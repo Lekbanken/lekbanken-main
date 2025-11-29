@@ -1,12 +1,12 @@
+'use client'
+
 import type { ReactNode } from "react";
+import { AuthProvider } from "@/lib/supabase/auth";
+import { TenantProvider } from "@/lib/context/TenantContext";
+import { useAuth } from "@/lib/supabase/auth";
 import { BottomNav } from "./components/bottom-nav";
 
-export const metadata = {
-  title: "Lekbanken – App",
-  description: "Mobil-first app med bottom navigation för lekledare.",
-};
-
-export default function AppShell({ children }: { children: ReactNode }) {
+function AppShellContent({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-950 to-black text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-4 pb-24 pt-10">
@@ -22,5 +22,17 @@ export default function AppShell({ children }: { children: ReactNode }) {
       </div>
       <BottomNav />
     </div>
+  );
+}
+
+export default function AppShell({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
+
+  return (
+    <AuthProvider>
+      <TenantProvider userId={user?.id || null}>
+        <AppShellContent>{children}</AppShellContent>
+      </TenantProvider>
+    </AuthProvider>
   );
 }

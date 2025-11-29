@@ -31,13 +31,25 @@ export default function SignupPage() {
 
       // Create organization tenant if requested
       if (createOrgTenant && organizationName) {
-        await createTenant(organizationName, 'organization')
+        try {
+          await createTenant(organizationName, 'organization')
+        } catch (tenantErr) {
+          console.error('Tenant creation failed:', tenantErr)
+          // Don't fail signup if tenant creation fails
+        }
       }
 
-      // Redirect to app dashboard
-      router.push('/app')
+      // Show success message and redirect to login
+      alert('Sign up successful! Please log in with your credentials.')
+      
+      // Redirect to login
+      setTimeout(() => {
+        router.push('/auth/login')
+      }, 1500)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Signup failed')
+      const errorMessage = err instanceof Error ? err.message : 'Signup failed'
+      setError(errorMessage)
+      console.error('Signup error:', err)
     } finally {
       setIsLoading(false)
     }

@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/supabase/auth';
+import { useTenant } from '@/lib/context/TenantContext';
 import {
   startGameSession,
   getActiveSession,
@@ -13,7 +15,6 @@ import {
   GameSession,
 } from '@/lib/services/sessionService';
 import ScoreBoard from '@/components/ScoreBoard';
-import Link from 'next/link';
 
 interface Game {
   id: string;
@@ -32,7 +33,8 @@ export default function GamePlayerPage() {
   const params = useParams();
   const gameId = params.gameId as string;
   const { user } = useAuth();
-  
+  const { currentTenant } = useTenant();
+
   const [game, setGame] = useState<Game | null>(null);
   const [session, setSession] = useState<GameSession | null>(null);
   const [stats, setStats] = useState<{
@@ -47,15 +49,14 @@ export default function GamePlayerPage() {
   const [score, setScore] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
 
-  // Load game and session
   useEffect(() => {
     const loadGame = async () => {
-      if (!user || !gameId) return;
+      if (!gameId) return;
 
       try {
         setIsLoading(true);
+        setError(null);
 
-        // Load game details
         const { data: gameData, error: gameError } = await supabase
           .from('games')
           .select('*')
@@ -64,21 +65,32 @@ export default function GamePlayerPage() {
 
         if (gameError || !gameData) {
           setError('Game not found');
+          setGame(null);
           return;
         }
 
         setGame(gameData);
 
-        // Check for active session
-        const activeSession = await getActiveSession(gameId, user.id);
-        if (activeSession) {
-          setSession(activeSession);
-          setGameStarted(true);
-        }
+        if (user) {
+          const activeSession = await getActiveSession(gameId, user.id);
+          if (activeSession) {
+            setSession(activeSession);
+            setGameStarted(true);
+            setScore(activeSession.score || 0);
+          } else {
+            setSession(null);
+            setGameStarted(false);
+            setScore(0);
+          }
 
-        // Load user stats for this game
-        const userStats = await getUserGameStats(user.id, gameId);
-        setStats(userStats);
+          const userStats = await getUserGameStats(user.id, gameId);
+          setStats(userStats);
+        } else {
+          setSession(null);
+          setGameStarted(false);
+          setStats(null);
+          setScore(0);
+        }
       } catch (err) {
         console.error('Error loading game:', err);
         setError('Error loading game details');
@@ -91,18 +103,24 @@ export default function GamePlayerPage() {
   }, [user, gameId]);
 
   const handleStartGame = async () => {
-    if (!user || !gameId) return;
+    if (!user) {
+      setError('You must be logged in to start a game.');
+      return;
+    }
+    if (!gameId) return;
 
     try {
       const newSession = await startGameSession({
         gameId,
         userId: user.id,
+        tenantId: currentTenant?.id,
       });
 
       if (newSession) {
         setSession(newSession);
         setGameStarted(true);
         setScore(0);
+        setError(null);
       }
     } catch (err) {
       console.error('Error starting game:', err);
@@ -111,14 +129,15 @@ export default function GamePlayerPage() {
   };
 
   const handleAddScore = async (points: number) => {
-    if (!session) return;
+    if (!session || !user || !game) return;
 
     try {
       await recordScore({
         sessionId: session.id,
-        gameId: game!.id,
-        userId: user!.id,
+        gameId: game.id,
+        userId: user.id,
         score: points,
+        tenantId: currentTenant?.id,
       });
 
       setScore((prev) => prev + points);
@@ -140,6 +159,21 @@ export default function GamePlayerPage() {
         setGameStarted(false);
         setScore(0);
         setSession(null);
+        setStats((prev) =>
+          prev
+            ? {
+                ...prev,
+                totalGames: prev.totalGames + 1,
+                totalScore: prev.totalScore + score,
+                bestScore: Math.max(prev.bestScore, score),
+                averageScore:
+                  prev.totalGames + 1 > 0
+                    ? Math.round((prev.totalScore + score) / (prev.totalGames + 1))
+                    : prev.averageScore,
+                totalTimeSeconds: prev.totalTimeSeconds,
+              }
+            : prev
+        );
       }
     } catch (err) {
       console.error('Error ending game:', err);
@@ -151,7 +185,7 @@ export default function GamePlayerPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
           <p className="mt-4 text-gray-600">Loading game...</p>
         </div>
       </div>
@@ -176,18 +210,16 @@ export default function GamePlayerPage() {
 
   return (
     <>
-      {/* Show scoreboard only when game is active */}
       {gameStarted && session && (
         <ScoreBoard
           sessionId={session.id}
-          initialScore={score}
+          score={score}
           gameTimeSeconds={game.time_estimate_min ? game.time_estimate_min * 60 : 0}
         />
       )}
 
       <div className={gameStarted ? 'pt-32 pb-8' : 'py-8'}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Game Header */}
           {!gameStarted && (
             <div className="mb-8">
               <Link href="/app/games" className="text-blue-500 hover:text-blue-700 mb-4 inline-block">
@@ -198,17 +230,13 @@ export default function GamePlayerPage() {
             </div>
           )}
 
-          {/* Game Instructions */}
           {!gameStarted && game.instructions && (
             <div className="bg-white rounded-lg shadow p-6 mb-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">How to Play</h2>
-              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {game.instructions}
-              </div>
+              <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">{game.instructions}</div>
             </div>
           )}
 
-          {/* Player Stats */}
           {!gameStarted && stats && (
             <div className="bg-blue-50 rounded-lg shadow p-6 mb-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Your Stats</h3>
@@ -233,14 +261,12 @@ export default function GamePlayerPage() {
             </div>
           )}
 
-          {/* Game Area */}
           {gameStarted && session ? (
             <div className="bg-white rounded-lg shadow p-8">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">{game.name}</h2>
                 <div className="text-6xl font-bold text-blue-600 mb-8">{score}</div>
 
-                {/* Game Controls */}
                 <div className="flex flex-wrap justify-center gap-3 mb-6">
                   <button
                     onClick={() => handleAddScore(10)}
@@ -272,12 +298,21 @@ export default function GamePlayerPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow p-8 text-center">
-              <button
-                onClick={handleStartGame}
-                className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg text-2xl transition"
-              >
-                ▶ Start Game
-              </button>
+              {user ? (
+                <button
+                  onClick={handleStartGame}
+                  className="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-lg text-2xl transition"
+                >
+                  Start Game
+                </button>
+              ) : (
+                <Link
+                  href={`/auth/login?redirect=/app/play/${game.id}`}
+                  className="inline-block bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-lg text-2xl transition"
+                >
+                  Sign in to play
+                </Link>
+              )}
             </div>
           )}
         </div>

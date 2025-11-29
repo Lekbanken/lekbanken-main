@@ -4,20 +4,20 @@ import { useEffect, useState } from 'react';
 
 interface ScoreBoardProps {
   sessionId: string;
-  initialScore?: number;
+  score?: number;
   gameTimeSeconds?: number;
 }
 
 export default function ScoreBoard({
   sessionId,
-  initialScore = 0,
+  score = 0,
   gameTimeSeconds = 0,
 }: ScoreBoardProps) {
-  const [score] = useState(initialScore);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Handle elapsed time
   useEffect(() => {
+    setElapsedSeconds(0);
     if (gameTimeSeconds === 0) return;
 
     const interval = setInterval(() => {

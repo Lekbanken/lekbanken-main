@@ -51,7 +51,11 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        setIsLoading(false);
+        setStats(null);
+        return;
+      }
 
       try {
         setIsLoading(true);

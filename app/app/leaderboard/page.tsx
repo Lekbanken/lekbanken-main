@@ -9,6 +9,7 @@ import {
   getTenantLeaderboard,
   getUserGlobalRank,
   getUserGameRank,
+  getUserTenantRank,
   getUserGlobalStats,
   LeaderboardEntry,
 } from '@/lib/services/leaderboardService';
@@ -76,7 +77,7 @@ export default function LeaderboardPage() {
           leaderboardEntries = await getTenantLeaderboard(currentTenant.id, ITEMS_PER_PAGE, offset);
 
           if (user) {
-            rank = await getUserGameRank(user.id, currentTenant.id);
+            rank = await getUserTenantRank(user.id, currentTenant.id);
           }
         } else {
           // Global leaderboard

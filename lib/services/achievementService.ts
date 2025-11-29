@@ -142,15 +142,19 @@ export async function getUserAchievements(userId: string): Promise<UserAchieveme
       return [];
     }
 
-    return (data || []).map((item) => ({
-      id: item.id,
-      achievement_id: item.achievement_id,
-      user_id: item.user_id,
-      tenant_id: item.tenant_id,
-      unlocked_at: item.unlocked_at,
-      created_at: item.created_at,
-      achievement: (item.achievements as unknown as Achievement[])?.[0],
-    }));
+    return (data || []).map((item) => {
+      const achievement = item.achievements as unknown as Achievement | null;
+
+      return {
+        id: item.id,
+        achievement_id: item.achievement_id,
+        user_id: item.user_id,
+        tenant_id: item.tenant_id,
+        unlocked_at: item.unlocked_at,
+        created_at: item.created_at,
+        achievement: achievement || undefined,
+      };
+    });
   } catch (err) {
     console.error('Error in getUserAchievements:', err);
     return [];

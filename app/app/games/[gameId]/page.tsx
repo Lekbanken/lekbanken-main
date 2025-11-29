@@ -209,9 +209,12 @@ export default function GameDetailPage() {
           {/* Sidebar */}
           <div className="lg:col-span-1">
             {/* Play Button */}
-            <button className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition mb-6 shadow-lg">
-              ▶ Play Game
-            </button>
+            <Link
+              href={`/app/play/${game.id}`}
+              className="block text-center w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg text-lg transition mb-6 shadow-lg"
+            >
+              Play Game
+            </Link>
 
             {/* Game Info Card */}
             <div className="bg-white rounded-lg shadow p-6 mb-6">

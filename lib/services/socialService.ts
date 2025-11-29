@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabaseAdmin } from '@/lib/supabase/server';
 
 // Types
@@ -51,8 +52,8 @@ export async function sendFriendRequest(
   recipientId: string
 ): Promise<FriendRequest | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('friend_requests')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('friend_requests' as any) as any)
       .insert({
         requester_id: requesterId,
         recipient_id: recipientId,
@@ -66,64 +67,64 @@ export async function sendFriendRequest(
       return null;
     }
 
-    return data;
+    return data as FriendRequest;
   } catch (err) {
     console.error('Error sending friend request:', err);
     return null;
   }
 }
 
-export async function acceptFriendRequest(requestId: string): Promise<boolean> {
+export async function acceptFriendRequest(requestId: string): Promise<FriendRequest | null> {
   try {
-    const { data: request, error: requestError } = await supabaseAdmin
-      .from('friend_requests')
-      .select('requester_id, recipient_id')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: request, error: getError } = await (supabaseAdmin.from('friend_requests' as any) as any)
+      .select('*')
       .eq('id', requestId)
       .single();
 
-    if (requestError) {
-      console.error('Error fetching friend request:', requestError);
-      return false;
+    if (getError || !request) {
+      console.error('Error getting friend request:', getError);
+      return null;
     }
 
-    // Create friendship
-    const { error: friendError } = await supabaseAdmin
-      .from('friends')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: insertError } = await (supabaseAdmin.from('friends' as any) as any)
       .insert({
         user_id_1: [request.requester_id, request.recipient_id].sort()[0],
         user_id_2: [request.requester_id, request.recipient_id].sort()[1],
       });
 
-    if (friendError) {
-      console.error('Error creating friendship:', friendError);
-      return false;
+    if (insertError) {
+      console.error('Error creating friendship:', insertError);
+      return null;
     }
 
-    // Update friend request status
-    const { error: updateError } = await supabaseAdmin
-      .from('friend_requests')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('friend_requests' as any) as any)
       .update({
         status: 'accepted',
         responded_at: new Date().toISOString(),
       })
-      .eq('id', requestId);
+      .eq('id', requestId)
+      .select()
+      .single();
 
-    if (updateError) {
-      console.error('Error updating friend request:', updateError);
-      return false;
+    if (error) {
+      console.error('Error accepting friend request:', error);
+      return null;
     }
 
-    return true;
+    return data as FriendRequest;
   } catch (err) {
     console.error('Error accepting friend request:', err);
-    return false;
+    return null;
   }
 }
 
 export async function rejectFriendRequest(requestId: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
-      .from('friend_requests')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabaseAdmin.from('friend_requests' as any) as any)
       .update({
         status: 'rejected',
         responded_at: new Date().toISOString(),
@@ -146,8 +147,8 @@ export async function removeFriend(userId1: string, userId2: string): Promise<bo
   try {
     const sortedIds = [userId1, userId2].sort();
 
-    const { error } = await supabaseAdmin
-      .from('friends')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabaseAdmin.from('friends' as any) as any)
       .delete()
       .eq('user_id_1', sortedIds[0])
       .eq('user_id_2', sortedIds[1]);
@@ -166,8 +167,8 @@ export async function removeFriend(userId1: string, userId2: string): Promise<bo
 
 export async function getFriends(userId: string): Promise<Friend[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('friends')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('friends' as any) as any)
       .select('*')
       .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`);
 
@@ -176,7 +177,7 @@ export async function getFriends(userId: string): Promise<Friend[] | null> {
       return null;
     }
 
-    return data || [];
+    return (data as Friend[]) || [];
   } catch (err) {
     console.error('Error fetching friends:', err);
     return null;
@@ -188,7 +189,8 @@ export async function getFriendRequests(
   filter: 'received' | 'sent' | 'all' = 'all'
 ): Promise<FriendRequest[] | null> {
   try {
-    let query = supabaseAdmin.from('friend_requests').select('*');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let query = (supabaseAdmin.from('friend_requests' as any) as any).select('*');
 
     if (filter === 'received') {
       query = query.eq('recipient_id', userId).eq('status', 'pending');
@@ -198,6 +200,7 @@ export async function getFriendRequests(
       query = query.or(`requester_id.eq.${userId},recipient_id.eq.${userId}`);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data, error } = await query;
 
     if (error) {
@@ -205,7 +208,7 @@ export async function getFriendRequests(
       return null;
     }
 
-    return data || [];
+    return (data as FriendRequest[]) || [];
   } catch (err) {
     console.error('Error fetching friend requests:', err);
     return null;
@@ -220,8 +223,8 @@ export async function getSocialLeaderboard(
   offset = 0
 ): Promise<SocialLeaderboardEntry[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('social_leaderboards')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('social_leaderboards' as any) as any)
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('game_id', gameId)
@@ -233,7 +236,7 @@ export async function getSocialLeaderboard(
       return null;
     }
 
-    return data || [];
+    return (data as SocialLeaderboardEntry[]) || [];
   } catch (err) {
     console.error('Error fetching leaderboard:', err);
     return null;
@@ -259,8 +262,8 @@ export async function getFriendsLeaderboard(
       return [];
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('social_leaderboards')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('social_leaderboards' as any) as any)
       .select('*')
       .eq('game_id', gameId)
       .in('user_id', friendIds)
@@ -272,7 +275,7 @@ export async function getFriendsLeaderboard(
       return null;
     }
 
-    return data || [];
+    return (data as SocialLeaderboardEntry[]) || [];
   } catch (err) {
     console.error('Error fetching friends leaderboard:', err);
     return null;
@@ -293,12 +296,10 @@ export async function updateLeaderboardEntry(
   }
 ): Promise<SocialLeaderboardEntry | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('social_leaderboards')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('social_leaderboards' as any) as any)
       .upsert(
         {
-          tenant_id: tenantId,
-          user_id: userId,
           game_id: gameId,
           score: params.score || 0,
           total_plays: params.totalPlays,
@@ -310,6 +311,8 @@ export async function updateLeaderboardEntry(
         },
         { onConflict: 'tenant_id,user_id,game_id' }
       )
+      .eq('tenant_id', tenantId)
+      .eq('user_id', userId)
       .select()
       .single();
 
@@ -318,7 +321,7 @@ export async function updateLeaderboardEntry(
       return null;
     }
 
-    return data;
+    return data as SocialLeaderboardEntry;
   } catch (err) {
     console.error('Error updating leaderboard entry:', err);
     return null;
@@ -326,14 +329,15 @@ export async function updateLeaderboardEntry(
 }
 
 // Multiplayer Sessions
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function createMultiplayerSession(
   gameId: string,
   userId: string,
   maxPlayers = 2
 ): Promise<MultiplayerSession | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('multiplayer_sessions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('multiplayer_sessions' as any) as any)
       .insert({
         game_id: gameId,
         created_by_user_id: userId,
@@ -350,43 +354,47 @@ export async function createMultiplayerSession(
     }
 
     // Add creator as participant
-    await supabaseAdmin.from('multiplayer_participants').insert({
-      session_id: data.id,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabaseAdmin.from('multiplayer_participants' as any) as any).insert({
+      session_id: (data as any).id,
       user_id: userId,
     });
 
-    return data;
+    return data as MultiplayerSession;
   } catch (err) {
     console.error('Error creating multiplayer session:', err);
     return null;
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function joinMultiplayerSession(
   sessionId: string,
   userId: string
 ): Promise<boolean> {
   try {
     // Check if session is full
-    const { data: session, error: sessionError } = await supabaseAdmin
-      .from('multiplayer_sessions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: session, error: sessionError } = await (supabaseAdmin
+      .from('multiplayer_sessions' as any) as any)
       .select('current_players, max_players, status')
       .eq('id', sessionId)
       .single();
 
-    if (sessionError || !session || session.status !== 'waiting') {
+    if (sessionError || !session || (session as any).status !== 'waiting') {
       console.error('Session not available');
       return false;
     }
 
-    if (session.current_players >= session.max_players) {
+    if ((session as any).current_players >= (session as any).max_players) {
       console.error('Session is full');
       return false;
     }
 
     // Add participant
-    const { error: participantError } = await supabaseAdmin
-      .from('multiplayer_participants')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: participantError } = await (supabaseAdmin
+      .from('multiplayer_participants' as any) as any)
       .insert({
         session_id: sessionId,
         user_id: userId,
@@ -398,11 +406,14 @@ export async function joinMultiplayerSession(
     }
 
     // Update session player count
-    await supabaseAdmin
-      .from('multiplayer_sessions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (supabaseAdmin.from('multiplayer_sessions' as any) as any)
       .update({
-        current_players: session.current_players + 1,
-        status: session.current_players + 1 === session.max_players ? 'in_progress' : 'waiting',
+        current_players: (session as any).current_players + 1,
+        status:
+          (session as any).current_players + 1 === (session as any).max_players
+            ? 'in_progress'
+            : 'waiting',
       })
       .eq('id', sessionId);
 
@@ -418,8 +429,8 @@ export async function endMultiplayerSession(
   winnerUserId?: string
 ): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
-      .from('multiplayer_sessions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabaseAdmin.from('multiplayer_sessions' as any) as any)
       .update({
         status: 'completed',
         ended_at: new Date().toISOString(),
@@ -441,8 +452,8 @@ export async function endMultiplayerSession(
 
 export async function getMultiplayerSession(sessionId: string): Promise<MultiplayerSession | null> {
   try {
-    const { data, error } = await supabaseAdmin
-      .from('multiplayer_sessions')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabaseAdmin.from('multiplayer_sessions' as any) as any)
       .select('*')
       .eq('id', sessionId)
       .single();
@@ -452,7 +463,7 @@ export async function getMultiplayerSession(sessionId: string): Promise<Multipla
       return null;
     }
 
-    return data;
+    return data as MultiplayerSession;
   } catch (err) {
     console.error('Error fetching multiplayer session:', err);
     return null;

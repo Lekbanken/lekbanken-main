@@ -454,7 +454,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 -- Get all tenant IDs user is member of
 CREATE OR REPLACE FUNCTION get_user_tenant_ids()
 RETURNS uuid[] AS $$
-  SELECT array_agg(tenant_id)
+  SELECT COALESCE(array_agg(tenant_id), ARRAY[]::uuid[])
   FROM user_tenant_memberships
   WHERE user_id = auth.uid();
 $$ LANGUAGE sql SECURITY DEFINER;

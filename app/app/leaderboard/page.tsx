@@ -1,21 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import {
-  getGlobalLeaderboard,
-  getGameLeaderboard,
-  getTenantLeaderboard,
-  getUserGlobalRank,
-  getUserGameRank,
-  getUserTenantRank,
-  getUserGlobalStats,
-  LeaderboardEntry,
-} from '@/lib/services/leaderboardService';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
-import { supabase } from '@/lib/supabase/client';
+import { getSocialLeaderboard, getFriendsLeaderboard, SocialLeaderboardEntry } from '@/lib/services/socialService';
+import { supabaseAdmin } from '@/lib/supabase/server';
 
 interface Game {
   id: string;
@@ -23,249 +12,188 @@ interface Game {
 }
 
 export default function LeaderboardPage() {
-  const searchParams = useSearchParams();
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
-  const gameId = searchParams.get('gameId');
-  const leaderboardType = (searchParams.get('type') || 'global') as 'global' | 'game' | 'tenant';
-
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [game, setGame] = useState<Game | null>(null);
-  const [userStats, setUserStats] = useState<{
-    totalScore: number;
-    totalSessions: number;
-    averageScore: number;
-    bestScore: number;
-    rank: number | null;
-  } | null>(null);
-  const [userRank, setUserRank] = useState<number | null>(null);
+  const [games, setGames] = useState<Game[]>([]);
+  const [selectedGameId, setSelectedGameId] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<'global' | 'friends'>('global');
+  const [globalLeaderboard, setGlobalLeaderboard] = useState<SocialLeaderboardEntry[]>([]);
+  const [friendsLeaderboard, setFriendsLeaderboard] = useState<SocialLeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  const ITEMS_PER_PAGE = 50;
-
+  // Load games on mount
   useEffect(() => {
-    const loadLeaderboard = async () => {
+    const loadGames = async () => {
       try {
-        setIsLoading(true);
+        const { data, error } = await supabaseAdmin
+          .from('games')
+          .select('id, name')
+          .eq('tenant_id', currentTenant?.id || '')
+          .order('name');
 
-        let leaderboardEntries: LeaderboardEntry[] = [];
-        let rank: number | null = null;
-
-        // Load leaderboard based on type
-        if (leaderboardType === 'game' && gameId) {
-          // Load game details
-          const { data: gameData } = await supabase
-            .from('games')
-            .select('id, name')
-            .eq('id', gameId)
-            .single();
-
-          if (gameData) {
-            setGame(gameData);
-          }
-
-          const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-          leaderboardEntries = await getGameLeaderboard(gameId, ITEMS_PER_PAGE, offset);
-
-          if (user) {
-            rank = await getUserGameRank(user.id, gameId);
-          }
-        } else if (leaderboardType === 'tenant' && currentTenant?.id) {
-          const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-          leaderboardEntries = await getTenantLeaderboard(currentTenant.id, ITEMS_PER_PAGE, offset);
-
-          if (user) {
-            rank = await getUserTenantRank(user.id, currentTenant.id);
-          }
-        } else {
-          // Global leaderboard
-          const offset = (currentPage - 1) * ITEMS_PER_PAGE;
-          leaderboardEntries = await getGlobalLeaderboard(ITEMS_PER_PAGE, offset);
-
-          if (user) {
-            rank = await getUserGlobalRank(user.id);
-            const stats = await getUserGlobalStats(user.id);
-            setUserStats(stats);
-          }
+        if (error) {
+          console.error('Error loading games:', error);
+          return;
         }
 
-        setEntries(leaderboardEntries);
-        setUserRank(rank);
+        setGames(data || []);
+        if (data && data.length > 0) {
+          setSelectedGameId(data[0].id);
+        }
       } catch (err) {
-        console.error('Error loading leaderboard:', err);
-      } finally {
-        setIsLoading(false);
+        console.error('Error loading games:', err);
       }
     };
 
+    if (currentTenant?.id) {
+      loadGames();
+    }
+  }, [currentTenant?.id]);
+
+  // Load leaderboard data when game or tab changes
+  useEffect(() => {
+    if (!selectedGameId || !currentTenant?.id || !user?.id) return;
+
+    const loadLeaderboard = async () => {
+      setIsLoading(true);
+      try {
+        if (activeTab === 'global') {
+          const data = await getSocialLeaderboard(currentTenant.id, selectedGameId, 100, 0);
+          setGlobalLeaderboard(data || []);
+        } else {
+          const data = await getFriendsLeaderboard(user.id, selectedGameId);
+          setFriendsLeaderboard(data || []);
+        }
+      } catch (err) {
+        console.error('Error loading leaderboard:', err);
+      }
+      setIsLoading(false);
+    };
+
     loadLeaderboard();
-  }, [leaderboardType, gameId, currentTenant?.id, user, currentPage]);
+  }, [selectedGameId, activeTab, currentTenant?.id, user?.id]);
 
-  const getRankBadge = (rank: number) => {
-    if (rank === 1) return '🥇';
-    if (rank === 2) return '🥈';
-    if (rank === 3) return '🥉';
-    return `#${rank}`;
-  };
-
-  const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(1, prev - 1));
-  };
-
-  const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
-  };
+  const currentLeaderboard = activeTab === 'global' ? globalLeaderboard : friendsLeaderboard;
+  const isTopTen = (rank: number) => rank <= 10;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/app/games" className="text-blue-500 hover:text-blue-700 mb-4 inline-block">
-            ← Back to Games
-          </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Leaderboard</h1>
-          <p className="text-lg text-gray-600">
-            {leaderboardType === 'game' && game
-              ? `Top players in ${game.name}`
-              : leaderboardType === 'tenant'
-                ? 'Tenant leaderboard'
-                : 'Global leaderboard'}
-          </p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-2">Leaderboard</h1>
+          <p className="text-slate-600">Se hur du står sig mot andra spelare</p>
         </div>
 
-        {/* Leaderboard Type Tabs */}
-        <div className="flex gap-4 mb-8 border-b border-gray-200">
-          <Link
-            href="/app/leaderboard"
-            className={`py-2 px-4 font-semibold transition ${
-              leaderboardType === 'global'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Global
-          </Link>
-          {currentTenant && (
-            <Link
-              href={`/app/leaderboard?type=tenant`}
-              className={`py-2 px-4 font-semibold transition ${
-                leaderboardType === 'tenant'
-                  ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+        {/* Game Selector */}
+        {games.length > 0 && (
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Select Game</label>
+            <select
+              value={selectedGameId}
+              onChange={(e) => setSelectedGameId(e.target.value)}
+              className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
             >
-              {currentTenant.name}
-            </Link>
-          )}
-        </div>
-
-        {/* User's Stats Card */}
-        {user && userStats && leaderboardType === 'global' && (
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 className="text-xl font-bold mb-4">Your Stats</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-              <div>
-                <p className="text-sm opacity-90">Rank</p>
-                <p className="text-3xl font-bold">
-                  {userRank ? `#${userRank}` : 'N/A'}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Total Score</p>
-                <p className="text-3xl font-bold">{userStats.totalScore}</p>
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Games Played</p>
-                <p className="text-3xl font-bold">{userStats.totalSessions}</p>
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Average</p>
-                <p className="text-3xl font-bold">{userStats.averageScore}</p>
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Best</p>
-                <p className="text-3xl font-bold">{userStats.bestScore}</p>
-              </div>
-            </div>
+              {games.map((game) => (
+                <option key={game.id} value={game.id}>
+                  {game.name}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 
-        {/* Leaderboard Table */}
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            <p className="mt-4 text-gray-600">Loading leaderboard...</p>
-          </div>
-        ) : entries.length > 0 ? (
-          <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-100 border-b-2 border-gray-200">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Rank</th>
-                    <th className="px-6 py-4 text-left text-sm font-bold text-gray-900">Player</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">Score</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">Games</th>
-                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">Average</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {entries.map((entry) => (
-                    <tr
-                      key={entry.userId}
-                      className={`hover:bg-gray-50 transition ${
-                        user?.id === entry.userId ? 'bg-blue-50' : ''
-                      }`}
-                    >
-                      <td className="px-6 py-4 text-2xl font-bold">
-                        {getRankBadge(entry.rank)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <p className="font-semibold text-gray-900">{entry.userName}</p>
-                        {user?.id === entry.userId && (
-                          <p className="text-sm text-blue-600">You</p>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 text-right text-lg font-bold text-gray-900">
-                        {entry.totalScore.toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4 text-right text-gray-600">
-                        {entry.totalSessions}
-                      </td>
-                      <td className="px-6 py-4 text-right text-gray-600">
-                        {Math.round(entry.averageScore)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+        {/* Tabs */}
+        <div className="flex gap-2 mb-6 bg-white rounded-lg p-2 shadow">
+          {(['global', 'friends'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
+                activeTab === tab
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {tab === 'global' && 'Global Rankings'}
+              {tab === 'friends' && 'Friends Rankings'}
+            </button>
+          ))}
+        </div>
 
-            {/* Pagination */}
-            <div className="flex items-center justify-center gap-4 mt-8">
-              <button
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-                className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                Previous
-              </button>
-              <span className="text-gray-600 font-semibold">Page {currentPage}</span>
-              <button
-                onClick={handleNextPage}
-                disabled={entries.length < ITEMS_PER_PAGE}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
-              >
-                Next
-              </button>
+        {/* Leaderboard */}
+        <div className="space-y-2">
+          {isLoading ? (
+            <div className="bg-white rounded-lg shadow p-12 text-center">
+              <p className="text-slate-600">Laddar leaderboard...</p>
             </div>
-          </>
-        ) : (
-          <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-600 text-lg">No leaderboard data yet</p>
+          ) : currentLeaderboard.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-12 text-center">
+              <p className="text-slate-600">
+                {activeTab === 'global'
+                  ? 'Inga spelare än'
+                  : 'Du har inga vänner än'}
+              </p>
+            </div>
+          ) : (
+            currentLeaderboard.map((entry, index) => {
+              const rank = index + 1;
+              const medalEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank <= 10 ? '⭐' : '';
+
+              return (
+                <div
+                  key={entry.id}
+                  className={`rounded-lg shadow p-4 flex justify-between items-center transition-colors ${
+                    isTopTen(rank)
+                      ? 'bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200'
+                      : 'bg-white hover:bg-slate-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-200 font-bold text-slate-700">
+                      {medalEmoji || rank}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-900">{entry.user_id}</p>
+                      <div className="flex gap-4 text-xs text-slate-600">
+                        <span>Score: {entry.score}</span>
+                        <span>Plays: {entry.total_plays}</span>
+                        <span>Best: {entry.best_score || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-medium text-slate-700">Avg: {(entry.avg_score || 0).toFixed(1)}</p>
+                    <p className="text-xs text-slate-500">{entry.achievements_unlocked} achievements</p>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Stats Summary */}
+        {currentLeaderboard.length > 0 && (
+          <div className="mt-8 grid grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 text-center">
+              <p className="text-slate-600 text-sm mb-1">Total Players</p>
+              <p className="text-2xl font-bold text-blue-600">{currentLeaderboard.length}</p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 text-center">
+              <p className="text-slate-600 text-sm mb-1">Average Score</p>
+              <p className="text-2xl font-bold text-green-600">
+                {(
+                  currentLeaderboard.reduce((sum: number, e: SocialLeaderboardEntry) => sum + e.score, 0) / currentLeaderboard.length
+                ).toFixed(0)}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 text-center">
+              <p className="text-slate-600 text-sm mb-1">Top Score</p>
+              <p className="text-2xl font-bold text-purple-600">
+                {currentLeaderboard[0]?.score || 0}
+              </p>
+            </div>
           </div>
         )}
       </div>

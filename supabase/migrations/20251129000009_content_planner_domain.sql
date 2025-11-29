@@ -340,3 +340,4 @@ CREATE POLICY "content_analytics_update" ON content_analytics
         AND tenant_id = content_analytics.tenant_id
     )
   );
+

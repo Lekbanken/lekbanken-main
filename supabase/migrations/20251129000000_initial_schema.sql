@@ -453,14 +453,11 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Get all tenant IDs user is member of
 CREATE OR REPLACE FUNCTION get_user_tenant_ids()
-RETURNS SETOF uuid AS $$
-BEGIN
-  RETURN QUERY
-  SELECT tenant_id
+RETURNS uuid[] AS $$
+  SELECT array_agg(tenant_id)
   FROM user_tenant_memberships
   WHERE user_id = auth.uid();
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE sql SECURITY DEFINER;
 
 -- Check if user has specific role in tenant
 CREATE OR REPLACE FUNCTION has_tenant_role(tenant_uuid uuid, required_role text)
@@ -484,7 +481,7 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE POLICY "tenant_members_can_select"
 ON tenants FOR SELECT
 USING (
-  id IN (SELECT get_user_tenant_ids())
+  id = ANY(get_user_tenant_ids())
 );
 
 -- USERS: Users can select users in their tenants
@@ -494,7 +491,7 @@ USING (
   id = auth.uid()
   OR id IN (
     SELECT user_id FROM user_tenant_memberships
-    WHERE tenant_id IN (SELECT get_user_tenant_ids())
+    WHERE tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -532,7 +529,7 @@ USING (auth.role() = 'authenticated');
 CREATE POLICY "users_can_select_games"
 ON games FOR SELECT
 USING (
-  owner_tenant_id IN (SELECT get_user_tenant_ids())
+  owner_tenant_id = ANY(get_user_tenant_ids())
   OR (owner_tenant_id IS NULL AND status = 'published')
   OR (owner_tenant_id IS NULL)
 );
@@ -541,21 +538,21 @@ USING (
 CREATE POLICY "tenant_members_can_insert_games"
 ON games FOR INSERT
 WITH CHECK (
-  owner_tenant_id IN (SELECT get_user_tenant_ids())
+  owner_tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- GAMES: Tenant members can update games owned by their tenant
 CREATE POLICY "tenant_members_can_update_games"
 ON games FOR UPDATE
 USING (
-  owner_tenant_id IN (SELECT get_user_tenant_ids())
+  owner_tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- GAMES: Tenant admins can delete games owned by their tenant
 CREATE POLICY "tenant_admins_can_delete_games"
 ON games FOR DELETE
 USING (
-  owner_tenant_id IN (SELECT get_user_tenant_ids())
+  owner_tenant_id = ANY(get_user_tenant_ids())
   AND (has_tenant_role(owner_tenant_id, 'admin') OR has_tenant_role(owner_tenant_id, 'owner'))
 );
 
@@ -565,7 +562,7 @@ ON game_secondary_purposes FOR SELECT
 USING (
   game_id IN (
     SELECT id FROM games
-    WHERE owner_tenant_id IN (SELECT get_user_tenant_ids())
+    WHERE owner_tenant_id = ANY(get_user_tenant_ids())
        OR (owner_tenant_id IS NULL)
   )
 );
@@ -576,7 +573,7 @@ ON media FOR SELECT
 USING (
   game_id IN (
     SELECT id FROM games
-    WHERE owner_tenant_id IN (SELECT get_user_tenant_ids())
+    WHERE owner_tenant_id = ANY(get_user_tenant_ids())
        OR owner_tenant_id IS NULL
   )
   OR game_id IS NULL
@@ -588,7 +585,7 @@ ON media FOR INSERT
 WITH CHECK (
   game_id IN (
     SELECT id FROM games
-    WHERE owner_tenant_id IN (SELECT get_user_tenant_ids())
+    WHERE owner_tenant_id = ANY(get_user_tenant_ids())
   )
   OR game_id IS NULL
 );
@@ -598,7 +595,7 @@ CREATE POLICY "users_can_select_plans"
 ON plans FOR SELECT
 USING (
   owner_user_id = auth.uid()
-  OR (visibility = 'tenant' AND owner_tenant_id IN (SELECT get_user_tenant_ids()))
+  OR (visibility = 'tenant' AND owner_tenant_id = ANY(get_user_tenant_ids()))
   OR visibility = 'public'
 );
 
@@ -609,7 +606,7 @@ WITH CHECK (
   owner_user_id = auth.uid()
   AND (
     owner_tenant_id IS NULL
-    OR owner_tenant_id IN (SELECT get_user_tenant_ids())
+    OR owner_tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -630,7 +627,7 @@ USING (
   plan_id IN (
     SELECT id FROM plans
     WHERE owner_user_id = auth.uid()
-       OR (visibility = 'tenant' AND owner_tenant_id IN (SELECT get_user_tenant_ids()))
+       OR (visibility = 'tenant' AND owner_tenant_id = ANY(get_user_tenant_ids()))
        OR visibility = 'public'
   )
 );
@@ -651,7 +648,7 @@ USING (
   plan_id IN (
     SELECT id FROM plans
     WHERE owner_user_id = auth.uid()
-       OR (visibility = 'tenant' AND owner_tenant_id IN (SELECT get_user_tenant_ids()))
+       OR (visibility = 'tenant' AND owner_tenant_id = ANY(get_user_tenant_ids()))
        OR visibility = 'public'
   )
 );
@@ -665,7 +662,7 @@ USING (auth.role() = 'authenticated' AND is_active = true);
 CREATE POLICY "tenant_members_can_select_subscriptions"
 ON tenant_subscriptions FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- PRIVATE_SUBSCRIPTIONS: Users can select their own
@@ -677,7 +674,7 @@ USING (user_id = auth.uid());
 CREATE POLICY "tenant_members_can_select_seat_assignments"
 ON tenant_seat_assignments FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
   OR user_id = auth.uid()
 );
 
@@ -685,7 +682,7 @@ USING (
 CREATE POLICY "tenant_members_can_select_invoices"
 ON invoices FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- PAYMENTS: Tenant members can select
@@ -694,7 +691,7 @@ ON payments FOR SELECT
 USING (
   invoice_id IN (
     SELECT id FROM invoices
-    WHERE tenant_id IN (SELECT get_user_tenant_ids())
+    WHERE tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -703,7 +700,7 @@ CREATE POLICY "users_can_select_own_search_logs"
 ON browse_search_logs FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- =========================================
@@ -781,3 +778,4 @@ COMMENT ON TABLE user_tenant_memberships IS 'Many-to-many relationship between u
 COMMENT ON TABLE games IS 'Core game/activity database';
 COMMENT ON TABLE plans IS 'User-created plans combining multiple games';
 COMMENT ON TABLE browse_search_logs IS 'Logs for search analytics and recommendations';
+

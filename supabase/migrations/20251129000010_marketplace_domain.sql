@@ -275,3 +275,4 @@ CREATE POLICY "promo_codes_manage" ON promo_codes
         AND role = 'admin'
     )
   );
+

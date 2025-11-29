@@ -226,3 +226,4 @@ CREATE POLICY "Service can manage trial usage"
 CREATE POLICY "Service can update trial usage"
   ON public.trial_usage FOR UPDATE
   USING (true);
+

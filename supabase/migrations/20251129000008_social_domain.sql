@@ -170,3 +170,4 @@ CREATE POLICY "Users can join sessions"
 CREATE POLICY "Service can update participant data"
   ON public.multiplayer_participants FOR UPDATE
   USING (true);
+

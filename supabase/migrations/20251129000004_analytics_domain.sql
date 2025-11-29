@@ -197,7 +197,7 @@ WITH CHECK (
 CREATE POLICY "admins_can_select_page_views"
 ON page_views FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- SESSION_ANALYTICS: Users can insert their own sessions
@@ -212,7 +212,7 @@ WITH CHECK (
 CREATE POLICY "admins_can_select_sessions"
 ON session_analytics FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- FEATURE_USAGE: Users can insert their own feature usage
@@ -227,14 +227,14 @@ WITH CHECK (
 CREATE POLICY "admins_can_select_feature_usage"
 ON feature_usage FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- ANALYTICS_TIMESERIES: Admins can select time series
 CREATE POLICY "admins_can_select_timeseries"
 ON analytics_timeseries FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- ANALYTICS_TIMESERIES: System can insert time series
@@ -254,7 +254,7 @@ WITH CHECK (
 CREATE POLICY "admins_can_select_funnels"
 ON funnel_analytics FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- ERROR_TRACKING: Users can insert errors
@@ -269,7 +269,7 @@ WITH CHECK (
 CREATE POLICY "admins_can_select_errors"
 ON error_tracking FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- =========================================
@@ -282,3 +282,4 @@ COMMENT ON TABLE feature_usage IS 'Tracks feature adoption, action types, and pe
 COMMENT ON TABLE analytics_timeseries IS 'Aggregated time-series metrics for dashboard display';
 COMMENT ON TABLE funnel_analytics IS 'Funnel conversion tracking with step-by-step progression';
 COMMENT ON TABLE error_tracking IS 'Error logging and tracking with aggregation';
+

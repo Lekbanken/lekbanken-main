@@ -235,3 +235,4 @@ create policy "Moderators can view analytics"
       and role in ('admin', 'moderator')
     )
   );
+

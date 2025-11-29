@@ -252,3 +252,4 @@ CREATE POLICY content_preferences_user_select ON content_preferences
 
 CREATE POLICY content_preferences_user_crud ON content_preferences
   FOR ALL USING (user_id = auth.uid());
+

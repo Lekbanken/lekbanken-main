@@ -97,3 +97,4 @@ INSERT INTO public.billing_plans (
   'dedicated',
   true
 ) ON CONFLICT (slug) DO NOTHING;
+

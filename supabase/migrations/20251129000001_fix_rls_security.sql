@@ -66,3 +66,4 @@ GRANT EXECUTE ON FUNCTION public.has_tenant_role TO authenticated;
 REVOKE EXECUTE ON FUNCTION public.is_tenant_member FROM public;
 REVOKE EXECUTE ON FUNCTION public.get_user_tenant_ids FROM public;
 REVOKE EXECUTE ON FUNCTION public.has_tenant_role FROM public;
+

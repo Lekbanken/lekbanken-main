@@ -152,7 +152,7 @@ CREATE POLICY "users_can_select_own_game_sessions"
 ON game_sessions FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- GAME_SESSIONS: Users can insert their own sessions
@@ -162,7 +162,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND (
     tenant_id IS NULL
-    OR tenant_id IN (SELECT get_user_tenant_ids())
+    OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -176,7 +176,7 @@ CREATE POLICY "users_can_select_own_game_scores"
 ON game_scores FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- GAME_SCORES: Users can insert scores for their own sessions
@@ -186,7 +186,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND (
     tenant_id IS NULL
-    OR tenant_id IN (SELECT get_user_tenant_ids())
+    OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -195,7 +195,7 @@ CREATE POLICY "users_can_select_leaderboards"
 ON leaderboards FOR SELECT
 USING (
   leaderboard_type = 'global'
-  OR (leaderboard_type = 'tenant' AND tenant_id IN (SELECT get_user_tenant_ids()))
+  OR (leaderboard_type = 'tenant' AND tenant_id = ANY(get_user_tenant_ids()))
   OR (leaderboard_type = 'personal' AND user_id = auth.uid())
 );
 
@@ -209,7 +209,7 @@ CREATE POLICY "users_can_select_own_achievements"
 ON user_achievements FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- USER_ACHIEVEMENTS: System can insert (via triggers)
@@ -239,3 +239,4 @@ COMMENT ON TABLE game_scores IS 'Score events during game sessions';
 COMMENT ON TABLE leaderboards IS 'Aggregated leaderboard data for rankings';
 COMMENT ON TABLE achievements IS 'Badge definitions for users';
 COMMENT ON TABLE user_achievements IS 'User unlocked achievements';
+

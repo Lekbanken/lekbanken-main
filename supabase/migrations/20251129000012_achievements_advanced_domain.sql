@@ -204,3 +204,4 @@ create policy "Users can view achievement leaderboards"
       and tenant_id = achievement_leaderboards.tenant_id
     )
   );
+

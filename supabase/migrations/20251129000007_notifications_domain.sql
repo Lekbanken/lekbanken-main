@@ -132,3 +132,4 @@ CREATE POLICY "Admins can view notification logs"
       WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
     )
   );
+

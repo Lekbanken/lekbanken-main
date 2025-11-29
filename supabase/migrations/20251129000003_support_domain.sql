@@ -176,7 +176,7 @@ CREATE POLICY "users_can_select_own_feedback"
 ON feedback FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- FEEDBACK: Users can insert their own feedback
@@ -186,7 +186,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND (
     tenant_id IS NULL
-    OR tenant_id IN (SELECT get_user_tenant_ids())
+    OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -201,7 +201,7 @@ ON support_tickets FOR SELECT
 USING (
   user_id = auth.uid()
   OR assigned_to_user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- SUPPORT_TICKETS: Users can insert their own tickets
@@ -211,7 +211,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND (
     tenant_id IS NULL
-    OR tenant_id IN (SELECT get_user_tenant_ids())
+    OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -219,7 +219,7 @@ WITH CHECK (
 CREATE POLICY "admins_can_update_tickets"
 ON support_tickets FOR UPDATE
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
   AND (has_tenant_role(tenant_id, 'admin') OR has_tenant_role(tenant_id, 'owner'))
 );
 
@@ -231,7 +231,7 @@ USING (
     SELECT id FROM support_tickets
     WHERE user_id = auth.uid()
        OR assigned_to_user_id = auth.uid()
-       OR tenant_id IN (SELECT get_user_tenant_ids())
+       OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -251,7 +251,7 @@ WITH CHECK (
 CREATE POLICY "tenant_members_can_select_reports"
 ON support_reports FOR SELECT
 USING (
-  tenant_id IN (SELECT get_user_tenant_ids())
+  tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- BUG_REPORTS: Users can select their own bug reports
@@ -259,7 +259,7 @@ CREATE POLICY "users_can_select_own_bug_reports"
 ON bug_reports FOR SELECT
 USING (
   user_id = auth.uid()
-  OR tenant_id IN (SELECT get_user_tenant_ids())
+  OR tenant_id = ANY(get_user_tenant_ids())
 );
 
 -- BUG_REPORTS: Users can insert their own bug reports
@@ -269,7 +269,7 @@ WITH CHECK (
   user_id = auth.uid()
   AND (
     tenant_id IS NULL
-    OR tenant_id IN (SELECT get_user_tenant_ids())
+    OR tenant_id = ANY(get_user_tenant_ids())
   )
 );
 
@@ -282,3 +282,4 @@ COMMENT ON TABLE support_tickets IS 'Support tickets and help requests';
 COMMENT ON TABLE ticket_messages IS 'Conversation messages on support tickets';
 COMMENT ON TABLE support_reports IS 'Support team performance metrics and statistics';
 COMMENT ON TABLE bug_reports IS 'Detailed bug reports with reproduction steps';
+

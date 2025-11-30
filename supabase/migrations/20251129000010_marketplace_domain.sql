@@ -152,8 +152,28 @@ ALTER TABLE promo_codes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "virtual_currencies_select" ON virtual_currencies
   FOR SELECT USING (true);
 
-CREATE POLICY "virtual_currencies_manage" ON virtual_currencies
-  FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY "virtual_currencies_insert" ON virtual_currencies
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = virtual_currencies.tenant_id
+        AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "virtual_currencies_update" ON virtual_currencies
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = virtual_currencies.tenant_id
+        AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "virtual_currencies_delete" ON virtual_currencies
+  FOR DELETE USING (
     EXISTS (
       SELECT 1 FROM user_tenant_memberships
       WHERE user_id = auth.uid()
@@ -189,8 +209,28 @@ CREATE POLICY "user_currency_balances_update" ON user_currency_balances
 CREATE POLICY "shop_items_select" ON shop_items
   FOR SELECT USING (is_available = true OR created_by_user_id = auth.uid());
 
-CREATE POLICY "shop_items_manage" ON shop_items
-  FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY "shop_items_insert" ON shop_items
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = shop_items.tenant_id
+        AND role IN ('admin', 'editor')
+    )
+  );
+
+CREATE POLICY "shop_items_update" ON shop_items
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = shop_items.tenant_id
+        AND role IN ('admin', 'editor')
+    )
+  );
+
+CREATE POLICY "shop_items_delete" ON shop_items
+  FOR DELETE USING (
     EXISTS (
       SELECT 1 FROM user_tenant_memberships
       WHERE user_id = auth.uid()
@@ -266,8 +306,28 @@ CREATE POLICY "promo_codes_select" ON promo_codes
     )
   );
 
-CREATE POLICY "promo_codes_manage" ON promo_codes
-  FOR INSERT, UPDATE, DELETE USING (
+CREATE POLICY "promo_codes_insert" ON promo_codes
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = promo_codes.tenant_id
+        AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "promo_codes_update" ON promo_codes
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM user_tenant_memberships
+      WHERE user_id = auth.uid()
+        AND tenant_id = promo_codes.tenant_id
+        AND role = 'admin'
+    )
+  );
+
+CREATE POLICY "promo_codes_delete" ON promo_codes
+  FOR DELETE USING (
     EXISTS (
       SELECT 1 FROM user_tenant_memberships
       WHERE user_id = auth.uid()

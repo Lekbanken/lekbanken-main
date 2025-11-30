@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { Card, CardContent, CardHeader, CardTitle, Button, Badge, Input } from '@/components/ui';
+import { ShoppingBagIcon } from '@heroicons/react/24/outline';
 import {
   getShopItems,
   createShopItem,
@@ -117,27 +119,30 @@ export default function MarketplaceAdminPage() {
     }
   };
 
-  if (!currentTenant) return <div className="p-4">Loading...</div>;
+  if (!currentTenant) return <div className="p-4 text-muted-foreground">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Marketplace Admin</h1>
-          <p className="text-slate-300">Manage shop items, currency, and promotions</p>
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <ShoppingBagIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">Marketplace Admin</h1>
+          </div>
+          <p className="text-muted-foreground">Manage shop items, currency, and promotions</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-slate-700">
+        <div className="flex gap-2 border-b border-border">
           {['stats', 'items', 'analytics'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as 'stats' | 'items' | 'analytics')}
-              className={`px-6 py-3 font-medium transition ${
+              className={`px-6 py-3 font-medium transition-colors ${
                 activeTab === tab
-                  ? 'border-b-2 border-blue-500 text-white'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -149,28 +154,36 @@ export default function MarketplaceAdminPage() {
         {activeTab === 'stats' && (
           <div className="space-y-6">
             {loading ? (
-              <p className="text-slate-300">Loading stats...</p>
+              <p className="text-muted-foreground">Loading stats...</p>
             ) : (
               <>
                 {/* Stats Grid */}
                 {stats && (
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-slate-700 rounded-lg p-6 border border-slate-600">
-                      <p className="text-slate-400 text-sm mb-2">Total Purchases</p>
-                      <p className="text-3xl font-bold text-white">{stats.total_purchases}</p>
-                    </div>
-                    <div className="bg-slate-700 rounded-lg p-6 border border-slate-600">
-                      <p className="text-slate-400 text-sm mb-2">Revenue</p>
-                      <p className="text-3xl font-bold text-green-400">${stats.total_revenue}</p>
-                    </div>
-                    <div className="bg-slate-700 rounded-lg p-6 border border-slate-600">
-                      <p className="text-slate-400 text-sm mb-2">Avg Purchase</p>
-                      <p className="text-3xl font-bold text-blue-400">${stats.average_purchase_value.toFixed(2)}</p>
-                    </div>
-                    <div className="bg-slate-700 rounded-lg p-6 border border-slate-600">
-                      <p className="text-slate-400 text-sm mb-2">Total Items</p>
-                      <p className="text-3xl font-bold text-purple-400">{items.length}</p>
-                    </div>
+                    <Card>
+                      <CardContent className="p-6">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Total Purchases</p>
+                        <p className="text-3xl font-bold text-foreground">{stats.total_purchases}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-6">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Revenue</p>
+                        <p className="text-3xl font-bold text-green-500">${stats.total_revenue}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-6">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Avg Purchase</p>
+                        <p className="text-3xl font-bold text-primary">${stats.average_purchase_value.toFixed(2)}</p>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className="p-6">
+                        <p className="text-sm font-medium text-muted-foreground mb-2">Total Items</p>
+                        <p className="text-3xl font-bold text-accent">{items.length}</p>
+                      </CardContent>
+                    </Card>
                   </div>
                 )}
               </>
@@ -181,106 +194,103 @@ export default function MarketplaceAdminPage() {
         {/* Items Tab */}
         {activeTab === 'items' && (
           <div className="space-y-6">
-            <button
+            <Button
               onClick={() => setShowItemModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded transition"
             >
               Add New Item
-            </button>
+            </Button>
 
             {/* Item Modal */}
             {showItemModal && (
-              <div className="bg-slate-700 rounded-lg p-6 border border-slate-600">
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Item Name"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="bg-slate-800 border border-slate-600 text-white px-3 py-2 rounded"
+              <Card>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-2 gap-4 mb-4">
+                    <Input
+                      type="text"
+                      placeholder="Item Name"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    />
+                    <select
+                      value={formData.category}
+                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                      className="bg-muted border border-border text-foreground px-3 py-2 rounded-lg"
+                    >
+                      {ITEM_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                        </option>
+                      ))}
+                    </select>
+                    <Input
+                      type="number"
+                      placeholder="Price"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Quantity Limit (optional)"
+                      value={formData.quantity_limit || ''}
+                      onChange={(e) => setFormData({ ...formData, quantity_limit: e.target.value ? Number(e.target.value) : null })}
+                    />
+                  </div>
+                  <textarea
+                    placeholder="Description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className="w-full bg-muted border border-border text-foreground px-3 py-2 rounded-lg mb-4 resize-none"
+                    rows={3}
                   />
-                  <select
-                    value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="bg-slate-800 border border-slate-600 text-white px-3 py-2 rounded"
-                  >
-                    {ITEM_CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    placeholder="Price"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: Number(e.target.value) })}
-                    className="bg-slate-800 border border-slate-600 text-white px-3 py-2 rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Quantity Limit (optional)"
-                    value={formData.quantity_limit || ''}
-                    onChange={(e) => setFormData({ ...formData, quantity_limit: e.target.value ? Number(e.target.value) : null })}
-                    className="bg-slate-800 border border-slate-600 text-white px-3 py-2 rounded"
-                  />
-                </div>
-                <textarea
-                  placeholder="Description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full bg-slate-800 border border-slate-600 text-white px-3 py-2 rounded mb-4 resize-none"
-                  rows={3}
-                />
-                <label className="flex items-center gap-2 mb-4">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_featured}
-                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                    className="w-4 h-4"
-                  />
-                  <span className="text-white">Featured Item</span>
-                </label>
-                <div className="flex gap-2">
-                  <button
-                    onClick={handleAddItem}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded transition"
-                  >
-                    Save Item
-                  </button>
-                  <button
-                    onClick={() => setShowItemModal(false)}
-                    className="bg-slate-600 hover:bg-slate-700 text-white font-medium py-2 px-6 rounded transition"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
+                  <label className="flex items-center gap-2 mb-4">
+                    <input
+                      type="checkbox"
+                      checked={formData.is_featured}
+                      onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-foreground">Featured Item</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleAddItem}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      Save Item
+                    </Button>
+                    <Button
+                      onClick={() => setShowItemModal(false)}
+                      variant="outline"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
             {/* Items List */}
             <div className="space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-slate-700 rounded-lg p-4 border border-slate-600 flex justify-between items-start">
-                  <div>
-                    <h3 className="text-white font-bold flex items-center gap-2">
-                      {item.name}
-                      {item.is_featured && <span className="bg-yellow-500 text-black text-xs px-2 py-1 rounded">Featured</span>}
-                    </h3>
-                    <p className="text-slate-400 text-sm">{item.category} • ${item.price}</p>
-                    {item.description && <p className="text-slate-300 mt-1">{item.description}</p>}
-                  </div>
-                  <button
-                    onClick={() => handleFeatureItem(item)}
-                    className={`${
-                      item.is_featured
-                        ? 'bg-yellow-600 hover:bg-yellow-700'
-                        : 'bg-slate-600 hover:bg-slate-700'
-                    } text-white font-medium py-1 px-4 rounded transition`}
-                  >
-                    {item.is_featured ? 'Unfeature' : 'Feature'}
-                  </button>
-                </div>
+                <Card key={item.id}>
+                  <CardContent className="p-4 flex justify-between items-start">
+                    <div>
+                      <h3 className="text-foreground font-bold flex items-center gap-2">
+                        {item.name}
+                        {item.is_featured && <Badge variant="warning">Featured</Badge>}
+                      </h3>
+                      <p className="text-muted-foreground text-sm">{item.category} • ${item.price}</p>
+                      {item.description && <p className="text-foreground mt-1">{item.description}</p>}
+                    </div>
+                    <Button
+                      onClick={() => handleFeatureItem(item)}
+                      variant={item.is_featured ? 'default' : 'outline'}
+                      className={item.is_featured ? 'bg-yellow-600 hover:bg-yellow-700' : ''}
+                    >
+                      {item.is_featured ? 'Unfeature' : 'Feature'}
+                    </Button>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
@@ -289,22 +299,26 @@ export default function MarketplaceAdminPage() {
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
           <div className="space-y-6">
-            <div>
-              <h2 className="text-xl font-bold text-white mb-4">Top Selling Items</h2>
-              <div className="space-y-2">
-                {topItems.slice(0, 10).map((item, idx) => (
-                  <div key={item.id} className="bg-slate-700 rounded p-3 border border-slate-600 flex justify-between items-center">
-                    <span className="text-slate-300">
-                      {idx + 1}. {item.name}
-                    </span>
-                    <span className="text-yellow-400 font-bold">${item.price}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg">Top Selling Items</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {topItems.slice(0, 10).map((item, idx) => (
+                    <div key={item.id} className="flex justify-between items-center py-2 border-b border-border last:border-b-0">
+                      <span className="text-foreground">
+                        {idx + 1}. {item.name}
+                      </span>
+                      <span className="text-accent font-bold">${item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
+        </div>
       </div>
-    </div>
   );
 }

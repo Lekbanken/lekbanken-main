@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { TrophyIcon } from '@heroicons/react/24/outline';
 import {
   getActiveChallenges,
   createChallenge,
@@ -143,311 +145,330 @@ export default function AchievementsAdvancedPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Achievements & Events</h1>
-        <div className="flex gap-4 border-b">
-          <button
-            onClick={() => setActiveTab('challenges')}
-            className={`px-4 py-2 font-semibold transition ${
-              activeTab === 'challenges'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Challenges
-          </button>
-          <button
-            onClick={() => setActiveTab('events')}
-            className={`px-4 py-2 font-semibold transition ${
-              activeTab === 'events'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Limited Events
-          </button>
-          <button
-            onClick={() => setActiveTab('leaderboard')}
-            className={`px-4 py-2 font-semibold transition ${
-              activeTab === 'leaderboard'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Leaderboard
-          </button>
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-4">
+            <TrophyIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Achievements & Events</h1>
+          </div>
+          <div className="flex gap-4 border-b border-border">
+            <button
+              onClick={() => setActiveTab('challenges')}
+              className={`px-4 py-2 font-semibold transition ${
+                activeTab === 'challenges'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Challenges
+            </button>
+            <button
+              onClick={() => setActiveTab('events')}
+              className={`px-4 py-2 font-semibold transition ${
+                activeTab === 'events'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Limited Events
+            </button>
+            <button
+              onClick={() => setActiveTab('leaderboard')}
+              className={`px-4 py-2 font-semibold transition ${
+                activeTab === 'leaderboard'
+                  ? 'border-b-2 border-primary text-primary'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Leaderboard
+            </button>
+          </div>
         </div>
-      </div>
 
       {activeTab === 'challenges' && (
         <div className="space-y-8">
           {/* Create Challenge Form */}
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Create Challenge</h2>
-            <form onSubmit={handleCreateChallenge} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Challenge Title"
-                  value={challengeForm.title}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setChallengeForm({ ...challengeForm, title: e.target.value })
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Challenge</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreateChallenge} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Challenge Title"
+                    value={challengeForm.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setChallengeForm({ ...challengeForm, title: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                    required
+                  />
+                  <select
+                    value={challengeForm.challenge_type}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                      setChallengeForm({ ...challengeForm, challenge_type: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="score">Score Challenge</option>
+                    <option value="participation">Participation</option>
+                    <option value="speed">Speed Challenge</option>
+                    <option value="cooperation">Cooperation</option>
+                  </select>
+                </div>
+                <textarea
+                  placeholder="Description"
+                  value={challengeForm.description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setChallengeForm({ ...challengeForm, description: e.target.value })
                   }
-                  className="px-3 py-2 border rounded-md"
-                  required
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
                 />
-                <select
-                  value={challengeForm.challenge_type}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setChallengeForm({ ...challengeForm, challenge_type: e.target.value })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                >
-                  <option value="score">Score Challenge</option>
-                  <option value="participation">Participation</option>
-                  <option value="speed">Speed Challenge</option>
-                  <option value="cooperation">Cooperation</option>
-                </select>
-              </div>
-              <textarea
-                placeholder="Description"
-                value={challengeForm.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setChallengeForm({ ...challengeForm, description: e.target.value })
-                }
-                className="w-full px-3 py-2 border rounded-md"
-              />
-              <div className="grid grid-cols-3 gap-4">
-                <select
-                  value={challengeForm.difficulty}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setChallengeForm({ ...challengeForm, difficulty: e.target.value })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                >
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                  <option value="expert">Expert</option>
-                </select>
-                <input
-                  type="number"
-                  placeholder="Target Value"
-                  value={challengeForm.target_value}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setChallengeForm({
-                      ...challengeForm,
-                      target_value: parseInt(e.target.value),
-                    })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                />
-                <input
-                  type="number"
-                  placeholder="Reward Points"
-                  value={challengeForm.reward_points}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setChallengeForm({
-                      ...challengeForm,
-                      reward_points: parseInt(e.target.value),
-                    })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              >
-                Create Challenge
-              </button>
-            </form>
-          </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <select
+                    value={challengeForm.difficulty}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                      setChallengeForm({ ...challengeForm, difficulty: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="expert">Expert</option>
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="Target Value"
+                    value={challengeForm.target_value}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setChallengeForm({
+                        ...challengeForm,
+                        target_value: parseInt(e.target.value),
+                      })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  />
+                  <input
+                    type="number"
+                    placeholder="Reward Points"
+                    value={challengeForm.reward_points}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setChallengeForm({
+                        ...challengeForm,
+                        reward_points: parseInt(e.target.value),
+                      })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Create Challenge
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
           {/* Active Challenges List */}
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Active Challenges</h2>
-            <div className="space-y-4">
-              {loading ? (
-                <p>Loading challenges...</p>
-              ) : challenges.length === 0 ? (
-                <p className="text-gray-500">No challenges yet</p>
-              ) : (
-                challenges.map((challenge) => (
-                  <div
-                    key={challenge.id}
-                    className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{challenge.title}</h3>
-                      <div className="flex gap-4 text-sm text-gray-500 mt-1">
-                        <span>Type: {challenge.challenge_type}</span>
-                        <span>Difficulty: {challenge.difficulty}</span>
-                        <span>Target: {challenge.target_value}</span>
-                        <span>Participants: {challenge.participation_count}</span>
-                        <span>Completed: {challenge.completion_count}</span>
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Challenges</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {loading ? (
+                  <p className="text-muted-foreground">Loading challenges...</p>
+                ) : challenges.length === 0 ? (
+                  <p className="text-muted-foreground">No challenges yet</p>
+                ) : (
+                  challenges.map((challenge) => (
+                    <div
+                      key={challenge.id}
+                      className="flex justify-between items-center p-4 border border-border rounded-lg hover:bg-muted"
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground">{challenge.title}</h3>
+                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                          <span>Type: {challenge.challenge_type}</span>
+                          <span>Difficulty: {challenge.difficulty}</span>
+                          <span>Target: {challenge.target_value}</span>
+                          <span>Participants: {challenge.participation_count}</span>
+                          <span>Completed: {challenge.completion_count}</span>
+                        </div>
                       </div>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
                     </div>
-                    <button className="px-4 py-2 border rounded-md hover:bg-gray-100">
-                      Edit
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       {activeTab === 'events' && (
         <div className="space-y-8">
           {/* Create Event Form */}
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Create Limited Event</h2>
-            <form onSubmit={handleCreateEvent} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Event Title"
-                  value={eventForm.title}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEventForm({ ...eventForm, title: e.target.value })
+          <Card>
+            <CardHeader>
+              <CardTitle>Create Limited Event</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleCreateEvent} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text"
+                    placeholder="Event Title"
+                    value={eventForm.title}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setEventForm({ ...eventForm, title: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Theme"
+                    value={eventForm.theme}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setEventForm({ ...eventForm, theme: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <textarea
+                  placeholder="Description"
+                  value={eventForm.description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setEventForm({ ...eventForm, description: e.target.value })
                   }
-                  className="px-3 py-2 border rounded-md"
-                  required
+                  className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
                 />
-                <input
-                  type="text"
-                  placeholder="Theme"
-                  value={eventForm.theme}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEventForm({ ...eventForm, theme: e.target.value })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                />
-              </div>
-              <textarea
-                placeholder="Description"
-                value={eventForm.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setEventForm({ ...eventForm, description: e.target.value })
-                }
-                className="w-full px-3 py-2 border rounded-md"
-              />
-              <div className="grid grid-cols-3 gap-4">
-                <input
-                  type="datetime-local"
-                  value={eventForm.ends_at}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEventForm({ ...eventForm, ends_at: e.target.value })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                  required
-                />
-                <select
-                  value={eventForm.reward_type}
-                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setEventForm({ ...eventForm, reward_type: e.target.value })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                >
-                  <option value="points">Points</option>
-                  <option value="currency">Currency</option>
-                  <option value="cosmetics">Cosmetics</option>
-                </select>
-                <input
-                  type="number"
-                  placeholder="Reward Amount"
-                  value={eventForm.reward_amount}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEventForm({
-                      ...eventForm,
-                      reward_amount: parseInt(e.target.value),
-                    })
-                  }
-                  className="px-3 py-2 border rounded-md"
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-              >
-                Create Event
-              </button>
-            </form>
-          </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <input
+                    type="datetime-local"
+                    value={eventForm.ends_at}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setEventForm({ ...eventForm, ends_at: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                    required
+                  />
+                  <select
+                    value={eventForm.reward_type}
+                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                      setEventForm({ ...eventForm, reward_type: e.target.value })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="points">Points</option>
+                    <option value="currency">Currency</option>
+                    <option value="cosmetics">Cosmetics</option>
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="Reward Amount"
+                    value={eventForm.reward_amount}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      setEventForm({
+                        ...eventForm,
+                        reward_amount: parseInt(e.target.value),
+                      })
+                    }
+                    className="px-3 py-2 border border-border rounded-md bg-background text-foreground focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <Button type="submit" className="w-full">
+                  Create Event
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
           {/* Active Events List */}
-          <div className="bg-white border rounded-lg p-6">
-            <h2 className="text-2xl font-bold mb-4">Active Events</h2>
-            <div className="space-y-4">
-              {loading ? (
-                <p>Loading events...</p>
-              ) : events.length === 0 ? (
-                <p className="text-gray-500">No events yet</p>
-              ) : (
-                events.map((event) => (
-                  <div
-                    key={event.id}
-                    className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50"
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-semibold">{event.title}</h3>
-                      <div className="flex gap-4 text-sm text-gray-500 mt-1">
-                        <span>Theme: {event.theme}</span>
-                        <span>Ends: {new Date(event.ends_at).toLocaleDateString()}</span>
-                        <span>Participants: {event.participant_count}</span>
+          <Card>
+            <CardHeader>
+              <CardTitle>Active Events</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {loading ? (
+                  <p className="text-muted-foreground">Loading events...</p>
+                ) : events.length === 0 ? (
+                  <p className="text-muted-foreground">No events yet</p>
+                ) : (
+                  events.map((event) => (
+                    <div
+                      key={event.id}
+                      className="flex justify-between items-center p-4 border border-border rounded-lg hover:bg-muted"
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground">{event.title}</h3>
+                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                          <span>Theme: {event.theme}</span>
+                          <span>Ends: {new Date(event.ends_at).toLocaleDateString()}</span>
+                          <span>Participants: {event.participant_count}</span>
+                        </div>
                       </div>
+                      <Button variant="outline" size="sm">
+                        Edit
+                      </Button>
                     </div>
-                    <button className="px-4 py-2 border rounded-md hover:bg-gray-100">
-                      Edit
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       {activeTab === 'leaderboard' && (
-        <div className="bg-white border rounded-lg p-6">
-          <h2 className="text-2xl font-bold mb-4">Achievement Leaderboard</h2>
-          {loading ? (
-            <p>Loading leaderboard...</p>
-          ) : leaderboard.length === 0 ? (
-            <p className="text-gray-500">No leaderboard data yet</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="border-b">
-                  <tr>
-                    <th className="text-left py-2 px-4">Rank</th>
-                    <th className="text-left py-2 px-4">Player</th>
-                    <th className="text-center py-2 px-4">Achievements</th>
-                    <th className="text-center py-2 px-4">Seasonal</th>
-                    <th className="text-right py-2 px-4">Points</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leaderboard.map((entry) => (
-                    <tr key={entry.user_id} className="border-b hover:bg-gray-50">
-                      <td className="py-2 px-4 font-semibold">#{entry.rank}</td>
-                      <td className="py-2 px-4">{entry.user_name}</td>
-                      <td className="py-2 px-4 text-center">{entry.achievement_count}</td>
-                      <td className="py-2 px-4 text-center">{entry.seasonal_count}</td>
-                      <td className="py-2 px-4 text-right font-semibold">
-                        {entry.total_points}
-                      </td>
+        <Card>
+          <CardHeader>
+            <CardTitle>Achievement Leaderboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className="text-muted-foreground">Loading leaderboard...</p>
+            ) : leaderboard.length === 0 ? (
+              <p className="text-muted-foreground">No leaderboard data yet</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="border-b border-border">
+                    <tr>
+                      <th className="text-left py-2 px-4 text-muted-foreground">Rank</th>
+                      <th className="text-left py-2 px-4 text-muted-foreground">Player</th>
+                      <th className="text-center py-2 px-4 text-muted-foreground">Achievements</th>
+                      <th className="text-center py-2 px-4 text-muted-foreground">Seasonal</th>
+                      <th className="text-right py-2 px-4 text-muted-foreground">Points</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+                  </thead>
+                  <tbody>
+                    {leaderboard.map((entry) => (
+                      <tr key={entry.user_id} className="border-b border-border hover:bg-muted">
+                        <td className="py-2 px-4 font-semibold text-foreground">#{entry.rank}</td>
+                        <td className="py-2 px-4 text-foreground">{entry.user_name}</td>
+                        <td className="py-2 px-4 text-center text-foreground">{entry.achievement_count}</td>
+                        <td className="py-2 px-4 text-center text-foreground">{entry.seasonal_count}</td>
+                        <td className="py-2 px-4 text-right font-semibold text-primary">
+                          {entry.total_points}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
+      </div>
     </div>
   );
 }

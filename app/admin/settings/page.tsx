@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { supabase } from '@/lib/supabase/client';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 interface TenantInfo {
   id: string;
@@ -129,11 +131,11 @@ export default function SettingsPage() {
 
   if (!user || !currentTenant) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto pt-20">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Organization Settings</h1>
-            <p className="text-slate-600">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Organization Settings</h1>
+            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
           </div>
         </div>
       </div>
@@ -141,71 +143,80 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Organization Settings</h1>
-          <p className="text-slate-600">Hantera organisationsinställningar och information</p>
+          <div className="flex items-center gap-3 mb-2">
+            <Cog6ToothIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Organization Settings</h1>
+          </div>
+          <p className="text-muted-foreground">Hantera organisationsinställningar och information</p>
         </div>
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-slate-600">Laddar...</p>
+            <p className="text-muted-foreground">Laddar...</p>
           </div>
         ) : tenantInfo ? (
           <div className="space-y-6">
             {/* Organization Overview */}
             <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-slate-600 text-sm font-medium mb-1">Medlemmar</p>
-                <p className="text-3xl font-bold text-slate-900">{tenantInfo.member_count}</p>
-                <p className="text-xs text-slate-500 mt-2">i organisationen</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-muted-foreground text-sm font-medium mb-1">Medlemmar</p>
+                  <p className="text-3xl font-bold text-foreground">{tenantInfo.member_count}</p>
+                  <p className="text-xs text-muted-foreground mt-2">i organisationen</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-slate-600 text-sm font-medium mb-1">Spel</p>
-                <p className="text-3xl font-bold text-slate-900">{tenantInfo.game_count}</p>
-                <p className="text-xs text-slate-500 mt-2">tillgängliga</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-muted-foreground text-sm font-medium mb-1">Spel</p>
+                  <p className="text-3xl font-bold text-foreground">{tenantInfo.game_count}</p>
+                  <p className="text-xs text-muted-foreground mt-2">tillgängliga</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-slate-600 text-sm font-medium mb-1">Gamesessioner</p>
-                <p className="text-3xl font-bold text-slate-900">{tenantInfo.session_count.toLocaleString()}</p>
-                <p className="text-xs text-slate-500 mt-2">totalt</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-muted-foreground text-sm font-medium mb-1">Gamesessioner</p>
+                  <p className="text-3xl font-bold text-foreground">{tenantInfo.session_count.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-2">totalt</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-slate-600 text-sm font-medium mb-1">Prenumerationsstatus</p>
-                <p className="text-lg font-bold text-slate-900 capitalize mb-2">{tenantInfo.subscription_tier}</p>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  tenantInfo.subscription_status === 'active'
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-yellow-100 text-yellow-700'
-                }`}>
-                  {tenantInfo.subscription_status === 'active' ? 'Aktiv' : 'Auktoriserad'}
-                </span>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-muted-foreground text-sm font-medium mb-1">Prenumerationsstatus</p>
+                  <p className="text-lg font-bold text-foreground capitalize mb-2">{tenantInfo.subscription_tier}</p>
+                  <Badge variant={tenantInfo.subscription_status === 'active' ? 'default' : 'secondary'}>
+                    {tenantInfo.subscription_status === 'active' ? 'Aktiv' : 'Auktoriserad'}
+                  </Badge>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Organization Info */}
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 flex justify-between items-center">
-                <h2 className="text-lg font-bold text-white">Organisationsinformation</h2>
+            <Card>
+              <CardHeader className="bg-primary p-4 flex flex-row justify-between items-center">
+                <CardTitle className="text-white">Organisationsinformation</CardTitle>
                 {!isEditing && (
-                  <button
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setIsEditing(true)}
-                    className="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium hover:bg-slate-100 transition-colors text-sm"
+                    className="bg-white text-primary hover:bg-muted"
                   >
                     Redigera
-                  </button>
+                  </Button>
                 )}
-              </div>
+              </CardHeader>
 
-              <div className="p-6 space-y-4">
+              <CardContent className="p-6 space-y-4">
                 {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Organisationsnamn
                   </label>
                   {isEditing ? (
@@ -213,25 +224,25 @@ export default function SettingsPage() {
                       type="text"
                       value={editValues.name}
                       onChange={(e) => setEditValues({ ...editValues, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
                     />
                   ) : (
-                    <p className="text-slate-900">{tenantInfo.name}</p>
+                    <p className="text-foreground">{tenantInfo.name}</p>
                   )}
                 </div>
 
                 {/* Slug */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Slug (URL-vänlig)
                   </label>
-                  <p className="text-slate-600 text-sm">{tenantInfo.slug}</p>
-                  <p className="text-xs text-slate-500 mt-1">Kan inte ändras efter skapande</p>
+                  <p className="text-muted-foreground text-sm">{tenantInfo.slug}</p>
+                  <p className="text-xs text-muted-foreground mt-1">Kan inte ändras efter skapande</p>
                 </div>
 
                 {/* Description */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Beskrivning
                   </label>
                   {isEditing ? (
@@ -239,42 +250,43 @@ export default function SettingsPage() {
                       value={editValues.description}
                       onChange={(e) => setEditValues({ ...editValues, description: e.target.value })}
                       rows={4}
-                      className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground resize-none"
                     />
                   ) : (
-                    <p className="text-slate-600">{tenantInfo.description || '-'}</p>
+                    <p className="text-muted-foreground">{tenantInfo.description || '-'}</p>
                   )}
                 </div>
 
                 {/* Created */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Skapad
                   </label>
-                  <p className="text-slate-600 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {new Date(tenantInfo.created_at).toLocaleDateString('sv-SE')}
                   </p>
                 </div>
 
                 {/* Tenant ID */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Organisation ID
                   </label>
-                  <p className="text-slate-600 text-sm break-all font-mono text-xs">{tenantInfo.id}</p>
+                  <p className="text-muted-foreground text-sm break-all font-mono text-xs">{tenantInfo.id}</p>
                 </div>
 
                 {/* Save/Cancel Buttons */}
                 {isEditing && (
-                  <div className="flex gap-3 pt-4 border-t border-slate-200 mt-6">
-                    <button
+                  <div className="flex gap-3 pt-4 border-t border-border mt-6">
+                    <Button
                       onClick={handleSaveChanges}
                       disabled={isSaving}
-                      className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white rounded-lg font-medium transition-colors"
+                      className="flex-1"
                     >
                       {isSaving ? 'Sparar...' : 'Spara Ändringar'}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setIsEditing(false);
                         setEditValues({
@@ -283,37 +295,37 @@ export default function SettingsPage() {
                         });
                       }}
                       disabled={isSaving}
-                      className="flex-1 px-4 py-2 bg-slate-200 hover:bg-slate-300 disabled:bg-slate-100 text-slate-900 rounded-lg font-medium transition-colors"
+                      className="flex-1"
                     >
                       Avbryt
-                    </button>
+                    </Button>
                   </div>
                 )}
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Danger Zone */}
-            <div className="border-t border-red-200 bg-red-50 rounded-lg shadow overflow-hidden">
-              <div className="bg-red-100 p-4">
-                <h3 className="font-bold text-red-900">Farlig Zon</h3>
-              </div>
-              <div className="p-6">
+            <Card className="border-red-200 bg-red-50">
+              <CardHeader className="bg-red-100 p-4">
+                <CardTitle className="text-red-900">Farlig Zon</CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
                 <p className="text-red-900 mb-4">
                   Dessa åtgärder kan inte ångras. Var försiktig.
                 </p>
-                <button
+                <Button
+                  variant="destructive"
                   disabled
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50"
                   title="Funktionen är inte tillgänglig ännu"
                 >
                   Ta Bort Organisation
-                </button>
-              </div>
-            </div>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-slate-600">Ingen organisationsinformation tillgänglig</p>
+            <p className="text-muted-foreground">Ingen organisationsinformation tillgänglig</p>
           </div>
         )}
       </div>

@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { Card, CardContent, Badge, Input, Button } from '@/components/ui';
+import { TicketIcon } from '@heroicons/react/24/outline';
 import {
   getAdminTickets,
   getTicketStats,
@@ -112,11 +114,11 @@ export default function AdminTicketsPage() {
 
   if (!user || !currentTenant) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto pt-20">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Support Tickets</h1>
-            <p className="text-slate-600">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Support Tickets</h1>
+            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
           </div>
         </div>
       </div>
@@ -127,57 +129,68 @@ export default function AdminTicketsPage() {
   const totalPages = Math.ceil((stats?.totalTickets || 0) / itemsPerPage);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background p-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Support Tickets</h1>
-          <p className="text-slate-600">Hantera support-ärenden från användare</p>
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <TicketIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">Support Tickets</h1>
+          </div>
+          <p className="text-muted-foreground">Hantera support-ärenden från användare</p>
         </div>
 
         {/* Stats Cards */}
         {stats && (
-          <div className="grid md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-slate-600 text-sm font-medium mb-1">Totalt Ärenden</p>
-              <p className="text-3xl font-bold text-slate-900">{stats.totalTickets}</p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-slate-600 text-sm font-medium mb-1">Öppna Ärenden</p>
-              <p className="text-3xl font-bold text-yellow-600">{stats.openTickets}</p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-slate-600 text-sm font-medium mb-1">Lösta</p>
-              <p className="text-3xl font-bold text-green-600">
-                {stats.totalTickets - stats.openTickets}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-slate-600 text-sm font-medium mb-1">Genomsnittlig Tid</p>
-              <p className="text-3xl font-bold text-blue-600">
-                {stats.avgResolutionTime ? `${Math.round(stats.avgResolutionTime / 60)}h` : '-'}
-              </p>
-            </div>
+          <div className="grid md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Totalt Ärenden</p>
+                <p className="text-3xl font-bold text-foreground">{stats.totalTickets}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Öppna Ärenden</p>
+                <p className="text-3xl font-bold text-yellow-600">{stats.openTickets}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Lösta</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {stats.totalTickets - stats.openTickets}
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-sm font-medium text-muted-foreground mb-1">Genomsnittlig Tid</p>
+                <p className="text-3xl font-bold text-primary">
+                  {stats.avgResolutionTime ? `${Math.round(stats.avgResolutionTime / 60)}h` : '-'}
+                </p>
+              </CardContent>
+            </Card>
           </div>
         )}
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Tickets List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <h2 className="text-lg font-bold text-white">Support Ärenden</h2>
+          <Card className="lg:col-span-2 overflow-hidden flex flex-col">
+            <div className="bg-gradient-to-r from-primary to-primary/80 p-4">
+              <h2 className="text-lg font-bold text-primary-foreground">Support Ärenden</h2>
             </div>
 
             {/* Filters */}
-            <div className="p-4 border-b border-slate-200 flex gap-2 flex-wrap">
+            <div className="p-4 border-b border-border flex gap-2 flex-wrap">
               <select
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value as SupportTicket['status'] | '');
                   setCurrentPage(1);
                 }}
-                className="px-3 py-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-1 border border-border rounded-lg text-sm bg-muted text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Alla Status</option>
                 <option value="open">Öppen</option>
@@ -192,7 +205,7 @@ export default function AdminTicketsPage() {
                   setPriorityFilter(e.target.value as SupportTicket['priority'] | '');
                   setCurrentPage(1);
                 }}
-                className="px-3 py-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-1 border border-border rounded-lg text-sm bg-muted text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Alla Prioriteter</option>
                 <option value="urgent">Brådskande</option>
@@ -203,38 +216,38 @@ export default function AdminTicketsPage() {
             </div>
 
             {/* Tickets */}
-            <div className="divide-y overflow-y-auto flex-1 max-h-96">
+            <div className="divide-y divide-border overflow-y-auto flex-1 max-h-96">
               {isLoading ? (
-                <div className="p-4 text-center text-slate-600">Laddar...</div>
+                <div className="p-4 text-center text-muted-foreground">Laddar...</div>
               ) : tickets.length === 0 ? (
-                <div className="p-4 text-center text-slate-600">Inga ärenden hittades</div>
+                <div className="p-4 text-center text-muted-foreground">Inga ärenden hittades</div>
               ) : (
                 tickets.map((ticket) => (
                   <button
                     key={ticket.id}
                     onClick={() => setSelectedTicket(ticket)}
-                    className={`w-full text-left p-4 hover:bg-slate-50 transition-colors border-l-4 ${
-                      selectedTicket?.id === ticket.id ? 'bg-blue-50 border-l-blue-500' : 'border-l-slate-200'
+                    className={`w-full text-left p-4 hover:bg-muted transition-colors border-l-4 ${
+                      selectedTicket?.id === ticket.id ? 'bg-primary/10 border-l-primary' : 'border-l-border'
                     } ${
                       ticket.priority === 'urgent'
                         ? 'border-l-red-500'
                         : ticket.priority === 'high'
                           ? 'border-l-orange-500'
-                          : 'border-l-slate-200'
+                          : 'border-l-border'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <p className="font-medium text-slate-900">{ticket.title}</p>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
+                      <p className="font-medium text-foreground">{ticket.title}</p>
+                      <Badge
+                        variant={
                           ticket.status === 'open'
-                            ? 'bg-yellow-100 text-yellow-700'
+                            ? 'warning'
                             : ticket.status === 'in_progress'
-                              ? 'bg-blue-100 text-blue-700'
+                              ? 'default'
                               : ticket.status === 'resolved'
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-slate-100 text-slate-700'
-                        }`}
+                                ? 'success'
+                                : 'secondary'
+                        }
                       >
                         {ticket.status === 'open'
                           ? 'Öppen'
@@ -243,10 +256,10 @@ export default function AdminTicketsPage() {
                             : ticket.status === 'resolved'
                               ? 'Löst'
                               : 'Stängt'}
-                      </span>
+                      </Badge>
                     </div>
-                    <p className="text-sm text-slate-500 mb-2">{new Date(ticket.created_at).toLocaleDateString('sv-SE')}</p>
-                    <p className="text-sm text-slate-600 truncate">{ticket.description}</p>
+                    <p className="text-sm text-muted-foreground mb-2">{new Date(ticket.created_at).toLocaleDateString('sv-SE')}</p>
+                    <p className="text-sm text-muted-foreground truncate">{ticket.description}</p>
                   </button>
                 ))
               )}
@@ -254,60 +267,62 @@ export default function AdminTicketsPage() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="p-4 border-t border-slate-200 flex justify-between items-center">
-                <button
+              <div className="p-4 border-t border-border flex justify-between items-center">
+                <Button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1 bg-slate-100 text-slate-600 rounded disabled:opacity-50 hover:bg-slate-200"
+                  variant="outline"
+                  size="sm"
                 >
                   Föregående
-                </button>
-                <span className="text-sm text-slate-600">
+                </Button>
+                <span className="text-sm text-muted-foreground">
                   Sida {currentPage} av {totalPages}
                 </span>
-                <button
+                <Button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1 bg-slate-100 text-slate-600 rounded disabled:opacity-50 hover:bg-slate-200"
+                  variant="outline"
+                  size="sm"
                 >
                   Nästa
-                </button>
+                </Button>
               </div>
             )}
-          </div>
+          </Card>
 
           {/* Ticket Detail */}
           {selectedTicket ? (
-            <div className="bg-white rounded-lg shadow overflow-hidden flex flex-col max-h-screen md:max-h-96 lg:max-h-full">
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4">
-                <h2 className="text-lg font-bold text-white truncate">{selectedTicket.title}</h2>
+            <Card className="overflow-hidden flex flex-col max-h-screen md:max-h-96 lg:max-h-full">
+              <div className="bg-gradient-to-r from-accent to-accent/80 p-4">
+                <h2 className="text-lg font-bold text-accent-foreground truncate">{selectedTicket.title}</h2>
               </div>
 
               <div className="overflow-y-auto flex-1 p-4 space-y-4">
                 {/* Ticket Info */}
-                <div className="space-y-2 pb-4 border-b border-slate-200">
+                <div className="space-y-2 pb-4 border-b border-border">
                   <div>
-                    <p className="text-xs text-slate-500 font-medium">Ticket ID</p>
-                    <p className="text-sm text-slate-900">{selectedTicket.ticket_key || selectedTicket.id.slice(0, 8)}</p>
+                    <p className="text-xs text-muted-foreground font-medium">Ticket ID</p>
+                    <p className="text-sm text-foreground">{selectedTicket.ticket_key || selectedTicket.id.slice(0, 8)}</p>
                   </div>
 
                   {selectedTicket.description && (
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">Beskrivning</p>
-                      <p className="text-sm text-slate-700">{selectedTicket.description}</p>
+                      <p className="text-xs text-muted-foreground font-medium">Beskrivning</p>
+                      <p className="text-sm text-foreground">{selectedTicket.description}</p>
                     </div>
                   )}
 
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">Skapat</p>
-                      <p className="text-sm text-slate-900">
+                      <p className="text-xs text-muted-foreground font-medium">Skapat</p>
+                      <p className="text-sm text-foreground">
                         {new Date(selectedTicket.created_at).toLocaleDateString('sv-SE')}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500 font-medium">Kategori</p>
-                      <p className="text-sm text-slate-900">{selectedTicket.category || 'Allmänt'}</p>
+                      <p className="text-xs text-muted-foreground font-medium">Kategori</p>
+                      <p className="text-sm text-foreground">{selectedTicket.category || 'Allmänt'}</p>
                     </div>
                   </div>
                 </div>
@@ -315,13 +330,13 @@ export default function AdminTicketsPage() {
                 {/* Status & Priority Controls */}
                 <div className="space-y-2">
                   <div>
-                    <p className="text-xs text-slate-500 font-medium mb-1">Status</p>
+                    <p className="text-xs text-muted-foreground font-medium mb-1">Status</p>
                     <select
                       value={selectedTicket.status}
                       onChange={(e) =>
                         handleStatusChange(selectedTicket.id, e.target.value as SupportTicket['status'])
                       }
-                      className="w-full px-2 py-1 text-sm border border-slate-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-2 py-1 text-sm border border-border rounded-lg bg-muted text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="open">Öppen</option>
                       <option value="in_progress">Hanteras</option>
@@ -332,13 +347,13 @@ export default function AdminTicketsPage() {
                   </div>
 
                   <div>
-                    <p className="text-xs text-slate-500 font-medium mb-1">Prioritet</p>
+                    <p className="text-xs text-muted-foreground font-medium mb-1">Prioritet</p>
                     <select
                       value={selectedTicket.priority}
                       onChange={(e) =>
                         handlePriorityChange(selectedTicket.id, e.target.value as SupportTicket['priority'])
                       }
-                      className="w-full px-2 py-1 text-sm border border-slate-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-2 py-1 text-sm border border-border rounded-lg bg-muted text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="low">Låg</option>
                       <option value="medium">Medel</option>
@@ -350,24 +365,24 @@ export default function AdminTicketsPage() {
 
                 {/* Messages */}
                 <div className="pt-2">
-                  <p className="text-xs text-slate-500 font-medium mb-2">Meddelanden ({ticketMessages.length})</p>
+                  <p className="text-xs text-muted-foreground font-medium mb-2">Meddelanden ({ticketMessages.length})</p>
                   <div className="space-y-2 max-h-40 overflow-y-auto">
                     {isLoadingMessages ? (
-                      <p className="text-sm text-slate-500">Laddar meddelanden...</p>
+                      <p className="text-sm text-muted-foreground">Laddar meddelanden...</p>
                     ) : ticketMessages.length === 0 ? (
-                      <p className="text-sm text-slate-500">Inga meddelanden än</p>
+                      <p className="text-sm text-muted-foreground">Inga meddelanden än</p>
                     ) : (
                       ticketMessages.map((msg) => (
                         <div
                           key={msg.id}
-                          className={`p-2 rounded text-sm ${
-                            msg.is_internal ? 'bg-yellow-50 border border-yellow-200' : 'bg-slate-50'
+                          className={`p-2 rounded-lg text-sm ${
+                            msg.is_internal ? 'bg-yellow-50 border border-yellow-200' : 'bg-muted'
                           }`}
                         >
-                          <p className="text-xs text-slate-500 mb-1">
+                          <p className="text-xs text-muted-foreground mb-1">
                             {msg.is_internal && '🔒 Internt'} {new Date(msg.created_at).toLocaleString('sv-SE')}
                           </p>
-                          <p className="text-slate-700 break-words">{msg.message}</p>
+                          <p className="text-foreground break-words">{msg.message}</p>
                         </div>
                       ))
                     )}
@@ -376,29 +391,29 @@ export default function AdminTicketsPage() {
               </div>
 
               {/* Send Message */}
-              <div className="p-4 border-t border-slate-200">
+              <div className="p-4 border-t border-border">
                 <form onSubmit={handleSendMessage} className="flex gap-2">
-                  <input
+                  <Input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Skicka ett meddelande..."
-                    className="flex-1 px-3 py-1 text-sm border border-slate-200 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1"
                   />
-                  <button
+                  <Button
                     type="submit"
                     disabled={isSendingMessage || !newMessage.trim()}
-                    className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm rounded transition-colors"
+                    size="sm"
                   >
                     Skicka
-                  </button>
+                  </Button>
                 </form>
               </div>
-            </div>
+            </Card>
           ) : (
-            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center min-h-64">
-              <p className="text-slate-600">Välj ett ärende för att se detaljer</p>
-            </div>
+            <Card className="p-6 flex items-center justify-center min-h-64">
+              <p className="text-muted-foreground">Välj ett ärende för att se detaljer</p>
+            </Card>
           )}
         </div>
       </div>

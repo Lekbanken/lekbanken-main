@@ -1,20 +1,37 @@
-const licenseBadges = ["Aktiv", "Pågående", "Avslutad"];
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { KeyIcon } from '@heroicons/react/24/outline';
+
+const licenseBadges = ['Aktiv', 'Pågående', 'Avslutad'];
 
 export default function LicensesPage() {
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <header className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Licenser</h2>
-        <span className="text-xs text-slate-500">StatusBadge + Pagination</span>
-      </header>
-      <p className="text-sm text-slate-700">Licenser kopplas till organisationer och följer samma datatabellsmönster.</p>
-      <div className="flex gap-2 text-xs text-slate-700">
-        {licenseBadges.map((badge) => (
-          <span key={badge} className="rounded-full bg-emerald-50 px-3 py-1 font-semibold text-emerald-700">
-            {badge}
-          </span>
-        ))}
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <KeyIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Licenser</h1>
+          </div>
+          <p className="text-muted-foreground">StatusBadge + Pagination</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Licenshantering</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">Licenser kopplas till organisationer och följer samma datatabellsmönster.</p>
+            <div className="flex gap-2">
+              {licenseBadges.map((badge) => (
+                <Badge key={badge} variant="secondary" className="bg-emerald-100 text-emerald-700">
+                  {badge}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </section>
+    </div>
   );
 }

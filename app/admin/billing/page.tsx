@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { getBillingStats } from '@/lib/services/billingService';
+import { Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { CreditCardIcon } from '@heroicons/react/24/outline';
 
 interface Stats {
   activeSubscriptions: number;
@@ -40,11 +42,11 @@ export default function BillingAdminPage() {
 
   if (!user || !currentTenant) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto pt-20">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Billing Administration</h1>
-            <p className="text-slate-600">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Billing Administration</h1>
+            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
           </div>
         </div>
       </div>
@@ -52,12 +54,15 @@ export default function BillingAdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Billing Administration</h1>
-          <p className="text-slate-600">Hantera prenumerationer, fakturor och betalningar</p>
+          <div className="flex items-center gap-3 mb-2">
+            <CreditCardIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Billing Administration</h1>
+          </div>
+          <p className="text-muted-foreground">Hantera prenumerationer, fakturor och betalningar</p>
         </div>
 
         {/* Stats Cards */}
@@ -65,38 +70,50 @@ export default function BillingAdminPage() {
           {isLoading ? (
             <>
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
-                  <div className="h-4 bg-slate-200 rounded w-20 mb-3"></div>
-                  <div className="h-8 bg-slate-200 rounded w-24"></div>
-                </div>
+                <Card key={i} className="animate-pulse">
+                  <CardContent className="p-6">
+                    <div className="h-4 bg-muted rounded w-20 mb-3"></div>
+                    <div className="h-8 bg-muted rounded w-24"></div>
+                  </CardContent>
+                </Card>
               ))}
             </>
           ) : stats ? (
             <>
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-slate-500 font-medium mb-2">Active Subscriptions</p>
-                <p className="text-3xl font-bold text-blue-600">{stats.activeSubscriptions}</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground font-medium mb-2">Active Subscriptions</p>
+                  <p className="text-3xl font-bold text-primary">{stats.activeSubscriptions}</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-slate-500 font-medium mb-2">Monthly Recurring Revenue</p>
-                <p className="text-3xl font-bold text-green-600">${stats.monthlyRecurringRevenue.toFixed(2)}</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground font-medium mb-2">Monthly Recurring Revenue</p>
+                  <p className="text-3xl font-bold text-green-600">${stats.monthlyRecurringRevenue.toFixed(2)}</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-slate-500 font-medium mb-2">Total Revenue</p>
-                <p className="text-3xl font-bold text-purple-600">${stats.totalRevenue.toFixed(2)}</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground font-medium mb-2">Total Revenue</p>
+                  <p className="text-3xl font-bold text-purple-600">${stats.totalRevenue.toFixed(2)}</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-slate-500 font-medium mb-2">Paid Invoices</p>
-                <p className="text-3xl font-bold text-emerald-600">{stats.paidInvoices}</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground font-medium mb-2">Paid Invoices</p>
+                  <p className="text-3xl font-bold text-emerald-600">{stats.paidInvoices}</p>
+                </CardContent>
+              </Card>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <p className="text-sm text-slate-500 font-medium mb-2">Outstanding Invoices</p>
-                <p className="text-3xl font-bold text-orange-600">{stats.outstandingInvoices}</p>
-              </div>
+              <Card>
+                <CardContent className="p-6">
+                  <p className="text-sm text-muted-foreground font-medium mb-2">Outstanding Invoices</p>
+                  <p className="text-3xl font-bold text-orange-600">{stats.outstandingInvoices}</p>
+                </CardContent>
+              </Card>
             </>
           ) : null}
         </div>
@@ -104,74 +121,70 @@ export default function BillingAdminPage() {
         {/* Sections */}
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Subscriptions Section */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <h2 className="text-lg font-bold text-white">Subscriptions</h2>
-            </div>
-            <div className="p-6">
-              <p className="text-slate-600 mb-4">Manage customer subscriptions and plans.</p>
-              <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
-                View Subscriptions
-              </button>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="bg-primary p-4">
+              <CardTitle className="text-white">Subscriptions</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <p className="text-muted-foreground mb-4">Manage customer subscriptions and plans.</p>
+              <Button>View Subscriptions</Button>
+            </CardContent>
+          </Card>
 
           {/* Invoices Section */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 p-4">
-              <h2 className="text-lg font-bold text-white">Invoices</h2>
-            </div>
-            <div className="p-6">
-              <p className="text-slate-600 mb-4">View and manage customer invoices and payments.</p>
-              <button className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
-                View Invoices
-              </button>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="bg-green-600 p-4">
+              <CardTitle className="text-white">Invoices</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <p className="text-muted-foreground mb-4">View and manage customer invoices and payments.</p>
+              <Button className="bg-green-600 hover:bg-green-700">View Invoices</Button>
+            </CardContent>
+          </Card>
 
           {/* Plans Section */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4">
-              <h2 className="text-lg font-bold text-white">Billing Plans</h2>
-            </div>
-            <div className="p-6">
-              <p className="text-slate-600 mb-4">Manage subscription tiers and pricing.</p>
-              <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors">
-                View Plans
-              </button>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="bg-purple-600 p-4">
+              <CardTitle className="text-white">Billing Plans</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <p className="text-muted-foreground mb-4">Manage subscription tiers and pricing.</p>
+              <Button className="bg-purple-600 hover:bg-purple-700">View Plans</Button>
+            </CardContent>
+          </Card>
 
           {/* Payment Methods Section */}
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-4">
-              <h2 className="text-lg font-bold text-white">Payment Methods</h2>
-            </div>
-            <div className="p-6">
-              <p className="text-slate-600 mb-4">View customer payment methods and preferences.</p>
-              <button className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors">
-                View Payment Methods
-              </button>
-            </div>
-          </div>
+          <Card>
+            <CardHeader className="bg-indigo-600 p-4">
+              <CardTitle className="text-white">Payment Methods</CardTitle>
+            </CardHeader>
+            <CardContent className="p-6">
+              <p className="text-muted-foreground mb-4">View customer payment methods and preferences.</p>
+              <Button className="bg-indigo-600 hover:bg-indigo-700">View Payment Methods</Button>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Billing Information */}
-        <div className="bg-white rounded-lg shadow p-6 mt-8">
-          <h2 className="text-lg font-bold text-slate-900 mb-4">About Billing</h2>
-          <div className="space-y-3 text-slate-600">
-            <p>
-              This billing administration dashboard provides an overview of all subscription and payment activities
-              across your organization.
-            </p>
-            <p>
-              You can manage customer subscriptions, view invoices, configure billing plans, and monitor payment methods.
-            </p>
-            <p className="text-sm text-slate-500">
-              Note: Stripe integration will be enabled in production. Currently, billing data is stored in Supabase.
-            </p>
-          </div>
-        </div>
+        <Card className="mt-8">
+          <CardHeader>
+            <CardTitle>About Billing</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3 text-muted-foreground">
+              <p>
+                This billing administration dashboard provides an overview of all subscription and payment activities
+                across your organization.
+              </p>
+              <p>
+                You can manage customer subscriptions, view invoices, configure billing plans, and monitor payment methods.
+              </p>
+              <p className="text-sm">
+                Note: Stripe integration will be enabled in production. Currently, billing data is stored in Supabase.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,20 +1,37 @@
-const tools = ["ConfirmDialog", "Toast", "Modal"];
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { LifebuoyIcon } from '@heroicons/react/24/outline';
+
+const tools = ['ConfirmDialog', 'Toast', 'Modal'];
 
 export default function SupportPage() {
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <header className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Support</h2>
-        <span className="text-xs text-slate-500">Shared utilities</span>
-      </header>
-      <p className="text-sm text-slate-700">Supportflöden återanvänder delade modaler och notiser för konsekvent UX.</p>
-      <div className="flex gap-2 text-xs text-slate-700">
-        {tools.map((tool) => (
-          <span key={tool} className="rounded-full bg-slate-100 px-3 py-1 font-semibold text-slate-800">
-            {tool}
-          </span>
-        ))}
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <LifebuoyIcon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Support</h1>
+          </div>
+          <p className="text-muted-foreground">Shared utilities</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Supportflöden</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">Supportflöden återanvänder delade modaler och notiser för konsekvent UX.</p>
+            <div className="flex gap-2">
+              {tools.map((tool) => (
+                <Badge key={tool} variant="secondary">
+                  {tool}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </section>
+    </div>
   );
 }

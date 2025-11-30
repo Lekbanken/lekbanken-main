@@ -1,20 +1,37 @@
-const organisationsColumns = ["Namn", "Plan", "Status"];
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { BuildingOffice2Icon } from '@heroicons/react/24/outline';
+
+const organisationsColumns = ['Namn', 'Plan', 'Status'];
 
 export default function OrganisationsPage() {
   return (
-    <section className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <header className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Organisationer</h2>
-        <span className="text-xs text-slate-500">DataTable + TagChip</span>
-      </header>
-      <p className="text-sm text-slate-700">Hantera organisationer, licenser och status direkt i admin.</p>
-      <div className="flex gap-2 text-xs text-slate-700">
-        {organisationsColumns.map((column) => (
-          <span key={column} className="rounded-full bg-indigo-50 px-3 py-1 font-semibold text-indigo-700">
-            {column}
-          </span>
-        ))}
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <BuildingOffice2Icon className="h-8 w-8 text-primary" />
+            <h1 className="text-4xl font-bold text-foreground">Organisationer</h1>
+          </div>
+          <p className="text-muted-foreground">DataTable + TagChip</p>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Organisationshantering</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground mb-4">Hantera organisationer, licenser och status direkt i admin.</p>
+            <div className="flex gap-2">
+              {organisationsColumns.map((column) => (
+                <Badge key={column} variant="secondary" className="bg-indigo-100 text-indigo-700">
+                  {column}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </section>
+    </div>
   );
 }

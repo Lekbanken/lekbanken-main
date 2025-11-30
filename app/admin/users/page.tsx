@@ -4,6 +4,13 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { supabase } from '@/lib/supabase/client';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui';
+import {
+  UsersIcon,
+  MagnifyingGlassIcon,
+  PencilIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 
 interface MembershipRow {
   id: string;
@@ -141,47 +148,83 @@ export default function UsersPage() {
 
   if (!user || !currentTenant) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <div className="max-w-6xl mx-auto pt-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">User Management</h1>
-            <p className="text-slate-600">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
-          </div>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Användare</h1>
+          <p className="text-muted-foreground mt-1">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">User Management</h1>
-          <p className="text-slate-600">Hantera användare och roller för organisationen</p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Användare</h1>
+        <p className="text-muted-foreground mt-1">Hantera användare och roller för organisationen</p>
+      </div>
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Users List */}
-          <div className="lg:col-span-2 bg-white rounded-lg shadow overflow-hidden flex flex-col">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-              <h2 className="text-lg font-bold text-white">Användare ({filteredUsers.length})</h2>
+      {/* Stats */}
+      <div className="grid gap-4 sm:grid-cols-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary">{users.length}</div>
+            <div className="text-sm text-muted-foreground">Totalt</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-purple-500">
+              {users.filter((u) => u.role === 'owner').length}
             </div>
+            <div className="text-sm text-muted-foreground">Ägare</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-accent">
+              {users.filter((u) => u.role === 'admin').length}
+            </div>
+            <div className="text-sm text-muted-foreground">Admins</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-foreground">
+              {users.filter((u) => u.role === 'member').length}
+            </div>
+            <div className="text-sm text-muted-foreground">Medlemmar</div>
+          </CardContent>
+        </Card>
+      </div>
 
+      {/* Main Content */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Users List */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UsersIcon className="h-5 w-5 text-muted-foreground" />
+              Användare ({filteredUsers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             {/* Filters */}
-            <div className="p-4 border-b border-slate-200 flex gap-2 flex-wrap">
-              <input
-                type="text"
-                placeholder="Sök efter e-post..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="flex-1 min-w-48 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
+            <div className="flex gap-3 mb-4 flex-wrap">
+              <div className="relative flex-1 min-w-48">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input
+                  placeholder="Sök efter e-post..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
               <select
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
-                className="px-3 py-2 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="">Alla Roller</option>
                 <option value="owner">Ägare</option>
@@ -191,11 +234,11 @@ export default function UsersPage() {
             </div>
 
             {/* Users */}
-            <div className="divide-y overflow-y-auto flex-1 max-h-96">
+            <div className="divide-y divide-border max-h-96 overflow-y-auto">
               {isLoading ? (
-                <div className="p-4 text-center text-slate-600">Laddar...</div>
+                <div className="p-4 text-center text-muted-foreground">Laddar...</div>
               ) : filteredUsers.length === 0 ? (
-                <div className="p-4 text-center text-slate-600">Inga användare hittades</div>
+                <div className="p-4 text-center text-muted-foreground">Inga användare hittades</div>
               ) : (
                 filteredUsers.map((u) => (
                   <button
@@ -204,105 +247,114 @@ export default function UsersPage() {
                       setSelectedUser(u);
                       setNewRole(u.role);
                     }}
-                    className={`w-full text-left p-4 hover:bg-slate-50 transition-colors border-l-4 ${
-                      selectedUser?.id === u.id ? 'bg-blue-50 border-l-blue-500' : 'border-l-slate-200'
+                    className={`w-full text-left p-4 hover:bg-muted transition-colors border-l-4 ${
+                      selectedUser?.id === u.id ? 'bg-primary/5 border-l-primary' : 'border-l-transparent'
                     }`}
                   >
                     <div className="flex justify-between items-start mb-1">
-                      <p className="font-medium text-slate-900">{u.email}</p>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium whitespace-nowrap ${
-                          u.role === 'owner'
-                            ? 'bg-purple-100 text-purple-700'
-                            : u.role === 'admin'
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'bg-slate-100 text-slate-700'
-                        }`}
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium text-sm">
+                          {u.email.charAt(0).toUpperCase()}
+                        </div>
+                        <p className="font-medium text-foreground">{u.email}</p>
+                      </div>
+                      <Badge
+                        variant={
+                          u.role === 'owner' ? 'primary' :
+                          u.role === 'admin' ? 'accent' : 'outline'
+                        }
                       >
                         {u.role === 'owner' ? 'Ägare' : u.role === 'admin' ? 'Admin' : 'Medlem'}
-                      </span>
+                      </Badge>
                     </div>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-muted-foreground ml-11">
                       Medlem sedan {new Date(u.created_at).toLocaleDateString('sv-SE')}
                     </p>
                   </button>
                 ))
               )}
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          {/* User Detail */}
-          {selectedUser ? (
-            <div className="bg-white rounded-lg shadow overflow-hidden flex flex-col max-h-96">
-              <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4">
-                <h2 className="text-lg font-bold text-white truncate">{selectedUser.email}</h2>
+        {/* User Detail */}
+        {selectedUser ? (
+          <Card>
+            <CardHeader className="bg-primary/5">
+              <CardTitle className="text-foreground truncate">{selectedUser.email}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 space-y-4">
+              {/* User Info */}
+              <div className="space-y-3 pb-4 border-b border-border">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">Användar ID</p>
+                  <p className="text-sm text-foreground break-all">{selectedUser.user_id}</p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">Medlem sedan</p>
+                  <p className="text-sm text-foreground">
+                    {new Date(selectedUser.created_at).toLocaleDateString('sv-SE')}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">Nuvarande Roll</p>
+                  <Badge
+                    variant={
+                      selectedUser.role === 'owner' ? 'primary' :
+                      selectedUser.role === 'admin' ? 'accent' : 'outline'
+                    }
+                  >
+                    {selectedUser.role === 'owner' ? 'Ägare' : selectedUser.role === 'admin' ? 'Admin' : 'Medlem'}
+                  </Badge>
+                </div>
               </div>
 
-              <div className="overflow-y-auto flex-1 p-4 space-y-4">
-                {/* User Info */}
-                <div className="space-y-2 pb-4 border-b border-slate-200">
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">Användar ID</p>
-                    <p className="text-sm text-slate-900 break-all">{selectedUser.user_id}</p>
-                  </div>
+              {/* Role Change */}
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground font-medium">Ändra Roll</p>
+                <select
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value="member">Medlem</option>
+                  <option value="admin">Admin</option>
+                  <option value="owner">Ägare</option>
+                </select>
 
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">Medlem sedan</p>
-                    <p className="text-sm text-slate-900">
-                      {new Date(selectedUser.created_at).toLocaleDateString('sv-SE')}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-xs text-slate-500 font-medium">Nuvarande Rol</p>
-                    <p className="text-sm font-semibold text-slate-900">
-                      {selectedUser.role === 'owner' ? 'Ägare' : selectedUser.role === 'admin' ? 'Admin' : 'Medlem'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Role Change */}
-                <div className="space-y-2">
-                  <p className="text-xs text-slate-500 font-medium">Ändra Rol</p>
-                  <select
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                {newRole !== selectedUser.role && (
+                  <Button
+                    onClick={handleRoleChange}
+                    disabled={isUpdating}
+                    className="w-full"
                   >
-                    <option value="member">Medlem</option>
-                    <option value="admin">Admin</option>
-                    <option value="owner">Ägare</option>
-                  </select>
-
-                  {newRole !== selectedUser.role && (
-                    <button
-                      onClick={handleRoleChange}
-                      disabled={isUpdating}
-                      className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors font-medium"
-                    >
-                      {isUpdating ? 'Uppdaterar...' : 'Uppdatera Rol'}
-                    </button>
-                  )}
-                </div>
+                    <PencilIcon className="h-4 w-4 mr-1" />
+                    {isUpdating ? 'Uppdaterar...' : 'Uppdatera Roll'}
+                  </Button>
+                )}
               </div>
 
               {/* Remove Button */}
-              <div className="p-4 border-t border-slate-200">
-                <button
-                  onClick={handleRemoveUser}
-                  disabled={isUpdating}
-                  className="w-full px-3 py-2 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 text-white text-sm rounded-lg transition-colors font-medium"
-                >
-                  {isUpdating ? 'Tar bort...' : 'Ta Bort Användare'}
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-lg shadow p-6 flex items-center justify-center min-h-64">
-              <p className="text-slate-600">Välj en användare för att redigera</p>
-            </div>
-          )}
-        </div>
+              <Button
+                onClick={handleRemoveUser}
+                disabled={isUpdating}
+                variant="outline"
+                className="w-full text-red-600 hover:bg-red-50"
+              >
+                <TrashIcon className="h-4 w-4 mr-1" />
+                {isUpdating ? 'Tar bort...' : 'Ta Bort Användare'}
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-6 flex items-center justify-center min-h-64">
+              <p className="text-muted-foreground">Välj en användare för att redigera</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

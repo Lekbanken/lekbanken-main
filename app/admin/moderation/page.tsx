@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { Badge, Button, Card, CardContent } from '@/components/ui';
+import { ShieldExclamationIcon } from '@heroicons/react/24/outline';
 import {
   getContentReports,
   updateContentReport,
@@ -97,14 +99,17 @@ export default function ModerationAdminPage() {
     }
   };
 
-  if (!currentTenant) return <div className="p-4">Loading...</div>;
+  if (!currentTenant) return <div className="p-4 text-muted-foreground">Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-900 to-slate-900 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Moderation Console</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <ShieldExclamationIcon className="h-8 w-8 text-red-400" />
+            <h1 className="text-4xl font-bold text-white">Moderation Console</h1>
+          </div>
           <p className="text-red-200">Content reports, user restrictions, and safety management</p>
         </div>
 
@@ -122,9 +127,9 @@ export default function ModerationAdminPage() {
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
               {tab === 'queue' && queue.length > 0 && (
-                <span className="ml-2 bg-red-600 text-white text-xs px-2 py-1 rounded">
+                <Badge variant="destructive" className="ml-2">
                   {queue.length}
-                </span>
+                </Badge>
               )}
             </button>
           ))}
@@ -137,39 +142,42 @@ export default function ModerationAdminPage() {
               <p className="text-red-200">Loading queue...</p>
             ) : queue.length > 0 ? (
               queue.map((item) => (
-                <div key={item.id} className="bg-red-800/30 border border-red-700 rounded-lg p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-white font-bold text-lg">
-                        {item.content_reports?.[0]?.reason || 'Content Report'}
-                      </h3>
-                      <p className="text-red-200 text-sm">
-                        {item.content_reports?.[0]?.content_type || 'Unknown'} •{' '}
-                        {item.priority}
-                      </p>
+                <Card key={item.id} className="bg-red-800/30 border-red-700">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h3 className="text-white font-bold text-lg">
+                          {item.content_reports?.[0]?.reason || 'Content Report'}
+                        </h3>
+                        <p className="text-red-200 text-sm">
+                          {item.content_reports?.[0]?.content_type || 'Unknown'} •{' '}
+                          {item.priority}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="destructive"
+                        className={`${
+                          item.priority === 'critical'
+                            ? 'bg-red-600'
+                            : item.priority === 'high'
+                              ? 'bg-orange-600'
+                              : 'bg-yellow-600 text-black'
+                        }`}
+                      >
+                        {item.priority.toUpperCase()}
+                      </Badge>
                     </div>
-                    <span
-                      className={`px-3 py-1 rounded text-sm font-bold ${
-                        item.priority === 'critical'
-                          ? 'bg-red-600 text-white'
-                          : item.priority === 'high'
-                            ? 'bg-orange-600 text-white'
-                            : 'bg-yellow-600 text-black'
-                      }`}
+                    {item.content_reports?.[0]?.description && (
+                      <p className="text-red-100 mb-4">{item.content_reports[0].description}</p>
+                    )}
+                    <Button
+                      onClick={() => handleCompleteQueueItem(item.id)}
+                      className="bg-green-600 hover:bg-green-700"
                     >
-                      {item.priority.toUpperCase()}
-                    </span>
-                  </div>
-                  {item.content_reports?.[0]?.description && (
-                    <p className="text-red-100 mb-4">{item.content_reports[0].description}</p>
-                  )}
-                  <button
-                    onClick={() => handleCompleteQueueItem(item.id)}
-                    className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded transition"
-                  >
-                    Mark Complete
-                  </button>
-                </div>
+                      Mark Complete
+                    </Button>
+                  </CardContent>
+                </Card>
               ))
             ) : (
               <div className="text-center py-12">
@@ -336,7 +344,7 @@ export default function ModerationAdminPage() {
                       <p className="text-red-200 text-sm mb-2">Users Banned</p>
                       <p className="text-3xl font-bold text-red-400">{stats.users_banned}</p>
                     </div>
-                    <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-6">
+                    <div className="bg-slate-800/30 border border-border rounded-lg p-6">
                       <p className="text-slate-200 text-sm mb-2">Avg Resolution Time</p>
                       <p className="text-3xl font-bold text-slate-300">
                         {stats.average_resolution_time.toFixed(1)}h

@@ -34,7 +34,7 @@ export default function ResetPasswordPage() {
             Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your email and we'll send you a link to reset your password.
+            Enter your email and we’ll send you a link to reset your password.
           </p>
         </div>
 
@@ -86,7 +86,7 @@ export default function ResetPasswordPage() {
             </Link>
           </p>
           <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
+            Don’t have an account?{' '}
             <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
               Sign up
             </Link>

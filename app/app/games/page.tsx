@@ -6,12 +6,13 @@ import type { Database } from '@/lib/supabase/types'
 import GameCard from '@/components/GameCard'
 
 type Game = Database['public']['Tables']['games']['Row']
+type EnergyLevel = 'low' | 'medium' | 'high' | ''
 
 export default function GamesPage() {
   const [games, setGames] = useState<Game[]>([])
   const [featured, setFeatured] = useState<Game[]>([])
   const [search, setSearch] = useState('')
-  const [energyLevel, setEnergyLevel] = useState<'low' | 'medium' | 'high' | ''>('')
+  const [energyLevel, setEnergyLevel] = useState<EnergyLevel>('')
   const [isLoading, setIsLoading] = useState(false)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -114,7 +115,7 @@ export default function GamesPage() {
             {/* Energy Level Filter */}
             <select
               value={energyLevel}
-              onChange={(e) => setEnergyLevel(e.target.value as any)}
+              onChange={(e) => setEnergyLevel(e.target.value as EnergyLevel)}
               className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Energy Levels</option>

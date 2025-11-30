@@ -5,6 +5,14 @@ import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { supabase } from '@/lib/supabase/client';
 
+interface MembershipRow {
+  id: string;
+  user_id: string;
+  role: string;
+  created_at: string;
+  users?: { email?: string | null } | null;
+}
+
 interface TenantUser {
   id: string;
   email: string;
@@ -45,7 +53,7 @@ export default function UsersPage() {
         }
 
         // Type-safe mapping
-        const mappedUsers = (data || []).map((membership: any) => ({
+        const mappedUsers = (data || []).map((membership: MembershipRow) => ({
           id: membership.id,
           email: membership.users?.email || '',
           user_id: membership.user_id,

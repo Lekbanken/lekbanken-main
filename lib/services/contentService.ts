@@ -1,22 +1,9 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
+import type { Database, Json } from '@/types/supabase';
 
-// Types
-export interface ContentItem {
-  id: string;
-  tenant_id: string;
-  type: 'game' | 'collection' | 'event' | 'challenge';
-  title: string;
-  description: string | null;
-  image_url: string | null;
-  is_published: boolean;
-  is_featured: boolean;
-  featured_until: string | null;
-  view_count: number;
-  created_by_user_id: string;
-  created_at: string;
-  updated_at: string;
-  metadata: Record<string, unknown>;
-}
+// Types - Use Supabase generated types where possible
+export type ContentItem = Database['public']['Tables']['content_items']['Row'];
+export type ContentItemInsert = Database['public']['Tables']['content_items']['Insert'];
 
 export interface ContentSchedule {
   id: string;
@@ -104,16 +91,34 @@ export async function getContentItems(
 export async function createContentItem(
   tenantId: string,
   userId: string,
-  item: Omit<ContentItem, 'id' | 'tenant_id' | 'created_by_user_id' | 'created_at' | 'updated_at' | 'view_count'>
+  item: {
+    type: ContentItem['type'];
+    title: string;
+    description?: string | null;
+    image_url?: string | null;
+    is_published?: boolean;
+    is_featured?: boolean;
+    featured_until?: string | null;
+    metadata?: Json | null;
+  }
 ): Promise<ContentItem | null> {
   try {
+    const insertData: ContentItemInsert = {
+      tenant_id: tenantId,
+      created_by_user_id: userId,
+      type: item.type,
+      title: item.title,
+      description: item.description ?? null,
+      image_url: item.image_url ?? null,
+      is_published: item.is_published ?? false,
+      is_featured: item.is_featured ?? false,
+      featured_until: item.featured_until ?? null,
+      metadata: item.metadata ?? null,
+    };
+
     const { data, error } = await supabaseAdmin
       .from('content_items')
-      .insert({
-        tenant_id: tenantId,
-        created_by_user_id: userId,
-        ...item,
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -122,14 +127,17 @@ export async function createContentItem(
       return null;
     }
 
-    return data as ContentItem;
+    return data;
   } catch (err) {
     console.error('Error creating content item:', err);
     return null;
   }
 }
 
-export async function updateContentItem(id: string, updates: Partial<ContentItem>): Promise<ContentItem | null> {
+export async function updateContentItem(
+  id: string,
+  updates: Database['public']['Tables']['content_items']['Update']
+): Promise<ContentItem | null> {
   try {
     const { data, error } = await supabaseAdmin
       .from('content_items')
@@ -143,7 +151,7 @@ export async function updateContentItem(id: string, updates: Partial<ContentItem
       return null;
     }
 
-    return data as ContentItem;
+    return data;
   } catch (err) {
     console.error('Error updating content item:', err);
     return null;
@@ -464,17 +472,8 @@ export async function removeGameFromCollection(collectionItemId: string): Promis
   }
 }
 
-export interface ContentAnalytics {
-  id: string;
-  tenant_id: string;
-  content_id: string;
-  view_count: number;
-  click_count: number;
-  engagement_score: number;
-  last_viewed_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// Use Supabase type for ContentAnalytics
+export type ContentAnalytics = Database['public']['Tables']['content_analytics']['Row'];
 
 export async function getContentAnalytics(tenantId: string, contentId: string): Promise<ContentAnalytics | null> {
   try {
@@ -544,7 +543,7 @@ export async function getTrendingContent(tenantId: string, limit = 10): Promise<
   try {
     const { data, error } = await supabaseAdmin
       .from('content_analytics')
-      .select('*, content_items(*)')
+      .select('content_items(*)')
       .eq('tenant_id', tenantId)
       .order('engagement_score', { ascending: false })
       .limit(limit);
@@ -554,7 +553,12 @@ export async function getTrendingContent(tenantId: string, limit = 10): Promise<
       return null;
     }
 
-    return (data?.map((item: { content_items: ContentItem }) => item.content_items) as ContentItem[]) || [];
+    // Extract content_items from the joined query result
+    const contentItems = data
+      ?.map((item) => item.content_items)
+      .filter((item): item is ContentItem => item !== null);
+
+    return contentItems || [];
   } catch (err) {
     console.error('Error fetching trending content:', err);
     return null;

@@ -17,8 +17,8 @@ export default function ScoreBoard({
 
   // Handle elapsed time
   useEffect(() => {
-    setElapsedSeconds(0);
-    if (gameTimeSeconds === 0) return;
+    const resetTimer = setTimeout(() => setElapsedSeconds(0), 0);
+    if (gameTimeSeconds === 0) return () => clearTimeout(resetTimer);
 
     const interval = setInterval(() => {
       setElapsedSeconds((prev) => {
@@ -30,7 +30,10 @@ export default function ScoreBoard({
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(resetTimer);
+      clearInterval(interval);
+    };
   }, [gameTimeSeconds]);
 
   const formatTime = (seconds: number): string => {

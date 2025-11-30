@@ -212,6 +212,7 @@ export default function GamePlayerPage() {
     <>
       {gameStarted && session && (
         <ScoreBoard
+          key={session.id}
           sessionId={session.id}
           score={score}
           gameTimeSeconds={game.time_estimate_min ? game.time_estimate_min * 60 : 0}

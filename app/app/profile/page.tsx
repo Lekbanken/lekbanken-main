@@ -12,6 +12,8 @@ import {
   getUserAchievementStats,
   getUserAchievements,
   getAllAchievements,
+  type UserAchievement,
+  type Achievement,
 } from '@/lib/services/achievementService';
 import { getUserGlobalStats } from '@/lib/services/leaderboardService';
 import AchievementBadge from '@/components/AchievementBadge';
@@ -44,8 +46,8 @@ interface Stats {
 export default function ProfilePage() {
   const { user } = useAuth();
   const [stats, setStats] = useState<Stats | null>(null);
-  const [userAchievements, setUserAchievements] = useState<any[]>([]);
-  const [allAchievements, setAllAchievements] = useState<any[]>([]);
+  const [userAchievements, setUserAchievements] = useState<UserAchievement[]>([]);
+  const [allAchievements, setAllAchievements] = useState<Achievement[]>([]);
   const [levelRank, setLevelRank] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

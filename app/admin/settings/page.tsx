@@ -59,7 +59,7 @@ export default function SettingsPage() {
         const { count: gameCount } = await supabase
           .from('games')
           .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', currentTenant.id);
+          .eq('owner_tenant_id', currentTenant.id);
 
         // Get session count
         const { count: sessionCount } = await supabase
@@ -70,9 +70,9 @@ export default function SettingsPage() {
         setTenantInfo({
           id: tenant.id,
           name: tenant.name,
-          slug: tenant.slug,
-          description: tenant.description,
-          logo_url: tenant.logo_url,
+          slug: tenant.slug || '',
+          description: tenant.description || '',
+          logo_url: tenant.logo_url || '',
           subscription_tier: tenant.subscription_tier || 'free',
           subscription_status: tenant.subscription_status || 'active',
           created_at: tenant.created_at,

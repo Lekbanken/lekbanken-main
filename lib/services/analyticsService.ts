@@ -1,109 +1,27 @@
 import { supabase } from '@/lib/supabase/client';
+import type { Database } from '@/types/supabase';
 
 // =========================================
-// TYPES & INTERFACES
+// TYPES - Use Supabase generated types
 // =========================================
 
-export interface PageView {
-  id: string;
-  page_view_key: string;
-  user_id: string | null;
-  tenant_id: string | null;
-  page_path: string;
-  page_title: string | null;
-  referrer: string | null;
-  duration_seconds: number | null;
-  device_type: string | null;
-  browser_name: string | null;
-  browser_version: string | null;
-  os_name: string | null;
-  os_version: string | null;
-  ip_address: string | null;
-  country_code: string | null;
-  region: string | null;
-  created_at: string;
-}
+export type PageView = Database['public']['Tables']['page_views']['Row'];
+export type PageViewInsert = Database['public']['Tables']['page_views']['Insert'];
 
-export interface SessionAnalytics {
-  id: string;
-  session_key: string;
-  user_id: string | null;
-  tenant_id: string | null;
-  game_id: string | null;
-  session_duration: number;
-  pages_visited: number;
-  actions_count: number;
-  score: number | null;
-  completed: boolean;
-  exit_page: string | null;
-  device_type: string | null;
-  referrer: string | null;
-  entry_point: string | null;
-  created_at: string;
-  ended_at: string | null;
-}
+export type SessionAnalytics = Database['public']['Tables']['session_analytics']['Row'];
+export type SessionAnalyticsInsert = Database['public']['Tables']['session_analytics']['Insert'];
 
-export interface FeatureUsage {
-  id: string;
-  feature_key: string;
-  user_id: string | null;
-  tenant_id: string | null;
-  feature_name: string;
-  category: string | null;
-  action_type: string;
-  metadata: Record<string, unknown> | null;
-  duration_ms: number | null;
-  success: boolean;
-  error_message: string | null;
-  created_at: string;
-}
+export type FeatureUsage = Database['public']['Tables']['feature_usage']['Row'];
+export type FeatureUsageInsert = Database['public']['Tables']['feature_usage']['Insert'];
 
-export interface AnalyticsTimeseries {
-  id: string;
-  timeseries_key: string;
-  tenant_id: string | null;
-  metric_type: string;
-  metric_name: string;
-  value: number;
-  count: number;
-  breakdown_by: string | null;
-  breakdown_value: string | null;
-  time_bucket: string;
-  created_at: string;
-}
+export type AnalyticsTimeseries = Database['public']['Tables']['analytics_timeseries']['Row'];
+export type AnalyticsTimeseriesInsert = Database['public']['Tables']['analytics_timeseries']['Insert'];
 
-export interface FunnelAnalytics {
-  id: string;
-  funnel_key: string;
-  user_id: string | null;
-  tenant_id: string | null;
-  funnel_name: string;
-  step_1: boolean;
-  step_2: boolean;
-  step_3: boolean;
-  step_4: boolean;
-  step_5: boolean;
-  completed: boolean;
-  abandoned_at_step: number | null;
-  duration_seconds: number | null;
-  created_at: string;
-}
+export type FunnelAnalytics = Database['public']['Tables']['funnel_analytics']['Row'];
+export type FunnelAnalyticsInsert = Database['public']['Tables']['funnel_analytics']['Insert'];
 
-export interface ErrorTracking {
-  id: string;
-  error_key: string;
-  user_id: string | null;
-  tenant_id: string | null;
-  error_type: string;
-  error_message: string | null;
-  stack_trace: string | null;
-  page_path: string | null;
-  severity: string;
-  resolved: boolean;
-  occurrence_count: number;
-  last_occurred_at: string | null;
-  created_at: string;
-}
+export type ErrorTracking = Database['public']['Tables']['error_tracking']['Row'];
+export type ErrorTrackingInsert = Database['public']['Tables']['error_tracking']['Insert'];
 
 export interface PageViewParams {
   userId?: string | null;
@@ -417,7 +335,7 @@ export async function trackFeatureUsage(params: FeatureUsageParams): Promise<Fea
         feature_name: params.featureName,
         category: params.category || null,
         action_type: params.actionType,
-        metadata: params.metadata || null,
+        metadata: (params.metadata || null) as Database['public']['Tables']['feature_usage']['Insert']['metadata'],
         duration_ms: params.durationMs || null,
         success: params.success !== false,
         error_message: params.errorMessage || null,
@@ -628,9 +546,9 @@ export async function getTopErrors(
     const errors = data || [];
     const errorMap = errors.reduce(
       (acc, err) => {
-        const key = `${err.error_type}:${err.error_message}`;
+        const key = `${err.error_type}:${err.error_message || 'unknown'}`;
         if (!acc[key]) {
-          acc[key] = { type: err.error_type, message: err.error_message, count: 0 };
+          acc[key] = { type: err.error_type, message: err.error_message || '', count: 0 };
         }
         acc[key].count += 1;
         return acc;
@@ -658,7 +576,12 @@ export async function trackFunnelStep(
   step: 1 | 2 | 3 | 4 | 5
 ): Promise<FunnelAnalytics | null> {
   try {
-    // Get or create funnel entry
+    // Get or create funnel entry - only query if we have a userId
+    if (!userId) {
+      console.error('Cannot track funnel without userId');
+      return null;
+    }
+    
     const { data: existing } = await supabase
       .from('funnel_analytics')
       .select('*')
@@ -695,22 +618,20 @@ export async function trackFunnelStep(
       }
       return data;
     } else {
-      // Create new funnel
-      const insertData: Record<string, unknown> = {
-        user_id: userId,
-        tenant_id: tenantId,
-        funnel_name: funnelName,
-        step_1: step === 1,
-        step_2: step === 2,
-        step_3: step === 3,
-        step_4: step === 4,
-        step_5: step === 5,
-        completed: step === 5,
-      };
-
+      // Create new funnel entry with explicit type
       const { data, error } = await supabase
         .from('funnel_analytics')
-        .insert(insertData)
+        .insert({
+          user_id: userId,
+          tenant_id: tenantId,
+          funnel_name: funnelName,
+          step_1: step === 1,
+          step_2: step === 2,
+          step_3: step === 3,
+          step_4: step === 4,
+          step_5: step === 5,
+          completed: step === 5,
+        })
         .select()
         .single();
 

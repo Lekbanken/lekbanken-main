@@ -1,45 +1,12 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
+import type { Database } from '@/types/supabase';
 
-// Types
-export interface Notification {
-  id: string;
-  tenant_id: string;
-  user_id: string | null;
-  title: string;
-  message: string;
-  type: string;
-  category: string | null;
-  related_entity_id: string | null;
-  related_entity_type: string | null;
-  action_url: string | null;
-  action_label: string | null;
-  is_read: boolean;
-  read_at: string | null;
-  expires_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+// Types - Use Supabase generated types
+export type Notification = Database['public']['Tables']['notifications']['Row'];
+export type NotificationInsert = Database['public']['Tables']['notifications']['Insert'];
 
-export interface NotificationPreference {
-  id: string;
-  user_id: string;
-  tenant_id: string | null;
-  email_enabled: boolean;
-  push_enabled: boolean;
-  sms_enabled: boolean;
-  in_app_enabled: boolean;
-  billing_notifications: boolean;
-  gameplay_notifications: boolean;
-  achievement_notifications: boolean;
-  support_notifications: boolean;
-  system_notifications: boolean;
-  digest_frequency: string;
-  quiet_hours_start: string | null;
-  quiet_hours_end: string | null;
-  quiet_hours_enabled: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type NotificationPreference = Database['public']['Tables']['notification_preferences']['Row'];
+export type NotificationPreferenceInsert = Database['public']['Tables']['notification_preferences']['Insert'];
 
 // Send Notifications
 export async function sendNotification(params: {
@@ -439,12 +406,12 @@ export async function getNotificationStats(userId: string): Promise<
 
     const stats = {
       total: (notifications || []).length,
-      unread: (notifications || []).filter((n: { is_read: boolean }) => !n.is_read).length,
+      unread: (notifications || []).filter((n) => !n.is_read).length,
       byType: {} as Record<string, number>,
       byCategory: {} as Record<string, number>,
     };
 
-    (notifications || []).forEach((n: { type: string; category: string | null }) => {
+    (notifications || []).forEach((n) => {
       stats.byType[n.type] = (stats.byType[n.type] || 0) + 1;
       if (n.category) {
         stats.byCategory[n.category] = (stats.byCategory[n.category] || 0) + 1;
@@ -461,18 +428,18 @@ export async function getNotificationStats(userId: string): Promise<
 // Clean up expired notifications
 export async function deleteExpiredNotifications(): Promise<number | null> {
   try {
-    const { data: deletedCount, error } = await supabaseAdmin
+    const { data: deletedRows, error } = await supabaseAdmin
       .from('notifications')
       .delete()
       .lt('expires_at', new Date().toISOString())
-      .select('id', { count: 'exact' });
+      .select('id');
 
     if (error) {
       console.error('Error deleting expired notifications:', error);
       return null;
     }
 
-    return (deletedCount || []).length;
+    return (deletedRows || []).length;
   } catch (err) {
     console.error('Error deleting expired notifications:', err);
     return null;

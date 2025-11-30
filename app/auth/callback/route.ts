@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { createRouteHandlerClient } from '@supabase/ssr'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/types/supabase'
 
 /**
  * OAuth Callback Handler
@@ -16,9 +16,24 @@ export async function GET(request: NextRequest) {
   const redirectTo = requestUrl.searchParams.get('next') || '/app'
 
   if (code) {
-    const supabase = createRouteHandlerClient<Database>({
-      cookies,
-    })
+    const cookieStore = await cookies()
+    
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll()
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
+              cookieStore.set(name, value, options)
+            })
+          },
+        },
+      }
+    )
 
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 

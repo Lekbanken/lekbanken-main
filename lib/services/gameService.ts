@@ -197,6 +197,10 @@ export async function getRelatedGames(
   }
 
   // Get related games from same category
+  if (!currentGame.category) {
+    return []
+  }
+
   const { data, error } = await supabase
     .from('games')
     .select('*')

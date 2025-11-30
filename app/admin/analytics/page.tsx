@@ -7,7 +7,6 @@ import {
   getPageViewStats,
   getTopPages,
   getSessionStats,
-  getFeatureUsageStats,
   getTopFeatures,
   getErrorStats,
   getTopErrors,
@@ -24,9 +23,12 @@ export default function AnalyticsPage() {
 
   // States
   const [isLoading, setIsLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+  const [dateRange, setDateRange] = useState<DateRange>(() => {
+    const now = Date.now();
+    return {
+      startDate: new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      endDate: new Date(now).toISOString().split('T')[0],
+    };
   });
 
   // Analytics data

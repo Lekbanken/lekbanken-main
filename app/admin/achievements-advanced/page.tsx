@@ -10,8 +10,35 @@ import {
   getAchievementLeaderboard,
 } from '@/lib/services/achievementsAdvancedService';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRecord = any;
+type Challenge = {
+  id: string;
+  title: string;
+  description?: string | null;
+  type: string;
+  difficulty: string;
+  target_value: number;
+  reward_points?: number | null;
+  participant_count?: number;
+  completion_count?: number;
+};
+
+type LimitedEvent = {
+  id: string;
+  title: string;
+  description?: string | null;
+  theme?: string | null;
+  end_date: string;
+  participant_count?: number;
+};
+
+type AchievementLeaderboardEntry = {
+  user_id: string;
+  user_name: string;
+  rank: number;
+  achievement_count: number;
+  seasonal_count: number;
+  total_points: number;
+};
 
 type TabType = 'challenges' | 'events' | 'leaderboard';
 
@@ -19,9 +46,9 @@ export default function AchievementsAdvancedPage() {
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id;
   const [activeTab, setActiveTab] = useState<TabType>('challenges');
-  const [challenges, setChallenges] = useState<AnyRecord[]>([]);
-  const [events, setEvents] = useState<AnyRecord[]>([]);
-  const [leaderboard, setLeaderboard] = useState<AnyRecord[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [events, setEvents] = useState<LimitedEvent[]>([]);
+  const [leaderboard, setLeaderboard] = useState<AchievementLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [challengeForm, setChallengeForm] = useState({
@@ -46,12 +73,11 @@ export default function AchievementsAdvancedPage() {
     const loadData = async () => {
       if (!tenantId) return;
       setLoading(true);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const results = (await Promise.all([
         getActiveChallenges(tenantId, 50),
         getActiveEvents(tenantId, 50),
         getAchievementLeaderboard(tenantId, 1, 50),
-      ])) as unknown as AnyRecord[];
+      ])) as [Challenge[] | null, LimitedEvent[] | null, AchievementLeaderboardEntry[] | null];
       setChallenges(results[0] || []);
       setEvents(results[1] || []);
       setLeaderboard(results[2] || []);
@@ -65,8 +91,7 @@ export default function AchievementsAdvancedPage() {
     if (!tenantId) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (createChallenge as any)(tenantId, {
+      await createChallenge(tenantId, {
         title: challengeForm.title,
         description: challengeForm.description,
         type: challengeForm.type,
@@ -99,8 +124,7 @@ export default function AchievementsAdvancedPage() {
     if (!tenantId) return;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (createEvent as any)(tenantId, {
+      await createEvent(tenantId, {
         title: eventForm.title,
         description: eventForm.description,
         theme: eventForm.theme,
@@ -260,7 +284,7 @@ export default function AchievementsAdvancedPage() {
               ) : challenges.length === 0 ? (
                 <p className="text-gray-500">No challenges yet</p>
               ) : (
-                challenges.map((challenge: AnyRecord) => (
+                challenges.map((challenge) => (
                   <div
                     key={challenge.id}
                     className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50"
@@ -373,7 +397,7 @@ export default function AchievementsAdvancedPage() {
               ) : events.length === 0 ? (
                 <p className="text-gray-500">No events yet</p>
               ) : (
-                events.map((event: AnyRecord) => (
+                events.map((event) => (
                   <div
                     key={event.id}
                     className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50"
@@ -417,7 +441,7 @@ export default function AchievementsAdvancedPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {leaderboard.map((entry: AnyRecord) => (
+                  {leaderboard.map((entry) => (
                     <tr key={entry.user_id} className="border-b hover:bg-gray-50">
                       <td className="py-2 px-4 font-semibold">#{entry.rank}</td>
                       <td className="py-2 px-4">{entry.user_name}</td>

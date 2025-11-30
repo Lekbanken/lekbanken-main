@@ -10,7 +10,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
 import { User } from '@supabase/supabase-js'
 import { supabase } from './client'
-import type { Database } from './types'
+import type { Database } from '@/types/supabase'
 
 type UserProfile = Database['public']['Tables']['users']['Row']
 

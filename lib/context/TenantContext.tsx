@@ -9,7 +9,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
 import { supabase } from '@/lib/supabase/client'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/types/supabase'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
 type UserTenantMembership = Database['public']['Tables']['user_tenant_memberships']['Row'] & {

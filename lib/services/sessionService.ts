@@ -6,7 +6,7 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
-import type { Tables } from '@/types/supabase';
+import type { Tables, Json } from '@/types/supabase';
 
 export type GameSession = Tables<'game_sessions'>;
 export type GameScore = Tables<'game_scores'>;
@@ -243,7 +243,7 @@ export async function recordScore(params: ScoreUpdateParams): Promise<GameScore 
         tenant_id: tenantId || null,
         score: score,
         score_type: scoreType,
-        metadata: metadata || {},
+        metadata: (metadata ?? null) as Json,
         recorded_at: new Date().toISOString(),
       })
       .select()

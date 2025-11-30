@@ -205,11 +205,12 @@ export default function NotificationsPage() {
                           </span>
                         )}
                         <span>
-                          {new Date(notification.created_at).toLocaleDateString('sv-SE')}{' '}
-                          {new Date(notification.created_at).toLocaleTimeString('sv-SE', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
+                          {notification.created_at
+                            ? `${new Date(notification.created_at).toLocaleDateString('sv-SE')} ${new Date(notification.created_at).toLocaleTimeString('sv-SE', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}`
+                            : ''}
                         </span>
                       </div>
                     </div>

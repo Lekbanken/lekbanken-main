@@ -4,66 +4,20 @@ import { supabase } from '@/lib/supabase/client';
 // TYPES & INTERFACES
 // =========================================
 
-export interface Feedback {
-  id: string;
-  feedback_key: string;
-  user_id: string;
-  tenant_id: string | null;
-  game_id: string | null;
-  type: 'bug' | 'feature_request' | 'improvement' | 'other';
-  title: string;
-  description: string | null;
-  rating: number | null;
-  is_anonymous: boolean;
-  status: string;
-  created_at: string;
-  updated_at: string;
-}
+// Use Supabase generated types for type safety
+import type { Database } from '@/types/supabase';
 
-export interface SupportTicket {
-  id: string;
-  ticket_key: string;
-  user_id: string;
-  tenant_id: string | null;
-  assigned_to_user_id: string | null;
-  title: string;
-  description: string | null;
-  category: string | null;
-  status: 'open' | 'in_progress' | 'waiting_for_user' | 'resolved' | 'closed';
-  priority: 'low' | 'medium' | 'high' | 'urgent';
-  resolved_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type Feedback = Database['public']['Tables']['feedback']['Row'];
+export type FeedbackInsert = Database['public']['Tables']['feedback']['Insert'];
 
-export interface TicketMessage {
-  id: string;
-  message_key: string;
-  ticket_id: string;
-  user_id: string;
-  message: string;
-  is_internal: boolean;
-  created_at: string;
-  updated_at: string;
-}
+export type SupportTicket = Database['public']['Tables']['support_tickets']['Row'];
+export type SupportTicketInsert = Database['public']['Tables']['support_tickets']['Insert'];
 
-export interface BugReport {
-  id: string;
-  bug_report_key: string;
-  user_id: string;
-  tenant_id: string | null;
-  game_id: string | null;
-  title: string;
-  description: string;
-  error_message: string | null;
-  steps_to_reproduce: string | null;
-  browser_info: string | null;
-  status: string;
-  is_resolved: boolean;
-  resolved_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type TicketMessage = Database['public']['Tables']['ticket_messages']['Row'];
+export type TicketMessageInsert = Database['public']['Tables']['ticket_messages']['Insert'];
+
+export type BugReport = Database['public']['Tables']['bug_reports']['Row'];
+export type BugReportInsert = Database['public']['Tables']['bug_reports']['Insert'];
 
 export interface SupportStats {
   totalTickets: number;
@@ -223,7 +177,7 @@ export async function createTicket(params: TicketCreateParams): Promise<SupportT
 
 export async function getUserTickets(
   userId: string,
-  status?: string,
+  status?: SupportTicket['status'],
   limit = 20,
   offset = 0
 ): Promise<SupportTicket[] | null> {
@@ -532,8 +486,8 @@ export async function updateBugReportStatus(
 
 export async function getAdminTickets(
   tenantId: string | null,
-  status?: string,
-  priority?: string,
+  status?: SupportTicket['status'],
+  priority?: SupportTicket['priority'],
   limit = 50,
   offset = 0
 ): Promise<SupportTicket[] | null> {

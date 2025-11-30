@@ -1,72 +1,27 @@
 import { supabaseAdmin } from '@/lib/supabase/server';
+import type { Database } from '@/types/supabase';
 
-// Types
-export interface BillingPlan {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  price_monthly: number;
-  price_yearly: number | null;
-  features: Record<string, unknown>;
-  user_limit: number | null;
-  api_limit_daily: number | null;
-  storage_gb: number | null;
-  support_level: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
+// =========================================
+// TYPES - Use Supabase generated types
+// =========================================
 
-export interface Subscription {
-  id: string;
-  tenant_id: string;
-  billing_plan_id: string;
-  status: string;
-  stripe_subscription_id: string | null;
-  stripe_customer_id: string | null;
-  current_period_start: string | null;
-  current_period_end: string | null;
-  canceled_at: string | null;
-  ended_at: string | null;
-  billing_cycle: string;
-  auto_renew: boolean;
-  created_at: string;
-  updated_at: string;
-  plan?: BillingPlan;
-}
+export type BillingPlan = Database['public']['Tables']['billing_plans']['Row'];
+export type BillingPlanInsert = Database['public']['Tables']['billing_plans']['Insert'];
 
-export interface Invoice {
-  id: string;
-  tenant_id: string;
-  subscription_id: string | null;
-  stripe_invoice_id: string | null;
-  invoice_number: string;
-  amount_subtotal: number;
-  amount_tax: number;
-  amount_total: number;
-  currency: string;
-  status: string;
-  paid_at: string | null;
-  due_date: string | null;
-  pdf_url: string | null;
-  notes: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type Subscription = Database['public']['Tables']['subscriptions']['Row'];
+export type SubscriptionInsert = Database['public']['Tables']['subscriptions']['Insert'];
 
-export interface BillingHistory {
-  id: string;
-  tenant_id: string;
-  subscription_id: string | null;
-  event_type: string;
-  from_plan_id: string | null;
-  to_plan_id: string | null;
-  amount_charged: number | null;
-  amount_credited: number | null;
-  notes: string | null;
-  created_at: string;
-}
+export type BillingHistory = Database['public']['Tables']['billing_history']['Row'];
+export type BillingHistoryInsert = Database['public']['Tables']['billing_history']['Insert'];
+
+export type Invoice = Database['public']['Tables']['invoices']['Row'];
+export type InvoiceInsert = Database['public']['Tables']['invoices']['Insert'];
+
+export type PaymentMethod = Database['public']['Tables']['payment_methods']['Row'];
+export type PaymentMethodInsert = Database['public']['Tables']['payment_methods']['Insert'];
+
+// Extended types with relations
+export type SubscriptionWithPlan = Subscription & { plan?: BillingPlan };
 
 // Plan Management
 export async function getAvailablePlans(): Promise<BillingPlan[] | null> {
@@ -366,13 +321,15 @@ export async function getBillingHistory(
 export async function createInvoice(params: {
   tenantId: string;
   subscriptionId?: string;
-  invoiceNumber: string;
-  amountSubtotal: number;
+  name: string;
+  invoiceNumber?: string;
+  amount: number;
+  amountSubtotal?: number;
   amountTax?: number;
-  amountTotal: number;
+  amountTotal?: number;
   currency?: string;
   stripeInvoiceId?: string;
-  dueDate?: Date;
+  dueDate: Date;
   notes?: string;
 }): Promise<Invoice | null> {
   try {
@@ -381,13 +338,15 @@ export async function createInvoice(params: {
       .insert({
         tenant_id: params.tenantId,
         subscription_id: params.subscriptionId,
+        name: params.name,
         invoice_number: params.invoiceNumber,
+        amount: params.amount,
         amount_subtotal: params.amountSubtotal,
-        amount_tax: params.amountTax || 0,
-        amount_total: params.amountTotal,
-        currency: params.currency || 'USD',
+        amount_tax: params.amountTax ?? 0,
+        amount_total: params.amountTotal ?? params.amount,
+        currency: params.currency ?? 'USD',
         stripe_invoice_id: params.stripeInvoiceId,
-        due_date: params.dueDate?.toISOString(),
+        due_date: params.dueDate.toISOString(),
         notes: params.notes,
         status: 'draft',
       })
@@ -454,21 +413,7 @@ export async function updateInvoice(
 // Payment Methods
 export async function getPaymentMethods(
   tenantId: string
-): Promise<
-  Array<{
-    id: string;
-    tenant_id: string;
-    stripe_payment_method_id: string | null;
-    type: string;
-    card_brand: string | null;
-    card_last_four: string | null;
-    card_exp_month: number | null;
-    card_exp_year: number | null;
-    is_default: boolean;
-    created_at: string;
-    updated_at: string;
-  }> | null
-> {
+): Promise<PaymentMethod[] | null> {
   try {
     const { data, error } = await supabaseAdmin
       .from('payment_methods')
@@ -550,11 +495,11 @@ export async function getBillingStats(
     if (invoicesError) throw invoicesError;
 
     const totalRevenue = (invoices || []).reduce(
-      (sum: number, inv: { amount_total?: number }) => sum + (inv.amount_total || 0),
+      (sum: number, inv: { amount_total: number | null }) => sum + (inv.amount_total ?? 0),
       0
     );
-    const paidInvoices = (invoices || []).filter((inv: { status?: string }) => inv.status === 'paid').length;
-    const outstandingInvoices = (invoices || []).filter((inv: { status?: string }) => inv.status === 'open').length;
+    const paidInvoices = (invoices || []).filter((inv) => inv.status === 'paid').length;
+    const outstandingInvoices = (invoices || []).filter((inv) => inv.status === 'draft' || inv.status === 'issued').length;
 
     return {
       activeSubscriptions: (subs || []).length,
@@ -573,7 +518,7 @@ export async function getBillingStats(
 export async function validatePlan(planId: string): Promise<boolean> {
   try {
     const plan = await getPlanById(planId);
-    return !!plan && plan.is_active;
+    return !!plan && (plan.is_active ?? false);
   } catch (err) {
     console.error('Error validating plan:', err);
     return false;

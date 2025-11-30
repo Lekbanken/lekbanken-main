@@ -25,8 +25,8 @@ export default function AdminTicketsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Filter states
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [priorityFilter, setPriorityFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<SupportTicket['status'] | ''>('');
+  const [priorityFilter, setPriorityFilter] = useState<SupportTicket['priority'] | ''>('');
   const [currentPage, setCurrentPage] = useState(1);
 
   // Detail view states
@@ -174,7 +174,7 @@ export default function AdminTicketsPage() {
               <select
                 value={statusFilter}
                 onChange={(e) => {
-                  setStatusFilter(e.target.value);
+                  setStatusFilter(e.target.value as SupportTicket['status'] | '');
                   setCurrentPage(1);
                 }}
                 className="px-3 py-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -189,7 +189,7 @@ export default function AdminTicketsPage() {
               <select
                 value={priorityFilter}
                 onChange={(e) => {
-                  setPriorityFilter(e.target.value);
+                  setPriorityFilter(e.target.value as SupportTicket['priority'] | '');
                   setCurrentPage(1);
                 }}
                 className="px-3 py-1 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"

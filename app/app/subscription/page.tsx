@@ -9,29 +9,16 @@ import {
   getInvoices,
   getPaymentMethods,
   BillingPlan,
-  Subscription,
+  SubscriptionWithPlan,
   Invoice,
+  PaymentMethod,
 } from '@/lib/services/billingService';
-
-interface PaymentMethod {
-  id: string;
-  tenant_id: string;
-  stripe_payment_method_id: string | null;
-  type: string;
-  card_brand: string | null;
-  card_last_four: string | null;
-  card_exp_month: number | null;
-  card_exp_year: number | null;
-  is_default: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 export default function SubscriptionPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
-  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionWithPlan | null>(null);
   const [plans, setPlans] = useState<BillingPlan[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
@@ -248,7 +235,7 @@ export default function SubscriptionPage() {
                           className={`text-xs font-medium px-2 py-1 rounded ${
                             invoice.status === 'paid'
                               ? 'bg-green-100 text-green-700'
-                              : invoice.status === 'open'
+                              : invoice.status === 'draft' || invoice.status === 'issued'
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : 'bg-slate-100 text-slate-700'
                           }`}

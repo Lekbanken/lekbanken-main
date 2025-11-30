@@ -1,7 +1,7 @@
 # 🎨 Design Implementation TODO
 
 > Översikt över hela UI/Design-implementationen för Lekbanken.  
-> Uppdaterad: 2025-01-XX
+> Uppdaterad: 2025-01-27
 
 ---
 
@@ -11,10 +11,16 @@
 |--------|--------|----------|
 | Design System | ✅ Klar | 100% |
 | UI Primitives | ✅ Klar | 100% |
+| Feedback & States | ✅ Klar | 100% |
+| Interactive Components | ✅ Klar | 100% |
 | Marketing | ✅ Klar | 100% |
 | App Shell | ✅ Klar | 100% |
-| App Pages | 🔄 Pågår | 80% |
-| Admin Panel | ⬜ Ej påbörjad | 0% |
+| App Sandbox | ✅ Klar | 100% |
+| App Pages | ✅ Klar | 100% |
+| Admin Sandbox | ✅ Klar | 100% |
+| Admin Navigation | ✅ Klar | 100% |
+| Design Consistency | ✅ Klar | 100% |
+| Admin Implementation | ⬜ Ej påbörjad | 0% |
 | Dark Mode | ⬜ Ej påbörjad | 0% |
 
 ---
@@ -68,8 +74,61 @@
 ### App Pages (/app)
 - [x] **/app** - Dashboard med stats, aktiviteter, snabbåtgärder
 - [x] **/app/games** - Spellista med sök, filter, grid/list-vy
+- [x] **/app/games/[gameId]** - Speldetalj med info, regler, tips
 - [x] **/app/profile** - Profilsida med level, XP, achievements
+- [x] **/app/profile/friends** - Vänlista med requests
 - [x] **/app/leaderboard** - Topplista med podium och ranking
+- [x] **/app/support** - Supportformulär och FAQ
+- [x] **/app/subscription** - Prenumerationshantering
+- [x] **/app/notifications** - Notifikationslista
+- [x] **/app/shop** - Butik med valutor och items
+- [x] **/app/challenges** - Utmaningar och progress
+- [x] **/app/events** - Händelser och event
+- [x] **/app/preferences** - Inställningar
+
+### Feedback & States (components/ui/)
+- [x] **Alert** - 4 varianter (info, success, warning, error) + closable
+- [x] **Toast** - Positioner + varianter
+- [x] **EmptyState** - Illustration placeholder
+- [x] **ErrorState** - Felmeddelande med retry
+- [x] **LoadingSpinner** - Animerad spinner
+- [x] **Skeleton** - Loading placeholder
+
+### Interactive Components (components/ui/)
+- [x] **Dialog** - Modal med Headless UI
+- [x] **DropdownMenu** - Actions menu med Headless UI
+- [x] **Avatar** - Med fallback initialer + storlekar
+- [x] **Breadcrumbs** - Navigation breadcrumbs
+- [x] **Tabs** - Horisontell tab navigation
+
+### Admin Navigation
+- [x] **sidebar.tsx** - Refaktorerad med design tokens
+- [x] **topbar.tsx** - Refaktorerad med design tokens
+- [x] **admin-nav-items.tsx** - Navigation konfiguration
+- [x] **layout-client.tsx** - Uppdaterad layout
+
+### Admin Sandbox (/sandbox/admin)
+- [x] /sandbox/admin - Admin sandbox index
+- [x] /sandbox/admin/dashboard - Dashboard med stats
+- [x] /sandbox/admin/users - Användarhantering
+- [x] /sandbox/admin/content - Innehållshantering
+- [x] /sandbox/admin/analytics - Statistik och grafer
+- [x] /sandbox/admin/settings - Systeminställningar
+- [x] /sandbox/admin/support - Supportärenden
+- [x] /sandbox/admin/billing - Fakturering
+- [x] /sandbox/admin/notifications - Notifieringar
+- [x] /sandbox/admin/organisations - Organisationer
+- [x] /sandbox/admin/licenses - Licenshantering
+- [x] /sandbox/admin/achievements - Achievements
+- [x] /sandbox/admin/leaderboard - Leaderboard config
+- [x] /sandbox/admin/moderation - Moderering
+- [x] /sandbox/admin/personalization - Personalisering
+
+### Design Consistency Audit
+- [x] All App pages now use semantic design tokens
+- [x] No hardcoded gray-*/slate-* colors in user-facing pages
+- [x] components/GameCard.tsx updated
+- [x] Documentation: docs/DESIGN_CONSISTENCY_TODO.md
 
 ### Sandbox (/sandbox)
 - [x] Huvudsida med kategorier (UI, Marketing, App, Admin)
@@ -84,44 +143,38 @@
 - [x] /sandbox/app/shell - AppShell preview
 - [x] /sandbox/app/game-card - GameCard varianter
 - [x] /sandbox/app/dashboard - Dashboard layout
+- [x] /sandbox/app/games - Games lista
+- [x] /sandbox/app/leaderboard - Leaderboard
+- [x] /sandbox/app/profile - Profilsida
+- [x] /sandbox/app/shop - Butik
+- [x] /sandbox/app/planner - Planerare
+- [x] /sandbox/app/events - Events
+- [x] /sandbox/feedback - Feedback & States (Alert, Toast, Empty, Error, Loading, Skeleton)
+- [x] /sandbox/interactive - Interactive (Dialog, Dropdown, Avatar, Breadcrumbs, Tabs)
 
 ---
 
 ## ⬜ TODO
 
-### Fas 2: Fler UI Komponenter
+### Fas 2: Fler UI Komponenter (vid behov)
 
-#### Forms (Prioritet: HÖG)
+#### Forms (Prioritet: MEDIUM)
 - [ ] **Checkbox** - Med label, description
 - [ ] **Radio** - Group med options
-- [ ] **Switch/Toggle** - On/off med label
+- [ ] **Switch/Toggle** - On/off med label (finns inline i preferences)
 - [ ] **Slider** - Range input
 - [ ] **DatePicker** - Kalenderväljare
 - [ ] **FileUpload** - Drag & drop + click
 
-#### Feedback (Prioritet: HÖG)
-- [ ] **Alert** - Info, Success, Warning, Error
-- [ ] **Toast** - Notifikationer (use react-hot-toast eller sonner)
-- [ ] **Modal/Dialog** - Med Headless UI
-- [ ] **Drawer** - Side panel
-- [ ] **Tooltip** - Hover info
-- [ ] **Popover** - Click info
-
-#### Navigation (Prioritet: MEDIUM)
-- [ ] **Tabs** - Horisontell navigation
-- [ ] **Breadcrumb** - Sökväg
+#### Navigation (Prioritet: LÅG)
 - [ ] **Pagination** - Sidnavigering
 - [ ] **Stepper** - Flerstegsprocess
-- [ ] **Dropdown Menu** - Actions menu
 
-#### Data Display (Prioritet: MEDIUM)
-- [ ] **Avatar** - Med fallback initialer
+#### Data Display (Prioritet: LÅG)
 - [ ] **AvatarGroup** - Stacked avatars
-- [ ] **Table** - Sortable, filterable
+- [ ] **Table** - Sortable, filterable (finns inline i admin sandbox)
 - [ ] **DataList** - Key-value pairs
-- [ ] **Skeleton** - Loading placeholder
-- [ ] **EmptyState** - Tom data illustration
-- [ ] **Stats** - KPI-kort
+- [ ] **Stats** - KPI-kort (finns inline i dashboard)
 
 #### Layout (Prioritet: LÅG)
 - [ ] **Container** - Max-width wrapper
@@ -132,23 +185,12 @@
 
 ---
 
-### Fas 3: Marketing Sidor
-
-#### Landningssida (/)
-- [ ] Sammanfoga alla sektioner
-- [ ] Animationer (Framer Motion)
-- [ ] SEO meta tags
-- [ ] Open Graph bilder
+### Fas 3: Marketing Sidor (vid behov)
 
 #### Features (/features)
 - [ ] Feature grid
 - [ ] Detaljerade feature-sidor
 - [ ] Screenshots/demos
-
-#### Prissättning (/pricing)
-- [ ] FAQ accordion
-- [ ] Jämförelsetabell
-- [ ] Enterprise kontaktformulär
 
 #### Om oss (/about)
 - [ ] Team section
@@ -157,77 +199,38 @@
 
 #### Kontakt (/contact)
 - [ ] Kontaktformulär
-- [ ] Karta (om relevant)
 - [ ] Support-info
 
-#### Auth
-- [ ] Login sida design
-- [ ] Register sida design
-- [ ] Forgot password design
-- [ ] Email verification design
+---
+
+### Fas 4: Admin Implementation (NÄSTA STEG)
+
+> Kopiera från sandbox till riktiga admin-sidor
+
+#### Layout (från sandbox)
+- [ ] Kopiera sidebar-design till app/admin/components/
+- [ ] Kopiera topbar-design
+- [ ] Integrera navigation
+
+#### Pages att implementera
+- [ ] /admin/page.tsx - Dashboard (från sandbox/admin/dashboard)
+- [ ] /admin/users/page.tsx - Användare (från sandbox/admin/users)
+- [ ] /admin/content/page.tsx - Innehåll (från sandbox/admin/content)
+- [ ] /admin/analytics/page.tsx - Statistik (från sandbox/admin/analytics)
+- [ ] /admin/settings/page.tsx - Inställningar (från sandbox/admin/settings)
+- [ ] /admin/support/page.tsx - Support (från sandbox/admin/support)
+- [ ] /admin/billing/page.tsx - Fakturering (från sandbox/admin/billing)
+- [ ] /admin/notifications/page.tsx - Notifikationer (från sandbox/admin/notifications)
+- [ ] /admin/organisations/page.tsx - Organisationer (från sandbox/admin/organisations)
+- [ ] /admin/licenses/page.tsx - Licenser (från sandbox/admin/licenses)
+- [ ] /admin/achievements-advanced/page.tsx - Achievements (från sandbox/admin/achievements)
+- [ ] /admin/leaderboard/page.tsx - Leaderboard (från sandbox/admin/leaderboard)
+- [ ] /admin/moderation/page.tsx - Moderering (från sandbox/admin/moderation)
+- [ ] /admin/personalization/page.tsx - Personalisering (från sandbox/admin/personalization)
 
 ---
 
-### Fas 4: App UI
-
-#### Dashboard (/app)
-- [ ] Välkomst-kort
-- [ ] Statistik-widgets
-- [ ] Senaste aktiviteter
-- [ ] Snabbåtgärder
-
-#### Aktiviteter (/app/games)
-- [ ] Lista med filter
-- [ ] Grid/list toggle
-- [ ] Sök med debounce
-- [ ] Aktivitetskort (GameCard)
-- [ ] Detaljsida
-
-#### Planering (/app/planner)
-- [ ] Kalendervy
-- [ ] Drag & drop aktiviteter
-- [ ] Pass-builder
-- [ ] Export/print
-
-#### Profil (/app/profile)
-- [ ] Profilkort
-- [ ] Redigera profil modal
-- [ ] Avatar upload
-- [ ] Inställningar
-
-#### Leaderboard (/app/leaderboard)
-- [ ] Topplistor
-- [ ] Filtrera på kategori
-- [ ] Animerade placeringar
-
----
-
-### Fas 5: Admin Panel
-
-#### Layout
-- [ ] Admin sidebar
-- [ ] Admin header
-- [ ] Breadcrumbs
-
-#### Users (/admin/users)
-- [ ] Användartabell
-- [ ] Sök & filter
-- [ ] Användardetalj modal
-- [ ] Bulk actions
-
-#### Content (/admin/content)
-- [ ] Aktivitetshantering
-- [ ] CRUD interface
-- [ ] Rich text editor
-
-#### Analytics (/admin/analytics)
-- [ ] Grafer (Recharts/Chart.js)
-- [ ] KPI-kort
-- [ ] Datumväljare
-
----
-
-### Fas 6: Polish
+### Fas 5: Polish (framtida)
 
 #### Animationer
 - [ ] Page transitions
@@ -248,6 +251,8 @@
 
 #### Dark Mode
 - [ ] Fullständig dark mode support
+- [ ] Theme toggle i UI
+- [ ] Testa alla komponenter
 - [ ] Theme toggle komponent
 - [ ] System preference detection
 - [ ] Persist user preference

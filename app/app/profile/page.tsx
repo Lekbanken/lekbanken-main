@@ -262,16 +262,19 @@ export default function ProfilePage() {
               Recent Achievements ({userAchievements.length})
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {userAchievements.slice(0, 12).map((ua) => (
-                <AchievementBadge
-                  key={ua.id}
-                  achievement={ua.achievement}
-                  isUnlocked={true}
-                  unlockedAt={ua.unlocked_at}
-                  size="md"
-                  showLabel={false}
-                />
-              ))}
+              {userAchievements
+                .slice(0, 12)
+                .filter((ua) => ua.achievement)
+                .map((ua) => (
+                  <AchievementBadge
+                    key={ua.id}
+                    achievement={ua.achievement!}
+                    isUnlocked={true}
+                    unlockedAt={ua.unlocked_at}
+                    size="md"
+                    showLabel={false}
+                  />
+                ))}
             </div>
             <Link
               href="/app/profile/achievements"

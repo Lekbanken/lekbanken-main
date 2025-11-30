@@ -2,34 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/context/TenantContext';
+import { useAuth } from '@/lib/supabase/auth';
 import {
   getActiveChallenges,
   createChallenge,
   createEvent,
   getActiveEvents,
   getAchievementLeaderboard,
+  type CommunityChallenge,
+  type LimitedTimeEvent,
 } from '@/lib/services/achievementsAdvancedService';
-
-type Challenge = {
-  id: string;
-  title: string;
-  description?: string | null;
-  type: string;
-  difficulty: string;
-  target_value: number;
-  reward_points?: number | null;
-  participant_count?: number;
-  completion_count?: number;
-};
-
-type LimitedEvent = {
-  id: string;
-  title: string;
-  description?: string | null;
-  theme?: string | null;
-  end_date: string;
-  participant_count?: number;
-};
 
 type AchievementLeaderboardEntry = {
   user_id: string;
@@ -43,28 +25,33 @@ type AchievementLeaderboardEntry = {
 type TabType = 'challenges' | 'events' | 'leaderboard';
 
 export default function AchievementsAdvancedPage() {
+  const { user } = useAuth();
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id;
   const [activeTab, setActiveTab] = useState<TabType>('challenges');
-  const [challenges, setChallenges] = useState<Challenge[]>([]);
-  const [events, setEvents] = useState<LimitedEvent[]>([]);
+  const [challenges, setChallenges] = useState<CommunityChallenge[]>([]);
+  const [events, setEvents] = useState<LimitedTimeEvent[]>([]);
   const [leaderboard, setLeaderboard] = useState<AchievementLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const [challengeForm, setChallengeForm] = useState({
+  const defaultChallengeEnd = () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const [challengeForm, setChallengeForm] = useState(() => ({
     title: '',
     description: '',
-    type: 'score',
+    challenge_type: 'score',
     difficulty: 'medium',
     target_value: 100,
     reward_points: 50,
-  });
+    ends_at: defaultChallengeEnd(),
+  }));
 
   const [eventForm, setEventForm] = useState({
     title: '',
     description: '',
     theme: '',
-    end_date: '',
+    ends_at: '',
+    event_type: 'engagement',
     reward_type: 'points',
     reward_amount: 100,
   });
@@ -77,7 +64,7 @@ export default function AchievementsAdvancedPage() {
         getActiveChallenges(tenantId, 50),
         getActiveEvents(tenantId, 50),
         getAchievementLeaderboard(tenantId, 1, 50),
-      ])) as [Challenge[] | null, LimitedEvent[] | null, AchievementLeaderboardEntry[] | null];
+      ])) as [CommunityChallenge[] | null, LimitedTimeEvent[] | null, AchievementLeaderboardEntry[] | null];
       setChallenges(results[0] || []);
       setEvents(results[1] || []);
       setLeaderboard(results[2] || []);
@@ -88,28 +75,30 @@ export default function AchievementsAdvancedPage() {
 
   async function handleCreateChallenge(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!tenantId) return;
+    if (!tenantId || !user) return;
 
     try {
-      await createChallenge(tenantId, {
+      await createChallenge(tenantId, user.id, {
         title: challengeForm.title,
         description: challengeForm.description,
-        type: challengeForm.type,
+        challenge_type: challengeForm.challenge_type,
         difficulty: challengeForm.difficulty,
         target_value: challengeForm.target_value,
         reward_points: challengeForm.reward_points,
+        reward_currency_amount: null,
         status: 'active',
-        participant_count: 0,
-        completion_count: 0,
+        starts_at: new Date().toISOString(),
+        ends_at: challengeForm.ends_at || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       });
 
       setChallengeForm({
         title: '',
         description: '',
-        type: 'score',
+        challenge_type: 'score',
         difficulty: 'medium',
         target_value: 100,
         reward_points: 50,
+        ends_at: defaultChallengeEnd(),
       });
 
       const data = await getActiveChallenges(tenantId, 50);
@@ -121,26 +110,27 @@ export default function AchievementsAdvancedPage() {
 
   async function handleCreateEvent(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!tenantId) return;
+    if (!tenantId || !user) return;
 
     try {
-      await createEvent(tenantId, {
+      await createEvent(tenantId, user.id, {
         title: eventForm.title,
         description: eventForm.description,
         theme: eventForm.theme,
-        start_date: new Date().toISOString(),
-        end_date: eventForm.end_date,
+        event_type: eventForm.event_type,
+        starts_at: new Date().toISOString(),
+        ends_at: eventForm.ends_at,
+        status: 'active',
         reward_type: eventForm.reward_type,
         reward_amount: eventForm.reward_amount,
-        participant_count: 0,
-        completion_count: 0,
       });
 
       setEventForm({
         title: '',
         description: '',
         theme: '',
-        end_date: '',
+        ends_at: '',
+        event_type: 'engagement',
         reward_type: 'points',
         reward_amount: 100,
       });
@@ -208,9 +198,9 @@ export default function AchievementsAdvancedPage() {
                   required
                 />
                 <select
-                  value={challengeForm.type}
+                  value={challengeForm.challenge_type}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                    setChallengeForm({ ...challengeForm, type: e.target.value })
+                    setChallengeForm({ ...challengeForm, challenge_type: e.target.value })
                   }
                   className="px-3 py-2 border rounded-md"
                 >
@@ -292,10 +282,10 @@ export default function AchievementsAdvancedPage() {
                     <div className="flex-1">
                       <h3 className="font-semibold">{challenge.title}</h3>
                       <div className="flex gap-4 text-sm text-gray-500 mt-1">
-                        <span>Type: {challenge.type}</span>
+                        <span>Type: {challenge.challenge_type}</span>
                         <span>Difficulty: {challenge.difficulty}</span>
                         <span>Target: {challenge.target_value}</span>
-                        <span>Participants: {challenge.participant_count}</span>
+                        <span>Participants: {challenge.participation_count}</span>
                         <span>Completed: {challenge.completion_count}</span>
                       </div>
                     </div>
@@ -348,9 +338,9 @@ export default function AchievementsAdvancedPage() {
               <div className="grid grid-cols-3 gap-4">
                 <input
                   type="datetime-local"
-                  value={eventForm.end_date}
+                  value={eventForm.ends_at}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setEventForm({ ...eventForm, end_date: e.target.value })
+                    setEventForm({ ...eventForm, ends_at: e.target.value })
                   }
                   className="px-3 py-2 border rounded-md"
                   required
@@ -406,7 +396,7 @@ export default function AchievementsAdvancedPage() {
                       <h3 className="font-semibold">{event.title}</h3>
                       <div className="flex gap-4 text-sm text-gray-500 mt-1">
                         <span>Theme: {event.theme}</span>
-                        <span>Ends: {new Date(event.end_date).toLocaleDateString()}</span>
+                        <span>Ends: {new Date(event.ends_at).toLocaleDateString()}</span>
                         <span>Participants: {event.participant_count}</span>
                       </div>
                     </div>

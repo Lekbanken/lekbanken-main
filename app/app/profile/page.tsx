@@ -281,23 +281,26 @@ export default function ProfilePage() {
         )}
 
         {/* Achievement Progress */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Achievement Progress</h2>
-          <div className="space-y-3">
-            {allAchievements.slice(0, 5).map((achievement) => {
-              const isUnlocked = userAchievements.some(
-                (ua) => ua.achievement_id === achievement.id
-              );
-              return (
-                <div key={achievement.id} className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${isUnlocked ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                  <p className="text-gray-700">{achievement.name}</p>
-                  {isUnlocked && <span className="ml-auto text-green-600">✓ Unlocked</span>}
-                </div>
-              );
-            })}
+        {allAchievements.length > 0 && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Achievement Progress</h2>
+            <div className="space-y-3">
+              {allAchievements.slice(0, 5).map((achievement) => {
+                const isUnlocked = userAchievements.some(
+                  (ua) => ua.achievement_id === achievement.id
+                );
+                return (
+                  <div key={achievement.id} className="flex items-center gap-3">
+                    <div className={`w-2 h-2 rounded-full ${isUnlocked ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                    <p className="text-gray-700">{achievement.name}</p>
+                    {isUnlocked && <span className="ml-auto text-green-600">✓ Unlocked</span>}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
+}

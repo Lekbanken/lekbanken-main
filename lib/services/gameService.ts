@@ -6,9 +6,9 @@
  */
 
 import { supabase } from '@/lib/supabase/client'
-import type { Database } from '@/lib/supabase/types'
+import type { Tables } from '@/types/supabase'
 
-type Game = Database['public']['Tables']['games']['Row']
+export type Game = Tables<'games'>
 
 export interface GameFilters {
   search?: string

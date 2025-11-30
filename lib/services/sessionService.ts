@@ -6,37 +6,10 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
+import type { Tables } from '@/types/supabase';
 
-// Types will be generated once migrations run
-// For now, using inline interfaces
-export interface GameSession {
-  id: string;
-  session_key: string | null;
-  game_id: string;
-  user_id: string;
-  tenant_id: string | null;
-  status: 'active' | 'paused' | 'completed' | 'abandoned';
-  score: number | null;
-  duration_seconds: number | null;
-  started_at: string;
-  ended_at: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface GameScore {
-  id: string;
-  score_key: string | null;
-  session_id: string;
-  game_id: string;
-  user_id: string;
-  tenant_id: string | null;
-  score: number;
-  score_type: string | null;
-  metadata: Record<string, unknown> | null;
-  recorded_at: string;
-  created_at: string;
-}
+export type GameSession = Tables<'game_sessions'>;
+export type GameScore = Tables<'game_scores'>;
 
 // ============================================
 // TYPES & INTERFACES

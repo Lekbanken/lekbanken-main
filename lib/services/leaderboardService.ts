@@ -6,10 +6,10 @@
  */
 
 import { supabase } from '@/lib/supabase/client';
+import type { Tables } from '@/types/supabase';
 
-// ============================================
-// TYPES & INTERFACES
-// ============================================
+// Types
+export type Leaderboard = Tables<'leaderboards'>;
 
 export interface LeaderboardEntry {
   rank: number;

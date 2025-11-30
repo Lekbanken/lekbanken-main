@@ -142,11 +142,11 @@ export default function FriendsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="max-w-3xl mx-auto pt-20">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Friends</h1>
-            <p className="text-slate-600">Du måste vara inloggad för att komma åt denna sidan.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">Friends</h1>
+            <p className="text-muted-foreground">Du måste vara inloggad för att komma åt denna sidan.</p>
           </div>
         </div>
       </div>
@@ -154,12 +154,12 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+    <div className="min-h-screen bg-background p-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Friends</h1>
-          <p className="text-slate-600">Hantera dina vänner och vänförfrågningar</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Friends</h1>
+          <p className="text-muted-foreground">Hantera dina vänner och vänförfrågningar</p>
         </div>
 
         {/* Tabs */}
@@ -170,8 +170,8 @@ export default function FriendsPage() {
               onClick={() => setActiveTab(tab)}
               className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
                 activeTab === tab
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-primary text-white'
+                  : 'text-muted-foreground hover:bg-muted'
               }`}
             >
               {tab === 'friends' && `Friends (${friendsList.length})`}
@@ -185,25 +185,25 @@ export default function FriendsPage() {
         {activeTab === 'friends' && (
           <div className="space-y-3">
             {isLoading ? (
-              <div className="bg-white rounded-lg shadow p-6 text-center">
-                <p className="text-slate-600">Laddar...</p>
+              <div className="bg-card rounded-lg shadow p-6 text-center">
+                <p className="text-muted-foreground">Laddar...</p>
               </div>
             ) : friendsList.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-slate-600 mb-4">Du har inga vänner ännu</p>
+              <div className="bg-card rounded-lg shadow p-12 text-center">
+                <p className="text-muted-foreground mb-4">Du har inga vänner ännu</p>
                 <button
                   onClick={() => setActiveTab('add')}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded font-medium transition-colors"
                 >
                   Add Your First Friend
                 </button>
               </div>
             ) : (
               friendsList.map((friend) => (
-                <div key={friend.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+                <div key={friend.id} className="bg-card rounded-lg shadow p-4 flex justify-between items-center">
                   <div>
-                    <p className="font-bold text-slate-900">{friend.email}</p>
-                    <p className="text-xs text-slate-500">{friend.id}</p>
+                    <p className="font-bold text-foreground">{friend.email}</p>
+                    <p className="text-xs text-muted-foreground">{friend.id}</p>
                   </div>
                   <button
                     onClick={() => handleRemoveFriend(friend.id)}
@@ -221,22 +221,22 @@ export default function FriendsPage() {
         {activeTab === 'requests' && (
           <div className="space-y-3">
             {isLoading ? (
-              <div className="bg-white rounded-lg shadow p-6 text-center">
-                <p className="text-slate-600">Laddar...</p>
+              <div className="bg-card rounded-lg shadow p-6 text-center">
+                <p className="text-muted-foreground">Laddar...</p>
               </div>
             ) : receivedRequests.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-slate-600">Du har inga väntande vänförfrågningar</p>
+              <div className="bg-card rounded-lg shadow p-12 text-center">
+                <p className="text-muted-foreground">Du har inga väntande vänförfrågningar</p>
               </div>
             ) : (
               <div>
-                <h3 className="font-bold text-slate-900 mb-3">Received Requests</h3>
+                <h3 className="font-bold text-foreground mb-3">Received Requests</h3>
                 <div className="space-y-2 mb-6">
                   {receivedRequests.map((req) => (
-                    <div key={req.id} className="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+                    <div key={req.id} className="bg-card rounded-lg shadow p-4 flex justify-between items-center">
                       <div>
-                        <p className="text-sm text-slate-600">Friend request from:</p>
-                        <p className="font-bold text-slate-900">{req.requester_id}</p>
+                        <p className="text-sm text-muted-foreground">Friend request from:</p>
+                        <p className="font-bold text-foreground">{req.requester_id}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -260,13 +260,13 @@ export default function FriendsPage() {
 
             {sentRequests.length > 0 && (
               <div>
-                <h3 className="font-bold text-slate-900 mb-3">Sent Requests</h3>
+                <h3 className="font-bold text-foreground mb-3">Sent Requests</h3>
                 <div className="space-y-2">
                   {sentRequests.map((req) => (
-                    <div key={req.id} className="bg-slate-50 rounded-lg p-4 flex justify-between items-center border border-slate-200">
+                    <div key={req.id} className="bg-muted rounded-lg p-4 flex justify-between items-center border border-border">
                       <div>
-                        <p className="text-sm text-slate-600">Pending friend request to:</p>
-                        <p className="font-bold text-slate-900">{req.recipient_id}</p>
+                        <p className="text-sm text-muted-foreground">Pending friend request to:</p>
+                        <p className="font-bold text-foreground">{req.recipient_id}</p>
                       </div>
                       <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded font-medium">
                         Pending
@@ -281,8 +281,8 @@ export default function FriendsPage() {
 
         {/* Add Friend Tab */}
         {activeTab === 'add' && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="font-bold text-slate-900 mb-4">Search Users</h3>
+          <div className="bg-card rounded-lg shadow p-6">
+            <h3 className="font-bold text-foreground mb-4">Search Users</h3>
             <div className="space-y-4">
               <input
                 type="email"
@@ -292,23 +292,22 @@ export default function FriendsPage() {
                   setAddFriendEmail(e.target.value);
                   handleSearchUsers(e.target.value);
                 }}
-                className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
               />
 
-              {isSearching && <p className="text-slate-600 text-sm">Searching...</p>}
+              {isSearching && <p className="text-muted-foreground text-sm">Searching...</p>}
 
               {searchResults.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm text-slate-600 font-medium">Results:</p>
+                  <p className="text-sm text-muted-foreground font-medium">Results:</p>
                   {searchResults.map((user) => (
-                    <div key={user.id} className="flex justify-between items-center p-3 border border-slate-200 rounded-lg">
+                    <div key={user.id} className="flex justify-between items-center p-3 border border-border rounded-lg">
                       <div>
-                        <p className="font-medium text-slate-900">{user.email}</p>
+                        <p className="font-medium text-foreground">{user.email}</p>
                       </div>
                       <button
                         onClick={() => handleSendRequest(user.id)}
-                        className="px-4 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-medium transition-colors"
-                      >
+                        className="px-4 py-1 bg-primary hover:bg-primary/90 text-white text-sm rounded font-medium transition-colors">
                         Add Friend
                       </button>
                     </div>
@@ -317,7 +316,7 @@ export default function FriendsPage() {
               )}
 
               {addFriendEmail.trim() && searchResults.length === 0 && !isSearching && (
-                <p className="text-slate-500 text-sm">No users found matching that email</p>
+                <p className="text-muted-foreground text-sm">No users found matching that email</p>
               )}
             </div>
           </div>

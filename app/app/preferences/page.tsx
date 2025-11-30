@@ -1,262 +1,339 @@
-'use client';
+'use client'
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTenant } from '@/lib/context/TenantContext';
-import { useAuth } from '@/lib/supabase/auth';
-import * as personalizationService from '@/lib/services/personalizationService';
+import { useState } from 'react'
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Select } from '@/components/ui'
+import {
+  Cog6ToothIcon,
+  BellIcon,
+  GlobeAltIcon,
+  PaintBrushIcon,
+  ShieldCheckIcon,
+  UserCircleIcon,
+  SparklesIcon,
+  CheckIcon,
+} from '@heroicons/react/24/outline'
 
-interface UserPreferences {
-  language: string;
-  theme: string;
-  email_frequency: string;
-  notifications_enabled: boolean;
-  content_maturity_level: string;
-  profile_visibility: string;
-  enable_recommendations: boolean;
-  recommendation_frequency: string;
+// Types
+interface Preferences {
+  language: string
+  theme: string
+  emailFrequency: string
+  notificationsEnabled: boolean
+  pushNotifications: boolean
+  soundEnabled: boolean
+  contentMaturity: string
+  profileVisibility: string
+  enableRecommendations: boolean
+  displayName: string
+}
+
+const LANGUAGES = [
+  { value: 'sv', label: 'Svenska' },
+  { value: 'en', label: 'English' },
+  { value: 'no', label: 'Norsk' },
+  { value: 'da', label: 'Dansk' },
+]
+
+const THEMES = [
+  { value: 'light', label: 'Ljust' },
+  { value: 'dark', label: 'Mörkt' },
+  { value: 'system', label: 'Systemval' },
+]
+
+const EMAIL_FREQUENCIES = [
+  { value: 'daily', label: 'Dagligen' },
+  { value: 'weekly', label: 'Veckovis' },
+  { value: 'monthly', label: 'Månatligen' },
+  { value: 'never', label: 'Aldrig' },
+]
+
+const VISIBILITY_OPTIONS = [
+  { value: 'public', label: 'Publik' },
+  { value: 'friends', label: 'Endast vänner' },
+  { value: 'private', label: 'Privat' },
+]
+
+const MATURITY_LEVELS = [
+  { value: 'all', label: 'Allt innehåll' },
+  { value: 'family', label: 'Familjevänligt' },
+  { value: 'kids', label: 'Endast barn' },
+]
+
+function Toggle({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean
+  onChange: (checked: boolean) => void
+  label?: string
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+        checked ? 'bg-primary' : 'bg-muted'
+      }`}
+      aria-label={label}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          checked ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+    </button>
+  )
 }
 
 export default function PreferencesPage() {
-  const { currentTenant } = useTenant();
-  const { user } = useAuth();
-  const userId = user?.id;
-
-  const [preferences, setPreferences] = useState<UserPreferences>({
-    language: 'en',
+  const [preferences, setPreferences] = useState<Preferences>({
+    language: 'sv',
     theme: 'light',
-    email_frequency: 'weekly',
-    notifications_enabled: true,
-    content_maturity_level: 'all',
-    profile_visibility: 'public',
-    enable_recommendations: true,
-    recommendation_frequency: 'weekly',
-  });
+    emailFrequency: 'weekly',
+    notificationsEnabled: true,
+    pushNotifications: true,
+    soundEnabled: false,
+    contentMaturity: 'all',
+    profileVisibility: 'public',
+    enableRecommendations: true,
+    displayName: 'Anna Andersson',
+  })
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const loadPreferences = useCallback(async () => {
-    if (!currentTenant?.id || !userId) return;
-    setLoading(true);
-    try {
-      const prefs = await personalizationService.getUserPreferences(currentTenant.id, userId);
-      if (prefs) {
-        setPreferences({
-          language: (prefs.language as string) || 'en',
-          theme: (prefs.theme as string) || 'light',
-          email_frequency: (prefs.email_frequency as string) || 'weekly',
-          notifications_enabled: (prefs.notifications_enabled as boolean) !== false,
-          content_maturity_level: (prefs.content_maturity_level as string) || 'all',
-          profile_visibility: (prefs.profile_visibility as string) || 'public',
-          enable_recommendations: (prefs.enable_recommendations as boolean) !== false,
-          recommendation_frequency: (prefs.recommendation_frequency as string) || 'weekly',
-        });
-      }
-    } catch (error) {
-      console.error('Error loading preferences:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentTenant?.id, userId]);
-
-  useEffect(() => {
-    loadPreferences();
-  }, [loadPreferences]);
-
-  async function savePreferences() {
-    if (!currentTenant?.id || !userId) return;
-    setSaving(true);
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await personalizationService.updateUserPreferences(currentTenant.id, userId, preferences as any);
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch (error) {
-      console.error('Error saving preferences:', error);
-    } finally {
-      setSaving(false);
-    }
+  const updatePreference = <K extends keyof Preferences>(key: K, value: Preferences[K]) => {
+    setPreferences((prev) => ({ ...prev, [key]: value }))
+    setSaved(false)
   }
 
-  if (loading) {
-    return <div className="py-12 text-center text-gray-600">Loading your preferences...</div>;
+  const handleSave = async () => {
+    setSaving(true)
+    // Simulate save
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    setSaving(false)
+    setSaved(true)
+    setTimeout(() => setSaved(false), 3000)
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-4xl font-bold tracking-tight">Settings</h1>
-        <p className="mt-2 text-gray-600">
-          Manage your preferences and notification settings
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Inställningar</h1>
+          <p className="text-muted-foreground mt-1">Anpassa din upplevelse</p>
+        </div>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? (
+            'Sparar...'
+          ) : saved ? (
+            <>
+              <CheckIcon className="h-4 w-4 mr-1" />
+              Sparat!
+            </>
+          ) : (
+            'Spara ändringar'
+          )}
+        </Button>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 text-2xl font-semibold">Display</h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-              Preferred Language
-            </label>
-            <select
-              id="language"
-              value={preferences.language}
-              onChange={(e) => setPreferences({ ...preferences, language: e.target.value })}
-              className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="en">English</option>
-              <option value="sv">Swedish</option>
-              <option value="de">Deutsch</option>
-              <option value="fr">Français</option>
-              <option value="es">Español</option>
-              <option value="it">Italiano</option>
-              <option value="pt">Português</option>
-            </select>
-          </div>
+      {saved && (
+        <Badge variant="success" className="w-full justify-center py-2">
+          Dina inställningar har sparats!
+        </Badge>
+      )}
 
-          <div>
-            <label htmlFor="theme" className="block text-sm font-medium text-gray-700">
-              Color Theme
-            </label>
-            <div className="mt-2 space-y-2">
-              {['light', 'dark', 'auto'].map((themeOption) => (
-                <label key={themeOption} className="flex items-center">
-                  <input
-                    type="radio"
-                    name="theme"
-                    value={themeOption}
-                    checked={preferences.theme === themeOption}
-                    onChange={(e) => setPreferences({ ...preferences, theme: e.target.value })}
-                    className="h-4 w-4"
-                  />
-                  <span className="ml-2 capitalize text-gray-700">{themeOption}</span>
-                </label>
-              ))}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Profile Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <UserCircleIcon className="h-5 w-5 text-primary" />
+              Profil
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Visningsnamn
+              </label>
+              <Input
+                value={preferences.displayName}
+                onChange={(e) => updatePreference('displayName', e.target.value)}
+              />
             </div>
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Profilsynlighet
+              </label>
+              <Select
+                value={preferences.profileVisibility}
+                onChange={(e) => updatePreference('profileVisibility', e.target.value)}
+                options={VISIBILITY_OPTIONS}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Välj vem som kan se din profil och aktivitet
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            <label htmlFor="maturity" className="block text-sm font-medium text-gray-700">
-              Content Maturity Level
-            </label>
-            <select
-              id="maturity"
-              value={preferences.content_maturity_level}
-              onChange={(e) => setPreferences({ ...preferences, content_maturity_level: e.target.value })}
-              className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="all">All Ages</option>
-              <option value="teen">13+ (Teen)</option>
-              <option value="mature">17+ (Mature)</option>
-              <option value="adult">18+ (Adult)</option>
-            </select>
-          </div>
-        </div>
+        {/* Appearance Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <PaintBrushIcon className="h-5 w-5 text-accent" />
+              Utseende
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Språk
+              </label>
+              <Select
+                value={preferences.language}
+                onChange={(e) => updatePreference('language', e.target.value)}
+                options={LANGUAGES}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Tema
+              </label>
+              <Select
+                value={preferences.theme}
+                onChange={(e) => updatePreference('theme', e.target.value)}
+                options={THEMES}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Notification Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BellIcon className="h-5 w-5 text-yellow-500" />
+              Notiser
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-foreground">E-postnotiser</div>
+                <div className="text-sm text-muted-foreground">Få uppdateringar via e-post</div>
+              </div>
+              <Toggle
+                checked={preferences.notificationsEnabled}
+                onChange={(val) => updatePreference('notificationsEnabled', val)}
+                label="E-postnotiser"
+              />
+            </div>
+            {preferences.notificationsEnabled && (
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">
+                  E-postfrekvens
+                </label>
+                <Select
+                  value={preferences.emailFrequency}
+                  onChange={(e) => updatePreference('emailFrequency', e.target.value)}
+                  options={EMAIL_FREQUENCIES}
+                />
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-foreground">Push-notiser</div>
+                <div className="text-sm text-muted-foreground">Få notiser på din enhet</div>
+              </div>
+              <Toggle
+                checked={preferences.pushNotifications}
+                onChange={(val) => updatePreference('pushNotifications', val)}
+                label="Push-notiser"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-foreground">Ljud</div>
+                <div className="text-sm text-muted-foreground">Spela upp ljud vid notiser</div>
+              </div>
+              <Toggle
+                checked={preferences.soundEnabled}
+                onChange={(val) => updatePreference('soundEnabled', val)}
+                label="Ljud"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Content & Privacy Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShieldCheckIcon className="h-5 w-5 text-green-500" />
+              Innehåll & Integritet
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-1">
+                Innehållsnivå
+              </label>
+              <Select
+                value={preferences.contentMaturity}
+                onChange={(e) => updatePreference('contentMaturity', e.target.value)}
+                options={MATURITY_LEVELS}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Filtrera innehåll baserat på åldersgrupp
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium text-foreground">Rekommendationer</div>
+                <div className="text-sm text-muted-foreground">Få personliga förslag</div>
+              </div>
+              <Toggle
+                checked={preferences.enableRecommendations}
+                onChange={(val) => updatePreference('enableRecommendations', val)}
+                label="Rekommendationer"
+              />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 text-2xl font-semibold">Notifications</h2>
-        <div className="space-y-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={preferences.notifications_enabled}
-              onChange={(e) => setPreferences({ ...preferences, notifications_enabled: e.target.checked })}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <span className="ml-3 text-gray-700">Enable email notifications</span>
-          </label>
-
-          <div>
-            <label htmlFor="email-frequency" className="block text-sm font-medium text-gray-700">
-              Email Frequency
-            </label>
-            <select
-              id="email-frequency"
-              value={preferences.email_frequency}
-              onChange={(e) => setPreferences({ ...preferences, email_frequency: e.target.value })}
-              disabled={!preferences.notifications_enabled}
-              className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="immediate">Immediately</option>
-              <option value="daily">Daily Digest</option>
-              <option value="weekly">Weekly Digest</option>
-              <option value="monthly">Monthly Digest</option>
-              <option value="never">Never</option>
-            </select>
+      {/* Quick Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <SparklesIcon className="h-5 w-5 text-purple-500" />
+            Snabbinställningar
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Button variant="outline" className="justify-start">
+              <GlobeAltIcon className="h-4 w-4 mr-2" />
+              Byt språk
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <PaintBrushIcon className="h-4 w-4 mr-2" />
+              Byt tema
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <BellIcon className="h-4 w-4 mr-2" />
+              Tysta notiser
+            </Button>
+            <Button variant="outline" className="justify-start">
+              <Cog6ToothIcon className="h-4 w-4 mr-2" />
+              Avancerat
+            </Button>
           </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 text-2xl font-semibold">Recommendations</h2>
-        <div className="space-y-4">
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={preferences.enable_recommendations}
-              onChange={(e) => setPreferences({ ...preferences, enable_recommendations: e.target.checked })}
-              className="h-4 w-4 rounded border-gray-300"
-            />
-            <span className="ml-3 text-gray-700">Receive personalized recommendations</span>
-          </label>
-
-          <div>
-            <label htmlFor="rec-frequency" className="block text-sm font-medium text-gray-700">
-              Recommendation Frequency
-            </label>
-            <select
-              id="rec-frequency"
-              value={preferences.recommendation_frequency}
-              onChange={(e) => setPreferences({ ...preferences, recommendation_frequency: e.target.value })}
-              disabled={!preferences.enable_recommendations}
-              className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="biweekly">Bi-weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-6 text-2xl font-semibold">Privacy</h2>
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="visibility" className="block text-sm font-medium text-gray-700">
-              Profile Visibility
-            </label>
-            <select
-              id="visibility"
-              value={preferences.profile_visibility}
-              onChange={(e) => setPreferences({ ...preferences, profile_visibility: e.target.value })}
-              className="mt-1 block w-full rounded border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-            >
-              <option value="public">Public</option>
-              <option value="friends">Friends Only</option>
-              <option value="private">Private</option>
-            </select>
-          </div>
-
-          <p className="text-xs text-gray-600">
-            Your personalization data is always kept private. We use it only to improve your recommendations and experience.
-          </p>
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <button
-          onClick={savePreferences}
-          disabled={saving}
-          className="rounded-lg bg-blue-600 px-6 py-2 font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-        {saved && <div className="flex items-center text-green-600">✓ Changes saved</div>}
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
+  )
 }

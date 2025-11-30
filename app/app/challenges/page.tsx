@@ -1,197 +1,386 @@
-'use client';
+'use client'
 
-import { useState, useEffect } from 'react';
-import { useTenant } from '@/lib/context/TenantContext';
-import { getActiveChallenges, joinChallenge } from '@/lib/services/achievementsAdvancedService';
+import { useState } from 'react'
+import { Button, Card, CardContent, Badge } from '@/components/ui'
+import {
+  TrophyIcon,
+  FireIcon,
+  UserGroupIcon,
+  ClockIcon,
+  CheckCircleIcon,
+  ChartBarIcon,
+  BoltIcon,
+  StarIcon,
+  LockClosedIcon,
+} from '@heroicons/react/24/outline'
+import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRecord = any;
+// Types
+interface Challenge {
+  id: string
+  title: string
+  description: string
+  type: 'daily' | 'weekly' | 'special' | 'community'
+  difficulty: 'easy' | 'medium' | 'hard'
+  reward: number
+  rewardType: 'xp' | 'coins' | 'badge'
+  progress: number
+  maxProgress: number
+  participants?: number
+  timeRemaining?: string
+  isJoined?: boolean
+  isCompleted?: boolean
+}
+
+// Mock data
+const mockChallenges: Challenge[] = [
+  {
+    id: '1',
+    title: 'Daglig utmaning: 3 lekar',
+    description: 'Genomför minst 3 olika lekar idag',
+    type: 'daily',
+    difficulty: 'easy',
+    reward: 50,
+    rewardType: 'xp',
+    progress: 2,
+    maxProgress: 3,
+    timeRemaining: '8 timmar',
+    isJoined: true,
+  },
+  {
+    id: '2',
+    title: 'Veckoutmaning: Utforskaren',
+    description: 'Prova 10 nya lekar du aldrig testat förut',
+    type: 'weekly',
+    difficulty: 'medium',
+    reward: 200,
+    rewardType: 'xp',
+    progress: 4,
+    maxProgress: 10,
+    timeRemaining: '4 dagar',
+    isJoined: true,
+  },
+  {
+    id: '3',
+    title: 'Gemenskapsutmaning: 1000 lekar',
+    description: 'Tillsammans ska vi nå 1000 genomförda lekar',
+    type: 'community',
+    difficulty: 'hard',
+    reward: 500,
+    rewardType: 'coins',
+    progress: 743,
+    maxProgress: 1000,
+    participants: 156,
+    timeRemaining: '2 dagar',
+    isJoined: true,
+  },
+  {
+    id: '4',
+    title: 'Specialutmaning: Vintertema',
+    description: 'Genomför 5 vinter-temade aktiviteter',
+    type: 'special',
+    difficulty: 'medium',
+    reward: 1,
+    rewardType: 'badge',
+    progress: 0,
+    maxProgress: 5,
+    timeRemaining: '6 dagar',
+    isJoined: false,
+  },
+  {
+    id: '5',
+    title: 'Daglig utmaning: Samarbete',
+    description: 'Genomför en gruppaktivitet med minst 5 deltagare',
+    type: 'daily',
+    difficulty: 'easy',
+    reward: 30,
+    rewardType: 'xp',
+    progress: 1,
+    maxProgress: 1,
+    isCompleted: true,
+    isJoined: true,
+  },
+]
+
+function getDifficultyVariant(difficulty: string) {
+  switch (difficulty) {
+    case 'easy':
+      return 'success'
+    case 'medium':
+      return 'warning'
+    case 'hard':
+      return 'destructive'
+    default:
+      return 'default'
+  }
+}
+
+function getDifficultyLabel(difficulty: string) {
+  switch (difficulty) {
+    case 'easy':
+      return 'Lätt'
+    case 'medium':
+      return 'Medel'
+    case 'hard':
+      return 'Svår'
+    default:
+      return difficulty
+  }
+}
+
+function getTypeIcon(type: string) {
+  switch (type) {
+    case 'daily':
+      return <BoltIcon className="h-4 w-4" />
+    case 'weekly':
+      return <ChartBarIcon className="h-4 w-4" />
+    case 'community':
+      return <UserGroupIcon className="h-4 w-4" />
+    case 'special':
+      return <StarIcon className="h-4 w-4" />
+    default:
+      return <TrophyIcon className="h-4 w-4" />
+  }
+}
+
+function getTypeLabel(type: string) {
+  switch (type) {
+    case 'daily':
+      return 'Daglig'
+    case 'weekly':
+      return 'Vecka'
+    case 'community':
+      return 'Gemenskap'
+    case 'special':
+      return 'Special'
+    default:
+      return type
+  }
+}
+
+function getRewardIcon(type: string) {
+  switch (type) {
+    case 'xp':
+      return <StarSolidIcon className="h-4 w-4 text-yellow-500" />
+    case 'coins':
+      return <span className="text-yellow-500">🪙</span>
+    case 'badge':
+      return <TrophyIcon className="h-4 w-4 text-purple-500" />
+    default:
+      return null
+  }
+}
 
 export default function ChallengesPage() {
-  const { currentTenant } = useTenant();
-  const tenantId = currentTenant?.id;
+  const [challenges] = useState<Challenge[]>(mockChallenges)
+  const [filterType, setFilterType] = useState<string>('all')
+  const [filterDifficulty, setFilterDifficulty] = useState<string>('all')
 
-  const [challenges, setChallenges] = useState<AnyRecord[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
+  const filteredChallenges = challenges.filter((challenge) => {
+    if (filterType !== 'all' && challenge.type !== filterType) return false
+    if (filterDifficulty !== 'all' && challenge.difficulty !== filterDifficulty) return false
+    return true
+  })
 
-  useEffect(() => {
-    const loadChallenges = async () => {
-      if (!tenantId) return;
-      setLoading(true);
-      const data = await getActiveChallenges(tenantId, 100);
-      setChallenges(data || []);
-      setLoading(false);
-    };
-    loadChallenges();
-  }, [tenantId]);
-
-  const filteredChallenges = challenges.filter((challenge: AnyRecord) => {
-    if (selectedDifficulty !== 'all' && challenge.difficulty !== selectedDifficulty) return false;
-    if (selectedType !== 'all' && challenge.type !== selectedType) return false;
-    return true;
-  });
-
-  async function handleJoinChallenge(challengeId: string) {
-    if (!tenantId || !currentTenant?.membership.user_id) return;
-    try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (joinChallenge as any)(tenantId, challengeId, currentTenant.membership.user_id);
-      // Refresh challenges
-      const data = await getActiveChallenges(tenantId, 100);
-      setChallenges(data || []);
-    } catch (error) {
-      console.error('Error joining challenge:', error);
-    }
-  }
-
-  const getDifficultyColor = (difficulty: string) => {
-    const colors: Record<string, string> = {
-      easy: 'bg-green-100 text-green-800',
-      medium: 'bg-yellow-100 text-yellow-800',
-      hard: 'bg-orange-100 text-orange-800',
-      expert: 'bg-red-100 text-red-800',
-    };
-    return colors[difficulty] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getTypeIcon = (type: string) => {
-    const icons: Record<string, string> = {
-      score: '🎯',
-      participation: '👥',
-      speed: '⚡',
-      cooperation: '🤝',
-    };
-    return icons[type] || '🎮';
-  };
+  const activeChallenges = challenges.filter((c) => c.isJoined && !c.isCompleted)
+  const completedToday = challenges.filter((c) => c.isCompleted).length
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Community Challenges</h1>
-          <p className="text-gray-600">Join challenges and compete with other players</p>
-        </div>
-
-        {/* Filters */}
-        <div className="bg-white border rounded-lg p-4 mb-6 shadow-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold mb-2">Difficulty</label>
-              <select
-                value={selectedDifficulty}
-                onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
-              >
-                <option value="all">All Difficulties</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-                <option value="expert">Expert</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold mb-2">Type</label>
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full px-3 py-2 border rounded-md"
-              >
-                <option value="all">All Types</option>
-                <option value="score">Score Challenge</option>
-                <option value="participation">Participation</option>
-                <option value="speed">Speed Challenge</option>
-                <option value="cooperation">Cooperation</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Challenges Grid */}
-        {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Loading challenges...</p>
-          </div>
-        ) : filteredChallenges.length === 0 ? (
-          <div className="bg-white border rounded-lg p-12 text-center">
-            <p className="text-gray-500 text-lg">
-              {challenges.length === 0 ? 'No challenges available yet' : 'No challenges match your filters'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredChallenges.map((challenge: AnyRecord) => (
-              <div
-                key={challenge.id}
-                className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-4 text-white">
-                  <div className="flex justify-between items-start mb-2">
-                    <span className="text-3xl">{getTypeIcon(challenge.type)}</span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getDifficultyColor(challenge.difficulty)}`}>
-                      {challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)}
-                    </span>
-                  </div>
-                  <h2 className="text-xl font-bold">{challenge.title}</h2>
-                </div>
-
-                <div className="p-4">
-                  <p className="text-gray-600 text-sm mb-4">{challenge.description}</p>
-
-                  <div className="space-y-2 mb-4 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Type:</span>
-                      <span className="font-semibold">{challenge.type}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Target:</span>
-                      <span className="font-semibold">{challenge.target_value}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Reward:</span>
-                      <span className="font-semibold text-yellow-600">{challenge.reward_points} pts</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Participants:</span>
-                      <span className="font-semibold">{challenge.participant_count}</span>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="mb-4">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="text-gray-600">Completion</span>
-                      <span className="text-gray-600">
-                        {challenge.completion_count} / {challenge.participant_count}
-                      </span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full"
-                        style={{
-                          width:
-                            challenge.participant_count > 0
-                              ? `${(challenge.completion_count / challenge.participant_count) * 100}%`
-                              : '0%',
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleJoinChallenge(challenge.id)}
-                    className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-semibold"
-                  >
-                    Join Challenge
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Utmaningar</h1>
+        <p className="text-muted-foreground mt-1">Ta dig an utmaningar och tjäna belöningar</p>
       </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-primary">{activeChallenges.length}</div>
+            <div className="text-sm text-muted-foreground">Aktiva</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-green-500">{completedToday}</div>
+            <div className="text-sm text-muted-foreground">Avklarade</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4 text-center">
+            <div className="text-2xl font-bold text-yellow-500">
+              <FireIcon className="h-6 w-6 mx-auto" />
+            </div>
+            <div className="text-sm text-muted-foreground">5 dagar streak</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2">
+        <div className="flex gap-1 mr-4">
+          {['all', 'daily', 'weekly', 'special', 'community'].map((type) => (
+            <Button
+              key={type}
+              variant={filterType === type ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilterType(type)}
+            >
+              {type === 'all' ? 'Alla' : getTypeLabel(type)}
+            </Button>
+          ))}
+        </div>
+        <div className="flex gap-1">
+          {['all', 'easy', 'medium', 'hard'].map((diff) => (
+            <Button
+              key={diff}
+              variant={filterDifficulty === diff ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setFilterDifficulty(diff)}
+            >
+              {diff === 'all' ? 'Alla' : getDifficultyLabel(diff)}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Challenges List */}
+      <div className="space-y-4">
+        {filteredChallenges.map((challenge) => {
+          const progressPercent = Math.round((challenge.progress / challenge.maxProgress) * 100)
+
+          return (
+            <Card
+              key={challenge.id}
+              className={`overflow-hidden ${challenge.isCompleted ? 'opacity-60' : ''}`}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  {/* Type Icon */}
+                  <div
+                    className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      challenge.isCompleted
+                        ? 'bg-green-100 text-green-600'
+                        : challenge.type === 'special'
+                        ? 'bg-purple-100 text-purple-600'
+                        : challenge.type === 'community'
+                        ? 'bg-accent/20 text-accent'
+                        : 'bg-primary/10 text-primary'
+                    }`}
+                  >
+                    {challenge.isCompleted ? (
+                      <CheckCircleIcon className="h-6 w-6" />
+                    ) : (
+                      <span className="scale-150">{getTypeIcon(challenge.type)}</span>
+                    )}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    {/* Header */}
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <Badge variant="outline" className="flex items-center gap-1">
+                        {getTypeIcon(challenge.type)}
+                        {getTypeLabel(challenge.type)}
+                      </Badge>
+                      <Badge
+                        variant={getDifficultyVariant(challenge.difficulty) as 'success' | 'warning' | 'destructive' | 'default'}
+                      >
+                        {getDifficultyLabel(challenge.difficulty)}
+                      </Badge>
+                      {challenge.isCompleted && (
+                        <Badge variant="success">Avklarad!</Badge>
+                      )}
+                    </div>
+
+                    {/* Title & Description */}
+                    <h3 className={`font-semibold text-foreground ${challenge.isCompleted ? 'line-through' : ''}`}>
+                      {challenge.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">{challenge.description}</p>
+
+                    {/* Progress */}
+                    {!challenge.isCompleted && (
+                      <div className="mt-3">
+                        <div className="flex justify-between text-sm mb-1">
+                          <span className="text-muted-foreground">
+                            {challenge.progress} / {challenge.maxProgress}
+                          </span>
+                          <span className="font-medium text-primary">{progressPercent}%</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Footer Info */}
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        {challenge.timeRemaining && (
+                          <span className="flex items-center gap-1">
+                            <ClockIcon className="h-4 w-4" />
+                            {challenge.timeRemaining}
+                          </span>
+                        )}
+                        {challenge.participants && (
+                          <span className="flex items-center gap-1">
+                            <UserGroupIcon className="h-4 w-4" />
+                            {challenge.participants} deltagare
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getRewardIcon(challenge.rewardType)}
+                        <span className="font-medium">
+                          {challenge.rewardType === 'badge'
+                            ? 'Märke'
+                            : `+${challenge.reward} ${challenge.rewardType === 'xp' ? 'XP' : 'mynt'}`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <div className="flex-shrink-0">
+                    {challenge.isCompleted ? (
+                      <Button size="sm" variant="outline" disabled>
+                        <CheckCircleIcon className="h-4 w-4 mr-1" />
+                        Klar
+                      </Button>
+                    ) : challenge.isJoined ? (
+                      <Button size="sm" variant="outline">
+                        Visa
+                      </Button>
+                    ) : (
+                      <Button size="sm">
+                        <LockClosedIcon className="h-4 w-4 mr-1" />
+                        Delta
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
+
+      {/* Empty State */}
+      {filteredChallenges.length === 0 && (
+        <Card>
+          <CardContent className="p-8 text-center">
+            <TrophyIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+            <h3 className="font-semibold text-foreground mb-2">Inga utmaningar hittades</h3>
+            <p className="text-muted-foreground text-sm">
+              Prova att ändra dina filter för att se fler utmaningar.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
-  );
+  )
 }

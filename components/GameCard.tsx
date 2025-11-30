@@ -12,11 +12,11 @@ interface GameCardProps {
 export default function GameCard({ game }: GameCardProps) {
   return (
     <Link href={`/app/games/${game.id}`}>
-      <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all hover:shadow-lg hover:scale-105">
+      <div className="group relative overflow-hidden rounded-lg border border-border bg-card shadow-sm transition-all hover:shadow-lg hover:scale-105">
         {/* Image/Thumbnail */}
-        <div className="relative h-40 bg-gradient-to-br from-indigo-100 to-indigo-50 flex items-center justify-center">
+        <div className="relative h-40 bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-sm font-semibold text-indigo-700">{game.name}</p>
+            <p className="text-sm font-semibold text-primary">{game.name}</p>
           </div>
         </div>
 
@@ -24,23 +24,23 @@ export default function GameCard({ game }: GameCardProps) {
         <div className="p-4 space-y-3">
           {/* Name */}
           <div>
-            <h3 className="font-semibold text-gray-900 line-clamp-2 group-hover:text-indigo-600">
+            <h3 className="font-semibold text-foreground line-clamp-2 group-hover:text-primary">
               {game.name}
             </h3>
           </div>
 
           {/* Description */}
           {game.description && (
-            <p className="text-sm text-gray-600 line-clamp-2">
+            <p className="text-sm text-muted-foreground line-clamp-2">
               {game.description}
             </p>
           )}
 
           {/* Meta Info */}
-          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+          <div className="flex items-center justify-between pt-2 border-t border-border">
             {/* Age Range */}
             {game.age_min && game.age_max && (
-              <span className="text-xs font-medium text-gray-700 bg-gray-100 px-2 py-1 rounded">
+              <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
                 Ages {game.age_min}-{game.age_max}
               </span>
             )}
@@ -63,14 +63,14 @@ export default function GameCard({ game }: GameCardProps) {
 
           {/* Time Estimate if available */}
           {game.time_estimate_min && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               ~{game.time_estimate_min} min
             </div>
           )}
 
           {/* Player Count */}
           {(game.min_players || game.max_players) && (
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-muted-foreground">
               Players: {game.min_players || '?'}-{game.max_players || '?'}
             </div>
           )}

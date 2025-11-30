@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 
-type Variant = "default" | "outline" | "ghost";
+export type Variant = "default" | "primary" | "outline" | "ghost" | "destructive";
 type Size = "sm" | "md" | "lg";
 
 type ButtonProps = {
@@ -18,9 +18,11 @@ const baseStyles =
 
 const variantStyles: Record<Variant, string> = {
   default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+  primary: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
   outline:
     "border border-border text-foreground hover:bg-muted hover:text-foreground",
   ghost: "text-foreground hover:bg-muted",
+  destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
 };
 
 const sizeStyles: Record<Size, string> = {

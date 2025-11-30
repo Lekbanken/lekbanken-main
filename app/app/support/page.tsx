@@ -1,435 +1,443 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/lib/supabase/auth';
-import { useTenant } from '@/lib/context/TenantContext';
+import { useState } from 'react'
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Textarea, Select } from '@/components/ui'
 import {
-  submitFeedback,
-  getUserFeedback,
-  createTicket,
-  getUserTickets,
-  type Feedback,
-  type SupportTicket,
-} from '@/lib/services/supportService';
+  QuestionMarkCircleIcon,
+  ChatBubbleLeftRightIcon,
+  LightBulbIcon,
+  BugAntIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  PaperAirplaneIcon,
+  BookOpenIcon,
+  EnvelopeIcon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/outline'
+import { StarIcon } from '@heroicons/react/24/solid'
 
-type FeedbackType = 'bug' | 'feature_request' | 'improvement' | 'other';
+// Types
+interface Ticket {
+  id: string
+  title: string
+  status: 'open' | 'in_progress' | 'resolved' | 'closed'
+  category: string
+  createdAt: string
+  lastUpdate: string
+}
+
+interface FAQ {
+  question: string
+  answer: string
+}
+
+// Mock data
+const mockTickets: Ticket[] = [
+  {
+    id: '1',
+    title: 'Problem med inloggning',
+    status: 'resolved',
+    category: 'technical',
+    createdAt: '2025-01-25',
+    lastUpdate: '2025-01-26',
+  },
+  {
+    id: '2',
+    title: 'Förslag på ny funktion',
+    status: 'in_progress',
+    category: 'feature',
+    createdAt: '2025-01-20',
+    lastUpdate: '2025-01-27',
+  },
+]
+
+const mockFAQs: FAQ[] = [
+  {
+    question: 'Hur ändrar jag mitt lösenord?',
+    answer: 'Gå till Inställningar > Profil > Ändra lösenord. Där kan du ange ditt nya lösenord.',
+  },
+  {
+    question: 'Hur kontaktar jag supporten?',
+    answer: 'Du kan skicka ett supportärende via denna sida eller maila oss på support@lekbanken.se.',
+  },
+  {
+    question: 'Kan jag dela mitt konto?',
+    answer: 'Nej, varje användare ska ha sitt eget konto. Med Team-planen kan du ha flera användare.',
+  },
+  {
+    question: 'Hur avbryter jag min prenumeration?',
+    answer: 'Gå till Prenumeration > Avbryt prenumeration. Din tillgång fortsätter till periodens slut.',
+  },
+]
+
+const CATEGORIES = [
+  { value: 'general', label: 'Allmänt' },
+  { value: 'technical', label: 'Tekniskt problem' },
+  { value: 'billing', label: 'Fakturering' },
+  { value: 'feature', label: 'Funktionsförslag' },
+  { value: 'bug', label: 'Buggrapport' },
+]
+
+const FEEDBACK_TYPES = [
+  { value: 'bug', label: 'Bugg', icon: BugAntIcon },
+  { value: 'feature', label: 'Förslag', icon: LightBulbIcon },
+  { value: 'question', label: 'Fråga', icon: QuestionMarkCircleIcon },
+  { value: 'other', label: 'Övrigt', icon: ChatBubbleLeftRightIcon },
+]
+
+function getStatusVariant(status: string) {
+  switch (status) {
+    case 'open':
+      return 'primary'
+    case 'in_progress':
+      return 'warning'
+    case 'resolved':
+      return 'success'
+    case 'closed':
+      return 'default'
+    default:
+      return 'default'
+  }
+}
+
+function getStatusLabel(status: string) {
+  switch (status) {
+    case 'open':
+      return 'Öppen'
+    case 'in_progress':
+      return 'Pågår'
+    case 'resolved':
+      return 'Löst'
+    case 'closed':
+      return 'Stängd'
+    default:
+      return status
+  }
+}
 
 export default function SupportPage() {
-  const { user } = useAuth();
-  const { currentTenant } = useTenant();
+  const [activeTab, setActiveTab] = useState<'contact' | 'tickets' | 'faq'>('contact')
+  const [feedbackType, setFeedbackType] = useState('general')
+  const [title, setTitle] = useState('')
+  const [description, setDescription] = useState('')
+  const [rating, setRating] = useState(0)
+  const [tickets] = useState<Ticket[]>(mockTickets)
+  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null)
+  const [submitted, setSubmitted] = useState(false)
 
-  // Form states
-  const [feedbackType, setFeedbackType] = useState<FeedbackType>('other');
-  const [feedbackTitle, setFeedbackTitle] = useState('');
-  const [feedbackDescription, setFeedbackDescription] = useState('');
-  const [feedbackRating, setFeedbackRating] = useState<number | null>(null);
-  const [isAnonymous, setIsAnonymous] = useState(false);
-
-  const [ticketTitle, setTicketTitle] = useState('');
-  const [ticketDescription, setTicketDescription] = useState('');
-  const [ticketCategory, setTicketCategory] = useState('general');
-
-  // Data states
-  const [feedback, setFeedback] = useState<Feedback[]>([]);
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSending, setIsSending] = useState(false);
-  const [activeTab, setActiveTab] = useState<'submit' | 'history'>('submit');
-
-  // Load user's feedback and tickets
-  useEffect(() => {
-    if (!user) return;
-
-    const loadData = async () => {
-      setIsLoading(true);
-      const [feedbackData, ticketsData] = await Promise.all([
-        getUserFeedback(user.id, 10),
-        getUserTickets(user.id, undefined, 10),
-      ]);
-
-      if (feedbackData) setFeedback(feedbackData);
-      if (ticketsData) setTickets(ticketsData);
-      setIsLoading(false);
-    };
-
-    loadData();
-  }, [user]);
-
-  const handleSubmitFeedback = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !feedbackTitle.trim()) return;
-
-    setIsSending(true);
-    const result = await submitFeedback({
-      userId: user.id,
-      tenantId: currentTenant?.id || null,
-      type: feedbackType,
-      title: feedbackTitle,
-      description: feedbackDescription,
-      rating: feedbackRating || undefined,
-      isAnonymous,
-    });
-
-    if (result) {
-      setFeedback([result, ...feedback]);
-      setFeedbackTitle('');
-      setFeedbackDescription('');
-      setFeedbackRating(null);
-      setIsAnonymous(false);
-      alert('Tack för din feedback! 🎉');
-    } else {
-      alert('Det uppstod ett fel. Försök igen.');
-    }
-    setIsSending(false);
-  };
-
-  const handleCreateTicket = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !ticketTitle.trim()) return;
-
-    setIsSending(true);
-    const result = await createTicket({
-      userId: user.id,
-      tenantId: currentTenant?.id || null,
-      title: ticketTitle,
-      description: ticketDescription,
-      category: ticketCategory,
-      priority: 'medium',
-    });
-
-    if (result) {
-      setTickets([result, ...tickets]);
-      setTicketTitle('');
-      setTicketDescription('');
-      setTicketCategory('general');
-      alert('Support-ärende skapat! Vi tittar på det så snart vi kan. 📧');
-    } else {
-      alert('Det uppstod ett fel. Försök igen.');
-    }
-    setIsSending(false);
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-        <div className="max-w-2xl mx-auto pt-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-slate-900 mb-4">Support</h1>
-            <p className="text-slate-600">Du måste logga in för att skicka feedback eller skapa support-ärenden.</p>
-          </div>
-        </div>
-      </div>
-    );
+  const handleSubmit = () => {
+    // Simulate submit
+    setSubmitted(true)
+    setTimeout(() => {
+      setTitle('')
+      setDescription('')
+      setRating(0)
+      setSubmitted(false)
+    }, 3000)
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">Support & Feedback</h1>
-          <p className="text-slate-600">Vi älskar att höra från dig! Sänd feedback eller skapa ett support-ärende.</p>
-        </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Support</h1>
+        <p className="text-muted-foreground mt-1">Hur kan vi hjälpa dig idag?</p>
+      </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => setActiveTab('submit')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === 'submit'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            Skicka Feedback
-          </button>
-          <button
-            onClick={() => setActiveTab('history')}
-            className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === 'history'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-slate-600 hover:bg-slate-100'
-            }`}
-          >
-            Historik ({feedback.length + tickets.length})
-          </button>
-        </div>
+      {/* Quick Links */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Card
+          className="cursor-pointer hover:border-primary transition-colors"
+          onClick={() => setActiveTab('contact')}
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <EnvelopeIcon className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <div className="font-medium text-foreground">Kontakta oss</div>
+              <div className="text-sm text-muted-foreground">Skicka ett ärende</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="cursor-pointer hover:border-primary transition-colors"
+          onClick={() => setActiveTab('tickets')}
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
+              <ClockIcon className="h-5 w-5 text-accent" />
+            </div>
+            <div>
+              <div className="font-medium text-foreground">Mina ärenden</div>
+              <div className="text-sm text-muted-foreground">{tickets.length} aktiva</div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="cursor-pointer hover:border-primary transition-colors"
+          onClick={() => setActiveTab('faq')}
+        >
+          <CardContent className="p-4 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center">
+              <BookOpenIcon className="h-5 w-5 text-yellow-600" />
+            </div>
+            <div>
+              <div className="font-medium text-foreground">Vanliga frågor</div>
+              <div className="text-sm text-muted-foreground">Snabba svar</div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-        {/* Submit Tab */}
-        {activeTab === 'submit' && (
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Feedback Form */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">💬 Skicka Feedback</h2>
+      {/* Tabs */}
+      <div className="flex gap-2 border-b border-gray-200 pb-2">
+        <Button
+          variant={activeTab === 'contact' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('contact')}
+        >
+          Kontakta oss
+        </Button>
+        <Button
+          variant={activeTab === 'tickets' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('tickets')}
+        >
+          Mina ärenden
+        </Button>
+        <Button
+          variant={activeTab === 'faq' ? 'default' : 'ghost'}
+          size="sm"
+          onClick={() => setActiveTab('faq')}
+        >
+          Vanliga frågor
+        </Button>
+      </div>
 
-              <form onSubmit={handleSubmitFeedback} className="space-y-4">
-                {/* Feedback Type */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Typ av feedback
-                  </label>
-                  <select
-                    value={feedbackType}
-                    onChange={(e) => setFeedbackType(e.target.value as FeedbackType)}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="other">Allmän feedback</option>
-                    <option value="bug">Bugg-rapport</option>
-                    <option value="feature_request">Funktionsönskemål</option>
-                    <option value="improvement">Förbättringsförslag</option>
-                  </select>
+      {/* Contact Tab */}
+      {activeTab === 'contact' && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card>
+            <CardHeader>
+              <CardTitle>Skicka ett ärende</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {submitted ? (
+                <div className="text-center py-8">
+                  <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                  <h3 className="font-semibold text-foreground mb-2">Tack för ditt meddelande!</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Vi återkommer så snart vi kan.
+                  </p>
                 </div>
-
-                {/* Title */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Rubrik
-                  </label>
-                  <input
-                    type="text"
-                    value={feedbackTitle}
-                    onChange={(e) => setFeedbackTitle(e.target.value)}
-                    placeholder="Kort beskrivning av din feedback..."
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Detaljer
-                  </label>
-                  <textarea
-                    value={feedbackDescription}
-                    onChange={(e) => setFeedbackDescription(e.target.value)}
-                    placeholder="Berätta mer om din feedback..."
-                    rows={4}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  />
-                </div>
-
-                {/* Rating */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Nöjdhetsgrad (valfritt)
-                  </label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((rating) => (
-                      <button
-                        key={rating}
-                        type="button"
-                        onClick={() => setFeedbackRating(rating)}
-                        className={`w-10 h-10 rounded-lg font-bold transition-all ${
-                          feedbackRating === rating
-                            ? 'bg-yellow-400 text-slate-900 scale-110'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                        }`}
-                      >
-                        {rating}⭐
-                      </button>
-                    ))}
+              ) : (
+                <>
+                  {/* Feedback Type */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {FEEDBACK_TYPES.map((type) => {
+                      const Icon = type.icon
+                      return (
+                        <button
+                          key={type.value}
+                          onClick={() => setFeedbackType(type.value)}
+                          className={`p-3 rounded-lg border text-center transition-all ${
+                            feedbackType === type.value
+                              ? 'border-primary bg-primary/5'
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <Icon
+                            className={`h-5 w-5 mx-auto mb-1 ${
+                              feedbackType === type.value ? 'text-primary' : 'text-muted-foreground'
+                            }`}
+                          />
+                          <span className="text-xs">{type.label}</span>
+                        </button>
+                      )
+                    })}
                   </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      Kategori
+                    </label>
+                    <Select
+                      value={feedbackType}
+                      onChange={(e) => setFeedbackType(e.target.value)}
+                      options={CATEGORIES}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      Titel
+                    </label>
+                    <Input
+                      placeholder="Kort beskrivning av ärendet"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">
+                      Beskrivning
+                    </label>
+                    <Textarea
+                      placeholder="Beskriv ditt ärende i detalj..."
+                      rows={4}
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+
+                  {/* Rating */}
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-2">
+                      Hur nöjd är du med Lekbanken? (valfritt)
+                    </label>
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          onClick={() => setRating(star)}
+                          className="p-1"
+                        >
+                          <StarIcon
+                            className={`h-6 w-6 ${
+                              star <= rating ? 'text-yellow-400' : 'text-muted-foreground/30'
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <Button onClick={handleSubmit} disabled={!title || !description}>
+                    <PaperAirplaneIcon className="h-4 w-4 mr-1" />
+                    Skicka ärende
+                  </Button>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Contact Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Kontaktuppgifter</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="font-medium text-foreground mb-1">E-post</div>
+                <div className="text-primary">support@lekbanken.se</div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Svarstid: 1-2 arbetsdagar
                 </div>
+              </div>
+              <div className="p-4 bg-muted rounded-lg">
+                <div className="font-medium text-foreground mb-1">Telefon</div>
+                <div className="text-primary">08-123 456 78</div>
+                <div className="text-sm text-muted-foreground mt-1">
+                  Mån-Fre 9:00-17:00
+                </div>
+              </div>
+              <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                <div className="font-medium text-foreground mb-1">Pro-support</div>
+                <div className="text-sm text-muted-foreground">
+                  Som Pro-användare har du prioriterad support med svarstid under 24 timmar.
+                </div>
+                <Badge variant="primary" className="mt-2">
+                  Aktiverad
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
-                {/* Anonymous */}
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={isAnonymous}
-                    onChange={(e) => setIsAnonymous(e.target.checked)}
-                    className="w-4 h-4 rounded border-slate-300"
-                  />
-                  <span className="text-sm text-slate-700">Skicka anonymt</span>
-                </label>
-
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-medium py-2 rounded-lg transition-colors"
-                >
-                  {isSending ? 'Skickar...' : 'Skicka Feedback'}
-                </button>
-              </form>
-            </div>
-
-            {/* Support Ticket Form */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-4">🎟️ Skapa Support-Ärende</h2>
-
-              <form onSubmit={handleCreateTicket} className="space-y-4">
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Kategori
-                  </label>
-                  <select
-                    value={ticketCategory}
-                    onChange={(e) => setTicketCategory(e.target.value)}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      {/* Tickets Tab */}
+      {activeTab === 'tickets' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Dina supportärenden</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {tickets.length > 0 ? (
+              <div className="space-y-3">
+                {tickets.map((ticket) => (
+                  <div
+                    key={ticket.id}
+                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors cursor-pointer"
                   >
-                    <option value="general">Allmänt</option>
-                    <option value="technical">Tekniskt problem</option>
-                    <option value="account">Kontokonto</option>
-                    <option value="billing">Fakturering</option>
-                    <option value="other">Övrigt</option>
-                  </select>
-                </div>
-
-                {/* Title */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Ämne
-                  </label>
-                  <input
-                    type="text"
-                    value={ticketTitle}
-                    onChange={(e) => setTicketTitle(e.target.value)}
-                    placeholder="Vad behöver du hjälp med?"
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Beskrivning
-                  </label>
-                  <textarea
-                    value={ticketDescription}
-                    onChange={(e) => setTicketDescription(e.target.value)}
-                    placeholder="Beskriv problemet eller frågan i detalj..."
-                    rows={4}
-                    className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    required
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className="w-full bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-medium py-2 rounded-lg transition-colors"
-                >
-                  {isSending ? 'Skapar...' : 'Skapa Ärende'}
-                </button>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* History Tab */}
-        {activeTab === 'history' && (
-          <div className="space-y-6">
-            {isLoading ? (
-              <div className="text-center py-12">
-                <p className="text-slate-600">Laddar...</p>
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`h-2 w-2 rounded-full ${
+                          ticket.status === 'open'
+                            ? 'bg-primary'
+                            : ticket.status === 'in_progress'
+                            ? 'bg-yellow-500'
+                            : 'bg-green-500'
+                        }`}
+                      />
+                      <div>
+                        <div className="font-medium text-foreground">{ticket.title}</div>
+                        <div className="text-sm text-muted-foreground">
+                          Skapad {new Date(ticket.createdAt).toLocaleDateString('sv-SE')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Badge variant={getStatusVariant(ticket.status) as 'primary' | 'warning' | 'success' | 'default'}>
+                        {getStatusLabel(ticket.status)}
+                      </Badge>
+                      <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : (
-              <>
-                {/* Feedback */}
-                {feedback.length > 0 && (
-                  <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4">
-                      <h3 className="text-lg font-bold text-white">Din Feedback</h3>
-                    </div>
-                    <div className="divide-y">
-                      {feedback.map((item) => (
-                        <div key={item.id} className="p-4 hover:bg-slate-50">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="font-medium text-slate-900">{item.title}</p>
-                              <p className="text-sm text-slate-500">
-                                {new Date(item.created_at).toLocaleDateString('sv-SE')}
-                              </p>
-                            </div>
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                item.type === 'bug'
-                                  ? 'bg-red-100 text-red-700'
-                                  : item.type === 'feature_request'
-                                    ? 'bg-purple-100 text-purple-700'
-                                    : 'bg-slate-100 text-slate-700'
-                              }`}
-                            >
-                              {item.type === 'bug'
-                                ? 'Bugg'
-                                : item.type === 'feature_request'
-                                  ? 'Önskemål'
-                                  : 'Feedback'}
-                            </span>
-                          </div>
-                          {item.description && (
-                            <p className="text-slate-600 text-sm mb-2">{item.description}</p>
-                          )}
-                          {item.rating && (
-                            <p className="text-sm text-yellow-600">Betyg: {'⭐'.repeat(item.rating)}</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Support Tickets */}
-                {tickets.length > 0 && (
-                  <div className="bg-white rounded-lg shadow overflow-hidden">
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 p-4">
-                      <h3 className="text-lg font-bold text-white">Dina Support-Ärenden</h3>
-                    </div>
-                    <div className="divide-y">
-                      {tickets.map((ticket) => (
-                        <div key={ticket.id} className="p-4 hover:bg-slate-50">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <p className="font-medium text-slate-900">{ticket.title}</p>
-                              <p className="text-sm text-slate-500">
-                                #{ticket.ticket_key || ticket.id.slice(0, 8)}
-                              </p>
-                            </div>
-                            <span
-                              className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                ticket.status === 'open'
-                                  ? 'bg-yellow-100 text-yellow-700'
-                                  : ticket.status === 'in_progress'
-                                    ? 'bg-blue-100 text-blue-700'
-                                    : ticket.status === 'resolved'
-                                      ? 'bg-green-100 text-green-700'
-                                      : 'bg-slate-100 text-slate-700'
-                              }`}
-                            >
-                              {ticket.status === 'open'
-                                ? 'Öppet'
-                                : ticket.status === 'in_progress'
-                                  ? 'Hanteras'
-                                  : ticket.status === 'resolved'
-                                    ? 'Löst'
-                                    : 'Stängt'}
-                            </span>
-                          </div>
-                          {ticket.description && (
-                            <p className="text-slate-600 text-sm mb-2">{ticket.description}</p>
-                          )}
-                          <div className="flex gap-4 text-xs text-slate-500">
-                            <span>Prioritet: {ticket.priority}</span>
-                            <span>{new Date(ticket.created_at).toLocaleDateString('sv-SE')}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {feedback.length === 0 && tickets.length === 0 && (
-                  <div className="text-center py-12 bg-white rounded-lg">
-                    <p className="text-slate-600">Du har inte skickat någon feedback eller support-ärenden ännu.</p>
-                  </div>
-                )}
-              </>
+              <div className="text-center py-8">
+                <ChatBubbleLeftRightIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="font-semibold text-foreground mb-2">Inga ärenden</h3>
+                <p className="text-muted-foreground text-sm">
+                  Du har inga aktiva supportärenden.
+                </p>
+              </div>
             )}
-          </div>
-        )}
-      </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* FAQ Tab */}
+      {activeTab === 'faq' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Vanliga frågor</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {mockFAQs.map((faq, index) => (
+              <div key={index} className="border border-border rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                  className="w-full flex items-center justify-between p-4 text-left hover:bg-muted"
+                >
+                  <span className="font-medium text-foreground">{faq.question}</span>
+                  <ChevronRightIcon
+                    className={`h-5 w-5 text-muted-foreground transition-transform ${
+                      expandedFAQ === index ? 'rotate-90' : ''
+                    }`}
+                  />
+                </button>
+                {expandedFAQ === index && (
+                  <div className="px-4 pb-4 text-muted-foreground">{faq.answer}</div>
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
-  );
+  )
 }

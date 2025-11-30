@@ -67,8 +67,8 @@ export default function GameDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600">Loading game...</p>
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <p className="mt-4 text-muted-foreground">Loading game...</p>
         </div>
       </div>
     );
@@ -78,12 +78,12 @@ export default function GameDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || 'Game not found'}
           </h1>
           <Link
             href="/app/games"
-            className="inline-block px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+            className="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
           >
             Back to Games
           </Link>
@@ -102,22 +102,22 @@ export default function GameDetailPage() {
       case 'high':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Link
             href="/app/games"
-            className="text-blue-500 hover:text-blue-700 mb-4 inline-block"
+            className="text-primary hover:text-primary/80 mb-4 inline-block"
           >
             ← Back to Games
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">{game.name}</h1>
+          <h1 className="text-4xl font-bold text-foreground mb-4">{game.name}</h1>
           <div className="flex flex-wrap gap-3">
             {game.energy_level && (
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getEnergyLevelColor(game.energy_level)}`}>
@@ -135,7 +135,7 @@ export default function GameDetailPage() {
               </span>
             )}
             {game.time_estimate_min && (
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+              <span className="px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
                 ~{game.time_estimate_min} min
               </span>
             )}
@@ -149,56 +149,56 @@ export default function GameDetailPage() {
           {/* Game Details */}
           <div className="lg:col-span-2">
             {/* Description */}
-            <section className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About</h2>
-              <p className="text-gray-700 leading-relaxed text-lg">
+            <section className="bg-card rounded-lg shadow p-6 mb-6">
+              <h2 className="text-2xl font-bold text-foreground mb-4">About</h2>
+              <p className="text-muted-foreground leading-relaxed text-lg">
                 {game.description || 'No description available'}
               </p>
             </section>
 
             {/* Instructions */}
             {game.instructions && (
-              <section className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">How to Play</h2>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+              <section className="bg-card rounded-lg shadow p-6 mb-6">
+                <h2 className="text-2xl font-bold text-foreground mb-4">How to Play</h2>
+                <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                   {game.instructions}
                 </div>
               </section>
             )}
 
             {/* Game Details Grid */}
-            <section className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Game Details</h2>
+            <section className="bg-card rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-foreground mb-4">Game Details</h2>
               <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Player Count
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {game.min_players}-{game.max_players}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Duration
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     ~{game.time_estimate_min} min
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Age Range
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-foreground">
                     {game.age_min}-{game.age_max}
                   </p>
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                     Energy Level
                   </h3>
-                  <p className="text-2xl font-bold text-gray-900 capitalize">
+                  <p className="text-2xl font-bold text-foreground capitalize">
                     {game.energy_level}
                   </p>
                 </div>
@@ -217,19 +217,19 @@ export default function GameDetailPage() {
             </Link>
 
             {/* Game Info Card */}
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Info</h3>
+            <div className="bg-card rounded-lg shadow p-6 mb-6">
+              <h3 className="text-lg font-bold text-foreground mb-4">Quick Info</h3>
               <div className="space-y-4 text-sm">
                 <div>
-                  <p className="text-gray-500 font-medium">Status</p>
-                  <p className="text-gray-900 capitalize font-semibold">
+                  <p className="text-muted-foreground font-medium">Status</p>
+                  <p className="text-foreground capitalize font-semibold">
                     {game.status === 'published' ? '✓ Published' : 'Draft'}
                   </p>
                 </div>
                 {game.created_at && (
                   <div>
-                    <p className="text-gray-500 font-medium">Added</p>
-                    <p className="text-gray-900 font-semibold">
+                    <p className="text-muted-foreground font-medium">Added</p>
+                    <p className="text-foreground font-semibold">
                       {new Date(game.created_at).toLocaleDateString()}
                     </p>
                   </div>
@@ -238,12 +238,12 @@ export default function GameDetailPage() {
             </div>
 
             {/* Share Card */}
-            <div className="bg-blue-50 rounded-lg shadow p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-3">Share This Game</h3>
-              <button className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded transition mb-2">
+            <div className="bg-primary/5 rounded-lg shadow p-6">
+              <h3 className="text-lg font-bold text-foreground mb-3">Share This Game</h3>
+              <button className="w-full bg-primary hover:bg-primary/90 text-white font-semibold py-2 px-4 rounded transition mb-2">
                 Share
               </button>
-              <button className="w-full bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 font-semibold py-2 px-4 rounded transition">
+              <button className="w-full bg-card border border-primary text-primary hover:bg-primary/5 font-semibold py-2 px-4 rounded transition">
                 Favorite
               </button>
             </div>
@@ -253,7 +253,7 @@ export default function GameDetailPage() {
         {/* Related Games */}
         {relatedGames.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">You Might Also Like</h2>
+            <h2 className="text-3xl font-bold text-foreground mb-6">You Might Also Like</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {relatedGames.map((relatedGame) => (
                 <GameCard key={relatedGame.id} game={relatedGame} />

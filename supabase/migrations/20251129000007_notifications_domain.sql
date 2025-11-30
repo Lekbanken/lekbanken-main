@@ -124,12 +124,3 @@ CREATE POLICY "Service can insert notification logs"
   ON public.notification_log FOR INSERT
   WITH CHECK (true);
 
-CREATE POLICY "Admins can view notification logs"
-  ON public.notification_log FOR SELECT
-  USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
-    )
-  );
-

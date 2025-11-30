@@ -9,7 +9,7 @@ CREATE TABLE user_preferences (
   
   -- Preference Settings
   language VARCHAR(10),
-  theme 'light' | 'dark' | 'auto',
+  theme VARCHAR(20) DEFAULT 'auto' CHECK (theme IN ('light', 'dark', 'auto')),
   notifications_enabled BOOLEAN DEFAULT true,
   email_frequency VARCHAR(20) DEFAULT 'weekly', -- daily, weekly, monthly, never
   

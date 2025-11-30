@@ -171,38 +171,35 @@
 
 ---
 
-## ⬜ TODO
+## ⬜ TODO (Framtida - vid behov)
 
-### Fas 2: Fler UI Komponenter (vid behov)
+### Fler UI Komponenter (Prioritet: LÅG)
 
-#### Forms (Prioritet: MEDIUM)
-- [ ] **Checkbox** - Med label, description
-- [ ] **Radio** - Group med options
+> Dessa komponenter finns redan inline i olika sidor men kan extraheras till återanvändbara komponenter om det behövs.
+
+#### Forms
+- [ ] **Checkbox** - Med label, description (finns inline)
+- [ ] **Radio** - Group med options (finns inline)
 - [ ] **Switch/Toggle** - On/off med label (finns inline i preferences)
 - [ ] **Slider** - Range input
 - [ ] **DatePicker** - Kalenderväljare
 - [ ] **FileUpload** - Drag & drop + click
 
-#### Navigation (Prioritet: LÅG)
-- [ ] **Pagination** - Sidnavigering
+#### Navigation
+- [ ] **Pagination** - Sidnavigering (finns inline)
 - [ ] **Stepper** - Flerstegsprocess
 
-#### Data Display (Prioritet: LÅG)
+#### Data Display
 - [ ] **AvatarGroup** - Stacked avatars
-- [ ] **Table** - Sortable, filterable (finns inline i admin sandbox)
+- [ ] **Table** - Sortable, filterable (finns inline i admin)
 - [ ] **DataList** - Key-value pairs
 - [ ] **Stats** - KPI-kort (finns inline i dashboard)
 
-#### Layout (Prioritet: LÅG)
-- [ ] **Container** - Max-width wrapper
-- [ ] **Stack** - Vertical/horizontal spacing
-- [ ] **Grid** - Responsiv grid
-- [ ] **Divider** - Horizontal/vertical separator
-- [ ] **AspectRatio** - Bildförhållande
-
 ---
 
-### Fas 3: Marketing Sidor (vid behov)
+### Marketing Sidor (Prioritet: LÅG)
+
+> Grundläggande marketing är klar. Dessa är framtida utökningar.
 
 #### Features (/features)
 - [ ] Feature grid
@@ -212,7 +209,6 @@
 #### Om oss (/about)
 - [ ] Team section
 - [ ] Mission/vision
-- [ ] Timeline/historia
 
 #### Kontakt (/contact)
 - [ ] Kontaktformulär
@@ -220,34 +216,7 @@
 
 ---
 
-### Fas 4: Admin Implementation (NÄSTA STEG)
-
-> Kopiera från sandbox till riktiga admin-sidor
-
-#### Layout (från sandbox)
-- [ ] Kopiera sidebar-design till app/admin/components/
-- [ ] Kopiera topbar-design
-- [ ] Integrera navigation
-
-#### Pages att implementera
-- [ ] /admin/page.tsx - Dashboard (från sandbox/admin/dashboard)
-- [ ] /admin/users/page.tsx - Användare (från sandbox/admin/users)
-- [ ] /admin/content/page.tsx - Innehåll (från sandbox/admin/content)
-- [ ] /admin/analytics/page.tsx - Statistik (från sandbox/admin/analytics)
-- [ ] /admin/settings/page.tsx - Inställningar (från sandbox/admin/settings)
-- [ ] /admin/support/page.tsx - Support (från sandbox/admin/support)
-- [ ] /admin/billing/page.tsx - Fakturering (från sandbox/admin/billing)
-- [ ] /admin/notifications/page.tsx - Notifikationer (från sandbox/admin/notifications)
-- [ ] /admin/organisations/page.tsx - Organisationer (från sandbox/admin/organisations)
-- [ ] /admin/licenses/page.tsx - Licenser (från sandbox/admin/licenses)
-- [ ] /admin/achievements-advanced/page.tsx - Achievements (från sandbox/admin/achievements)
-- [ ] /admin/leaderboard/page.tsx - Leaderboard (från sandbox/admin/leaderboard)
-- [ ] /admin/moderation/page.tsx - Moderering (från sandbox/admin/moderation)
-- [ ] /admin/personalization/page.tsx - Personalisering (från sandbox/admin/personalization)
-
----
-
-### Fas 5: Polish (framtida)
+### Polish & Dark Mode (Prioritet: LÅG)
 
 #### Animationer
 - [ ] Page transitions
@@ -256,76 +225,72 @@
 - [ ] Success animations
 
 #### Accessibility (a11y)
-- [ ] Keyboard navigation
+- [ ] Keyboard navigation audit
 - [ ] Screen reader labels
 - [ ] Focus indicators
 - [ ] Color contrast check
 
 #### Performance
 - [ ] Component lazy loading
-- [ ] Image optimization
+- [ ] Image optimization (Next.js Image)
 - [ ] Bundle analysis
 
 #### Dark Mode
 - [ ] Fullständig dark mode support
-- [ ] Theme toggle i UI
-- [ ] Testa alla komponenter
 - [ ] Theme toggle komponent
 - [ ] System preference detection
 - [ ] Persist user preference
+- [ ] Testa alla komponenter
 
 ---
 
-## 📁 Filstruktur
+## 📁 Aktuell Filstruktur
 
 ```
 components/
-├── ui/                      # ✅ Primitives
+├── ui/                      # ✅ UI Primitives (komplett)
 │   ├── button.tsx           # ✅
 │   ├── card.tsx             # ✅
 │   ├── badge.tsx            # ✅
 │   ├── input.tsx            # ✅
 │   ├── textarea.tsx         # ✅
 │   ├── select.tsx           # ✅
-│   ├── index.tsx            # ✅
-│   ├── checkbox.tsx         # ⬜
-│   ├── radio.tsx            # ⬜
-│   ├── switch.tsx           # ⬜
-│   ├── alert.tsx            # ⬜
-│   ├── modal.tsx            # ⬜
-│   ├── toast.tsx            # ⬜
-│   ├── tabs.tsx             # ⬜
-│   ├── avatar.tsx           # ⬜
-│   ├── table.tsx            # ⬜
-│   └── skeleton.tsx         # ⬜
+│   ├── alert.tsx            # ✅
+│   ├── toast.tsx            # ✅
+│   ├── dialog.tsx           # ✅
+│   ├── dropdown-menu.tsx    # ✅
+│   ├── avatar.tsx           # ✅
+│   ├── breadcrumbs.tsx      # ✅
+│   ├── tabs.tsx             # ✅
+│   ├── empty-state.tsx      # ✅
+│   ├── error-state.tsx      # ✅
+│   ├── loading-spinner.tsx  # ✅
+│   ├── skeleton.tsx         # ✅
+│   └── index.tsx            # ✅
 │
-├── marketing/               # ✅ Marknadsföring
+├── marketing/               # ✅ Marketing (komplett)
 │   ├── hero.tsx             # ✅
 │   ├── header.tsx           # ✅
 │   ├── pricing-section.tsx  # ✅
 │   ├── testimonials.tsx     # ✅
-│   ├── features.tsx         # ⬜
-│   ├── cta.tsx              # ⬜
-│   └── footer.tsx           # ⬜
+│   ├── steps-timeline.tsx   # ✅
+│   ├── steps-spotlight.tsx  # ✅
+│   ├── cta.tsx              # ✅
+│   └── footer.tsx           # ✅
 │
-├── app/                     # 🔄 App shell
-│   ├── AppShell.tsx         # 🔄
-│   ├── SideNav.tsx          # 🔄
-│   ├── BottomNav.tsx        # 🔄
-│   └── PageHeader.tsx       # 🔄
+├── app/                     # ✅ App Shell (komplett)
+│   ├── AppShell.tsx         # ✅
+│   ├── SideNav.tsx          # ✅
+│   ├── BottomNav.tsx        # ✅
+│   ├── GameCard.tsx         # ✅
+│   ├── PageHeader.tsx       # ✅
+│   └── nav-items.tsx        # ✅
 │
-└── admin/                   # ⬜ Admin
-    ├── AdminShell.tsx       # ⬜
-    ├── AdminSidebar.tsx     # ⬜
-    └── AdminHeader.tsx      # ⬜
+└── admin/                   # ✅ Admin (komplett)
+    ├── sidebar.tsx          # ✅
+    ├── topbar.tsx           # ✅
+    └── admin-nav-items.tsx  # ✅
 ```
-
----
-
-## 🎯 Nästa Steg (Rekommenderat)
-
-1. **Integrera marketing-sidan** - Sätt ihop Header + Hero + Pricing + Testimonials
-2. **Lägg till Modal/Dialog** - Behövs för många features
 3. **Lägg till Toast** - Feedback för actions
 4. **Uppdatera App Shell** - Använd design tokens
 5. **Dark mode toggle** - Efterfrågat feature

@@ -52,40 +52,8 @@ CREATE TABLE public.billing_history (
   created_at TIMESTAMP DEFAULT now()
 );
 
--- Invoices Table
-CREATE TABLE public.invoices (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
-  subscription_id UUID REFERENCES public.subscriptions(id) ON DELETE SET NULL,
-  stripe_invoice_id VARCHAR(255) UNIQUE,
-  invoice_number VARCHAR(50) NOT NULL UNIQUE,
-  amount_subtotal DECIMAL(10, 2) NOT NULL,
-  amount_tax DECIMAL(10, 2) DEFAULT 0,
-  amount_total DECIMAL(10, 2) NOT NULL,
-  currency VARCHAR(3) DEFAULT 'USD',
-  status VARCHAR(50) NOT NULL DEFAULT 'draft', -- draft, open, paid, void, uncollectible
-  paid_at TIMESTAMP,
-  due_date TIMESTAMP,
-  pdf_url VARCHAR(512),
-  notes TEXT,
-  created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
-);
-
--- Payment Methods Table
-CREATE TABLE public.payment_methods (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
-  stripe_payment_method_id VARCHAR(255) UNIQUE,
-  type VARCHAR(50) NOT NULL, -- card, bank_account
-  card_brand VARCHAR(50),
-  card_last_four VARCHAR(4),
-  card_exp_month INTEGER,
-  card_exp_year INTEGER,
-  is_default BOOLEAN DEFAULT false,
-  created_at TIMESTAMP DEFAULT now(),
-  updated_at TIMESTAMP DEFAULT now()
-);
+-- Note: invoices and payment_methods tables already exist from initial_schema.sql
+-- Only new tables specific to this migration are created below
 
 -- Trial Usage Tracking
 CREATE TABLE public.trial_usage (
@@ -107,18 +75,11 @@ CREATE INDEX idx_subscriptions_status ON public.subscriptions(status);
 CREATE INDEX idx_subscriptions_billing_plan_id ON public.subscriptions(billing_plan_id);
 CREATE INDEX idx_billing_history_tenant_id ON public.billing_history(tenant_id);
 CREATE INDEX idx_billing_history_created_at ON public.billing_history(created_at);
-CREATE INDEX idx_invoices_tenant_id ON public.invoices(tenant_id);
-CREATE INDEX idx_invoices_status ON public.invoices(status);
-CREATE INDEX idx_invoices_created_at ON public.invoices(created_at);
-CREATE INDEX idx_payment_methods_tenant_id ON public.payment_methods(tenant_id);
-CREATE INDEX idx_trial_usage_tenant_id ON public.trial_usage(tenant_id);
 
 -- Enable RLS
 ALTER TABLE public.billing_plans DISABLE ROW LEVEL SECURITY;
 ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.billing_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.payment_methods ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.trial_usage ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for Subscriptions
@@ -157,57 +118,6 @@ CREATE POLICY "Users can view their billing history"
 CREATE POLICY "Service can insert billing history"
   ON public.billing_history FOR INSERT
   WITH CHECK (true);
-
--- RLS Policies for Invoices
-CREATE POLICY "Users can view their invoices"
-  ON public.invoices FOR SELECT
-  USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Admins can update invoices"
-  ON public.invoices FOR UPDATE
-  USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
-    )
-  );
-
-CREATE POLICY "Service can insert invoices"
-  ON public.invoices FOR INSERT
-  WITH CHECK (true);
-
--- RLS Policies for Payment Methods
-CREATE POLICY "Users can view their payment methods"
-  ON public.payment_methods FOR SELECT
-  USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid()
-    )
-  );
-
-CREATE POLICY "Users can manage their payment methods"
-  ON public.payment_methods FOR UPDATE
-  USING (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid() AND role IN ('owner', 'admin')
-    )
-  );
-
-CREATE POLICY "Users can add payment methods"
-  ON public.payment_methods FOR INSERT
-  WITH CHECK (
-    tenant_id IN (
-      SELECT tenant_id FROM public.user_tenant_memberships
-      WHERE user_id = auth.uid()
-    )
-  );
 
 -- RLS Policies for Trial Usage
 CREATE POLICY "Users can view their trial usage"

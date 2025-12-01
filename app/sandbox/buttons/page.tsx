@@ -100,6 +100,27 @@ export default function ButtonsSandbox() {
               <Button variant="ghost" href="/sandbox">Ghost Link</Button>
             </div>
           </section>
+
+          {/* Disabled Buttons */}
+          <section>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Disabled Buttons</h2>
+            <div className="flex flex-wrap gap-4">
+              <Button disabled>Primary Disabled</Button>
+              <Button variant="outline" disabled>Outline Disabled</Button>
+              <Button variant="ghost" disabled>Ghost Disabled</Button>
+              <Button variant="destructive" disabled>Destructive Disabled</Button>
+            </div>
+          </section>
+
+          {/* Loading Buttons */}
+          <section>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">Loading Buttons</h2>
+            <div className="flex flex-wrap gap-4">
+              <Button loading>Laddar...</Button>
+              <Button variant="outline" loading>Sparar</Button>
+              <Button variant="destructive" loading loadingText="Raderar...">Radera</Button>
+            </div>
+          </section>
         </div>
       </div>
 
@@ -107,9 +128,12 @@ export default function ButtonsSandbox() {
       <div className="mx-auto max-w-4xl border-t border-border p-8">
         <h2 className="text-lg font-semibold text-foreground">Implementationsnoteringar</h2>
         <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-          <li>Button: 3 varianter (primary, outline, ghost)</li>
+          <li>Button: 5 varianter (default, primary, outline, ghost, destructive)</li>
           <li>Button: 3 storlekar (sm, md, lg)</li>
           <li>Button: Stöd för <code className="rounded bg-muted px-1">href</code> prop för länkar</li>
+          <li>Button: <code className="rounded bg-muted px-1">disabled</code> prop för inaktiv knapp</li>
+          <li>Button: <code className="rounded bg-muted px-1">loading</code> prop för laddningsläge med spinner</li>
+          <li>Button: <code className="rounded bg-muted px-1">loadingText</code> för att ändra text under laddning</li>
           <li>Badge: 7 varianter (default, primary, accent, warning, success, destructive, outline)</li>
           <li>Badge: 3 storlekar (sm, md, lg)</li>
           <li>Badge: <code className="rounded bg-muted px-1">dot</code> prop för statusindikator</li>
@@ -122,10 +146,12 @@ import { Badge } from '@/components/ui/badge'
 
 <Button variant="primary" size="md">Klicka här</Button>
 <Button variant="outline" href="/page">Länk</Button>
+<Button loading>Sparar...</Button>
+<Button disabled>Inaktiverad</Button>
 <Badge variant="success" dot>Online</Badge>`}
         </pre>
 
-        <p className="mt-8 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
+        <p className="mt-8 text-xs text-muted-foreground">Senast uppdaterad: 2024-12-01</p>
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const ADMIN_REDIRECT = "/auth/login";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   // Only run for admin routes
   if (!req.nextUrl.pathname.startsWith("/admin")) {
     return NextResponse.next();

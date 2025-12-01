@@ -145,7 +145,7 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
       <button
         onClick={() => onRemove(toast.id)}
         className="flex-shrink-0 rounded-md p-1 opacity-70 hover:opacity-100 transition-opacity"
-        aria-label="Stäng"
+        aria-label="Stang"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -154,3 +154,5 @@ function ToastItem({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
     </div>
   )
 }
+
+

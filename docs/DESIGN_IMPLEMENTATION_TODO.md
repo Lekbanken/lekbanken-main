@@ -46,7 +46,7 @@
 
 ### Marketing (components/marketing/)
 - [x] **Hero** - Med stats-kort och preview-mockup
-- [x] **Header** - Sticky nav med Headless UI mobilmeny
+- [x] **Header** - Sticky nav med Radix-baserad mobilmeny (sheet)
 - [x] **PricingSection** - 3 tiers med månads/års toggle
 - [x] **Testimonials** - Grid med featured testimonial
 - [x] **StepsTimeline** - Hur det funkar
@@ -95,8 +95,8 @@
 - [x] **Skeleton** - Loading placeholder
 
 ### Interactive Components (components/ui/)
-- [x] **Dialog** - Modal med Headless UI
-- [x] **DropdownMenu** - Actions menu med Headless UI
+- [x] **Dialog** - Modal med Radix/shadcn-stil
+- [x] **DropdownMenu** - Actions menu med Radix DropdownMenu
 - [x] **Avatar** - Med fallback initialer + storlekar
 - [x] **Breadcrumbs** - Navigation breadcrumbs
 - [x] **Tabs** - Horisontell tab navigation

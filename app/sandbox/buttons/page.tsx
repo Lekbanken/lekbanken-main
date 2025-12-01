@@ -15,7 +15,7 @@ export default function ButtonsSandbox() {
               href="/sandbox" 
               className="text-sm text-muted-foreground hover:text-foreground"
             >
-              ← Tillbaka
+              Tillbaka
             </Link>
             <h1 className="text-lg font-semibold text-foreground">Buttons & Badges</h1>
           </div>
@@ -156,3 +156,6 @@ import { Badge } from '@/components/ui/badge'
     </div>
   )
 }
+
+
+

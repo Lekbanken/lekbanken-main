@@ -20,8 +20,36 @@ export { Alert, InlineAlert } from "./alert";
 export { ToastProvider, useToast } from "./toast";
 
 // Overlays & Menus
-export { Dialog, ConfirmDialog } from "./dialog";
-export { DropdownMenu, DropdownItem, DropdownDivider, DropdownLabel } from "./dropdown-menu";
+export {
+  Dialog,
+  DialogTrigger,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+  ConfirmDialog,
+} from "./dialog";
+export {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+} from "./dropdown-menu";
+export {
+  Sheet,
+  SheetTrigger,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetFooter,
+  SheetTitle,
+  SheetDescription,
+} from "./sheet";
 
 // Navigation
 export { Breadcrumbs, BackLink } from "./breadcrumbs";

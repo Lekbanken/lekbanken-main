@@ -2,10 +2,17 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { DropdownMenu, DropdownItem, DropdownDivider, DropdownLabel } from '@/components/ui/dropdown-menu'
-import { Avatar } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/lib/supabase/auth'
 
 export function AdminTopbar() {
@@ -18,7 +25,6 @@ export function AdminTopbar() {
     router.push('/auth/login')
   }
 
-  const userInitials = user?.email?.charAt(0).toUpperCase() || 'A'
   const userEmail = user?.email || 'admin@lekbanken.no'
 
   return (
@@ -26,17 +32,17 @@ export function AdminTopbar() {
       {/* Search */}
       <div className="flex items-center gap-4">
         <div className="relative">
-          <svg 
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" 
-            fill="none" 
-            viewBox="0 0 24 24" 
+          <svg
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+            fill="none"
+            viewBox="0 0 24 24"
             stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <Input
             type="search"
-            placeholder="Sök användare, organisationer..."
+            placeholder="Sok anvandare, organisationer..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-80 pl-10"
@@ -51,7 +57,7 @@ export function AdminTopbar() {
           <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Ny användare
+          Ny anvandare
         </Button>
 
         {/* Notifications */}
@@ -72,8 +78,8 @@ export function AdminTopbar() {
         </button>
 
         {/* User menu with dropdown */}
-        <DropdownMenu
-          trigger={
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <button className="flex items-center gap-3 rounded-lg border border-border bg-background px-3 py-1.5 transition-colors hover:bg-muted">
               <Avatar name={userEmail} size="sm" />
               <div className="hidden text-left sm:block">
@@ -81,63 +87,46 @@ export function AdminTopbar() {
                 <p className="text-xs text-muted-foreground">Superadmin</p>
               </div>
               <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
               </svg>
             </button>
-          }
-          align="right"
-        >
-          <DropdownLabel>Inloggad som</DropdownLabel>
-          <div className="px-3 py-2 text-sm text-foreground">{userEmail}</div>
-          <DropdownDivider />
-          <DropdownItem
-            icon={
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuLabel>Inloggad som</DropdownMenuLabel>
+            <div className="px-3 py-2 text-sm text-foreground">{userEmail}</div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => router.push('/admin/settings')} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6" />
               </svg>
-            }
-            onClick={() => router.push('/admin/settings')}
-          >
-            Min profil
-          </DropdownItem>
-          <DropdownItem
-            icon={
+              Min profil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/admin/settings')} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07-5.07-1.41 1.41M8.34 15.66l-1.41 1.41m10.14 0-1.41-1.41M8.34 8.34 6.93 6.93" />
               </svg>
-            }
-            onClick={() => router.push('/admin/settings')}
-          >
-            Inställningar
-          </DropdownItem>
-          <DropdownItem
-            icon={
+              Installningar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/app')} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-            }
-            onClick={() => router.push('/app')}
-          >
-            Gå till appen
-          </DropdownItem>
-          <DropdownDivider />
-          <DropdownItem
-            destructive
-            icon={
+              Ga till appen
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem destructive onClick={handleSignOut} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-            }
-            onClick={handleSignOut}
-          >
-            Logga ut
-          </DropdownItem>
+              Logga ut
+            </DropdownMenuItem>
+          </DropdownMenuContent>
         </DropdownMenu>
       </div>
     </header>

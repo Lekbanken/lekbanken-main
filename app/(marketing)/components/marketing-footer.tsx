@@ -32,10 +32,10 @@ export function MarketingFooter() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="outline" size="sm" href="/login">
+          <Button variant="outline" size="sm" href="/auth/login">
             Logga in
           </Button>
-          <Button size="sm" href="/register">
+          <Button size="sm" href="/auth/signup">
             Kom igång
           </Button>
         </div>

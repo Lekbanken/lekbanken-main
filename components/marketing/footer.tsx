@@ -9,21 +9,14 @@ const navigation = {
     { name: "Testimonials", href: "#testimonials" },
   ],
   resurser: [
-    { name: "Dokumentation", href: "/docs" },
-    { name: "Guider", href: "/guides" },
-    { name: "Support", href: "/support" },
-    { name: "Status", href: "/status" },
-  ],
-  foretag: [
-    { name: "Om oss", href: "/about" },
-    { name: "Blogg", href: "/blog" },
-    { name: "Karriär", href: "/careers" },
-    { name: "Kontakt", href: "/contact" },
+    { name: "Hjälp & FAQ", href: "#contact" },
+    { name: "Kom igång", href: "/auth/signup" },
+    { name: "Logga in", href: "/auth/login" },
   ],
   juridiskt: [
-    { name: "Integritetspolicy", href: "/privacy" },
-    { name: "Användarvillkor", href: "/terms" },
-    { name: "Cookies", href: "/cookies" },
+    { name: "Integritetspolicy", href: "#" },
+    { name: "Användarvillkor", href: "#" },
+    { name: "Cookies", href: "#" },
   ],
 };
 
@@ -135,21 +128,6 @@ export function Footer() {
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
-                <h3 className="text-sm font-semibold text-background">Företag</h3>
-                <ul role="list" className="mt-4 space-y-3">
-                  {navigation.foretag.map((item) => (
-                    <li key={item.name}>
-                      <Link
-                        href={item.href}
-                        className="text-sm text-background/60 hover:text-background transition-colors"
-                      >
-                        {item.name}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="mt-10 md:mt-0">
                 <h3 className="text-sm font-semibold text-background">Juridiskt</h3>
                 <ul role="list" className="mt-4 space-y-3">
                   {navigation.juridiskt.map((item) => (
@@ -174,10 +152,10 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Lekbanken AB. Alla rättigheter förbehållna.
           </p>
           <div className="mt-4 flex gap-4 md:mt-0">
-            <Button size="sm" variant="outline" href="/login" className="border-background/20 text-background/60 hover:text-background hover:bg-background/10">
+            <Button size="sm" variant="outline" href="/auth/login" className="border-background/20 text-background/60 hover:text-background hover:bg-background/10">
               Logga in
             </Button>
-            <Button size="sm" href="/register" className="bg-primary hover:bg-primary/90">
+            <Button size="sm" href="/auth/signup" className="bg-primary hover:bg-primary/90">
               Kom igång gratis
             </Button>
           </div>

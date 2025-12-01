@@ -24,7 +24,7 @@ export function CTASection() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Button
               size="lg"
-              href="/register"
+              href="/auth/signup"
               className="bg-white text-primary hover:bg-white/90 shadow-lg"
             >
               Starta gratis
@@ -32,10 +32,10 @@ export function CTASection() {
             <Button
               size="lg"
               variant="outline"
-              href="/demo"
+              href="/#contact"
               className="border-white/30 text-primary-foreground hover:bg-white/10"
             >
-              Boka demo
+              Kontakta oss
             </Button>
           </div>
           <p className="mt-6 text-sm text-primary-foreground/60">

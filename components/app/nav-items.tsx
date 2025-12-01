@@ -46,8 +46,8 @@ const iconUser = (
 
 export const appNavItems: AppNavItem[] = [
   { href: "/app", label: "Hem", icon: iconHome },
-  { href: "/app/categories", label: "Kategorier", icon: iconGrid },
-  { href: "/app/journey", label: "Lekresa", icon: iconMap },
-  { href: "/app/favorites", label: "Favoriter", icon: iconHeart },
+  { href: "/app/games", label: "Spel", icon: iconGrid },
+  { href: "/app/planner", label: "Planer", icon: iconMap },
+  { href: "/app/leaderboard", label: "Topplista", icon: iconHeart },
   { href: "/app/profile", label: "Profil", icon: iconUser },
 ];

@@ -60,10 +60,10 @@ export function Header() {
 
         {/* Desktop CTA */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Button variant="ghost" href="/login">
+          <Button variant="ghost" href="/auth/login">
             Logga in
           </Button>
-          <Button href="/register">
+          <Button href="/auth/signup">
             Prova gratis
           </Button>
         </div>
@@ -106,10 +106,10 @@ export function Header() {
                 ))}
               </div>
               <div className="py-6 space-y-3">
-                <Button variant="outline" href="/login" className="w-full">
+                <Button variant="outline" href="/auth/login" className="w-full">
                   Logga in
                 </Button>
-                <Button href="/register" className="w-full">
+                <Button href="/auth/signup" className="w-full">
                   Prova gratis
                 </Button>
               </div>

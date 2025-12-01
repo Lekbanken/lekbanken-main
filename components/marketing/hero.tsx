@@ -17,10 +17,10 @@ export function Hero() {
             träningar, lektioner och teambuilding.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
-            <Button size="lg" href="/register">
+            <Button size="lg" href="/auth/signup">
               Prova gratis
             </Button>
-            <Button size="lg" variant="outline" href="/demo">
+            <Button size="lg" variant="outline" href="/#contact">
               Boka demo
             </Button>
           </div>

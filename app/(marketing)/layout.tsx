@@ -4,7 +4,7 @@ import { Header } from "@/components/marketing/header";
 import { Footer } from "@/components/marketing/footer";
 
 export const metadata: Metadata = {
-  title: "Lekbanken – Gör planeringen lekfull, snabb och delbar",
+  title: "Lekbanken - Gör planeringen lekfull, snabb och delbar",
   description: "Bygg, anpassa och dela aktiviteter på sekunder. Perfekt för träningar, lektioner och teambuilding.",
 };
 

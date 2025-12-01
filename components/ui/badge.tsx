@@ -15,12 +15,12 @@ const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-muted text-muted-foreground",
   primary: "bg-primary/10 text-primary ring-1 ring-primary/20",
   accent: "bg-accent/10 text-accent-foreground ring-1 ring-accent/20",
-  warning: "bg-yellow/10 text-yellow-800 ring-1 ring-yellow/20",
-  success: "bg-green-50 text-green-700 ring-1 ring-green-600/20",
-  destructive: "bg-red-50 text-red-700 ring-1 ring-red-600/20",
-  error: "bg-red-50 text-red-700 ring-1 ring-red-600/20",
+  warning: "bg-warning/10 text-warning-foreground ring-1 ring-warning/25",
+  success: "bg-success/10 text-success-foreground ring-1 ring-success/20",
+  destructive: "bg-destructive/10 text-destructive-foreground ring-1 ring-destructive/20",
+  error: "bg-destructive/10 text-destructive-foreground ring-1 ring-destructive/20",
   outline: "bg-transparent text-foreground ring-1 ring-border",
-  secondary: "bg-gray-100 text-gray-700 ring-1 ring-gray-200",
+  secondary: "bg-muted text-muted-foreground ring-1 ring-border",
 };
 
 const sizeStyles: Record<BadgeSize, string> = {
@@ -33,12 +33,12 @@ const dotColors: Record<BadgeVariant, string> = {
   default: "bg-muted-foreground",
   primary: "bg-primary",
   accent: "bg-accent",
-  warning: "bg-yellow",
-  success: "bg-green-500",
-  destructive: "bg-red-500",
-  error: "bg-red-500",
+  warning: "bg-warning",
+  success: "bg-success",
+  destructive: "bg-destructive",
+  error: "bg-destructive",
   outline: "bg-foreground",
-  secondary: "bg-gray-500",
+  secondary: "bg-muted-foreground",
 };
 
 export function Badge({

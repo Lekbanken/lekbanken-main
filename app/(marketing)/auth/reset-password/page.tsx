@@ -34,22 +34,22 @@ export default function ResetPasswordPage() {
             Reset your password
           </h2>
           <p className="mt-2 text-center text-sm text-muted-foreground">
-            Enter your email and we'll send you a link to reset your password.
+            Enter your email and we&apos;ll send you a link to reset your password.
           </p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleResetPassword}>
           {success && (
-            <div className="rounded-md bg-green-50 p-4">
-              <p className="text-sm font-medium text-green-800">
+            <div className="rounded-md border border-success/30 bg-success/10 p-4 text-success-foreground">
+              <p className="text-sm font-medium">
                 If an account exists with that email, you will receive a password reset link.
               </p>
             </div>
           )}
 
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <p className="text-sm font-medium text-red-800">{error}</p>
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 p-4 text-destructive-foreground">
+              <p className="text-sm font-medium">{error}</p>
             </div>
           )}
 
@@ -65,7 +65,7 @@ export default function ResetPasswordPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="relative block w-full rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary sm:text-sm"
               placeholder="Email address"
             />
           </div>
@@ -73,21 +73,21 @@ export default function ResetPasswordPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="group relative flex w-full justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
           >
             {isLoading ? 'Sending...' : 'Send reset link'}
           </button>
         </form>
 
         <div className="text-center space-y-2">
-          <p className="text-sm text-gray-600">
-            <Link href="/auth/login" className="font-medium text-blue-600 hover:text-blue-500">
+          <p className="text-sm text-muted-foreground">
+            <Link href="/auth/login" className="font-medium text-primary hover:text-primary/90">
               Back to login
             </Link>
           </p>
-          <p className="text-sm text-gray-600">
-            Don’t have an account?{' '}
-            <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
+          <p className="text-sm text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Link href="/auth/signup" className="font-medium text-primary hover:text-primary/90">
               Sign up
             </Link>
           </p>

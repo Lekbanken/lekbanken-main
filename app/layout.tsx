@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Lekbanken – Frontend Architecture",
+  title: "Lekbanken - Frontend Architecture",
   description:
     "Separata UI-världar för Marketing, App och Admin i Next.js App Router med delade providers och komponenter.",
 };

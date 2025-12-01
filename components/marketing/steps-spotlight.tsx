@@ -108,4 +108,3 @@ export function StepsSpotlight() {
     </section>
   );
 }
-import type React from "react";

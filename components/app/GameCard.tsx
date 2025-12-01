@@ -1,31 +1,32 @@
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
+import Image from "next/image";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 
-type GameCardVariant = 'default' | 'compact' | 'featured'
+type GameCardVariant = "default" | "compact" | "featured";
 
 interface GameCardProps {
-  id: string
-  name: string
-  description?: string | null
-  imageUrl?: string | null
-  ageMin?: number | null
-  ageMax?: number | null
-  energyLevel?: 'low' | 'medium' | 'high' | null
-  timeEstimate?: number | null
-  minPlayers?: number | null
-  maxPlayers?: number | null
-  rating?: number | null
-  playCount?: number | null
-  isFavorite?: boolean
-  variant?: GameCardVariant
-  categories?: string[]
+  id: string;
+  name: string;
+  description?: string | null;
+  imageUrl?: string | null;
+  ageMin?: number | null;
+  ageMax?: number | null;
+  energyLevel?: "low" | "medium" | "high" | null;
+  timeEstimate?: number | null;
+  minPlayers?: number | null;
+  maxPlayers?: number | null;
+  rating?: number | null;
+  playCount?: number | null;
+  isFavorite?: boolean;
+  variant?: GameCardVariant;
+  categories?: string[];
 }
 
 const energyConfig = {
-  low: { label: 'Lugn', variant: 'success' as const },
-  medium: { label: 'Mellan', variant: 'warning' as const },
-  high: { label: 'Hög energi', variant: 'destructive' as const },
-}
+  low: { label: "Lugn", variant: "success" as const },
+  medium: { label: "Mellan", variant: "warning" as const },
+  high: { label: "H\u00f6g energi", variant: "destructive" as const },
+};
 
 export function GameCard({
   id,
@@ -41,94 +42,101 @@ export function GameCard({
   rating,
   playCount,
   isFavorite = false,
-  variant = 'default',
+  variant = "default",
   categories = [],
 }: GameCardProps) {
-  const ageRange = ageMin && ageMax ? `${ageMin}-${ageMax} år` : ageMin ? `${ageMin}+ år` : null
-  const playerRange = minPlayers && maxPlayers 
-    ? `${minPlayers}-${maxPlayers} spelare` 
-    : minPlayers 
-      ? `${minPlayers}+ spelare` 
-      : null
+  const ageRange = ageMin && ageMax ? `${ageMin}-${ageMax} \u00e5r` : ageMin ? `${ageMin}+ \u00e5r` : null;
+  const playerRange =
+    minPlayers && maxPlayers
+      ? `${minPlayers}-${maxPlayers} spelare`
+      : minPlayers
+        ? `${minPlayers}+ spelare`
+        : null;
 
-  if (variant === 'compact') {
+  if (variant === "compact") {
     return (
       <Link href={`/app/games/${id}`} className="group block">
         <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary hover:shadow-md">
           {/* Thumbnail */}
-          <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
+          <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
             {imageUrl ? (
-              <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+              <Image src={imageUrl} alt={name} fill sizes="64px" className="object-cover" />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-2xl">🎮</div>
+              <div className="flex h-full w-full items-center justify-center text-2xl">??</div>
             )}
           </div>
-          
+
           {/* Content */}
           <div className="min-w-0 flex-1">
-            <h3 className="truncate font-semibold text-foreground group-hover:text-primary">
-              {name}
-            </h3>
+            <h3 className="truncate font-semibold text-foreground group-hover:text-primary">{name}</h3>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               {ageRange && <span>{ageRange}</span>}
-              {timeEstimate && <span>• {timeEstimate} min</span>}
+              {timeEstimate && <span>- {timeEstimate} min</span>}
             </div>
           </div>
 
           {/* Rating */}
           {rating && (
             <div className="flex items-center gap-1 text-sm">
-              <span className="text-yellow">★</span>
+              <span className="text-yellow">*</span>
               <span className="font-medium text-foreground">{rating.toFixed(1)}</span>
             </div>
           )}
         </div>
       </Link>
-    )
+    );
   }
 
-  if (variant === 'featured') {
+  if (variant === "featured") {
     return (
       <Link href={`/app/games/${id}`} className="group block">
         <div className="relative overflow-hidden rounded-2xl border-2 border-primary bg-card shadow-lg transition-all hover:shadow-xl">
           {/* Featured badge */}
           <div className="absolute left-4 top-4 z-10">
-            <Badge variant="primary">⭐ Utvald</Badge>
+            <Badge variant="primary">* Utvald</Badge>
           </div>
-          
+
           {/* Favorite button */}
-          <button 
+          <button
             className="absolute right-4 top-4 z-10 rounded-full bg-background/80 p-2 backdrop-blur transition-colors hover:bg-background"
-            onClick={(e) => { e.preventDefault(); /* Toggle favorite */ }}
+            onClick={(e) => {
+              e.preventDefault();
+              /* Toggle favorite */
+            }}
+            type="button"
           >
-            <span className={isFavorite ? 'text-red-500' : 'text-muted-foreground'}>
-              {isFavorite ? '❤️' : '🤍'}
+            <span className={isFavorite ? "text-destructive" : "text-muted-foreground"}>
+              {isFavorite ? "\u2665" : "\u2661"}
             </span>
           </button>
 
           {/* Image */}
-          <div className="aspect-[16/9] bg-gradient-to-br from-primary to-accent">
+          <div className="relative aspect-[16/9] bg-gradient-to-br from-primary to-accent">
             {imageUrl ? (
-              <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                sizes="(min-width: 1024px) 520px, 100vw"
+                className="object-cover"
+              />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-6xl">🎮</div>
+              <div className="flex h-full w-full items-center justify-center text-6xl">??</div>
             )}
           </div>
 
           {/* Content */}
           <div className="p-6">
-            <h3 className="text-xl font-semibold text-foreground group-hover:text-primary">
-              {name}
-            </h3>
-            {description && (
-              <p className="mt-2 line-clamp-2 text-muted-foreground">{description}</p>
-            )}
-            
+            <h3 className="text-xl font-semibold text-foreground group-hover:text-primary">{name}</h3>
+            {description && <p className="mt-2 line-clamp-2 text-muted-foreground">{description}</p>}
+
             {/* Categories */}
             {categories.length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {categories.slice(0, 3).map((cat) => (
-                  <Badge key={cat} variant="outline" size="sm">{cat}</Badge>
+                  <Badge key={cat} variant="outline" size="sm">
+                    {cat}
+                  </Badge>
                 ))}
               </div>
             )}
@@ -142,7 +150,7 @@ export function GameCard({
               </div>
               {rating && (
                 <div className="flex items-center gap-1">
-                  <span className="text-yellow">★</span>
+                  <span className="text-yellow">*</span>
                   <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
                   {playCount && <span className="text-xs text-muted-foreground">({playCount})</span>}
                 </div>
@@ -151,7 +159,7 @@ export function GameCard({
           </div>
         </div>
       </Link>
-    )
+    );
   }
 
   // Default variant
@@ -160,21 +168,31 @@ export function GameCard({
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:border-primary hover:shadow-md">
         {/* Favorite button */}
         <div className="relative">
-          <button 
+          <button
             className="absolute right-3 top-3 z-10 rounded-full bg-background/80 p-1.5 backdrop-blur transition-colors hover:bg-background"
-            onClick={(e) => { e.preventDefault(); /* Toggle favorite */ }}
+            onClick={(e) => {
+              e.preventDefault();
+              /* Toggle favorite */
+            }}
+            type="button"
           >
-            <span className={`text-sm ${isFavorite ? 'text-red-500' : 'text-muted-foreground'}`}>
-              {isFavorite ? '❤️' : '🤍'}
+            <span className={`text-sm ${isFavorite ? "text-destructive" : "text-muted-foreground"}`}>
+              {isFavorite ? "\u2665" : "\u2661"}
             </span>
           </button>
 
           {/* Image */}
-          <div className="aspect-[4/3] bg-gradient-to-br from-primary/20 to-accent/20">
+          <div className="relative aspect-[4/3] bg-gradient-to-br from-primary/20 to-accent/20">
             {imageUrl ? (
-              <img src={imageUrl} alt={name} className="h-full w-full object-cover" />
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                sizes="(min-width: 1024px) 360px, 100vw"
+                className="object-cover"
+              />
             ) : (
-              <div className="flex h-full w-full items-center justify-center text-4xl">🎮</div>
+              <div className="flex h-full w-full items-center justify-center text-4xl">??</div>
             )}
           </div>
         </div>
@@ -182,31 +200,33 @@ export function GameCard({
         {/* Content */}
         <div className="p-4">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-1 font-semibold text-foreground group-hover:text-primary">
-              {name}
-            </h3>
+            <h3 className="line-clamp-1 font-semibold text-foreground group-hover:text-primary">{name}</h3>
             {rating && (
               <div className="flex items-center gap-0.5 text-sm">
-                <span className="text-yellow">★</span>
+                <span className="text-yellow">*</span>
                 <span className="font-medium text-foreground">{rating.toFixed(1)}</span>
               </div>
             )}
           </div>
 
-          {description && (
-            <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">{description}</p>}
 
           {/* Tags */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {ageRange && <Badge variant="primary" size="sm">{ageRange}</Badge>}
+            {ageRange && (
+              <Badge variant="primary" size="sm">
+                {ageRange}
+              </Badge>
+            )}
             {energyLevel && (
               <Badge variant={energyConfig[energyLevel].variant} size="sm">
                 {energyConfig[energyLevel].label}
               </Badge>
             )}
             {timeEstimate && (
-              <Badge variant="outline" size="sm">{timeEstimate} min</Badge>
+              <Badge variant="outline" size="sm">
+                {timeEstimate} min
+              </Badge>
             )}
           </div>
 
@@ -220,5 +240,5 @@ export function GameCard({
         </div>
       </div>
     </Link>
-  )
+  );
 }

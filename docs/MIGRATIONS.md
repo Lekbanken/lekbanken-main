@@ -63,6 +63,13 @@ This project has **14 database migrations** (created: Nov 29, 2025) that need to
 
 **Better for automated deployments and version control**
 
+> **Tip (no global install needed):** You can run the CLI via `npx` if Claude/CI doesn't have `supabase` installed. Example:
+> ```bash
+> # Requires SUPABASE_DB_URL in your env (postgres://…)
+> npx supabase db push --db-url "$SUPABASE_DB_URL"
+> ```
+> On Windows PowerShell: `npx supabase db push --db-url "$env:SUPABASE_DB_URL"`.
+
 #### Step 1: Install Supabase CLI
 
 **Windows (using Winget - Recommended):**

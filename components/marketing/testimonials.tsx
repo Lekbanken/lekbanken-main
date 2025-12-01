@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+
 const featuredTestimonial = {
   body: "Lekbanken sparar oss timmar varje vecka och gör det enkelt att dela pass med vikarier.",
   author: {

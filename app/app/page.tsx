@@ -91,7 +91,7 @@ export default function AppHome() {
           <h2 className="mb-4 text-lg font-semibold text-foreground">Senaste aktivitet</h2>
           <Card>
             <CardContent className="divide-y divide-border p-0">
-              {recentActivities.map((activity, i) => (
+              {recentActivities.map((activity) => (
                 <Link 
                   key={activity.id} 
                   href={`/app/games/${activity.id}`}

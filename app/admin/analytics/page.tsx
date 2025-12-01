@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
   getPageViewStats,

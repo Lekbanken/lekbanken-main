@@ -1,3 +1,6 @@
+import type { JSX } from "react";
+import type React from "react";
+
 type SpotlightFeature = {
   name: string;
   description: string;

@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/supabase/auth'
@@ -23,6 +23,14 @@ export default function SignupPage() {
   const [organizationName, setOrganizationName] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const allowlist = useMemo(() => {
+    const raw = process.env.NEXT_PUBLIC_REGISTRATION_ALLOWLIST || ''
+    return raw.split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+  }, [])
+
+  const isAllowed = allowlist.length === 0 || allowlist.includes(email.trim().toLowerCase())
+  const registrationClosed = allowlist.length > 0 && !isAllowed
+  const betaMessage = "Vi är i beta – registrering är stängd. Kontakta oss för access."
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,6 +38,9 @@ export default function SignupPage() {
     setIsLoading(true)
 
     try {
+      if (registrationClosed) {
+        throw new Error(betaMessage)
+      }
       // Sign up user
       await signUp(email, password, fullName)
 
@@ -72,6 +83,9 @@ export default function SignupPage() {
           <form className="space-y-6" onSubmit={handleSignup}>
             {error && (
               <Alert variant="error">{error}</Alert>
+            )}
+            {registrationClosed && !error && (
+              <Alert variant="warning">{betaMessage}</Alert>
             )}
 
             <div className="space-y-4">
@@ -147,7 +161,7 @@ export default function SignupPage() {
 
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || registrationClosed}
               className="w-full"
             >
               {isLoading ? 'Creating account...' : 'Sign up'}

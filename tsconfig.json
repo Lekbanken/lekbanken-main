@@ -19,7 +19,12 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/components/*": [
+        "./components/*",
+        "./catalyst-ui-kit/demo/typescript/src/components/*"
+      ],
+      "@/data": ["./catalyst-ui-kit/demo/typescript/src/data"]
     }
   },
   "include": [
@@ -30,5 +35,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "catalyst-ui-kit"]
 }

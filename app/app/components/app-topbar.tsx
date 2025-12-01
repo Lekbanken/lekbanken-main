@@ -23,7 +23,7 @@ export function AppTopbar() {
   }
 
   const userEmail = user?.email || ''
-  const userName = userProfile?.display_name || user?.user_metadata?.full_name || userEmail.split('@')[0]
+  const userName = userProfile?.full_name || user?.user_metadata?.full_name || userEmail.split('@')[0]
   const userRole = user?.app_metadata?.role || user?.user_metadata?.role
   const isAdmin = userRole === 'admin'
 

@@ -3,171 +3,130 @@
 import {
   UsersIcon,
   BuildingOfficeIcon,
-  Cog6ToothIcon,
   TrophyIcon,
   RectangleGroupIcon,
-  ChartBarIcon,
-  BellIcon,
-  DocumentTextIcon,
-  InboxStackIcon,
-  PlusIcon,
+  Cog6ToothIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
-import { MetricCard } from "./components/MetricCard";
-import { SectionTile } from "./components/SectionTile";
+import { OverviewStats } from "./components/OverviewStats";
+import { QuickLinks } from "./components/QuickLinks";
+import { ActivityFeed } from "./components/ActivityFeed";
+import type { ActivityItem, OverviewMetric, QuickLinkItem } from "./types";
 
-const metrics = [
-  { 
-    label: "Totalt användare", 
-    value: "2 847", 
-    change: "+12% senaste 30 d", 
-    trend: "up" as const, 
+const metrics: OverviewMetric[] = [
+  {
+    id: "users",
+    label: "Total users",
+    value: "2,847",
+    change: "+12% last 30d",
+    trend: "up",
     icon: <UsersIcon className="h-5 w-5" />,
-    iconGradient: "from-blue-500 to-indigo-600"
+    iconGradient: "from-blue-500 to-indigo-600",
   },
-  { 
-    label: "Organisationer", 
-    value: "184", 
-    change: "+4% senaste 30 d", 
-    trend: "up" as const, 
+  {
+    id: "orgs",
+    label: "Organisations",
+    value: "184",
+    change: "+4% last 30d",
+    trend: "up",
     icon: <BuildingOfficeIcon className="h-5 w-5" />,
-    iconGradient: "from-emerald-500 to-teal-600"
+    iconGradient: "from-emerald-500 to-teal-600",
   },
-  { 
-    label: "Publicerat innehåll", 
-    value: "1 245", 
-    change: "+7% senaste 30 d", 
-    trend: "up" as const, 
-    icon: <DocumentTextIcon className="h-5 w-5" />,
-    iconGradient: "from-amber-500 to-orange-600"
+  {
+    id: "achievements",
+    label: "Achievements created",
+    value: "48",
+    change: "+7 this week",
+    trend: "up",
+    icon: <TrophyIcon className="h-5 w-5" />,
+    iconGradient: "from-amber-500 to-orange-600",
   },
-  { 
-    label: "Supportärenden öppna", 
-    value: "12", 
-    change: "-3 st denna vecka", 
-    trend: "down" as const, 
-    icon: <InboxStackIcon className="h-5 w-5" />,
-    iconGradient: "from-rose-500 to-pink-600"
+  {
+    id: "products",
+    label: "Active products",
+    value: "12",
+    change: "Stable",
+    trend: "flat",
+    icon: <RectangleGroupIcon className="h-5 w-5" />,
+    iconGradient: "from-primary to-purple-600",
   },
 ];
 
-const sectionTiles = [
+const quickLinks: QuickLinkItem[] = [
   {
-    title: "Användare",
-    description: "Hantera roller, åtkomst och status för alla användare.",
+    id: "users",
+    label: "User Admin",
+    description: "Manage roles, access, and invites.",
     href: "/admin/users",
     icon: <UsersIcon className="h-5 w-5" />,
     iconGradient: "from-blue-500 to-indigo-600",
-    stat: { value: "2 847", label: "registrerade" },
   },
   {
-    title: "Organisationer",
-    description: "Översikt över organisationer, licenser och team.",
+    id: "organisations",
+    label: "Organisation Admin",
+    description: "Licenses, contacts, member oversight.",
     href: "/admin/organisations",
     icon: <BuildingOfficeIcon className="h-5 w-5" />,
     iconGradient: "from-emerald-500 to-teal-600",
-    stat: { value: "184", label: "aktiva" },
   },
   {
-    title: "Produkt & innehåll",
-    description: "Hantera bibliotek, kategorier och publiceringsflöden.",
-    href: "/admin/content",
+    id: "products",
+    label: "Product Admin",
+    description: "Products, capabilities, availability.",
+    href: "/admin/products",
     icon: <RectangleGroupIcon className="h-5 w-5" />,
     iconGradient: "from-amber-500 to-orange-600",
-    stat: { value: "1 245", label: "objekt" },
   },
   {
-    title: "Achievements / Gamification",
-    description: "Bygg badges, events och belöningar för användare.",
-    href: "/admin/achievements-advanced",
+    id: "achievements",
+    label: "Achievements Admin",
+    description: "Badge builder and rewards.",
+    href: "/admin/achievements",
     icon: <TrophyIcon className="h-5 w-5" />,
     iconGradient: "from-primary to-purple-600",
-    stat: { value: "48", label: "aktiva badges" },
-  },
-  {
-    title: "Notifikationer",
-    description: "Styr utgående utskick och in-app notiser.",
-    href: "/admin/notifications",
-    icon: <BellIcon className="h-5 w-5" />,
-    iconGradient: "from-pink-500 to-rose-600",
-  },
-  {
-    title: "Analys",
-    description: "Dashboard för användning, retention och funnels.",
-    href: "/admin/analytics",
-    icon: <ChartBarIcon className="h-5 w-5" />,
-    iconGradient: "from-cyan-500 to-blue-600",
   },
 ];
 
-const quickActions = [
-  { label: "Skapa användare", href: "/admin/users/new", icon: <UsersIcon className="h-5 w-5" /> },
-  { label: "Ny organisation", href: "/admin/organisations/new", icon: <BuildingOfficeIcon className="h-5 w-5" /> },
-  { label: "Publicera innehåll", href: "/admin/content/new", icon: <DocumentTextIcon className="h-5 w-5" /> },
-  { label: "Öppna inställningar", href: "/admin/settings", icon: <Cog6ToothIcon className="h-5 w-5" /> },
+const activity: ActivityItem[] = [
+  { id: "1", type: "user_created", message: "New user invited: alex.berg@lekbanken.test", createdAt: new Date().toISOString(), status: "info" },
+  { id: "2", type: "organisation_created", message: "Organisation added: Sunrise Schools", createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(), status: "success" },
+  { id: "3", type: "achievement_created", message: "Achievement published: Core Pathfinder", createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(), status: "success" },
+  { id: "4", type: "product_updated", message: "Product updated: Gamification Pro capabilities", createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(), status: "info" },
+  { id: "5", type: "license_updated", message: "License warning: 3 orgs near seat limit", createdAt: new Date(Date.now() - 1000 * 60 * 360).toISOString(), status: "warning" },
 ];
 
 export function AdminDashboardPage() {
   return (
     <div className="space-y-6">
-      {/* Page header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Admin</p>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Översikt</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Snabb åtkomst till de viktigaste admin-ytorna.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">Overview</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Quick health check and entry points for admin areas.</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" href="/admin/support" size="sm">
-            Supportkö
+            Support
           </Button>
           <Button href="/admin/settings" size="sm">
             <Cog6ToothIcon className="mr-2 h-4 w-4" />
-            Inställningar
+            Settings
           </Button>
         </div>
       </div>
 
-      {/* Metrics grid */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((metric) => (
-          <MetricCard key={metric.label} {...metric} />
-        ))}
-      </div>
+      <OverviewStats metrics={metrics} />
 
-      {/* Section tiles */}
-      <div>
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Huvudsektioner</h2>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {sectionTiles.map((tile) => (
-            <SectionTile key={tile.href} {...tile} />
-          ))}
-        </div>
-      </div>
-
-      {/* Quick actions */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base">Snabbåtgärder</CardTitle>
+      <Card className="border-border/60">
+        <CardHeader className="border-b border-border/60 pb-3">
+          <CardTitle className="text-base">Quick links</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {quickActions.map((action) => (
-              <Button 
-                key={action.href} 
-                variant="outline" 
-                className="h-auto flex-col gap-2 py-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md" 
-                href={action.href}
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-                  {action.icon}
-                </div>
-                <span className="text-sm font-medium text-foreground">{action.label}</span>
-              </Button>
-            ))}
-          </div>
+        <CardContent className="pt-4">
+          <QuickLinks items={quickLinks} />
         </CardContent>
       </Card>
+
+      <ActivityFeed items={activity} />
     </div>
   );
 }

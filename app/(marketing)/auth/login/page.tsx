@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useAuth } from '@/lib/supabase/auth'
@@ -22,12 +22,20 @@ export default function LoginPage() {
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { signIn, signInWithGoogle, isLoading } = useAuth()
+  const { signIn, signInWithGoogle, isLoading, isAuthenticated, userRole } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
-  const redirectTo = searchParams.get('redirect') || '/app'
+  const redirectParam = searchParams.get('redirect')
+  const redirectTo = redirectParam || (userRole === 'admin' ? '/admin' : '/app')
+
+  // If already signed in, bounce to redirect target
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      router.replace(redirectTo)
+    }
+  }, [isAuthenticated, isLoading, redirectTo, router])
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault()

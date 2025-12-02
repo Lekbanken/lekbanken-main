@@ -17,6 +17,7 @@ type UserProfile = Database['public']['Tables']['users']['Row']
 interface AuthContextType {
   user: User | null
   userProfile: UserProfile | null
+  userRole: string | null
   isLoading: boolean
   isAuthenticated: boolean
   signUp: (email: string, password: string, fullName?: string) => Promise<void>
@@ -35,6 +36,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const ensureProfile = useCallback(async (currentUser: User) => {
+    try {
+      const { data: profile } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle()
+
+      if (profile) return profile as UserProfile
+
+      const baseProfile: Partial<UserProfile> & { id: string } = {
+        id: currentUser.id,
+        email: currentUser.email ?? "",
+        full_name:
+          (currentUser.user_metadata?.full_name as string | undefined) ??
+          (currentUser.user_metadata?.name as string | undefined) ??
+          currentUser.email ??
+          "",
+        role:
+          (currentUser.app_metadata?.role as string | undefined) ??
+          (currentUser.user_metadata?.role as string | undefined) ??
+          undefined,
+      }
+
+      const { data: inserted } = await supabase
+        .from('users')
+        // Cast to any to avoid mismatch if table requires specific fields; we only set safe defaults.
+        .upsert(baseProfile as any, { onConflict: 'id' })
+        .select('*')
+        .maybeSingle()
+
+      if (inserted) {
+        console.info('ensureProfile: created profile for user', currentUser.id)
+      }
+
+      return inserted as UserProfile | null
+    } catch (err) {
+      console.error('ensureProfile error:', err)
+      return null
+    }
+  }, [])
+
+  const fetchProfile = useCallback(async (currentUser: User) => {
+    const profile = await ensureProfile(currentUser)
+    setUserProfile(profile ?? null)
+  }, [ensureProfile])
+
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
@@ -45,16 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           setUser(session.user)
-          // Fetch user profile
-          const { data: profile } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-
-          if (profile) {
-            setUserProfile(profile)
-          }
+          await fetchProfile(session.user)
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
@@ -63,25 +102,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    initAuth()
+    void initAuth()
 
     // Listen to auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         setUser(session.user)
-
-        // Fetch updated profile
-        const { data: profile } = await supabase
-          .from('users')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        if (profile) {
-          setUserProfile(profile)
-        }
+        await fetchProfile(session.user)
       } else {
         setUser(null)
         setUserProfile(null)
@@ -89,7 +118,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     return () => subscription?.unsubscribe()
-  }, [])
+  }, [fetchProfile])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -117,8 +146,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
     if (data.user) {
       setUser(data.user)
+      await fetchProfile(data.user)
     }
-  }, [])
+  }, [fetchProfile])
 
   const signInWithGoogle = useCallback(async () => {
     const { error } = await supabase.auth.signInWithOAuth({
@@ -173,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     user,
     userProfile,
+    userRole: userProfile?.role || (user?.app_metadata?.role as string | undefined) || null,
     isLoading,
     isAuthenticated: !!user,
     signUp,

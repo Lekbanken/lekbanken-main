@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -16,7 +16,21 @@ type LanguageSelectorProps = {
 
 export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const selectedLang = languages.find((l) => l.code === value);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <span className="h-4 w-4 rounded-full bg-muted" />
+        <span className="h-4 w-16 rounded bg-muted" />
+      </div>
+    );
+  }
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>

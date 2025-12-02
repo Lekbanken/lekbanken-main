@@ -1,5 +1,6 @@
 ﻿"use client"
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/avatar";
@@ -17,6 +18,11 @@ import { useAuth } from "@/lib/supabase/auth";
 export function AppTopbar() {
   const router = useRouter();
   const { user, userProfile, signOut } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -27,6 +33,22 @@ export function AppTopbar() {
   const userName = userProfile?.full_name || user?.user_metadata?.full_name || userEmail.split("@")[0];
   const userRole = user?.app_metadata?.role || user?.user_metadata?.role;
   const isAdmin = userRole === "admin";
+
+  if (!mounted) {
+    return (
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="h-8 w-8 rounded-xl bg-muted sm:h-9 sm:w-9" />
+          <div className="hidden sm:block space-y-1">
+            <div className="h-2 w-16 rounded bg-muted" />
+            <div className="h-3 w-24 rounded bg-muted" />
+          </div>
+          <div className="h-3 w-20 rounded bg-muted sm:hidden" />
+        </div>
+        <div className="h-8 w-20 rounded-full bg-muted" />
+      </header>
+    );
+  }
 
   return (
     <header className="flex items-center justify-between">

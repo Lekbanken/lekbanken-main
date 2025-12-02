@@ -3,18 +3,18 @@
 import type { ReactNode } from "react";
 import { AuthProvider, useAuth } from "@/lib/supabase/auth";
 import { TenantProvider } from "@/lib/context/TenantContext";
-import AdminShellContent from "./layout-client";
+import { AdminShell } from "@/components/admin/AdminShell";
 
 function TenantProviderWithAuth({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   return <TenantProvider userId={user?.id ?? null}>{children}</TenantProvider>;
 }
 
-export default function AdminShell({ children }: { children: ReactNode }) {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <AuthProvider>
       <TenantProviderWithAuth>
-        <AdminShellContent>{children}</AdminShellContent>
+        <AdminShell>{children}</AdminShell>
       </TenantProviderWithAuth>
     </AuthProvider>
   );

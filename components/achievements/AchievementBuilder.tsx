@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -73,7 +73,7 @@ export function AchievementBuilder() {
                 <ThemeSelector />
                 <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4">
                   <p className="text-xs text-muted-foreground">
-                    💡 <strong>Tips:</strong> Välj ett tema som passar din achievement. Temafärgerna påverkar hur "Tema"-färger visas i preview.
+                    Tips: Valj ett tema som passar din achievement. Temafarger paverkar hur temafarger visas i preview.
                   </p>
                 </div>
               </div>
@@ -111,7 +111,7 @@ export function AchievementBuilder() {
             <label className="flex cursor-not-allowed items-center gap-3 text-sm text-muted-foreground">
               <input
                 type="checkbox"
-                checked={state.profileFrame?.enabled}
+                checked={state.profileFrame?.enabled ?? false}
                 onChange={(e) => setProfileFrameEnabled(e.target.checked)}
                 className="h-4 w-4 rounded border-border"
                 disabled
@@ -119,7 +119,7 @@ export function AchievementBuilder() {
               Aktivera profilram-stil
             </label>
             <p className="text-xs text-muted-foreground">
-              Profilramar ger spelaren en unik ram runt sin avatar baserad på achievement-designen.
+              Profilramar ger spelaren en unik ram runt sin avatar baserad pÃ¥ achievement-designen.
             </p>
           </CardContent>
         </Card>
@@ -161,12 +161,12 @@ export function AchievementBuilder() {
                 </Badge>
                 {state.backDecorations.map((d, i) => (
                   <Badge key={`back-${i}`} variant="secondary" size="sm">
-                    ↓ {d.type}
+                    â†“ {d.type}
                   </Badge>
                 ))}
                 {state.frontDecorations.map((d, i) => (
                   <Badge key={`front-${i}`} variant="primary" size="sm">
-                    ↑ {d.type}
+                    â†‘ {d.type}
                   </Badge>
                 ))}
               </div>
@@ -190,14 +190,14 @@ export function AchievementBuilder() {
         <Card className="border-dashed bg-gradient-to-br from-primary/5 to-accent/5">
           <CardContent className="p-5">
             <div className="mb-3 flex items-center gap-2">
-              <span className="text-xl">🛍️</span>
+              <span className="text-xl">ðŸ›ï¸</span>
               <h4 className="font-semibold text-foreground">Marketplace</h4>
               <Badge variant="accent" size="sm">
                 Snart
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Kommer snart: Köp och sälj skins, badge-packs, ramar och symboler. Skapa unika achievements med premium-innehåll.
+              Kommer snart: KÃ¶p och sÃ¤lj skins, badge-packs, ramar och symboler. Skapa unika achievements med premium-innehÃ¥ll.
             </p>
             <div className="mt-3 flex gap-2">
               <Badge variant="outline" size="sm">
@@ -216,7 +216,7 @@ export function AchievementBuilder() {
         {/* Permissions */}
         <Card className="border-dashed opacity-75">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Behörigheter</CardTitle>
+            <CardTitle className="text-sm">BehÃ¶righeter</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-xs text-muted-foreground">
             <p>

@@ -1,16 +1,17 @@
-'use client'
+﻿'use client'
 
-import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const navigation = [
   { name: "Funktioner", href: "#features" },
+  { name: "Så funkar det", href: "#how-it-works" },
   { name: "Priser", href: "#pricing" },
-  { name: "Testimonials", href: "#testimonials" },
-  { name: "Kontakt", href: "#contact" },
+  { name: "Kunder", href: "#testimonials" },
 ];
 
 export function Header() {
@@ -22,18 +23,21 @@ export function Header() {
         className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8"
         aria-label="Huvudnavigering"
       >
-        {/* Logo */}
         <div className="flex lg:flex-1">
-          <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 p-1.5">
             <span className="sr-only">Lekbanken</span>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">L</span>
-            </div>
+            <Image
+              src="/lekbanken-icon.png"
+              alt="Lekbanken ikon"
+              width={32}
+              height={32}
+              className="h-8 w-8 rounded-lg"
+              priority
+            />
             <span className="text-xl font-semibold text-foreground">Lekbanken</span>
           </Link>
         </div>
 
-        {/* Mobile menu button */}
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <div className="flex lg:hidden">
             <SheetTrigger asChild>
@@ -41,7 +45,7 @@ export function Header() {
                 type="button"
                 className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-muted-foreground hover:text-foreground"
               >
-                <span className="sr-only">Oppna meny</span>
+                <span className="sr-only">Öppna menyn</span>
                 <Bars3Icon aria-hidden="true" className="h-6 w-6" />
               </button>
             </SheetTrigger>
@@ -49,11 +53,15 @@ export function Header() {
 
           <SheetContent side="right" className="w-full border-l border-border px-6 py-4 sm:max-w-sm">
             <div className="flex items-center justify-between">
-              <Link href="/" className="-m-1.5 p-1.5 flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2 p-1.5">
                 <span className="sr-only">Lekbanken</span>
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                  <span className="text-lg font-bold text-primary-foreground">L</span>
-                </div>
+                <Image
+                  src="/lekbanken-icon.png"
+                  alt="Lekbanken ikon"
+                  width={32}
+                  height={32}
+                  className="h-8 w-8 rounded-lg"
+                />
                 <span className="text-xl font-semibold text-foreground">Lekbanken</span>
               </Link>
               <SheetClose asChild>
@@ -61,7 +69,7 @@ export function Header() {
                   type="button"
                   className="-m-2.5 rounded-md p-2.5 text-muted-foreground hover:text-foreground"
                 >
-                  <span className="sr-only">Stang meny</span>
+                  <span className="sr-only">Stäng menyn</span>
                   <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                 </button>
               </SheetClose>
@@ -94,7 +102,6 @@ export function Header() {
           </SheetContent>
         </Sheet>
 
-        {/* Desktop navigation */}
         <div className="hidden lg:flex lg:gap-x-8">
           {navigation.map((item) => (
             <Link
@@ -107,7 +114,6 @@ export function Header() {
           ))}
         </div>
 
-        {/* Desktop CTA */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
           <Button variant="ghost" href="/auth/login">
             Logga in

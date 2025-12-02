@@ -1,8 +1,9 @@
-'use client'
+﻿"use client"
 
-import { useRouter } from 'next/navigation'
-import { Avatar } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,50 +11,58 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { useAuth } from '@/lib/supabase/auth'
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/lib/supabase/auth";
 
 export function AppTopbar() {
-  const router = useRouter()
-  const { user, userProfile, signOut } = useAuth()
+  const router = useRouter();
+  const { user, userProfile, signOut } = useAuth();
 
   const handleSignOut = async () => {
-    await signOut()
-    router.push('/auth/login')
-  }
+    await signOut();
+    router.push("/auth/login");
+  };
 
-  const userEmail = user?.email || ''
-  const userName = userProfile?.full_name || user?.user_metadata?.full_name || userEmail.split('@')[0]
-  const userRole = user?.app_metadata?.role || user?.user_metadata?.role
-  const isAdmin = userRole === 'admin'
+  const userEmail = user?.email || "";
+  const userName = userProfile?.full_name || user?.user_metadata?.full_name || userEmail.split("@")[0];
+  const userRole = user?.app_metadata?.role || user?.user_metadata?.role;
+  const isAdmin = userRole === "admin";
 
   return (
     <header className="flex items-center justify-between">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">App</p>
-        <h1 className="text-2xl font-semibold text-foreground">Lekledare</h1>
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <Image
+          src="/lekbanken-icon.png"
+          alt="Lekbanken ikon"
+          width={36}
+          height={36}
+          className="h-8 w-8 rounded-xl sm:h-9 sm:w-9"
+        />
+        <div className="hidden sm:block">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">App</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Lekbanken</h1>
+        </div>
+        <h1 className="text-lg font-semibold tracking-tight text-foreground sm:hidden">Lekbanken</h1>
       </div>
-      
+
       <div className="flex items-center gap-3">
-        {/* Admin badge/link for admins */}
         {isAdmin && (
           <Badge
             variant="accent"
             size="sm"
             className="cursor-pointer transition-opacity hover:opacity-80"
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push("/admin")}
           >
             Admin
           </Badge>
         )}
 
-        {/* User menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-muted">
+            <button className="flex items-center gap-1.5 rounded-full p-0.5 ring-2 ring-border/50 transition-all hover:ring-primary/30 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50">
               <Avatar name={userName} size="sm" />
-              <svg className="h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <svg className="mr-1 h-3.5 w-3.5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
               </svg>
             </button>
           </DropdownMenuTrigger>
@@ -64,24 +73,24 @@ export function AppTopbar() {
               <p className="text-xs text-muted-foreground">{userEmail}</p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/app/profile')} className="flex items-center gap-2">
+            <DropdownMenuItem onClick={() => router.push("/app/profile")} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="8" r="4" />
                 <path d="M5 20c0-3.3 3-6 7-6s7 2.7 7 6" />
               </svg>
               Min profil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => router.push('/app/preferences')} className="flex items-center gap-2">
+            <DropdownMenuItem onClick={() => router.push("/app/preferences")} className="flex items-center gap-2">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <circle cx="12" cy="12" r="3" />
                 <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.07-5.07-1.41 1.41M8.34 15.66l-1.41 1.41m10.14 0-1.41-1.41M8.34 8.34 6.93 6.93" />
               </svg>
-              Installningar
+              Inställningar
             </DropdownMenuItem>
             {isAdmin && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="flex items-center gap-2">
+                <DropdownMenuItem onClick={() => router.push("/admin")} className="flex items-center gap-2">
                   <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
                   </svg>
@@ -102,5 +111,5 @@ export function AppTopbar() {
         </DropdownMenu>
       </div>
     </header>
-  )
+  );
 }

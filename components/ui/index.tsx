@@ -18,6 +18,7 @@ export { LoadingSpinner, LoadingState, LoadingOverlay, ButtonSpinner } from "./l
 export { Skeleton, SkeletonText, SkeletonCard, SkeletonAvatar, SkeletonButton, SkeletonTable, SkeletonTableRow, SkeletonList, SkeletonStats, SkeletonGameCard } from "./skeleton";
 export { Alert, InlineAlert } from "./alert";
 export { ToastProvider, useToast } from "./toast";
+export { Switch } from "./switch";
 
 // Overlays & Menus
 export {

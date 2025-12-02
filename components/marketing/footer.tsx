@@ -1,15 +1,17 @@
+﻿import Image from "next/image";
 import Link from "next/link";
+import type React from "react";
 import { Button } from "@/components/ui/button";
 
 const navigation = {
   produkt: [
-    { name: "Funktioner", href: "#spotlight" },
+    { name: "Funktioner", href: "#features" },
     { name: "Så funkar det", href: "#how-it-works" },
     { name: "Priser", href: "#pricing" },
-    { name: "Testimonials", href: "#testimonials" },
+    { name: "Kunder", href: "#testimonials" },
   ],
   resurser: [
-    { name: "Hjälp & FAQ", href: "#contact" },
+    { name: "Hjälp & FAQ", href: "#cta" },
     { name: "Kom igång", href: "/auth/signup" },
     { name: "Logga in", href: "/auth/login" },
   ],
@@ -66,33 +68,35 @@ export function Footer() {
       </h2>
       <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 lg:px-8 lg:pt-24">
         <div className="xl:grid xl:grid-cols-3 xl:gap-8">
-          {/* Logo & tagline */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <span className="text-lg font-bold text-primary-foreground">L</span>
-              </div>
+          <div className="space-y-5">
+            <div className="flex items-center gap-2.5">
+              <Image
+                src="/lekbanken-icon.png"
+                alt="Lekbanken ikon"
+                width={32}
+                height={32}
+                className="h-8 w-8 rounded-lg bg-background p-1"
+              />
               <span className="text-xl font-semibold text-background">Lekbanken</span>
             </div>
-            <p className="text-sm text-background/60 max-w-xs">
-              Gör planeringen lekfull, snabb och delbar. Perfekt för träningar, lektioner 
-              och teambuilding.
+            <p className="max-w-xs text-sm leading-relaxed text-background/60">
+              Gör planeringen lekfull, snabb och delbar. Perfekt för träningar, lektioner och
+              teambuilding.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               {social.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-background/40 hover:text-background/60 transition-colors"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-background/5 text-background/50 transition-all hover:bg-background/10 hover:text-background hover:scale-110"
                 >
                   <span className="sr-only">{item.name}</span>
-                  <item.icon className="h-6 w-6" aria-hidden="true" />
+                  <item.icon className="h-5 w-5" aria-hidden="true" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Links */}
           <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
               <div>
@@ -102,7 +106,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 hover:text-background transition-colors"
+                        className="text-sm text-background/60 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -117,7 +121,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 hover:text-background transition-colors"
+                        className="text-sm text-background/60 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -134,7 +138,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 hover:text-background transition-colors"
+                        className="text-sm text-background/60 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -146,16 +150,20 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom */}
         <div className="mt-12 border-t border-background/10 pt-8 md:flex md:items-center md:justify-between">
-          <p className="text-xs text-background/40">
+          <p className="text-xs text-background/50">
             &copy; {new Date().getFullYear()} Lekbanken AB. Alla rättigheter förbehållna.
           </p>
-          <div className="mt-4 flex gap-4 md:mt-0">
-            <Button size="sm" variant="outline" href="/auth/login" className="border-background/20 text-background/60 hover:text-background hover:bg-background/10">
+          <div className="mt-4 flex gap-3 md:mt-0">
+            <Button
+              size="sm"
+              variant="outline"
+              href="/auth/login"
+              className="border-background/20 text-background/70 hover:bg-background/10 hover:text-background transition-all"
+            >
               Logga in
             </Button>
-            <Button size="sm" href="/auth/signup" className="bg-primary hover:bg-primary/90">
+            <Button size="sm" href="/auth/signup" className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-xl">
               Kom igång gratis
             </Button>
           </div>

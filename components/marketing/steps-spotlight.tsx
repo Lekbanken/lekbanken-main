@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+﻿import type { JSX } from "react";
 import type React from "react";
 
 type SpotlightFeature = {
@@ -45,12 +45,12 @@ const features: SpotlightFeature[] = [
   },
   {
     name: "Säkra samtycken",
-    description: "Behörigheter och notiser samlade per pass/aktivitet.",
+    description: "Behörigheter och notiser samlade per pass eller aktivitet.",
     Icon: ShieldIcon,
   },
   {
     name: "Backup & export",
-    description: "Exportera till PDF/print och ha allt i trygg backup.",
+    description: "Exportera till PDF eller print och ha allt i trygg backup.",
     Icon: ServerIcon,
   },
 ];
@@ -74,26 +74,33 @@ export function StepsSpotlight() {
                 Boostad produktivitet för ledare och lärare.
               </h2>
               <p className="mt-4 text-lg text-muted-foreground">
-                Planera, anpassa och dela med trygghet. Allt sparas och kan återanvändas,
-                så du slipper börja om.
+                Planera, anpassa och dela med trygghet. Allt sparas och kan återanvändas, så du
+                slipper börja om.
               </p>
             </div>
 
             <div className="order-first lg:order-none">
-              <div className="relative overflow-hidden rounded-2xl border border-border bg-muted">
-                <div className="aspect-[16/10] w-full flex items-center justify-center text-sm text-muted-foreground">
-                  Produktbild / skärmdump här
+              <div className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-muted via-muted/80 to-primary/10 shadow-xl">
+                <div className="flex aspect-[16/10] w-full flex-col items-center justify-center gap-3 text-sm text-muted-foreground">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10">
+                    <svg className="h-8 w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
+                    </svg>
+                  </div>
+                  <span className="font-medium">Produktbild / skärmdump</span>
                 </div>
               </div>
             </div>
 
             <div className="lg:row-start-2 lg:max-w-md lg:border-t lg:border-border lg:pt-8">
-              <dl className="space-y-6 text-sm text-muted-foreground">
+              <dl className="space-y-5 text-sm text-muted-foreground">
                 {features.map(({ name, description, Icon }) => (
-                  <div key={name} className="relative pl-10">
-                    <Icon className="absolute left-0 top-1 h-5 w-5 text-primary" aria-hidden />
+                  <div key={name} className="group relative rounded-lg pl-12 pr-4 py-3 transition-colors hover:bg-muted/50">
+                    <div className="absolute left-3 top-3.5 flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 transition-colors group-hover:bg-primary/20">
+                      <Icon className="h-4 w-4 text-primary" aria-hidden />
+                    </div>
                     <dt className="font-semibold text-foreground">{name}</dt>
-                    <dd className="mt-1">{description}</dd>
+                    <dd className="mt-0.5">{description}</dd>
                   </div>
                 ))}
               </dl>

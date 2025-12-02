@@ -38,40 +38,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const ensureProfile = useCallback(async (currentUser: User) => {
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', currentUser.id)
         .maybeSingle()
 
+      if (error) {
+        console.warn('ensureProfile select error:', error)
+        return null
+      }
+
       if (profile) return profile as UserProfile
 
-      const baseProfile: Partial<UserProfile> & { id: string } = {
-        id: currentUser.id,
-        email: currentUser.email ?? "",
-        full_name:
-          (currentUser.user_metadata?.full_name as string | undefined) ??
-          (currentUser.user_metadata?.name as string | undefined) ??
-          currentUser.email ??
-          "",
-        role:
-          (currentUser.app_metadata?.role as string | undefined) ??
-          (currentUser.user_metadata?.role as string | undefined) ??
-          undefined,
-      }
-
-      const { data: inserted } = await supabase
-        .from('users')
-        // Cast to any to avoid mismatch if table requires specific fields; we only set safe defaults.
-        .upsert(baseProfile as any, { onConflict: 'id' })
-        .select('*')
-        .maybeSingle()
-
-      if (inserted) {
-        console.info('ensureProfile: created profile for user', currentUser.id)
-      }
-
-      return inserted as UserProfile | null
+      // Profil saknas och vi försöker inte skapa från klienten p.g.a. RLS.
+      console.warn('ensureProfile: profile missing and upsert skipped (RLS/client)', currentUser.id)
+      return null
     } catch (err) {
       console.error('ensureProfile error:', err)
       return null

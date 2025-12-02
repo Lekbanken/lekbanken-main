@@ -13,9 +13,25 @@ type AdminShellProps = {
 export function AdminShell({ children }: AdminShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
   const router = useRouter();
   const { user, userRole, isLoading } = useAuth();
   const isRoleResolved = userRole !== null;
+
+  // Debug trace to help diagnose stuck loading
+  useEffect(() => {
+    console.info("[AdminShell] state", { isLoading, hasUser: !!user, userRole });
+  }, [isLoading, user, userRole]);
+
+  // Fallback if loading takes too long
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingTimedOut(false);
+      return;
+    }
+    const timer = setTimeout(() => setLoadingTimedOut(true), 4000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -33,7 +49,21 @@ export function AdminShell({ children }: AdminShellProps) {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
-        Laddar...
+        <div className="text-center space-y-2">
+          <p>Laddar...</p>
+          {loadingTimedOut && (
+            <div className="space-y-2">
+              <p className="text-sm">Det tar ovanligt lång tid. Testa att ladda om eller logga in igen.</p>
+              <button
+                type="button"
+                className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+                onClick={() => router.replace("/auth/login?redirect=/admin")}
+              >
+                Gå till login
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     );
   }

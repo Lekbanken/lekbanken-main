@@ -8,9 +8,6 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Debug log to verify proxy execution (remove in production)
-  console.info("[proxy] guarding admin route", req.nextUrl.pathname);
-
   const res = NextResponse.next({
     request: {
       headers: req.headers,
@@ -41,7 +38,6 @@ export async function proxy(req: NextRequest) {
 
   // If server can't see a session (client-only storage), allow through; client-side guard will handle redirect.
   if (!user) {
-    console.info("[proxy] no server-visible user, letting client guard handle");
     return res;
   }
 
@@ -49,13 +45,11 @@ export async function proxy(req: NextRequest) {
   const isAdmin = role === "admin";
 
   if (!isAdmin) {
-    console.warn("[proxy] non-admin user blocked from admin", user.id);
     const redirectUrl = new URL(ADMIN_REDIRECT, req.url);
     redirectUrl.searchParams.set("redirect", req.nextUrl.pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  console.info("[proxy] admin access granted", user.id);
   return res;
 }
 

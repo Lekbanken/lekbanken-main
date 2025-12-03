@@ -44,6 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', currentUser.id)
         .maybeSingle()
 
+      // DEBUG
+      console.log('[auth] ensureProfile result:', { userId: currentUser.id, profile, error: error?.message })
+
       if (error) {
         console.warn('ensureProfile select error:', error)
         return null
@@ -68,23 +71,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Initialize auth state on mount
   useEffect(() => {
     const initAuth = async () => {
+      console.log('[auth] initAuth starting...')
       try {
+        // Use getUser() instead of getSession() for security
         const {
-          data: { session },
-        } = await supabase.auth.getSession()
+          data: { user: authUser },
+          error: userError,
+        } = await supabase.auth.getUser()
 
-        if (session?.user) {
-          setUser(session.user)
-          await fetchProfile(session.user)
-          console.info('[auth] session init', {
-            userId: session.user.id,
-            expiresAt: session.expires_at,
-            roleMeta: session.user.app_metadata?.role,
+        console.log('[auth] getUser result:', { hasUser: !!authUser, userId: authUser?.id, error: userError?.message })
+
+        if (authUser) {
+          setUser(authUser)
+          await fetchProfile(authUser)
+          console.info('[auth] session init complete', {
+            userId: authUser.id,
+            roleMeta: authUser.app_metadata?.role,
           })
+        } else {
+          console.log('[auth] No user found')
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
       } finally {
+        console.log('[auth] initAuth done, setting isLoading=false')
         setIsLoading(false)
       }
     }

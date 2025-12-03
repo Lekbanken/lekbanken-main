@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/types/supabase';
 
 // =========================================
@@ -26,7 +26,7 @@ export type SubscriptionWithPlan = Subscription & { plan?: BillingPlan };
 // Plan Management
 export async function getAvailablePlans(): Promise<BillingPlan[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('billing_plans')
       .select('*')
       .eq('is_active', true)
@@ -45,7 +45,7 @@ export async function getAvailablePlans(): Promise<BillingPlan[] | null> {
 
 export async function getPlanById(planId: string): Promise<BillingPlan | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('billing_plans')
       .select('*')
       .eq('id', planId)
@@ -64,7 +64,7 @@ export async function getPlanById(planId: string): Promise<BillingPlan | null> {
 
 export async function getPlanBySlug(slug: string): Promise<BillingPlan | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('billing_plans')
       .select('*')
       .eq('slug', slug)
@@ -84,7 +84,7 @@ export async function getPlanBySlug(slug: string): Promise<BillingPlan | null> {
 // Subscription Management
 export async function getSubscription(tenantId: string): Promise<Subscription | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('subscriptions')
       .select('*, plan:billing_plan_id(*)')
       .eq('tenant_id', tenantId)
@@ -114,7 +114,7 @@ export async function createSubscription(params: {
   periodEnd?: Date;
 }): Promise<Subscription | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('subscriptions')
       .insert({
         tenant_id: params.tenantId,
@@ -153,7 +153,7 @@ export async function updateSubscription(
   updates: Partial<Subscription>
 ): Promise<Subscription | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         ...updates,
@@ -180,7 +180,7 @@ export async function upgradeSubscription(params: {
   tenantId: string;
 }): Promise<Subscription | null> {
   try {
-    const currentSub = await supabaseAdmin
+    const currentSub = await supabase
       .from('subscriptions')
       .select('billing_plan_id')
       .eq('id', params.subscriptionId)
@@ -191,7 +191,7 @@ export async function upgradeSubscription(params: {
       return null;
     }
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         billing_plan_id: params.newPlanId,
@@ -226,7 +226,7 @@ export async function cancelSubscription(
   tenantId: string
 ): Promise<Subscription | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('subscriptions')
       .update({
         status: 'canceled',
@@ -267,7 +267,7 @@ export async function createBillingHistory(params: {
   notes?: string;
 }): Promise<BillingHistory | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('billing_history')
       .insert({
         tenant_id: params.tenantId,
@@ -299,7 +299,7 @@ export async function getBillingHistory(
   offset = 0
 ): Promise<BillingHistory[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('billing_history')
       .select('*')
       .eq('tenant_id', tenantId)
@@ -333,7 +333,7 @@ export async function createInvoice(params: {
   notes?: string;
 }): Promise<Invoice | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('invoices')
       .insert({
         tenant_id: params.tenantId,
@@ -366,7 +366,7 @@ export async function createInvoice(params: {
 
 export async function getInvoices(tenantId: string): Promise<Invoice[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('invoices')
       .select('*')
       .eq('tenant_id', tenantId)
@@ -389,7 +389,7 @@ export async function updateInvoice(
   updates: Partial<Invoice>
 ): Promise<Invoice | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('invoices')
       .update({
         ...updates,
@@ -415,7 +415,7 @@ export async function getPaymentMethods(
   tenantId: string
 ): Promise<PaymentMethod[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('payment_methods')
       .select('*')
       .eq('tenant_id', tenantId)
@@ -438,12 +438,12 @@ export async function setDefaultPaymentMethod(
   tenantId: string
 ): Promise<boolean> {
   try {
-    await supabaseAdmin
+    await supabase
       .from('payment_methods')
       .update({ is_default: false })
       .eq('tenant_id', tenantId);
 
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('payment_methods')
       .update({ is_default: true })
       .eq('id', paymentMethodId)
@@ -473,7 +473,7 @@ export async function getBillingStats(
   } | null
 > {
   try {
-    const { data: subs, error: subsError } = await supabaseAdmin
+    const { data: subs, error: subsError } = await supabase
       .from('subscriptions')
       .select('*, plan:billing_plan_id(price_monthly)')
       .eq('tenant_id', tenantId)
@@ -487,7 +487,7 @@ export async function getBillingStats(
         return sum + (sub.billing_cycle === 'monthly' ? price : price / 12);
       }, 0) || 0;
 
-    const { data: invoices, error: invoicesError } = await supabaseAdmin
+    const { data: invoices, error: invoicesError } = await supabase
       .from('invoices')
       .select('amount_total, status')
       .eq('tenant_id', tenantId);

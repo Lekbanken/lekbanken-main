@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/types/supabase';
 
 // Types - Use Supabase generated types
@@ -23,7 +23,7 @@ export async function sendNotification(params: {
   expiresAt?: Date;
 }): Promise<Notification | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notifications')
       .insert({
         tenant_id: params.tenantId,
@@ -76,7 +76,7 @@ export async function sendBulkNotifications(params: {
       category: params.category,
     }));
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notifications')
       .insert(notifications)
       .select();
@@ -100,7 +100,7 @@ export async function getNotifications(
   offset = 0
 ): Promise<Notification[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notifications')
       .select('*')
       .eq('user_id', userId)
@@ -121,7 +121,7 @@ export async function getNotifications(
 
 export async function getUnreadNotificationCount(userId: string): Promise<number | null> {
   try {
-    const { count, error } = await supabaseAdmin
+    const { count, error } = await supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
@@ -146,7 +146,7 @@ export async function getNotificationsByCategory(
   offset = 0
 ): Promise<Notification[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notifications')
       .select('*')
       .eq('user_id', userId)
@@ -169,7 +169,7 @@ export async function getNotificationsByCategory(
 // Mark Notifications
 export async function markNotificationAsRead(notificationId: string): Promise<Notification | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notifications')
       .update({
         is_read: true,
@@ -194,7 +194,7 @@ export async function markNotificationAsRead(notificationId: string): Promise<No
 
 export async function markAllNotificationsAsRead(userId: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('notifications')
       .update({
         is_read: true,
@@ -219,7 +219,7 @@ export async function markAllNotificationsAsRead(userId: string): Promise<boolea
 // Delete Notifications
 export async function deleteNotification(notificationId: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('notifications')
       .delete()
       .eq('id', notificationId);
@@ -238,7 +238,7 @@ export async function deleteNotification(notificationId: string): Promise<boolea
 
 export async function deleteNotificationsByCategory(userId: string, category: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('notifications')
       .delete()
       .eq('user_id', userId)
@@ -258,7 +258,7 @@ export async function deleteNotificationsByCategory(userId: string, category: st
 
 export async function deleteAllReadNotifications(userId: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('notifications')
       .delete()
       .eq('user_id', userId)
@@ -279,7 +279,7 @@ export async function deleteAllReadNotifications(userId: string): Promise<boolea
 // Notification Preferences
 export async function getNotificationPreferences(userId: string): Promise<NotificationPreference | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notification_preferences')
       .select('*')
       .eq('user_id', userId)
@@ -303,7 +303,7 @@ export async function createNotificationPreferences(
   preferences?: Partial<NotificationPreference>
 ): Promise<NotificationPreference | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notification_preferences')
       .insert({
         user_id: userId,
@@ -330,7 +330,7 @@ export async function updateNotificationPreferences(
   updates: Partial<NotificationPreference>
 ): Promise<NotificationPreference | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('notification_preferences')
       .update({
         ...updates,
@@ -361,7 +361,7 @@ export async function logNotificationDelivery(
   errorMessage?: string
 ): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('notification_log')
       .insert({
         notification_id: notificationId,
@@ -394,7 +394,7 @@ export async function getNotificationStats(userId: string): Promise<
   } | null
 > {
   try {
-    const { data: notifications, error } = await supabaseAdmin
+    const { data: notifications, error } = await supabase
       .from('notifications')
       .select('type, category, is_read')
       .eq('user_id', userId);
@@ -428,7 +428,7 @@ export async function getNotificationStats(userId: string): Promise<
 // Clean up expired notifications
 export async function deleteExpiredNotifications(): Promise<number | null> {
   try {
-    const { data: deletedRows, error } = await supabaseAdmin
+    const { data: deletedRows, error } = await supabase
       .from('notifications')
       .delete()
       .lt('expires_at', new Date().toISOString())

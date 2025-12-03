@@ -5,7 +5,7 @@
  * settings to deliver customized experiences based on user behavior and interests.
  */
 
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 
 // Type definitions
 export interface UserPreference {
@@ -85,7 +85,7 @@ export interface InterestProfile {
 export async function getUserPreferences(tenantId: string, userId: string): Promise<UserPreference | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences' as any) as any;
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -111,7 +111,7 @@ export async function updateUserPreferences(
 ): Promise<UserPreference | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences' as any) as any;
     const { data, error } = await query
       .update(updates)
       .eq('tenant_id', tenantId)
@@ -138,7 +138,7 @@ export async function createUserPreferences(
 ): Promise<UserPreference | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences' as any) as any;
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -168,7 +168,7 @@ export async function getSavedItems(
 ): Promise<SavedItem[] | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabaseAdmin.from('saved_items' as any) as any)
+    let query = (supabase.from('saved_items' as any) as any)
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -200,7 +200,7 @@ export async function saveItem(
 ): Promise<SavedItem | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('saved_items' as any) as any;
+    const query = supabase.from('saved_items' as any) as any;
     const { data, error } = await query
       .upsert(
         {
@@ -235,7 +235,7 @@ export async function removeSavedItem(
 ): Promise<boolean> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('saved_items' as any) as any;
+    const query = supabase.from('saved_items' as any) as any;
     const { error } = await query
       .delete()
       .eq('tenant_id', tenantId)
@@ -266,7 +266,7 @@ export async function trackPersonalizationEvent(
 ): Promise<PersonalizationEvent | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('personalization_events' as any) as any;
+    const query = supabase.from('personalization_events' as any) as any;
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -299,7 +299,7 @@ export async function getPersonalizationEvents(
 ): Promise<PersonalizationEvent[] | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabaseAdmin.from('personalization_events' as any) as any)
+    let query = (supabase.from('personalization_events' as any) as any)
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -332,7 +332,7 @@ export async function getRecommendations(
 ): Promise<RecommendationItem[] | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('recommendation_history' as any) as any;
+    const query = supabase.from('recommendation_history' as any) as any;
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -359,7 +359,7 @@ export async function trackRecommendationClick(
 ): Promise<RecommendationItem | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('recommendation_history' as any) as any;
+    const query = supabase.from('recommendation_history' as any) as any;
     const { data, error } = await query
       .update({
         was_clicked: true,
@@ -391,7 +391,7 @@ export async function getInterestProfiles(
 ): Promise<InterestProfile[] | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('interest_profiles' as any) as any;
+    const query = supabase.from('interest_profiles' as any) as any;
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -420,7 +420,7 @@ export async function updateInterestProfile(
 ): Promise<InterestProfile | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('interest_profiles' as any) as any;
+    const query = supabase.from('interest_profiles' as any) as any;
     const { data, error } = await query
       .upsert(
         {
@@ -456,7 +456,7 @@ export async function getContentPreferences(
 ): Promise<Record<string, unknown>[] | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('content_preferences' as any) as any;
+    const query = supabase.from('content_preferences' as any) as any;
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -485,7 +485,7 @@ export async function updateContentPreference(
 ): Promise<Record<string, unknown> | null> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabaseAdmin.from('content_preferences' as any) as any;
+    const query = supabase.from('content_preferences' as any) as any;
     const { data, error } = await query
       .upsert({
         content_category: category,
@@ -518,7 +518,7 @@ export async function getPersonalizationStats(
   try {
     // Get event counts
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const eventsQuery = (supabaseAdmin.from('personalization_events' as any) as any)
+    const eventsQuery = (supabase.from('personalization_events' as any) as any)
       .select('event_type', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -527,7 +527,7 @@ export async function getPersonalizationStats(
 
     // Get saved items count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const savedQuery = (supabaseAdmin.from('saved_items' as any) as any)
+    const savedQuery = (supabase.from('saved_items' as any) as any)
       .select('id', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -536,7 +536,7 @@ export async function getPersonalizationStats(
 
     // Get interests count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const interestsQuery = (supabaseAdmin.from('interest_profiles' as any) as any)
+    const interestsQuery = (supabase.from('interest_profiles' as any) as any)
       .select('id', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -560,7 +560,7 @@ export async function getTenantPersonalizationStats(
   try {
     // Get total users with preferences
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const usersQuery = (supabaseAdmin.from('user_preferences' as any) as any)
+    const usersQuery = (supabase.from('user_preferences' as any) as any)
       .select('user_id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
@@ -568,7 +568,7 @@ export async function getTenantPersonalizationStats(
 
     // Get language distribution
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const langQuery = (supabaseAdmin.from('user_preferences' as any) as any)
+    const langQuery = (supabase.from('user_preferences' as any) as any)
       .select('preferred_language')
       .eq('tenant_id', tenantId);
 
@@ -582,7 +582,7 @@ export async function getTenantPersonalizationStats(
 
     // Get theme distribution
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const themeQuery = (supabaseAdmin.from('user_preferences' as any) as any)
+    const themeQuery = (supabase.from('user_preferences' as any) as any)
       .select('preferred_theme')
       .eq('tenant_id', tenantId);
 
@@ -596,7 +596,7 @@ export async function getTenantPersonalizationStats(
 
     // Get interest profiles count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const profilesQuery = (supabaseAdmin.from('interest_profiles' as any) as any)
+    const profilesQuery = (supabase.from('interest_profiles' as any) as any)
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
@@ -604,7 +604,7 @@ export async function getTenantPersonalizationStats(
 
     // Get content preferences count
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contentQuery = (supabaseAdmin.from('content_preferences' as any) as any)
+    const contentQuery = (supabase.from('content_preferences' as any) as any)
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
@@ -612,7 +612,7 @@ export async function getTenantPersonalizationStats(
 
     // Get recommendation stats
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recQuery = (supabaseAdmin.from('recommendation_history' as any) as any)
+    const recQuery = (supabase.from('recommendation_history' as any) as any)
       .select('id, clicked, completed')
       .eq('tenant_id', tenantId);
 

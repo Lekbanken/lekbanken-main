@@ -1,39 +1,50 @@
+import 'server-only'
+
+import { createClient as createServiceRoleSupabaseClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
+import { cookies, headers } from 'next/headers'
+import type { Database } from '@/types/supabase'
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
 /**
- * Supabase Server Client
- *
- * This client is used in server-side code (API routes, middleware, server components).
- * It uses the SERVICE_ROLE_KEY which should NEVER be exposed to the browser.
- *
- * IMPORTANT: Only use this in:
- * - API routes (app/api/*)
- * - Middleware (middleware.ts)
- * - Server-side functions with 'use server'
- * - Never import this in client components!
- *
- * Usage in an API route:
- * ```ts
- * import { createServiceRoleClient } from '@/lib/supabase/server';
- *
- * export async function GET(request: Request) {
- *   const supabase = createServiceRoleClient();
- *   const { data, error } = await supabase
- *     .from('users')
- *     .select();
- *
- *   return Response.json({ data, error });
- * }
- * ```
+ * Request-scoped RLS-aware client for server code (app router, server actions, route handlers).
+ * Uses @supabase/ssr so refreshed tokens are written back to response cookies.
  */
+export async function createServerRlsClient() {
+  const cookieStore = await cookies()
 
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase';
-
-export function createServiceRoleClient() {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createServerClient<Database>(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll()
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          cookieStore.set(name, value, options)
+        })
+      },
+    },
+  })
 }
 
-// Export singleton instance for convenience
-export const supabaseAdmin = createServiceRoleClient();
+/**
+ * Service role client for background/admin tasks.
+ * Never use this in the browser or in user-scoped request flows.
+ */
+export function createServiceRoleClient() {
+  if (!supabaseServiceRoleKey) {
+    throw new Error('SUPABASE_SERVICE_ROLE_KEY is not configured')
+  }
+  return createServiceRoleSupabaseClient<Database>(supabaseUrl, supabaseServiceRoleKey)
+}
+
+// Export singleton for rare admin tasks on the server only
+export const supabaseAdmin = createServiceRoleClient()
+
+export async function getRequestTenantId() {
+  const headerStore = await headers()
+  return headerStore.get('x-tenant-id')
+}

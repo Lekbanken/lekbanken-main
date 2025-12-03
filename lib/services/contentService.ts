@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import type { Database, Json } from '@/types/supabase';
 
 // Types - Use Supabase generated types where possible
@@ -62,7 +62,7 @@ export async function getContentItems(
   filter?: { type?: string; onlyPublished?: boolean; onlyFeatured?: boolean; limit?: number; offset?: number }
 ): Promise<ContentItem[] | null> {
   try {
-    let query = supabaseAdmin
+    let query = supabase
       .from('content_items')
       .select('*')
       .eq('tenant_id', tenantId);
@@ -116,7 +116,7 @@ export async function createContentItem(
       metadata: item.metadata ?? null,
     };
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_items')
       .insert(insertData)
       .select()
@@ -139,7 +139,7 @@ export async function updateContentItem(
   updates: Database['public']['Tables']['content_items']['Update']
 ): Promise<ContentItem | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_items')
       .update(updates)
       .eq('id', id)
@@ -160,7 +160,7 @@ export async function updateContentItem(
 
 export async function deleteContentItem(id: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('content_items')
       .delete()
       .eq('id', id);
@@ -180,7 +180,7 @@ export async function deleteContentItem(id: string): Promise<boolean> {
 // Content Schedules
 export async function getContentSchedule(contentId: string): Promise<ContentSchedule | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_schedules')
       .select('*')
       .eq('content_id', contentId)
@@ -208,7 +208,7 @@ export async function createOrUpdateContentSchedule(
     const existing = await getContentSchedule(contentId);
 
     if (existing) {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('content_schedules')
         .update({
           start_date: startDate,
@@ -226,7 +226,7 @@ export async function createOrUpdateContentSchedule(
 
       return data as ContentSchedule;
     } else {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('content_schedules')
         .insert({
           tenant_id: tenantId,
@@ -254,7 +254,7 @@ export async function createOrUpdateContentSchedule(
 // Seasonal Events
 export async function getSeasonalEvents(tenantId: string, onlyActive?: boolean): Promise<SeasonalEvent[] | null> {
   try {
-    let query = supabaseAdmin
+    let query = supabase
       .from('seasonal_events')
       .select('*')
       .eq('tenant_id', tenantId);
@@ -282,7 +282,7 @@ export async function createSeasonalEvent(
   event: Omit<SeasonalEvent, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>
 ): Promise<SeasonalEvent | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('seasonal_events')
       .insert({
         tenant_id: tenantId,
@@ -305,7 +305,7 @@ export async function createSeasonalEvent(
 
 export async function updateSeasonalEvent(id: string, updates: Partial<SeasonalEvent>): Promise<SeasonalEvent | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('seasonal_events')
       .update(updates)
       .eq('id', id)
@@ -330,7 +330,7 @@ export async function getContentCollections(
   filter?: { category?: string; onlyPublished?: boolean; onlyFeatured?: boolean }
 ): Promise<ContentCollection[] | null> {
   try {
-    let query = supabaseAdmin
+    let query = supabase
       .from('content_collections')
       .select('*')
       .eq('tenant_id', tenantId);
@@ -361,7 +361,7 @@ export async function createContentCollection(
   collection: Omit<ContentCollection, 'id' | 'tenant_id' | 'created_by_user_id' | 'created_at' | 'updated_at' | 'game_count' | 'view_count'>
 ): Promise<ContentCollection | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_collections')
       .insert({
         tenant_id: tenantId,
@@ -385,7 +385,7 @@ export async function createContentCollection(
 
 export async function updateContentCollection(id: string, updates: Partial<ContentCollection>): Promise<ContentCollection | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_collections')
       .update(updates)
       .eq('id', id)
@@ -407,7 +407,7 @@ export async function updateContentCollection(id: string, updates: Partial<Conte
 // Collection Items
 export async function getCollectionItems(collectionId: string): Promise<CollectionItem[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('collection_items')
       .select('*')
       .eq('collection_id', collectionId)
@@ -431,7 +431,7 @@ export async function addGameToCollection(
   orderIndex?: number
 ): Promise<CollectionItem | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('collection_items')
       .insert({
         collection_id: collectionId,
@@ -455,7 +455,7 @@ export async function addGameToCollection(
 
 export async function removeGameFromCollection(collectionItemId: string): Promise<boolean> {
   try {
-    const { error } = await supabaseAdmin
+    const { error } = await supabase
       .from('collection_items')
       .delete()
       .eq('id', collectionItemId);
@@ -477,7 +477,7 @@ export type ContentAnalytics = Database['public']['Tables']['content_analytics']
 
 export async function getContentAnalytics(tenantId: string, contentId: string): Promise<ContentAnalytics | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_analytics')
       .select('*')
       .eq('tenant_id', tenantId)
@@ -501,7 +501,7 @@ export async function trackContentView(tenantId: string, contentId: string): Pro
     const analytics = await getContentAnalytics(tenantId, contentId);
 
     if (analytics) {
-      const { error } = await supabaseAdmin
+      const { error } = await supabase
         .from('content_analytics')
         .update({
           view_count: (analytics.view_count || 0) + 1,
@@ -515,7 +515,7 @@ export async function trackContentView(tenantId: string, contentId: string): Pro
         return false;
       }
     } else {
-      const { error } = await supabaseAdmin
+      const { error } = await supabase
         .from('content_analytics')
         .insert({
           tenant_id: tenantId,
@@ -541,7 +541,7 @@ export async function trackContentView(tenantId: string, contentId: string): Pro
 
 export async function getTrendingContent(tenantId: string, limit = 10): Promise<ContentItem[] | null> {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await supabase
       .from('content_analytics')
       .select('content_items(*)')
       .eq('tenant_id', tenantId)

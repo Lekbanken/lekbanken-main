@@ -62,7 +62,7 @@ function Breadcrumbs() {
   return (
     <nav className="hidden items-center gap-1 text-sm md:flex">
       <HomeIcon className="h-4 w-4 text-muted-foreground" />
-      {items.map((item, index) => (
+      {items.map((item) => (
         <span key={item.path} className="flex items-center gap-1">
           <ChevronRightIcon className="h-3 w-3 text-muted-foreground/50" />
           <span className={item.isLast ? "font-medium text-foreground" : "text-muted-foreground"}>

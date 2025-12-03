@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { PencilIcon } from "@heroicons/react/24/outline";
-import { Avatar } from "@/components/ui/avatar";
 import type { UserSummary } from "../types";
 
 type ProfileHeaderProps = {

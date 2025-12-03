@@ -30,11 +30,14 @@ export function OrganisationEditDialog({ open, organisation, onOpenChange, onSub
   const [status, setStatus] = useState<OrganisationStatus>(organisation?.status ?? "active");
 
   useEffect(() => {
-    setName(organisation?.name ?? "");
-    setContactName(organisation?.contactName ?? "");
-    setContactEmail(organisation?.contactEmail ?? "");
-    setContactPhone(organisation?.contactPhone ?? "");
-    setStatus(organisation?.status ?? "active");
+    const frame = requestAnimationFrame(() => {
+      setName(organisation?.name ?? "");
+      setContactName(organisation?.contactName ?? "");
+      setContactEmail(organisation?.contactEmail ?? "");
+      setContactPhone(organisation?.contactPhone ?? "");
+      setStatus(organisation?.status ?? "active");
+    });
+    return () => cancelAnimationFrame(frame);
   }, [organisation]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

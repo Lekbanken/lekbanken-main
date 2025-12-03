@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle, Button, Input, Textarea, Select, Switch } from "@/components/ui";
+import { Card, CardContent, CardHeader, CardTitle, Button } from "@/components/ui";
 import { AchievementItem, AchievementLayer, AchievementLayerType, AchievementTheme } from "../types";
 import { BadgePreview } from "./components/BadgePreview";
 import { LayerSelector } from "./components/LayerSelector";
@@ -32,7 +32,7 @@ export function AchievementEditor({ value, themes, layers, onChange, onCancel }:
     setDraft((prev) => ({
       ...prev,
       themeId: undefined,
-      customColors: colors as any,
+      customColors: colors,
     }));
   };
 

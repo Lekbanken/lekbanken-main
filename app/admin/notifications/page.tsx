@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { sendBulkNotifications } from '@/lib/services/notificationsService';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { BellIcon } from '@heroicons/react/24/outline';
 
@@ -40,7 +40,7 @@ export default function NotificationsAdminPage() {
 
     const loadUsers = async () => {
       try {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await supabase
           .from('user_tenant_memberships')
           .select('user_id, users(id, email)')
           .eq('tenant_id', currentTenant.id);

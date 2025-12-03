@@ -4643,8 +4643,12 @@ export type Database = {
     Functions: {
       get_user_tenant_ids: { Args: never; Returns: string[] }
       has_tenant_role: {
-        Args: { required_role: string; tenant_id: string }
+        Args: { tenant_uuid: string; required_roles: string[] }
         Returns: boolean
+      }
+      add_initial_tenant_owner: {
+        Args: { target_tenant: string; desired_role?: string }
+        Returns: Database['public']['Tables']['user_tenant_memberships']['Row']
       }
       is_tenant_member: { Args: { tenant_id: string }; Returns: boolean }
     }

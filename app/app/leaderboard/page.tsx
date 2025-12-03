@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import { getSocialLeaderboard, getFriendsLeaderboard, SocialLeaderboardEntry } from '@/lib/services/socialService'
-import { supabaseAdmin } from '@/lib/supabase/server'
+import { supabase } from '@/lib/supabase/client'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui'
 import {
   TrophyIcon,
@@ -34,7 +34,7 @@ export default function LeaderboardPage() {
   useEffect(() => {
     const loadGames = async () => {
       try {
-        const { data, error } = await supabaseAdmin
+        const { data, error } = await supabase
           .from('games')
           .select('id, name')
           .eq('tenant_id', currentTenant?.id || '')

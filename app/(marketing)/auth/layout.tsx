@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from "react";
-import { AuthProvider, useAuth } from "@/lib/supabase/auth";
+import { useAuth } from "@/lib/supabase/auth";
 import { TenantProvider } from "@/lib/context/TenantContext";
 import AuthLayoutContent from "./layout-client";
 
@@ -12,10 +12,8 @@ function TenantProviderWithAuth({ children }: { children: ReactNode }) {
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthProvider>
-      <TenantProviderWithAuth>
-        <AuthLayoutContent>{children}</AuthLayoutContent>
-      </TenantProviderWithAuth>
-    </AuthProvider>
+    <TenantProviderWithAuth>
+      <AuthLayoutContent>{children}</AuthLayoutContent>
+    </TenantProviderWithAuth>
   );
 }

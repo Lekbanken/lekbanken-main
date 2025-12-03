@@ -91,7 +91,7 @@ export function OrganisationAdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [user?.id]);
+  }, [user, user?.id]);
 
   const handleFiltersChange = (next: Partial<OrganisationFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));

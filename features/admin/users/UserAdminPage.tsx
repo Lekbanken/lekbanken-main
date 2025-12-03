@@ -8,7 +8,7 @@ import {
   EnvelopeIcon,
   UserMinusIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, useToast } from "@/components/ui";
+import { Button, Card, CardContent, EmptyState, LoadingState, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth";
@@ -119,7 +119,7 @@ export function UserAdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [currentTenant?.id, currentTenant?.name, user?.id]);
+  }, [currentTenant, currentTenant?.id, currentTenant?.name, user, user?.id]);
 
   const handleFiltersChange = (next: Partial<UserFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));

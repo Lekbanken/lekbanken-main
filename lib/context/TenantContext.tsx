@@ -7,8 +7,9 @@
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useTransition } from 'react'
 import { supabase } from '@/lib/supabase/client'
+import { resolveCurrentTenant, selectTenant as selectTenantAction } from '@/app/actions/tenant'
 import type { Database } from '@/types/supabase'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
@@ -33,10 +34,13 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
   const [userTenants, setUserTenants] = useState<(Tenant & { membership: UserTenantMembership })[]>([])
   const [isLoadingTenants, setIsLoadingTenants] = useState(true)
   const [hasTenants, setHasTenants] = useState(false)
+  const [, startTransition] = useTransition()
 
   // Load user's tenants
   const loadTenants = useCallback(async () => {
+    console.log('[TenantContext] loadTenants called, userId:', userId)
     if (!userId) {
+      console.log('[TenantContext] No userId, setting isLoadingTenants=false')
       setIsLoadingTenants(false)
       setHasTenants(false)
       return
@@ -44,41 +48,19 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
 
     try {
       setIsLoadingTenants(true)
+      console.log('[TenantContext] Calling resolveCurrentTenant...')
+      const resolved = await resolveCurrentTenant()
+      console.log('[TenantContext] resolveCurrentTenant result:', resolved)
 
-      // Get user's tenant memberships
-      const { data: memberships, error: membershipsError } = await supabase
-        .from('user_tenant_memberships')
-        .select('*,tenant:tenants(*)')
-        .eq('user_id', userId)
-
-      if (membershipsError) throw membershipsError
-
-      const tenantsWithMembership = (memberships || [])
-        .filter(
-          (m): m is typeof m & { tenant: Tenant } => m.tenant !== null
-        )
-        .map((m) => ({
-          ...m.tenant,
-          membership: m as UserTenantMembership,
-        }))
+      const tenantsWithMembership = (resolved.tenants || []) as (Tenant & { membership: UserTenantMembership })[]
 
       setUserTenants(tenantsWithMembership)
       setHasTenants(tenantsWithMembership.length > 0)
-
-      // Set current tenant from saved preference or first tenant
-      const savedTenantId = localStorage.getItem('selectedTenantId')
-      const primaryOrFirst =
-        tenantsWithMembership.find((t) => t.membership.is_primary) ||
-        tenantsWithMembership.find((t) => t.id === savedTenantId) ||
-        tenantsWithMembership[0]
-
-      if (primaryOrFirst) {
-        setCurrentTenant(primaryOrFirst)
-        localStorage.setItem('selectedTenantId', primaryOrFirst.id)
-      }
+      setCurrentTenant((resolved.tenant as Tenant & { membership: UserTenantMembership }) ?? null)
     } catch (error) {
       console.error('Error loading tenants:', error)
     } finally {
+      console.log('[TenantContext] loadTenants done, setting isLoadingTenants=false')
       setIsLoadingTenants(false)
     }
   }, [userId])
@@ -87,13 +69,18 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
     loadTenants()
   }, [userId, loadTenants])
 
-  const selectTenant = useCallback((tenantId: string) => {
-    const tenant = userTenants.find((t) => t.id === tenantId)
-    if (tenant) {
-      setCurrentTenant(tenant)
-      localStorage.setItem('selectedTenantId', tenantId)
-    }
-  }, [userTenants])
+  const selectTenant = useCallback(
+    (tenantId: string) => {
+      startTransition(async () => {
+        const result = await selectTenantAction(tenantId)
+        if (result.tenant) {
+          setCurrentTenant(result.tenant as Tenant & { membership: UserTenantMembership })
+          await loadTenants()
+        }
+      })
+    },
+    [loadTenants]
+  )
 
   const createTenant = useCallback(
     async (name: string, type: string): Promise<Tenant> => {
@@ -115,26 +102,18 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
 
       if (tenantError) throw tenantError
 
-      // Add user as owner
-      const { error: membershipError } = await supabase
-        .from('user_tenant_memberships')
-        .insert([
-          {
-            user_id: userId,
-            tenant_id: tenant.id,
-            role: 'admin',
-            is_primary: true,
-          },
-        ])
+      // Add user as owner via security definer function to satisfy RLS on fresh tenants
+      const { error: membershipError } = await supabase.rpc('add_initial_tenant_owner', {
+        target_tenant: tenant.id,
+      })
 
       if (membershipError) throw membershipError
 
-      // Reload tenants to refresh the list
-      await loadTenants()
+      await selectTenant(tenant.id)
 
       return tenant
     },
-    [userId, loadTenants]
+    [userId, selectTenant]
   )
 
   const reloadTenants = useCallback(async () => {

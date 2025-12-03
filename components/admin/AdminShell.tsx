@@ -23,8 +23,8 @@ export function AdminShell({ children }: AdminShellProps) {
 
   useEffect(() => {
     if (!isLoading) {
-      setLoadingTimedOut(false);
-      return;
+      const frame = requestAnimationFrame(() => setLoadingTimedOut(false));
+      return () => cancelAnimationFrame(frame);
     }
     const timer = setTimeout(() => setLoadingTimedOut(true), 4000);
     return () => clearTimeout(timer);
@@ -77,14 +77,22 @@ export function AdminShell({ children }: AdminShellProps) {
     );
   }
 
-  if (!user || (isRoleResolved && userRole !== "admin") || (!hasTenants && !isLoadingTenants)) {
+  // Superadmin har alltid tillgång, andra kräver tenant
+  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+  const needsTenant = !isGlobalAdmin && !hasTenants && !isLoadingTenants;
+  const noAdminRole = isRoleResolved && !isGlobalAdmin;
+
+  // DEBUG
+  console.log("[AdminShell] access check:", { user: !!user, userRole, isGlobalAdmin, hasTenants, needsTenant, noAdminRole });
+
+  if (!user || noAdminRole || needsTenant) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="space-y-4 rounded-xl border border-border bg-card p-6 text-center">
           <p className="text-sm font-semibold text-foreground">Ingen admin-åtkomst</p>
           <p className="text-sm text-muted-foreground">
             {user
-              ? "Din roll saknar åtkomst, eller inga tenants hittades. Logga in med ett admin-konto."
+              ? `Din roll (${userRole || 'ingen'}) saknar åtkomst. Logga in med ett admin-konto.`
               : "Du är inte inloggad."}
           </p>
           <div className="flex justify-center gap-2">

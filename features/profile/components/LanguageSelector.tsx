@@ -20,7 +20,8 @@ export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
   const selectedLang = languages.find((l) => l.code === value);
 
   useEffect(() => {
-    setMounted(true);
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   if (!mounted) {

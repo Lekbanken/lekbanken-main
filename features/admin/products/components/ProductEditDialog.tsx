@@ -35,11 +35,14 @@ export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capab
   );
 
   useEffect(() => {
-    setName(product?.name ?? "");
-    setCategory(product?.category ?? "platform");
-    setDescription(product?.description ?? "");
-    setStatus(product?.status ?? "active");
-    setSelectedCapabilities(product?.capabilities.map((c) => c.key) ?? []);
+    const frame = requestAnimationFrame(() => {
+      setName(product?.name ?? "");
+      setCategory(product?.category ?? "platform");
+      setDescription(product?.description ?? "");
+      setStatus(product?.status ?? "active");
+      setSelectedCapabilities(product?.capabilities.map((c) => c.key) ?? []);
+    });
+    return () => cancelAnimationFrame(frame);
   }, [product]);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {

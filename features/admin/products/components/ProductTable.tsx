@@ -2,7 +2,7 @@
 
 import { MouseEvent } from "react";
 import { CubeIcon, KeyIcon } from "@heroicons/react/24/outline";
-import { EmptyState, SkeletonTable } from "@/components/ui";
+import { SkeletonTable } from "@/components/ui";
 import { ProductAdminItem, ProductStatus, statusLabels } from "../types";
 import { ProductRowActions } from "./ProductRowActions";
 
@@ -13,7 +13,6 @@ type ProductTableProps = {
   onEdit: (product: ProductAdminItem) => void;
   onStatusChange: (productId: string, status: ProductStatus) => void;
   onRemove: (productId: string) => void;
-  onCreateClick?: () => void;
 };
 
 const categoryStyles: Record<string, string> = {
@@ -42,7 +41,6 @@ export function ProductTable({
   onEdit,
   onStatusChange,
   onRemove,
-  onCreateClick,
 }: ProductTableProps) {
   const handleRowClick = (event: MouseEvent<HTMLTableRowElement>, product: ProductAdminItem) => {
     if ((event.target as HTMLElement).closest("[data-no-row-click]")) return;

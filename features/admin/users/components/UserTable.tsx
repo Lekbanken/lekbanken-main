@@ -1,8 +1,8 @@
 'use client';
 
 import { MouseEvent } from "react";
-import { EnvelopeIcon, MagnifyingGlassIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/outline";
-import { Badge, Button, EmptyState, SkeletonTable } from "@/components/ui";
+import { EnvelopeIcon, MagnifyingGlassIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { EmptyState, SkeletonTable } from "@/components/ui";
 import { UserAdminItem, UserRole, UserStatus, roleLabels, statusLabels } from "../types";
 import { UserRowActions } from "./UserRowActions";
 

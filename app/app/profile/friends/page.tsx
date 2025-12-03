@@ -11,7 +11,7 @@ import {
   removeFriend,
   FriendRequest 
 } from '@/lib/services/socialService';
-import { supabaseAdmin } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase/client';
 
 interface FriendInfo {
   id: string;
@@ -46,7 +46,7 @@ export default function FriendsPage() {
         if (friends && friends.length > 0) {
           const friendIds = friends.map((f) => (f.user_id_1 === user.id ? f.user_id_2 : f.user_id_1));
 
-          const { data: friendDetails } = await supabaseAdmin
+          const { data: friendDetails } = await supabase
             .from('users')
             .select('id, email')
             .in('id', friendIds);
@@ -73,7 +73,7 @@ export default function FriendsPage() {
 
     setIsSearching(true);
     try {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await supabase
         .from('users')
         .select('id, email')
         .ilike('email', `%${email}%`)
@@ -115,7 +115,7 @@ export default function FriendsPage() {
       const updated = await getFriends(user?.id || '');
       if (updated) {
         const friendIds = updated.map((f) => (f.user_id_1 === user?.id ? f.user_id_2 : f.user_id_1));
-        const { data: friendDetails } = await supabaseAdmin
+        const { data: friendDetails } = await supabase
           .from('users')
           .select('id, email')
           .in('id', friendIds);

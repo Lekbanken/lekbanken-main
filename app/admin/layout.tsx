@@ -1,7 +1,7 @@
 'use client'
 
 import type { ReactNode } from "react";
-import { AuthProvider, useAuth } from "@/lib/supabase/auth";
+import { useAuth } from "@/lib/supabase/auth";
 import { TenantProvider } from "@/lib/context/TenantContext";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ToastProvider } from "@/components/ui";
@@ -13,12 +13,10 @@ function TenantProviderWithAuth({ children }: { children: ReactNode }) {
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <AuthProvider>
-      <TenantProviderWithAuth>
-        <ToastProvider>
-          <AdminShell>{children}</AdminShell>
-        </ToastProvider>
-      </TenantProviderWithAuth>
-    </AuthProvider>
+    <TenantProviderWithAuth>
+      <ToastProvider>
+        <AdminShell>{children}</AdminShell>
+      </ToastProvider>
+    </TenantProviderWithAuth>
   );
 }

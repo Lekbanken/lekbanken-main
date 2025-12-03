@@ -2,8 +2,6 @@ import type { ActivityItem } from "../types";
 import { Card, CardContent, CardHeader, CardTitle, Button } from "@/components/ui";
 import { 
   ClockIcon, 
-  ExclamationTriangleIcon, 
-  CheckCircleIcon,
   UserPlusIcon,
   BuildingOffice2Icon,
   TrophyIcon,

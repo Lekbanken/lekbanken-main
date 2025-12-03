@@ -92,7 +92,7 @@ export function ProductAdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [user?.id, baseCapabilities]);
+  }, [user, user?.id, baseCapabilities]);
 
   const handleFiltersChange = (next: Partial<ProductFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));
@@ -372,7 +372,6 @@ export function ProductAdminPage() {
               onEdit={setEditingProduct}
               onStatusChange={handleStatusChange}
               onRemove={handleRemove}
-              onCreateClick={() => setCreateOpen(true)}
             />
           </div>
           {filteredProducts.length > PRODUCTS_PER_PAGE && (

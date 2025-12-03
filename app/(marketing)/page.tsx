@@ -14,7 +14,7 @@ import { useAuth } from "@/lib/supabase/auth";
 function MarketingContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated, userRole, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
     const redirect = searchParams.get("redirect");

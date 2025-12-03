@@ -29,7 +29,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           setData(result);
           setError(null);
         }
-      } catch (err) {
+      } catch {
         if (isMounted) setError("Kunde inte ladda gamification just nu.");
       } finally {
         if (isMounted) setIsLoading(false);
@@ -39,7 +39,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [fetcher]);
 
   if (error) {
     return (
@@ -102,7 +102,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         </div>
       </header>
 
-      <ProgressOverview progress={data.progress} coins={data.coins} streak={data.streak} />
+      <ProgressOverview progress={data.progress} />
       <AchievementsSection achievements={data.achievements} />
       <CoinsSection summary={data.coins} />
       <StreakSection streak={data.streak} />

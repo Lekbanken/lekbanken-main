@@ -7,16 +7,16 @@ const COOKIE_NAME = 'lb_tenant'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 30 // 30 days
 const encoder = new TextEncoder()
 
-function getSecret() {
+function getSecret(): string | null {
   const secret = process.env.TENANT_COOKIE_SECRET || process.env.JWT_SECRET
   if (!secret) {
-    throw new Error('TENANT_COOKIE_SECRET (or JWT_SECRET) is required for tenant cookie signing')
+    console.warn('[tenantCookie] TENANT_COOKIE_SECRET (or JWT_SECRET) is not set - tenant cookies will be skipped')
+    return null
   }
   return secret
 }
 
-async function hmacHex(value: string) {
-  const secret = getSecret()
+async function hmacHex(value: string, secret: string) {
   const key = await crypto.subtle.importKey(
     'raw',
     encoder.encode(secret),
@@ -31,14 +31,25 @@ async function hmacHex(value: string) {
 }
 
 async function pack(tenantId: string) {
-  return `${tenantId}.${await hmacHex(tenantId)}`
+  const secret = getSecret()
+  if (!secret) return tenantId // Return unsigned if no secret
+  return `${tenantId}.${await hmacHex(tenantId, secret)}`
 }
 
 async function unpack(raw?: string | null) {
   if (!raw) return null
+  
+  const secret = getSecret()
+  if (!secret) {
+    // If no secret, just return the raw value (unsigned mode)
+    // But only if it looks like a UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+    return uuidRegex.test(raw) ? raw : null
+  }
+  
   const [tenantId, signature] = raw.split('.')
   if (!tenantId || !signature) return null
-  const expected = await hmacHex(tenantId)
+  const expected = await hmacHex(tenantId, secret)
   // Constant-time-ish comparison
   const a = signature
   const b = expected

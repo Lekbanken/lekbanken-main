@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { QuickLinkItem } from "../types";
 import { Card, CardContent } from "@/components/ui";
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
 type QuickLinksProps = {
   items: QuickLinkItem[];
@@ -16,18 +16,32 @@ export function QuickLinks({ items }: QuickLinksProps) {
         const gradient = item.iconGradient || defaultGradient;
         return (
           <Link key={item.id} href={item.href} className="group h-full">
-            <Card className="h-full border-border/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg">
-              <CardContent className="flex h-full flex-col gap-3 p-4">
-                <div className={`inline-flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${gradient} text-white shadow-lg`}>
+            <Card className="relative h-full overflow-hidden border-border/50 bg-card transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10">
+              {/* Subtle gradient overlay on hover */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/0 to-accent/0 opacity-0 transition-opacity duration-300 group-hover:opacity-5" />
+              
+              <CardContent className="relative flex h-full flex-col gap-4 p-5">
+                {/* Icon with gradient */}
+                <div className={`inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shadow-black/10 transition-transform duration-300 group-hover:scale-105`}>
                   {item.icon}
                 </div>
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-semibold text-foreground">{item.label}</p>
-                  {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
+                
+                {/* Content */}
+                <div className="flex-1 space-y-1.5">
+                  <p className="text-base font-semibold text-foreground transition-colors group-hover:text-primary">
+                    {item.label}
+                  </p>
+                  {item.description && (
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {item.description}
+                    </p>
+                  )}
                 </div>
-                <div className="flex items-center gap-1 text-sm font-medium text-primary">
-                  Open
-                  <ChevronRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+                
+                {/* Action indicator */}
+                <div className="flex items-center gap-1.5 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
+                  <span>Open</span>
+                  <ArrowRightIcon className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </CardContent>
             </Card>

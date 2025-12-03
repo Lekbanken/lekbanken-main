@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { useAuth } from "@/lib/supabase/auth";
+import { useTenant } from "@/lib/context/TenantContext";
+import { resetAuth } from "@/lib/supabase/resetAuth";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -16,14 +18,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
   const router = useRouter();
   const { user, userRole, isLoading } = useAuth();
+  const { currentTenant, hasTenants, isLoadingTenants } = useTenant();
   const isRoleResolved = userRole !== null;
 
-  // Debug trace to help diagnose stuck loading
-  useEffect(() => {
-    console.info("[AdminShell] state", { isLoading, hasUser: !!user, userRole });
-  }, [isLoading, user, userRole]);
-
-  // Fallback if loading takes too long
   useEffect(() => {
     if (!isLoading) {
       setLoadingTimedOut(false);
@@ -34,19 +31,22 @@ export function AdminShell({ children }: AdminShellProps) {
   }, [isLoading]);
 
   useEffect(() => {
-    if (isLoading) return;
-    if (!user) {
-      router.replace("/auth/login?redirect=/admin");
-      return;
-    }
-    // If role not resolved yet, wait.
-    if (!isRoleResolved) return;
-    if (userRole !== "admin") {
-      router.replace("/auth/login?redirect=/admin");
-    }
-  }, [user, userRole, isLoading, isRoleResolved, router]);
+    console.info("[AdminShell] state", {
+      isLoadingAuth: isLoading,
+      hasUser: !!user,
+      userRole,
+      tenantId: currentTenant?.id,
+      hasTenants,
+    });
+  }, [isLoading, user, userRole, currentTenant?.id, hasTenants]);
 
-  if (isLoading) {
+  const handleLogin = () => router.replace("/auth/login?redirect=/admin");
+  const handleReset = async () => {
+    await resetAuth();
+    handleLogin();
+  };
+
+  if (isLoading || isLoadingTenants) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         <div className="text-center space-y-2">
@@ -54,13 +54,22 @@ export function AdminShell({ children }: AdminShellProps) {
           {loadingTimedOut && (
             <div className="space-y-2">
               <p className="text-sm">Det tar ovanligt lång tid. Testa att ladda om eller logga in igen.</p>
-              <button
-                type="button"
-                className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
-                onClick={() => router.replace("/auth/login?redirect=/admin")}
-              >
-                Gå till login
-              </button>
+              <div className="flex justify-center gap-2">
+                <button
+                  type="button"
+                  className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+                  onClick={handleLogin}
+                >
+                  Gå till login
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+                  onClick={handleReset}
+                >
+                  Rensa session
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -68,8 +77,35 @@ export function AdminShell({ children }: AdminShellProps) {
     );
   }
 
-  if (!user || (isRoleResolved && userRole !== "admin")) {
-    return null;
+  if (!user || (isRoleResolved && userRole !== "admin") || (!hasTenants && !isLoadingTenants)) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="space-y-4 rounded-xl border border-border bg-card p-6 text-center">
+          <p className="text-sm font-semibold text-foreground">Ingen admin-åtkomst</p>
+          <p className="text-sm text-muted-foreground">
+            {user
+              ? "Din roll saknar åtkomst, eller inga tenants hittades. Logga in med ett admin-konto."
+              : "Du är inte inloggad."}
+          </p>
+          <div className="flex justify-center gap-2">
+            <button
+              type="button"
+              className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+              onClick={handleLogin}
+            >
+              Gå till login
+            </button>
+            <button
+              type="button"
+              className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
+              onClick={handleReset}
+            >
+              Rensa session
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

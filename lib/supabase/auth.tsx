@@ -76,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           setUser(session.user)
           await fetchProfile(session.user)
+          console.info('[auth] session init', {
+            userId: session.user.id,
+            expiresAt: session.expires_at,
+            roleMeta: session.user.app_metadata?.role,
+          })
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
@@ -93,6 +98,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         setUser(session.user)
         await fetchProfile(session.user)
+        console.info('[auth] auth change', {
+          userId: session.user.id,
+          expiresAt: session.expires_at,
+          roleMeta: session.user.app_metadata?.role,
+        })
       } else {
         setUser(null)
         setUserProfile(null)
@@ -182,10 +192,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user])
 
+  const fallbackRole = userProfile?.role || (user?.app_metadata?.role as string | undefined) || null
+
+  if (!userProfile && !fallbackRole && user) {
+    console.warn('[auth] userRole unresolved (no profile/app_metadata.role)', { userId: user.id })
+  }
+
   const value: AuthContextType = {
     user,
     userProfile,
-    userRole: userProfile?.role || (user?.app_metadata?.role as string | undefined) || null,
+    userRole: fallbackRole,
     isLoading,
     isAuthenticated: !!user,
     signUp,

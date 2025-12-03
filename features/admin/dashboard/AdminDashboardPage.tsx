@@ -6,6 +6,8 @@ import {
   TrophyIcon,
   RectangleGroupIcon,
   Cog6ToothIcon,
+  QuestionMarkCircleIcon,
+  HomeIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
 import { OverviewStats } from "./components/OverviewStats";
@@ -97,36 +99,73 @@ const activity: ActivityItem[] = [
 
 export function AdminDashboardPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Admin</p>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Overview</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Quick health check and entry points for admin areas.</p>
+    <div className="space-y-8">
+      {/* Page Header */}
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-center gap-4">
+          {/* Icon Container */}
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 text-primary shadow-sm ring-1 ring-primary/10">
+            <HomeIcon className="h-6 w-6" />
+          </div>
+          <div>
+            {/* Breadcrumb */}
+            <nav className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground">Admin</span>
+              <span>/</span>
+              <span>Overview</span>
+            </nav>
+            {/* Title */}
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+              Dashboard
+            </h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Quick health check and entry points for admin areas
+            </p>
+          </div>
         </div>
+        
+        {/* Actions */}
         <div className="flex gap-2">
-          <Button variant="outline" href="/admin/support" size="sm">
+          <Button variant="outline" href="/admin/support" size="sm" className="gap-1.5">
+            <QuestionMarkCircleIcon className="h-4 w-4" />
             Support
           </Button>
-          <Button href="/admin/settings" size="sm">
-            <Cog6ToothIcon className="mr-2 h-4 w-4" />
+          <Button href="/admin/settings" size="sm" className="gap-1.5">
+            <Cog6ToothIcon className="h-4 w-4" />
             Settings
           </Button>
         </div>
-      </div>
+      </header>
 
-      <OverviewStats metrics={metrics} />
+      {/* Overview Stats */}
+      <section>
+        <OverviewStats metrics={metrics} />
+      </section>
 
-      <Card className="border-border/60">
-        <CardHeader className="border-b border-border/60 pb-3">
-          <CardTitle className="text-base">Quick links</CardTitle>
-        </CardHeader>
-        <CardContent className="pt-4">
-          <QuickLinks items={quickLinks} />
-        </CardContent>
-      </Card>
+      {/* Quick Links */}
+      <section>
+        <Card className="border-border/50 overflow-hidden">
+          <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-transparent px-5 py-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10 text-accent">
+                <RectangleGroupIcon className="h-4 w-4" />
+              </div>
+              <div>
+                <CardTitle className="text-base">Quick Links</CardTitle>
+                <p className="text-xs text-muted-foreground">Jump to admin sections</p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-5">
+            <QuickLinks items={quickLinks} />
+          </CardContent>
+        </Card>
+      </section>
 
-      <ActivityFeed items={activity} />
+      {/* Activity Feed */}
+      <section>
+        <ActivityFeed items={activity} />
+      </section>
     </div>
   );
 }

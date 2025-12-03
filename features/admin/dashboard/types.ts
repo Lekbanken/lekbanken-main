@@ -8,6 +8,7 @@ export type OverviewMetric = {
   trend?: "up" | "down" | "flat";
   iconGradient?: string;
   icon?: ReactNode;
+  attention?: "normal" | "warning" | "critical";
 };
 
 export type QuickLinkItem = {

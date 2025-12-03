@@ -20,6 +20,7 @@ interface TenantContextType {
   currentTenant: (Tenant & { membership: UserTenantMembership }) | null
   userTenants: (Tenant & { membership: UserTenantMembership })[]
   isLoadingTenants: boolean
+  hasTenants: boolean
   selectTenant: (tenantId: string) => void
   createTenant: (name: string, type: string) => Promise<Tenant>
   reloadTenants: () => Promise<void>
@@ -31,11 +32,13 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
   const [currentTenant, setCurrentTenant] = useState<(Tenant & { membership: UserTenantMembership }) | null>(null)
   const [userTenants, setUserTenants] = useState<(Tenant & { membership: UserTenantMembership })[]>([])
   const [isLoadingTenants, setIsLoadingTenants] = useState(true)
+  const [hasTenants, setHasTenants] = useState(false)
 
   // Load user's tenants
   const loadTenants = useCallback(async () => {
     if (!userId) {
       setIsLoadingTenants(false)
+      setHasTenants(false)
       return
     }
 
@@ -60,6 +63,7 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
         }))
 
       setUserTenants(tenantsWithMembership)
+      setHasTenants(tenantsWithMembership.length > 0)
 
       // Set current tenant from saved preference or first tenant
       const savedTenantId = localStorage.getItem('selectedTenantId')
@@ -141,6 +145,7 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
     currentTenant,
     userTenants,
     isLoadingTenants,
+    hasTenants,
     selectTenant,
     createTenant,
     reloadTenants,

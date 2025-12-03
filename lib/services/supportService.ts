@@ -22,7 +22,10 @@ export type BugReportInsert = Database['public']['Tables']['bug_reports']['Inser
 export interface SupportStats {
   totalTickets: number;
   openTickets: number;
+  pendingTickets: number;
+  resolvedLast30Days: number;
   avgResolutionTime: number | null;
+  avgResponseTime: number | null;
   satisfactionScore: number | null;
 }
 
@@ -538,9 +541,20 @@ export async function getTicketStats(tenantId: string | null): Promise<SupportSt
 
     const tickets = data || [];
     const openTickets = tickets.filter((t) => t.status === 'open').length;
-    const resolvedTickets = tickets.filter((t) => t.status === 'resolved');
+    const pendingTickets = tickets.filter((t) => t.status === 'waiting_for_user' || t.status === 'in_progress').length;
+    const resolvedTickets = tickets.filter((t) => t.status === 'resolved' || t.status === 'closed');
+
+    // Resolved in last 30 days
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const resolvedLast30Days = resolvedTickets.filter((t) => {
+      const resolvedAt = t.resolved_at ? new Date(t.resolved_at) : null;
+      return resolvedAt && resolvedAt >= thirtyDaysAgo;
+    }).length;
 
     let avgResolutionTime = null;
+    const avgResponseTime = null; // Would need first_response_at column in schema
+
     if (resolvedTickets.length > 0) {
       const totalTime = resolvedTickets.reduce((acc, ticket) => {
         const created = new Date(ticket.created_at).getTime();
@@ -553,7 +567,10 @@ export async function getTicketStats(tenantId: string | null): Promise<SupportSt
     return {
       totalTickets: tickets.length,
       openTickets,
+      pendingTickets,
+      resolvedLast30Days,
       avgResolutionTime,
+      avgResponseTime,
       satisfactionScore: null, // Could be calculated from feedback ratings
     };
   } catch (err) {

@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export type Variant = "default" | "primary" | "outline" | "ghost" | "destructive";
+export type Variant = "default" | "primary" | "outline" | "ghost" | "destructive" | "link";
 type Size = "sm" | "md" | "lg";
 
 type ButtonProps = {
@@ -26,6 +26,7 @@ const variantStyles: Record<Variant, string> = {
     "border border-border text-foreground hover:bg-muted hover:text-foreground",
   ghost: "text-foreground hover:bg-muted",
   destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm",
+  link: "text-primary underline-offset-4 hover:underline",
 };
 
 const sizeStyles: Record<Size, string> = {

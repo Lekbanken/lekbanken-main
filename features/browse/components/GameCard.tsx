@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { BoltIcon, ClockIcon, HomeIcon, SunIcon, UsersIcon } from "@heroicons/react/24/outline";
 import type { Game } from "../types";
 
@@ -28,48 +29,50 @@ export function GameCard({ game }: GameCardProps) {
   const EnvIcon = environmentConfig[game.environment].icon;
 
   return (
-    <article className="group rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-border">
-      <header className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
-            {game.title}
-          </h3>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-            {game.description}
-          </p>
-        </div>
-        <span className="shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold capitalize text-primary">
-          {game.purpose}
-        </span>
-      </header>
+    <Link href={`/app/games/${game.id}`} className="block">
+      <article className="group rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-border">
+        <header className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+              {game.title}
+            </h3>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+              {game.description}
+            </p>
+          </div>
+          <span className="shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold capitalize text-primary">
+            {game.purpose}
+          </span>
+        </header>
 
-      <dl className="mt-4 flex flex-wrap gap-2 text-xs">
-        <div className="flex items-center gap-1.5 rounded-lg bg-muted/70 px-2.5 py-1.5 text-muted-foreground">
-          <ClockIcon className="h-3.5 w-3.5" aria-hidden />
-          <dd className="font-medium">{game.durationMinutes} min</dd>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-lg bg-muted/70 px-2.5 py-1.5 text-muted-foreground">
-          <UsersIcon className="h-3.5 w-3.5" aria-hidden />
-          <dd className="font-medium">{groupLabel[game.groupSize]}</dd>
-        </div>
-        <div className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 ${energy.bgColor} ${energy.color}`}>
-          <BoltIcon className="h-3.5 w-3.5" aria-hidden />
-          <dd className="font-medium">{energy.label}</dd>
-        </div>
-      </dl>
+        <dl className="mt-4 flex flex-wrap gap-2 text-xs">
+          <div className="flex items-center gap-1.5 rounded-lg bg-muted/70 px-2.5 py-1.5 text-muted-foreground">
+            <ClockIcon className="h-3.5 w-3.5" aria-hidden />
+            <dd className="font-medium">{game.durationMinutes} min</dd>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-lg bg-muted/70 px-2.5 py-1.5 text-muted-foreground">
+            <UsersIcon className="h-3.5 w-3.5" aria-hidden />
+            <dd className="font-medium">{groupLabel[game.groupSize]}</dd>
+          </div>
+          <div className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 ${energy.bgColor} ${energy.color}`}>
+            <BoltIcon className="h-3.5 w-3.5" aria-hidden />
+            <dd className="font-medium">{energy.label}</dd>
+          </div>
+        </dl>
 
-      <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
-        <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-muted-foreground">
-          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          {game.ageRange} år
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-muted-foreground">
-          <EnvIcon className="h-3 w-3" aria-hidden />
-          {environmentConfig[game.environment].label}
-        </span>
-      </div>
-    </article>
+        <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-muted-foreground">
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            {game.ageRange} år
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-muted-foreground">
+            <EnvIcon className="h-3 w-3" aria-hidden />
+            {environmentConfig[game.environment].label}
+          </span>
+        </div>
+      </article>
+    </Link>
   );
 }

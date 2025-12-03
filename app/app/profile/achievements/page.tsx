@@ -8,6 +8,13 @@ import {
   AchievementProgress,
 } from '@/lib/services/achievementService';
 import AchievementBadge from '@/components/AchievementBadge';
+import { Button, Card, CardContent } from '@/components/ui';
+import {
+  ArrowLeftIcon,
+  TrophyIcon,
+  LockClosedIcon,
+  CheckCircleIcon,
+} from '@heroicons/react/24/outline';
 
 export default function AchievementsPage() {
   const { user } = useAuth();
@@ -41,84 +48,110 @@ export default function AchievementsPage() {
 
   const unlockedCount = achievements.filter((a) => a.isUnlocked).length;
   const totalCount = achievements.length;
+  const progressPercent = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600">Loading achievements...</p>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+          <p className="text-muted-foreground">Laddar prestationer...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link href="/app/profile" className="text-blue-500 hover:text-blue-700 mb-4 inline-block">
-            ← Back to Profile
-          </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Achievements</h1>
-          <p className="text-lg text-gray-600">
-            {unlockedCount} of {totalCount} unlocked ({Math.round((unlockedCount / totalCount) * 100)}%)
+    <div className="space-y-6 pb-32">
+      {/* Header */}
+      <header className="flex items-center gap-4">
+        <Link
+          href="/app/profile"
+          className="rounded-full p-2 hover:bg-muted transition-colors"
+        >
+          <ArrowLeftIcon className="h-5 w-5 text-foreground" />
+        </Link>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
+            Profil
           </p>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">
+            Dina prestationer
+          </h1>
         </div>
+      </header>
 
-        {/* Progress Bar */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <div className="flex justify-between mb-2">
-            <span className="text-sm font-semibold text-gray-900">Completion</span>
-            <span className="text-sm font-semibold text-gray-900">
-              {Math.round((unlockedCount / totalCount) * 100)}%
-            </span>
+      {/* Progress Card */}
+      <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
+        <CardContent className="p-6">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="rounded-full bg-amber-500/20 p-3">
+              <TrophyIcon className="h-6 w-6 text-amber-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-foreground">
+                {unlockedCount} av {totalCount}
+              </p>
+              <p className="text-sm text-muted-foreground">prestationer upplåsta</p>
+            </div>
           </div>
-          <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-green-400 to-blue-500 transition-all duration-500"
-              style={{ width: `${(unlockedCount / totalCount) * 100}%` }}
-            />
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Framsteg</span>
+              <span className="font-semibold text-foreground">{progressPercent}%</span>
+            </div>
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-500"
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        {/* Filter Buttons */}
-        <div className="flex gap-2 mb-8">
-          <button
-            onClick={() => setFilterType('all')}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              filterType === 'all'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            All ({totalCount})
-          </button>
-          <button
-            onClick={() => setFilterType('unlocked')}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              filterType === 'unlocked'
-                ? 'bg-green-500 text-white'
-                : 'bg-white text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            Unlocked ({unlockedCount})
-          </button>
-          <button
-            onClick={() => setFilterType('locked')}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              filterType === 'locked'
-                ? 'bg-gray-500 text-white'
-                : 'bg-white text-gray-900 hover:bg-gray-100'
-            }`}
-          >
-            Locked ({totalCount - unlockedCount})
-          </button>
-        </div>
+      {/* Filter Buttons */}
+      <div className="flex gap-2">
+        <Button
+          variant={filterType === 'all' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilterType('all')}
+        >
+          Alla ({totalCount})
+        </Button>
+        <Button
+          variant={filterType === 'unlocked' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilterType('unlocked')}
+        >
+          <CheckCircleIcon className="h-4 w-4 mr-1" />
+          Upplåsta ({unlockedCount})
+        </Button>
+        <Button
+          variant={filterType === 'locked' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setFilterType('locked')}
+        >
+          <LockClosedIcon className="h-4 w-4 mr-1" />
+          Låsta ({totalCount - unlockedCount})
+        </Button>
+      </div>
 
-        {/* Achievements Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+      {/* Achievements Grid */}
+      {filteredAchievements.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <p className="text-muted-foreground">
+              {filterType === 'unlocked'
+                ? 'Inga prestationer upplåsta ännu. Fortsätt spela!'
+                : filterType === 'locked'
+                  ? 'Grattis! Du har låst upp alla prestationer!'
+                  : 'Inga prestationer hittades.'}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
           {filteredAchievements.map((item) => (
             <div key={item.achievement.id} className="flex justify-center">
               <AchievementBadge
@@ -131,56 +164,59 @@ export default function AchievementsPage() {
             </div>
           ))}
         </div>
+      )}
 
-        {/* Empty State */}
-        {filteredAchievements.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">
-              {filterType === 'unlocked'
-                ? 'No achievements unlocked yet'
-                : filterType === 'locked'
-                  ? 'All achievements unlocked!'
-                  : 'No achievements found'}
-            </p>
-          </div>
-        )}
-
-        {/* Achievement Details */}
-        {filteredAchievements.length > 0 && (
-          <div className="mt-12 bg-white rounded-lg shadow p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Achievement Details</h2>
-            <div className="space-y-4">
-              {filteredAchievements.slice(0, 10).map((item) => (
-                <div key={item.achievement.id} className="flex items-start gap-4 pb-4 border-b last:border-b-0">
-                  <div className="text-3xl">
-                    {item.isUnlocked ? '✓' : '🔒'}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-bold text-gray-900">{item.achievement.name}</h3>
-                    <p className="text-gray-600 text-sm mt-1">{item.achievement.description}</p>
-                    {!item.isUnlocked && item.percentComplete > 0 && (
-                      <div className="mt-2">
-                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-blue-500 transition-all"
-                            style={{ width: `${item.percentComplete}%` }}
-                          />
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">{Math.round(item.percentComplete)}% progress</p>
-                      </div>
-                    )}
-                    {item.isUnlocked && item.unlockedAt && (
-                      <p className="text-xs text-green-600 mt-1">
-                        Unlocked on {new Date(item.unlockedAt).toLocaleDateString()}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
+      {/* Achievement Details */}
+      {filteredAchievements.length > 0 && (
+        <Card>
+          <CardContent className="divide-y divide-border">
+            <div className="py-4">
+              <h2 className="text-lg font-semibold text-foreground">Detaljer</h2>
             </div>
-          </div>
-        )}
-      </div>
+            {filteredAchievements.slice(0, 10).map((item) => (
+              <div key={item.achievement.id} className="flex items-start gap-4 py-4">
+                <div
+                  className={`rounded-full p-2 ${
+                    item.isUnlocked
+                      ? 'bg-emerald-500/10 text-emerald-600'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {item.isUnlocked ? (
+                    <CheckCircleIcon className="h-5 w-5" />
+                  ) : (
+                    <LockClosedIcon className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-foreground">{item.achievement.name}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">
+                    {item.achievement.description}
+                  </p>
+                  {!item.isUnlocked && item.percentComplete > 0 && (
+                    <div className="mt-2">
+                      <div className="h-2 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary transition-all"
+                          style={{ width: `${item.percentComplete}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {Math.round(item.percentComplete)}% klart
+                      </p>
+                    </div>
+                  )}
+                  {item.isUnlocked && item.unlockedAt && (
+                    <p className="text-xs text-emerald-600 mt-1">
+                      Upplåst {new Date(item.unlockedAt).toLocaleDateString('sv-SE')}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

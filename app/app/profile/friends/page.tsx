@@ -154,174 +154,172 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Friends</h1>
-          <p className="text-muted-foreground">Hantera dina vänner och vänförfrågningar</p>
-        </div>
+    <div className="space-y-6 pb-32">
+      {/* Header */}
+      <header className="space-y-1">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Profil</p>
+        <h1 className="text-xl font-bold tracking-tight text-foreground">Vänner</h1>
+        <p className="text-sm text-muted-foreground">Hantera dina vänner och vänförfrågningar</p>
+      </header>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 bg-white rounded-lg p-2 shadow">
-          {(['friends', 'requests', 'add'] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`flex-1 px-4 py-2 rounded font-medium transition-colors ${
-                activeTab === tab
-                  ? 'bg-primary text-white'
-                  : 'text-muted-foreground hover:bg-muted'
-              }`}
-            >
-              {tab === 'friends' && `Friends (${friendsList.length})`}
-              {tab === 'requests' && `Requests (${receivedRequests.length})`}
-              {tab === 'add' && 'Add Friend'}
-            </button>
-          ))}
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-2">
+        {(['friends', 'requests', 'add'] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 px-4 py-2.5 rounded-xl font-medium text-sm transition-colors ${
+              activeTab === tab
+                ? 'bg-primary text-white'
+                : 'bg-card border border-border text-muted-foreground hover:bg-muted'
+            }`}
+          >
+            {tab === 'friends' && `Vänner (${friendsList.length})`}
+            {tab === 'requests' && `Förfrågningar (${receivedRequests.length})`}
+            {tab === 'add' && 'Lägg till'}
+          </button>
+        ))}
+      </div>
 
-        {/* Friends Tab */}
-        {activeTab === 'friends' && (
-          <div className="space-y-3">
-            {isLoading ? (
-              <div className="bg-card rounded-lg shadow p-6 text-center">
-                <p className="text-muted-foreground">Laddar...</p>
-              </div>
-            ) : friendsList.length === 0 ? (
-              <div className="bg-card rounded-lg shadow p-12 text-center">
-                <p className="text-muted-foreground mb-4">Du har inga vänner ännu</p>
+      {/* Friends Tab */}
+      {activeTab === 'friends' && (
+        <div className="space-y-3">
+          {isLoading ? (
+            <div className="rounded-2xl border border-border bg-card p-6 text-center">
+              <p className="text-muted-foreground">Laddar...</p>
+            </div>
+          ) : friendsList.length === 0 ? (
+            <div className="rounded-2xl border border-border bg-card p-12 text-center">
+              <p className="text-muted-foreground mb-4">Du har inga vänner ännu</p>
+              <button
+                onClick={() => setActiveTab('add')}
+                className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-colors"
+              >
+                Lägg till din första vän
+              </button>
+            </div>
+          ) : (
+            friendsList.map((friend) => (
+              <div key={friend.id} className="rounded-2xl border border-border bg-card p-4 flex justify-between items-center">
+                <div>
+                  <p className="font-semibold text-foreground">{friend.email}</p>
+                </div>
                 <button
-                  onClick={() => setActiveTab('add')}
-                  className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded font-medium transition-colors"
+                  onClick={() => handleRemoveFriend(friend.id)}
+                  className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-sm rounded-lg font-medium transition-colors"
                 >
-                  Add Your First Friend
+                  Ta bort
                 </button>
               </div>
-            ) : (
-              friendsList.map((friend) => (
-                <div key={friend.id} className="bg-card rounded-lg shadow p-4 flex justify-between items-center">
-                  <div>
-                    <p className="font-bold text-foreground">{friend.email}</p>
-                    <p className="text-xs text-muted-foreground">{friend.id}</p>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveFriend(friend.id)}
-                    className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded font-medium transition-colors"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        )}
+            ))
+          )}
+        </div>
+      )}
 
-        {/* Requests Tab */}
-        {activeTab === 'requests' && (
-          <div className="space-y-3">
-            {isLoading ? (
-              <div className="bg-card rounded-lg shadow p-6 text-center">
-                <p className="text-muted-foreground">Laddar...</p>
-              </div>
-            ) : receivedRequests.length === 0 ? (
-              <div className="bg-card rounded-lg shadow p-12 text-center">
-                <p className="text-muted-foreground">Du har inga väntande vänförfrågningar</p>
-              </div>
-            ) : (
-              <div>
-                <h3 className="font-bold text-foreground mb-3">Received Requests</h3>
-                <div className="space-y-2 mb-6">
+      {/* Requests Tab */}
+      {activeTab === 'requests' && (
+        <div className="space-y-4">
+          {isLoading ? (
+            <div className="rounded-2xl border border-border bg-card p-6 text-center">
+              <p className="text-muted-foreground">Laddar...</p>
+            </div>
+          ) : receivedRequests.length === 0 && sentRequests.length === 0 ? (
+            <div className="rounded-2xl border border-border bg-card p-12 text-center">
+              <p className="text-muted-foreground">Inga väntande vänförfrågningar</p>
+            </div>
+          ) : (
+            <>
+              {receivedRequests.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground">Mottagna förfrågningar</h3>
                   {receivedRequests.map((req) => (
-                    <div key={req.id} className="bg-card rounded-lg shadow p-4 flex justify-between items-center">
+                    <div key={req.id} className="rounded-2xl border border-border bg-card p-4 flex justify-between items-center">
                       <div>
-                        <p className="text-sm text-muted-foreground">Friend request from:</p>
-                        <p className="font-bold text-foreground">{req.requester_id}</p>
+                        <p className="text-xs text-muted-foreground">Vänförfrågan från:</p>
+                        <p className="font-semibold text-foreground">{req.requester_id}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleAcceptRequest(req.id)}
-                          className="px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 text-sm rounded font-medium transition-colors"
+                          className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 text-sm rounded-lg font-medium transition-colors"
                         >
-                          Accept
+                          Acceptera
                         </button>
                         <button
                           onClick={() => handleRejectRequest(req.id)}
-                          className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-sm rounded font-medium transition-colors"
+                          className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-600 text-sm rounded-lg font-medium transition-colors"
                         >
-                          Reject
+                          Avböj
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {sentRequests.length > 0 && (
-              <div>
-                <h3 className="font-bold text-foreground mb-3">Sent Requests</h3>
-                <div className="space-y-2">
+              {sentRequests.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-foreground">Skickade förfrågningar</h3>
                   {sentRequests.map((req) => (
-                    <div key={req.id} className="bg-muted rounded-lg p-4 flex justify-between items-center border border-border">
+                    <div key={req.id} className="rounded-2xl border border-border bg-muted/40 p-4 flex justify-between items-center">
                       <div>
-                        <p className="text-sm text-muted-foreground">Pending friend request to:</p>
-                        <p className="font-bold text-foreground">{req.recipient_id}</p>
+                        <p className="text-xs text-muted-foreground">Väntande förfrågan till:</p>
+                        <p className="font-semibold text-foreground">{req.recipient_id}</p>
                       </div>
-                      <span className="px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded font-medium">
-                        Pending
+                      <span className="px-2.5 py-1 bg-amber-500/10 text-amber-600 text-xs rounded-full font-medium">
+                        Väntar
                       </span>
                     </div>
                   ))}
                 </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Add Friend Tab */}
+      {activeTab === 'add' && (
+        <div className="rounded-2xl border border-border bg-card p-6">
+          <h3 className="font-semibold text-foreground mb-4">Sök användare</h3>
+          <div className="space-y-4">
+            <input
+              type="email"
+              placeholder="Ange e-postadress"
+              value={addFriendEmail}
+              onChange={(e) => {
+                setAddFriendEmail(e.target.value);
+                handleSearchUsers(e.target.value);
+              }}
+              className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground"
+            />
+
+            {isSearching && <p className="text-muted-foreground text-sm">Söker...</p>}
+
+            {searchResults.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Resultat</p>
+                {searchResults.map((user) => (
+                  <div key={user.id} className="flex justify-between items-center p-4 border border-border rounded-xl">
+                    <div>
+                      <p className="font-medium text-foreground">{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => handleSendRequest(user.id)}
+                      className="px-4 py-1.5 bg-primary hover:bg-primary/90 text-white text-sm rounded-lg font-medium transition-colors">
+                      Lägg till
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
+
+            {addFriendEmail.trim() && searchResults.length === 0 && !isSearching && (
+              <p className="text-muted-foreground text-sm">Ingen användare hittades med den e-postadressen</p>
+            )}
           </div>
-        )}
-
-        {/* Add Friend Tab */}
-        {activeTab === 'add' && (
-          <div className="bg-card rounded-lg shadow p-6">
-            <h3 className="font-bold text-foreground mb-4">Search Users</h3>
-            <div className="space-y-4">
-              <input
-                type="email"
-                placeholder="Enter email address"
-                value={addFriendEmail}
-                onChange={(e) => {
-                  setAddFriendEmail(e.target.value);
-                  handleSearchUsers(e.target.value);
-                }}
-                className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-              />
-
-              {isSearching && <p className="text-muted-foreground text-sm">Searching...</p>}
-
-              {searchResults.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground font-medium">Results:</p>
-                  {searchResults.map((user) => (
-                    <div key={user.id} className="flex justify-between items-center p-3 border border-border rounded-lg">
-                      <div>
-                        <p className="font-medium text-foreground">{user.email}</p>
-                      </div>
-                      <button
-                        onClick={() => handleSendRequest(user.id)}
-                        className="px-4 py-1 bg-primary hover:bg-primary/90 text-white text-sm rounded font-medium transition-colors">
-                        Add Friend
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {addFriendEmail.trim() && searchResults.length === 0 && !isSearching && (
-                <p className="text-muted-foreground text-sm">No users found matching that email</p>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

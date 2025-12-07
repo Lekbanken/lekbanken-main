@@ -219,12 +219,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
     }
     
-    // Refresh router to ensure server components see cleared cookies
-    router.refresh()
-    
-    // Navigate to login
-    router.push('/auth/login?signedOut=true')
-  }, [router])
+    // Hard redirect to login - forces full page reload to clear all React state
+    // router.push() does soft navigation which can keep cached state
+    window.location.href = '/auth/login?signedOut=true'
+  }, [])
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

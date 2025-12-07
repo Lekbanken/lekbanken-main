@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
-import { ThemeToggle } from "@/components/navigation/ThemeToggle";
+
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -97,18 +96,12 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6 pb-32">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Avatar src={avatar || undefined} name={fullName || email || initials} size="lg" />
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Profil</p>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">{fullName || "Din profil"}</h1>
-            <p className="text-sm text-muted-foreground">{email}</p>
-          </div>
-        </div>
-        <div className="hidden items-center gap-2 sm:flex">
-          <LanguageSwitcher />
-          <ThemeToggle />
+      <header className="flex items-center gap-3">
+        <Avatar src={avatar || undefined} name={fullName || email || initials} size="lg" />
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Profil</p>
+          <h1 className="text-xl font-bold tracking-tight text-foreground">{fullName || "Din profil"}</h1>
+          <p className="text-sm text-muted-foreground">{email}</p>
         </div>
       </header>
 

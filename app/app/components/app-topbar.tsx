@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Badge } from "@/components/ui/badge";
@@ -68,6 +69,7 @@ export function AppTopbar() {
             Admin
           </Badge>
         )}
+        <LanguageSwitcher />
         <ThemeToggle />
         <ProfileMenu context="app" />
       </div>

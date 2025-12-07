@@ -7,7 +7,7 @@
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useTransition } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useTransition, useRef } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { resolveCurrentTenant, selectTenant as selectTenantAction } from '@/app/actions/tenant'
 import type { Database } from '@/types/supabase'
@@ -35,14 +35,19 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
   const [isLoadingTenants, setIsLoadingTenants] = useState(true)
   const [hasTenants, setHasTenants] = useState(false)
   const [, startTransition] = useTransition()
+  
+  // Track previous userId to detect user changes
+  const prevUserIdRef = useRef<string | null>(null)
 
   // Load user's tenants
   const loadTenants = useCallback(async () => {
     console.log('[TenantContext] loadTenants called, userId:', userId)
     if (!userId) {
-      console.log('[TenantContext] No userId, setting isLoadingTenants=false')
-      setIsLoadingTenants(false)
+      console.log('[TenantContext] No userId, clearing tenant state')
+      setCurrentTenant(null)
+      setUserTenants([])
       setHasTenants(false)
+      setIsLoadingTenants(false)
       return
     }
 
@@ -65,9 +70,34 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
     }
   }, [userId])
 
+  // Reload tenants when userId changes (including login/logout)
   useEffect(() => {
+    const userChanged = prevUserIdRef.current !== userId
+    prevUserIdRef.current = userId
+    
+    if (userChanged) {
+      console.log('[TenantContext] User changed, reloading tenants', { prev: prevUserIdRef.current, new: userId })
+    }
+    
     loadTenants()
   }, [userId, loadTenants])
+  
+  // Listen to auth state changes to refresh tenants on SIGNED_IN
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN') {
+        console.log('[TenantContext] SIGNED_IN detected, reloading tenants')
+        loadTenants()
+      } else if (event === 'SIGNED_OUT') {
+        console.log('[TenantContext] SIGNED_OUT detected, clearing tenants')
+        setCurrentTenant(null)
+        setUserTenants([])
+        setHasTenants(false)
+      }
+    })
+    
+    return () => subscription?.unsubscribe()
+  }, [loadTenants])
 
   const selectTenant = useCallback(
     (tenantId: string) => {

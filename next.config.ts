@@ -1,11 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    // @ts-expect-error: turbo.root is supported but not yet in the Next type definitions
-    turbo: {
-      root: __dirname,
-    },
+  turbopack: {
+    root: __dirname,
   },
   async redirects() {
     return [

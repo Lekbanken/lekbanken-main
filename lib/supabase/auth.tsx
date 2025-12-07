@@ -8,6 +8,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
 import { supabase } from './client'
 import type { Database } from '@/types/supabase'
@@ -22,7 +23,7 @@ interface AuthContextType {
   isAuthenticated: boolean
   signUp: (email: string, password: string, fullName?: string) => Promise<void>
   signIn: (email: string, password: string) => Promise<void>
-  signInWithGoogle: () => Promise<void>
+  signInWithGoogle: (redirectTo?: string) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
   updatePassword: (newPassword: string) => Promise<void>
@@ -32,6 +33,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter()
   const [user, setUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -104,7 +106,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen to auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[auth] onAuthStateChange:', event)
+      
+      if (event === 'SIGNED_OUT') {
+        // Clear tenant cookie on client side as backup
+        if (typeof document !== 'undefined') {
+          document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
+        }
+        setUser(null)
+        setUserProfile(null)
+        return
+      }
+      
+      if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user)
+        await fetchProfile(session.user)
+        // Refresh to ensure server components see the new session
+        router.refresh()
+        console.info('[auth] SIGNED_IN', {
+          userId: session.user.id,
+          roleMeta: session.user.app_metadata?.role,
+        })
+        return
+      }
+      
       if (session?.user) {
         setUser(session.user)
         await fetchProfile(session.user)
@@ -152,11 +178,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchProfile])
 
-  const signInWithGoogle = useCallback(async () => {
+  const signInWithGoogle = useCallback(async (redirectTo?: string) => {
+    // Get redirect from URL params if not provided
+    const urlParams = new URLSearchParams(window.location.search)
+    const nextUrl = redirectTo || urlParams.get('redirect') || urlParams.get('next') || '/app'
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextUrl)}`,
       },
     })
 
@@ -164,11 +194,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signOut = useCallback(async () => {
-    const { error } = await supabase.auth.signOut()
-    if (error) throw error
+    try {
+      // Call server-side signout to properly clear httpOnly cookies
+      const response = await fetch('/auth/signout', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+      })
+      
+      if (!response.ok) {
+        console.warn('[auth] Server signout failed, falling back to client signout')
+        await supabase.auth.signOut()
+      }
+    } catch (err) {
+      console.warn('[auth] Server signout error, falling back to client signout:', err)
+      await supabase.auth.signOut()
+    }
+    
+    // Clear client state
     setUser(null)
     setUserProfile(null)
-  }, [])
+    
+    // Clear tenant cookie on client side as backup
+    if (typeof document !== 'undefined') {
+      document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
+    }
+    
+    // Refresh router to ensure server components see cleared cookies
+    router.refresh()
+    
+    // Navigate to login
+    router.push('/auth/login?signedOut=true')
+  }, [router])
 
   const resetPassword = useCallback(async (email: string) => {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {

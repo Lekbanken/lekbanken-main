@@ -50,9 +50,13 @@ export function AdminShell({ children }: AdminShellProps) {
   // Superadmin/admin har alltid tillgång, behöver inte vänta på tenants
   const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
 
-  // Om auth fortfarande laddar, visa laddning
-  // Men om vi är admin/superadmin, behöver vi inte vänta på tenants
-  const stillLoading = isLoading || (!isGlobalAdmin && isLoadingTenants);
+  // Om vi redan har user + admin roll, behöver vi inte vänta på isLoading
+  // Detta hanterar fallet där isLoading fastnar men data finns
+  const hasAuthData = !!user && isGlobalAdmin;
+  
+  // Om auth fortfarande laddar OCH vi inte har tillräcklig data, visa laddning
+  // Men om vi är admin/superadmin med user, fortsätt direkt
+  const stillLoading = !hasAuthData && (isLoading || (!isGlobalAdmin && isLoadingTenants));
 
   if (stillLoading) {
     return (

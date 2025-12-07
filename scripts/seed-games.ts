@@ -1,0 +1,696 @@
+/**
+ * Seed script for 25 real children's games
+ * Run with: npx tsx scripts/seed-games.ts
+ */
+
+import { config } from "dotenv";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../types/supabase";
+
+// Load environment variables from .env.local
+config({ path: ".env.local" });
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// Lekbanken tenant ID from seed-lekbanken.ts
+const TENANT_ID = "00000000-0000-0000-0000-000000000001";
+
+if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+  throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set.");
+}
+
+const supabase = createClient<Database>(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false },
+});
+
+type GameInsert = Database["public"]["Tables"]["games"]["Insert"];
+
+// 25 klassiska och populära barnlekar
+const GAMES: GameInsert[] = [
+  // === UTELEKER (Outdoor) ===
+  {
+    game_key: "sista-pansen",
+    name: "Sista pansen",
+    description: "En klassisk tagglek där en person är 'den' och ska ta fast de andra. Den som blir tagen blir nästa 'den'.",
+    instructions: `1. Välj vem som ska vara "den" (kan slumpa med räkneramsa)
+2. "Den" räknar till 10 medan de andra springer iväg
+3. "Den" springer efter och försöker ta fast någon genom att nudda dem
+4. Den som blir tagen ropar "Sista pansen!" och blir nya "den"
+5. Leken fortsätter tills ni bestämmer att sluta
+
+Tips: Markera ett område som är "säkert" där man inte kan bli tagen.`,
+    category: "Utelekar",
+    min_players: 3,
+    max_players: 20,
+    age_min: 4,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "outdoor",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "kurragomma",
+    name: "Kurragömma",
+    description: "Den klassiska gömlek där en person söker medan de andra gömmer sig.",
+    instructions: `1. Välj en person som ska söka ("den")
+2. "Den" blundar och räknar högt till ett bestämt tal (t.ex. 50)
+3. Medan "den" räknar gömmer sig alla andra
+4. "Den" ropar "Färdig eller inte, här kommer jag!" och börjar leta
+5. När "den" hittar någon ropar hen "Jag ser [namn]!"
+6. Första som hittas blir "den" nästa omgång
+
+Variant: Burken - den som hittas kan "fritas" om en annan deltagare sparkar på burken.`,
+    category: "Utelekar",
+    min_players: 3,
+    max_players: 15,
+    age_min: 4,
+    age_max: 14,
+    time_estimate_min: 20,
+    energy_level: "medium",
+    location_type: "outdoor",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "hoppa-hage",
+    name: "Hoppa hage",
+    description: "Klassisk lek där man hoppar på ett fot genom rutor ritade på marken.",
+    instructions: `1. Rita en hage på marken med krita (traditionellt 8-10 rutor)
+2. Första spelaren kastar en sten på ruta 1
+3. Hoppa på ett ben genom alla rutor (hoppa över rutan med stenen)
+4. På dubbelrutor får man landa med båda fötterna
+5. Vänd om i slutet och hoppa tillbaka
+6. Plocka upp stenen på vägen tillbaka
+7. Lyckas du? Kasta stenen på ruta 2 nästa gång
+8. Trampar du på linjen eller tappar balansen får nästa spelare försöka`,
+    category: "Utelekar",
+    min_players: 1,
+    max_players: 6,
+    age_min: 5,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "medium",
+    location_type: "outdoor",
+    materials: "Krita, liten sten",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "roda-ljuset",
+    name: "Röda ljuset, gröna ljuset",
+    description: "Signallek där barnen rör sig framåt på 'grönt ljus' och måste stanna helt på 'rött ljus'.",
+    instructions: `1. En person är "trafikljuset" och står med ryggen mot de andra
+2. Övriga står på en startlinje ca 15-20 meter bort
+3. "Trafikljuset" ropar "Grönt ljus!" - då får alla springa framåt
+4. "Trafikljuset" ropar "Rött ljus!" och vänder sig snabbt om
+5. Alla måste stanna helt stilla - den som rör sig får börja om
+6. Första som nuddar "trafikljuset" vinner och blir nya trafikljuset`,
+    category: "Utelekar",
+    min_players: 4,
+    max_players: 20,
+    age_min: 4,
+    age_max: 10,
+    time_estimate_min: 10,
+    energy_level: "high",
+    location_type: "outdoor",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "dansen-pa-rosor",
+    name: "Dansen på rosor",
+    description: "Ringlek där barnen dansar runt och en person i mitten väljer vem som ska bli nästa i mitten.",
+    instructions: `1. Alla står i en ring och håller varandra i händerna
+2. En person står i mitten
+3. Alla sjunger "Dansen på rosor" och går runt i ringen
+4. Vid slutet av versen pekar personen i mitten på någon
+5. Den utpekade byter plats med personen i mitten
+6. Upprepa med ny vers och ny person i mitten`,
+    category: "Ringlekar",
+    min_players: 6,
+    max_players: 25,
+    age_min: 3,
+    age_max: 8,
+    time_estimate_min: 10,
+    energy_level: "low",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "stolleken",
+    name: "Stolleken",
+    description: "Musiklek där barnen går runt stolar och sätter sig när musiken stannar. En stol för få!",
+    instructions: `1. Ställ upp stolar i en rad (en färre än antalet deltagare)
+2. Sätt på musik och låt barnen gå/dansa runt stolarna
+3. Stoppa musiken plötsligt
+4. Alla ska försöka sätta sig på en stol
+5. Den som blir utan stol är ute
+6. Ta bort en stol och fortsätt
+7. Vinnaren är den sista kvar!
+
+Tips: Låt de som är ute vara domare eller sköta musiken.`,
+    category: "Partylek",
+    min_players: 5,
+    max_players: 20,
+    age_min: 4,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "medium",
+    location_type: "indoor",
+    materials: "Stolar, musik",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "blindbock",
+    name: "Blindbock",
+    description: "En person är ögonbunden och ska försöka fånga de andra som smyger omkring.",
+    instructions: `1. Bind för ögonen på en person med en sjal eller ögonbindel
+2. Snurra personen försiktigt 3 varv
+3. De andra rör sig tyst omkring i rummet
+4. "Blindbocken" försöker fånga någon
+5. När någon blir fångad ska blindbocken gissa vem det är genom att känna på ansiktet
+6. Gissar hen rätt blir den fångade ny blindbock`,
+    category: "Partylek",
+    min_players: 5,
+    max_players: 12,
+    age_min: 5,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "medium",
+    location_type: "indoor",
+    materials: "Ögonbindel/sjal",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "kom-alla-mina-kycklingar",
+    name: "Kom alla mina kycklingar",
+    description: "Klassisk fångstlek där kycklingarna ska ta sig förbi räven till mamman.",
+    instructions: `1. En vuxen är "mamma höna" på ena sidan av planen
+2. En person är "räven" i mitten
+3. Alla barn (kycklingar) står på motsatt sida
+4. Mamma höna ropar: "Kom alla mina kycklingar!"
+5. Kycklingarna svarar: "Vi törs inte, räven är ute!"
+6. Mamma höna: "Räven sover!" (räven lägger sig ner)
+7. Kycklingarna springer - räven vaknar och försöker ta dem
+8. Tagna kycklingar blir också rävar
+9. Sista kycklingen vinner!`,
+    category: "Utelekar",
+    min_players: 6,
+    max_players: 30,
+    age_min: 3,
+    age_max: 8,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "outdoor",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "simon-sager",
+    name: "Simon säger",
+    description: "Instruktionslek där man bara får följa kommandon som börjar med 'Simon säger'.",
+    instructions: `1. En person är "Simon" och ger instruktioner
+2. Om Simon säger "Simon säger hoppa!" ska alla hoppa
+3. Om Simon bara säger "Hoppa!" utan "Simon säger" först - ska man INTE göra det
+4. Den som gör fel är ute (eller får en poäng emot sig)
+5. Simon kan variera tempo och försöka lura deltagarna
+6. Sista kvar vinner och kan bli nya Simon
+
+Exempel på kommandon:
+- Simon säger: Ta på näsan
+- Simon säger: Snurra runt
+- Sitt ner! (fälla - följ inte!)`,
+    category: "Partylek",
+    min_players: 3,
+    max_players: 30,
+    age_min: 4,
+    age_max: 12,
+    time_estimate_min: 10,
+    energy_level: "medium",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "pantomim",
+    name: "Pantomim",
+    description: "Gissningslek där en person agerar ut ett ord eller mening utan att prata.",
+    instructions: `1. Dela in i två lag
+2. Förbered lappar med ord/meningar (djur, yrken, filmer, etc.)
+3. En person från ett lag drar en lapp och agerar ut utan ljud
+4. Laget har begränsad tid att gissa (t.ex. 1 minut)
+5. Rätt svar = 1 poäng
+6. Turas om mellan lagen
+7. Laget med flest poäng vinner!
+
+Svårighetsgrad:
+- Lätt: Djur, sport
+- Medium: Yrken, känslor
+- Svår: Filmtitlar, ordspråk`,
+    category: "Partylek",
+    min_players: 4,
+    max_players: 20,
+    age_min: 6,
+    age_max: 99,
+    time_estimate_min: 20,
+    energy_level: "low",
+    location_type: "indoor",
+    materials: "Papper, penna, timer",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "fia-med-knuff",
+    name: "Fia med knuff",
+    description: "Klassiskt brädspel där man tävlar om att få alla sina pjäser runt banan först.",
+    instructions: `1. Varje spelare väljer en färg och har 4 pjäser i sitt bo
+2. Slå en 6:a för att få ut en pjäs på banan
+3. Flytta pjäsen lika många steg som tärningen visar
+4. Landar du på en motståndares pjäs - knuffa tillbaka den till boet
+5. Ta dig runt banan och in i mål
+6. Första spelare med alla 4 pjäser i mål vinner!
+
+Special: Slår du 6 får du slå igen.`,
+    category: "Brädspel",
+    min_players: 2,
+    max_players: 4,
+    age_min: 5,
+    age_max: 99,
+    time_estimate_min: 30,
+    energy_level: "low",
+    location_type: "indoor",
+    materials: "Fia-bräde, tärning, pjäser",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "memory",
+    name: "Memory",
+    description: "Minnesspel där man vänder kort två och två för att hitta matchande par.",
+    instructions: `1. Blanda korten och lägg dem med baksidan upp i rader
+2. Första spelaren vänder upp två kort
+3. Är de lika? Behåll paret och vänd två till
+4. Är de olika? Vänd tillbaka dem och nästa spelare provar
+5. Försök komma ihåg var korten ligger!
+6. Den med flest par när alla kort är tagna vinner`,
+    category: "Brädspel",
+    min_players: 2,
+    max_players: 6,
+    age_min: 3,
+    age_max: 99,
+    time_estimate_min: 15,
+    energy_level: "low",
+    location_type: "indoor",
+    materials: "Memory-kort",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "dojan",
+    name: "Dojan (Gömma nycklar)",
+    description: "Söklek där ett föremål göms och alla letar. Varmare/kallare ger ledtrådar.",
+    instructions: `1. En person gömmer ett litet föremål (nyckelknippa, mjukdjur etc.)
+2. De andra blundar eller går ut ur rummet
+3. När föremålet är gömt får alla börja leta
+4. Den som gömt säger "varmare" när någon kommer nära
+5. "Kallare" när de går åt fel håll
+6. Den som hittar föremålet får gömma nästa gång`,
+    category: "Partylek",
+    min_players: 3,
+    max_players: 10,
+    age_min: 4,
+    age_max: 10,
+    time_estimate_min: 15,
+    energy_level: "low",
+    location_type: "indoor",
+    materials: "Litet föremål att gömma",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "ringlek-bjornen-sover",
+    name: "Björnen sover",
+    description: "Klassisk ringlek där barnen sjunger och smyger runt en sovande björn.",
+    instructions: `1. En person är björnen och ligger i mitten och "sover"
+2. Alla andra går runt och sjunger:
+   "Björnen sover, björnen sover i sitt lugna bo
+   Han är inte farlig, bara man är varlig
+   Men man kan dock, men man kan dock honom aldrig tro!"
+3. På sista ordet vaknar björnen och jagar de andra!
+4. Den som fångas blir nästa björn`,
+    category: "Ringlekar",
+    min_players: 5,
+    max_players: 20,
+    age_min: 3,
+    age_max: 8,
+    time_estimate_min: 10,
+    energy_level: "medium",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "potatisloppet",
+    name: "Potatisloppet",
+    description: "Stafett där man balanserar en potatis på en sked utan att tappa den.",
+    instructions: `1. Dela in i lag med lika många deltagare
+2. Markera en bana med start, vändpunkt och mål
+3. Varje deltagare ska balansera en potatis på en sked
+4. Spring till vändpunkten och tillbaka
+5. Lämna över till nästa i laget
+6. Tappar du potatisen - stanna och lägg tillbaka den
+7. Första lag där alla gått i mål vinner!`,
+    category: "Stafettlekar",
+    min_players: 6,
+    max_players: 30,
+    age_min: 5,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "both",
+    materials: "Skedar, potatisar (eller bollar)",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "fallskarm",
+    name: "Fallskärm",
+    description: "Samarbetslek med en stor färgglad fallskärm som alla håller i tillsammans.",
+    instructions: `1. Alla står i en ring och håller i fallskärmens kant
+2. Grundövning: Lyfta och sänka tillsammans
+3. "Svampen": Alla lyfter, springer in och sätter sig på kanten
+4. "Kattleken": En person kryper under, en annan jagar
+5. "Byta plats": Ledaren ropar en färg, de vid den färgen springer under
+6. "Popcorn": Lägg bollar på duken, skaka så de hoppar
+
+Fantastisk för samarbete och gemenskap!`,
+    category: "Samarbetslek",
+    min_players: 8,
+    max_players: 30,
+    age_min: 3,
+    age_max: 12,
+    time_estimate_min: 20,
+    energy_level: "medium",
+    location_type: "both",
+    materials: "Stor fallskärm/duk",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "stenstocken",
+    name: "Sten, sax, påse",
+    description: "Snabb handlek för att avgöra saker eller bara för skojs skull.",
+    instructions: `1. Två personer står mitt emot varandra
+2. Säg tillsammans "Sten, sax, påse!" och visa ett handtecken:
+   - Sten = knuten näve
+   - Sax = två fingrar (pek + lång)
+   - Påse = öppen hand
+3. Vem vinner?
+   - Sten krossar sax
+   - Sax klipper påse
+   - Påse fångar sten
+4. Samma tecken = oavgjort, gör om!
+
+Bäst av 3 eller 5 för att avgöra en vinnare.`,
+    category: "Snabblek",
+    min_players: 2,
+    max_players: 2,
+    age_min: 4,
+    age_max: 99,
+    time_estimate_min: 1,
+    energy_level: "low",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "tunneln",
+    name: "Tunneln",
+    description: "Lagtävling där bollen ska skickas genom lagets ben snabbast möjligt.",
+    instructions: `1. Dela in i lag med 5-10 personer per lag
+2. Stå på rad med benen isär så de bildar en tunnel
+3. Första personen rullar bollen genom tunneln
+4. Sista personen fångar bollen, springer längst fram och rullar igen
+5. Fortsätt tills alla har rullat
+6. Första lag där startpersonen är tillbaka längst fram vinner!
+
+Variant: Skicka bollen över huvudet istället.`,
+    category: "Stafettlekar",
+    min_players: 10,
+    max_players: 40,
+    age_min: 5,
+    age_max: 12,
+    time_estimate_min: 10,
+    energy_level: "high",
+    location_type: "both",
+    materials: "Bollar (en per lag)",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "dragon-tail",
+    name: "Draksvansen",
+    description: "Laglek där varje lag är en drake som försöker stjäla de andra drakarnas svansar.",
+    instructions: `1. Dela in i lag om 4-6 personer
+2. Varje lag ställer sig på rad och håller i varandra (midjan)
+3. Sista personen har en "svans" (sjal/band) instoppad i byxorna
+4. Första personen är drakens huvud och ska stjäla andras svansar
+5. Lagen får inte släppa taget om varandra!
+6. Förlorar ni svansen är ni ute
+7. Sista draken med svans kvar vinner!`,
+    category: "Laglek",
+    min_players: 8,
+    max_players: 30,
+    age_min: 6,
+    age_max: 14,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "outdoor",
+    materials: "Sjalar/band som svansar",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "20-fragor",
+    name: "20 frågor",
+    description: "Gissningslek där man ställer ja/nej-frågor för att lista ut ett hemligt ord.",
+    instructions: `1. En person tänker på något (djur, föremål, person)
+2. De andra får ställa max 20 ja/nej-frågor
+3. Bra startfrågor:
+   - Är det levande?
+   - Är det större än en katt?
+   - Finns det inomhus?
+4. Efter varje svar får man gissa
+5. Gissar någon rätt innan 20 frågor - de vinner!
+6. Annars vinner den som tänkte
+
+Tips: Börja brett och smalna av!`,
+    category: "Gissningslek",
+    min_players: 2,
+    max_players: 10,
+    age_min: 6,
+    age_max: 99,
+    time_estimate_min: 10,
+    energy_level: "low",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "sardiner",
+    name: "Sardiner",
+    description: "Omvänd kurragömma - en person gömmer sig och alla andra letar. Hittar du gömslet, kryp in du också!",
+    instructions: `1. En person gömmer sig medan alla andra blundar
+2. När tiden är ute börjar alla leta - var för sig
+3. När du hittar personen - smyg in i gömslet också!
+4. Snart ligger ni tätt som sardiner i en burk
+5. Sista person som hittar gömslet "förlorar"
+6. Första som hittade får gömma sig nästa gång
+
+Perfekt för mörker eller stora ytor!`,
+    category: "Gömlek",
+    min_players: 4,
+    max_players: 15,
+    age_min: 5,
+    age_max: 14,
+    time_estimate_min: 20,
+    energy_level: "medium",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "kapten-stansen",
+    name: "Kapten Stansen",
+    description: "Alla måste lyda kaptenen och göra olika rörelser på kommando - en korsning mellan Simon säger och gymnastik.",
+    instructions: `1. En vuxen eller barn är "Kapten Stansen"
+2. Kaptenen ger kommandon som alla måste följa:
+   - "Däck!" - lägg dig platt på magen
+   - "Kapten på däck!" - stå i givakt och hälsa
+   - "Swabba däck!" - gör som att du moppar
+   - "Klättra i master!" - låtsas klättra uppåt
+   - "Styrbord!" - spring åt höger
+   - "Babord!" - spring åt vänster
+3. Den som är sist eller gör fel är ute
+4. Sista sjöman kvar blir ny kapten!`,
+    category: "Rörelselek",
+    min_players: 5,
+    max_players: 30,
+    age_min: 4,
+    age_max: 12,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "both",
+    materials: null,
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "fruktsallad",
+    name: "Fruktsallad",
+    description: "Stol-bytarlek där man byter plats när ens frukt ropas upp - eller 'fruktsallad' för totalt kaos!",
+    instructions: `1. Ställ stolar i en ring (en färre än antalet deltagare)
+2. Alla sitter, utom en som står i mitten
+3. Ge varje person en frukt: äpple, banan, apelsin (fördela jämnt)
+4. Personen i mitten ropar en frukt, t.ex. "Banan!"
+5. Alla bananer måste byta plats - inkl. den i mitten som försöker ta en stol
+6. Den utan stol blir nya mittenpersonen
+7. "Fruktsallad!" = alla byter plats!`,
+    category: "Partylek",
+    min_players: 8,
+    max_players: 25,
+    age_min: 5,
+    age_max: 14,
+    time_estimate_min: 15,
+    energy_level: "high",
+    location_type: "indoor",
+    materials: "Stolar",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "sandslott",
+    name: "Sandslottsbygge",
+    description: "Kreativ utomhusaktivitet där barnen bygger slott och figurer i sandlådan.",
+    instructions: `1. Samla material: hinkar, spadar, formar, vattenflaska
+2. Blöt sanden lite för bättre konsistens
+3. Bygg-tips:
+   - Börja med en stor baspyramid
+   - Använd hinkar för torn
+   - Dekorera med snäckor, pinnar, löv
+   - Gräv vallgravar runt slottet
+4. Gör det till en tävling eller samarbete
+5. Ta foton av mästerverket!
+
+Bonus: Vem kan bygga högst utan att det rasar?`,
+    category: "Kreativ lek",
+    min_players: 1,
+    max_players: 6,
+    age_min: 2,
+    age_max: 10,
+    time_estimate_min: 30,
+    energy_level: "low",
+    location_type: "outdoor",
+    materials: "Hink, spade, sandformar, vatten",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+  {
+    game_key: "sten-studsar",
+    name: "Kasta smörgåsar",
+    description: "Klassisk utomhuslek vid vatten där man försöker få stenar att studsa på vattenytan.",
+    instructions: `1. Hitta platta, runda stenar (smörgåsstenar)
+2. Stå vid vattenbrynet
+3. Håll stenen horisontellt mellan tumme och pekfinger
+4. Kasta med sidledskast, lågt mot vattnet
+5. Räkna hur många studsar du får!
+6. Tävla: Vem får flest studsar?
+
+Tips: Ju plattare sten och lägre kastvinkel, desto fler studsar!
+Världsrekord: 88 studsar!`,
+    category: "Utelekar",
+    min_players: 1,
+    max_players: 6,
+    age_min: 6,
+    age_max: 99,
+    time_estimate_min: 20,
+    energy_level: "low",
+    location_type: "outdoor",
+    materials: "Platta stenar, tillgång till vatten",
+    status: "published",
+    owner_tenant_id: TENANT_ID,
+  },
+];
+
+async function seedGames() {
+  console.log("🎮 Starting game seed...\n");
+
+  // Check if tenant exists
+  const { data: tenant, error: tenantError } = await supabase
+    .from("tenants")
+    .select("id, name")
+    .eq("id", TENANT_ID)
+    .single();
+
+  if (tenantError || !tenant) {
+    console.error("❌ Tenant not found! Run seed-lekbanken.ts first.");
+    console.error("   npx tsx scripts/seed-lekbanken.ts");
+    process.exit(1);
+  }
+
+  console.log(`✅ Found tenant: ${tenant.name}\n`);
+
+  // Insert games
+  let inserted = 0;
+  let updated = 0;
+  let errors = 0;
+
+  for (const game of GAMES) {
+    const { data, error } = await supabase
+      .from("games")
+      .upsert(game, { onConflict: "game_key" })
+      .select("id, name")
+      .single();
+
+    if (error) {
+      console.error(`❌ Error with "${game.name}":`, error.message);
+      errors++;
+    } else {
+      // Check if it was insert or update
+      const { count } = await supabase
+        .from("games")
+        .select("*", { count: "exact", head: true })
+        .eq("game_key", game.game_key);
+      
+      console.log(`✅ ${game.name}`);
+      inserted++;
+    }
+  }
+
+  console.log("\n" + "=".repeat(50));
+  console.log(`🎉 Seed completed!`);
+  console.log(`   ✅ ${inserted} games inserted/updated`);
+  if (errors > 0) console.log(`   ❌ ${errors} errors`);
+  console.log("=".repeat(50));
+}
+
+seedGames().catch((err) => {
+  console.error("Seed failed:", err);
+  process.exit(1);
+});

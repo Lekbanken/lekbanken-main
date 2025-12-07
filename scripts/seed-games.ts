@@ -658,11 +658,10 @@ async function seedGames() {
 
   // Insert games
   let inserted = 0;
-  let updated = 0;
   let errors = 0;
 
   for (const game of GAMES) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("games")
       .upsert(game, { onConflict: "game_key" })
       .select("id, name")
@@ -672,12 +671,6 @@ async function seedGames() {
       console.error(`❌ Error with "${game.name}":`, error.message);
       errors++;
     } else {
-      // Check if it was insert or update
-      const { count } = await supabase
-        .from("games")
-        .select("*", { count: "exact", head: true })
-        .eq("game_key", game.game_key);
-      
       console.log(`✅ ${game.name}`);
       inserted++;
     }

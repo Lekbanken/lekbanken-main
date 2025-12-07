@@ -1,6 +1,7 @@
 ﻿"use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { searchGames, type Game as DbGame } from "@/lib/services/gameService";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -10,52 +11,37 @@ import { GameCard } from "./components/GameCard";
 import { SearchBar } from "./components/SearchBar";
 import type { BrowseFilters, Game } from "./types";
 
-const mockGames: Game[] = [
-  {
-    id: "1",
-    title: "Bollkull",
-    description: "Klassisk kullek med mjuk boll. Perfekt för uppvärmning och energi.",
-    durationMinutes: 10,
-    groupSize: "medium",
-    ageRange: "7-12",
-    energyLevel: "high",
-    environment: "either",
-    purpose: "uppvärmning",
-  },
-  {
-    id: "2",
-    title: "Samarbetspussel",
-    description: "Lös ett pussel tillsammans under tidspress. Tränar samarbete och fokus.",
-    durationMinutes: 15,
-    groupSize: "small",
-    ageRange: "8-14",
-    energyLevel: "medium",
-    environment: "indoor",
-    purpose: "samarbete",
-  },
-  {
-    id: "3",
-    title: "Stafett med hinder",
-    description: "Snabb stafett med enkla hinder. Passar ute eller inne med yta.",
-    durationMinutes: 20,
-    groupSize: "large",
-    ageRange: "10-15",
-    energyLevel: "high",
-    environment: "outdoor",
-    purpose: "fokus",
-  },
-  {
-    id: "4",
-    title: "Andningslek",
-    description: "Kort mindfulness-övning med andning och rörelse, bra för nedvarvning.",
-    durationMinutes: 8,
-    groupSize: "small",
-    ageRange: "6-12",
-    energyLevel: "low",
-    environment: "either",
-    purpose: "trygghet",
-  },
-];
+// Map database game to browse Game type
+function mapDbGameToGame(dbGame: DbGame): Game {
+  // Map player count to group size
+  const getGroupSize = (min: number | null, max: number | null): Game["groupSize"] => {
+    const avgPlayers = ((min ?? 2) + (max ?? 10)) / 2;
+    if (avgPlayers <= 6) return "small";
+    if (avgPlayers <= 14) return "medium";
+    return "large";
+  };
+
+  // Map location_type to environment
+  const getEnvironment = (locationType: string | null): Game["environment"] => {
+    if (locationType === "indoor") return "indoor";
+    if (locationType === "outdoor") return "outdoor";
+    return "either";
+  };
+
+  return {
+    id: dbGame.id,
+    title: dbGame.name,
+    description: dbGame.description ?? "",
+    durationMinutes: dbGame.time_estimate_min ?? 15,
+    groupSize: getGroupSize(dbGame.min_players, dbGame.max_players),
+    ageRange: dbGame.age_min && dbGame.age_max 
+      ? `${dbGame.age_min}-${dbGame.age_max}` 
+      : "Alla åldrar",
+    energyLevel: (dbGame.energy_level as Game["energyLevel"]) ?? "medium",
+    environment: getEnvironment(dbGame.location_type),
+    purpose: dbGame.category ?? "aktivitet",
+  };
+}
 
 const initialFilters: BrowseFilters = {
   ages: [],
@@ -66,32 +52,56 @@ const initialFilters: BrowseFilters = {
 };
 
 export function BrowsePage() {
+  const [games, setGames] = useState<Game[]>([]);
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<BrowseFilters>(initialFilters);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const [isLoading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch games from database
+  const loadGames = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      // Get energy level filter if set
+      const energyFilter = filters.energyLevels.length === 1 
+        ? filters.energyLevels[0] 
+        : undefined;
+
+      const result = await searchGames({
+        search: search || undefined,
+        energyLevel: energyFilter,
+        pageSize: 50,
+      });
+      
+      setGames(result.games.map(mapDbGameToGame));
+    } catch (err) {
+      console.error("Failed to load games:", err);
+      setError("Kunde inte ladda aktiviteter");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [search, filters.energyLevels]);
+
+  // Load games on mount and when search/energy filter changes
+  useEffect(() => {
+    void loadGames();
+  }, [loadGames]);
+
+  // Client-side filter for group size, environment, purpose (not in DB query)
   const filteredGames = useMemo(() => {
-    return mockGames.filter((game) => {
-      const matchesSearch =
-        !search ||
-        game.title.toLowerCase().includes(search.toLowerCase()) ||
-        game.description.toLowerCase().includes(search.toLowerCase());
-
-      const matchesAge = filters.ages.length === 0 || filters.ages.includes(game.ageRange);
+    return games.filter((game) => {
       const matchesGroup =
         filters.groupSizes.length === 0 || filters.groupSizes.includes(game.groupSize);
-      const matchesEnergy =
-        filters.energyLevels.length === 0 || filters.energyLevels.includes(game.energyLevel);
       const matchesEnv =
         filters.environments.length === 0 || filters.environments.includes(game.environment);
       const matchesPurpose =
         filters.purposes.length === 0 || filters.purposes.includes(game.purpose);
 
-      return matchesSearch && matchesAge && matchesGroup && matchesEnergy && matchesEnv && matchesPurpose;
+      return matchesGroup && matchesEnv && matchesPurpose;
     });
-  }, [filters, search]);
+  }, [games, filters.groupSizes, filters.environments, filters.purposes]);
 
   const handleApplyFilters = (next: BrowseFilters) => setFilters(next);
   const handleClearAll = () => setFilters(initialFilters);

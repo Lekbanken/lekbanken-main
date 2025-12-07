@@ -9,11 +9,14 @@ import {
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
 import { mockAchievements, themes } from "./data";
 import { AchievementItem, AchievementFilters, AchievementTheme } from "./types";
+import { normalizeIconConfig } from "./icon-utils";
 import { AchievementLibraryGrid } from "./components/AchievementLibraryGrid";
 import { AchievementEditorPanel } from "./editor/AchievementEditorPanel";
 
 export function AchievementAdminPage() {
-  const [achievements, setAchievements] = useState<AchievementItem[]>(mockAchievements);
+  const [achievements, setAchievements] = useState<AchievementItem[]>(
+    mockAchievements.map((a) => ({ ...a, icon: normalizeIconConfig(a.icon) })),
+  );
   const [filters, setFilters] = useState<AchievementFilters>({ search: "", theme: "all", sort: "recent" });
   const [editing, setEditing] = useState<AchievementItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -21,7 +24,16 @@ export function AchievementAdminPage() {
   const filtered = useMemo(() => {
     const query = filters.search.toLowerCase();
     const bySearch = achievements.filter((ach) =>
-      [ach.title, ach.subtitle ?? "", ach.icon.layers.symbol ?? ""].join(" ").toLowerCase().includes(query),
+      [
+        ach.title,
+        ach.subtitle ?? "",
+        ach.icon.symbol?.id ?? "",
+        ...(ach.icon.backgrounds?.map((b) => b.id) ?? []),
+        ...(ach.icon.foregrounds?.map((f) => f.id) ?? []),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query),
     );
     const byTheme = filters.theme === "all" ? bySearch : bySearch.filter((ach) => ach.icon.themeId === filters.theme);
     const sorted = [...byTheme].sort((a, b) => {
@@ -49,12 +61,15 @@ export function AchievementAdminPage() {
       title: "",
       subtitle: "",
       rewardCoins: 0,
-      icon: {
+      icon: normalizeIconConfig({
         mode: "theme",
         themeId: themes[0]?.id,
         size: "lg",
-        layers: {},
-      },
+        base: null,
+        symbol: null,
+        backgrounds: [],
+        foregrounds: [],
+      }),
       profileFrameSync: { enabled: false },
       publishedRoles: [],
       status: "draft",
@@ -64,7 +79,7 @@ export function AchievementAdminPage() {
   };
 
   const handleEdit = (item: AchievementItem) => {
-    setEditing(item);
+    setEditing({ ...item, icon: normalizeIconConfig(item.icon) });
     setIsCreating(false);
   };
 

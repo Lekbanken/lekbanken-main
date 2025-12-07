@@ -79,6 +79,10 @@ export const mockAchievements: AchievementItem[] = [
       mode: "theme",
       themeId: "amethyst",
       size: "lg",
+      base: { id: "base_shield" },
+      backgrounds: [{ id: "bg_wings_2" }],
+      foregrounds: [{ id: "fg_stars_3" }],
+      symbol: { id: "ic_flash" },
       layers: {
         base: "base_shield",
         background: "bg_wings_2",
@@ -102,6 +106,10 @@ export const mockAchievements: AchievementItem[] = [
       mode: "custom",
       themeId: "emerald",
       size: "lg",
+      base: { id: "base_circle" },
+      backgrounds: [{ id: "bg_spikes_3" }],
+      foregrounds: [{ id: "fg_queen_crown_1" }],
+      symbol: { id: "ic_medalj" },
       layers: {
         base: "base_circle",
         background: "bg_spikes_3",

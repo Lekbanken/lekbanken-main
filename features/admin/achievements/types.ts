@@ -25,11 +25,25 @@ export type AchievementTheme = {
   colors: Record<AchievementAssetType, LayerColorConfig>;
 };
 
+export type AchievementLayerStackItem = {
+  id: string;
+  color?: string;
+  opacity?: number;
+  order?: number;
+};
+
 export type AchievementIconConfig = {
   mode: AchievementColorMode;
   themeId?: string | null;
   size?: AchievementAssetSize;
-  layers: {
+  base?: AchievementLayerStackItem | null;
+  symbol?: AchievementLayerStackItem | null;
+  backgrounds?: AchievementLayerStackItem[];
+  foregrounds?: AchievementLayerStackItem[];
+  /**
+   * @deprecated legacy single-layer shape kept for backwards compatibility.
+   */
+  layers?: {
     base?: string;
     background?: string;
     foreground?: string;

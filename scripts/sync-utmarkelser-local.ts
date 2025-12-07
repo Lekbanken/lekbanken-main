@@ -7,7 +7,7 @@ const sizeFolders: Record<"sm" | "md" | "lg", string> = {
   lg: "LG - 512x512",
 };
 
-const ROOT = process.env.ASSET_SOURCE_ROOT || "C:\\Users\\infen\\.codex\\Utmärkelser";
+const ROOT = process.env.ASSET_SOURCE_ROOT || "C:\\Users\\infen\\.codex\\utmarkelser";
 const DEST_ROOT = path.join(process.cwd(), "public", "achievements", "utmarkelser");
 
 async function ensureDir(dir: string) {

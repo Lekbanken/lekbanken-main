@@ -1,12 +1,13 @@
 'use client';
 
-import { AchievementAssetSize, AchievementAssetType, AchievementIconConfig } from "../../types";
+import { AchievementAssetSize, AchievementIconConfig, AchievementLayerStackItem, AchievementAssetType } from "../../types";
 import { resolveAssetUrl } from "../../assets";
-import Image from "next/image";
+import { TintedLayerImage } from "./TintedLayerImage";
+import { getEffectiveColor, normalizeSize } from "../../icon-utils";
 
 type BadgePreviewEnhancedProps = {
   icon: AchievementIconConfig;
-  colors: { base: string; background: string; foreground: string; symbol: string };
+  theme?: { colors: Record<AchievementAssetType, { color: string }> };
   size?: AchievementAssetSize;
   showGlow?: boolean;
 };
@@ -17,74 +18,59 @@ const sizeConfig: Record<AchievementAssetSize, { container: string; image: numbe
   lg: { container: "h-40 w-40", image: 140 },
 };
 
-const layerOrder: AchievementAssetType[] = ["background", "base", "foreground", "symbol"];
+export function BadgePreviewEnhanced({ icon, theme, size = "md", showGlow = true }: BadgePreviewEnhancedProps) {
+  const normalizedSize = normalizeSize(size);
+  const config = sizeConfig[normalizedSize];
 
-export function BadgePreviewEnhanced({ icon, colors, size = "md", showGlow = true }: BadgePreviewEnhancedProps) {
-  const config = sizeConfig[size];
+  const renderStack = (items: AchievementLayerStackItem[] = [], colorType: "background" | "foreground") =>
+    items.map((item, idx) => {
+      const url = resolveAssetUrl(item.id, normalizedSize);
+      if (!url) return null;
+      const tint = getEffectiveColor(colorType, icon, theme, item);
+      return (
+        <div key={`${item.id}-${idx}`} className="absolute inset-0 flex items-center justify-center">
+          <TintedLayerImage src={url} alt={item.id} color={tint} size={config.image} />
+        </div>
+      );
+    });
+
+  const baseUrl = icon.base?.id ? resolveAssetUrl(icon.base.id, normalizedSize) : undefined;
+  const symbolUrl = icon.symbol?.id ? resolveAssetUrl(icon.symbol.id, normalizedSize) : undefined;
+  const baseTint = getEffectiveColor("base", icon, theme, icon.base ?? undefined);
+  const symbolTint = getEffectiveColor("symbol", icon, theme, icon.symbol ?? undefined);
 
   return (
     <div className={`relative ${config.container}`}>
       {showGlow && (
         <div
           className="absolute inset-0 rounded-full opacity-30 blur-xl pointer-events-none"
-          style={{ background: `radial-gradient(circle, ${colors.base}60, transparent 70%)` }}
+          style={{ background: `radial-gradient(circle, ${baseTint}60, transparent 70%)` }}
         />
       )}
 
       <div className="relative flex h-full w-full items-center justify-center rounded-full shadow-lg bg-black/10 overflow-hidden">
-        {layerOrder.map((layer) => {
-          const assetId = icon.layers[layer];
-          const url = resolveAssetUrl(assetId, size);
-          if (!url) return null;
+        {renderStack(icon.backgrounds, "background")}
 
-          const tint =
-            layer === "base"
-              ? colors.base
-              : layer === "background"
-              ? colors.background
-              : layer === "foreground"
-              ? colors.foreground
-              : colors.symbol;
+        {baseUrl && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <TintedLayerImage src={baseUrl} alt={icon.base?.id ?? "base"} color={baseTint} size={config.image} />
+          </div>
+        )}
 
-          return (
-            <div key={layer} className="absolute inset-0 flex items-center justify-center">
-              <div
-                className="relative"
-                style={{
-                  width: config.image,
-                  height: config.image,
-                  maskImage: `url(${url})`,
-                  WebkitMaskImage: `url(${url})`,
-                  maskSize: "contain",
-                  WebkitMaskSize: "contain",
-                  maskRepeat: "no-repeat",
-                  WebkitMaskRepeat: "no-repeat",
-                  maskPosition: "center",
-                  WebkitMaskPosition: "center",
-                  backgroundColor: tint,
-                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.25))",
-                }}
-              >
-                <Image
-                  src={url}
-                  alt={assetId || layer}
-                  width={config.image}
-                  height={config.image}
-                  className="opacity-0"
-                  priority={size === "lg"}
-                  unoptimized
-                />
-              </div>
-            </div>
-          );
-        })}
+        {renderStack(icon.foregrounds, "foreground")}
+
+        {symbolUrl && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <TintedLayerImage src={symbolUrl} alt={icon.symbol?.id ?? "symbol"} color={symbolTint} size={config.image} />
+          </div>
+        )}
       </div>
 
-      {size === "lg" && (
+      {normalizedSize === "lg" && (
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {icon.layers.base && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.layers.base}</span>}
-            {icon.layers.symbol && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.layers.symbol}</span>}
+            {icon.base?.id && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.base.id}</span>}
+            {icon.symbol?.id && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.symbol.id}</span>}
           </div>
         </div>
       )}

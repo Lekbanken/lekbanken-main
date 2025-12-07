@@ -56,12 +56,18 @@ export function AchievementLibraryCard({ achievement, theme, onEdit, isSelected 
         <div className="flex items-center justify-center rounded-xl border border-dashed border-border/50 bg-gradient-to-br from-muted/30 to-muted/10 p-4">
           <BadgePreviewEnhanced
             icon={achievement.icon}
-            colors={{
-              base: achievement.icon.customColors?.base || theme?.colors.base.color || "#8661ff",
-              background: achievement.icon.customColors?.background || theme?.colors.background.color || "#00c7b0",
-              foreground: achievement.icon.customColors?.foreground || theme?.colors.foreground.color || "#ffd166",
-              symbol: achievement.icon.customColors?.symbol || theme?.colors.symbol.color || "#ffffff",
-            }}
+            theme={
+              theme
+                ? { colors: theme.colors }
+                : {
+                    colors: {
+                      base: { color: "#8661ff" },
+                      background: { color: "#00c7b0" },
+                      foreground: { color: "#ffd166" },
+                      symbol: { color: "#ffffff" },
+                    },
+                  }
+            }
             size="md"
           />
         </div>

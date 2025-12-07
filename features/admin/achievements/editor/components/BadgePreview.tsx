@@ -10,9 +10,17 @@ type BadgePreviewProps = {
 };
 
 export function BadgePreview({ icon, colors, size = "md" }: BadgePreviewProps) {
+  const pseudoTheme = {
+    colors: {
+      base: { color: colors.base },
+      background: { color: colors.background },
+      foreground: { color: colors.foreground },
+      symbol: { color: colors.symbol },
+    },
+  };
   return (
     <div className="flex items-center justify-center">
-      <BadgePreviewEnhanced icon={icon} colors={colors} size={size} showGlow />
+      <BadgePreviewEnhanced icon={icon} theme={pseudoTheme} size={size} showGlow />
     </div>
   );
 }

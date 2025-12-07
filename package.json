@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "upload:utmarkelser": "ts-node scripts/upload-utmarkelser.ts",
-    "sync:utmarkelser:local": "ts-node scripts/sync-utmarkelser-local.ts"
+    "upload:utmarkelser": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/upload-utmarkelser.ts",
+    "sync:utmarkelser:local": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-utmarkelser-local.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

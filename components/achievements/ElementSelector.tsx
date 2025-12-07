@@ -4,8 +4,9 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAchievementBuilderStore } from './store'
-import { BaseType, DecorationType, SymbolType, ColorConfig, ColorToken } from '@/types/achievements-builder'
+import { BaseType, DecorationType, SymbolType, ColorConfig } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
+import { ColorSelector } from './ColorSelector'
 import {
   CircleBase,
   ShieldBase,
@@ -46,44 +47,10 @@ const decorationOptions: { type: DecorationType; label: string; Icon: React.Comp
   { type: 'crown', label: 'Krona', Icon: CrownDecoration },
 ]
 
-const colorTokens: { token: ColorToken; label: string }[] = [
-  { token: 'gold', label: 'Guld' },
-  { token: 'silver', label: 'Silver' },
-  { token: 'bronze', label: 'Brons' },
-  { token: 'onyx', label: 'Onyx' },
-]
-
-function ColorChips({
-  value,
-  onChange,
-}: {
-  value: ColorConfig
-  onChange: (config: ColorConfig) => void
-}) {
-  return (
-    <div className="flex gap-1">
-      {colorTokens.map(({ token }) => {
-        const isActive = value.mode === 'token' && value.token === token
-        return (
-          <button
-            key={token}
-            onClick={() => onChange({ mode: 'token', token })}
-            className={cn(
-              'h-5 w-5 rounded-full ring-1 transition-transform hover:scale-110',
-              isActive ? 'ring-2 ring-primary' : 'ring-black/10'
-            )}
-            style={{ backgroundColor: tokenToHex(token) }}
-            title={token}
-          />
-        )
-      })}
-    </div>
-  )
-}
-
 export function BaseSelector() {
   const base = useAchievementBuilderStore((s) => s.state.base)
   const setBase = useAchievementBuilderStore((s) => s.setBase)
+  const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
 
   return (
     <div className="space-y-4">
@@ -117,30 +84,13 @@ export function BaseSelector() {
         </div>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">Basfärg</label>
-        <div className="flex flex-wrap gap-2">
-          {colorTokens.map(({ token, label }) => {
-            const isActive = base.color.mode === 'token' && base.color.token === token
-            return (
-              <button
-                key={token}
-                onClick={() => setBase({ ...base, color: { mode: 'token', token } })}
-                className={cn(
-                  'flex items-center gap-2 rounded-lg border px-3 py-2 transition-all hover:scale-105',
-                  isActive ? 'border-primary bg-primary/5' : 'border-border bg-card'
-                )}
-              >
-                <div
-                  className="h-5 w-5 rounded-full shadow-sm ring-1 ring-black/10"
-                  style={{ backgroundColor: tokenToHex(token) }}
-                />
-                <span className="text-xs font-medium text-muted-foreground">{label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
+
+      <ColorSelector
+        value={base.color}
+        onChange={(color) => setBase({ ...base, color })}
+        currentTheme={currentTheme}
+        label="Basfärg"
+      />
     </div>
   )
 }
@@ -148,6 +98,7 @@ export function BaseSelector() {
 export function SymbolSelector() {
   const symbol = useAchievementBuilderStore((s) => s.state.symbol)
   const setSymbol = useAchievementBuilderStore((s) => s.setSymbol)
+  const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
 
   return (
     <div className="space-y-4">
@@ -181,30 +132,13 @@ export function SymbolSelector() {
         </div>
       </div>
 
-      <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">Symbolfärg</label>
-        <div className="flex flex-wrap gap-2">
-          {colorTokens.map(({ token, label }) => {
-            const isActive = symbol.color.mode === 'token' && symbol.color.token === token
-            return (
-              <button
-                key={token}
-                onClick={() => setSymbol({ ...symbol, color: { mode: 'token', token } })}
-                className={cn(
-                  'flex items-center gap-2 rounded-lg border px-3 py-2 transition-all hover:scale-105',
-                  isActive ? 'border-primary bg-primary/5' : 'border-border bg-card'
-                )}
-              >
-                <div
-                  className="h-5 w-5 rounded-full shadow-sm ring-1 ring-black/10"
-                  style={{ backgroundColor: tokenToHex(token) }}
-                />
-                <span className="text-xs font-medium text-muted-foreground">{label}</span>
-              </button>
-            )
-          })}
-        </div>
-      </div>
+
+      <ColorSelector
+        value={symbol.color}
+        onChange={(color) => setSymbol({ ...symbol, color })}
+        currentTheme={currentTheme}
+        label="Symbolf?rg"
+      />
     </div>
   )
 }
@@ -217,6 +151,7 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
   const setItems = useAchievementBuilderStore((s) =>
     position === 'back' ? s.setBackDecorations : s.setFrontDecorations
   )
+  const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
 
   function addItem(type: DecorationType) {
     const next = [...items, { type, color: { mode: 'token' as const, token: 'gold' as const }, position }]
@@ -224,10 +159,8 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
     setIsAdding(false)
   }
 
-  function updateColor(idx: number, token: ColorToken) {
-    const next = items.map((item, i) =>
-      i === idx ? { ...item, color: { mode: 'token' as const, token } } : item
-    )
+  function updateColor(idx: number, color: ColorConfig) {
+    const next = items.map((item, i) => (i === idx ? { ...item, color } : item))
     setItems(next)
   }
 
@@ -289,13 +222,11 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
               {Icon && <Icon color={color} size={40} />}
               <div className="flex-1 space-y-1">
                 <span className="text-sm font-medium text-foreground">{decoration?.label}</span>
-                <ColorChips
+                <ColorSelector
                   value={item.color}
-                  onChange={(config) => {
-                    if (config.mode === 'token') {
-                      updateColor(idx, config.token)
-                    }
-                  }}
+                  onChange={(color) => updateColor(idx, color)}
+                  currentTheme={currentTheme}
+                  compact
                 />
               </div>
               {item.type === 'stars' && (

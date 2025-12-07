@@ -45,6 +45,7 @@ export function AchievementBuilder() {
   const state = useAchievementBuilderStore((s) => s.state)
   const setProfileFrameEnabled = useAchievementBuilderStore((s) => s.setProfileFrameEnabled)
   const [activeTab, setActiveTab] = useState('theme')
+  const [previewSize, setPreviewSize] = useState<'sm' | 'md' | 'lg'>('md')
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -73,7 +74,7 @@ export function AchievementBuilder() {
                 <ThemeSelector />
                 <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4">
                   <p className="text-xs text-muted-foreground">
-                    Tips: Valj ett tema som passar din achievement. Temafarger paverkar hur temafarger visas i preview.
+                    Tips: Välj ett tema som passar din achievement. Temafärger påverkar hur färger visas i preview.
                   </p>
                 </div>
               </div>
@@ -135,9 +136,12 @@ export function AchievementBuilder() {
                 {['sm', 'md', 'lg'].map((size) => (
                   <button
                     key={size}
+                    onClick={() => setPreviewSize(size as 'sm' | 'md' | 'lg')}
                     className={cn(
                       'rounded-md px-2 py-1 text-xs font-medium transition-colors',
-                      size === 'md' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+                      previewSize === size
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
                     {size.toUpperCase()}
@@ -147,7 +151,7 @@ export function AchievementBuilder() {
             </div>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center p-8">
-            <AchievementPreview state={state} size="lg" />
+            <AchievementPreview state={state} size={previewSize} />
             
             {/* Layer info */}
             <div className="mt-6 w-full space-y-2">

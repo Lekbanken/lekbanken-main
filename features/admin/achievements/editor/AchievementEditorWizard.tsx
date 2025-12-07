@@ -17,6 +17,8 @@ import { useBadgeHistory } from './hooks/useBadgeHistory';
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
+  ArrowUturnLeftIcon,
+  ArrowUturnRightIcon,
   CheckIcon,
   SparklesIcon,
   SwatchIcon,
@@ -32,15 +34,15 @@ type AchievementEditorWizardProps = {
 };
 
 const WIZARD_STEPS: WizardStep[] = [
-  { id: 0, name: 'Lagerval', description: 'Välj form och lager' },
-  { id: 1, name: 'Tema & Färger', description: 'Anpassa färger' },
+  { id: 0, name: 'Lagerval', description: 'Valj form och lager' },
+  { id: 1, name: 'Tema & Farger', description: 'Anpassa farger' },
   { id: 2, name: 'Metadata', description: 'Namn och beskrivning' },
   { id: 3, name: 'Publicering', description: 'Granska och spara' },
 ];
 
 /**
  * Wizard-based Badge Editor
- * 4 steps: Lagerval → Tema & Färger → Metadata → Publicering
+ * 4 steps: Lagerval -> Tema & Farger -> Metadata -> Publicering
  */
 export function AchievementEditorWizard({
   draft,
@@ -143,7 +145,7 @@ export function AchievementEditorWizard({
         <div className="sticky top-4 space-y-4">
           {/* Preview Mode Toggle */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">Förhandsvisning</h3>
+            <h3 className="text-sm font-medium text-foreground">Forhandsvisning</h3>
             <PreviewModeToggle mode={previewMode} onChange={setPreviewMode} />
           </div>
 
@@ -156,7 +158,7 @@ export function AchievementEditorWizard({
                 name: draft.title,
                 description: draft.description || '',
                 points: draft.rewardCoins || 0,
-                category: 'Utmärkelse',
+                category: 'Utmarkelse',
               }}
               showAsRing={previewMode === 'ring'}
               backgroundColor={previewBackground}
@@ -177,17 +179,19 @@ export function AchievementEditorWizard({
               type="button"
               onClick={undo}
               disabled={!canUndo}
-              className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
             >
-              ↩️ Ångra
+              <ArrowUturnLeftIcon className="h-4 w-4" />
+              Angra
             </button>
             <button
               type="button"
               onClick={redo}
               disabled={!canRedo}
-              className="flex-1 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
+              className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
             >
-              ↪️ Gör om
+              <ArrowUturnRightIcon className="h-4 w-4" />
+              Gor om
             </button>
           </div>
         </div>
@@ -223,7 +227,7 @@ export function AchievementEditorWizard({
               onClick={goNext}
               className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              Nästa
+              Nasta
               <ArrowRightIcon className="h-4 w-4" />
             </button>
           ) : (
@@ -268,13 +272,13 @@ function LayerStep({ draft, updateIcon, currentTheme, randomizeAll, onLoadPreset
         <div>
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <SparklesIcon className="h-5 w-5 text-primary" />
-            Välj lager
+            Valj lager
           </h2>
           <p className="text-sm text-muted-foreground">
-            Bygg din badge genom att välja bas, bakgrund, förgrund och symbol
+            Bygg din badge genom att valja bas, bakgrund, forgrund och symbol
           </p>
         </div>
-        <RandomizeButton onClick={randomizeAll} label="🎲 Slumpa allt" />
+        <RandomizeButton onClick={randomizeAll} label="Slumpa allt" />
       </div>
 
       {/* Layer Dropdowns */}
@@ -282,7 +286,7 @@ function LayerStep({ draft, updateIcon, currentTheme, randomizeAll, onLoadPreset
         {/* Base - single select */}
         <LayerDropdownSelector
           label="Bas (form)"
-          description="Huvudformen för din badge"
+          description="Huvudformen for din badge"
           type="base"
           assets={baseAssets}
           selectedId={draft.icon.base?.id}
@@ -302,8 +306,8 @@ function LayerStep({ draft, updateIcon, currentTheme, randomizeAll, onLoadPreset
 
         {/* Foregrounds - multi select */}
         <LayerDropdownSelector
-          label="Förgrund (0-2 lager)"
-          description="Dekorationer framför basen"
+          label="Forgrund (0-2 lager)"
+          description="Dekorationer framfor basen"
           type="foreground"
           assets={fgAssets}
           multiSelect
@@ -335,7 +339,7 @@ function LayerStep({ draft, updateIcon, currentTheme, randomizeAll, onLoadPreset
 }
 
 // ============================================================================
-// STEP 2: TEMA & FÄRGER
+// STEP 2: TEMA & FARGER
 // ============================================================================
 
 type ColorStepProps = {
@@ -373,13 +377,13 @@ function ColorStep({ draft, updateIcon, currentTheme, randomizeColors }: ColorSt
         <div>
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <SwatchIcon className="h-5 w-5 text-primary" />
-            Tema & Färger
+            Tema & Farger
           </h2>
           <p className="text-sm text-muted-foreground">
-            Anpassa färger för varje lager i din badge
+            Anpassa farger for varje lager i din badge
           </p>
         </div>
-        <RandomizeButton onClick={randomizeColors} label="🎲 Slumpa färger" />
+        <RandomizeButton onClick={randomizeColors} label="Slumpa farger" />
       </div>
 
       {/* Theme selector (quick presets) */}
@@ -407,7 +411,7 @@ function ColorStep({ draft, updateIcon, currentTheme, randomizeColors }: ColorSt
 
       {/* Individual layer colors */}
       <div className="space-y-3">
-        <p className="text-sm font-medium text-foreground">Anpassade färger per lager</p>
+        <p className="text-sm font-medium text-foreground">Anpassade farger per lager</p>
 
         {/* Base color */}
         {draft.icon.base && (
@@ -436,7 +440,7 @@ function ColorStep({ draft, updateIcon, currentTheme, randomizeColors }: ColorSt
         {draft.icon.foregrounds?.map((fg, idx) => (
           <ColorInputWithPicker
             key={`fg-${idx}`}
-            label={`Förgrund ${idx + 1}`}
+            label={`Forgrund ${idx + 1}`}
             value={fg.color || currentTheme.colors.foreground.color}
             onChange={(color) => updateStackColor('foregrounds', idx, color)}
             layerPreviewSrc={resolveAssetUrl(fg.id, 'sm')}
@@ -483,7 +487,7 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
           Metadata
         </h2>
         <p className="text-sm text-muted-foreground">
-          Beskriv din badge med namn, beskrivning och belöning
+          Beskriv din badge med namn, beskrivning och beloning
         </p>
       </div>
 
@@ -498,7 +502,7 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
             type="text"
             value={draft.title}
             onChange={(e) => updateDraft({ title: e.target.value })}
-            placeholder="T.ex. Stjärnskott"
+            placeholder="T.ex. Stjarnskott"
             className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -510,7 +514,7 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
             type="text"
             value={draft.subtitle || ''}
             onChange={(e) => updateDraft({ subtitle: e.target.value })}
-            placeholder="T.ex. Första steget"
+            placeholder="T.ex. Forsta steget"
             className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -521,7 +525,7 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
           <textarea
             value={draft.description || ''}
             onChange={(e) => updateDraft({ description: e.target.value })}
-            placeholder="Beskriv hur man uppnår denna badge..."
+            placeholder="Beskriv hur man uppnar denna badge..."
             rows={3}
             className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
           />
@@ -529,7 +533,7 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
 
         {/* Reward coins */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-foreground">Belöning (coins)</label>
+          <label className="text-sm font-medium text-foreground">Beloning (coins)</label>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -539,10 +543,10 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
               step={10}
               className="w-32 px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
             />
-            <span className="text-sm text-muted-foreground">🪙 coins</span>
+            <span className="text-sm text-muted-foreground">coins</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            💡 Tips: 10-50 för vanliga, 100-500 för sällsynta badges
+            Tips: 10-50 for vanliga, 100-500 for sallsynta badges
           </p>
         </div>
       </div>
@@ -583,8 +587,8 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
             <span className="font-medium">{draft.title || '(inget namn)'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Belöning:</span>
-            <span className="font-medium">🪙 {draft.rewardCoins || 0} coins</span>
+            <span className="text-muted-foreground">Beloning:</span>
+            <span className="font-medium">{draft.rewardCoins || 0} coins</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Lager:</span>
@@ -617,7 +621,7 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
               }
             `}
           >
-            📝 Utkast
+            Utkast
           </button>
           <button
             type="button"
@@ -630,7 +634,7 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
               }
             `}
           >
-            ✅ Publicerad
+            Publicerad
           </button>
         </div>
       </div>
@@ -654,7 +658,7 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
           <span className="text-sm font-medium text-foreground">Synka till profilram</span>
         </label>
         <p className="text-xs text-muted-foreground pl-6">
-          Låt användare använda denna badge som profilram
+          Lat anvandare anvanda denna badge som profilram
         </p>
       </div>
 
@@ -665,12 +669,12 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
         disabled={isSaving || !draft.title}
         className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
       >
-        {isSaving ? '⏳ Sparar...' : '💾 Spara badge'}
+        {isSaving ? 'Sparar...' : 'Spara badge'}
       </button>
 
       {!draft.title && (
         <p className="text-center text-sm text-red-500">
-          ⚠️ Du måste ange ett namn för att spara
+          Du maste ange ett namn for att spara
         </p>
       )}
     </div>

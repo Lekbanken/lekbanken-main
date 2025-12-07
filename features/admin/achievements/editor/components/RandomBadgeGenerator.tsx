@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { getAssetsByType } from '../../assets';
 import { AchievementIconConfig, AchievementAssetType } from '../../types';
 
@@ -189,7 +190,8 @@ export function RandomizeButton({ onClick, label = 'Slumpa', small = false }: Ra
       `}
       title={label}
     >
-      🎲 {label}
+      <ArrowPathIcon className={small ? 'h-3 w-3' : 'h-4 w-4'} />
+      {label}
     </button>
   );
 }

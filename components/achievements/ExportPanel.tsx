@@ -19,6 +19,7 @@ const RARITY_OPTIONS: { value: Rarity; label: string; color: string }[] = [
 
 export function ExportPanel() {
   const exportAchievement = useAchievementBuilderStore((s) => s.exportAchievement)
+  const [createdBy, setCreatedBy] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [rarity, setRarity] = useState<Rarity>('common')
@@ -28,7 +29,7 @@ export function ExportPanel() {
 
   function handleExport() {
     const data = exportAchievement({
-      createdBy: 'demo-user',
+      createdBy: createdBy || 'demo-user',
       name: name || undefined,
       description: description || undefined,
       rarity,
@@ -40,7 +41,7 @@ export function ExportPanel() {
     if (!json) {
       handleExport()
     }
-    const data = json || JSON.stringify(exportAchievement({ createdBy: 'demo-user', name, description, rarity }), null, 2)
+    const data = json || JSON.stringify(exportAchievement({ createdBy: createdBy || 'demo-user', name, description, rarity }), null, 2)
     navigator.clipboard.writeText(data)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
@@ -57,6 +58,17 @@ export function ExportPanel() {
       {/* Metadata */}
       <div className="space-y-4">
         <h3 className="text-sm font-semibold text-foreground">Metadata</h3>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Skapad av</label>
+          <input
+            type="text"
+            value={createdBy}
+            onChange={(e) => setCreatedBy(e.target.value)}
+            placeholder="Ange skapare/anv?ndare..."
+            className="w-full rounded-lg border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+          />
+        </div>
 
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground">Namn</label>
@@ -110,7 +122,7 @@ export function ExportPanel() {
             </svg>
             Generera JSON
           </Button>
-          <Button variant="outline" onClick={handleCopy} disabled={!json}>
+          <Button variant="outline" onClick={handleCopy}>
             {copied ? (
               <>
                 <svg className="mr-1 h-4 w-4 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">

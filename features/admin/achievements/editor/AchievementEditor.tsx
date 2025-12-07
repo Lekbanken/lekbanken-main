@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { AchievementItem, AchievementTheme } from "../types";
 import { AchievementEditorWizard } from "./AchievementEditorWizard";
 
@@ -33,7 +34,7 @@ export function AchievementEditor({ value, themes, onChange, onCancel }: Achieve
         className="absolute -top-2 -right-2 z-10 p-2 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
         title="Avbryt"
       >
-        ✕
+        <XMarkIcon className="h-5 w-5" />
       </button>
       
       <AchievementEditorWizard

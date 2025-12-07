@@ -37,8 +37,9 @@ export function AdminShell({ children }: AdminShellProps) {
       userRole,
       tenantId: currentTenant?.id,
       hasTenants,
+      isLoadingTenants,
     });
-  }, [isLoading, user, userRole, currentTenant?.id, hasTenants]);
+  }, [isLoading, user, userRole, currentTenant?.id, hasTenants, isLoadingTenants]);
 
   const handleLogin = () => router.replace("/auth/login?redirect=/admin");
   const handleReset = async () => {
@@ -46,7 +47,14 @@ export function AdminShell({ children }: AdminShellProps) {
     handleLogin();
   };
 
-  if (isLoading || isLoadingTenants) {
+  // Superadmin/admin har alltid tillgång, behöver inte vänta på tenants
+  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+
+  // Om auth fortfarande laddar, visa laddning
+  // Men om vi är admin/superadmin, behöver vi inte vänta på tenants
+  const stillLoading = isLoading || (!isGlobalAdmin && isLoadingTenants);
+
+  if (stillLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         <div className="text-center space-y-2">
@@ -77,8 +85,7 @@ export function AdminShell({ children }: AdminShellProps) {
     );
   }
 
-  // Superadmin har alltid tillgång, andra kräver tenant
-  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+  // Andra roller kräver tenant
   const needsTenant = !isGlobalAdmin && !hasTenants && !isLoadingTenants;
   const noAdminRole = isRoleResolved && !isGlobalAdmin;
 

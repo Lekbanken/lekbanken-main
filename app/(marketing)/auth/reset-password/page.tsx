@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import Link from 'next/link'
 import { LanguageSwitcher } from '@/components/navigation/LanguageSwitcher'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
 import { Button } from '@/components/ui/button'

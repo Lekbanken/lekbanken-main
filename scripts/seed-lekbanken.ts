@@ -37,8 +37,10 @@ async function ensureTenant() {
 }
 
 async function ensureAdminUser() {
-  const { data: existing } = await supabase.auth.admin.getUserByEmail(ADMIN_EMAIL);
-  let adminId = existing?.user?.id;
+  // List users and find by email since getUserByEmail doesn't exist
+  const { data: userList } = await supabase.auth.admin.listUsers();
+  const existing = userList?.users?.find(u => u.email === ADMIN_EMAIL);
+  let adminId: string | undefined = existing?.id;
 
   if (!adminId) {
     const { data, error } = await supabase.auth.admin.createUser({
@@ -48,7 +50,7 @@ async function ensureAdminUser() {
       user_metadata: { full_name: "Lekbanken Admin" },
     });
     if (error) throw error;
-    adminId = data.user?.id || null;
+    adminId = data.user?.id;
   }
 
   if (!adminId) {

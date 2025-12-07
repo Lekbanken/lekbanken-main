@@ -20,7 +20,8 @@ type BadgeCardPreviewProps = {
   // Background colors
   circleBackground?: string;
   cardBackground?: string;
-  textColor?: 'dark' | 'gray' | 'light';
+  /** Text color as hex string (e.g. '#1F2937') */
+  textColor?: string;
 };
 
 const RARITY_CONFIG = {
@@ -61,26 +62,16 @@ const RARITY_CONFIG = {
   },
 };
 
-// Text color classes based on selection
-const TEXT_COLORS = {
-  dark: {
-    title: 'text-gray-900',
-    subtitle: 'text-gray-700',
-    description: 'text-gray-600',
-    muted: 'text-gray-500',
-  },
-  gray: {
-    title: 'text-gray-600',
-    subtitle: 'text-gray-500',
-    description: 'text-gray-400',
-    muted: 'text-gray-400',
-  },
-  light: {
-    title: 'text-white',
-    subtitle: 'text-gray-200',
-    description: 'text-gray-300',
-    muted: 'text-gray-400',
-  },
+// Text color classes based on selection - now using hex color directly
+// We'll compute opacity variants from the hex color
+const getTextColors = (hexColor: string) => {
+  // For fully custom colors, use inline styles with opacity
+  return {
+    title: hexColor,
+    subtitle: hexColor,
+    description: hexColor,
+    muted: hexColor,
+  };
 };
 
 /**
@@ -94,42 +85,60 @@ export function BadgeCardPreview({
   showAsRing = false,
   circleBackground = '#1F2937',
   cardBackground = '#FFFFFF',
-  textColor = 'dark',
+  textColor = '#1F2937',
 }: BadgeCardPreviewProps) {
   const rarity = metadata.rarity || 'common';
   const rarityConfig = RARITY_CONFIG[rarity];
-  const colors = TEXT_COLORS[textColor];
+  const colors = getTextColors(textColor);
 
   // Check if circle background is transparent
   const isCircleTransparent = circleBackground === 'transparent' || circleBackground === '';
 
   if (showAsRing) {
-    // Simple ring/circle view - only circle has background, not the whole area
+    // Simple ring/circle view - badge on checkered background
     return (
       <div className="flex items-center justify-center rounded-2xl p-8 bg-[repeating-conic-gradient(#e5e7eb_0_90deg,#f3f4f6_90deg_180deg)] bg-[length:20px_20px]">
         <div className="relative">
-          {/* Circle background */}
-          <div
-            className="rounded-full p-4 transition-colors"
-            style={{ 
-              backgroundColor: isCircleTransparent ? 'transparent' : circleBackground,
-            }}
-          >
-            {/* Glow effect for higher rarities */}
-            {rarity !== 'common' && rarity !== 'uncommon' && (
-              <div
-                className={`absolute inset-0 rounded-full blur-xl opacity-30 ${rarityConfig.glow}`}
-                style={{
-                  background: rarity === 'legendary' 
-                    ? 'radial-gradient(circle, #F59E0B 0%, transparent 70%)'
-                    : rarity === 'epic'
-                    ? 'radial-gradient(circle, #8B5CF6 0%, transparent 70%)'
-                    : 'radial-gradient(circle, #3B82F6 0%, transparent 70%)',
-                }}
-              />
-            )}
-            <BadgePreviewEnhanced icon={icon} theme={theme} size="lg" showGlow={false} />
-          </div>
+          {/* Circle background - only show if not transparent */}
+          {!isCircleTransparent ? (
+            <div
+              className="rounded-full p-4 transition-colors"
+              style={{ backgroundColor: circleBackground }}
+            >
+              {/* Glow effect for higher rarities */}
+              {rarity !== 'common' && rarity !== 'uncommon' && (
+                <div
+                  className={`absolute inset-0 rounded-full blur-xl opacity-30 ${rarityConfig.glow}`}
+                  style={{
+                    background: rarity === 'legendary' 
+                      ? 'radial-gradient(circle, #F59E0B 0%, transparent 70%)'
+                      : rarity === 'epic'
+                      ? 'radial-gradient(circle, #8B5CF6 0%, transparent 70%)'
+                      : 'radial-gradient(circle, #3B82F6 0%, transparent 70%)',
+                  }}
+                />
+              )}
+              <BadgePreviewEnhanced icon={icon} theme={theme} size="lg" showGlow={false} />
+            </div>
+          ) : (
+            /* Transparent - show badge directly without extra circle container */
+            <>
+              {/* Glow effect for higher rarities */}
+              {rarity !== 'common' && rarity !== 'uncommon' && (
+                <div
+                  className={`absolute inset-0 rounded-full blur-xl opacity-30 ${rarityConfig.glow}`}
+                  style={{
+                    background: rarity === 'legendary' 
+                      ? 'radial-gradient(circle, #F59E0B 0%, transparent 70%)'
+                      : rarity === 'epic'
+                      ? 'radial-gradient(circle, #8B5CF6 0%, transparent 70%)'
+                      : 'radial-gradient(circle, #3B82F6 0%, transparent 70%)',
+                  }}
+                />
+              )}
+              <BadgePreviewEnhanced icon={icon} theme={theme} size="lg" showGlow={false} />
+            </>
+          )}
         </div>
       </div>
     );
@@ -163,29 +172,37 @@ export function BadgeCardPreview({
           </div>
         </div>
 
-        {/* Info */}
-        <div className="flex-1 min-w-0 space-y-1">
-          <h3 className={`font-bold truncate text-lg leading-tight ${colors.title}`}>
+        {/* Info - centered text */}
+        <div className="flex-1 min-w-0 flex flex-col justify-center space-y-1">
+          <h3 
+            className="font-bold truncate text-lg leading-tight"
+            style={{ color: colors.title }}
+          >
             {metadata.name || 'Namnlös utmärkelse'}
           </h3>
           
           {metadata.subtitle && (
-            <p className={`text-sm ${colors.subtitle}`}>
+            <p 
+              className="text-sm"
+              style={{ color: colors.subtitle, opacity: 0.85 }}
+            >
               {metadata.subtitle}
             </p>
           )}
           
-          <p className={`text-sm line-clamp-2 ${colors.description}`}>
+          <p 
+            className="text-sm line-clamp-2"
+            style={{ color: colors.description, opacity: 0.75 }}
+          >
             {metadata.description || 'Ingen beskrivning'}
           </p>
-
-          {/* Points */}
-          <div className="flex items-center gap-1 text-sm pt-1">
-            <CurrencyDollarIcon className="h-4 w-4 text-amber-500" />
-            <span className="font-semibold text-amber-600">{metadata.points}</span>
-            <span className={`text-xs ${colors.muted}`}>coins</span>
-          </div>
         </div>
+      </div>
+      
+      {/* Coins badge - bottom right corner */}
+      <div className="absolute bottom-3 right-3 flex items-center gap-1 bg-amber-100 rounded-full px-2 py-0.5">
+        <CurrencyDollarIcon className="h-4 w-4 text-amber-600" />
+        <span className="font-bold text-amber-700 text-sm">{metadata.points}</span>
       </div>
     </div>
   );

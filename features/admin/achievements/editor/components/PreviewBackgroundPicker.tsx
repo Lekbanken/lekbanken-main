@@ -1,31 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 type PreviewBackgroundPickerProps = {
   value: string;
   onChange: (color: string) => void;
 };
 
-// Predefined backgrounds for circle
+// Predefined backgrounds for circle - with labels for button style
 const CIRCLE_BACKGROUNDS = [
   { color: 'transparent', label: 'Transparent' },
-  { color: '#1F2937', label: 'Mörk grå' },
+  { color: '#1F2937', label: 'Mörk' },
   { color: '#000000', label: 'Svart' },
   { color: '#FFFFFF', label: 'Vit' },
-  { color: '#F3F4F6', label: 'Ljus grå' },
-  { color: '#8661FF', label: 'Lila' },
-  { color: '#059669', label: 'Grön' },
+  { color: '#F3F4F6', label: 'Ljus' },
 ];
 
-// Predefined backgrounds for card
+// Predefined backgrounds for card - with labels for button style
 const CARD_BACKGROUNDS = [
   { color: '#FFFFFF', label: 'Vit' },
-  { color: '#F3F4F6', label: 'Ljus grå' },
-  { color: '#1F2937', label: 'Mörk grå' },
+  { color: '#F3F4F6', label: 'Ljus' },
+  { color: '#1F2937', label: 'Mörk' },
   { color: '#000000', label: 'Svart' },
-  { color: '#8661FF', label: 'Lila' },
-  { color: '#059669', label: 'Grön' },
+];
+
+// Text color presets
+const TEXT_COLOR_PRESETS = [
+  { color: '#1F2937', label: 'Mörk' },
+  { color: '#6B7280', label: 'Grå' },
+  { color: '#FFFFFF', label: 'Ljus' },
 ];
 
 /**
@@ -63,6 +66,7 @@ export function PreviewBackgroundPicker({ value, onChange }: PreviewBackgroundPi
 
 /**
  * Extended picker for circle background (includes transparent option)
+ * Uses button style with labels like text color picker
  */
 type CircleBackgroundPickerProps = {
   value: string;
@@ -70,6 +74,9 @@ type CircleBackgroundPickerProps = {
 };
 
 export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPickerProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isCustom = !CIRCLE_BACKGROUNDS.some(bg => bg.color === value);
+
   return (
     <div className="space-y-1.5">
       <span className="text-xs font-medium text-muted-foreground">Cirkelbakgrund:</span>
@@ -81,18 +88,51 @@ export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPick
             onClick={() => onChange(bg.color)}
             title={bg.label}
             className={`
-              w-7 h-7 rounded-lg border-2 transition-all
+              px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
               ${value === bg.color 
-                ? 'border-primary ring-2 ring-primary/20' 
-                : 'border-border/50 hover:border-border'
+                ? 'border-primary bg-primary/10 text-primary' 
+                : 'border-border text-muted-foreground hover:border-primary/50'
               }
-              ${bg.color === 'transparent' ? 'bg-[repeating-conic-gradient(#d1d5db_0_90deg,#e5e7eb_90deg_180deg)] bg-[length:8px_8px]' : ''}
             `}
-            style={bg.color !== 'transparent' ? { backgroundColor: bg.color } : undefined}
           >
-            <span className="sr-only">{bg.label}</span>
+            {bg.label}
           </button>
         ))}
+        
+        {/* Custom color picker */}
+        <div className="relative">
+          <input
+            ref={inputRef}
+            type="color"
+            value={isCustom && value !== 'transparent' ? value : '#808080'}
+            onChange={(e) => onChange(e.target.value.toUpperCase())}
+            className="absolute inset-0 opacity-0 cursor-pointer"
+          />
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            title="Välj egen färg"
+            className={`
+              px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
+              ${isCustom && value !== 'transparent'
+                ? 'border-primary bg-primary/10 text-primary' 
+                : 'border-dashed border-muted-foreground/50 hover:border-primary text-muted-foreground'
+              }
+            `}
+          >
+            {isCustom && value !== 'transparent' ? (
+              <>
+                <span 
+                  className="w-3 h-3 rounded-full border border-border/50"
+                  style={{ backgroundColor: value }}
+                />
+                Egen
+              </>
+            ) : (
+              'Egen...'
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -100,12 +140,13 @@ export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPick
 
 /**
  * Extended picker for card background with text color option
+ * Uses button style with labels (same as text color picker)
  */
 type CardBackgroundPickerProps = {
   cardBackground: string;
   onCardBackgroundChange: (color: string) => void;
-  textColor: 'dark' | 'gray' | 'light';
-  onTextColorChange: (color: 'dark' | 'gray' | 'light') => void;
+  textColor: string;
+  onTextColorChange: (color: string) => void;
 };
 
 export function CardBackgroundPicker({ 
@@ -114,11 +155,15 @@ export function CardBackgroundPicker({
   textColor,
   onTextColorChange,
 }: CardBackgroundPickerProps) {
-  const isLightBackground = ['#FFFFFF', '#F3F4F6'].includes(cardBackground);
+  const bgInputRef = useRef<HTMLInputElement>(null);
+  const textInputRef = useRef<HTMLInputElement>(null);
+  
+  const isCustomBg = !CARD_BACKGROUNDS.some(bg => bg.color === cardBackground);
+  const isCustomText = !TEXT_COLOR_PRESETS.some(tc => tc.color === textColor);
 
   return (
     <div className="space-y-3">
-      {/* Card Background */}
+      {/* Card Background - button style with labels */}
       <div className="space-y-1.5">
         <span className="text-xs font-medium text-muted-foreground">Kortbakgrund:</span>
         <div className="flex items-center gap-1.5 flex-wrap">
@@ -129,67 +174,112 @@ export function CardBackgroundPicker({
               onClick={() => onCardBackgroundChange(bg.color)}
               title={bg.label}
               className={`
-                w-7 h-7 rounded-lg border-2 transition-all
+                px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
                 ${cardBackground === bg.color 
-                  ? 'border-primary ring-2 ring-primary/20' 
-                  : 'border-border/50 hover:border-border'
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-border text-muted-foreground hover:border-primary/50'
                 }
               `}
-              style={{ backgroundColor: bg.color }}
             >
-              <span className="sr-only">{bg.label}</span>
+              {bg.label}
             </button>
           ))}
-        </div>
-      </div>
-
-      {/* Text Color - only show if non-light background */}
-      {!isLightBackground && (
-        <div className="space-y-1.5">
-          <span className="text-xs font-medium text-muted-foreground">Textfärg:</span>
-          <div className="flex items-center gap-2">
+          
+          {/* Custom color picker for background */}
+          <div className="relative">
+            <input
+              ref={bgInputRef}
+              type="color"
+              value={isCustomBg ? cardBackground : '#808080'}
+              onChange={(e) => onCardBackgroundChange(e.target.value.toUpperCase())}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
             <button
               type="button"
-              onClick={() => onTextColorChange('dark')}
+              onClick={() => bgInputRef.current?.click()}
+              title="Välj egen färg"
               className={`
-                px-2.5 py-1 rounded-md text-xs font-medium border transition-all
-                ${textColor === 'dark' 
+                px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
+                ${isCustomBg 
                   ? 'border-primary bg-primary/10 text-primary' 
-                  : 'border-border text-muted-foreground hover:border-primary/50'
+                  : 'border-dashed border-muted-foreground/50 hover:border-primary text-muted-foreground'
                 }
               `}
             >
-              Mörk
-            </button>
-            <button
-              type="button"
-              onClick={() => onTextColorChange('gray')}
-              className={`
-                px-2.5 py-1 rounded-md text-xs font-medium border transition-all
-                ${textColor === 'gray' 
-                  ? 'border-primary bg-primary/10 text-primary' 
-                  : 'border-border text-muted-foreground hover:border-primary/50'
-                }
-              `}
-            >
-              Grå
-            </button>
-            <button
-              type="button"
-              onClick={() => onTextColorChange('light')}
-              className={`
-                px-2.5 py-1 rounded-md text-xs font-medium border transition-all
-                ${textColor === 'light' 
-                  ? 'border-primary bg-primary/10 text-primary' 
-                  : 'border-border text-muted-foreground hover:border-primary/50'
-                }
-              `}
-            >
-              Ljus
+              {isCustomBg ? (
+                <>
+                  <span 
+                    className="w-3 h-3 rounded-full border border-border/50"
+                    style={{ backgroundColor: cardBackground }}
+                  />
+                  Egen
+                </>
+              ) : (
+                'Egen...'
+              )}
             </button>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Text Color - button style with labels */}
+      <div className="space-y-1.5">
+        <span className="text-xs font-medium text-muted-foreground">Textfärg:</span>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {TEXT_COLOR_PRESETS.map((tc) => (
+            <button
+              key={tc.color}
+              type="button"
+              onClick={() => onTextColorChange(tc.color)}
+              title={tc.label}
+              className={`
+                px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
+                ${textColor === tc.color 
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-border text-muted-foreground hover:border-primary/50'
+                }
+              `}
+            >
+              {tc.label}
+            </button>
+          ))}
+          
+          {/* Custom text color picker */}
+          <div className="relative">
+            <input
+              ref={textInputRef}
+              type="color"
+              value={isCustomText ? textColor : '#808080'}
+              onChange={(e) => onTextColorChange(e.target.value.toUpperCase())}
+              className="absolute inset-0 opacity-0 cursor-pointer"
+            />
+            <button
+              type="button"
+              onClick={() => textInputRef.current?.click()}
+              title="Välj egen textfärg"
+              className={`
+                px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
+                ${isCustomText 
+                  ? 'border-primary bg-primary/10 text-primary' 
+                  : 'border-dashed border-muted-foreground/50 hover:border-primary text-muted-foreground'
+                }
+              `}
+            >
+              {isCustomText ? (
+                <>
+                  <span 
+                    className="w-3 h-3 rounded-full border border-border/50"
+                    style={{ backgroundColor: textColor }}
+                  />
+                  Egen
+                </>
+              ) : (
+                'Egen...'
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { WizardStepIndicator, WizardStep } from './components/WizardStepIndicato
 import { LayerDropdownSelector } from './components/LayerDropdownSelector';
 import { ColorInputWithPicker } from './components/ColorInputWithPicker';
 import { BadgeCardPreview, PreviewModeToggle } from './components/BadgeCardPreview';
-import { PreviewBackgroundPickerExtended, CardBackgroundPicker } from './components/PreviewBackgroundPicker';
+import { CircleBackgroundPicker, CardBackgroundPicker } from './components/PreviewBackgroundPicker';
 import { ContrastTip } from './components/ContrastTip';
 import { RandomizeButton, useRandomBadge } from './components/RandomBadgeGenerator';
 import { PresetManager } from './components/PresetManager';
@@ -23,6 +23,7 @@ import {
   SwatchIcon,
   DocumentTextIcon,
   CloudArrowUpIcon,
+  CheckIcon,
 } from '@heroicons/react/24/outline';
 
 type AchievementEditorWizardProps = {
@@ -55,7 +56,7 @@ export function AchievementEditorWizard({
   // Preview settings
   const [circleBackground, setCircleBackground] = useState('#1F2937');
   const [cardBackground, setCardBackground] = useState('#FFFFFF');
-  const [textColor, setTextColor] = useState<'dark' | 'gray' | 'light'>('dark');
+  const [textColor, setTextColor] = useState('#1F2937');
 
   // History for undo/redo - using the full AchievementItem
   const { setState: setHistoryState, undo, redo, canUndo, canRedo } = useBadgeHistory(draft);
@@ -131,8 +132,6 @@ export function AchievementEditorWizard({
           <PublishStep
             draft={draft}
             updateDraft={updateDraft}
-            onSave={onSave}
-            isSaving={isSaving}
           />
         );
       default:
@@ -171,7 +170,7 @@ export function AchievementEditorWizard({
 
           {/* Background Pickers */}
           {previewMode === 'ring' ? (
-            <PreviewBackgroundPickerExtended
+            <CircleBackgroundPicker
               value={circleBackground}
               onChange={setCircleBackground}
             />
@@ -186,7 +185,7 @@ export function AchievementEditorWizard({
 
           {/* Circle background for card mode too */}
           {previewMode === 'card' && (
-            <PreviewBackgroundPickerExtended
+            <CircleBackgroundPicker
               value={circleBackground}
               onChange={setCircleBackground}
             />
@@ -251,18 +250,26 @@ export function AchievementEditorWizard({
               <ArrowRightIcon className="h-4 w-4" />
             </button>
           ) : (
-            /* On last step, show save draft button (no name required) */
+            /* On last step, show save button - text changes based on status */
             <button
               type="button"
-              onClick={() => {
-                // Force draft status and save
-                updateDraft({ status: 'draft' });
-                onSave();
-              }}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl border border-amber-500 text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50"
+              onClick={() => onSave()}
+              disabled={isSaving || (draft.status === 'published' && !draft.title)}
+              className={`
+                flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl disabled:opacity-50 transition-all
+                ${draft.status === 'published' 
+                  ? 'bg-gradient-to-r from-green-600 to-green-500 text-white hover:shadow-lg' 
+                  : 'border border-amber-500 text-amber-700 bg-amber-50 hover:bg-amber-100'
+                }
+              `}
             >
-              {isSaving ? 'Sparar...' : 'Spara som utkast'}
+              {isSaving 
+                ? 'Sparar...' 
+                : draft.status === 'published' 
+                  ? 'Publicera' 
+                  : 'Spara utkast'
+              }
+              <CheckIcon className="h-4 w-4" />
             </button>
           )}
         </div>
@@ -381,7 +388,11 @@ function ColorStep({ draft, updateIcon, currentTheme, randomizeColors }: ColorSt
   const updateLayerColor = (layerType: 'base' | 'symbol', color: string) => {
     const layer = draft.icon[layerType];
     if (layer) {
-      updateIcon({ [layerType]: { ...layer, color } });
+      // When manually changing colors, switch to custom mode
+      updateIcon({ 
+        [layerType]: { ...layer, color },
+        mode: 'custom',
+      });
     }
   };
 
@@ -390,7 +401,11 @@ function ColorStep({ draft, updateIcon, currentTheme, randomizeColors }: ColorSt
     if (stack && stack[index]) {
       const newStack = [...stack];
       newStack[index] = { ...newStack[index], color };
-      updateIcon({ [stackType]: newStack });
+      // When manually changing colors, switch to custom mode
+      updateIcon({ 
+        [stackType]: newStack,
+        mode: 'custom',
+      });
     }
   };
 
@@ -627,11 +642,9 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
 type PublishStepProps = {
   draft: AchievementItem;
   updateDraft: (updates: Partial<AchievementItem>) => void;
-  onSave: () => void;
-  isSaving: boolean;
 };
 
-function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps) {
+function PublishStep({ draft, updateDraft }: PublishStepProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -728,24 +741,10 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
         </p>
       </div>
 
-      {/* Publish button (large) - requires name */}
-      <button
-        type="button"
-        onClick={() => {
-          updateDraft({ status: 'published' });
-          onSave();
-        }}
-        disabled={isSaving || !draft.title}
-        className="w-full py-4 rounded-2xl bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-      >
-        {isSaving ? 'Publicerar...' : 'Publicera utmärkelse'}
-      </button>
-
-      {!draft.title && draft.status === 'published' && (
-        <p className="text-center text-sm text-amber-600">
-          Du måste ange ett namn för att publicera. Du kan fortfarande spara som utkast.
-        </p>
-      )}
+      {/* Info text about save */}
+      <p className="text-center text-sm text-muted-foreground">
+        Klicka på &quot;{draft.status === 'published' ? 'Publicera' : 'Spara utkast'}&quot; i navigeringen för att spara.
+      </p>
     </div>
   );
 }

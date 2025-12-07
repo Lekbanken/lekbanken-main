@@ -2,13 +2,19 @@
 
 import { useMemo, useState } from "react";
 import { Button, Badge } from "@/components/ui";
-import { AchievementItem, AchievementLayer, AchievementLayerType, AchievementTheme } from "../types";
+import {
+  AchievementAssetSize,
+  AchievementAssetType,
+  AchievementItem,
+  AchievementTheme,
+} from "../types";
 import { BadgePreviewEnhanced } from "./components/BadgePreviewEnhanced";
 import { ThemeSelectorEnhanced } from "./components/ThemeSelectorEnhanced";
 import { ColorControlsEnhanced } from "./components/ColorControlsEnhanced";
 import { LayerSelectorEnhanced } from "./components/LayerSelectorEnhanced";
 import { MetadataFormEnhanced } from "./components/MetadataFormEnhanced";
 import { PublishingControls } from "./components/PublishingControls";
+import { getAssetsByType } from "../assets";
 import {
   SwatchIcon,
   Square3Stack3DIcon,
@@ -19,27 +25,68 @@ import {
 type AchievementEditorPanelProps = {
   value: AchievementItem;
   themes: AchievementTheme[];
-  layers: AchievementLayer[];
   onChange: (value: AchievementItem) => void;
   onCancel: () => void;
 };
 
-export function AchievementEditorPanel({ value, themes, layers, onChange, onCancel }: AchievementEditorPanelProps) {
-  const [draft, setDraft] = useState<AchievementItem>(value);
-  const [previewSize, setPreviewSize] = useState<'sm' | 'md' | 'lg'>('lg');
+const defaultColors = {
+  base: "#8661ff",
+  background: "#00c7b0",
+  foreground: "#ffd166",
+  symbol: "#ffffff",
+};
+
+export function AchievementEditorPanel({ value, themes, onChange, onCancel }: AchievementEditorPanelProps) {
+  const [draft, setDraft] = useState<AchievementItem>({
+    ...value,
+    icon: value.icon || { mode: "theme", themeId: themes[0]?.id, size: "lg", layers: {} },
+  });
+  const [previewSize, setPreviewSize] = useState<AchievementAssetSize>(value.icon.size || "lg");
 
   const themeMap = useMemo(() => Object.fromEntries(themes.map((t) => [t.id, t])), [themes]);
-  const currentTheme = draft.themeId ? themeMap[draft.themeId] : undefined;
+  const currentTheme = draft.icon.themeId ? themeMap[draft.icon.themeId] : undefined;
 
-  const handleLayerChange = (type: AchievementLayerType, id: string) => {
-    setDraft((prev) => ({ ...prev, layers: { ...prev.layers, [type]: id } }));
-  };
-
-  const handleColorChange = (colors: { base: string; background: string; foreground: string; symbol: string }) => {
+  const handleLayerChange = (type: AchievementAssetType, id: string) => {
     setDraft((prev) => ({
       ...prev,
-      themeId: undefined,
-      customColors: colors,
+      icon: {
+        ...prev.icon,
+        layers: { ...prev.icon.layers, [type]: id || undefined },
+      },
+    }));
+  };
+
+  const handleColorChange = (colors: Partial<Record<AchievementAssetType, string>>) => {
+    setDraft((prev) => ({
+      ...prev,
+      icon: {
+        ...prev.icon,
+        mode: "custom",
+        customColors: { ...prev.icon.customColors, ...colors },
+      },
+    }));
+  };
+
+  const handleModeChange = (mode: "theme" | "custom") => {
+    setDraft((prev) => ({
+      ...prev,
+      icon: {
+        ...prev.icon,
+        mode,
+        ...(mode === "theme" ? { customColors: undefined } : {}),
+      },
+    }));
+  };
+
+  const handleThemeChange = (themeId: string) => {
+    setDraft((prev) => ({
+      ...prev,
+      icon: {
+        ...prev.icon,
+        themeId,
+        mode: "theme",
+        customColors: undefined,
+      },
     }));
   };
 
@@ -52,10 +99,10 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
   };
 
   const currentColors = {
-    base: draft.customColors?.base || currentTheme?.baseColor || "#8661ff",
-    background: draft.customColors?.background || currentTheme?.backgroundColor || "#00c7b0",
-    foreground: draft.customColors?.foreground || currentTheme?.foregroundColor || "#ffd166",
-    symbol: draft.customColors?.symbol || currentTheme?.symbolColor || "#ffffff",
+    base: draft.icon.customColors?.base || currentTheme?.colors.base.color || defaultColors.base,
+    background: draft.icon.customColors?.background || currentTheme?.colors.background.color || defaultColors.background,
+    foreground: draft.icon.customColors?.foreground || currentTheme?.colors.foreground.color || defaultColors.foreground,
+    symbol: draft.icon.customColors?.symbol || currentTheme?.colors.symbol.color || defaultColors.symbol,
   };
 
   return (
@@ -72,14 +119,17 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
               </h3>
               {/* Size Toggle */}
               <div className="flex rounded-lg border border-border/40 bg-muted/30 p-1">
-                {(['sm', 'md', 'lg'] as const).map((size) => (
+                {(["sm", "md", "lg"] as const).map((size) => (
                   <button
                     key={size}
-                    onClick={() => setPreviewSize(size)}
+                    onClick={() => {
+                      setPreviewSize(size);
+                      setDraft((prev) => ({ ...prev, icon: { ...prev.icon, size } }));
+                    }}
                     className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
                       previewSize === size
-                        ? 'bg-primary/10 text-primary'
-                        : 'text-muted-foreground hover:text-foreground'
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {size.toUpperCase()}
@@ -87,31 +137,18 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
                 ))}
               </div>
             </div>
-            
+
             {/* Centered Preview */}
             <div className="flex items-center justify-center py-8">
-              <BadgePreviewEnhanced
-                layers={draft.layers}
-                colors={currentColors}
-                size={previewSize}
-                showGlow
-              />
+              <BadgePreviewEnhanced icon={draft.icon} colors={currentColors} size={previewSize} showGlow />
             </div>
 
             {/* Active Layers Summary */}
             <div className="flex flex-wrap items-center justify-center gap-2 pt-4 border-t border-border/30">
-              {draft.layers.base && (
-                <Badge variant="outline" size="sm">Base: {draft.layers.base}</Badge>
-              )}
-              {draft.layers.background && (
-                <Badge variant="secondary" size="sm">↙ {draft.layers.background}</Badge>
-              )}
-              {draft.layers.foreground && (
-                <Badge variant="primary" size="sm">↗ {draft.layers.foreground}</Badge>
-              )}
-              {draft.layers.symbol && (
-                <Badge variant="accent" size="sm">◆ {draft.layers.symbol}</Badge>
-              )}
+              {draft.icon.layers.base && <Badge variant="outline" size="sm">Base: {draft.icon.layers.base}</Badge>}
+              {draft.icon.layers.background && <Badge variant="secondary" size="sm">BG {draft.icon.layers.background}</Badge>}
+              {draft.icon.layers.foreground && <Badge variant="primary" size="sm">FG {draft.icon.layers.foreground}</Badge>}
+              {draft.icon.layers.symbol && <Badge variant="accent" size="sm">SYM {draft.icon.layers.symbol}</Badge>}
             </div>
           </section>
 
@@ -119,12 +156,14 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
           <section className="rounded-2xl border border-border/40 bg-card p-5">
             <h3 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-4">
               <SwatchIcon className="h-4 w-4 text-primary" />
-              Theme Presets
+              Theme & Mode
             </h3>
             <ThemeSelectorEnhanced
               themes={themes}
-              value={draft.themeId}
-              onChange={(themeId: string) => setDraft((prev) => ({ ...prev, themeId, customColors: undefined }))}
+              value={draft.icon.themeId || undefined}
+              mode={draft.icon.mode}
+              onModeChange={handleModeChange}
+              onChange={handleThemeChange}
             />
           </section>
 
@@ -133,7 +172,7 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
             <ColorControlsEnhanced
               value={currentColors}
               onChange={handleColorChange}
-              hasCustomColors={!!draft.customColors}
+              hasCustomColors={draft.icon.mode === "custom"}
             />
           </section>
 
@@ -148,32 +187,32 @@ export function AchievementEditorPanel({ value, themes, layers, onChange, onCanc
                 title="Base Shape"
                 description="Foundation of your badge"
                 type="base"
-                layers={layers}
-                selectedId={draft.layers.base}
+                assets={getAssetsByType("base")}
+                selectedId={draft.icon.layers.base}
                 onSelect={handleLayerChange}
               />
               <LayerSelectorEnhanced
                 title="Background Decoration"
                 description="Wings, laurels, frames"
                 type="background"
-                layers={layers}
-                selectedId={draft.layers.background}
+                assets={getAssetsByType("background")}
+                selectedId={draft.icon.layers.background}
                 onSelect={handleLayerChange}
               />
               <LayerSelectorEnhanced
                 title="Foreground Decoration"
                 description="Stars, crowns, accents"
                 type="foreground"
-                layers={layers}
-                selectedId={draft.layers.foreground}
+                assets={getAssetsByType("foreground")}
+                selectedId={draft.icon.layers.foreground}
                 onSelect={handleLayerChange}
               />
               <LayerSelectorEnhanced
                 title="Symbol"
                 description="Central meaningful icon"
                 type="symbol"
-                layers={layers}
-                selectedId={draft.layers.symbol}
+                assets={getAssetsByType("symbol")}
+                selectedId={draft.icon.layers.symbol}
                 onSelect={handleLayerChange}
               />
             </div>

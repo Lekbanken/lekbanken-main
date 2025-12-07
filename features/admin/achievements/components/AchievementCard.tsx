@@ -1,12 +1,12 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
-import { AchievementItem } from "../types";
+import { AchievementItem, AchievementTheme } from "../types";
 import { BadgePreview } from "../editor/components/BadgePreview";
 
 type AchievementCardProps = {
   achievement: AchievementItem;
-  theme?: { name: string; baseColor: string };
+  theme?: AchievementTheme;
   onEdit: () => void;
 };
 
@@ -25,12 +25,12 @@ export function AchievementCard({ achievement, theme, onEdit }: AchievementCardP
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center justify-center rounded-lg border border-dashed border-border bg-muted/50 p-3">
           <BadgePreview
-            layers={achievement.layers}
+            icon={achievement.icon}
             colors={{
-              base: theme?.baseColor || "#8661ff",
-              background: "#00c7b0",
-              foreground: "#ffd166",
-              symbol: "#ffffff",
+              base: achievement.icon.customColors?.base || theme?.colors.base.color || "#8661ff",
+              background: achievement.icon.customColors?.background || theme?.colors.background.color || "#00c7b0",
+              foreground: achievement.icon.customColors?.foreground || theme?.colors.foreground.color || "#ffd166",
+              symbol: achievement.icon.customColors?.symbol || theme?.colors.symbol.color || "#ffffff",
             }}
           />
         </div>

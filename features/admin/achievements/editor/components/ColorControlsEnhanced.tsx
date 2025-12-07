@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui";
 
 type ColorControlsEnhancedProps = {
   value: { base: string; background: string; foreground: string; symbol: string };
-  onChange: (value: { base: string; background: string; foreground: string; symbol: string }) => void;
+  onChange: (value: Partial<{ base: string; background: string; foreground: string; symbol: string }>) => void;
   hasCustomColors?: boolean;
 };
 
@@ -18,7 +18,7 @@ const colorLabels: Record<keyof ColorControlsEnhancedProps['value'], { label: st
 
 export function ColorControlsEnhanced({ value, onChange, hasCustomColors }: ColorControlsEnhancedProps) {
   const handleChange = (key: keyof typeof value, color: string) => {
-    onChange({ ...value, [key]: color });
+    onChange({ [key]: color });
   };
 
   return (

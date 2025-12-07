@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "upload:utmarkelser": "ts-node scripts/upload-utmarkelser.ts",
+    "sync:utmarkelser:local": "ts-node scripts/sync-utmarkelser-local.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -30,6 +32,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.5",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

@@ -7,7 +7,7 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
-import { mockAchievements, themes, layers } from "./data";
+import { mockAchievements, themes } from "./data";
 import { AchievementItem, AchievementFilters, AchievementTheme } from "./types";
 import { AchievementLibraryGrid } from "./components/AchievementLibraryGrid";
 import { AchievementEditorPanel } from "./editor/AchievementEditorPanel";
@@ -21,9 +21,9 @@ export function AchievementAdminPage() {
   const filtered = useMemo(() => {
     const query = filters.search.toLowerCase();
     const bySearch = achievements.filter((ach) =>
-      [ach.title, ach.subtitle ?? "", ach.layers.symbol ?? ""].join(" ").toLowerCase().includes(query),
+      [ach.title, ach.subtitle ?? "", ach.icon.layers.symbol ?? ""].join(" ").toLowerCase().includes(query),
     );
-    const byTheme = filters.theme === "all" ? bySearch : bySearch.filter((ach) => ach.themeId === filters.theme);
+    const byTheme = filters.theme === "all" ? bySearch : bySearch.filter((ach) => ach.icon.themeId === filters.theme);
     const sorted = [...byTheme].sort((a, b) => {
       if (filters.sort === "name") return a.title.localeCompare(b.title);
       return (b.rewardCoins ?? 0) - (a.rewardCoins ?? 0);
@@ -49,9 +49,13 @@ export function AchievementAdminPage() {
       title: "",
       subtitle: "",
       rewardCoins: 0,
-      themeId: themes[0]?.id,
-      layers: {},
-      profileFrameSync: false,
+      icon: {
+        mode: "theme",
+        themeId: themes[0]?.id,
+        size: "lg",
+        layers: {},
+      },
+      profileFrameSync: { enabled: false },
       publishedRoles: [],
       status: "draft",
       version: 1,
@@ -186,7 +190,6 @@ export function AchievementAdminPage() {
               <AchievementEditorPanel
                 value={editing}
                 themes={themes}
-                layers={layers}
                 onChange={handleSave}
                 onCancel={handleCancel}
               />

@@ -1,109 +1,90 @@
 'use client';
 
+import { AchievementAssetSize, AchievementAssetType, AchievementIconConfig } from "../../types";
+import { resolveAssetUrl } from "../../assets";
+import Image from "next/image";
+
 type BadgePreviewEnhancedProps = {
-  layers: { base?: string; background?: string; foreground?: string; symbol?: string };
+  icon: AchievementIconConfig;
   colors: { base: string; background: string; foreground: string; symbol: string };
-  size?: 'sm' | 'md' | 'lg';
+  size?: AchievementAssetSize;
   showGlow?: boolean;
 };
 
-const sizeConfig = {
-  sm: { container: 'h-16 w-16', icon: 'text-lg' },
-  md: { container: 'h-24 w-24', icon: 'text-2xl' },
-  lg: { container: 'h-40 w-40', icon: 'text-4xl' },
+const sizeConfig: Record<AchievementAssetSize, { container: string; image: number }> = {
+  sm: { container: "h-16 w-16", image: 56 },
+  md: { container: "h-24 w-24", image: 88 },
+  lg: { container: "h-40 w-40", image: 140 },
 };
 
-// Layer icon mapping
-const layerIcons: Record<string, string> = {
-  // Base shapes
-  'base-shield': '🛡️',
-  'base-circle': '⭕',
-  'base-ribbon': '🎀',
-  // Background decorations
-  'bg-wings': '🦋',
-  'bg-laurel': '🌿',
-  // Foreground decorations
-  'fg-stars': '⭐',
-  'fg-crown': '👑',
-  // Symbols
-  'sym-heart': '❤️',
-  'sym-lightning': '⚡',
-  'sym-book': '📖',
-  'sym-dice': '🎲',
-};
+const layerOrder: AchievementAssetType[] = ["background", "base", "foreground", "symbol"];
 
-export function BadgePreviewEnhanced({ layers, colors, size = 'md', showGlow = true }: BadgePreviewEnhancedProps) {
+export function BadgePreviewEnhanced({ icon, colors, size = "md", showGlow = true }: BadgePreviewEnhancedProps) {
   const config = sizeConfig[size];
-  
+
   return (
     <div className={`relative ${config.container}`}>
-      {/* Ambient glow */}
       {showGlow && (
-        <div 
+        <div
           className="absolute inset-0 rounded-full opacity-30 blur-xl pointer-events-none"
-          style={{ 
-            background: `radial-gradient(circle, ${colors.base}60, transparent 70%)` 
-          }}
+          style={{ background: `radial-gradient(circle, ${colors.base}60, transparent 70%)` }}
         />
       )}
 
-      {/* Badge Container */}
-      <div 
-        className="relative flex h-full w-full items-center justify-center rounded-full shadow-lg"
-        style={{ 
-          background: `linear-gradient(135deg, ${colors.base}, ${colors.base}cc)`,
-          boxShadow: `0 4px 20px ${colors.base}40`
-        }}
-      >
-        {/* Inner ring */}
-        <div 
-          className="absolute inset-1 rounded-full opacity-30"
-          style={{ 
-            border: `2px solid ${colors.foreground}`,
-          }}
-        />
+      <div className="relative flex h-full w-full items-center justify-center rounded-full shadow-lg bg-black/10 overflow-hidden">
+        {layerOrder.map((layer) => {
+          const assetId = icon.layers[layer];
+          const url = resolveAssetUrl(assetId, size);
+          if (!url) return null;
 
-        {/* Background decoration layer */}
-        {layers.background && (
-          <div 
-            className="absolute inset-0 flex items-center justify-center opacity-40"
-            style={{ color: colors.background }}
-          >
-            <span className={`${config.icon} filter drop-shadow-sm`}>
-              {layerIcons[layers.background] || '✨'}
-            </span>
-          </div>
-        )}
+          const tint =
+            layer === "base"
+              ? colors.base
+              : layer === "background"
+              ? colors.background
+              : layer === "foreground"
+              ? colors.foreground
+              : colors.symbol;
 
-        {/* Symbol layer (center) */}
-        <div 
-          className="relative z-10 flex items-center justify-center"
-          style={{ color: colors.symbol }}
-        >
-          <span className={`${config.icon} filter drop-shadow-md`}>
-            {layers.symbol ? layerIcons[layers.symbol] || '🏆' : '🏆'}
-          </span>
-        </div>
-
-        {/* Foreground decoration layer */}
-        {layers.foreground && (
-          <div 
-            className="absolute -top-1 left-1/2 -translate-x-1/2"
-            style={{ color: colors.foreground }}
-          >
-            <span className="text-sm filter drop-shadow-sm">
-              {layerIcons[layers.foreground] || '✨'}
-            </span>
-          </div>
-        )}
+          return (
+            <div key={layer} className="absolute inset-0 flex items-center justify-center">
+              <div
+                className="relative"
+                style={{
+                  width: config.image,
+                  height: config.image,
+                  maskImage: `url(${url})`,
+                  WebkitMaskImage: `url(${url})`,
+                  maskSize: "contain",
+                  WebkitMaskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  WebkitMaskPosition: "center",
+                  backgroundColor: tint,
+                  filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.25))",
+                }}
+              >
+                <Image
+                  src={url}
+                  alt={assetId || layer}
+                  width={config.image}
+                  height={config.image}
+                  className="opacity-0"
+                  priority={size === "lg"}
+                  unoptimized
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Layer info tooltip on hover - shown in larger sizes */}
-      {size === 'lg' && (
+      {size === "lg" && (
         <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            {layers.base && <span className="px-1.5 py-0.5 rounded bg-muted/50">{layers.base}</span>}
-            {layers.symbol && <span className="px-1.5 py-0.5 rounded bg-muted/50">{layers.symbol}</span>}
+            {icon.layers.base && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.layers.base}</span>}
+            {icon.layers.symbol && <span className="px-1.5 py-0.5 rounded bg-muted/50">{icon.layers.symbol}</span>}
           </div>
         </div>
       )}

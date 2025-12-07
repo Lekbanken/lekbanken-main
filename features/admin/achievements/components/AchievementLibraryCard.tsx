@@ -2,12 +2,12 @@
 
 import { CheckIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { Badge, Button } from "@/components/ui";
-import { AchievementItem } from "../types";
+import { AchievementItem, AchievementTheme } from "../types";
 import { BadgePreviewEnhanced } from "../editor/components/BadgePreviewEnhanced";
 
 type AchievementLibraryCardProps = {
   achievement: AchievementItem;
-  theme?: { name: string; baseColor: string };
+  theme?: AchievementTheme;
   onEdit: () => void;
   isSelected?: boolean;
 };
@@ -55,12 +55,12 @@ export function AchievementLibraryCard({ achievement, theme, onEdit, isSelected 
       <div className="px-4 py-4">
         <div className="flex items-center justify-center rounded-xl border border-dashed border-border/50 bg-gradient-to-br from-muted/30 to-muted/10 p-4">
           <BadgePreviewEnhanced
-            layers={achievement.layers}
+            icon={achievement.icon}
             colors={{
-              base: theme?.baseColor || "#8661ff",
-              background: "#00c7b0",
-              foreground: "#ffd166",
-              symbol: "#ffffff",
+              base: achievement.icon.customColors?.base || theme?.colors.base.color || "#8661ff",
+              background: achievement.icon.customColors?.background || theme?.colors.background.color || "#00c7b0",
+              foreground: achievement.icon.customColors?.foreground || theme?.colors.foreground.color || "#ffd166",
+              symbol: achievement.icon.customColors?.symbol || theme?.colors.symbol.color || "#ffffff",
             }}
             size="md"
           />
@@ -83,7 +83,7 @@ export function AchievementLibraryCard({ achievement, theme, onEdit, isSelected 
             <div className="flex items-center gap-1.5">
               <div 
                 className="h-3 w-3 rounded-full ring-1 ring-black/10"
-                style={{ backgroundColor: theme.baseColor }}
+                style={{ backgroundColor: theme.colors.base.color }}
               />
               <span className="text-xs text-muted-foreground">{theme.name}</span>
             </div>
@@ -103,7 +103,7 @@ export function AchievementLibraryCard({ achievement, theme, onEdit, isSelected 
       </div>
 
       {/* Profile Frame Sync Indicator */}
-      {achievement.profileFrameSync && (
+      {achievement.profileFrameSync?.enabled && (
         <div className="absolute left-3 top-3">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-accent/20 text-accent" title="Profile frame sync enabled">
             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

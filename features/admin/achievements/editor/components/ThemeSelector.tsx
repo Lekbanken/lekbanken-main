@@ -24,13 +24,13 @@ export function ThemeSelector({ themes, value, onChange }: ThemeSelectorProps) {
           >
             <div>
               <p className="font-medium">{theme.name}</p>
-              <p className="text-xs text-muted-foreground">Base {theme.baseColor}</p>
+              <p className="text-xs text-muted-foreground">Base {theme.colors.base.color}</p>
             </div>
             <div className="flex h-7 w-16 overflow-hidden rounded border border-border">
-              <span className="flex-1" style={{ backgroundColor: theme.baseColor }} />
-              <span className="flex-1" style={{ backgroundColor: theme.backgroundColor }} />
-              <span className="flex-1" style={{ backgroundColor: theme.foregroundColor }} />
-              <span className="flex-1" style={{ backgroundColor: theme.symbolColor }} />
+              <span className="flex-1" style={{ backgroundColor: theme.colors.base.color }} />
+              <span className="flex-1" style={{ backgroundColor: theme.colors.background.color }} />
+              <span className="flex-1" style={{ backgroundColor: theme.colors.foreground.color }} />
+              <span className="flex-1" style={{ backgroundColor: theme.colors.symbol.color }} />
             </div>
           </button>
         ))}

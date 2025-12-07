@@ -1,20 +1,50 @@
-export type AchievementLayerType = "base" | "background" | "foreground" | "symbol";
+export type AchievementAssetType = "base" | "background" | "foreground" | "symbol";
+export type AchievementAssetSize = "sm" | "md" | "lg";
 
-export type AchievementLayer = {
+export type AchievementAsset = {
   id: string;
-  type: AchievementLayerType;
-  name: string;
-  asset: string;
-  tintable?: boolean;
+  type: AchievementAssetType;
+  label: string;
+  sizes: Record<AchievementAssetSize, string>;
+  tags?: string[];
+  sortOrder?: number;
+};
+
+export type AchievementColorMode = "theme" | "custom";
+
+export type LayerColorConfig = {
+  color: string;
+  highlight?: string;
+  shadow?: string;
 };
 
 export type AchievementTheme = {
   id: string;
   name: string;
-  baseColor: string;
-  backgroundColor: string;
-  foregroundColor: string;
-  symbolColor: string;
+  description?: string;
+  colors: Record<AchievementAssetType, LayerColorConfig>;
+};
+
+export type AchievementIconConfig = {
+  mode: AchievementColorMode;
+  themeId?: string | null;
+  size?: AchievementAssetSize;
+  layers: {
+    base?: string;
+    background?: string;
+    foreground?: string;
+    symbol?: string;
+  };
+  customColors?: Partial<Record<AchievementAssetType, string>>;
+};
+
+export type ProfileFrameSyncConfig = {
+  enabled: boolean;
+  durationDays?: number | null;
+  useBase?: boolean;
+  useBackground?: boolean;
+  useForeground?: boolean;
+  useSymbol?: boolean;
 };
 
 export type AchievementItem = {
@@ -23,23 +53,11 @@ export type AchievementItem = {
   subtitle?: string;
   description?: string;
   rewardCoins?: number;
-  themeId?: string;
-  customColors?: {
-    base: string;
-    background: string;
-    foreground: string;
-    symbol: string;
-  };
   status?: "draft" | "published";
   version?: number;
   availableForOrgs?: string[];
-  layers: {
-    base?: string;
-    background?: string;
-    foreground?: string;
-    symbol?: string;
-  };
-  profileFrameSync?: boolean;
+  icon: AchievementIconConfig;
+  profileFrameSync?: ProfileFrameSyncConfig;
   publishedRoles?: string[];
 };
 

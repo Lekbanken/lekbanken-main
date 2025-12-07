@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PlusIcon, XMarkIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { Badge, Switch } from "@/components/ui";
-import { AchievementItem } from "../../types";
+import { AchievementItem, ProfileFrameSyncConfig } from "../../types";
 
 type PublishingControlsProps = {
   value: AchievementItem;
@@ -26,6 +26,7 @@ const orgOptions = [
 export function PublishingControls({ value, onChange }: PublishingControlsProps) {
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
+  const frame = value.profileFrameSync ?? { enabled: false };
 
   const handleStatusChange = (status: "draft" | "published") => {
     onChange({ status });
@@ -186,7 +187,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
       <div 
         className={`
           flex items-center justify-between rounded-xl border px-4 py-3 transition-colors
-          ${value.profileFrameSync 
+          ${frame.enabled 
             ? 'border-accent/30 bg-accent/10' 
             : 'border-border/60 bg-muted/20'
           }
@@ -194,15 +195,15 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
       >
         <div className="flex items-center gap-3">
           <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-            value.profileFrameSync ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
+            frame.enabled ? 'bg-accent/20 text-accent' : 'bg-muted text-muted-foreground'
           }`}>
             <LinkIcon className="h-4 w-4" />
           </div>
           <div>
             <p className="text-sm font-medium text-foreground">Profile Frame Sync</p>
-            <p className={`text-xs ${value.profileFrameSync ? 'text-accent' : 'text-muted-foreground'}`}>
-              {value.profileFrameSync 
-                ? 'Synced — Badge updates user profile frame' 
+            <p className={`text-xs ${frame.enabled ? 'text-accent' : 'text-muted-foreground'}`}>
+              {frame.enabled
+                ? 'Synced - Badge updates user profile frame' 
                 : 'Disabled'
               }
             </p>
@@ -210,10 +211,62 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
         </div>
         <Switch
           id="profile-frame-sync"
-          checked={value.profileFrameSync ?? false}
-          onCheckedChange={(checked) => onChange({ profileFrameSync: checked })}
+          checked={frame.enabled}
+          onCheckedChange={(checked) => onChange({ profileFrameSync: { ...frame, enabled: checked } })}
         />
       </div>
+
+      {frame.enabled && (
+        <div className="grid gap-3 rounded-xl border border-border/60 bg-muted/10 p-4">
+          <label className="text-xs text-muted-foreground">
+            Duration (days, optional)
+            <input
+              type="number"
+              min={1}
+              placeholder="7"
+              value={frame.durationDays ?? ""}
+              onChange={(e) =>
+                onChange({
+                  profileFrameSync: {
+                    ...frame,
+                    durationDays: e.target.value ? Number(e.target.value) : null,
+                  },
+                })
+              }
+              className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1 text-sm"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2 text-sm text-foreground">
+            {(
+              [
+                { key: "useBase", label: "Use base layer" },
+                { key: "useBackground", label: "Use background" },
+                { key: "useForeground", label: "Use foreground" },
+                { key: "useSymbol", label: "Use symbol" },
+              ] as Array<{ key: Extract<keyof ProfileFrameSyncConfig, "useBase" | "useBackground" | "useForeground" | "useSymbol">; label: string }>
+            ).map((item) => (
+              <label
+                key={item.key}
+                className="inline-flex items-center gap-2 rounded-md border border-border/60 bg-background px-3 py-2"
+              >
+                <input
+                  type="checkbox"
+                  checked={frame[item.key] ?? false}
+                  onChange={(e) =>
+                    onChange({
+                      profileFrameSync: {
+                        ...frame,
+                        [item.key]: e.target.checked,
+                      },
+                    })
+                  }
+                />
+                {item.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

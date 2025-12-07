@@ -3,12 +3,12 @@
 import { ChangeEvent } from "react";
 import { MagnifyingGlassIcon, FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui";
-import { AchievementFilters, AchievementItem } from "../types";
+import { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
 import { AchievementLibraryCard } from "./AchievementLibraryCard";
 
 type AchievementLibraryGridProps = {
   achievements: AchievementItem[];
-  themes: Record<string, { name: string; baseColor: string }>;
+  themes: Record<string, AchievementTheme>;
   filters: AchievementFilters;
   onFiltersChange: (next: AchievementFilters) => void;
   onEdit: (item: AchievementItem) => void;
@@ -119,7 +119,7 @@ export function AchievementLibraryGrid({
             <AchievementLibraryCard
               key={achievement.id}
               achievement={achievement}
-              theme={achievement.themeId ? themes[achievement.themeId] : undefined}
+              theme={achievement.icon.themeId ? themes[achievement.icon.themeId] : undefined}
               onEdit={() => onEdit(achievement)}
               isSelected={selectedId === achievement.id}
             />

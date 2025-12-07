@@ -1,26 +1,66 @@
-import { AchievementItem, AchievementLayer, AchievementTheme } from "./types";
+import { AchievementItem, AchievementTheme } from "./types";
 
 export const themes: AchievementTheme[] = [
-  { id: "twilight", name: "Twilight", baseColor: "#8661ff", backgroundColor: "#00c7b0", foregroundColor: "#ffd166", symbolColor: "#ffffff" },
-  { id: "ember", name: "Ember", baseColor: "#f97316", backgroundColor: "#1f2937", foregroundColor: "#facc15", symbolColor: "#ffffff" },
-  { id: "aurora", name: "Aurora", baseColor: "#22c55e", backgroundColor: "#0ea5e9", foregroundColor: "#a855f7", symbolColor: "#ffffff" },
-  { id: "slate", name: "Slate", baseColor: "#1f2937", backgroundColor: "#334155", foregroundColor: "#cbd5e1", symbolColor: "#f8fafc" },
-  { id: "sunrise", name: "Sunrise", baseColor: "#fb7185", backgroundColor: "#fbbf24", foregroundColor: "#22c55e", symbolColor: "#0f172a" },
-  { id: "arctic", name: "Arctic", baseColor: "#0ea5e9", backgroundColor: "#e0f2fe", foregroundColor: "#0284c7", symbolColor: "#0f172a" },
-];
-
-export const layers: AchievementLayer[] = [
-  { id: "base-shield", type: "base", name: "Shield", asset: "/achievements/base/shield.svg", tintable: true },
-  { id: "base-circle", type: "base", name: "Circle", asset: "/achievements/base/circle.svg", tintable: true },
-  { id: "base-ribbon", type: "base", name: "Ribbon", asset: "/achievements/base/ribbon.svg", tintable: true },
-  { id: "bg-wings", type: "background", name: "Wings", asset: "/achievements/background/wings.svg", tintable: true },
-  { id: "bg-laurel", type: "background", name: "Laurel", asset: "/achievements/background/laurel.svg", tintable: true },
-  { id: "fg-stars", type: "foreground", name: "Stars", asset: "/achievements/foreground/stars.svg", tintable: true },
-  { id: "fg-crown", type: "foreground", name: "Crown", asset: "/achievements/foreground/crown.svg", tintable: true },
-  { id: "sym-heart", type: "symbol", name: "Heart", asset: "/achievements/symbol/heart.svg", tintable: true },
-  { id: "sym-lightning", type: "symbol", name: "Lightning", asset: "/achievements/symbol/lightning.svg", tintable: true },
-  { id: "sym-book", type: "symbol", name: "Book", asset: "/achievements/symbol/book.svg", tintable: true },
-  { id: "sym-dice", type: "symbol", name: "Dice", asset: "/achievements/symbol/dice.svg", tintable: true },
+  {
+    id: "gold_default",
+    name: "Guld",
+    colors: {
+      base: { color: "#F1C232" },
+      background: { color: "#F59E0B" },
+      foreground: { color: "#FBBF24" },
+      symbol: { color: "#FFF7ED" },
+    },
+  },
+  {
+    id: "silver_default",
+    name: "Silver",
+    colors: {
+      base: { color: "#D1D5DB" },
+      background: { color: "#9CA3AF" },
+      foreground: { color: "#E5E7EB" },
+      symbol: { color: "#F9FAFB" },
+    },
+  },
+  {
+    id: "emerald",
+    name: "Emerald",
+    colors: {
+      base: { color: "#10B981" },
+      background: { color: "#059669" },
+      foreground: { color: "#34D399" },
+      symbol: { color: "#ECFDF3" },
+    },
+  },
+  {
+    id: "amethyst",
+    name: "Amethyst",
+    colors: {
+      base: { color: "#8B5CF6" },
+      background: { color: "#7C3AED" },
+      foreground: { color: "#A78BFA" },
+      symbol: { color: "#F5F3FF" },
+    },
+  },
+  {
+    id: "ruby",
+    name: "Ruby",
+    colors: {
+      base: { color: "#EF4444" },
+      background: { color: "#B91C1C" },
+      foreground: { color: "#F87171" },
+      symbol: { color: "#FEF2F2" },
+    },
+  },
+  {
+    id: "arctic",
+    name: "Arctic",
+    colors: {
+      base: { color: "#0EA5E9" },
+      background: { color: "#0369A1" },
+      foreground: { color: "#38BDF8" },
+      symbol: { color: "#E0F2FE" },
+    },
+  },
 ];
 
 export const mockAchievements: AchievementItem[] = [
@@ -30,17 +70,21 @@ export const mockAchievements: AchievementItem[] = [
     subtitle: "Complete onboarding",
     description: "Finish the onboarding flow and unlock the core badge.",
     rewardCoins: 50,
-    themeId: "twilight",
-    profileFrameSync: true,
+    profileFrameSync: { enabled: true, durationDays: 7, useBase: true, useForeground: true },
     publishedRoles: ["admin", "creator"],
     status: "published",
     version: 3,
     availableForOrgs: ["org-1", "org-2"],
-    layers: {
-      base: "base-shield",
-      background: "bg-laurel",
-      foreground: "fg-stars",
-      symbol: "sym-lightning",
+    icon: {
+      mode: "theme",
+      themeId: "amethyst",
+      size: "lg",
+      layers: {
+        base: "base_shield",
+        background: "bg_wings_2",
+        foreground: "fg_stars_3",
+        symbol: "ic_flash",
+      },
     },
   },
   {
@@ -49,17 +93,27 @@ export const mockAchievements: AchievementItem[] = [
     subtitle: "Launch your first quest",
     description: "Publish a gamified quest with rewards.",
     rewardCoins: 120,
-    themeId: "aurora",
-    profileFrameSync: false,
+    profileFrameSync: { enabled: false },
     publishedRoles: ["admin"],
     status: "draft",
     version: 1,
     availableForOrgs: [],
-    layers: {
-      base: "base-ribbon",
-      background: "bg-wings",
-      foreground: "fg-crown",
-      symbol: "sym-heart",
+    icon: {
+      mode: "custom",
+      themeId: "emerald",
+      size: "lg",
+      layers: {
+        base: "base_circle",
+        background: "bg_spikes_3",
+        foreground: "fg_queen_crown_1",
+        symbol: "ic_medalj",
+      },
+      customColors: {
+        base: "#0EA5E9",
+        background: "#10B981",
+        foreground: "#FBBF24",
+        symbol: "#F8FAFC",
+      },
     },
   },
 ];

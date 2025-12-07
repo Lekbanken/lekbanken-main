@@ -2,12 +2,12 @@
 
 type ColorControlsProps = {
   value: { base: string; background: string; foreground: string; symbol: string };
-  onChange: (value: { base: string; background: string; foreground: string; symbol: string }) => void;
+  onChange: (value: Partial<{ base: string; background: string; foreground: string; symbol: string }>) => void;
 };
 
 export function ColorControls({ value, onChange }: ColorControlsProps) {
   const handleChange = (key: keyof typeof value, color: string) => {
-    onChange({ ...value, [key]: color });
+    onChange({ [key]: color });
   };
 
   return (

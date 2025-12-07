@@ -1,26 +1,18 @@
 'use client';
 
+import { AchievementAssetSize, AchievementIconConfig } from "../../types";
+import { BadgePreviewEnhanced } from "./BadgePreviewEnhanced";
+
 type BadgePreviewProps = {
-  layers: { base?: string; background?: string; foreground?: string; symbol?: string };
+  icon: AchievementIconConfig;
   colors: { base: string; background: string; foreground: string; symbol: string };
+  size?: AchievementAssetSize;
 };
 
-export function BadgePreview({ layers, colors }: BadgePreviewProps) {
+export function BadgePreview({ icon, colors, size = "md" }: BadgePreviewProps) {
   return (
-    <div className="relative h-40 w-40">
-      <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-background to-muted border border-border" />
-      <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
-        <div className="space-y-1 text-center">
-          <p className="text-foreground">Preview</p>
-          <p>Base: {layers.base || "none"}</p>
-          <p>Back: {layers.background || "none"}</p>
-          <p>Front: {layers.foreground || "none"}</p>
-          <p>Symbol: {layers.symbol || "none"}</p>
-          <div className="mt-1 text-[10px] text-muted-foreground">
-            Colors: base {colors.base}, bg {colors.background}, fg {colors.foreground}, sym {colors.symbol}
-          </div>
-        </div>
-      </div>
+    <div className="flex items-center justify-center">
+      <BadgePreviewEnhanced icon={icon} colors={colors} size={size} showGlow />
     </div>
   );
 }

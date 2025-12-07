@@ -1,7 +1,7 @@
 'use client';
 
 import { AchievementItem, AchievementTheme } from "../types";
-import { AchievementEditorPanel } from "./AchievementEditorPanel";
+import { AchievementEditorPanelV2 } from "./AchievementEditorPanelV2";
 
 type AchievementEditorProps = {
   value: AchievementItem;
@@ -11,5 +11,5 @@ type AchievementEditorProps = {
 };
 
 export function AchievementEditor(props: AchievementEditorProps) {
-  return <AchievementEditorPanel {...props} />;
+  return <AchievementEditorPanelV2 {...props} />;
 }

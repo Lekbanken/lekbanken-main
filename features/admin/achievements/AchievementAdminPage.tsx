@@ -11,7 +11,7 @@ import { mockAchievements, themes } from "./data";
 import { AchievementItem, AchievementFilters, AchievementTheme } from "./types";
 import { normalizeIconConfig } from "./icon-utils";
 import { AchievementLibraryGrid } from "./components/AchievementLibraryGrid";
-import { AchievementEditorPanel } from "./editor/AchievementEditorPanel";
+import { AchievementEditor } from "./editor/AchievementEditor";
 
 export function AchievementAdminPage() {
   const [achievements, setAchievements] = useState<AchievementItem[]>(
@@ -63,9 +63,10 @@ export function AchievementAdminPage() {
       rewardCoins: 0,
       icon: normalizeIconConfig({
         mode: "theme",
-        themeId: themes[0]?.id,
+        themeId: themes[0]?.id ?? "gold",
         size: "lg",
-        base: null,
+        // Smart defaults: Start with a circle base for immediate visual feedback
+        base: { id: "base_circle" },
         symbol: null,
         backgrounds: [],
         foregrounds: [],
@@ -202,7 +203,7 @@ export function AchievementAdminPage() {
           </CardHeader>
           <CardContent className="p-0">
             {editing ? (
-              <AchievementEditorPanel
+              <AchievementEditor
                 value={editing}
                 themes={themes}
                 onChange={handleSave}

@@ -104,19 +104,27 @@ export function MultiLayerSelector({ title, description, type: _type, assets, se
               type="button"
               onClick={() => toggleAsset(asset.id)}
               className={`
-                group relative flex items-center gap-2.5 rounded-xl border-2 px-3 py-2.5 text-left transition-all duration-200
-                ${isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-border/60 bg-muted/30 hover:border-primary/40 hover:shadow-md"}
+                group relative flex items-center gap-2.5 rounded-xl border-2 px-3 py-2.5 text-left 
+                transition-all duration-200 ease-out
+                ${isSelected 
+                  ? "border-primary bg-primary/5 shadow-md ring-2 ring-primary/20 scale-[1.02]" 
+                  : "border-border/60 bg-muted/30 hover:border-primary/40 hover:shadow-lg hover:scale-[1.01]"
+                }
               `}
             >
-              <span className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-muted">
+              <span className={`
+                flex h-8 w-8 items-center justify-center overflow-hidden rounded-lg bg-muted
+                transition-transform duration-200 group-hover:scale-110
+                ${isSelected ? "scale-105" : ""}
+              `}>
                 <Image src={asset.sizes.sm} alt={asset.label} width={32} height={32} unoptimized />
               </span>
-              <span className={`text-sm font-medium truncate ${isSelected ? "text-primary" : "text-foreground"}`}>
+              <span className={`text-sm font-medium truncate ${isSelected ? "text-primary font-semibold" : "text-foreground"}`}>
                 {asset.label}
               </span>
               {isSelected && (
-                <div className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-white shadow-sm">
-                  <CheckIcon className="h-2.5 w-2.5" strokeWidth={3} />
+                <div className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-white shadow-md animate-in zoom-in-50 duration-200">
+                  <CheckIcon className="h-3 w-3" strokeWidth={3} />
                 </div>
               )}
             </button>

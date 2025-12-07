@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from "react";
 import { AchievementItem, AchievementTheme } from "../types";
-import { AchievementEditorPanelV2 } from "./AchievementEditorPanelV2";
+import { AchievementEditorWizard } from "./AchievementEditorWizard";
 
 type AchievementEditorProps = {
   value: AchievementItem;
@@ -10,6 +11,37 @@ type AchievementEditorProps = {
   onCancel: () => void;
 };
 
-export function AchievementEditor(props: AchievementEditorProps) {
-  return <AchievementEditorPanelV2 {...props} />;
+export function AchievementEditor({ value, themes, onChange, onCancel }: AchievementEditorProps) {
+  const [draft, setDraft] = useState<AchievementItem>(value);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = () => {
+    setIsSaving(true);
+    // Simulate save delay for UX feedback
+    setTimeout(() => {
+      onChange(draft);
+      setIsSaving(false);
+    }, 300);
+  };
+
+  return (
+    <div className="relative">
+      {/* Cancel button in top right */}
+      <button
+        type="button"
+        onClick={onCancel}
+        className="absolute -top-2 -right-2 z-10 p-2 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-colors"
+        title="Avbryt"
+      >
+        ✕
+      </button>
+      
+      <AchievementEditorWizard
+        draft={draft}
+        onDraftChange={setDraft}
+        onSave={handleSave}
+        isSaving={isSaving}
+      />
+    </div>
+  );
 }

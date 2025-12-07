@@ -27,7 +27,7 @@ interface TenantContextType {
   reloadTenants: () => Promise<void>
 }
 
-const TenantContext = createContext<TenantContextType | undefined>(undefined)
+export const TenantContext = createContext<TenantContextType | undefined>(undefined)
 
 export function TenantProvider({ children, userId }: { children: ReactNode; userId: string | null }) {
   const [currentTenant, setCurrentTenant] = useState<(Tenant & { membership: UserTenantMembership }) | null>(null)

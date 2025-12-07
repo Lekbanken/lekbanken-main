@@ -12,7 +12,7 @@ type AchievementEditorProps = {
   onCancel: () => void;
 };
 
-export function AchievementEditor({ value, themes, onChange, onCancel }: AchievementEditorProps) {
+export function AchievementEditor({ value, onChange, onCancel }: AchievementEditorProps) {
   const [draft, setDraft] = useState<AchievementItem>(value);
   const [isSaving, setIsSaving] = useState(false);
 

@@ -2,10 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Avatar } from "@/components/ui/avatar";
+import { useAuth } from "@/lib/supabase/auth";
 import { appNavItems } from "./nav-items";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const { user, userProfile } = useAuth();
+
+  const displayName = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || "Profil";
+  const avatarUrl = userProfile?.avatar_url;
 
   return (
     <nav
@@ -18,6 +24,14 @@ export function BottomNav() {
         {appNavItems.map((tab) => {
           const active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
           const isPlayTab = tab.href === "/app/play";
+          const isProfileTab = tab.href === "/app/profile";
+          const iconNode = isProfileTab ? (
+            <Avatar src={avatarUrl || undefined} name={displayName} size="sm" className="h-8 w-8" />
+          ) : active ? (
+            tab.iconActive
+          ) : (
+            tab.icon
+          );
           return (
             <Link
               key={tab.href}
@@ -35,7 +49,7 @@ export function BottomNav() {
                     : "text-muted-foreground group-hover:bg-muted group-hover:text-foreground"
                 }`}
               >
-                {active ? tab.iconActive : tab.icon}
+                {iconNode}
               </span>
               <span className={`text-[11px] font-medium tracking-wide transition-colors ${
                 active ? "text-primary font-semibold" : "text-muted-foreground"

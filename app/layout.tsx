@@ -3,6 +3,31 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
+const themeInitScript = `(() => {
+  try {
+    const storedTheme = localStorage.getItem('lb-theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const chosenTheme = storedTheme === 'light' || storedTheme === 'dark' || storedTheme === 'system'
+      ? storedTheme
+      : null;
+    const resolved = chosenTheme === 'dark'
+      ? 'dark'
+      : chosenTheme === 'light'
+        ? 'light'
+        : prefersDark
+          ? 'dark'
+          : 'light';
+    document.documentElement.dataset.theme = resolved;
+    document.documentElement.style.colorScheme = resolved === 'dark' ? 'dark' : 'light';
+    const storedLang = localStorage.getItem('lb-language');
+    if (storedLang) {
+      document.documentElement.lang = storedLang.toLowerCase();
+    }
+  } catch (e) {
+    /* no-op */
+  }
+})();`;
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -25,8 +50,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="sv" className="bg-background text-foreground">
+    <html
+      lang="sv"
+      className="bg-background text-foreground"
+      data-theme="light"
+      style={{ colorScheme: "light" }}
+      suppressHydrationWarning
+    >
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <Providers>
           {children}
         </Providers>

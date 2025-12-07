@@ -5,7 +5,7 @@ import { WizardStepIndicator, WizardStep } from './components/WizardStepIndicato
 import { LayerDropdownSelector } from './components/LayerDropdownSelector';
 import { ColorInputWithPicker } from './components/ColorInputWithPicker';
 import { BadgeCardPreview, PreviewModeToggle } from './components/BadgeCardPreview';
-import { PreviewBackgroundPickerExtended } from './components/PreviewBackgroundPicker';
+import { PreviewBackgroundPickerExtended, CardBackgroundPicker } from './components/PreviewBackgroundPicker';
 import { ContrastTip } from './components/ContrastTip';
 import { RandomizeButton, useRandomBadge } from './components/RandomBadgeGenerator';
 import { PresetManager } from './components/PresetManager';
@@ -19,7 +19,6 @@ import {
   ArrowRightIcon,
   ArrowUturnLeftIcon,
   ArrowUturnRightIcon,
-  CheckIcon,
   SparklesIcon,
   SwatchIcon,
   DocumentTextIcon,
@@ -52,7 +51,11 @@ export function AchievementEditorWizard({
 }: AchievementEditorWizardProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [previewMode, setPreviewMode] = useState<'ring' | 'card'>('ring');
-  const [previewBackground, setPreviewBackground] = useState('#1F2937');
+  
+  // Preview settings
+  const [circleBackground, setCircleBackground] = useState('#1F2937');
+  const [cardBackground, setCardBackground] = useState('#FFFFFF');
+  const [textColor, setTextColor] = useState<'dark' | 'gray' | 'light'>('dark');
 
   // History for undo/redo - using the full AchievementItem
   const { setState: setHistoryState, undo, redo, canUndo, canRedo } = useBadgeHistory(draft);
@@ -90,7 +93,6 @@ export function AchievementEditorWizard({
   // Navigation
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, WIZARD_STEPS.length - 1));
   const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
-  const canGoNext = currentStep < WIZARD_STEPS.length - 1;
   const canGoPrev = currentStep > 0;
 
   // Load preset
@@ -140,12 +142,12 @@ export function AchievementEditorWizard({
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 h-full">
-      {/* Left: Preview */}
-      <div className="lg:w-80 flex-shrink-0">
+      {/* Left: Preview - wider column */}
+      <div className="lg:w-[400px] flex-shrink-0">
         <div className="sticky top-4 space-y-4">
           {/* Preview Mode Toggle */}
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-medium text-foreground">Forhandsvisning</h3>
+            <h3 className="text-sm font-medium text-foreground">Förhandsvisning</h3>
             <PreviewModeToggle mode={previewMode} onChange={setPreviewMode} />
           </div>
 
@@ -156,20 +158,37 @@ export function AchievementEditorWizard({
               theme={currentTheme}
               metadata={{
                 name: draft.title,
+                subtitle: draft.subtitle,
                 description: draft.description || '',
                 points: draft.rewardCoins || 0,
-                category: 'Utmarkelse',
               }}
               showAsRing={previewMode === 'ring'}
-              backgroundColor={previewBackground}
+              circleBackground={circleBackground}
+              cardBackground={cardBackground}
+              textColor={textColor}
             />
           </div>
 
-          {/* Background Picker */}
-          {previewMode === 'ring' && (
+          {/* Background Pickers */}
+          {previewMode === 'ring' ? (
             <PreviewBackgroundPickerExtended
-              value={previewBackground}
-              onChange={setPreviewBackground}
+              value={circleBackground}
+              onChange={setCircleBackground}
+            />
+          ) : (
+            <CardBackgroundPicker
+              cardBackground={cardBackground}
+              onCardBackgroundChange={setCardBackground}
+              textColor={textColor}
+              onTextColorChange={setTextColor}
+            />
+          )}
+
+          {/* Circle background for card mode too */}
+          {previewMode === 'card' && (
+            <PreviewBackgroundPickerExtended
+              value={circleBackground}
+              onChange={setCircleBackground}
             />
           )}
 
@@ -182,7 +201,7 @@ export function AchievementEditorWizard({
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
             >
               <ArrowUturnLeftIcon className="h-4 w-4" />
-              Angra
+              Ångra
             </button>
             <button
               type="button"
@@ -191,7 +210,7 @@ export function AchievementEditorWizard({
               className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm rounded-lg border border-border bg-muted/50 hover:bg-muted disabled:opacity-40"
             >
               <ArrowUturnRightIcon className="h-4 w-4" />
-              Gor om
+              Gör om
             </button>
           </div>
         </div>
@@ -221,7 +240,8 @@ export function AchievementEditorWizard({
             Tillbaka
           </button>
 
-          {canGoNext ? (
+          {/* Show different buttons based on step */}
+          {currentStep < WIZARD_STEPS.length - 1 ? (
             <button
               type="button"
               onClick={goNext}
@@ -231,14 +251,18 @@ export function AchievementEditorWizard({
               <ArrowRightIcon className="h-4 w-4" />
             </button>
           ) : (
+            /* On last step, show save draft button (no name required) */
             <button
               type="button"
-              onClick={onSave}
+              onClick={() => {
+                // Force draft status and save
+                updateDraft({ status: 'draft' });
+                onSave();
+              }}
               disabled={isSaving}
-              className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl border border-amber-500 text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50"
             >
-              {isSaving ? 'Sparar...' : 'Spara badge'}
-              <CheckIcon className="h-4 w-4" />
+              {isSaving ? 'Sparar...' : 'Spara som utkast'}
             </button>
           )}
         </div>
@@ -549,6 +573,48 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
             Tips: 10-50 för vanliga, 100-500 för sällsynta badges
           </p>
         </div>
+
+        {/* Category */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">Kategori</label>
+          <select
+            value={draft.category || ''}
+            onChange={(e) => updateDraft({ category: e.target.value || undefined })}
+            className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="">Välj kategori (valfritt)</option>
+            <option value="spel">Spel & Aktiviteter</option>
+            <option value="social">Social & Samarbete</option>
+            <option value="prestation">Prestation & Milstolpar</option>
+            <option value="larande">Lärande & Utveckling</option>
+            <option value="event">Event & Säsong</option>
+            <option value="special">Special & Exklusiv</option>
+          </select>
+          <p className="text-xs text-muted-foreground">
+            Kategorisering hjälper användare att hitta utmärkelser
+          </p>
+        </div>
+
+        {/* Tags */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">Taggar</label>
+          <input
+            type="text"
+            value={(draft.tags || []).join(', ')}
+            onChange={(e) => {
+              const tags = e.target.value
+                .split(',')
+                .map(t => t.trim())
+                .filter(t => t.length > 0);
+              updateDraft({ tags: tags.length > 0 ? tags : undefined });
+            }}
+            placeholder="T.ex. nybörjare, sport, teamwork"
+            className="w-full px-4 py-2.5 rounded-xl border border-border bg-background focus:border-primary focus:ring-2 focus:ring-primary/20"
+          />
+          <p className="text-xs text-muted-foreground">
+            Separera taggar med kommatecken
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -662,19 +728,22 @@ function PublishStep({ draft, updateDraft, onSave, isSaving }: PublishStepProps)
         </p>
       </div>
 
-      {/* Save button (large) */}
+      {/* Publish button (large) - requires name */}
       <button
         type="button"
-        onClick={onSave}
+        onClick={() => {
+          updateDraft({ status: 'published' });
+          onSave();
+        }}
         disabled={isSaving || !draft.title}
-        className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+        className="w-full py-4 rounded-2xl bg-gradient-to-r from-green-600 to-green-500 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
       >
-        {isSaving ? 'Sparar...' : 'Spara badge'}
+        {isSaving ? 'Publicerar...' : 'Publicera utmärkelse'}
       </button>
 
-      {!draft.title && (
-        <p className="text-center text-sm text-red-500">
-          Du måste ange ett namn för att spara
+      {!draft.title && draft.status === 'published' && (
+        <p className="text-center text-sm text-amber-600">
+          Du måste ange ett namn för att publicera. Du kan fortfarande spara som utkast.
         </p>
       )}
     </div>

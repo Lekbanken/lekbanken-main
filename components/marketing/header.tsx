@@ -1,21 +1,37 @@
-﻿'use client'
+"use client";
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
+import { ProfileMenu } from "@/components/navigation/ProfileMenu";
+import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-
-const navigation = [
-  { name: "Funktioner", href: "#features" },
-  { name: "Så funkar det", href: "#how-it-works" },
-  { name: "Priser", href: "#pricing" },
-  { name: "Kunder", href: "#testimonials" },
-];
+import { usePreferences } from "@/lib/context/PreferencesContext";
+import { getUiCopy } from "@/lib/i18n/ui";
+import { useAuth } from "@/lib/supabase/auth";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const { isAuthenticated } = useAuth();
+  const { language } = usePreferences();
+  const copy = useMemo(() => getUiCopy(language), [language]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const navigation = [
+    { name: copy.marketing.nav.features, href: "#features" },
+    { name: copy.marketing.nav.howItWorks, href: "#how-it-works" },
+    { name: copy.marketing.nav.pricing, href: "#pricing" },
+    { name: copy.marketing.nav.customers, href: "#testimonials" },
+  ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-lg">
@@ -45,7 +61,7 @@ export function Header() {
                 type="button"
                 className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-muted-foreground hover:text-foreground"
               >
-                <span className="sr-only">Öppna menyn</span>
+                <span className="sr-only">Open menu</span>
                 <Bars3Icon aria-hidden="true" className="h-6 w-6" />
               </button>
             </SheetTrigger>
@@ -69,7 +85,7 @@ export function Header() {
                   type="button"
                   className="-m-2.5 rounded-md p-2.5 text-muted-foreground hover:text-foreground"
                 >
-                  <span className="sr-only">Stäng menyn</span>
+                  <span className="sr-only">Close menu</span>
                   <XMarkIcon aria-hidden="true" className="h-6 w-6" />
                 </button>
               </SheetClose>
@@ -90,12 +106,22 @@ export function Header() {
                   ))}
                 </div>
                 <div className="space-y-3 py-6">
-                  <Button variant="outline" href="/auth/login" className="w-full">
-                    Logga in
-                  </Button>
-                  <Button href="/auth/signup" className="w-full">
-                    Prova gratis
-                  </Button>
+                  {isAuthenticated ? (
+                    <ProfileMenu context="marketing" onNavigate={() => setMobileMenuOpen(false)} className="w-full justify-center" />
+                  ) : (
+                    <>
+                      <Button variant="outline" href="/auth/login" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                        {copy.marketing.actions.login}
+                      </Button>
+                      <Button href="/auth/signup" className="w-full" onClick={() => setMobileMenuOpen(false)}>
+                        {copy.marketing.actions.signup}
+                      </Button>
+                    </>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <LanguageSwitcher className="flex-1 justify-between" align="start" />
+                    <ThemeToggle className="flex-1 justify-between" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -114,13 +140,19 @@ export function Header() {
           ))}
         </div>
 
-        <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-4">
-          <Button variant="ghost" href="/auth/login">
-            Logga in
-          </Button>
-          <Button href="/auth/signup">
-            Prova gratis
-          </Button>
+        <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:gap-x-3">
+          <LanguageSwitcher />
+          <ThemeToggle />
+          {isAuthenticated ? (
+            <ProfileMenu context="marketing" />
+          ) : (
+            <>
+              <Button variant="ghost" href="/auth/login">
+                {copy.marketing.actions.login}
+              </Button>
+              <Button href="/auth/signup">{copy.marketing.actions.signup}</Button>
+            </>
+          )}
         </div>
       </nav>
     </header>

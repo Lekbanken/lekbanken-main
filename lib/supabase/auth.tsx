@@ -146,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
 
     return () => subscription?.unsubscribe()
-  }, [fetchProfile])
+  }, [fetchProfile, router])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({

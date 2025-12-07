@@ -73,6 +73,9 @@ export type AchievementItem = {
   icon: AchievementIconConfig;
   profileFrameSync?: ProfileFrameSyncConfig;
   publishedRoles?: string[];
+  // Categorization
+  category?: string;
+  tags?: string[];
 };
 
 export type AchievementFilters = {

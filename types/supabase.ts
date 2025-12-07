@@ -4561,30 +4561,39 @@ export type Database = {
       }
       users: {
         Row: {
+          avatar_url: string | null
           created_at: string
           email: string
           full_name: string | null
           id: string
           language: Database["public"]["Enums"]["language_code_enum"]
+          preferred_theme: string | null
           role: string
+          show_theme_toggle_in_header: boolean
           updated_at: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           email: string
           full_name?: string | null
           id: string
           language?: Database["public"]["Enums"]["language_code_enum"]
+          preferred_theme?: string | null
           role?: string
+          show_theme_toggle_in_header?: boolean
           updated_at?: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           email?: string
           full_name?: string | null
           id?: string
           language?: Database["public"]["Enums"]["language_code_enum"]
+          preferred_theme?: string | null
           role?: string
+          show_theme_toggle_in_header?: boolean
           updated_at?: string
         }
         Relationships: []

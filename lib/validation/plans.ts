@@ -1,7 +1,6 @@
 import type { Database } from '@/types/supabase'
 
 type PlanVisibility = Database['public']['Enums']['plan_visibility_enum']
-type PlanBlockType = Database['public']['Enums']['plan_block_type_enum']
 
 type PlanPayload = Partial<Database['public']['Tables']['plans']['Insert']> & {
   visibility?: PlanVisibility

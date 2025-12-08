@@ -80,8 +80,9 @@ export default function TenantAdminPage() {
       setMembers(membersResp.members ?? [])
       setModulesText(JSON.stringify(settingsResp.settings?.modules ?? {}, null, 2))
       setProductText(JSON.stringify(settingsResp.settings?.product_access ?? {}, null, 2))
-    } catch (e: any) {
-      setError(e.message ?? 'Kunde inte ladda tenant')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Kunde inte ladda tenant'
+      setError(message)
     } finally {
       setLoading(false)
     }
@@ -112,8 +113,9 @@ export default function TenantAdminPage() {
       })
       setTenant(updated)
       setMessage('Tenant sparad')
-    } catch (e: any) {
-      setError(e.message ?? 'Kunde inte spara tenant')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Kunde inte spara tenant'
+      setError(message)
     }
   }
 
@@ -131,8 +133,9 @@ export default function TenantAdminPage() {
       })
       setSettings(updated)
       setMessage('Settings sparade')
-    } catch (e: any) {
-      setError(e.message ?? 'Kunde inte spara settings')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Kunde inte spara settings'
+      setError(message)
     }
   }
 
@@ -148,8 +151,9 @@ export default function TenantAdminPage() {
       })
       setBranding(updated)
       setMessage('Branding sparad')
-    } catch (e: any) {
-      setError(e.message ?? 'Kunde inte spara branding')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Kunde inte spara branding'
+      setError(message)
     }
   }
 
@@ -164,8 +168,9 @@ export default function TenantAdminPage() {
         body: JSON.stringify({ email, role }),
       })
       setMessage('Inbjudan skapad')
-    } catch (e: any) {
-      setError(e.message ?? 'Kunde inte skapa inbjudan')
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Kunde inte skapa inbjudan'
+      setError(message)
     }
   }
 

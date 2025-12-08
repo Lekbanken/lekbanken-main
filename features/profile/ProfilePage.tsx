@@ -16,6 +16,30 @@ import { LogoutButton } from "./components/LogoutButton";
 
 type ThemePreference = "light" | "dark" | "system";
 
+type SessionInfo = {
+  id: string;
+  supabase_session_id: string | null;
+  ip: string | null;
+  user_agent: string | null;
+  last_seen_at: string | null;
+  revoked_at: string | null;
+};
+
+type DeviceInfo = {
+  id: string;
+  device_fingerprint: string | null;
+  user_agent: string | null;
+  device_type: string | null;
+  ip_last: string | null;
+  last_seen_at: string | null;
+};
+
+type MfaStatus = {
+  factors: unknown[];
+  totp: unknown;
+  user_mfa: unknown;
+};
+
 const languageOptions = [
   { value: "NO", label: "Norsk" },
   { value: "SE", label: "Svenska" },
@@ -45,12 +69,12 @@ export function ProfilePage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [sessions, setSessions] = useState<
-    { id: string; supabase_session_id: string | null; ip: string | null; user_agent: string | null; last_seen_at: string | null; revoked_at: string | null }[]
+    SessionInfo[]
   >([]);
   const [devices, setDevices] = useState<
-    { id: string; device_fingerprint: string | null; user_agent: string | null; device_type: string | null; ip_last: string | null; last_seen_at: string | null }[]
+    DeviceInfo[]
   >([]);
-  const [mfaStatus, setMfaStatus] = useState<{ factors: any[]; totp: any; user_mfa: any } | null>(null);
+  const [mfaStatus, setMfaStatus] = useState<MfaStatus | null>(null);
   const [loadingSecurity, setLoadingSecurity] = useState(false);
   const [securityError, setSecurityError] = useState<string | null>(null);
   const [mfaEnroll, setMfaEnroll] = useState<{ factorId: string; qr: string; secret: string } | null>(null);
@@ -112,9 +136,9 @@ export function ProfilePage() {
       if (!devicesRes.ok) throw new Error("Kunde inte ladda enheter");
       if (!mfaRes.ok) throw new Error("Kunde inte ladda MFA-status");
 
-      const sessionsJson = (await sessionsRes.json()) as { sessions: any[] };
-      const devicesJson = (await devicesRes.json()) as { devices: any[] };
-      const mfaJson = await mfaRes.json();
+      const sessionsJson = (await sessionsRes.json()) as { sessions: SessionInfo[] };
+      const devicesJson = (await devicesRes.json()) as { devices: DeviceInfo[] };
+      const mfaJson = (await mfaRes.json()) as Partial<MfaStatus>;
 
       setSessions(sessionsJson.sessions ?? []);
       setDevices(devicesJson.devices ?? []);
@@ -323,6 +347,7 @@ export function ProfilePage() {
                 <div className="mt-3 space-y-3 rounded-lg border border-border/60 p-3">
                   <div className="text-sm">
                     <p className="font-semibold text-foreground">Steg 1: Skanna QR eller ange hemlighet</p>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     {mfaEnroll.qr && <img src={mfaEnroll.qr} alt="MFA QR" className="mt-2 h-32 w-32" />}
                     <div className="mt-2 rounded bg-muted px-2 py-1 text-xs font-mono break-all">{mfaEnroll.secret}</div>
                   </div>

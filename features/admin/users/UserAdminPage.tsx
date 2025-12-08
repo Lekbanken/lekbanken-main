@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   UserPlusIcon,
   UsersIcon,
@@ -62,7 +62,7 @@ export function UserAdminPage() {
   const [editingUser, setEditingUser] = useState<UserAdminItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const loadUsers = async () => {
+  const loadUsers = useCallback(async () => {
     const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
     const tenantId = currentTenant?.id;
     const tenantName = currentTenant?.name;
@@ -113,7 +113,7 @@ export function UserAdminPage() {
     } finally {
       setIsLoadingUsers(false);
     }
-  };
+  }, [currentTenant, user, userRole]);
 
   useEffect(() => {
     let cancelled = false;
@@ -125,7 +125,7 @@ export function UserAdminPage() {
     return () => {
       cancelled = true;
     };
-  }, [currentTenant?.id, currentTenant?.name, user?.id, userRole]);
+  }, [loadUsers]);
 
   const handleFiltersChange = (next: Partial<UserFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));

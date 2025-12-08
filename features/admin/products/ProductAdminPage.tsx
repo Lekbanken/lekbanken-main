@@ -9,10 +9,9 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
-import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth";
 import type { Database } from "@/types/supabase";
-import { mockProducts, getBaseCapabilities } from "./data";
+import { getBaseCapabilities } from "./data";
 import { ProductAdminItem, ProductFilters, ProductStatus } from "./types";
 import { ProductTable } from "./components/ProductTable";
 import { ProductTableToolbar } from "./components/ProductTableToolbar";
@@ -23,6 +22,7 @@ import { ProductCapabilitiesEditor } from "./components/ProductCapabilitiesEdito
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
 
 const PRODUCTS_PER_PAGE = 10;
+const fallbackStatus: ProductStatus = "active";
 
 export function ProductAdminPage() {
   const { user } = useAuth();
@@ -54,22 +54,21 @@ export function ProductAdminPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const { data, error: queryError } = await supabase
-          .from("products")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (queryError) {
-          throw queryError;
+        const response = await fetch("/api/products");
+        if (!response.ok) {
+          throw new Error(`Failed to load products (${response.status})`);
         }
 
-        const mapped: ProductAdminItem[] = (data || []).map((row: ProductRow) => ({
+        const json = (await response.json()) as { products: ProductRow[] };
+        const mapped: ProductAdminItem[] = (json.products || []).map((row: ProductRow) => ({
           id: row.id,
           name: row.name,
           category: row.category,
           description: row.description,
-          status: "active",
-          capabilities: baseCapabilities.slice(0, 3),
+          status: (row.status as ProductStatus) || fallbackStatus,
+          capabilities: Array.isArray(row.capabilities)
+            ? (row.capabilities as unknown as ProductAdminItem["capabilities"])
+            : [],
           createdAt: row.created_at,
           updatedAt: row.updated_at,
         }));
@@ -79,8 +78,7 @@ export function ProductAdminPage() {
       } catch (err) {
         console.error("Failed to load products", err);
         if (!isMounted) return;
-        setError("Failed to load products from Supabase. Showing sample data instead.");
-        setProducts(mockProducts);
+        setError("Failed to load products.");
       } finally {
         if (isMounted) {
           setIsLoading(false);
@@ -101,40 +99,36 @@ export function ProductAdminPage() {
 
   const handleCreate = async (payload: Omit<ProductAdminItem, "id" | "createdAt" | "updatedAt">) => {
     try {
-      const now = new Date().toISOString();
-      const { data, error: insertError } = await supabase
-        .from("products")
-        .insert({
-          name: payload.name,
-          category: payload.category,
-          description: payload.description ?? null,
-          created_at: now,
-          updated_at: now,
-        })
-        .select("*")
-        .single();
+      const response = await fetch("/api/products", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-      if (insertError || !data) {
-        throw insertError || new Error("No data returned");
+      if (!response.ok) {
+        const json = await response.json().catch(() => ({}));
+        throw new Error(json.error || (json.errors || []).join(", ") || "Create failed");
       }
 
+      const json = (await response.json()) as { product: ProductRow };
+      const created = json.product;
       const newProduct: ProductAdminItem = {
-        ...payload,
-        id: data.id,
-        createdAt: data.created_at,
-        updatedAt: data.updated_at,
+        id: created.id,
+        name: created.name,
+        category: created.category,
+        description: created.description,
+        status: (created.status as ProductStatus) || payload.status || fallbackStatus,
+        capabilities: Array.isArray(created.capabilities)
+          ? (created.capabilities as unknown as ProductAdminItem["capabilities"])
+          : payload.capabilities,
+        createdAt: created.created_at,
+        updatedAt: created.updated_at,
       };
       setProducts((prev) => [newProduct, ...prev]);
       info("Product created.", "Product created");
     } catch (err) {
-      console.error("Create product failed, falling back to local", err);
-      const fallback: ProductAdminItem = {
-        ...payload,
-        id: `prod-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-      };
-      setProducts((prev) => [fallback, ...prev]);
-      warning("Saved locally only (Supabase insert failed).", "Offline fallback");
+      console.error("Create product failed", err);
+      warning("Failed to create product.", "Create failed");
     } finally {
       setCreateOpen(false);
     }
@@ -142,25 +136,37 @@ export function ProductAdminPage() {
 
   const handleEditSubmit = async (payload: ProductAdminItem) => {
     try {
-      const now = new Date().toISOString();
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({
-          name: payload.name,
-          category: payload.category,
-          description: payload.description ?? null,
-          updated_at: now,
-        })
-        .eq("id", payload.id);
+      const response = await fetch(`/api/products/${payload.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        const json = await response.json().catch(() => ({}));
+        throw new Error(json.error || (json.errors || []).join(", ") || "Update failed");
+      }
 
-      setProducts((prev) => prev.map((p) => (p.id === payload.id ? { ...payload, updatedAt: now } : p)));
+      const json = (await response.json()) as { product: ProductRow };
+      const updated = json.product;
+      const mapped: ProductAdminItem = {
+        id: updated.id,
+        name: updated.name,
+        category: updated.category,
+        description: updated.description,
+        status: (updated.status as ProductStatus) || payload.status,
+        capabilities: Array.isArray(updated.capabilities)
+          ? (updated.capabilities as unknown as ProductAdminItem["capabilities"])
+          : payload.capabilities,
+        createdAt: updated.created_at,
+        updatedAt: updated.updated_at,
+      };
+
+      setProducts((prev) => prev.map((p) => (p.id === payload.id ? mapped : p)));
       success("Changes saved.", "Product updated");
     } catch (err) {
-      console.error("Update product failed, keeping local changes", err);
-      setProducts((prev) => prev.map((p) => (p.id === payload.id ? payload : p)));
-      warning("Updated locally only (Supabase update failed).", "Offline fallback");
+      console.error("Update product failed", err);
+      warning("Failed to update product.", "Update failed");
     } finally {
       setEditingProduct(null);
     }
@@ -175,13 +181,16 @@ export function ProductAdminPage() {
 
   const handleRemove = async (productId: string) => {
     try {
-      const { error: deleteError } = await supabase.from("products").delete().eq("id", productId);
-      if (deleteError) throw deleteError;
+      const response = await fetch(`/api/products/${productId}`, { method: "DELETE" });
+      if (!response.ok) {
+        const json = await response.json().catch(() => ({}));
+        throw new Error(json.error || "Delete failed");
+      }
       setProducts((prev) => prev.filter((p) => p.id !== productId));
       warning("Product removed.", "Deleted");
     } catch (err) {
       console.error("Remove product failed", err);
-      warning("Failed to delete from Supabase. Item remains.", "Delete failed");
+      warning("Failed to delete product.", "Delete failed");
     }
   };
 

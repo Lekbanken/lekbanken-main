@@ -75,8 +75,10 @@ export async function createProduct(
   product: {
     name: string
     category: string
-    product_key?: string
     description?: string
+    status?: string
+    capabilities?: unknown
+    product_key?: string
   }
 ): Promise<Product> {
   const { data, error } = await supabase
@@ -99,6 +101,8 @@ export async function updateProduct(
     name?: string
     category?: string
     description?: string
+    status?: string
+    capabilities?: unknown
   }
 ): Promise<Product> {
   const { data, error } = await supabase

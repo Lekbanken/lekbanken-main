@@ -18,6 +18,11 @@ END $$;
 DO $$
 BEGIN
   IF EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users' AND policyname='users_update_admin_or_self'
+  ) THEN
+    DROP POLICY users_update_admin_or_self ON public.users;
+  END IF;
+  IF EXISTS (
     SELECT 1 FROM pg_policies WHERE schemaname='public' AND tablename='users' AND policyname='users_update_own'
   ) THEN
     DROP POLICY users_update_own ON public.users;

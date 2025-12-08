@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import {
   BuildingOffice2Icon,
   PlusIcon,
@@ -53,7 +53,7 @@ export function OrganisationAdminPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const loadOrganisations = async () => {
+  const loadOrganisations = useCallback(async () => {
     if (!user) {
       setIsLoading(false);
       return;
@@ -95,7 +95,7 @@ export function OrganisationAdminPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     let cancelled = false;
@@ -107,7 +107,7 @@ export function OrganisationAdminPage() {
     return () => {
       cancelled = true;
     };
-  }, [user, user?.id]);
+  }, [loadOrganisations]);
 
   const handleFiltersChange = (next: Partial<OrganisationFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));

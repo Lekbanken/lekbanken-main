@@ -12,8 +12,10 @@ import { SearchBar } from "./components/SearchBar";
 import type { BrowseFilters, Game } from "./types";
 import type { Tables } from "@/types/supabase";
 
+type GameMediaWithAsset = Tables<"game_media"> & { media?: Tables<"media"> | null };
+
 type DbGame = Tables<"games"> & {
-  media?: any[];
+  media?: GameMediaWithAsset[];
   product?: { name?: string | null } | null;
   main_purpose?: { name?: string | null } | null;
 };

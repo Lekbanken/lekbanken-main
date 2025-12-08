@@ -48,7 +48,8 @@ export function SessionEditor({
   plan,
   onPlanChange,
   onAddBlock,
-  onUpdateBlock,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  onUpdateBlock: _onUpdateBlock,
   onDeleteBlock,
   onSavePrivateNote,
   onVisibilityChange,

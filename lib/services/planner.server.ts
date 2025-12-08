@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
-import type { Database, Tables } from '@/types/supabase'
+import type { Tables } from '@/types/supabase'
 import type { PlannerPlan, PlannerPlayView, PlannerBlock, PlannerPlayBlock, PlannerGameSummary } from '@/types/planner'
 
 type PlanRow = Tables<'plans'>
@@ -10,6 +10,12 @@ type BlockRow = Tables<'plan_blocks'> & {
     translations?: Tables<'game_translations'>[] | null
     media?: Tables<'game_media'>[] | null
   }) | null
+}
+
+type PlanWithRelations = PlanRow & {
+  blocks?: (BlockRow & { game?: BlockRow['game'] })[] | null
+  private_notes?: PrivateNoteRow[] | null
+  tenant_notes?: TenantNoteRow[] | null
 }
 
 type PrivateNoteRow = Tables<'plan_notes_private'>
@@ -137,11 +143,18 @@ function mapInstructionsToSteps(
 ): PlannerPlayBlock['game']['steps'] {
   const instructions = translation?.instructions
   if (Array.isArray(instructions)) {
-    return instructions.map((step: any, idx: number) => ({
-      title: typeof step?.title === 'string' && step.title.length > 0 ? step.title : `Steg ${idx + 1}`,
-      description: typeof step?.description === 'string' ? step.description : '',
-      durationMinutes: typeof step?.duration_minutes === 'number' ? step.duration_minutes : null,
-    }))
+    return instructions.map((step, idx: number) => {
+      const stepObj = step as { title?: string; description?: string; duration_minutes?: number }
+      return {
+        title:
+          typeof stepObj.title === 'string' && stepObj.title.length > 0
+            ? stepObj.title
+            : `Steg ${idx + 1}`,
+        description: typeof stepObj.description === 'string' ? stepObj.description : '',
+        durationMinutes:
+          typeof stepObj.duration_minutes === 'number' ? stepObj.duration_minutes : null,
+      }
+    })
   }
   return [
     {
@@ -256,7 +269,7 @@ export async function fetchPlanWithRelations(
 
   if (!data) return { plan: null, error: 'not_found' }
 
-  return { plan: buildPlanModel(data as any, localeOrder) }
+  return { plan: buildPlanModel(data as PlanWithRelations, localeOrder) }
 }
 
 export function sortBlocks(blocks: PlannerBlock[]) {

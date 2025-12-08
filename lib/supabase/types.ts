@@ -621,30 +621,36 @@ export type Database = {
       }
       products: {
         Row: {
+          capabilities: Json | null
           category: string
           created_at: string
           description: string | null
           id: string
           name: string
           product_key: string | null
+          status: string
           updated_at: string
         }
         Insert: {
+          capabilities?: Json | null
           category: string
           created_at?: string
           description?: string | null
           id?: string
           name: string
           product_key?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
+          capabilities?: Json | null
           category?: string
           created_at?: string
           description?: string | null
           id?: string
           name?: string
           product_key?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []

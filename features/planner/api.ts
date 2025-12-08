@@ -1,11 +1,13 @@
 import type { PlannerPlan, PlannerPlayView } from '@/types/planner'
 
-async function handleJson<T = any>(res: Response): Promise<T> {
+type ErrorPayload = { error?: string; errors?: string[] }
+
+async function handleJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const payload = await res.json().catch(() => ({}))
-    const errors = (payload as any)?.errors
+    const payload = (await res.json().catch(() => ({}))) as ErrorPayload
+    const errors = payload?.errors
     const message =
-      (payload as any)?.error ||
+      payload?.error ||
       (Array.isArray(errors) ? errors.join(', ') : undefined) ||
       res.statusText
     throw new Error(message || 'Request failed')

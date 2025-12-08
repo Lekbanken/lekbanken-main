@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { buildPlayView, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
+import type { Tables } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -42,6 +43,15 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const play = buildPlayView(data as any, DEFAULT_LOCALE_ORDER)
+  type PlanWithRelations = Tables<'plans'> & {
+    blocks?: (Tables<'plan_blocks'> & {
+      game?: Tables<'games'> & {
+        translations?: Tables<'game_translations'>[] | null
+        media?: Tables<'game_media'>[] | null
+      } | null
+    })[] | null
+  }
+
+  const play = buildPlayView(data as PlanWithRelations, DEFAULT_LOCALE_ORDER)
   return NextResponse.json({ play })
 }

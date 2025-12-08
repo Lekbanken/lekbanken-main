@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { isSystemAdmin } from '@/lib/utils/authRoles'
+import type { Database } from '@/types/supabase'
 
 export async function GET() {
   const supabase = await createServerRlsClient()
@@ -26,11 +27,15 @@ export async function GET() {
 
   const activeTenantId = await readTenantIdFromCookies(cookieStore)
 
+  const globalRole =
+    (userRow as { global_role?: Database['public']['Enums']['global_role_enum'] | null } | null)?.global_role ??
+    null
+
   return NextResponse.json({
     user: userRow,
     auth_user: user,
     memberships: memberships ?? [],
     active_tenant_id: activeTenantId,
-    is_system_admin: isSystemAdmin(user, (userRow as { global_role?: string } | null)?.global_role as any),
+    is_system_admin: isSystemAdmin(user, globalRole),
   })
 }

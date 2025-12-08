@@ -13,12 +13,23 @@ type ApiGame = {
   id: string;
   name: string;
   description?: string | null;
-  translations?: { locale: string; title: string; short_description: string; instructions: any }[];
+  translations?: {
+    locale: string;
+    title: string;
+    short_description: string;
+    instructions: unknown;
+  }[];
   location_type?: string | null;
   min_players?: number | null;
   max_players?: number | null;
   age_min?: number | null;
   age_max?: number | null;
+};
+
+type InstructionStep = {
+  title?: string;
+  description?: string;
+  duration_minutes?: number;
 };
 
 function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "no", "en"]): GameRun | null {
@@ -28,7 +39,7 @@ function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "n
 
   const steps =
     Array.isArray(translation?.instructions)
-      ? (translation?.instructions as { title?: string; description?: string; duration_minutes?: number }[]).map((s, i) => ({
+      ? (translation?.instructions as InstructionStep[]).map((s, i) => ({
           id: s.title || `step-${i + 1}`,
           title: s.title || `Steg ${i + 1}`,
           description: s.description || "",

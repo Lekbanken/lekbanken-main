@@ -112,4 +112,16 @@ Projektet är organiserat enligt **Domain-Driven Design** med tydligt avgränsad
 
 ---
 
+## ✅ Planner QA-checklista (snabb)
+
+- Säkerställ giltig auth-cookie och `lb_tenant`-header/cookie.
+- Skapa plan via UI eller `POST /api/plans` (visibility default private).
+- Uppdatera titel/beskrivning och bekräfta att debounced sparning fungerar utan text-förlust.
+- Lägg till block (lek/pause/preparation/custom), flytta upp/ner, radera; kontrollera total tid.
+- Spara privata anteckningar och tenant-anteckningar; bekräfta RLS (tenant-medlem ser tenant note, ej privat note).
+- Ändra visibility (private/tenant/public – public kräver system_admin) och verifiera åtkomst med annan användare/tenant.
+- Kalla på `/api/plans/[planId]/play` och säkerställ att translations/media/duration finns.
+
+---
+
 ## 🔧 Kom igång

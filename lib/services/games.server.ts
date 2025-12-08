@@ -4,6 +4,8 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Tables } from '@/types/supabase'
 
 export type GameRow = Tables<'games'>
+type ProductRow = Tables<'products'>
+type PurposeRow = Tables<'purposes'>
 
 type GameTranslation = {
   game_id: string
@@ -23,11 +25,14 @@ type GameMedia = {
   position: number
   alt_text: string | null
   created_at: string
+  media?: Tables<'media'> | null
 }
 
 export type GameWithRelations = GameRow & {
   translations?: GameTranslation[]
   media?: GameMedia[]
+  product?: ProductRow | null
+  main_purpose?: PurposeRow | null
 }
 
 export async function getGameById(gameId: string): Promise<GameWithRelations | null> {
@@ -41,7 +46,7 @@ export async function getGameById(gameId: string): Promise<GameWithRelations | n
         product:products(*),
         main_purpose:purposes!main_purpose_id(*),
         translations:game_translations(*),
-        media:game_media(*)
+        media:game_media(*, media:media(*))
       `
     )
     .eq('id', gameId)

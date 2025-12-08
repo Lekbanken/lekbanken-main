@@ -1,29 +1,30 @@
-import Image from 'next/image';
-import Link from 'next/link';
-import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline';
-import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server';
+import Image from 'next/image'
+import Link from 'next/link'
+import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline'
+import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server'
 
-// Energinivå-konfiguration med dark mode stöd
+type Instruction = { title?: string; description?: string; duration_minutes?: number | null }
+
 const energyConfig: Record<string, { label: string; color: string; bgColor: string }> = {
-  low: { label: "Låg energi", color: "text-green-600 dark:text-green-400", bgColor: "bg-green-50 dark:bg-green-950/50" },
-  medium: { label: "Medel energi", color: "text-amber-600 dark:text-amber-400", bgColor: "bg-amber-50 dark:bg-amber-950/50" },
-  high: { label: "Hög energi", color: "text-red-600 dark:text-red-400", bgColor: "bg-red-50 dark:bg-red-950/50" },
-};
+  low: { label: 'Låg energi', color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/50' },
+  medium: { label: 'Medel energi', color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' },
+  high: { label: 'Hög energi', color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/50' },
+}
 
-const localePriority = ['sv', 'no', 'en'];
+const localePriority = ['sv', 'no', 'en']
 
 function pickTranslation(game: GameWithRelations) {
-  const translations = game.translations || [];
+  const translations = game.translations || []
   for (const locale of localePriority) {
-    const hit = translations.find((t) => t.locale === locale);
-    if (hit) return hit;
+    const hit = translations.find((t) => t.locale === locale)
+    if (hit) return hit
   }
-  return translations[0] || null;
+  return translations[0] || null
 }
 
 export default async function GameDetailPage({ params }: { params: { gameId: string } }) {
-  const game = await getGameById(params.gameId);
-  const relatedGames = game ? await getRelatedGames(game, 4) : [];
+  const game = await getGameById(params.gameId)
+  const relatedGames = game ? await getRelatedGames(game, 4) : []
 
   if (!game) {
     return (
@@ -39,19 +40,19 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
           </Link>
         </div>
       </div>
-    );
+    )
   }
 
-  const translation = pickTranslation(game);
-  const displayTitle = translation?.title || game.name;
-  const displayDescription = translation?.short_description || game.description || 'Ingen beskrivning tillgänglig';
+  const translation = pickTranslation(game)
+  const displayTitle = translation?.title || game.name
+  const displayDescription = translation?.short_description || game.description || 'Ingen beskrivning tillgänglig'
   const displayInstructions = Array.isArray(translation?.instructions)
-    ? (translation?.instructions as { title?: string; description?: string }[])
-    : null;
-  const energy = energyConfig[game.energy_level ?? 'medium'] ?? energyConfig.medium;
-  const media = (game.media as unknown as any[]) ?? [];
-  const cover = media.find((m) => m.kind === 'cover') ?? media[0];
-  const gallery = media.filter((m) => m !== cover);
+    ? (translation?.instructions as Instruction[])
+    : null
+  const energy = energyConfig[game.energy_level ?? 'medium'] ?? energyConfig.medium
+  const media = game.media ?? []
+  const cover = media.find((m) => m.kind === 'cover') ?? media[0]
+  const gallery = media.filter((m) => m !== cover)
 
   return (
     <div className="space-y-6">
@@ -64,7 +65,7 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
           <ArrowLeftIcon className="h-4 w-4" />
           Tillbaka till lekar
         </Link>
-        
+
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-1">Lek</p>
           <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{displayTitle}</h1>
@@ -165,7 +166,7 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
             <section className="rounded-2xl border border-border/60 bg-card p-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">Bilder</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {gallery.map((item) => (
+                {gallery.map((item) =>
                   item.media?.url ? (
                     <div key={item.id} className="overflow-hidden rounded-xl border border-border/60 bg-muted">
                       <div className="relative aspect-[4/3]">
@@ -179,7 +180,7 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
                       </div>
                     </div>
                   ) : null
-                ))}
+                )}
               </div>
             </section>
           )}
@@ -241,7 +242,7 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
               <div>
                 <p className="text-muted-foreground text-xs uppercase tracking-wide">Status</p>
                 <p className="text-foreground font-medium">
-                  {game.status === 'published' ? '✓ Publicerad' : 'Utkast'}
+                  {game.status === 'published' ? '💜 Publicerad' : 'Utkast'}
                 </p>
               </div>
               {game.created_at && (
@@ -276,15 +277,17 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
           <h2 className="text-xl font-semibold text-foreground mb-4">Liknande lekar</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {relatedGames.map((relatedGame) => (
-              <Link 
-                key={relatedGame.id} 
+              <Link
+                key={relatedGame.id}
                 href={`/app/games/${relatedGame.id}`}
                 className="block rounded-2xl border border-border/60 bg-card p-4 hover:shadow-md hover:-translate-y-0.5 transition-all"
               >
                 <h3 className="font-semibold text-foreground mb-1">{relatedGame.name}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-2">{relatedGame.description}</p>
                 {relatedGame.energy_level && (
-                  <span className={`mt-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${energyConfig[relatedGame.energy_level]?.bgColor} ${energyConfig[relatedGame.energy_level]?.color}`}>
+                  <span
+                    className={`mt-2 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg ${energyConfig[relatedGame.energy_level]?.bgColor} ${energyConfig[relatedGame.energy_level]?.color}`}
+                  >
                     <BoltIcon className="h-3 w-3" />
                     {energyConfig[relatedGame.energy_level]?.label}
                   </span>
@@ -295,5 +298,5 @@ export default async function GameDetailPage({ params }: { params: { gameId: str
         </section>
       )}
     </div>
-  );
+  )
 }

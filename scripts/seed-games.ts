@@ -29,6 +29,13 @@ type GameTranslationInsert = Database["public"]["Tables"]["game_translations"]["
 type MediaInsert = Database["public"]["Tables"]["media"]["Insert"];
 type GameMediaInsert = Database["public"]["Tables"]["game_media"]["Insert"];
 
+type GameSeed = Omit<GameInsert, "materials" | "instructions"> & {
+  materials?: string | string[] | null;
+  instructions?: string | null;
+  // Optional hint to pick a cover set (matches the purpose cover buckets below)
+  cover_hint?: string | null;
+};
+
 const shortify = (text?: string | null, max = 160) => {
   if (!text) return "Kort beskrivning saknas.";
   const firstSentence = text.split(/[\n\.]/)[0]?.trim() || text.trim();
@@ -44,8 +51,69 @@ const toSteps = (instructions?: string | null) => {
   }));
 };
 
+// Cover image sets per huvudsyfte (filer finns i bucket game-media)
+const COVER_SETS: Record<string, string[]> = {
+  kognition: [
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%201.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%202.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%203.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%204.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%205.webp",
+  ],
+  kommunikation: [
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%201.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%202.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%203.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%204.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%205.webp",
+  ],
+  kreativitet: [
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%201.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%202.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%203.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%204.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%205.webp",
+  ],
+  kunskap: [
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%201.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%202.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%203.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%204.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%205.webp",
+  ],
+  socialt: [
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%201.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%202.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%203.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%204.webp",
+    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%205.webp",
+  ],
+};
+
+const FALLBACK_SET = COVER_SETS.kreativitet;
+
+const normalizeKey = (value?: string | null) =>
+  (value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+const pickCoverUrl = (game: GameSeed) => {
+  const hint = normalizeKey(game.cover_hint || game.category || "");
+  let set: string[] | undefined;
+
+  if (hint.includes("kognition") || hint.includes("fokus")) set = COVER_SETS.kognition;
+  else if (hint.includes("kommunikation") || hint.includes("sprak") || hint.includes("språk")) set = COVER_SETS.kommunikation;
+  else if (hint.includes("kreativitet") || hint.includes("uttryck")) set = COVER_SETS.kreativitet;
+  else if (hint.includes("kunskap") || hint.includes("larande") || hint.includes("lärande")) set = COVER_SETS.kunskap;
+  else if (hint.includes("social") || hint.includes("relation")) set = COVER_SETS.socialt;
+
+  const chosenSet = set || FALLBACK_SET;
+  const key = game.game_key || game.name || "cover";
+  const hash = key.split("").reduce((acc, ch) => acc + ch.charCodeAt(0), 0);
+  const idx = hash % chosenSet.length;
+  return chosenSet[idx];
+};
+
 // 25 klassiska och populÃ¤ra barnlekar
-const GAMES: GameInsert[] = [
+const GAMES: GameSeed[] = [
   // === UTELEKER (Outdoor) ===
   {
     game_key: "sista-pansen",
@@ -682,6 +750,11 @@ async function seedGames() {
     const baseGame = {
       ...game,
       short_description: shortify(game.description),
+      materials: Array.isArray(game.materials)
+        ? game.materials
+        : game.materials
+          ? [game.materials]
+          : null,
     };
 
     const { data: upserted, error } = await supabase
@@ -691,7 +764,8 @@ async function seedGames() {
       .single();
 
     if (error) {
-      console.error(`Error with "${game.name}":`, (error as any).message || error);
+      const errMsg = (error as { message?: string } | null)?.message ?? String(error);
+      console.error(`Error with "${game.name}":`, errMsg);
       errors++;
       continue;
     }
@@ -707,7 +781,11 @@ async function seedGames() {
       title: game.name,
       short_description: shortify(upserted.description),
       instructions: toSteps(game.instructions),
-      materials: Array.isArray(game.materials) ? (game.materials as string[]) : null,
+      materials: Array.isArray(game.materials)
+        ? game.materials
+        : game.materials
+          ? [game.materials]
+          : null,
     } as GameTranslationInsert;
     await supabase
       .from("game_translations")
@@ -721,15 +799,15 @@ async function seedGames() {
       .limit(1);
 
     if (!existingCover || existingCover.length === 0) {
-      const mediaPayload = {
+      const mediaPayload: MediaInsert = {
         name: `${game.name} cover`,
-        type: "image",
+        type: "upload",
         game_id: gameId,
-        url: `https://picsum.photos/seed/${game.game_key || game.name}/1200/800`,
+        url: pickCoverUrl(game),
         alt_text: game.name,
         product_id: upserted.product_id || null,
         purpose_id: upserted.main_purpose_id || null,
-      } as MediaInsert;
+      };
       const { data: mediaRow, error: mediaError } = await supabase
         .from("media")
         .insert(mediaPayload)

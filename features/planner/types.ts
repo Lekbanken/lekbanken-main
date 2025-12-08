@@ -1,15 +1,15 @@
-export type GameItem = {
-  id: string;
-  title: string;
-  durationMinutes: number;
-  energy?: "low" | "medium" | "high";
-  environment?: "indoor" | "outdoor" | "either";
-};
+import type {
+  PlannerPlan,
+  PlannerBlock,
+  PlannerBlockType,
+  PlannerVisibility,
+  PlannerGameSummary,
+} from '@/types/planner'
 
-export type Session = {
-  id: string;
-  title: string;
-  notes?: string;
-  games: GameItem[];
-  updatedAt?: string;
-};
+export type {
+  PlannerPlan,
+  PlannerBlock,
+  PlannerBlockType,
+  PlannerVisibility,
+  PlannerGameSummary,
+}

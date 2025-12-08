@@ -2929,36 +2929,58 @@ export type Database = {
       }
       plan_blocks: {
         Row: {
-          block_type: string
+          block_type: Database["public"]["Enums"]["plan_block_type_enum"]
           created_at: string
+          created_by: string | null
           duration_minutes: number | null
           game_id: string | null
           id: string
+          is_optional: boolean | null
+          metadata: Json | null
           notes: string | null
           plan_id: string
           position: number
+          title: string | null
+          updated_by: string | null
         }
         Insert: {
-          block_type: string
+          block_type: Database["public"]["Enums"]["plan_block_type_enum"]
           created_at?: string
+          created_by?: string | null
           duration_minutes?: number | null
           game_id?: string | null
           id?: string
+          is_optional?: boolean | null
+          metadata?: Json | null
           notes?: string | null
           plan_id: string
           position: number
+          title?: string | null
+          updated_by?: string | null
         }
         Update: {
-          block_type?: string
+          block_type?: Database["public"]["Enums"]["plan_block_type_enum"]
           created_at?: string
+          created_by?: string | null
           duration_minutes?: number | null
           game_id?: string | null
           id?: string
+          is_optional?: boolean | null
+          metadata?: Json | null
           notes?: string | null
           plan_id?: string
           position?: number
+          title?: string | null
+          updated_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "plan_blocks_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plan_blocks_game_id_fkey"
             columns: ["game_id"]
@@ -2971,6 +2993,13 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_blocks_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -3008,44 +3037,235 @@ export type Database = {
           },
         ]
       }
+      plan_notes_private: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          plan_id: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          plan_id: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          plan_id?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_notes_private_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_notes_private_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_notes_private_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_notes_tenant: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string
+          id: string
+          plan_id: string
+          tenant_id: string
+          updated_at: string
+          updated_by: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by: string
+          id?: string
+          plan_id: string
+          tenant_id: string
+          updated_at?: string
+          updated_by: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          plan_id?: string
+          tenant_id?: string
+          updated_at?: string
+          updated_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_notes_tenant_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_notes_tenant_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_notes_tenant_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_notes_tenant_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plan_play_progress: {
+        Row: {
+          completed_at: string | null
+          current_block_id: string | null
+          current_position: number | null
+          id: string
+          metadata: Json | null
+          plan_id: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["plan_run_status_enum"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          current_block_id?: string | null
+          current_position?: number | null
+          id?: string
+          metadata?: Json | null
+          plan_id: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["plan_run_status_enum"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          current_block_id?: string | null
+          current_position?: number | null
+          id?: string
+          metadata?: Json | null
+          plan_id?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["plan_run_status_enum"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_play_progress_current_block_id_fkey"
+            columns: ["current_block_id"]
+            isOneToOne: false
+            referencedRelation: "plan_blocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_play_progress_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plan_play_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       plans: {
         Row: {
           created_at: string
+          created_by: string | null
           description: string | null
           id: string
+          metadata: Json | null
           name: string
           owner_tenant_id: string | null
           owner_user_id: string
           plan_key: string | null
           total_time_minutes: number | null
           updated_at: string
+          updated_by: string | null
           visibility: Database["public"]["Enums"]["plan_visibility_enum"]
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
+          metadata?: Json | null
           name: string
           owner_tenant_id?: string | null
           owner_user_id: string
           plan_key?: string | null
           total_time_minutes?: number | null
           updated_at?: string
+          updated_by?: string | null
           visibility?: Database["public"]["Enums"]["plan_visibility_enum"]
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           description?: string | null
           id?: string
+          metadata?: Json | null
           name?: string
           owner_tenant_id?: string | null
           owner_user_id?: string
           plan_key?: string | null
           total_time_minutes?: number | null
           updated_at?: string
+          updated_by?: string | null
           visibility?: Database["public"]["Enums"]["plan_visibility_enum"]
         }
         Relationships: [
+          {
+            foreignKeyName: "plans_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "plans_owner_tenant_id_fkey"
             columns: ["owner_tenant_id"]
@@ -3056,6 +3276,13 @@ export type Database = {
           {
             foreignKeyName: "plans_owner_user_id_fkey"
             columns: ["owner_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "plans_updated_by_fkey"
+            columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -4031,6 +4258,255 @@ export type Database = {
           },
         ]
       }
+      tenant_audit_logs: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          tenant_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          tenant_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_audit_logs_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_audit_logs_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_branding: {
+        Row: {
+          accent_color: string | null
+          brand_name_override: string | null
+          created_at: string
+          id: string
+          logo_media_id: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          tenant_id: string
+          theme: string | null
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string | null
+          brand_name_override?: string | null
+          created_at?: string
+          id?: string
+          logo_media_id?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          tenant_id: string
+          theme?: string | null
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string | null
+          brand_name_override?: string | null
+          created_at?: string
+          id?: string
+          logo_media_id?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          tenant_id?: string
+          theme?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_branding_logo_media_id_fkey"
+            columns: ["logo_media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_branding_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_features: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          feature_key: string
+          id: string
+          tenant_id: string
+          updated_at: string
+          value: Json | null
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          feature_key: string
+          id?: string
+          tenant_id: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          feature_key?: string
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          value?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_features_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string | null
+          id: string
+          invited_by: string | null
+          role: string
+          status: string
+          tenant_id: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string | null
+          role?: string
+          status?: string
+          tenant_id: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invited_by?: string | null
+          role?: string
+          status?: string
+          tenant_id?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenant_invitations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tenant_memberships: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          role: Database["public"]["Enums"]["tenant_role_enum"]
+          seat_assignment_id: string | null
+          status: string | null
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          role?: Database["public"]["Enums"]["tenant_role_enum"]
+          seat_assignment_id?: string | null
+          status?: string | null
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          role?: Database["public"]["Enums"]["tenant_role_enum"]
+          seat_assignment_id?: string | null
+          status?: string | null
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_memberships_seat_assignment_id_fkey"
+            columns: ["seat_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_seat_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_tenant_memberships_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_tenant_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_seat_assignments: {
         Row: {
           assigned_at: string
@@ -4115,6 +4591,44 @@ export type Database = {
           },
         ]
       }
+      tenant_settings: {
+        Row: {
+          created_at: string
+          id: string
+          modules: Json | null
+          preferences: Json | null
+          product_access: Json | null
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          modules?: Json | null
+          preferences?: Json | null
+          product_access?: Json | null
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          modules?: Json | null
+          preferences?: Json | null
+          product_access?: Json | null
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_settings_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: true
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tenant_subscriptions: {
         Row: {
           billing_product_id: string
@@ -4178,56 +4692,98 @@ export type Database = {
           contact_name: string | null
           contact_phone: string | null
           created_at: string
+          created_by: string | null
+          default_language: string | null
+          default_theme: string | null
+          demo_flag: boolean | null
           description: string | null
           id: string
           logo_url: string | null
           main_language: Database["public"]["Enums"]["language_code_enum"]
+          metadata: Json | null
           name: string
+          primary_color: string | null
+          secondary_color: string | null
           slug: string | null
           status: string
           subscription_status: string | null
           subscription_tier: string | null
           tenant_key: string | null
+          trial_ends_at: string | null
           type: string
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          created_by?: string | null
+          default_language?: string | null
+          default_theme?: string | null
+          demo_flag?: boolean | null
           description?: string | null
           id?: string
           logo_url?: string | null
           main_language?: Database["public"]["Enums"]["language_code_enum"]
+          metadata?: Json | null
           name: string
+          primary_color?: string | null
+          secondary_color?: string | null
           slug?: string | null
           status?: string
           subscription_status?: string | null
           subscription_tier?: string | null
           tenant_key?: string | null
+          trial_ends_at?: string | null
           type: string
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           contact_email?: string | null
           contact_name?: string | null
           contact_phone?: string | null
           created_at?: string
+          created_by?: string | null
+          default_language?: string | null
+          default_theme?: string | null
+          demo_flag?: boolean | null
           description?: string | null
           id?: string
           logo_url?: string | null
           main_language?: Database["public"]["Enums"]["language_code_enum"]
+          metadata?: Json | null
           name?: string
+          primary_color?: string | null
+          secondary_color?: string | null
           slug?: string | null
           status?: string
           subscription_status?: string | null
           subscription_tier?: string | null
           tenant_key?: string | null
+          trial_ends_at?: string | null
           type?: string
           updated_at?: string
+          updated_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tenants_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tenants_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       ticket_messages: {
         Row: {
@@ -4668,51 +5224,6 @@ export type Database = {
           },
         ]
       }
-      user_tenant_memberships: {
-        Row: {
-          created_at: string
-          id: string
-          is_primary: boolean
-          role: Database["public"]["Enums"]["tenant_role_enum"]
-          tenant_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          is_primary?: boolean
-          role?: Database["public"]["Enums"]["tenant_role_enum"]
-          tenant_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          is_primary?: boolean
-          role?: Database["public"]["Enums"]["tenant_role_enum"]
-          tenant_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_tenant_memberships_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_tenant_memberships_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           avatar_url: string | null
@@ -4814,13 +5325,15 @@ export type Database = {
           id: string
           is_primary: boolean
           role: Database["public"]["Enums"]["tenant_role_enum"]
+          seat_assignment_id: string | null
+          status: string | null
           tenant_id: string
           updated_at: string
           user_id: string
         }
         SetofOptions: {
           from: "*"
-          to: "user_tenant_memberships"
+          to: "tenant_memberships"
           isOneToOne: true
           isSetofReturn: false
         }
@@ -4842,6 +5355,7 @@ export type Database = {
             Returns: boolean
           }
       is_global_admin: { Args: never; Returns: boolean }
+      is_system_admin: { Args: never; Returns: boolean }
       is_tenant_member: { Args: { target_tenant: string }; Returns: boolean }
       to_text_array_safe:
         | {
@@ -4873,12 +5387,20 @@ export type Database = {
       location_type_enum: "indoor" | "outdoor" | "both"
       media_type_enum: "template" | "upload" | "ai"
       payment_status_enum: "pending" | "confirmed" | "failed" | "refunded"
+      plan_block_type_enum: "game" | "pause" | "preparation" | "custom"
+      plan_run_status_enum:
+        | "not_started"
+        | "in_progress"
+        | "completed"
+        | "abandoned"
       plan_visibility_enum: "private" | "tenant" | "public"
       purpose_type_enum: "main" | "sub"
       seat_assignment_status_enum: "active" | "released" | "pending" | "revoked"
       session_status_enum: "active" | "paused" | "completed" | "abandoned"
       subscription_status_enum: "active" | "paused" | "canceled" | "trial"
       tenant_role_enum: "owner" | "admin" | "editor" | "member"
+      tenant_status_enum: "active" | "suspended" | "trial" | "demo" | "archived"
+      tenant_type_enum: "school" | "sports" | "workplace" | "private" | "demo"
       ticket_priority_enum: "low" | "medium" | "high" | "urgent"
       ticket_status_enum:
         | "open"
@@ -5029,12 +5551,21 @@ export const Constants = {
       location_type_enum: ["indoor", "outdoor", "both"],
       media_type_enum: ["template", "upload", "ai"],
       payment_status_enum: ["pending", "confirmed", "failed", "refunded"],
+      plan_block_type_enum: ["game", "pause", "preparation", "custom"],
+      plan_run_status_enum: [
+        "not_started",
+        "in_progress",
+        "completed",
+        "abandoned",
+      ],
       plan_visibility_enum: ["private", "tenant", "public"],
       purpose_type_enum: ["main", "sub"],
       seat_assignment_status_enum: ["active", "released", "pending", "revoked"],
       session_status_enum: ["active", "paused", "completed", "abandoned"],
       subscription_status_enum: ["active", "paused", "canceled", "trial"],
       tenant_role_enum: ["owner", "admin", "editor", "member"],
+      tenant_status_enum: ["active", "suspended", "trial", "demo", "archived"],
+      tenant_type_enum: ["school", "sports", "workplace", "private", "demo"],
       ticket_priority_enum: ["low", "medium", "high", "urgent"],
       ticket_status_enum: [
         "open",

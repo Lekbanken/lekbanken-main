@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   Bars3Icon,
   ChevronUpIcon,
@@ -6,11 +5,13 @@ import {
   TrashIcon,
   PlayIcon,
   ClockIcon,
-  HomeIcon,
-  SunIcon,
+  RectangleGroupIcon,
+  PauseIcon,
+  PencilSquareIcon,
   EllipsisVerticalIcon,
 } from "@heroicons/react/24/outline";
-import type { GameItem } from "../types";
+import Link from "next/link";
+import type { PlannerBlock } from "../types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,8 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-type GameRowProps = {
-  game: GameItem;
+type BlockRowProps = {
+  block: PlannerBlock;
   index: number;
   total?: number;
   onMoveUp: () => void;
@@ -28,21 +29,19 @@ type GameRowProps = {
   onRemove: () => void;
 };
 
-const energyConfig = {
-  high: { label: "Hög", color: "text-emerald-600", bg: "bg-emerald-500" },
-  medium: { label: "Medium", color: "text-amber-600", bg: "bg-amber-500" },
-  low: { label: "Lugn", color: "text-sky-600", bg: "bg-sky-500" },
-} as const;
+const blockMeta: Record<
+  PlannerBlock["blockType"],
+  { label: string; Icon: typeof RectangleGroupIcon; tone: string }
+> = {
+  game: { label: "Lek", Icon: RectangleGroupIcon, tone: "text-primary" },
+  pause: { label: "Paus", Icon: PauseIcon, tone: "text-amber-600" },
+  preparation: { label: "Förberedelse", Icon: PencilSquareIcon, tone: "text-sky-600" },
+  custom: { label: "Notis", Icon: PencilSquareIcon, tone: "text-emerald-600" },
+};
 
-const environmentConfig = {
-  indoor: { label: "Inomhus", Icon: HomeIcon },
-  outdoor: { label: "Utomhus", Icon: SunIcon },
-  either: { label: "Var som helst", Icon: HomeIcon },
-} as const;
-
-export function GameRow({ game, index, total = 999, onMoveUp, onMoveDown, onRemove }: GameRowProps) {
-  const energy = game.energy ? energyConfig[game.energy] : null;
-  const environment = game.environment ? environmentConfig[game.environment] : null;
+export function BlockRow({ block, index, total = 999, onMoveUp, onMoveDown, onRemove }: BlockRowProps) {
+  const meta = blockMeta[block.blockType];
+  const duration = block.durationMinutes ?? block.game?.durationMinutes ?? null;
 
   return (
     <div className="group flex items-center gap-2 rounded-xl border border-border/50 bg-card p-3 shadow-sm transition-all hover:shadow-md hover:border-border">
@@ -54,30 +53,36 @@ export function GameRow({ game, index, total = 999, onMoveUp, onMoveDown, onRemo
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="truncate text-sm font-semibold text-foreground">{game.title}</h3>
+          <meta.Icon className={`h-4 w-4 ${meta.tone}`} />
+          <h3 className="truncate text-sm font-semibold text-foreground">
+            {block.blockType === "game"
+              ? block.game?.title ?? "Lek"
+              : block.title ?? meta.label}
+          </h3>
         </div>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs">
-          <span className="flex items-center gap-1 text-muted-foreground">
-            <ClockIcon className="h-3 w-3" />
-            {game.durationMinutes} min
+          <span className="flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+            {meta.label}
           </span>
-          {energy && (
-            <span className={`flex items-center gap-1 ${energy.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${energy.bg}`} />
-              {energy.label}
-            </span>
-          )}
-          {environment && (
+          {duration ? (
             <span className="flex items-center gap-1 text-muted-foreground">
-              <environment.Icon className="h-3 w-3" />
-              {environment.label}
+              <ClockIcon className="h-3 w-3" />
+              {duration} min
             </span>
-          )}
+          ) : null}
+          {block.blockType === "game" && block.game ? (
+            <span className="flex items-center gap-1 text-muted-foreground">
+              <PlayIcon className="h-3 w-3" />
+              {block.game.shortDescription ?? ""}
+            </span>
+          ) : null}
         </div>
       </div>
-      <div className="hidden rounded-full bg-muted px-2.5 py-1 text-xs font-medium tabular-nums text-muted-foreground sm:block">
-        {game.durationMinutes} min
-      </div>
+      {duration ? (
+        <div className="hidden rounded-full bg-muted px-2.5 py-1 text-xs font-medium tabular-nums text-muted-foreground sm:block">
+          {duration} min
+        </div>
+      ) : null}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
@@ -97,13 +102,17 @@ export function GameRow({ game, index, total = 999, onMoveUp, onMoveDown, onRemo
             <ChevronDownIcon className="mr-2 h-4 w-4" />
             Flytta ner
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href={`/app/play/${game.id}`}>
-              <PlayIcon className="mr-2 h-4 w-4" />
-              Spela direkt
-            </Link>
-          </DropdownMenuItem>
+          {block.blockType === "game" && block.game ? (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/app/play/${block.game.id}`}>
+                  <PlayIcon className="mr-2 h-4 w-4" />
+                  Spela
+                </Link>
+              </DropdownMenuItem>
+            </>
+          ) : null}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={onRemove} className="text-destructive focus:text-destructive">
             <TrashIcon className="mr-2 h-4 w-4" />

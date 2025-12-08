@@ -11,6 +11,16 @@ const nextConfig: NextConfig = {
         hostname: "qohhnufxididbmzqnjwg.supabase.co",
         pathname: "/storage/v1/object/public/avatars/**",
       },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        pathname: "/storage/v1/object/public/avatars/**",
+      },
+      {
+        protocol: "http",
+        hostname: "127.0.0.1",
+        pathname: "/storage/v1/object/public/avatars/**",
+      },
     ],
   },
   async redirects() {

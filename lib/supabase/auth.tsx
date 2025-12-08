@@ -175,6 +175,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (data.user) {
       setUser(data.user)
       await fetchProfile(data.user)
+      // Fire-and-forget to register session/device
+      void fetch('/api/accounts/devices', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          device_fingerprint: null,
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+          device_type: null,
+        }),
+      }).catch(() => {})
+      void fetch('/api/accounts/sessions', { method: 'GET' }).catch(() => {})
     }
   }, [fetchProfile])
 
@@ -243,18 +254,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     if (!user) throw new Error('No user logged in')
 
-    const { data, error } = await supabase
-      .from('users')
-      .update(updates)
-      .eq('id', user.id)
-      .select()
-      .single()
+    const response = await fetch('/api/accounts/profile', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    })
 
-    if (error) throw error
-    if (data) {
-      setUserProfile(data)
+    if (!response.ok) {
+      let message = 'Failed to update profile'
+      try {
+        const errorJson = (await response.json()) as { error?: string }
+        if (typeof errorJson?.error === 'string') message = errorJson.error
+      } catch (err) {
+        console.warn('[auth] updateProfile error parsing response', err)
+      }
+      throw new Error(message)
     }
-  }, [user])
+
+    const payload = (await response.json()) as { user?: UserProfile | null }
+    if (payload?.user) {
+      setUserProfile(payload.user)
+    } else {
+      await fetchProfile(user)
+    }
+
+    const { data: refreshedAuth } = await supabase.auth.getUser()
+    if (refreshedAuth?.user) {
+      setUser(refreshedAuth.user)
+    }
+  }, [fetchProfile, user])
 
   const fallbackRole = userProfile?.role || (user?.app_metadata?.role as string | undefined) || null
 

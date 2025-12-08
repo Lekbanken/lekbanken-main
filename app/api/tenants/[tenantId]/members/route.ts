@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
+import { requireMfaIfEnabled } from '@/lib/utils/mfaGuard'
 
 export async function GET(
   _request: Request,
@@ -32,6 +33,10 @@ export async function POST(
   } = await supabase.auth.getUser()
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const mfa = await requireMfaIfEnabled()
+  if (!mfa.ok) return NextResponse.json({ error: 'MFA required' }, { status: 403 })
+
   if (!(isSystemAdmin(user) || (await isTenantAdmin(tenantId, user.id)))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -41,12 +46,13 @@ export async function POST(
     role?: string
     status?: string
     is_primary?: boolean
+    seat_assignment_id?: string | null
   }
 
   if (!body.user_id) {
     return NextResponse.json({ errors: ['user_id is required'] }, { status: 400 })
   }
-  const allowedRoles = ['owner', 'admin', 'editor', 'member']
+  const allowedRoles = ['owner', 'admin', 'editor', 'member', 'organisation_admin', 'organisation_user', 'demo_org_admin', 'demo_org_user']
   if (body.role && !allowedRoles.includes(body.role)) {
     return NextResponse.json({ errors: ['invalid role'] }, { status: 400 })
   }
@@ -65,6 +71,7 @@ export async function POST(
       role: body.role ?? 'member',
       status: body.status ?? 'active',
       is_primary: body.is_primary ?? false,
+      seat_assignment_id: body.seat_assignment_id ?? null,
     })
     .select()
     .single()

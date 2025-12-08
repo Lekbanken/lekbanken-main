@@ -155,6 +155,19 @@ export async function signIn(
   })
 
   if (error) throw error
+
+  // Fire-and-forget to register device/session via accounts API
+  void fetch('/api/accounts/devices', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      device_fingerprint: null,
+      user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : null,
+      device_type: null,
+    }),
+  }).catch(() => {})
+  void fetch('/api/accounts/sessions').catch(() => {})
+
   return data
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -44,6 +44,18 @@ export function ProfilePage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<
+    { id: string; supabase_session_id: string | null; ip: string | null; user_agent: string | null; last_seen_at: string | null; revoked_at: string | null }[]
+  >([]);
+  const [devices, setDevices] = useState<
+    { id: string; device_fingerprint: string | null; user_agent: string | null; device_type: string | null; ip_last: string | null; last_seen_at: string | null }[]
+  >([]);
+  const [mfaStatus, setMfaStatus] = useState<{ factors: any[]; totp: any; user_mfa: any } | null>(null);
+  const [loadingSecurity, setLoadingSecurity] = useState(false);
+  const [securityError, setSecurityError] = useState<string | null>(null);
+  const [mfaEnroll, setMfaEnroll] = useState<{ factorId: string; qr: string; secret: string } | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
 
   const email = user?.email || "";
 
@@ -84,6 +96,115 @@ export function ProfilePage() {
 
   const handleAvatarSelect = (src: string | null) => {
     setAvatar(src);
+  };
+
+  const loadSecurityData = useCallback(async () => {
+    setLoadingSecurity(true);
+    setSecurityError(null);
+    try {
+      const [sessionsRes, devicesRes, mfaRes] = await Promise.all([
+        fetch("/api/accounts/sessions"),
+        fetch("/api/accounts/devices"),
+        fetch("/api/accounts/auth/mfa/status"),
+      ]);
+
+      if (!sessionsRes.ok) throw new Error("Kunde inte ladda sessioner");
+      if (!devicesRes.ok) throw new Error("Kunde inte ladda enheter");
+      if (!mfaRes.ok) throw new Error("Kunde inte ladda MFA-status");
+
+      const sessionsJson = (await sessionsRes.json()) as { sessions: any[] };
+      const devicesJson = (await devicesRes.json()) as { devices: any[] };
+      const mfaJson = await mfaRes.json();
+
+      setSessions(sessionsJson.sessions ?? []);
+      setDevices(devicesJson.devices ?? []);
+      setMfaStatus({
+        factors: mfaJson.factors ?? [],
+        totp: mfaJson.totp ?? null,
+        user_mfa: mfaJson.user_mfa ?? null,
+      });
+    } catch (err) {
+      setSecurityError(err instanceof Error ? err.message : "Kunde inte ladda säkerhetsdata");
+    } finally {
+      setLoadingSecurity(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadSecurityData();
+  }, [loadSecurityData]);
+
+  const handleRevokeSession = async (sessionId: string | null | undefined) => {
+    if (!sessionId) return;
+    await fetch("/api/accounts/sessions/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    void loadSecurityData();
+  };
+
+  const handleRemoveDevice = async (deviceId: string) => {
+    await fetch("/api/accounts/devices/remove", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ device_id: deviceId }),
+    });
+    void loadSecurityData();
+  };
+
+  const handleStartMfa = async () => {
+    const res = await fetch("/api/accounts/auth/mfa/enroll", { method: "POST" });
+    if (!res.ok) {
+      setSecurityError("Kunde inte starta MFA-registrering");
+      return;
+    }
+    const json = await res.json();
+    setMfaEnroll({
+      factorId: json.factorId,
+      qr: json.totp?.qr_code ?? "",
+      secret: json.totp?.secret ?? "",
+    });
+    setSecurityError(null);
+  };
+
+  const handleDisableMfa = async (factorId: string) => {
+    await fetch("/api/accounts/auth/mfa/disable", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ factor_id: factorId }),
+    });
+    void loadSecurityData();
+    setMfaEnroll(null);
+    setMfaCode("");
+    setRecoveryCodes(null);
+  };
+
+  const handleVerifyMfa = async () => {
+    if (!mfaEnroll?.factorId || !mfaCode) return;
+    const res = await fetch("/api/accounts/auth/mfa/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ factor_id: mfaEnroll.factorId, code: mfaCode }),
+    });
+    if (!res.ok) {
+      setSecurityError("Verifiering misslyckades");
+      return;
+    }
+    setMfaEnroll(null);
+    setMfaCode("");
+    setRecoveryCodes(null);
+    await loadSecurityData();
+  };
+
+  const handleRecoveryCodes = async () => {
+    const res = await fetch("/api/accounts/auth/mfa/recovery-codes", { method: "POST" });
+    if (!res.ok) {
+      setSecurityError("Kunde inte generera recovery-koder");
+      return;
+    }
+    const json = await res.json();
+    setRecoveryCodes(json.recovery_codes ?? []);
   };
 
   return (
@@ -163,6 +284,133 @@ export function ProfilePage() {
               Använd initialer om du inte vill visa en bild.
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Säkerhet & MFA</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {securityError && <div className="text-sm text-destructive">{securityError}</div>}
+          {loadingSecurity ? (
+            <div className="text-sm text-muted-foreground">Laddar...</div>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">MFA-status</p>
+                  <p className="text-xs text-muted-foreground">
+                    {mfaStatus?.user_mfa?.enrolled_at ? "Aktiverad" : "Inte aktiverad"}
+                  </p>
+                </div>
+                  {mfaStatus?.user_mfa?.enrolled_at && mfaStatus.totp?.id ? (
+                    <Button variant="outline" onClick={() => void handleDisableMfa(mfaStatus.totp.id)}>
+                      Stäng av
+                    </Button>
+                  ) : (
+                    <Button onClick={() => void handleStartMfa()}>Aktivera MFA</Button>
+                  )}
+              </div>
+              {mfaStatus?.user_mfa?.enrolled_at && (
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="secondary" onClick={() => void handleRecoveryCodes()}>
+                    Visa recovery-koder
+                  </Button>
+                </div>
+              )}
+              {mfaEnroll && (
+                <div className="mt-3 space-y-3 rounded-lg border border-border/60 p-3">
+                  <div className="text-sm">
+                    <p className="font-semibold text-foreground">Steg 1: Skanna QR eller ange hemlighet</p>
+                    {mfaEnroll.qr && <img src={mfaEnroll.qr} alt="MFA QR" className="mt-2 h-32 w-32" />}
+                    <div className="mt-2 rounded bg-muted px-2 py-1 text-xs font-mono break-all">{mfaEnroll.secret}</div>
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-sm font-semibold text-foreground">Steg 2: Ange kod</p>
+                    <Input value={mfaCode} onChange={(e) => setMfaCode(e.target.value)} placeholder="123 456" />
+                    <div className="flex gap-2">
+                      <Button onClick={() => void handleVerifyMfa()} disabled={!mfaCode}>
+                        Verifiera
+                      </Button>
+                      <Button variant="ghost" onClick={() => { setMfaEnroll(null); setMfaCode(""); }}>
+                        Avbryt
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {recoveryCodes && (
+                <div className="mt-3 space-y-2 rounded-lg border border-border/60 p-3">
+                  <p className="text-sm font-semibold text-foreground">Recovery-koder</p>
+                  <p className="text-xs text-muted-foreground">Spara dessa på en säker plats. De visas bara nu.</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                    {recoveryCodes.map((code) => (
+                      <div key={code} className="rounded bg-muted px-2 py-1">
+                        {code}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Aktiva sessioner</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {sessions.length === 0 && <p className="text-sm text-muted-foreground">Inga sessioner hittades.</p>}
+          {sessions.map((session) => (
+            <div
+              key={session.id}
+              className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2"
+            >
+              <div className="text-sm">
+                <div className="font-semibold text-foreground">{session.user_agent || "Okänd enhet"}</div>
+                <div className="text-muted-foreground">
+                  {session.ip || "—"} • Senast: {session.last_seen_at ? new Date(session.last_seen_at).toLocaleString() : "okänt"}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleRevokeSession(session.supabase_session_id)}
+                disabled={!!session.revoked_at}
+              >
+                {session.revoked_at ? "Revokerad" : "Logga ut"}
+              </Button>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Enheter</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {devices.length === 0 && <p className="text-sm text-muted-foreground">Inga enheter registrerade.</p>}
+          {devices.map((device) => (
+            <div
+              key={device.id}
+              className="flex items-center justify-between rounded-lg border border-border/60 px-3 py-2"
+            >
+              <div className="text-sm">
+                <div className="font-semibold text-foreground">{device.device_type || "Enhet"}</div>
+                <div className="text-muted-foreground">
+                  {device.user_agent || "Okänd UA"} • {device.ip_last || "—"} • Senast:{" "}
+                  {device.last_seen_at ? new Date(device.last_seen_at).toLocaleString() : "okänt"}
+                </div>
+              </div>
+              <Button variant="outline" size="sm" onClick={() => void handleRemoveDevice(device.id)}>
+                Ta bort
+              </Button>
+            </div>
+          ))}
         </CardContent>
       </Card>
 

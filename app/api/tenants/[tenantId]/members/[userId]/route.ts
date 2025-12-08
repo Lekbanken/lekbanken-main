@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
+import { requireMfaIfEnabled } from '@/lib/utils/mfaGuard'
 
 export async function PATCH(
   request: Request,
@@ -14,6 +15,10 @@ export async function PATCH(
   } = await supabase.auth.getUser()
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const mfa = await requireMfaIfEnabled()
+  if (!mfa.ok) return NextResponse.json({ error: 'MFA required' }, { status: 403 })
+
   if (!(isSystemAdmin(user) || (await isTenantAdmin(tenantId, user.id)))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -26,12 +31,14 @@ export async function PATCH(
   }
 
   const allowedRoles = ['owner', 'admin', 'editor', 'member']
+  const expandedRoles = ['owner','admin','editor','member','organisation_admin','organisation_user','demo_org_admin','demo_org_user']
   if (body.role && !allowedRoles.includes(body.role)) {
-    return NextResponse.json({ errors: ['invalid role'] }, { status: 400 })
+    if (!expandedRoles.includes(body.role)) {
+      return NextResponse.json({ errors: ['invalid role'] }, { status: 400 })
+    }
   }
 
   // Demo tenants: only system_admin may mutate
-  const supabase = await createServerRlsClient()
   const { data: existingTenant } = await supabase.from('tenants').select('type,demo_flag').eq('id', tenantId).maybeSingle()
   if (existingTenant && (existingTenant.type === 'demo' || existingTenant.demo_flag) && !isSystemAdmin(user)) {
     return NextResponse.json({ error: 'Demo tenants can only be modified by system admins' }, { status: 403 })

@@ -24,6 +24,7 @@ type OrganisationEditDialogProps = {
 
 export function OrganisationEditDialog({ open, organisation, onOpenChange, onSubmit }: OrganisationEditDialogProps) {
   const [name, setName] = useState(organisation?.name ?? "");
+  const [slug, setSlug] = useState(organisation?.slug ?? "");
   const [contactName, setContactName] = useState(organisation?.contactName ?? "");
   const [contactEmail, setContactEmail] = useState(organisation?.contactEmail ?? "");
   const [contactPhone, setContactPhone] = useState(organisation?.contactPhone ?? "");
@@ -32,6 +33,7 @@ export function OrganisationEditDialog({ open, organisation, onOpenChange, onSub
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       setName(organisation?.name ?? "");
+      setSlug(organisation?.slug ?? "");
       setContactName(organisation?.contactName ?? "");
       setContactEmail(organisation?.contactEmail ?? "");
       setContactPhone(organisation?.contactPhone ?? "");
@@ -46,6 +48,7 @@ export function OrganisationEditDialog({ open, organisation, onOpenChange, onSub
     onSubmit({
       ...organisation,
       name: name.trim() || organisation.name,
+      slug: slug.trim() || organisation.slug,
       contactName: contactName.trim() || null,
       contactEmail: contactEmail.trim() || organisation.contactEmail,
       contactPhone: contactPhone.trim() || null,
@@ -133,6 +136,18 @@ export function OrganisationEditDialog({ open, organisation, onOpenChange, onSub
                   ]}
                   placeholder="Status"
                 />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="org-slug">
+                  Slug <span className="text-muted-foreground font-normal">(valfritt)</span>
+                </label>
+                <Input
+                  id="org-slug"
+                  value={slug}
+                  onChange={(event) => setSlug(event.target.value)}
+                  placeholder="organisation-ab"
+                />
+                <p className="text-xs text-muted-foreground">Lämna tomt för auto-slug.</p>
               </div>
             </div>
 

@@ -23,6 +23,7 @@ type OrganisationCreateDialogProps = {
 
 export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: OrganisationCreateDialogProps) {
   const [name, setName] = useState("");
+  const [slug, setSlug] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
@@ -33,6 +34,7 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
     if (!name || !contactEmail) return;
     onCreate({
       name: name.trim(),
+      slug: slug.trim() || null,
       contactName: contactName.trim() || null,
       contactEmail: contactEmail.trim(),
       contactPhone: contactPhone.trim() || null,
@@ -43,6 +45,7 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
       updatedAt: null,
     });
     setName("");
+    setSlug("");
     setContactName("");
     setContactEmail("");
     setContactPhone("");
@@ -116,6 +119,18 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-status">
                 Status
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="create-slug">
+                  Slug <span className="text-muted-foreground font-normal">(valfritt)</span>
+                </label>
+                <Input
+                  id="create-slug"
+                  value={slug}
+                  onChange={(event) => setSlug(event.target.value)}
+                  placeholder="organisation-ab"
+                />
+                <p className="text-xs text-muted-foreground">Lämna tomt för auto-slug.</p>
+              </div>
               </label>
               <Select
                 id="create-status"

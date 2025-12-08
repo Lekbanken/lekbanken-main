@@ -11,10 +11,10 @@ type PublishingControlsProps = {
 };
 
 const roleOptions = [
+  { value: "owner", label: "Owner" },
   { value: "admin", label: "Admin" },
-  { value: "creator", label: "Creator" },
-  { value: "org_admin", label: "Org Admin" },
-  { value: "moderator", label: "Moderator" },
+  { value: "editor", label: "Editor" },
+  { value: "member", label: "Member" },
 ];
 
 const orgOptions = [

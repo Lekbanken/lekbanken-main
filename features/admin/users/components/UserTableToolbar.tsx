@@ -15,14 +15,10 @@ type UserTableToolbarProps = {
 
 const roleOptions: { value: UserRole | "all"; label: string }[] = [
   { value: "all", label: "All roles" },
-  { value: "system_admin", label: roleLabels.system_admin },
-  { value: "organisation_admin", label: roleLabels.organisation_admin },
-  { value: "product_admin", label: roleLabels.product_admin },
-  { value: "admin", label: roleLabels.admin },
   { value: "owner", label: roleLabels.owner },
+  { value: "admin", label: roleLabels.admin },
+  { value: "editor", label: roleLabels.editor },
   { value: "member", label: roleLabels.member },
-  { value: "user", label: roleLabels.user },
-  { value: "demo_user", label: roleLabels.demo_user },
 ];
 
 const statusOptions: { value: UserStatus | "all"; label: string }[] = [

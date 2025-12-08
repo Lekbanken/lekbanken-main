@@ -1,23 +1,25 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTenant } from '@/lib/context/TenantContext';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
+import { useAuth } from '@/lib/supabase/auth';
+import { supabase } from '@/lib/supabase/client';
+import { Badge, Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, useToast } from '@/components/ui';
 import {
   PuzzlePieceIcon,
   PlusIcon,
   TrashIcon,
-  StarIcon,
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
+import type { Database } from '@/types/supabase';
+
+type GameRow = Database['public']['Tables']['games']['Row'];
 
 interface ContentItem {
   id: string;
   title: string;
-  type: 'game' | 'collection' | 'event' | 'challenge';
+  type: 'game';
   is_published: boolean;
-  is_featured: boolean;
-  view_count: number;
   created_at: string;
 }
 
@@ -32,22 +34,23 @@ interface SeasonalEvent {
 
 export default function ContentPlannerAdminPage() {
   const { currentTenant } = useTenant();
+  const { user, userRole } = useAuth();
+  const { success, warning } = useToast();
 
   const [activeTab, setActiveTab] = useState<'content' | 'events' | 'schedule'>('content');
   const [content, setContent] = useState<ContentItem[]>([]);
   const [events, setEvents] = useState<SeasonalEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEventModal, setShowEventModal] = useState(false);
 
   const [formData, setFormData] = useState<{
     title: string;
     description: string;
-    type: 'game' | 'collection' | 'event' | 'challenge';
   }>({
     title: '',
     description: '',
-    type: 'game',
   });
 
   const [eventData, setEventData] = useState({
@@ -57,28 +60,81 @@ export default function ContentPlannerAdminPage() {
     endDate: '',
   });
 
-  useEffect(() => {
-    // Placeholder - would load from service once DB migrates
-    const timer = setTimeout(() => setIsLoading(false), 100);
-    return () => clearTimeout(timer);
-  }, [currentTenant?.id]);
+  const isGlobalAdmin = userRole === 'admin' || userRole === 'superadmin';
 
-  const handleCreateContent = () => {
+  const loadContent = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const query = supabase
+        .from('games')
+        .select('id, name, description, owner_tenant_id, status, created_at')
+        .order('created_at', { ascending: false });
+
+      const { data, error: queryError } = currentTenant && !isGlobalAdmin
+        ? await query.eq('owner_tenant_id', currentTenant.id)
+        : await query;
+
+      if (queryError) throw queryError;
+
+      const mapped: ContentItem[] = ((data as GameRow[]) || []).map((row) => ({
+        id: row.id,
+        title: row.name,
+        type: 'game',
+        is_published: row.status === 'published',
+        created_at: row.created_at ?? new Date().toISOString(),
+      }));
+
+      setContent(mapped);
+    } catch (err) {
+      console.error('Failed to load content', err);
+      setError('Kunde inte ladda innehåll.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentTenant, isGlobalAdmin]);
+
+  useEffect(() => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+    void loadContent();
+  }, [loadContent, user]);
+
+  const handleCreateContent = async () => {
     if (!formData.title) return;
 
-    const newItem: ContentItem = {
-      id: `content-${Date.now()}`,
-      title: formData.title,
-      type: formData.type,
-      is_published: false,
-      is_featured: false,
-      view_count: 0,
-      created_at: new Date().toISOString(),
-    };
+    try {
+      const { data, error: insertError } = await supabase
+        .from('games')
+        .insert({
+          name: formData.title,
+          description: formData.description,
+          owner_tenant_id: currentTenant?.id ?? null,
+          status: 'draft',
+        })
+        .select('id, name, status, created_at')
+        .single();
 
-    setContent([newItem, ...content]);
-    setFormData({ title: '', description: '', type: 'game' });
-    setShowCreateModal(false);
+      if (insertError) throw insertError;
+
+      const newItem: ContentItem = {
+        id: data.id,
+        title: data.name,
+        type: 'game',
+        is_published: data.status === 'published',
+        created_at: data.created_at ?? new Date().toISOString(),
+      };
+
+      setContent((prev) => [newItem, ...prev]);
+      setFormData({ title: '', description: '' });
+      setShowCreateModal(false);
+      success('Innehåll skapat.');
+    } catch (err) {
+      console.error('Failed to create content', err);
+      setError('Kunde inte skapa innehåll.');
+    }
   };
 
   const handleCreateEvent = () => {
@@ -98,38 +154,50 @@ export default function ContentPlannerAdminPage() {
     setShowEventModal(false);
   };
 
-  const toggleContentPublish = (id: string) => {
-    setContent(
-      content.map((item) =>
-        item.id === id ? { ...item, is_published: !item.is_published } : item
-      )
-    );
+  const toggleContentPublish = async (id: string, current: boolean) => {
+    try {
+      const nextStatus = current ? 'draft' : 'published';
+      const { error: updateError } = await supabase
+        .from('games')
+        .update({ status: nextStatus, updated_at: new Date().toISOString() })
+        .eq('id', id);
+      if (updateError) throw updateError;
+
+      setContent((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, is_published: !current } : item))
+      );
+      success(nextStatus === 'published' ? 'Publicerat' : 'Återställt till utkast');
+    } catch (err) {
+      console.error('Failed to update publish status', err);
+      setError('Kunde inte uppdatera publiceringsstatus.');
+    }
   };
 
-  const toggleContentFeatured = (id: string) => {
-    setContent(
-      content.map((item) =>
-        item.id === id ? { ...item, is_featured: !item.is_featured } : item
-      )
-    );
-  };
-
-  const deleteContent = (id: string) => {
-    setContent(content.filter((item) => item.id !== id));
+  const deleteContent = async (id: string) => {
+    try {
+      const { error: deleteError } = await supabase.from('games').delete().eq('id', id);
+      if (deleteError) throw deleteError;
+      setContent((prev) => prev.filter((item) => item.id !== id));
+      warning('Innehållet togs bort.');
+    } catch (err) {
+      console.error('Failed to delete content', err);
+      setError('Kunde inte ta bort innehåll.');
+    }
   };
 
   const deleteEvent = (id: string) => {
     setEvents(events.filter((event) => event.id !== id));
   };
 
-  if (!currentTenant) {
+  const isLoadingContent = isLoading && content.length === 0;
+
+  if (!user) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-5xl mx-auto pt-20">
-          <h1 className="text-3xl font-bold text-foreground">Content Planner</h1>
-          <p className="text-muted-foreground">Tenant context required</p>
-        </div>
-      </div>
+      <EmptyState
+        title="Ingen åtkomst"
+        description="Du behöver vara inloggad för att hantera innehåll."
+        action={{ label: 'Go to login', onClick: () => (window.location.href = '/auth/login') }}
+      />
     );
   }
 
@@ -167,31 +235,32 @@ export default function ContentPlannerAdminPage() {
         {/* Content Tab */}
         {activeTab === 'content' && (
           <div>
-            <Button
-              onClick={() => setShowCreateModal(true)}
-              className="mb-6"
-            >
+            <Button onClick={() => setShowCreateModal(true)} className="mb-6">
               <PlusIcon className="h-4 w-4 mr-2" />
               Add Content
             </Button>
 
+            {error && (
+              <Card className="mb-3 border-amber-500/40 bg-amber-500/5">
+                <CardContent className="flex items-center justify-between gap-3 p-3 text-sm text-amber-700">
+                  <span>{error}</span>
+                  <Button size="sm" variant="outline" onClick={() => void loadContent()}>
+                    Försök igen
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="space-y-3">
-              {isLoading ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <p className="text-muted-foreground">Loading...</p>
-                  </CardContent>
-                </Card>
+              {isLoadingContent ? (
+                <LoadingState message="Laddar innehåll..." />
               ) : content.length === 0 ? (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <p className="text-muted-foreground mb-4">No content created yet</p>
-                    <Button onClick={() => setShowCreateModal(true)}>
-                      <PlusIcon className="h-4 w-4 mr-2" />
-                      Create First Content
-                    </Button>
-                  </CardContent>
-                </Card>
+                <EmptyState
+                  icon={<PuzzlePieceIcon className="h-8 w-8" />}
+                  title="No content created yet"
+                  description="Skapa ditt första spel eller innehåll för din organisation."
+                  action={{ label: "Create content", onClick: () => setShowCreateModal(true) }}
+                />
               ) : (
                 content.map((item) => (
                   <Card key={item.id}>
@@ -203,33 +272,20 @@ export default function ContentPlannerAdminPage() {
                             <Badge variant="secondary">{item.type}</Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Views: {item.view_count} • Created: {new Date(item.created_at).toLocaleDateString()}
+                            Created: {new Date(item.created_at).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex gap-2">
                           <Button
-                            variant={item.is_featured ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => toggleContentFeatured(item.id)}
-                            className={item.is_featured ? 'bg-yellow-500 hover:bg-yellow-600' : ''}
-                          >
-                            <StarIcon className="h-3 w-3 mr-1" />
-                            {item.is_featured ? 'Featured' : 'Feature'}
-                          </Button>
-                          <Button
                             variant={item.is_published ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => toggleContentPublish(item.id)}
+                            onClick={() => toggleContentPublish(item.id, item.is_published)}
                             className={item.is_published ? 'bg-green-600 hover:bg-green-700' : ''}
                           >
                             <CheckCircleIcon className="h-3 w-3 mr-1" />
                             {item.is_published ? 'Published' : 'Publish'}
                           </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => deleteContent(item.id)}
-                          >
+                          <Button variant="destructive" size="sm" onClick={() => deleteContent(item.id)}>
                             <TrashIcon className="h-3 w-3 mr-1" />
                             Delete
                           </Button>
@@ -339,20 +395,6 @@ export default function ContentPlannerAdminPage() {
                     className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
                     placeholder="Content title"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Type</label>
-                  <select
-                    value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value as 'game' | 'collection' | 'event' | 'challenge' })}
-                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-                  >
-                    <option value="game">Game</option>
-                    <option value="collection">Collection</option>
-                    <option value="event">Event</option>
-                    <option value="challenge">Challenge</option>
-                  </select>
                 </div>
 
                 <div>

@@ -5,6 +5,7 @@ import { searchGames, type Game as DbGame } from "@/lib/services/gameService";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useTenant } from "@/lib/context/TenantContext";
 import { FilterBar } from "./components/FilterBar";
 import { FilterSheet } from "./components/FilterSheet";
 import { GameCard } from "./components/GameCard";
@@ -58,6 +59,7 @@ export function BrowsePage() {
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { currentTenant } = useTenant();
 
   // Fetch games from database
   const loadGames = useCallback(async () => {
@@ -69,12 +71,16 @@ export function BrowsePage() {
         ? filters.energyLevels[0] 
         : undefined;
 
+      console.log("[BrowsePage] Loading games with tenantId:", currentTenant?.id ?? "null");
+      
       const result = await searchGames({
         search: search || undefined,
         energyLevel: energyFilter,
         pageSize: 50,
+        tenantId: currentTenant?.id ?? null,
       });
       
+      console.log("[BrowsePage] Got", result.games.length, "games from searchGames");
       setGames(result.games.map(mapDbGameToGame));
     } catch (err) {
       console.error("Failed to load games:", err);
@@ -82,7 +88,7 @@ export function BrowsePage() {
     } finally {
       setIsLoading(false);
     }
-  }, [search, filters.energyLevels]);
+  }, [search, filters.energyLevels, currentTenant?.id]);
 
   // Load games on mount and when search/energy filter changes
   useEffect(() => {

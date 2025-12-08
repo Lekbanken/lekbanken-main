@@ -22,27 +22,14 @@ type UserEditDialogProps = {
   onSubmit: (payload: { name?: string | null; roles: UserRole[]; status: UserStatus }) => void;
 };
 
-const availableRoles: UserRole[] = [
-  "system_admin",
-  "organisation_admin",
-  "product_admin",
-  "admin",
-  "owner",
-  "member",
-  "user",
-  "demo_user",
-];
+const availableRoles: UserRole[] = ["owner", "admin", "editor", "member"];
 
 // Role badge styles for checkboxes
 const roleBadgeStyles: Record<UserRole, { bg: string; border: string; checked: string }> = {
-  system_admin: { bg: "bg-primary/5", border: "border-primary/20", checked: "bg-primary/15 border-primary/40" },
-  organisation_admin: { bg: "bg-primary/5", border: "border-primary/20", checked: "bg-primary/15 border-primary/40" },
-  product_admin: { bg: "bg-cyan-500/5", border: "border-cyan-500/20", checked: "bg-cyan-500/15 border-cyan-500/40" },
-  admin: { bg: "bg-primary/5", border: "border-primary/20", checked: "bg-primary/15 border-primary/40" },
   owner: { bg: "bg-amber-500/5", border: "border-amber-500/20", checked: "bg-amber-500/15 border-amber-500/40" },
+  admin: { bg: "bg-primary/5", border: "border-primary/20", checked: "bg-primary/15 border-primary/40" },
+  editor: { bg: "bg-cyan-500/5", border: "border-cyan-500/20", checked: "bg-cyan-500/15 border-cyan-500/40" },
   member: { bg: "bg-muted/50", border: "border-border", checked: "bg-muted border-border" },
-  user: { bg: "bg-muted/50", border: "border-border", checked: "bg-muted border-border" },
-  demo_user: { bg: "bg-muted/50", border: "border-border", checked: "bg-muted border-border" },
 };
 
 export function UserEditDialog({ open, user, onOpenChange, onSubmit }: UserEditDialogProps) {

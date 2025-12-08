@@ -6,7 +6,7 @@ import { readTenantIdFromCookies, setTenantCookie, clearTenantCookie } from '@/l
 import type { Database } from '@/types/supabase'
 
 type TenantRow = Database['public']['Tables']['tenants']['Row']
-type TenantRole = 'owner' | 'admin' | 'teacher' | 'member'
+type TenantRole = 'owner' | 'admin' | 'editor' | 'member'
 type TenantWithMembership = TenantRow & { membership: { tenant_id: string; role: TenantRole; is_primary?: boolean } }
 
 export async function resolveCurrentTenant() {

@@ -23,13 +23,7 @@ type UserInviteDialogProps = {
   defaultOrganisation?: string;
 };
 
-const inviteRoles: UserRole[] = [
-  "organisation_admin",
-  "admin",
-  "member",
-  "user",
-  "demo_user",
-];
+const inviteRoles: UserRole[] = ["owner", "admin", "editor", "member"];
 
 export function UserInviteDialog({ open, onOpenChange, onInvite, defaultOrganisation }: UserInviteDialogProps) {
   const [email, setEmail] = useState("");

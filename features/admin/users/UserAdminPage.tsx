@@ -26,6 +26,7 @@ const USERS_PER_PAGE = 15;
 
 type MembershipRow = Database["public"]["Tables"]["user_tenant_memberships"]["Row"] & {
   users: { email: string | null; full_name: string | null } | null;
+  tenants: { name: string | null } | null;
 };
 
 type InvitePayload = {
@@ -42,87 +43,97 @@ type EditPayload = {
 };
 
 export function UserAdminPage() {
-  const { user } = useAuth();
+  const { user, userRole } = useAuth();
   const { currentTenant, isLoadingTenants } = useTenant();
   const { success, info, warning } = useToast();
 
   const [users, setUsers] = useState<UserAdminItem[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<UserFilters>({
+  const defaultFilters: UserFilters = {
     search: "",
     role: "all",
     status: "all",
     organisation: "all",
     sort: "recent",
-  });
+  };
+  const [filters, setFilters] = useState<UserFilters>(defaultFilters);
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserAdminItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
+  const loadUsers = async () => {
+    const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+    const tenantId = currentTenant?.id;
+    const tenantName = currentTenant?.name;
+
     if (!user) {
       setIsLoadingUsers(false);
       return;
     }
-    if (!currentTenant) {
+
+    if (!currentTenant && !isGlobalAdmin) {
       setIsLoadingUsers(false);
       return;
     }
 
-    let isMounted = true;
-    const tenantId = currentTenant.id;
-    const tenantName = currentTenant.name;
+    setIsLoadingUsers(true);
+    setError(null);
+    try {
+      const query = supabase
+        .from("user_tenant_memberships")
+        .select("id, user_id, role, tenant_id, created_at, tenants ( name ), users ( email, full_name )")
+        .order("created_at", { ascending: false });
 
-    const loadUsers = async () => {
-      setIsLoadingUsers(true);
-      setError(null);
-      try {
-        const { data, error: queryError } = await supabase
-          .from("user_tenant_memberships")
-          .select("id, user_id, role, created_at, users ( email, full_name )")
-          .eq("tenant_id", tenantId)
-          .order("created_at", { ascending: false });
+      const { data, error: queryError } = tenantId ? query.eq("tenant_id", tenantId) : query;
 
-        if (queryError) {
-          throw queryError;
-        }
-
-        const mapped: UserAdminItem[] = (data || []).map((row) => {
-          const membership = row as MembershipRow;
-          return {
-            id: membership.id,
-            email: membership.users?.email ?? "unknown@example.com",
-            name: membership.users?.full_name ?? null,
-            roles: [membership.role as UserRole],
-            organisationName: tenantName,
-            status: "active",
-            createdAt: membership.created_at,
-          };
-        });
-
-        if (!isMounted) return;
-        setUsers(mapped);
-      } catch (err) {
-        console.error("Failed to load users", err);
-        if (!isMounted) return;
-        setError("Failed to load users from Supabase. Showing sample data instead.");
-        setUsers(createMockUsers(tenantName));
-      } finally {
-        if (isMounted) {
-          setIsLoadingUsers(false);
-        }
+      if (queryError) {
+        throw queryError;
       }
-    };
 
-    void loadUsers();
-    return () => {
-      isMounted = false;
+      const mapped: UserAdminItem[] = (data || []).map((row) => {
+        const membership = row as MembershipRow;
+        return {
+          id: membership.id,
+          userId: membership.user_id,
+          email: membership.users?.email ?? "unknown@example.com",
+          name: membership.users?.full_name ?? null,
+          roles: [membership.role as UserRole],
+          organisationName: membership.tenants?.name ?? tenantName,
+          status: "active",
+          createdAt: membership.created_at,
+        };
+      });
+
+      setUsers(mapped);
+    } catch (err) {
+      console.error("Failed to load users", err);
+      setError("Failed to load users from Supabase. Showing sample data instead.");
+      setUsers(createMockUsers(tenantName || "Global"));
+    } finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      await loadUsers();
+      if (cancelled) return;
     };
-  }, [currentTenant, currentTenant?.id, currentTenant?.name, user, user?.id]);
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentTenant?.id, currentTenant?.name, user?.id, userRole]);
 
   const handleFiltersChange = (next: Partial<UserFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setFilters(defaultFilters);
     setCurrentPage(1);
   };
 
@@ -133,42 +144,132 @@ export function UserAdminPage() {
     success(`User is now ${status}`, "Status updated");
   };
 
-  const handleEditSubmit = (payload: EditPayload) => {
+  const handleEditSubmit = async (payload: EditPayload) => {
     if (!editingUser) return;
-    setUsers((prev) =>
-      prev.map((userItem) =>
-        userItem.id === editingUser.id
-          ? {
-              ...userItem,
-              name: payload.name ?? userItem.name,
-              roles: payload.roles,
-              status: payload.status,
-            }
-          : userItem,
-      ),
-    );
-    setEditingUser(null);
-    success("Changes saved.", "User updated");
+    if (editingUser.id.startsWith("temp-")) {
+      setUsers((prev) =>
+        prev.map((userItem) =>
+          userItem.id === editingUser.id
+            ? { ...userItem, name: payload.name ?? userItem.name, roles: payload.roles, status: payload.status }
+            : userItem,
+        ),
+      );
+      success("Pending invite uppdaterad lokalt.", "Updated");
+      setEditingUser(null);
+      return;
+    }
+    try {
+      // Update membership role/status in DB
+      const { error: updateError } = await supabase
+        .from("user_tenant_memberships")
+        .update({ role: payload.roles[0] })
+        .eq("id", editingUser.id);
+      if (updateError) throw updateError;
+
+      if (payload.name) {
+        // Best-effort update of user full_name
+        void supabase.from("users").update({ full_name: payload.name }).eq("id", editingUser.userId ?? editingUser.id);
+      }
+
+      setUsers((prev) =>
+        prev.map((userItem) =>
+          userItem.id === editingUser.id
+            ? {
+                ...userItem,
+                name: payload.name ?? userItem.name,
+                roles: payload.roles,
+                status: payload.status,
+              }
+            : userItem,
+        ),
+      );
+      success("Changes saved.", "User updated");
+    } catch (err) {
+      console.error("Failed to update user", err);
+      setError("Kunde inte uppdatera användaren.");
+    } finally {
+      setEditingUser(null);
+    }
   };
 
-  const handleInviteSubmit = (payload: InvitePayload) => {
-    const newUser: UserAdminItem = {
-      id: `invite-${Date.now()}`,
-      email: payload.email,
-      name: payload.name || payload.email,
-      roles: [payload.role],
-      organisationName: payload.organisationName || currentTenant?.name,
-      status: "invited",
-      createdAt: new Date().toISOString(),
-    };
-    setUsers((prev) => [newUser, ...prev]);
-    setInviteOpen(false);
-    info(`Invitation prepared for ${payload.email}`, "Invite sent");
+  const handleInviteSubmit = async (payload: InvitePayload) => {
+    if (!currentTenant) {
+      setError("Ingen organisation vald för inbjudan.");
+      return;
+    }
+
+    try {
+      // Find user by email
+      const { data: userRow, error: userError } = await supabase
+        .from("users")
+        .select("id, full_name")
+        .ilike("email", payload.email)
+        .maybeSingle();
+
+      if (userError) throw userError;
+      if (!userRow) {
+        const pending: UserAdminItem = {
+          id: `temp-${Date.now()}`,
+          email: payload.email,
+          name: payload.name || payload.email,
+          roles: [payload.role],
+          organisationName: currentTenant.name,
+          status: "invited",
+          createdAt: new Date().toISOString(),
+        };
+        setUsers((prev) => [pending, ...prev]);
+        setInviteOpen(false);
+        info("Inbjudan sparad lokalt. Skapa användare i auth för att slutföra.", "Pending invite");
+        return;
+      }
+
+      // Insert membership
+      const { data: membership, error: membershipError } = await supabase
+        .from("user_tenant_memberships")
+        .insert({
+          user_id: userRow.id,
+          tenant_id: currentTenant.id,
+          role: payload.role,
+        })
+        .select("id, role, created_at, tenants(name), users(email, full_name)")
+        .single();
+
+      if (membershipError) throw membershipError;
+
+      const newUser: UserAdminItem = {
+        id: membership.id,
+        userId: userRow.id,
+        email: membership.users?.email ?? payload.email,
+        name: payload.name || membership.users?.full_name || payload.email,
+        roles: [payload.role],
+        organisationName: membership.tenants?.name || currentTenant.name,
+        status: "active",
+        createdAt: membership.created_at,
+      };
+
+      setUsers((prev) => [newUser, ...prev]);
+      setInviteOpen(false);
+      success(`Användare tillagd i ${newUser.organisationName}.`, "Invite/membership saved");
+    } catch (err) {
+      console.error("Failed to invite user", err);
+      setError("Kunde inte lägga till användaren. Kontrollera e-post och försök igen.");
+    }
   };
 
-  const handleRemove = (userId: string) => {
+  const handleRemove = async (userId: string) => {
     setUsers((prev) => prev.filter((userItem) => userItem.id !== userId));
-    warning("User removed from organisation list.", "User removed");
+    if (userId.startsWith("temp-")) {
+      warning("Pending invite removed from list.", "Invite removed");
+      return;
+    }
+    try {
+      const { error: deleteError } = await supabase.from("user_tenant_memberships").delete().eq("id", userId);
+      if (deleteError) throw deleteError;
+      warning("User removed from organisation list.", "User removed");
+    } catch (err) {
+      console.error("Failed to remove user", err);
+      setError("Kunde inte ta bort användaren.");
+    }
   };
 
   const handleResendInvite = (userItem: UserAdminItem) => {
@@ -287,7 +388,9 @@ export function UserAdminPage() {
     );
   }
 
-  if (!user || !currentTenant) {
+  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+
+  if (!user || (!currentTenant && !isGlobalAdmin)) {
     return (
       <EmptyState
         title="No organisation access"
@@ -317,6 +420,21 @@ export function UserAdminPage() {
           Invite user
         </Button>
       </div>
+
+      {error && (
+        <Card className="border-amber-500/40 bg-amber-500/10">
+          <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
+            <div className="flex-1">
+              <p className="font-medium">{error}</p>
+              <p className="text-xs text-amber-700/80">Försök igen eller använd mock-data för att fortsätta arbetet.</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => void loadUsers()}>
+              Ladda om
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Status Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -387,6 +505,7 @@ export function UserAdminPage() {
               onResendInvite={handleResendInvite}
               onRowClick={setEditingUser}
               onInviteClick={() => setInviteOpen(true)}
+              onClearFilters={handleClearFilters}
             />
           </div>
           {filteredUsers.length > USERS_PER_PAGE && (
@@ -398,11 +517,6 @@ export function UserAdminPage() {
               onPageChange={setCurrentPage}
             />
           )}
-          {error && (
-            <div className="border-t border-border/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-600">
-              {error}
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -410,7 +524,7 @@ export function UserAdminPage() {
         open={inviteOpen}
         onOpenChange={setInviteOpen}
         onInvite={handleInviteSubmit}
-        defaultOrganisation={currentTenant.name}
+        defaultOrganisation={currentTenant?.name}
       />
 
       <UserEditDialog

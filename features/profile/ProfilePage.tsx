@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { usePreferences } from "@/lib/context/PreferencesContext";
 import { useAuth } from "@/lib/supabase/auth";
 import { cn } from "@/lib/utils";
+import { avatarPresets } from "./avatarPresets";
 import { LogoutButton } from "./components/LogoutButton";
 
 type ThemePreference = "light" | "dark" | "system";
@@ -25,15 +26,6 @@ const themeOptions: Array<{ value: ThemePreference; label: string }> = [
   { value: "light", label: "Light" },
   { value: "dark", label: "Dark" },
   { value: "system", label: "Follow system" },
-];
-
-const avatarPresets = [
-  { id: "aurora", label: "Aurora", src: "/avatars/avatar-aurora.svg" },
-  { id: "blush", label: "Blush", src: "/avatars/avatar-blush.svg" },
-  { id: "cobalt", label: "Cobalt", src: "/avatars/avatar-cobalt.svg" },
-  { id: "forest", label: "Forest", src: "/avatars/avatar-forest.svg" },
-  { id: "sunrise", label: "Sunrise", src: "/avatars/avatar-sunrise.svg" },
-  { id: "wave", label: "Wave", src: "/avatars/avatar-wave.svg" },
 ];
 
 export function ProfilePage() {

@@ -128,7 +128,7 @@ export function AdminShell({ children }: AdminShellProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-foreground dark:bg-slate-950">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen">
         {/* Desktop Sidebar */}
         <AdminSidebar
@@ -149,7 +149,7 @@ export function AdminShell({ children }: AdminShellProps) {
             onToggleSidebar={() => setIsMobileNavOpen(true)}
             isSidebarCollapsed={isSidebarCollapsed}
           />
-          <main className="flex flex-1 flex-col bg-slate-100/50 p-4 dark:bg-slate-900/50 lg:p-6 xl:p-8">
+          <main className="flex flex-1 flex-col bg-muted/40 p-4 lg:p-6 xl:p-8">
             {children}
           </main>
         </div>

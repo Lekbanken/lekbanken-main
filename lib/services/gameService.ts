@@ -21,6 +21,7 @@ export interface GameFilters {
 export interface GameQueryOptions extends GameFilters {
   page?: number
   pageSize?: number
+  tenantId?: string | null
 }
 
 export interface GameQueryResult {
@@ -49,14 +50,13 @@ export async function searchGames(
 
   const offset = (page - 1) * pageSize
 
-  // Start with published games query
+  // Start with games query - rely on RLS to expose public/global published games or tenant-owned games
   let query = supabase
     .from('games')
     .select('*', { count: 'exact' })
-    .eq('status', 'published')
-    .order('created_at', { ascending: false })
+    .order('name', { ascending: true })
 
-  // Add search filter
+  // Add search filter across name + description
   if (search) {
     query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
   }
@@ -85,7 +85,12 @@ export async function searchGames(
   const { data: games, count, error } = await query
 
   if (error) {
-    console.error('Error searching games:', error)
+    console.error('Error searching games:', {
+      message: (error as { message?: string })?.message,
+      details: (error as { details?: string })?.details,
+      hint: (error as { hint?: string })?.hint,
+      code: (error as { code?: string })?.code,
+    })
     throw error
   }
 

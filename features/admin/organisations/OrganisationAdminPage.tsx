@@ -20,7 +20,19 @@ import { OrganisationEditDialog } from "./components/OrganisationEditDialog";
 import { OrganisationCreateDialog } from "./components/OrganisationCreateDialog";
 import { OrganisationTablePagination } from "./components/OrganisationTablePagination";
 
-type TenantRow = Database["public"]["Tables"]["tenants"]["Row"];
+type TenantRow = Database["public"]["Tables"]["tenants"]["Row"] & {
+  user_tenant_memberships?: { count: number | null }[];
+};
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
 
 const ORGS_PER_PAGE = 15;
 
@@ -31,65 +43,69 @@ export function OrganisationAdminPage() {
   const [organisations, setOrganisations] = useState<OrganisationAdminItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<OrganisationFilters>({
+  const defaultFilters: OrganisationFilters = {
     search: "",
     status: "all",
     sort: "recent",
-  });
+  };
+  const [filters, setFilters] = useState<OrganisationFilters>(defaultFilters);
   const [editingOrg, setEditingOrg] = useState<OrganisationAdminItem | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
+  const loadOrganisations = async () => {
     if (!user) {
       setIsLoading(false);
       return;
     }
 
-    let isMounted = true;
-    const loadOrganisations = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const { data, error: queryError } = await supabase
-          .from("tenants")
-          .select("*")
-          .order("created_at", { ascending: false });
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { data, error: queryError } = await supabase
+        .from("tenants")
+        .select(
+          "id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at, user_tenant_memberships(count)"
+        )
+        .order("created_at", { ascending: false });
 
-        if (queryError) {
-          throw queryError;
-        }
-
-        const mapped: OrganisationAdminItem[] = (data || []).map((tenant: TenantRow) => ({
-          id: tenant.id,
-          name: tenant.name,
-          contactEmail: null,
-          contactName: null,
-          contactPhone: null,
-          status: (tenant.status as OrganisationStatus) || "active",
-          membersCount: null,
-          subscriptionPlan: null,
-          createdAt: tenant.created_at,
-          updatedAt: tenant.updated_at,
-        }));
-
-        if (!isMounted) return;
-        setOrganisations(mapped);
-      } catch (err) {
-        console.error("Failed to load organisations", err);
-        if (!isMounted) return;
-        setError("Failed to load organisations from Supabase. Showing sample data instead.");
-        setOrganisations(mockOrganisations);
-      } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+      if (queryError) {
+        throw queryError;
       }
-    };
 
-    void loadOrganisations();
+      const mapped: OrganisationAdminItem[] = (data || []).map((tenant: TenantRow) => ({
+        id: tenant.id,
+        name: tenant.name,
+        slug: tenant.slug,
+        contactEmail: tenant.contact_email,
+        contactName: tenant.contact_name,
+        contactPhone: tenant.contact_phone,
+        status: (tenant.status as OrganisationStatus) || "active",
+        membersCount: tenant.user_tenant_memberships?.[0]?.count ?? null,
+        subscriptionPlan: null,
+        createdAt: tenant.created_at,
+        updatedAt: tenant.updated_at,
+      }));
+
+      setOrganisations(mapped);
+    } catch (err) {
+      console.error("Failed to load organisations", err);
+      setError("Failed to load organisations from Supabase. Showing sample data instead.");
+      setOrganisations(mockOrganisations);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      await loadOrganisations();
+      if (cancelled) return;
+    };
+    void run();
     return () => {
-      isMounted = false;
+      cancelled = true;
     };
   }, [user, user?.id]);
 
@@ -98,17 +114,67 @@ export function OrganisationAdminPage() {
     setCurrentPage(1);
   };
 
-  const handleCreate = (payload: Omit<OrganisationAdminItem, "id">) => {
-    const newOrg: OrganisationAdminItem =
-      payload.name && payload.contactEmail
-        ? { ...payload, id: `org-${Date.now()}` }
-        : createMockOrganisation(payload.name, payload.contactEmail || "contact@example.com");
-    setOrganisations((prev) => [newOrg, ...prev]);
-    setCreateOpen(false);
-    info("Saved locally. Connect API to persist.", "Organisation created");
+  const handleClearFilters = () => {
+    setFilters(defaultFilters);
+    setCurrentPage(1);
+  };
+
+  const handleCreate = async (payload: Omit<OrganisationAdminItem, "id">) => {
+    try {
+      const slug = payload.slug?.trim() || slugify(payload.name);
+      const { data, error: insertError } = await supabase
+        .from("tenants")
+        .insert({
+          name: payload.name,
+          status: payload.status,
+          type: "organisation",
+          main_language: "NO",
+          slug: slug || null,
+          contact_name: payload.contactName,
+          contact_email: payload.contactEmail,
+          contact_phone: payload.contactPhone,
+        })
+        .select("id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at")
+        .single();
+
+      if (insertError) {
+        throw insertError;
+      }
+      if (!data) {
+        throw new Error("Supabase returned no data for tenant insert");
+      }
+
+      const newOrg: OrganisationAdminItem = {
+        ...payload,
+        id: data.id,
+        status: (data.status as OrganisationStatus) || payload.status,
+        contactName: data.contact_name,
+        contactEmail: data.contact_email,
+        contactPhone: data.contact_phone,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+        membersCount: 0,
+      };
+
+      setOrganisations((prev) => [newOrg, ...prev]);
+      // Try to add creator as owner membership (best-effort)
+      void supabase.rpc("add_initial_tenant_owner", { target_tenant: data.id });
+      setCreateOpen(false);
+      success("Organisation skapad.", "Saved to Supabase");
+    } catch (err) {
+      console.error("Failed to create organisation", err);
+      const message = err instanceof Error ? err.message : "Kunde inte skapa organisation.";
+      setError(message || "Kunde inte skapa organisation.");
+      // fallback: keep local mock
+      const local = createMockOrganisation(payload.name, payload.contactEmail || "contact@example.com");
+      setOrganisations((prev) => [local, ...prev]);
+      info("Sparat lokalt som fallback.");
+    }
   };
 
   const handleEditSubmit = (payload: OrganisationAdminItem) => {
+    const updatedAt = new Date().toISOString();
+    const slug = payload.slug?.trim() || slugify(payload.name);
     setOrganisations((prev) => prev.map((org) => (org.id === payload.id ? payload : org)));
     setEditingOrg(null);
     void supabase
@@ -116,7 +182,11 @@ export function OrganisationAdminPage() {
       .update({
         name: payload.name,
         status: payload.status,
-        updated_at: new Date().toISOString(),
+        slug: slug || null,
+        contact_name: payload.contactName,
+        contact_email: payload.contactEmail,
+        contact_phone: payload.contactPhone,
+        updated_at: updatedAt,
       })
       .eq("id", payload.id);
     success("Changes saved.", "Organisation updated");
@@ -136,7 +206,8 @@ export function OrganisationAdminPage() {
 
   const handleRemove = (orgId: string) => {
     setOrganisations((prev) => prev.filter((org) => org.id !== orgId));
-    warning("Removed from list.", "Organisation removed");
+    void supabase.from("tenants").delete().eq("id", orgId);
+    warning("Organisation borttagen.");
   };
 
   const filteredOrganisations = useMemo(() => {
@@ -249,6 +320,21 @@ export function OrganisationAdminPage() {
           </Button>
         </div>
 
+        {error && (
+          <Card className="border-amber-500/40 bg-amber-500/10">
+            <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
+              <div className="flex-1">
+                <p className="font-medium">{error}</p>
+                <p className="text-xs text-amber-700/80">Försök igen eller arbeta vidare med mock-data.</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => void loadOrganisations()}>
+                Ladda om
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
       {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="group border-border/60 transition-all duration-200 hover:border-primary/30 hover:shadow-md">
@@ -305,6 +391,7 @@ export function OrganisationAdminPage() {
               onStatusChange={handleStatusChange}
               onRemove={handleRemove}
               onCreateClick={() => setCreateOpen(true)}
+              onClearFilters={handleClearFilters}
             />
           </div>
           {filteredOrganisations.length > ORGS_PER_PAGE && (
@@ -315,11 +402,6 @@ export function OrganisationAdminPage() {
               itemsPerPage={ORGS_PER_PAGE}
               onPageChange={setCurrentPage}
             />
-          )}
-          {error && (
-            <div className="border-t border-border/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-600">
-              {error}
-            </div>
           )}
         </CardContent>
       </Card>

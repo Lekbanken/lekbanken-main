@@ -1,17 +1,14 @@
 export type UserStatus = "active" | "inactive" | "invited";
 
-export type UserRole =
-  | "system_admin"
-  | "organisation_admin"
-  | "product_admin"
-  | "user"
-  | "demo_user"
-  | "owner"
-  | "admin"
-  | "member";
+// Tenant-scoped roles (normalized)
+export type UserRole = "owner" | "admin" | "editor" | "member";
+
+// Global roles for auth/users.role
+export type GlobalRole = "superadmin" | "admin" | "user";
 
 export type UserAdminItem = {
   id: string;
+  userId?: string;
   email: string;
   name?: string | null;
   roles: UserRole[];
@@ -32,13 +29,9 @@ export type UserFilters = {
 };
 
 export const roleLabels: Record<UserRole, string> = {
-  system_admin: "System admin",
-  organisation_admin: "Organisation admin",
-  product_admin: "Product admin",
-  user: "User",
-  demo_user: "Demo user",
   owner: "Owner",
   admin: "Admin",
+  editor: "Editor",
   member: "Member",
 };
 

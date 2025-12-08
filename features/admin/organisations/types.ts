@@ -3,6 +3,7 @@ export type OrganisationStatus = "active" | "inactive";
 export type OrganisationAdminItem = {
   id: string;
   name: string;
+  slug?: string | null;
   contactName?: string | null;
   contactEmail?: string | null;
   contactPhone?: string | null;

@@ -16,18 +16,15 @@ type UserTableProps = {
   onRemove: (userId: string) => void;
   onResendInvite: (user: UserAdminItem) => void;
   onInviteClick: () => void;
+  onClearFilters?: () => void;
 };
 
 // Role badge variants with semantic colors
 const roleBadgeStyles: Record<UserRole, { bg: string; text: string; border: string }> = {
-  system_admin: { bg: "bg-primary/15", text: "text-primary", border: "border-primary/25" },
-  organisation_admin: { bg: "bg-primary/15", text: "text-primary", border: "border-primary/25" },
-  product_admin: { bg: "bg-cyan-500/15", text: "text-cyan-600", border: "border-cyan-500/25" },
+  owner: { bg: "bg-amber-500/15", text: "text-amber-700", border: "border-amber-500/30" },
   admin: { bg: "bg-primary/15", text: "text-primary", border: "border-primary/25" },
-  owner: { bg: "bg-amber-500/15", text: "text-amber-600", border: "border-amber-500/25" },
+  editor: { bg: "bg-cyan-500/15", text: "text-cyan-700", border: "border-cyan-500/25" },
   member: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-  user: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
-  demo_user: { bg: "bg-muted", text: "text-muted-foreground", border: "border-border" },
 };
 
 // Status indicator styles
@@ -79,7 +76,7 @@ export function UserTable({
             : "Invite your first team member to get started."
         }
         action={searchQuery ? undefined : { label: "Invite user", onClick: onInviteClick }}
-        secondaryAction={searchQuery ? { label: "Clear filters", onClick: () => {} } : undefined}
+        secondaryAction={searchQuery ? { label: "Clear filters", onClick: onClearFilters } : undefined}
       />
     );
   }

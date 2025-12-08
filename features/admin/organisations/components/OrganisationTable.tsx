@@ -15,6 +15,7 @@ type OrganisationTableProps = {
   onStatusChange: (organisationId: string, status: OrganisationStatus) => void;
   onRemove: (organisationId: string) => void;
   onCreateClick?: () => void;
+  onClearFilters?: () => void;
 };
 
 // Status indicator styles
@@ -69,7 +70,7 @@ export function OrganisationTable({
             : "Create your first organisation to start managing tenants."
         }
         action={searchQuery ? undefined : onCreateClick ? { label: "Create organisation", onClick: onCreateClick } : undefined}
-        secondaryAction={searchQuery ? { label: "Clear filters", onClick: () => {} } : undefined}
+        secondaryAction={searchQuery ? { label: "Clear filters", onClick: onClearFilters } : undefined}
       />
     );
   }
@@ -81,6 +82,9 @@ export function OrganisationTable({
           <tr>
             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Organisation
+            </th>
+            <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Slug
             </th>
             <th scope="col" className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Contact
@@ -126,6 +130,9 @@ export function OrganisationTable({
                       )}
                     </div>
                   </div>
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-sm text-muted-foreground">
+                  {org.slug ? <code className="rounded bg-muted px-2 py-1 text-xs">{org.slug}</code> : <span className="text-sm text-muted-foreground">—</span>}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3">
                   <div className="space-y-0.5">

@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "13.0.5"
   }
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json
-          operationName?: string
-          query?: string
-          variables?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       achievement_leaderboards: {
@@ -1448,6 +1423,61 @@ export type Database = {
           },
         ]
       }
+      game_media: {
+        Row: {
+          alt_text: string | null
+          created_at: string
+          game_id: string
+          id: string
+          kind: Database["public"]["Enums"]["game_media_kind"]
+          media_id: string
+          position: number
+          tenant_id: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          created_at?: string
+          game_id: string
+          id?: string
+          kind?: Database["public"]["Enums"]["game_media_kind"]
+          media_id: string
+          position?: number
+          tenant_id?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          created_at?: string
+          game_id?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["game_media_kind"]
+          media_id?: string
+          position?: number
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_media_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_media_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_media_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_scores: {
         Row: {
           created_at: string
@@ -1616,74 +1646,146 @@ export type Database = {
           },
         ]
       }
+      game_translations: {
+        Row: {
+          created_at: string
+          game_id: string
+          instructions: Json
+          locale: string
+          materials: string[] | null
+          short_description: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          instructions?: Json
+          locale: string
+          materials?: string[] | null
+          short_description: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          instructions?: Json
+          locale?: string
+          materials?: string[] | null
+          short_description?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_translations_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           age_max: number | null
           age_min: number | null
           category: string | null
           created_at: string
+          created_by: string | null
           description: string | null
-          energy_level: string | null
+          energy_level: Database["public"]["Enums"]["energy_level_enum"] | null
           game_key: string | null
+          holiday_tags: string[] | null
           id: string
           instructions: string | null
-          location_type: string | null
+          location_type:
+            | Database["public"]["Enums"]["location_type_enum"]
+            | null
           main_purpose_id: string | null
-          materials: string | null
+          materials: string[] | null
           max_players: number | null
           min_players: number | null
           name: string
           owner_tenant_id: string | null
           product_id: string | null
+          season_tags: string[] | null
+          short_description: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
           time_estimate_min: number | null
           updated_at: string
+          updated_by: string | null
+          version: number
         }
         Insert: {
           age_max?: number | null
           age_min?: number | null
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
-          energy_level?: string | null
+          energy_level?: Database["public"]["Enums"]["energy_level_enum"] | null
           game_key?: string | null
+          holiday_tags?: string[] | null
           id?: string
           instructions?: string | null
-          location_type?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["location_type_enum"]
+            | null
           main_purpose_id?: string | null
-          materials?: string | null
+          materials?: string[] | null
           max_players?: number | null
           min_players?: number | null
           name: string
           owner_tenant_id?: string | null
           product_id?: string | null
+          season_tags?: string[] | null
+          short_description?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           time_estimate_min?: number | null
           updated_at?: string
+          updated_by?: string | null
+          version?: number
         }
         Update: {
           age_max?: number | null
           age_min?: number | null
           category?: string | null
           created_at?: string
+          created_by?: string | null
           description?: string | null
-          energy_level?: string | null
+          energy_level?: Database["public"]["Enums"]["energy_level_enum"] | null
           game_key?: string | null
+          holiday_tags?: string[] | null
           id?: string
           instructions?: string | null
-          location_type?: string | null
+          location_type?:
+            | Database["public"]["Enums"]["location_type_enum"]
+            | null
           main_purpose_id?: string | null
-          materials?: string | null
+          materials?: string[] | null
           max_players?: number | null
           min_players?: number | null
           name?: string
           owner_tenant_id?: string | null
           product_id?: string | null
+          season_tags?: string[] | null
+          short_description?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
           time_estimate_min?: number | null
           updated_at?: string
+          updated_by?: string | null
+          version?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "games_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "games_main_purpose_id_fkey"
             columns: ["main_purpose_id"]
@@ -1703,6 +1805,13 @@ export type Database = {
             columns: ["product_id"]
             isOneToOne: false
             referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -3303,6 +3412,42 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          action: string
+          allowed: boolean
+          created_at: string
+          id: string
+          metadata: Json | null
+          resource: string
+          role: Database["public"]["Enums"]["tenant_role_enum"]
+          scope: string
+          updated_at: string
+        }
+        Insert: {
+          action: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          resource: string
+          role: Database["public"]["Enums"]["tenant_role_enum"]
+          scope: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          allowed?: boolean
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          resource?: string
+          role?: Database["public"]["Enums"]["tenant_role_enum"]
+          scope?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       saved_items: {
         Row: {
           id: string
@@ -4029,6 +4174,9 @@ export type Database = {
       }
       tenants: {
         Row: {
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
           created_at: string
           description: string | null
           id: string
@@ -4044,6 +4192,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -4059,6 +4210,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -4519,7 +4673,7 @@ export type Database = {
           created_at: string
           id: string
           is_primary: boolean
-          role: string
+          role: Database["public"]["Enums"]["tenant_role_enum"]
           tenant_id: string
           updated_at: string
           user_id: string
@@ -4528,7 +4682,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean
-          role?: string
+          role?: Database["public"]["Enums"]["tenant_role_enum"]
           tenant_id: string
           updated_at?: string
           user_id: string
@@ -4537,7 +4691,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean
-          role?: string
+          role?: Database["public"]["Enums"]["tenant_role_enum"]
           tenant_id?: string
           updated_at?: string
           user_id?: string
@@ -4650,19 +4804,63 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_tenant_ids: { Args: never; Returns: string[] }
-      has_tenant_role: {
-        Args: { tenant_uuid: string; required_roles: string[] }
-        Returns: boolean
-      }
       add_initial_tenant_owner: {
-        Args: { target_tenant: string; desired_role?: string }
-        Returns: Database['public']['Tables']['user_tenant_memberships']['Row']
+        Args: {
+          desired_role?: Database["public"]["Enums"]["tenant_role_enum"]
+          target_tenant: string
+        }
+        Returns: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          role: Database["public"]["Enums"]["tenant_role_enum"]
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "user_tenant_memberships"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
-      is_tenant_member: { Args: { tenant_id: string }; Returns: boolean }
+      get_user_tenant_ids: { Args: never; Returns: string[] }
+      has_tenant_role:
+        | {
+            Args: {
+              required_role: Database["public"]["Enums"]["tenant_role_enum"]
+              target_tenant: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              required_roles: Database["public"]["Enums"]["tenant_role_enum"][]
+              target_tenant: string
+            }
+            Returns: boolean
+          }
+      is_global_admin: { Args: never; Returns: boolean }
+      is_tenant_member: { Args: { target_tenant: string }; Returns: boolean }
+      to_text_array_safe:
+        | {
+            Args: { input: string[] }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { input: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
     }
     Enums: {
+      energy_level_enum: "low" | "medium" | "high"
       feedback_type_enum: "bug" | "feature_request" | "improvement" | "other"
+      game_media_kind: "cover" | "gallery"
       game_status_enum: "draft" | "published"
       invoice_status_enum:
         | "draft"
@@ -4672,6 +4870,7 @@ export type Database = {
         | "overdue"
         | "canceled"
       language_code_enum: "NO" | "SE" | "EN"
+      location_type_enum: "indoor" | "outdoor" | "both"
       media_type_enum: "template" | "upload" | "ai"
       payment_status_enum: "pending" | "confirmed" | "failed" | "refunded"
       plan_visibility_enum: "private" | "tenant" | "public"
@@ -4679,6 +4878,7 @@ export type Database = {
       seat_assignment_status_enum: "active" | "released" | "pending" | "revoked"
       session_status_enum: "active" | "paused" | "completed" | "abandoned"
       subscription_status_enum: "active" | "paused" | "canceled" | "trial"
+      tenant_role_enum: "owner" | "admin" | "editor" | "member"
       ticket_priority_enum: "low" | "medium" | "high" | "urgent"
       ticket_status_enum:
         | "open"
@@ -4811,12 +5011,11 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
+      energy_level_enum: ["low", "medium", "high"],
       feedback_type_enum: ["bug", "feature_request", "improvement", "other"],
+      game_media_kind: ["cover", "gallery"],
       game_status_enum: ["draft", "published"],
       invoice_status_enum: [
         "draft",
@@ -4827,6 +5026,7 @@ export const Constants = {
         "canceled",
       ],
       language_code_enum: ["NO", "SE", "EN"],
+      location_type_enum: ["indoor", "outdoor", "both"],
       media_type_enum: ["template", "upload", "ai"],
       payment_status_enum: ["pending", "confirmed", "failed", "refunded"],
       plan_visibility_enum: ["private", "tenant", "public"],
@@ -4834,6 +5034,7 @@ export const Constants = {
       seat_assignment_status_enum: ["active", "released", "pending", "revoked"],
       session_status_enum: ["active", "paused", "completed", "abandoned"],
       subscription_status_enum: ["active", "paused", "canceled", "trial"],
+      tenant_role_enum: ["owner", "admin", "editor", "member"],
       ticket_priority_enum: ["low", "medium", "high", "urgent"],
       ticket_status_enum: [
         "open",

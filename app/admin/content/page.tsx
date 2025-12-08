@@ -48,9 +48,15 @@ export default function ContentPlannerAdminPage() {
   const [formData, setFormData] = useState<{
     title: string;
     description: string;
+    shortDescription: string;
+    mainPurposeId: string;
+    hasCoverImage: boolean;
   }>({
     title: '',
     description: '',
+    shortDescription: '',
+    mainPurposeId: '',
+    hasCoverImage: false,
   });
 
   const [eventData, setEventData] = useState({
@@ -103,32 +109,41 @@ export default function ContentPlannerAdminPage() {
   }, [loadContent, user]);
 
   const handleCreateContent = async () => {
-    if (!formData.title) return;
+    if (!formData.title || !formData.shortDescription || !formData.mainPurposeId) {
+      setError('Ange titel, kort beskrivning och main purpose ID.');
+      return;
+    }
 
     try {
-      const { data, error: insertError } = await supabase
-        .from('games')
-        .insert({
+      const res = await fetch('/api/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: formData.title,
-          description: formData.description,
+          description: formData.description || null,
+          short_description: formData.shortDescription,
+          main_purpose_id: formData.mainPurposeId || null,
           owner_tenant_id: currentTenant?.id ?? null,
           status: 'draft',
-        })
-        .select('id, name, status, created_at')
-        .single();
+        }),
+      });
 
-      if (insertError) throw insertError;
+      if (!res.ok) {
+        throw new Error('Create failed');
+      }
+
+      const { game } = (await res.json()) as { game: { id: string; name: string; status: string; created_at: string } };
 
       const newItem: ContentItem = {
-        id: data.id,
-        title: data.name,
+        id: game.id,
+        title: game.name,
         type: 'game',
-        is_published: data.status === 'published',
-        created_at: data.created_at ?? new Date().toISOString(),
+        is_published: game.status === 'published',
+        created_at: game.created_at ?? new Date().toISOString(),
       };
 
       setContent((prev) => [newItem, ...prev]);
-      setFormData({ title: '', description: '' });
+      setFormData({ title: '', description: '', shortDescription: '', mainPurposeId: '', hasCoverImage: false });
       setShowCreateModal(false);
       success('Innehåll skapat.');
     } catch (err) {
@@ -157,11 +172,21 @@ export default function ContentPlannerAdminPage() {
   const toggleContentPublish = async (id: string, current: boolean) => {
     try {
       const nextStatus = current ? 'draft' : 'published';
-      const { error: updateError } = await supabase
-        .from('games')
-        .update({ status: nextStatus, updated_at: new Date().toISOString() })
-        .eq('id', id);
-      if (updateError) throw updateError;
+      if (nextStatus === 'published') {
+        const res = await fetch(`/api/games/${id}/publish`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ hasCoverImage: true }),
+        });
+        if (!res.ok) throw new Error('Publish failed');
+      } else {
+        const res = await fetch(`/api/games/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'draft' }),
+        });
+        if (!res.ok) throw new Error('Unpublish failed');
+      }
 
       setContent((prev) =>
         prev.map((item) => (item.id === id ? { ...item, is_published: !current } : item))
@@ -407,6 +432,34 @@ export default function ContentPlannerAdminPage() {
                     rows={3}
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Short description</label>
+                  <textarea
+                    value={formData.shortDescription}
+                    onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
+                    placeholder="Kort sammanfattning (krävs)"
+                    rows={2}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-1">Main purpose ID</label>
+                  <input
+                    type="text"
+                    value={formData.mainPurposeId}
+                    onChange={(e) => setFormData({ ...formData, mainPurposeId: e.target.value })}
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
+                    placeholder="UUID för main purpose"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasCoverImage}
+                    onChange={(e) => setFormData({ ...formData, hasCoverImage: e.target.checked })}
+                  />
+                  <label className="text-sm font-medium text-foreground">Har cover-bild uppladdad</label>
+                </div>
               </div>
 
               <div className="flex gap-3 mt-6">
@@ -504,3 +557,4 @@ export default function ContentPlannerAdminPage() {
     </div>
   );
 }
+

@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { searchGames, type Game as DbGame } from "@/lib/services/gameService";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -11,10 +10,19 @@ import { FilterSheet } from "./components/FilterSheet";
 import { GameCard } from "./components/GameCard";
 import { SearchBar } from "./components/SearchBar";
 import type { BrowseFilters, Game } from "./types";
+import type { Tables } from "@/types/supabase";
 
-// Map database game to browse Game type
+type DbGame = Tables<"games"> & {
+  media?: any[];
+  product?: { name?: string | null } | null;
+  main_purpose?: { name?: string | null } | null;
+};
+
 function mapDbGameToGame(dbGame: DbGame): Game {
-  // Map player count to group size
+  const media = dbGame.media ?? [];
+  const cover = media.find((m) => m.kind === "cover") ?? media[0];
+  const coverUrl = cover?.media?.url ?? null;
+
   const getGroupSize = (min: number | null, max: number | null): Game["groupSize"] => {
     const avgPlayers = ((min ?? 2) + (max ?? 10)) / 2;
     if (avgPlayers <= 6) return "small";
@@ -22,12 +30,13 @@ function mapDbGameToGame(dbGame: DbGame): Game {
     return "large";
   };
 
-  // Map location_type to environment
   const getEnvironment = (locationType: string | null): Game["environment"] => {
     if (locationType === "indoor") return "indoor";
     if (locationType === "outdoor") return "outdoor";
     return "either";
   };
+
+  const purposeName = dbGame.main_purpose?.name || dbGame.category || "aktivitet";
 
   return {
     id: dbGame.id,
@@ -35,12 +44,15 @@ function mapDbGameToGame(dbGame: DbGame): Game {
     description: dbGame.description ?? "",
     durationMinutes: dbGame.time_estimate_min ?? 15,
     groupSize: getGroupSize(dbGame.min_players, dbGame.max_players),
-    ageRange: dbGame.age_min && dbGame.age_max 
-      ? `${dbGame.age_min}-${dbGame.age_max}` 
-      : "Alla åldrar",
+    ageRange:
+      dbGame.age_min && dbGame.age_max
+        ? `${dbGame.age_min}-${dbGame.age_max}`
+        : "Alla åldrar",
     energyLevel: (dbGame.energy_level as Game["energyLevel"]) ?? "medium",
     environment: getEnvironment(dbGame.location_type),
-    purpose: dbGame.category ?? "aktivitet",
+    purpose: purposeName,
+    imageUrl: coverUrl,
+    productName: dbGame.product?.name ?? null,
   };
 }
 
@@ -61,6 +73,28 @@ export function BrowsePage() {
   const [error, setError] = useState<string | null>(null);
   const { currentTenant } = useTenant();
 
+  const fetchGames = useCallback(
+    async (params: { search?: string; energyLevel?: Game["energyLevel"]; tenantId?: string | null }) => {
+      const response = await fetch("/api/games/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          search: params.search || undefined,
+          energyLevel: params.energyLevel,
+          tenantId: params.tenantId ?? null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to load games");
+      }
+
+      const json = (await response.json()) as { games: DbGame[] };
+      return json.games;
+    },
+    []
+  );
+
   // Fetch games from database
   const loadGames = useCallback(async () => {
     setIsLoading(true);
@@ -73,22 +107,21 @@ export function BrowsePage() {
 
       console.log("[BrowsePage] Loading games with tenantId:", currentTenant?.id ?? "null");
       
-      const result = await searchGames({
+      const dbGames = await fetchGames({
         search: search || undefined,
         energyLevel: energyFilter,
-        pageSize: 50,
         tenantId: currentTenant?.id ?? null,
       });
-      
-      console.log("[BrowsePage] Got", result.games.length, "games from searchGames");
-      setGames(result.games.map(mapDbGameToGame));
+
+      console.log("[BrowsePage] Got", dbGames.length, "games from API");
+      setGames(dbGames.map(mapDbGameToGame));
     } catch (err) {
       console.error("Failed to load games:", err);
       setError("Kunde inte ladda aktiviteter");
     } finally {
       setIsLoading(false);
     }
-  }, [search, filters.energyLevels, currentTenant?.id]);
+  }, [fetchGames, search, filters.energyLevels, currentTenant?.id]);
 
   // Load games on mount and when search/energy filter changes
   useEffect(() => {
@@ -191,3 +224,5 @@ export function BrowsePage() {
     </div>
   );
 }
+
+

@@ -6,7 +6,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/types/supabase'
 
 type Game = Database['public']['Tables']['games']['Row']
 type GameInsert = Database['public']['Tables']['games']['Insert']

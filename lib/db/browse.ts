@@ -5,7 +5,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/types/supabase'
 
 type BrowseSearchLog = Database['public']['Tables']['browse_search_logs']['Row']
 

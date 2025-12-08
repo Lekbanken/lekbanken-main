@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { BoltIcon, ClockIcon, HomeIcon, SunIcon, UsersIcon } from "@heroicons/react/24/outline";
 import type { Game } from "../types";
@@ -31,18 +32,30 @@ export function GameCard({ game }: GameCardProps) {
   return (
     <Link href={`/app/games/${game.id}`} className="block">
       <article className="group rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-border">
+        {game.imageUrl && (
+          <div className="mb-3 overflow-hidden rounded-xl bg-muted">
+            <div className="relative aspect-[16/9]">
+              <Image src={game.imageUrl} alt={game.title} fill className="object-cover" sizes="100vw" />
+            </div>
+          </div>
+        )}
         <header className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <h3 className="text-base font-semibold text-foreground group-hover:text-primary transition-colors">
               {game.title}
             </h3>
+            <div className="flex items-center gap-2 mt-0.5 text-xs text-muted-foreground">
+              {game.productName && <span>Produkt: {game.productName}</span>}
+              {game.purpose && (
+                <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground">
+                  {game.purpose}
+                </span>
+              )}
+            </div>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
               {game.description}
             </p>
           </div>
-          <span className="shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold capitalize text-primary">
-            {game.purpose}
-          </span>
         </header>
 
         <dl className="mt-4 flex flex-wrap gap-2 text-xs">

@@ -22,6 +22,7 @@ export interface GameQueryOptions extends GameFilters {
   page?: number
   pageSize?: number
   tenantId?: string | null
+  status?: 'draft' | 'published'
 }
 
 export interface GameQueryResult {
@@ -46,6 +47,8 @@ export async function searchGames(
     ageMax,
     page = 1,
     pageSize = 12,
+    status = 'published',
+    tenantId = null,
   } = options
 
   const offset = (page - 1) * pageSize
@@ -54,7 +57,15 @@ export async function searchGames(
   let query = supabase
     .from('games')
     .select('*', { count: 'exact' })
+    .eq('status', status)
     .order('name', { ascending: true })
+
+  // Scope to tenant/global explicitly to avoid showing other tenants' drafts
+  if (tenantId) {
+    query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
+  } else {
+    query = query.is('owner_tenant_id', null)
+  }
 
   // Add search filter across name + description
   if (search) {
@@ -118,6 +129,7 @@ export async function getTenantGames(
     energyLevel,
     page = 1,
     pageSize = 12,
+    status,
   } = options
 
   const offset = (page - 1) * pageSize
@@ -127,6 +139,10 @@ export async function getTenantGames(
     .select('*', { count: 'exact' })
     .eq('owner_tenant_id', tenantId)
     .order('created_at', { ascending: false })
+
+  if (status) {
+    query = query.eq('status', status)
+  }
 
   // Add search filter
   if (search) {
@@ -170,7 +186,7 @@ export async function getFeaturedGames(
     .from('games')
     .select('*')
     .eq('status', 'published')
-    .eq('featured', true)
+    .is('owner_tenant_id', null)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -206,14 +222,23 @@ export async function getRelatedGames(
     return []
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('games')
     .select('*')
     .eq('status', 'published')
     .eq('category', currentGame.category)
     .neq('id', gameId)
-    .limit(limit)
     .order('created_at', { ascending: false })
+    .limit(limit)
+
+  // Respect tenant ownership to avoid leaking other tenants' games
+  if (currentGame.owner_tenant_id) {
+    query = query.eq('owner_tenant_id', currentGame.owner_tenant_id)
+  } else {
+    query = query.is('owner_tenant_id', null)
+  }
+
+  const { data, error } = await query
 
   if (error) {
     console.error('Error fetching related games:', error)

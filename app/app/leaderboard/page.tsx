@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
         const { data, error } = await supabase
           .from('games')
           .select('id, name')
-          .eq('tenant_id', currentTenant?.id || '')
+          .eq('owner_tenant_id', currentTenant?.id || '')
           .order('name')
 
         if (error) {

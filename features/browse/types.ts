@@ -12,6 +12,8 @@ export type Game = {
   energyLevel: EnergyLevel;
   environment: Environment;
   purpose: string;
+  imageUrl?: string | null;
+   productName?: string | null;
 };
 
 export type BrowseFilters = {

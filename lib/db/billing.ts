@@ -5,7 +5,7 @@
  */
 
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/lib/supabase/types'
+import type { Database } from '@/types/supabase'
 
 type TenantSubscription = Database['public']['Tables']['tenant_subscriptions']['Row']
 type PrivateSubscription = Database['public']['Tables']['private_subscriptions']['Row']

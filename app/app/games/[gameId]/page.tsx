@@ -1,13 +1,7 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { Database } from '@/lib/supabase/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline';
-
-type Game = Database['public']['Tables']['games']['Row'];
+import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server';
 
 // Energinivå-konfiguration med dark mode stöd
 const energyConfig: Record<string, { label: string; color: string; bgColor: string }> = {
@@ -16,78 +10,26 @@ const energyConfig: Record<string, { label: string; color: string; bgColor: stri
   high: { label: "Hög energi", color: "text-red-600 dark:text-red-400", bgColor: "bg-red-50 dark:bg-red-950/50" },
 };
 
-export default function GameDetailPage() {
-  const params = useParams();
-  const gameId = params.gameId as string;
-  const [game, setGame] = useState<Game | null>(null);
-  const [relatedGames, setRelatedGames] = useState<Game[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const localePriority = ['sv', 'no', 'en'];
 
-  useEffect(() => {
-    const loadGame = async () => {
-      try {
-        setIsLoading(true);
-
-        // Fetch game details
-        const { data: gameData, error: gameError } = await supabase
-          .from('games')
-          .select('*')
-          .eq('id', gameId)
-          .single();
-
-        if (gameError) {
-          setError('Leken hittades inte');
-          return;
-        }
-
-        setGame(gameData);
-
-        // Fetch related games (same energy level, different game)
-        if (gameData.energy_level) {
-          const { data: related, error: relatedError } = await supabase
-            .from('games')
-            .select('*')
-            .eq('energy_level', gameData.energy_level)
-            .neq('id', gameId)
-            .eq('status', 'published')
-            .limit(4);
-
-          if (!relatedError && related) {
-            setRelatedGames(related);
-          }
-        }
-      } catch (err) {
-        console.error('Error loading game:', err);
-        setError('Kunde inte ladda leken');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (gameId) {
-      loadGame();
-    }
-  }, [gameId]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          <p className="mt-4 text-muted-foreground">Laddar lek...</p>
-        </div>
-      </div>
-    );
+function pickTranslation(game: GameWithRelations) {
+  const translations = game.translations || [];
+  for (const locale of localePriority) {
+    const hit = translations.find((t) => t.locale === locale);
+    if (hit) return hit;
   }
+  return translations[0] || null;
+}
 
-  if (error || !game) {
+export default async function GameDetailPage({ params }: { params: { gameId: string } }) {
+  const game = await getGameById(params.gameId);
+  const relatedGames = game ? await getRelatedGames(game, 4) : [];
+
+  if (!game) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
-            {error || 'Leken hittades inte'}
-          </h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Leken hittades inte</h1>
           <Link
             href="/app/browse"
             className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
@@ -100,7 +42,16 @@ export default function GameDetailPage() {
     );
   }
 
+  const translation = pickTranslation(game);
+  const displayTitle = translation?.title || game.name;
+  const displayDescription = translation?.short_description || game.description || 'Ingen beskrivning tillgänglig';
+  const displayInstructions = Array.isArray(translation?.instructions)
+    ? (translation?.instructions as { title?: string; description?: string }[])
+    : null;
   const energy = energyConfig[game.energy_level ?? 'medium'] ?? energyConfig.medium;
+  const media = (game.media as unknown as any[]) ?? [];
+  const cover = media.find((m) => m.kind === 'cover') ?? media[0];
+  const gallery = media.filter((m) => m !== cover);
 
   return (
     <div className="space-y-6">
@@ -116,8 +67,23 @@ export default function GameDetailPage() {
         
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-1">Lek</p>
-          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{game.name}</h1>
+          <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{displayTitle}</h1>
         </div>
+
+        {/* Cover image */}
+        {cover?.media?.url && (
+          <div className="overflow-hidden rounded-2xl border border-border/60 bg-muted">
+            <div className="relative aspect-[16/9]">
+              <Image
+                src={cover.media.url}
+                alt={cover.media.alt_text || displayTitle}
+                fill
+                className="object-cover"
+                sizes="100vw"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Badges */}
         <div className="flex flex-wrap gap-2">
@@ -125,6 +91,16 @@ export default function GameDetailPage() {
             <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium ${energy.bgColor} ${energy.color}`}>
               <BoltIcon className="h-4 w-4" />
               {energy.label}
+            </span>
+          )}
+          {game.main_purpose && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary">
+              {game.main_purpose.name || 'Syfte'}
+            </span>
+          )}
+          {game.product && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200">
+              {game.product.name || 'Produkt'}
             </span>
           )}
           {game.age_min && game.age_max && (
@@ -156,16 +132,54 @@ export default function GameDetailPage() {
           <section className="rounded-2xl border border-border/60 bg-card p-6">
             <h2 className="text-lg font-semibold text-foreground mb-3">Om leken</h2>
             <p className="text-muted-foreground leading-relaxed">
-              {game.description || 'Ingen beskrivning tillgänglig'}
+              {displayDescription}
             </p>
           </section>
 
           {/* Instructions */}
-          {game.instructions && (
+          {displayInstructions && displayInstructions.length > 0 ? (
             <section className="rounded-2xl border border-border/60 bg-card p-6">
               <h2 className="text-lg font-semibold text-foreground mb-3">Så spelar du</h2>
-              <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
-                {game.instructions}
+              <ol className="space-y-3 text-muted-foreground leading-relaxed">
+                {displayInstructions.map((step, idx) => (
+                  <li key={idx} className="rounded-lg border border-border/60 bg-muted/30 p-3">
+                    {step.title && <p className="font-semibold text-foreground">{step.title}</p>}
+                    {step.description && <p className="mt-1 whitespace-pre-wrap">{step.description}</p>}
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ) : (
+            game.instructions && (
+              <section className="rounded-2xl border border-border/60 bg-card p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-3">Så spelar du</h2>
+                <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                  {game.instructions}
+                </div>
+              </section>
+            )
+          )}
+
+          {/* Gallery */}
+          {gallery.length > 0 && (
+            <section className="rounded-2xl border border-border/60 bg-card p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-3">Bilder</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {gallery.map((item) => (
+                  item.media?.url ? (
+                    <div key={item.id} className="overflow-hidden rounded-xl border border-border/60 bg-muted">
+                      <div className="relative aspect-[4/3]">
+                        <Image
+                          src={item.media.url}
+                          alt={item.media.alt_text || displayTitle}
+                          fill
+                          className="object-cover"
+                          sizes="50vw"
+                        />
+                      </div>
+                    </div>
+                  ) : null
+                ))}
               </div>
             </section>
           )}

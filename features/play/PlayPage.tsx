@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,75 +9,84 @@ import { StepViewer } from "./components/StepViewer";
 import { NavigationControls } from "./components/NavigationControls";
 import type { GameRun } from "./types";
 
-const mockGames: Record<string, GameRun> = {
-  "demo-1": {
-    id: "demo-1",
-    title: "Stafett med hinder",
-    summary: "Snabb stafett med enkla hinder. Passar för uppvärmning eller tempo.",
-    environment: "Inne/ute",
-    groupSize: "6-14 deltagare",
-    ageRange: "8-14 år",
-    steps: [
-      {
-        id: "step-1",
-        title: "Förbered bana",
-        description: "Placera ut 4-6 hinder i en rak linje. Dela gruppen i två lag.",
-        durationMinutes: 3,
-        materials: ["4-6 koner eller liknande", "En boll per lag"],
-      },
-      {
-        id: "step-2",
-        title: "Förklara regler",
-        description:
-          "Varje lag springer stafett, en i taget. Varje deltagare ska runda hindren och tillbaka. Växla genom att ge bollen.",
-        durationMinutes: 2,
-        safety: "Se till att avståndet mellan hindren är säkert. Värm upp innan ni börjar springa.",
-      },
-      {
-        id: "step-3",
-        title: "Kör 2-3 rundor",
-        description: "Starta runda ett. Byt ordning eller lägg till fler hinder för runda två och tre.",
-        durationMinutes: 8,
-      },
-    ],
-  },
-  "demo-2": {
-    id: "demo-2",
-    title: "Andningslek",
-    summary: "Kort mindfulness-övning med andning och rörelse för att samla fokus.",
-    environment: "Inne/ute",
-    groupSize: "2-10 deltagare",
-    ageRange: "6-12 år",
-    steps: [
-      {
-        id: "step-1",
-        title: "Samla gruppen",
-        description: "Be alla stå i en cirkel, fötterna axelbrett. Förklara att ni ska göra lugna andetag.",
-        durationMinutes: 2,
-      },
-      {
-        id: "step-2",
-        title: "Guidad andning",
-        description: "Räkna 4 in, håll 2, räkna 4 ut. Upprepa 5 gånger. Lägg till armrörelser om ni vill.",
-        durationMinutes: 5,
-        safety: "Avsluta om någon känner obehag.",
-      },
-      {
-        id: "step-3",
-        title: "Reflektion",
-        description: "Fråga hur kroppen känns. Uppmuntra kort delning, håll tempot lugnt.",
-        durationMinutes: 3,
-      },
-    ],
-  },
+type ApiGame = {
+  id: string;
+  name: string;
+  description?: string | null;
+  translations?: { locale: string; title: string; short_description: string; instructions: any }[];
+  location_type?: string | null;
+  min_players?: number | null;
+  max_players?: number | null;
+  age_min?: number | null;
+  age_max?: number | null;
 };
+
+function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "no", "en"]): GameRun | null {
+  if (!game) return null;
+  const translations = game.translations ?? [];
+  const translation = localeOrder.map((l) => translations.find((t) => t.locale === l)).find(Boolean) || translations[0];
+
+  const steps =
+    Array.isArray(translation?.instructions)
+      ? (translation?.instructions as { title?: string; description?: string; duration_minutes?: number }[]).map((s, i) => ({
+          id: s.title || `step-${i + 1}`,
+          title: s.title || `Steg ${i + 1}`,
+          description: s.description || "",
+          durationMinutes: s.duration_minutes ?? undefined,
+        }))
+      : [
+          {
+            id: "step-1",
+            title: "Instruktioner",
+            description: translation?.short_description || game.description || "",
+          },
+        ];
+
+  const groupSize =
+    game.min_players && game.max_players ? `${game.min_players}-${game.max_players} deltagare` : undefined;
+  const ageRange = game.age_min && game.age_max ? `${game.age_min}-${game.age_max} år` : undefined;
+
+  return {
+    id: game.id,
+    title: translation?.title || game.name,
+    summary: translation?.short_description || game.description || "",
+    steps,
+    environment: game.location_type || undefined,
+    groupSize,
+    ageRange,
+  };
+}
 
 export function PlayPage({ gameId }: { gameId?: string }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isLoading] = useState(false);
-  const [error] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [game, setGame] = useState<GameRun | null>(null);
 
-  const game = useMemo(() => mockGames[gameId ?? "demo-1"], [gameId]);
+  useEffect(() => {
+    const load = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`/api/games/${gameId}/`, { method: "GET" });
+        if (!res.ok) {
+          throw new Error("Not found");
+        }
+        const json = (await res.json()) as { game: ApiGame };
+        setGame(mapApiToGameRun(json.game));
+      } catch (err) {
+        console.error("Failed to load game", err);
+        setError("Kunde inte ladda passet");
+      } finally {
+        setIsLoading(false);
+        setCurrentStep(0);
+      }
+    };
+    if (gameId) {
+      void load();
+    }
+  }, [gameId]);
+
   const totalSteps = game?.steps.length ?? 0;
   const step = useMemo(() => game?.steps[currentStep], [game, currentStep]);
 
@@ -138,7 +147,6 @@ export function PlayPage({ gameId }: { gameId?: string }) {
 
       <StepViewer step={step} index={currentStep} total={totalSteps} />
 
-      {/* Tips block - subtle and collapsible feel */}
       <details className="group rounded-2xl bg-muted/30 text-sm" open>
         <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 font-medium text-foreground">
           <svg className="h-4 w-4 text-primary transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -162,9 +170,8 @@ export function PlayPage({ gameId }: { gameId?: string }) {
         </ul>
       </details>
 
-      {/* Secondary actions - smaller and grouped */}
       <div className="flex gap-2">
-        <Button variant="ghost" size="sm" className="flex-1 text-muted-foreground hover:text-foreground">
+        <Button variant="ghost" size="sm" className="flex-1 text-muted-foreground hover:text-foreground" onClick={() => window.location.href = '/app/games'}>
           <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
           </svg>

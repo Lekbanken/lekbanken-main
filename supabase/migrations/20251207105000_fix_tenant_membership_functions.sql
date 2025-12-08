@@ -59,10 +59,11 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION public.is_tenant_member TO authenticated;
-GRANT EXECUTE ON FUNCTION public.get_user_tenant_ids TO authenticated;
-GRANT EXECUTE ON FUNCTION public.has_tenant_role TO authenticated;
+-- Grant/revoke on the specific signature to avoid ambiguity with other overloads
+GRANT EXECUTE ON FUNCTION public.is_tenant_member(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_user_tenant_ids() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.has_tenant_role(uuid, text) TO authenticated;
 
-REVOKE EXECUTE ON FUNCTION public.is_tenant_member FROM public;
-REVOKE EXECUTE ON FUNCTION public.get_user_tenant_ids FROM public;
-REVOKE EXECUTE ON FUNCTION public.has_tenant_role FROM public;
+REVOKE EXECUTE ON FUNCTION public.is_tenant_member(uuid) FROM public;
+REVOKE EXECUTE ON FUNCTION public.get_user_tenant_ids() FROM public;
+REVOKE EXECUTE ON FUNCTION public.has_tenant_role(uuid, text) FROM public;

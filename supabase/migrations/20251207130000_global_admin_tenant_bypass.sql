@@ -8,7 +8,9 @@ DROP FUNCTION IF EXISTS public.get_user_tenant_ids() CASCADE;
 DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text) CASCADE;
 DROP FUNCTION IF EXISTS public.has_tenant_role(uuid, text[]) CASCADE;
 
--- Global admin helper
+-- Drop existing to avoid duplicate-definition errors when rerun
+DROP FUNCTION IF EXISTS public.is_global_admin() CASCADE;
+
 CREATE FUNCTION public.is_global_admin()
 RETURNS boolean
 LANGUAGE plpgsql

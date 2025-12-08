@@ -1,8 +1,10 @@
 -- Fix RLS policy to allow reading published global games
 -- The existing policy requires get_user_tenant_ids() which can fail for some auth states
 
--- Drop the existing policy
+-- Drop existing policies to avoid duplicate errors when re-running
 DROP POLICY IF EXISTS "users_can_select_games" ON games;
+DROP POLICY IF EXISTS "anyone_can_read_published_global_games" ON games;
+DROP POLICY IF EXISTS "authenticated_can_read_tenant_games" ON games;
 
 -- Create a simpler policy that allows:
 -- 1. Anyone (including anon) to read published games with no owner

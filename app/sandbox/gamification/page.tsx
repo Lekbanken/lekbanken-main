@@ -1,23 +1,15 @@
 'use client';
 
 import { SandboxShell as SandboxShellV2 } from '../components/shell/SandboxShellV2';
-import { ColorControls, SpacingControls, GlobalControls } from '../components/controls';
+import { ColorControls, SpacingControls } from '../components/controls';
 import { CoinBalance, AchievementBadgePreview } from '../components/previews';
 
 function GamificationModuleControls() {
   return (
-    <>
-      <GlobalControls />
-      <div className="mt-6 border-t border-border pt-6">
-        <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Module Controls
-        </div>
-        <div className="space-y-6">
-          <ColorControls />
-          <SpacingControls />
-        </div>
-      </div>
-    </>
+    <div className="space-y-6">
+      <ColorControls />
+      <SpacingControls />
+    </div>
   );
 }
 

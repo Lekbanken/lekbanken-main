@@ -1,7 +1,7 @@
 'use client';
 
 import { SandboxShell as SandboxShellV2 } from '../components/shell/SandboxShellV2';
-import { SpacingControls, GlobalControls } from '../components/controls';
+import { SpacingControls } from '../components/controls';
 import { useSpacing } from '../store/sandbox-store';
 
 function SpacingPreview() {
@@ -114,17 +114,7 @@ function SpacingPreview() {
 }
 
 function SpacingModuleControls() {
-  return (
-    <>
-      <GlobalControls />
-      <div className="mt-6 border-t border-border pt-6">
-        <div className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Module Controls
-        </div>
-        <SpacingControls />
-      </div>
-    </>
-  );
+  return <SpacingControls />;
 }
 
 export default function SpacingPage() {

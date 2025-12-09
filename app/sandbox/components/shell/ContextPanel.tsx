@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { getModuleNotes } from '../../config/module-notes';
 import { getModuleById } from '../../config/sandbox-modules';
 import { StatusFilterControl } from './StatusFilterControl';
+import { GlobalControls } from '../controls/GlobalControls';
 import { CodeBracketIcon, MapPinIcon, SwatchIcon } from '@heroicons/react/24/outline';
 
 interface ContextPanelProps {
@@ -141,23 +142,22 @@ export function ContextPanel({ moduleId, controls, className }: ContextPanelProp
       <div className="flex-1 overflow-y-auto p-4">
         {activeTab === 'controls' && (
           <div className="space-y-6">
-            {/* Status filter - always show */}
-            <StatusFilterControl />
+            {/* Global Controls - always show (viewport, theme, etc.) */}
+            <GlobalControls />
+            
+            {/* Status filter */}
+            <div className="border-t border-border pt-4">
+              <StatusFilterControl />
+            </div>
             
             {/* Module-specific controls */}
-            {controls ? (
-              <>
-                <div className="border-t border-border pt-4">
-                  <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    Modul-inställningar
-                  </h4>
-                  {controls}
-                </div>
-              </>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Inga extra kontroller för denna modul.
-              </p>
+            {controls && (
+              <div className="border-t border-border pt-4">
+                <h4 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Modul-inställningar
+                </h4>
+                {controls}
+              </div>
             )}
           </div>
         )}

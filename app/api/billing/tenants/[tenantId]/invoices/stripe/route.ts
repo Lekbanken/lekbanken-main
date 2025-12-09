@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY
@@ -28,7 +28,13 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function POST(request: Request, { params }: { params: { tenantId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params
+
+  if (process.env.STRIPE_ENABLED !== 'true') {
+    return NextResponse.json({ error: 'Stripe integration temporarily disabled' }, { status: 501 })
+  }
+
   if (!stripe) {
     console.error('[billing/stripe-invoice] Missing STRIPE_SECRET_KEY')
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
@@ -37,7 +43,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -65,7 +71,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { data: billingAccount, error: acctError } = await (supabase as any)
     .from('billing_accounts')
     .select('provider_customer_id')
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .eq('provider', 'stripe')
     .maybeSingle()
 
@@ -91,7 +97,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
       collection_method: 'send_invoice',
       due_date: dueDateUnix,
       metadata: {
-        tenant_id: params.tenantId,
+        tenant_id: tenantId,
         name: body.name,
       },
     })
@@ -104,7 +110,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
     const { data: localInvoice, error: insertError } = await supabase
       .from('invoices')
       .insert({
-        tenant_id: params.tenantId,
+        tenant_id: tenantId,
         name: body.name,
         amount: body.amount,
         amount_subtotal: body.amount,

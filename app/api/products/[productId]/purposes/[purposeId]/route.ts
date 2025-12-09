@@ -1,21 +1,22 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { productId: string; purposeId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ productId: string; purposeId: string }> }
 ) {
+  const { productId, purposeId } = await params
   const supabase = await createServerRlsClient()
 
-  if (!params.productId || !params.purposeId) {
+  if (!productId || !purposeId) {
     return NextResponse.json({ error: 'productId and purposeId are required' }, { status: 400 })
   }
 
   const { error } = await supabase
     .from('product_purposes')
     .delete()
-    .eq('product_id', params.productId)
-    .eq('purpose_id', params.purposeId)
+    .eq('product_id', productId)
+    .eq('purpose_id', purposeId)
 
   if (error) {
     console.error('[api/products/:id/purposes/:purposeId] delete error', error)

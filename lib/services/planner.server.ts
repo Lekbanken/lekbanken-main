@@ -140,7 +140,7 @@ function buildPlanModel(
 
 function mapInstructionsToSteps(
   translation?: Tables<'game_translations'> | null
-): PlannerPlayBlock['game']['steps'] {
+): { title: string; description?: string | null; durationMinutes?: number | null }[] {
   const instructions = translation?.instructions
   if (Array.isArray(instructions)) {
     return instructions.map((step, idx: number) => {

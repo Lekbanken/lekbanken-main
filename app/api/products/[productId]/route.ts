@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateProductPayload } from '@/lib/validation/products'
 import type { Database } from '@/types/supabase'
@@ -6,14 +6,15 @@ import type { Database } from '@/types/supabase'
 type ProductRow = Database['public']['Tables']['products']['Row']
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { productId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ productId: string }> }
 ) {
+  const { productId } = await params
   const supabase = await createServerRlsClient()
   const { data, error } = await supabase
     .from('products')
     .select('*,purposes:product_purposes(purpose:purposes(*))')
-    .eq('id', params.productId)
+    .eq('id', productId)
     .single()
 
   if (error) {
@@ -25,9 +26,10 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { productId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ productId: string }> }
 ) {
+  const { productId } = await params
   const supabase = await createServerRlsClient()
   const body = (await request.json().catch(() => ({}))) as Partial<ProductRow>
 
@@ -54,7 +56,7 @@ export async function PATCH(
   const { data, error } = await supabase
     .from('products')
     .update(updates)
-    .eq('id', params.productId)
+    .eq('id', productId)
     .select('*,purposes:product_purposes(purpose:purposes(*))')
     .single()
 
@@ -67,11 +69,12 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { productId: string } }
+  _request: NextRequest,
+  { params }: { params: Promise<{ productId: string }> }
 ) {
+  const { productId } = await params
   const supabase = await createServerRlsClient()
-  const { error } = await supabase.from('products').delete().eq('id', params.productId)
+  const { error } = await supabase.from('products').delete().eq('id', productId)
 
   if (error) {
     console.error('[api/products/:id] delete error', error)

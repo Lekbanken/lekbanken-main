@@ -5,6 +5,8 @@ export type Step = {
   durationMinutes?: number;
   materials?: string[];
   safety?: string;
+  tag?: string;
+  note?: string;
 };
 
 export type GameRun = {

@@ -1,5 +1,5 @@
 import Stripe from 'stripe'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY
@@ -28,7 +28,11 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function POST(request: Request, { params }: { params: { tenantId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params
+  if (process.env.STRIPE_ENABLED !== 'true') {
+    return NextResponse.json({ error: 'Stripe integration temporarily disabled' }, { status: 501 })
+  }
   if (!stripe) {
     console.error('[billing/stripe-customer] Missing STRIPE_SECRET_KEY')
     return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
@@ -37,7 +41,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -50,7 +54,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { data: existing } = await (supabase as any)
     .from('billing_accounts')
     .select('id, provider_customer_id')
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .eq('provider', 'stripe')
     .maybeSingle()
 
@@ -62,7 +66,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const customer = await stripe.customers.create({
     name: body.name || undefined,
     email: body.email || undefined,
-    metadata: { tenant_id: params.tenantId },
+    metadata: { tenant_id: tenantId },
   })
 
   // Insert billing_accounts
@@ -70,7 +74,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { error } = await (supabase as any)
     .from('billing_accounts')
     .insert({
-      tenant_id: params.tenantId,
+      tenant_id: tenantId,
       provider: 'stripe',
       provider_customer_id: customer.id,
     })

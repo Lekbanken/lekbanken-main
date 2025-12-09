@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 async function requireUser() {
@@ -24,17 +24,18 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(_: Request, { params }: { params: { tenantId: string } }) {
+export async function GET(_: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
     .from('tenant_subscriptions')
     .select('*, billing_product:billing_products(*)')
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
@@ -47,11 +48,12 @@ export async function GET(_: Request, { params }: { params: { tenantId: string }
   return NextResponse.json({ subscription: data })
 }
 
-export async function POST(request: Request, { params }: { params: { tenantId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -67,13 +69,13 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   const { data: existing } = await supabase
     .from('tenant_subscriptions')
     .select('id')
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle()
 
   const payload = {
-    tenant_id: params.tenantId,
+    tenant_id: tenantId,
     billing_product_id: body.billing_product_id,
     seats_purchased: body.seats_purchased ?? 1,
     start_date: body.start_date ?? new Date().toISOString().slice(0, 10),
@@ -110,10 +112,11 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   return NextResponse.json({ subscription: result })
 }
 
-export async function PATCH(request: Request, { params }: { params: { tenantId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
+  const { tenantId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -137,7 +140,7 @@ export async function PATCH(request: Request, { params }: { params: { tenantId: 
     .from('tenant_subscriptions')
     .update(updates)
     .eq('id', subscriptionId)
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .select('*, billing_product:billing_products(*)')
     .maybeSingle()
 

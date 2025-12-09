@@ -12,6 +12,7 @@ function hashCodes(codes: string[]) {
 
 export async function POST() {
   const supabase = await createServerRlsClient()
+  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -21,7 +22,8 @@ export async function POST() {
   const codes = generateCodes()
   const hashed = hashCodes(codes)
 
-  const { error } = await supabase
+  const loose = supabase as unknown as LooseSupabase
+  const { error } = await loose
     .from('user_mfa')
     .upsert(
       {

@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 type PaymentStatus = 'pending' | 'confirmed' | 'failed' | 'refunded'
@@ -45,16 +45,20 @@ async function fetchInvoice(
   return data
 }
 
-export async function GET(_: Request, { params }: { params: { tenantId: string; invoiceId: string } }) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
+) {
+  const { tenantId, invoiceId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let invoice
   try {
-    invoice = await fetchInvoice(supabase, params.tenantId, params.invoiceId)
+    invoice = await fetchInvoice(supabase, tenantId, invoiceId)
   } catch {
     return NextResponse.json({ error: 'Failed to load invoice' }, { status: 500 })
   }
@@ -63,7 +67,7 @@ export async function GET(_: Request, { params }: { params: { tenantId: string; 
   const { data, error } = await supabase
     .from('payments')
     .select('*')
-    .eq('invoice_id', params.invoiceId)
+    .eq('invoice_id', invoiceId)
     .order('created_at', { ascending: false })
 
   if (error) {
@@ -74,16 +78,20 @@ export async function GET(_: Request, { params }: { params: { tenantId: string; 
   return NextResponse.json({ invoice, payments: data ?? [] })
 }
 
-export async function POST(request: Request, { params }: { params: { tenantId: string; invoiceId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
+) {
+  const { tenantId, invoiceId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let invoice
   try {
-    invoice = await fetchInvoice(supabase, params.tenantId, params.invoiceId)
+    invoice = await fetchInvoice(supabase, tenantId, invoiceId)
   } catch {
     return NextResponse.json({ error: 'Failed to load invoice' }, { status: 500 })
   }
@@ -104,7 +112,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   }
 
   const payload = {
-    invoice_id: params.invoiceId,
+    invoice_id: invoiceId,
     name: body.name,
     amount: body.amount,
     currency: body.currency || invoice.currency || 'NOK',

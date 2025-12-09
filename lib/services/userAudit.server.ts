@@ -7,7 +7,7 @@ export async function logUserAuditEvent(params: {
   payload?: Record<string, unknown>
 }) {
   const supabase = await createServerRlsClient()
-  await supabase.from('user_audit_logs').insert({
+  await (supabase as any).from('user_audit_logs').insert({
     user_id: params.userId,
     actor_user_id: params.actorUserId,
     event_type: params.eventType,

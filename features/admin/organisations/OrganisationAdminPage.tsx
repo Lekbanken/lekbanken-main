@@ -62,7 +62,7 @@ export function OrganisationAdminPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const { data, error: queryError } = await supabase
+      const { data, error: queryError } = await (supabase as any)
         .from("tenants")
         .select(
           "id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at, user_tenant_memberships(count)"
@@ -73,7 +73,7 @@ export function OrganisationAdminPage() {
         throw queryError;
       }
 
-      const mapped: OrganisationAdminItem[] = (data || []).map((tenant: TenantRow) => ({
+      const mapped: OrganisationAdminItem[] = (data || []).map((tenant: any) => ({
         id: tenant.id,
         name: tenant.name,
         slug: tenant.slug,

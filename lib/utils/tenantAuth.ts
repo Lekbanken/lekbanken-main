@@ -1,12 +1,14 @@
 import { createServerRlsClient } from '@/lib/supabase/server'
 
-type UserMeta = {
-  app_metadata?: { role?: string }
+// Flexible user type that works with Supabase User and custom shapes
+type UserLike = {
+  app_metadata?: Record<string, unknown>
   id: string
 }
 
-export function isSystemAdmin(user: UserMeta | null | undefined) {
-  return user?.app_metadata?.role === 'system_admin'
+export function isSystemAdmin(user: UserLike | null | undefined) {
+  const role = (user?.app_metadata as { role?: string } | undefined)?.role
+  return role === 'system_admin'
 }
 
 export async function isTenantAdmin(tenantId: string, userId: string) {
@@ -23,7 +25,7 @@ export async function isTenantAdmin(tenantId: string, userId: string) {
   return data?.role === 'owner' || data?.role === 'admin'
 }
 
-export async function assertTenantAdminOrSystem(tenantId: string, user: UserMeta | null | undefined) {
+export async function assertTenantAdminOrSystem(tenantId: string, user: UserLike | null | undefined) {
   if (!user) return false
   if (isSystemAdmin(user)) return true
   return isTenantAdmin(tenantId, user.id)

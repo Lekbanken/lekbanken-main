@@ -58,7 +58,7 @@ export async function PATCH(
         product_access: body.product_access,
         preferences: body.preferences,
         updated_at: new Date().toISOString(),
-      },
+      } as any,
       { onConflict: 'tenant_id' }
     )
     .select()

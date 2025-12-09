@@ -49,6 +49,7 @@ export function OrganisationTable({
   onStatusChange,
   onRemove,
   onCreateClick,
+  onClearFilters,
 }: OrganisationTableProps) {
   const handleRowClick = (event: MouseEvent<HTMLTableRowElement>, organisation: OrganisationAdminItem) => {
     if ((event.target as HTMLElement).closest("[data-no-row-click]")) return;
@@ -70,7 +71,7 @@ export function OrganisationTable({
             : "Create your first organisation to start managing tenants."
         }
         action={searchQuery ? undefined : onCreateClick ? { label: "Create organisation", onClick: onCreateClick } : undefined}
-        secondaryAction={searchQuery ? { label: "Clear filters", onClick: onClearFilters } : undefined}
+        secondaryAction={searchQuery && onClearFilters ? { label: "Clear filters", onClick: onClearFilters } : undefined}
       />
     );
   }

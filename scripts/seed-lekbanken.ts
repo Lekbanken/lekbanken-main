@@ -71,7 +71,7 @@ async function ensureAdminUser() {
   );
   if (profileError) throw profileError;
 
-  const { error: membershipError } = await supabase.from("user_tenant_memberships").upsert(
+  const { error: membershipError } = await (supabase as any).from("user_tenant_memberships").upsert(
     {
       user_id: adminId,
       tenant_id: TENANT_ID,

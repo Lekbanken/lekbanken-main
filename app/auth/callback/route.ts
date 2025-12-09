@@ -53,6 +53,8 @@ export async function GET(request: NextRequest) {
 
     // Record session/device
     const rlsClient = await createServerRlsClient()
+    type LooseSupabase = { from: (table: string) => ReturnType<typeof rlsClient.from> }
+    const loose = rlsClient as unknown as LooseSupabase
     const {
       data: { user },
     } = await rlsClient.auth.getUser()
@@ -60,7 +62,7 @@ export async function GET(request: NextRequest) {
     if (user) {
       const now = new Date().toISOString()
       // Upsert device with fingerprint = null (OAuth flow) but keep UA/IP
-      const { data: deviceRow } = await rlsClient
+      const { data: deviceRow } = await loose
         .from('user_devices')
         .insert({
           user_id: user.id,
@@ -73,7 +75,8 @@ export async function GET(request: NextRequest) {
         .select('id')
         .maybeSingle()
 
-      await rlsClient.from('user_sessions').insert({
+        await loose.from('user_sessions').insert({
+        // using loose typing avoids missing table in generated types
         user_id: user.id,
         supabase_session_id: null,
         device_id: deviceRow?.id ?? null,

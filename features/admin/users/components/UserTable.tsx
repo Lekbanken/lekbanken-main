@@ -51,6 +51,7 @@ export function UserTable({
   onRemove,
   onResendInvite,
   onInviteClick,
+  onClearFilters,
 }: UserTableProps) {
   const handleRowClick = (event: MouseEvent<HTMLTableRowElement>, user: UserAdminItem) => {
     if ((event.target as HTMLElement).closest("[data-no-row-click]")) return;
@@ -76,7 +77,7 @@ export function UserTable({
             : "Invite your first team member to get started."
         }
         action={searchQuery ? undefined : { label: "Invite user", onClick: onInviteClick }}
-        secondaryAction={searchQuery ? { label: "Clear filters", onClick: onClearFilters } : undefined}
+        secondaryAction={searchQuery && onClearFilters ? { label: "Clear filters", onClick: onClearFilters } : undefined}
       />
     );
   }

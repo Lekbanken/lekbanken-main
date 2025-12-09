@@ -27,15 +27,13 @@ export async function GET() {
 
   const activeTenantId = await readTenantIdFromCookies(cookieStore)
 
-  const globalRole =
-    (userRow as { global_role?: Database['public']['Enums']['global_role_enum'] | null } | null)?.global_role ??
-    null
+  const globalRole = (userRow as { global_role?: string | null } | null)?.global_role ?? null
 
   return NextResponse.json({
     user: userRow,
     auth_user: user,
     memberships: memberships ?? [],
     active_tenant_id: activeTenantId,
-    is_system_admin: isSystemAdmin(user, globalRole),
+    is_system_admin: isSystemAdmin(user as any, globalRole),
   })
 }

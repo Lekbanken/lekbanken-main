@@ -29,7 +29,7 @@ export function validateGamePayload(
     if (payload.name !== undefined && payload.name.trim().length === 0) {
       errors.push('name cannot be empty')
     }
-    if (payload.short_description !== undefined && payload.short_description.trim().length === 0) {
+    if (payload.short_description !== undefined && payload.short_description !== null && payload.short_description.trim().length === 0) {
       errors.push('short_description cannot be empty')
     }
   }

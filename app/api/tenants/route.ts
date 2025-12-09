@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       demo_flag: body.demo_flag ?? false,
       created_by: user.id,
       updated_by: user.id,
-    })
+    } as any)
     .select()
     .single()
 

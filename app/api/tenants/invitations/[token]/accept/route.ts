@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
+import { isSystemAdmin } from '@/lib/utils/tenantAuth'
 
 export async function POST(
   _request: Request,
@@ -46,7 +47,7 @@ export async function POST(
       user_id: user.id,
       role: invite.role,
       status: 'active',
-    },
+    } as any,
     { onConflict: 'tenant_id,user_id' }
   )
 

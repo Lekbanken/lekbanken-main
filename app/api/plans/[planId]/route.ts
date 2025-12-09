@@ -49,7 +49,8 @@ export async function PATCH(
     metadata?: Record<string, unknown> | null
   }
 
-  const validation = validatePlanPayload(body, { mode: 'update' })
+  // Cast to any to satisfy Json typing for metadata during validation
+  const validation = validatePlanPayload(body as any, { mode: 'update' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
@@ -59,7 +60,7 @@ export async function PATCH(
     .update({
       name: body.name,
       description: body.description,
-      metadata: body.metadata ?? undefined,
+      metadata: (body.metadata ?? undefined) as any,
       updated_at: new Date().toISOString(),
       updated_by: user.id,
     })

@@ -1,5 +1,30 @@
 # Supabase Migration Execution Guide
 
+## ⚠️ KRITISKT: Efter Varje Migration
+
+**ALLTID** regenerera TypeScript types efter schema changes:
+
+```bash
+# 1. Kör migration (via Dashboard eller CLI)
+# 2. Regenerera types omedelbart:
+npm run db:types:remote
+
+# 3. Verifiera inga type errors:
+npm run type-check
+
+# 4. Commit båda filerna tillsammans:
+git add supabase/migrations/TIMESTAMP_*.sql types/supabase.ts
+git commit -m "feat: migration with type regeneration"
+```
+
+**Varför detta är viktigt:**
+- Förhindrar type mismatches mellan databas och kod
+- Undviker temporära `as any` casts
+- Håller TypeScript type safety intakt
+- CI/CD kommer att validera detta
+
+---
+
 ## Overview
 
 This project has **14 database migrations** (created: Nov 29, 2025) that need to be executed to set up the complete MVP schema with all 15 domains.

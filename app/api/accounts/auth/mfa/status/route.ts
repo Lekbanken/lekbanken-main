@@ -3,6 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 
 export async function GET() {
   const supabase = await createServerRlsClient()
+  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -15,7 +16,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load MFA status' }, { status: 500 })
   }
 
-  const { data: mfaRow } = await supabase
+  const loose = supabase as unknown as LooseSupabase
+  const { data: mfaRow } = await loose
     .from('user_mfa')
     .select('*')
     .eq('user_id', user.id)

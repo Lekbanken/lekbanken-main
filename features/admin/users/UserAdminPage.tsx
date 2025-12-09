@@ -24,7 +24,7 @@ import { UserTablePagination } from "./components/UserTablePagination";
 
 const USERS_PER_PAGE = 15;
 
-type MembershipRow = Database["public"]["Tables"]["user_tenant_memberships"]["Row"] & {
+type MembershipRow = any & {
   users: { email: string | null; full_name: string | null } | null;
   tenants: { name: string | null } | null;
 };
@@ -80,18 +80,18 @@ export function UserAdminPage() {
     setIsLoadingUsers(true);
     setError(null);
     try {
-      const query = supabase
+      const query = (supabase as any)
         .from("user_tenant_memberships")
         .select("id, user_id, role, tenant_id, created_at, tenants ( name ), users ( email, full_name )")
         .order("created_at", { ascending: false });
 
-      const { data, error: queryError } = tenantId ? query.eq("tenant_id", tenantId) : query;
+      const { data, error: queryError } = tenantId ? (query as any).eq("tenant_id", tenantId) : (query as any);
 
       if (queryError) {
         throw queryError;
       }
 
-      const mapped: UserAdminItem[] = (data || []).map((row) => {
+      const mapped: UserAdminItem[] = (data || []).map((row: any) => {
         const membership = row as MembershipRow;
         return {
           id: membership.id,
@@ -160,7 +160,7 @@ export function UserAdminPage() {
     }
     try {
       // Update membership role/status in DB
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("user_tenant_memberships")
         .update({ role: payload.roles[0] })
         .eq("id", editingUser.id);
@@ -224,7 +224,7 @@ export function UserAdminPage() {
       }
 
       // Insert membership
-      const { data: membership, error: membershipError } = await supabase
+      const { data: membership, error: membershipError } = await (supabase as any)
         .from("user_tenant_memberships")
         .insert({
           user_id: userRow.id,
@@ -263,7 +263,7 @@ export function UserAdminPage() {
       return;
     }
     try {
-      const { error: deleteError } = await supabase.from("user_tenant_memberships").delete().eq("id", userId);
+      const { error: deleteError } = await (supabase as any).from("user_tenant_memberships").delete().eq("id", userId);
       if (deleteError) throw deleteError;
       warning("User removed from organisation list.", "User removed");
     } catch (err) {

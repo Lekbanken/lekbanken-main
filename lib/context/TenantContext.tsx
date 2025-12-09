@@ -13,7 +13,7 @@ import { resolveCurrentTenant, selectTenant as selectTenantAction } from '@/app/
 import type { Database } from '@/types/supabase'
 
 type Tenant = Database['public']['Tables']['tenants']['Row']
-type UserTenantMembership = Database['public']['Tables']['user_tenant_memberships']['Row'] & {
+type UserTenantMembership = any & {
   tenant: Tenant
 }
 

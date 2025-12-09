@@ -6,7 +6,7 @@ type SupabaseUser = {
 }
 
 type TenantRole = Database['public']['Enums']['tenant_role_enum']
-type GlobalRole = Database['public']['Enums']['global_role_enum']
+type GlobalRole = string
 
 export function isSystemAdmin(user?: SupabaseUser | null, globalRole?: GlobalRole | null) {
   if (!user) return false

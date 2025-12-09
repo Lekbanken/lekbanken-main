@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 type PaymentStatus = 'pending' | 'confirmed' | 'failed' | 'refunded'
@@ -47,16 +47,20 @@ async function fetchPayment(
   return data
 }
 
-export async function GET(_: Request, { params }: { params: { tenantId: string; invoiceId: string; paymentId: string } }) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string; paymentId: string }> }
+) {
+  const { tenantId, invoiceId, paymentId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let payment
   try {
-    payment = await fetchPayment(supabase, params.tenantId, params.invoiceId, params.paymentId)
+    payment = await fetchPayment(supabase, tenantId, invoiceId, paymentId)
   } catch {
     return NextResponse.json({ error: 'Failed to load payment' }, { status: 500 })
   }
@@ -66,16 +70,20 @@ export async function GET(_: Request, { params }: { params: { tenantId: string; 
   return NextResponse.json({ payment })
 }
 
-export async function PATCH(request: Request, { params }: { params: { tenantId: string; invoiceId: string; paymentId: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string; paymentId: string }> }
+) {
+  const { tenantId, invoiceId, paymentId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   let payment
   try {
-    payment = await fetchPayment(supabase, params.tenantId, params.invoiceId, params.paymentId)
+    payment = await fetchPayment(supabase, tenantId, invoiceId, paymentId)
   } catch {
     return NextResponse.json({ error: 'Failed to load payment' }, { status: 500 })
   }
@@ -111,8 +119,8 @@ export async function PATCH(request: Request, { params }: { params: { tenantId: 
   const { data, error } = await supabase
     .from('payments')
     .update(updates)
-    .eq('id', params.paymentId)
-    .eq('invoice_id', params.invoiceId)
+    .eq('id', paymentId)
+    .eq('invoice_id', invoiceId)
     .select('*, invoice:invoices(id, tenant_id, currency)')
     .maybeSingle()
 
@@ -120,7 +128,7 @@ export async function PATCH(request: Request, { params }: { params: { tenantId: 
     console.error('[billing/payment] patch error', error)
     return NextResponse.json({ error: 'Failed to update payment' }, { status: 500 })
   }
-  if (!data || data.invoice?.tenant_id !== params.tenantId) {
+  if (!data || data.invoice?.tenant_id !== tenantId) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 

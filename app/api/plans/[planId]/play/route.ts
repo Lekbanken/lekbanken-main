@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { buildPlayView, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'
@@ -9,7 +9,7 @@ function normalizeId(value: string | string[] | undefined) {
 }
 
 export async function GET(
-  _request: Request,
+  _request: NextRequest,
   context: { params: Promise<{ planId: string }> }
 ) {
   const params = await context.params

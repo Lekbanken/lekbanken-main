@@ -59,7 +59,7 @@ export async function searchPublicGames(
   }
 
   if (options?.energyLevel) {
-    query = query.eq('energy_level', options.energyLevel)
+    query = query.eq('energy_level', options.energyLevel as any)
   }
 
   if (options?.minTimeMin !== undefined) {
@@ -353,7 +353,7 @@ export async function getFilteredGames(
 
   // Energy level filter
   if (filters.energyLevels && filters.energyLevels.length > 0) {
-    query = query.in('energy_level', filters.energyLevels)
+    query = query.in('energy_level', filters.energyLevels as any)
   }
 
   // Age range

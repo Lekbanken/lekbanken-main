@@ -4,6 +4,8 @@ import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
+  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
+  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -22,7 +24,7 @@ export async function POST(request: Request) {
     console.warn('[accounts/sessions/revoke] admin signOut warning', err)
   }
 
-  const { error } = await supabase
+  const { error } = await loose
     .from('user_sessions')
     .update({ revoked_at: new Date().toISOString() })
     .eq('user_id', user.id)

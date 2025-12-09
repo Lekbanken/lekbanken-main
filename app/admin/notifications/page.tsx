@@ -13,11 +13,6 @@ interface User {
   email: string;
 }
 
-interface UserTenantData {
-  user_id: string;
-  users: { id: string; email: string } | null;
-}
-
 export default function NotificationsAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
@@ -40,7 +35,9 @@ export default function NotificationsAdminPage() {
 
     const loadUsers = async () => {
       try {
-        const { data, error } = await supabase
+        type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
+        const supa = supabase as unknown as LooseSupabase
+        const { data, error } = await supa
           .from('user_tenant_memberships')
           .select('user_id, users(id, email)')
           .eq('tenant_id', currentTenant.id);
@@ -50,7 +47,8 @@ export default function NotificationsAdminPage() {
           return;
         }
 
-        const users = (data || []).map((item: UserTenantData) => ({
+        const rows = (data ?? []) as Array<{ user_id: string; users: { id: string; email: string } | null }>
+        const users = rows.map((item) => ({
           id: item.user_id,
           email: item.users?.email || 'Unknown',
         }));

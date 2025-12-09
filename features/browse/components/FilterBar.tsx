@@ -20,7 +20,7 @@ const filterLabels: Record<string, string> = {
   medium: "6-14 pers",
   large: "15+ pers",
   low: "Låg energi",
-  medium: "Medel energi",
+  medium_energy: "Medel energi",
   high: "Hög energi",
   indoor: "Inne",
   outdoor: "Ute",

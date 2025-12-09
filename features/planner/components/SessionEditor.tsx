@@ -340,7 +340,7 @@ export function SessionEditor({
       <div className="sticky bottom-20 z-10 rounded-2xl border border-border/50 bg-background/80 p-3 shadow-xl backdrop-blur-xl">
         <div className="flex gap-2">
           <Button
-            href={localPlan.blocks[0]?.blockType === "game" && localPlan.blocks[0].game ? `/app/play/${localPlan.blocks[0].game.id}` : undefined}
+            href={localPlan.blocks.length > 0 ? `/app/play/plan/${localPlan.id}` : undefined}
             className="h-12 flex-1 gap-2 bg-gradient-to-br from-primary to-primary/80 text-base font-semibold"
             disabled={!localPlan.blocks[0]}
           >

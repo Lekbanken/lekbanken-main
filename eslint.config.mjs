@@ -14,6 +14,19 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "catalyst-ui-kit/**",
   ]),
+  {
+    rules: {
+      // Prevent 'as any' usage - force proper typing
+      "@typescript-eslint/no-explicit-any": "warn",
+      // Encourage consistent type imports
+      "@typescript-eslint/consistent-type-imports": "warn",
+      // Warn about unused vars
+      "@typescript-eslint/no-unused-vars": ["warn", { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_" 
+      }]
+    }
+  }
 ]);
 
 export default eslintConfig;

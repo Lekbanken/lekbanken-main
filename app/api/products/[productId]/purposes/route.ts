@@ -1,22 +1,23 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/supabase'
 
 type ProductPurposeRow = Database['public']['Tables']['product_purposes']['Row']
 
 export async function POST(
-  request: Request,
-  { params }: { params: { productId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ productId: string }> }
 ) {
+  const { productId } = await params
   const supabase = await createServerRlsClient()
   const body = (await request.json().catch(() => ({}))) as { purpose_id?: string }
 
-  if (!params.productId || !body.purpose_id) {
+  if (!productId || !body.purpose_id) {
     return NextResponse.json({ error: 'productId and purpose_id are required' }, { status: 400 })
   }
 
   const insertPayload: ProductPurposeRow = {
-    product_id: params.productId,
+    product_id: productId,
     purpose_id: body.purpose_id,
   }
 

@@ -28,7 +28,7 @@ export async function POST(request: Request) {
   const isSystemAdmin = role === 'system_admin' || role === 'admin'
 
   const validation = validatePlanPayload(
-    { ...body, owner_tenant_id: tenantId, visibility },
+    { ...body, owner_tenant_id: tenantId, visibility } as any,
     { mode: 'create', isSystemAdmin }
   )
   if (!validation.ok) {
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
       owner_user_id: user.id,
       owner_tenant_id: tenantId,
       visibility,
-      metadata: body.metadata ?? {},
+      metadata: (body.metadata ?? {}) as any,
       created_by: user.id,
       updated_by: user.id,
-    })
+    } as any)
     .select()
     .single()
 

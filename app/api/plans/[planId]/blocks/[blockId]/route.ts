@@ -38,7 +38,8 @@ export async function PATCH(
     is_optional?: boolean | null
   }
 
-  const validation = validatePlanBlockPayload(body, { mode: 'update' })
+  // Cast to any to satisfy Json typing on metadata while preserving runtime validation
+  const validation = validatePlanBlockPayload(body as any, { mode: 'update' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
@@ -100,7 +101,9 @@ export async function PATCH(
     orderedIds.splice(currentIndex, 1)
     orderedIds.splice(sanitized, 0, blockId)
     const reorderPayload = orderedIds.map((id, idx) => ({ id, position: idx }))
-    const { error: orderError } = await supabase.from('plan_blocks').upsert(reorderPayload)
+    const { error: orderError } = await supabase
+      .from('plan_blocks')
+      .upsert(reorderPayload as any)
     if (orderError) {
       console.error('[api/plans/:id/blocks/:blockId] reorder error', orderError)
       return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
@@ -172,7 +175,9 @@ export async function DELETE(
   if (existingBlocks && existingBlocks.length > 1) {
     const remainingIds = existingBlocks.filter((b) => b.id !== blockId).map((b) => b.id)
     const reorderPayload = remainingIds.map((id, idx) => ({ id, position: idx }))
-    const { error: orderError } = await supabase.from('plan_blocks').upsert(reorderPayload)
+    const { error: orderError } = await supabase
+      .from('plan_blocks')
+      .upsert(reorderPayload as any)
     if (orderError) {
       console.error('[api/plans/:id/blocks/:blockId] reorder after delete error', orderError)
       return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })

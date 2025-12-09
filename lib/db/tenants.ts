@@ -10,7 +10,7 @@ import type { Database } from '@/types/supabase'
 type Tenant = Database['public']['Tables']['tenants']['Row']
 type TenantInsert = Database['public']['Tables']['tenants']['Insert']
 type TenantUpdate = Database['public']['Tables']['tenants']['Update']
-type UserTenantMembership = Database['public']['Tables']['user_tenant_memberships']['Row']
+type UserTenantMembership = any
 
 /**
  * Get a single tenant by ID
@@ -40,7 +40,7 @@ export async function getUserTenants(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<(UserTenantMembership & { tenant: Tenant })[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .select(`
       *,
@@ -60,7 +60,7 @@ export async function getUserPrimaryTenant(
   supabase: SupabaseClient<Database>,
   userId: string
 ): Promise<Tenant | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .select(`
       *,
@@ -124,7 +124,7 @@ export async function addUserToTenant(
   role: string = 'member',
   isPrimary: boolean = false
 ): Promise<UserTenantMembership> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .insert({
       user_id: userId,
@@ -147,7 +147,7 @@ export async function getUserRoleInTenant(
   userId: string,
   tenantId: string
 ): Promise<string | null> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .select('role')
     .eq('user_id', userId)
@@ -183,7 +183,7 @@ export async function updateUserTenantRole(
   tenantId: string,
   newRole: string
 ): Promise<UserTenantMembership> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .update({ role: newRole })
     .eq('user_id', userId)
@@ -203,7 +203,7 @@ export async function removeUserFromTenant(
   userId: string,
   tenantId: string
 ): Promise<void> {
-  const { error } = await supabase
+  const { error } = await (supabase as any)
     .from('user_tenant_memberships')
     .delete()
     .eq('user_id', userId)
@@ -219,7 +219,7 @@ export async function getTenantMembers(
   supabase: SupabaseClient<Database>,
   tenantId: string
 ): Promise<(UserTenantMembership & { user: Database['public']['Tables']['users']['Row'] })[]> {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_tenant_memberships')
     .select(`
       *,

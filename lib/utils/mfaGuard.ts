@@ -15,7 +15,7 @@ export async function requireMfaIfEnabled() {
   } = await supabase.auth.getUser()
   if (!user) return { ok: false, reason: 'unauthorized' }
 
-  const { data: userRow } = await supabase
+  const { data: userRow } = await (supabase as any)
     .from('users')
     .select('global_role')
     .eq('id', user.id)
@@ -24,7 +24,7 @@ export async function requireMfaIfEnabled() {
   const isSystem = user.app_metadata?.role === 'system_admin' || userRow?.global_role === 'system_admin'
   if (!isSystem) return { ok: true }
 
-  const { data: mfaRow } = await supabase
+  const { data: mfaRow } = await (supabase as any)
     .from('user_mfa')
     .select('enrolled_at')
     .eq('user_id', user.id)

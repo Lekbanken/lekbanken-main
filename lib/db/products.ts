@@ -83,7 +83,7 @@ export async function createProduct(
 ): Promise<Product> {
   const { data, error } = await supabase
     .from('products')
-    .insert([product])
+    .insert([product] as any)
     .select()
     .single()
 
@@ -107,7 +107,7 @@ export async function updateProduct(
 ): Promise<Product> {
   const { data, error } = await supabase
     .from('products')
-    .update(updates)
+    .update(updates as any)
     .eq('id', productId)
     .select()
     .single()

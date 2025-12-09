@@ -12,6 +12,6 @@ export async function logTenantAuditEvent(params: {
     tenant_id: params.tenantId,
     actor_user_id: params.actorUserId,
     event_type: params.eventType,
-    payload,
+    payload: payload as any,
   })
 }

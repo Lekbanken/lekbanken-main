@@ -36,8 +36,12 @@ type DeviceInfo = {
 
 type MfaStatus = {
   factors: unknown[];
-  totp: unknown;
-  user_mfa: unknown;
+  totp?: {
+    id?: string;
+  };
+  user_mfa?: {
+    enrolled_at?: string;
+  };
 };
 
 const languageOptions = [
@@ -144,8 +148,8 @@ export function ProfilePage() {
       setDevices(devicesJson.devices ?? []);
       setMfaStatus({
         factors: mfaJson.factors ?? [],
-        totp: mfaJson.totp ?? null,
-        user_mfa: mfaJson.user_mfa ?? null,
+        totp: mfaJson.totp ?? undefined,
+        user_mfa: mfaJson.user_mfa ?? undefined,
       });
     } catch (err) {
       setSecurityError(err instanceof Error ? err.message : "Kunde inte ladda säkerhetsdata");
@@ -329,7 +333,7 @@ export function ProfilePage() {
                   </p>
                 </div>
                   {mfaStatus?.user_mfa?.enrolled_at && mfaStatus.totp?.id ? (
-                    <Button variant="outline" onClick={() => void handleDisableMfa(mfaStatus.totp.id)}>
+                    <Button variant="outline" onClick={() => void handleDisableMfa(mfaStatus.totp!.id!)}>
                       Stäng av
                     </Button>
                   ) : (
@@ -338,7 +342,7 @@ export function ProfilePage() {
               </div>
               {mfaStatus?.user_mfa?.enrolled_at && (
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="secondary" onClick={() => void handleRecoveryCodes()}>
+                  <Button variant="outline" onClick={() => void handleRecoveryCodes()}>
                     Visa recovery-koder
                   </Button>
                 </div>

@@ -1,11 +1,12 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateGamePayload } from '@/lib/validation/games'
 
 export async function POST(
-  request: Request,
-  { params }: { params: { gameId: string } }
+  request: NextRequest,
+  { params }: { params: Promise<{ gameId: string }> }
 ) {
+  const { gameId } = await params
   const supabase = await createServerRlsClient()
   const {
     data: { user },
@@ -34,7 +35,7 @@ export async function POST(
   const { data: covers, error: coverError } = await supabase
     .from('game_media')
     .select('id')
-    .eq('game_id', params.gameId)
+    .eq('game_id', gameId)
     .eq('kind', 'cover')
 
   if (coverError) {
@@ -49,7 +50,7 @@ export async function POST(
   const { data, error } = await supabase
     .from('games')
     .update({ status: 'published', updated_at: new Date().toISOString() })
-    .eq('id', params.gameId)
+    .eq('id', gameId)
     .select()
     .single()
 

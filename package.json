@@ -7,7 +7,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "tsc --noEmit --watch",
     "test": "node tests/browse/search-helpers.test.cjs",
+    "db:types": "supabase gen types typescript --local > types/supabase.ts",
+    "db:types:remote": "supabase gen types typescript --linked > types/supabase.ts",
+    "db:verify": "echo 'Run scripts/verify-migrations.sql in Supabase SQL Editor'",
+    "db:check-any": "pwsh -File scripts/find-any-casts.ps1",
     "upload:utmarkelser": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/upload-utmarkelser.ts",
     "sync:utmarkelser:local": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-utmarkelser-local.ts"
   },

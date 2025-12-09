@@ -1,0 +1,44 @@
+name: TypeScript Type Check
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run TypeScript type check
+        run: npm run type-check
+        
+      - name: Check for 'as any' in production code
+        run: |
+          if grep -r "as any" app/ lib/ --include="*.ts" --include="*.tsx" | grep -v "types/supabase.ts"; then
+            echo "❌ Found 'as any' casts in production code:"
+            grep -r "as any" app/ lib/ --include="*.ts" --include="*.tsx" | grep -v "types/supabase.ts"
+            echo ""
+            echo "⚠️  Please remove 'as any' casts and use proper types"
+            exit 1
+          fi
+          echo "✅ No 'as any' casts found in production code"
+        
+      - name: Build check
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: true

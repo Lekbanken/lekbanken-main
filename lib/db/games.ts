@@ -391,7 +391,7 @@ export async function filterGames(
   }
 
   if (filters.energyLevel) {
-    query = query.eq('energy_level', filters.energyLevel)
+    query = query.eq('energy_level', filters.energyLevel as any)
   }
 
   if (filters.minTimeEstimate !== undefined) {

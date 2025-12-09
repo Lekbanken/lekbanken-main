@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
@@ -26,18 +26,22 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(_: Request, { params }: { params: { tenantId: string; invoiceId: string } }) {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
+) {
+  const { tenantId, invoiceId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase
     .from('invoices')
     .select('*, billing_product:billing_products(*), subscription:tenant_subscriptions(*), payments:payments(*)')
-    .eq('tenant_id', params.tenantId)
-    .eq('id', params.invoiceId)
+    .eq('tenant_id', tenantId)
+    .eq('id', invoiceId)
     .maybeSingle()
 
   if (error) {
@@ -49,11 +53,15 @@ export async function GET(_: Request, { params }: { params: { tenantId: string; 
   return NextResponse.json({ invoice: data })
 }
 
-export async function PATCH(request: Request, { params }: { params: { tenantId: string; invoiceId: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string; invoiceId: string }> }
+) {
+  const { tenantId, invoiceId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -104,8 +112,8 @@ export async function PATCH(request: Request, { params }: { params: { tenantId: 
   const { data, error } = await supabase
     .from('invoices')
     .update(updates)
-    .eq('id', params.invoiceId)
-    .eq('tenant_id', params.tenantId)
+    .eq('id', invoiceId)
+    .eq('tenant_id', tenantId)
     .select('*, billing_product:billing_products(*), subscription:tenant_subscriptions(*), payments:payments(*)')
     .maybeSingle()
 

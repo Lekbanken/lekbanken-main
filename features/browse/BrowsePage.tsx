@@ -427,7 +427,7 @@ export function BrowsePage() {
                 aria-label="Visa fler"
                 disabled={!hasMore || isLoadingMore}
                 pressed={false}
-                onPressedChange={() => setPage((p) => p + 1)}
+                onClick={() => setPage((p) => p + 1)}
               >
                 {isLoadingMore ? "Laddar..." : hasMore ? "Visa fler" : "Slut på resultat"}
               </Toggle>

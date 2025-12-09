@@ -37,7 +37,8 @@ export async function POST(
     is_optional?: boolean | null
   }
 
-  const validation = validatePlanBlockPayload(body, { mode: 'create' })
+  // Cast to any to satisfy Json typing for metadata during validation
+  const validation = validatePlanBlockPayload(body as any, { mode: 'create' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
@@ -72,19 +73,21 @@ export async function POST(
 
   const { data: newBlock, error: insertError } = await supabase
     .from('plan_blocks')
-    .insert({
-      plan_id: planId,
-      block_type: body.block_type!,
-      game_id: body.game_id ?? null,
-      duration_minutes: body.duration_minutes ?? null,
-      title: body.title ?? null,
-      notes: body.notes ?? null,
-      position: insertPosition,
-      metadata: body.metadata ?? {},
-      is_optional: body.is_optional ?? false,
-      created_by: user.id,
-      updated_by: user.id,
-    })
+    .insert(
+      {
+        plan_id: planId,
+        block_type: body.block_type!,
+        game_id: body.game_id ?? null,
+        duration_minutes: body.duration_minutes ?? null,
+        title: body.title ?? null,
+        notes: body.notes ?? null,
+        position: insertPosition,
+        metadata: (body.metadata ?? {}) as any,
+        is_optional: body.is_optional ?? false,
+        created_by: user.id,
+        updated_by: user.id,
+      } as any
+    )
     .select()
     .single()
 
@@ -98,7 +101,7 @@ export async function POST(
   orderedIds.splice(insertPosition, 0, newBlock.id)
 
   const updates = orderedIds.map((id, idx) => ({ id, position: idx }))
-  const { error: orderError } = await supabase.from('plan_blocks').upsert(updates)
+  const { error: orderError } = await supabase.from('plan_blocks').upsert(updates as any)
   if (orderError) {
     console.error('[api/plans/:id/blocks] reorder error', orderError)
     return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })

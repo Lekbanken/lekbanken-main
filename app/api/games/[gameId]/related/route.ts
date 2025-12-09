@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { getAllowedProductIds } from '@/app/api/games/utils'
@@ -34,7 +34,8 @@ function scoreGame(
   return score
 }
 
-export async function GET(request: Request, { params }: { params: { gameId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
+  const { gameId } = await params
   const supabase = await createServerRlsClient()
   const { searchParams } = new URL(request.url)
   const parsed = querySchema.safeParse({
@@ -51,7 +52,7 @@ export async function GET(request: Request, { params }: { params: { gameId: stri
   const { data: baseGame, error: baseError } = await supabase
     .from('games')
     .select('id, product_id, main_purpose_id, owner_tenant_id, status, secondary_purposes:game_secondary_purposes(purpose_id)')
-    .eq('id', params.gameId)
+    .eq('id', gameId)
     .single()
 
   if (baseError || !baseGame) {
@@ -95,7 +96,7 @@ export async function GET(request: Request, { params }: { params: { gameId: stri
       `
     )
     .eq('status', 'published')
-    .neq('id', params.gameId)
+    .neq('id', gameId)
 
   if (tenantId) {
     query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)

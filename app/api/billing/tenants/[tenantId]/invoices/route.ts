@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
@@ -26,11 +26,15 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function GET(request: Request, { params }: { params: { tenantId: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string }> }
+) {
+  const { tenantId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { searchParams } = new URL(request.url)
@@ -43,7 +47,7 @@ export async function GET(request: Request, { params }: { params: { tenantId: st
   let query = supabase
     .from('invoices')
     .select('*, billing_product:billing_products(*), subscription:tenant_subscriptions(*), payments:payments(*)')
-    .eq('tenant_id', params.tenantId)
+    .eq('tenant_id', tenantId)
     .order('due_date', { ascending: false })
     .limit(limit)
 
@@ -61,11 +65,15 @@ export async function GET(request: Request, { params }: { params: { tenantId: st
   return NextResponse.json({ invoices: data ?? [] })
 }
 
-export async function POST(request: Request, { params }: { params: { tenantId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ tenantId: string }> }
+) {
+  const { tenantId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -92,7 +100,7 @@ export async function POST(request: Request, { params }: { params: { tenantId: s
   }
 
   const payload = {
-    tenant_id: params.tenantId,
+    tenant_id: tenantId,
     name: body.name,
     amount: body.amount,
     amount_subtotal: body.amount_subtotal ?? body.amount,

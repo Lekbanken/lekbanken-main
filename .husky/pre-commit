@@ -1,0 +1,42 @@
+#!/usr/bin/env pwsh
+# Husky pre-commit hook för type checking
+
+Write-Host "🔍 Running pre-commit checks..." -ForegroundColor Cyan
+
+# Run type check
+Write-Host "`n📝 Type checking..." -ForegroundColor Yellow
+npm run type-check
+$typeCheckResult = $LASTEXITCODE
+
+if ($typeCheckResult -ne 0) {
+    Write-Host "❌ Type check failed!" -ForegroundColor Red
+    exit 1
+}
+
+# Check for 'as any' in staged files
+Write-Host "`n🔎 Checking for 'as any' in staged files..." -ForegroundColor Yellow
+$stagedFiles = git diff --cached --name-only --diff-filter=ACM | Where-Object { $_ -match "\.(ts|tsx)$" -and $_ -notmatch "types/supabase.ts" }
+
+$foundAny = $false
+foreach ($file in $stagedFiles) {
+    if (Test-Path $file) {
+        $content = Get-Content $file -Raw
+        if ($content -match "as any") {
+            if (-not $foundAny) {
+                Write-Host "⚠️  Warning: 'as any' found in staged files:" -ForegroundColor Yellow
+                $foundAny = $true
+            }
+            Write-Host "   - $file" -ForegroundColor Yellow
+        }
+    }
+}
+
+if ($foundAny) {
+    Write-Host "`n⚠️  Please ensure types are properly defined before committing" -ForegroundColor Yellow
+    Write-Host "   Consider regenerating types if schema has changed:" -ForegroundColor Gray
+    Write-Host "   npm run db:types:remote" -ForegroundColor Gray
+    # Inte exit 1 här - bara varning
+}
+
+Write-Host "`n✅ Pre-commit checks passed!" -ForegroundColor Green
+exit 0

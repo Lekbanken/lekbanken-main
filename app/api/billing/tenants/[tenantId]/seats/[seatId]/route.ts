@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 
 async function requireUser() {
@@ -24,10 +24,11 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
   return data?.role ?? null
 }
 
-export async function PATCH(request: Request, { params }: { params: { tenantId: string; seatId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ tenantId: string; seatId: string }> }) {
+  const { tenantId, seatId } = await params
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const role = await userTenantRole(supabase, params.tenantId)
+  const role = await userTenantRole(supabase, tenantId)
   if (!role || (role !== 'owner' && role !== 'admin')) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = (await request.json().catch(() => ({}))) as {
@@ -39,8 +40,8 @@ export async function PATCH(request: Request, { params }: { params: { tenantId: 
   const { data, error } = await supabase
     .from('tenant_seat_assignments')
     .update({ status: body.status, released_at: body.status === 'released' ? new Date().toISOString() : null })
-    .eq('id', params.seatId)
-    .eq('tenant_id', params.tenantId)
+    .eq('id', seatId)
+    .eq('tenant_id', tenantId)
     .select('*, user:users(id,email,full_name), subscription:tenant_subscriptions(*), billing_product:billing_products(*)')
     .maybeSingle()
 

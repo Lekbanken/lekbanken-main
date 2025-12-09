@@ -40,3 +40,10 @@ export type ProgressSnapshot = {
   // Placeholder for future layered badge / frame references
   rewardAssetKey?: string;
 };
+
+export type GamificationPayload = {
+  achievements: Achievement[];
+  coins: CoinsSummary;
+  streak: StreakSummary;
+  progress: ProgressSnapshot;
+};

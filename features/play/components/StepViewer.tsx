@@ -1,13 +1,22 @@
-import { ClockIcon, CubeIcon, ShieldExclamationIcon } from "@heroicons/react/24/outline";
+import { ClockIcon, CubeIcon, DocumentTextIcon, ShieldExclamationIcon } from "@heroicons/react/24/outline";
 import type { Step } from "../types";
 
 type StepViewerProps = {
   step: Step;
   index: number;
   total: number;
+  timerSeconds?: number;
+  timerTotalSeconds?: number;
+  timerRunning?: boolean;
+  formatTime?: (seconds: number) => string;
 };
 
-export function StepViewer({ step, index, total }: StepViewerProps) {
+export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds, timerRunning, formatTime }: StepViewerProps) {
+  const totalSeconds = typeof timerTotalSeconds === "number" ? timerTotalSeconds : 0;
+  const remainingSeconds = typeof timerSeconds === "number" ? timerSeconds : totalSeconds;
+  const timerProgress = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : null;
+  const timerLabel = formatTime ? formatTime(remainingSeconds) : `${remainingSeconds}s`;
+
   return (
     <article className="space-y-5 rounded-3xl border border-border/60 bg-card p-5 shadow-md sm:p-6">
       <div className="flex items-start justify-between gap-3">
@@ -20,7 +29,14 @@ export function StepViewer({ step, index, total }: StepViewerProps) {
               Steg {index + 1} av {total}
             </p>
           </div>
-          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">{step.title}</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-xl font-semibold text-foreground sm:text-2xl">{step.title}</h2>
+            {step.tag ? (
+              <span className="inline-flex items-center rounded-full bg-muted px-3 py-1 text-[11px] font-semibold text-muted-foreground">
+                {step.tag}
+              </span>
+            ) : null}
+          </div>
         </div>
         {step.durationMinutes ? (
           <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
@@ -31,6 +47,22 @@ export function StepViewer({ step, index, total }: StepViewerProps) {
       </div>
 
       <p className="text-base leading-relaxed text-foreground sm:text-lg">{step.description}</p>
+
+      {timerProgress !== null && (
+        <div className="space-y-2 rounded-2xl bg-muted/40 p-4">
+          <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
+            <span>{timerRunning ? "Tid pågår" : "Tid pausad"}</span>
+            <span className="text-sm font-semibold text-foreground">{timerLabel}</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+              style={{ width: `${timerProgress * 100}%` }}
+              aria-hidden
+            />
+          </div>
+        </div>
+      )}
 
       {step.materials && step.materials.length > 0 && (
         <div className="space-y-2.5 rounded-2xl bg-muted/40 p-4">
@@ -46,6 +78,16 @@ export function StepViewer({ step, index, total }: StepViewerProps) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {step.note && (
+        <div className="space-y-2.5 rounded-2xl bg-muted/40 p-4">
+          <div className="flex items-center gap-2">
+            <DocumentTextIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Anteckning</p>
+          </div>
+          <p className="text-sm leading-relaxed text-foreground">{step.note}</p>
         </div>
       )}
 

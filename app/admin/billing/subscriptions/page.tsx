@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
-import { supabase } from '@/lib/supabase/client';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -24,81 +23,42 @@ import {
   PauseCircleIcon,
 } from '@heroicons/react/24/outline';
 
-// Types
+type SubscriptionStatus = 'trial' | 'active' | 'paused' | 'canceled';
+
+interface BillingProduct {
+  id: string;
+  name: string;
+  price_per_seat: number;
+  currency: string;
+  seats_included: number | null;
+}
+
 interface Subscription {
   id: string;
-  organisationId: string;
-  organisationName: string;
-  plan: string;
-  status: 'active' | 'cancelled' | 'past_due' | 'trialing' | 'paused';
-  amount: number;
-  currency: string;
-  interval: 'month' | 'year';
-  currentPeriodStart: string;
-  currentPeriodEnd: string;
-  cancelAtPeriodEnd: boolean;
+  tenant_id: string;
+  billing_product_id: string;
+  seats_purchased: number;
+  start_date: string;
+  renewal_date: string | null;
+  status: SubscriptionStatus;
+  billing_product?: BillingProduct | null;
 }
 
 interface SubscriptionStats {
   total: number;
   active: number;
-  trialing: number;
-  cancelled: number;
+  trial: number;
+  paused: number;
+  canceled: number;
   mrr: number;
 }
 
-type StatusFilter = 'all' | 'active' | 'trialing' | 'cancelled' | 'past_due' | 'paused';
+type StatusFilter = 'all' | SubscriptionStatus;
 
-// Mock data generator
-function generateMockSubscriptions(): Subscription[] {
-  const orgs = [
-    'Stockholms Skolor', 'Göteborgs Fritid', 'Malmö Förskolor', 'Uppsala Kommun',
-    'Lunds Aktiviteter', 'Västerås Barn', 'Örebro Fritid', 'Linköpings Skolor',
-    'Helsingborgs Skolor', 'Norrköpings Kommun', 'Jönköpings Fritid', 'Umeå Skolor',
-  ];
-
-  const plans = ['Basic', 'Pro', 'Enterprise'];
-  const amounts = [990, 2490, 4990];
-  const statuses: Subscription['status'][] = ['active', 'active', 'active', 'trialing', 'cancelled', 'past_due'];
-
-  return orgs.map((org, i) => {
-    const planIndex = i % 3;
-    const status = statuses[i % statuses.length];
-    const periodStart = new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000);
-    const periodEnd = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-    return {
-      id: `sub-${i}`,
-      organisationId: `org-${i}`,
-      organisationName: org,
-      plan: plans[planIndex],
-      status,
-      amount: amounts[planIndex],
-      currency: 'SEK',
-      interval: 'month',
-      currentPeriodStart: periodStart.toISOString(),
-      currentPeriodEnd: periodEnd.toISOString(),
-      cancelAtPeriodEnd: status === 'cancelled',
-    };
-  });
-}
-
-function calculateStats(subscriptions: Subscription[]): SubscriptionStats {
-  const active = subscriptions.filter(s => s.status === 'active');
-  return {
-    total: subscriptions.length,
-    active: active.length,
-    trialing: subscriptions.filter(s => s.status === 'trialing').length,
-    cancelled: subscriptions.filter(s => s.status === 'cancelled').length,
-    mrr: active.reduce((sum, s) => sum + s.amount, 0),
-  };
-}
-
-const statusConfig: Record<Subscription['status'], { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+const statusConfig: Record<SubscriptionStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
   active: { label: 'Aktiv', variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
-  trialing: { label: 'Testperiod', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
-  cancelled: { label: 'Avslutad', variant: 'destructive', icon: <XCircleIcon className="h-4 w-4" /> },
-  past_due: { label: 'Förfallen', variant: 'destructive', icon: <XCircleIcon className="h-4 w-4" /> },
+  trial: { label: 'Testperiod', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
+  canceled: { label: 'Avslutad', variant: 'destructive', icon: <XCircleIcon className="h-4 w-4" /> },
   paused: { label: 'Pausad', variant: 'outline', icon: <PauseCircleIcon className="h-4 w-4" /> },
 };
 
@@ -111,6 +71,7 @@ export default function SubscriptionsPage() {
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   // Filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -118,50 +79,61 @@ export default function SubscriptionsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // Load data
+  const calculateStats = useMemo(
+    () => (list: Subscription[]): SubscriptionStats => {
+      const active = list.filter((s) => s.status === 'active');
+      const mrr = active.reduce((sum, s) => {
+        const seatPrice = s.billing_product?.price_per_seat ?? 0;
+        const seats = s.seats_purchased || s.billing_product?.seats_included || 0;
+        return sum + seatPrice * seats;
+      }, 0);
+
+      return {
+        total: list.length,
+        active: active.length,
+        trial: list.filter((s) => s.status === 'trial').length,
+        paused: list.filter((s) => s.status === 'paused').length,
+        canceled: list.filter((s) => s.status === 'canceled').length,
+        mrr,
+      };
+    },
+    []
+  );
+
   useEffect(() => {
     const loadData = async () => {
+      if (!currentTenant) return;
       setIsLoading(true);
-
-      // Try to load from Supabase
+      setLoadError(null);
       try {
-        if (currentTenant) {
-          const { data } = await supabase
-            .from('subscriptions')
-            .select('*, tenants(name)')
-            .eq('tenant_id', currentTenant.id)
-            .limit(50);
-
-          if (data && data.length > 0) {
-            // Map real data if available
-            console.log('Loaded subscriptions from Supabase:', data.length);
-          }
-        }
+        const res = await fetch(`/api/billing/tenants/${currentTenant.id}/subscription`);
+        if (!res.ok) throw new Error('Failed to load subscription');
+        const json = await res.json();
+        const sub: Subscription | null = json.subscription ?? null;
+        const list = sub ? [sub] : [];
+        setSubscriptions(list);
+        setStats(calculateStats(list));
       } catch (err) {
         console.error('Error loading subscriptions:', err);
+        setLoadError('Kunde inte ladda prenumerationer');
+        setSubscriptions([]);
+        setStats({ total: 0, active: 0, trial: 0, paused: 0, canceled: 0, mrr: 0 });
       }
-
-      // Fall back to mock data
-      const mockData = generateMockSubscriptions();
-      setSubscriptions(mockData);
-      setStats(calculateStats(mockData));
       setIsLoading(false);
     };
 
     loadData();
-  }, [currentTenant]);
+  }, [currentTenant, calculateStats]);
 
-  // Filter data
   const filteredSubscriptions = subscriptions.filter((sub) => {
-    if (searchQuery && !sub.organisationName.toLowerCase().includes(searchQuery.toLowerCase())) {
+    if (searchQuery && !(sub.billing_product?.name || '').toLowerCase().includes(searchQuery.toLowerCase())) {
       return false;
     }
     if (statusFilter !== 'all' && sub.status !== statusFilter) return false;
     return true;
   });
 
-  // Pagination
-  const totalPages = Math.ceil(filteredSubscriptions.length / itemsPerPage);
+  const totalPages = Math.max(Math.ceil(filteredSubscriptions.length / itemsPerPage), 1);
   const paginatedSubscriptions = filteredSubscriptions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -173,8 +145,8 @@ export default function SubscriptionsPage() {
       header: 'Organisation',
       accessor: (row: Subscription) => (
         <div>
-          <p className="font-medium text-foreground">{row.organisationName}</p>
-          <p className="text-xs text-muted-foreground">Plan: {row.plan}</p>
+          <p className="font-medium text-foreground">{row.billing_product?.name || 'Plan saknas'}</p>
+          <p className="text-xs text-muted-foreground">Seats: {row.seats_purchased}</p>
         </div>
       ),
     },
@@ -194,18 +166,19 @@ export default function SubscriptionsPage() {
       header: 'Belopp',
       accessor: (row: Subscription) => (
         <span className="font-medium">
-          {row.amount.toLocaleString('sv-SE')} {row.currency}/{row.interval === 'month' ? 'mån' : 'år'}
+          {row.billing_product?.price_per_seat
+            ? `${(row.billing_product.price_per_seat * row.seats_purchased).toLocaleString('sv-SE')} ${row.billing_product.currency}/mån`
+            : '—'}
         </span>
       ),
       align: 'right' as const,
       hideBelow: 'sm' as const,
     },
     {
-      header: 'Nästa faktura',
+      header: 'Förnyas',
       accessor: (row: Subscription) => (
-        <span className={row.cancelAtPeriodEnd ? 'text-red-600' : ''}>
-          {row.cancelAtPeriodEnd ? 'Avslutas ' : ''}
-          {new Date(row.currentPeriodEnd).toLocaleDateString('sv-SE')}
+        <span className={row.status === 'canceled' ? 'text-red-600' : ''}>
+          {row.renewal_date ? new Date(row.renewal_date).toLocaleDateString('sv-SE') : '—'}
         </span>
       ),
       hideBelow: 'md' as const,
@@ -259,14 +232,14 @@ export default function SubscriptionsPage() {
         />
         <AdminStatCard
           label="Testperiod"
-          value={stats?.trialing ?? 0}
+          value={stats?.trial ?? 0}
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="amber"
           isLoading={isLoading}
         />
         <AdminStatCard
           label="MRR"
-          value={stats ? `${stats.mrr.toLocaleString('sv-SE')} SEK` : '-'}
+          value={stats ? `${stats.mrr.toLocaleString('sv-SE')} ${subscriptions[0]?.billing_product?.currency || 'SEK'}` : '-'}
           icon={<span className="text-base">💰</span>}
           iconColor="blue"
           isLoading={isLoading}
@@ -287,10 +260,9 @@ export default function SubscriptionsPage() {
           >
             <option value="all">Alla statusar</option>
             <option value="active">Aktiva</option>
-            <option value="trialing">Testperiod</option>
-            <option value="past_due">Förfallna</option>
-            <option value="cancelled">Avslutade</option>
+            <option value="trial">Testperiod</option>
             <option value="paused">Pausade</option>
+            <option value="canceled">Avslutade</option>
           </select>
         }
       />
@@ -305,7 +277,7 @@ export default function SubscriptionsPage() {
           <EmptyState
             icon={<CreditCardIcon className="h-8 w-8" />}
             title="Inga prenumerationer"
-            description={searchQuery ? `Inga resultat för "${searchQuery}"` : 'Det finns inga prenumerationer att visa.'}
+            description={loadError ? loadError : searchQuery ? `Inga resultat för "${searchQuery}"` : 'Det finns inga prenumerationer att visa.'}
             action={searchQuery ? { label: 'Rensa sökning', onClick: () => setSearchQuery('') } : undefined}
           />
         }

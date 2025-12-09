@@ -11,6 +11,7 @@ import {
   PaperClipIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline'
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -150,25 +151,12 @@ export default function SupportSandboxPage() {
   const [replyText, setReplyText] = useState('')
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a 
-              href="/sandbox/admin" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </a>
-            <h1 className="text-lg font-semibold text-foreground">Support & Tickets</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="mx-auto max-w-7xl space-y-8">
+    <SandboxShell
+      moduleId="admin-support"
+      title="Support"
+      description="Support tickets and customer service"
+    >
+      <div className="space-y-8">
           {/* Action buttons */}
           <div className="flex justify-end">
             <Button>
@@ -366,7 +354,6 @@ export default function SupportSandboxPage() {
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
       </div>
-      </div>
-    </div>
+    </SandboxShell>
   )
 }

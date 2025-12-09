@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import {
   PuzzlePieceIcon,
@@ -112,25 +113,12 @@ export default function AdminContentSandbox() {
   })
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a 
-              href="/sandbox/admin" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </a>
-            <h1 className="text-lg font-semibold text-foreground">Content / Innehåll</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <SandboxShell
+      moduleId="admin-content"
+      title="Content"
+      description="Content and activity management"
+    >
+      <div className="space-y-8">
           {/* Stats */}
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">Content Stats</h2>
@@ -415,8 +403,7 @@ export default function AdminContentSandbox() {
 
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
-        </div>
       </div>
-    </div>
+    </SandboxShell>
   )
 }

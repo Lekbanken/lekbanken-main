@@ -1,5 +1,6 @@
 'use client'
 
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import {
   CogIcon,
   BellIcon,
@@ -65,25 +66,12 @@ export default function SettingsSandboxPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a 
-              href="/sandbox/admin" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </a>
-            <h1 className="text-lg font-semibold text-foreground">Settings</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="mx-auto max-w-6xl space-y-8">
+    <SandboxShell
+      moduleId="admin-settings"
+      title="Settings"
+      description="Systeminställningar, konfiguration"
+    >
+      <div className="space-y-8">
           {/* Save Button */}
           <div className="flex justify-end">
             <Button>
@@ -485,7 +473,6 @@ export default function SettingsSandboxPage() {
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
       </div>
-      </div>
-    </div>
+    </SandboxShell>
   )
 }

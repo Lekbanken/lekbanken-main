@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui'
 import {
   TrophyIcon,
@@ -9,7 +9,6 @@ import {
   GlobeAltIcon,
   ChartBarIcon,
   StarIcon,
-  ArrowLeftIcon,
 } from '@heroicons/react/24/outline'
 
 const mockLeaderboard = [
@@ -47,43 +46,26 @@ export default function LeaderboardSandbox() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-2">
-          <Link 
-            href="/sandbox/app" 
-            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            Tillbaka till App Sandbox
-          </Link>
+    <SandboxShell
+      moduleId="app-leaderboard"
+      title="Leaderboard"
+      description="Förhandsvisning av topplistan med podium och ranking."
+    >
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Topplista</h1>
+          <p className="mt-1 text-gray-600">Se hur du står dig mot andra spelare</p>
         </div>
 
-        <div className="mb-8">
-          <Badge variant="accent" size="sm" className="mb-2">Sandbox Preview</Badge>
-          <h1 className="text-3xl font-bold text-gray-900">🏆 Leaderboard / Topplista</h1>
-          <p className="mt-2 text-gray-600">
-            Förhandsvisning av topplistan med podium och ranking.
-          </p>
-        </div>
-
-        {/* Demo of actual Leaderboard page */}
-        <div className="rounded-xl border-2 border-dashed border-gray-300 bg-white p-6">
-          <div className="space-y-6">
-            {/* Page Header */}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Topplista</h1>
-              <p className="mt-1 text-gray-600">Se hur du står dig mot andra spelare</p>
-            </div>
-
-            {/* Filters */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <div className="w-full sm:w-64">
-                    <Select
-                      label="Välj lek"
-                      value={selectedGame}
+        {/* Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <div className="w-full sm:w-64">
+                <Select
+                  label="Välj lek"
+                  value={selectedGame}
                       onChange={(e) => setSelectedGame(e.target.value)}
                       options={gameOptions}
                     />
@@ -236,7 +218,6 @@ export default function LeaderboardSandbox() {
               </Card>
             </div>
           </div>
-        </div>
 
         {/* Link to real page */}
         <div className="mt-6 text-center">
@@ -257,7 +238,6 @@ export default function LeaderboardSandbox() {
 
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
-      </div>
-    </div>
+    </SandboxShell>
   )
 }

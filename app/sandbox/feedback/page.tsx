@@ -1,8 +1,6 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState, EmptySearchState, EmptyListState, EmptyFavoritesState } from '@/components/ui/empty-state'
@@ -11,6 +9,7 @@ import { LoadingSpinner, LoadingState, ButtonSpinner } from '@/components/ui/loa
 import { Skeleton, SkeletonCard, SkeletonTable, SkeletonList, SkeletonStats, SkeletonGameCard } from '@/components/ui/skeleton'
 import { Alert, InlineAlert } from '@/components/ui/alert'
 import { ToastProvider, useToast } from '@/components/ui/toast'
+import { SimpleModulePage } from '../components/shell/SimpleModulePage'
 
 function ToastDemo() {
   const { success, error, warning, info } = useToast()
@@ -38,25 +37,12 @@ export default function FeedbackSandboxPage() {
 
   return (
     <ToastProvider>
-      <div className="min-h-screen bg-background">
-        {/* Toolbar */}
-        <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link 
-                href="/sandbox" 
-                className="text-sm text-muted-foreground hover:text-foreground"
-              >
-                ← Tillbaka
-              </Link>
-              <h1 className="text-lg font-semibold text-foreground">Feedback & States</h1>
-            </div>
-            <Badge variant="success">Implementerad</Badge>
-          </div>
-        </div>
-
-        <div className="p-8">
-          <div className="mx-auto max-w-6xl space-y-12">
+      <SimpleModulePage
+        moduleId="feedback"
+        title="Feedback & States"
+        description="Empty states, error states, loading, skeletons, alerts, and toasts."
+      >
+        <div className="space-y-12">
             
             {/* Empty States */}
             <section>
@@ -344,9 +330,8 @@ error('Något gick fel')`}
               <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
             </div>
 
-          </div>
         </div>
-      </div>
+      </SimpleModulePage>
     </ToastProvider>
   )
 }

@@ -1,7 +1,6 @@
 'use client'
 
-import Link from 'next/link'
-import { Badge } from '@/components/ui/badge'
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { GameCard } from '@/components/app/GameCard'
 
 const mockGames = [
@@ -66,26 +65,13 @@ const mockGames = [
 
 export default function GameCardSandbox() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/sandbox/app" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </Link>
-            <h1 className="text-lg font-semibold text-foreground">Game Card</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="mx-auto max-w-6xl space-y-12">
-          {/* Default variant */}
+    <SandboxShell
+      moduleId="app-game-card"
+      title="Game Card"
+      description="Game card component variants and states"
+    >
+      <div className="mx-auto max-w-6xl space-y-12">
+        {/* Default variant */}
           <section>
             <h2 className="mb-4 text-lg font-semibold text-foreground">Default Variant</h2>
             <p className="mb-4 text-sm text-muted-foreground">
@@ -190,7 +176,6 @@ export default function GameCardSandbox() {
             <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
           </section>
         </div>
-      </div>
-    </div>
+    </SandboxShell>
   )
 }

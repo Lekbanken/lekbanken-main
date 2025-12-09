@@ -1,5 +1,6 @@
 'use client'
 
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 import {
   UsersIcon,
@@ -85,25 +86,12 @@ function getActivityIcon(type: string) {
 
 export default function AdminDashboardSandbox() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <a 
-              href="/sandbox/admin" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </a>
-            <h1 className="text-lg font-semibold text-foreground">Dashboard</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <SandboxShell
+      moduleId="admin-dashboard"
+      title="Dashboard"
+      description="Översikt, KPI-kort, aktivitetsfeed"
+    >
+      <div className="space-y-8">
           {/* Stats Cards */}
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">KPI Stats Cards</h2>
@@ -314,8 +302,7 @@ export default function AdminDashboardSandbox() {
 
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
-        </div>
       </div>
-    </div>
+    </SandboxShell>
   )
 }

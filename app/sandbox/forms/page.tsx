@@ -1,12 +1,11 @@
 'use client'
 
-import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Select } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { MagnifyingGlassIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/20/solid'
+import { SimpleModulePage } from '../components/shell/SimpleModulePage'
 
 const categoryOptions = [
   { value: 'football', label: 'Fotboll' },
@@ -24,26 +23,12 @@ const ageOptions = [
 
 export default function FormsSandbox() {
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link 
-              href="/sandbox" 
-              className="text-sm text-muted-foreground hover:text-foreground"
-            >
-              ← Tillbaka
-            </Link>
-            <h1 className="text-lg font-semibold text-foreground">Forms</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      {/* Preview Area */}
-      <div className="p-8">
-        <div className="mx-auto max-w-3xl space-y-12">
+    <SimpleModulePage
+      moduleId="forms"
+      title="Forms"
+      description="Input, textarea, and select form components."
+    >
+      <div className="space-y-12">
           {/* Basic Inputs */}
           <section>
             <h2 className="mb-4 text-lg font-semibold text-foreground">Input varianter</h2>
@@ -204,43 +189,7 @@ export default function FormsSandbox() {
               </div>
             </form>
           </section>
-        </div>
       </div>
-
-      {/* Notes */}
-      <div className="mx-auto max-w-4xl border-t border-border p-8">
-        <h2 className="text-lg font-semibold text-foreground">Implementationsnoteringar</h2>
-        <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-          <li>Input: 3 storlekar (sm, md, lg)</li>
-          <li>Input: Stöd för <code className="rounded bg-muted px-1">leftIcon</code> för ikoner</li>
-          <li>Input/Textarea/Select: <code className="rounded bg-muted px-1">label</code>, <code className="rounded bg-muted px-1">hint</code>, <code className="rounded bg-muted px-1">error</code> props</li>
-          <li>Select: options array med <code className="rounded bg-muted px-1">{'{value, label, disabled?}'}</code></li>
-          <li>Alla formfält stödjer <code className="rounded bg-muted px-1">disabled</code> state</li>
-          <li>Validering via error prop för röd border och felmeddelande</li>
-        </ul>
-        
-        <h3 className="mt-8 text-md font-semibold text-foreground">Användning</h3>
-        <pre className="mt-2 overflow-x-auto rounded-lg bg-muted p-4 text-sm">
-{`import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { Select } from '@/components/ui/select'
-
-<Input 
-  label="E-post"
-  placeholder="namn@exempel.se"
-  leftIcon={<EnvelopeIcon />}
-  error="Ogiltig e-post"
-/>
-
-<Select 
-  label="Kategori"
-  options={[{ value: 'a', label: 'Alt A' }]}
-  onChange={(e) => setValue(e.target.value)}
-/>`}
-        </pre>
-
-        <p className="mt-8 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
-      </div>
-    </div>
+    </SimpleModulePage>
   )
 }

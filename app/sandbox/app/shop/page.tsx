@@ -1,5 +1,6 @@
 'use client'
 
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Badge, Button, Card, CardContent, Input } from '@/components/ui'
 import {
   ShoppingBagIcon,
@@ -16,16 +17,12 @@ import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
 
 export default function ShopSandboxPage() {
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Shop Sandbox</h1>
-          <p className="text-gray-600 mt-2">
-            Preview av butik-komponenter för app-sektionen
-          </p>
-        </div>
-
+    <SandboxShell
+      moduleId="app-shop"
+      title="Shop"
+      description="Preview av butik-komponenter för app-sektionen"
+    >
+      <div className="space-y-8">
         {/* Currency Balances */}
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Currency Balances</h2>
@@ -249,6 +246,6 @@ export default function ShopSandboxPage() {
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
       </div>
-    </div>
+    </SandboxShell>
   )
 }

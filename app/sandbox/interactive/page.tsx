@@ -1,9 +1,7 @@
 'use client'
 
-import Link from 'next/link'
 import { useState } from 'react'
 import { Avatar, AvatarGroup, AvatarWithStatus } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
 import { Breadcrumbs, BackLink } from '@/components/ui/breadcrumbs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,6 +24,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs'
+import { SimpleModulePage } from '../components/shell/SimpleModulePage'
 
 export default function InteractiveSandboxPage() {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -35,22 +34,12 @@ export default function InteractiveSandboxPage() {
   const { activeTab: pillTab, setActiveTab: setPillTab } = useTabs('overview')
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Toolbar */}
-      <div className="sticky top-0 z-50 border-b border-border bg-background px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/sandbox" className="text-sm text-muted-foreground hover:text-foreground">
-              Tillbaka
-            </Link>
-            <h1 className="text-lg font-semibold text-foreground">Interactive Components</h1>
-          </div>
-          <Badge variant="success">Implementerad</Badge>
-        </div>
-      </div>
-
-      <div className="p-8">
-        <div className="mx-auto max-w-6xl space-y-12">
+    <SimpleModulePage
+      moduleId="interactive"
+      title="Interactive Components"
+      description="Dialogs, dropdowns, avatars, breadcrumbs, and tabs."
+    >
+      <div className="space-y-12">
           {/* Dialogs */}
           <section>
             <h2 className="mb-6 text-xl font-semibold text-foreground">Dialogs</h2>
@@ -421,8 +410,7 @@ const { activeTab, setActiveTab } = useTabs('tab1')
             
             <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-12-01</p>
           </div>
-        </div>
       </div>
-    </div>
+    </SimpleModulePage>
   )
 }

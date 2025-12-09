@@ -1,5 +1,6 @@
 'use client'
 
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import {
   CalendarDaysIcon,
@@ -14,16 +15,12 @@ import { CheckCircleIcon as CheckCircleSolidIcon } from '@heroicons/react/24/sol
 
 export default function PlannerSandboxPage() {
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Planner Sandbox</h1>
-          <p className="text-gray-600 mt-2">
-            Preview av planerare-komponenter för app-sektionen
-          </p>
-        </div>
-
+    <SandboxShell
+      moduleId="app-planner"
+      title="Planner"
+      description="Preview av planerare-komponenter för app-sektionen"
+    >
+      <div className="space-y-8">
         {/* Stats Preview */}
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Stats Overview</h2>
@@ -242,6 +239,6 @@ export default function PlannerSandboxPage() {
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
       </div>
-    </div>
+    </SandboxShell>
   )
 }

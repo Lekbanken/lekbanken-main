@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui'
 import {
   FireIcon,
@@ -8,7 +8,6 @@ import {
   StarIcon,
   ChartBarIcon,
   SparklesIcon,
-  ArrowLeftIcon,
 } from '@heroicons/react/24/outline'
 
 const mockStats = {
@@ -52,33 +51,16 @@ export default function ProfileSandbox() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-2">
-          <Link 
-            href="/sandbox/app" 
-            className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700"
-          >
-            <ArrowLeftIcon className="h-4 w-4" />
-            Tillbaka till App Sandbox
-          </Link>
-        </div>
-
-        <div className="mb-8">
-          <Badge variant="accent" size="sm" className="mb-2">Sandbox Preview</Badge>
-          <h1 className="text-3xl font-bold text-gray-900">👤 Profile / Min Profil</h1>
-          <p className="mt-2 text-gray-600">
-            Förhandsvisning av profilsidan med nivå, XP, achievements och milestones.
-          </p>
-        </div>
-
-        {/* Demo of actual Profile page */}
-        <div className="rounded-xl border-2 border-dashed border-gray-300 bg-white p-6">
-          <div className="space-y-6">
-            {/* Page Header */}
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Min Profil</h1>
-              <p className="mt-1 text-gray-600">Se din progression och achievements</p>
+    <SandboxShell
+      moduleId="app-profile"
+      title="Profile"
+      description="Förhandsvisning av profilsidan med nivå, XP, achievements och milestones."
+    >
+      <div className="space-y-6">
+        {/* Page Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Min Profil</h1>
+          <p className="mt-1 text-gray-600">Se din progression och achievements</p>
             </div>
 
             {/* Level Card */}
@@ -251,7 +233,6 @@ export default function ProfileSandbox() {
               </Button>
             </div>
           </div>
-        </div>
 
         {/* Link to real page */}
         <div className="mt-6 text-center">
@@ -272,7 +253,6 @@ export default function ProfileSandbox() {
 
           <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
-      </div>
-    </div>
+    </SandboxShell>
   )
 }

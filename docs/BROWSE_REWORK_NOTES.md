@@ -12,7 +12,7 @@
 - Prefer the new APIs from UI/SSR; avoid direct Supabase client browsing queries in favor of entitlement-aware endpoints.
 - `environment: "both"` should be treated as “no environment filter” when sending search payloads.
 - Pagination defaults: pageSize 12 (UI), max 50 (API); keep requests within these bounds.
-- Logging: inserts into `browse_search_logs` are allowed via new insert policy (20251209000100). Ensure database is migrated.
+- Logging: inserts into `browse_search_logs` are allowed via new insert policy (20251209000110). Ensure database is migrated.
 - Metrics: new `games` columns `popularity_score`, `rating_average`, `rating_count` (migration `20251209000100_add_game_metrics.sql`) back sorting; keep them updated via background jobs or analytics pipeline.
 
 ## Legacy notes

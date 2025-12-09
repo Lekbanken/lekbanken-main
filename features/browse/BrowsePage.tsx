@@ -1,16 +1,18 @@
 ﻿"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Toggle } from "@/components/ui/toggle";
 import { useTenant } from "@/lib/context/TenantContext";
 import { FilterBar } from "./components/FilterBar";
 import { FilterSheet } from "./components/FilterSheet";
 import { GameCard } from "./components/GameCard";
 import { SearchBar } from "./components/SearchBar";
-import type { BrowseFilters, Game } from "./types";
+import type { BrowseFilters, FilterOptions, Game, SortOption } from "./types";
 import type { Tables } from "@/types/supabase";
+import { cn } from "@/lib/utils";
 
 type GameMediaWithAsset = Tables<"game_media"> & { media?: Tables<"media"> | null };
 
@@ -18,6 +20,8 @@ type DbGame = Tables<"games"> & {
   media?: GameMediaWithAsset[];
   product?: { name?: string | null } | null;
   main_purpose?: { name?: string | null } | null;
+  main_purpose_id: string | null;
+  secondary_purposes?: Array<{ purpose?: { id?: string | null; name?: string | null; type?: string | null } | null }>;
 };
 
 function mapDbGameToGame(dbGame: DbGame): Game {
@@ -35,10 +39,14 @@ function mapDbGameToGame(dbGame: DbGame): Game {
   const getEnvironment = (locationType: string | null): Game["environment"] => {
     if (locationType === "indoor") return "indoor";
     if (locationType === "outdoor") return "outdoor";
-    return "either";
+    return "both";
   };
 
-  const purposeName = dbGame.main_purpose?.name || dbGame.category || "aktivitet";
+  const purposeName =
+    dbGame.main_purpose?.name ||
+    dbGame.secondary_purposes?.map((p) => p?.purpose?.name).filter(Boolean)[0] ||
+    dbGame.category ||
+    "aktivitet";
 
   return {
     id: dbGame.id,
@@ -59,31 +67,113 @@ function mapDbGameToGame(dbGame: DbGame): Game {
 }
 
 const initialFilters: BrowseFilters = {
-  ages: [],
+  products: [],
+  mainPurposes: [],
+  subPurposes: [],
   groupSizes: [],
   energyLevels: [],
-  environments: [],
-  purposes: [],
+  environment: null,
+  minPlayers: null,
+  maxPlayers: null,
+  minAge: null,
+  maxAge: null,
+  minTime: null,
+  maxTime: null,
 };
+
+const pageSize = 12;
 
 export function BrowsePage() {
   const [games, setGames] = useState<Game[]>([]);
-  const [search, setSearch] = useState("");
+  const [featuredGames, setFeaturedGames] = useState<Game[]>([]);
+  const [total, setTotal] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [filters, setFilters] = useState<BrowseFilters>(initialFilters);
+  const [sort, setSort] = useState<SortOption>("relevance");
+  const [page, setPage] = useState(1);
+  const [view, setView] = useState<"grid" | "list">("grid");
+  const [filterOptions, setFilterOptions] = useState<FilterOptions | null>(null);
   const [isSheetOpen, setSheetOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [noAccess, setNoAccess] = useState(false);
   const { currentTenant } = useTenant();
 
+  const tenantId = currentTenant?.id ?? null;
+
+  // Reset filters when tenant changes to avoid stale, disallowed selections
+  useEffect(() => {
+    setFilters(initialFilters);
+    setPage(1);
+    setGames([]);
+    setHasMore(true);
+  }, [tenantId]);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim());
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
+
+  const fetchFilters = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/browse/filters${tenantId ? `?tenantId=${tenantId}` : ""}`);
+      if (!res.ok) throw new Error("Failed to load filters");
+      const json = (await res.json()) as {
+        products: { id: string; name: string | null }[];
+        purposes: { id: string; name: string | null }[];
+        subPurposes: { id: string; name: string | null; parent_id?: string | null }[];
+        metadata?: { allowedProducts?: string[] };
+      };
+      setFilterOptions({
+        products: json.products ?? [],
+        mainPurposes: json.purposes ?? [],
+        subPurposes: json.subPurposes ?? [],
+      });
+      if (tenantId && (json.metadata?.allowedProducts?.length ?? 0) === 0) {
+        setNoAccess(true);
+      } else {
+        setNoAccess(false);
+      }
+    } catch (err) {
+      console.error("[BrowsePage] filter fetch failed", err);
+      setFilterOptions({ products: [], mainPurposes: [], subPurposes: [] });
+    }
+  }, [tenantId]);
+
   const fetchGames = useCallback(
-    async (params: { search?: string; energyLevel?: Game["energyLevel"]; tenantId?: string | null }) => {
+    async (payload: {
+      search?: string;
+      tenantId?: string | null;
+      filters: BrowseFilters;
+        sort: SortOption;
+        page: number;
+    }) => {
       const response = await fetch("/api/games/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          search: params.search || undefined,
-          energyLevel: params.energyLevel,
-          tenantId: params.tenantId ?? null,
+          search: payload.search || undefined,
+          tenantId: payload.tenantId ?? null,
+          products: payload.filters.products,
+          mainPurposes: payload.filters.mainPurposes,
+          subPurposes: payload.filters.subPurposes,
+          groupSizes: payload.filters.groupSizes,
+          energyLevels: payload.filters.energyLevels,
+          environment: payload.filters.environment || undefined,
+          minPlayers: payload.filters.minPlayers || undefined,
+          maxPlayers: payload.filters.maxPlayers || undefined,
+          minAge: payload.filters.minAge || undefined,
+          maxAge: payload.filters.maxAge || undefined,
+          minTime: payload.filters.minTime || undefined,
+          maxTime: payload.filters.maxTime || undefined,
+          sort: payload.sort,
+          page: payload.page,
+          pageSize,
         }),
       });
 
@@ -91,66 +181,122 @@ export function BrowsePage() {
         throw new Error("Failed to load games");
       }
 
-      const json = (await response.json()) as { games: DbGame[] };
-      return json.games;
+      const json = (await response.json()) as {
+        games: DbGame[];
+        total: number;
+        hasMore?: boolean;
+        metadata?: { allowedProducts?: string[] };
+      };
+
+      if (tenantId && (json.metadata?.allowedProducts?.length ?? 0) === 0) {
+        setNoAccess(true);
+      } else {
+        setNoAccess(false);
+      }
+
+      return {
+        games: json.games,
+        total: json.total ?? json.games.length,
+        hasMore: json.hasMore ?? payload.page * pageSize < (json.total ?? json.games.length),
+      };
     },
-    []
+    [tenantId]
   );
 
   // Fetch games from database
-  const loadGames = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Get energy level filter if set
-      const energyFilter = filters.energyLevels.length === 1 
-        ? filters.energyLevels[0] 
-        : undefined;
+  const loadGames = useCallback(
+    async (targetPage: number, append: boolean) => {
+      if (append) {
+        setIsLoadingMore(true);
+      } else {
+        setIsLoading(true);
+        setGames([]);
+      }
+      setError(null);
+      try {
+        const { games: dbGames, total: dbTotal, hasMore: more } = await fetchGames({
+          search: debouncedSearch || undefined,
+          tenantId,
+          filters,
+          sort,
+          page: targetPage,
+        });
 
-      console.log("[BrowsePage] Loading games with tenantId:", currentTenant?.id ?? "null");
-      
-      const dbGames = await fetchGames({
-        search: search || undefined,
-        energyLevel: energyFilter,
-        tenantId: currentTenant?.id ?? null,
-      });
+        const mapped = dbGames.map(mapDbGameToGame);
+        setGames((prev) => (append ? [...prev, ...mapped] : mapped));
+        setTotal(dbTotal);
+        setHasMore(more);
+      } catch (err) {
+        console.error("Failed to load games:", err);
+        setError("Kunde inte ladda aktiviteter");
+      } finally {
+        if (append) {
+          setIsLoadingMore(false);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    },
+    [fetchGames, debouncedSearch, filters, tenantId, sort]
+  );
 
-      console.log("[BrowsePage] Got", dbGames.length, "games from API");
-      setGames(dbGames.map(mapDbGameToGame));
-    } catch (err) {
-      console.error("Failed to load games:", err);
-      setError("Kunde inte ladda aktiviteter");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchGames, search, filters.energyLevels, currentTenant?.id]);
-
-  // Load games on mount and when search/energy filter changes
+  // Fetch filter options on mount/tenant change
   useEffect(() => {
-    void loadGames();
-  }, [loadGames]);
+    void fetchFilters();
+  }, [fetchFilters]);
 
-  // Client-side filter for group size, environment, purpose (not in DB query)
-  const filteredGames = useMemo(() => {
-    return games.filter((game) => {
-      const matchesGroup =
-        filters.groupSizes.length === 0 || filters.groupSizes.includes(game.groupSize);
-      const matchesEnv =
-        filters.environments.length === 0 || filters.environments.includes(game.environment);
-      const matchesPurpose =
-        filters.purposes.length === 0 || filters.purposes.includes(game.purpose);
+  // Reset paging when inputs change
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+  }, [debouncedSearch, filters, sort, tenantId]);
 
-      return matchesGroup && matchesEnv && matchesPurpose;
-    });
-  }, [games, filters.groupSizes, filters.environments, filters.purposes]);
+  // Load games on mount and when search/filter/sort changes
+  useEffect(() => {
+    void loadGames(page, page > 1);
+  }, [loadGames, page]);
 
-  const handleApplyFilters = (next: BrowseFilters) => setFilters(next);
-  const handleClearAll = () => setFilters(initialFilters);
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await fetch(`/api/games/featured?limit=4${tenantId ? `&tenantId=${tenantId}` : ""}`);
+        if (!res.ok) return;
+        const json = (await res.json()) as { games: DbGame[] };
+        setFeaturedGames((json.games ?? []).map(mapDbGameToGame));
+      } catch (err) {
+        console.warn("[BrowsePage] featured fetch failed", err);
+      }
+    };
+    void fetchFeatured();
+  }, [tenantId]);
+
+  const handleApplyFilters = (next: BrowseFilters) => {
+    setFilters(next);
+    setPage(1);
+  };
+  const handleClearAll = () => {
+    setFilters(initialFilters);
+    setPage(1);
+  };
   const handleClearSingle = (key: keyof BrowseFilters, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: prev[key].filter((item) => item !== value),
-    }));
+    setFilters((prev) => {
+      const current = prev[key];
+
+      if (Array.isArray(current)) {
+        return {
+          ...prev,
+          [key]: current.filter((item) => item !== value),
+        } as BrowseFilters;
+      }
+
+      if (typeof current === "number" || current === null) {
+        return { ...prev, [key]: null } as BrowseFilters;
+      }
+
+      // environment or other scalar
+      return { ...prev, [key]: null } as BrowseFilters;
+    });
+    setPage(1);
   };
 
   return (
@@ -160,15 +306,62 @@ export function BrowsePage() {
         <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Hitta rätt aktivitet</h1>
       </header>
 
-      <SearchBar value={search} onChange={setSearch} onClear={() => setSearch("")} />
-      <FilterBar filters={filters} onOpen={() => setSheetOpen(true)} onClearFilter={handleClearSingle} />
+      {featuredGames.length > 0 && (
+        <section className="rounded-2xl border border-border/60 bg-gradient-to-r from-primary/5 via-card to-card px-4 py-4">
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Utvalda</p>
+              <h2 className="text-lg font-semibold text-foreground">Tips från redaktionen</h2>
+            </div>
+            <span className="text-xs text-muted-foreground">{featuredGames.length} aktiviteter</span>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {featuredGames.map((game) => (
+              <GameCard key={game.id} game={game} layout="list" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <SearchBar
+        value={searchInput}
+        onChange={(value) => {
+          setSearchInput(value);
+          setPage(1);
+        }}
+        onClear={() => {
+          setSearchInput("");
+          setPage(1);
+        }}
+      />
+      <FilterBar
+        filters={filters}
+        options={filterOptions}
+        sort={sort}
+        view={view}
+        total={total}
+        onOpen={() => setSheetOpen(true)}
+        onClearFilter={handleClearSingle}
+        onSortChange={(value) => {
+          setSort(value);
+          setPage(1);
+        }}
+        onViewChange={setView}
+      />
       <FilterSheet
         open={isSheetOpen}
         onOpenChange={setSheetOpen}
         filters={filters}
+        options={filterOptions}
         onApply={handleApplyFilters}
         onClearAll={handleClearAll}
       />
+
+      {noAccess && (
+        <div className="rounded-xl border border-border/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          Du saknar tillgång till produkter i denna tenant. Kontakta admin eller välj annan tenant.
+        </div>
+      )}
 
       {error ? (
         <ErrorState
@@ -200,7 +393,7 @@ export function BrowsePage() {
             </div>
           ))}
         </div>
-      ) : filteredGames.length === 0 ? (
+      ) : games.length === 0 ? (
         <EmptyState
           title="Inga lekar matchar"
           description="Prova att ändra sökningen eller justera filtren."
@@ -208,7 +401,7 @@ export function BrowsePage() {
         />
       ) : (
         <div className="space-y-4">
-          {filteredGames.length > 0 && search === "" && Object.values(filters).every(arr => arr.length === 0) && (
+          {games.length > 0 && debouncedSearch === "" && Object.values(filters).every((val) => Array.isArray(val) ? val.length === 0 : val === null) && (
             <div className="flex items-center gap-2 rounded-xl border border-border/50 bg-muted/40 px-3 py-2.5 text-xs text-muted-foreground">
               <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" />
@@ -216,10 +409,29 @@ export function BrowsePage() {
               <span>Använd filter för att hitta aktiviteter som passar din grupp.</span>
             </div>
           )}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {filteredGames.map((game) => (
-              <GameCard key={game.id} game={game} />
+          <div
+            className={cn(
+              "gap-4",
+              view === "grid" ? "grid grid-cols-1 sm:grid-cols-2" : "flex flex-col"
+            )}
+          >
+            {games.map((game) => (
+              <GameCard key={game.id} game={game} layout={view} />
             ))}
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-border/60 bg-card px-3 py-2 text-sm text-muted-foreground">
+            <div className="font-medium text-foreground">{total} aktiviteter</div>
+            <div className="flex items-center gap-2">
+              <Toggle
+                aria-label="Visa fler"
+                disabled={!hasMore || isLoadingMore}
+                pressed={false}
+                onPressedChange={() => setPage((p) => p + 1)}
+              >
+                {isLoadingMore ? "Laddar..." : hasMore ? "Visa fler" : "Slut på resultat"}
+              </Toggle>
+            </div>
           </div>
         </div>
       )}

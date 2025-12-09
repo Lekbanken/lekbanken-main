@@ -1,5 +1,5 @@
 export type EnergyLevel = "low" | "medium" | "high";
-export type Environment = "indoor" | "outdoor" | "either";
+export type Environment = "indoor" | "outdoor" | "both";
 export type GroupSize = "small" | "medium" | "large";
 
 export type Game = {
@@ -13,13 +13,30 @@ export type Game = {
   environment: Environment;
   purpose: string;
   imageUrl?: string | null;
-   productName?: string | null;
+  productName?: string | null;
 };
 
 export type BrowseFilters = {
-  ages: string[];
+  products: string[];
+  mainPurposes: string[];
+  subPurposes: string[];
   groupSizes: GroupSize[];
   energyLevels: EnergyLevel[];
-  environments: Environment[];
-  purposes: string[];
+  environment: Environment | null;
+  minPlayers: number | null;
+  maxPlayers: number | null;
+  minAge: number | null;
+  maxAge: number | null;
+  minTime: number | null;
+  maxTime: number | null;
+};
+
+export type SortOption = "relevance" | "newest" | "name" | "duration" | "popular" | "rating";
+
+export type FilterOption = { id: string; name: string | null };
+
+export type FilterOptions = {
+  products: FilterOption[];
+  mainPurposes: FilterOption[];
+  subPurposes: FilterOption[];
 };

@@ -1709,7 +1709,10 @@ export type Database = {
           min_players: number | null
           name: string
           owner_tenant_id: string | null
+          popularity_score: number
           product_id: string | null
+          rating_average: number | null
+          rating_count: number
           season_tags: string[] | null
           short_description: string | null
           status: Database["public"]["Enums"]["game_status_enum"]
@@ -1739,7 +1742,10 @@ export type Database = {
           min_players?: number | null
           name: string
           owner_tenant_id?: string | null
+          popularity_score?: number
           product_id?: string | null
+          rating_average?: number | null
+          rating_count?: number
           season_tags?: string[] | null
           short_description?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]
@@ -1769,7 +1775,10 @@ export type Database = {
           min_players?: number | null
           name?: string
           owner_tenant_id?: string | null
+          popularity_score?: number
           product_id?: string | null
+          rating_average?: number | null
+          rating_count?: number
           season_tags?: string[] | null
           short_description?: string | null
           status?: Database["public"]["Enums"]["game_status_enum"]

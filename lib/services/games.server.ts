@@ -64,33 +64,23 @@ export async function getRelatedGames(
   game: GameRow,
   limit: number = 4
 ): Promise<GameRow[]> {
-  const supabase = await createServerRlsClient()
+  const tenantQuery = game.owner_tenant_id ? `&tenantId=${game.owner_tenant_id}` : ''
 
-  let query = supabase
-    .from('games')
-    .select('*')
-    .eq('status', 'published')
-    .neq('id', game.id)
-    .limit(limit)
+  try {
+    const response = await fetch(
+      `/api/games/${game.id}/related?limit=${limit}${tenantQuery}`,
+      { cache: 'no-store' }
+    )
 
-  if (game.energy_level) {
-    query = query.eq('energy_level', game.energy_level)
-  }
+    if (!response.ok) {
+      console.warn('[games.server] related fetch failed', response.status)
+      return []
+    }
 
-  if (game.category) {
-    query = query.eq('category', game.category)
-  }
-
-  query = game.owner_tenant_id
-    ? query.eq('owner_tenant_id', game.owner_tenant_id)
-    : query.is('owner_tenant_id', null)
-
-  const { data, error } = await query
-
-  if (error) {
+    const json = (await response.json()) as { games?: GameRow[] }
+    return json.games ?? []
+  } catch (error) {
     console.error('[games.server] getRelatedGames error', error)
     return []
   }
-
-  return data ?? []
 }

@@ -1,16 +1,12 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import type { BrowseFilters, EnergyLevel, Environment, GroupSize } from "../types";
+import type { BrowseFilters, EnergyLevel, Environment, FilterOptions, GroupSize } from "../types";
+import { cn } from "@/lib/utils";
 
 type Option<T extends string> = { label: string; value: T };
-
-const ageOptions: Option<string>[] = [
-  { label: "4-6 år", value: "4-6" },
-  { label: "7-9 år", value: "7-9" },
-  { label: "10-12 år", value: "10-12" },
-  { label: "13+ år", value: "13+" },
-];
 
 const groupOptions: Option<GroupSize>[] = [
   { label: "2-6", value: "small" },
@@ -27,30 +23,37 @@ const energyOptions: Option<EnergyLevel>[] = [
 const environmentOptions: Option<Environment>[] = [
   { label: "Inne", value: "indoor" },
   { label: "Ute", value: "outdoor" },
-  { label: "Både", value: "either" },
-];
-
-const purposeOptions: Option<string>[] = [
-  { label: "Uppvärmning", value: "uppvärmning" },
-  { label: "Samarbete", value: "samarbete" },
-  { label: "Fokus", value: "fokus" },
-  { label: "Trygghet", value: "trygghet" },
+  { label: "Både", value: "both" },
 ];
 
 type FilterSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   filters: BrowseFilters;
+  options: FilterOptions | null;
   onApply: (filters: BrowseFilters) => void;
   onClearAll: () => void;
 };
 
-export function FilterSheet({ open, onOpenChange, filters, onApply, onClearAll }: FilterSheetProps) {
+export function FilterSheet({ open, onOpenChange, filters, options, onApply, onClearAll }: FilterSheetProps) {
   const [localFilters, setLocalFilters] = useState<BrowseFilters>(filters);
 
   const activeCount = useMemo(() => {
-    const { ages, groupSizes, energyLevels, environments, purposes } = localFilters;
-    return ages.length + groupSizes.length + energyLevels.length + environments.length + purposes.length;
+    const { products, mainPurposes, subPurposes, groupSizes, energyLevels, environment, minPlayers, maxPlayers, minAge, maxAge, minTime, maxTime } = localFilters;
+    return (
+      products.length +
+      mainPurposes.length +
+      subPurposes.length +
+      groupSizes.length +
+      energyLevels.length +
+      (environment ? 1 : 0) +
+      (minPlayers ? 1 : 0) +
+      (maxPlayers ? 1 : 0) +
+      (minAge ? 1 : 0) +
+      (maxAge ? 1 : 0) +
+      (minTime ? 1 : 0) +
+      (maxTime ? 1 : 0)
+    );
   }, [localFilters]);
 
   const toggleValue = <T extends string>(key: keyof BrowseFilters, value: T) => {
@@ -59,6 +62,10 @@ export function FilterSheet({ open, onOpenChange, filters, onApply, onClearAll }
       const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
       return { ...prev, [key]: next };
     });
+  };
+
+  const setField = <K extends keyof BrowseFilters>(key: K, value: BrowseFilters[K]) => {
+    setLocalFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleApply = () => {
@@ -84,10 +91,25 @@ export function FilterSheet({ open, onOpenChange, filters, onApply, onClearAll }
 
         <div className="mt-5 space-y-5 divide-y divide-border/40">
           <FilterSection
-            title="Ålder"
-            options={ageOptions}
-            selected={localFilters.ages}
-            onToggle={(value) => toggleValue("ages", value)}
+            title="Produkt"
+            options={(options?.products ?? []).map((p) => ({ label: p.name ?? "Okänd produkt", value: p.id }))}
+            selected={localFilters.products}
+            onToggle={(value) => toggleValue("products", value)}
+            emptyLabel="Inga produkter tillgängliga"
+          />
+          <FilterSection
+            title="Syfte"
+            options={(options?.mainPurposes ?? []).map((p) => ({ label: p.name ?? "Syfte", value: p.id }))}
+            selected={localFilters.mainPurposes}
+            onToggle={(value) => toggleValue("mainPurposes", value)}
+            emptyLabel="Inga syften tillgängliga"
+          />
+          <FilterSection
+            title="Del-syfte"
+            options={(options?.subPurposes ?? []).map((p) => ({ label: p.name ?? "Del-syfte", value: p.id }))}
+            selected={localFilters.subPurposes}
+            onToggle={(value) => toggleValue("subPurposes", value)}
+            emptyLabel="Inga del-syften tillgängliga"
           />
           <FilterSection
             title="Gruppstorlek"
@@ -104,14 +126,35 @@ export function FilterSheet({ open, onOpenChange, filters, onApply, onClearAll }
           <FilterSection
             title="Miljö"
             options={environmentOptions}
-            selected={localFilters.environments}
-            onToggle={(value) => toggleValue("environments", value)}
+            selected={localFilters.environment ? [localFilters.environment] : []}
+            onToggle={(value) =>
+              setField("environment", localFilters.environment === value ? null : value)
+            }
           />
-          <FilterSection
-            title="Syfte"
-            options={purposeOptions}
-            selected={localFilters.purposes}
-            onToggle={(value) => toggleValue("purposes", value)}
+
+          <NumberSection
+            title="Spelare"
+            minValue={localFilters.minPlayers}
+            maxValue={localFilters.maxPlayers}
+            onMinChange={(value) => setField("minPlayers", value)}
+            onMaxChange={(value) => setField("maxPlayers", value)}
+            placeholder="Antal"
+          />
+          <NumberSection
+            title="Ålder"
+            minValue={localFilters.minAge}
+            maxValue={localFilters.maxAge}
+            onMinChange={(value) => setField("minAge", value)}
+            onMaxChange={(value) => setField("maxAge", value)}
+            placeholder="År"
+          />
+          <NumberSection
+            title="Tid (min)"
+            minValue={localFilters.minTime}
+            maxValue={localFilters.maxTime}
+            onMinChange={(value) => setField("minTime", value)}
+            onMaxChange={(value) => setField("maxTime", value)}
+            placeholder="Minuter"
           />
         </div>
 
@@ -133,36 +176,87 @@ type FilterSectionProps<T extends string> = {
   options: Option<T>[];
   selected: T[];
   onToggle: (value: T) => void;
+  emptyLabel?: string;
 };
 
-function FilterSection<T extends string>({ title, options, selected, onToggle }: FilterSectionProps<T>) {
+function FilterSection<T extends string>({ title, options, selected, onToggle, emptyLabel }: FilterSectionProps<T>) {
   return (
     <div className="space-y-3 pt-5 first:pt-0">
       <h3 className="text-sm font-semibold text-foreground">{title}</h3>
-      <div className="flex flex-wrap gap-2">
-        {options.map((option) => {
-          const active = selected.includes(option.value);
-          return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => onToggle(option.value)}
-              aria-pressed={active}
-              className={`rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95 ${
-                active
-                  ? "bg-primary/15 text-primary ring-1 ring-primary/30 shadow-sm"
-                  : "bg-muted/70 text-foreground hover:bg-muted"
-              }`}
-            >
-              {active && (
-                <svg className="mr-1.5 inline-block h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              )}
-              {option.label}
-            </button>
-          );
-        })}
+      {options.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{emptyLabel || "Inga alternativ"}</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {options.map((option) => {
+            const active = selected.includes(option.value);
+            return (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => onToggle(option.value)}
+                aria-pressed={active}
+                className={cn(
+                  "rounded-full px-3.5 py-2 text-sm font-medium transition-all active:scale-95",
+                  active
+                    ? "bg-primary/15 text-primary ring-1 ring-primary/30 shadow-sm"
+                    : "bg-muted/70 text-foreground hover:bg-muted"
+                )}
+              >
+                {active && (
+                  <svg className="mr-1.5 inline-block h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                )}
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+type NumberSectionProps = {
+  title: string;
+  minValue: number | null;
+  maxValue: number | null;
+  onMinChange: (value: number | null) => void;
+  onMaxChange: (value: number | null) => void;
+  placeholder?: string;
+};
+
+function NumberSection({ title, minValue, maxValue, onMinChange, onMaxChange, placeholder }: NumberSectionProps) {
+  const parseValue = (val: string) => {
+    if (val === "") return null;
+    const parsed = Number(val);
+    return Number.isNaN(parsed) ? null : parsed;
+  };
+
+  return (
+    <div className="space-y-3 pt-5 first:pt-0">
+      <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+      <div className="grid grid-cols-2 gap-2">
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">Min</Label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={minValue ?? ""}
+            onChange={(e) => onMinChange(parseValue(e.target.value))}
+            placeholder={placeholder}
+          />
+        </div>
+        <div className="space-y-1">
+          <Label className="text-xs text-muted-foreground">Max</Label>
+          <Input
+            type="number"
+            inputMode="numeric"
+            value={maxValue ?? ""}
+            onChange={(e) => onMaxChange(parseValue(e.target.value))}
+            placeholder={placeholder}
+          />
+        </div>
       </div>
     </div>
   );

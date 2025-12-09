@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { ModuleNav } from './ModuleNavV2';
 import { ContextPanel } from './ContextPanel';
 import { ViewportFrame } from './ViewportFrame';
+import { SandboxThemeProvider } from './SandboxThemeProvider';
 
 interface SandboxShellProps {
   children: React.ReactNode;
@@ -26,7 +27,8 @@ export function SandboxShell({
   const [rightOpen, setRightOpen] = useState(false);
 
   return (
-    <div className="relative flex h-screen overflow-hidden bg-background">
+    <SandboxThemeProvider>
+      <div className="relative flex h-screen overflow-hidden bg-background">
       {/* Mobile left sidebar backdrop */}
       {leftOpen && (
         <div
@@ -123,5 +125,6 @@ export function SandboxShell({
         <ContextPanel moduleId={moduleId} controls={controls} />
       </div>
     </div>
+    </SandboxThemeProvider>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
 import { SandboxShell as SandboxShellV2 } from './SandboxShellV2';
-import { GlobalControls } from '../controls';
 
 interface SimpleModulePageProps {
   moduleId: string;
@@ -13,6 +12,7 @@ interface SimpleModulePageProps {
 /**
  * A simple wrapper for legacy sandbox pages that only need global controls.
  * Provides the new shell structure with minimal changes to existing content.
+ * GlobalControls are automatically provided by ContextPanel.
  */
 export function SimpleModulePage({
   moduleId,
@@ -25,7 +25,6 @@ export function SimpleModulePage({
       moduleId={moduleId}
       title={title}
       description={description}
-      controls={<GlobalControls />}
     >
       {children}
     </SandboxShellV2>

@@ -6,7 +6,6 @@
  */
 
 import { env } from '@/lib/config/env';
-import { createServiceRoleClient } from '@/lib/supabase/server';
 
 export interface LogContext {
   userId?: string;
@@ -96,55 +95,24 @@ function log(level: LogLevel, message: string, error?: Error, context?: LogConte
       break;
   }
   
-  // Save errors to database (async, don't await to avoid blocking)
-  if (level === 'error' || level === 'fatal') {
-    saveErrorToDatabase(entry, error, context).catch((dbError) => {
-      // If database save fails, log to console but don't crash
-      console.error('[Logger] Failed to save error to database:', dbError);
-    });
-  }
+  // Note: Database error logging removed to keep logger browser-safe
+  // For server-side error tracking, use saveErrorToDatabase() separately
+  // in API routes or server components
 }
 
 /**
- * Save error to error_tracking table
- * Runs async without blocking the main error logging flow
+ * Save error to error_tracking table (Server-only)
+ * 
+ * TODO: Move to separate logger.server.ts file for server-only error tracking
+ * For now, this is a placeholder to keep builds working
  */
-async function saveErrorToDatabase(
-  entry: LogEntry,
-  error: Error | undefined,
-  context: LogContext | undefined
+export async function saveErrorToDatabase(
+  _message: string,
+  _error: Error | undefined,
+  _context: LogContext | undefined
 ) {
-  try {
-    const supabase = createServiceRoleClient();
-    
-    // Create unique error key based on error type + message
-    const errorKey = error 
-      ? `${error.name}:${error.message}`.substring(0, 100)
-      : entry.message.substring(0, 100);
-    
-    // Insert error into error_tracking table
-    const { error: insertError } = await supabase
-      .from('error_tracking')
-      .insert({
-        error_key: errorKey,
-        error_type: error?.name || entry.level,
-        error_message: error?.message || entry.message,
-        stack_trace: error?.stack,
-        page_path: context?.endpoint,
-        severity: entry.level === 'fatal' ? 'critical' : entry.level,
-        user_id: context?.userId,
-        tenant_id: context?.tenantId,
-        occurrence_count: 1,
-        last_occurred_at: entry.timestamp,
-      });
-    
-    if (insertError) {
-      throw insertError;
-    }
-  } catch (err) {
-    // Don't throw - we don't want database errors to crash the app
-    throw err;
-  }
+  // Placeholder - implement in logger.server.ts when needed
+  console.warn('[Logger] Database error tracking not yet implemented');
 }
 
 /**

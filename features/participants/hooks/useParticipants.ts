@@ -9,29 +9,11 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
+import type { Database } from '@/types/supabase';
 
-// Temporary types until migration is run and types regenerated
-type ParticipantRole = 'observer' | 'player' | 'team_lead' | 'facilitator';
-type ParticipantStatus = 'active' | 'idle' | 'disconnected' | 'kicked' | 'blocked';
-
-interface Participant {
-  id: string;
-  session_id: string;
-  display_name: string;
-  participant_token: string;
-  avatar_url: string | null;
-  role: ParticipantRole;
-  status: ParticipantStatus;
-  joined_at: string;
-  last_seen_at: string;
-  disconnected_at: string | null;
-  token_expires_at: string | null;
-  progress: Record<string, unknown>;
-  user_agent: string | null;
-  ip_address: string | null;
-  created_at: string;
-  updated_at: string;
-}
+type Participant = Database['public']['Tables']['participants']['Row'];
+type ParticipantRole = Database['public']['Enums']['participant_role'];
+type ParticipantStatus = Database['public']['Enums']['participant_status'];
 
 interface UseParticipantsOptions {
   sessionId: string;

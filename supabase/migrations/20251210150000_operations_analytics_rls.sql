@@ -22,7 +22,7 @@ CREATE POLICY error_tracking_select ON public.error_tracking
     -- Tenant admins see their tenant's errors
     (
       tenant_id IS NOT NULL 
-      AND is_tenant_admin(tenant_id, auth.uid())
+      AND public.has_tenant_role(tenant_id, ARRAY['owner','admin']::public.tenant_role_enum[])
     )
     OR
     -- Users can see their own errors
@@ -55,7 +55,7 @@ CREATE POLICY page_views_select ON public.page_views
     -- Tenant admins see their tenant's page views
     (
       tenant_id IS NOT NULL 
-      AND is_tenant_admin(tenant_id, auth.uid())
+      AND public.has_tenant_role(tenant_id, ARRAY['owner','admin']::public.tenant_role_enum[])
     )
     OR
     -- Users can see their own page views
@@ -88,7 +88,7 @@ CREATE POLICY feature_usage_select ON public.feature_usage
     -- Tenant admins see their tenant's feature usage
     (
       tenant_id IS NOT NULL 
-      AND is_tenant_admin(tenant_id, auth.uid())
+      AND public.has_tenant_role(tenant_id, ARRAY['owner','admin']::public.tenant_role_enum[])
     )
     OR
     -- Users can see their own feature usage
@@ -121,7 +121,7 @@ CREATE POLICY session_analytics_select ON public.session_analytics
     -- Tenant admins see their tenant's sessions
     (
       tenant_id IS NOT NULL 
-      AND is_tenant_admin(tenant_id, auth.uid())
+      AND public.has_tenant_role(tenant_id, ARRAY['owner','admin']::public.tenant_role_enum[])
     )
     OR
     -- Users can see their own sessions

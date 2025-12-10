@@ -234,13 +234,7 @@ CREATE POLICY "Hosts can delete their own sessions"
 -- System admins can view all sessions
 CREATE POLICY "System admins can view all sessions"
   ON participant_sessions FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_system_roles
-      WHERE user_id = auth.uid()
-      AND role = 'system_admin'
-    )
-  );
+  USING (public.is_system_admin());
 
 -- Anyone can view active sessions by code (for join flow)
 -- Note: This is intentionally permissive - the join flow validates separately
@@ -311,24 +305,12 @@ CREATE POLICY "Service role can insert activity logs"
 -- Tenants can view their own quota
 CREATE POLICY "Tenants can view their own quota"
   ON participant_token_quotas FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM tenant_members
-      WHERE tenant_members.tenant_id = participant_token_quotas.tenant_id
-      AND tenant_members.user_id = auth.uid()
-    )
-  );
+  USING (tenant_id = ANY(public.get_user_tenant_ids()));
 
 -- System admins can view all quotas
 CREATE POLICY "System admins can view all quotas"
   ON participant_token_quotas FOR SELECT
-  USING (
-    EXISTS (
-      SELECT 1 FROM user_system_roles
-      WHERE user_id = auth.uid()
-      AND role = 'system_admin'
-    )
-  );
+  USING (public.is_system_admin());
 
 -- ============================================================================
 -- FUNCTIONS & TRIGGERS

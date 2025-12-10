@@ -51,9 +51,7 @@ export function useParticipantHeartbeat({
     const isIdle = timeSinceActivity > idleThreshold;
     
     try {
-      // Type assertion since migration not yet run
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('participants')
         .update({
           last_seen_at: new Date().toISOString(),
@@ -129,8 +127,7 @@ export function useParticipantHeartbeat({
     
     return () => {
       // Mark as disconnected when component unmounts
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (supabase as any)
+      supabase
         .from('participants')
         .update({
           status: 'disconnected',
@@ -138,7 +135,7 @@ export function useParticipantHeartbeat({
         })
         .eq('participant_token', participantToken)
         .eq('session_id', sessionId)
-        .then(({ error }: { error: unknown }) => {
+        .then(({ error }) => {
           if (error) {
             console.error('[Heartbeat] Failed to mark as disconnected:', error);
           }

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import type { Json } from '@/types/supabase'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 
@@ -54,11 +55,11 @@ export async function PATCH(
     .upsert(
       {
         tenant_id: tenantId,
-        modules: body.modules,
-        product_access: body.product_access,
-        preferences: body.preferences,
+        modules: body.modules as Json | undefined,
+        product_access: body.product_access as Json | undefined,
+        preferences: body.preferences as Json | undefined,
         updated_at: new Date().toISOString(),
-      } as any,
+      },
       { onConflict: 'tenant_id' }
     )
     .select()

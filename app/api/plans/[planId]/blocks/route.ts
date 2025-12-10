@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations, recalcPlanDuration } from '@/lib/services/planner.server'
+import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -37,7 +38,7 @@ export async function POST(
     is_optional?: boolean | null
   }
 
-  // Cast to any to satisfy Json typing for metadata during validation
+  // Cast to any for validation since body comes from request
   const validation = validatePlanBlockPayload(body as any, { mode: 'create' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
@@ -82,11 +83,11 @@ export async function POST(
         title: body.title ?? null,
         notes: body.notes ?? null,
         position: insertPosition,
-        metadata: (body.metadata ?? {}) as any,
+        metadata: (body.metadata ?? {}) as Json,
         is_optional: body.is_optional ?? false,
         created_by: user.id,
         updated_by: user.id,
-      } as any
+      }
     )
     .select()
     .single()
@@ -101,7 +102,8 @@ export async function POST(
   orderedIds.splice(insertPosition, 0, newBlock.id)
 
   const updates = orderedIds.map((id, idx) => ({ id, position: idx }))
-  const { error: orderError } = await supabase.from('plan_blocks').upsert(updates as any)
+  // @ts-expect-error - upsert with partial update for reordering
+  const { error: orderError } = await supabase.from('plan_blocks').upsert(updates, { onConflict: 'id' })
   if (orderError) {
     console.error('[api/plans/:id/blocks] reorder error', orderError)
     return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })

@@ -72,7 +72,7 @@ export async function POST(
       status: body.status ?? 'active',
       is_primary: body.is_primary ?? false,
       seat_assignment_id: body.seat_assignment_id ?? null,
-    } as any)
+    })
     .select()
     .single()
 

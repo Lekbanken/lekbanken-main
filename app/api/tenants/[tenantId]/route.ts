@@ -65,7 +65,7 @@ export async function PATCH(
       default_language: body.default_language,
       default_theme: body.default_theme,
       demo_flag: body.demo_flag,
-      metadata: body.metadata as any,
+      metadata: body.metadata as Json | undefined,
       updated_by: user.id,
       updated_at: new Date().toISOString(),
     })

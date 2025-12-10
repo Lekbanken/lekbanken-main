@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations, recalcPlanDuration } from '@/lib/services/planner.server'
+import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -38,7 +39,7 @@ export async function PATCH(
     is_optional?: boolean | null
   }
 
-  // Cast to any to satisfy Json typing on metadata while preserving runtime validation
+  //  Cast to any for validation since body comes from request
   const validation = validatePlanBlockPayload(body as any, { mode: 'update' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })

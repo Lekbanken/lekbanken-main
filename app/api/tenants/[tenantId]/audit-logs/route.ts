@@ -13,7 +13,7 @@ export async function GET(
   } = await supabase.auth.getUser()
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  if (!(isSystemAdmin(user as any) || (await isTenantAdmin(tenantId, user.id)))) {
+  if (!(isSystemAdmin(user) || (await isTenantAdmin(tenantId, user.id)))) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

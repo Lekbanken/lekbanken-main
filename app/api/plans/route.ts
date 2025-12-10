@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import type { Json } from '@/types/supabase'
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
@@ -43,10 +44,10 @@ export async function POST(request: Request) {
       owner_user_id: user.id,
       owner_tenant_id: tenantId,
       visibility,
-      metadata: (body.metadata ?? {}) as any,
+      metadata: (body.metadata ?? {}) as Json,
       created_by: user.id,
       updated_by: user.id,
-    } as any)
+    })
     .select()
     .single()
 

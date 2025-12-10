@@ -50,8 +50,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   }
 
   // Check if account already exists
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: existing } = await (supabase as any)
+  const { data: existing } = await supabase
     .from('billing_accounts')
     .select('id, provider_customer_id')
     .eq('tenant_id', tenantId)
@@ -70,8 +69,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   })
 
   // Insert billing_accounts
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('billing_accounts')
     .insert({
       tenant_id: tenantId,

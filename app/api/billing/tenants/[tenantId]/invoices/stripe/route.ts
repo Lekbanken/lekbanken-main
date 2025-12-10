@@ -67,8 +67,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
   const dueDateUnix = Math.floor(dueDate.getTime() / 1000)
 
   // Look up Stripe customer for tenant
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: billingAccount, error: acctError } = await (supabase as any)
+  const { data: billingAccount, error: acctError } = await supabase
     .from('billing_accounts')
     .select('provider_customer_id')
     .eq('tenant_id', tenantId)

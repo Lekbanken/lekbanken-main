@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
   const body = (await request.json().catch(() => ({}))) as Partial<ProductRow>
 
-  const validation = validateProductPayload(body as any, { mode: 'create' })
+  const validation = validateProductPayload(body, { mode: 'create' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from('products')
-    .insert(payload as any)
+    .insert(payload)
     .select('*,purposes:product_purposes(purpose:purposes(*))')
     .single()
 

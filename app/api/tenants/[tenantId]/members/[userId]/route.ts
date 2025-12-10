@@ -47,8 +47,8 @@ export async function PATCH(
   const { data, error } = await supabase
     .from('tenant_memberships')
     .update({
-      role: body.role as any,
-      status: body.status as any,
+      role: body.role,
+      status: body.status,
       is_primary: body.is_primary,
       seat_assignment_id: body.seat_assignment_id ?? null,
       updated_at: new Date().toISOString(),

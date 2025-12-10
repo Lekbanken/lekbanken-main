@@ -47,7 +47,7 @@ export async function POST(
       user_id: user.id,
       role: invite.role,
       status: 'active',
-    } as any,
+    },
     { onConflict: 'tenant_id,user_id' }
   )
 

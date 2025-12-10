@@ -1,6 +1,7 @@
 import Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
+import type { Json } from '@/types/supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -17,8 +18,7 @@ function toMajorUnits(amount?: number | null) {
 }
 
 async function logEvent(event: Stripe.Event) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (supabaseAdmin as any)
+  return supabaseAdmin
     .from('billing_events')
     .upsert(
       {
@@ -26,7 +26,7 @@ async function logEvent(event: Stripe.Event) {
         event_type: event.type,
         status: 'received',
         source: 'stripe',
-        payload: event as unknown as Record<string, unknown>,
+        payload: event as unknown as Json,
         subscription_id: null,
         invoice_id: null,
         payment_id: null,

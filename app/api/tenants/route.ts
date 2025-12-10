@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
+import type { Json } from '@/types/supabase'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
 
 export async function POST(request: Request) {
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
       demo_flag: body.demo_flag ?? false,
       created_by: user.id,
       updated_by: user.id,
-    } as any)
+    })
     .select()
     .single()
 

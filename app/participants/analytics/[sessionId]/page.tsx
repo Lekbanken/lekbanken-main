@@ -9,6 +9,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { SessionActions } from '@/features/participants/components/SessionActions';
 
 interface SessionAnalytics {
   session: {
@@ -218,6 +219,16 @@ export default function SessionAnalyticsPage() {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Session Management Actions */}
+        <div className="mb-6">
+          <SessionActions
+            sessionId={analytics.session.id}
+            sessionCode={analytics.session.session_code}
+            status={analytics.session.status}
+            onActionComplete={fetchAnalytics}
+          />
         </div>
 
         {/* Stats Grid */}

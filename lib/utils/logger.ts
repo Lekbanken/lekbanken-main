@@ -6,6 +6,7 @@
  */
 
 import { env } from '@/lib/config/env';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 export interface LogContext {
   userId?: string;
@@ -95,21 +96,55 @@ function log(level: LogLevel, message: string, error?: Error, context?: LogConte
       break;
   }
   
-  // TODO: Save errors to error_tracking table in database
-  // This will enable viewing errors in /admin/analytics/errors
-  // Example implementation:
-  // if (level === 'error' || level === 'fatal') {
-  //   await supabase.from('error_tracking').insert({
-  //     level,
-  //     message,
-  //     error_message: error?.message,
-  //     error_stack: error?.stack,
-  //     context,
-  //     user_id: context?.userId,
-  //     tenant_id: context?.tenantId,
-  //     endpoint: context?.endpoint,
-  //   });
-  // }
+  // Save errors to database (async, don't await to avoid blocking)
+  if (level === 'error' || level === 'fatal') {
+    saveErrorToDatabase(entry, error, context).catch((dbError) => {
+      // If database save fails, log to console but don't crash
+      console.error('[Logger] Failed to save error to database:', dbError);
+    });
+  }
+}
+
+/**
+ * Save error to error_tracking table
+ * Runs async without blocking the main error logging flow
+ */
+async function saveErrorToDatabase(
+  entry: LogEntry,
+  error: Error | undefined,
+  context: LogContext | undefined
+) {
+  try {
+    const supabase = createServiceRoleClient();
+    
+    // Create unique error key based on error type + message
+    const errorKey = error 
+      ? `${error.name}:${error.message}`.substring(0, 100)
+      : entry.message.substring(0, 100);
+    
+    // Insert error into error_tracking table
+    const { error: insertError } = await supabase
+      .from('error_tracking')
+      .insert({
+        error_key: errorKey,
+        error_type: error?.name || entry.level,
+        error_message: error?.message || entry.message,
+        stack_trace: error?.stack,
+        page_path: context?.endpoint,
+        severity: entry.level === 'fatal' ? 'critical' : entry.level,
+        user_id: context?.userId,
+        tenant_id: context?.tenantId,
+        occurrence_count: 1,
+        last_occurred_at: entry.timestamp,
+      });
+    
+    if (insertError) {
+      throw insertError;
+    }
+  } catch (err) {
+    // Don't throw - we don't want database errors to crash the app
+    throw err;
+  }
 }
 
 /**

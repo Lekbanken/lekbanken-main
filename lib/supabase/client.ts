@@ -9,9 +9,10 @@
 import { createBrowserClient as createSupabaseBrowserClient, type CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
+import { env } from '@/lib/config/env'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+const supabaseUrl = env.supabase.url
+const supabaseAnonKey = env.supabase.anonKey
 
 function serializeCookie(name: string, value: string, options: CookieOptions = {}) {
   // Minimal cookie serializer for browser usage; mirrors Next.js defaults.

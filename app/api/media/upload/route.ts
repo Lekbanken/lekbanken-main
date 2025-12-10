@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
+import { logger } from '@/lib/utils/logger'
 
 const uploadSchema = z.object({
   fileName: z.string().min(1).max(255),
@@ -45,7 +46,12 @@ export async function POST(request: NextRequest) {
     .createSignedUploadUrl(filePath)
 
   if (signedError || !signedData) {
-    console.error('[api/media/upload] signed URL error', signedError)
+    logger.error('Failed to generate signed upload URL', signedError ?? undefined, {
+      endpoint: '/api/media/upload',
+      bucket,
+      filePath,
+      userId: user.id
+    })
     return NextResponse.json(
       { error: 'Failed to generate upload URL' },
       { status: 500 }

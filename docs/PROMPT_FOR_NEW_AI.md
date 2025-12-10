@@ -1,44 +1,52 @@
 # LEKBANKEN — PROMPT FÖR NY AI-ASSISTENT
 
+## ⚠️ OBLIGATORISK LÄSNING FÖRST
+
+**Innan du gör NÅGOT:**
+1. Läs `docs/AI_CODING_GUIDELINES.md` — Kritiska regler för att undvika breaking changes
+2. Läs `docs/VS_CODE_WORKFLOW.md` — Utvecklingsworkflow
+
+**Nyckelfakta:**
+- Vi använder `proxy.ts` (INTE `middleware.ts`)
+- Supabase via `createBrowserClient()` från `@/lib/supabase/client`
+- Catalyst UI Kit (inte Shadcn)
+- DDD-struktur i `features/`
+
 ## Kontext
 
 Du hjälper till med **Lekbanken**, en svensk webbapp för att hitta och organisera barnlekar. Projektet använder:
 
-- **Next.js 14** (App Router)
+- **Next.js 15** (App Router)
 - **TypeScript**
 - **Tailwind CSS** + Catalyst UI Kit
 - **Supabase** (PostgreSQL, Auth, RLS)
 - **Heroicons**
 
-## Senaste Arbetet (2024-12-07)
+## Aktuell Status (2025-12-10)
 
-Vi har precis:
+Vi arbetar på:
+- **Participants Domain** — Anonymous join via session codes (se `PARTICIPANTS_DOMAIN_ARCHITECTURE.md`)
+- Admin dashboard är live
+- 25 svenska lekar finns i databasen
 
-1. ✅ Seedat 25 riktiga svenska barnlekar i Supabase (Kurragömma, Sista pansen, Björnen sover, etc.)
-2. ✅ Kopplat `/app/browse` till riktig Supabase-data istället för mock
-3. ✅ Fixat RLS-policies så att publicerade globala lekar kan läsas av alla
-4. ✅ Fixat tenant helper-funktioner som hade en bugg (refererade `deleted_at` som inte existerade)
 
-## Vad Som Behöver Göras Nu
+## Viktiga Dokumentation
 
-1. **Verifiera att browse-sidan fungerar**
-   - Öppna `http://localhost:3000/app/browse`
-   - Bör visa 25 lekar
-   - Testa både inloggad och utloggad
-
-2. **Game Detail Page** (`/app/games/[gameId]`)
-   - Behöver kopplas till riktig data (använder nog fortfarande mock)
-
-3. **Sök och filter**
-   - Kategori, energinivå, antal deltagare, ålder
+| Dokument | När använda |
+|----------|-------------|
+| `AI_CODING_GUIDELINES.md` | **ALLTID först** — Undvik vanliga AI-fel |
+| `PARTICIPANTS_DOMAIN_ARCHITECTURE.md` | Bygger join/session-funktionalitet |
+| `VS_CODE_WORKFLOW.md` | Setup & dagligt arbete |
+| `CATALYST_UI_KIT.md` | UI-komponenter |
+| `HANDOVER_2024-12-07.md` | Historisk kontext |
 
 ## Viktiga Filer
 
+- `proxy.ts` — Auth middleware (INTE middleware.ts!)
 - `lib/services/gameService.ts` — Supabase queries
 - `features/browse/BrowsePage.tsx` — Leklistan
 - `app/app/games/[gameId]/page.tsx` — Detaljvy
 - `supabase/migrations/` — Databasmigrationer
-- `scripts/seed-games.ts` — Seeding script
 
 ## Kommandon
 
@@ -46,8 +54,9 @@ Vi har precis:
 # Starta dev
 npm run dev
 
-# Testa RLS/fetch
-npx tsx scripts/test-games-fetch.ts
+# Supabase
+npx supabase status
+npx supabase db push
 
 # Se git-status
 git status
@@ -59,8 +68,3 @@ git status
 - Använd svenska tecken (å, ä, ö) korrekt
 - Lekar har svenska namn och beskrivningar
 
-## Dokumentation
-
-- `docs/HANDOVER_2024-12-07.md` — Fullständig status
-- `docs/VS_CODE_WORKFLOW.md` — Dagliga rutiner
-- `docs/CATALYST_UI_KIT.md` — UI-komponenter

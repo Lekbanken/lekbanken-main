@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import type { Json } from '@/types/supabase'
+import { logger } from '@/lib/utils/logger'
 
 const mediaSchema = z.object({
   name: z.string().min(1).max(255),
@@ -38,7 +39,12 @@ export async function GET(request: NextRequest) {
   const { data, error, count } = await query
 
   if (error) {
-    console.error('[api/media] GET error', error)
+    logger.error('Failed to fetch media', error, { 
+      endpoint: '/api/media',
+      method: 'GET',
+      tenantId: tenantId ?? undefined,
+      type: type ?? undefined
+    })
     return NextResponse.json({ error: 'Failed to fetch media' }, { status: 500 })
   }
 
@@ -84,7 +90,12 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (error) {
-    console.error('[api/media] POST error', error)
+    logger.error('Failed to create media', error, {
+      endpoint: '/api/media',
+      method: 'POST',
+      userId: user.id,
+      mediaType: parsed.data.type
+    })
     return NextResponse.json({ error: 'Failed to create media' }, { status: 500 })
   }
 

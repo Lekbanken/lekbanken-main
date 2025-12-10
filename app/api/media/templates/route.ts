@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { logger } from '@/lib/utils/logger'
 
 export const dynamic = 'force-dynamic'
 
@@ -51,13 +52,20 @@ export async function GET(_request: NextRequest) {
       `).order('priority', { ascending: false }).order('created_at', { ascending: false })
 
     if (error) {
-      console.error('Failed to fetch templates:', error)
+      logger.error('Failed to fetch media templates', error, {
+        endpoint: '/api/media/templates',
+        method: 'GET',
+        userId: user.id
+      })
       return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
     }
 
     return NextResponse.json({ templates })
   } catch (error) {
-    console.error('Error in GET /api/media/templates:', error)
+    logger.error('Unexpected error in GET /api/media/templates', error instanceof Error ? error : undefined, {
+      endpoint: '/api/media/templates',
+      method: 'GET'
+    })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
@@ -111,13 +119,21 @@ export async function POST(request: NextRequest) {
       }).select().single()
 
     if (error) {
-      console.error('Failed to create template:', error)
+      logger.error('Failed to create media template', error, {
+        endpoint: '/api/media/templates',
+        method: 'POST',
+        templateKey,
+        userId: user.id
+      })
       return NextResponse.json({ error: 'Failed to create template' }, { status: 500 })
     }
 
     return NextResponse.json({ template }, { status: 201 })
   } catch (error) {
-    console.error('Error in POST /api/media/templates:', error)
+    logger.error('Unexpected error in POST /api/media/templates', error instanceof Error ? error : undefined, {
+      endpoint: '/api/media/templates',
+      method: 'POST'
+    })
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

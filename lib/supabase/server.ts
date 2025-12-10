@@ -4,10 +4,11 @@ import { createClient as createServiceRoleSupabaseClient } from '@supabase/supab
 import { createServerClient } from '@supabase/ssr'
 import { cookies, headers } from 'next/headers'
 import type { Database } from '@/types/supabase'
+import { env } from '@/lib/config/env'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+const supabaseUrl = env.supabase.url
+const supabaseAnonKey = env.supabase.anonKey
+const supabaseServiceRoleKey = env.supabase.serviceRoleKey
 
 /**
  * Request-scoped RLS-aware client for server code (app router, server actions, route handlers).

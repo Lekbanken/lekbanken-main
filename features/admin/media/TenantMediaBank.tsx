@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 import { TrashIcon, ArrowUpTrayIcon } from '@heroicons/react/24/outline'
+import { logger } from '@/lib/utils/logger'
 
 type Media = {
   id: string
@@ -36,7 +37,9 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
       const data = await response.json()
       setMedia(data.media || [])
     } catch (error) {
-      console.error('Failed to load media:', error)
+      logger.error('Failed to load tenant media', error instanceof Error ? error : undefined, {
+        tenantId
+      })
     } finally {
       setLoading(false)
     }
@@ -65,7 +68,11 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
 
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json().catch(() => ({}))
-        console.error('Upload URL error:', errorData)
+        logger.error('Upload URL request failed', undefined, {
+          component: 'TenantMediaBank',
+          tenantId,
+          errorData
+        })
         throw new Error(errorData.error || 'Failed to get upload URL')
       }
       const { uploadUrl, bucket, path } = await uploadResponse.json()
@@ -77,7 +84,11 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
       })
 
       if (!putResponse.ok) {
-        console.error('Upload to storage failed:', putResponse.status, putResponse.statusText)
+        logger.error('Storage upload failed', undefined, {
+          component: 'TenantMediaBank',
+          tenantId,
+          status: putResponse.status
+        })
         throw new Error('Failed to upload file to storage')
       }
 
@@ -89,7 +100,11 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
 
       if (!confirmResponse.ok) {
         const errorData = await confirmResponse.json().catch(() => ({}))
-        console.error('Confirm upload error:', errorData)
+        logger.error('Upload confirmation failed', undefined, {
+          component: 'TenantMediaBank',
+          tenantId,
+          errorData
+        })
         throw new Error(errorData.error || 'Failed to confirm upload')
       }
       const { url } = await confirmResponse.json()
@@ -107,14 +122,21 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
 
       if (!createResponse.ok) {
         const errorData = await createResponse.json().catch(() => ({}))
-        console.error('Create media record error:', errorData)
+        logger.error('Create media record failed', undefined, {
+          component: 'TenantMediaBank',
+          tenantId,
+          errorData
+        })
         throw new Error(errorData.error || 'Failed to create media record')
       }
 
       await loadMedia()
       setUploadFile(null)
     } catch (error) {
-      console.error('Upload failed:', error)
+      logger.error('Tenant media upload failed', error instanceof Error ? error : undefined, {
+        component: 'TenantMediaBank',
+        tenantId
+      })
       alert(`Upload failed: ${error instanceof Error ? error.message : 'Please try again'}`)
     } finally {
       setUploading(false)
@@ -133,7 +155,11 @@ export function TenantMediaBank({ tenantId }: TenantMediaBankProps) {
 
       await loadMedia()
     } catch (error) {
-      console.error('Delete failed:', error)
+      logger.error('Failed to delete tenant media', error instanceof Error ? error : undefined, {
+        component: 'TenantMediaBank',
+        tenantId,
+        mediaId
+      })
       alert('Delete failed. Please try again.')
     }
   }

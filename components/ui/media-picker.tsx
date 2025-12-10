@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
+import { logger } from '@/lib/utils/logger'
 
 type Media = {
   id: string
@@ -62,7 +63,10 @@ export function MediaPicker({
       const data = await response.json()
       setMedia(data.media || [])
     } catch (error) {
-      console.error('Failed to load media:', error)
+      logger.error('Failed to load media in picker', error instanceof Error ? error : undefined, {
+        tenantId: tenantId ?? undefined,
+        type
+      })
     } finally {
       setLoading(false)
     }
@@ -87,7 +91,11 @@ export function MediaPicker({
 
       if (!uploadResponse.ok) {
         const errorData = await uploadResponse.json().catch(() => ({}))
-        console.error('Upload URL error:', errorData)
+        logger.error('Upload URL request failed', undefined, {
+          component: 'MediaPicker',
+          errorData,
+          fileName: uploadFile.name
+        })
         throw new Error(errorData.error || 'Failed to get upload URL')
       }
       const { uploadUrl, bucket, path } = await uploadResponse.json()
@@ -99,7 +107,12 @@ export function MediaPicker({
       })
 
       if (!putResponse.ok) {
-        console.error('Upload to storage failed:', putResponse.status, putResponse.statusText)
+        logger.error('Storage upload failed', undefined, {
+          component: 'MediaPicker',
+          status: putResponse.status,
+          statusText: putResponse.statusText,
+          fileName: uploadFile.name
+        })
         throw new Error('Failed to upload file to storage')
       }
 
@@ -111,7 +124,11 @@ export function MediaPicker({
 
       if (!confirmResponse.ok) {
         const errorData = await confirmResponse.json().catch(() => ({}))
-        console.error('Confirm upload error:', errorData)
+        logger.error('Upload confirmation failed', undefined, {
+          component: 'MediaPicker',
+          errorData,
+          fileName: uploadFile.name
+        })
         throw new Error(errorData.error || 'Failed to confirm upload')
       }
       const { url } = await confirmResponse.json()
@@ -129,7 +146,11 @@ export function MediaPicker({
 
       if (!createResponse.ok) {
         const errorData = await createResponse.json().catch(() => ({}))
-        console.error('Create media record error:', errorData)
+        logger.error('Create media record failed', undefined, {
+          component: 'MediaPicker',
+          errorData,
+          fileName: uploadFile.name
+        })
         throw new Error(errorData.error || 'Failed to create media record')
       }
       const { media: newMedia } = await createResponse.json()
@@ -138,7 +159,10 @@ export function MediaPicker({
       setSelectedId(newMedia.id)
       setUploadFile(null)
     } catch (error) {
-      console.error('Upload failed:', error)
+      logger.error('Media upload failed', error instanceof Error ? error : undefined, {
+        component: 'MediaPicker',
+        fileName: uploadFile?.name
+      })
       alert(`Upload failed: ${error instanceof Error ? error.message : 'Please try again'}`)
     } finally {
       setUploading(false)

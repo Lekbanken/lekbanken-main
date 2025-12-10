@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { MediaPicker } from '@/components/ui/media-picker'
 import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { logger } from '@/lib/utils/logger'
 
 type MediaTemplate = {
   id: string
@@ -81,11 +82,14 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       const data = await response.json()
       setTemplates(data.templates || [])
     } catch (error) {
-      console.error('Failed to load templates:', error)
+      logger.error('Failed to load media templates', error instanceof Error ? error : undefined, {
+        component: 'StandardImagesManager',
+        tenantId
+      })
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [tenantId])
 
   const loadProducts = useCallback(async () => {
     try {
@@ -95,7 +99,9 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       const data = await response.json()
       setProducts(data.products || [])
     } catch (error) {
-      console.error('Failed to load products:', error)
+      logger.error('Failed to load products', error instanceof Error ? error : undefined, {
+        component: 'StandardImagesManager'
+      })
     }
   }, [])
 
@@ -107,7 +113,9 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       const data = await response.json()
       setPurposes(data.purposes || [])
     } catch (error) {
-      console.error('Failed to load purposes:', error)
+      logger.error('Failed to load purposes', error instanceof Error ? error : undefined, {
+        component: 'StandardImagesManager'
+      })
     }
   }, [])
 
@@ -153,7 +161,11 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       setTemplateName('')
       setTemplateDescription('')
     } catch (error) {
-      console.error('Failed to create template:', error)
+      logger.error('Failed to create media template', error instanceof Error ? error : undefined, {
+        component: 'StandardImagesManager',
+        tenantId,
+        templateKey
+      })
       alert('Failed to create template')
     }
   }
@@ -170,7 +182,11 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
 
       await loadTemplates()
     } catch (error) {
-      console.error('Failed to delete template:', error)
+      logger.error('Failed to delete media template', error instanceof Error ? error : undefined, {
+        component: 'StandardImagesManager',
+        tenantId,
+        templateId
+      })
       alert('Failed to delete template')
     }
   }

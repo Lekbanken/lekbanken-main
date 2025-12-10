@@ -23,6 +23,29 @@
 ---
 
 # ============================================================
+#   🤖 0. FOR AI AGENTS: READ THIS FIRST!
+## <Before you write ANY code, read the AI Coding Guidelines>
+# ============================================================
+
+**⚠️ MANDATORY FOR ALL AI AGENTS**
+
+Before making changes to this codebase, **READ**:
+```
+docs/AI_CODING_GUIDELINES.md
+```
+
+This document contains:
+- Critical patterns (proxy.ts vs middleware.ts)
+- Correct imports (createBrowserClient vs createClient)
+- Database schema facts (actual table/column names)
+- Domain boundaries (features/ structure)
+- Common mistakes & fixes
+
+**Failure to read this will result in breaking changes.**
+
+---
+
+# ============================================================
 #   🟪 1. STARTA DAGEN
 ## <Här gör du allt för att ladda projektet, få senaste kod och starta servern.>
 # ============================================================

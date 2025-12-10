@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import type { Json } from '@/types/supabase'
+import { logger } from '@/lib/utils/logger'
 
 const updateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
@@ -23,7 +24,11 @@ export async function GET(
     .single()
 
   if (error || !data) {
-    console.error('[api/media/:id] GET error', error)
+    logger.error('Media not found', error ?? undefined, { 
+      endpoint: '/api/media/[mediaId]',
+      method: 'GET',
+      mediaId 
+    })
     return NextResponse.json({ error: 'Media not found' }, { status: 404 })
   }
 
@@ -67,7 +72,12 @@ export async function PATCH(
     .single()
 
   if (error) {
-    console.error('[api/media/:id] PATCH error', error)
+    logger.error('Failed to update media', error, {
+      endpoint: '/api/media/[mediaId]',
+      method: 'PATCH',
+      mediaId,
+      userId: user.id
+    })
     return NextResponse.json({ error: 'Failed to update media' }, { status: 500 })
   }
 
@@ -91,7 +101,12 @@ export async function DELETE(
   const { error } = await supabase.from('media').delete().eq('id', mediaId)
 
   if (error) {
-    console.error('[api/media/:id] DELETE error', error)
+    logger.error('Failed to delete media', error, {
+      endpoint: '/api/media/[mediaId]',
+      method: 'DELETE',
+      mediaId,
+      userId: user.id
+    })
     return NextResponse.json({ error: 'Failed to delete media' }, { status: 500 })
   }
 

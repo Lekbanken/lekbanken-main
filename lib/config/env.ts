@@ -103,18 +103,6 @@ export const env = {
     aiSuggestions: process.env.FEATURE_AI_SUGGESTIONS === 'true',
     participantsDomain: process.env.FEATURE_PARTICIPANTS === 'true',
   },
-  
-  // Monitoring (Optional - will be added with Sentry)
-  monitoring: {
-    sentryDsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-    sentryEnvironment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV || 'development',
-  },
-  
-  // Upstash Redis (Optional - for rate limiting)
-  upstash: {
-    redisUrl: process.env.UPSTASH_REDIS_REST_URL,
-    redisToken: process.env.UPSTASH_REDIS_REST_TOKEN,
-  },
 } as const;
 
 // Run validation on module load (server-side only)

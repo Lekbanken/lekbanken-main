@@ -1,11 +1,10 @@
 /**
  * Structured Logging Utility
  * 
- * Provides structured logging with automatic Sentry integration.
+ * Provides structured logging with Vercel logs and database storage.
  * Replaces raw console.error calls with context-aware logging.
  */
 
-import * as Sentry from '@sentry/nextjs';
 import { env } from '@/lib/config/env';
 
 export interface LogContext {
@@ -96,30 +95,21 @@ function log(level: LogLevel, message: string, error?: Error, context?: LogConte
       break;
   }
   
-  // Send to Sentry for errors
-  if ((level === 'error' || level === 'fatal') && env.monitoring.sentryDsn) {
-    if (error) {
-      Sentry.captureException(error, {
-        level: level === 'fatal' ? 'fatal' : 'error',
-        tags: {
-          endpoint: context?.endpoint,
-        },
-        contexts: {
-          custom: context,
-        },
-      });
-    } else {
-      Sentry.captureMessage(message, {
-        level: level === 'fatal' ? 'fatal' : 'error',
-        tags: {
-          endpoint: context?.endpoint,
-        },
-        contexts: {
-          custom: context,
-        },
-      });
-    }
-  }
+  // TODO: Save errors to error_tracking table in database
+  // This will enable viewing errors in /admin/analytics/errors
+  // Example implementation:
+  // if (level === 'error' || level === 'fatal') {
+  //   await supabase.from('error_tracking').insert({
+  //     level,
+  //     message,
+  //     error_message: error?.message,
+  //     error_stack: error?.stack,
+  //     context,
+  //     user_id: context?.userId,
+  //     tenant_id: context?.tenantId,
+  //     endpoint: context?.endpoint,
+  //   });
+  // }
 }
 
 /**

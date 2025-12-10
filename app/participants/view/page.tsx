@@ -86,6 +86,8 @@ export default function ParticipantViewPage() {
         return `👋 ${event.payload?.displayName || 'Someone'} joined`;
       case 'participant_left':
         return `👋 ${event.payload?.displayName || 'Someone'} left`;
+      case 'role_changed':
+        return `👤 Your role changed to ${event.payload?.newRole || 'unknown'}`;
       default:
         return null;
     }

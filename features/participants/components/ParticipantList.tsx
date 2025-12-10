@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useParticipants } from '../hooks/useParticipants';
+import { ParticipantRoleSelector } from './ParticipantRoleSelector';
 
 interface ParticipantListProps {
   sessionId: string;
@@ -30,9 +31,9 @@ export function ParticipantList({ sessionId, sessionCode }: ParticipantListProps
     participants, 
     loading, 
     error,
+    refetch,
     kickParticipant,
     blockParticipant,
-    updateParticipantRole,
   } = useParticipants({ sessionId });
   
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -55,28 +56,6 @@ export function ParticipantList({ sessionId, sessionCode }: ParticipantListProps
     } finally {
       setActionLoading(null);
     }
-  };
-  
-  const handleRoleChange = async (participantId: string, newRole: string) => {
-    const validRoles = ['observer', 'player', 'team_lead', 'facilitator'] as const;
-    if (!validRoles.includes(newRole as typeof validRoles[number])) return;
-    
-    try {
-      setActionLoading(participantId);
-      await updateParticipantRole(participantId, newRole as typeof validRoles[number]);
-    } finally {
-      setActionLoading(null);
-    }
-  };
-  
-  const getRoleLabel = (role: string) => {
-    const labels: Record<string, string> = {
-      observer: 'Observatör',
-      player: 'Spelare',
-      team_lead: 'Lagledare',
-      facilitator: 'Handledare',
-    };
-    return labels[role] || role;
   };
   
   const getStatusBadge = (status: string, lastSeen: string) => {
@@ -138,22 +117,19 @@ export function ParticipantList({ sessionId, sessionCode }: ParticipantListProps
                       <span className="font-medium">{p.display_name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm">{getRoleLabel(p.role)}</td>
+                  <td className="px-4 py-3 text-sm">
+                    <ParticipantRoleSelector
+                      participantId={p.id}
+                      currentRole={p.role}
+                      sessionId={sessionId}
+                      disabled={actionLoading === p.id}
+                      onRoleChange={() => refetch()}
+                    />
+                  </td>
                   <td className="px-4 py-3">{getStatusBadge(p.status, p.last_seen_at)}</td>
                   <td className="px-4 py-3 text-sm text-gray-600">{timeAgo(p.joined_at)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <select
-                        value={p.role}
-                        onChange={(e) => handleRoleChange(p.id, e.target.value)}
-                        disabled={actionLoading === p.id}
-                        className="text-sm border rounded px-2 py-1"
-                      >
-                        <option value="observer">Observatör</option>
-                        <option value="player">Spelare</option>
-                        <option value="team_lead">Lagledare</option>
-                        <option value="facilitator">Handledare</option>
-                      </select>
                       <button
                         onClick={() => handleKick(p.id, p.display_name)}
                         disabled={actionLoading === p.id}

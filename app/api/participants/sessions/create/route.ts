@@ -7,7 +7,7 @@
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
-import { createServerClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { logger } from '@/lib/utils/logger';
 
@@ -30,7 +30,7 @@ interface CreateSessionRequest {
 export async function POST(request: NextRequest) {
   try {
     // Authenticate user
-    const supabase = createServerClient();
+    const supabase = await createServerRlsClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
     if (authError || !user) {
@@ -42,12 +42,12 @@ export async function POST(request: NextRequest) {
     
     // Get user's tenant
     const { data: membership } = await supabase
-      .from('tenant_members')
+      .from('user_tenant_memberships')
       .select('tenant_id, role')
       .eq('user_id', user.id)
       .single();
     
-    if (!membership) {
+    if (!membership || !membership.tenant_id) {
       return NextResponse.json(
         { error: 'No tenant membership found' },
         { status: 403 }

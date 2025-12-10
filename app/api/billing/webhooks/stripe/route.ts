@@ -1,14 +1,11 @@
-import Stripe from 'stripe'
+import type Stripe from 'stripe'
 import { NextResponse } from 'next/server'
 import { supabaseAdmin } from '@/lib/supabase/server'
 import type { Json } from '@/types/supabase'
+import { stripe, stripeWebhookSecret } from '@/lib/stripe/config'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
-const stripeSecret = process.env.STRIPE_SECRET_KEY
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-const stripe = stripeSecret ? new Stripe(stripeSecret, { apiVersion: '2024-06-20' }) : null
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
 
@@ -103,7 +100,7 @@ async function upsertPaymentForInvoice(params: {
 }
 
 export async function POST(request: Request) {
-  if (!stripe || !webhookSecret) {
+  if (!stripe || !stripeWebhookSecret) {
     console.error('[stripe-webhook] Missing Stripe secrets')
     return NextResponse.json({ error: 'Server not configured' }, { status: 500 })
   }
@@ -115,7 +112,7 @@ export async function POST(request: Request) {
   const rawBody = await request.text()
 
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
+    event = stripe.webhooks.constructEvent(rawBody, signature, stripeWebhookSecret)
   } catch (err) {
     console.error('[stripe-webhook] Invalid signature', err)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
@@ -132,6 +129,76 @@ export async function POST(request: Request) {
   // Handle selected Stripe events → local billing tables
   try {
     switch (event.type) {
+      // Subscription events
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        const tenantId = subscription.metadata.tenant_id
+        
+        if (tenantId) {
+          // Find existing subscription by stripe_subscription_id
+          const { data: existing } = await supabaseAdmin
+            .from('tenant_subscriptions')
+            .select('id')
+            .eq('stripe_subscription_id', subscription.id)
+            .maybeSingle()
+
+          const statusMap: Record<string, 'trial' | 'active' | 'canceled' | 'paused'> = {
+            active: 'active',
+            trialing: 'trial',
+            canceled: 'canceled',
+            past_due: 'paused',
+            unpaid: 'paused',
+            incomplete: 'paused',
+            incomplete_expired: 'canceled',
+            paused: 'paused',
+          }
+
+          const dbStatus = statusMap[subscription.status] || 'paused'
+
+          if (existing) {
+            // Update existing subscription
+            await supabaseAdmin
+              .from('tenant_subscriptions')
+              .update({
+                status: dbStatus,
+                renewal_date: subscription.current_period_end
+                  ? new Date(subscription.current_period_end * 1000).toISOString().split('T')[0]
+                  : null,
+                cancelled_at: subscription.canceled_at
+                  ? new Date(subscription.canceled_at * 1000).toISOString()
+                  : null,
+              })
+              .eq('id', existing.id)
+          }
+          // Note: If subscription doesn't exist, it was likely just created via API
+          // and the database record was already inserted
+        }
+        break
+      }
+
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        
+        const { data: existing } = await supabaseAdmin
+          .from('tenant_subscriptions')
+          .select('id')
+          .eq('stripe_subscription_id', subscription.id)
+          .maybeSingle()
+
+        if (existing) {
+          await supabaseAdmin
+            .from('tenant_subscriptions')
+            .update({
+              status: 'canceled',
+              cancelled_at: new Date().toISOString(),
+            })
+            .eq('id', existing.id)
+        }
+        break
+      }
+
+      // Invoice events
       case 'invoice.paid':
       case 'invoice.payment_succeeded': {
         const invoiceObj = event.data.object as Stripe.Invoice

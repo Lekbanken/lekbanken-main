@@ -76,6 +76,7 @@ export type Database = {
           condition_value: number | null
           created_at: string
           description: string | null
+          icon_media_id: string | null
           icon_url: string | null
           id: string
           name: string
@@ -87,6 +88,7 @@ export type Database = {
           condition_value?: number | null
           created_at?: string
           description?: string | null
+          icon_media_id?: string | null
           icon_url?: string | null
           id?: string
           name: string
@@ -98,11 +100,20 @@ export type Database = {
           condition_value?: number | null
           created_at?: string
           description?: string | null
+          icon_media_id?: string | null
           icon_url?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "achievements_icon_media_id_fkey"
+            columns: ["icon_media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       analytics_timeseries: {
         Row: {
@@ -2388,9 +2399,11 @@ export type Database = {
           game_id: string | null
           id: string
           media_key: string | null
+          metadata: Json | null
           name: string
           product_id: string | null
           purpose_id: string | null
+          tenant_id: string | null
           type: Database["public"]["Enums"]["media_type_enum"]
           url: string
         }
@@ -2400,9 +2413,11 @@ export type Database = {
           game_id?: string | null
           id?: string
           media_key?: string | null
+          metadata?: Json | null
           name: string
           product_id?: string | null
           purpose_id?: string | null
+          tenant_id?: string | null
           type: Database["public"]["Enums"]["media_type_enum"]
           url: string
         }
@@ -2412,9 +2427,11 @@ export type Database = {
           game_id?: string | null
           id?: string
           media_key?: string | null
+          metadata?: Json | null
           name?: string
           product_id?: string | null
           purpose_id?: string | null
+          tenant_id?: string | null
           type?: Database["public"]["Enums"]["media_type_enum"]
           url?: string
         }
@@ -2436,6 +2453,166 @@ export type Database = {
           {
             foreignKeyName: "media_purpose_id_fkey"
             columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "purposes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_ai_generations: {
+        Row: {
+          completed_at: string | null
+          cost_credits: number | null
+          created_at: string
+          error_message: string | null
+          generation_time_ms: number | null
+          id: string
+          media_id: string
+          model: string
+          model_version: string | null
+          parameters: Json | null
+          prompt: string
+          revision: number
+          seed: number | null
+          status: string
+          tenant_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          cost_credits?: number | null
+          created_at?: string
+          error_message?: string | null
+          generation_time_ms?: number | null
+          id?: string
+          media_id: string
+          model: string
+          model_version?: string | null
+          parameters?: Json | null
+          prompt: string
+          revision?: number
+          seed?: number | null
+          status?: string
+          tenant_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          cost_credits?: number | null
+          created_at?: string
+          error_message?: string | null
+          generation_time_ms?: number | null
+          id?: string
+          media_id?: string
+          model?: string
+          model_version?: string | null
+          parameters?: Json | null
+          prompt?: string
+          revision?: number
+          seed?: number | null
+          status?: string
+          tenant_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_ai_generations_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_ai_generations_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_ai_generations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_default: boolean
+          main_purpose_id: string | null
+          media_id: string
+          name: string
+          priority: number
+          product_id: string | null
+          sub_purpose_id: string | null
+          template_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          main_purpose_id?: string | null
+          media_id: string
+          name: string
+          priority?: number
+          product_id?: string | null
+          sub_purpose_id?: string | null
+          template_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_default?: boolean
+          main_purpose_id?: string | null
+          media_id?: string
+          name?: string
+          priority?: number
+          product_id?: string | null
+          sub_purpose_id?: string | null
+          template_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_templates_main_purpose_id_fkey"
+            columns: ["main_purpose_id"]
+            isOneToOne: false
+            referencedRelation: "purposes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_templates_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_templates_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "media_templates_sub_purpose_id_fkey"
+            columns: ["sub_purpose_id"]
             isOneToOne: false
             referencedRelation: "purposes"
             referencedColumns: ["id"]
@@ -3557,6 +3734,7 @@ export type Database = {
           renewal_date: string | null
           start_date: string
           status: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id: string | null
           subscription_key: string | null
           updated_at: string
           user_id: string
@@ -3569,6 +3747,7 @@ export type Database = {
           renewal_date?: string | null
           start_date: string
           status?: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id?: string | null
           subscription_key?: string | null
           updated_at?: string
           user_id: string
@@ -3581,6 +3760,7 @@ export type Database = {
           renewal_date?: string | null
           start_date?: string
           status?: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id?: string | null
           subscription_key?: string | null
           updated_at?: string
           user_id?: string
@@ -4894,6 +5074,7 @@ export type Database = {
           seats_purchased: number
           start_date: string
           status: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id: string | null
           subscription_key: string | null
           tenant_id: string
           updated_at: string
@@ -4907,6 +5088,7 @@ export type Database = {
           seats_purchased?: number
           start_date: string
           status?: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id?: string | null
           subscription_key?: string | null
           tenant_id: string
           updated_at?: string
@@ -4920,6 +5102,7 @@ export type Database = {
           seats_purchased?: number
           start_date?: string
           status?: Database["public"]["Enums"]["subscription_status_enum"]
+          stripe_subscription_id?: string | null
           subscription_key?: string | null
           tenant_id?: string
           updated_at?: string

@@ -1,0 +1,282 @@
+'use client'
+
+import { useState } from 'react'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tabs } from '@/components/ui/tabs'
+import { cn } from '@/lib/utils'
+
+type Media = {
+  id: string
+  name: string
+  url: string
+  alt_text: string | null
+  type: 'template' | 'upload' | 'ai'
+  created_at: string
+}
+
+type MediaPickerProps = {
+  value?: string | null
+  onSelect: (mediaId: string, url: string) => void
+  tenantId?: string | null
+  trigger?: React.ReactNode
+  allowUpload?: boolean
+  allowTemplate?: boolean
+}
+
+export function MediaPicker({
+  value,
+  onSelect,
+  tenantId,
+  trigger,
+  allowUpload = true,
+  allowTemplate = true,
+}: MediaPickerProps) {
+  const [open, setOpen] = useState(false)
+  const [media, setMedia] = useState<Media[]>([])
+  const [selectedId, setSelectedId] = useState<string | null>(value ?? null)
+  const [loading, setLoading] = useState(false)
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
+  const [activeTab, setActiveTab] = useState('library')
+
+  const tabs = [
+    { id: 'library', label: 'Library', disabled: false },
+    ...(allowTemplate ? [{ id: 'templates', label: 'Templates', disabled: false }] : []),
+    ...(allowUpload ? [{ id: 'upload', label: 'Upload', disabled: false }] : []),
+  ]
+
+  const loadMedia = async (type?: 'template' | 'upload') => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({ limit: '50' })
+      if (tenantId) params.set('tenantId', tenantId)
+      if (type) params.set('type', type)
+
+      const response = await fetch(`/api/media?${params}`)
+      if (!response.ok) throw new Error('Failed to load media')
+
+      const data = await response.json()
+      setMedia(data.media || [])
+    } catch (error) {
+      console.error('Failed to load media:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUpload = async () => {
+    if (!uploadFile) return
+
+    setUploading(true)
+    try {
+      const uploadResponse = await fetch('/api/media/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: uploadFile.name,
+          fileType: uploadFile.type,
+          fileSize: uploadFile.size,
+          tenantId,
+          bucket: 'tenant-media',
+        }),
+      })
+
+      if (!uploadResponse.ok) {
+        const errorData = await uploadResponse.json().catch(() => ({}))
+        console.error('Upload URL error:', errorData)
+        throw new Error(errorData.error || 'Failed to get upload URL')
+      }
+      const { uploadUrl, bucket, path } = await uploadResponse.json()
+
+      const putResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': uploadFile.type, 'x-upsert': 'true' },
+        body: uploadFile,
+      })
+
+      if (!putResponse.ok) {
+        console.error('Upload to storage failed:', putResponse.status, putResponse.statusText)
+        throw new Error('Failed to upload file to storage')
+      }
+
+      const confirmResponse = await fetch('/api/media/upload/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bucket, path }),
+      })
+
+      if (!confirmResponse.ok) {
+        const errorData = await confirmResponse.json().catch(() => ({}))
+        console.error('Confirm upload error:', errorData)
+        throw new Error(errorData.error || 'Failed to confirm upload')
+      }
+      const { url } = await confirmResponse.json()
+
+      const createResponse = await fetch('/api/media', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: uploadFile.name,
+          type: 'upload',
+          url,
+          tenant_id: tenantId,
+        }),
+      })
+
+      if (!createResponse.ok) {
+        const errorData = await createResponse.json().catch(() => ({}))
+        console.error('Create media record error:', errorData)
+        throw new Error(errorData.error || 'Failed to create media record')
+      }
+      const { media: newMedia } = await createResponse.json()
+
+      await loadMedia('upload')
+      setSelectedId(newMedia.id)
+      setUploadFile(null)
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert(`Upload failed: ${error instanceof Error ? error.message : 'Please try again'}`)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const handleSelect = () => {
+    const selected = media.find((m) => m.id === selectedId)
+    if (selected) {
+      onSelect(selected.id, selected.url)
+      setOpen(false)
+    }
+  }
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId)
+    if (tabId === 'library') loadMedia('upload')
+    else if (tabId === 'templates') loadMedia('template')
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="outline" onClick={() => loadMedia()}>
+            Select Media
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Select Media</DialogTitle>
+        </DialogHeader>
+
+        <Tabs tabs={tabs} activeTab={activeTab} onChange={handleTabChange} />
+
+        <div className="mt-4">
+          {activeTab === 'library' && (
+            <div className="space-y-4">
+              {loading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+              ) : media.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">No media found</div>
+              ) : (
+                <div className="grid grid-cols-4 gap-4">
+                  {media.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedId(item.id)}
+                      className={cn(
+                        'relative aspect-square rounded-lg border-2 overflow-hidden transition-all hover:scale-105',
+                        selectedId === item.id ? 'border-primary ring-2 ring-primary' : 'border-border'
+                      )}
+                    >
+                      <Image
+                        src={item.url}
+                        alt={item.alt_text || item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'templates' && (
+            <div className="space-y-4">
+              {loading ? (
+                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+              ) : media.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">No templates found</div>
+              ) : (
+                <div className="grid grid-cols-4 gap-4">
+                  {media.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => setSelectedId(item.id)}
+                      className={cn(
+                        'relative aspect-square rounded-lg border-2 overflow-hidden transition-all hover:scale-105',
+                        selectedId === item.id ? 'border-primary ring-2 ring-primary' : 'border-border'
+                      )}
+                    >
+                      <Image
+                        src={item.url}
+                        alt={item.alt_text || item.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'upload' && (
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="file">Select File</Label>
+                <Input
+                  id="file"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                  disabled={uploading}
+                />
+              </div>
+              {uploadFile && (
+                <div className="text-sm text-muted-foreground">
+                  Selected: {uploadFile.name} ({(uploadFile.size / 1024).toFixed(1)} KB)
+                </div>
+              )}
+              <Button
+                onClick={handleUpload}
+                disabled={!uploadFile || uploading}
+                className="w-full"
+              >
+                {uploading ? 'Uploading...' : 'Upload'}
+              </Button>
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleSelect} disabled={!selectedId}>
+            Select
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}

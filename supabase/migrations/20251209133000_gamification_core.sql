@@ -69,40 +69,72 @@ alter table public.user_streaks enable row level security;
 alter table public.user_progress enable row level security;
 
 -- Policies: users can read their own rows; service role can manage
-create policy "users_can_select_own_user_coins"
-  on public.user_coins for select
-  using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_coins' and policyname='users_can_select_own_user_coins') then
+    create policy "users_can_select_own_user_coins"
+      on public.user_coins for select
+      using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+  end if;
+end $$;
 
-create policy "service_can_modify_user_coins"
-  on public.user_coins for all
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_coins' and policyname='service_can_modify_user_coins') then
+    create policy "service_can_modify_user_coins"
+      on public.user_coins for all
+      using (auth.role() = 'service_role')
+      with check (auth.role() = 'service_role');
+  end if;
+end $$;
 
-create policy "users_can_select_own_coin_transactions"
-  on public.coin_transactions for select
-  using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='coin_transactions' and policyname='users_can_select_own_coin_transactions') then
+    create policy "users_can_select_own_coin_transactions"
+      on public.coin_transactions for select
+      using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+  end if;
+end $$;
 
-create policy "service_can_insert_coin_transactions"
-  on public.coin_transactions for insert
-  with check (auth.role() = 'service_role');
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='coin_transactions' and policyname='service_can_insert_coin_transactions') then
+    create policy "service_can_insert_coin_transactions"
+      on public.coin_transactions for insert
+      with check (auth.role() = 'service_role');
+  end if;
+end $$;
 
-create policy "users_can_select_own_user_streaks"
-  on public.user_streaks for select
-  using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_streaks' and policyname='users_can_select_own_user_streaks') then
+    create policy "users_can_select_own_user_streaks"
+      on public.user_streaks for select
+      using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+  end if;
+end $$;
 
-create policy "service_can_modify_user_streaks"
-  on public.user_streaks for all
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_streaks' and policyname='service_can_modify_user_streaks') then
+    create policy "service_can_modify_user_streaks"
+      on public.user_streaks for all
+      using (auth.role() = 'service_role')
+      with check (auth.role() = 'service_role');
+  end if;
+end $$;
 
-create policy "users_can_select_own_user_progress"
-  on public.user_progress for select
-  using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_progress' and policyname='users_can_select_own_user_progress') then
+    create policy "users_can_select_own_user_progress"
+      on public.user_progress for select
+      using (auth.uid() = user_id or tenant_id = any(get_user_tenant_ids()));
+  end if;
+end $$;
 
-create policy "service_can_modify_user_progress"
-  on public.user_progress for all
-  using (auth.role() = 'service_role')
-  with check (auth.role() = 'service_role');
+do $$ begin
+  if not exists (select 1 from pg_policies where schemaname='public' and tablename='user_progress' and policyname='service_can_modify_user_progress') then
+    create policy "service_can_modify_user_progress"
+      on public.user_progress for all
+      using (auth.role() = 'service_role')
+      with check (auth.role() = 'service_role');
+  end if;
+end $$;
 
 comment on table public.user_coins is 'Gamification coin balances per user and tenant';
 comment on table public.coin_transactions is 'Earn/spend ledger for gamification coins';

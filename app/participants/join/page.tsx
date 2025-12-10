@@ -40,9 +40,11 @@ export default function JoinSessionPage() {
       // Save token to localStorage for rejoin
       localStorage.setItem('participant_token', data.participant.token);
       localStorage.setItem('participant_session_id', data.participant.sessionId);
+      localStorage.setItem('participant_session_code', sessionCode.trim().toUpperCase());
+      localStorage.setItem('participant_display_name', displayName.trim());
       
       // Redirect to participant view
-      router.push(`/participants/session/${data.session.id}`);
+      router.push(`/participants/view`);
       
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');

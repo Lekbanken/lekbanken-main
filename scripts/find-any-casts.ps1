@@ -3,13 +3,6 @@
 
 Write-Host "🔍 Söker efter 'as any' casts i projektet..." -ForegroundColor Cyan
 
-$patterns = @(
-    "(supabase as any)",
-    "} as any",
-    ": any",
-    "as any)"
-)
-
 $files = Get-ChildItem -Path . -Include *.ts,*.tsx -Recurse -File | 
     Where-Object { $_.FullName -notmatch "node_modules" -and $_.FullName -notmatch ".next" -and $_.FullName -notmatch "types\\supabase.ts" }
 

@@ -3,6 +3,9 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { requireMfaIfEnabled } from '@/lib/utils/mfaGuard'
+import type { Database } from '@/lib/supabase/database.types'
+
+type TenantRole = Database['public']['Enums']['tenant_role_enum']
 
 export async function GET(
   _request: Request,
@@ -43,7 +46,7 @@ export async function POST(
 
   const body = (await request.json().catch(() => ({}))) as {
     user_id?: string
-    role?: string
+    role?: TenantRole
     status?: string
     is_primary?: boolean
     seat_assignment_id?: string | null
@@ -68,7 +71,7 @@ export async function POST(
     .insert({
       tenant_id: tenantId,
       user_id: body.user_id,
-      role: body.role ?? 'member',
+      role: (body.role ?? 'member') as TenantRole,
       status: body.status ?? 'active',
       is_primary: body.is_primary ?? false,
       seat_assignment_id: body.seat_assignment_id ?? null,

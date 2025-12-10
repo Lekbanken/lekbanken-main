@@ -3,6 +3,9 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { randomUUID } from 'crypto'
+import type { Database } from '@/lib/supabase/database.types'
+
+type TenantRole = Database['public']['Enums']['tenant_role_enum']
 
 export async function POST(
   request: Request,
@@ -49,7 +52,7 @@ export async function POST(
     .insert({
       tenant_id: tenantId,
       email: body.email,
-      role: body.role ?? 'member',
+      role: (body.role ?? 'member') as TenantRole,
       token,
       invited_by: user.id,
       expires_at: body.expires_at ? new Date(body.expires_at).toISOString() : null,

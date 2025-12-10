@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import type { Database } from '@/lib/supabase/database.types'
+
+type TenantRole = Database['public']['Enums']['tenant_role_enum']
 
 export async function POST(
   _request: Request,
@@ -45,7 +48,7 @@ export async function POST(
     {
       tenant_id: invite.tenant_id,
       user_id: user.id,
-      role: invite.role,
+      role: invite.role as TenantRole,
       status: 'active',
     },
     { onConflict: 'tenant_id,user_id' }

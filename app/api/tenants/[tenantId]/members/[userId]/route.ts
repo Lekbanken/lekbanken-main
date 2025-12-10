@@ -3,6 +3,9 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
 import { requireMfaIfEnabled } from '@/lib/utils/mfaGuard'
+import type { Database } from '@/lib/supabase/database.types'
+
+type TenantRole = Database['public']['Enums']['tenant_role_enum']
 
 export async function PATCH(
   request: Request,
@@ -24,7 +27,7 @@ export async function PATCH(
   }
 
   const body = (await request.json().catch(() => ({}))) as {
-    role?: string
+    role?: TenantRole
     status?: string
     is_primary?: boolean
     seat_assignment_id?: string | null

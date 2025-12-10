@@ -30,9 +30,9 @@ export async function POST(request: Request) {
   const { data, error } = await supabase
     .from('tenants')
     .insert({
-      name: body.name,
-      type: body.type,
-      status: body.status,
+      name: body.name || '',
+      type: body.type || 'standard',
+      status: body.status || 'active',
       default_language: body.default_language,
       default_theme: body.default_theme,
       demo_flag: body.demo_flag ?? false,

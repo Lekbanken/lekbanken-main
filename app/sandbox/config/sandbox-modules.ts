@@ -110,7 +110,7 @@ export const sandboxCategories: SandboxCategory[] = [
       { 
         id: 'tokens', 
         label: 'Design Tokens', 
-        href: '/sandbox/tokens', 
+        href: '/sandbox/design-system', 
         description: 'CSS-variabler och semantiska tokens', 
         status: 'done',
         tokens: ['*'],
@@ -392,6 +392,24 @@ export const sandboxCategories: SandboxCategory[] = [
         status: 'done',
         components: ['@/components/navigation/Header', '@/components/navigation/MobileNav'],
         routes: ['/', '/*'],
+      },
+    ],
+  },
+  {
+    id: 'testing',
+    label: 'Testing & Development',
+    href: '/sandbox/testing',
+    description: 'Test och utvecklingsverktyg',
+    icon: CogIcon,
+    modules: [
+      { 
+        id: 'stripe-test', 
+        label: 'Stripe Payment Test', 
+        href: '/sandbox/stripe-test', 
+        description: 'Testa Stripe Payment Element och subscription flow', 
+        status: 'done',
+        components: ['@/components/billing/SubscriptionCheckout', '@/components/billing/StripePaymentElement'],
+        routes: ['/sandbox/stripe-test'],
       },
     ],
   },

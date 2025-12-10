@@ -30,14 +30,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
 
-  const payload: Partial<ProductRow> = {
+  const payload = {
     name: body.name?.trim() || '',
-    category: body.category?.trim() || '',
+    category: body.category?.trim() || 'general',
     description: body.description?.trim() || null,
     status: body.status || 'active',
     capabilities: Array.isArray(body.capabilities) ? body.capabilities : [],
     product_key: body.product_key?.trim() || null,
-  }
+  } as const
 
   const { data, error } = await supabase
     .from('products')

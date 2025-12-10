@@ -1,9 +1,6 @@
-import Stripe from 'stripe'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
-
-const stripeSecret = process.env.STRIPE_SECRET_KEY
-const stripe = stripeSecret ? new Stripe(stripeSecret, { apiVersion: '2024-06-20' }) : null
+import { stripe } from '@/lib/stripe/config'
 
 async function requireUser() {
   const supabase = await createServerRlsClient()
@@ -30,15 +27,6 @@ async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRl
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ tenantId: string }> }) {
   const { tenantId } = await params
-
-  if (process.env.STRIPE_ENABLED !== 'true') {
-    return NextResponse.json({ error: 'Stripe integration temporarily disabled' }, { status: 501 })
-  }
-
-  if (!stripe) {
-    console.error('[billing/stripe-invoice] Missing STRIPE_SECRET_KEY')
-    return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
-  }
 
   const { supabase, user } = await requireUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

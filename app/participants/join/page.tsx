@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useParticipantRejoin } from '@/features/participants/hooks/useParticipantRejoin';
 
 export default function JoinSessionPage() {
   const [sessionCode, setSessionCode] = useState('');
@@ -15,6 +16,18 @@ export default function JoinSessionPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  
+  // Try to rejoin if token exists
+  useParticipantRejoin({
+    enabled: true,
+    onSuccess: () => {
+      // Redirect to participant view if rejoin successful
+      router.push('/participants/view');
+    },
+    onError: () => {
+      // Rejoin failed, stay on join page
+    },
+  });
   
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -37,22 +37,21 @@ const isProduction = process.env.NODE_ENV === 'production'
  * Determines which Stripe keys to use based on environment.
  * 
  * LOGIC:
- * - Development: Use TEST keys
- * - Production: Use LIVE keys
- * - Can be overridden with STRIPE_USE_LIVE_KEYS=true in dev
+ * - Always use TEST keys unless explicitly enabled via STRIPE_USE_LIVE_KEYS=true
+ * - This prevents accidental live charges during development/testing
  */
-const useLiveKeys = isProduction || getOptionalEnv('STRIPE_USE_LIVE_KEYS') === 'true'
+const useLiveKeys = getOptionalEnv('STRIPE_USE_LIVE_KEYS') === 'true'
 
-// Get appropriate keys
-const secretKey = useLiveKeys
+// Get appropriate keys (fallback to test if live not available)
+const secretKey = useLiveKeys && getOptionalEnv('STRIPE_LIVE_SECRET_KEY')
   ? getRequiredEnv('STRIPE_LIVE_SECRET_KEY')
   : getRequiredEnv('STRIPE_TEST_SECRET_KEY')
 
-const publishableKey = useLiveKeys
+const publishableKey = useLiveKeys && getOptionalEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
   ? getRequiredEnv('NEXT_PUBLIC_STRIPE_LIVE_PUBLISHABLE_KEY')
   : getRequiredEnv('NEXT_PUBLIC_STRIPE_TEST_PUBLISHABLE_KEY')
 
-const webhookSecret = useLiveKeys
+const webhookSecret = useLiveKeys && getOptionalEnv('STRIPE_LIVE_WEBHOOK_SECRET')
   ? getRequiredEnv('STRIPE_LIVE_WEBHOOK_SECRET')
   : getRequiredEnv('STRIPE_TEST_WEBHOOK_SECRET')
 

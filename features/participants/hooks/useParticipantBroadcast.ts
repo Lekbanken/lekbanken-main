@@ -12,7 +12,7 @@ import { createBrowserClient } from '@/lib/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface BroadcastEvent {
-  type: 'session_paused' | 'session_resumed' | 'session_ended' | 'host_message' | 'participant_joined' | 'participant_left' | 'role_changed';
+  type: 'session_paused' | 'session_resumed' | 'session_ended' | 'session_locked' | 'session_unlocked' | 'host_message' | 'participant_joined' | 'participant_left' | 'role_changed';
   payload?: Record<string, unknown>;
   timestamp: string;
 }

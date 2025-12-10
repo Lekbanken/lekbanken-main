@@ -75,19 +75,23 @@ export default function ParticipantViewPage() {
   const formatBroadcastMessage = (event: BroadcastEvent): string | null => {
     switch (event.type) {
       case 'session_paused':
-        return '⏸️ Session paused by host';
+        return '⏸️ Sessionen pausad av värden';
       case 'session_resumed':
-        return '▶️ Session resumed';
+        return '▶️ Sessionen återupptagen';
+      case 'session_locked':
+        return '🔒 Sessionen låst - inga nya deltagare kan gå med';
+      case 'session_unlocked':
+        return '🔓 Sessionen upplåst - nya deltagare kan gå med';
       case 'session_ended':
-        return '🏁 Session ended by host';
+        return '🏁 Sessionen avslutad av värden';
       case 'host_message':
-        return `💬 ${event.payload?.message || 'Message from host'}`;
+        return `💬 ${event.payload?.message || 'Meddelande från värden'}`;
       case 'participant_joined':
-        return `👋 ${event.payload?.displayName || 'Someone'} joined`;
+        return `👋 ${event.payload?.displayName || 'Någon'} gick med`;
       case 'participant_left':
-        return `👋 ${event.payload?.displayName || 'Someone'} left`;
+        return `👋 ${event.payload?.displayName || 'Någon'} lämnade`;
       case 'role_changed':
-        return `👤 Your role changed to ${event.payload?.newRole || 'unknown'}`;
+        return `👤 Din roll ändrades till ${event.payload?.newRole || 'okänd'}`;
       default:
         return null;
     }

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { ParticipantList } from '@/features/participants/components/ParticipantList';
 import { SessionControlPanel } from '@/features/participants/components/SessionControlPanel';
+import { LiveProgressDashboard } from '@/features/participants/components/LiveProgressDashboard';
 import type { Database } from '@/types/supabase';
 
 type ParticipantSession = Database['public']['Tables']['participant_sessions']['Row'];
@@ -215,6 +216,11 @@ export default function HostDashboardPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Live Progress Dashboard */}
+        <div className="mb-6">
+          <LiveProgressDashboard sessionId={session.id} />
         </div>
 
         {/* Participant List */}

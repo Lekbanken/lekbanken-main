@@ -92,6 +92,10 @@ export default function ParticipantViewPage() {
         return `👋 ${event.payload?.displayName || 'Någon'} lämnade`;
       case 'role_changed':
         return `👤 Din roll ändrades till ${event.payload?.newRole || 'okänd'}`;
+      case 'achievement_unlocked':
+        return `🏆 Utmärkelse upplåst: ${event.payload?.achievement_name || 'Okänd'}!`;
+      case 'progress_updated':
+        return null; // Don't show progress updates as messages (too noisy)
       default:
         return null;
     }

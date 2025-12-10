@@ -28,7 +28,7 @@ export async function recordLoginSession(params: Params) {
 
     if (existing) {
       deviceId = existing.id
-      await loose
+      await supabase
         .from('user_devices')
         .update({
           user_agent: params.userAgent ?? null,
@@ -36,7 +36,7 @@ export async function recordLoginSession(params: Params) {
           ip_last: params.ip ?? null,
           last_seen_at: now,
         })
-        .eq('id', existing.id)
+        .eq('id', existing.id!)
     } else {
       const { data: inserted } = await loose
         .from('user_devices')

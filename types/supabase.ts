@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -154,6 +154,115 @@ export type Database = {
           },
         ]
       }
+      billing_accounts: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          provider: string
+          provider_customer_id: string
+          tenant_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          provider: string
+          provider_customer_id: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          provider?: string
+          provider_customer_id?: string
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_accounts_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_accounts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_events: {
+        Row: {
+          created_at: string
+          event_key: string | null
+          event_type: string
+          id: string
+          invoice_id: string | null
+          payload: Json
+          payment_id: string | null
+          source: string | null
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_key?: string | null
+          event_type: string
+          id?: string
+          invoice_id?: string | null
+          payload?: Json
+          payment_id?: string | null
+          source?: string | null
+          status?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_key?: string | null
+          event_type?: string
+          id?: string
+          invoice_id?: string | null
+          payload?: Json
+          payment_id?: string | null
+          source?: string | null
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_events_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_events_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       billing_history: {
         Row: {
           amount_charged: number | null
@@ -272,6 +381,44 @@ export type Database = {
           user_limit?: number | null
         }
         Relationships: []
+      }
+      billing_product_features: {
+        Row: {
+          billing_product_id: string
+          created_at: string
+          description: string | null
+          feature_key: string
+          id: string
+          label: string | null
+          updated_at: string
+        }
+        Insert: {
+          billing_product_id: string
+          created_at?: string
+          description?: string | null
+          feature_key: string
+          id?: string
+          label?: string | null
+          updated_at?: string
+        }
+        Update: {
+          billing_product_id?: string
+          created_at?: string
+          description?: string | null
+          feature_key?: string
+          id?: string
+          label?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_product_features_billing_product_id_fkey"
+            columns: ["billing_product_id"]
+            isOneToOne: false
+            referencedRelation: "billing_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       billing_products: {
         Row: {
@@ -490,6 +637,51 @@ export type Database = {
           },
           {
             foreignKeyName: "challenge_participation_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coin_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          tenant_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          tenant_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          tenant_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_transactions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coin_transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -1918,6 +2110,7 @@ export type Database = {
           stripe_invoice_id: string | null
           subscription_id: string | null
           tenant_id: string
+          updated_at: string
         }
         Insert: {
           amount: number
@@ -1940,6 +2133,7 @@ export type Database = {
           stripe_invoice_id?: string | null
           subscription_id?: string | null
           tenant_id: string
+          updated_at?: string
         }
         Update: {
           amount?: number
@@ -1962,6 +2156,7 @@ export type Database = {
           stripe_invoice_id?: string | null
           subscription_id?: string | null
           tenant_id?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -3439,7 +3634,7 @@ export type Database = {
       }
       products: {
         Row: {
-          capabilities: Json | null
+          capabilities: Json
           category: string
           created_at: string
           description: string | null
@@ -3450,7 +3645,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          capabilities?: Json | null
+          capabilities?: Json
           category: string
           created_at?: string
           description?: string | null
@@ -3461,7 +3656,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          capabilities?: Json | null
+          capabilities?: Json
           category?: string
           created_at?: string
           description?: string | null
@@ -4089,6 +4284,51 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subscription_items: {
+        Row: {
+          billing_product_id: string
+          created_at: string
+          id: string
+          metadata: Json
+          quantity: number
+          subscription_id: string
+          updated_at: string
+        }
+        Insert: {
+          billing_product_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          quantity?: number
+          subscription_id: string
+          updated_at?: string
+        }
+        Update: {
+          billing_product_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          quantity?: number
+          subscription_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_items_billing_product_id_fkey"
+            columns: ["billing_product_id"]
+            isOneToOne: false
+            referencedRelation: "billing_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_items_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_subscriptions"
             referencedColumns: ["id"]
           },
         ]
@@ -4941,6 +5181,96 @@ export type Database = {
           },
         ]
       }
+      user_audit_logs: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_audit_logs_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_coins: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          tenant_id: string | null
+          total_earned: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          tenant_id?: string | null
+          total_earned?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          tenant_id?: string | null
+          total_earned?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_coins_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_coins_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_currency_balances: {
         Row: {
           balance: number | null
@@ -4997,6 +5327,94 @@ export type Database = {
             foreignKeyName: "user_currency_balances_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_devices: {
+        Row: {
+          device_fingerprint: string | null
+          device_type: string | null
+          first_seen_at: string | null
+          id: string
+          ip_last: unknown
+          last_seen_at: string | null
+          metadata: Json | null
+          risk_score: number | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          device_fingerprint?: string | null
+          device_type?: string | null
+          first_seen_at?: string | null
+          id?: string
+          ip_last?: unknown
+          last_seen_at?: string | null
+          metadata?: Json | null
+          risk_score?: number | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          device_fingerprint?: string | null
+          device_type?: string | null
+          first_seen_at?: string | null
+          id?: string
+          ip_last?: unknown
+          last_seen_at?: string | null
+          metadata?: Json | null
+          risk_score?: number | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_devices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_mfa: {
+        Row: {
+          created_at: string
+          enforced_reason: string | null
+          enrolled_at: string | null
+          last_verified_at: string | null
+          methods: Json | null
+          recovery_codes_hashed: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enforced_reason?: string | null
+          enrolled_at?: string | null
+          last_verified_at?: string | null
+          methods?: Json | null
+          recovery_codes_hashed?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enforced_reason?: string | null
+          enrolled_at?: string | null
+          last_verified_at?: string | null
+          methods?: Json | null
+          recovery_codes_hashed?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_mfa_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -5087,6 +5505,104 @@ export type Database = {
           },
           {
             foreignKeyName: "user_preferences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          job_title: string | null
+          locale: string | null
+          metadata: Json | null
+          organisation: string | null
+          phone: string | null
+          timezone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          job_title?: string | null
+          locale?: string | null
+          metadata?: Json | null
+          organisation?: string | null
+          phone?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          job_title?: string | null
+          locale?: string | null
+          metadata?: Json | null
+          organisation?: string | null
+          phone?: string | null
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_profiles_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_progress: {
+        Row: {
+          created_at: string
+          current_xp: number
+          id: string
+          level: number
+          next_level_xp: number
+          tenant_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_xp?: number
+          id?: string
+          level?: number
+          next_level_xp?: number
+          tenant_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_xp?: number
+          id?: string
+          level?: number
+          next_level_xp?: number
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_progress_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -5239,14 +5755,119 @@ export type Database = {
           },
         ]
       }
+      user_sessions: {
+        Row: {
+          device_id: string | null
+          id: string
+          ip: unknown
+          last_login_at: string | null
+          last_seen_at: string | null
+          revoked_at: string | null
+          risk_flags: Json | null
+          supabase_session_id: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          device_id?: string | null
+          id?: string
+          ip?: unknown
+          last_login_at?: string | null
+          last_seen_at?: string | null
+          revoked_at?: string | null
+          risk_flags?: Json | null
+          supabase_session_id?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          device_id?: string | null
+          id?: string
+          ip?: unknown
+          last_login_at?: string | null
+          last_seen_at?: string | null
+          revoked_at?: string | null
+          risk_flags?: Json | null
+          supabase_session_id?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "user_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_streaks: {
+        Row: {
+          best_streak_days: number
+          created_at: string
+          current_streak_days: number
+          id: string
+          last_active_date: string | null
+          tenant_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          best_streak_days?: number
+          created_at?: string
+          current_streak_days?: number
+          id?: string
+          last_active_date?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          best_streak_days?: number
+          created_at?: string
+          current_streak_days?: number
+          id?: string
+          last_active_date?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_streaks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_streaks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           avatar_url: string | null
           created_at: string
           email: string
+          email_verified: boolean | null
           full_name: string | null
+          global_role: Database["public"]["Enums"]["global_role_enum"] | null
           id: string
           language: Database["public"]["Enums"]["language_code_enum"]
+          mfa_enforced: boolean | null
           preferred_theme: string | null
           role: string
           show_theme_toggle_in_header: boolean
@@ -5256,9 +5877,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email: string
+          email_verified?: boolean | null
           full_name?: string | null
+          global_role?: Database["public"]["Enums"]["global_role_enum"] | null
           id: string
           language?: Database["public"]["Enums"]["language_code_enum"]
+          mfa_enforced?: boolean | null
           preferred_theme?: string | null
           role?: string
           show_theme_toggle_in_header?: boolean
@@ -5268,9 +5892,12 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           email?: string
+          email_verified?: boolean | null
           full_name?: string | null
+          global_role?: Database["public"]["Enums"]["global_role_enum"] | null
           id?: string
           language?: Database["public"]["Enums"]["language_code_enum"]
+          mfa_enforced?: boolean | null
           preferred_theme?: string | null
           role?: string
           show_theme_toggle_in_header?: boolean
@@ -5327,7 +5954,64 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      user_tenant_memberships: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_primary: boolean | null
+          role: Database["public"]["Enums"]["tenant_role_enum"] | null
+          seat_assignment_id: string | null
+          status: string | null
+          tenant_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_primary?: boolean | null
+          role?: Database["public"]["Enums"]["tenant_role_enum"] | null
+          seat_assignment_id?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_primary?: boolean | null
+          role?: Database["public"]["Enums"]["tenant_role_enum"] | null
+          seat_assignment_id?: string | null
+          status?: string | null
+          tenant_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tenant_memberships_seat_assignment_id_fkey"
+            columns: ["seat_assignment_id"]
+            isOneToOne: false
+            referencedRelation: "tenant_seat_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_tenant_memberships_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_tenant_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       add_initial_tenant_owner: {
@@ -5374,13 +6058,13 @@ export type Database = {
       is_tenant_member: { Args: { target_tenant: string }; Returns: boolean }
       to_text_array_safe:
         | {
-            Args: { input: string[] }
+            Args: { input: string }
             Returns: {
               error: true
             } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
           }
         | {
-            Args: { input: string }
+            Args: { input: string[] }
             Returns: {
               error: true
             } & "Could not choose the best candidate function between: public.to_text_array_safe(input => text), public.to_text_array_safe(input => _text). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
@@ -5391,6 +6075,11 @@ export type Database = {
       feedback_type_enum: "bug" | "feature_request" | "improvement" | "other"
       game_media_kind: "cover" | "gallery"
       game_status_enum: "draft" | "published"
+      global_role_enum:
+        | "system_admin"
+        | "private_user"
+        | "demo_private_user"
+        | "member"
       invoice_status_enum:
         | "draft"
         | "issued"
@@ -5413,7 +6102,15 @@ export type Database = {
       seat_assignment_status_enum: "active" | "released" | "pending" | "revoked"
       session_status_enum: "active" | "paused" | "completed" | "abandoned"
       subscription_status_enum: "active" | "paused" | "canceled" | "trial"
-      tenant_role_enum: "owner" | "admin" | "editor" | "member"
+      tenant_role_enum:
+        | "owner"
+        | "admin"
+        | "editor"
+        | "member"
+        | "organisation_admin"
+        | "organisation_user"
+        | "demo_org_admin"
+        | "demo_org_user"
       tenant_status_enum: "active" | "suspended" | "trial" | "demo" | "archived"
       tenant_type_enum: "school" | "sports" | "workplace" | "private" | "demo"
       ticket_priority_enum: "low" | "medium" | "high" | "urgent"
@@ -5554,6 +6251,12 @@ export const Constants = {
       feedback_type_enum: ["bug", "feature_request", "improvement", "other"],
       game_media_kind: ["cover", "gallery"],
       game_status_enum: ["draft", "published"],
+      global_role_enum: [
+        "system_admin",
+        "private_user",
+        "demo_private_user",
+        "member",
+      ],
       invoice_status_enum: [
         "draft",
         "issued",
@@ -5578,7 +6281,16 @@ export const Constants = {
       seat_assignment_status_enum: ["active", "released", "pending", "revoked"],
       session_status_enum: ["active", "paused", "completed", "abandoned"],
       subscription_status_enum: ["active", "paused", "canceled", "trial"],
-      tenant_role_enum: ["owner", "admin", "editor", "member"],
+      tenant_role_enum: [
+        "owner",
+        "admin",
+        "editor",
+        "member",
+        "organisation_admin",
+        "organisation_user",
+        "demo_org_admin",
+        "demo_org_user",
+      ],
       tenant_status_enum: ["active", "suspended", "trial", "demo", "archived"],
       tenant_type_enum: ["school", "sports", "workplace", "private", "demo"],
       ticket_priority_enum: ["low", "medium", "high", "urgent"],

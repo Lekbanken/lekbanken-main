@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     console.warn('[accounts/sessions/revoke] admin signOut warning', err)
   }
 
-  const { error } = await loose
+  const { error } = await supabase
     .from('user_sessions')
     .update({ revoked_at: new Date().toISOString() })
     .eq('user_id', user.id)

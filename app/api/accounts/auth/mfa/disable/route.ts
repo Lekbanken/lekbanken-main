@@ -22,8 +22,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to disable factor' }, { status: 400 })
   }
 
-  const loose = supabase as unknown as LooseSupabase
-  const { error: mfaErr } = await loose
+  const { error: mfaErr } = await supabase
     .from('user_mfa')
     .update({ enforced_reason: null })
     .eq('user_id', user.id)

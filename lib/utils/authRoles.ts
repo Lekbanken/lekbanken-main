@@ -42,6 +42,10 @@ export const permissionMatrix = {
     admin: ['admin', 'editor', 'member'],
     editor: ['editor', 'member'],
     member: ['member'],
+    organisation_admin: ['admin', 'editor', 'member'],
+    organisation_user: ['member'],
+    demo_org_admin: ['admin', 'editor', 'member'],
+    demo_org_user: ['member'],
   },
 }
 

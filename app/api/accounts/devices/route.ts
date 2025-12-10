@@ -69,7 +69,7 @@ export async function POST(request: Request) {
 
     if (existing) {
       deviceId = existing.id
-      const { error: updateErr } = await loose
+      const { error: updateErr } = await supabase
         .from('user_devices')
         .update({
           user_agent: body.user_agent ?? null,
@@ -77,7 +77,7 @@ export async function POST(request: Request) {
           ip_last: ip,
           last_seen_at: now,
         })
-        .eq('id', existing.id)
+        .eq('id', existing.id!)
       if (updateErr) {
         console.error('[accounts/devices] update error', updateErr)
         return NextResponse.json({ error: 'Failed to update device' }, { status: 500 })

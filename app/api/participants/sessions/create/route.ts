@@ -10,6 +10,8 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { logger } from '@/lib/utils/logger';
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
+import { errorTracker } from '@/lib/utils/error-tracker';
 
 interface CreateSessionRequest {
   displayName: string;
@@ -28,6 +30,10 @@ interface CreateSessionRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Apply rate limiting for session creation
+  const rateLimitResponse = applyRateLimitMiddleware(request, 'api');
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     // Authenticate user
     const supabase = await createServerRlsClient();
@@ -114,9 +120,12 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    logger.error('Failed to create participant session', error as Error, {
-      endpoint: '/api/participants/sessions/create',
-    });
+    // Track error to Supabase
+    await errorTracker.api(
+      '/api/participants/sessions/create',
+      'POST',
+      error
+    );
     
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     

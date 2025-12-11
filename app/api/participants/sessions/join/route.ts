@@ -15,6 +15,8 @@ import {
 } from '@/lib/services/participants/participant-token';
 import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
 import { logger } from '@/lib/utils/logger';
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
+import { errorTracker } from '@/lib/utils/error-tracker';
 
 interface JoinSessionRequest {
   sessionCode: string;
@@ -23,6 +25,10 @@ interface JoinSessionRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Apply strict rate limiting for join endpoint (prevent abuse)
+  const rateLimitResponse = applyRateLimitMiddleware(request, 'strict');
+  if (rateLimitResponse) return rateLimitResponse;
+
   try {
     // Parse request body
     const body: JoinSessionRequest = await request.json();
@@ -169,9 +175,12 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    logger.error('Failed to process join request', error as Error, {
-      endpoint: '/api/participants/sessions/join',
-    });
+    // Track error to Supabase error_tracking table
+    await errorTracker.api(
+      '/api/participants/sessions/join',
+      'POST',
+      error
+    );
     
     return NextResponse.json(
       { error: 'Failed to join session', details: error instanceof Error ? error.message : 'Unknown error' },

@@ -1,12 +1,26 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Bars3Icon, XMarkIcon, AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
-import { ModuleNav } from './ModuleNavV2';
-import { ContextPanel } from './ContextPanel';
 import { ViewportFrame } from './ViewportFrame';
 import { SandboxThemeProvider } from './SandboxThemeProvider';
+
+// Defer heavier panels to client only to reduce initial render cost
+const ModuleNav = dynamic(() => import('./ModuleNavV2').then((m) => m.ModuleNav), {
+  ssr: false,
+  loading: () => <div className="p-4 text-sm text-muted-foreground">Laddar navigation…</div>,
+});
+
+const ContextPanel = dynamic(() => import('./ContextPanel').then((m) => m.ContextPanel), {
+  ssr: false,
+  loading: () => (
+    <aside className="h-full border-l border-border bg-card p-4 text-sm text-muted-foreground">
+      Laddar panel…
+    </aside>
+  ),
+});
 
 interface SandboxShellProps {
   children: React.ReactNode;

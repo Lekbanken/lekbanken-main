@@ -14,8 +14,8 @@ Last Updated: 2025-12-11
 - Backup failures/misses (see `backup_dr.md`).
 
 ## Destinations
-- Slack channel (e.g., #alerts) for all.
-- PagerDuty/on-call for SEV1/2-class signals (auth, API 5xx, Stripe webhooks).
+- Slack channel (e.g., #alerts) for all — replace with actual channel.
+- PagerDuty/on-call for SEV1/2-class signals (auth, API 5xx, Stripe webhooks) — fill service name.
 
 ## Ownership
 - Auth/Accounts: platform team.
@@ -33,3 +33,4 @@ Last Updated: 2025-12-11
 ## Open Items
 - Define exact Slack channel and PagerDuty service IDs.
 - Add rate-limit alerts per endpoint group once baseline is known.
+- Hook alerts to runbooks (link to incident_response/backup_dr) in tooling.

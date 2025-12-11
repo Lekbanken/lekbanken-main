@@ -25,8 +25,8 @@ Last Updated: 2025-12-11
 6) **Postmortem:** Within 48h for SEV1/2, 5d for SEV3. Include timeline, root cause, blast radius, fixes, preventions.
 
 ## Communication Channels
-- Primary: Slack #status (alerts + human updates).
-- Escalation: PagerDuty/phone for SEV1/2.
+- Primary: Slack #status (alerts + human updates). Replace with actual channel when known.
+- Escalation: PagerDuty/phone for SEV1/2 (fill service/on-call rotation).
 - External (if needed): Status page or email template (TBD).
 
 ## Runbooks to Keep Handy
@@ -36,5 +36,5 @@ Last Updated: 2025-12-11
 - Rotate secrets (Supabase keys, Stripe keys).
 
 ## Open Items
-- Add actual contact roster / on-call rotation.
-- Link to status page template and comms templates.
+- Add actual contact roster / on-call rotation (names, phone).
+- Add status page link and comms templates (Slack/email).

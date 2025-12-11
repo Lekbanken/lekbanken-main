@@ -36,6 +36,7 @@ export const moduleGroups: ModuleGroup[] = [
       { id: 'logo', label: 'Logo & Wordmark', href: '/sandbox/logo', description: 'Logo layouts and sizing' },
       { id: 'colors', label: 'Colors', href: '/sandbox/colors', description: 'Accent hues and palettes' },
       { id: 'gamification', label: 'Gamification', href: '/sandbox/gamification', description: 'Lekvalutan, achievements' },
+      { id: 'achievements', label: 'Achievements & Scoreboard', href: '/sandbox/achievements', description: 'Badges och scoreboard-overlay' },
       { id: 'spacing', label: 'Spacing', href: '/sandbox/spacing', description: 'Spacing scale, border radius' },
     ],
   },
@@ -55,6 +56,7 @@ export const moduleGroups: ModuleGroup[] = [
     defaultExpanded: false,
     modules: [
       { id: 'admin-main', label: 'Admin Overview', href: '/sandbox/admin', description: 'Dashboard, Users, Content, Analytics' },
+      { id: 'admin-components', label: 'Admin Components', href: '/sandbox/admin/components', description: 'Stat cards, empty/error states' },
     ],
   },
   {
@@ -80,6 +82,7 @@ export const moduleGroups: ModuleGroup[] = [
       { id: 'forms', label: 'Forms', href: '/sandbox/forms', description: 'Input, Textarea, Select' },
       { id: 'feedback', label: 'Feedback & States', href: '/sandbox/feedback', description: 'Empty, Error, Loading, Skeletons' },
       { id: 'interactive', label: 'Interactive', href: '/sandbox/interactive', description: 'Dialog, Dropdown, Tabs, etc.' },
+      { id: 'ui-extras', label: 'UI Extras', href: '/sandbox/components/ui-extras', description: 'Toast, sheet, media picker, states' },
     ],
   },
 ];

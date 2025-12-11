@@ -3,7 +3,7 @@
 **Date:** 2025-12-11  
 **Phase:** 2 – Backend ↔ Frontend Validation  
 **Total Endpoints Inventoried:** 83  
-**Status:** 🔄 IN PROGRESS (49/83 = 59%)
+**Status:** 🔄 IN PROGRESS (62/83 = 75%)
 
 ---
 
@@ -90,32 +90,33 @@ interface FrontendType { id: string; name: string; description?: string }
 #### Subscriptions
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/billing/create-subscription` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/products` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/subscription` | GET/POST/PATCH | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/stripe-customer` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/billing/create-subscription` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Stripe integration, auto tax |
+| `/api/billing/products` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Lists active billing products |
+| `/api/billing/tenants/[tenantId]/subscription` | GET/POST/PATCH | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Upsert logic, owner/admin only |
+| `/api/billing/tenants/[tenantId]/stripe-customer` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Creates Stripe customer |
 
 #### Invoices & Payments
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/billing/tenants/[tenantId]/invoices` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments/[paymentId]` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/invoices/stripe` | POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/billing/tenants/[tenantId]/invoices` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Filter by status, 200 limit |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]` | GET/PATCH | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Auto paid_at on status=paid |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Fetches invoice first |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments/[paymentId]` | GET/PATCH | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Tenant validation via invoice |
+| `/api/billing/tenants/[tenantId]/invoices/stripe` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Creates + finalizes + sends |
 
 #### Seats
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/billing/tenants/[tenantId]/seats` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/billing/tenants/[tenantId]/seats/[seatId]` | PATCH/DELETE | ? | ? | ? | ? | ⏳ TODO |
+| `/api/billing/tenants/[tenantId]/seats` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Validates seat availability |
+| `/api/billing/tenants/[tenantId]/seats/[seatId]` | PATCH | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - ⚠️ DELETE missing |
 
 #### Webhooks
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/billing/webhooks/stripe` | POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/billing/webhooks/stripe` | POST | ✅ | ⚠️ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - supabaseAdmin bypasses RLS |
 
-**Billing Domain Summary:** 13 endpoints – ⏳ Validation pending
+**Billing Domain Summary:** 13 endpoints – **13 validated ✅ (Dec 11)**  
+**Issues Found:** 1 missing DELETE handler (seats P2), webhook uses admin client (correct)
 
 ---
 
@@ -1431,3 +1432,324 @@ export async function GET(request, context) {
 **Missing Endpoints:** 3 GET handlers + 1 DELETE (all P2)  
 **Critical Issues:** 0  
 **Overall Quality:** Good – Core planning functionality working, missing convenience endpoints
+
+---
+
+### ✅ Billing Domain – Complete (13/13 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Production-ready Stripe integration with comprehensive invoice/payment tracking
+
+#### Endpoint Summary
+
+| Endpoint | Method | Type Safety | RLS | Error Handling | Performance | Notes |
+|----------|--------|-------------|-----|----------------|-------------|-------|
+| `/api/billing/create-subscription` | POST | ✅ | ✅ | ✅ | ✅ | Stripe subscription creation with auto tax |
+| `/api/billing/products` | GET | ✅ | ✅ | ✅ | ✅ | Lists active billing products with features |
+| `/api/billing/tenants/[tenantId]/subscription` | GET | ✅ | ✅ | ✅ | ✅ | Most recent subscription + billing_product join |
+| `/api/billing/tenants/[tenantId]/subscription` | POST | ✅ | ✅ | ✅ | ✅ | Upserts subscription (owner/admin only) |
+| `/api/billing/tenants/[tenantId]/subscription` | PATCH | ✅ | ✅ | ✅ | ✅ | Update status, seats, renewal date |
+| `/api/billing/tenants/[tenantId]/stripe-customer` | POST | ✅ | ✅ | ✅ | ✅ | Create Stripe customer, check existing first |
+| `/api/billing/tenants/[tenantId]/invoices` | GET | ✅ | ✅ | ✅ | ✅ | Filter by status, 200 limit, with relations |
+| `/api/billing/tenants/[tenantId]/invoices` | POST | ✅ | ✅ | ✅ | ✅ | Create manual invoice |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]` | GET/PATCH | ✅ | ✅ | ✅ | ✅ | Auto paid_at when status=paid |
+| `/api/billing/tenants/[tenantId]/invoices/stripe` | POST | ✅ | ✅ | ✅ | ✅ | Create→finalize→send Stripe invoice |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments` | GET/POST | ✅ | ✅ | ✅ | ✅ | List payments, record new payment |
+| `/api/billing/tenants/[tenantId]/invoices/[invoiceId]/payments/[paymentId]` | GET/PATCH | ✅ | ✅ | ✅ | ✅ | Tenant validation via invoice join |
+| `/api/billing/tenants/[tenantId]/seats` | GET/POST | ✅ | ✅ | ✅ | ✅ | List seats, validate availability before assign |
+| `/api/billing/tenants/[tenantId]/seats/[seatId]` | PATCH | ✅ | ✅ | ✅ | ✅ | Update seat status (⚠️ DELETE missing) |
+| `/api/billing/webhooks/stripe` | POST | ✅ | ⚠️ | ✅ | ✅ | Uses supabaseAdmin (correct for webhooks) |
+
+#### Architecture Highlights
+
+**1. Stripe Integration**
+
+**create-subscription endpoint:**
+```typescript
+// Creates Stripe customer if not exists
+const customer = await stripe.customers.create({
+  name: tenant?.name,
+  metadata: { tenant_id: tenantId },
+})
+
+// Create subscription with automatic tax
+const subscription = await stripe.subscriptions.create({
+  customer: stripeCustomerId,
+  items: [{ price: priceId, quantity }],
+  payment_behavior: 'default_incomplete',
+  automatic_tax: { enabled: true },
+  expand: ['latest_invoice.payment_intent'],
+})
+
+// Returns client_secret for Payment Element
+const clientSecret = paymentIntent?.client_secret
+```
+- ✅ Automatic tax calculation
+- ✅ Payment Element integration (client_secret)
+- ✅ Upserts billing_accounts record
+- ✅ Validates tenant membership (owner/admin only)
+
+**2. Invoice Workflow**
+
+**Three invoice types:**
+
+**A. Manual invoices (POST /invoices):**
+```typescript
+// Direct database insert for custom invoices
+await supabase.from('invoices').insert({
+  tenant_id: tenantId,
+  name, amount, due_date,
+  status: 'draft', // or issued/sent/paid
+})
+```
+
+**B. Stripe invoices (POST /invoices/stripe):**
+```typescript
+// 1. Create invoice item
+await stripe.invoiceItems.create({ customer, amount, description })
+
+// 2. Create invoice with due date
+const stripeInvoice = await stripe.invoices.create({
+  customer, collection_method: 'send_invoice', due_date
+})
+
+// 3. Finalize and send
+const finalized = await stripe.invoices.finalizeInvoice(stripeInvoice.id)
+await stripe.invoices.sendInvoice(finalized.id)
+
+// 4. Save local record with stripe_invoice_id
+await supabase.from('invoices').insert({ ...data, stripe_invoice_id: finalized.id })
+```
+- ✅ Complete Stripe invoice lifecycle
+- ✅ Local record for tracking
+- ✅ Proper error handling if local insert fails
+
+**C. Webhook updates (POST /webhooks/stripe):**
+- Processes Stripe events (invoice.paid, invoice.payment_failed, etc.)
+- Uses `supabaseAdmin` to bypass RLS (webhooks run without user context)
+- Logs all events to `billing_events` table
+- Updates invoice status based on Stripe events
+
+**3. Payment Tracking**
+
+```typescript
+// POST /invoices/[invoiceId]/payments
+const payload = {
+  invoice_id: invoiceId,
+  name, amount, currency,
+  status: 'pending' | 'confirmed' | 'failed' | 'refunded',
+  provider: 'stripe' | null,
+  transaction_reference: string | null,
+  paid_at: string | null
+}
+
+// Auto-set paid_at when status changes to 'confirmed'
+if (status === 'confirmed' && !paid_at) {
+  paid_at = new Date().toISOString()
+}
+```
+- ✅ Multi-provider support (Stripe, manual, etc.)
+- ✅ Automatic timestamp management
+- ✅ Links to invoices via invoice_id
+
+**4. Seat Management**
+
+**POST /seats** – Assign seat to user:
+```typescript
+// 1. Fetch subscription
+const { data: subscription } = await supabase
+  .from('tenant_subscriptions')
+  .select('id, seats_purchased, status, tenant_id')
+  .eq('id', subscription_id)
+  .maybeSingle()
+
+// 2. Count active seats
+const { count } = await supabase
+  .from('tenant_seat_assignments')
+  .select('*', { count: 'exact', head: true })
+  .eq('subscription_id', subscription_id)
+  .not('status', 'in', '(released,revoked)')
+
+// 3. Validate availability
+if (count >= subscription.seats_purchased) {
+  return 400 'No seats available'
+}
+
+// 4. Insert seat assignment
+await supabase.from('tenant_seat_assignments').insert({
+  tenant_id, user_id, subscription_id, billing_product_id,
+  status: 'active'
+})
+```
+- ✅ Prevents over-allocation
+- ✅ Validates subscription status (no canceled subscriptions)
+- ✅ Joins user, subscription, billing_product on return
+
+**PATCH /seats/[seatId]** – Update seat status:
+```typescript
+await supabase.from('tenant_seat_assignments').update({
+  status: 'pending' | 'active' | 'released' | 'revoked',
+  released_at: status === 'released' ? now : null
+})
+```
+- ✅ Auto-sets released_at timestamp
+- ⚠️ Missing DELETE handler (should revoke vs hard delete?)
+
+**5. Role-Based Access Control**
+
+**Shared helper pattern:**
+```typescript
+async function userTenantRole(supabase, tenantId) {
+  const { data } = await supabase
+    .from('tenant_memberships')
+    .select('role')
+    .eq('tenant_id', tenantId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+  return data?.role ?? null
+}
+
+// Usage:
+const role = await userTenantRole(supabase, tenantId)
+if (!role) return 403 // Not a member
+if (!['owner', 'admin'].includes(role)) return 403 // Not authorized
+```
+- ✅ Consistent across all billing endpoints
+- ✅ Reads require any role (member, admin, owner)
+- ✅ Writes require owner OR admin
+
+#### Validation Findings
+
+**✅ Strengths:**
+
+1. **Type Safety:**
+   - All endpoints use proper Database types
+   - Stripe types imported from `stripe` package
+   - Enum validation for invoice status, payment status, seat status
+   - Type-safe Stripe API calls
+
+2. **Error Handling:**
+   - ✅ 400 for validation errors (missing fields, invalid amounts)
+   - ✅ 401 for unauthenticated
+   - ✅ 403 for role checks (owner/admin required for mutations)
+   - ✅ 404 for not found (invoices, payments)
+   - ✅ 500 for Stripe/database errors with console.error
+   - ✅ Handles Stripe errors gracefully (isStripeError helper)
+
+3. **Stripe Integration:**
+   - Automatic tax calculation ✅
+   - Payment Element support (client_secret) ✅
+   - Customer creation with metadata ✅
+   - Invoice creation + finalization + sending ✅
+   - Webhook signature verification ✅
+   - Event logging for audit trail ✅
+
+4. **Business Logic:**
+   - Seat availability validation (prevents over-allocation) ✅
+   - Auto paid_at timestamp when payment confirmed ✅
+   - Upsert pattern for subscriptions (update if exists) ✅
+   - Tenant validation via invoice join (payments endpoint) ✅
+   - Status-based filtering for invoices ✅
+
+5. **Performance:**
+   - Proper `.select()` with specific joins (not `*`)
+   - Limits on invoice listing (200 max)
+   - Count queries use `{ count: 'exact', head: true }` (no data fetch)
+   - Single query patterns (no N+1)
+
+**⚠️ Issues:**
+
+**Issue #12: Missing DELETE /seats/[seatId]**
+- **Location:** [/api/billing/tenants/[tenantId]/seats/[seatId]/route.ts](app/api/billing/tenants/[tenantId]/seats/[seatId]/route.ts)
+- **Problem:** Only PATCH exists, no DELETE handler
+- **Impact:** Cannot delete seat assignments (must use PATCH to status='revoked'?)
+- **Fix:** Add DELETE handler OR document that revoke via PATCH is preferred
+- **Priority:** P2 (functional gap vs design choice)
+
+**Issue #13: Webhook Uses supabaseAdmin**
+- **Location:** [/api/billing/webhooks/stripe/route.ts](app/api/billing/webhooks/stripe/route.ts)
+- **Note:** This is **CORRECT BEHAVIOR** – webhooks have no user context
+- **Pattern:** Uses `supabaseAdmin` to bypass RLS for system updates
+- **Validation:** ✅ Verifies webhook signature, logs all events
+- **Status:** No issue, by design
+
+**Issue #14: GET /stripe-customer Missing**
+- **Location:** Expected at `/api/billing/tenants/[tenantId]/stripe-customer`
+- **Problem:** Only POST exists (create), no GET (retrieve customer ID)
+- **Impact:** Cannot check if customer exists without creating
+- **Fix:** Add GET handler to return existing customer_id
+- **Priority:** P3 (can check billing_accounts table instead)
+
+#### RLS Validation
+
+**Expected Policies:**
+- ✅ `tenant_subscriptions`: Tenant members can read, only owner/admin can mutate
+- ✅ `invoices`: Tenant-scoped, owner/admin for mutations
+- ✅ `payments`: Scoped via invoice→tenant relationship
+- ✅ `tenant_seat_assignments`: Tenant-scoped, owner/admin for mutations
+- ✅ `billing_products`: Public read (no tenant filtering)
+- ✅ `billing_accounts`: Tenant-scoped
+- ⚠️ `billing_events`: Webhook uses admin client (bypasses RLS)
+
+**Query Patterns:**
+- All mutations check `userTenantRole()` for owner/admin
+- Reads allow any tenant member
+- Payments endpoint validates tenant via invoice join
+- Webhook uses `supabaseAdmin` (correct for system context)
+
+**Status:** ✅ RLS correctly enforced
+
+#### Recommendations
+
+**P2 - Add DELETE /seats/[seatId]:**
+```typescript
+export async function DELETE(request, context) {
+  const { tenantId, seatId } = await context.params
+  // Verify role
+  // Option A: Hard delete
+  await supabase.from('tenant_seat_assignments').delete().eq('id', seatId)
+  // Option B: Soft delete (set status='revoked')
+  await supabase.from('tenant_seat_assignments')
+    .update({ status: 'revoked', released_at: now })
+    .eq('id', seatId)
+}
+```
+- Estimated effort: 15 minutes
+- Impact: Complete CRUD for seats
+- Decision: Hard delete vs soft delete (revoke)?
+
+**P3 - Add GET /stripe-customer:**
+```typescript
+export async function GET(request, context) {
+  const { tenantId } = await context.params
+  const { data } = await supabase
+    .from('billing_accounts')
+    .select('provider_customer_id')
+    .eq('tenant_id', tenantId)
+    .eq('provider', 'stripe')
+    .maybeSingle()
+  
+  return NextResponse.json({ customer_id: data?.provider_customer_id ?? null })
+}
+```
+- Estimated effort: 10 minutes
+- Impact: Check customer existence without creating
+
+**P4 - Add Invoice DELETE Endpoint:**
+- Allow deleting draft invoices
+- Prevent deleting paid invoices
+- Cascade delete payments
+- Estimated effort: 20 minutes
+
+**P4 - Add Subscription Cancellation:**
+- Dedicated endpoint: `POST /subscriptions/[id]/cancel`
+- Update Stripe subscription (if stripe_subscription_id exists)
+- Set local status to 'canceled', record cancelled_at
+- Estimated effort: 30 minutes
+
+---
+
+**Billing Domain Status:** ✅ COMPLETE (13/13 endpoints)  
+**Critical Issues:** 0  
+**Missing Handlers:** 3 (DELETE seat P2, GET customer P3, DELETE invoice P4)  
+**Overall Quality:** Excellent – Production-ready Stripe integration with comprehensive tracking

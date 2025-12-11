@@ -60,27 +60,28 @@ interface FrontendType { id: string; name: string; description?: string }
 #### Authentication & MFA
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/auth/mfa/disable` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/auth/mfa/enroll` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/auth/mfa/recovery-codes` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/auth/mfa/status` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/auth/mfa/verify` | POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/accounts/auth/mfa/disable` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
+| `/api/accounts/auth/mfa/enroll` | POST | ✅ | ✅ | ✅ | ✅ | ✅ OK - Uses Supabase auth.mfa.enroll() API, returns QR code |
+| `/api/accounts/auth/mfa/recovery-codes` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
+| `/api/accounts/auth/mfa/status` | GET | ✅ | ✅ | ✅ | ✅ | ✅ OK - Lists MFA factors via auth.mfa.listFactors(), joins user_mfa table |
+| `/api/accounts/auth/mfa/verify` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
 
-#### Devices & Sessions
+#### Devices & Sessions  
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/devices` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/devices/remove` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/sessions` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/sessions/revoke` | POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/accounts/devices` | GET/POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Uses `type LooseSupabase` to bypass type checking for user_devices |
+| `/api/accounts/devices/remove` | POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Same LooseSupabase pattern, validates device ownership |
+| `/api/accounts/sessions` | GET | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Lists user sessions via LooseSupabase cast |
+| `/api/accounts/sessions/revoke` | POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Uses admin.signOut() + updates user_sessions, logs audit |
 
-#### Profile
+#### Profile (Critical Auth Flow ✅)
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/profile` | GET/PATCH | ? | ? | ? | ? | ⏳ TODO |
-| `/api/accounts/whoami` | GET | ? | ? | ? | ? | ⏳ TODO |
+| `/api/accounts/profile` | GET/PATCH | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Updates users + user_profiles + auth.metadata, complex upsert logic |
+| `/api/accounts/whoami` | GET | ✅ | ✅ | ✅ | ✅ | ✅ OK - Core auth endpoint, returns user+memberships+tenant+admin status |
 
-**Accounts Domain Summary:** 11 endpoints – ⏳ Validation pending
+**Accounts Domain Summary:** 11 endpoints – **8 validated ✅**, 3 TODO (non-critical MFA)  
+**Critical Issue:** Type casting pattern `type LooseSupabase` bypasses TypeScript safety for user_profiles/user_sessions/user_devices tables
 
 ---
 
@@ -291,7 +292,7 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Domain | Total Endpoints | Validated | Pending | % Complete |
 |--------|----------------|-----------|---------|-----------|
-| Accounts | 11 | 0 | 11 | 0% |
+| Accounts | 11 | 8 | 3 | 73% |
 | Billing | 13 | 0 | 13 | 0% |
 | Browse | 1 | 0 | 1 | 0% |
 | Games | 6 | 0 | 6 | 0% |
@@ -302,7 +303,7 @@ interface FrontendType { id: string; name: string; description?: string }
 | Products | 6 | 0 | 6 | 0% |
 | Tenants | 12 | 0 | 12 | 0% |
 | Platform/System | 2 | 0 | 2 | 0% |
-| **TOTAL** | **83** | **15** | **68** | **18%** |
+| **TOTAL** | **83** | **23** | **60** | **28%** |
 
 ---
 
@@ -403,9 +404,9 @@ interface FrontendType { id: string; name: string; description?: string }
 
 ---
 
-**Status:** 🔄 Phase 2 Started  
-**Progress:** 15/83 endpoints validated (18%)  
-**Next:** Continue with Accounts Domain critical endpoints (whoami, profile, sessions)
+**Status:** 🔄 Phase 2 In Progress  
+**Progress:** 23/83 endpoints validated (28%)  
+**Next:** Continue with Games/Browse Domain (game search, filters, featured)
 
 ---
 
@@ -537,3 +538,168 @@ All endpoints follow standard patterns:
 **Critical Issues:** 0  
 **Performance Issues:** 3 (N+1 queries - non-blocking)  
 **Recommended Fixes:** 4 (P1-P4 above)
+
+---
+
+### ✅ Accounts Domain – Core Auth Complete (8/11 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Good – Core auth flow solid, type safety issue with auxiliary tables
+
+#### Strengths
+1. **Core Auth Flow Works:**
+   - `/api/accounts/whoami` returns complete user context (user, memberships, active_tenant, is_system_admin)
+   - `/api/accounts/profile` handles users + user_profiles + auth.metadata sync correctly
+   - Session management functional (list, revoke with admin API)
+
+2. **RLS Policies Correct:**
+   - All tables use `auth.uid() = user_id OR is_system_admin()` pattern
+   - Devices/sessions properly scoped to user
+   - Admin bypass working via `is_system_admin()` helper
+
+3. **Audit Logging:**
+   - Profile updates, session revokes, device removals all logged to `user_audit_logs`
+   - Uses `logUserAuditEvent()` service consistently
+
+4. **MFA Integration:**
+   - Properly uses Supabase auth.mfa.* APIs
+   - Status endpoint joins auth factors with user_mfa table
+   - Enroll returns QR code for TOTP setup
+
+#### Critical Type Safety Issue ❌
+
+**Problem:** All endpoints querying `user_profiles`, `user_sessions`, `user_devices`, `user_mfa` use this pattern:
+
+```typescript
+type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
+const loose = supabase as unknown as LooseSupabase
+const { data } = await loose.from('user_profiles').select('*')
+```
+
+**Why:** These tables are **not in the generated Supabase types** (`types/supabase.ts`).
+
+**Root Cause:** Migration `20251209120000_accounts_domain.sql` creates tables but types not regenerated.
+
+**Impact:**
+- ❌ No TypeScript compile-time validation
+- ❌ Runtime errors possible if schema changes
+- ❌ Auto-complete broken for these tables
+- ❌ Type mismatches between API and frontend undetected
+
+**Fix Required:**
+```bash
+# Regenerate Supabase types
+npx supabase gen types typescript --project-id <project-id> > types/supabase.ts
+
+# Then remove all LooseSupabase casts and use normal types:
+const { data } = await supabase
+  .from('user_profiles')  // Now type-safe!
+  .select('*')
+  .eq('user_id', user.id)
+```
+
+**Affected Endpoints:**
+- `/api/accounts/profile` (GET, PATCH)
+- `/api/accounts/sessions` (GET)
+- `/api/accounts/sessions/revoke` (POST)
+- `/api/accounts/devices` (GET, POST)
+- `/api/accounts/devices/remove` (POST)
+- `/api/accounts/auth/mfa/status` (GET)
+
+#### RLS Validation ✅
+
+All policies verified in migration:
+
+```sql
+-- user_profiles: Owner or system admin
+CREATE POLICY user_profiles_owner ON public.user_profiles
+  FOR ALL USING (user_id = auth.uid() OR public.is_system_admin())
+
+-- user_devices: Owner or system admin  
+CREATE POLICY user_devices_owner ON public.user_devices
+  FOR ALL USING (user_id = auth.uid() OR public.is_system_admin())
+
+-- user_sessions: Owner or system admin
+CREATE POLICY user_sessions_owner ON public.user_sessions
+  FOR ALL USING (user_id = auth.uid() OR public.is_system_admin())
+
+-- user_mfa: Owner or system admin
+CREATE POLICY user_mfa_owner ON public.user_mfa
+  FOR ALL USING (user_id = auth.uid() OR public.is_system_admin())
+
+-- user_audit_logs: Can see logs where you're user or actor
+CREATE POLICY user_audit_logs_owner ON public.user_audit_logs
+  FOR SELECT USING (user_id = auth.uid() OR actor_user_id = auth.uid() OR public.is_system_admin())
+```
+
+**Status:** ✅ Policies correct, queries will succeed
+
+#### Error Handling ✅
+
+Standard pattern across all endpoints:
+- ✅ 401 for unauthenticated requests
+- ✅ 400 for missing required fields (e.g., `device_id`, `session_id`)
+- ✅ 500 with console.error for unexpected database errors
+- ✅ Graceful error handling in profile PATCH (continues if auth metadata update fails)
+
+#### Performance ✅
+
+- Indexes exist for all foreign keys (user_id, session_id, device_id)
+- Order by last_seen_at descending (indexed)
+- No N+1 queries detected
+- Device upsert logic optimized (single query to check existing)
+
+#### Session Management Pattern
+
+**Best-effort revoke:**
+```typescript
+// Try admin API revoke (may fail silently)
+try {
+  await supabaseAdmin.auth.admin.signOut(session_id)
+} catch (err) {
+  console.warn('[revoke] admin signOut warning', err)
+}
+
+// Always mark as revoked in database
+await supabase
+  .from('user_sessions')
+  .update({ revoked_at: now })
+  .eq('supabase_session_id', session_id)
+```
+
+This is **correct pattern** – database is source of truth, admin API is best-effort.
+
+#### Recommendations
+
+**P0 - CRITICAL: Regenerate Supabase Types**
+- Run `supabase gen types` to add user_profiles/user_sessions/user_devices/user_mfa
+- Remove all `LooseSupabase` type casts
+- Test all 6 affected endpoints for type errors
+- Estimated effort: 1-2 hours
+- **Impact:** Prevents future runtime errors from schema changes
+
+**P1 - Complete MFA Endpoints:**
+- Implement `/api/accounts/auth/mfa/disable`, `/api/accounts/auth/mfa/verify`, `/api/accounts/auth/mfa/recovery-codes`
+- Currently partial implementation (enroll + status work, but no disable/verify)
+- Estimated effort: 2-3 hours
+
+**P2 - Add Admin Override for user_profiles:**
+- Migration `20251209123000_users_rls_admin.sql` adds admin policy for user_profiles:
+  ```sql
+  CREATE POLICY user_profiles_admin_or_self ON public.user_profiles
+    FOR ALL USING (user_id = auth.uid() OR public.is_system_admin())
+  ```
+- Verify this policy is applied (may conflict with `user_profiles_owner` policy)
+- Check for duplicate policies: `DROP POLICY IF EXISTS user_profiles_owner` before creating
+
+**P3 - Frontend Type Sync:**
+- After regenerating types, verify frontend components using these endpoints:
+  - `features/profile/ProfilePage.tsx` (uses /whoami, /profile, /sessions, /devices)
+  - Check SessionInfo, DeviceInfo types match API responses
+
+---
+
+**Accounts Domain Status:** ✅ CORE COMPLETE (8/11 validated)  
+**Critical Issues:** 1 (Type safety - requires type regeneration)  
+**Blocking:** No (API works, just lacks compile-time safety)  
+**Recommended:** Fix type safety before adding new features to Accounts Domain

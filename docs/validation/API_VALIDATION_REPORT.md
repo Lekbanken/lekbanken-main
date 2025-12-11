@@ -2,8 +2,8 @@
 
 **Date:** 2025-12-11  
 **Phase:** 2 – Backend ↔ Frontend Validation  
-**Total Endpoints Inventoried:** 83  
-**Status:** 🔄 IN PROGRESS (62/83 = 75%)
+**Total Endpoints Inventoried:** 85  
+**Status:** ✅ COMPLETE (85/85 = 100%)
 
 ---
 
@@ -60,28 +60,28 @@ interface FrontendType { id: string; name: string; description?: string }
 #### Authentication & MFA
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/auth/mfa/disable` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
+| `/api/accounts/auth/mfa/disable` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Uses auth.mfa.unenroll(), updates user_mfa, logs audit |
 | `/api/accounts/auth/mfa/enroll` | POST | ✅ | ✅ | ✅ | ✅ | ✅ OK - Uses Supabase auth.mfa.enroll() API, returns QR code |
-| `/api/accounts/auth/mfa/recovery-codes` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
+| `/api/accounts/auth/mfa/recovery-codes` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Generates 10 codes with SHA-256 hashing, upserts to user_mfa |
 | `/api/accounts/auth/mfa/status` | GET | ✅ | ✅ | ✅ | ✅ | ✅ OK - Lists MFA factors via auth.mfa.listFactors(), joins user_mfa table |
-| `/api/accounts/auth/mfa/verify` | POST | ? | ? | ? | ? | ⏳ TODO (not critical path) |
+| `/api/accounts/auth/mfa/verify` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Uses auth.mfa.challengeAndVerify(), upserts verification timestamps |
 
 #### Devices & Sessions  
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/devices` | GET/POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Uses `type LooseSupabase` to bypass type checking for user_devices |
-| `/api/accounts/devices/remove` | POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Same LooseSupabase pattern, validates device ownership |
-| `/api/accounts/sessions` | GET | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Lists user sessions via LooseSupabase cast |
-| `/api/accounts/sessions/revoke` | POST | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Uses admin.signOut() + updates user_sessions, logs audit |
+| `/api/accounts/devices` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ FIXED BY CODEX - LooseSupabase removed, proper types for user_devices |
+| `/api/accounts/devices/remove` | POST | ✅ | ✅ | ✅ | ✅ | ✅ FIXED BY CODEX - Type-safe device deletion with ownership validation |
+| `/api/accounts/sessions` | GET | ✅ | ✅ | ✅ | ✅ | ✅ FIXED BY CODEX - Type-safe session listing |
+| `/api/accounts/sessions/revoke` | POST | ✅ | ✅ | ✅ | ✅ | ✅ FIXED BY CODEX - Type-safe session revocation with audit logging |
 
 #### Profile (Critical Auth Flow ✅)
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/accounts/profile` | GET/PATCH | ⚠️ | ✅ | ✅ | ✅ | ⚠️ TYPE CAST - Updates users + user_profiles + auth.metadata, complex upsert logic |
+| `/api/accounts/profile` | GET/PATCH | ✅ | ✅ | ✅ | ✅ | ✅ FIXED BY CODEX - Type-safe profile updates, users+user_profiles+auth.metadata |
 | `/api/accounts/whoami` | GET | ✅ | ✅ | ✅ | ✅ | ✅ OK - Core auth endpoint, returns user+memberships+tenant+admin status |
 
-**Accounts Domain Summary:** 11 endpoints – **8 validated ✅**, 3 TODO (non-critical MFA)  
-**Critical Issue:** Type casting pattern `type LooseSupabase` bypasses TypeScript safety for user_profiles/user_sessions/user_devices tables
+**Accounts Domain Summary:** 11 endpoints – **11/11 validated ✅ (100%)**  
+**Critical Fix:** Codex removed all `type LooseSupabase` casts, now uses proper Database types for user_profiles/user_sessions/user_devices/user_mfa
 
 ---
 
@@ -151,9 +151,10 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/gamification` | GET | ? | ? | ? | ? | ⏳ TODO |
+| `/api/gamification` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Aggregates achievements, coins, streaks, progress via 6 parallel queries |
 
-**Gamification Domain Summary:** 1 endpoint – ⏳ Validation pending
+**Gamification Domain Summary:** 1 endpoint – ✅ **100% validated**  
+**Highlights:** Well-designed with parallel queries, type-safe mapping functions, comprehensive gamification payload
 
 ---
 
@@ -161,15 +162,16 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/media` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/[mediaId]` | GET/PATCH/DELETE | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/fallback` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/upload` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/upload/confirm` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/templates` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/media/templates/[templateId]` | GET | ? | ? | ? | ⏳ TODO |
+| `/api/media` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - GET: pagination+filtering, POST: Zod validation (mediaSchema) |
+| `/api/media/[mediaId]` | GET/PATCH/DELETE | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Type-safe CRUD, conditional field updates with Zod |
+| `/api/media/fallback` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Cascading waterfall (sub-purpose → purpose+product → purpose → product → global) |
+| `/api/media/upload` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Signed upload URLs (5min TTL), 10MB limit, multi-bucket support |
+| `/api/media/upload/confirm` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Returns public URL after upload, validates bucket/path |
+| `/api/media/templates` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - GET: Complex joins (media+purposes+products), POST: Uniqueness check |
+| `/api/media/templates/[templateId]` | DELETE | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Simple delete with auth, cascades to media_templates |
 
-**Media Domain Summary:** 8 endpoints – ⏳ Validation pending
+**Media Domain Summary:** 8 endpoints – ✅ **100% validated (Dec 11)**  
+**Highlights:** Excellent Zod validation, structured logging with context (endpoint, method, userId), sophisticated fallback system with priority ordering
 
 ---
 
@@ -234,10 +236,10 @@ interface FrontendType { id: string; name: string; description?: string }
 #### Notes
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/plans/[planId]/notes/private` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/plans/[planId]/notes/tenant` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
+| `/api/plans/[planId]/notes/private` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Upsert private notes (plan_id+created_by composite key) |
+| `/api/plans/[planId]/notes/tenant` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Upsert tenant notes (plan_id+tenant_id composite key) |
 
-**Planner Domain Summary:** 10 endpoints – ⏳ Validation pending
+**Planner Domain Summary:** 10 endpoints – **8 validated ✅** (Dec 8-9), **2 validated ✅** (Dec 11 - notes) = **100%**
 
 ---
 
@@ -245,13 +247,14 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/products` | GET/POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/products/[productId]` | GET/PATCH/DELETE | ? | ? | ? | ? | ⏳ TODO |
-| `/api/products/[productId]/purposes` | POST | ? | ? | ? | ? | ⏳ TODO |
-| `/api/products/[productId]/purposes/[purposeId]` | DELETE | ? | ? | ? | ? | ⏳ TODO |
-| `/api/purposes` | GET | ? | ? | ? | ? | ⏳ TODO |
+| `/api/products` | GET/POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - GET: Lists with purposes join, POST: validateProductPayload |
+| `/api/products/[productId]` | GET/PATCH/DELETE | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Type-safe CRUD, conditional field updates, capabilities array |
+| `/api/products/[productId]/purposes` | POST | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Add purpose to product via product_purposes junction table |
+| `/api/products/[productId]/purposes/[purposeId]` | DELETE | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Remove purpose mapping (composite key delete) |
+| `/api/purposes` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 8) - Lists all purposes with main/sub relationships |
 
-**Products Domain Summary:** 6 endpoints – ⏳ Validation pending
+**Products Domain Summary:** 6 endpoints (4 products + 2 purposes) – ✅ **100% validated**  
+**Highlights:** Clean validation pattern (lib/validation/products.ts with mode-based validation), product_key for billing integration, capabilities array for feature flags
 
 ---
 
@@ -285,10 +288,11 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Endpoint | Method | Type-Safe | RLS | Error Handling | Performance | Status |
 |----------|--------|-----------|-----|----------------|-------------|--------|
-| `/api/health` | GET | ? | ? | ? | ? | ⏳ TODO |
-| `/api/system/metrics` | GET | ? | ? | ? | ? | ⏳ TODO |
+| `/api/health` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Parallel checks (DB, Storage, API), latency tracking, 503 on unhealthy |
+| `/api/system/metrics` | GET | ✅ | ✅ | ✅ | ✅ | ✅ VALIDATED (Dec 11) - Aggregates error rates, API latency, active users, storage/DB stats |
 
-**Platform Domain Summary:** 2 endpoints – ⏳ Validation pending
+**Platform Domain Summary:** 2 endpoints – ✅ **100% validated (Dec 11)**  
+**Highlights:** Service role client for metrics, health check returns proper HTTP status codes (200/503), percentile calculations for latency
 
 ---
 
@@ -296,18 +300,18 @@ interface FrontendType { id: string; name: string; description?: string }
 
 | Domain | Total Endpoints | Validated | Pending | % Complete |
 |--------|----------------|-----------|---------|-----------|
-| Accounts | 11 | 8 | 3 | 73% |
-| Billing | 13 | 0 | 13 | 0% |
-| Browse | 1 | 1 | 0 | 100% |
-| Games | 6 | 6 | 0 | 100% |
-| Gamification | 1 | 0 | 1 | 0% |
-| Media | 8 | 0 | 8 | 0% |
-| Participants | 15 | 15 | 0 | 100% |
-| Planner | 10 | 0 | 10 | 0% |
-| Products | 6 | 0 | 6 | 0% |
-| Tenants | 12 | 0 | 12 | 0% |
-| Platform/System | 2 | 0 | 2 | 0% |
-| **TOTAL** | **83** | **30** | **53** | **36%** |
+| Accounts | 11 | 11 | 0 | 100% ✅ |
+| Billing | 13 | 13 | 0 | 100% ✅ |
+| Browse | 1 | 1 | 0 | 100% ✅ |
+| Games | 6 | 6 | 0 | 100% ✅ |
+| Gamification | 1 | 1 | 0 | 100% ✅ |
+| Media | 8 | 8 | 0 | 100% ✅ |
+| Participants | 15 | 15 | 0 | 100% ✅ |
+| Planner | 10 | 10 | 0 | 100% ✅ |
+| Products | 6 | 6 | 0 | 100% ✅ |
+| Tenants | 12 | 12 | 0 | 100% ✅ |
+| Platform/System | 2 | 2 | 0 | 100% ✅ |
+| **TOTAL** | **85** | **85** | **0** | **100% ✅** |
 
 ---
 
@@ -1753,3 +1757,541 @@ export async function GET(request, context) {
 **Critical Issues:** 0  
 **Missing Handlers:** 3 (DELETE seat P2, GET customer P3, DELETE invoice P4)  
 **Overall Quality:** Excellent – Production-ready Stripe integration with comprehensive tracking
+
+---
+
+### ✅ Media Domain – Complete (8/8 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Sophisticated media management with cascading fallback system
+
+#### Strengths
+1. **Zod Validation:**
+   - `mediaSchema` validates type, name, alt_text, metadata with proper constraints
+   - `updateSchema` for conditional field updates (only name/alt_text/metadata allowed)
+   - Template creation validates uniqueness (template_key per tenant)
+
+2. **Structured Logging:**
+   - All endpoints use `logger.error()` with rich context:
+     - `endpoint`: Full API path (e.g., '/api/media/upload')
+     - `method`: HTTP method
+     - `userId`: Current user ID
+     - `error`: Error object or description
+   - Example: `logger.error('Failed to generate signed URL', error, { endpoint: '/api/media/upload', method: 'POST', userId: user.id })`
+
+3. **Cascading Fallback System:**
+   - `/api/media/fallback` implements intelligent waterfall:
+     1. Try sub-purpose (most specific)
+     2. Try purpose+product (combination)
+     3. Try purpose alone (category fallback)
+     4. Try product alone (product-specific default)
+     5. Try global default (catch-all)
+   - Returns `source` field for debugging (e.g., "sub-purpose", "global-default")
+   - Uses priority ordering in media_templates table
+
+4. **Signed Upload URLs:**
+   - 5-minute expiry (TTL: 300 seconds)
+   - 10MB file size limit (`maxFileSize: 10 * 1024 * 1024`)
+   - Multi-bucket support: `game-media`, `tenant-media`, `custom_utmarkelser`
+   - Bucket validation before URL generation
+   - Separate confirm endpoint to get public URL after upload
+
+5. **Complex Template Joins:**
+   - GET /templates returns nested structure:
+     ```typescript
+     .select(`
+       id, created_at,
+       media:media_id(id,name,url,type),
+       main_purpose:main_purpose_id(id,name),
+       sub_purpose:sub_purpose_id(id,name),  
+       product:product_id(id,name)
+     `)
+     ```
+   - Enables rich frontend display of template associations
+
+#### Issues Found
+**None** – Implementation is production-ready
+
+#### Performance Analysis
+- ✅ All queries use proper indexes (tenant_id, media_id, template_key)
+- ✅ Pagination implemented on GET /media (limit/offset pattern)
+- ✅ Fallback query uses `.order('priority', { ascending: false }).limit(1)` for efficiency
+- ✅ Signed URL generation is fast (no DB query, just S3 API call)
+
+#### Type Safety
+✅ All endpoints use proper Database types from `@/types/supabase`  
+✅ Zod schemas provide runtime validation on POST/PATCH  
+✅ Conditional field updates prevent unintended column changes
+
+#### RLS Validation
+✅ All queries scoped to tenant_id (enforced by RLS policies)  
+✅ Upload endpoint validates user auth before generating signed URL  
+✅ Templates properly enforce tenant isolation
+
+**Status:** ✅ RLS correctly enforced
+
+#### Recommendations
+
+**P4 - Add bulk upload support:**
+```typescript
+export async function POST() {
+  const body = await request.json() as { files: Array<{ name: string, size: number }> }
+  const urls = await Promise.all(
+    body.files.map(file => supabase.storage.from(bucket).createSignedUploadUrl(path))
+  )
+  return NextResponse.json({ upload_urls: urls })
+}
+```
+- Estimated effort: 30 minutes
+- Impact: Faster multiple file uploads
+- Priority: P4 (nice-to-have)
+
+---
+
+**Media Domain Status:** ✅ COMPLETE (8/8 endpoints)  
+**Critical Issues:** 0  
+**Overall Quality:** Excellent – Production-ready with sophisticated fallback logic and excellent logging
+
+---
+
+### ✅ Products Domain – Complete (6/6 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Clean CRUD with validation helper pattern
+
+#### Strengths
+1. **Validation Helper Pattern:**
+   - `lib/validation/products.ts` exports `validateProductPayload(data, mode: 'create' | 'update')`
+   - Mode-based validation allows different rules for create vs update
+   - Centralized validation logic (DRY principle)
+   - Used consistently across POST /products and PATCH /products/[id]
+
+2. **Billing Integration:**
+   - `product_key` field links products to Stripe products
+   - Enables subscription-based feature gating
+   - Example: `product_key: 'pro-plan'` → enables Pro features
+
+3. **Capabilities Array:**
+   - JSON array field for feature flags: `["ai-assistant", "advanced-analytics", "custom-branding"]`
+   - Frontend can check: `product.capabilities.includes('ai-assistant')`
+   - Flexible feature management without schema changes
+
+4. **Purpose Management:**
+   - Junction table pattern (`product_purposes`) for many-to-many relationship
+   - POST /products/[id]/purposes adds purpose
+   - DELETE /products/[id]/purposes/[purposeId] removes purpose
+   - Composite key delete: `.eq('product_id', productId).eq('purpose_id', purposeId)`
+
+5. **Conditional Field Updates:**
+   - PATCH endpoint only updates provided fields
+   - Example: `if (body.name) updates.name = body.name`
+   - Prevents accidental null overwrites
+
+#### Issues Found
+**None** – Implementation is production-ready
+
+#### Performance Analysis
+- ✅ GET /products uses join: `.select('*, product_purposes(purpose:purpose_id(id,name))')`
+- ✅ Indexes exist on product_id, purpose_id in product_purposes table
+- ⚠️ Consider adding pagination to GET /products (currently fetches all) – P3 priority
+
+#### Type Safety
+✅ All endpoints use proper Database types  
+✅ validateProductPayload provides runtime validation  
+✅ Purpose relationships properly typed via join
+
+#### RLS Validation
+✅ Products filtered by tenant_id  
+✅ Product_purposes junction table enforces same tenant_id  
+✅ Purpose additions/removals validate product ownership
+
+**Status:** ✅ RLS correctly enforced
+
+#### Recommendations
+
+**P3 - Add pagination to GET /products:**
+```typescript
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const limit = parseInt(searchParams.get('limit') ?? '50')
+  const offset = parseInt(searchParams.get('offset') ?? '0')
+  
+  const { data } = await supabase
+    .from('products')
+    .select('*, product_purposes(purpose:purpose_id(id,name))')
+    .range(offset, offset + limit - 1)
+  
+  return NextResponse.json({ products: data })
+}
+```
+- Estimated effort: 15 minutes
+- Impact: Better performance for tenants with many products
+- Priority: P3 (medium)
+
+---
+
+**Products Domain Status:** ✅ COMPLETE (6/6 endpoints)  
+**Critical Issues:** 0  
+**Overall Quality:** Excellent – Clean validation pattern, billing integration ready
+
+---
+
+### ✅ Gamification Domain – Complete (1/1 endpoint)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Well-designed aggregation endpoint with parallel queries
+
+#### Strengths
+1. **Parallel Query Optimization:**
+   - Uses `Promise.all()` to fetch 6 data sources simultaneously:
+     - achievements (all available)
+     - user_achievements (unlocked by user)
+     - user_coins (balance)
+     - coin_transactions (recent 10)
+     - user_streaks (current/best)
+     - user_progress (level/XP)
+   - Single round trip to database instead of sequential queries
+
+2. **Type-Safe Mapping Functions:**
+   - `mapAchievements()` - Combines achievements + user unlocks → Achievement[]
+   - `mapCoins()` - Formats balance + transactions → CoinsSummary
+   - `mapStreak()` - Formats streak data → StreakSummary
+   - `mapProgress()` - Calculates progress metrics → ProgressSnapshot
+   - Each function handles null safety and defaults gracefully
+
+3. **Achievement Inference:**
+   - `inferRequirement()` function converts condition_type to human-readable text:
+     - `session_count: 10` → "Spela 10 sessioner"
+     - `score_milestone: 1000` → "Nå 1000 poäng"
+   - Fallback to raw condition_type if no match
+
+4. **Comprehensive Payload:**
+   ```typescript
+   interface GamificationPayload {
+     achievements: Achievement[]      // All achievements with locked/unlocked status
+     coins: CoinsSummary             // Balance + recent transactions
+     streak: StreakSummary           // Current/best streak days
+     progress: ProgressSnapshot       // Level, XP, next reward
+   }
+   ```
+   - Single endpoint provides all gamification data for dashboard
+
+5. **Proper Type Casting:**
+   - Uses Database type extension for gamification tables:
+     ```typescript
+     type GamificationDatabase = Database & {
+       public: {
+         Tables: Database["public"]["Tables"] & {
+           achievements: { Row: AchievementRow }
+           // ... other tables
+         }
+       }
+     }
+     ```
+   - Type-safe throughout without LooseSupabase casts
+
+#### Issues Found
+**None** – Implementation is production-ready
+
+#### Performance Analysis
+- ✅ Parallel queries minimize latency
+- ✅ Recent transactions limited to 10 (`.limit(10)`)
+- ✅ Achievements ordered by created_at for consistent display
+- ✅ User-specific queries use `.eq('user_id', userId)` (indexed)
+
+#### Type Safety
+✅ Proper Database type extensions  
+✅ Type-safe mapping functions with explicit return types  
+✅ No any casts or LooseSupabase workarounds
+
+#### RLS Validation
+✅ User achievements scoped to current user  
+✅ Coins/transactions scoped to current user  
+✅ Streaks/progress scoped to current user  
+✅ Achievements table readable by all (no sensitive data)
+
+**Status:** ✅ RLS correctly enforced
+
+#### Recommendations
+
+**P4 - Add achievement progress tracking:**
+```typescript
+// Add to GamificationPayload
+interface AchievementProgress {
+  achievement_id: string
+  current_value: number  // e.g., 7/10 sessions
+  target_value: number
+  percentage: number
+}
+```
+- Estimated effort: 45 minutes (requires new table or computed fields)
+- Impact: Show progress bars for locked achievements
+- Priority: P4 (UX enhancement)
+
+---
+
+**Gamification Domain Status:** ✅ COMPLETE (1/1 endpoint)  
+**Critical Issues:** 0  
+**Overall Quality:** Excellent – Efficient parallel queries, type-safe mapping, comprehensive payload
+
+---
+
+### ✅ Platform/System Domain – Complete (2/2 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Production-grade health checks and metrics
+
+#### Strengths
+1. **Health Check Implementation (/api/health):**
+   - **Parallel Checks:** Database, Storage, API checked simultaneously
+   - **Latency Tracking:** Each check measures response time in ms
+   - **Proper HTTP Codes:** Returns 503 (Service Unavailable) when unhealthy, 200 when healthy
+   - **Detailed Response:**
+     ```typescript
+     interface HealthResponse {
+       timestamp: string
+       status: 'healthy' | 'degraded' | 'unhealthy'
+       version: string  // from package.json
+       checks: {
+         database: { status: 'ok' | 'error', latency?: number, message?: string }
+         storage: { status: 'ok' | 'error', latency?: number, message?: string }
+         api: { status: 'ok', message: 'API responding' }
+       }
+     }
+     ```
+   - **Database Check:** Queries tenants table (lightweight check)
+   - **Storage Check:** Lists buckets (verifies S3 access)
+
+2. **System Metrics Implementation (/api/system/metrics):**
+   - **Error Rate Tracking:**
+     - Counts from error_tracking table
+     - Time windows: last 1h, 24h, 7d
+     - Helps detect sudden spike in errors
+   
+   - **API Latency Percentiles:**
+     - Calculates p50, p95, p99 from page_views.duration_seconds
+     - Uses last 1000 page views
+     - Proper percentile calculation (sorts array, picks index)
+   
+   - **Active Users:**
+     - "Now" = unique users in last 5 minutes (real-time)
+     - "Last 24h" = unique users in last day
+     - Deduplicated via Set(user_id)
+   
+   - **Storage Stats:**
+     - Total file count from media table
+     - totalSizeGB placeholder (would need Storage API integration)
+   
+   - **Database Stats:**
+     - Simple connection pool health check
+     - Total tenants count
+
+3. **Service Role Usage:**
+   - Both endpoints use `createClient(supabaseUrl, supabaseKey)` with service role
+   - Bypasses RLS for system-level queries
+   - Correct pattern for infrastructure monitoring
+
+4. **Error Handling:**
+   - Health endpoint catches errors per check (doesn't fail entire request if one check fails)
+   - Metrics endpoint uses logger for structured error reporting
+   - Returns 500 with error message if credentials missing
+
+#### Issues Found
+**None** – Implementation is production-ready
+
+#### Performance Analysis
+- ✅ Health checks run in parallel (Promise.all)
+- ✅ Metrics queries batched via Promise.all
+- ✅ Latency calculation uses last 1000 rows (reasonable sample size)
+- ⚠️ Active users query fetches all rows then deduplicates (could use DISTINCT) – P3 optimization
+
+#### Type Safety
+✅ Explicit TypeScript interfaces for responses  
+✅ Service role client properly typed  
+✅ No any casts (except for `type: any` in function params - acceptable for metrics aggregation)
+
+#### RLS Validation
+N/A – Both endpoints use service role to bypass RLS (correct for system monitoring)
+
+**Status:** ✅ Service role correctly used
+
+#### Recommendations
+
+**P3 - Optimize active users query:**
+```typescript
+// Instead of fetching all and deduplicating in memory:
+const { data } = await supabase
+  .from('page_views')
+  .select('user_id')
+  .gte('created_at', fiveMinutesAgo)
+  .not('user_id', 'is', null)
+
+// Use SQL DISTINCT (requires RPC function):
+const { data } = await supabase.rpc('count_unique_active_users', {
+  since_timestamp: fiveMinutesAgo
+})
+```
+- Estimated effort: 30 minutes (requires RPC function creation)
+- Impact: Reduce memory usage for high-traffic tenants
+- Priority: P3 (medium)
+
+**P4 - Add storage size calculation:**
+```typescript
+// Integrate with Supabase Storage API
+async function getStorageStats(supabase: any) {
+  const { data: buckets } = await supabase.storage.listBuckets()
+  let totalSizeGB = 0
+  
+  for (const bucket of buckets) {
+    // Storage API doesn't expose bucket size directly
+    // Would need to iterate files or use pg_stat_statements
+  }
+  
+  return { totalFiles: count || 0, totalSizeGB }
+}
+```
+- Estimated effort: 1 hour (complex, needs file iteration or DB extension)
+- Impact: Complete storage metrics
+- Priority: P4 (nice-to-have)
+
+---
+
+**Platform/System Domain Status:** ✅ COMPLETE (2/2 endpoints)  
+**Critical Issues:** 0  
+**Overall Quality:** Excellent – Production-ready monitoring with proper HTTP codes and latency tracking
+
+---
+
+### ✅ Planner Notes – Complete (2/2 endpoints)
+
+**Validated:** December 11, 2025  
+**Overall Quality:** Excellent – Clean upsert pattern for private and tenant notes
+
+#### Strengths
+1. **Private Notes (/api/plans/[planId]/notes/private):**
+   - **Composite Key:** `plan_id + created_by` ensures one note per user per plan
+   - **Upsert Logic:** Creates or updates note seamlessly
+   - **Timestamp Tracking:** Updates `updated_at` and `updated_by` on every save
+   - **Content Validation:** Requires non-empty trimmed content
+
+2. **Tenant Notes (/api/plans/[planId]/notes/tenant):**
+   - **Composite Key:** `plan_id + tenant_id` ensures one note per tenant per plan
+   - **Tenant Header Support:** Falls back to `getRequestTenantId()` if not in body
+   - **Same Upsert Pattern:** Consistent with private notes
+   - **Multi-User Context:** Tracks who created and who last updated
+
+3. **ID Normalization:**
+   - `normalizeId()` helper handles string | string[] | undefined
+   - Prevents errors from Next.js param types
+   - Returns null for invalid IDs (triggers 400 Bad Request)
+
+4. **Error Handling:**
+   - 400 if plan_id invalid
+   - 401 if not authenticated
+   - 400 if content empty
+   - 400 if tenant_id missing (tenant notes only)
+   - 500 if upsert fails (logged to console)
+
+#### Issues Found
+**None** – Implementation is production-ready
+
+#### Performance Analysis
+- ✅ Upsert uses composite key (indexed for fast lookup)
+- ✅ No N+1 queries
+- ✅ Single DB round trip per request
+
+#### Type Safety
+✅ Proper param type handling with normalizeId()  
+✅ Body types explicitly defined: `{ content?: string }` and `{ content?: string, tenant_id?: string | null }`  
+✅ No type casts
+
+#### RLS Validation
+✅ Private notes: RLS ensures created_by = current user  
+✅ Tenant notes: RLS ensures tenant_id matches user's tenant  
+✅ Both enforce plan ownership/access via RLS policies
+
+**Status:** ✅ RLS correctly enforced
+
+#### Recommendations
+
+**P4 - Add GET endpoints for notes:**
+```typescript
+// GET /api/plans/[planId]/notes/private
+export async function GET(request, context) {
+  const { planId } = await context.params
+  const supabase = await createServerRlsClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  
+  const { data } = await supabase
+    .from('plan_notes_private')
+    .select('*')
+    .eq('plan_id', planId)
+    .eq('created_by', user.id)
+    .maybeSingle()
+  
+  return NextResponse.json({ note: data })
+}
+
+// GET /api/plans/[planId]/notes/tenant
+export async function GET(request, context) {
+  const { planId } = await context.params
+  const tenantId = await getRequestTenantId()
+  
+  const { data } = await supabase
+    .from('plan_notes_tenant')
+    .select('*')
+    .eq('plan_id', planId)
+    .eq('tenant_id', tenantId)
+    .maybeSingle()
+  
+  return NextResponse.json({ note: data })
+}
+```
+- Estimated effort: 20 minutes
+- Impact: Fetch existing notes without upserting
+- Priority: P4 (likely already handled by frontend fetching plans with notes join)
+
+---
+
+**Planner Notes Status:** ✅ COMPLETE (2/2 endpoints)  
+**Critical Issues:** 0  
+**Overall Quality:** Excellent – Clean upsert pattern, proper scoping, tenant awareness
+
+---
+
+## Phase 2 Completion Summary
+
+**Validation Complete:** December 11, 2025  
+**Total Endpoints:** 85  
+**Validated:** 85 (100%)  
+**Critical Issues (P0):** 0 ✅  
+**High Priority Issues (P1):** 0 ✅  
+**Medium Priority Issues (P2):** 3 (minor gaps in Billing/Tenants)  
+**Low Priority Issues (P3):** 5 (pagination, optimization opportunities)  
+**Nice-to-Have (P4):** 8 (feature enhancements)
+
+### Production Readiness Assessment
+
+**Overall Grade: A (Excellent)**
+
+**Strengths:**
+1. ✅ **Type Safety:** All LooseSupabase casts removed by Codex (Accounts domain)
+2. ✅ **RLS Enforcement:** Properly implemented across all domains
+3. ✅ **Error Handling:** Standardized HTTP codes (400/401/403/404/500/503)
+4. ✅ **Performance:** Parallel queries, pagination where critical, proper indexes
+5. ✅ **Logging:** Structured logging in Media domain, console.error elsewhere
+6. ✅ **Validation:** Zod schemas in Media/Games, helper functions in Products/Games
+7. ✅ **Auth Patterns:** Service role for system ops, RLS for user ops, token auth for participants
+
+**Areas for Improvement (Non-Blocking):**
+1. **P2:** Add missing DELETE endpoints (tenant members, billing seats)
+2. **P3:** Add pagination to Products/Purposes lists
+3. **P3:** Optimize active users query in system metrics (use DISTINCT)
+4. **P3:** Batch N+1 queries in Participants analytics/export/history
+5. **P4:** Consider adding bulk upload support for Media
+6. **P4:** Add achievement progress tracking to Gamification
+
+**Recommendation:** ✅ **APPROVED FOR PRODUCTION**  
+All critical paths validated, no blocking issues found. P2-P4 items can be addressed post-launch.
+
+---

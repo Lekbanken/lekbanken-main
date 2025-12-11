@@ -4,8 +4,6 @@ import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()

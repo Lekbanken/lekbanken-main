@@ -4,8 +4,6 @@ import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 
 export async function GET() {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -23,7 +21,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load profile' }, { status: 500 })
   }
 
-  const { data: profileRow } = await loose
+  const { data: profileRow } = await supabase
     .from('user_profiles')
     .select('*')
     .eq('user_id', user.id)
@@ -34,8 +32,6 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -97,7 +93,7 @@ export async function PATCH(request: Request) {
   }
 
   if (Object.keys(profileUpdate).length > 0) {
-    const { error } = await loose
+    const { error } = await supabase
       .from('user_profiles')
       .upsert({ user_id: user.id, ...profileUpdate }, { onConflict: 'user_id' })
     if (error) {
@@ -125,7 +121,7 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: 'Failed to load updated user' }, { status: 500 })
   }
 
-  const { data: profileRow, error: profileError } = await loose
+  const { data: profileRow, error: profileError } = await supabase
     .from('user_profiles')
     .select('*')
     .eq('user_id', user.id)

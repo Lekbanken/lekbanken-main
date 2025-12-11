@@ -10,15 +10,13 @@ function getClientIp(req: Request) {
 
 export async function GET() {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data, error } = await loose
+  const { data, error } = await supabase
     .from('user_devices')
     .select('*')
     .eq('user_id', user.id)
@@ -34,8 +32,6 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -55,7 +51,7 @@ export async function POST(request: Request) {
   let deviceId: string | null = null
 
   if (fingerprint) {
-    const { data: existing, error: selectErr } = await loose
+    const { data: existing, error: selectErr } = await supabase
       .from('user_devices')
       .select('id')
       .eq('user_id', user.id)
@@ -86,7 +82,7 @@ export async function POST(request: Request) {
   }
 
   if (!deviceId) {
-    const { data, error } = await loose
+    const { data, error } = await supabase
       .from('user_devices')
       .insert({
         user_id: user.id,

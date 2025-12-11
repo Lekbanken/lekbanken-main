@@ -11,10 +11,10 @@ import { createServerRlsClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  context: { params: Promise<{ sessionId: string }> }
 ) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await context.params;
     const supabase = await createServerRlsClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 

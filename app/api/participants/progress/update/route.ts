@@ -8,6 +8,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Database, Json } from '@/types/supabase';
 
 interface UpdateProgressRequest {
   participant_token: string;
@@ -39,8 +40,8 @@ export async function POST(request: NextRequest) {
     // Get participant by token
     const { data: participant, error: participantError } = await supabase
       .from('participants')
-      .select('id, session_id, tenant_id, status')
-      .eq('token', participant_token)
+      .select('id, session_id, status')
+      .eq('participant_token', participant_token)
       .single();
 
     if (participantError || !participant) {
@@ -55,6 +56,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Participant is blocked or kicked' },
         { status: 403 }
+      );
+    }
+
+    // Get session to resolve tenant
+    const { data: session, error: sessionError } = await supabase
+      .from('participant_sessions')
+      .select('id, tenant_id')
+      .eq('id', participant.session_id)
+      .single();
+
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Session not found for participant' },
+        { status: 404 }
       );
     }
 
@@ -81,22 +96,26 @@ export async function POST(request: NextRequest) {
       .single();
 
     const now = new Date().toISOString();
-    let progressData;
+    let progressData: Database['public']['Tables']['participant_game_progress']['Row'];
+
+    const { game_data, ...progressUpdates } = updates;
+    const parsedGameData: Json | null = (game_data as Json) ?? null;
 
     if (existingProgress) {
       // Update existing progress
-      const updateData = {
-        ...updates,
+      const updateData: Database['public']['Tables']['participant_game_progress']['Update'] = {
+        ...progressUpdates,
+        game_data: parsedGameData,
         last_updated_at: now,
       };
 
       // If status changed to 'in_progress' and started_at is null, set it
-      if (updates.status === 'in_progress' && !existingProgress.started_at) {
+      if (progressUpdates.status === 'in_progress' && !existingProgress.started_at) {
         updateData.started_at = now;
       }
 
       // If status changed to 'completed', set completed_at
-      if (updates.status === 'completed' && !existingProgress.completed_at) {
+      if (progressUpdates.status === 'completed' && !existingProgress.completed_at) {
         updateData.completed_at = now;
       }
 
@@ -118,14 +137,16 @@ export async function POST(request: NextRequest) {
       progressData = updated;
     } else {
       // Create new progress record
-      const insertData = {
-        tenant_id: participant.tenant_id,
+      const insertData: Database['public']['Tables']['participant_game_progress']['Insert'] = {
+        tenant_id: session.tenant_id,
         session_id: participant.session_id,
         participant_id: participant.id,
         game_id,
-        ...updates,
-        started_at: updates.status === 'in_progress' ? now : undefined,
-        completed_at: updates.status === 'completed' ? now : undefined,
+        ...progressUpdates,
+        game_data: parsedGameData,
+        last_updated_at: now,
+        started_at: progressUpdates.status === 'in_progress' ? now : null,
+        completed_at: progressUpdates.status === 'completed' ? now : null,
       };
 
       const { data: created, error: insertError } = await supabase
@@ -162,7 +183,6 @@ export async function POST(request: NextRequest) {
 
     // Log activity
     await supabase.from('participant_activity_log').insert({
-      tenant_id: participant.tenant_id,
       session_id: participant.session_id,
       participant_id: participant.id,
       event_type: 'progress_update',
@@ -171,7 +191,7 @@ export async function POST(request: NextRequest) {
         status: progressData.status,
         score: progressData.score,
         progress_percentage: progressData.progress_percentage,
-      },
+      } as Json,
     });
 
     return NextResponse.json({

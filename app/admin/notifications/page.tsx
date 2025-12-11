@@ -35,9 +35,7 @@ export default function NotificationsAdminPage() {
 
     const loadUsers = async () => {
       try {
-        type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-        const supa = supabase as unknown as LooseSupabase
-        const { data, error } = await supa
+        const { data, error } = await supabase
           .from('user_tenant_memberships')
           .select('user_id, users(id, email)')
           .eq('tenant_id', currentTenant.id);

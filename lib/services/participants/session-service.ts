@@ -207,15 +207,21 @@ export class ParticipantSessionService {
     const supabase = await createServiceRoleClient();
     
     // System admins have unlimited no-expiry tokens
-    const { data: systemRole } = await supabase
-      .from('user_system_roles')
-      .select('role')
-      .eq('user_id', hostUserId)
-      .eq('role', 'system_admin')
+    const { data: hostUser, error: userError } = await supabase
+      .from('users')
+      .select('global_role')
+      .eq('id', hostUserId)
       .single();
     
-    if (systemRole) {
+    if (hostUser?.global_role === 'system_admin') {
       return true; // Unlimited for system admins
+    }
+
+    if (userError) {
+      logger.warn('Unable to resolve host user for quota check', {
+        hostUserId,
+        error: userError.message,
+      });
     }
     
     // Check tenant quota
@@ -241,25 +247,42 @@ export class ParticipantSessionService {
    */
   private static async incrementNoExpiryQuota(tenantId: string): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    const { error } = await supabase.rpc('increment_no_expiry_quota', {
-      p_tenant_id: tenantId,
-    });
-    
-    if (error) {
-      // Fallback to manual increment if RPC doesn't exist
-      const { data: quota } = await supabase
+
+    const { data: quota, error: quotaError } = await supabase
+      .from('participant_token_quotas')
+      .select('no_expiry_tokens_used, no_expiry_tokens_limit')
+      .eq('tenant_id', tenantId)
+      .single();
+
+    if (quotaError) {
+      logger.error('Failed to fetch quota for increment', quotaError, { tenantId });
+      return;
+    }
+
+    if (!quota) {
+      const { error: createError } = await supabase
         .from('participant_token_quotas')
-        .select('*')
-        .eq('tenant_id', tenantId)
-        .single();
-      
-      if (quota) {
-        await supabase
-          .from('participant_token_quotas')
-          .update({ no_expiry_tokens_used: quota.no_expiry_tokens_used + 1 })
-          .eq('tenant_id', tenantId);
+        .insert({
+          tenant_id: tenantId,
+          no_expiry_tokens_limit: 2,
+          no_expiry_tokens_used: 1,
+        });
+
+      if (createError) {
+        logger.error('Failed to create quota record when incrementing', createError, {
+          tenantId,
+        });
       }
+      return;
+    }
+
+    const { error: updateError } = await supabase
+      .from('participant_token_quotas')
+      .update({ no_expiry_tokens_used: quota.no_expiry_tokens_used + 1 })
+      .eq('tenant_id', tenantId);
+
+    if (updateError) {
+      logger.error('Failed to increment no-expiry quota', updateError, { tenantId });
     }
   }
   

@@ -4,7 +4,6 @@ import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -26,8 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid or expired code' }, { status: 400 })
   }
 
-  const loose = supabase as unknown as LooseSupabase
-  const { error: mfaErr } = await loose
+  const { error: mfaErr } = await supabase
     .from('user_mfa')
     .upsert(
       {

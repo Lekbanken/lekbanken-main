@@ -21,8 +21,6 @@ interface TenantInfo {
   session_count: number;
 }
 
-type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-
 export default function SettingsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
@@ -54,8 +52,7 @@ export default function SettingsPage() {
         }
 
         // Get member count
-        const loose = supabase as unknown as LooseSupabase
-        const { count: memberCount } = await loose
+        const { count: memberCount } = await supabase
           .from('user_tenant_memberships')
           .select('*', { count: 'exact', head: true })
           .eq('tenant_id', currentTenant.id);

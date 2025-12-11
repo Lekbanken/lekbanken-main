@@ -8,6 +8,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Database, Json } from '@/types/supabase';
 
 interface UnlockAchievementRequest {
   participant_token: string;
@@ -33,8 +34,8 @@ export async function POST(request: NextRequest) {
     // Get participant by token
     const { data: participant, error: participantError } = await supabase
       .from('participants')
-      .select('id, session_id, tenant_id, status')
-      .eq('token', participant_token)
+      .select('id, session_id, status')
+      .eq('participant_token', participant_token)
       .single();
 
     if (participantError || !participant) {
@@ -52,10 +53,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get session to resolve tenant
+    const { data: session, error: sessionError } = await supabase
+      .from('participant_sessions')
+      .select('id, tenant_id')
+      .eq('id', participant.session_id)
+      .single();
+
+    if (sessionError || !session) {
+      return NextResponse.json(
+        { error: 'Session not found for participant' },
+        { status: 404 }
+      );
+    }
+
     // Get achievement details
     const { data: achievement, error: achievementError } = await supabase
       .from('achievements')
-      .select('id, name, points, rarity')
+      .select('id, name')
       .eq('id', achievement_id)
       .single();
 
@@ -65,6 +80,10 @@ export async function POST(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    const achievementPoints = 0;
+    const achievementRarity: Database['public']['Tables']['participant_achievement_unlocks']['Insert']['rarity'] = null;
+    const unlockContext: Json | null = (unlock_context as Json) ?? null;
 
     // Check if already unlocked
     const { data: existingUnlock } = await supabase
@@ -95,19 +114,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Create unlock record
+    const unlockInsert: Database['public']['Tables']['participant_achievement_unlocks']['Insert'] = {
+      tenant_id: session.tenant_id,
+      session_id: participant.session_id,
+      participant_id: participant.id,
+      game_progress_id: gameProgressId,
+      achievement_id,
+      achievement_name: achievement.name,
+      achievement_points: achievementPoints,
+      rarity: achievementRarity,
+      unlock_context: unlockContext,
+    };
+
     const { data: unlock, error: unlockError } = await supabase
       .from('participant_achievement_unlocks')
-      .insert({
-        tenant_id: participant.tenant_id,
-        session_id: participant.session_id,
-        participant_id: participant.id,
-        game_progress_id: gameProgressId,
-        achievement_id,
-        achievement_name: achievement.name,
-        achievement_points: achievement.points || 0,
-        rarity: achievement.rarity,
-        unlock_context: unlock_context || {},
-      })
+      .insert(unlockInsert)
       .select()
       .single();
 
@@ -153,24 +174,23 @@ export async function POST(request: NextRequest) {
         participant_id: participant.id,
         achievement_id,
         achievement_name: achievement.name,
-        points: achievement.points,
-        rarity: achievement.rarity,
+        points: achievementPoints,
+        rarity: achievementRarity,
         timestamp: new Date().toISOString(),
       },
     });
 
     // Log activity
     await supabase.from('participant_activity_log').insert({
-      tenant_id: participant.tenant_id,
       session_id: participant.session_id,
       participant_id: participant.id,
       event_type: 'achievement_unlock',
       event_data: {
         achievement_id,
         achievement_name: achievement.name,
-        points: achievement.points,
-        context: unlock_context,
-      },
+        points: achievementPoints,
+        context: unlock_context ?? null,
+      } as Json,
     });
 
     return NextResponse.json({
@@ -179,8 +199,8 @@ export async function POST(request: NextRequest) {
       achievement: {
         id: achievement.id,
         name: achievement.name,
-        points: achievement.points,
-        rarity: achievement.rarity,
+        points: achievementPoints,
+        rarity: achievementRarity,
       },
       message: 'Achievement unlocked successfully',
     });

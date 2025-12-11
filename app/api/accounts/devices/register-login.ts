@@ -12,14 +12,12 @@ type Params = {
 
 export async function recordLoginSession(params: Params) {
   const supabase = await createServerRlsClient()
-  type LooseSupabase = { from: (table: string) => ReturnType<typeof supabase.from> }
-  const loose = supabase as unknown as LooseSupabase
   const now = new Date().toISOString()
 
   // Upsert device if fingerprint provided
   let deviceId: string | null = null
   if (params.deviceFingerprint) {
-    const { data: existing } = await loose
+    const { data: existing } = await supabase
       .from('user_devices')
       .select('id')
       .eq('user_id', params.userId)
@@ -38,7 +36,7 @@ export async function recordLoginSession(params: Params) {
         })
         .eq('id', existing.id!)
     } else {
-      const { data: inserted } = await loose
+      const { data: inserted } = await supabase
         .from('user_devices')
         .insert({
           user_id: params.userId,
@@ -56,7 +54,7 @@ export async function recordLoginSession(params: Params) {
   }
 
   // Insert session record
-  await loose.from('user_sessions').insert({
+  await supabase.from('user_sessions').insert({
     user_id: params.userId,
     supabase_session_id: params.supabaseSessionId ?? null,
     device_id: deviceId,

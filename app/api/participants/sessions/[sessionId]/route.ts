@@ -1,5 +1,8 @@
 /**
- * Session Permanent Delete API
+ * Session Management API
+ * 
+ * GET /api/participants/sessions/[sessionId]
+ * Get session information by session code or ID
  * 
  * DELETE /api/participants/sessions/[sessionId]
  * Permanently deletes an archived session and all related data
@@ -9,6 +12,64 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import { normalizeSessionCode } from '@/lib/services/participants/session-code-generator';
+
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ sessionId: string }> }
+) {
+  try {
+    const { sessionId } = await params;
+    
+    // Check if it's a 6-character code (session code) or UUID (session ID)
+    let session;
+    if (sessionId.length === 6) {
+      // It's a session code
+      const normalizedCode = normalizeSessionCode(sessionId);
+      session = await ParticipantSessionService.getSessionByCode(normalizedCode);
+    } else {
+      // It's a session ID - fetch directly
+      const supabase = createServiceRoleClient();
+      const { data } = await supabase
+        .from('participant_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+      session = data;
+    }
+    
+    if (!session) {
+      return NextResponse.json(
+        { error: 'Session not found' },
+        { status: 404 }
+      );
+    }
+    
+    // Return public information
+    return NextResponse.json({
+      success: true,
+      session: {
+        id: session.id,
+        sessionCode: session.session_code,
+        displayName: session.display_name,
+        description: session.description,
+        status: session.status,
+        participantCount: session.participant_count,
+        maxParticipants: (session.settings as { max_participants?: number })?.max_participants,
+        expiresAt: session.expires_at,
+        createdAt: session.created_at,
+        endedAt: session.ended_at,
+      },
+    });
+    
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Failed to fetch session', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function DELETE(
   request: NextRequest,

@@ -11,8 +11,8 @@ import {
   updateShopItem,
   getMarketplaceStats,
   getTopSellingItems,
-  ShopItem,
-  MarketplaceStats,
+  type ShopItem,
+  type MarketplaceStats,
 } from '@/lib/services/marketplaceService';
 
 const ITEM_CATEGORIES = ['cosmetic', 'powerup', 'bundle', 'season_pass'];

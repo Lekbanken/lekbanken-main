@@ -60,14 +60,6 @@ const iconAnalytics = (
   </svg>
 )
 
-// Support
-const iconSupport = (
-  <svg viewBox="0 0 24 24" className={iconBase} fill="none" stroke="currentColor" strokeWidth="1.8">
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 8v4l2 2" />
-  </svg>
-)
-
 // Inställningar
 const iconSettings = (
   <svg viewBox="0 0 24 24" className={iconBase} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -151,20 +143,19 @@ export const adminMainNavItems: AdminNavItem[] = [
   { href: '/admin/content', label: 'Innehåll', icon: iconContent },
 ]
 
-// Secondary navigation items
+// Secondary navigation items (Verktyg)
 export const adminSecondaryNavItems: AdminNavItem[] = [
   { href: '/admin/analytics', label: 'Analys', icon: iconAnalytics },
   { href: '/admin/billing', label: 'Fakturering', icon: iconBilling },
   { href: '/admin/moderation', label: 'Moderering', icon: iconModeration, badge: '3' },
   { href: '/admin/notifications', label: 'Notifikationer', icon: iconNotifications },
-  { href: '/admin/support', label: 'Support', icon: iconSupport, badge: '5' },
-  { href: '/admin/tickets', label: 'Ärenden', icon: iconTickets },
+  { href: '/admin/tickets', label: 'Ärenden', icon: iconTickets, badge: '5' },
 ]
 
 // Settings/System navigation items  
 export const adminSettingsNavItems: AdminNavItem[] = [
   { href: '/admin/leaderboard', label: 'Leaderboard', icon: iconLeaderboard },
-  { href: '/admin/achievements-advanced', label: 'Achievements', icon: iconAchievements },
+  { href: '/admin/achievements', label: 'Achievements', icon: iconAchievements },
   { href: '/admin/personalization', label: 'Personalisering', icon: iconPersonalization },
   { href: '/admin/marketplace', label: 'Butik', icon: iconMarketplace },
   { href: '/admin/settings', label: 'Inställningar', icon: iconSettings },

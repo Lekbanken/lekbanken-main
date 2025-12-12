@@ -12,8 +12,8 @@ import {
   completeQueueItem,
   getModerationStats,
   createModerationAction,
-  ContentReport,
-  ModerationStats,
+  type ContentReport,
+  type ModerationStats,
 } from '@/lib/services/moderationService';
 
 // Report and action types

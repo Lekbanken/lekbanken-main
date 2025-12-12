@@ -11,3 +11,13 @@ export {
   AdminFilterSelect,
   AdminCard,
 } from './AdminStates';
+export { 
+  AdminBreadcrumbs, 
+  buildBreadcrumbsFromPath, 
+  adminLabelMap,
+  type BreadcrumbItem,
+} from './AdminBreadcrumbs';
+export { 
+  AdminConfirmDialog, 
+  useConfirmDialog,
+} from './AdminConfirmDialog';

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Badge } from '@/components/ui/badge'
 import { AchievementEditorWizard } from '@/features/admin/achievements/editor/AchievementEditorWizard'
-import { AchievementItem } from '@/features/admin/achievements/types'
+import type { AchievementItem } from '@/features/admin/achievements/types'
 import { themes } from '@/features/admin/achievements/data'
 import { SandboxShell as SandboxShellV2 } from '../../components/shell/SandboxShellV2'
 

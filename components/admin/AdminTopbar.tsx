@@ -6,10 +6,11 @@ import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { AdminNotificationsCenter, useAdminNotifications } from "./AdminNotificationsCenter";
+import { useCommandPalette } from "./AdminCommandPalette";
 import {
   Bars3Icon,
   MagnifyingGlassIcon,
-  BellIcon,
   ChevronRightIcon,
   HomeIcon,
   UserIcon,
@@ -65,6 +66,39 @@ function Breadcrumbs() {
 
 export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { setOpen: setCommandPaletteOpen } = useCommandPalette();
+  const { 
+    notifications, 
+    markAsRead, 
+    markAllAsRead, 
+    dismiss 
+  } = useAdminNotifications([
+    // Demo notifications - in real app these would come from a server/subscription
+    {
+      id: '1',
+      title: 'Ny användare registrerad',
+      message: 'John Doe har registrerat sig och väntar på godkännande.',
+      type: 'info',
+      timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      read: false,
+    },
+    {
+      id: '2',
+      title: 'Fakturabetalning förfallen',
+      message: 'Organisation "Skola ABC" har en förfallen faktura.',
+      type: 'warning',
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      read: false,
+    },
+    {
+      id: '3',
+      title: 'System uppdaterat',
+      message: 'Version 2.4.1 har installerats framgångsrikt.',
+      type: 'success',
+      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      read: true,
+    },
+  ]);
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/80 px-4 backdrop-blur-sm lg:px-6">
@@ -84,19 +118,18 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
 
       {/* Center: Search */}
       <div className="hidden flex-1 justify-center md:flex md:max-w-md lg:max-w-lg">
-        <div className="relative w-full">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Sök användare, organisationer..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9 w-full rounded-lg bg-muted/50 pl-9 pr-12 text-sm placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30"
-          />
-          <kbd className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground lg:inline-block">
-            ⌘K
-          </kbd>
-        </div>
+        <button
+          onClick={() => setCommandPaletteOpen(true)}
+          className="relative w-full"
+        >
+          <div className="flex h-9 w-full items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <MagnifyingGlassIcon className="h-4 w-4" />
+            <span className="flex-1 text-left">Sök användare, organisationer...</span>
+            <kbd className="hidden rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground lg:inline-block">
+              ⌘K
+            </kbd>
+          </div>
+        </button>
       </div>
 
       {/* Right side: Actions */}
@@ -106,15 +139,12 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
           Ny användare
         </Button>
 
-        <button
-          className="relative rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          aria-label="Notiser"
-        >
-          <BellIcon className="h-5 w-5" />
-          <span className="absolute right-1 top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-            3
-          </span>
-        </button>
+        <AdminNotificationsCenter
+          notifications={notifications}
+          onMarkAsRead={markAsRead}
+          onMarkAllAsRead={markAllAsRead}
+          onDismiss={dismiss}
+        />
 
         <ThemeToggle />
         <ProfileMenu context="admin" />

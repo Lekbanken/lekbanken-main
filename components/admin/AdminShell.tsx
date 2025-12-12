@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { ActingAsTenantBanner } from "./ActingAsTenantBanner";
+import { AdminCommandPalette, useCommandPalette } from "./AdminCommandPalette";
 import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
 import { resetAuth } from "@/lib/supabase/resetAuth";
@@ -17,6 +18,7 @@ export function AdminShell({ children }: AdminShellProps) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
+  const { open: commandPaletteOpen, setOpen: setCommandPaletteOpen } = useCommandPalette();
   const router = useRouter();
   const { user, userRole, isLoading } = useAuth();
   const { currentTenant, hasTenants, isLoadingTenants } = useTenant();
@@ -130,6 +132,12 @@ export function AdminShell({ children }: AdminShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      {/* Command Palette */}
+      <AdminCommandPalette 
+        open={commandPaletteOpen} 
+        onOpenChange={setCommandPaletteOpen} 
+      />
+
       <div className="flex min-h-screen">
         {/* Desktop Sidebar */}
         <AdminSidebar

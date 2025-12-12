@@ -23,7 +23,7 @@ import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
 import type { Database } from "@/types/supabase";
 import { createMockUsers } from "./data";
-import { UserAdminItem, UserFilters, UserRole, UserStatus } from "./types";
+import type { UserAdminItem, UserFilters, UserRole, UserStatus } from "./types";
 import { UserTable } from "./components/UserTable";
 import { UserTableToolbar } from "./components/UserTableToolbar";
 import { UserInviteDialog } from "./components/UserInviteDialog";
@@ -32,7 +32,14 @@ import { UserTablePagination } from "./components/UserTablePagination";
 
 const USERS_PER_PAGE = 15;
 
-type MembershipRow = any & {
+// Note: user_tenant_memberships table type not in generated types yet
+// Using manual type definition until DB types are regenerated
+type MembershipRow = {
+  id: string;
+  user_id: string;
+  tenant_id: string;
+  role: string;
+  created_at: string;
   users: { email: string | null; full_name: string | null } | null;
   tenants: { name: string | null } | null;
 };
@@ -59,8 +66,6 @@ export function UserAdminPage() {
   // RBAC permissions
   const canViewUsers = can('admin.users.list');
   const canInviteUser = can('admin.users.create');
-  const canEditUser = can('admin.users.edit');
-  const canDeleteUser = can('admin.users.delete');
 
   const [users, setUsers] = useState<UserAdminItem[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
@@ -95,30 +100,31 @@ export function UserAdminPage() {
     setIsLoadingUsers(true);
     setError(null);
     try {
-      const query = (supabase as any)
+      let query = supabase
         .from("user_tenant_memberships")
         .select("id, user_id, role, tenant_id, created_at, tenants ( name ), users ( email, full_name )")
         .order("created_at", { ascending: false });
 
-      const { data, error: queryError } = tenantId ? (query as any).eq("tenant_id", tenantId) : (query as any);
+      if (tenantId) {
+        query = query.eq("tenant_id", tenantId);
+      }
+
+      const { data, error: queryError } = await query;
 
       if (queryError) {
         throw queryError;
       }
 
-      const mapped: UserAdminItem[] = (data || []).map((row: any) => {
-        const membership = row as MembershipRow;
-        return {
-          id: membership.id,
-          userId: membership.user_id,
-          email: membership.users?.email ?? "unknown@example.com",
-          name: membership.users?.full_name ?? null,
-          roles: [membership.role as UserRole],
-          organisationName: membership.tenants?.name ?? tenantName,
-          status: "active",
-          createdAt: membership.created_at,
-        };
-      });
+      const mapped: UserAdminItem[] = ((data ?? []) as MembershipRow[]).map((membership: MembershipRow) => ({
+        id: membership.id,
+        userId: membership.user_id,
+        email: membership.users?.email ?? "unknown@example.com",
+        name: membership.users?.full_name ?? null,
+        roles: [membership.role as UserRole],
+        organisationName: membership.tenants?.name ?? tenantName,
+        status: "active",
+        createdAt: membership.created_at,
+      }));
 
       setUsers(mapped);
     } catch (err) {
@@ -175,7 +181,7 @@ export function UserAdminPage() {
     }
     try {
       // Update membership role/status in DB
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from("user_tenant_memberships")
         .update({ role: payload.roles[0] })
         .eq("id", editingUser.id);
@@ -239,7 +245,7 @@ export function UserAdminPage() {
       }
 
       // Insert membership
-      const { data: membership, error: membershipError } = await (supabase as any)
+      const { data: membership, error: membershipError } = await supabase
         .from("user_tenant_memberships")
         .insert({
           user_id: userRow.id,
@@ -251,15 +257,17 @@ export function UserAdminPage() {
 
       if (membershipError) throw membershipError;
 
+      const membershipRow = membership as MembershipRow;
+
       const newUser: UserAdminItem = {
-        id: membership.id,
+        id: membershipRow.id,
         userId: userRow.id,
-        email: membership.users?.email ?? payload.email,
-        name: payload.name || membership.users?.full_name || payload.email,
+        email: membershipRow.users?.email ?? payload.email,
+        name: payload.name || membershipRow.users?.full_name || payload.email,
         roles: [payload.role],
-        organisationName: membership.tenants?.name || currentTenant.name,
+        organisationName: membershipRow.tenants?.name || currentTenant.name,
         status: "active",
-        createdAt: membership.created_at,
+        createdAt: membershipRow.created_at,
       };
 
       setUsers((prev) => [newUser, ...prev]);
@@ -278,7 +286,7 @@ export function UserAdminPage() {
       return;
     }
     try {
-      const { error: deleteError } = await (supabase as any).from("user_tenant_memberships").delete().eq("id", userId);
+      const { error: deleteError } = await supabase.from("user_tenant_memberships").delete().eq("id", userId);
       if (deleteError) throw deleteError;
       warning("User removed from organisation list.", "User removed");
     } catch (err) {

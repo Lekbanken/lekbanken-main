@@ -5,6 +5,7 @@ export { AdminPageHeader } from './AdminPageHeader';
 export { AdminPageLayout, AdminSection, AdminGrid } from './AdminPageLayout';
 export { AdminStatCard, AdminStatGrid } from './AdminStatCard';
 export { AdminDataTable, AdminTableToolbar, AdminPagination } from './AdminDataTable';
+export { AdminExportButton } from './AdminExportButton';
 export { 
   AdminErrorState, 
   AdminEmptyState, 

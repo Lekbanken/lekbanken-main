@@ -37,6 +37,12 @@ function useFilteredNavGroups(): AdminNavGroupConfig[] {
     const baseConfig = currentTenantId && !isSystemAdmin 
       ? tenantAdminNavConfig 
       : adminNavConfig;
+
+    // Resolve tenant placeholders in hrefs
+    const resolveHref = (href: string) => {
+      if (!currentTenantId) return href;
+      return href.replace('[tenantId]', currentTenantId);
+    };
     
     return baseConfig
       .filter((group) => {
@@ -54,7 +60,10 @@ function useFilteredNavGroups(): AdminNavGroupConfig[] {
           // Permission check
           if (item.permission && !can(item.permission)) return false;
           return true;
-        }),
+        }).map((item) => ({
+          ...item,
+          href: resolveHref(item.href),
+        })),
       }))
       .filter((group) => group.items.length > 0); // Remove empty groups
   }, [can, isSystemAdmin, currentTenantId]);

@@ -240,25 +240,25 @@ export const tenantAdminNavConfig: AdminNavConfig = [
     id: 'tenant-main',
     title: 'Min Organisation',
     items: [
-      { id: 'tenant-dashboard', href: '/admin/tenant', label: 'Översikt', icon: navIcons.dashboard },
-      { id: 'tenant-members', href: '/admin/tenant/members', label: 'Medlemmar', icon: navIcons.users },
-      { id: 'tenant-settings', href: '/admin/tenant/settings', label: 'Inställningar', icon: navIcons.settings },
+      { id: 'tenant-dashboard', href: '/admin/tenant/[tenantId]', label: 'Översikt', icon: navIcons.dashboard },
+      { id: 'tenant-members', href: '/admin/tenant/[tenantId]/members', label: 'Medlemmar', icon: navIcons.users },
+      { id: 'tenant-settings', href: '/admin/tenant/[tenantId]/settings', label: 'Inställningar', icon: navIcons.settings },
     ],
   },
   {
     id: 'tenant-content',
     title: 'Innehåll',
     items: [
-      { id: 'tenant-games', href: '/admin/tenant/games', label: 'Spel', icon: navIcons.games },
-      { id: 'tenant-content', href: '/admin/tenant/content', label: 'Material', icon: navIcons.content },
+      { id: 'tenant-games', href: '/admin/tenant/[tenantId]/games', label: 'Spel', icon: navIcons.games },
+      { id: 'tenant-content', href: '/admin/tenant/[tenantId]/content', label: 'Material', icon: navIcons.content },
     ],
   },
   {
     id: 'tenant-billing',
     title: 'Konto',
     items: [
-      { id: 'tenant-subscription', href: '/admin/tenant/subscription', label: 'Prenumeration', icon: navIcons.billing },
-      { id: 'tenant-analytics', href: '/admin/tenant/analytics', label: 'Statistik', icon: navIcons.analytics },
+      { id: 'tenant-subscription', href: '/admin/tenant/[tenantId]/subscription', label: 'Prenumeration', icon: navIcons.billing },
+      { id: 'tenant-analytics', href: '/admin/tenant/[tenantId]/analytics', label: 'Statistik', icon: navIcons.analytics },
     ],
   },
 ];

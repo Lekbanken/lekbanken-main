@@ -1,3 +1,5 @@
+'use client';
+
 import { PuzzlePieceIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
 import { Button } from "@/components/ui/button";

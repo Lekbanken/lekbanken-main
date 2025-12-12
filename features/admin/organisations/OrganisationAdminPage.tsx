@@ -28,7 +28,7 @@ import { OrganisationEditDialog } from "./components/OrganisationEditDialog";
 import { OrganisationCreateDialog } from "./components/OrganisationCreateDialog";
 import { OrganisationTablePagination } from "./components/OrganisationTablePagination";
 
-type TenantRow = Database["public"]["Tables"]["tenants"]["Row"] & {
+type TenantWithMembershipCount = Database["public"]["Tables"]["tenants"]["Row"] & {
   user_tenant_memberships?: { count: number | null }[];
 };
 
@@ -71,7 +71,7 @@ export function OrganisationAdminPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const { data, error: queryError } = await (supabase as any)
+      const { data, error: queryError } = await supabase
         .from("tenants")
         .select(
           "id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at, user_tenant_memberships(count)"
@@ -82,7 +82,7 @@ export function OrganisationAdminPage() {
         throw queryError;
       }
 
-      const mapped: OrganisationAdminItem[] = (data || []).map((tenant: any) => ({
+      const mapped: OrganisationAdminItem[] = (data || [] as TenantWithMembershipCount[]).map((tenant) => ({
         id: tenant.id,
         name: tenant.name,
         slug: tenant.slug,
@@ -282,7 +282,7 @@ export function OrganisationAdminPage() {
   const canViewTenants = can('admin.tenants.list');
   const canCreateTenant = can('admin.tenants.create');
   const canEditTenant = can('admin.tenants.edit');
-  const canDeleteTenant = can('admin.tenants.delete');
+  // const canDeleteTenant = can('admin.tenants.delete');
 
   if (rbacLoading || (isLoading && organisations.length === 0)) {
     return (

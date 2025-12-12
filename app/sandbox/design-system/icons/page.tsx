@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
 import { notFound } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
@@ -190,10 +191,13 @@ export default function IconGuidelinesPage() {
                   {[{ label: 'Original', src: pair.primary }, { label: 'Test', src: pair.secondary }].map((item) => (
                     <div key={item.label} className={`rounded-lg ${pair.bgClass} p-4`}>
                       <div className="flex h-32 items-center justify-center">
-                        <img
+                        <Image
                           src={item.src || '/lekbanken-icon.png'}
                           alt={`${item.label} ikon`}
+                          width={64}
+                          height={64}
                           className="h-16 w-16"
+                          unoptimized
                         />
                       </div>
                       <div className={`mt-3 text-xs ${pair.textClass}`}>{item.label}</div>

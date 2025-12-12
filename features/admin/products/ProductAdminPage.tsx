@@ -20,7 +20,7 @@ import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useAuth } from "@/lib/supabase/auth";
 import type { Database } from "@/types/supabase";
 import { getBaseCapabilities } from "./data";
-import { ProductAdminItem, ProductFilters, ProductStatus } from "./types";
+import type { ProductAdminItem, ProductFilters, ProductStatus } from "./types";
 import { ProductTable } from "./components/ProductTable";
 import { ProductTableToolbar } from "./components/ProductTableToolbar";
 import { ProductCreateDialog } from "./components/ProductCreateDialog";

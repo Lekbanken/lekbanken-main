@@ -7,6 +7,12 @@ export { AdminStatCard, AdminStatGrid } from './AdminStatCard';
 export { AdminDataTable, AdminTableToolbar, AdminPagination } from './AdminDataTable';
 export { AdminExportButton } from './AdminExportButton';
 export { 
+  AdminBulkActions, 
+  useTableSelection,
+  bulkActionPresets,
+  type BulkAction,
+} from './AdminBulkActions';
+export { 
   AdminErrorState, 
   AdminEmptyState, 
   AdminFilterSelect,

@@ -3,6 +3,7 @@
 import type { ReactNode, ReactElement } from 'react';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
+import { MinusIcon } from '@heroicons/react/24/solid';
 
 interface Column<T> {
   /** Column header */
@@ -40,6 +41,18 @@ interface AdminDataTableProps<T> {
   skeletonRows?: number;
   /** Caption for accessibility */
   caption?: string;
+  /** Enable row selection with checkboxes */
+  selectable?: boolean;
+  /** Check if a row is selected (for controlled selection) */
+  isRowSelected?: (row: T) => boolean;
+  /** Handler for toggling row selection */
+  onToggleRow?: (row: T) => void;
+  /** Handler for toggling all rows */
+  onToggleAll?: () => void;
+  /** Whether all rows are selected */
+  allSelected?: boolean;
+  /** Whether some (but not all) rows are selected */
+  someSelected?: boolean;
 }
 
 const alignClasses = {
@@ -80,6 +93,12 @@ export function AdminDataTable<T>({
   className = '',
   skeletonRows = 5,
   caption,
+  selectable = false,
+  isRowSelected,
+  onToggleRow,
+  onToggleAll,
+  allSelected = false,
+  someSelected = false,
 }: AdminDataTableProps<T>): ReactElement {
   const getKey = (row: T): string => {
     if (typeof keyAccessor === 'function') {
@@ -99,6 +118,48 @@ export function AdminDataTable<T>({
     return value !== null && value !== undefined ? String(value) : '–';
   };
 
+  // Checkbox component for selection
+  const SelectionCheckbox = ({ 
+    checked, 
+    indeterminate = false,
+    onChange, 
+    label 
+  }: { 
+    checked: boolean; 
+    indeterminate?: boolean;
+    onChange: () => void; 
+    label: string;
+  }) => (
+    <div className="flex items-center justify-center">
+      <label className="sr-only">{label}</label>
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          onClick={(e) => e.stopPropagation()}
+          className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-border bg-background transition-colors checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1"
+          aria-label={label}
+        />
+        {indeterminate ? (
+          <MinusIcon 
+            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100" 
+            aria-hidden="true"
+          />
+        ) : (
+          <svg
+            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
+          </svg>
+        )}
+      </div>
+    </div>
+  );
+
   // Loading skeleton
   if (isLoading) {
     return (
@@ -108,6 +169,11 @@ export function AdminDataTable<T>({
             {caption && <caption className="sr-only">{caption}</caption>}
             <thead className="border-b border-border bg-muted/40">
               <tr>
+                {selectable && (
+                  <th scope="col" className="w-12 px-4 py-3.5">
+                    <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+                  </th>
+                )}
                 {columns.map((col, i) => (
                   <th
                     key={i}
@@ -122,6 +188,11 @@ export function AdminDataTable<T>({
             <tbody className="divide-y divide-border">
               {Array.from({ length: skeletonRows }).map((_, rowIndex) => (
                 <tr key={rowIndex}>
+                  {selectable && (
+                    <td className="w-12 px-4 py-3.5">
+                      <div className="h-4 w-4 animate-pulse rounded bg-muted" />
+                    </td>
+                  )}
                   {columns.map((col, colIndex) => (
                     <td
                       key={colIndex}
@@ -158,6 +229,16 @@ export function AdminDataTable<T>({
           {caption && <caption className="sr-only">{caption}</caption>}
           <thead className="border-b border-border bg-muted/40">
             <tr>
+              {selectable && onToggleAll && (
+                <th scope="col" className="w-12 px-4 py-3.5">
+                  <SelectionCheckbox
+                    checked={allSelected || someSelected}
+                    indeterminate={someSelected && !allSelected}
+                    onChange={onToggleAll}
+                    label={allSelected ? 'Avmarkera alla' : 'Markera alla'}
+                  />
+                </th>
+              )}
               {columns.map((col, i) => (
                 <th
                   key={i}
@@ -170,29 +251,41 @@ export function AdminDataTable<T>({
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {data.map((row) => (
-              <tr
-                key={getKey(row)}
-                className={`transition-colors hover:bg-muted/50 ${onRowClick ? 'cursor-pointer focus-within:bg-muted/50' : ''}`}
-                onClick={() => onRowClick?.(row)}
-                tabIndex={onRowClick ? 0 : undefined}
-                onKeyDown={(e) => {
-                  if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
-                    e.preventDefault();
-                    onRowClick(row);
-                  }
-                }}
-              >
-                {columns.map((col, i) => (
-                  <td
-                    key={i}
-                    className={`px-4 py-3.5 text-sm text-foreground ${alignClasses[col.align || 'left']} ${col.hideBelow ? hideClasses[col.hideBelow] : ''}`}
-                  >
-                    {getCellValue(row, col)}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {data.map((row) => {
+              const isSelected = selectable && isRowSelected?.(row);
+              return (
+                <tr
+                  key={getKey(row)}
+                  className={`transition-colors hover:bg-muted/50 ${onRowClick ? 'cursor-pointer focus-within:bg-muted/50' : ''} ${isSelected ? 'bg-primary/5' : ''}`}
+                  onClick={() => onRowClick?.(row)}
+                  tabIndex={onRowClick ? 0 : undefined}
+                  onKeyDown={(e) => {
+                    if (onRowClick && (e.key === 'Enter' || e.key === ' ')) {
+                      e.preventDefault();
+                      onRowClick(row);
+                    }
+                  }}
+                >
+                  {selectable && onToggleRow && (
+                    <td className="w-12 px-4 py-3.5">
+                      <SelectionCheckbox
+                        checked={isSelected || false}
+                        onChange={() => onToggleRow(row)}
+                        label={isSelected ? 'Avmarkera rad' : 'Markera rad'}
+                      />
+                    </td>
+                  )}
+                  {columns.map((col, i) => (
+                    <td
+                      key={i}
+                      className={`px-4 py-3.5 text-sm text-foreground ${alignClasses[col.align || 'left']} ${col.hideBelow ? hideClasses[col.hideBelow] : ''}`}
+                    >
+                      {getCellValue(row, col)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

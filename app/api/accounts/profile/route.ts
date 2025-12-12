@@ -12,7 +12,9 @@ export async function GET() {
 
   const { data: userRow, error: userError } = await supabase
     .from('users')
-    .select('id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role')
+    .select(
+      'id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role,role'
+    )
     .eq('id', user.id)
     .maybeSingle()
 
@@ -112,7 +114,9 @@ export async function PATCH(request: Request) {
 
   const { data: userRow, error: userError } = await supabase
     .from('users')
-    .select('id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role')
+    .select(
+      'id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role,role'
+    )
     .eq('id', user.id)
     .maybeSingle()
 

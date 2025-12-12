@@ -67,6 +67,51 @@ const hideClasses = {
   lg: 'hidden lg:table-cell',
 };
 
+type SelectionCheckboxProps = {
+  checked: boolean;
+  indeterminate?: boolean;
+  onChange: () => void;
+  label: string;
+};
+
+function SelectionCheckbox({
+  checked,
+  indeterminate = false,
+  onChange,
+  label,
+}: SelectionCheckboxProps) {
+  return (
+    <div className="flex items-center justify-center">
+      <label className="sr-only">{label}</label>
+      <div className="relative">
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={onChange}
+          onClick={(e) => e.stopPropagation()}
+          className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-border bg-background transition-colors checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1"
+          aria-label={label}
+        />
+        {indeterminate ? (
+          <MinusIcon
+            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100"
+            aria-hidden="true"
+          />
+        ) : (
+          <svg
+            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100"
+            viewBox="0 0 16 16"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
+          </svg>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /**
  * Shared data table component for admin pages.
  * Provides consistent table styling with loading and empty states.
@@ -117,48 +162,6 @@ export function AdminDataTable<T>({
     const value = row[column.accessor];
     return value !== null && value !== undefined ? String(value) : '–';
   };
-
-  // Checkbox component for selection
-  const SelectionCheckbox = ({ 
-    checked, 
-    indeterminate = false,
-    onChange, 
-    label 
-  }: { 
-    checked: boolean; 
-    indeterminate?: boolean;
-    onChange: () => void; 
-    label: string;
-  }) => (
-    <div className="flex items-center justify-center">
-      <label className="sr-only">{label}</label>
-      <div className="relative">
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={onChange}
-          onClick={(e) => e.stopPropagation()}
-          className="peer h-4 w-4 cursor-pointer appearance-none rounded border border-border bg-background transition-colors checked:border-primary checked:bg-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-1"
-          aria-label={label}
-        />
-        {indeterminate ? (
-          <MinusIcon 
-            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100" 
-            aria-hidden="true"
-          />
-        ) : (
-          <svg
-            className="pointer-events-none absolute left-0 top-0 h-4 w-4 text-primary-foreground opacity-0 peer-checked:opacity-100"
-            viewBox="0 0 16 16"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z" />
-          </svg>
-        )}
-      </div>
-    </div>
-  );
 
   // Loading skeleton
   if (isLoading) {

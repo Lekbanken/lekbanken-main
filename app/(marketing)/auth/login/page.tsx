@@ -34,7 +34,8 @@ function LoginForm() {
   const [error, setError] = useState('')
 
   const redirectParam = searchParams.get('redirect')
-  const redirectTo = redirectParam || (userRole === 'admin' ? '/admin' : '/app')
+  const isAdminRole = userRole === 'admin' || userRole === 'superadmin'
+  const redirectTo = redirectParam || (isAdminRole ? '/admin' : '/app')
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {

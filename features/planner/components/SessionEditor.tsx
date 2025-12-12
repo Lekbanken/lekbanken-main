@@ -27,6 +27,7 @@ type SessionEditorProps = {
   onSavePrivateNote: (content: string) => Promise<void>;
   onVisibilityChange: (visibility: PlannerVisibility) => Promise<void>;
   onReorderBlocks: (blockIds: string[]) => Promise<void>;
+  canSetPublicVisibility?: boolean;
 };
 
 type GameSearchResult = {
@@ -54,6 +55,7 @@ export function SessionEditor({
   onSavePrivateNote,
   onVisibilityChange,
   onReorderBlocks,
+  canSetPublicVisibility = false,
 }: SessionEditorProps) {
   const [localPlan, setLocalPlan] = useState<PlannerPlan>(plan);
   const [noteContent, setNoteContent] = useState<string>(plan.notes?.privateNote?.content ?? "");
@@ -189,6 +191,7 @@ export function SessionEditor({
             />
             <VisibilitySwitcher
               value={localPlan.visibility}
+              canSetPublic={canSetPublicVisibility}
               onChange={(next) => void onVisibilityChange(next)}
             />
           </div>
@@ -365,14 +368,16 @@ export function SessionEditor({
 function VisibilitySwitcher({
   value,
   onChange,
+  canSetPublic = false,
 }: {
   value: PlannerVisibility;
   onChange: (v: PlannerVisibility) => void;
+  canSetPublic?: boolean;
 }) {
-  const options: { label: string; value: PlannerVisibility }[] = [
+  const options: { label: string; value: PlannerVisibility; disabled?: boolean; tooltip?: string }[] = [
     { label: "Privat", value: "private" },
     { label: "Tenant", value: "tenant" },
-    { label: "Public", value: "public" },
+    { label: "Public", value: "public", disabled: !canSetPublic, tooltip: "Endast systemadmin kan göra planer publika" },
   ];
 
   return (
@@ -381,12 +386,19 @@ function VisibilitySwitcher({
         <button
           key={opt.value}
           type="button"
-          onClick={() => onChange(opt.value)}
+          onClick={() => {
+            if (opt.disabled) return;
+            onChange(opt.value);
+          }}
+          aria-disabled={opt.disabled}
+          title={opt.disabled ? opt.tooltip : undefined}
           className={clsx(
             "rounded-full px-3 py-1 transition",
             value === opt.value
               ? "bg-primary text-primary-foreground shadow-sm"
-              : "hover:bg-muted"
+              : opt.disabled
+                ? "cursor-not-allowed opacity-60"
+                : "hover:bg-muted"
           )}
         >
           {opt.label}

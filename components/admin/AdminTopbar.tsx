@@ -1,11 +1,10 @@
-'use client';
+﻿'use client';
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { AdminNotificationsCenter, useAdminNotifications } from "./AdminNotificationsCenter";
 import { useCommandPalette } from "./AdminCommandPalette";
 import {
@@ -65,8 +64,8 @@ function Breadcrumbs() {
 }
 
 export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
-  const [searchQuery, setSearchQuery] = useState("");
   const { setOpen: setCommandPaletteOpen } = useCommandPalette();
+  const [baseNow] = useState(() => Date.now());
   const { 
     notifications, 
     markAsRead, 
@@ -76,26 +75,26 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
     // Demo notifications - in real app these would come from a server/subscription
     {
       id: '1',
-      title: 'Ny användare registrerad',
-      message: 'John Doe har registrerat sig och väntar på godkännande.',
+      title: 'Ny anv?ndare registrerad',
+      message: 'John Doe har registrerat sig och v?ntar p? godk?nnande.',
       type: 'info',
-      timestamp: new Date(Date.now() - 5 * 60 * 1000),
+      timestamp: new Date(baseNow - 5 * 60 * 1000),
       read: false,
     },
     {
       id: '2',
-      title: 'Fakturabetalning förfallen',
-      message: 'Organisation "Skola ABC" har en förfallen faktura.',
+      title: 'Fakturabetalning f?rfallen',
+      message: 'Organisation "Skola ABC" har en f?rfallen faktura.',
       type: 'warning',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000),
+      timestamp: new Date(baseNow - 2 * 60 * 60 * 1000),
       read: false,
     },
     {
       id: '3',
       title: 'System uppdaterat',
-      message: 'Version 2.4.1 har installerats framgångsrikt.',
+      message: 'Version 2.4.1 har installerats framg?ngsrikt.',
       type: 'success',
-      timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      timestamp: new Date(baseNow - 24 * 60 * 60 * 1000),
       read: true,
     },
   ]);
@@ -124,7 +123,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
         >
           <div className="flex h-9 w-full items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
             <MagnifyingGlassIcon className="h-4 w-4" />
-            <span className="flex-1 text-left">Sök användare, organisationer...</span>
+            <span className="flex-1 text-left">Sök Användare, organisationer...</span>
             <kbd className="hidden rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground lg:inline-block">
               ⌘K
             </kbd>
@@ -136,7 +135,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" className="hidden gap-2 xl:inline-flex">
           <UserIcon className="h-4 w-4" />
-          Ny användare
+          Ny Användare
         </Button>
 
         <AdminNotificationsCenter

@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { useState, useEffect, useMemo } from 'react';
 import { 
   UserPlusIcon,
@@ -181,10 +183,13 @@ export function AdminActivityFeed({
             {/* Actor avatar */}
             <div className="flex-shrink-0">
               {activity.actor.avatarUrl ? (
-                <img
+                <Image
                   src={activity.actor.avatarUrl}
                   alt=""
                   className="h-8 w-8 rounded-full"
+                  width={32}
+                  height={32}
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-xs font-medium text-muted-foreground">

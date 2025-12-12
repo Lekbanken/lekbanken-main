@@ -3,7 +3,6 @@ import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { isSystemAdmin } from '@/lib/utils/authRoles'
-import type { Database } from '@/types/supabase'
 
 export async function GET() {
   const supabase = await createServerRlsClient()
@@ -16,7 +15,9 @@ export async function GET() {
 
   const { data: userRow } = await supabase
     .from('users')
-    .select('id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role')
+    .select(
+      'id,email,full_name,language,avatar_url,preferred_theme,show_theme_toggle_in_header,global_role,role'
+    )
     .eq('id', user.id)
     .maybeSingle()
 
@@ -34,6 +35,6 @@ export async function GET() {
     auth_user: user,
     memberships: memberships ?? [],
     active_tenant_id: activeTenantId,
-    is_system_admin: isSystemAdmin(user as any, globalRole),
+    is_system_admin: isSystemAdmin(user as { app_metadata?: { roles?: string[] } }, globalRole),
   })
 }

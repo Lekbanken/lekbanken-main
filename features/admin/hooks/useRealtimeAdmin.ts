@@ -244,5 +244,5 @@ export function useRealtimePresence({
     };
   }, [supabase, channelName, userState, onSync, onJoin, onLeave, enabled]);
 
-  return { channel: channelRef.current };
+  return { channelRef };
 }

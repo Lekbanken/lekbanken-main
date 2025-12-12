@@ -8,12 +8,16 @@ import { createPlan, fetchPlans, updatePlan, addBlock, updateBlock, deleteBlock,
 import type { PlannerPlan, PlannerBlock, PlannerVisibility } from "./types";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/lib/supabase/auth";
+import { isSystemAdmin } from "@/lib/utils/authRoles";
 
 export function PlannerPage() {
   const [plans, setPlans] = useState<PlannerPlan[]>([]);
   const [activePlanId, setActivePlanId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user, userProfile } = useAuth();
+  const canSetPublic = isSystemAdmin(user, userProfile?.global_role ?? null);
 
   const loadPlans = async () => {
     setIsLoading(true);
@@ -142,7 +146,11 @@ export function PlannerPage() {
       updatePlanState(updated);
     } catch (err) {
       console.error(err);
-      setError("Kunde inte uppdatera synlighet");
+      const message =
+        err instanceof Error && err.message.toLowerCase().includes("public visibility")
+          ? "Endast systemadmin kan sätta planer som publika."
+          : "Kunde inte uppdatera synlighet";
+      setError(message);
     }
   };
 
@@ -182,6 +190,7 @@ export function PlannerPage() {
             onUpdateBlock={handleUpdateBlock}
             onDeleteBlock={handleDeleteBlock}
             onSavePrivateNote={handleSaveNote}
+            canSetPublicVisibility={canSetPublic}
             onVisibilityChange={(visibility) => handleVisibilityChange(activePlan.id, visibility)}
             onReorderBlocks={handleReorderBlocks}
           />

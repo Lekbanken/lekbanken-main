@@ -171,12 +171,19 @@ export function AdminNotificationsCenter({
                 <ul className="divide-y divide-border">
                   {notifications.map((notification) => (
                     <li key={notification.id}>
-                      <button
+                      <div
+                        role="menuitem"
+                        tabIndex={0}
                         onClick={() => handleNotificationClick(notification)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleNotificationClick(notification);
+                          }
+                        }}
                         className={`flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-muted ${
                           !notification.read ? 'bg-muted/50' : ''
                         }`}
-                        role="menuitem"
                       >
                         {/* Unread indicator */}
                         <div className="mt-1.5 shrink-0">
@@ -213,7 +220,7 @@ export function AdminNotificationsCenter({
                             <XMarkIcon className="h-4 w-4" />
                           </button>
                         )}
-                      </button>
+                      </div>
                     </li>
                   ))}
                 </ul>

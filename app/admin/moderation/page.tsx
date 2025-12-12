@@ -146,11 +146,11 @@ export default function ModerationAdminPage() {
       )}
 
       {stats && (
-        <AdminStatGrid className="mb-4">
-          <AdminStatCard label="Öppna rapporter" value={reports.length} />
+      <AdminStatGrid className="mb-4">
+          <AdminStatCard label="Öppna rapporter" value={stats.pending_reports ?? reports.length} />
           <AdminStatCard label="Kö" value={openQueueCount} />
-          <AdminStatCard label="Hanterade (24h)" value={stats.reports_processed_last_24h || 0} />
-          <AdminStatCard label="Blockeringar" value={stats.blocks_active || 0} />
+          <AdminStatCard label="Åtgärder" value={stats.actions_taken ?? 0} />
+          <AdminStatCard label="Suspenderade" value={stats.users_suspended ?? 0} />
         </AdminStatGrid>
       )}
 
@@ -262,12 +262,9 @@ export default function ModerationAdminPage() {
               />
             ) : (
               <div className="grid md:grid-cols-3 gap-4">
-                <AdminStatCard label="Öppna rapporter" value={stats.open_reports || 0} />
-                <AdminStatCard label="Blockeringar" value={stats.blocks_active || 0} />
-                <AdminStatCard
-                  label="Hanterade 24h"
-                  value={stats.reports_processed_last_24h || 0}
-                />
+                <AdminStatCard label="Öppna rapporter" value={stats.pending_reports ?? 0} />
+                <AdminStatCard label="Åtgärder totalt" value={stats.actions_taken ?? 0} />
+                <AdminStatCard label="Suspenderade" value={stats.users_suspended ?? 0} />
               </div>
             )}
           </CardContent>

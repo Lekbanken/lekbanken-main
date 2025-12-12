@@ -78,11 +78,27 @@ export default function LicensesPage() {
 
         if (queryError) throw queryError;
 
+        const tenants = data || [];
+
+        // Fetch member counts per tenant to reflect actual usage
+        const memberCounts = await Promise.all(
+          tenants.map(async (t) => {
+            const { count, error: countError } = await supabase
+              .from('user_tenant_memberships')
+              .select('id', { count: 'exact', head: true })
+              .eq('tenant_id', t.id);
+            if (countError) {
+              console.error('Error counting members for tenant', t.id, countError);
+            }
+            return { tenantId: t.id, count: count ?? 0 };
+          })
+        );
+
         const mapped: LicenseRow[] =
-          (data || []).map((t) => {
+          tenants.map((t) => {
             const status = (t.subscription_status === 'active' ? 'active' : t.subscription_status === 'trial' ? 'trial' : 'expired') as LicenseStatus;
-            const seats = 50; // TODO: replace with actual seat field if available
-            const usedSeats = Math.floor(Math.random() * 40) + 5; // TODO: replace with real usage
+            const usedSeats = memberCounts.find((m) => m.tenantId === t.id)?.count ?? 0;
+            const seats = Math.max(50, usedSeats); // TODO: replace with actual seat/quota field if available
             const startDate = t.created_at;
             const endDate = new Date(new Date(t.created_at).getTime() + 365 * 24 * 60 * 60 * 1000).toISOString();
             return {
@@ -105,8 +121,8 @@ export default function LicensesPage() {
           expired: mapped.filter((l) => l.status === 'expired').length,
           trial: mapped.filter((l) => l.status === 'trial').length,
           totalSeats: mapped.reduce((sum, l) => sum + l.seats, 0),
-          usedSeats: mapped.reduce((sum, l) => sum + l.usedSeats, 0),
-        };
+            usedSeats: mapped.reduce((sum, l) => sum + l.usedSeats, 0),
+          };
 
         setLicenses(mapped);
         setStats(nextStats);

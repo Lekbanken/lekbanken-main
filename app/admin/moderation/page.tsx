@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { Badge, Button, Card, CardContent } from '@/components/ui';
@@ -15,9 +15,17 @@ import {
   type ContentReport,
   type ModerationStats,
 } from '@/lib/services/moderationService';
+import {
+  AdminPageLayout,
+  AdminPageHeader,
+  AdminEmptyState,
+  AdminErrorState,
+  AdminStatGrid,
+  AdminStatCard,
+} from '@/components/admin/shared';
 
-// Report and action types
 type TabType = 'queue' | 'reports' | 'stats';
+
 interface QueueItem {
   id: string;
   priority: string;
@@ -27,18 +35,21 @@ interface QueueItem {
 export default function ModerationAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
+
   const [reports, setReports] = useState<ContentReport[]>([]);
   const [stats, setStats] = useState<ModerationStats | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [activeTab, setActiveTab] = useState<TabType>('queue');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<ContentReport | null>(null);
-  const [actionNotes, setActionNotes] = useState('');
 
   useEffect(() => {
     if (!currentTenant) return;
 
     const loadData = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const [reportsData, queueData, statsData] = await Promise.all([
           getContentReports(currentTenant.id, { status: 'pending', limit: 100 }),
@@ -51,12 +62,13 @@ export default function ModerationAdminPage() {
         setStats(statsData);
       } catch (err) {
         console.error('Error loading moderation data:', err);
+        setError('Kunde inte ladda modereringsdata.');
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    void loadData();
   }, [currentTenant]);
 
   const handleResolveReport = async (report: ContentReport, action: string) => {
@@ -84,9 +96,9 @@ export default function ModerationAdminPage() {
 
       setReports((prev) => prev.filter((r) => r.id !== report.id));
       setSelectedReport(null);
-      setActionNotes('');
     } catch (err) {
       console.error('Error resolving report:', err);
+      setError('Kunde inte uppdatera rapporten.');
     }
   };
 
@@ -96,267 +108,203 @@ export default function ModerationAdminPage() {
       setQueue((prev) => prev.filter((q) => q.id !== queueId));
     } catch (err) {
       console.error('Error completing queue item:', err);
+      setError('Kunde inte uppdatera modereringskön.');
     }
   };
 
-  if (!currentTenant) return <div className="p-4 text-muted-foreground">Loading...</div>;
+  const openQueueCount = useMemo(() => queue.length, [queue]);
+
+  if (!currentTenant) {
+    return (
+      <AdminPageLayout>
+        <AdminEmptyState
+          icon={<ShieldExclamationIcon className="h-6 w-6" />}
+          title="Ingen organisation vald"
+          description="Välj en organisation för att hantera moderering."
+        />
+      </AdminPageLayout>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-900 to-slate-900 p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <ShieldExclamationIcon className="h-8 w-8 text-red-400" />
-            <h1 className="text-4xl font-bold text-white">Moderation Console</h1>
-          </div>
-          <p className="text-red-200">Content reports, user restrictions, and safety management</p>
-        </div>
+    <AdminPageLayout>
+      <AdminPageHeader
+        title="Moderering"
+        description="Content reports, åtgärder och statistik."
+        icon={<ShieldExclamationIcon className="h-8 w-8 text-primary" />}
+      />
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-red-800">
-          {['queue', 'reports', 'stats'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab as TabType)}
-              className={`px-6 py-3 font-medium transition ${
-                activeTab === tab
-                  ? 'border-b-2 border-red-500 text-white'
-                  : 'text-red-200 hover:text-white'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-              {tab === 'queue' && queue.length > 0 && (
-                <Badge variant="destructive" className="ml-2">
-                  {queue.length}
-                </Badge>
-              )}
-            </button>
-          ))}
-        </div>
+      {error && (
+        <AdminErrorState
+          title="Kunde inte ladda modereringsdata"
+          description={error}
+          onRetry={() => {
+            setError(null);
+            setLoading(true);
+          }}
+        />
+      )}
 
-        {/* Queue Tab */}
-        {activeTab === 'queue' && (
-          <div className="space-y-6">
-            {loading ? (
-              <p className="text-red-200">Loading queue...</p>
-            ) : queue.length > 0 ? (
-              queue.map((item) => (
-                <Card key={item.id} className="bg-red-800/30 border-red-700">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-white font-bold text-lg">
-                          {item.content_reports?.[0]?.reason || 'Content Report'}
-                        </h3>
-                        <p className="text-red-200 text-sm">
-                          {item.content_reports?.[0]?.content_type || 'Unknown'} •{' '}
-                          {item.priority}
+      {stats && (
+        <AdminStatGrid className="mb-4">
+          <AdminStatCard label="Öppna rapporter" value={reports.length} />
+          <AdminStatCard label="Kö" value={openQueueCount} />
+          <AdminStatCard label="Hanterade (24h)" value={stats.reports_processed_last_24h || 0} />
+          <AdminStatCard label="Blockeringar" value={stats.blocks_active || 0} />
+        </AdminStatGrid>
+      )}
+
+      <div className="flex gap-2 mb-6 border-b border-border">
+        {(['queue', 'reports', 'stats'] as TabType[]).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 font-medium transition border-b-2 ${
+              activeTab === tab
+                ? 'border-primary text-foreground'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            {tab === 'queue' ? 'Kö' : tab === 'reports' ? 'Rapporter' : 'Statistik'}
+            {tab === 'queue' && openQueueCount > 0 && (
+              <Badge variant="destructive" className="ml-2">
+                {openQueueCount}
+              </Badge>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'queue' && (
+        <div className="space-y-4">
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Laddar kö...</p>
+          ) : queue.length === 0 ? (
+            <AdminEmptyState
+              icon={<ShieldExclamationIcon className="h-6 w-6" />}
+              title="Ingen kö"
+              description="Inga poster i modereringskön just nu."
+            />
+          ) : (
+            queue.map((item) => (
+              <Card key={item.id}>
+                <CardContent className="flex items-start justify-between gap-4 py-4">
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Queue #{item.id}</p>
+                    <p className="text-xs text-muted-foreground">Priority: {item.priority}</p>
+                    <div className="mt-2 space-y-1">
+                      {(item.content_reports || []).map((r, idx) => (
+                        <p key={idx} className="text-sm text-foreground">
+                          {r.content_type}: {r.reason}
+                          {r.description ? ` – ${r.description}` : ''}
                         </p>
-                      </div>
-                      <Badge
-                        variant="destructive"
-                        className={`${
-                          item.priority === 'critical'
-                            ? 'bg-red-600'
-                            : item.priority === 'high'
-                              ? 'bg-orange-600'
-                              : 'bg-yellow-600 text-black'
-                        }`}
-                      >
-                        {item.priority.toUpperCase()}
-                      </Badge>
+                      ))}
                     </div>
-                    {item.content_reports?.[0]?.description && (
-                      <p className="text-red-100 mb-4">{item.content_reports[0].description}</p>
-                    )}
-                    <Button
-                      onClick={() => handleCompleteQueueItem(item.id)}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      Mark Complete
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => void handleCompleteQueueItem(item.id)}>
+                    Markera hanterad
+                  </Button>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === 'reports' && (
+        <div className="grid gap-4 md:grid-cols-2">
+          {loading ? (
+            <p className="text-sm text-muted-foreground">Laddar rapporter...</p>
+          ) : reports.length === 0 ? (
+            <AdminEmptyState
+              icon={<ShieldExclamationIcon className="h-6 w-6" />}
+              title="Inga rapporter"
+              description="Det finns inga öppna rapporter."
+            />
+          ) : (
+            reports.map((report) => (
+              <Card
+                key={report.id}
+                className={`cursor-pointer border ${selectedReport?.id === report.id ? 'border-primary' : ''}`}
+                onClick={() => setSelectedReport(report)}
+              >
+                <CardContent className="space-y-2 py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-foreground">{report.reason}</p>
+                      <p className="text-xs text-muted-foreground">{report.content_type}</p>
+                    </div>
+                    <Badge variant="outline">{report.priority || 'normal'}</Badge>
+                  </div>
+                  {report.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-2">{report.description}</p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    Skapad: {new Date(report.created_at).toLocaleDateString('sv-SE')}
+                  </p>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
+      )}
+
+      {activeTab === 'stats' && (
+        <Card>
+          <CardContent className="py-6">
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Laddar statistik...</p>
+            ) : !stats ? (
+              <AdminEmptyState
+                icon={<ShieldExclamationIcon className="h-6 w-6" />}
+                title="Ingen statistik"
+                description="Statistik kunde inte hämtas."
+              />
             ) : (
-              <div className="text-center py-12">
-                <p className="text-red-200 text-lg">No pending items in queue</p>
+              <div className="grid md:grid-cols-3 gap-4">
+                <AdminStatCard label="Öppna rapporter" value={stats.open_reports || 0} />
+                <AdminStatCard label="Blockeringar" value={stats.blocks_active || 0} />
+                <AdminStatCard
+                  label="Hanterade 24h"
+                  value={stats.reports_processed_last_24h || 0}
+                />
               </div>
             )}
-          </div>
-        )}
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Reports Tab */}
-        {activeTab === 'reports' && (
-          <div className="space-y-6">
-            {loading ? (
-              <p className="text-red-200">Loading reports...</p>
-            ) : (
-              <>
-                {selectedReport ? (
-                  <div className="bg-red-800/30 border border-red-700 rounded-lg p-6">
-                    <button
-                      onClick={() => setSelectedReport(null)}
-                      className="text-red-300 hover:text-white mb-4 underline"
-                    >
-                      ← Back to reports
-                    </button>
-                    <h2 className="text-2xl font-bold text-white mb-4">{selectedReport.reason}</h2>
-                    <div className="space-y-3 mb-6">
-                      <p className="text-red-100">
-                        <span className="font-bold">Type:</span> {selectedReport.content_type}
-                      </p>
-                      <p className="text-red-100">
-                        <span className="font-bold">Priority:</span> {selectedReport.priority}
-                      </p>
-                      <p className="text-red-100">
-                        <span className="font-bold">Status:</span> {selectedReport.status}
-                      </p>
-                      {selectedReport.description && (
-                        <p className="text-red-100">
-                          <span className="font-bold">Details:</span> {selectedReport.description}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="mb-6">
-                      <label className="block text-white font-bold mb-2">Action Notes</label>
-                      <textarea
-                        value={actionNotes}
-                        onChange={(e) => setActionNotes(e.target.value)}
-                        className="w-full bg-red-900 border border-red-700 text-white px-3 py-2 rounded resize-none"
-                        rows={4}
-                        placeholder="Add notes about this report..."
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'dismiss')}
-                        className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Dismiss
-                      </button>
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'warn')}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Warn
-                      </button>
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'mute')}
-                        className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Mute
-                      </button>
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'suspend')}
-                        className="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Suspend
-                      </button>
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'ban')}
-                        className="bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Ban
-                      </button>
-                      <button
-                        onClick={() => handleResolveReport(selectedReport, 'content_removal')}
-                        className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-4 rounded transition"
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {reports.map((report) => (
-                      <button
-                        key={report.id}
-                        onClick={() => setSelectedReport(report)}
-                        className="w-full text-left bg-red-800/30 border border-red-700 rounded-lg p-4 hover:bg-red-800/50 transition"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="text-white font-bold">{report.reason}</h3>
-                            <p className="text-red-200 text-sm">
-                              {report.content_type} • {report.priority}
-                            </p>
-                          </div>
-                          <span
-                            className={`px-2 py-1 rounded text-xs font-bold ${
-                              report.priority === 'critical'
-                                ? 'bg-red-600'
-                                : report.priority === 'high'
-                                  ? 'bg-orange-600'
-                                  : 'bg-yellow-600'
-                            } text-white`}
-                          >
-                            {report.priority}
-                          </span>
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </>
+      {selectedReport && activeTab === 'reports' && (
+        <Card className="mt-6">
+          <CardContent className="space-y-3 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-foreground">{selectedReport.reason}</p>
+                <p className="text-xs text-muted-foreground">{selectedReport.content_type}</p>
+              </div>
+              <Badge variant="outline">{selectedReport.priority || 'normal'}</Badge>
+            </div>
+            {selectedReport.description && (
+              <p className="text-sm text-foreground">{selectedReport.description}</p>
             )}
-          </div>
-        )}
-
-        {/* Stats Tab */}
-        {activeTab === 'stats' && (
-          <div className="space-y-6">
-            {loading ? (
-              <p className="text-red-200">Loading stats...</p>
-            ) : (
-              <>
-                {stats && (
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="bg-red-800/30 border border-red-700 rounded-lg p-6">
-                      <p className="text-red-200 text-sm mb-2">Total Reports</p>
-                      <p className="text-3xl font-bold text-white">{stats.total_reports}</p>
-                    </div>
-                    <div className="bg-yellow-800/30 border border-yellow-700 rounded-lg p-6">
-                      <p className="text-yellow-200 text-sm mb-2">Pending</p>
-                      <p className="text-3xl font-bold text-yellow-300">{stats.pending_reports}</p>
-                    </div>
-                    <div className="bg-green-800/30 border border-green-700 rounded-lg p-6">
-                      <p className="text-green-200 text-sm mb-2">Resolved</p>
-                      <p className="text-3xl font-bold text-green-300">{stats.resolved_reports}</p>
-                    </div>
-                    <div className="bg-blue-800/30 border border-blue-700 rounded-lg p-6">
-                      <p className="text-blue-200 text-sm mb-2">Actions Taken</p>
-                      <p className="text-3xl font-bold text-blue-300">{stats.actions_taken}</p>
-                    </div>
-
-                    <div className="bg-orange-800/30 border border-orange-700 rounded-lg p-6">
-                      <p className="text-orange-200 text-sm mb-2">Users Warned</p>
-                      <p className="text-3xl font-bold text-orange-300">{stats.users_warned}</p>
-                    </div>
-                    <div className="bg-purple-800/30 border border-purple-700 rounded-lg p-6">
-                      <p className="text-purple-200 text-sm mb-2">Users Suspended</p>
-                      <p className="text-3xl font-bold text-purple-300">{stats.users_suspended}</p>
-                    </div>
-                    <div className="bg-red-800/30 border border-red-700 rounded-lg p-6">
-                      <p className="text-red-200 text-sm mb-2">Users Banned</p>
-                      <p className="text-3xl font-bold text-red-400">{stats.users_banned}</p>
-                    </div>
-                    <div className="bg-slate-800/30 border border-border rounded-lg p-6">
-                      <p className="text-slate-200 text-sm mb-2">Avg Resolution Time</p>
-                      <p className="text-3xl font-bold text-slate-300">
-                        {stats.average_resolution_time.toFixed(1)}h
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleResolveReport(selectedReport, 'dismiss')}
+              >
+                Avfärda
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => void handleResolveReport(selectedReport, 'block')}
+              >
+                Blockera
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </AdminPageLayout>
   );
 }

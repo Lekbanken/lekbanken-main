@@ -1,16 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { sendBulkNotifications } from '@/lib/services/notificationsService';
 import { supabase } from '@/lib/supabase/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { BellIcon } from '@heroicons/react/24/outline';
+import { AdminPageLayout, AdminPageHeader, AdminEmptyState, AdminErrorState } from '@/components/admin/shared';
 
 interface User {
   id: string;
-  email: string;
+  email: string | null;
 }
 
 export default function NotificationsAdminPage() {
@@ -19,6 +20,8 @@ export default function NotificationsAdminPage() {
 
   const [tenantUsers, setTenantUsers] = useState<User[]>([]);
   const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Form state
   const [targetType, setTargetType] = useState<'all' | 'specific'>('all');
@@ -34,120 +37,127 @@ export default function NotificationsAdminPage() {
     if (!user || !currentTenant) return;
 
     const loadUsers = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        const { data, error } = await supabase
+        const { data, error: queryError } = await supabase
           .from('user_tenant_memberships')
           .select('user_id, users(id, email)')
-          .eq('tenant_id', currentTenant.id);
+          .eq('tenant_id', currentTenant.id)
+          .limit(200);
 
-        if (error) {
-          console.error('Error loading users:', error);
+        if (queryError) {
+          setError('Kunde inte ladda användare för organisationen.');
           return;
         }
 
-        const rows = (data ?? []) as Array<{ user_id: string; users: { id: string; email: string } | null }>
-        const users = rows.map((item) => ({
-          id: item.user_id,
-          email: item.users?.email || 'Unknown',
-        }));
-
-        setTenantUsers(users);
+        const mapped = (data || [])
+          .map((row) => ({
+            id: (row as { user_id: string }).user_id,
+            email: (row as { users?: { email?: string | null } | null }).users?.email ?? null,
+          }))
+          .filter((u) => !!u.id);
+        setTenantUsers(mapped);
       } catch (err) {
-        console.error('Error loading users:', err);
+        console.error(err);
+        setError('Kunde inte ladda användare.');
+      } finally {
+        setLoading(false);
       }
     };
 
-    loadUsers();
+    void loadUsers();
   }, [user, currentTenant]);
 
-  const handleSendNotification = async () => {
-    if (!currentTenant || !notificationTitle.trim() || !notificationMessage.trim()) {
-      alert('Please fill in all required fields');
-      return;
-    }
+  const canSend = useMemo(() => {
+    if (!notificationTitle.trim() || !notificationMessage.trim()) return false;
+    if (targetType === 'specific' && selectedUserIds.length === 0) return false;
+    return true;
+  }, [notificationTitle, notificationMessage, targetType, selectedUserIds]);
 
+  const handleSend = async () => {
+    if (!canSend) return;
     setIsSending(true);
+    setError(null);
     try {
-      if (targetType === 'all') {
-        await sendBulkNotifications({
-          tenantId: currentTenant.id,
-          userIds: tenantUsers.map((u) => u.id),
-          title: notificationTitle,
-          message: notificationMessage,
-          type: notificationType,
-          category: notificationCategory,
-        });
-        alert(`Notification sent to ${tenantUsers.length} users!`);
-      } else if (selectedUserIds.length > 0) {
-        await sendBulkNotifications({
-          tenantId: currentTenant.id,
-          userIds: selectedUserIds,
-          title: notificationTitle,
-          message: notificationMessage,
-          type: notificationType,
-          category: notificationCategory,
-        });
-        alert(`Notification sent to ${selectedUserIds.length} users!`);
-      } else {
-        alert('Please select at least one user');
-        setIsSending(false);
-        return;
-      }
-
-      // Reset form
+      await sendBulkNotifications({
+        userIds: targetType === 'specific' ? selectedUserIds : undefined,
+        tenantId: currentTenant?.id ?? undefined,
+        title: notificationTitle,
+        message: notificationMessage,
+        type: notificationType,
+        category: notificationCategory,
+        actionUrl: actionUrl || undefined,
+        actionLabel: actionLabel || undefined,
+      });
       setNotificationTitle('');
       setNotificationMessage('');
       setActionUrl('');
       setActionLabel('');
       setSelectedUserIds([]);
     } catch (err) {
-      console.error('Error sending notification:', err);
-      alert('Error sending notification');
+      console.error(err);
+      setError('Kunde inte skicka notifikationer.');
+    } finally {
+      setIsSending(false);
     }
-    setIsSending(false);
   };
 
-  const toggleUserSelection = (userId: string) => {
-    setSelectedUserIds((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
-    );
-  };
-
-  if (!user || !currentTenant) {
+  if (!currentTenant) {
     return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-6xl mx-auto pt-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Notifications Admin</h1>
-            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
-          </div>
-        </div>
-      </div>
+      <AdminPageLayout>
+        <AdminEmptyState
+          icon={<BellIcon className="h-6 w-6" />}
+          title="Ingen organisation vald"
+          description="Välj en organisation för att skicka notifikationer."
+        />
+      </AdminPageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <BellIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold text-foreground">Notifications Admin</h1>
-          </div>
-          <p className="text-muted-foreground">Skicka systemmeddelanden till användare</p>
-        </div>
+    <AdminPageLayout>
+      <AdminPageHeader
+        title="Notifikationer"
+        description="Skicka meddelanden till organisationens användare."
+        icon={<BellIcon className="h-8 w-8 text-primary" />}
+        actions={
+          <Badge variant="outline" className="capitalize">
+            {notificationType}
+          </Badge>
+        }
+      />
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Send Form */}
-          <Card className="lg:col-span-2">
-            <CardContent className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Notification Type</label>
+      {error && (
+        <AdminErrorState
+          title="Ett fel inträffade"
+          description={error}
+          onRetry={() => setError(null)}
+        />
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>Skicka notifikation</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Titel</label>
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  value={notificationTitle}
+                  onChange={(e) => setNotificationTitle(e.target.value)}
+                  placeholder="Uppdatering i appen"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Typ</label>
                 <select
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationType}
-                  onChange={(e) => setNotificationType(e.target.value as 'info' | 'success' | 'warning' | 'error' | 'system')}
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
+                  onChange={(e) => setNotificationType(e.target.value as typeof notificationType)}
                 >
                   <option value="info">Info</option>
                   <option value="success">Success</option>
@@ -156,175 +166,113 @@ export default function NotificationsAdminPage() {
                   <option value="system">System</option>
                 </select>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Category</label>
-                <select
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Meddelande</label>
+              <textarea
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                value={notificationMessage}
+                onChange={(e) => setNotificationMessage(e.target.value)}
+                rows={4}
+                placeholder="Ditt meddelande..."
+              />
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Kategori</label>
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationCategory}
                   onChange={(e) => setNotificationCategory(e.target.value)}
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
+                  placeholder="system"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Målgrupp</label>
+                <select
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  value={targetType}
+                  onChange={(e) => setTargetType(e.target.value as typeof targetType)}
                 >
-                  <option value="system">System</option>
-                  <option value="billing">Billing</option>
-                  <option value="gameplay">Gameplay</option>
-                  <option value="achievement">Achievement</option>
-                  <option value="support">Support</option>
+                  <option value="all">Alla i organisationen</option>
+                  <option value="specific">Specifika användare</option>
                 </select>
               </div>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Title *</label>
-                <input
-                  type="text"
-                  value={notificationTitle}
-                  onChange={(e) => setNotificationTitle(e.target.value)}
-                  placeholder="Notification title"
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Message *</label>
-                <textarea
-                  value={notificationMessage}
-                  onChange={(e) => setNotificationMessage(e.target.value)}
-                  placeholder="Notification message"
-                  rows={6}
-                  className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Action URL (Optional)</label>
-                  <input
-                    type="url"
-                    value={actionUrl}
-                    onChange={(e) => setActionUrl(e.target.value)}
-                    placeholder="https://example.com"
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">Action Label (Optional)</label>
-                  <input
-                    type="text"
-                    value={actionLabel}
-                    onChange={(e) => setActionLabel(e.target.value)}
-                    placeholder="Click here"
-                    className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
-                  />
-                </div>
-              </div>
-
-              {/* Target Selection */}
-              <div className="border-t border-border pt-6">
-                <h3 className="font-bold text-foreground mb-3">Recipients</h3>
-                <div className="space-y-3 mb-4">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={targetType === 'all'}
-                      onChange={() => {
-                        setTargetType('all');
-                        setSelectedUserIds([]);
-                      }}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-foreground">Send to all users ({tenantUsers.length})</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="radio"
-                      checked={targetType === 'specific'}
-                      onChange={() => setTargetType('specific')}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-foreground">Send to specific users</span>
-                  </label>
-                </div>
-
-                {targetType === 'specific' && (
-                  <div className="bg-muted rounded-lg p-3 max-h-40 overflow-y-auto border border-border">
-                    {tenantUsers.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">No users found</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {tenantUsers.map((u) => (
-                          <label key={u.id} className="flex items-center gap-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={selectedUserIds.includes(u.id)}
-                              onChange={() => toggleUserSelection(u.id)}
-                              className="w-4 h-4"
-                            />
-                            <span className="text-sm text-muted-foreground">{u.email}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
+            {targetType === 'specific' && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Välj mottagare</label>
+                {loading ? (
+                  <p className="text-sm text-muted-foreground">Laddar användare...</p>
+                ) : tenantUsers.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Inga användare att välja.</p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                    {tenantUsers.map((u) => (
+                      <label key={u.id} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={selectedUserIds.includes(u.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedUserIds((prev) => [...prev, u.id]);
+                            } else {
+                              setSelectedUserIds((prev) => prev.filter((id) => id !== u.id));
+                            }
+                          }}
+                        />
+                        <span>{u.email || u.id}</span>
+                      </label>
+                    ))}
                   </div>
                 )}
               </div>
+            )}
 
-              <Button
-                onClick={handleSendNotification}
-                disabled={isSending || !notificationTitle.trim() || !notificationMessage.trim()}
-                className="w-full py-3"
-              >
-                {isSending ? 'Sending...' : 'Send Notification'}
-              </Button>
-            </CardContent>
-          </Card>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Action URL (valfritt)</label>
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  value={actionUrl}
+                  onChange={(e) => setActionUrl(e.target.value)}
+                  placeholder="https://..."
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Action label (valfritt)</label>
+                <input
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  value={actionLabel}
+                  onChange={(e) => setActionLabel(e.target.value)}
+                  placeholder="Öppna"
+                />
+              </div>
+            </div>
 
-          {/* Preview & Stats */}
-          <div className="space-y-6">
-            {/* Preview */}
-            {notificationTitle || notificationMessage ? (
-              <Card>
-                <CardHeader className="bg-primary p-4">
-                  <CardTitle className="text-white">Preview</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4">
-                  <Badge
-                    variant={notificationType === 'error' ? 'destructive' : 'secondary'}
-                    className={`mb-3 ${
-                      notificationType === 'success' ? 'bg-green-100 text-green-700' :
-                      notificationType === 'warning' ? 'bg-yellow-100 text-yellow-700' :
-                      notificationType === 'error' ? 'bg-red-100 text-red-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}
-                  >
-                    {notificationType.toUpperCase()}
-                  </Badge>
-                  <h4 className="font-bold text-foreground mb-2">{notificationTitle || 'Title...'}</h4>
-                  <p className="text-sm text-muted-foreground mb-3">{notificationMessage || 'Message...'}</p>
-                  {actionLabel && (
-                    <Button size="sm">{actionLabel}</Button>
-                  )}
-                </CardContent>
-              </Card>
-            ) : null}
+            <Button onClick={handleSend} disabled={isSending || !canSend}>
+              {isSending ? 'Skickar...' : 'Skicka notifikation'}
+            </Button>
+          </CardContent>
+        </Card>
 
-            {/* Stats */}
-            <Card>
-              <CardContent className="p-4">
-                <h3 className="font-bold text-foreground mb-3">Recipients</h3>
-                <div className="space-y-2 text-sm">
-                  <p className="text-muted-foreground">
-                    Total Users: <span className="font-bold text-foreground">{tenantUsers.length}</span>
-                  </p>
-                  {targetType === 'specific' && (
-                    <p className="text-muted-foreground">
-                      Selected: <span className="font-bold text-primary">{selectedUserIds.length}</span>
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Mottagare</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              {tenantUsers.length} användare i organisationen.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              När du väljer "Specifika användare" kan du välja från listan. Annars skickas till alla.
+            </p>
+          </CardContent>
+        </Card>
       </div>
-    </div>
+    </AdminPageLayout>
   );
 }

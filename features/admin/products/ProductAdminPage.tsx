@@ -9,6 +9,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
+import {
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminStatCard,
+  AdminStatGrid,
+  AdminBreadcrumbs,
+} from "@/components/admin/shared";
+import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useAuth } from "@/lib/supabase/auth";
 import type { Database } from "@/types/supabase";
 import { getBaseCapabilities } from "./data";
@@ -27,6 +35,12 @@ const fallbackStatus: ProductStatus = "active";
 export function ProductAdminPage() {
   const { user } = useAuth();
   const { success, info, warning } = useToast();
+  const { can } = useRbac();
+
+  // RBAC permissions (Products is system_admin only)
+  const canViewProducts = can('admin.products.list');
+  const canCreateProduct = can('admin.products.create');
+  const _canEditProduct = can('admin.products.edit');
 
   const [products, setProducts] = useState<ProductAdminItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -275,85 +289,71 @@ export function ProductAdminPage() {
 
   if (isLoading && products.length === 0) {
     return (
-      <div className="space-y-6">
-        <header className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20">
-            <CubeIcon className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">Products</h1>
-            <p className="text-sm text-muted-foreground">
-              Configure products, modules, and their capabilities
-            </p>
-          </div>
-        </header>
+      <AdminPageLayout>
+        <AdminPageHeader
+          icon={<CubeIcon className="h-6 w-6" />}
+          title="Produkter"
+          description="Konfigurera produkter, moduler och deras förmågor"
+        />
         <SkeletonStats />
-        <LoadingState message="Loading products..." />
-      </div>
+        <LoadingState message="Laddar produkter..." />
+      </AdminPageLayout>
     );
   }
 
-  if (!user) {
+  if (!user || !canViewProducts) {
     return (
       <EmptyState
-        title="No access"
-        description="You need to be signed in to manage products."
-        action={{ label: "Go to login", onClick: () => (window.location.href = "/auth/login") }}
+        title="Ingen åtkomst"
+        description="Du behöver vara inloggad för att hantera produkter."
+        action={{ label: "Gå till login", onClick: () => (window.location.href = "/auth/login") }}
       />
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <header className="flex items-center gap-4">
-        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20">
-          <CubeIcon className="h-7 w-7 text-primary" />
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Products</h1>
-          <p className="text-sm text-muted-foreground">
-            Configure products, modules, and their capabilities
-          </p>
-        </div>
-      </header>
+    <AdminPageLayout>
+      <AdminBreadcrumbs
+        items={[
+          { label: 'Startsida', href: '/admin' },
+          { label: 'Produkter' },
+        ]}
+      />
+
+      <AdminPageHeader
+        icon={<CubeIcon className="h-6 w-6" />}
+        title="Produkter"
+        description="Konfigurera produkter, moduler och deras förmågor"
+        actions={
+          canCreateProduct && (
+            <Button onClick={() => setCreateOpen(true)} className="gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Skapa produkt
+            </Button>
+          )
+        }
+      />
 
       {/* Status Cards */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/30 hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Products</p>
-              <p className="mt-1 text-3xl font-bold text-foreground">{products.length}</p>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
-              <CubeIcon className="h-6 w-6 text-primary" />
-            </div>
-          </div>
-        </div>
-        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-emerald-500/30 hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Active</p>
-              <p className="mt-1 text-3xl font-bold text-foreground">{statusCounts.active}</p>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10">
-              <CheckBadgeIcon className="h-6 w-6 text-emerald-600" />
-            </div>
-          </div>
-        </div>
-        <div className="group relative overflow-hidden rounded-xl border border-border bg-card p-5 transition-all hover:border-amber-500/30 hover:shadow-md">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Inactive</p>
-              <p className="mt-1 text-3xl font-bold text-foreground">{statusCounts.inactive}</p>
-            </div>
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10">
-              <PauseCircleIcon className="h-6 w-6 text-amber-600" />
-            </div>
-          </div>
-        </div>
-      </div>
+      <AdminStatGrid cols={3}>
+        <AdminStatCard
+          label="Totalt produkter"
+          value={products.length}
+          icon={<CubeIcon className="h-5 w-5" />}
+        />
+        <AdminStatCard
+          label="Aktiva"
+          value={statusCounts.active}
+          icon={<CheckBadgeIcon className="h-5 w-5" />}
+          iconColor="green"
+        />
+        <AdminStatCard
+          label="Inaktiva"
+          value={statusCounts.inactive}
+          icon={<PauseCircleIcon className="h-5 w-5" />}
+          iconColor="amber"
+        />
+      </AdminStatGrid>
 
       {/* Directory */}
       <Card className="overflow-hidden rounded-xl border border-border">
@@ -454,6 +454,6 @@ export function ProductAdminPage() {
       <div className="hidden">
         <ProductCapabilitiesEditor capabilities={baseCapabilities} value={[]} onChange={() => {}} />
       </div>
-    </div>
+    </AdminPageLayout>
   );
 }

@@ -7,13 +7,26 @@ import {
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from "@/components/ui";
+import {
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminBreadcrumbs,
+} from "@/components/admin/shared";
+import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { mockAchievements, themes } from "./data";
-import { AchievementItem, AchievementFilters, AchievementTheme } from "./types";
+import type { AchievementItem, AchievementFilters, AchievementTheme } from "./types";
 import { normalizeIconConfig } from "./icon-utils";
 import { AchievementLibraryGrid } from "./components/AchievementLibraryGrid";
 import { AchievementEditor } from "./editor/AchievementEditor";
 
 export function AchievementAdminPage() {
+  const { can } = useRbac();
+
+  // RBAC permissions
+  const _canViewAchievements = can('admin.achievements.list');
+  const canCreateAchievement = can('admin.achievements.create');
+  const _canEditAchievement = can('admin.achievements.edit');
+
   const [achievements, setAchievements] = useState<AchievementItem[]>(
     mockAchievements.map((a) => ({ ...a, icon: normalizeIconConfig(a.icon) })),
   );
@@ -95,37 +108,27 @@ export function AchievementAdminPage() {
   );
 
   return (
-    <div className="space-y-6">
-      {/* Page Header with Breadcrumb */}
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          {/* Icon Container */}
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/10 text-primary shadow-sm ring-1 ring-primary/10">
-            <SparklesIcon className="h-6 w-6" />
-          </div>
-          <div>
-            {/* Breadcrumb */}
-            <nav className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="hover:text-foreground cursor-pointer transition-colors">Admin</span>
-              <span>/</span>
-              <span className="text-foreground font-medium">Achievements</span>
-            </nav>
-            {/* Title */}
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Achievements
-            </h1>
-            <p className="mt-0.5 text-sm text-muted-foreground">
-              Build layered badges, assign themes, and manage rewards
-            </p>
-          </div>
-        </div>
-        
-        {/* Primary Action */}
-        <Button onClick={handleCreate} className="gap-2 shadow-sm">
-          <PlusIcon className="h-4 w-4" />
-          Create Achievement
-        </Button>
-      </header>
+    <AdminPageLayout>
+      <AdminBreadcrumbs
+        items={[
+          { label: 'Startsida', href: '/admin' },
+          { label: 'Achievements' },
+        ]}
+      />
+
+      <AdminPageHeader
+        icon={<SparklesIcon className="h-6 w-6" />}
+        title="Achievements"
+        description="Bygg skiktade badges, tilldela teman och hantera belöningar"
+        actions={
+          canCreateAchievement && (
+            <Button onClick={handleCreate} className="gap-2 shadow-sm">
+              <PlusIcon className="h-4 w-4" />
+              Skapa Achievement
+            </Button>
+          )
+        }
+      />
 
       {/* Badge Library Section */}
       <section>
@@ -229,6 +232,6 @@ export function AchievementAdminPage() {
           </CardContent>
         </Card>
       </section>
-    </div>
+    </AdminPageLayout>
   );
 }

@@ -9,6 +9,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, EmptyState, LoadingState, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
+import { 
+  AdminPageHeader, 
+  AdminPageLayout, 
+  AdminStatCard, 
+  AdminStatGrid,
+  AdminBreadcrumbs,
+} from "@/components/admin/shared";
+import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useAuth } from "@/lib/supabase/auth";
 import { supabase } from "@/lib/supabase/client";
 import type { Database } from "@/types/supabase";
@@ -38,6 +46,7 @@ const ORGS_PER_PAGE = 15;
 
 export function OrganisationAdminPage() {
   const { user } = useAuth();
+  const { can, isLoading: rbacLoading } = useRbac();
   const { success, info, warning } = useToast();
 
   const [organisations, setOrganisations] = useState<OrganisationAdminItem[]>([]);
@@ -269,108 +278,107 @@ export function OrganisationAdminPage() {
     setCurrentPage(1);
   }, [filters.search, filters.status]);
 
-  if (isLoading && organisations.length === 0) {
+  // RBAC check
+  const canViewTenants = can('admin.tenants.list');
+  const canCreateTenant = can('admin.tenants.create');
+  const canEditTenant = can('admin.tenants.edit');
+  const canDeleteTenant = can('admin.tenants.delete');
+
+  if (rbacLoading || (isLoading && organisations.length === 0)) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-            <BuildingOffice2Icon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground">Organisations</h1>
-            <p className="text-sm text-muted-foreground">Manage organisations, contacts, and subscription status.</p>
-          </div>
-        </div>
+      <AdminPageLayout>
+        <AdminBreadcrumbs items={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Organisationer' },
+        ]} />
+        <AdminPageHeader
+          title="Organisationer"
+          description="Hantera organisationer, kontakter och prenumerationsstatus."
+          icon={<BuildingOffice2Icon className="h-6 w-6" />}
+        />
         <SkeletonStats />
-        <LoadingState message="Loading organisations..." />
-      </div>
+        <LoadingState message="Laddar organisationer..." />
+      </AdminPageLayout>
     );
   }
 
-  if (!user) {
+  if (!user || !canViewTenants) {
     return (
-      <EmptyState
-        title="No access"
-        description="You need to be signed in to manage organisations."
-        action={{ label: "Go to login", onClick: () => (window.location.href = "/auth/login") }}
-      />
+      <AdminPageLayout>
+        <AdminBreadcrumbs items={[
+          { label: 'Admin', href: '/admin' },
+          { label: 'Organisationer' },
+        ]} />
+        <EmptyState
+          title="Åtkomst nekad"
+          description="Du har inte behörighet att se organisationer."
+          action={{ label: "Gå till dashboard", onClick: () => (window.location.href = "/admin") }}
+        />
+      </AdminPageLayout>
     );
   }
 
   const hasActiveFilters = filters.search !== "" || filters.status !== "all" || filters.sort !== "recent";
 
   return (
-      <div className="space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-              <BuildingOffice2Icon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Organisations</h1>
-              <p className="text-sm text-muted-foreground">
-                Manage organisations, contacts, and subscription status.
-              </p>
-            </div>
-          </div>
-          <Button onClick={() => setCreateOpen(true)} className="gap-2">
-            <PlusIcon className="h-4 w-4" />
-            Create organisation
-          </Button>
-        </div>
+    <AdminPageLayout>
+      {/* Breadcrumbs */}
+      <AdminBreadcrumbs items={[
+        { label: 'Admin', href: '/admin' },
+        { label: 'Organisationer' },
+      ]} />
 
-        {error && (
-          <Card className="border-amber-500/40 bg-amber-500/10">
-            <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
-              <div className="flex-1">
-                <p className="font-medium">{error}</p>
-                <p className="text-xs text-amber-700/80">Försök igen eller arbeta vidare med mock-data.</p>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => void loadOrganisations()}>
-                Ladda om
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+      {/* Page Header */}
+      <AdminPageHeader
+        title="Organisationer"
+        description="Hantera organisationer, kontakter och prenumerationsstatus."
+        icon={<BuildingOffice2Icon className="h-6 w-6" />}
+        actions={
+          canCreateTenant && (
+            <Button onClick={() => setCreateOpen(true)} className="gap-2">
+              <PlusIcon className="h-4 w-4" />
+              Skapa organisation
+            </Button>
+          )
+        }
+      />
+
+      {error && (
+        <Card className="border-amber-500/40 bg-amber-500/10">
+          <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
+            <div className="flex-1">
+              <p className="font-medium">{error}</p>
+              <p className="text-xs text-amber-700/80">Försök igen eller arbeta vidare med mock-data.</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => void loadOrganisations()}>
+              Ladda om
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Summary Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="group border-border/60 transition-all duration-200 hover:border-primary/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-              <BuildingOffice2Icon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{organisations.length}</p>
-              <p className="text-sm text-muted-foreground">Total organisations</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="group border-border/60 transition-all duration-200 hover:border-emerald-500/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5">
-              <CheckBadgeIcon className="h-6 w-6 text-emerald-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{statusCounts.active}</p>
-              <p className="text-sm text-muted-foreground">Active</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="group border-border/60 transition-all duration-200 hover:border-muted-foreground/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-              <PauseCircleIcon className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{statusCounts.inactive}</p>
-              <p className="text-sm text-muted-foreground">Inactive</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AdminStatGrid cols={3} className="mb-6">
+        <AdminStatCard
+          label="Totalt organisationer"
+          value={organisations.length}
+          icon={<BuildingOffice2Icon className="h-5 w-5" />}
+          iconColor="primary"
+        />
+        <AdminStatCard
+          label="Aktiva"
+          value={statusCounts.active}
+          icon={<CheckBadgeIcon className="h-5 w-5" />}
+          iconColor="green"
+        />
+        <AdminStatCard
+          label="Inaktiva"
+          value={statusCounts.inactive}
+          icon={<PauseCircleIcon className="h-5 w-5" />}
+          iconColor="amber"
+        />
+      </AdminStatGrid>
 
       {/* Directory Card */}
       {/* Directory Card */}
@@ -412,14 +420,16 @@ export function OrganisationAdminPage() {
         onCreate={handleCreate}
       />
 
-      <OrganisationEditDialog
-        open={Boolean(editingOrg)}
-        organisation={editingOrg}
-        onOpenChange={(open) => {
-          if (!open) setEditingOrg(null);
-        }}
-        onSubmit={handleEditSubmit}
-      />
-    </div>
+      {canEditTenant && (
+        <OrganisationEditDialog
+          open={Boolean(editingOrg)}
+          organisation={editingOrg}
+          onOpenChange={(open) => {
+            if (!open) setEditingOrg(null);
+          }}
+          onSubmit={handleEditSubmit}
+        />
+      )}
+    </AdminPageLayout>
   );
 }

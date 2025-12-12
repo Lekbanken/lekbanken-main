@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import type { ReactNode } from "react";
 import { useEffect } from "react";
@@ -61,3 +61,4 @@ export default function TenantAdminLayout({ children }: { children: ReactNode })
 
   return <>{children}</>;
 }
+

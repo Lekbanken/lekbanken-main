@@ -10,6 +10,14 @@ import {
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, EmptyState, LoadingState, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
+import {
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminStatCard,
+  AdminStatGrid,
+  AdminBreadcrumbs,
+} from "@/components/admin/shared";
+import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
@@ -46,6 +54,13 @@ export function UserAdminPage() {
   const { user, userRole } = useAuth();
   const { currentTenant, isLoadingTenants } = useTenant();
   const { success, info, warning } = useToast();
+  const { can } = useRbac();
+
+  // RBAC permissions
+  const canViewUsers = can('admin.users.list');
+  const canInviteUser = can('admin.users.create');
+  const canEditUser = can('admin.users.edit');
+  const canDeleteUser = can('admin.users.delete');
 
   const [users, setUsers] = useState<UserAdminItem[]>([]);
   const [isLoadingUsers, setIsLoadingUsers] = useState(true);
@@ -370,56 +385,52 @@ export function UserAdminPage() {
 
   if (isLoadingTenants || (isLoadingUsers && users.length === 0)) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-              <UsersIcon className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold text-foreground">Users</h1>
-              <p className="text-sm text-muted-foreground">Manage user accounts, roles and permissions.</p>
-            </div>
-          </div>
-        </div>
+      <AdminPageLayout>
+        <AdminPageHeader
+          icon={<UsersIcon className="h-6 w-6" />}
+          title="Användare"
+          description="Hantera användarkonton, roller och behörigheter."
+        />
         <SkeletonStats />
-        <LoadingState message="Loading users..." />
-      </div>
+        <LoadingState message="Laddar användare..." />
+      </AdminPageLayout>
     );
   }
 
   const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
 
-  if (!user || (!currentTenant && !isGlobalAdmin)) {
+  if (!user || (!currentTenant && !isGlobalAdmin) || !canViewUsers) {
     return (
       <EmptyState
-        title="No organisation access"
-        description="You need to be signed in and assigned to an organisation to manage users."
-        action={{ label: "Go to login", onClick: () => (window.location.href = "/auth/login") }}
+        title="Ingen åtkomst"
+        description="Du behöver vara inloggad och tilldelad till en organisation för att hantera användare."
+        action={{ label: "Gå till login", onClick: () => (window.location.href = "/auth/login") }}
       />
     );
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/10">
-            <UsersIcon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground">Users</h1>
-            <p className="text-sm text-muted-foreground">
-              Manage user accounts, roles and permissions across your organisation.
-            </p>
-          </div>
-        </div>
-        <Button onClick={() => setInviteOpen(true)} className="gap-2">
-          <UserPlusIcon className="h-4 w-4" />
-          Invite user
-        </Button>
-      </div>
+    <AdminPageLayout>
+      <AdminBreadcrumbs
+        items={[
+          { label: 'Startsida', href: '/admin' },
+          { label: 'Användare' },
+        ]}
+      />
+
+      <AdminPageHeader
+        icon={<UsersIcon className="h-6 w-6" />}
+        title="Användare"
+        description="Hantera användarkonton, roller och behörigheter i din organisation."
+        actions={
+          canInviteUser && (
+            <Button onClick={() => setInviteOpen(true)} className="gap-2">
+              <UserPlusIcon className="h-4 w-4" />
+              Bjud in användare
+            </Button>
+          )
+        }
+      />
 
       {error && (
         <Card className="border-amber-500/40 bg-amber-500/10">
@@ -437,52 +448,30 @@ export function UserAdminPage() {
       )}
 
       {/* Status Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="group border-border/60 transition-all duration-200 hover:border-primary/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-              <UsersIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{users.length}</p>
-              <p className="text-sm text-muted-foreground">Total users</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="group border-border/60 transition-all duration-200 hover:border-emerald-500/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5">
-              <CheckBadgeIcon className="h-6 w-6 text-emerald-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{statusCounts.active}</p>
-              <p className="text-sm text-muted-foreground">Active</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="group border-border/60 transition-all duration-200 hover:border-amber-500/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-500/5">
-              <EnvelopeIcon className="h-6 w-6 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{statusCounts.invited}</p>
-              <p className="text-sm text-muted-foreground">Invited</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="group border-border/60 transition-all duration-200 hover:border-muted-foreground/30 hover:shadow-md">
-          <CardContent className="flex items-center gap-4 p-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
-              <UserMinusIcon className="h-6 w-6 text-muted-foreground" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">{statusCounts.inactive}</p>
-              <p className="text-sm text-muted-foreground">Inactive</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <AdminStatGrid cols={4}>
+        <AdminStatCard
+          label="Totalt"
+          value={users.length}
+          icon={<UsersIcon className="h-5 w-5" />}
+        />
+        <AdminStatCard
+          label="Aktiva"
+          value={statusCounts.active}
+          icon={<CheckBadgeIcon className="h-5 w-5" />}
+          iconColor="green"
+        />
+        <AdminStatCard
+          label="Inbjudna"
+          value={statusCounts.invited}
+          icon={<EnvelopeIcon className="h-5 w-5" />}
+          iconColor="amber"
+        />
+        <AdminStatCard
+          label="Inaktiva"
+          value={statusCounts.inactive}
+          icon={<UserMinusIcon className="h-5 w-5" />}
+        />
+      </AdminStatGrid>
 
       {/* Directory Card */}
       <Card className="overflow-hidden border-border/60">
@@ -535,6 +524,6 @@ export function UserAdminPage() {
         }}
         onSubmit={handleEditSubmit}
       />
-    </div>
+    </AdminPageLayout>
   );
 }

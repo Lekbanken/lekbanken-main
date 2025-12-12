@@ -30,7 +30,7 @@ type AdminSidebarProps = {
  * Filter nav items based on RBAC permissions
  */
 function useFilteredNavGroups(): AdminNavGroupConfig[] {
-  const { can, isSystemAdmin, isTenantAdmin, currentTenantId } = useRbac();
+  const { can, isSystemAdmin, currentTenantId } = useRbac();
   
   return useMemo(() => {
     // Determine which config to use as base
@@ -57,7 +57,7 @@ function useFilteredNavGroups(): AdminNavGroupConfig[] {
         }),
       }))
       .filter((group) => group.items.length > 0); // Remove empty groups
-  }, [can, isSystemAdmin, isTenantAdmin, currentTenantId]);
+  }, [can, isSystemAdmin, currentTenantId]);
 }
 
 function NavSection({ 

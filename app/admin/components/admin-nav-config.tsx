@@ -172,6 +172,37 @@ export const navIcons = {
       <path d="M12 6v6l4 2" />
     </svg>
   ),
+  flag: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 3v18m0-16h12l-3 4 3 4H4" />
+    </svg>
+  ),
+  key: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="8" cy="15" r="4" />
+      <path d="M12 15h7l-2-2m0 4 2-2" />
+    </svg>
+  ),
+  rss: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M5 19h0.01" />
+      <path d="M4 4a16 16 0 0 1 16 16" />
+      <path d="M4 11a9 9 0 0 1 9 9" />
+    </svg>
+  ),
+  megaphone: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M3 11v2a1 1 0 0 0 1 1h2.5l4.5 4v-16l-4.5 4H4a1 1 0 0 0-1 1Z" />
+      <path d="M16 13a4 4 0 0 0 0-6" />
+    </svg>
+  ),
+  incident: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M12 9v4" />
+      <path d="M12 17h.01" />
+      <path d="m10.29 3.86-8 14A1 1 0 0 0 3.1 19h17.8a1 1 0 0 0 .87-1.5l-8-14a1 1 0 0 0-1.76 0Z" />
+    </svg>
+  ),
   products: (
     <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -227,6 +258,11 @@ export const adminNavConfig: AdminNavConfig = [
     items: [
       { id: 'system-health', href: '/admin/system-health', label: 'System Health', icon: navIcons.systemHealth, permission: 'admin.system.view' },
       { id: 'audit-logs', href: '/admin/audit-logs', label: 'Granskningslogg', icon: navIcons.audit, permission: 'admin.audit.view' },
+      { id: 'feature-flags', href: '/admin/feature-flags', label: 'Feature Flags', icon: navIcons.flag, permission: 'admin.system.view' },
+      { id: 'api-keys', href: '/admin/api-keys', label: 'API-nycklar', icon: navIcons.key, permission: 'admin.system.view' },
+      { id: 'webhooks', href: '/admin/webhooks', label: 'Webhooks', icon: navIcons.rss, permission: 'admin.system.view' },
+      { id: 'incidents', href: '/admin/incidents', label: 'Incidenter', icon: navIcons.incident, permission: 'admin.system.view' },
+      { id: 'release-notes', href: '/admin/release-notes', label: 'Release Notes', icon: navIcons.megaphone, permission: 'admin.system.view' },
       { id: 'settings', href: '/admin/settings', label: 'Inställningar', icon: navIcons.settings, permission: 'admin.settings.view' },
     ],
   },

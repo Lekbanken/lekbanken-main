@@ -1,9 +1,9 @@
 'use client';
 
-/* eslint-disable @next/next/no-img-element */
 import { useLogo, useTypography, useColors } from '../../store/sandbox-store';
 import { getFontFamily } from '../../tokens/fonts';
 import { SparklesIcon } from '@heroicons/react/24/solid';
+import Image from 'next/image';
 
 const logoSizes = {
   sm: { icon: 24, text: 16 },
@@ -48,11 +48,11 @@ export function LogoLockup({ iconSrc }: { iconSrc?: string }) {
         >
           {showIcon && (
             iconSrc ? (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
+              <Image
                 src={iconSrc}
                 alt="Lekbanken ikon"
-                style={{ width: sizes.icon, height: sizes.icon }}
+                width={sizes.icon}
+                height={sizes.icon}
                 className="object-contain"
               />
             ) : (
@@ -152,11 +152,11 @@ export function LogoLockup({ iconSrc }: { iconSrc?: string }) {
                 >
                   {hasIcon && (
                     iconSrc ? (
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      <img
+                      <Image
                         src={iconSrc}
                         alt="Lekbanken ikon"
-                        style={{ width: s.icon, height: s.icon }}
+                        width={s.icon}
+                        height={s.icon}
                         className="object-contain"
                       />
                     ) : (

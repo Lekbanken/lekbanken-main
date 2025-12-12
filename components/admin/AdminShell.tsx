@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
+import { ActingAsTenantBanner } from "./ActingAsTenantBanner";
 import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
 import { resetAuth } from "@/lib/supabase/resetAuth";
@@ -149,6 +150,8 @@ export function AdminShell({ children }: AdminShellProps) {
             onToggleSidebar={() => setIsMobileNavOpen(true)}
             isSidebarCollapsed={isSidebarCollapsed}
           />
+          {/* System admin acting as tenant banner */}
+          <ActingAsTenantBanner />
           <main className="flex flex-1 flex-col bg-muted/40 p-4 lg:p-6 xl:p-8">
             {children}
           </main>

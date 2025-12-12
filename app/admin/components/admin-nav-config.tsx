@@ -225,6 +225,7 @@ export const adminNavConfig: AdminNavConfig = [
       { id: 'dashboard', href: '/admin', label: 'Dashboard', icon: navIcons.dashboard },
       { id: 'organisations', href: '/admin/organisations', label: 'Organisationer', icon: navIcons.organisations, permission: 'admin.tenants.list' },
       { id: 'users', href: '/admin/users', label: 'Användare', icon: navIcons.users, permission: 'admin.users.list' },
+      { id: 'games', href: '/admin/games', label: 'Spel', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
       { id: 'products', href: '/admin/products', label: 'Produkter', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
       { id: 'licenses', href: '/admin/licenses', label: 'Licenser', icon: navIcons.licenses, permission: 'admin.billing.view' },
       { id: 'content', href: '/admin/content', label: 'Innehåll', icon: navIcons.content, permission: 'admin.content.list' },
@@ -246,6 +247,7 @@ export const adminNavConfig: AdminNavConfig = [
     title: 'Gamification',
     items: [
       { id: 'leaderboard', href: '/admin/leaderboard', label: 'Leaderboard', icon: navIcons.leaderboard },
+      { id: 'sessions', href: '/admin/sessions', label: 'Sessioner', icon: navIcons.sessions, permission: 'admin.sessions.list' },
       { id: 'achievements', href: '/admin/achievements', label: 'Achievements', icon: navIcons.achievements, permission: 'admin.achievements.list' },
       { id: 'personalization', href: '/admin/personalization', label: 'Personalisering', icon: navIcons.personalization },
       { id: 'marketplace', href: '/admin/marketplace', label: 'Butik', icon: navIcons.marketplace },

@@ -1,7 +1,74 @@
+import { useEffect, useState, useMemo } from "react";
 import { UsersIcon } from "@heroicons/react/24/outline";
-import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
+import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";
+import { Badge, Input } from "@/components/ui";
+import { useTenant } from "@/lib/context/TenantContext";
+import { supabase } from "@/lib/supabase/client";
+
+type MemberRow = {
+  id: string;
+  role: string;
+  is_primary?: boolean | null;
+  user?: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+  } | null;
+};
 
 export default function TenantMembersPage() {
+  const { currentTenant } = useTenant();
+  const tenantId = currentTenant?.id ?? null;
+
+  const [members, setMembers] = useState<MemberRow[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    if (!tenantId) return;
+    setIsLoading(true);
+    setError(null);
+
+    const load = async () => {
+      const { data, error: queryError } = await supabase
+        .from("user_tenant_memberships")
+        .select("id, role, is_primary, user:users(id, email, full_name)")
+        .eq("tenant_id", tenantId)
+        .limit(200);
+
+      if (queryError) {
+        console.error(queryError);
+        setError("Kunde inte ladda medlemmar just nu.");
+      } else {
+        setMembers(data || []);
+      }
+      setIsLoading(false);
+    };
+
+    void load();
+  }, [tenantId]);
+
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return members;
+    return members.filter((m) =>
+      [m.user?.full_name, m.user?.email, m.role].some((v) => v?.toLowerCase().includes(term))
+    );
+  }, [members, search]);
+
+  if (!tenantId) {
+    return (
+      <AdminPageLayout>
+        <AdminEmptyState
+          icon={<UsersIcon className="h-6 w-6" />}
+          title="Ingen organisation vald"
+          description="Välj eller byt organisation för att se medlemmar."
+        />
+      </AdminPageLayout>
+    );
+  }
+
   return (
     <AdminPageLayout>
       <AdminPageHeader
@@ -10,11 +77,55 @@ export default function TenantMembersPage() {
         icon={<UsersIcon className="h-8 w-8 text-primary" />}
       />
 
-      <AdminEmptyState
-        icon={<UsersIcon className="h-6 w-6" />}
-        title="Inga medlemmar att visa ännu"
-        description="Denna sida är under uppbyggnad. Snart kan du bjuda in, hantera roller och se aktivitet."
-      />
+      {error && (
+        <AdminErrorState
+          title="Kunde inte ladda medlemmar"
+          description={error}
+          onRetry={() => {
+            setError(null);
+            setIsLoading(true);
+          }}
+        />
+      )}
+
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <Input
+          placeholder="Sök på namn, e-post eller roll"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full sm:w-80"
+        />
+      </div>
+
+      {isLoading ? (
+        <p className="text-sm text-muted-foreground">Laddar medlemmar...</p>
+      ) : filtered.length === 0 ? (
+        <AdminEmptyState
+          icon={<UsersIcon className="h-6 w-6" />}
+          title="Inga medlemmar"
+          description="Det finns inga medlemmar att visa för denna organisation."
+        />
+      ) : (
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((member) => (
+            <AdminCard
+              key={member.id}
+              title={member.user?.full_name || member.user?.email || "Okänd användare"}
+              description={member.user?.email || "Ingen e-post"}
+              icon={<UsersIcon className="h-5 w-5 text-primary" />}
+              actions={
+                <Badge variant="outline" className="capitalize">
+                  {member.role}
+                </Badge>
+              }
+            >
+              <p className="text-xs text-muted-foreground">
+                {member.is_primary ? "Primär kontakt" : "Medlem"}
+              </p>
+            </AdminCard>
+          ))}
+        </div>
+      )}
     </AdminPageLayout>
   );
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { Breadcrumbs } from '@/components/ui/breadcrumbs'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EmptyState, EmptySearchState, EmptyListState, EmptyFavoritesState } from '@/components/ui/empty-state'
@@ -9,6 +10,13 @@ import { LoadingSpinner, LoadingState, ButtonSpinner } from '@/components/ui/loa
 import { Skeleton, SkeletonCard, SkeletonTable, SkeletonList, SkeletonStats, SkeletonGameCard } from '@/components/ui/skeleton'
 import { Alert, InlineAlert } from '@/components/ui/alert'
 import { ToastProvider, useToast } from '@/components/ui/toast'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import { Toggle } from '@/components/ui/toggle'
+import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs'
+import { MediaPicker } from '@/components/ui/media-picker'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SimpleModulePage } from '../components/shell/SimpleModulePage'
 
 function ToastDemo() {
@@ -34,6 +42,11 @@ function ToastDemo() {
 
 export default function FeedbackSandboxPage() {
   const [isLoading, setIsLoading] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
+  const [sheetToggle, setSheetToggle] = useState(true)
+  const { activeTab, setActiveTab } = useTabs('inputs')
 
   return (
     <ToastProvider>
@@ -282,6 +295,109 @@ export default function FeedbackSandboxPage() {
                   </p>
                   <ToastDemo />
                 </CardContent>
+              </Card>
+            </section>
+
+            {/* UI Extras (nav, sheet, media) */}
+            <section>
+              <h2 className="mb-6 text-xl font-semibold text-foreground">UI Extras</h2>
+              <Card className="space-y-6 p-6">
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-muted-foreground">Breadcrumbs</div>
+                  <Breadcrumbs
+                    items={[
+                      { label: 'Hem', href: '/' },
+                      { label: 'Sandbox', href: '/sandbox' },
+                      { label: 'Feedback & States' },
+                    ]}
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-4">
+                  <Tabs
+                    tabs={[
+                      { id: 'inputs', label: 'Inputs' },
+                      { id: 'overlay', label: 'Overlay' },
+                      { id: 'media', label: 'Media' },
+                    ]}
+                    activeTab={activeTab}
+                    onChange={setActiveTab}
+                    variant="underline"
+                  />
+                </div>
+
+                <TabPanel id="inputs" activeTab={activeTab} className="grid gap-6 md:grid-cols-2">
+                  <div className="space-y-3 rounded-lg border border-border p-4">
+                    <h3 className="font-semibold">Toggles & Switches</h3>
+                    <div className="flex items-center justify-between gap-3">
+                      <Label htmlFor="notif">Notiser</Label>
+                      <Switch id="notif" checked={notificationsEnabled} onCheckedChange={setNotificationsEnabled} />
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <Label htmlFor="dark">Dark mode</Label>
+                      <Toggle pressed={darkMode} onClick={() => setDarkMode(!darkMode)} aria-label="Dark mode">
+                        {darkMode ? 'On' : 'Off'}
+                      </Toggle>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 rounded-lg border border-border p-4">
+                    <h3 className="font-semibold">Form + Tabs</h3>
+                    <Tabs
+                      tabs={[
+                        { id: 'info', label: 'Info' },
+                        { id: 'inst', label: 'Inställningar' },
+                      ]}
+                      activeTab="info"
+                      onChange={() => {}}
+                      variant="pills"
+                    />
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Namn</Label>
+                      <Input id="name" placeholder="Skriv något" />
+                    </div>
+                  </div>
+                </TabPanel>
+
+                <TabPanel id="overlay" activeTab={activeTab} className="space-y-4">
+                  <div className="space-y-3 rounded-lg border border-border p-4">
+                    <h3 className="font-semibold">Sheet</h3>
+                    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+                      <SheetTrigger asChild>
+                        <Button variant="outline">Öppna sheet</Button>
+                      </SheetTrigger>
+                      <SheetContent side="right">
+                        <SheetHeader>
+                          <SheetTitle>Inställningspanel</SheetTitle>
+                          <SheetDescription>En enkel sheet för sekundära åtgärder.</SheetDescription>
+                        </SheetHeader>
+                        <div className="mt-4 space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="sheet-name">Namn</Label>
+                            <Input id="sheet-name" placeholder="Ange namn" />
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <Label htmlFor="sheet-toggle">Aktivera</Label>
+                            <Switch id="sheet-toggle" checked={sheetToggle} onCheckedChange={setSheetToggle} />
+                          </div>
+                        </div>
+                      </SheetContent>
+                    </Sheet>
+                  </div>
+                </TabPanel>
+
+                <TabPanel id="media" activeTab={activeTab} className="space-y-3 rounded-lg border border-border p-4">
+                  <h3 className="font-semibold">Media Picker (mockad)</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Visar biblioteket utan nätverksladdning (ingen fetch förrän du byter flik eller laddar).
+                  </p>
+                  <MediaPicker
+                    onSelect={(id, url) => alert(`Valde media ${id} (${url})`)}
+                    allowUpload={false}
+                    allowTemplate={false}
+                    trigger={<Button variant="outline">Öppna Media Picker</Button>}
+                  />
+                </TabPanel>
               </Card>
             </section>
 

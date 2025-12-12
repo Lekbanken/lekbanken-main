@@ -97,14 +97,10 @@ export function ModuleNav({ onNavigate }: ModuleNavProps) {
   const pathname = usePathname();
   const currentModule = findModuleByPath(pathname);
 
-  // Initialize expansion state - expand first category by default
+  // Initialize expansion state - expand current category only
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>();
-    // Expand first category by default
-    if (sandboxCategories.length > 0) {
-      initial.add(sandboxCategories[0].id);
-    }
-    // Also expand the category containing the current module
+    // Expand the category containing the current module
     if (currentModule) {
       initial.add(currentModule.category.id);
     }

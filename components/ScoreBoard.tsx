@@ -2,16 +2,20 @@
 
 import { useEffect, useState } from 'react';
 
+type ScoreBoardVariant = 'fixed' | 'inline';
+
 interface ScoreBoardProps {
   sessionId: string;
   score?: number;
   gameTimeSeconds?: number;
+  variant?: ScoreBoardVariant;
 }
 
 export default function ScoreBoard({
   sessionId,
   score = 0,
   gameTimeSeconds = 0,
+  variant = 'fixed',
 }: ScoreBoardProps) {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
@@ -44,9 +48,14 @@ export default function ScoreBoard({
 
   const timeProgress = gameTimeSeconds > 0 ? (elapsedSeconds / gameTimeSeconds) * 100 : 0;
 
+  const containerClasses =
+    variant === 'fixed'
+      ? 'fixed top-0 left-0 right-0 z-50'
+      : 'relative rounded-2xl shadow-md';
+
   return (
-    <div className="fixed top-0 left-0 right-0 bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg z-50">
-      <div className="max-w-6xl mx-auto px-4 py-4">
+    <div className={containerClasses + ' bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg'}>
+      <div className="mx-auto max-w-6xl px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Score Display */}
           <div className="flex items-center gap-8">

@@ -10,7 +10,7 @@ interface SubModuleLayoutProps {
   categoryLabel: string;
 }
 
-export function SubModuleLayout({ children, categoryId, categoryLabel }: SubModuleLayoutProps) {
+export function SubModuleLayout({ children, categoryId: _categoryId, categoryLabel }: SubModuleLayoutProps) {
   const pathname = usePathname();
   const found = findModuleByPath(pathname);
   

@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 const modules = [
   { id: 'typography', name: 'Typography', href: '/sandbox/typography', icon: DocumentTextIcon },
-  { id: 'logo', name: 'Logo & Wordmark', href: '/sandbox/logo', icon: SparklesIcon },
+  { id: 'icons', name: 'Icon & Logo', href: '/sandbox/design-system/icons', icon: SparklesIcon },
   { id: 'colors', name: 'Colors', href: '/sandbox/colors', icon: SwatchIcon },
   { id: 'gamification', name: 'Gamification', href: '/sandbox/gamification', icon: PhotoIcon },
   { id: 'buttons', name: 'Buttons', href: '/sandbox/buttons', icon: CursorArrowRaysIcon },

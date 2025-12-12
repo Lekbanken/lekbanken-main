@@ -27,14 +27,15 @@ export const moduleNotes: Record<string, ModuleNotes> = {
 <BodyTextPreview />`,
   },
 
-  logo: {
+  icons: {
     notes: `
-- Logo lockup supports four layouts: icon-left, icon-top, icon-only, text-only
-- Sizes: sm (24px), md (32px), lg (48px), xl (64px)
-- Letter spacing adjustable via controls
-- Uses primary font family for wordmark
+- Fyra ikon-URL:er kan testas parallellt (ljust/mörkt original + ljust/mörkt test)
+- Logo lockup stöder fyra layouts: icon-left, icon-top, icon-only, text-only
+- Storlekar: sm (24px), md (32px), lg (48px), xl (64px)
+- Justerbar letter spacing och case för wordmark
     `.trim(),
     changelog: [
+      { date: '2025-12-12', note: 'La till ikon-URL-fält och flyttade logolayout hit från /logo' },
       { date: '2025-12-09', note: 'Added logo layout controls' },
     ],
     codeSnippet: `import { LogoLockup } from '@/app/sandbox/components/previews';

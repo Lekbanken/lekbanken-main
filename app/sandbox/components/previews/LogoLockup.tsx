@@ -1,5 +1,6 @@
 'use client';
 
+/* eslint-disable @next/next/no-img-element */
 import { useLogo, useTypography, useColors } from '../../store/sandbox-store';
 import { getFontFamily } from '../../tokens/fonts';
 import { SparklesIcon } from '@heroicons/react/24/solid';
@@ -11,7 +12,7 @@ const logoSizes = {
   xl: { icon: 64, text: 36 },
 };
 
-export function LogoLockup() {
+export function LogoLockup({ iconSrc }: { iconSrc?: string }) {
   const { logoLayout, logoCase, logoSize, logoLetterSpacing } = useLogo();
   const { fontPrimary } = useTypography();
   const { accentHue } = useColors();
@@ -46,13 +47,23 @@ export function LogoLockup() {
           }`}
         >
           {showIcon && (
-            <SparklesIcon
-              style={{
-                width: sizes.icon,
-                height: sizes.icon,
-                color: `hsl(${accentHue}, 70%, 50%)`,
-              }}
-            />
+            iconSrc ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={iconSrc}
+                alt="Lekbanken ikon"
+                style={{ width: sizes.icon, height: sizes.icon }}
+                className="object-contain"
+              />
+            ) : (
+              <SparklesIcon
+                style={{
+                  width: sizes.icon,
+                  height: sizes.icon,
+                  color: `hsl(${accentHue}, 70%, 50%)`,
+                }}
+              />
+            )
           )}
           {showText && (
             <span
@@ -140,13 +151,23 @@ export function LogoLockup() {
                   }`}
                 >
                   {hasIcon && (
-                    <SparklesIcon
-                      style={{
-                        width: s.icon,
-                        height: s.icon,
-                        color: `hsl(${accentHue}, 70%, 50%)`,
-                      }}
-                    />
+                    iconSrc ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img
+                        src={iconSrc}
+                        alt="Lekbanken ikon"
+                        style={{ width: s.icon, height: s.icon }}
+                        className="object-contain"
+                      />
+                    ) : (
+                      <SparklesIcon
+                        style={{
+                          width: s.icon,
+                          height: s.icon,
+                          color: `hsl(${accentHue}, 70%, 50%)`,
+                        }}
+                      />
+                    )
                   )}
                   {hasText && (
                     <span

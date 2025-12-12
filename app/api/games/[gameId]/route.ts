@@ -116,3 +116,20 @@ export async function PATCH(
 
   return NextResponse.json({ game: data })
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ gameId: string }> }
+) {
+  const { gameId } = await params
+  const supabase = await createServerRlsClient()
+
+  const { error } = await supabase.from('games').delete().eq('id', gameId)
+
+  if (error) {
+    console.error('[api/games/:id] delete error', error)
+    return NextResponse.json({ error: 'Failed to delete game' }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true })
+}

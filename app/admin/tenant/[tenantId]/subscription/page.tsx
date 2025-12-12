@@ -13,13 +13,19 @@ export default function TenantSubscriptionPage() {
 
   useEffect(() => {
     if (!tenantId) return;
-    setIsLoading(true);
+    let active = true;
     const load = async () => {
+      if (!active) return;
+      setIsLoading(true);
       const sub = await getSubscription(tenantId);
+      if (!active) return;
       setSubscription(sub);
       setIsLoading(false);
     };
     void load();
+    return () => {
+      active = false;
+    };
   }, [tenantId]);
 
   const planName = useMemo(() => {

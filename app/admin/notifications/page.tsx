@@ -268,7 +268,7 @@ export default function NotificationsAdminPage() {
               {tenantUsers.length} användare i organisationen.
             </p>
             <p className="text-xs text-muted-foreground">
-              När du väljer "Specifika användare" kan du välja från listan. Annars skickas till alla.
+              Nar du valjer specifika anvandare kan du valja fran listan. Annars skickas till alla.
             </p>
           </CardContent>
         </Card>

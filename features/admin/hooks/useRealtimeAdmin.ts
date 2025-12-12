@@ -4,7 +4,15 @@ import { useEffect, useRef, useCallback, useMemo } from 'react';
 import { createBrowserClient } from '@/lib/supabase/client';
 import type { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
-type TableName = 'users' | 'organizations' | 'products' | 'games' | 'achievements' | 'tenant_admin_users';
+type TableName =
+  | 'users'
+  | 'organizations'
+  | 'products'
+  | 'games'
+  | 'achievements'
+  | 'tenant_admin_users'
+  | 'sessions'
+  | 'participants';
 
 interface RealtimeEvent<T> {
   type: 'INSERT' | 'UPDATE' | 'DELETE';

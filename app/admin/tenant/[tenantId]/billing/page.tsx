@@ -22,19 +22,25 @@ export default function TenantBillingPage() {
 
   useEffect(() => {
     if (!tenantId) return;
-    setIsLoading(true);
+    let active = true;
     const load = async () => {
+      if (!active) return;
+      setIsLoading(true);
       const [sub, inv, st] = await Promise.all([
         getSubscription(tenantId),
         getInvoices(tenantId),
         getBillingStats(tenantId),
       ]);
+      if (!active) return;
       setSubscription(sub);
       setInvoices(inv);
       setStats(st);
       setIsLoading(false);
     };
     void load();
+    return () => {
+      active = false;
+    };
   }, [tenantId]);
 
   const planName = useMemo(() => {

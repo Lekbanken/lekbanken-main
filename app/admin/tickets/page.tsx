@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
-import { Card, CardContent, Badge, Input, Button } from '@/components/ui';
+import { Card, Badge, Input, Button } from '@/components/ui';
 import { TicketIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import {
   getAdminTickets,

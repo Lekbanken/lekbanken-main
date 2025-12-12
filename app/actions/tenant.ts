@@ -8,8 +8,6 @@ import type { Database } from '@/types/supabase'
 type TenantRow = Database['public']['Tables']['tenants']['Row']
 type TenantRole = 'owner' | 'admin' | 'editor' | 'member'
 type TenantWithMembership = TenantRow & { membership: { tenant_id: string; role: TenantRole; is_primary?: boolean } }
-type MembershipRow = { tenant_id: string; role: TenantRole; is_primary?: boolean | null; tenant: TenantRow | null }
-
 export async function resolveCurrentTenant() {
   const cookieStore = await cookies()
   const supabase = await createServerRlsClient()
@@ -24,10 +22,10 @@ export async function resolveCurrentTenant() {
 
   const tenantIdFromCookie = await readTenantIdFromCookies(cookieStore)
 
-  const { data: memberships } = (await (supabase as any)
+  const { data: memberships } = await supabase
     .from('user_tenant_memberships')
     .select('tenant_id, role, is_primary, tenant:tenants(*)')
-    .eq('user_id', user.id)) as { data: MembershipRow[] | null; error: unknown }
+    .eq('user_id', user.id)
 
   const validMemberships =
     memberships?.filter((m): m is typeof m & { tenant: NonNullable<typeof m['tenant']> } => !!m.tenant) ?? []
@@ -86,11 +84,11 @@ export async function selectTenant(tenantId: string) {
   }
 
   const { data: membership } = await supabase
-    .from('user_tenant_memberships' as any)
+    .from('user_tenant_memberships')
     .select('tenant_id, role, tenant:tenants(*)')
     .eq('user_id', user.id)
     .eq('tenant_id', tenantId)
-    .maybeSingle() as { data: { tenant_id: string; role: TenantRole; tenant: TenantRow | null } | null }
+    .maybeSingle()
 
   if (!membership?.tenant) {
     clearTenantCookie(cookieStore)

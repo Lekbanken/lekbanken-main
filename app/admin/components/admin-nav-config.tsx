@@ -5,51 +5,27 @@ import type { AdminPermission } from '@/features/admin/shared/hooks/useRbac';
  * Navigation item with RBAC support
  */
 export interface AdminNavItemConfig {
-  /** Unique identifier */
   id: string;
-  /** Route href */
   href: string;
-  /** Display label (Swedish) */
   label: string;
-  /** Icon element */
   icon: ReactNode;
-  /** Static badge text */
   badge?: string;
-  /** Permission required to see this item */
   permission?: AdminPermission;
-  /** Only show for system admins */
   systemAdminOnly?: boolean;
-  /** Only show for tenant admins (not system admin without tenant context) */
   tenantAdminOnly?: boolean;
 }
 
-/**
- * Navigation group with RBAC support
- */
 export interface AdminNavGroupConfig {
-  /** Unique identifier */
   id: string;
-  /** Group title (Swedish) */
   title: string;
-  /** Nav items in this group */
   items: AdminNavItemConfig[];
-  /** Hide entire group for non-system admins */
   systemAdminOnly?: boolean;
 }
 
-/**
- * Navigation configuration type
- */
 export type AdminNavConfig = AdminNavGroupConfig[];
 
-/**
- * Icon base class for consistency
- */
 export const navIconClass = 'h-5 w-5';
 
-/**
- * SVG Icons as functions for nav items
- */
 export const navIcons = {
   dashboard: (
     <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
@@ -72,6 +48,14 @@ export const navIcons = {
       <path d="M3 20c0-2.8 2.7-5 6-5s6 2.2 6 5" />
       <circle cx="17" cy="9" r="2.5" />
       <path d="M21 20c0-2 -1.8-3.5-4-3.5" />
+    </svg>
+  ),
+  participants: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="8" cy="8" r="3" />
+      <circle cx="16" cy="8" r="3" />
+      <path d="M2 20c0-3.5 3-6 6-6s6 2.5 6 6" />
+      <path d="M10 18c0-3 2.5-5 6-5 1.7 0 3.3.7 4.4 1.9" />
     </svg>
   ),
   licenses: (
@@ -211,12 +195,6 @@ export const navIcons = {
   ),
 };
 
-/**
- * Main navigation configuration with RBAC
- * 
- * Groups are rendered in order.
- * Items within groups are filtered based on user permissions.
- */
 export const adminNavConfig: AdminNavConfig = [
   {
     id: 'main',
@@ -243,11 +221,18 @@ export const adminNavConfig: AdminNavConfig = [
     ],
   },
   {
+    id: 'participants',
+    title: 'Deltagare',
+    items: [
+      { id: 'participants', href: '/admin/participants', label: 'Deltagare', icon: navIcons.participants, permission: 'admin.participants.list' },
+      { id: 'sessions', href: '/admin/sessions', label: 'Sessioner', icon: navIcons.sessions, permission: 'admin.sessions.list' },
+    ],
+  },
+  {
     id: 'gamification',
     title: 'Gamification',
     items: [
       { id: 'leaderboard', href: '/admin/leaderboard', label: 'Leaderboard', icon: navIcons.leaderboard },
-      { id: 'sessions', href: '/admin/sessions', label: 'Sessioner', icon: navIcons.sessions, permission: 'admin.sessions.list' },
       { id: 'achievements', href: '/admin/achievements', label: 'Achievements', icon: navIcons.achievements, permission: 'admin.achievements.list' },
       { id: 'personalization', href: '/admin/personalization', label: 'Personalisering', icon: navIcons.personalization },
       { id: 'marketplace', href: '/admin/marketplace', label: 'Butik', icon: navIcons.marketplace },
@@ -270,9 +255,6 @@ export const adminNavConfig: AdminNavConfig = [
   },
 ];
 
-/**
- * Tenant-scoped navigation for license admins
- */
 export const tenantAdminNavConfig: AdminNavConfig = [
   {
     id: 'tenant-main',
@@ -289,6 +271,7 @@ export const tenantAdminNavConfig: AdminNavConfig = [
     items: [
       { id: 'tenant-games', href: '/admin/tenant/[tenantId]/games', label: 'Spel', icon: navIcons.games },
       { id: 'tenant-content', href: '/admin/tenant/[tenantId]/content', label: 'Material', icon: navIcons.content },
+      { id: 'tenant-participants', href: '/admin/tenant/[tenantId]/participants', label: 'Deltagare', icon: navIcons.participants },
     ],
   },
   {

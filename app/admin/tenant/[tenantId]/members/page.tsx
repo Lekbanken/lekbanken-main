@@ -27,16 +27,18 @@ export default function TenantMembersPage() {
 
   useEffect(() => {
     if (!tenantId) return;
-    setIsLoading(true);
-    setError(null);
-
+    let active = true;
     const load = async () => {
+      if (!active) return;
+      setError(null);
+      setIsLoading(true);
       const { data, error: queryError } = await supabase
         .from("user_tenant_memberships")
         .select("id, role, is_primary, user:users(id, email, full_name)")
         .eq("tenant_id", tenantId)
         .limit(200);
 
+      if (!active) return;
       if (queryError) {
         console.error(queryError);
         setError("Kunde inte ladda medlemmar just nu.");
@@ -47,6 +49,9 @@ export default function TenantMembersPage() {
     };
 
     void load();
+    return () => {
+      active = false;
+    };
   }, [tenantId]);
 
   const filtered = useMemo(() => {

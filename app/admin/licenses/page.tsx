@@ -12,7 +12,7 @@ import {
   AdminErrorState,
 } from '@/components/admin/shared';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge, Button, Input } from '@/components/ui';
+import { Badge, Input } from '@/components/ui';
 import {
   KeyIcon,
   CheckCircleIcon,

@@ -52,7 +52,11 @@ export type AdminPermission =
   | 'admin.system.manage'
   | 'admin.settings.view'
   | 'admin.settings.edit'
-  | 'admin.notifications.send';
+  | 'admin.notifications.send'
+  // Participants
+  | 'admin.participants.list'
+  | 'admin.participants.view'
+  | 'admin.participants.moderate';
 
 /**
  * Admin role types
@@ -119,6 +123,11 @@ const permissionChecks: Record<AdminPermission, PermissionCheck> = {
   'admin.settings.view': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
   'admin.settings.edit': (sys, tr) => sys || tr === 'owner',
   'admin.notifications.send': (sys) => sys,
+
+  // Participants - system_admin or tenant admin/editor
+  'admin.participants.list': (sys, tr) => sys || Boolean(tr),
+  'admin.participants.view': (sys, tr) => sys || Boolean(tr),
+  'admin.participants.moderate': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
 };
 
 /**

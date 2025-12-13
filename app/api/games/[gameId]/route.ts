@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { getAllowedProductIds } from '@/app/api/games/utils'
 import { validateGamePayload } from '@/lib/validation/games'
@@ -13,17 +13,20 @@ export async function GET(
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   const { gameId } = await params
-  const supabase = await createServerRlsClient()
+  const rlsClient = await createServerRlsClient()
   const cookieStore = await cookies()
-  const activeTenantId = await readTenantIdFromCookies(cookieStore)
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await rlsClient.auth.getUser()
 
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
-  const isSystemAdmin = role === 'system_admin'
+  const isSuperAdmin = role === 'superadmin'
+  const isSystemAdmin = role === 'system_admin' || isSuperAdmin
   const isTenantElevated = role === 'admin' || role === 'owner'
   const isElevated = isSystemAdmin || isTenantElevated
+
+  const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
+  const activeTenantId = isSystemAdmin ? null : await readTenantIdFromCookies(cookieStore)
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, activeTenantId || null)
   if (activeTenantId && allowedProductIds.length === 0 && !isElevated) {
@@ -38,7 +41,7 @@ export async function GET(
         translations:game_translations(*),
         media:game_media(*),
         product:products(*),
-        main_purpose:purposes!main_purpose_id(*)
+        main_purpose:purposes!games_main_purpose_id_fkey(*)
       `
     )
     .eq('id', gameId)

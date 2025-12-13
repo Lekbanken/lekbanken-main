@@ -21,7 +21,6 @@ import {
 } from '@/components/admin/shared';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, useToast } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import { supabase } from '@/lib/supabase/client';
 import type { Database } from '@/types/supabase';
 import { GameFormDialog } from './components/GameFormDialog';
 import type { GameFormValues, GameWithRelations, SelectOption } from './types';
@@ -72,34 +71,41 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
     setIsLoading(true);
     setError(null);
     try {
-      const [{ data, error: gameError }, tenantsRes, purposesRes, productsRes] = await Promise.all([
-        supabase
-          .from('games')
-          .select(
-            `
-              *,
-              owner:tenants(id, name),
-              product:products(id, name),
-              main_purpose:main_purpose_id(id, name)
-            `
-          )
-          .eq('id', gameId)
-          .single(),
-        supabase.from('tenants').select('id, name').order('name', { ascending: true }).limit(200),
-        supabase.from('purposes').select('id, name').order('name', { ascending: true }).limit(200),
-        supabase.from('products').select('id, name').order('name', { ascending: true }).limit(200),
+      const [gameRes, tenantsRes, purposesRes, productsRes] = await Promise.all([
+        fetch(`/api/games/${gameId}`),
+        fetch('/api/tenants'),
+        fetch('/api/purposes'),
+        fetch('/api/products'),
       ]);
 
-      const firstError = gameError || tenantsRes.error || purposesRes.error || productsRes.error;
-      if (firstError) {
-        throw firstError;
+      if (!gameRes.ok) {
+        const json = await gameRes.json().catch(() => ({}));
+        setError(json.error || 'Kunde inte hämta spelet');
+        return;
       }
 
-      setGame(data as GameWithRelations);
-      setTenants((tenantsRes.data || []).map((t) => ({ value: t.id, label: t.name || 'Namn saknas' })));
-      setPurposes((purposesRes.data || []).map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })));
-      setProducts((productsRes.data || []).map((p) => ({ value: p.id, label: p.name || 'Okänd produkt' })));
-    } catch {
+      const { game: gameData } = (await gameRes.json()) as { game: GameWithRelations };
+      if (!gameData) {
+        setError('Spelet saknas');
+        return;
+      }
+
+      const tenantsJson = tenantsRes.ok
+        ? ((await tenantsRes.json()) as { tenants?: { id: string; name: string | null }[] })
+        : { tenants: [] };
+      const purposesJson = purposesRes.ok
+        ? ((await purposesRes.json()) as { purposes?: { id: string; name: string | null }[] })
+        : { purposes: [] };
+      const productsJson = productsRes.ok
+        ? ((await productsRes.json()) as { products?: { id: string; name: string | null }[] })
+        : { products: [] };
+
+      setGame(gameData);
+      setTenants((tenantsJson.tenants || []).map((t) => ({ value: t.id, label: t.name || 'Namn saknas' })));
+      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })));
+      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || 'Okänd produkt' })));
+    } catch (err) {
+      console.error('[admin/games/:id] load error', err);
       setGame(null);
       setError('Kunde inte ladda spelet just nu.');
     } finally {
@@ -209,12 +215,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   if (error) {
     return (
       <AdminPageLayout>
-        <AdminErrorState
-          title="Något gick fel"
-          description={error}
-          onRetry={load}
-          retryLabel="Försök igen"
-        />
+        <AdminErrorState title="Något gick fel" description={error} onRetry={load} retryLabel="Försök igen" />
       </AdminPageLayout>
     );
   }
@@ -337,7 +338,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
             <code className="text-xs">{game.id}</code>
           </div>
           <p className="text-xs text-muted-foreground">
-            Skapad {new Date(game.created_at).toLocaleString()} · Uppdaterad {new Date(game.updated_at).toLocaleString()}
+            Skapad {new Date(game.created_at).toLocaleString()} • Uppdaterad {new Date(game.updated_at).toLocaleString()}
           </p>
         </CardContent>
       </Card>

@@ -5,6 +5,7 @@ import {
   AdminBreadcrumbs,
   AdminDataTable,
   AdminEmptyState,
+  AdminErrorState,
   AdminPageHeader,
   AdminPageLayout,
   AdminStatCard,
@@ -28,36 +29,6 @@ type SessionRow = {
   status: SessionStatus;
 };
 
-const mockSessions: SessionRow[] = [
-  {
-    id: 'sess-1',
-    title: 'Fredagslek',
-    tenantName: 'Lekbanken',
-    host: 'Anna',
-    participants: 12,
-    startedAt: '2025-12-12T09:00:00Z',
-    status: 'active',
-  },
-  {
-    id: 'sess-2',
-    title: 'Workshop QA',
-    tenantName: 'Campus Nord',
-    host: 'Oskar',
-    participants: 8,
-    startedAt: '2025-12-11T15:00:00Z',
-    status: 'completed',
-  },
-  {
-    id: 'sess-3',
-    title: 'Trygghetspass',
-    tenantName: 'Lekbanken',
-    host: 'Mia',
-    participants: 15,
-    startedAt: '2025-12-12T08:30:00Z',
-    status: 'flagged',
-  },
-];
-
 type Props = {
   tenantId?: string;
   onSelectSession?: (id: string) => void;
@@ -71,6 +42,17 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const stats = useMemo(() => {
+    const total = sessions.length;
+    const active = sessions.filter((s) => s.status === 'active').length;
+    const flagged = sessions.filter((s) => s.status === 'flagged').length;
+    return [
+      { label: 'Sessioner', value: total },
+      { label: 'Aktiva', value: active },
+      { label: 'Flaggade', value: flagged },
+    ];
+  }, [sessions]);
+
   const breadcrumbs = tenantId
     ? [
         { label: 'Startsida', href: '/admin' },
@@ -83,25 +65,29 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
       ];
 
   const load = useCallback(async () => {
+    if (!can('admin.participants.list')) {
+      warning('Du har inte behörighet att se sessioner.');
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
-      const query = tenantId ? `/api/sessions?tenantId=${tenantId}` : '/api/sessions';
-      const res = await fetch(query);
-      if (res.ok) {
-        const json = (await res.json()) as { sessions?: SessionRow[] };
-        setSessions(json.sessions || []);
-      } else {
-        throw new Error(`API svarade ${res.status}`);
+      const qs = tenantId ? `?tenantId=${tenantId}` : '';
+      const res = await fetch(`/api/sessions${qs}`);
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || `API-fel ${res.status}`);
       }
+      const { sessions: rows } = (await res.json()) as { sessions?: SessionRow[] };
+      setSessions(rows || []);
     } catch (err) {
-      console.warn('[admin/sessions] fallback till mock', err);
-      setSessions(mockSessions);
-      setError('Visar mockdata tills riktiga sessionskopplingen är klar.');
+      console.error('[admin/sessions] load error', err);
+      setError('Kunde inte ladda sessioner just nu.');
+      setSessions([]);
     } finally {
       setIsLoading(false);
     }
-  }, [tenantId]);
+  }, [can, tenantId, warning]);
 
   useEffect(() => {
     void load();
@@ -109,7 +95,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
 
   useRealtimeTable({
     table: 'sessions',
-    enabled: can('admin.sessions.list'),
+    enabled: can('admin.participants.list'),
     onEvent: () => {
       void load();
     },
@@ -117,26 +103,12 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
 
   const filtered = useMemo(() => {
     return sessions.filter((s) => (statusFilter === 'all' ? true : s.status === statusFilter));
-  }, [statusFilter, sessions]);
+  }, [sessions, statusFilter]);
 
-  const stats = useMemo(() => {
-    const total = filtered.length;
-    const active = filtered.filter((s) => s.status === 'active').length;
-    const flagged = filtered.filter((s) => s.status === 'flagged').length;
-    return [
-      { label: 'Sessioner', value: total },
-      { label: 'Aktiva', value: active },
-      { label: 'Flaggade', value: flagged },
-    ];
-  }, [filtered]);
-
-  if (!can('admin.sessions.list')) {
+  if (!can('admin.participants.list')) {
     return (
       <AdminPageLayout>
-        <AdminEmptyState
-          title="Ingen åtkomst"
-          description="Du behöver behörighet för att se sessioner."
-        />
+        <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se sessioner." />
       </AdminPageLayout>
     );
   }
@@ -146,21 +118,11 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title="Sessioner"
-        description="Visa och hantera deltagarsessioner, statistik och avvikelser."
+        description="Översikt över aktiva och avslutade sessioner."
         icon={<PlayIcon className="h-8 w-8 text-primary" />}
       />
 
-      {error && (
-        <p className="mb-2 text-sm text-amber-600">
-          {error}{' '}
-          <button
-            className="underline"
-            onClick={() => warning('Koppla backend för att ta bort denna varning.')}
-          >
-            Lär mer
-          </button>
-        </p>
-      )}
+      {error && <AdminErrorState title="Kunde inte ladda sessioner" description={error} onRetry={load} />}
 
       <AdminStatGrid className="mb-4">
         {stats.map((s) => (
@@ -168,27 +130,29 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
         ))}
       </AdminStatGrid>
 
-      <Card className="border border-border">
-        <CardHeader className="border-b border-border bg-muted/40">
+      <Card className="mb-4 border border-border">
+        <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
           <CardTitle>Sessioner</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <AdminTableToolbar
             searchValue=""
             onSearchChange={() => {}}
-            searchPlaceholder="Sök (kommersiell data kopplas senare)"
+            searchPlaceholder="Sök (ej aktiv ännu)"
             filters={
-              <Select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-                options={[
-                  { value: 'all', label: 'Alla statusar' },
-                  { value: 'active', label: 'Aktiva' },
-                  { value: 'completed', label: 'Avslutade' },
-                  { value: 'flagged', label: 'Flaggade' },
-                ]}
-                placeholder="Status"
-              />
+              <div className="flex flex-wrap gap-2">
+                <Select
+                  value={statusFilter}
+                  onChange={(event) => setStatusFilter(event.target.value as 'all' | SessionStatus)}
+                  options={[
+                    { value: 'all', label: 'Alla statusar' },
+                    { value: 'active', label: 'Aktiva' },
+                    { value: 'completed', label: 'Avslutade' },
+                    { value: 'flagged', label: 'Flaggade' },
+                  ]}
+                  placeholder="Status"
+                />
+              </div>
             }
           />
 
@@ -196,48 +160,34 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
             data={filtered}
             isLoading={isLoading}
             keyAccessor="id"
-            columns={[
-              {
-                header: 'Titel',
-                accessor: (row) => row.title,
-                cell: (row) => (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{row.title}</span>
-                      <Badge
-                        variant={
-                          row.status === 'active'
-                            ? 'success'
-                            : row.status === 'flagged'
-                            ? 'destructive'
-                            : 'secondary'
-                        }
-                        className="capitalize"
-                      >
-                        {row.status}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Värd: {row.host} · {row.tenantName}
-                    </p>
-                  </div>
-                ),
-              },
-              { header: 'Deltagare', accessor: (row) => row.participants.toString(), hideBelow: 'md' },
-              {
-                header: 'Start',
-                accessor: (row) => new Date(row.startedAt).toLocaleString(),
-                hideBelow: 'md',
-              },
-            ]}
+            selectable={false}
             emptyState={
               <AdminEmptyState
-                icon={<PlayIcon className="h-6 w-6" />}
                 title="Inga sessioner"
-                description="När data kopplas in visas sessioner här."
+                description="Justera filter eller försök igen senare."
               />
             }
-            onRowClick={(row) => onSelectSession?.(row.id)}
+            onRowClick={onSelectSession ? (row) => onSelectSession(row.id) : undefined}
+            columns={[
+              { header: 'Titel', accessor: (row) => row.title },
+              { header: 'Tenant', accessor: (row) => row.tenantName || 'Global' },
+              { header: 'Värd', accessor: (row) => row.host },
+              { header: 'Deltagare', accessor: (row) => row.participants },
+              {
+                header: 'Status',
+                accessor: (row) => row.status,
+                cell: (row) => (
+                  <Badge
+                    variant={
+                      row.status === 'flagged' ? 'destructive' : row.status === 'active' ? 'success' : 'secondary'
+                    }
+                  >
+                    {row.status === 'active' ? 'Aktiv' : row.status === 'completed' ? 'Avslutad' : 'Flaggad'}
+                  </Badge>
+                ),
+              },
+              { header: 'Startad', accessor: (row) => new Date(row.startedAt).toLocaleString() },
+            ]}
           />
         </CardContent>
       </Card>

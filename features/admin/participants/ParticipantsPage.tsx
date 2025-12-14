@@ -5,6 +5,7 @@ import {
   AdminBreadcrumbs,
   AdminDataTable,
   AdminEmptyState,
+  AdminErrorState,
   AdminPageHeader,
   AdminPageLayout,
   AdminStatCard,
@@ -25,33 +26,6 @@ type ParticipantRow = {
   lastActive: string;
   risk: RiskLevel;
 };
-
-const mockParticipants: ParticipantRow[] = [
-  {
-    id: 'p-1',
-    name: 'Nora Nilsson',
-    email: 'nora@example.com',
-    tenantName: 'Lekbanken',
-    lastActive: '2025-12-12T09:05:00Z',
-    risk: 'none',
-  },
-  {
-    id: 'p-2',
-    name: 'Oskar Öhman',
-    email: 'oskar@example.com',
-    tenantName: 'Campus Nord',
-    lastActive: '2025-12-11T14:00:00Z',
-    risk: 'low',
-  },
-  {
-    id: 'p-3',
-    name: 'Mia Månsson',
-    email: 'mia@example.com',
-    tenantName: 'Lekbanken',
-    lastActive: '2025-12-12T08:50:00Z',
-    risk: 'high',
-  },
-];
 
 type Props = {
   tenantId?: string;
@@ -89,25 +63,29 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       ];
 
   const load = useCallback(async () => {
+    if (!can('admin.participants.list')) {
+      warning('Du har inte behörighet att se deltagare.');
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
       const query = tenantId ? `/api/participants?tenantId=${tenantId}` : '/api/participants';
       const res = await fetch(query);
-      if (res.ok) {
-        const json = (await res.json()) as { participants?: ParticipantRow[] };
-        setParticipants(json.participants || []);
-      } else {
-        throw new Error(`API ${res.status}`);
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        throw new Error(json.error || `API-fel ${res.status}`);
       }
+      const { participants: rows } = (await res.json()) as { participants?: ParticipantRow[] };
+      setParticipants(rows || []);
     } catch (err) {
-      console.warn('[admin/participants] fallback till mock', err);
-      setParticipants(mockParticipants);
-      setError('Visar mockdata tills riktiga kopplingen är klar.');
+      console.error('[admin/participants] load error', err);
+      setError('Kunde inte ladda deltagare just nu.');
+      setParticipants([]);
     } finally {
       setIsLoading(false);
     }
-  }, [tenantId]);
+  }, [can, tenantId, warning]);
 
   useEffect(() => {
     void load();
@@ -128,10 +106,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   if (!can('admin.participants.list')) {
     return (
       <AdminPageLayout>
-        <AdminEmptyState
-          title="Ingen åtkomst"
-          description="Du behöver behörighet för att se deltagare."
-        />
+        <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se deltagare." />
       </AdminPageLayout>
     );
   }
@@ -141,21 +116,11 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title="Deltagare"
-        description={
-          tenantId
-            ? 'Hantera deltagare och sessioner för denna organisation.'
-            : 'Överblick över deltagare och sessioner.'
-        }
+        description="Översikt av deltagare, risknivåer och senaste aktivitet."
+        icon={<Badge variant="outline">P</Badge>}
       />
 
-      {error && (
-        <p className="mb-2 text-sm text-amber-600">
-          {error}{' '}
-          <button className="underline" onClick={() => warning('Koppla backend för skarpa data.')}>
-            Lär mer
-          </button>
-        </p>
-      )}
+      {error && <AdminErrorState title="Kunde inte ladda deltagare" description={error} onRetry={load} />}
 
       <AdminStatGrid className="mb-4">
         {stats.map((s) => (
@@ -163,27 +128,28 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
         ))}
       </AdminStatGrid>
 
-      <Card className="border border-border">
-        <CardHeader className="border-b border-border bg-muted/40">
-          <CardTitle>Deltagare</CardTitle>
+      <Card className="mb-4 border border-border">
+        <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
+          <CardTitle>Deltagaröversikt</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <AdminTableToolbar
             searchValue=""
             onSearchChange={() => {}}
-            searchPlaceholder="Sök (kopplas till riktig data)"
+            searchPlaceholder="Sök (ej aktiv ännu)"
             filters={
-              <Select
-                value={riskFilter}
-                onChange={(e) => setRiskFilter(e.target.value as typeof riskFilter)}
-                options={[
-                  { value: 'all', label: 'Alla risknivåer' },
-                  { value: 'none', label: 'Ingen' },
-                  { value: 'low', label: 'Låg' },
-                  { value: 'high', label: 'Hög' },
-                ]}
-                placeholder="Risk"
-              />
+              <div className="flex flex-wrap gap-2">
+                <Select
+                  value={riskFilter}
+                  onChange={(event) => setRiskFilter(event.target.value as 'all' | RiskLevel)}
+                  options={[
+                    { value: 'all', label: 'Alla risknivåer' },
+                    { value: 'low', label: 'Låg risk' },
+                    { value: 'high', label: 'Hög risk' },
+                  ]}
+                  placeholder="Risk"
+                />
+              </div>
             }
           />
 
@@ -191,45 +157,32 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
             data={filtered}
             isLoading={isLoading}
             keyAccessor="id"
+            selectable={false}
+            emptyState={
+              <AdminEmptyState
+                title="Inga deltagare"
+                description="Justera filter eller försök igen senare."
+              />
+            }
+            onRowClick={onSelectParticipant ? (row) => onSelectParticipant(row.id) : undefined}
             columns={[
-              {
-                header: 'Namn',
-                accessor: (row) => row.name,
-                cell: (row) => (
-                  <div className="space-y-1">
-                    <p className="font-semibold text-foreground">{row.name}</p>
-                    <p className="text-xs text-muted-foreground">{row.email || 'Ingen e-post'}</p>
-                  </div>
-                ),
-              },
-              { header: 'Organisation', accessor: (row) => row.tenantName, hideBelow: 'md' },
-              {
-                header: 'Senast aktiv',
-                accessor: (row) => new Date(row.lastActive).toLocaleString(),
-                hideBelow: 'md',
-              },
+              { header: 'Namn', accessor: (row) => row.name },
+              { header: 'E-post', accessor: (row) => row.email || '—' },
+              { header: 'Tenant', accessor: (row) => row.tenantName || 'Global' },
               {
                 header: 'Risk',
                 accessor: (row) => row.risk,
                 cell: (row) => (
-                  <Badge
-                    variant={
-                      row.risk === 'high' ? 'destructive' : row.risk === 'low' ? 'secondary' : 'success'
-                    }
-                    className="capitalize"
-                  >
-                    {row.risk}
+                  <Badge variant={row.risk === 'high' ? 'destructive' : row.risk === 'low' ? 'warning' : 'secondary'}>
+                    {row.risk === 'high' ? 'Hög' : row.risk === 'low' ? 'Låg' : 'Ingen'}
                   </Badge>
                 ),
               },
+              {
+                header: 'Senast aktiv',
+                accessor: (row) => new Date(row.lastActive).toLocaleString(),
+              },
             ]}
-            emptyState={
-              <AdminEmptyState
-                title="Inga deltagare"
-                description="När data kopplas in visas deltagare här."
-              />
-            }
-            onRowClick={(row) => onSelectParticipant?.(row.id)}
           />
         </CardContent>
       </Card>

@@ -106,7 +106,7 @@ export function GameAdminPage() {
         fetch('/api/games/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tenantId, page: 1, pageSize: 500, status: statusFilter }),
+          body: JSON.stringify({ tenantId, page: 1, pageSize: 50, status: statusFilter }),
         }),
         fetch('/api/tenants'),
         fetch('/api/purposes'),

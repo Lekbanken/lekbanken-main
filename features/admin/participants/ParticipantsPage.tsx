@@ -84,7 +84,8 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
     } finally {
       setIsLoading(false);
     }
-  }, [can, tenantId, warning]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [can, tenantId]);
 
   useEffect(() => {
     void load();

@@ -94,10 +94,17 @@ export async function POST(request: Request) {
   } else if (status !== 'all') {
     query = query.eq('status', status)
   }
-  if (tenantId) {
-    query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
+  if (!isElevated) {
+    if (tenantId) {
+      query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
+    } else {
+      query = query.is('owner_tenant_id', null)
+    }
   } else {
-    query = query.is('owner_tenant_id', null)
+    if (tenantId) {
+      query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
+    }
+    // if elevated and no tenantId provided: no owner filter => all games
   }
 
   if (effectiveProductFilter.length > 0) {

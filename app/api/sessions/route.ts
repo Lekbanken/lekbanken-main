@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 import { cookies } from 'next/headers'
 
@@ -21,7 +21,9 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenantId') || activeTenantId || null
 
-  const { data, error } = await supabase
+  const client = supabaseAdmin ?? supabase
+
+  const { data, error } = await client
     .from('participant_sessions')
     .select(
       `

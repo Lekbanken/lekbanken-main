@@ -40,6 +40,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastLoadedAt, setLastLoadedAt] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const total = sessions.length;
@@ -90,8 +91,21 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   }, [can, tenantId]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    let cancelled = false;
+    const run = async () => {
+      if (cancelled || isLoading) return;
+      await load();
+      if (!cancelled) {
+        setLastLoadedAt(new Date().toISOString());
+      }
+    };
+    void run();
+    const interval = setInterval(run, 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [load, isLoading]);
 
   const filtered = useMemo(() => {
     return sessions.filter((s) => (statusFilter === 'all' ? true : s.status === statusFilter));

@@ -14,7 +14,6 @@ import {
 } from '@/components/admin/shared';
 import { Badge, Card, CardContent, CardHeader, CardTitle, Select, useToast } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import { useRealtimeTable } from '@/features/admin/hooks';
 import { PlayIcon } from '@heroicons/react/24/outline';
 
 type SessionStatus = 'active' | 'completed' | 'flagged';
@@ -92,14 +91,6 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   useEffect(() => {
     void load();
   }, [load]);
-
-  useRealtimeTable({
-    table: 'sessions',
-    enabled: can('admin.participants.list'),
-    onEvent: () => {
-      void load();
-    },
-  });
 
   const filtered = useMemo(() => {
     return sessions.filter((s) => (statusFilter === 'all' ? true : s.status === statusFilter));

@@ -14,7 +14,6 @@ import {
 } from '@/components/admin/shared';
 import { Badge, Card, CardContent, CardHeader, CardTitle, Select, useToast } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import { useRealtimeTable } from '@/features/admin/hooks';
 
 type RiskLevel = 'none' | 'low' | 'high';
 
@@ -90,14 +89,6 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   useEffect(() => {
     void load();
   }, [load]);
-
-  useRealtimeTable({
-    table: 'participants',
-    enabled: can('admin.participants.list'),
-    onEvent: () => {
-      void load();
-    },
-  });
 
   const filtered = useMemo(() => {
     return participants.filter((p) => (riskFilter === 'all' ? true : p.risk === riskFilter));

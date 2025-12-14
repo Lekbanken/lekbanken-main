@@ -33,7 +33,7 @@ export async function GET(request: Request) {
         participant_count,
         started_at,
         status,
-        host:users!participant_sessions_host_user_id_fkey(full_name),
+        host_user_id,
         tenant:tenants!participant_sessions_tenant_id_fkey(name)
       `
     )
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
         title: (row as { display_name: string }).display_name,
         tenantId: (row as { tenant_id?: string | null }).tenant_id ?? null,
         tenantName: (row as { tenant?: { name?: string | null } }).tenant?.name || 'Okänd',
-        host: (row as { host?: { full_name?: string | null } }).host?.full_name || 'Okänd',
+        host: (row as { host_user_id?: string | null }).host_user_id || 'Okänd',
         participants: (row as { participant_count?: number | null }).participant_count ?? 0,
         startedAt: (row as { started_at?: string | null }).started_at || '',
         status,

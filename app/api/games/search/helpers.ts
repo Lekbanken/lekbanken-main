@@ -21,6 +21,7 @@ export const searchSchema = z.object({
   sort: z.enum(['relevance', 'newest', 'popular', 'name', 'duration', 'rating']).optional(),
   page: z.number().int().min(1).default(1),
   pageSize: z.number().int().min(1).max(50).default(24),
+  status: z.enum(['published', 'draft', 'all']).optional(),
 })
 
 export type SearchInput = z.infer<typeof searchSchema>

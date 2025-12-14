@@ -28,6 +28,9 @@ async function getSubPurposeGameIds(
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const body = await request.json().catch(() => ({}))
   const parsed = searchSchema.safeParse(body)
 
@@ -52,7 +55,11 @@ export async function POST(request: Request) {
     sort = 'relevance',
     page,
     pageSize,
+    status = 'published',
   } = parsed.data
+
+  const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
+  const isElevated = role === 'system_admin' || role === 'superadmin' || role === 'admin' || role === 'owner'
 
   const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId)
   if (tenantId && allowedProductIds.length === 0) {
@@ -73,6 +80,7 @@ export async function POST(request: Request) {
     .select(
       `
         *,
+        owner:tenants(id,name),
         media:game_media(*, media:media(*)),
         product:products(*),
         main_purpose:purposes!main_purpose_id(*),
@@ -80,8 +88,12 @@ export async function POST(request: Request) {
       `,
       { count: 'exact' }
     )
-    .eq('status', 'published')
 
+  if (!isElevated) {
+    query = query.eq('status', 'published')
+  } else if (status !== 'all') {
+    query = query.eq('status', status)
+  }
   if (tenantId) {
     query = query.or(`owner_tenant_id.eq.${tenantId},owner_tenant_id.is.null`)
   } else {

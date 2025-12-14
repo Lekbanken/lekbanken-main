@@ -30,7 +30,6 @@ import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select, useToa
 import { AdminExportButton } from '@/components/admin/shared/AdminExportButton';
 import { AdminConfirmDialog } from '@/components/admin/shared/AdminConfirmDialog';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import { supabase } from '@/lib/supabase/client';
 import type { ExportColumn } from '@/lib/utils/export';
 import type { Database } from '@/types/supabase';
 import { GameFormDialog } from './components/GameFormDialog';
@@ -99,76 +98,49 @@ export function GameAdminPage() {
     setIsLoading(true);
     setError(null);
 
+    const statusFilter = filters.status === 'all' ? 'all' : filters.status;
+    const tenantId = filters.tenant === 'all' ? null : filters.tenant === 'global' ? null : filters.tenant;
+
     try {
-      const [{ data: gameData, error: gameError }, tenantsRes, purposesRes, productsRes] = await Promise.all([
-        supabase
-          .from('games')
-          .select(
-            `
-              *,
-              owner:tenants(id, name),
-              product:products(id, name),
-              main_purpose:main_purpose_id(id, name)
-            `
-          )
-          .order('updated_at', { ascending: false })
-          .limit(500),
-        supabase.from('tenants').select('id, name').order('name', { ascending: true }).limit(200),
-        supabase.from('purposes').select('id, name').order('name', { ascending: true }).limit(200),
-        supabase.from('products').select('id, name').order('name', { ascending: true }).limit(200),
-      ]);
-
-      const firstError = gameError || tenantsRes.error || purposesRes.error || productsRes.error;
-      if (firstError) {
-        throw firstError;
-      }
-
-      setGames((gameData as GameWithRelations[]) || []);
-      setTenants(
-        (tenantsRes.data || []).map((t) => ({
-          value: t.id,
-          label: t.name || 'Namnlös organisation',
-        }))
-      );
-      setPurposes(
-        (purposesRes.data || []).map((p) => ({
-          value: p.id,
-          label: p.name || 'Okänt syfte',
-        }))
-      );
-      setProducts(
-        (productsRes.data || []).map((p) => ({
-          value: p.id,
-          label: p.name || 'Okänd produkt',
-        }))
-      );
-    } catch (err) {
-      const message =
-        err && typeof err === 'object' && 'message' in (err as Record<string, unknown>)
-          ? String((err as { message?: string }).message)
-          : 'Okänt fel';
-      console.error('[admin/games] load error', message);
-      try {
-        const res = await fetch('/api/games/search', {
+      const [gamesRes, tenantsRes, purposesRes, productsRes] = await Promise.all([
+        fetch('/api/games/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tenantId: null, page: 1, pageSize: 500, status: 'published' }),
-        });
-        if (res.ok) {
-          const json = (await res.json()) as { games?: GameWithRelations[] };
-          setGames(json.games || []);
-          setError(null);
-          return;
-        }
-      } catch (fallbackErr) {
-        console.error('[admin/games] fallback load error', fallbackErr);
+          body: JSON.stringify({ tenantId, page: 1, pageSize: 500, status: statusFilter }),
+        }),
+        fetch('/api/tenants'),
+        fetch('/api/purposes'),
+        fetch('/api/products'),
+      ]);
+
+      if (!gamesRes.ok) {
+        const json = await gamesRes.json().catch(() => ({}));
+        throw new Error(json.error || 'Kunde inte hämta spel');
       }
+
+      const gamesJson = (await gamesRes.json()) as { games?: GameWithRelations[] };
+      const tenantsJson = tenantsRes.ok
+        ? ((await tenantsRes.json()) as { tenants?: { id: string; name: string | null }[] })
+        : { tenants: [] };
+      const purposesJson = purposesRes.ok
+        ? ((await purposesRes.json()) as { purposes?: { id: string; name: string | null }[] })
+        : { purposes: [] };
+      const productsJson = productsRes.ok
+        ? ((await productsRes.json()) as { products?: { id: string; name: string | null }[] })
+        : { products: [] };
+
+      setGames(gamesJson.games || []);
+      setTenants((tenantsJson.tenants || []).map((t) => ({ value: t.id, label: t.name || 'Namnlös organisation' })));
+      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })));
+      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || 'Okänd produkt' })));
+    } catch (err) {
+      console.error('[admin/games] load error', err);
       setGames([]);
       setError('Kunde inte ladda spel just nu.');
     } finally {
       setIsLoading(false);
     }
-  }, [canView]);
+  }, [canView, filters.status, filters.tenant]);
 
   useEffect(() => {
     let active = true;
@@ -193,14 +165,7 @@ export function GameAdminPage() {
       })
       .filter((g) => {
         if (!term) return true;
-        return [
-          g.name,
-          g.description,
-          g.short_description,
-          g.category,
-          g.owner?.name,
-          g.main_purpose?.name,
-        ]
+        return [g.name, g.description, g.short_description, g.category, g.owner?.name, g.main_purpose?.name]
           .filter(Boolean)
           .some((value) => value?.toLowerCase().includes(term));
       });
@@ -316,10 +281,14 @@ export function GameAdminPage() {
   };
 
   const handleImport = async (items: ImportableGame[]) => {
-    const { data, error: insertError } = await supabase
-      .from('games')
-      .insert(
-        items.map((item) => ({
+    const created: GameWithRelations[] = [];
+    const failures: string[] = [];
+
+    for (const item of items) {
+      const res = await fetch('/api/games', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           name: item.name,
           short_description: item.short_description,
           description: item.description || null,
@@ -335,24 +304,34 @@ export function GameAdminPage() {
           age_min: item.age_min ?? null,
           age_max: item.age_max ?? null,
           status: item.status || 'draft',
-        }))
-      )
-      .select(
-        `
-          *,
-          owner:tenants(id, name),
-          product:products(id, name),
-          main_purpose:purposes(id, name)
-        `
-      );
+        }),
+      });
 
-    if (insertError) {
-      console.error('[admin/games] import error', insertError);
-      throw insertError;
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        failures.push(json.error || 'Okänt fel');
+        continue;
+      }
+
+      const { game } = (await res.json()) as { game: GameWithRelations };
+      const owner = tenants.find((t) => t.value === game.owner_tenant_id);
+      const purpose = purposes.find((p) => p.value === game.main_purpose_id);
+      const product = products.find((p) => p.value === game.product_id);
+      created.push({
+        ...game,
+        owner: owner ? { id: owner.value, name: owner.label } : null,
+        main_purpose: purpose ? { id: purpose.value, name: purpose.label } : null,
+        product: product ? { id: product.value, name: product.label } : null,
+      });
     }
 
-    setGames((prev) => [...(data as GameWithRelations[]), ...prev]);
-    success(`Importerade ${data?.length ?? 0} spel.`);
+    if (created.length) {
+      setGames((prev) => [...created, ...prev]);
+      success(`Importerade ${created.length} spel.`);
+    }
+    if (failures.length) {
+      warning(`Misslyckades för ${failures.length} spel.`);
+    }
   };
 
   const exportColumns: ExportColumn<GameWithRelations>[] = [
@@ -540,22 +519,22 @@ export function GameAdminPage() {
               },
               {
                 header: 'Kategori',
-                accessor: (row) => row.category || '—',
+                accessor: (row) => row.category || '-',
                 hideBelow: 'md',
               },
               {
                 header: 'Energi',
-                accessor: (row) => row.energy_level || '—',
+                accessor: (row) => row.energy_level || '-',
                 hideBelow: 'md',
               },
               {
                 header: 'Spelare',
-                accessor: (row) => `${row.min_players ?? '?'}–${row.max_players ?? '?'}`,
+                accessor: (row) => `${row.min_players ?? '?'} - ${row.max_players ?? '?'}`,
                 hideBelow: 'md',
               },
               {
                 header: 'Tid',
-                accessor: (row) => (row.time_estimate_min ? `${row.time_estimate_min} min` : '—'),
+                accessor: (row) => (row.time_estimate_min ? `${row.time_estimate_min} min` : '-'),
                 hideBelow: 'lg',
               },
               {
@@ -581,9 +560,7 @@ export function GameAdminPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        handlePublishToggle(row, row.status === 'published' ? 'draft' : 'published')
-                      }
+                      onClick={() => handlePublishToggle(row, row.status === 'published' ? 'draft' : 'published')}
                     >
                       {row.status === 'published' ? (
                         <>

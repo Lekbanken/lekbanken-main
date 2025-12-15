@@ -80,7 +80,23 @@ export async function PATCH(
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   const { gameId } = await params
-  const supabase = await createServerRlsClient()
+  const rlsClient = await createServerRlsClient()
+  const cookieStore = await cookies()
+  const {
+    data: { user },
+  } = await rlsClient.auth.getUser()
+
+  const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
+  const isSuperAdmin = role === 'superadmin'
+  const isSystemAdmin = role === 'system_admin' || isSuperAdmin
+  const isTenantElevated = role === 'admin' || role === 'owner'
+
+  if (!isSystemAdmin && !isTenantElevated) {
+    return NextResponse.json({ error: 'Not authorized' }, { status: 403 })
+  }
+
+  const activeTenantId = isSystemAdmin ? null : await readTenantIdFromCookies(cookieStore)
+  const supabase = supabaseAdmin
   const body = (await request.json().catch(() => ({}))) as Partial<GameUpdate> & {
     hasCoverImage?: boolean
   }
@@ -88,6 +104,19 @@ export async function PATCH(
   const validation = validateGamePayload(body, { mode: 'update' })
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
+  }
+
+  // Ensure tenant admins can only edit their own games
+  if (!isSystemAdmin && activeTenantId) {
+    const { data: existing, error: existingError } = await supabase
+      .from('games')
+      .select('owner_tenant_id')
+      .eq('id', gameId)
+      .single()
+
+    if (existingError || !existing || existing.owner_tenant_id !== activeTenantId) {
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
   }
 
   const { data, error } = await supabase

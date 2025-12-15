@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AdminBreadcrumbs,
   AdminDataTable,
@@ -38,7 +38,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   const [participants, setParticipants] = useState<ParticipantRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastLoadedAt, setLastLoadedAt] = useState<string | null>(null);
+  const inFlight = useRef(false);
 
   const stats = useMemo(() => {
     const total = participants.length;
@@ -46,8 +46,8 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
     const low = participants.filter((p) => p.risk === 'low').length;
     return [
       { label: 'Deltagare', value: total },
-      { label: 'Hög risk', value: high },
-      { label: 'Låg risk', value: low },
+      { label: 'Hog risk', value: high },
+      { label: 'Lag risk', value: low },
     ];
   }, [participants]);
 
@@ -63,8 +63,11 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       ];
 
   const load = useCallback(async () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
     if (!can('admin.participants.list')) {
-      warning('Du har inte behörighet att se deltagare.');
+      warning('Du har inte behorighet att se deltagare.');
+      inFlight.current = false;
       return;
     }
     setIsLoading(true);
@@ -84,6 +87,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       setParticipants([]);
     } finally {
       setIsLoading(false);
+      inFlight.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [can, tenantId]);
@@ -91,11 +95,8 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if (cancelled || isLoading) return;
+      if (cancelled) return;
       await load();
-      if (!cancelled) {
-        setLastLoadedAt(new Date().toISOString());
-      }
     };
     void run();
     const interval = setInterval(run, 30000);
@@ -103,7 +104,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [load, isLoading]);
+  }, [load]);
 
   const filtered = useMemo(() => {
     return participants.filter((p) => (riskFilter === 'all' ? true : p.risk === riskFilter));
@@ -112,7 +113,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   if (!can('admin.participants.list')) {
     return (
       <AdminPageLayout>
-        <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se deltagare." />
+        <AdminEmptyState title="Ingen atkomst" description="Du behover behorighet for att se deltagare." />
       </AdminPageLayout>
     );
   }
@@ -122,7 +123,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title="Deltagare"
-        description="Översikt av deltagare, risknivåer och senaste aktivitet."
+        description="Oversikt av deltagare, risknivaer och senaste aktivitet."
         icon={<Badge variant="outline">P</Badge>}
       />
 
@@ -136,22 +137,22 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
 
       <Card className="mb-4 border border-border">
         <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
-          <CardTitle>Deltagaröversikt</CardTitle>
+          <CardTitle>Deltagaroversikt</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <AdminTableToolbar
             searchValue=""
             onSearchChange={() => {}}
-            searchPlaceholder="Sök (ej aktiv ännu)"
+            searchPlaceholder="Sok (ej aktiv annu)"
             filters={
               <div className="flex flex-wrap gap-2">
                 <Select
                   value={riskFilter}
                   onChange={(event) => setRiskFilter(event.target.value as 'all' | RiskLevel)}
                   options={[
-                    { value: 'all', label: 'Alla risknivåer' },
-                    { value: 'low', label: 'Låg risk' },
-                    { value: 'high', label: 'Hög risk' },
+                    { value: 'all', label: 'Alla risknivaer' },
+                    { value: 'low', label: 'Lag risk' },
+                    { value: 'high', label: 'Hog risk' },
                   ]}
                   placeholder="Risk"
                 />
@@ -167,20 +168,20 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
             emptyState={
               <AdminEmptyState
                 title="Inga deltagare"
-                description="Justera filter eller försök igen senare."
+                description="Justera filter eller forsok igen senare."
               />
             }
             onRowClick={onSelectParticipant ? (row) => onSelectParticipant(row.id) : undefined}
             columns={[
               { header: 'Namn', accessor: (row) => row.name },
-              { header: 'E-post', accessor: (row) => row.email || '—' },
+              { header: 'E-post', accessor: (row) => row.email || 'Saknas' },
               { header: 'Tenant', accessor: (row) => row.tenantName || 'Global' },
               {
                 header: 'Risk',
                 accessor: (row) => row.risk,
                 cell: (row) => (
                   <Badge variant={row.risk === 'high' ? 'destructive' : row.risk === 'low' ? 'warning' : 'secondary'}>
-                    {row.risk === 'high' ? 'Hög' : row.risk === 'low' ? 'Låg' : 'Ingen'}
+                    {row.risk === 'high' ? 'Hog' : row.risk === 'low' ? 'Lag' : 'Ingen'}
                   </Badge>
                 ),
               },
@@ -195,3 +196,4 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
     </AdminPageLayout>
   );
 }
+

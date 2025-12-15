@@ -202,11 +202,12 @@ export const adminNavConfig: AdminNavConfig = [
     items: [
       { id: 'dashboard', href: '/admin', label: 'Dashboard', icon: navIcons.dashboard },
       { id: 'organisations', href: '/admin/organisations', label: 'Organisationer', icon: navIcons.organisations, permission: 'admin.tenants.list' },
-      { id: 'users', href: '/admin/users', label: 'Användare', icon: navIcons.users, permission: 'admin.users.list' },
+      { id: 'users', href: '/admin/users', label: 'Anvandare', icon: navIcons.users, permission: 'admin.users.list' },
       { id: 'games', href: '/admin/games', label: 'Spel', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
       { id: 'products', href: '/admin/products', label: 'Produkter', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
+      { id: 'purposes', href: '/admin/purposes', label: 'Syften', icon: navIcons.content, permission: 'admin.products.list', systemAdminOnly: true },
       { id: 'licenses', href: '/admin/licenses', label: 'Licenser', icon: navIcons.licenses, permission: 'admin.billing.view' },
-      { id: 'content', href: '/admin/content', label: 'Innehåll', icon: navIcons.content, permission: 'admin.content.list' },
+      { id: 'content', href: '/admin/content', label: 'Innehall', icon: navIcons.content, permission: 'admin.content.list' },
     ],
   },
   {
@@ -217,7 +218,7 @@ export const adminNavConfig: AdminNavConfig = [
       { id: 'billing', href: '/admin/billing', label: 'Fakturering', icon: navIcons.billing, permission: 'admin.billing.view' },
       { id: 'moderation', href: '/admin/moderation', label: 'Moderering', icon: navIcons.moderation, permission: 'admin.moderation.view', systemAdminOnly: true },
       { id: 'notifications', href: '/admin/notifications', label: 'Notifikationer', icon: navIcons.notifications, permission: 'admin.notifications.send', systemAdminOnly: true },
-      { id: 'tickets', href: '/admin/tickets', label: 'Ärenden', icon: navIcons.tickets, permission: 'admin.tickets.view', systemAdminOnly: true },
+      { id: 'tickets', href: '/admin/tickets', label: 'Arenden', icon: navIcons.tickets, permission: 'admin.tickets.view', systemAdminOnly: true },
     ],
   },
   {
@@ -250,7 +251,7 @@ export const adminNavConfig: AdminNavConfig = [
       { id: 'webhooks', href: '/admin/webhooks', label: 'Webhooks', icon: navIcons.rss, permission: 'admin.system.view' },
       { id: 'incidents', href: '/admin/incidents', label: 'Incidenter', icon: navIcons.incident, permission: 'admin.system.view' },
       { id: 'release-notes', href: '/admin/release-notes', label: 'Release Notes', icon: navIcons.megaphone, permission: 'admin.system.view' },
-      { id: 'settings', href: '/admin/settings', label: 'Inställningar', icon: navIcons.settings, permission: 'admin.settings.view' },
+      { id: 'settings', href: '/admin/settings', label: 'Installningar', icon: navIcons.settings, permission: 'admin.settings.view' },
     ],
   },
 ];
@@ -260,14 +261,14 @@ export const tenantAdminNavConfig: AdminNavConfig = [
     id: 'tenant-main',
     title: 'Min Organisation',
     items: [
-      { id: 'tenant-dashboard', href: '/admin/tenant/[tenantId]', label: 'Översikt', icon: navIcons.dashboard },
+      { id: 'tenant-dashboard', href: '/admin/tenant/[tenantId]', label: 'Oversikt', icon: navIcons.dashboard },
       { id: 'tenant-members', href: '/admin/tenant/[tenantId]/members', label: 'Medlemmar', icon: navIcons.users },
-      { id: 'tenant-settings', href: '/admin/tenant/[tenantId]/settings', label: 'Inställningar', icon: navIcons.settings },
+      { id: 'tenant-settings', href: '/admin/tenant/[tenantId]/settings', label: 'Installningar', icon: navIcons.settings },
     ],
   },
   {
     id: 'tenant-content',
-    title: 'Innehåll',
+    title: 'Innehall',
     items: [
       { id: 'tenant-games', href: '/admin/tenant/[tenantId]/games', label: 'Spel', icon: navIcons.games },
       { id: 'tenant-content', href: '/admin/tenant/[tenantId]/content', label: 'Material', icon: navIcons.content },

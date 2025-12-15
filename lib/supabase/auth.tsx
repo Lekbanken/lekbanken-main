@@ -7,7 +7,7 @@
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
 import { supabase } from './client'
@@ -37,9 +37,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const userProfileRef = useRef<UserProfile | null>(null)
+  
+  // Keep ref in sync with state
+  useEffect(() => {
+    userProfileRef.current = userProfile
+  }, [userProfile])
 
   const ensureProfile = useCallback(async (currentUser: User) => {
+    console.log('[auth] ensureProfile called for:', { userId: currentUser.id, email: currentUser.email })
     try {
+      // First, try to find profile by auth user ID
       const { data: profile, error } = await supabase
         .from('users')
         .select('*')
@@ -47,14 +55,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .maybeSingle()
 
       // DEBUG
-      console.log('[auth] ensureProfile result:', { userId: currentUser.id, profile, error: error?.message })
+      console.log('[auth] ensureProfile result:', { 
+        userId: currentUser.id, 
+        profile: profile ? { id: profile.id, email: profile.email, full_name: profile.full_name } : null, 
+        error: error?.message,
+        errorCode: error?.code 
+      })
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.warn('ensureProfile select error:', error)
         return null
       }
 
       if (profile) return profile as UserProfile
+
+      // Profile not found by ID - try fallback search by email
+      // This handles the case where Google OAuth creates a new auth user for existing email
+      if (currentUser.email) {
+        console.log('[auth] Profile not found by ID, trying email fallback:', currentUser.email)
+        const { data: emailProfile, error: emailError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', currentUser.email)
+          .maybeSingle()
+
+        if (emailError && emailError.code !== 'PGRST116') {
+          console.warn('ensureProfile email fallback error:', emailError)
+        }
+
+        if (emailProfile) {
+          console.log('[auth] Found profile by email, ID mismatch detected:', {
+            authUserId: currentUser.id,
+            profileId: emailProfile.id,
+            email: currentUser.email
+          })
+          // The database trigger should fix this on next auth event, but we return the profile
+          // Note: The profile ID doesn't match auth ID - this will be fixed by the database trigger
+          return emailProfile as UserProfile
+        }
+      }
 
       // Profil saknas och vi försöker inte skapa från klienten p.g.a. RLS.
       console.warn('ensureProfile: profile missing and upsert skipped (RLS/client)', currentUser.id)
@@ -107,7 +146,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[auth] onAuthStateChange:', event)
+      console.log('[auth] onAuthStateChange:', event, { hasSession: !!session, userId: session?.user?.id })
+      
+      // Skip INITIAL_SESSION if we already loaded via initAuth
+      if (event === 'INITIAL_SESSION') {
+        console.log('[auth] INITIAL_SESSION - skipping (already handled by initAuth)')
+        return
+      }
       
       if (event === 'SIGNED_OUT') {
         // Clear tenant cookie on client side as backup
@@ -131,9 +176,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
       
+      // TOKEN_REFRESHED or other events
       if (session?.user) {
         setUser(session.user)
-        await fetchProfile(session.user)
+        // Only refetch profile if we don't have one or if user ID changed
+        const currentProfile = userProfileRef.current
+        if (!currentProfile || currentProfile.id !== session.user.id) {
+          await fetchProfile(session.user)
+        }
         console.info('[auth] auth change', {
           userId: session.user.id,
           expiresAt: session.expires_at,

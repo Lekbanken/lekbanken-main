@@ -57,7 +57,7 @@ const themeOptions: Array<{ value: ThemePreference; label: string }> = [
 ];
 
 export function ProfilePage() {
-  const { user, userProfile, updateProfile } = useAuth();
+  const { user, userProfile, updateProfile, isLoading: authLoading } = useAuth();
   const {
     language,
     setLanguage,
@@ -84,6 +84,7 @@ export function ProfilePage() {
   const [mfaEnroll, setMfaEnroll] = useState<{ factorId: string; qr: string; secret: string } | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
+  const [profileInitialized, setProfileInitialized] = useState(false);
 
   const email = user?.email || "";
 
@@ -91,8 +92,14 @@ export function ProfilePage() {
     if (userProfile) {
       setFullName(userProfile.full_name || email.split("@")[0] || "");
       setAvatar(userProfile.avatar_url || null);
+      setProfileInitialized(true);
+    } else if (!authLoading && user && !userProfile) {
+      // Auth loaded but no profile - use fallback from email
+      console.warn('[ProfilePage] No userProfile loaded, using email fallback');
+      setFullName(email.split("@")[0] || "");
+      setProfileInitialized(true);
     }
-  }, [email, userProfile]);
+  }, [email, userProfile, authLoading, user]);
 
   const initials = useMemo(() => {
     if (fullName.trim().length === 0 && email) return email[0]?.toUpperCase() || "?";
@@ -234,6 +241,18 @@ export function ProfilePage() {
     const json = await res.json();
     setRecoveryCodes(json.recovery_codes ?? []);
   };
+
+  // Show loading state while auth is loading or profile not yet initialized
+  if (authLoading || (!profileInitialized && !userProfile)) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
+          <p className="text-muted-foreground">Laddar profil...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-32">

@@ -28,9 +28,9 @@ const categoryLabels: Record<string, string> = {
 };
 
 function formatDate(value?: string | null) {
-  if (!value) return "—";
+  if (!value) return "";
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
+  if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 }
 
@@ -48,19 +48,19 @@ export function ProductTable({
   };
 
   if (isLoading) {
-    return <SkeletonTable rows={6} columns={6} />;
+    return <SkeletonTable rows={6} columns={7} />;
   }
 
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
           <CubeIcon className="h-8 w-8 text-muted-foreground" />
         </div>
         <h3 className="text-lg font-semibold text-foreground">
           {searchQuery ? "No products found" : "No products yet"}
         </h3>
-        <p className="mt-1 text-sm text-muted-foreground max-w-sm">
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
           {searchQuery
             ? "Try adjusting your search or filters."
             : "Create your first product to define capabilities and licensing."}
@@ -79,6 +79,9 @@ export function ProductTable({
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Category
+            </th>
+            <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Purpose
             </th>
             <th scope="col" className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Status
@@ -109,7 +112,7 @@ export function ProductTable({
                   <div>
                     <p className="font-medium text-foreground">{product.name}</p>
                     {product.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-1 max-w-xs">
+                      <p className="max-w-xs text-sm text-muted-foreground line-clamp-1">
                         {product.description}
                       </p>
                     )}
@@ -120,6 +123,9 @@ export function ProductTable({
                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${categoryStyles[product.category] || "bg-muted text-muted-foreground"}`}>
                   {categoryLabels[product.category] || product.category}
                 </span>
+              </td>
+              <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
+                {product.purposeName || "—"}
               </td>
               <td className="whitespace-nowrap px-6 py-4">
                 <div className="flex items-center gap-2">

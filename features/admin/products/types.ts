@@ -13,6 +13,8 @@ export type ProductAdminItem = {
   name: string;
   category: string;
   description?: string | null;
+  purposeId?: string | null;
+  purposeName?: string | null;
   status: ProductStatus;
   capabilities: Capability[];
   createdAt?: string | null;

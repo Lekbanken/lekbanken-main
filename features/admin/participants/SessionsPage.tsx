@@ -40,7 +40,6 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastLoadedAt, setLastLoadedAt] = useState<string | null>(null);
 
   const stats = useMemo(() => {
     const total = sessions.length;
@@ -66,7 +65,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
 
   const load = useCallback(async () => {
     if (!can('admin.participants.list')) {
-      warning('Du har inte behörighet att se sessioner.');
+      warning('Du har inte behorighet att se sessioner.');
       return;
     }
     setIsLoading(true);
@@ -93,11 +92,8 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if (cancelled || isLoading) return;
+      if (cancelled) return;
       await load();
-      if (!cancelled) {
-        setLastLoadedAt(new Date().toISOString());
-      }
     };
     void run();
     const interval = setInterval(run, 30000);
@@ -105,7 +101,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
       cancelled = true;
       clearInterval(interval);
     };
-  }, [load, isLoading]);
+  }, [load]);
 
   const filtered = useMemo(() => {
     return sessions.filter((s) => (statusFilter === 'all' ? true : s.status === statusFilter));
@@ -114,7 +110,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
   if (!can('admin.participants.list')) {
     return (
       <AdminPageLayout>
-        <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se sessioner." />
+        <AdminEmptyState title="Ingen atkomst" description="Du behover behorighet for att se sessioner." />
       </AdminPageLayout>
     );
   }
@@ -124,7 +120,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title="Sessioner"
-        description="Översikt över aktiva och avslutade sessioner."
+        description="Oversikt over aktiva och avslutade sessioner."
         icon={<PlayIcon className="h-8 w-8 text-primary" />}
       />
 
@@ -144,7 +140,7 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
           <AdminTableToolbar
             searchValue=""
             onSearchChange={() => {}}
-            searchPlaceholder="Sök (ej aktiv ännu)"
+            searchPlaceholder="Sok (ej aktiv annu)"
             filters={
               <div className="flex flex-wrap gap-2">
                 <Select
@@ -170,14 +166,14 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
             emptyState={
               <AdminEmptyState
                 title="Inga sessioner"
-                description="Justera filter eller försök igen senare."
+                description="Justera filter eller forsok igen senare."
               />
             }
             onRowClick={onSelectSession ? (row) => onSelectSession(row.id) : undefined}
             columns={[
               { header: 'Titel', accessor: (row) => row.title },
               { header: 'Tenant', accessor: (row) => row.tenantName || 'Global' },
-              { header: 'Värd', accessor: (row) => row.host },
+              { header: 'Vard', accessor: (row) => row.host },
               { header: 'Deltagare', accessor: (row) => row.participants },
               {
                 header: 'Status',

@@ -23,9 +23,10 @@ type ProductEditDialogProps = {
   onOpenChange: (open: boolean) => void;
   onSubmit: (product: ProductAdminItem) => void;
   capabilities: Capability[];
+  purposes: { value: string; label: string }[];
 };
 
-export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capabilities }: ProductEditDialogProps) {
+export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capabilities, purposes }: ProductEditDialogProps) {
   const [name, setName] = useState(product?.name ?? "");
   const [category, setCategory] = useState(product?.category ?? "platform");
   const [description, setDescription] = useState(product?.description ?? "");
@@ -33,6 +34,7 @@ export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capab
   const [selectedCapabilities, setSelectedCapabilities] = useState<string[]>(
     product?.capabilities.map((c) => c.key) ?? [],
   );
+  const [selectedPurpose, setSelectedPurpose] = useState<string>(product?.purposeId ?? "");
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
@@ -41,6 +43,7 @@ export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capab
       setDescription(product?.description ?? "");
       setStatus(product?.status ?? "active");
       setSelectedCapabilities(product?.capabilities.map((c) => c.key) ?? []);
+      setSelectedPurpose(product?.purposeId ?? "");
     });
     return () => cancelAnimationFrame(frame);
   }, [product]);
@@ -54,6 +57,8 @@ export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capab
       category: category || product.category,
       description: description.trim() || product.description,
       status,
+      purposeId: selectedPurpose || null,
+      purposeName: purposes.find((p) => p.value === selectedPurpose)?.label ?? null,
       capabilities: capabilities.filter((cap) => selectedCapabilities.includes(cap.key)),
       updatedAt: new Date().toISOString(),
     });
@@ -128,6 +133,20 @@ export function ProductEditDialog({ open, product, onOpenChange, onSubmit, capab
                   options={[
                     { value: "active", label: statusLabels.active },
                     { value: "inactive", label: statusLabels.inactive },
+                  ]}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground" htmlFor="edit-product-purpose">
+                  Purpose <span className="text-muted-foreground font-normal">(optional)</span>
+                </label>
+                <Select
+                  id="edit-product-purpose"
+                  value={selectedPurpose}
+                  onChange={(event) => setSelectedPurpose(event.target.value)}
+                  options={[
+                    { value: "", label: "No primary purpose" },
+                    ...purposes.map((p) => ({ value: p.value, label: p.label })),
                   ]}
                 />
               </div>

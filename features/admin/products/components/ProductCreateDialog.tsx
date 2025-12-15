@@ -22,16 +22,18 @@ type ProductCreateDialogProps = {
   onOpenChange: (open: boolean) => void;
   onCreate: (product: Omit<ProductAdminItem, "id" | "createdAt" | "updatedAt">) => void;
   capabilities: Capability[];
+  purposes: { value: string; label: string }[];
 };
 
 const defaultCapabilityKeys = ["browse.view", "play.run"];
 
-export function ProductCreateDialog({ open, onOpenChange, onCreate, capabilities }: ProductCreateDialogProps) {
+export function ProductCreateDialog({ open, onOpenChange, onCreate, capabilities, purposes }: ProductCreateDialogProps) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState("platform");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState<ProductStatus>("active");
   const [selectedCapabilities, setSelectedCapabilities] = useState<string[]>(defaultCapabilityKeys);
+  const [selectedPurpose, setSelectedPurpose] = useState<string>("");
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -41,6 +43,8 @@ export function ProductCreateDialog({ open, onOpenChange, onCreate, capabilities
       category: category || "platform",
       description: description.trim() || null,
       status,
+      purposeId: selectedPurpose || null,
+      purposeName: purposes.find((p) => p.value === selectedPurpose)?.label ?? null,
       capabilities: capabilities.filter((cap) => selectedCapabilities.includes(cap.key)),
     });
     resetForm();
@@ -54,6 +58,7 @@ export function ProductCreateDialog({ open, onOpenChange, onCreate, capabilities
     setDescription("");
     setStatus("active");
     setSelectedCapabilities(defaultCapabilityKeys);
+    setSelectedPurpose("");
   };
 
   return (
@@ -98,6 +103,20 @@ export function ProductCreateDialog({ open, onOpenChange, onCreate, capabilities
               <p className="text-xs text-muted-foreground">
                 Platform = core product, Add-on = extension, Bundle = package
               </p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground" htmlFor="product-purpose">
+                Purpose <span className="text-muted-foreground font-normal">(optional)</span>
+              </label>
+              <Select
+                id="product-purpose"
+                value={selectedPurpose}
+                onChange={(event) => setSelectedPurpose(event.target.value)}
+                options={[
+                  { value: "", label: "No primary purpose" },
+                  ...purposes.map((p) => ({ value: p.value, label: p.label })),
+                ]}
+              />
             </div>
           </div>
 

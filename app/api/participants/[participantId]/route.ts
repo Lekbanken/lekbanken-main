@@ -32,34 +32,44 @@ export async function GET(_: Request, { params }: { params: Promise<{ participan
   try {
     const supabase = await createServerRlsClient();
     type ParticipantRow = Database['public']['Tables']['participants']['Row'] & {
-      tenant?: { id: string; name: string | null };
+      session?: { tenant?: { id: string; name: string | null } | null } | null;
+      updated_at?: string | null;
+      created_at?: string | null;
     };
+
     const { data, error } = await supabase
       .from('participants')
       .select(
         `
           id,
-          name,
-          email,
-          last_active,
-          risk_level,
-          notes,
-          tenant:tenant_id ( id, name )
+          display_name,
+          last_seen_at,
+          updated_at,
+          created_at,
+          status,
+          session:session_id (
+            tenant:tenant_id ( id, name )
+          )
         `
       )
       .eq('id', participantId)
       .single();
+
     if (error) throw error;
 
     const r = data as ParticipantRow;
+    const status = (r.status as Database['public']['Enums']['participant_status'] | null) ?? 'active';
+    const risk: ParticipantDetail['risk'] =
+      status === 'blocked' || status === 'kicked' ? 'high' : status === 'disconnected' ? 'low' : 'none';
+
     const participant: ParticipantDetail = {
       id: r.id ?? participantId,
-      name: r.name ?? 'Okänd',
-      email: r.email ?? undefined,
-      tenantName: r.tenant?.name ?? 'Okänd',
-      lastActive: r.last_active ?? (r as { updated_at?: string }).updated_at ?? new Date().toISOString(),
-      risk: (r.risk_level as ParticipantDetail['risk']) ?? 'none',
-      notes: r.notes ?? null,
+      name: r.display_name ?? 'Okänd',
+      email: undefined,
+      tenantName: r.session?.tenant?.name ?? 'Okänd',
+      lastActive: r.last_seen_at ?? r.updated_at ?? r.created_at ?? new Date().toISOString(),
+      risk,
+      notes: null,
     };
 
     return NextResponse.json({ participant, log: [] });

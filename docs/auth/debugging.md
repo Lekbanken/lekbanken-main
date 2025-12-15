@@ -1,6 +1,6 @@
 # Auth/Tenant Debugging
 
-- Check middleware: verify redirects for `/app`/`/admin`, and that `x-request-id`/`x-tenant-id` headers are set when authenticated.
+- Check proxy: verify redirects for `/app`/`/admin`, and that `x-request-id`/`x-tenant-id` headers are set when authenticated.
 - Inspect cookies: `sb-*` (Supabase session), `lb_tenant` (signed, httpOnly). Use `tenantCookie` helpers to clear/set in server actions if needed.
 - Server context: `getServerAuthContext()` returns user, profile, memberships, effectiveGlobalRole, activeTenant. Log this in layouts for diagnostics.
 - Client context: use `/sandbox/auth-demo` and `AuthDebugPanel` to inspect `useAuth`/`useTenant` state.

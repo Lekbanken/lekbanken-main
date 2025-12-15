@@ -7,6 +7,7 @@ import type { TenantMembership } from '@/types/tenant'
 export function deriveEffectiveGlobalRoleFromClaims(user: User | null): GlobalRole | null {
   const claimRole = (user?.app_metadata?.role as string | undefined) ?? null
   if (claimRole === 'system_admin') return 'system_admin'
+  if (claimRole === 'superadmin' || claimRole === 'admin') return 'system_admin'
 
   const globalRole =
     (user?.app_metadata?.global_role as GlobalRole | undefined) ??

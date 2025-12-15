@@ -33,20 +33,20 @@ export async function GET(_: Request, { params }: { params: Promise<{ sessionId:
   const { sessionId } = await params;
   try {
     const supabase = await createServerRlsClient();
-    type SessionRow = Database['public']['Tables']['sessions']['Row'] & {
-      tenant?: { id: string; name: string | null };
+    type SessionRow = Database['public']['Tables']['participant_sessions']['Row'] & {
+      tenant?: { id: string; name: string | null } | null;
     };
     const { data, error } = await supabase
-      .from('sessions')
+      .from('participant_sessions')
       .select(
         `
           id,
-          title,
-          host,
+          display_name,
+          host_user_id,
           status,
           started_at,
           participant_count,
-          notes,
+          description,
           tenant:tenant_id ( id, name )
         `
       )
@@ -55,15 +55,19 @@ export async function GET(_: Request, { params }: { params: Promise<{ sessionId:
     if (error) throw error;
 
     const r = data as SessionRow;
+    const status = (r.status as Database['public']['Enums']['participant_session_status'] | null) ?? 'active';
+    const normalizedStatus: SessionDetail['status'] =
+      status === 'ended' || status === 'archived' || status === 'cancelled' ? 'completed' : 'active';
+
     const session: SessionDetail = {
       id: r.id ?? sessionId,
-      title: r.title ?? 'Session',
+      title: r.display_name ?? 'Session',
       tenantName: r.tenant?.name ?? 'Okänd',
-      host: r.host ?? 'Okänd',
+      host: r.host_user_id ?? 'Okänd',
       participants: r.participant_count ?? 0,
       startedAt: r.started_at ?? r.created_at ?? new Date().toISOString(),
-      status: (r.status as SessionDetail['status']) ?? 'active',
-      notes: r.notes ?? null,
+      status: normalizedStatus,
+      notes: (r as { description?: string | null }).description ?? null,
     };
 
     return NextResponse.json({ session, log: [] });

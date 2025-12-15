@@ -410,13 +410,21 @@ export function GameAdminPage() {
           onSelectAll={selection.selectAll}
           allSelected={selection.allSelected}
           actions={[
-            bulkActionPresets.delete((items) => Promise.all(items.map((item) => handleDelete(item.id)))),
-            bulkActionPresets.activate((items) =>
-              Promise.all(items.map((item) => handlePublishToggle(item, 'published')))
-            ),
-            bulkActionPresets.archive((items) =>
-              Promise.all(items.map((item) => handlePublishToggle(item, 'draft')))
-            ),
+            bulkActionPresets.delete(async (items: GameWithRelations[]) => {
+              for (const item of items) {
+                await handleDelete(item.id);
+              }
+            }),
+            bulkActionPresets.activate(async (items: GameWithRelations[]) => {
+              for (const item of items) {
+                await handlePublishToggle(item, 'published');
+              }
+            }),
+            bulkActionPresets.archive(async (items: GameWithRelations[]) => {
+              for (const item of items) {
+                await handlePublishToggle(item, 'draft');
+              }
+            }),
           ]}
           className="mb-4"
         />

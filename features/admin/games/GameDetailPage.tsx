@@ -215,7 +215,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   if (error) {
     return (
       <AdminPageLayout>
-        <AdminErrorState title="Något gick fel" description={error} onRetry={load} retryLabel="Försök igen" />
+        <AdminErrorState title="Något gick fel" description={error} onRetry={load} />
       </AdminPageLayout>
     );
   }
@@ -235,11 +235,10 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
           icon={<ArrowLeftIcon className="h-6 w-6" />}
           title="Spelet hittades inte"
           description="Kontrollera länken eller gå tillbaka till listan."
-          action={
-            <Button onClick={() => router.push('/admin/games')} variant="outline">
-              Tillbaka till spel
-            </Button>
-          }
+          action={{
+            label: 'Tillbaka till spel',
+            onClick: () => router.push('/admin/games'),
+          }}
         />
       </AdminPageLayout>
     );
@@ -338,7 +337,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
             <code className="text-xs">{game.id}</code>
           </div>
           <p className="text-xs text-muted-foreground">
-            Skapad {new Date(game.created_at).toLocaleString()} • Uppdaterad {new Date(game.updated_at).toLocaleString()}
+            Skapad {new Date(game.created_at).toLocaleString()} · Uppdaterad {new Date(game.updated_at).toLocaleString()}
           </p>
         </CardContent>
       </Card>

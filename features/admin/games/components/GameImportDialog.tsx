@@ -32,7 +32,9 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
     }
 
     const cleaned: ImportableGame[] = parsed
-      .map((item) => ({
+      .map((item) => {
+        const status: ImportableGame['status'] = item.status === 'published' ? 'published' : 'draft';
+        return {
         name: typeof item.name === 'string' ? item.name.trim() : '',
         short_description: typeof item.short_description === 'string' ? item.short_description.trim() : '',
         main_purpose_id: typeof item.main_purpose_id === 'string' ? item.main_purpose_id : '',
@@ -47,8 +49,9 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
         age_max: typeof item.age_max === 'number' ? item.age_max : null,
         owner_tenant_id: typeof item.owner_tenant_id === 'string' ? item.owner_tenant_id : null,
         product_id: typeof item.product_id === 'string' ? item.product_id : null,
-        status: item.status === 'published' ? 'published' : 'draft',
-      }))
+        status,
+      };
+      })
       .filter((g) => g.name && g.short_description && g.main_purpose_id);
 
     if (cleaned.length === 0) {

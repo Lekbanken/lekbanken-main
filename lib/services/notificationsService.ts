@@ -65,6 +65,8 @@ export async function sendBulkNotifications(params: {
   message: string;
   type?: string;
   category?: string;
+  actionUrl?: string;
+  actionLabel?: string;
 }): Promise<Notification[] | null> {
   try {
     const notifications = params.userIds.map((userId) => ({
@@ -74,6 +76,8 @@ export async function sendBulkNotifications(params: {
       message: params.message,
       type: params.type || 'info',
       category: params.category,
+      action_url: params.actionUrl,
+      action_label: params.actionLabel,
     }));
 
     const { data, error } = await supabase

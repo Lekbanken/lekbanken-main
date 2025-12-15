@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
-import { CreditCardIcon, DocumentTextIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
-import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminStatCard, AdminStatGrid } from "@/components/admin/shared";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTenant } from "@/lib/context/TenantContext";
-import { getBillingStats, getSubscription, getInvoices, type Subscription, type Invoice } from "@/lib/services/billingService";
+import { useEffect, useMemo, useState } from 'react';
+import { CreditCardIcon, DocumentTextIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminStatCard, AdminStatGrid } from '@/components/admin/shared';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useTenant } from '@/lib/context/TenantContext';
+import { getBillingStats, getSubscription, getInvoices, type Subscription, type Invoice } from '@/lib/services/billingService';
 
 export default function TenantBillingPage() {
   const { currentTenant } = useTenant();
@@ -44,9 +44,9 @@ export default function TenantBillingPage() {
   }, [tenantId]);
 
   const planName = useMemo(() => {
-    if (!subscription) return "Ingen aktiv plan";
+    if (!subscription) return 'Ingen aktiv plan';
     const plan = (subscription as unknown as { plan?: { name?: string; slug?: string } }).plan;
-    return plan?.name || plan?.slug || "Okänd plan";
+    return plan?.name || plan?.slug || 'Okänd plan';
   }, [subscription]);
 
   if (!tenantId) {
@@ -81,21 +81,24 @@ export default function TenantBillingPage() {
         <AdminStatCard
           label="Aktiv plan"
           value={planName}
-          trend={subscription?.status ?? "—"}
+          subtitle={subscription?.status ?? 'Ingen status'}
+          trend="flat"
           icon={<CreditCardIcon className="h-5 w-5 text-primary" />}
           isLoading={isLoading}
         />
         <AdminStatCard
           label="MRR"
-          value={stats ? `${stats.monthlyRecurringRevenue.toLocaleString()} kr` : "—"}
-          trend="Beräknat"
+          value={stats ? `${stats.monthlyRecurringRevenue.toLocaleString()} kr` : '–'}
+          subtitle="Beräknat"
+          trend="flat"
           icon={<CreditCardIcon className="h-5 w-5 text-primary" />}
           isLoading={isLoading}
         />
         <AdminStatCard
           label="Totalt fakturerat"
-          value={stats ? `${stats.totalRevenue.toLocaleString()} kr` : "—"}
-          trend="Summa"
+          value={stats ? `${stats.totalRevenue.toLocaleString()} kr` : '–'}
+          subtitle="Summa"
+          trend="flat"
           icon={<DocumentTextIcon className="h-5 w-5 text-primary" />}
           isLoading={isLoading}
         />
@@ -119,13 +122,13 @@ export default function TenantBillingPage() {
               {invoices.map((inv) => (
                 <div key={inv.id} className="flex items-center justify-between px-4 py-3">
                   <div>
-                    <p className="font-semibold text-foreground">{inv.name || inv.invoice_number || "Faktura"}</p>
+                    <p className="font-semibold text-foreground">{inv.name || inv.invoice_number || 'Faktura'}</p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(inv.created_at).toLocaleDateString()} • {inv.status}
+                      {new Date(inv.created_at).toLocaleDateString()} · {inv.status}
                     </p>
                   </div>
                   <p className="text-sm font-semibold text-foreground">
-                    {(inv.amount_total ?? inv.amount)?.toLocaleString()} {inv.currency || "SEK"}
+                    {(inv.amount_total ?? inv.amount)?.toLocaleString()} {inv.currency || 'SEK'}
                   </p>
                 </div>
               ))}

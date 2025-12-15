@@ -69,7 +69,8 @@ const cookieOptions = {
   maxAge: COOKIE_MAX_AGE,
 }
 
-export async function readTenantIdFromCookies(cookieStore: Pick<CookieStore, 'get'> | NextRequest['cookies']) {
+export async function readTenantIdFromCookies(cookieStore?: Pick<CookieStore, 'get'> | NextRequest['cookies']) {
+  if (!cookieStore) return null
   return unpack(cookieStore.get(COOKIE_NAME)?.value ?? null)
 }
 

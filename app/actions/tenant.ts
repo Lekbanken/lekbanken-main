@@ -43,7 +43,7 @@ export async function resolveCurrentTenant() {
   }
 
   const selected = chooseTenant()
-  if (selected) {
+  if (selected?.tenant_id) {
     await setTenantCookie(cookieStore, selected.tenant_id)
   } else {
     clearTenantCookie(cookieStore)

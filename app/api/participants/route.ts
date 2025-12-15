@@ -1,76 +1,82 @@
-import { NextResponse } from 'next/server'
-import { createServerRlsClient } from '@/lib/supabase/server'
-import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
-import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
+import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie';
+import { cookies } from 'next/headers';
+import type { Database } from '@/types/supabase';
 
 type ParticipantResponse = {
-  id: string
-  name: string
-  email?: string
-  tenantId: string | null
-  tenantName: string
-  lastActive: string
-  risk: 'none' | 'low' | 'high'
-}
+  id: string;
+  name: string;
+  email?: string;
+  tenantId: string | null;
+  tenantName: string;
+  lastActive: string;
+  risk: 'none' | 'low' | 'high';
+};
+
+type ParticipantRow = {
+  id: string;
+  display_name: string;
+  last_seen_at?: string | null;
+  updated_at?: string | null;
+  created_at?: string | null;
+  status?: Database['public']['Enums']['participant_status'] | null;
+  session?: { tenant_id?: string | null; display_name?: string | null } | null;
+};
 
 export async function GET(request: Request) {
-  const supabase = await createServerRlsClient()
-  const cookieStore = await cookies()
-  const activeTenantId = await readTenantIdFromCookies(cookieStore)
-  const { searchParams } = new URL(request.url)
-  const tenantId = searchParams.get('tenantId') || activeTenantId || null
+  const supabase = await createServerRlsClient();
+  const cookieStore = await cookies();
+  const activeTenantId = await readTenantIdFromCookies(cookieStore);
+  const { searchParams } = new URL(request.url);
+  const tenantId = searchParams.get('tenantId') || activeTenantId || null;
 
-  const { data: rows, error } = await supabase
+  const { data, error } = await supabase
     .from('participants')
     .select(
       `
         id,
         display_name,
-        email:progress->>email,
         last_seen_at,
-        status,
         updated_at,
         created_at,
-        session:participant_sessions!participants_session_id_fkey(
+        status,
+        session:session_id (
           tenant_id,
           display_name
         )
       `
-    )
-    .maybeSingle(false)
+    );
 
   if (error) {
-    console.error('[api/participants] fetch error', error)
-    return NextResponse.json({ error: 'Failed to load participants' }, { status: 500 })
+    console.error('[api/participants] fetch error', error);
+    return NextResponse.json({ error: 'Failed to load participants' }, { status: 500 });
   }
 
-  const mapped: ParticipantResponse[] = (rows || [])
+  const rows = (data as ParticipantRow[] | null) ?? [];
+
+  const mapped: ParticipantResponse[] = rows
     .filter((row) => {
       if (tenantId) {
-        return (row as { session?: { tenant_id?: string | null } }).session?.tenant_id === tenantId
+        return row.session?.tenant_id === tenantId;
       }
-      return true
+      return true;
     })
     .map((row) => {
-      const session = (row as { session?: { tenant_id?: string | null; display_name?: string | null } }).session
-      const status = (row as { status?: string }).status || 'active'
+      const status = row.status ?? 'active';
       const risk: ParticipantResponse['risk'] =
-        status === 'blocked' || status === 'kicked' ? 'high' : status === 'disconnected' ? 'low' : 'none'
+        status === 'blocked' || status === 'kicked' ? 'high' : status === 'disconnected' ? 'low' : 'none';
 
       return {
-        id: (row as { id: string }).id,
-        name: (row as { display_name: string }).display_name,
-        email: (row as { email?: string | null }).email || undefined,
-        tenantId: session?.tenant_id ?? null,
-        tenantName: session?.display_name || 'Okänd',
-        lastActive:
-          (row as { last_seen_at?: string | null }).last_seen_at ||
-          (row as { updated_at?: string | null }).updated_at ||
-          (row as { created_at?: string | null }).created_at ||
-          '',
+        id: row.id,
+        name: row.display_name,
+        email: undefined,
+        tenantId: row.session?.tenant_id ?? null,
+        tenantName: row.session?.display_name || 'Okänd',
+        lastActive: row.last_seen_at || row.updated_at || row.created_at || '',
         risk,
-      }
-    })
+      };
+    });
 
-  return NextResponse.json({ participants: mapped })
+  return NextResponse.json({ participants: mapped });
 }

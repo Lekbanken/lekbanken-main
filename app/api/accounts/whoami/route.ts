@@ -35,6 +35,9 @@ export async function GET() {
     auth_user: user,
     memberships: memberships ?? [],
     active_tenant_id: activeTenantId,
-    is_system_admin: isSystemAdmin(user as { app_metadata?: { roles?: string[] } }, globalRole),
+    is_system_admin: isSystemAdmin(
+      { id: user.id, app_metadata: { role: (user.app_metadata as { role?: string } | null)?.role } },
+      globalRole
+    ),
   })
 }

@@ -16,7 +16,14 @@ import {
   type SupportStats,
   type TicketMessage,
 } from '@/lib/services/supportService';
-import { AdminPageLayout, AdminPageHeader, AdminEmptyState, AdminErrorState, AdminStatCard, AdminStatGrid } from '@/components/admin/shared';
+import {
+  AdminPageLayout,
+  AdminPageHeader,
+  AdminEmptyState,
+  AdminErrorState,
+  AdminStatCard,
+  AdminStatGrid,
+} from '@/components/admin/shared';
 
 export default function AdminTicketsPage() {
   const { user } = useAuth();
@@ -169,7 +176,8 @@ export default function AdminTicketsPage() {
           <AdminStatCard
             label="Lösta 30d"
             value={stats.resolvedLast30Days}
-            trend={stats.avgResolutionTime ? `Snitt ${Math.round(stats.avgResolutionTime / 60)}h` : undefined}
+            change={stats.avgResolutionTime ? `Snitt ${Math.round(stats.avgResolutionTime / 60)}h` : undefined}
+            trend="flat"
           />
         </AdminStatGrid>
       )}
@@ -328,7 +336,7 @@ export default function AdminTicketsPage() {
                   >
                     <option value="open">Öppen</option>
                     <option value="in_progress">Hanteras</option>
-                    <option value="waiting_for_user">Väntar på Användare</option>
+                    <option value="waiting_for_user">Väntar på användare</option>
                     <option value="resolved">Löst</option>
                     <option value="closed">Stängt</option>
                   </select>

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { ChartBarIcon } from "@heroicons/react/24/outline";
+import { useEffect, useMemo, useState } from 'react';
+import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -9,14 +9,9 @@ import {
   AdminErrorState,
   AdminStatGrid,
   AdminStatCard,
-} from "@/components/admin/shared";
-import { useTenant } from "@/lib/context/TenantContext";
-import {
-  getPageViewStats,
-  getSessionStats,
-  type PageViewStats,
-  type SessionStats,
-} from "@/lib/services/analyticsService";
+} from '@/components/admin/shared';
+import { useTenant } from '@/lib/context/TenantContext';
+import { getPageViewStats, getSessionStats } from '@/lib/services/analyticsService';
 
 type DateRange = { startDate: string; endDate: string };
 
@@ -26,8 +21,8 @@ export default function TenantAnalyticsPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pageStats, setPageStats] = useState<PageViewStats | null>(null);
-  const [sessionStats, setSessionStats] = useState<SessionStats | null>(null);
+  const [pageStats, setPageStats] = useState<NonNullable<Awaited<ReturnType<typeof getPageViewStats>>> | null>(null);
+  const [sessionStats, setSessionStats] = useState<NonNullable<Awaited<ReturnType<typeof getSessionStats>>> | null>(null);
 
   const dateRange = useMemo<DateRange>(() => {
     const now = Date.now();
@@ -47,11 +42,11 @@ export default function TenantAnalyticsPage() {
           getPageViewStats(tenantId, dateRange.startDate, dateRange.endDate),
           getSessionStats(tenantId, dateRange.startDate, dateRange.endDate),
         ]);
-        if (pageData) setPageStats(pageData);
-        if (sessionData) setSessionStats(sessionData);
+        setPageStats(pageData ?? null);
+        setSessionStats(sessionData ?? null);
       } catch (err) {
         console.error(err);
-        setError("Kunde inte ladda statistik just nu.");
+        setError('Kunde inte ladda statistik just nu.');
       } finally {
         setIsLoading(false);
       }
@@ -96,23 +91,27 @@ export default function TenantAnalyticsPage() {
         <AdminStatGrid>
           <AdminStatCard
             label="Sidvisningar"
-            value={pageStats ? pageStats.total : "—"}
-            trend={pageStats ? `Unika: ${pageStats.unique}` : undefined}
+            value={pageStats ? pageStats.total : '–'}
+            change={pageStats ? `Unika: ${pageStats.unique}` : undefined}
+            trend="flat"
           />
           <AdminStatCard
             label="Sessioner"
-            value={sessionStats ? sessionStats.totalSessions : "—"}
-            trend={sessionStats ? `Avslutade: ${sessionStats.completedSessions}` : undefined}
+            value={sessionStats ? sessionStats.totalSessions : '–'}
+            change={sessionStats ? `Avslutade: ${sessionStats.completedSessions}` : undefined}
+            trend="flat"
           />
           <AdminStatCard
             label="Genomsnittlig tid"
-            value={sessionStats ? `${Math.round(sessionStats.avgDuration / 60)} min` : "—"}
-            trend={pageStats ? `Snitt besökstid: ${Math.round(pageStats.avgDuration)}s` : undefined}
+            value={sessionStats ? `${Math.round(sessionStats.avgDuration / 60)} min` : '–'}
+            subtitle={pageStats ? `Snitt besökstid: ${Math.round(pageStats.avgDuration)}s` : undefined}
+            trend="flat"
           />
           <AdminStatCard
             label="Genomsnittlig poäng"
-            value={sessionStats ? sessionStats.avgScore : "—"}
-            trend="Senaste 30 dagarna"
+            value={sessionStats ? sessionStats.avgScore : '–'}
+            subtitle="Senaste 30 dagarna"
+            trend="flat"
           />
         </AdminStatGrid>
       )}

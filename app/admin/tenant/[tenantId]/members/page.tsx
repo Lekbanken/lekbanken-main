@@ -4,10 +4,11 @@ import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, Adm
 import { Badge, Input } from "@/components/ui";
 import { useTenant } from "@/lib/context/TenantContext";
 import { supabase } from "@/lib/supabase/client";
+import type { Database } from "@/types/supabase";
 
 type MemberRow = {
   id: string;
-  role: string;
+  role: Database["public"]["Enums"]["tenant_role_enum"] | null;
   is_primary?: boolean | null;
   user?: {
     id: string;
@@ -43,7 +44,17 @@ export default function TenantMembersPage() {
         console.error(queryError);
         setError("Kunde inte ladda medlemmar just nu.");
       } else {
-        setMembers(data || []);
+        type MembershipQueryRow = {
+          id: string | null;
+          role: MemberRow["role"];
+          is_primary: boolean | null;
+          user: MemberRow["user"];
+        };
+        const rows = (data as MembershipQueryRow[] | null) ?? [];
+        const normalized = rows
+          .filter((row): row is MembershipQueryRow & { id: string } => typeof row.id === "string")
+          .map((row) => ({ ...row, id: row.id as string }));
+        setMembers(normalized);
       }
       setIsLoading(false);
     };

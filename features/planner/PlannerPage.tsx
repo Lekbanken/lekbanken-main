@@ -17,7 +17,10 @@ export function PlannerPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user, userProfile } = useAuth();
-  const canSetPublic = isSystemAdmin(user, userProfile?.global_role ?? null);
+  const canSetPublic = isSystemAdmin(
+    user ? { id: user.id, app_metadata: { role: (user.app_metadata as { role?: string } | null)?.role } } : null,
+    userProfile?.global_role ?? null
+  );
 
   const loadPlans = async () => {
     setIsLoading(true);

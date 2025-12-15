@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server'
 import type { TenantMembership, TenantResolution, TenantRole, TenantWithMembership } from '@/types/tenant'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 
-type CookieReader = { get: (name: string) => { value?: string | null } | undefined }
+type CookieReader = { get: (name: string) => { name: string; value: string } | undefined }
 
 type ResolveTenantParams = {
   pathname?: string | null

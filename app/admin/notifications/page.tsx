@@ -70,19 +70,32 @@ export default function NotificationsAdminPage() {
   }, [user, currentTenant]);
 
   const canSend = useMemo(() => {
+    if (!currentTenant) return false;
     if (!notificationTitle.trim() || !notificationMessage.trim()) return false;
     if (targetType === 'specific' && selectedUserIds.length === 0) return false;
+    if (targetType === 'all' && tenantUsers.length === 0) return false;
     return true;
-  }, [notificationTitle, notificationMessage, targetType, selectedUserIds]);
+  }, [currentTenant, notificationTitle, notificationMessage, targetType, selectedUserIds, tenantUsers.length]);
 
   const handleSend = async () => {
     if (!canSend) return;
+    if (!currentTenant) return;
+
+    const userIds = targetType === 'specific'
+      ? selectedUserIds
+      : tenantUsers.map((u) => u.id).filter(Boolean);
+
+    if (userIds.length === 0) {
+      setError('Det finns inga anvÇÏndare att skicka till.');
+      return;
+    }
+
     setIsSending(true);
     setError(null);
     try {
       await sendBulkNotifications({
-        userIds: targetType === 'specific' ? selectedUserIds : undefined,
-        tenantId: currentTenant?.id ?? undefined,
+        userIds,
+        tenantId: currentTenant.id,
         title: notificationTitle,
         message: notificationMessage,
         type: notificationType,

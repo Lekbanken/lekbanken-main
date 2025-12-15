@@ -5,8 +5,8 @@ type ActionBody = {
   reason?: string;
 };
 
-export async function POST(req: Request, { params }: { params: { participantId: string } }) {
-  const { participantId } = params;
+export async function POST(req: Request, { params }: { params: Promise<{ participantId: string }> }) {
+  const { participantId } = await params;
   const body = (await req.json().catch(() => ({}))) as ActionBody;
   const logEntry = {
     id: crypto.randomUUID(),

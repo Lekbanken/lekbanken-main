@@ -27,8 +27,8 @@ const mockLog = [
   { id: 'p-log-2', at: '2025-12-12T09:05:00Z', actor: 'System', action: 'Risknivå: låg' },
 ];
 
-export async function GET(_: Request, { params }: { params: { participantId: string } }) {
-  const { participantId } = params;
+export async function GET(_: Request, { params }: { params: Promise<{ participantId: string }> }) {
+  const { participantId } = await params;
   try {
     const supabase = await createServerRlsClient();
     type ParticipantRow = Database['public']['Tables']['participants']['Row'] & {

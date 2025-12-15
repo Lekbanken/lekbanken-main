@@ -29,8 +29,8 @@ const mockLog = [
   { id: 'log-2', at: '2025-12-12T09:05:00Z', actor: 'System', action: 'Flaggor registrerades' },
 ];
 
-export async function GET(_: Request, { params }: { params: { sessionId: string } }) {
-  const { sessionId } = params;
+export async function GET(_: Request, { params }: { params: Promise<{ sessionId: string }> }) {
+  const { sessionId } = await params;
   try {
     const supabase = await createServerRlsClient();
     type SessionRow = Database['public']['Tables']['sessions']['Row'] & {

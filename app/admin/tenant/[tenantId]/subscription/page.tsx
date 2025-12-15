@@ -1,3 +1,5 @@
+ 'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import { CreditCardIcon, BoltIcon } from '@heroicons/react/24/outline';
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from '@/components/admin/shared';

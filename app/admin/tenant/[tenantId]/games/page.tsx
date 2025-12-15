@@ -1,3 +1,5 @@
+ 'use client';
+
 import { useEffect, useMemo, useState } from "react";
 import { PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";

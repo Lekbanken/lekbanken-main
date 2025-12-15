@@ -1,0 +1,58 @@
+import 'server-only'
+
+import { cookies } from 'next/headers'
+import type { User } from '@supabase/supabase-js'
+import { createServerRlsClient } from '@/lib/supabase/server'
+import { resolveTenant } from '@/lib/tenant/resolver'
+import type { AuthContext, GlobalRole, UserProfile } from '@/types/auth'
+import type { TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
+
+export function deriveEffectiveGlobalRole(profile: UserProfile | null, user: User | null): GlobalRole | null {
+  if (profile?.global_role) return profile.global_role as GlobalRole
+  if (user?.app_metadata?.role === 'system_admin') return 'system_admin'
+  if (profile?.role === 'superadmin' || profile?.role === 'admin') return 'system_admin'
+  return null
+}
+
+export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
+  const cookieStore = await cookies()
+  const supabase = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return {
+      user: null,
+      profile: null,
+      effectiveGlobalRole: null,
+      memberships: [],
+      activeTenant: null,
+      activeTenantRole: null,
+    }
+  }
+
+  const [profileResult, membershipsResult] = await Promise.all([
+    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase.from('user_tenant_memberships').select('*, tenant:tenants(*)').eq('user_id', user.id),
+  ])
+
+  const profile = (profileResult.data as UserProfile | null) ?? null
+  const memberships = (membershipsResult.data as TenantMembership[] | null) ?? []
+  const effectiveGlobalRole = deriveEffectiveGlobalRole(profile, user)
+
+  const { tenant, tenantRole } = await resolveTenant({
+    pathname,
+    cookieStore,
+    memberships,
+  })
+
+  return {
+    user,
+    profile,
+    effectiveGlobalRole,
+    memberships,
+    activeTenant: tenant as TenantWithMembership | null,
+    activeTenantRole: (tenantRole as TenantRole | null) ?? null,
+  }
+}

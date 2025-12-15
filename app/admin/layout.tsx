@@ -1,22 +1,31 @@
-'use client'
+import type { ReactNode } from 'react'
+import { redirect } from 'next/navigation'
+import { TenantProvider } from '@/lib/context/TenantContext'
+import { getServerAuthContext } from '@/lib/auth/server-context'
+import { AdminShell } from '@/components/admin/AdminShell'
+import { ToastProvider } from '@/components/ui'
 
-import type { ReactNode } from "react";
-import { useAuth } from "@/lib/supabase/auth";
-import { TenantProvider } from "@/lib/context/TenantContext";
-import { AdminShell } from "@/components/admin/AdminShell";
-import { ToastProvider } from "@/components/ui";
+export default async function AdminLayout({ children }: { children: ReactNode }) {
+  const authContext = await getServerAuthContext('/admin')
 
-function TenantProviderWithAuth({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  return <TenantProvider userId={user?.id ?? null}>{children}</TenantProvider>;
-}
+  if (!authContext.user) {
+    redirect('/auth/login?redirect=/admin')
+  }
 
-export default function AdminLayout({ children }: { children: ReactNode }) {
+  if (authContext.effectiveGlobalRole !== 'system_admin') {
+    redirect('/app')
+  }
+
   return (
-    <TenantProviderWithAuth>
+    <TenantProvider
+      userId={authContext.user.id}
+      initialTenant={authContext.activeTenant}
+      initialRole={authContext.activeTenantRole}
+      initialMemberships={authContext.memberships}
+    >
       <ToastProvider>
         <AdminShell>{children}</AdminShell>
       </ToastProvider>
-    </TenantProviderWithAuth>
-  );
+    </TenantProvider>
+  )
 }

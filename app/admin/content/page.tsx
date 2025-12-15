@@ -34,7 +34,7 @@ interface SeasonalEvent {
 
 export default function ContentPlannerAdminPage() {
   const { currentTenant } = useTenant();
-  const { user, userRole } = useAuth();
+  const { user, effectiveGlobalRole } = useAuth();
   const { success, warning } = useToast();
 
   const [activeTab, setActiveTab] = useState<'content' | 'events' | 'schedule'>('content');
@@ -66,7 +66,7 @@ export default function ContentPlannerAdminPage() {
     endDate: '',
   });
 
-  const isGlobalAdmin = userRole === 'admin' || userRole === 'superadmin';
+  const isGlobalAdmin = effectiveGlobalRole === 'system_admin';
 
   const loadContent = useCallback(async () => {
     setIsLoading(true);
@@ -557,4 +557,3 @@ export default function ContentPlannerAdminPage() {
     </div>
   );
 }
-

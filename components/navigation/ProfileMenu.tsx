@@ -28,7 +28,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
   const router = useRouter();
   const { language } = usePreferences();
   const copy = getUiCopy(language).marketing.actions;
-  const { user, userProfile, userRole, signOut } = useAuth();
+  const { user, userProfile, effectiveGlobalRole, signOut } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
   const displayName = userProfile?.full_name || (user.email ? user.email.split("@")[0] : "Profil");
   const email = user.email || "";
   const avatarUrl = userProfile?.avatar_url;
-  const isAdmin = userRole === "admin" || userRole === "superadmin";
+  const isAdmin = effectiveGlobalRole === "system_admin";
 
   const handleNavigate = (href: string) => {
     router.push(href);

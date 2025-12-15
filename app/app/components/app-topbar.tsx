@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/supabase/auth";
 
 export function AppTopbar() {
   const router = useRouter();
-  const { user, userProfile } = useAuth();
+  const { effectiveGlobalRole } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,8 +19,7 @@ export function AppTopbar() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  const userRole = user?.app_metadata?.role || user?.user_metadata?.role || userProfile?.role;
-  const isAdmin = userRole === "admin" || userRole === "superadmin";
+  const isAdmin = effectiveGlobalRole === "system_admin";
 
   if (!mounted) {
     return (

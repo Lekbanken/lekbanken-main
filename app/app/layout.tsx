@@ -1,19 +1,36 @@
-'use client'
+import type { ReactNode } from 'react'
+import { redirect } from 'next/navigation'
+import { TenantProvider } from '@/lib/context/TenantContext'
+import { getServerAuthContext } from '@/lib/auth/server-context'
+import AppShellContent from './layout-client'
 
-import type { ReactNode } from "react";
-import { useAuth } from "@/lib/supabase/auth";
-import { TenantProvider } from "@/lib/context/TenantContext";
-import AppShellContent from "./layout-client";
+export default async function AppShell({ children }: { children: ReactNode }) {
+  const authContext = await getServerAuthContext('/app')
 
-function TenantProviderWithAuth({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
-  return <TenantProvider userId={user?.id ?? null}>{children}</TenantProvider>;
-}
+  if (!authContext.user) {
+    redirect('/auth/login?redirect=/app')
+  }
 
-export default function AppShell({ children }: { children: ReactNode }) {
+  const memberships = authContext.memberships || []
+  const activeTenant = authContext.activeTenant
+
+  if (!activeTenant) {
+    if (memberships.length > 1) {
+      redirect('/app/select-tenant')
+    }
+    if (memberships.length === 0) {
+      redirect('/app/no-access')
+    }
+  }
+
   return (
-    <TenantProviderWithAuth>
+    <TenantProvider
+      userId={authContext.user.id}
+      initialTenant={activeTenant}
+      initialRole={authContext.activeTenantRole}
+      initialMemberships={memberships}
+    >
       <AppShellContent>{children}</AppShellContent>
-    </TenantProviderWithAuth>
-  );
+    </TenantProvider>
+  )
 }

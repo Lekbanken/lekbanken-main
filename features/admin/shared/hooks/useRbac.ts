@@ -2,9 +2,7 @@
 
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
-import type { Database } from '@/types/supabase';
-
-type TenantRole = Database['public']['Enums']['tenant_role_enum'];
+import type { TenantRole } from '@/types/tenant';
 
 /**
  * Admin permission types.
@@ -148,12 +146,10 @@ const permissionChecks: Record<AdminPermission, PermissionCheck> = {
  * );
  */
 export function useRbac() {
-  const { user, userRole, isLoading: authLoading } = useAuth();
+  const { effectiveGlobalRole, isLoading: authLoading } = useAuth();
   const { currentTenant, isLoadingTenants, hasTenants } = useTenant();
 
-  // Determine global role
-  const appMetaRole = user?.app_metadata?.role as string | undefined;
-  const isSystemAdmin = appMetaRole === 'system_admin' || userRole === 'admin' || userRole === 'superadmin';
+  const isSystemAdmin = effectiveGlobalRole === 'system_admin';
 
   // Determine tenant role from current tenant membership
   const tenantRole = (currentTenant?.membership?.role ?? null) as TenantRole | null;

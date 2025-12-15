@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "./providers";
+import ServerProviders from "./server-providers";
 
 const themeInitScript = `(() => {
   try {
@@ -59,9 +59,9 @@ export default function RootLayout({
     >
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <Providers>
+        <ServerProviders>
           {children}
-        </Providers>
+        </ServerProviders>
       </body>
     </html>
   );

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -20,9 +20,9 @@ export function AdminShell({ children }: AdminShellProps) {
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
   const { open: commandPaletteOpen, setOpen: setCommandPaletteOpen } = useCommandPalette();
   const router = useRouter();
-  const { user, userRole, isLoading } = useAuth();
+  const { user, effectiveGlobalRole, isLoading } = useAuth();
   const { currentTenant, hasTenants, isLoadingTenants } = useTenant();
-  const isRoleResolved = userRole !== null;
+  const isRoleResolved = effectiveGlobalRole !== null;
 
   useEffect(() => {
     if (!isLoading) {
@@ -37,12 +37,12 @@ export function AdminShell({ children }: AdminShellProps) {
     console.info("[AdminShell] state", {
       isLoadingAuth: isLoading,
       hasUser: !!user,
-      userRole,
+      effectiveGlobalRole,
       tenantId: currentTenant?.id,
       hasTenants,
       isLoadingTenants,
     });
-  }, [isLoading, user, userRole, currentTenant?.id, hasTenants, isLoadingTenants]);
+  }, [isLoading, user, effectiveGlobalRole, currentTenant?.id, hasTenants, isLoadingTenants]);
 
   const handleLogin = () => router.replace("/auth/login?redirect=/admin");
   const handleReset = async () => {
@@ -50,15 +50,8 @@ export function AdminShell({ children }: AdminShellProps) {
     handleLogin();
   };
 
-  // Superadmin/admin har alltid tillgång, behöver inte vänta på tenants
-  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
-
-  // Om vi redan har user + admin roll, behöver vi inte vänta på isLoading
-  // Detta hanterar fallet där isLoading fastnar men data finns
+  const isGlobalAdmin = effectiveGlobalRole === "system_admin";
   const hasAuthData = !!user && isGlobalAdmin;
-  
-  // Om auth fortfarande laddar OCH vi inte har tillräcklig data, visa laddning
-  // Men om vi är admin/superadmin med user, fortsätt direkt
   const stillLoading = !hasAuthData && (isLoading || (!isGlobalAdmin && isLoadingTenants));
 
   if (stillLoading) {
@@ -92,12 +85,17 @@ export function AdminShell({ children }: AdminShellProps) {
     );
   }
 
-  // Andra roller kräver tenant
   const needsTenant = !isGlobalAdmin && !hasTenants && !isLoadingTenants;
   const noAdminRole = isRoleResolved && !isGlobalAdmin;
 
-  // DEBUG
-  console.log("[AdminShell] access check:", { user: !!user, userRole, isGlobalAdmin, hasTenants, needsTenant, noAdminRole });
+  console.log("[AdminShell] access check:", {
+    user: !!user,
+    effectiveGlobalRole,
+    isGlobalAdmin,
+    hasTenants,
+    needsTenant,
+    noAdminRole,
+  });
 
   if (!user || noAdminRole || needsTenant) {
     return (
@@ -106,7 +104,7 @@ export function AdminShell({ children }: AdminShellProps) {
           <p className="text-sm font-semibold text-foreground">Ingen admin-åtkomst</p>
           <p className="text-sm text-muted-foreground">
             {user
-              ? `Din roll (${userRole || 'ingen'}) saknar åtkomst. Logga in med ett admin-konto.`
+              ? `Din roll (${effectiveGlobalRole || 'ingen'}) saknar åtkomst. Logga in med ett admin-konto.`
               : "Du är inte inloggad."}
           </p>
           <div className="flex justify-center gap-2">
@@ -132,33 +130,28 @@ export function AdminShell({ children }: AdminShellProps) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Command Palette */}
-      <AdminCommandPalette 
-        open={commandPaletteOpen} 
-        onOpenChange={setCommandPaletteOpen} 
+      <AdminCommandPalette
+        open={commandPaletteOpen}
+        onOpenChange={setCommandPaletteOpen}
       />
 
       <div className="flex min-h-screen">
-        {/* Desktop Sidebar */}
         <AdminSidebar
           collapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
 
-        {/* Mobile Sidebar */}
         <AdminSidebar
           variant="mobile"
           open={isMobileNavOpen}
           onClose={() => setIsMobileNavOpen(false)}
         />
 
-        {/* Main content area */}
         <div className="flex min-h-screen flex-1 flex-col">
           <AdminTopbar
             onToggleSidebar={() => setIsMobileNavOpen(true)}
             isSidebarCollapsed={isSidebarCollapsed}
           />
-          {/* System admin acting as tenant banner */}
           <ActingAsTenantBanner />
           <main className="flex flex-1 flex-col bg-muted/40 p-4 lg:p-6 xl:p-8">
             {children}

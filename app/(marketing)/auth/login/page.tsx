@@ -28,13 +28,13 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const { language } = usePreferences()
   const copy = useMemo(() => getUiCopy(language), [language])
-  const { signIn, signInWithGoogle, isLoading, isAuthenticated, userRole } = useAuth()
+  const { signIn, signInWithGoogle, isLoading, isAuthenticated, effectiveGlobalRole } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
 
   const redirectParam = searchParams.get('redirect')
-  const isAdminRole = userRole === 'admin' || userRole === 'superadmin'
+  const isAdminRole = effectiveGlobalRole === 'system_admin'
   const redirectTo = redirectParam || (isAdminRole ? '/admin' : '/app')
 
   useEffect(() => {

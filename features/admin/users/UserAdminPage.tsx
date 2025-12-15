@@ -58,7 +58,7 @@ type EditPayload = {
 };
 
 export function UserAdminPage() {
-  const { user, userRole } = useAuth();
+  const { user, effectiveGlobalRole } = useAuth();
   const { currentTenant, isLoadingTenants } = useTenant();
   const { success, info, warning } = useToast();
   const { can } = useRbac();
@@ -83,7 +83,7 @@ export function UserAdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadUsers = useCallback(async () => {
-    const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+    const isGlobalAdmin = effectiveGlobalRole === "system_admin";
     const tenantId = currentTenant?.id;
     const tenantName = currentTenant?.name;
 
@@ -134,7 +134,7 @@ export function UserAdminPage() {
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [currentTenant, user, userRole]);
+  }, [currentTenant, user, effectiveGlobalRole]);
 
   useEffect(() => {
     let cancelled = false;
@@ -405,7 +405,7 @@ export function UserAdminPage() {
     );
   }
 
-  const isGlobalAdmin = userRole === "admin" || userRole === "superadmin";
+  const isGlobalAdmin = effectiveGlobalRole === "system_admin";
 
   if (!user || (!currentTenant && !isGlobalAdmin) || !canViewUsers) {
     return (

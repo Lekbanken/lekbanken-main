@@ -2,23 +2,39 @@
  * Auth Context Hook
  *
  * Provides authentication state and methods to React components.
- * Handles user session, login, logout, signup and MFA.
+ * Supports server-hydrated initial state to avoid client-side flicker.
  */
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useRef } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+  useMemo,
+} from 'react'
 import { useRouter } from 'next/navigation'
-import { User } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
-import type { Database } from '@/types/supabase'
+import type { GlobalRole, UserProfile } from '@/types/auth'
+import type { TenantMembership } from '@/types/tenant'
 
-type UserProfile = Database['public']['Tables']['users']['Row']
+interface AuthProviderProps {
+  children: ReactNode
+  initialUser?: User | null
+  initialProfile?: UserProfile | null
+  initialMemberships?: TenantMembership[]
+}
 
 interface AuthContextType {
   user: User | null
   userProfile: UserProfile | null
-  userRole: string | null
+  memberships: TenantMembership[]
+  effectiveGlobalRole: GlobalRole | null
+  userRole: GlobalRole | null // Deprecated alias
   isLoading: boolean
   isAuthenticated: boolean
   signUp: (email: string, password: string, fullName?: string) => Promise<void>
@@ -32,35 +48,38 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+function deriveEffectiveGlobalRole(profile: UserProfile | null, user: User | null): GlobalRole | null {
+  if (profile?.global_role) return profile.global_role as GlobalRole
+  if (user?.app_metadata?.role === 'system_admin') return 'system_admin'
+  if (profile?.role === 'superadmin' || profile?.role === 'admin') return 'system_admin'
+  return null
+}
+
+export function AuthProvider({
+  children,
+  initialUser,
+  initialProfile,
+  initialMemberships,
+}: AuthProviderProps) {
   const router = useRouter()
-  const [user, setUser] = useState<User | null>(null)
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const userProfileRef = useRef<UserProfile | null>(null)
-  
-  // Keep ref in sync with state
-  useEffect(() => {
-    userProfileRef.current = userProfile
-  }, [userProfile])
+
+  const [user, setUser] = useState<User | null>(initialUser ?? null)
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(initialProfile ?? null)
+  const [memberships, setMemberships] = useState<TenantMembership[]>(initialMemberships ?? [])
+  const [isLoading, setIsLoading] = useState(initialUser === undefined)
+
+  const effectiveGlobalRole = useMemo(
+    () => deriveEffectiveGlobalRole(userProfile, user),
+    [userProfile, user]
+  )
 
   const ensureProfile = useCallback(async (currentUser: User) => {
-    console.log('[auth] ensureProfile called for:', { userId: currentUser.id, email: currentUser.email })
     try {
-      // First, try to find profile by auth user ID
       const { data: profile, error } = await supabase
         .from('users')
         .select('*')
         .eq('id', currentUser.id)
         .maybeSingle()
-
-      // DEBUG
-      console.log('[auth] ensureProfile result:', { 
-        userId: currentUser.id, 
-        profile: profile ? { id: profile.id, email: profile.email, full_name: profile.full_name } : null, 
-        error: error?.message,
-        errorCode: error?.code 
-      })
 
       if (error && error.code !== 'PGRST116') {
         console.warn('ensureProfile select error:', error)
@@ -69,10 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (profile) return profile as UserProfile
 
-      // Profile not found by ID - try fallback search by email
-      // This handles the case where Google OAuth creates a new auth user for existing email
       if (currentUser.email) {
-        console.log('[auth] Profile not found by ID, trying email fallback:', currentUser.email)
         const { data: emailProfile, error: emailError } = await supabase
           .from('users')
           .select('*')
@@ -84,18 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         if (emailProfile) {
-          console.log('[auth] Found profile by email, ID mismatch detected:', {
-            authUserId: currentUser.id,
-            profileId: emailProfile.id,
-            email: currentUser.email
-          })
-          // The database trigger should fix this on next auth event, but we return the profile
-          // Note: The profile ID doesn't match auth ID - this will be fixed by the database trigger
           return emailProfile as UserProfile
         }
       }
 
-      // Profil saknas och vi försöker inte skapa från klienten p.g.a. RLS.
       console.warn('ensureProfile: profile missing and upsert skipped (RLS/client)', currentUser.id)
       return null
     } catch (err) {
@@ -104,99 +112,89 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const fetchProfile = useCallback(async (currentUser: User) => {
-    const profile = await ensureProfile(currentUser)
-    setUserProfile(profile ?? null)
-  }, [ensureProfile])
+  const fetchProfile = useCallback(
+    async (currentUser: User) => {
+      const profile = await ensureProfile(currentUser)
+      setUserProfile(profile ?? null)
+    },
+    [ensureProfile]
+  )
 
-  // Initialize auth state on mount
+  const fetchMemberships = useCallback(async (currentUser: User) => {
+    const { data, error } = await supabase
+      .from('user_tenant_memberships')
+      .select('*, tenant:tenants(*)')
+      .eq('user_id', currentUser.id)
+
+    if (error) {
+      console.warn('[auth] fetchMemberships error:', error)
+      return
+    }
+
+    setMemberships((data as TenantMembership[]) ?? [])
+  }, [])
+
   useEffect(() => {
+    // Skip client init if server provided initial data (including null)
+    if (initialUser !== undefined) {
+      setIsLoading(false)
+      return
+    }
+
     const initAuth = async () => {
-      console.log('[auth] initAuth starting...')
       try {
-        // Use getUser() instead of getSession() for security
         const {
           data: { user: authUser },
-          error: userError,
         } = await supabase.auth.getUser()
-
-        console.log('[auth] getUser result:', { hasUser: !!authUser, userId: authUser?.id, error: userError?.message })
 
         if (authUser) {
           setUser(authUser)
-          await fetchProfile(authUser)
-          console.info('[auth] session init complete', {
-            userId: authUser.id,
-            roleMeta: authUser.app_metadata?.role,
-          })
-        } else {
-          console.log('[auth] No user found')
+          await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
         }
       } catch (error) {
         console.error('Error initializing auth:', error)
       } finally {
-        console.log('[auth] initAuth done, setting isLoading=false')
         setIsLoading(false)
       }
     }
 
     void initAuth()
+  }, [fetchMemberships, fetchProfile, initialUser])
 
-    // Listen to auth changes
+  useEffect(() => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[auth] onAuthStateChange:', event, { hasSession: !!session, userId: session?.user?.id })
-      
-      // Skip INITIAL_SESSION if we already loaded via initAuth
-      if (event === 'INITIAL_SESSION') {
-        console.log('[auth] INITIAL_SESSION - skipping (already handled by initAuth)')
-        return
-      }
-      
+      if (event === 'INITIAL_SESSION') return
+
       if (event === 'SIGNED_OUT') {
-        // Clear tenant cookie on client side as backup
         if (typeof document !== 'undefined') {
           document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
         }
         setUser(null)
         setUserProfile(null)
+        setMemberships([])
         return
       }
-      
+
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
-        await fetchProfile(session.user)
-        // Refresh to ensure server components see the new session
+        await Promise.all([fetchProfile(session.user), fetchMemberships(session.user)])
         router.refresh()
-        console.info('[auth] SIGNED_IN', {
-          userId: session.user.id,
-          roleMeta: session.user.app_metadata?.role,
-        })
         return
       }
-      
-      // TOKEN_REFRESHED or other events
+
       if (session?.user) {
         setUser(session.user)
-        // Only refetch profile if we don't have one or if user ID changed
-        const currentProfile = userProfileRef.current
-        if (!currentProfile || currentProfile.id !== session.user.id) {
-          await fetchProfile(session.user)
-        }
-        console.info('[auth] auth change', {
-          userId: session.user.id,
-          expiresAt: session.expires_at,
-          roleMeta: session.user.app_metadata?.role,
-        })
       } else {
         setUser(null)
         setUserProfile(null)
+        setMemberships([])
       }
     })
 
     return () => subscription?.unsubscribe()
-  }, [fetchProfile, router])
+  }, [fetchMemberships, fetchProfile, router])
 
   const signUp = useCallback(async (email: string, password: string, fullName?: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -212,8 +210,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
     if (data.user) {
       setUser(data.user)
+      await Promise.all([fetchProfile(data.user), fetchMemberships(data.user)])
     }
-  }, [])
+  }, [fetchMemberships, fetchProfile])
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -224,8 +223,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error
     if (data.user) {
       setUser(data.user)
-      await fetchProfile(data.user)
-      // Fire-and-forget to register session/device
+      await Promise.all([fetchProfile(data.user), fetchMemberships(data.user)])
       void fetch('/api/accounts/devices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -237,13 +235,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }).catch(() => {})
       void fetch('/api/accounts/sessions', { method: 'GET' }).catch(() => {})
     }
-  }, [fetchProfile])
+  }, [fetchMemberships, fetchProfile])
 
   const signInWithGoogle = useCallback(async (redirectTo?: string) => {
-    // Get redirect from URL params if not provided
     const urlParams = new URLSearchParams(window.location.search)
     const nextUrl = redirectTo || urlParams.get('redirect') || urlParams.get('next') || '/app'
-    
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -256,32 +253,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     try {
-      // Call server-side signout to properly clear httpOnly cookies
       const response = await fetch('/auth/signout', {
         method: 'POST',
-        headers: { 'Accept': 'application/json' },
+        headers: { Accept: 'application/json' },
       })
-      
+
       if (!response.ok) {
-        console.warn('[auth] Server signout failed, falling back to client signout')
         await supabase.auth.signOut()
       }
     } catch (err) {
-      console.warn('[auth] Server signout error, falling back to client signout:', err)
       await supabase.auth.signOut()
     }
-    
-    // Clear client state
+
     setUser(null)
     setUserProfile(null)
-    
-    // Clear tenant cookie on client side as backup
+    setMemberships([])
+
     if (typeof document !== 'undefined') {
       document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
     }
-    
-    // Hard redirect to login - forces full page reload to clear all React state
-    // router.push() does soft navigation which can keep cached state
+
     window.location.href = '/auth/login?signedOut=true'
   }, [])
 
@@ -334,16 +325,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchProfile, user])
 
-  const fallbackRole = userProfile?.role || (user?.app_metadata?.role as string | undefined) || null
-
-  if (!userProfile && !fallbackRole && user) {
-    console.warn('[auth] userRole unresolved (no profile/app_metadata.role)', { userId: user.id })
-  }
-
   const value: AuthContextType = {
     user,
     userProfile,
-    userRole: fallbackRole,
+    memberships,
+    effectiveGlobalRole,
+    userRole: effectiveGlobalRole,
     isLoading,
     isAuthenticated: !!user,
     signUp,

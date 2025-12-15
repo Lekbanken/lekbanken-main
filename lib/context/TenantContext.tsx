@@ -2,24 +2,29 @@
  * Tenant Context Hook
  *
  * Manages tenant selection, user's tenant memberships, and tenant-specific state.
- * Provides access to current tenant and tenant switching functionality.
+ * Supports server-hydrated initial state.
  */
 
 'use client'
 
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode, useTransition, useRef } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  ReactNode,
+  useTransition,
+  useRef,
+} from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { resolveCurrentTenant, selectTenant as selectTenantAction } from '@/app/actions/tenant'
-import type { Database } from '@/types/supabase'
-
-type Tenant = Database['public']['Tables']['tenants']['Row']
-type UserTenantMembership = any & {
-  tenant: Tenant
-}
+import type { Tenant, TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
 
 interface TenantContextType {
-  currentTenant: (Tenant & { membership: UserTenantMembership }) | null
-  userTenants: (Tenant & { membership: UserTenantMembership })[]
+  currentTenant: TenantWithMembership | null
+  userTenants: TenantWithMembership[]
+  tenantRole: TenantRole | null
   isLoadingTenants: boolean
   hasTenants: boolean
   selectTenant: (tenantId: string) => void
@@ -27,23 +32,60 @@ interface TenantContextType {
   reloadTenants: () => Promise<void>
 }
 
+type TenantProviderProps = {
+  children: ReactNode
+  userId: string | null
+  initialTenant?: TenantWithMembership | null
+  initialRole?: TenantRole | null
+  initialMemberships?: TenantMembership[]
+}
+
+function mapMembershipsToTenants(memberships: TenantMembership[]): TenantWithMembership[] {
+  return memberships
+    .filter((m) => m.tenant && m.tenant_id)
+    .map((m) => ({
+      ...m.tenant!,
+      membership: {
+        tenant_id: m.tenant_id!,
+        role: (m.role ?? 'member') as TenantRole,
+        is_primary: m.is_primary,
+        status: m.status ?? null,
+      },
+    }))
+}
+
 export const TenantContext = createContext<TenantContextType | undefined>(undefined)
 
-export function TenantProvider({ children, userId }: { children: ReactNode; userId: string | null }) {
-  const [currentTenant, setCurrentTenant] = useState<(Tenant & { membership: UserTenantMembership }) | null>(null)
-  const [userTenants, setUserTenants] = useState<(Tenant & { membership: UserTenantMembership })[]>([])
-  const [isLoadingTenants, setIsLoadingTenants] = useState(true)
-  const [hasTenants, setHasTenants] = useState(false)
+export function TenantProvider({
+  children,
+  userId,
+  initialTenant,
+  initialRole,
+  initialMemberships,
+}: TenantProviderProps) {
+  const hasInitial = initialTenant !== undefined || initialMemberships !== undefined
+
+  const [currentTenant, setCurrentTenant] = useState<TenantWithMembership | null>(() => {
+    if (initialTenant) {
+      return initialTenant
+    }
+    return null
+  })
+  const [userTenants, setUserTenants] = useState<TenantWithMembership[]>(() =>
+    initialMemberships ? mapMembershipsToTenants(initialMemberships) : []
+  )
+  const [isLoadingTenants, setIsLoadingTenants] = useState(!hasInitial)
+  const [hasTenants, setHasTenants] = useState(
+    initialMemberships ? initialMemberships.length > 0 : false
+  )
   const [, startTransition] = useTransition()
-  
-  // Track previous userId to detect user changes
+
   const prevUserIdRef = useRef<string | null>(null)
 
-  // Load user's tenants
+  const tenantRole = currentTenant?.membership?.role ?? initialRole ?? null
+
   const loadTenants = useCallback(async () => {
-    console.log('[TenantContext] loadTenants called, userId:', userId)
     if (!userId) {
-      console.log('[TenantContext] No userId, clearing tenant state')
       setCurrentTenant(null)
       setUserTenants([])
       setHasTenants(false)
@@ -53,49 +95,41 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
 
     try {
       setIsLoadingTenants(true)
-      console.log('[TenantContext] Calling resolveCurrentTenant...')
       const resolved = await resolveCurrentTenant()
-      console.log('[TenantContext] resolveCurrentTenant result:', resolved)
-
-      const tenantsWithMembership = (resolved.tenants || []) as (Tenant & { membership: UserTenantMembership })[]
+      const tenantsWithMembership = (resolved.tenants as TenantWithMembership[]) || []
 
       setUserTenants(tenantsWithMembership)
       setHasTenants(tenantsWithMembership.length > 0)
-      setCurrentTenant((resolved.tenant as Tenant & { membership: UserTenantMembership }) ?? null)
+      setCurrentTenant((resolved.tenant as TenantWithMembership) ?? null)
     } catch (error) {
       console.error('Error loading tenants:', error)
     } finally {
-      console.log('[TenantContext] loadTenants done, setting isLoadingTenants=false')
       setIsLoadingTenants(false)
     }
   }, [userId])
 
-  // Reload tenants when userId changes (including login/logout)
   useEffect(() => {
     const userChanged = prevUserIdRef.current !== userId
     prevUserIdRef.current = userId
-    
-    if (userChanged) {
-      console.log('[TenantContext] User changed, reloading tenants', { prev: prevUserIdRef.current, new: userId })
+
+    if (userChanged || !hasInitial) {
+      loadTenants()
     }
-    
-    loadTenants()
-  }, [userId, loadTenants])
-  
-  // Listen to auth state changes to refresh tenants on SIGNED_IN
+  }, [hasInitial, loadTenants, userId])
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
-        console.log('[TenantContext] SIGNED_IN detected, reloading tenants')
         loadTenants()
       } else if (event === 'SIGNED_OUT') {
-        console.log('[TenantContext] SIGNED_OUT detected, clearing tenants')
         setCurrentTenant(null)
         setUserTenants([])
         setHasTenants(false)
       }
     })
-    
+
     return () => subscription?.unsubscribe()
   }, [loadTenants])
 
@@ -104,7 +138,7 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
       startTransition(async () => {
         const result = await selectTenantAction(tenantId)
         if (result.tenant) {
-          setCurrentTenant(result.tenant as Tenant & { membership: UserTenantMembership })
+          setCurrentTenant(result.tenant as TenantWithMembership)
           await loadTenants()
         }
       })
@@ -116,7 +150,6 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
     async (name: string, type: string): Promise<Tenant> => {
       if (!userId) throw new Error('No user logged in')
 
-      // Create tenant
       const { data: tenant, error: tenantError } = await supabase
         .from('tenants')
         .insert([
@@ -132,7 +165,6 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
 
       if (tenantError) throw tenantError
 
-      // Add user as owner via security definer function to satisfy RLS on fresh tenants
       const { error: membershipError } = await supabase.rpc('add_initial_tenant_owner', {
         target_tenant: tenant.id,
       })
@@ -143,7 +175,7 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
 
       return tenant
     },
-    [userId, selectTenant]
+    [selectTenant, userId]
   )
 
   const reloadTenants = useCallback(async () => {
@@ -153,6 +185,7 @@ export function TenantProvider({ children, userId }: { children: ReactNode; user
   const value: TenantContextType = {
     currentTenant,
     userTenants,
+    tenantRole,
     isLoadingTenants,
     hasTenants,
     selectTenant,

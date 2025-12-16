@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
   PuzzlePieceIcon,
   PlusIcon,
@@ -11,11 +12,15 @@ import {
   XCircleIcon,
   PencilSquareIcon,
   TrashIcon,
+  EllipsisVerticalIcon,
+  WrenchScrewdriverIcon,
+  UserGroupIcon,
+  ClockIcon,
+  BoltIcon,
 } from '@heroicons/react/24/outline';
 import {
   AdminBreadcrumbs,
   AdminBulkActions,
-  AdminDataTable,
   AdminEmptyState,
   AdminErrorState,
   AdminPageHeader,
@@ -442,117 +447,156 @@ export function GameAdminPage() {
             }
           />
 
-          <AdminDataTable
-            data={pageSlice}
-            isLoading={isLoading}
-            keyAccessor="id"
-            selectable
-            isRowSelected={selection.isSelected}
-            onToggleRow={selection.toggle}
-            onToggleAll={selection.toggleAll}
-            allSelected={selection.allSelected}
-            someSelected={selection.someSelected}
-            emptyState={
-              <AdminEmptyState
-                icon={<PuzzlePieceIcon className="h-6 w-6" />}
-                title="Inga spel matchar filtren"
-                description="Justera filter eller lägg till ett nytt spel."
-              />
-            }
-            onRowClick={(row) => router.push(`/admin/games/${row.id}/edit`)}
-            columns={[
-              {
-                header: 'Namn',
-                accessor: (row) => row.name,
-                cell: (row) => (
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-foreground">{row.name}</span>
-                      <Badge variant={row.status === 'published' ? 'success' : 'secondary'} className="capitalize">
-                        {row.status === 'published' ? 'Publicerad' : 'Utkast'}
-                      </Badge>
+          {/* Game List */}
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            </div>
+          ) : pageSlice.length === 0 ? (
+            <AdminEmptyState
+              icon={<PuzzlePieceIcon className="h-6 w-6" />}
+              title="Inga spel matchar filtren"
+              description="Justera filter eller lägg till ett nytt spel."
+            />
+          ) : (
+            <ul role="list" className="divide-y divide-border">
+              {pageSlice.map((game) => (
+                <li key={game.id} className="flex items-center justify-between gap-x-6 py-5">
+                  {/* Checkbox */}
+                  <div className="flex items-center gap-x-4">
+                    <input
+                      type="checkbox"
+                      checked={selection.isSelected(game)}
+                      onChange={() => selection.toggle(game)}
+                      aria-label={`Välj ${game.name}`}
+                      className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                    />
+                    
+                    {/* Game info */}
+                    <div className="min-w-0 flex-auto">
+                      <div className="flex items-start gap-x-3">
+                        <p className="text-sm font-semibold text-foreground">{game.name}</p>
+                        <Badge 
+                          variant={game.status === 'published' ? 'success' : 'secondary'}
+                          className="mt-0.5"
+                        >
+                          {game.status === 'published' ? 'Publicerad' : 'Utkast'}
+                        </Badge>
+                        {game.category && (
+                          <Badge variant="outline" className="mt-0.5">
+                            {game.category}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
+                        {game.short_description || game.description || 'Ingen beskrivning'}
+                      </p>
+                      <div className="mt-2 flex items-center gap-x-4 text-xs text-muted-foreground">
+                        {game.min_players && (
+                          <div className="flex items-center gap-x-1">
+                            <UserGroupIcon className="h-4 w-4" />
+                            <span>{game.min_players} - {game.max_players ?? '?'}</span>
+                          </div>
+                        )}
+                        {game.time_estimate_min && (
+                          <div className="flex items-center gap-x-1">
+                            <ClockIcon className="h-4 w-4" />
+                            <span>{game.time_estimate_min} min</span>
+                          </div>
+                        )}
+                        {game.energy_level && (
+                          <div className="flex items-center gap-x-1">
+                            <BoltIcon className="h-4 w-4" />
+                            <span className="capitalize">{game.energy_level}</span>
+                          </div>
+                        )}
+                        <span className="text-muted-foreground/60">•</span>
+                        <span>{game.owner?.name || 'Global'}</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2">
-                      {row.short_description || row.description || 'Ingen beskrivning'}
-                    </p>
                   </div>
-                ),
-                width: 'w-[280px]',
-              },
-              {
-                header: 'Kategori',
-                accessor: (row) => row.category || '-',
-                hideBelow: 'md',
-              },
-              {
-                header: 'Energi',
-                accessor: (row) => row.energy_level || '-',
-                hideBelow: 'md',
-              },
-              {
-                header: 'Spelare',
-                accessor: (row) => `${row.min_players ?? '?'} - ${row.max_players ?? '?'}`,
-                hideBelow: 'md',
-              },
-              {
-                header: 'Tid',
-                accessor: (row) => (row.time_estimate_min ? `${row.time_estimate_min} min` : '-'),
-                hideBelow: 'lg',
-              },
-              {
-                header: 'Ägare',
-                accessor: (row) => row.owner?.name || 'Global',
-              },
-              {
-                header: 'Uppdaterad',
-                accessor: (row) => new Date(row.updated_at).toLocaleDateString(),
-                hideBelow: 'lg',
-              },
-              {
-                header: 'Åtgärder',
-                accessor: 'id',
-                cell: (row) => (
-                  <div className="flex flex-wrap items-center gap-2">
+
+                  {/* Actions */}
+                  <div className="flex flex-none items-center gap-x-4">
                     {canEdit && (
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/games/${row.id}/edit`)}>
-                        <PencilSquareIcon className="mr-1 h-4 w-4" />
-                        Redigera
-                      </Button>
-                    )}
-                    {canEdit && (
-                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/games/${row.id}/edit`)}>
-                        <PencilSquareIcon className="mr-1 h-4 w-4" />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/admin/games/${game.id}/builder`)}
+                        className="hidden sm:flex"
+                      >
+                        <WrenchScrewdriverIcon className="mr-1.5 h-4 w-4" />
                         Builder
                       </Button>
                     )}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handlePublishToggle(row, row.status === 'published' ? 'draft' : 'published')}
-                    >
-                      {row.status === 'published' ? (
-                        <>
-                          <XCircleIcon className="mr-1 h-4 w-4" />
-                          Gör till utkast
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircleIcon className="mr-1 h-4 w-4" />
-                          Publicera
-                        </>
-                      )}
-                    </Button>
-                    {canEdit && (
-                      <Button variant="ghost" size="sm" onClick={() => setDeleteTarget(row)}>
-                        <TrashIcon className="mr-1 h-4 w-4" />
-                        Ta bort
-                      </Button>
-                    )}
+                    
+                    <Menu as="div" className="relative flex-none">
+                      <MenuButton className="-m-2.5 block p-2.5 text-muted-foreground hover:text-foreground">
+                        <span className="sr-only">Öppna meny</span>
+                        <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
+                      </MenuButton>
+                      <MenuItems
+                        transition
+                        className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-popover py-2 shadow-lg ring-1 ring-border focus:outline-none transition data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[enter]:ease-out data-[leave]:duration-75 data-[leave]:ease-in"
+                      >
+                        {canEdit && (
+                          <MenuItem>
+                            <button
+                              onClick={() => router.push(`/admin/games/${game.id}/edit`)}
+                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted"
+                            >
+                              <PencilSquareIcon className="h-4 w-4" />
+                              Redigera
+                            </button>
+                          </MenuItem>
+                        )}
+                        {canEdit && (
+                          <MenuItem>
+                            <button
+                              onClick={() => router.push(`/admin/games/${game.id}/builder`)}
+                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted sm:hidden"
+                            >
+                              <WrenchScrewdriverIcon className="h-4 w-4" />
+                              Builder
+                            </button>
+                          </MenuItem>
+                        )}
+                        <MenuItem>
+                          <button
+                            onClick={() => handlePublishToggle(game, game.status === 'published' ? 'draft' : 'published')}
+                            className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted"
+                          >
+                            {game.status === 'published' ? (
+                              <>
+                                <XCircleIcon className="h-4 w-4" />
+                                Gör till utkast
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircleIcon className="h-4 w-4" />
+                                Publicera
+                              </>
+                            )}
+                          </button>
+                        </MenuItem>
+                        {canEdit && (
+                          <MenuItem>
+                            <button
+                              onClick={() => setDeleteTarget(game)}
+                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-destructive data-[focus]:bg-muted"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                              Ta bort
+                            </button>
+                          </MenuItem>
+                        )}
+                      </MenuItems>
+                    </Menu>
                   </div>
-                ),
-              },
-            ]}
-          />
+                </li>
+              ))}
+            </ul>
+          )}
 
           <AdminPagination
             currentPage={current}

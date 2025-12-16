@@ -148,11 +148,11 @@ export async function POST(request: Request) {
       return NextResponse.json(dryRunResult);
     }
 
-    // If there are errors, don't proceed with import
-    if (validationResult.allErrors.length > 0) {
+    // If there are NO valid games, don't proceed with import
+    if (validationResult.validGames.length === 0) {
       return NextResponse.json({
         success: false,
-        error: 'Valideringsfel hittades',
+        error: 'Inga giltiga spel att importera',
         stats: {
           total: parsedGames.length,
           created: 0,
@@ -164,7 +164,7 @@ export async function POST(request: Request) {
       }, { status: 400 });
     }
 
-    // Proceed with actual import
+    // Proceed with actual import (only valid games)
     const supabase = await createServiceRoleClient();
     const db = supabase as AnySupabase;
 

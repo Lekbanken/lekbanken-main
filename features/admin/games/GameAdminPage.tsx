@@ -284,6 +284,13 @@ export function GameAdminPage() {
   };
 
   const handleImport = async (items: ImportableGame[]) => {
+    // If items is empty, the import was done via CSV API - just reload the list
+    if (items.length === 0) {
+      await loadGames();
+      success('Import klar! Spellistta uppdaterad.');
+      return;
+    }
+
     const created: GameWithRelations[] = [];
     const failures: string[] = [];
 

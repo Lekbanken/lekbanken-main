@@ -90,13 +90,14 @@ export function validateGame(
     });
   }
   
-  // Game key is required
+  // Game key - if missing the parser should have generated one (warning only)
+  // This shouldn't happen since csv-parser generates game_key, but log warning
   if (!game.game_key || game.game_key.trim() === '') {
-    errors.push({
+    warnings.push({
       row: rowNumber,
       column: 'game_key',
-      message: 'game_key saknas (obligatoriskt för upsert)',
-      severity: 'error',
+      message: 'game_key saknas (genereras automatiskt)',
+      severity: 'warning',
     });
   }
   

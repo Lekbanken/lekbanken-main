@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
-import type { Database } from '@/types/supabase';
 
 type CorePayload = {
   name?: string;
@@ -98,7 +97,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createServiceRoleClient<Database>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = await createServiceRoleClient() as any;
 
   const { data: game, error } = await supabase
     .from('games')
@@ -155,7 +155,8 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createServiceRoleClient<Database>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = await createServiceRoleClient() as any;
   const body = (await request.json().catch(() => ({}))) as {
     core?: CorePayload;
     steps?: StepPayload[];

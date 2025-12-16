@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import type React from 'react';
 import { AdminBreadcrumbs, AdminEmptyState, AdminErrorState, AdminPageHeader, AdminPageLayout, AdminStatCard, AdminStatGrid } from '@/components/admin/shared';
 import { AdminExportButton } from '@/components/admin/shared/AdminExportButton';
 import { Button, Card, CardContent, CardHeader, CardTitle, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Input, Select } from '@/components/ui';
@@ -12,6 +13,7 @@ type PurposeRow = Database['public']['Tables']['purposes']['Row'];
 
 export default function PurposesPage() {
   const { can } = useRbac();
+  const canView = can('admin.products.list');
   const [purposes, setPurposes] = useState<PurposeRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,29 +38,29 @@ export default function PurposesPage() {
   }, [mainPurposes, subPurposes]);
 
   useEffect(() => {
-    let fetched = false;
-    if (!can('admin.products.list') || fetched) return;
-    setIsLoading(true);
-    setError(null);
-    void fetch('/api/purposes')
-      .then(async (res) => {
-        if (!res.ok) {
-          const json = await res.json().catch(() => ({}));
-          throw new Error(json.error || 'Kunde inte ladda syften');
+    if (!canView) return;
+    let cancelled = false;
+    void (async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await fetch('/api/purposes');
+        const json = (await res.json().catch(() => ({}))) as { purposes?: PurposeRow[]; error?: string };
+        if (!res.ok) throw new Error(json.error || 'Kunde inte ladda syften');
+        if (!cancelled) {
+          setPurposes(json.purposes || []);
         }
-        const json = (await res.json()) as { purposes?: PurposeRow[] };
-        setPurposes(json.purposes || []);
-        fetched = true;
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('[admin/purposes] load error', err);
-        setError('Kunde inte ladda syften just nu.');
-      })
-      .finally(() => setIsLoading(false));
+        if (!cancelled) setError('Kunde inte ladda syften just nu.');
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    })();
     return () => {
-      fetched = true;
+      cancelled = true;
     };
-  }, [can]);
+  }, [canView]);
 
   const openCreate = () => {
     setEditing(null);
@@ -77,7 +79,7 @@ export default function PurposesPage() {
     setDialogOpen(true);
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     const payload = {

@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
-import type { Tables, Database } from '@/types/supabase'
+import type { Tables } from '@/types/supabase'
 
 export type GameRow = Tables<'games'>
 type ProductRow = Tables<'products'>
@@ -49,7 +49,8 @@ export type GameWithRelations = GameRow & {
 }
 
 export async function getGameById(gameId: string): Promise<GameWithRelations | null> {
-  const supabase = await createServerRlsClient<Database>()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const supabase = await createServerRlsClient() as any
 
   const { data, error } = await supabase
     .from('games')

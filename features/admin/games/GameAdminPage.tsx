@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import {
   PuzzlePieceIcon,
   PlusIcon,
@@ -32,7 +31,20 @@ import {
   bulkActionPresets,
   useTableSelection,
 } from '@/components/admin/shared';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select, useToast } from '@/components/ui';
+import { 
+  Badge, 
+  Button, 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle, 
+  Select, 
+  useToast,
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui';
 import { AdminConfirmDialog } from '@/components/admin/shared/AdminConfirmDialog';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
 import type { Database } from '@/types/supabase';
@@ -530,68 +542,55 @@ export function GameAdminPage() {
                       </Button>
                     )}
                     
-                    <Menu as="div" className="relative flex-none">
-                      <MenuButton className="-m-2.5 block p-2.5 text-muted-foreground hover:text-foreground">
-                        <span className="sr-only">Öppna meny</span>
-                        <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
-                      </MenuButton>
-                      <MenuItems
-                        transition
-                        className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-popover py-2 shadow-lg ring-1 ring-border focus:outline-none transition data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[enter]:ease-out data-[leave]:duration-75 data-[leave]:ease-in"
-                      >
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <button className="-m-2.5 block p-2.5 text-muted-foreground hover:text-foreground">
+                          <span className="sr-only">Öppna meny</span>
+                          <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
                         {canEdit && (
-                          <MenuItem>
-                            <button
-                              onClick={() => router.push(`/admin/games/${game.id}/edit`)}
-                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted"
-                            >
-                              <PencilSquareIcon className="h-4 w-4" />
-                              Redigera
-                            </button>
-                          </MenuItem>
+                          <DropdownMenuItem onClick={() => router.push(`/admin/games/${game.id}/edit`)}>
+                            <PencilSquareIcon className="h-4 w-4" />
+                            Redigera
+                          </DropdownMenuItem>
                         )}
                         {canEdit && (
-                          <MenuItem>
-                            <button
-                              onClick={() => router.push(`/admin/games/${game.id}/builder`)}
-                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted sm:hidden"
-                            >
-                              <WrenchScrewdriverIcon className="h-4 w-4" />
-                              Builder
-                            </button>
-                          </MenuItem>
-                        )}
-                        <MenuItem>
-                          <button
-                            onClick={() => handlePublishToggle(game, game.status === 'published' ? 'draft' : 'published')}
-                            className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-foreground data-[focus]:bg-muted"
+                          <DropdownMenuItem 
+                            onClick={() => router.push(`/admin/games/${game.id}/builder`)}
+                            className="sm:hidden"
                           >
-                            {game.status === 'published' ? (
-                              <>
-                                <XCircleIcon className="h-4 w-4" />
-                                Gör till utkast
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircleIcon className="h-4 w-4" />
-                                Publicera
-                              </>
-                            )}
-                          </button>
-                        </MenuItem>
-                        {canEdit && (
-                          <MenuItem>
-                            <button
-                              onClick={() => setDeleteTarget(game)}
-                              className="flex w-full items-center gap-x-2 px-3 py-2 text-sm text-destructive data-[focus]:bg-muted"
-                            >
-                              <TrashIcon className="h-4 w-4" />
-                              Ta bort
-                            </button>
-                          </MenuItem>
+                            <WrenchScrewdriverIcon className="h-4 w-4" />
+                            Builder
+                          </DropdownMenuItem>
                         )}
-                      </MenuItems>
-                    </Menu>
+                        <DropdownMenuItem
+                          onClick={() => handlePublishToggle(game, game.status === 'published' ? 'draft' : 'published')}
+                        >
+                          {game.status === 'published' ? (
+                            <>
+                              <XCircleIcon className="h-4 w-4" />
+                              Gör till utkast
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircleIcon className="h-4 w-4" />
+                              Publicera
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        {canEdit && (
+                          <DropdownMenuItem
+                            destructive
+                            onClick={() => setDeleteTarget(game)}
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                            Ta bort
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </li>
               ))}

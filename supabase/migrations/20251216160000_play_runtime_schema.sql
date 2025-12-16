@@ -187,7 +187,7 @@ CREATE POLICY "session_roles_select_assigned" ON public.session_roles
       SELECT 1 FROM public.participant_role_assignments pra
       JOIN public.participants p ON p.id = pra.participant_id
       WHERE pra.session_role_id = session_roles.id
-      AND p.token_hash IS NOT NULL
+      AND p.participant_token IS NOT NULL
       -- Token verification happens at API layer
     )
   );

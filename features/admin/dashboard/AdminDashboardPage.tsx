@@ -90,11 +90,11 @@ const quickLinks: QuickLinkItem[] = [
 ];
 
 const activity: ActivityItem[] = [
-  { id: "1", type: "user_created", message: "New user invited: alex.berg@lekbanken.test", createdAt: new Date().toISOString(), status: "info" },
-  { id: "2", type: "organisation_created", message: "Organisation added: Sunrise Schools", createdAt: new Date(Date.now() - 1000 * 60 * 35).toISOString(), status: "success" },
-  { id: "3", type: "achievement_created", message: "Achievement published: Core Pathfinder", createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(), status: "success" },
-  { id: "4", type: "product_updated", message: "Product updated: Gamification Pro capabilities", createdAt: new Date(Date.now() - 1000 * 60 * 240).toISOString(), status: "info" },
-  { id: "5", type: "license_updated", message: "License warning: 3 orgs near seat limit", createdAt: new Date(Date.now() - 1000 * 60 * 360).toISOString(), status: "warning" },
+  { id: "1", type: "user_created", message: "New user invited: alex.berg@lekbanken.test", createdAt: "2025-12-15T10:00:00Z", createdAtLabel: "Just now", status: "info" },
+  { id: "2", type: "organisation_created", message: "Organisation added: Sunrise Schools", createdAt: "2025-12-15T09:25:00Z", createdAtLabel: "35m ago", status: "success" },
+  { id: "3", type: "achievement_created", message: "Achievement published: Core Pathfinder", createdAt: "2025-12-15T08:30:00Z", createdAtLabel: "1h ago", status: "success" },
+  { id: "4", type: "product_updated", message: "Product updated: Gamification Pro capabilities", createdAt: "2025-12-15T06:00:00Z", createdAtLabel: "4h ago", status: "info" },
+  { id: "5", type: "license_updated", message: "License warning: 3 orgs near seat limit", createdAt: "2025-12-15T04:00:00Z", createdAtLabel: "6h ago", status: "warning" },
 ];
 
 export function AdminDashboardPage() {

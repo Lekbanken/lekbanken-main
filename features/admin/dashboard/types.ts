@@ -25,6 +25,8 @@ export type ActivityItem = {
   type: "user_created" | "organisation_created" | "product_updated" | "achievement_created" | "license_updated" | "other";
   message: string;
   createdAt: string;
+  /** Optional preformatted label to avoid hydration drift when statically rendered */
+  createdAtLabel?: string;
   status?: "info" | "success" | "warning";
   icon?: ReactNode;
 };

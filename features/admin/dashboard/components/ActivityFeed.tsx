@@ -144,7 +144,7 @@ export function ActivityFeed({ items }: ActivityFeedProps) {
                       {item.message}
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      {formatTime(item.createdAt)}
+                      {item.createdAtLabel ?? formatTime(item.createdAt)}
                     </p>
                   </div>
                 </li>

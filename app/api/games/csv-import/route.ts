@@ -87,6 +87,9 @@ export async function POST(request: Request) {
           space_requirements: item.space_requirements || null,
           leader_tips: item.leader_tips || null,
           main_purpose_id: item.main_purpose_id || null,
+          sub_purpose_ids: Array.isArray(item.sub_purpose_ids) 
+            ? item.sub_purpose_ids 
+            : (item.sub_purpose_id ? [item.sub_purpose_id] : []),
           product_id: item.product_id || null,
           owner_tenant_id: item.owner_tenant_id || null,
           steps: item.steps || [],
@@ -188,7 +191,7 @@ export async function POST(request: Request) {
             .eq('game_key', game.game_key)
             .maybeSingle();
           
-          if (existing) {
+          if (existing && existing.id) {
             existingGameId = existing.id;
           }
         }
@@ -299,6 +302,16 @@ async function importRelatedData(
     await db.from('game_phases').delete().eq('game_id', gameId);
     await db.from('game_roles').delete().eq('game_id', gameId);
     await db.from('game_board_config').delete().eq('game_id', gameId);
+    await db.from('game_secondary_purposes').delete().eq('game_id', gameId);
+  }
+
+  // Insert secondary purposes (sub-purposes)
+  if (game.sub_purpose_ids && game.sub_purpose_ids.length > 0) {
+    const purposeRows = game.sub_purpose_ids.map(purposeId => ({
+      game_id: gameId,
+      purpose_id: purposeId,
+    }));
+    await db.from('game_secondary_purposes').insert(purposeRows);
   }
 
   // Insert steps

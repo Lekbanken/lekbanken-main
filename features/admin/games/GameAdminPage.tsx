@@ -28,12 +28,9 @@ import {
   useTableSelection,
 } from '@/components/admin/shared';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select, useToast } from '@/components/ui';
-import { AdminExportButton } from '@/components/admin/shared/AdminExportButton';
 import { AdminConfirmDialog } from '@/components/admin/shared/AdminConfirmDialog';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import type { ExportColumn } from '@/lib/utils/export';
 import type { Database } from '@/types/supabase';
-import { GameFormDialog } from './components/GameFormDialog';
 import { GameImportDialog } from './components/GameImportDialog';
 import { GameExportDialog } from './components/GameExportDialog';
 import type { GameFormValues, GameWithRelations, ImportableGame, SelectOption } from './types';
@@ -84,8 +81,7 @@ export function GameAdminPage() {
   const [tenants, setTenants] = useState<SelectOption[]>([]);
   const [purposes, setPurposes] = useState<SelectOption[]>([]);
   const [products, setProducts] = useState<SelectOption[]>([]);
-  const [createOpen, setCreateOpen] = useState(false);
-  const [editGame, setEditGame] = useState<GameWithRelations | null>(null);
+  // Legacy modal states removed
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<GameWithRelations | null>(null);
@@ -185,63 +181,6 @@ export function GameAdminPage() {
     const tenantGames = games.filter((g) => g.owner_tenant_id !== null).length;
     return { total, published, drafts, tenantGames };
   }, [games]);
-
-  const handleCreate = async (values: GameFormValues) => {
-    const payload = toGameFormPayload(values);
-    const res = await fetch('/api/games', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({}));
-      throw new Error(json.error || 'Misslyckades att skapa lek');
-    }
-    const { game } = (await res.json()) as { game: GameWithRelations };
-    const owner = tenants.find((t) => t.value === game.owner_tenant_id);
-    const purpose = purposes.find((p) => p.value === game.main_purpose_id);
-    const product = products.find((p) => p.value === game.product_id);
-    setGames((prev) => [
-      {
-        ...game,
-        owner: owner ? { id: owner.value, name: owner.label } : null,
-        main_purpose: purpose ? { id: purpose.value, name: purpose.label } : null,
-        product: product ? { id: product.value, name: product.label } : null,
-      },
-      ...prev,
-    ]);
-    success('Leken skapades.');
-  };
-
-  const handleUpdate = async (gameId: string, values: GameFormValues) => {
-    const res = await fetch(`/api/games/${gameId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(toGameFormPayload(values)),
-    });
-    if (!res.ok) {
-      const json = await res.json().catch(() => ({}));
-      throw new Error(json.error || 'Misslyckades att uppdatera lek');
-    }
-    const { game } = (await res.json()) as { game: GameWithRelations };
-    const owner = tenants.find((t) => t.value === game.owner_tenant_id);
-    const purpose = purposes.find((p) => p.value === game.main_purpose_id);
-    const product = products.find((p) => p.value === game.product_id);
-    setGames((prev) =>
-      prev.map((g) =>
-        g.id === gameId
-          ? {
-              ...g,
-              ...game,
-              owner: owner ? { id: owner.value, name: owner.label } : null,
-              main_purpose: purpose ? { id: purpose.value, name: purpose.label } : null,
-              product: product ? { id: product.value, name: product.label } : null,
-            }
-          : g
-      )
-    );
-    success('Ändringar sparade.');
-  };
 
   const handlePublishToggle = async (game: GameWithRelations, next: Database['public']['Enums']['game_status_enum']) => {
     if (next === 'published') {
@@ -379,7 +318,6 @@ export function GameAdminPage() {
         icon={<PuzzlePieceIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
-            <AdminExportButton data={filteredGames} columns={exportColumns} filename="games" />
             <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
               CSV Export
@@ -393,10 +331,6 @@ export function GameAdminPage() {
                 <Button variant="outline" size="sm" onClick={() => router.push('/admin/games/new')}>
                   <PlusIcon className="mr-2 h-4 w-4" />
                   Builder
-                </Button>
-                <Button size="sm" onClick={() => setCreateOpen(true)}>
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  Snabb lek
                 </Button>
               </div>
             )}
@@ -525,7 +459,7 @@ export function GameAdminPage() {
                 description="Justera filter eller lägg till ett nytt spel."
               />
             }
-            onRowClick={(row) => router.push(`/admin/games/${row.id}`)}
+            onRowClick={(row) => router.push(`/admin/games/${row.id}/edit`)}
             columns={[
               {
                 header: 'Namn',
@@ -580,7 +514,7 @@ export function GameAdminPage() {
                 cell: (row) => (
                   <div className="flex flex-wrap items-center gap-2">
                     {canEdit && (
-                      <Button variant="ghost" size="sm" onClick={() => setEditGame(row)}>
+                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/games/${row.id}/edit`)}>
                         <PencilSquareIcon className="mr-1 h-4 w-4" />
                         Redigera
                       </Button>
@@ -629,25 +563,6 @@ export function GameAdminPage() {
           />
         </CardContent>
       </Card>
-
-      <GameFormDialog
-        open={createOpen}
-        onOpenChange={setCreateOpen}
-        onSubmit={handleCreate}
-        tenants={tenants}
-        purposes={purposes}
-        products={products}
-      />
-
-      <GameFormDialog
-        open={Boolean(editGame)}
-        onOpenChange={(open) => !open && setEditGame(null)}
-        onSubmit={(values) => (editGame ? handleUpdate(editGame.id, values) : Promise.resolve())}
-        tenants={tenants}
-        purposes={purposes}
-        products={products}
-        initialGame={editGame}
-      />
 
       <GameImportDialog open={importOpen} onOpenChange={setImportOpen} onImport={handleImport} />
 

@@ -322,6 +322,9 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
     leader_tips: sanitizeText(row.leader_tips),
     
     main_purpose_id: row.main_purpose_id?.trim() || null,
+    sub_purpose_ids: row.sub_purpose_id?.trim() 
+      ? row.sub_purpose_id.split(',').map(id => id.trim()).filter(Boolean)
+      : [],
     product_id: row.product_id?.trim() || null,
     owner_tenant_id: row.owner_tenant_id?.trim() || null,
     

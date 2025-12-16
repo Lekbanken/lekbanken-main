@@ -53,6 +53,7 @@ export type CsvGameRow = {
   
   // References (optional)
   main_purpose_id?: string;
+  sub_purpose_id?: string;
   product_id?: string;
   owner_tenant_id?: string;
   
@@ -161,6 +162,7 @@ export type ParsedGame = {
   
   // References
   main_purpose_id: string | null;
+  sub_purpose_ids: string[];
   product_id: string | null;
   owner_tenant_id: string | null;
   

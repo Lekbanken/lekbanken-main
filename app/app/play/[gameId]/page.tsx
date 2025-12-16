@@ -3,8 +3,13 @@ import Link from 'next/link';
 import { getGameById } from '@/lib/services/games.server';
 import { StartSessionButton } from './start-session-button';
 
-export default async function StartGameSessionPage({ params }: { params: { gameId: string } }) {
-  const game = await getGameById(params.gameId);
+type Props = {
+  params: Promise<{ gameId: string }>;
+};
+
+export default async function StartGameSessionPage({ params }: Props) {
+  const { gameId } = await params;
+  const game = await getGameById(gameId);
   if (!game) return notFound();
 
   return (

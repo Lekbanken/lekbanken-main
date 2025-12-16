@@ -14,6 +14,13 @@ export type { TimerControlProps } from './TimerControl';
 export { StepPhaseNavigation } from './StepPhaseNavigation';
 export type { StepPhaseNavigationProps, StepInfo, PhaseInfo } from './StepPhaseNavigation';
 
+// Participant components
+export { ParticipantPlayView } from './ParticipantPlayView';
+export type { ParticipantPlayViewProps, StepData } from './ParticipantPlayView';
+
+export { RoleCard } from './RoleCard';
+export type { RoleCardProps, RoleCardData } from './RoleCard';
+
 // Existing components
 export { NavigationControls } from './NavigationControls';
 export { SessionHeader } from './SessionHeader';

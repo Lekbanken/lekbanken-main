@@ -343,4 +343,302 @@ export class ParticipantSessionService {
     
     return count;
   }
+
+  // ===========================================================================
+  // RUNTIME STATE METHODS (PR1: Legendary Play)
+  // NOTE: These methods require migration 20251216160000 to be applied.
+  // After applying the migration, regenerate types with: npx supabase gen types typescript
+  // The `as any` casts can then be removed and replaced with proper types.
+  // ===========================================================================
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+
+  /**
+   * Update current step index
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async updateCurrentStep(sessionId: string, stepIndex: number): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ current_step_index: stepIndex })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to update current step', error, { sessionId, stepIndex });
+      throw error;
+    }
+    
+    // Log event
+    await this.logSessionEvent(sessionId, 'step_changed', { step_index: stepIndex });
+  }
+
+  /**
+   * Update current phase index
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async updateCurrentPhase(sessionId: string, phaseIndex: number): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ current_phase_index: phaseIndex })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to update current phase', error, { sessionId, phaseIndex });
+      throw error;
+    }
+    
+    // Log event
+    await this.logSessionEvent(sessionId, 'phase_changed', { phase_index: phaseIndex });
+  }
+
+  /**
+   * Start timer
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async startTimer(sessionId: string, durationSeconds: number): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    const timerState = {
+      started_at: new Date().toISOString(),
+      duration_seconds: durationSeconds,
+      paused_at: null,
+    };
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ timer_state: timerState })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to start timer', error, { sessionId, durationSeconds });
+      throw error;
+    }
+    
+    await this.logSessionEvent(sessionId, 'timer_started', { duration_seconds: durationSeconds });
+  }
+
+  /**
+   * Pause timer
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async pauseTimer(sessionId: string): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { data: session, error: fetchError } = await (supabase as any)
+      .from('participant_sessions')
+      .select('timer_state')
+      .eq('id', sessionId)
+      .single();
+    
+    if (fetchError || !session?.timer_state) {
+      throw new Error('No active timer to pause');
+    }
+    
+    const currentState = session.timer_state as { started_at: string; duration_seconds: number; paused_at: string | null };
+    if (currentState.paused_at) {
+      return; // Already paused
+    }
+    
+    const timerState = {
+      ...currentState,
+      paused_at: new Date().toISOString(),
+    };
+    
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ timer_state: timerState })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to pause timer', error, { sessionId });
+      throw error;
+    }
+    
+    await this.logSessionEvent(sessionId, 'timer_paused', {});
+  }
+
+  /**
+   * Resume timer
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async resumeTimer(sessionId: string): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { data: session, error: fetchError } = await (supabase as any)
+      .from('participant_sessions')
+      .select('timer_state')
+      .eq('id', sessionId)
+      .single();
+    
+    if (fetchError || !session?.timer_state) {
+      throw new Error('No timer to resume');
+    }
+    
+    const currentState = session.timer_state as { started_at: string; duration_seconds: number; paused_at: string | null };
+    if (!currentState.paused_at) {
+      return; // Not paused
+    }
+    
+    // Adjust started_at to account for pause duration
+    const pauseTime = new Date(currentState.paused_at).getTime();
+    const pauseDuration = Date.now() - pauseTime;
+    const originalStart = new Date(currentState.started_at).getTime();
+    const adjustedStart = new Date(originalStart + pauseDuration);
+    
+    const timerState = {
+      started_at: adjustedStart.toISOString(),
+      duration_seconds: currentState.duration_seconds,
+      paused_at: null,
+    };
+    
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ timer_state: timerState })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to resume timer', error, { sessionId });
+      throw error;
+    }
+    
+    await this.logSessionEvent(sessionId, 'timer_resumed', {});
+  }
+
+  /**
+   * Reset/stop timer
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async resetTimer(sessionId: string): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ timer_state: null })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to reset timer', error, { sessionId });
+      throw error;
+    }
+    
+    await this.logSessionEvent(sessionId, 'timer_reset', {});
+  }
+
+  /**
+   * Update board state (message and overrides)
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async updateBoardState(
+    sessionId: string, 
+    boardState: { message?: string; overrides?: Record<string, boolean> } | null
+  ): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new columns added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('participant_sessions')
+      .update({ board_state: boardState })
+      .eq('id', sessionId);
+    
+    if (error) {
+      logger.error('Failed to update board state', error, { sessionId });
+      throw error;
+    }
+    
+    await this.logSessionEvent(sessionId, 'board_message_set', { board_state: boardState });
+  }
+
+  /**
+   * Snapshot game roles to session (call at session start for participants games)
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async snapshotGameRoles(
+    sessionId: string,
+    gameId: string,
+    locale?: string
+  ): Promise<number> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new RPC added in migration 20251216160000
+    const { data, error } = await (supabase as any)
+      .rpc('snapshot_game_roles_to_session', {
+        p_session_id: sessionId,
+        p_game_id: gameId,
+        p_locale: locale || null,
+      });
+    
+    if (error) {
+      logger.error('Failed to snapshot game roles', error, { sessionId, gameId });
+      throw error;
+    }
+    
+    const count = (data as number) || 0;
+    logger.info(`Snapshotted ${count} roles to session`, { sessionId, gameId });
+    
+    return count;
+  }
+
+  /**
+   * Get session roles
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async getSessionRoles(sessionId: string): Promise<unknown[]> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new table added in migration 20251216160000
+    const { data, error } = await (supabase as any)
+      .from('session_roles')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('role_order');
+    
+    if (error) {
+      logger.error('Failed to get session roles', error, { sessionId });
+      throw error;
+    }
+    
+    return data || [];
+  }
+
+  /**
+   * Log session event
+   * NOTE: Requires migration 20251216160000, regenerate types after applying
+   */
+  static async logSessionEvent(
+    sessionId: string,
+    eventType: string,
+    eventData: Record<string, unknown>,
+    actorUserId?: string,
+    actorParticipantId?: string
+  ): Promise<void> {
+    const supabase = await createServiceRoleClient();
+    
+    // Cast to any - new table added in migration 20251216160000
+    const { error } = await (supabase as any)
+      .from('session_events')
+      .insert({
+        session_id: sessionId,
+        event_type: eventType,
+        event_data: eventData,
+        actor_user_id: actorUserId || null,
+        actor_participant_id: actorParticipantId || null,
+      });
+    
+    if (error) {
+      // Log but don't throw - event logging should not break main flow
+      logger.warn('Failed to log session event', { sessionId, eventType, error: error.message });
+    }
+  }
+
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }

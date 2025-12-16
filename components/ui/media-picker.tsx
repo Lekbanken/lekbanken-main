@@ -23,6 +23,8 @@ type MediaPickerProps = {
   value?: string | null
   onSelect: (mediaId: string, url: string) => void
   tenantId?: string | null
+  mainPurposeId?: string | null
+  mainPurposeName?: string | null
   trigger?: React.ReactNode
   allowUpload?: boolean
   allowTemplate?: boolean
@@ -32,6 +34,8 @@ export function MediaPicker({
   value,
   onSelect,
   tenantId,
+  mainPurposeId,
+  mainPurposeName,
   trigger,
   allowUpload = true,
   allowTemplate = true,
@@ -45,9 +49,9 @@ export function MediaPicker({
   const [activeTab, setActiveTab] = useState('library')
 
   const tabs = [
-    { id: 'library', label: 'Library', disabled: false },
-    ...(allowTemplate ? [{ id: 'templates', label: 'Templates', disabled: false }] : []),
-    ...(allowUpload ? [{ id: 'upload', label: 'Upload', disabled: false }] : []),
+    { id: 'library', label: 'Bibliotek', disabled: false },
+    ...(allowTemplate ? [{ id: 'templates', label: mainPurposeName ? `Standardbilder (${mainPurposeName})` : 'Standardbilder', disabled: false }] : []),
+    ...(allowUpload ? [{ id: 'upload', label: 'Ladda upp', disabled: false }] : []),
   ]
 
   const loadMedia = async (type?: 'template' | 'upload') => {
@@ -56,6 +60,10 @@ export function MediaPicker({
       const params = new URLSearchParams({ limit: '50' })
       if (tenantId) params.set('tenantId', tenantId)
       if (type) params.set('type', type)
+      // For templates, filter by main purpose if provided
+      if (type === 'template' && mainPurposeId) {
+        params.set('mainPurposeId', mainPurposeId)
+      }
 
       const response = await fetch(`/api/media?${params}`)
       if (!response.ok) throw new Error('Failed to load media')
@@ -234,12 +242,24 @@ export function MediaPicker({
 
           {activeTab === 'templates' && (
             <div className="space-y-4">
+              {mainPurposeId && mainPurposeName && (
+                <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
+                  Visar standardbilder för <span className="font-medium text-foreground">{mainPurposeName}</span>
+                </div>
+              )}
+              {!mainPurposeId && (
+                <div className="text-center py-4 text-muted-foreground bg-amber-50 dark:bg-amber-950/20 rounded-lg">
+                  <p className="text-sm">Välj ett huvudsyfte först för att se standardbilder</p>
+                </div>
+              )}
               {loading ? (
-                <div className="text-center py-8 text-muted-foreground">Loading...</div>
+                <div className="text-center py-8 text-muted-foreground">Laddar...</div>
               ) : media.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">No templates found</div>
+                <div className="text-center py-8 text-muted-foreground">
+                  {mainPurposeId ? 'Inga standardbilder för detta syfte' : 'Inga standardbilder hittades'}
+                </div>
               ) : (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-5 gap-3">
                   {media.map((item) => (
                     <button
                       key={item.id}
@@ -255,7 +275,7 @@ export function MediaPicker({
                         alt={item.alt_text || item.name}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 25vw"
+                        sizes="(max-width: 768px) 50vw, 20vw"
                       />
                     </button>
                   ))}

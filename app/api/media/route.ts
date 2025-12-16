@@ -19,8 +19,45 @@ export async function GET(request: NextRequest) {
 
   const tenantId = searchParams.get('tenantId')
   const type = searchParams.get('type')
+  const mainPurposeId = searchParams.get('mainPurposeId')
   const limit = parseInt(searchParams.get('limit') || '50', 10)
   const offset = parseInt(searchParams.get('offset') || '0', 10)
+
+  // Special handling for templates filtered by main_purpose_id
+  if (type === 'template' && mainPurposeId) {
+    const { data: templateData, error: templateError } = await supabase
+      .from('media_templates')
+      .select(`
+        media_id,
+        priority,
+        media:media(*)
+      `)
+      .eq('main_purpose_id', mainPurposeId)
+      .is('sub_purpose_id', null)
+      .order('priority', { ascending: false })
+      .limit(10)
+
+    if (templateError) {
+      logger.error('Failed to fetch templates by purpose', templateError, {
+        endpoint: '/api/media',
+        method: 'GET',
+        mainPurposeId
+      })
+      return NextResponse.json({ error: 'Failed to fetch templates' }, { status: 500 })
+    }
+
+    // Extract media from templates and filter out nulls
+    const media = (templateData ?? [])
+      .map(t => t.media)
+      .filter(Boolean)
+
+    return NextResponse.json({
+      media,
+      total: media.length,
+      limit,
+      offset: 0,
+    })
+  }
 
   let query = supabase
     .from('media')

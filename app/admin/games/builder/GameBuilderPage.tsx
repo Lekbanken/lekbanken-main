@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Textarea, Select, Button, Card } from '@/components/ui';
-import { MediaPicker } from '@/components/ui/media-picker';
 import { ArrowLeftIcon, EyeIcon } from '@heroicons/react/24/outline';
 import {
   BuilderSectionNav,
@@ -15,6 +14,7 @@ import {
   PhaseEditor,
   RoleEditor,
   BoardEditor,
+  StandardImagePicker,
   type BuilderSection,
   type QualityState,
   type StepData,
@@ -627,34 +627,14 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Omslagsbild / standardbild</label>
-                  <div className="flex items-center gap-3">
-                    <div className="h-16 w-28 overflow-hidden rounded-lg border border-border bg-muted">
-                      {cover.url ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={cover.url} alt="Omslagsbild" className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">Ingen bild</div>
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <MediaPicker
-                        value={cover.mediaId}
-                        onSelect={(mediaId, url) => setCover({ mediaId, url })}
-                        allowTemplate
-                      />
-                      {cover.mediaId && (
-                        <Button variant="ghost" size="sm" onClick={() => setCover({ mediaId: null, url: null })}>
-                          Rensa bild
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Välj en omslagsbild eller använd en standardbild kopplad till valt syfte/undersyfte.
-                  </p>
-                </div>
+                <StandardImagePicker
+                  mainPurposeId={core.main_purpose_id || null}
+                  mainPurposeName={mainPurposeOptions.find(p => p.value === core.main_purpose_id)?.label || null}
+                  selectedMediaId={cover.mediaId}
+                  selectedUrl={cover.url}
+                  onSelect={(mediaId, url) => setCover({ mediaId, url })}
+                  onClear={() => setCover({ mediaId: null, url: null })}
+                />
               </Card>
 
               <Card className="p-6 space-y-4">

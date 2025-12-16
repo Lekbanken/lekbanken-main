@@ -1,6 +1,6 @@
 ﻿import { redirect } from "next/navigation";
 
-// The base /app/play route should not hang without a game id; redirect users to pick a game.
+// Redirect to sessions list - users manage their play sessions there
 export default function PlayRoutePage() {
-  redirect("/app/games?playNotice=select");
+  redirect("/app/play/sessions");
 }

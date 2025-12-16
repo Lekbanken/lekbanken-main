@@ -8,10 +8,10 @@ import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 
 type Participant = {
   id: string;
-  display_name: string;
+  displayName: string;
   status: Database['public']['Enums']['participant_status'];
   role: Database['public']['Enums']['participant_role'];
-  last_seen_at?: string | null;
+  lastSeenAt?: string | null;
 };
 
 type ParticipantRowProps = {
@@ -56,7 +56,7 @@ export function ParticipantRow({
       <div className="flex items-center gap-3">
         <ParticipantStatusDot status={participant.status} />
         <span className={cn('font-medium text-foreground', compact && 'text-sm')}>
-          {participant.display_name}
+          {participant.displayName}
           {isCurrentUser && (
             <span className="ml-1 text-muted-foreground">(du)</span>
           )}

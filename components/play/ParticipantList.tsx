@@ -8,10 +8,10 @@ import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 
 type Participant = {
   id: string;
-  display_name: string;
+  displayName: string;
   status: Database['public']['Enums']['participant_status'];
   role: Database['public']['Enums']['participant_role'];
-  last_seen_at?: string | null;
+  lastSeenAt?: string | null;
 };
 
 type ParticipantListProps = {

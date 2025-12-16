@@ -30,5 +30,15 @@ export async function GET(
     return NextResponse.json({ error: 'Failed to fetch participants', details: error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ participants: participants || [] });
+  // Transform to camelCase for frontend
+  const transformed = (participants || []).map((p) => ({
+    id: p.id,
+    displayName: p.display_name,
+    role: p.role,
+    status: p.status,
+    joinedAt: p.joined_at,
+    lastSeenAt: p.last_seen_at,
+  }));
+
+  return NextResponse.json({ participants: transformed });
 }

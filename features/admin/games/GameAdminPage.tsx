@@ -375,10 +375,16 @@ export function GameAdminPage() {
               Importera
             </Button>
             {canEdit && (
-              <Button size="sm" onClick={() => setCreateOpen(true)}>
-                <PlusIcon className="mr-2 h-4 w-4" />
-                Ny lek
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => router.push('/admin/games/new')}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Builder
+                </Button>
+                <Button size="sm" onClick={() => setCreateOpen(true)}>
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Snabb lek
+                </Button>
+              </div>
             )}
           </div>
         }
@@ -563,6 +569,12 @@ export function GameAdminPage() {
                       <Button variant="ghost" size="sm" onClick={() => setEditGame(row)}>
                         <PencilSquareIcon className="mr-1 h-4 w-4" />
                         Redigera
+                      </Button>
+                    )}
+                    {canEdit && (
+                      <Button variant="ghost" size="sm" onClick={() => router.push(`/admin/games/${row.id}/edit`)}>
+                        <PencilSquareIcon className="mr-1 h-4 w-4" />
+                        Builder
                       </Button>
                     )}
                     <Button

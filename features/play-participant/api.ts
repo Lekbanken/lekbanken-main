@@ -108,3 +108,40 @@ export async function getPublicSession(code: string) {
   const res = await fetch(`/api/play/session/${code}`, { cache: 'no-store' });
   return parseJson(res);
 }
+
+// Participant action functions for hosts
+export async function kickParticipant(sessionId: string, participantId: string) {
+  const res = await fetch(`/api/play/sessions/${sessionId}/participants/${participantId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'kick' }),
+  });
+  return parseJson(res);
+}
+
+export async function blockParticipant(sessionId: string, participantId: string) {
+  const res = await fetch(`/api/play/sessions/${sessionId}/participants/${participantId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'block' }),
+  });
+  return parseJson(res);
+}
+
+export async function setNextStarter(sessionId: string, participantId: string) {
+  const res = await fetch(`/api/play/sessions/${sessionId}/participants/${participantId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'setNextStarter' }),
+  });
+  return parseJson(res);
+}
+
+export async function setParticipantPosition(sessionId: string, participantId: string, position: number) {
+  const res = await fetch(`/api/play/sessions/${sessionId}/participants/${participantId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'setPosition', position }),
+  });
+  return parseJson(res);
+}

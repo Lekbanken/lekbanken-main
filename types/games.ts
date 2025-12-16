@@ -1,0 +1,217 @@
+/**
+ * Game Builder types
+ * Types for games, steps, materials, phases, roles, and board config
+ */
+
+// =============================================================================
+// Enums / Literals
+// =============================================================================
+
+export type PlayMode = 'basic' | 'facilitated' | 'participants';
+export type PhaseType = 'intro' | 'round' | 'finale' | 'break';
+export type TimerStyle = 'countdown' | 'elapsed' | 'trafficlight';
+export type AssignmentStrategy = 'random' | 'leader_picks' | 'player_picks';
+export type BoardTheme = 'mystery' | 'party' | 'sport' | 'nature' | 'neutral';
+export type BoardLayout = 'standard' | 'fullscreen';  // 'compact' removed for MVP
+
+// =============================================================================
+// Game Steps
+// =============================================================================
+
+export type GameStep = {
+  id: string;
+  game_id: string;
+  locale: string | null;
+  phase_id: string | null;
+  step_order: number;
+  title: string | null;
+  body: string | null;
+  duration_seconds: number | null;
+  leader_script: string | null;
+  participant_prompt: string | null;
+  board_text: string | null;
+  media_ref: string | null;
+  optional: boolean;
+  conditional: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type StepFormData = {
+  id?: string; // client-side ID for drag-and-drop
+  title: string;
+  body: string;
+  duration_seconds: number | null;
+  leader_script: string | null;
+  phase_id?: string | null;
+};
+
+// =============================================================================
+// Game Materials
+// =============================================================================
+
+export type GameMaterials = {
+  id: string;
+  game_id: string;
+  locale: string | null;
+  items: string[];
+  safety_notes: string | null;
+  preparation: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MaterialsFormData = {
+  items: string[];
+  safety_notes: string;
+  preparation: string;
+};
+
+// =============================================================================
+// Game Phases (P2a)
+// =============================================================================
+
+export type GamePhase = {
+  id: string;
+  game_id: string;
+  locale: string | null;
+  name: string;
+  phase_type: PhaseType;
+  phase_order: number;
+  duration_seconds: number | null;
+  timer_visible: boolean;
+  timer_style: TimerStyle;
+  description: string | null;
+  board_message: string | null;
+  auto_advance: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PhaseFormData = {
+  id?: string; // client-side ID for UI
+  name: string;
+  phase_type: PhaseType;
+  phase_order: number;
+  duration_seconds: number | null;
+  timer_visible: boolean;
+  timer_style: TimerStyle;
+  description: string;
+  board_message: string;
+  auto_advance: boolean;
+};
+
+// =============================================================================
+// Game Roles (P2b - reserved)
+// =============================================================================
+
+export type GameRole = {
+  id: string;
+  game_id: string;
+  locale: string | null;
+  name: string;
+  icon: string | null;
+  color: string | null;
+  role_order: number;
+  public_description: string | null;
+  private_instructions: string;
+  private_hints: string | null;
+  min_count: number;
+  max_count: number | null;
+  assignment_strategy: AssignmentStrategy;
+  scaling_rules: Record<string, number> | null;
+  conflicts_with: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type RoleFormData = {
+  id?: string;
+  name: string;
+  icon: string;
+  color: string;
+  role_order: number;
+  public_description: string;
+  private_instructions: string;
+  private_hints: string;
+  min_count: number;
+  max_count: number | null;
+  assignment_strategy: AssignmentStrategy;
+  scaling_rules: Record<string, number> | null;
+  conflicts_with: string[];
+};
+
+// =============================================================================
+// Game Board Config (P2c)
+// =============================================================================
+
+export type GameBoardConfig = {
+  id: string;
+  game_id: string;
+  locale: string | null;
+  show_game_name: boolean;
+  show_current_phase: boolean;
+  show_timer: boolean;
+  show_participants: boolean;
+  show_public_roles: boolean;   // no-op if no roles defined
+  show_leaderboard: boolean;    // stub until leaderboard model
+  show_qr_code: boolean;        // links to /join/[code]
+  welcome_message: string | null;
+  // NOTE: custom_css removed for MVP (XSS risk)
+  theme: BoardTheme;
+  background_media_id: string | null;
+  background_color: string | null;
+  layout_variant: BoardLayout;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BoardConfigFormData = {
+  locale?: string | null;
+  show_game_name: boolean;
+  show_current_phase: boolean;
+  show_timer: boolean;
+  show_participants: boolean;
+  show_public_roles: boolean;
+  show_leaderboard: boolean;
+  show_qr_code: boolean;
+  welcome_message: string;
+  theme: BoardTheme;
+  background_media_id?: string | null;
+  background_color: string;
+  layout_variant: BoardLayout;
+};
+
+// =============================================================================
+// Builder API Response
+// =============================================================================
+
+export type GameBuilderData = {
+  game: {
+    id: string;
+    name: string;
+    short_description: string | null;
+    description: string | null;
+    status: 'draft' | 'published';
+    play_mode: PlayMode;
+    main_purpose_id: string | null;
+    product_id: string | null;
+    energy_level: string | null;
+    location_type: string | null;
+    time_estimate_min: number | null;
+    duration_max: number | null;
+    min_players: number | null;
+    max_players: number | null;
+    age_min: number | null;
+    age_max: number | null;
+    difficulty: string | null;
+    accessibility_notes: string | null;
+    space_requirements: string | null;
+    leader_tips: string | null;
+  };
+  steps: GameStep[];
+  materials: GameMaterials | null;
+  phases: GamePhase[];
+  roles: GameRole[];
+  boardConfig: GameBoardConfig | null;
+};

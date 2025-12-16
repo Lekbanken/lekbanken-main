@@ -12,6 +12,8 @@ type Participant = {
   status: Database['public']['Enums']['participant_status'];
   role: Database['public']['Enums']['participant_role'];
   lastSeenAt?: string | null;
+  position?: number | null;
+  isNextStarter?: boolean;
 };
 
 type ParticipantListProps = {
@@ -20,8 +22,11 @@ type ParticipantListProps = {
   showActions?: boolean;
   collapsible?: boolean;
   maxVisible?: number;
+  isSessionEnded?: boolean;
   onKick?: (participantId: string) => void;
   onBlock?: (participantId: string) => void;
+  onSetNextStarter?: (participantId: string) => void;
+  onSetPosition?: (participantId: string, position: number) => void;
   className?: string;
 };
 
@@ -31,8 +36,11 @@ export function ParticipantList({
   showActions = false,
   collapsible = false,
   maxVisible = 10,
+  isSessionEnded = false,
   onKick,
   onBlock,
+  onSetNextStarter,
+  onSetPosition,
   className = '',
 }: ParticipantListProps) {
   const [isExpanded, setIsExpanded] = useState(!collapsible);
@@ -115,8 +123,12 @@ export function ParticipantList({
               showActions={showActions}
               showBadge={false}
               compact
+              isSessionEnded={isSessionEnded}
+              participantCount={participants.length}
               onKick={onKick}
               onBlock={onBlock}
+              onSetNextStarter={onSetNextStarter}
+              onSetPosition={onSetPosition}
             />
           ))
         )}

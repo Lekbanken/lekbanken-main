@@ -33,12 +33,25 @@ export type GameWithRelations = GameRow & {
   media?: GameMedia[]
   product?: ProductRow | null
   main_purpose?: PurposeRow | null
+  steps?: Array<{
+    id: string
+    title: string | null
+    body: string | null
+    duration_seconds: number | null
+    step_order: number
+  }>
+  materials?: Array<{
+    items: string[] | null
+    safety_notes: string | null
+    preparation: string | null
+    locale: string | null
+  }>
 }
 
 export async function getGameById(gameId: string): Promise<GameWithRelations | null> {
   const supabase = await createServerRlsClient()
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('games')
     .select(
       `
@@ -46,7 +59,9 @@ export async function getGameById(gameId: string): Promise<GameWithRelations | n
         product:products(*),
         main_purpose:purposes!main_purpose_id(*),
         translations:game_translations(*),
-        media:game_media(*, media:media(*))
+        media:game_media(*, media:media(*)),
+        steps:game_steps(*),
+        materials:game_materials(*)
       `
     )
     .eq('id', gameId)

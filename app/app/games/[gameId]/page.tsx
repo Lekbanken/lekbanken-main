@@ -51,9 +51,22 @@ export default async function GameDetailPage({ params }: Props) {
   const translation = pickTranslation(game)
   const displayTitle = translation?.title || game.name
   const displayDescription = translation?.short_description || game.description || 'Ingen beskrivning tillgänglig'
-  const displayInstructions = Array.isArray(translation?.instructions)
-    ? (translation?.instructions as Instruction[])
-    : null
+
+  const structuredSteps =
+    Array.isArray(game.steps) && game.steps.length
+      ? [...game.steps].sort((a, b) => (a.step_order ?? 0) - (b.step_order ?? 0))
+      : null
+
+  const displayInstructions: Instruction[] | null = structuredSteps
+    ? structuredSteps.map((s) => ({
+        title: s.title || undefined,
+        description: s.body || undefined,
+        duration_minutes: s.duration_seconds ? Math.round(Number(s.duration_seconds) / 60) : null,
+      }))
+    : Array.isArray(translation?.instructions)
+      ? (translation?.instructions as Instruction[])
+      : null
+
   const energy = energyConfig[game.energy_level ?? 'medium'] ?? energyConfig.medium
   const media = game.media ?? []
   const cover = media.find((m) => m.kind === 'cover') ?? media[0]
@@ -153,6 +166,9 @@ export default async function GameDetailPage({ params }: Props) {
                   <li key={idx} className="rounded-lg border border-border/60 bg-muted/30 p-3">
                     {step.title && <p className="font-semibold text-foreground">{step.title}</p>}
                     {step.description && <p className="mt-1 whitespace-pre-wrap">{step.description}</p>}
+                    {step.duration_minutes ? (
+                      <p className="mt-1 text-xs text-muted-foreground">~{step.duration_minutes} min</p>
+                    ) : null}
                   </li>
                 ))}
               </ol>
@@ -249,7 +265,7 @@ export default async function GameDetailPage({ params }: Props) {
               <div>
                 <p className="text-muted-foreground text-xs uppercase tracking-wide">Status</p>
                 <p className="text-foreground font-medium">
-                  {game.status === 'published' ? '💜 Publicerad' : 'Utkast'}
+                  {game.status === 'published' ? 'Publicerad' : 'Utkast'}
                 </p>
               </div>
               {game.created_at && (

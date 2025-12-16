@@ -31,14 +31,19 @@ export async function GET(
   }
 
   // Transform to camelCase for frontend
-  const transformed = (participants || []).map((p) => ({
-    id: p.id,
-    displayName: p.display_name,
-    role: p.role,
-    status: p.status,
-    joinedAt: p.joined_at,
-    lastSeenAt: p.last_seen_at,
-  }));
+  const transformed = (participants || []).map((p) => {
+    const progress = (p.progress as Record<string, unknown>) || {};
+    return {
+      id: p.id,
+      displayName: p.display_name,
+      role: p.role,
+      status: p.status,
+      joinedAt: p.joined_at,
+      lastSeenAt: p.last_seen_at,
+      position: typeof progress.position === 'number' ? progress.position : null,
+      isNextStarter: progress.isNextStarter === true,
+    };
+  });
 
   return NextResponse.json({ participants: transformed });
 }

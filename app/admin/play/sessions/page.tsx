@@ -145,7 +145,7 @@ export default function AdminPlaySessionsPage() {
       {/* Empty state */}
       {!loading && filteredSessions.length === 0 && (
         <EmptyState
-          icon={PlayIcon}
+          icon={<PlayIcon className="h-8 w-8" />}
           title="Inga sessioner hittades"
           description={search || statusFilter !== 'all' 
             ? 'Prova att ändra sökning eller filter.'

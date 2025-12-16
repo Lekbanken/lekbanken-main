@@ -5,7 +5,11 @@ import { useRouter } from 'next/navigation';
 import { 
   getHostSession, 
   getParticipants, 
-  updateSessionStatus, 
+  updateSessionStatus,
+  kickParticipant,
+  blockParticipant,
+  setNextStarter,
+  setParticipantPosition,
   type Participant, 
   type PlaySession,
 } from '@/features/play-participant/api';
@@ -30,10 +34,15 @@ type HostSessionDetailClientProps = {
   sessionId: string;
 };
 
+type ParticipantWithExtras = Participant & {
+  position?: number | null;
+  isNextStarter?: boolean;
+};
+
 export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientProps) {
   const router = useRouter();
   const [session, setSession] = useState<PlaySession | null>(null);
-  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [participants, setParticipants] = useState<ParticipantWithExtras[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionPending, setActionPending] = useState(false);
@@ -97,6 +106,42 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await navigator.clipboard.writeText(session.sessionCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleKick = async (participantId: string) => {
+    try {
+      await kickParticipant(sessionId, participantId);
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte ta bort deltagare');
+    }
+  };
+
+  const handleBlock = async (participantId: string) => {
+    try {
+      await blockParticipant(sessionId, participantId);
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte blockera deltagare');
+    }
+  };
+
+  const handleSetNextStarter = async (participantId: string) => {
+    try {
+      await setNextStarter(sessionId, participantId);
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte sätta nästa startare');
+    }
+  };
+
+  const handleSetPosition = async (participantId: string, position: number) => {
+    try {
+      await setParticipantPosition(sessionId, participantId, position);
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte sätta position');
     }
   };
 
@@ -226,10 +271,15 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
                 displayName: p.displayName,
                 status: p.status,
                 role: p.role,
+                position: p.position,
+                isNextStarter: p.isNextStarter,
               }))}
               showActions
-              onKick={(id: string) => console.log('Kick:', id)}
-              onBlock={(id: string) => console.log('Block:', id)}
+              isSessionEnded={session.status === 'ended'}
+              onKick={handleKick}
+              onBlock={handleBlock}
+              onSetNextStarter={handleSetNextStarter}
+              onSetPosition={handleSetPosition}
             />
           </Card>
         </div>

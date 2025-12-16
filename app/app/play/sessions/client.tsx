@@ -61,7 +61,7 @@ export function HostSessionsClient() {
             }
           </p>
         </div>
-        <Button variant="primary" href="/app/games?playNotice=select">
+        <Button variant="primary" href="/app/browse">
           <PlusIcon className="h-4 w-4" />
           Ny session
         </Button>
@@ -112,7 +112,7 @@ export function HostSessionsClient() {
           }
           action={filter === 'all' ? {
             label: 'Välj spel',
-            onClick: () => router.push('/app/games?playNotice=select'),
+            onClick: () => router.push('/app/browse'),
           } : undefined}
         />
       )}

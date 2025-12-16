@@ -155,7 +155,17 @@ export async function DELETE(
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   const { gameId } = await params
-  const supabase = await createServerRlsClient()
+  const rlsClient = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await rlsClient.auth.getUser()
+
+  const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
+  const isSuperAdmin = role === 'superadmin'
+  const isSystemAdmin = role === 'system_admin' || isSuperAdmin
+
+  // System admins can delete any game, others go through RLS
+  const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
 
   const { error } = await supabase.from('games').delete().eq('id', gameId)
 

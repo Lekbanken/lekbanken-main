@@ -534,7 +534,7 @@ export function GameAdminPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push(`/admin/games/${game.id}/builder`)}
+                        onClick={() => router.push(`/admin/games/${game.id}/edit`)}
                         className="hidden sm:flex"
                       >
                         <WrenchScrewdriverIcon className="mr-1.5 h-4 w-4" />
@@ -558,7 +558,7 @@ export function GameAdminPage() {
                         )}
                         {canEdit && (
                           <DropdownMenuItem 
-                            onClick={() => router.push(`/admin/games/${game.id}/builder`)}
+                            onClick={() => router.push(`/admin/games/${game.id}/edit`)}
                             className="sm:hidden"
                           >
                             <WrenchScrewdriverIcon className="h-4 w-4" />

@@ -22,8 +22,13 @@ function pickTranslation(game: GameWithRelations) {
   return translations[0] || null
 }
 
-export default async function GameDetailPage({ params }: { params: { gameId: string } }) {
-  const game = await getGameById(params.gameId)
+type Props = {
+  params: Promise<{ gameId: string }>;
+};
+
+export default async function GameDetailPage({ params }: Props) {
+  const { gameId } = await params;
+  const game = await getGameById(gameId)
   const relatedGames = game ? await getRelatedGames(game, 4) : []
 
   if (!game) {

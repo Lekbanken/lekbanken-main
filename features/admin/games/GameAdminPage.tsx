@@ -6,6 +6,7 @@ import {
   PuzzlePieceIcon,
   PlusIcon,
   ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
   CheckCircleIcon,
   XCircleIcon,
   PencilSquareIcon,
@@ -34,6 +35,7 @@ import type { ExportColumn } from '@/lib/utils/export';
 import type { Database } from '@/types/supabase';
 import { GameFormDialog } from './components/GameFormDialog';
 import { GameImportDialog } from './components/GameImportDialog';
+import { GameExportDialog } from './components/GameExportDialog';
 import type { GameFormValues, GameWithRelations, ImportableGame, SelectOption } from './types';
 
 type Filters = {
@@ -85,6 +87,7 @@ export function GameAdminPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editGame, setEditGame] = useState<GameWithRelations | null>(null);
   const [importOpen, setImportOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<GameWithRelations | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -370,6 +373,10 @@ export function GameAdminPage() {
         actions={
           <div className="flex items-center gap-2">
             <AdminExportButton data={filteredGames} columns={exportColumns} filename="games" />
+            <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
+              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+              CSV Export
+            </Button>
             <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
               <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
               Importera
@@ -636,6 +643,13 @@ export function GameAdminPage() {
       />
 
       <GameImportDialog open={importOpen} onOpenChange={setImportOpen} onImport={handleImport} />
+
+      <GameExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        selectedIds={selection.selectedItems.map((g) => g.id)}
+        totalCount={games.length}
+      />
 
       <AdminConfirmDialog
         open={Boolean(deleteTarget)}

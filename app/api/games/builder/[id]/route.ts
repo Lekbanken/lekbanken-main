@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Database } from '@/types/supabase';
 
 type CorePayload = {
   name?: string;
@@ -97,7 +98,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createServiceRoleClient();
+  const supabase = await createServiceRoleClient<Database>();
 
   const { data: game, error } = await supabase
     .from('games')
@@ -109,31 +110,31 @@ export async function GET(
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  const { data: steps } = await (supabase as any)
+  const { data: steps } = await supabase
     .from('game_steps')
     .select('*')
     .eq('game_id', id)
     .order('step_order', { ascending: true });
 
-  const { data: materials } = await (supabase as any)
+  const { data: materials } = await supabase
     .from('game_materials')
     .select('*')
     .eq('game_id', id)
     .maybeSingle();
 
-  const { data: phases } = await (supabase as any)
+  const { data: phases } = await supabase
     .from('game_phases')
     .select('*')
     .eq('game_id', id)
     .order('phase_order', { ascending: true });
 
-  const { data: roles } = await (supabase as any)
+  const { data: roles } = await supabase
     .from('game_roles')
     .select('*')
     .eq('game_id', id)
     .order('role_order', { ascending: true });
 
-  const { data: boardConfig } = await (supabase as any)
+  const { data: boardConfig } = await supabase
     .from('game_board_config')
     .select('*')
     .eq('game_id', id)
@@ -154,7 +155,7 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const supabase = await createServiceRoleClient();
+  const supabase = await createServiceRoleClient<Database>();
   const body = (await request.json().catch(() => ({}))) as {
     core?: CorePayload;
     steps?: StepPayload[];
@@ -195,9 +196,9 @@ export async function PUT(
     leader_tips: core.leader_tips ?? null,
   };
 
-  const { error: updateError } = await (supabase as any)
+  const { error: updateError } = await supabase
     .from('games')
-    .update(updateGame as any)
+    .update(updateGame)
     .eq('id', id);
 
   if (updateError) {
@@ -205,7 +206,7 @@ export async function PUT(
   }
 
   // Replace steps
-  await (supabase as any).from('game_steps').delete().eq('game_id', id);
+  await supabase.from('game_steps').delete().eq('game_id', id);
   const steps = body.steps ?? [];
   if (steps.length > 0) {
     const rows = steps.map((s, idx) => ({
@@ -222,12 +223,12 @@ export async function PUT(
       optional: s.optional ?? false,
       conditional: s.conditional ?? null,
     }));
-    await (supabase as any).from('game_steps').insert(rows);
+    await supabase.from('game_steps').insert(rows);
   }
 
   if (body.materials) {
     const m = body.materials;
-    await (supabase as any)
+    await supabase
       .from('game_materials')
       .upsert({
         game_id: id,
@@ -240,7 +241,7 @@ export async function PUT(
 
   // Replace phases (upsert pattern: delete all, insert new)
   const phases = body.phases ?? [];
-  await (supabase as any).from('game_phases').delete().eq('game_id', id);
+  await supabase.from('game_phases').delete().eq('game_id', id);
   if (phases.length > 0) {
     const phaseRows = phases.map((p, idx) => ({
       game_id: id,
@@ -255,12 +256,12 @@ export async function PUT(
       board_message: p.board_message ?? null,
       auto_advance: p.auto_advance ?? false,
     }));
-    await (supabase as any).from('game_phases').insert(phaseRows);
+    await supabase.from('game_phases').insert(phaseRows);
   }
 
   // Replace roles (upsert pattern: delete all, insert new)
   const roles = body.roles ?? [];
-  await (supabase as any).from('game_roles').delete().eq('game_id', id);
+  await supabase.from('game_roles').delete().eq('game_id', id);
   if (roles.length > 0) {
     const roleRows = roles.map((r, idx) => ({
       game_id: id,
@@ -278,11 +279,11 @@ export async function PUT(
       scaling_rules: r.scaling_rules ?? null,
       conflicts_with: r.conflicts_with ?? null,
     }));
-    await (supabase as any).from('game_roles').insert(roleRows);
+    await supabase.from('game_roles').insert(roleRows);
   }
 
   // Replace board config (upsert pattern: delete all, insert new)
-  await (supabase as any).from('game_board_config').delete().eq('game_id', id);
+  await supabase.from('game_board_config').delete().eq('game_id', id);
   if (body.boardConfig) {
     const bc = body.boardConfig;
     // Validate: at least one element visible OR welcome_message set
@@ -291,7 +292,7 @@ export async function PUT(
       bc.show_leaderboard || bc.show_qr_code || bc.welcome_message?.trim();
     
     if (hasContent) {
-      await (supabase as any).from('game_board_config').insert({
+      await supabase.from('game_board_config').insert({
         game_id: id,
         locale: bc.locale ?? null,
         show_game_name: bc.show_game_name ?? true,

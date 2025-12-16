@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useId, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -218,23 +218,31 @@ type RoleEditDrawerProps = {
 };
 
 function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
-  const [form, setForm] = useState<RoleData>(
-    role || {
-      id: `role-${Date.now()}`,
-      name: '',
-      icon: '👤',
-      color: '#3B82F6',
-      role_order: 0,
-      public_description: '',
-      private_instructions: '',
-      private_hints: '',
-      min_count: 0,
-      max_count: null,
-      assignment_strategy: 'random',
-      scaling_rules: null,
-      conflicts_with: null,
-    }
+  const generatedId = useId();
+  const initialForm = useMemo<RoleData>(
+    () =>
+      role || {
+        id: `role-${generatedId}`,
+        name: '',
+        icon: '??',
+        color: '#3B82F6',
+        role_order: 0,
+        public_description: '',
+        private_instructions: '',
+        private_hints: '',
+        min_count: 0,
+        max_count: null,
+        assignment_strategy: 'random',
+        scaling_rules: null,
+        conflicts_with: null,
+      },
+    [role, generatedId]
   );
+  const [form, setForm] = useState<RoleData>(initialForm);
+
+  useEffect(() => {
+    setForm(initialForm);
+  }, [initialForm]);
 
   const [activeTab, setActiveTab] = useState<'basic' | 'public' | 'private' | 'rules'>('basic');
 

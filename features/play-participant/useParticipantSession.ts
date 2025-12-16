@@ -6,12 +6,28 @@ import { clearParticipantAuth, loadParticipantAuth, saveParticipantAuth, type St
 
 type JoinState = 'idle' | 'joining' | 'joined' | 'error';
 
+type ParticipantState = {
+  id: string;
+  token?: string;
+  sessionId?: string;
+  displayName?: string;
+  [key: string]: unknown;
+};
+
+type SessionState = {
+  id?: string;
+  status?: string;
+  displayName?: string;
+  participantCount?: number;
+  [key: string]: unknown;
+};
+
 export function useParticipantSession(sessionCode: string) {
   const [auth, setAuth] = useState<StoredParticipant | null>(() => loadParticipantAuth(sessionCode));
   const [joinState, setJoinState] = useState<JoinState>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [participant, setParticipant] = useState<any>(null);
-  const [session, setSession] = useState<any>(null);
+  const [participant, setParticipant] = useState<ParticipantState | null>(null);
+  const [session, setSession] = useState<SessionState | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchMe = useCallback(async () => {

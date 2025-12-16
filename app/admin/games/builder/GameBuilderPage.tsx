@@ -162,14 +162,17 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           leader_tips: g.leader_tips || '',
         });
 
-        const loadedSteps = (data.steps || []).map((s: any, idx: number) => ({
-          id: s.id || `step-${idx}`,
-          title: s.title || '',
-          body: s.body || '',
-          duration_seconds: s.duration_seconds ?? null,
-          leader_script: s.leader_script || '',
-        }));
-        setSteps(loadedSteps.length > 0 ? loadedSteps : []);
+        const loadedSteps = ((data.steps as Partial<StepData>[] | undefined) ?? []).map(
+          (s, idx) => ({
+            id: s.id || `step-${idx}`,
+            title: s.title || '',
+            body: s.body || '',
+            duration_seconds: s.duration_seconds ?? null,
+            leader_script: s.leader_script || '',
+          })
+        );
+        setSteps(loadedSteps);
+
 
         if (data.materials) {
           setMaterials({
@@ -180,54 +183,62 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         }
 
         // Load phases
-        const loadedPhases = (data.phases || []).map((p: any, idx: number) => ({
-          id: p.id || `phase-${idx}`,
-          name: p.name || '',
-          phase_type: p.phase_type || 'round',
-          phase_order: p.phase_order ?? idx,
-          duration_seconds: p.duration_seconds ?? null,
-          timer_visible: p.timer_visible ?? true,
-          timer_style: p.timer_style || 'countdown',
-          description: p.description || '',
-          board_message: p.board_message || '',
-          auto_advance: p.auto_advance ?? false,
-        }));
+        const loadedPhases = ((data.phases as Partial<PhaseData>[] | undefined) ?? []).map(
+          (p, idx) => ({
+            id: p.id || `phase-${idx}`,
+            name: p.name || '',
+            phase_type: p.phase_type || 'round',
+            phase_order: p.phase_order ?? idx,
+            duration_seconds: p.duration_seconds ?? null,
+            timer_visible: p.timer_visible ?? true,
+            timer_style: p.timer_style || 'countdown',
+            description: p.description || '',
+            board_message: p.board_message || '',
+            auto_advance: p.auto_advance ?? false,
+          })
+        );
         setPhases(loadedPhases);
 
+
         // Load roles
-        const loadedRoles = (data.roles || []).map((r: any, idx: number) => ({
-          id: r.id || `role-${idx}`,
-          name: r.name || '',
-          icon: r.icon || '👤',
-          color: r.color || '#3B82F6',
-          role_order: r.role_order ?? idx,
-          public_description: r.public_description || '',
-          private_instructions: r.private_instructions || '',
-          private_hints: r.private_hints || '',
-          min_count: r.min_count ?? 0,
-          max_count: r.max_count ?? null,
-          assignment_strategy: r.assignment_strategy || 'random',
-          scaling_rules: r.scaling_rules ?? null,
-          conflicts_with: r.conflicts_with ?? null,
-        }));
+        const loadedRoles = ((data.roles as Partial<RoleData>[] | undefined) ?? []).map(
+          (r, idx) => ({
+            id: r.id || `role-${idx}`,
+            name: r.name || '',
+            icon: r.icon || '??',
+            color: r.color || '#3B82F6',
+            role_order: r.role_order ?? idx,
+            public_description: r.public_description || '',
+            private_instructions: r.private_instructions || '',
+            private_hints: r.private_hints || '',
+            min_count: r.min_count ?? 0,
+            max_count: r.max_count ?? null,
+            assignment_strategy: r.assignment_strategy || 'random',
+            scaling_rules: r.scaling_rules ?? null,
+            conflicts_with: r.conflicts_with ?? null,
+          })
+        );
         setRoles(loadedRoles);
+
 
         // Load board config
         if (data.boardConfig) {
-          const bc = data.boardConfig;
-          setBoardConfig({
-            show_game_name: bc.show_game_name ?? true,
-            show_current_phase: bc.show_current_phase ?? true,
-            show_timer: bc.show_timer ?? true,
-            show_participants: bc.show_participants ?? true,
-            show_public_roles: bc.show_public_roles ?? true,
-            show_leaderboard: bc.show_leaderboard ?? false,
-            show_qr_code: bc.show_qr_code ?? false,
-            welcome_message: bc.welcome_message || '',
-            theme: bc.theme || 'neutral',
-            background_color: bc.background_color || '',
-            layout_variant: bc.layout_variant || 'standard',
-          });
+          const bc = data.boardConfig as Partial<BoardConfigData> | undefined;
+          if (bc) {
+            setBoardConfig({
+              show_game_name: bc.show_game_name ?? true,
+              show_current_phase: bc.show_current_phase ?? true,
+              show_timer: bc.show_timer ?? true,
+              show_participants: bc.show_participants ?? true,
+              show_public_roles: bc.show_public_roles ?? true,
+              show_leaderboard: bc.show_leaderboard ?? false,
+              show_qr_code: bc.show_qr_code ?? false,
+              welcome_message: bc.welcome_message || '',
+              theme: bc.theme || 'neutral',
+              background_color: bc.background_color || '',
+              layout_variant: bc.layout_variant || 'standard',
+            });
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Kunde inte ladda data');

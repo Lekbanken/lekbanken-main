@@ -11,7 +11,6 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { 
   PlayIcon,
   MagnifyingGlassIcon,
-  FunnelIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';

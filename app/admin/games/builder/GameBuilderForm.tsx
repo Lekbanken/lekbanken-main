@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input, Textarea, Select, Button } from '@/components/ui';
 
@@ -105,11 +106,16 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
           space_requirements: g.space_requirements || '',
           leader_tips: g.leader_tips || '',
         });
-        setSteps((data.steps || []).map((s: any) => ({
-          title: s.title || '',
-          body: s.body || '',
-          duration_seconds: s.duration_seconds ?? null,
-        })) || [{ title: '', body: '', duration_seconds: null }]);
+        const incomingSteps = (data.steps as Partial<StepForm>[] | undefined) ?? [];
+        setSteps(
+          incomingSteps.length
+            ? incomingSteps.map((s) => ({
+                title: s.title || '',
+                body: s.body || '',
+                duration_seconds: s.duration_seconds ?? null,
+              }))
+            : [{ title: '', body: '', duration_seconds: null }]
+        );
         if (data.materials) {
           setMaterials({
             items: data.materials.items || [],
@@ -133,7 +139,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
   const removeStep = (index: number) =>
     setSteps((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== index) : prev));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSaving(true);
     setError(null);

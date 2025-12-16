@@ -1,9 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-import { Button, Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Textarea } from '@/components/ui';
-import { ArrowUpTrayIcon } from '@heroicons/react/24/outline';
+import { useState, useRef, useCallback } from 'react';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Textarea,
+  Switch,
+  Badge,
+} from '@/components/ui';
+import { Label } from '@/components/ui/label';
+import {
+  ArrowUpTrayIcon,
+  DocumentTextIcon,
+  TableCellsIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/24/outline';
+import { cn } from '@/lib/utils';
 import type { ImportableGame } from '../types';
+import type { ImportError, DryRunResult } from '@/types/csv-import';
+
+type ImportFormat = 'csv' | 'json';
 
 type GameImportDialogProps = {
   open: boolean;
@@ -11,98 +34,434 @@ type GameImportDialogProps = {
   onImport: (payload: ImportableGame[]) => Promise<void>;
 };
 
+type ImportState = 'idle' | 'validating' | 'validated' | 'importing' | 'done';
+
 export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDialogProps) {
+  const [format, setFormat] = useState<ImportFormat>('csv');
   const [raw, setRaw] = useState('');
+  const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [state, setState] = useState<ImportState>('idle');
+  const [dryRunResult, setDryRunResult] = useState<DryRunResult | null>(null);
+  const [upsertMode, setUpsertMode] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImport = async () => {
+  const resetDialog = useCallback(() => {
+    setRaw('');
+    setFileName(null);
     setError(null);
-    let parsed: unknown;
+    setState('idle');
+    setDryRunResult(null);
+  }, []);
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Auto-detect format from extension
+    if (file.name.endsWith('.csv')) {
+      setFormat('csv');
+    } else if (file.name.endsWith('.json')) {
+      setFormat('json');
+    }
+
+    setFileName(file.name);
+    setError(null);
+    setState('idle');
+    setDryRunResult(null);
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      setRaw(content);
+    };
+    reader.onerror = () => {
+      setError('Kunde inte läsa filen');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleValidate = async () => {
+    setError(null);
+    setState('validating');
+
     try {
-      parsed = JSON.parse(raw);
-    } catch {
-      setError('Kunde inte tolka JSON. Klistra in en giltig JSON-array.');
-      return;
-    }
+      const response = await fetch('/api/games/csv-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: raw,
+          format,
+          dry_run: true,
+          upsert: upsertMode,
+        }),
+      });
 
-    if (!Array.isArray(parsed)) {
-      setError('Formatet måste vara en array av spelobjekt.');
-      return;
-    }
+      const result = await response.json();
 
-    const cleaned: ImportableGame[] = parsed
-      .map((item) => {
-        const status: ImportableGame['status'] = item.status === 'published' ? 'published' : 'draft';
-        return {
-        name: typeof item.name === 'string' ? item.name.trim() : '',
-        short_description: typeof item.short_description === 'string' ? item.short_description.trim() : '',
-        main_purpose_id: typeof item.main_purpose_id === 'string' ? item.main_purpose_id : '',
-        description: typeof item.description === 'string' ? item.description : '',
-        category: typeof item.category === 'string' ? item.category : null,
-        energy_level: item.energy_level ?? null,
-        location_type: item.location_type ?? null,
-        time_estimate_min: typeof item.time_estimate_min === 'number' ? item.time_estimate_min : null,
-        min_players: typeof item.min_players === 'number' ? item.min_players : null,
-        max_players: typeof item.max_players === 'number' ? item.max_players : null,
-        age_min: typeof item.age_min === 'number' ? item.age_min : null,
-        age_max: typeof item.age_max === 'number' ? item.age_max : null,
-        owner_tenant_id: typeof item.owner_tenant_id === 'string' ? item.owner_tenant_id : null,
-        product_id: typeof item.product_id === 'string' ? item.product_id : null,
-        status,
-      };
-      })
-      .filter((g) => g.name && g.short_description && g.main_purpose_id);
+      if (!response.ok) {
+        setError(result.error || 'Valideringsfel');
+        setState('idle');
+        return;
+      }
 
-    if (cleaned.length === 0) {
-      setError('Inga giltiga spel hittades. Se till att namn, kort beskrivning och main_purpose_id finns.');
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      await onImport(cleaned);
-      setRaw('');
-      onOpenChange(false);
+      setDryRunResult(result as DryRunResult);
+      setState('validated');
     } catch (err) {
-      console.error('Import failed', err);
-      setError('Importen misslyckades. Kontrollera data och försök igen.');
-    } finally {
-      setIsProcessing(false);
+      console.error('Validation failed:', err);
+      setError('Kunde inte validera data');
+      setState('idle');
     }
   };
 
+  const handleImport = async () => {
+    setError(null);
+    setState('importing');
+
+    try {
+      const response = await fetch('/api/games/csv-import', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: raw,
+          format,
+          dry_run: false,
+          upsert: upsertMode,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setError(result.error || 'Import misslyckades');
+        setState('validated');
+        return;
+      }
+
+      setState('done');
+
+      // Call original onImport callback with empty array (data already saved via API)
+      // This triggers the parent to refresh the game list
+      await onImport([]);
+      
+      // Close dialog after short delay
+      setTimeout(() => {
+        resetDialog();
+        onOpenChange(false);
+      }, 1500);
+
+    } catch (err) {
+      console.error('Import failed:', err);
+      setError('Import misslyckades');
+      setState('validated');
+    }
+  };
+
+  const handleClose = () => {
+    resetDialog();
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <ArrowUpTrayIcon className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle>Importera spel</DialogTitle>
           <DialogDescription>
-            Klistra in en JSON-array med spel. Minimikrav per rad: <code>name</code>, <code>short_description</code>,{' '}
-            <code>main_purpose_id</code>. Status sätts till utkast om inget anges.
+            Importera spel från CSV eller JSON-fil. CSV stöder upp till 20 inline-steg.
+            Använd <code>game_key</code> för att uppdatera befintliga spel.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3">
-          <Textarea
-            value={raw}
-            onChange={(event) => setRaw(event.target.value)}
-            rows={14}
-            placeholder='[{"name":"Lek","short_description":"Kort text","main_purpose_id":"..."}]'
-          />
-          {error && <p className="text-sm text-destructive">{error}</p>}
+        <div className="space-y-6">
+          {/* Format selection */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground">Format</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setFormat('csv')}
+                className={cn(
+                  'flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all',
+                  format === 'csv'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-muted-foreground/50'
+                )}
+              >
+                <TableCellsIcon className="h-8 w-8 text-muted-foreground" />
+                <div className="text-center">
+                  <div className="font-medium">CSV</div>
+                  <div className="text-xs text-muted-foreground">Flat fil med inline steg</div>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormat('json')}
+                className={cn(
+                  'flex flex-col items-center gap-2 rounded-lg border-2 p-4 transition-all',
+                  format === 'json'
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border hover:border-muted-foreground/50'
+                )}
+              >
+                <DocumentTextIcon className="h-8 w-8 text-muted-foreground" />
+                <div className="text-center">
+                  <div className="font-medium">JSON</div>
+                  <div className="text-xs text-muted-foreground">Komplett struktur</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* File upload */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-foreground">Fil eller data</label>
+            <div className="flex gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv,.json"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-shrink-0"
+              >
+                <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
+                Välj fil
+              </Button>
+              {fileName && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <DocumentTextIcon className="h-4 w-4" />
+                  {fileName}
+                </div>
+              )}
+            </div>
+            <Textarea
+              value={raw}
+              onChange={(event) => {
+                setRaw(event.target.value);
+                setState('idle');
+                setDryRunResult(null);
+              }}
+              rows={10}
+              placeholder={format === 'csv' 
+                ? 'game_key,name,short_description,play_mode,status,...'
+                : '[{"game_key":"...", "name":"...", ...}]'
+              }
+              className="font-mono text-xs"
+            />
+          </div>
+
+          {/* Options */}
+          <div className="flex items-center justify-between rounded-lg border border-border p-4">
+            <div>
+              <Label htmlFor="upsertMode" className="cursor-pointer">
+                Upsert-läge
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Uppdatera befintliga spel baserat på <code>game_key</code>
+              </p>
+            </div>
+            <Switch
+              id="upsertMode"
+              checked={upsertMode}
+              onCheckedChange={setUpsertMode}
+            />
+          </div>
+
+          {/* Error display */}
+          {error && (
+            <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+              <div className="flex items-center gap-2 text-destructive">
+                <XCircleIcon className="h-5 w-5" />
+                <span className="font-medium">{error}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Validation result preview */}
+          {dryRunResult && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                {dryRunResult.valid ? (
+                  <>
+                    <CheckCircleIcon className="h-5 w-5 text-green-600" />
+                    <span className="text-green-600">Valideringen lyckades</span>
+                  </>
+                ) : (
+                  <>
+                    <ExclamationTriangleIcon className="h-5 w-5 text-amber-600" />
+                    <span className="text-amber-600">Valideringsfel hittades</span>
+                  </>
+                )}
+              </div>
+
+              {/* Summary */}
+              <div className="grid grid-cols-4 gap-3">
+                <div className="rounded-lg border border-border p-3 text-center">
+                  <div className="text-2xl font-bold">{dryRunResult.total_rows}</div>
+                  <div className="text-xs text-muted-foreground">Totalt</div>
+                </div>
+                <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-center">
+                  <div className="text-2xl font-bold text-green-700">{dryRunResult.valid_count}</div>
+                  <div className="text-xs text-green-600">Giltiga</div>
+                </div>
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
+                  <div className="text-2xl font-bold text-amber-700">{dryRunResult.warning_count}</div>
+                  <div className="text-xs text-amber-600">Varningar</div>
+                </div>
+                <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
+                  <div className="text-2xl font-bold text-red-700">{dryRunResult.error_count}</div>
+                  <div className="text-xs text-red-600">Fel</div>
+                </div>
+              </div>
+
+              {/* Game preview */}
+              {dryRunResult.games && dryRunResult.games.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium">Förhandsvisning</div>
+                  <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
+                    <table className="w-full text-sm">
+                      <thead className="sticky top-0 bg-muted">
+                        <tr>
+                          <th className="px-3 py-2 text-left font-medium">Rad</th>
+                          <th className="px-3 py-2 text-left font-medium">game_key</th>
+                          <th className="px-3 py-2 text-left font-medium">Namn</th>
+                          <th className="px-3 py-2 text-left font-medium">Läge</th>
+                          <th className="px-3 py-2 text-left font-medium">Status</th>
+                          <th className="px-3 py-2 text-left font-medium">Steg</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {dryRunResult.games.slice(0, 10).map((game) => (
+                          <tr key={game.row_number} className="border-t border-border">
+                            <td className="px-3 py-2">{game.row_number}</td>
+                            <td className="px-3 py-2 font-mono text-xs">{game.game_key || '-'}</td>
+                            <td className="px-3 py-2">{game.name}</td>
+                            <td className="px-3 py-2">
+                              <Badge variant="outline" className="text-xs">
+                                {game.play_mode}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2">
+                              <Badge 
+                                variant={game.status === 'published' ? 'default' : 'secondary'}
+                                className="text-xs"
+                              >
+                                {game.status === 'published' ? 'Publicerad' : 'Utkast'}
+                              </Badge>
+                            </td>
+                            <td className="px-3 py-2">{game.steps?.length || 0}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {dryRunResult.games.length > 10 && (
+                      <div className="border-t border-border bg-muted/50 px-3 py-2 text-center text-xs text-muted-foreground">
+                        ... och {dryRunResult.games.length - 10} till
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Errors list */}
+              {dryRunResult.errors && dryRunResult.errors.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-destructive">Fel</div>
+                  <div className="max-h-32 overflow-y-auto rounded-lg border border-destructive/30 bg-destructive/5 p-3">
+                    <ul className="space-y-1 text-sm">
+                      {dryRunResult.errors.slice(0, 10).map((err: ImportError, idx: number) => (
+                        <li key={idx} className="flex gap-2">
+                          <span className="text-muted-foreground">Rad {err.row}:</span>
+                          <span className="text-destructive">{err.column ? `${err.column}: ` : ''}{err.message}</span>
+                        </li>
+                      ))}
+                      {dryRunResult.errors.length > 10 && (
+                        <li className="text-muted-foreground">
+                          ... och {dryRunResult.errors.length - 10} fel till
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
+              {/* Warnings list */}
+              {dryRunResult.warnings && dryRunResult.warnings.length > 0 && (
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-amber-600">Varningar</div>
+                  <div className="max-h-32 overflow-y-auto rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <ul className="space-y-1 text-sm">
+                      {dryRunResult.warnings.slice(0, 5).map((warn: ImportError, idx: number) => (
+                        <li key={idx} className="flex gap-2">
+                          <span className="text-muted-foreground">Rad {warn.row}:</span>
+                          <span className="text-amber-700">{warn.column ? `${warn.column}: ` : ''}{warn.message}</span>
+                        </li>
+                      ))}
+                      {dryRunResult.warnings.length > 5 && (
+                        <li className="text-muted-foreground">
+                          ... och {dryRunResult.warnings.length - 5} varningar till
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Success state */}
+          {state === 'done' && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+              <div className="flex items-center gap-2 text-green-700">
+                <CheckCircleIcon className="h-5 w-5" />
+                <span className="font-medium">Import slutförd!</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>
+          <Button variant="ghost" onClick={handleClose}>
             Avbryt
           </Button>
-          <Button onClick={handleImport} disabled={isProcessing || raw.trim().length === 0}>
-            {isProcessing ? 'Importerar...' : 'Importera'}
-          </Button>
+          
+          {state === 'idle' && (
+            <Button 
+              onClick={handleValidate} 
+              disabled={raw.trim().length === 0}
+            >
+              Validera
+            </Button>
+          )}
+
+          {state === 'validating' && (
+            <Button disabled>
+              Validerar...
+            </Button>
+          )}
+
+          {state === 'validated' && dryRunResult && (
+            <Button 
+              onClick={handleImport}
+              disabled={!dryRunResult.valid || dryRunResult.error_count > 0}
+            >
+              Importera {dryRunResult.valid_count} spel
+            </Button>
+          )}
+
+          {state === 'importing' && (
+            <Button disabled>
+              Importerar...
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

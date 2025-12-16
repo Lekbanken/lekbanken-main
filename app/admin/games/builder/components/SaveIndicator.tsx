@@ -1,6 +1,5 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { CheckCircleIcon, ArrowPathIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -49,7 +48,7 @@ export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicat
         <>
           <ExclamationCircleIcon className="h-4 w-4 text-destructive" />
           <span className="text-destructive">
-            Kunde inte spara
+            {error ? `Kunde inte spara: ${error}` : 'Kunde inte spara'}
           </span>
           {onRetry && (
             <button

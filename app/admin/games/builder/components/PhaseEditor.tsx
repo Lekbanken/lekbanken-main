@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useId, useEffect } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -191,20 +191,28 @@ type PhaseEditDrawerProps = {
 };
 
 function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
-  const [form, setForm] = useState<PhaseData>(
-    phase || {
-      id: `phase-${Date.now()}`,
-      name: '',
-      phase_type: 'round',
-      phase_order: 0,
-      duration_seconds: null,
-      timer_visible: true,
-      timer_style: 'countdown',
-      description: '',
-      board_message: '',
-      auto_advance: false,
-    }
+  const generatedId = useId();
+  const initialForm = useMemo<PhaseData>(
+    () =>
+      phase || {
+        id: `phase-${generatedId}`,
+        name: '',
+        phase_type: 'round',
+        phase_order: 0,
+        duration_seconds: null,
+        timer_visible: true,
+        timer_style: 'countdown',
+        description: '',
+        board_message: '',
+        auto_advance: false,
+      },
+    [phase, generatedId]
   );
+  const [form, setForm] = useState<PhaseData>(initialForm);
+
+  useEffect(() => {
+    setForm(initialForm);
+  }, [initialForm]);
 
   const handleSave = () => {
     if (!form.name.trim()) return;

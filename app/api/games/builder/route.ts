@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Database } from '@/types/supabase';
 
 type CorePayload = {
   name: string;
@@ -48,7 +49,7 @@ type MaterialsPayload = {
 };
 
 export async function POST(request: Request) {
-  const supabase = await createServiceRoleClient();
+  const supabase = await createServiceRoleClient<Database>();
   const body = (await request.json().catch(() => ({}))) as {
     core?: CorePayload;
     steps?: StepPayload[];
@@ -86,7 +87,7 @@ export async function POST(request: Request) {
     leader_tips: core.leader_tips ?? null,
   };
 
-  const { data: game, error } = await (supabase as any).from('games').insert(insertGame as any).select().single();
+  const { data: game, error } = await supabase.from('games').insert(insertGame).select().single();
   if (error || !game) {
     return NextResponse.json({ error: 'Failed to create game', details: error?.message }, { status: 500 });
   }
@@ -107,12 +108,12 @@ export async function POST(request: Request) {
       optional: s.optional ?? false,
       conditional: s.conditional ?? null,
     }));
-    await (supabase as any).from('game_steps').insert(rows);
+    await supabase.from('game_steps').insert(rows);
   }
 
   if (body.materials) {
     const m = body.materials;
-    await (supabase as any).from('game_materials').upsert({
+    await supabase.from('game_materials').upsert({
       game_id: game.id,
       locale: m.locale ?? null,
       items: m.items ?? [],

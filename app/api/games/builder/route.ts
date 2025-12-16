@@ -47,14 +47,18 @@ type MaterialsPayload = {
   preparation?: string | null;
 };
 
+type BuilderBody = {
+  core?: CorePayload;
+  steps?: StepPayload[];
+  materials?: MaterialsPayload;
+  secondaryPurposes?: string[];
+  coverMediaId?: string | null;
+};
+
 export async function POST(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createServiceRoleClient() as any;
-  const body = (await request.json().catch(() => ({}))) as {
-    core?: CorePayload;
-    steps?: StepPayload[];
-    materials?: MaterialsPayload;
-  };
+  const body = (await request.json().catch(() => ({}))) as BuilderBody;
 
   const core = body.core;
   if (!core || !core.name?.trim() || !core.short_description?.trim()) {
@@ -90,6 +94,25 @@ export async function POST(request: Request) {
   const { data: game, error } = await supabase.from('games').insert(insertGame).select().single();
   if (error || !game) {
     return NextResponse.json({ error: 'Failed to create game', details: error?.message }, { status: 500 });
+  }
+
+  const secondaryPurposes = body.secondaryPurposes ?? [];
+  if (secondaryPurposes.length > 0) {
+    const purposeRows = secondaryPurposes.map((purposeId: string) => ({
+      game_id: game.id,
+      purpose_id: purposeId,
+    }));
+    await supabase.from('game_secondary_purposes').insert(purposeRows);
+  }
+
+  if (body.coverMediaId) {
+    await supabase.from('game_media').insert({
+      game_id: game.id,
+      media_id: body.coverMediaId,
+      kind: 'cover',
+      position: 0,
+      tenant_id: core.owner_tenant_id ?? null,
+    });
   }
 
   const steps = body.steps ?? [];

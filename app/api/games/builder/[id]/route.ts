@@ -92,6 +92,17 @@ type BoardConfigPayload = {
   layout_variant?: string;
 };
 
+type BuilderBody = {
+  core?: CorePayload;
+  steps?: StepPayload[];
+  materials?: MaterialsPayload;
+  phases?: PhasePayload[];
+  roles?: RolePayload[];
+  boardConfig?: BoardConfigPayload;
+  secondaryPurposes?: string[];
+  coverMediaId?: string | null;
+};
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -140,6 +151,20 @@ export async function GET(
     .eq('game_id', id)
     .maybeSingle();
 
+  const { data: secondaryPurposes } = await supabase
+    .from('game_secondary_purposes')
+    .select('purpose_id')
+    .eq('game_id', id);
+
+  const { data: coverMedia } = await supabase
+    .from('game_media')
+    .select('media_id, media:media(url, alt_text, id)')
+    .eq('game_id', id)
+    .eq('kind', 'cover')
+    .order('position', { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
   return NextResponse.json({
     game,
     steps: steps || [],
@@ -147,6 +172,14 @@ export async function GET(
     phases: phases || [],
     roles: roles || [],
     boardConfig: boardConfig || null,
+    secondaryPurposes: (secondaryPurposes || []).map((p) => p.purpose_id),
+    coverMedia: coverMedia
+      ? {
+          media_id: coverMedia.media_id,
+          url: (coverMedia.media as { url?: string } | null)?.url ?? null,
+          alt_text: (coverMedia.media as { alt_text?: string | null } | null)?.alt_text ?? null,
+        }
+      : null,
   });
 }
 
@@ -157,14 +190,7 @@ export async function PUT(
   const { id } = await params;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const supabase = await createServiceRoleClient() as any;
-  const body = (await request.json().catch(() => ({}))) as {
-    core?: CorePayload;
-    steps?: StepPayload[];
-    materials?: MaterialsPayload;
-    phases?: PhasePayload[];
-    roles?: RolePayload[];
-    boardConfig?: BoardConfigPayload;
-  };
+  const body = (await request.json().catch(() => ({}))) as BuilderBody;
 
   const core = body.core;
   if (!core?.name?.trim() || !core.short_description?.trim()) {
@@ -240,6 +266,17 @@ export async function PUT(
       });
   }
 
+  // Replace secondary purposes
+  await supabase.from('game_secondary_purposes').delete().eq('game_id', id);
+  const secondaryPurposes = body.secondaryPurposes ?? [];
+  if (secondaryPurposes.length > 0) {
+    const purposeRows = secondaryPurposes.map((purposeId: string) => ({
+      game_id: id,
+      purpose_id: purposeId,
+    }));
+    await supabase.from('game_secondary_purposes').insert(purposeRows);
+  }
+
   // Replace phases (upsert pattern: delete all, insert new)
   const phases = body.phases ?? [];
   await supabase.from('game_phases').delete().eq('game_id', id);
@@ -310,6 +347,18 @@ export async function PUT(
         layout_variant: bc.layout_variant ?? 'standard',
       });
     }
+  }
+
+  // Replace cover media
+  await supabase.from('game_media').delete().eq('game_id', id).eq('kind', 'cover');
+  if (body.coverMediaId) {
+    await supabase.from('game_media').insert({
+      game_id: id,
+      media_id: body.coverMediaId,
+      kind: 'cover',
+      position: 0,
+      tenant_id: core.owner_tenant_id ?? null,
+    });
   }
 
   return NextResponse.json({ success: true });

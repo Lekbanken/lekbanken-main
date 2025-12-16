@@ -68,6 +68,8 @@ export type QualityState = {
   name: boolean;
   shortDescription: boolean;
   purposeSelected: boolean;
+  subPurposeSelected: boolean;
+  coverImageSelected: boolean;
   hasStepsOrDescription: boolean;
   energyLevel: boolean;
   location: boolean;
@@ -89,15 +91,17 @@ export function QualityChecklist({ state, status }: QualityChecklistProps) {
   const playableItems = useMemo(() => [
     { label: 'Kort beskrivning', checked: state.shortDescription },
     { label: 'Syfte valt', checked: state.purposeSelected },
+    { label: 'Undersyfte valt', checked: state.subPurposeSelected, optional: true },
     { label: 'Steg eller beskrivning', checked: state.hasStepsOrDescription },
     { label: 'Energinivå', checked: state.energyLevel, optional: true },
     { label: 'Plats', checked: state.location, optional: true },
   ], [state]);
 
   const publishableItems = useMemo(() => [
+    { label: 'Omslagsbild eller standardbild', checked: state.coverImageSelected },
     { label: 'Alla krav uppfyllda', checked: state.allRequiredMet },
     { label: 'Inga valideringsfel', checked: state.noValidationErrors },
-  ], [state.allRequiredMet, state.noValidationErrors]);
+  ], [state.allRequiredMet, state.noValidationErrors, state.coverImageSelected]);
 
   const draftComplete = draftItems.every((i) => i.checked);
   const playableComplete = playableItems.filter((i) => !i.optional).every((i) => i.checked);

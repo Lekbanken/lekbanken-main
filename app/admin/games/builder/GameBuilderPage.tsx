@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Input, Textarea, Select, Button, Card } from '@/components/ui';
+import { MediaPicker } from '@/components/ui/media-picker';
 import { ArrowLeftIcon, EyeIcon } from '@heroicons/react/24/outline';
 import {
   BuilderSectionNav,
@@ -23,6 +24,13 @@ import {
 } from './components';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
+
+type Purpose = {
+  id: string;
+  name: string | null;
+  type?: string | null;
+  parent_id?: string | null;
+};
 
 type CoreForm = {
   name: string;
@@ -106,6 +114,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   });
   const [phases, setPhases] = useState<PhaseData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
+  const [purposes, setPurposes] = useState<Purpose[]>([]);
+  const [subPurposeIds, setSubPurposeIds] = useState<string[]>([]);
+  const [cover, setCover] = useState<{ mediaId: string | null; url: string | null }>({ mediaId: null, url: null });
   const [boardConfig, setBoardConfig] = useState<BoardConfigData>({
     show_game_name: true,
     show_current_phase: true,
@@ -126,6 +137,46 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Load purposes for main/sub purpose selection
+  useEffect(() => {
+    void (async () => {
+      try {
+        const res = await fetch('/api/purposes');
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda syften');
+        setPurposes(data.purposes || []);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Kunde inte ladda syften');
+      }
+    })();
+  }, []);
+
+  const mainPurposeOptions = useMemo(
+    () =>
+      purposes
+        .filter((p) => (p.type ?? 'main') !== 'sub')
+        .map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })),
+    [purposes]
+  );
+
+  const subPurposeOptions = useMemo(
+    () =>
+      purposes
+        .filter((p) => (p.type ?? 'main') === 'sub' && (!core.main_purpose_id || p.parent_id === core.main_purpose_id))
+        .map((p) => ({ value: p.id, label: p.name || 'Okänt undersyfte' })),
+    [purposes, core.main_purpose_id]
+  );
+
+  useEffect(() => {
+    if (!core.main_purpose_id && mainPurposeOptions.length > 0) {
+      setCore((prev) => ({ ...prev, main_purpose_id: prev.main_purpose_id || mainPurposeOptions[0].value }));
+    }
+  }, [core.main_purpose_id, mainPurposeOptions]);
+
+  useEffect(() => {
+    setSubPurposeIds((prev) => prev.filter((id) => subPurposeOptions.some((opt) => opt.value === id)));
+  }, [subPurposeOptions]);
 
   // Load existing game
   useEffect(() => {
@@ -220,6 +271,17 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         );
         setRoles(loadedRoles);
 
+        if (Array.isArray(data.secondaryPurposes)) {
+          setSubPurposeIds((data.secondaryPurposes as string[]).filter(Boolean));
+        }
+
+        if (data.coverMedia) {
+          setCover({
+            mediaId: data.coverMedia.media_id ?? null,
+            url: data.coverMedia.url ?? null,
+          });
+        }
+
 
         // Load board config
         if (data.boardConfig) {
@@ -253,17 +315,21 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     name: Boolean(core.name.trim()),
     shortDescription: Boolean(core.short_description.trim()),
     purposeSelected: Boolean(core.main_purpose_id),
+    subPurposeSelected: subPurposeIds.length > 0,
+    coverImageSelected: Boolean(cover.mediaId),
     hasStepsOrDescription: steps.length > 0 || Boolean(core.description.trim()),
     energyLevel: Boolean(core.energy_level),
     location: Boolean(core.location_type),
     allRequiredMet: Boolean(
       core.name.trim() &&
       core.short_description.trim() &&
-      (steps.length > 0 || core.description.trim())
+      core.main_purpose_id &&
+      (steps.length > 0 || core.description.trim()) &&
+      cover.mediaId
     ),
     noValidationErrors: true,
     reviewed: false,
-  }), [core, steps]);
+  }), [core, steps, subPurposeIds, cover]);
 
   // Completed sections
   const completedSections = useMemo(() => {
@@ -283,7 +349,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   }, [qualityState, steps, materials, phases, roles, boardConfig]);
 
   // Save handler
-  const handleSave = useCallback(async () => {
+  const handleSave = useCallback(async (options?: { status?: 'draft' | 'published' }) => {
     setSaveStatus('saving');
     setError(null);
 
@@ -291,6 +357,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       const payload = {
         core: {
           ...core,
+          status: options?.status ?? core.status,
           name: core.name.trim(),
           short_description: core.short_description.trim(),
           description: core.description || null,
@@ -345,6 +412,8 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           background_color: boardConfig.background_color || null,
           layout_variant: boardConfig.layout_variant,
         },
+        secondaryPurposes: subPurposeIds,
+        coverMediaId: cover.mediaId,
       };
 
       const res = await fetch(
@@ -369,14 +438,17 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [core, steps, materials, phases, roles, boardConfig, gameId, router]);
+  }, [core, steps, materials, phases, roles, boardConfig, gameId, router, subPurposeIds, cover]);
 
   // Publish handler
   const handlePublish = useCallback(async () => {
+    if (!qualityState.allRequiredMet) {
+      setError('Fyll i obligatoriska fält och välj omslagsbild innan publicering.');
+      return;
+    }
     setCore((prev) => ({ ...prev, status: 'published' }));
-    // Trigger save with published status
-    setTimeout(() => handleSave(), 0);
-  }, [handleSave]);
+    await handleSave({ status: 'published' });
+  }, [handleSave, qualityState.allRequiredMet]);
 
   if (loading) {
     return (
@@ -412,7 +484,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             <SaveIndicator
               status={saveStatus}
               lastSaved={lastSaved}
-              onRetry={handleSave}
+              onRetry={() => handleSave()}
             />
 
             <Button
@@ -429,7 +501,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={handleSave}
+              onClick={() => handleSave()}
               disabled={saveStatus === 'saving'}
             >
               Spara utkast
@@ -511,6 +583,77 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                     rows={5}
                     placeholder="Detaljerad beskrivning av leken..."
                   />
+                </div>
+              </Card>
+
+              <Card className="p-6 space-y-4">
+                <h3 className="font-medium text-foreground">Syften & omslagsbild</h3>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">
+                      Huvudsyfte <span className="text-destructive">*</span>
+                    </label>
+                    <Select
+                      value={core.main_purpose_id}
+                      onChange={(e) => setCore({ ...core, main_purpose_id: e.target.value })}
+                      options={mainPurposeOptions.length > 0 ? mainPurposeOptions : [{ value: '', label: 'Laddar syften...' }]}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Undersyften</label>
+                    <div className="rounded-lg border border-border p-3 space-y-2 max-h-32 overflow-y-auto">
+                      {subPurposeOptions.length === 0 && (
+                        <p className="text-sm text-muted-foreground">Välj huvudsyfte för att se undersyften.</p>
+                      )}
+                      {subPurposeOptions.map((opt) => (
+                        <label key={opt.value} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            className="h-4 w-4 rounded border-border"
+                            checked={subPurposeIds.includes(opt.value)}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setSubPurposeIds((prev) =>
+                                checked ? [...prev, opt.value] : prev.filter((id) => id !== opt.value)
+                              );
+                            }}
+                          />
+                          <span>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Omslagsbild / standardbild</label>
+                  <div className="flex items-center gap-3">
+                    <div className="h-16 w-28 overflow-hidden rounded-lg border border-border bg-muted">
+                      {cover.url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={cover.url} alt="Omslagsbild" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center text-xs text-muted-foreground">Ingen bild</div>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <MediaPicker
+                        value={cover.mediaId}
+                        onSelect={(mediaId, url) => setCover({ mediaId, url })}
+                        allowTemplate
+                      />
+                      {cover.mediaId && (
+                        <Button variant="ghost" size="sm" onClick={() => setCover({ mediaId: null, url: null })}>
+                          Rensa bild
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Välj en omslagsbild eller använd en standardbild kopplad till valt syfte/undersyfte.
+                  </p>
                 </div>
               </Card>
 

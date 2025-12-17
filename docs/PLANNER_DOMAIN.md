@@ -135,9 +135,8 @@ From `supabase/migrations/20251208120000_planner_modernization.sql`:
   - writing tenant notes
 
 ## Known gaps / tech debt (repo-anchored)
-- Duration consistency: `plans.total_time_minutes` is updated in API handlers (suggested RPC/trigger noted in `docs/DOMAIN_PLANNER_TODO.md`).
-- Plan playback progress: `plan_play_progress` exists but current Play plan UI also persists locally (see Play domain’s plan playback route).
-- Tenant notes UX: endpoints exist, but planner UI currently focuses on private notes.
+- Duration consistency: handled by DB trigger in `supabase/migrations/20251217120000_planner_total_time_trigger.sql`.
+- Plan playback progress: persisted via `GET/POST /api/plans/[planId]/progress` + Play plan playback sync.
 
 ## Validation checklist
 - Create plan, rename, edit description.

@@ -13,6 +13,15 @@ import type { Step } from "./types";
 const DEFAULT_STEP_DURATION_MINUTES = 5;
 const STORAGE_PREFIX = "play-plan:";
 
+type ProgressStatus = "not_started" | "in_progress" | "completed" | "abandoned";
+
+type PlanPlayProgress = {
+  current_block_id?: string | null;
+  current_position?: number | null;
+  status?: ProgressStatus;
+  metadata?: Record<string, unknown> | null;
+};
+
 type PlannerPlayGame = {
   id: string;
   title: string;
@@ -111,6 +120,9 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   const [timerTotal, setTimerTotal] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const restoredTimerRef = useRef(false);
+  const saveProgressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastProgressRef = useRef<string>("");
+  const blockPositionByIdRef = useRef<Record<string, number>>({});
 
   const storageKey = planId ? `${STORAGE_PREFIX}${planId}` : null;
 
@@ -142,6 +154,9 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
       }
 
       const json = (await res.json()) as { play: PlannerPlayView };
+      blockPositionByIdRef.current = Object.fromEntries(
+        (json.play?.blocks ?? []).map((b, idx) => [b.id, idx])
+      );
       const mapped = mapPlanToRun(json.play);
       if (!mapped) {
         setPlan(null);
@@ -172,7 +187,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
 
     try {
       const raw = storageKey ? window.localStorage.getItem(storageKey) : null;
-      const saved = raw
+      const savedLocal = raw
         ? (JSON.parse(raw) as {
             stepIndex?: number;
             remainingSeconds?: number;
@@ -181,17 +196,68 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
           })
         : null;
 
-      const safeIndex = clampStep(saved?.stepIndex ?? 0, totalSteps);
-      const targetStep = plan.steps[safeIndex];
-      const defaultTotal = getStepDurationSeconds(targetStep);
-      const savedTotal = saved?.timerTotalSeconds && saved.timerTotalSeconds > 0 ? saved.timerTotalSeconds : defaultTotal;
-      const savedRemaining = saved?.remainingSeconds && saved.remainingSeconds > 0 ? Math.min(saved.remainingSeconds, savedTotal) : savedTotal;
+      if (savedLocal) {
+        const safeIndex = clampStep(savedLocal?.stepIndex ?? 0, totalSteps);
+        const targetStep = plan.steps[safeIndex];
+        const defaultTotal = getStepDurationSeconds(targetStep);
+        const savedTotal =
+          savedLocal?.timerTotalSeconds && savedLocal.timerTotalSeconds > 0
+            ? savedLocal.timerTotalSeconds
+            : defaultTotal;
+        const savedRemaining =
+          savedLocal?.remainingSeconds && savedLocal.remainingSeconds > 0
+            ? Math.min(savedLocal.remainingSeconds, savedTotal)
+            : savedTotal;
 
-      setCurrentStep(safeIndex);
-      setTimerTotal(savedTotal);
-      setTimerRemaining(savedRemaining);
-      setIsTimerRunning(Boolean(saved?.isRunning && savedRemaining > 0));
-      restoredTimerRef.current = true;
+        setCurrentStep(safeIndex);
+        setTimerTotal(savedTotal);
+        setTimerRemaining(savedRemaining);
+        setIsTimerRunning(Boolean(savedLocal?.isRunning && savedRemaining > 0));
+        restoredTimerRef.current = true;
+        return;
+      }
+
+      void (async () => {
+        try {
+          const res = await fetch(`/api/plans/${planId}/progress`);
+          if (!res.ok) return;
+          const json = (await res.json()) as { progress: PlanPlayProgress | null };
+          const progress = json.progress;
+          const meta = (progress?.metadata ?? {}) as Record<string, unknown>;
+
+          const stepIndexMeta = typeof meta.stepIndex === "number" ? (meta.stepIndex as number) : null;
+
+          let inferredIndex = 0;
+          if (stepIndexMeta !== null) {
+            inferredIndex = stepIndexMeta;
+          } else if (progress?.current_block_id) {
+            const prefix = `${progress.current_block_id}:`;
+            const found = plan.steps.findIndex((s) => s.id.startsWith(prefix));
+            inferredIndex = found >= 0 ? found : 0;
+          }
+
+          const safeIndex = clampStep(inferredIndex, totalSteps);
+          const targetStep = plan.steps[safeIndex];
+          const defaultTotal = getStepDurationSeconds(targetStep);
+          const totalSeconds =
+            typeof meta.timerTotalSeconds === "number" && (meta.timerTotalSeconds as number) > 0
+              ? (meta.timerTotalSeconds as number)
+              : defaultTotal;
+          const remainingSeconds =
+            typeof meta.remainingSeconds === "number" && (meta.remainingSeconds as number) > 0
+              ? Math.min(meta.remainingSeconds as number, totalSeconds)
+              : totalSeconds;
+          const isRunning = Boolean(meta.isRunning && remainingSeconds > 0);
+
+          setCurrentStep(safeIndex);
+          setTimerTotal(totalSeconds);
+          setTimerRemaining(remainingSeconds);
+          setIsTimerRunning(isRunning);
+          restoredTimerRef.current = true;
+        } catch (err) {
+          console.warn("Failed to restore remote progress", err);
+        }
+      })();
     } catch (err) {
       console.warn("Failed to restore play state", err);
       setCurrentStep(0);
@@ -216,7 +282,31 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     } catch (err) {
       console.warn("Failed to persist play state", err);
     }
-  }, [storageKey, plan, totalSteps, currentStep, timerRemaining, timerTotal, isTimerRunning]);
+
+    if (!planId) return;
+    const blockId = plan.steps[currentStep]?.id.split(":")[0] || null;
+    const blockPosition = blockId ? blockPositionByIdRef.current[blockId] ?? null : null;
+    const progressPayload = {
+      current_block_id: blockId,
+      current_position: blockPosition,
+      status: "in_progress" as const,
+      metadata: payload,
+    };
+    const serialized = JSON.stringify(progressPayload);
+    if (serialized === lastProgressRef.current) return;
+    lastProgressRef.current = serialized;
+
+    if (saveProgressTimerRef.current) {
+      clearTimeout(saveProgressTimerRef.current);
+    }
+    saveProgressTimerRef.current = setTimeout(() => {
+      void fetch(`/api/plans/${planId}/progress`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(progressPayload),
+      }).catch(() => null);
+    }, 800);
+  }, [storageKey, plan, totalSteps, currentStep, timerRemaining, timerTotal, isTimerRunning, planId]);
 
   useEffect(() => {
     if (!step) return;

@@ -25,6 +25,7 @@ type SessionEditorProps = {
   onUpdateBlock: (blockId: string, updates: Partial<PlannerBlock> & { position?: number }) => Promise<void>;
   onDeleteBlock: (blockId: string) => Promise<void>;
   onSavePrivateNote: (content: string) => Promise<void>;
+  onSaveTenantNote?: (content: string) => Promise<void>;
   onVisibilityChange: (visibility: PlannerVisibility) => Promise<void>;
   onReorderBlocks: (blockIds: string[]) => Promise<void>;
   canSetPublicVisibility?: boolean;
@@ -53,6 +54,7 @@ export function SessionEditor({
   onUpdateBlock: _onUpdateBlock,
   onDeleteBlock,
   onSavePrivateNote,
+  onSaveTenantNote,
   onVisibilityChange,
   onReorderBlocks,
   canSetPublicVisibility = false,
@@ -60,6 +62,8 @@ export function SessionEditor({
   const [localPlan, setLocalPlan] = useState<PlannerPlan>(plan);
   const [noteContent, setNoteContent] = useState<string>(plan.notes?.privateNote?.content ?? "");
   const [isSavingNote, setIsSavingNote] = useState(false);
+  const [tenantNoteContent, setTenantNoteContent] = useState<string>(plan.notes?.tenantNote?.content ?? "");
+  const [isSavingTenantNote, setIsSavingTenantNote] = useState(false);
   const [gameQuery, setGameQuery] = useState("");
   const [gameResults, setGameResults] = useState<GameSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -82,6 +86,7 @@ export function SessionEditor({
       description: shouldSyncDesc ? plan.description : prev.description,
     }));
     setNoteContent(plan.notes?.privateNote?.content ?? "");
+    setTenantNoteContent(plan.notes?.tenantNote?.content ?? "");
   }, [plan, isTypingTitle, isTypingDesc, localPlan.id]);
 
   const totalDuration = useMemo(
@@ -161,6 +166,16 @@ export function SessionEditor({
     setIsSavingNote(false);
   };
 
+  const handleSaveTenantNote = async () => {
+    if (!onSaveTenantNote) return;
+    setIsSavingTenantNote(true);
+    try {
+      await onSaveTenantNote(tenantNoteContent);
+    } finally {
+      setIsSavingTenantNote(false);
+    }
+  };
+
   const searchGames = async () => {
     setIsSearching(true);
     try {
@@ -206,6 +221,32 @@ export function SessionEditor({
           </div>
         </div>
       </div>
+
+      {localPlan.visibility !== "private" && localPlan.ownerTenantId ? (
+        <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BookmarkIcon className="h-4 w-4 text-muted-foreground" />
+              <h3 className="text-sm font-semibold">Tenant-anteckningar</h3>
+            </div>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={isSavingTenantNote || !onSaveTenantNote}
+              onClick={() => void handleSaveTenantNote()}
+            >
+              {isSavingTenantNote ? "Sparar..." : "Spara"}
+            </Button>
+          </div>
+          <Textarea
+            value={tenantNoteContent}
+            onChange={(e) => setTenantNoteContent(e.target.value)}
+            rows={3}
+            className="mt-3"
+            placeholder="Anteckningar som delas inom din tenant."
+          />
+        </div>
+      ) : null}
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">

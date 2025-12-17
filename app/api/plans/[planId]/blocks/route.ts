@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
-import { fetchPlanWithRelations, recalcPlanDuration } from '@/lib/services/planner.server'
+import { fetchPlanWithRelations } from '@/lib/services/planner.server'
 import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -107,20 +107,6 @@ export async function POST(
   if (orderError) {
     console.error('[api/plans/:id/blocks] reorder error', orderError)
     return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
-  }
-
-  // Update total duration
-  const { plan } = await fetchPlanWithRelations(planId)
-  if (plan) {
-    const totalTime = recalcPlanDuration(plan.blocks)
-    await supabase
-      .from('plans')
-      .update({
-        total_time_minutes: totalTime,
-        updated_at: new Date().toISOString(),
-        updated_by: user.id,
-      })
-      .eq('id', planId)
   }
 
   const refreshed = await fetchPlanWithRelations(planId)

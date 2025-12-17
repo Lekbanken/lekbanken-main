@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PlannerPageLayout } from "./components/PlannerPageLayout";
 import { SessionEditor } from "./components/SessionEditor";
 import { SessionList } from "./components/SessionList";
-import { createPlan, fetchPlans, updatePlan, addBlock, updateBlock, deleteBlock, savePrivateNote, updateVisibility, reorderBlocks } from "./api";
+import { createPlan, fetchPlans, updatePlan, addBlock, updateBlock, deleteBlock, savePrivateNote, saveTenantNote, updateVisibility, reorderBlocks } from "./api";
 import type { PlannerPlan, PlannerBlock, PlannerVisibility } from "./types";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -140,6 +140,16 @@ export function PlannerPage() {
     }
   };
 
+  const handleSaveTenantNote = async (content: string) => {
+    if (!activePlan) return;
+    try {
+      await saveTenantNote(activePlan.id, content, activePlan.ownerTenantId ?? null);
+    } catch (err) {
+      console.error(err);
+      setError("Kunde inte spara tenant-anteckning");
+    }
+  };
+
   const handleVisibilityChange = async (planId: string, visibility: PlannerVisibility) => {
     try {
       const updated = await updateVisibility(planId, {
@@ -193,6 +203,7 @@ export function PlannerPage() {
             onUpdateBlock={handleUpdateBlock}
             onDeleteBlock={handleDeleteBlock}
             onSavePrivateNote={handleSaveNote}
+            onSaveTenantNote={handleSaveTenantNote}
             canSetPublicVisibility={canSetPublic}
             onVisibilityChange={(visibility) => handleVisibilityChange(activePlan.id, visibility)}
             onReorderBlocks={handleReorderBlocks}

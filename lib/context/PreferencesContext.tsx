@@ -48,7 +48,13 @@ function applyTheme(preference: ThemePreference) {
 
 function applyLanguage(lang: LanguageCode) {
   if (typeof document !== 'undefined') {
-    document.documentElement.lang = lang.toLowerCase()
+    const htmlLang =
+      lang === 'SE'
+        ? 'sv'
+        : lang === 'NO'
+          ? 'no'
+          : 'en'
+    document.documentElement.lang = htmlLang
   }
 }
 

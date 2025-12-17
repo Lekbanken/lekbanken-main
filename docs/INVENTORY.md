@@ -99,6 +99,7 @@ Fält:
 | [docs/templates/DOMAIN_VALIDATION_TEMPLATE.md](templates/DOMAIN_VALIDATION_TEMPLATE.md) | E | draft | - | - | Template |
 | [docs/templates/VALIDATION_CHECKLIST.md](templates/VALIDATION_CHECKLIST.md) | E | draft | - | - | Template |
 | [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | - | - | Test plan |
+| [docs/TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md](TRANSLATION_ENGINE_DOMAIN_VALIDATION_REPORT.md) | C | draft | - | - | Validation report |
 | [docs/TYPE_MANAGEMENT.md](TYPE_MANAGEMENT.md) | A | draft | - | - | Core reference |
 | [docs/validation/API_VALIDATION_REPORT.md](validation/API_VALIDATION_REPORT.md) | C | draft | - | - | Validation report |

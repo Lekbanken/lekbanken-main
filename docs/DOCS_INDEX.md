@@ -39,6 +39,7 @@ Fält:
 | ACCOUNTS_DOMAIN.md | A | active | 2025-12-17 | - |
 | GAMES_DOMAIN.md | A | active | 2025-12-17 | - |
 | OPERATIONS_DOMAIN.md | A | active | 2025-12-17 | - |
+| TRANSLATION_ENGINE_DOMAIN.md | A | active | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_ARCHITECTURE.md | B | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md | C | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_MVP.md | B | archived | 2025-12-17 | - |

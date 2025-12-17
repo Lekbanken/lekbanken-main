@@ -1,5 +1,7 @@
 # 🌍 TRANSLATION ENGINE DOMAIN – VALIDATION REPORT
 
+Canonical domain doc (source of truth): `docs/TRANSLATION_ENGINE_DOMAIN.md`
+
 **Validation Date:** December 11, 2025  
 **Domain:** Translation Engine (i18n)  
 **Status:** ⚠️ PARTIAL IMPLEMENTATION (60% complete)

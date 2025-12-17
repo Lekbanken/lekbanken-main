@@ -35,7 +35,7 @@ Non-goals:
 - Rewards shop: `app/app/shop/page.tsx`
 
 ### API endpoints
-- `GET/POST /api/gamification` (snapshot: achievements, coins, streaks, progress)
+- `GET /api/gamification` (snapshot: achievements, coins, streaks, progress)
   - Reads: achievements, user_achievements, user_coins, coin_transactions, user_streaks, user_progress
   - Returns serialized `GamificationPayload` with mapped data
 
@@ -195,6 +195,10 @@ From `supabase/migrations/20251129000012_achievements_advanced_domain.sql`:
 - Challenge/event participation is user-scoped
 - Leaderboards visible to all tenant members
 
+Note on current data flows:
+- `features/gamification/GamificationPage.tsx` uses `fetchGamificationSnapshot()` → `GET /api/gamification`.
+- `app/app/profile/achievements/page.tsx` currently uses `lib/services/achievementService.ts` directly from the client (Supabase client), not the snapshot API.
+
 ## Validation & logic
 
 ### Progression mechanics
@@ -209,12 +213,13 @@ From `supabase/migrations/20251129000012_achievements_advanced_domain.sql`:
 - **Reward claiming**: event_rewards.claimed flag tracks whether user has taken reward
 
 ## Known gaps / tech debt (repo-anchored)
-- Challenge/event management UIs exist (`app/app/challenges/page.tsx`, `app/app/events/page.tsx`) but are mock data (not yet wired to DB)
-- Shop (`app/app/shop/page.tsx`) is mock; not yet integrated with coin balance
-- Seasonal leaderboards structure exists but season rotation logic not yet implemented
-- Streak reset logic (48-hour window) not automated; relies on manual trigger
-- No audit trail for challenge completion or event reward claims
-- Achievement auto-unlock from events not yet implemented in API
+- Challenge and event pages exist but are currently mock data:
+  - `app/app/challenges/page.tsx` (mockChallenges)
+  - `app/app/events/page.tsx` (mockEvents)
+- Shop page exists but is currently mock data (`app/app/shop/page.tsx`, mockItems) and not integrated with `user_coins` / `coin_transactions`.
+- Seasonal leaderboard structures exist in DB (`achievement_leaderboards`, `seasonal_achievements`) but season rotation and recompute jobs are not implemented.
+- Streak reset logic (48-hour window) is defined in `lib/services/progressionService.ts` but not automated by a scheduled job/trigger.
+- Coin and progression writes are designed for `service_role` (see RLS in `20251209133000_gamification_core.sql`), so client-side mutation flows require a server/API layer.
 
 ## Validation checklist
 - Fetch gamification snapshot via `GET /api/gamification` returns all 4 subsections (achievements, coins, streak, progress)

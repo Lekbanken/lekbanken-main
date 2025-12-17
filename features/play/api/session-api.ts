@@ -7,8 +7,6 @@
  * NOTE: Uses 'as any' casts for new tables not in generated Supabase types yet.
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';
 
 // Local step/phase types for API responses
@@ -95,44 +93,20 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
     
     // Default empty data if no game linked
     let steps: StepInfo[] = [];
-    const phases: PhaseInfo[] = [];
+    let phases: PhaseInfo[] = [];
     let gameTitle = session.displayName || 'Session';
-    
-    // If game is linked, fetch game data
+
+    // If game is linked, fetch game+steps/phases through Play API
     if (session.gameId) {
-      const gameRes = await fetch(`/api/games/${session.gameId}`, {
+      const gameRes = await fetch(`/api/play/sessions/${sessionId}/game`, {
         cache: 'no-store',
       });
-      
+
       if (gameRes.ok) {
         const gameData = await gameRes.json();
-        gameTitle = gameData.game?.name || gameTitle;
-        
-        // Fetch game steps
-        const stepsRes = await fetch(`/api/games/${session.gameId}/steps`, {
-          cache: 'no-store',
-        });
-        
-        if (stepsRes.ok) {
-          const stepsData = await stepsRes.json();
-          steps = (stepsData.steps || []).map((s: any, index: number) => ({
-            id: s.id || `step-${index}`,
-            index,
-            title: s.title || `Steg ${index + 1}`,
-            description: s.description || s.content || '',
-            content: s.content || s.description || '',
-            durationMinutes: s.duration_minutes || (s.duration_seconds ? Math.ceil(s.duration_seconds / 60) : undefined),
-            duration: s.duration_seconds || null,
-            media: s.media_url ? { type: 'image', url: s.media_url } : undefined,
-            materials: s.materials || undefined,
-            safety: s.safety || undefined,
-            tag: s.tag || undefined,
-            note: s.note || undefined,
-          }));
-        }
-        
-        // TODO: Fetch phases when phases API exists
-        // For now, phases are empty or derived from steps
+        gameTitle = gameData.title || gameTitle;
+        steps = gameData.steps || [];
+        phases = gameData.phases || [];
       }
     }
     
@@ -177,16 +151,110 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
  */
 export async function updatePlaySessionState(
   sessionId: string,
-  updates: Partial<SessionRuntimeState>
+  updates: Partial<SessionRuntimeState>,
+  previousState?: Partial<SessionRuntimeState>
 ): Promise<boolean> {
   try {
-    const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updates),
-    });
-    
-    return res.ok;
+    // Session status is updated through the session endpoint
+    if (typeof updates.status === 'string') {
+      const action =
+        updates.status === 'paused'
+          ? 'pause'
+          : updates.status === 'active'
+            ? 'resume'
+            : updates.status === 'ended'
+              ? 'end'
+              : null;
+
+      if (action) {
+        const statusRes = await fetch(`/api/play/sessions/${sessionId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action }),
+        });
+
+        if (!statusRes.ok) return false;
+      }
+    }
+
+    // Step/phase/timer/board updates are handled via the runtime state endpoint
+    if (typeof updates.current_step_index === 'number') {
+      const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set_step', step_index: updates.current_step_index }),
+      });
+      if (!res.ok) return false;
+    }
+
+    if (typeof updates.current_phase_index === 'number') {
+      const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'set_phase', phase_index: updates.current_phase_index }),
+      });
+      if (!res.ok) return false;
+    }
+
+    if (updates.timer_state !== undefined) {
+      const prev = previousState?.timer_state ?? null;
+      const next = updates.timer_state ?? null;
+
+      if (next === null) {
+        const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'timer_reset' }),
+        });
+        if (!res.ok) return false;
+      } else if (prev === null) {
+        const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'timer_start', duration_seconds: next.duration_seconds }),
+        });
+        if (!res.ok) return false;
+      } else if (prev.paused_at === null && next.paused_at !== null) {
+        const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'timer_pause' }),
+        });
+        if (!res.ok) return false;
+      } else if (prev.paused_at !== null && next.paused_at === null) {
+        const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'timer_resume' }),
+        });
+        if (!res.ok) return false;
+      } else if (
+        prev.started_at !== next.started_at ||
+        prev.duration_seconds !== next.duration_seconds
+      ) {
+        const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'timer_start', duration_seconds: next.duration_seconds }),
+        });
+        if (!res.ok) return false;
+      }
+    }
+
+    if (updates.board_state !== undefined) {
+      const res = await fetch(`/api/play/sessions/${sessionId}/state`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'set_board_message',
+          message: updates.board_state?.message ?? null,
+          overrides: updates.board_state?.overrides,
+        }),
+      });
+      if (!res.ok) return false;
+    }
+
+    return true;
   } catch (error) {
     console.error('[updatePlaySessionState] Error:', error);
     return false;

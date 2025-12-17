@@ -71,6 +71,7 @@ Rekommenderad spegling i repo:
 - Games (aktuellt): [GAMES_DOMAIN.md](GAMES_DOMAIN.md)
 	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
+- Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Media (aktuellt): [MEDIA_DOMAIN.md](MEDIA_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md)
@@ -114,7 +115,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | ⭐ Dokumenterad |
 | **Browse Domain** | Filter, produkter, kategorier, huvudsyften & undersyften, favoriter, sök, rekommendationer | ⭐ Dokumenterad |
 | **Games Domain** | Lekdatabas, lekstruktur (Inför/Under/Efter/Reflektion), metadata, variationer, gruppstorlek/ålder/tid, koppling till syften och produkter | ⭐ Dokumenterad |
-| **Play Domain** | Game-view, steg-för-steg UI, presentationsläge, session state, offline-läge | Placeholder |
+| **Play Domain** | Sessions (host + participants), Legendary Play realtime runtime (steps/phases/timer/roles/board), plan playback | ⭐ Dokumenterad |
 | **Planner Domain** | Planläggning av flera lekar, veckoscheman, export (PDF, delning), AI-genererade planer, templates, delning med team/grupp | Placeholder |
 | **Gamification Domain** | "Din Lekresa" – poängsystem, tokens/valuta, badges/troféer, levels, milestones, easter eggs, butik/reward-shop, aktivitetshistorik | Placeholder |
 | **Media Domain** | Standardbilder, illustrationer per produkt + huvudsyfte, kundens egna bilder, moderering, bildformat, media templates, versionering | ⭐ Dokumenterad |

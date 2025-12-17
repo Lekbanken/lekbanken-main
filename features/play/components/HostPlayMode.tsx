@@ -77,7 +77,8 @@ export function HostPlayMode({
 
   // Handle state updates
   const handleStateUpdate = useCallback(async (updates: Partial<SessionRuntimeState>) => {
-    const success = await updatePlaySessionState(sessionId, updates);
+    const previousState = playData?.runtimeState;
+    const success = await updatePlaySessionState(sessionId, updates, previousState);
     if (success) {
       // Update local state optimistically
       setPlayData((prev) => {
@@ -91,7 +92,7 @@ export function HostPlayMode({
         };
       });
     }
-  }, [sessionId]);
+  }, [sessionId, playData?.runtimeState]);
 
   // Handle session end
   const handleEndSession = useCallback(() => {

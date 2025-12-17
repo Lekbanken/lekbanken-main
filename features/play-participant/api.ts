@@ -80,10 +80,19 @@ export async function joinSession(payload: { sessionCode: string; displayName: s
 }
 
 export async function rejoinSession(payload: { sessionCode: string; participantToken: string }) {
+  // Underlying endpoint expects { participantToken, sessionId }
+  // (sessionId is not always available in callers), so we resolve it via the
+  // public session lookup endpoint when needed.
+  const session = await getPublicSession(payload.sessionCode);
+  const sessionId: string | undefined = session?.session?.id;
+  if (!sessionId) {
+    throw new Error('Session not found');
+  }
+
   const res = await fetch('/api/play/rejoin', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ participantToken: payload.participantToken, sessionId }),
   });
   return parseJson(res);
 }

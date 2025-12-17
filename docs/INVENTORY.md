@@ -85,6 +85,7 @@ Fält:
 | [docs/PLATFORM_DOMAIN_VALIDATION_REPORT.md](PLATFORM_DOMAIN_VALIDATION_REPORT.md) | C | draft | - | - | Validation report |
 | [docs/TENANT_DOMAIN.md](TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
+| [docs/PLAY_DOMAIN.md](PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |
 | [docs/PROMPT_FOR_NEW_AI.md](PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |

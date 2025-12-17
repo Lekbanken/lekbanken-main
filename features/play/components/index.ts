@@ -17,12 +17,26 @@ export type { StepPhaseNavigationProps, StepInfo, PhaseInfo } from './StepPhaseN
 export { RoleAssigner } from './RoleAssigner';
 export type { RoleAssignerProps } from './RoleAssigner';
 
+export { RoleAssignerContainer } from './RoleAssignerContainer';
+export type { RoleAssignerContainerProps } from './RoleAssignerContainer';
+
 // Participant components
 export { ParticipantPlayView } from './ParticipantPlayView';
 export type { ParticipantPlayViewProps, StepData } from './ParticipantPlayView';
 
 export { RoleCard } from './RoleCard';
 export type { RoleCardProps, RoleCardData } from './RoleCard';
+
+// Integration components
+export { HostPlayMode } from './HostPlayMode';
+export type { HostPlayModeProps } from './HostPlayMode';
+
+export { ParticipantPlayMode } from './ParticipantPlayMode';
+export type { ParticipantPlayModeProps } from './ParticipantPlayMode';
+
+export { HostSessionWithPlayClient } from './HostSessionWithPlay';
+
+export { ParticipantSessionWithPlayClient } from './ParticipantSessionWithPlay';
 
 // Existing components
 export { NavigationControls } from './NavigationControls';

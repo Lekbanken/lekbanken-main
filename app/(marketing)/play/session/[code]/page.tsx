@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ParticipantSessionClient } from './client';
+import { ParticipantSessionWithPlayClient } from '@/features/play';
 
 type Props = {
   params: Promise<{ code: string }>;
@@ -15,5 +15,5 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ParticipantSessionPage({ params }: Props) {
   const { code } = await params;
-  return <ParticipantSessionClient code={code} />;
+  return <ParticipantSessionWithPlayClient code={code} />;
 }

@@ -3,13 +3,8 @@
  * 
  * POST: Assign roles to participants
  * DELETE: Remove role assignment
- * 
- * NOTE: Uses 'as any' casts for new tables (session_roles, session_events, 
- * participant_role_assignments) that aren't in generated Supabase types yet.
- * Run `supabase gen types` after migration to remove these casts.
+ * GET: List assignments for a session
  */
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
@@ -68,18 +63,18 @@ export async function POST(request: NextRequest, context: RouteContext) {
     
     // Validate all role IDs belong to this session
     const roleIds = body.assignments.map((a) => a.roleId);
-    const { data: validRoles, error: rolesError } = await (supabase
-      .from('session_roles' as any)
+    const { data: validRoles, error: rolesError } = await supabase
+      .from('session_roles')
       .select('id')
       .eq('session_id', sessionId)
-      .in('id', roleIds) as any);
+      .in('id', roleIds);
     
     if (rolesError) {
       console.error('[Assignments API] Role validation error:', rolesError);
       return NextResponse.json({ error: 'Failed to validate roles' }, { status: 500 });
     }
     
-    const validRoleIds = new Set((validRoles as Array<{ id: string }> || []).map((r) => r.id));
+    const validRoleIds = new Set((validRoles || []).map((r) => r.id));
     const invalidRoles = roleIds.filter((id) => !validRoleIds.has(id));
     
     if (invalidRoles.length > 0) {
@@ -102,7 +97,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Failed to validate participants' }, { status: 500 });
     }
     
-    const validParticipantIds = new Set(validParticipants?.map((p: { id: string }) => p.id) || []);
+    const validParticipantIds = new Set((validParticipants || []).map((p) => p.id));
     const invalidParticipants = participantIds.filter((id) => !validParticipantIds.has(id));
     
     if (invalidParticipants.length > 0) {
@@ -121,13 +116,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
       assigned_at: new Date().toISOString(),
     }));
     
-    const { data: inserted, error: insertError } = await (supabase
-      .from('participant_role_assignments' as any)
+    const { data: inserted, error: insertError } = await supabase
+      .from('participant_role_assignments')
       .upsert(insertData, {
         onConflict: 'session_id,participant_id',
         ignoreDuplicates: false,
       })
-      .select() as any);
+      .select();
     
     if (insertError) {
       console.error('[Assignments API] Insert error:', insertError);
@@ -147,23 +142,23 @@ export async function POST(request: NextRequest, context: RouteContext) {
     // Update each role's count
     for (const [roleId, count] of roleCountUpdates) {
       // Get current count first
-      const { data: currentRole } = await (supabase
-        .from('session_roles' as any)
+      const { data: currentRole } = await supabase
+        .from('session_roles')
         .select('assigned_count')
         .eq('id', roleId)
-        .single() as any);
+        .single();
       
       if (currentRole) {
-        await (supabase
-          .from('session_roles' as any)
-          .update({ assigned_count: (currentRole as any).assigned_count + count })
-          .eq('id', roleId) as any);
+        await supabase
+          .from('session_roles')
+          .update({ assigned_count: currentRole.assigned_count + count })
+          .eq('id', roleId);
       }
     }
     
     // Log event
-    await (supabase
-      .from('session_events' as any)
+    await supabase
+      .from('session_events')
       .insert({
         session_id: sessionId,
         event_type: 'role_assigned',
@@ -172,7 +167,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
           count: body.assignments.length,
         },
         actor_user_id: user.id,
-      }) as any);
+      });
     
     return NextResponse.json({
       success: true,
@@ -231,12 +226,12 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
     
     // Delete assignment
-    const { error: deleteError } = await (supabase
-      .from('participant_role_assignments' as any)
+    const { error: deleteError } = await supabase
+      .from('participant_role_assignments')
       .delete()
       .eq('session_id', sessionId)
       .eq('participant_id', body.participantId)
-      .eq('session_role_id', body.roleId) as any);
+      .eq('session_role_id', body.roleId);
     
     if (deleteError) {
       console.error('[Assignments API] Delete error:', deleteError);
@@ -244,32 +239,32 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
     
     // Update assigned_count on session_role
-    const { data: currentRole } = await (supabase
-      .from('session_roles' as any)
+    const { data: currentRole } = await supabase
+      .from('session_roles')
       .select('assigned_count')
       .eq('id', body.roleId)
-      .single() as any);
+      .single();
     
-    if (currentRole && (currentRole as any).assigned_count > 0) {
-      await (supabase
-        .from('session_roles' as any)
-        .update({ assigned_count: (currentRole as any).assigned_count - 1 })
-        .eq('id', body.roleId) as any);
+    if (currentRole && currentRole.assigned_count > 0) {
+      await supabase
+        .from('session_roles')
+        .update({ assigned_count: currentRole.assigned_count - 1 })
+        .eq('id', body.roleId);
     }
     
     // Log event
-    await (supabase
-      .from('session_events' as any)
+    await supabase
+      .from('session_events')
       .insert({
         session_id: sessionId,
-        event_type: 'role_assigned', // Could use 'role_unassigned' if added to event types
+        event_type: 'role_unassigned',
         event_data: {
           action: 'unassign',
           participantId: body.participantId,
           roleId: body.roleId,
         },
         actor_user_id: user.id,
-      }) as any);
+      });
     
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -309,8 +304,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
     }
     
     // Get all assignments for this session
-    const { data: assignments, error: assignmentsError } = await (supabase
-      .from('participant_role_assignments' as any)
+    const { data: assignments, error: assignmentsError } = await supabase
+      .from('participant_role_assignments')
       .select(`
         id,
         session_id,
@@ -320,7 +315,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
         assigned_by,
         revealed_at
       `)
-      .eq('session_id', sessionId) as any);
+      .eq('session_id', sessionId);
     
     if (assignmentsError) {
       console.error('[Assignments API] Fetch error:', assignmentsError);

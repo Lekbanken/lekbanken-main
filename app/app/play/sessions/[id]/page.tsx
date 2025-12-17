@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { HostSessionDetailClient } from './client';
+import { HostSessionWithPlayClient } from '@/features/play';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -12,5 +12,5 @@ export const metadata: Metadata = {
 
 export default async function HostSessionDetailPage({ params }: Props) {
   const { id } = await params;
-  return <HostSessionDetailClient sessionId={id} />;
+  return <HostSessionWithPlayClient sessionId={id} />;
 }

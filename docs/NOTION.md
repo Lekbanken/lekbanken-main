@@ -68,6 +68,9 @@ Rekommenderad spegling i repo:
 	- Learnings: [DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)
 - Billing & Licensing (aktuellt): [BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md)
 	- Stripe integration (detail): [STRIPE.md](STRIPE.md)
+- Games (aktuellt): [GAMES_DOMAIN.md](GAMES_DOMAIN.md)
+	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
+	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
 - DOMAIN_* (där det finns)
 
 ---
@@ -103,10 +106,10 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 |-------|--------|--------|
 | **Platform Domain** | Runtime (Vercel), miljöer, deployment, routing, subdomäner, feature flags, error handling, performance, security, release channels | ⭐ Dokumenterad |
 | **Accounts Domain** | Multi-tenant authentication, användarkonton, roller & behörigheter, språkpreferenser, sessionshantering, onboarding, e-postverifiering, 2FA | ⭐ Dokumenterad |
-| **Tenant Domain** | Tenant-inställningar, valda produkter, aktiva licenser, feature configuration, standardinställningar, admin users, användarbegränsningar | Placeholder |
+| **Tenant Domain** | Tenant-inställningar, valda produkter, aktiva licenser, feature configuration, standardinställningar, admin users, användarbegränsningar | ⭐ Dokumenterad |
 | **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | ⭐ Dokumenterad |
 | **Browse Domain** | Filter, produkter, kategorier, huvudsyften & undersyften, favoriter, sök, rekommendationer | ⭐ Dokumenterad |
-| **Games Domain** | Lekdatabas, lekstruktur (Inför/Under/Efter/Reflektion), metadata, variationer, gruppstorlek/ålder/tid, koppling till syften och produkter | Placeholder |
+| **Games Domain** | Lekdatabas, lekstruktur (Inför/Under/Efter/Reflektion), metadata, variationer, gruppstorlek/ålder/tid, koppling till syften och produkter | ⭐ Dokumenterad |
 | **Play Domain** | Game-view, steg-för-steg UI, presentationsläge, session state, offline-läge | Placeholder |
 | **Planner Domain** | Planläggning av flera lekar, veckoscheman, export (PDF, delning), AI-genererade planer, templates, delning med team/grupp | Placeholder |
 | **Gamification Domain** | "Din Lekresa" – poängsystem, tokens/valuta, badges/troféer, levels, milestones, easter eggs, butik/reward-shop, aktivitetshistorik | Placeholder |
@@ -190,9 +193,9 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 
 - [ ] **Data Model Domain** – Central schema-governance
 - [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
-- [ ] **Tenant Domain** – Multi-tenancy-setup
+- [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
-- [ ] **Games Domain** – Lekstruktur och metadata
+- [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
 - [ ] **Gamification Domain** – "Din Lekresa"-logik
 - [ ] **Translation Engine Domain** – i18n-fallback och batch-översättning

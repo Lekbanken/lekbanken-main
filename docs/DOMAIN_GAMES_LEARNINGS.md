@@ -1,5 +1,8 @@
 # DOMAIN: GAMES - KEY LEARNINGS FOR NEXT DOMAINS
 
+Canonical documentation (repo source of truth):
+- `docs/GAMES_DOMAIN.md`
+
 This document summarizes the main architectural and implementation lessons learned from the current GAMES domain implementation. It should be used as guidance when designing and implementing future domains in Lekbanken.
 
 ---

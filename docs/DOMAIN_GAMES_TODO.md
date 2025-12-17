@@ -1,5 +1,10 @@
 # Games Domain TODOs
 
+Canonical documentation (repo source of truth):
+- `docs/GAMES_DOMAIN.md`
+
+This file is a backlog/worklist and may lag behind implementation.
+
 ## DB changes
 - Add `short_description`, `version`, `season_tags`, `holiday_tags`, `created_by`, `updated_by` to `games`; convert `materials` to `text[]`.
 - Introduce enums for `energy_level` and `location_type`; index on `energy_level`, `location_type`, `time_estimate_min`, `age_min/age_max`.
@@ -22,7 +27,7 @@
 - Expand browse filters (purpose, environment, age, time, group size) server-side and paginate.
 
 ## Documentation updates
-- Write `docs/DOMAIN_GAMES.md` with schema, RLS, service/API map, component map, and media/translation rules.
+- Write/update `docs/GAMES_DOMAIN.md` with schema, RLS, service/API map, component map, and media/translation rules.
 - Update Notion Games Domain page with the new schema, publish flow, and validation rules.
 
 ## Follow-up items (versioning)

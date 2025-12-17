@@ -65,6 +65,7 @@ Fält:
 | [docs/GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md](GAME_BUILDER_P2_IMPLEMENTATION_PLAN.md) | B | draft | - | - | Plan |
 | [docs/GAME_BUILDER_UI_SPEC.md](GAME_BUILDER_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/GAME_CSV_IMPORT_EXPORT_PLAN.md](GAME_CSV_IMPORT_EXPORT_PLAN.md) | B | draft | - | - | Plan |
+| [docs/GAMES_DOMAIN.md](GAMES_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/HANDOVER_2024-12-07.md](HANDOVER_2024-12-07.md) | C | draft | - | - | Handover |
 | [docs/MEDIA_DOMAIN.md](MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |

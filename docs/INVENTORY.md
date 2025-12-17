@@ -35,6 +35,7 @@ Fält:
 | [docs/ADMIN_GAME_BUILDER_V1.md](ADMIN_GAME_BUILDER_V1.md) | A | active | 2025-12-17 | - | Game Builder (current) |
 | [docs/ADMIN_OVERVIEW_REPORT.md](ADMIN_OVERVIEW_REPORT.md) | C | draft | - | - | Report/overview |
 | [docs/AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | A | draft | - | - | Process/guidelines |
+| [docs/ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/auth/architecture.md](auth/architecture.md) | A | active | 2025-12-17 | - | Auth architecture |
 | [docs/auth/debugging.md](auth/debugging.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/auth/README.md](auth/README.md) | A | active | 2025-12-17 | - | Sub-index |

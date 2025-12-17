@@ -60,6 +60,7 @@ Målet är att undvika "code vibe drift": om något står i Notion men inte kan 
 Rekommenderad spegling i repo:
 - [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
+- Accounts (aktuellt): [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md)
 - Participants (aktuellt): [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
 	- Legacy spec: [PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
 - Tenant (aktuellt): [TENANT_DOMAIN.md](TENANT_DOMAIN.md)
@@ -101,7 +102,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | Domän | Ansvar | Status |
 |-------|--------|--------|
 | **Platform Domain** | Runtime (Vercel), miljöer, deployment, routing, subdomäner, feature flags, error handling, performance, security, release channels | ⭐ Dokumenterad |
-| **Accounts Domain** | Multi-tenant authentication, användarkonton, roller & behörigheter, språkpreferenser, sessionshantering, onboarding, e-postverifiering, 2FA | Placeholder |
+| **Accounts Domain** | Multi-tenant authentication, användarkonton, roller & behörigheter, språkpreferenser, sessionshantering, onboarding, e-postverifiering, 2FA | ⭐ Dokumenterad |
 | **Tenant Domain** | Tenant-inställningar, valda produkter, aktiva licenser, feature configuration, standardinställningar, admin users, användarbegränsningar | Placeholder |
 | **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | ⭐ Dokumenterad |
 | **Browse Domain** | Filter, produkter, kategorier, huvudsyften & undersyften, favoriter, sök, rekommendationer | ⭐ Dokumenterad |
@@ -188,7 +189,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 ### Domäner som behöver fyllas i:
 
 - [ ] **Data Model Domain** – Central schema-governance
-- [ ] **Accounts Domain** – Auth-flöden och roller
+- [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [ ] **Tenant Domain** – Multi-tenancy-setup
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
 - [ ] **Games Domain** – Lekstruktur och metadata

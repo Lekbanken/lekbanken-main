@@ -15,7 +15,8 @@ import {
   ArrowRightIcon,
 } from '@heroicons/react/24/outline'
 import { Card, CardContent } from '@/components/ui'
-import { fetchGamificationSnapshot, type GamificationPayload } from '@/features/gamification/api'
+import { fetchJourneyFeed, fetchJourneySnapshot } from '@/features/journey/api'
+import type { JourneyActivity, JourneySnapshot } from '@/features/journey/types'
 
 // Mock data - replace with real data fetching
 const quickActions = [
@@ -25,26 +26,82 @@ const quickActions = [
   { icon: TrophyIcon, label: 'Topplista', href: '/app/leaderboard', color: 'bg-violet-500/10 text-violet-600' },
 ]
 
-const recentActivities = [
-  { id: '1', title: 'Bollkull', type: 'game', time: '2 timmar sedan' },
-  { id: '2', title: 'Samarbetspussel', type: 'game', time: 'Igår' },
-  { id: '3', title: 'Nya achievement: Första steget', type: 'achievement', time: 'Igår' },
-]
+function formatRelativeTimeSv(iso: string): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return '—'
+
+  const seconds = Math.round((date.getTime() - Date.now()) / 1000)
+  const rtf = new Intl.RelativeTimeFormat('sv', { numeric: 'auto' })
+  const abs = Math.abs(seconds)
+
+  if (abs < 60) return rtf.format(seconds, 'second')
+  const minutes = Math.round(seconds / 60)
+  if (Math.abs(minutes) < 60) return rtf.format(minutes, 'minute')
+  const hours = Math.round(minutes / 60)
+  if (Math.abs(hours) < 24) return rtf.format(hours, 'hour')
+  const days = Math.round(hours / 24)
+  return rtf.format(days, 'day')
+}
+
+function activityIcon(activity: JourneyActivity) {
+  switch (activity.type) {
+    case 'achievement_unlocked':
+      return TrophyIcon
+    case 'session_completed':
+      return PlayIcon
+    case 'coin_earned':
+    case 'coin_spent':
+      return SparklesIcon
+    case 'plan_progressed':
+      return CalendarIcon
+    default:
+      return ClockIcon
+  }
+}
+
+function activityAccent(activity: JourneyActivity): string {
+  switch (activity.type) {
+    case 'achievement_unlocked':
+      return 'bg-amber-500/10 text-amber-600'
+    case 'session_completed':
+      return 'bg-emerald-500/10 text-emerald-600'
+    case 'coin_earned':
+    case 'coin_spent':
+      return 'bg-primary/10 text-primary'
+    case 'plan_progressed':
+      return 'bg-violet-500/10 text-violet-600'
+    default:
+      return 'bg-muted text-muted-foreground'
+  }
+}
 
 export default function AppDashboardPage() {
   const { user, userProfile, isLoading: authLoading } = useAuth()
   const { currentTenant, isLoadingTenants } = useTenant()
 
-  const [gamification, setGamification] = useState<GamificationPayload | null>(null)
+  const [snapshot, setSnapshot] = useState<JourneySnapshot | null>(null)
+  const [activities, setActivities] = useState<JourneyActivity[]>([])
+  const [isActivitiesLoading, setIsActivitiesLoading] = useState(false)
 
   useEffect(() => {
     let isMounted = true
     const load = async () => {
       try {
-        const payload = await fetchGamificationSnapshot()
-        if (isMounted) setGamification(payload)
+        setIsActivitiesLoading(true)
+        const [snapshotPayload, feedPayload] = await Promise.all([
+          fetchJourneySnapshot(),
+          fetchJourneyFeed({ limit: 10 }),
+        ])
+        if (!isMounted) return
+
+        setSnapshot(snapshotPayload)
+        setActivities(feedPayload.items)
       } catch {
-        if (isMounted) setGamification(null)
+        if (!isMounted) return
+        setSnapshot(null)
+        setActivities([])
+      } finally {
+        if (isMounted) setIsActivitiesLoading(false)
       }
     }
 
@@ -68,9 +125,9 @@ export default function AppDashboardPage() {
   const userName = userProfile?.full_name || user?.user_metadata?.full_name || 'där'
   const firstName = userName.split(' ')[0]
 
-  const streakDays = gamification?.streak.currentStreakDays
-  const coinsBalance = gamification?.coins.balance
-  const unlockedAchievements = gamification?.achievements.filter((a) => a.status === 'unlocked').length
+  const streakDays = snapshot?.streakDays ?? null
+  const coinsBalance = snapshot?.coinsBalance ?? null
+  const unlockedAchievements = snapshot?.unlockedAchievements ?? null
 
   if (authLoading || isLoadingTenants) {
     return (
@@ -155,31 +212,42 @@ export default function AppDashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-foreground">Senaste aktivitet</h2>
-          <Link href="/app/gamification" className="text-sm text-primary hover:underline flex items-center gap-1">
-            Visa alla <ArrowRightIcon className="h-4 w-4" />
-          </Link>
         </div>
 
         <Card>
           <CardContent className="divide-y divide-border">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-center gap-4 py-4 first:pt-6 last:pb-6">
-                <div
-                  className={`rounded-lg p-2 ${
-                    activity.type === 'achievement' ? 'bg-amber-500/10 text-amber-600' : 'bg-primary/10 text-primary'
-                  }`}
-                >
-                  {activity.type === 'achievement' ? <TrophyIcon className="h-5 w-5" /> : <PlayIcon className="h-5 w-5" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground truncate">{activity.title}</p>
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    <ClockIcon className="h-3 w-3" />
-                    {activity.time}
-                  </p>
-                </div>
-              </div>
-            ))}
+            {isActivitiesLoading ? (
+              <div className="py-6 text-sm text-muted-foreground">Laddar aktivitet…</div>
+            ) : activities.length === 0 ? (
+              <div className="py-6 text-sm text-muted-foreground">Ingen aktivitet än.</div>
+            ) : (
+              activities.map((activity) => {
+                const Icon = activityIcon(activity)
+                return (
+                  <div key={activity.id} className="flex items-center gap-4 py-4 first:pt-6 last:pb-6">
+                    <div className={`rounded-lg p-2 ${activityAccent(activity)}`}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      {activity.href ? (
+                        <Link href={activity.href} className="font-medium text-foreground truncate hover:underline">
+                          {activity.title}
+                        </Link>
+                      ) : (
+                        <p className="font-medium text-foreground truncate">{activity.title}</p>
+                      )}
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <ClockIcon className="h-3 w-3" />
+                        {formatRelativeTimeSv(activity.occurredAt)}
+                      </p>
+                      {activity.description ? (
+                        <p className="text-sm text-muted-foreground truncate mt-1">{activity.description}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                )
+              })
+            )}
           </CardContent>
         </Card>
       </section>

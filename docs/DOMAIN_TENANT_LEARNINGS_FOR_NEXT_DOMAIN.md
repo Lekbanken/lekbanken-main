@@ -1,5 +1,7 @@
 # DOMAIN: TENANT – KEY LEARNINGS FOR NEXT DOMAINS
 
+> Canonical Tenant domain documentation (source of truth): **[TENANT_DOMAIN.md](TENANT_DOMAIN.md)**
+
 This document summarizes the main architectural and security learnings from the current TENANT domain implementation. It should be used as guidance when designing and implementing future domains in Lekbanken.
 
 ---

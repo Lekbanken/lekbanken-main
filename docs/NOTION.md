@@ -62,6 +62,11 @@ Rekommenderad spegling i repo:
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Participants (aktuellt): [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
 	- Legacy spec: [PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
+- Tenant (aktuellt): [TENANT_DOMAIN.md](TENANT_DOMAIN.md)
+	- Roadmap: [DOMAIN_TENANT_TODO.md](DOMAIN_TENANT_TODO.md)
+	- Learnings: [DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md](DOMAIN_TENANT_LEARNINGS_FOR_NEXT_DOMAIN.md)
+- Billing & Licensing (aktuellt): [BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md)
+	- Stripe integration (detail): [STRIPE.md](STRIPE.md)
 - DOMAIN_* (där det finns)
 
 ---
@@ -98,7 +103,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Platform Domain** | Runtime (Vercel), miljöer, deployment, routing, subdomäner, feature flags, error handling, performance, security, release channels | ⭐ Dokumenterad |
 | **Accounts Domain** | Multi-tenant authentication, användarkonton, roller & behörigheter, språkpreferenser, sessionshantering, onboarding, e-postverifiering, 2FA | Placeholder |
 | **Tenant Domain** | Tenant-inställningar, valda produkter, aktiva licenser, feature configuration, standardinställningar, admin users, användarbegränsningar | Placeholder |
-| **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | Placeholder |
+| **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | ⭐ Dokumenterad |
 | **Browse Domain** | Filter, produkter, kategorier, huvudsyften & undersyften, favoriter, sök, rekommendationer | ⭐ Dokumenterad |
 | **Games Domain** | Lekdatabas, lekstruktur (Inför/Under/Efter/Reflektion), metadata, variationer, gruppstorlek/ålder/tid, koppling till syften och produkter | Placeholder |
 | **Play Domain** | Game-view, steg-för-steg UI, presentationsläge, session state, offline-läge | Placeholder |
@@ -185,7 +190,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [ ] **Data Model Domain** – Central schema-governance
 - [ ] **Accounts Domain** – Auth-flöden och roller
 - [ ] **Tenant Domain** – Multi-tenancy-setup
-- [ ] **Billing & Licenses Domain** – Stripe/Vipps-integration
+- [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
 - [ ] **Games Domain** – Lekstruktur och metadata
 - [ ] **Planner Domain** – AI-generering och templates
 - [ ] **Gamification Domain** – "Din Lekresa"-logik

@@ -1,5 +1,7 @@
 # DOMAIN: TENANT – TODO & ROADMAP
 
+> Canonical domain documentation (source of truth): **[TENANT_DOMAIN.md](TENANT_DOMAIN.md)**
+
 _Last updated: 2025-12-09 (based on full implementation report)._
 
 ---

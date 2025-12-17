@@ -49,6 +49,7 @@ Fält:
 | [docs/BROWSE_REWORK_NOTES.md](BROWSE_REWORK_NOTES.md) | C | draft | - | - | Notes |
 | [docs/CATALYST_UI_KIT.md](CATALYST_UI_KIT.md) | A | draft | - | - | Reference |
 | [docs/CHATGPT_GAME_CREATOR_PROMPT.md](CHATGPT_GAME_CREATOR_PROMPT.md) | E | draft | - | - | Prompt |
+| [docs/BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
 | [docs/DESIGN_CONSISTENCY_TODO.md](DESIGN_CONSISTENCY_TODO.md) | D | draft | - | - | Backlog |
 | [docs/DESIGN_IMPLEMENTATION_TODO.md](DESIGN_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
@@ -79,6 +80,7 @@ Fält:
 | [docs/PARTICIPANTS_DOMAIN_MVP.md](PARTICIPANTS_DOMAIN_MVP.md) | B | archived | 2025-12-17 | - | Historical MVP/spec snapshot |
 | [docs/PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/PLATFORM_DOMAIN_VALIDATION_REPORT.md](PLATFORM_DOMAIN_VALIDATION_REPORT.md) | C | draft | - | - | Validation report |
+| [docs/TENANT_DOMAIN.md](TENANT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TESTPLAN_GAME_BUILDER_P0.md](TESTPLAN_GAME_BUILDER_P0.md) | B | draft | 2025-12-17 | - | Testplan |
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |

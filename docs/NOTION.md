@@ -74,6 +74,7 @@ Rekommenderad spegling i repo:
 - Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
 - Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
+- Journey (aktuellt): [JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md)
 - Media (aktuellt): [MEDIA_DOMAIN.md](MEDIA_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md)
@@ -120,6 +121,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Play Domain** | Sessions (host + participants), Legendary Play realtime runtime (steps/phases/timer/roles/board), plan playback | ⭐ Dokumenterad |
 | **Planner Domain** | Planer, block/tidslinje, synlighet (private/tenant/public), anteckningar, play-projection | ⭐ Dokumenterad |
 | **Gamification Domain** | Achievements, badges, coins, streaks, levels/XP, challenges, events, leaderboards | ⭐ Dokumenterad |
+| **Journey Domain** | "Din lekresa" – dashboard/timeline över aktivitet och framsteg (placeholder i repo just nu) | ⭐ Dokumenterad |
 | **Media Domain** | Standardbilder, illustrationer per produkt + huvudsyfte, kundens egna bilder, moderering, bildformat, media templates, versionering | ⭐ Dokumenterad |
 | **AI Domain** | AI-generering av lekar och planer, AI-illustrationer, AI-sökning, AI-förslag baserat på ålder/syfte/produkt, översättningshjälp | Placeholder |
 | **Translation Engine Domain** | i18n-logik, fallback-kedja (NO → SE → EN), import/export av språksträngar, batch-översättning, missing-key-detektor, admin UI för översättning | ⭐ Dokumenterad |
@@ -204,7 +206,8 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
 - [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
-- [ ] **Gamification Domain** – "Din Lekresa"-logik
+- [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/GAMIFICATION_DOMAIN.md`)
+- [x] **Journey Domain** – "Din lekresa" dashboard/timeline (placeholder) (se `docs/JOURNEY_DOMAIN.md`)
 - [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/OPERATIONS_DOMAIN.md` + `docs/ops/*`)
 - [ ] **API/Integration Domain** – REST/GraphQL-spec

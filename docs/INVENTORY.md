@@ -88,6 +88,7 @@ Fält:
 | [docs/PLAY_DOMAIN.md](PLAY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/PLANNER_DOMAIN.md](PLANNER_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md) | A | draft | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |
 | [docs/PROMPT_FOR_NEW_AI.md](PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |

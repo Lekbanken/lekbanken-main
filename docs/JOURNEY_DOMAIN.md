@@ -17,13 +17,21 @@ Non-goals (currently owned elsewhere):
 - Planner authoring and plan data model (see `docs/PLANNER_DOMAIN.md`)
 
 ## Current implementation status (as-is in repo)
-Journey is currently a **UI placeholder** only:
-- There is a `JourneyPage` component with hard-coded sessions.
-- There is **no** `app/app/journey/*` route in the app router.
-- There is **no** `app/api/journey/*` API surface.
+Journey is currently implemented as the **App dashboard** with partial real data:
+- `/app` is a dashboard page implemented in `features/journey/AppDashboardPage.tsx`.
+- `/app/journey` exists and renders the same dashboard.
+- The dashboard reads Gamification stats via `GET /api/gamification` (streak, coin balance, unlocked achievements).
+- There is still **no** `app/api/journey/*` API surface.
+
+There is also a legacy placeholder component with hard-coded sessions:
+- `features/journey/JourneyPage.tsx`
 
 ## Related code (repo-anchored)
-- Placeholder page: `features/journey/JourneyPage.tsx`
+- App dashboard implementation: `features/journey/AppDashboardPage.tsx`
+- Routes:
+  - `app/app/page.tsx` (renders dashboard)
+  - `app/app/journey/page.tsx` (alias route)
+- Legacy placeholder: `features/journey/JourneyPage.tsx`
 
 Sandbox references (currently inconsistent with filesystem):
 - `app/sandbox/config/sandbox-modules.ts` references components that do not exist in the repo:

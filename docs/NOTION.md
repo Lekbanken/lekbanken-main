@@ -205,6 +205,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
 - [x] **Games Domain** – Lekstruktur och metadata (se `docs/GAMES_DOMAIN.md`)
+- [x] **Planner Domain** – Planer, block/tidslinje, synlighet, anteckningar, play-projection (se `docs/PLANNER_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
 - [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/GAMIFICATION_DOMAIN.md`)
 - [x] **Journey Domain** – "Din lekresa" dashboard/timeline (placeholder) (se `docs/JOURNEY_DOMAIN.md`)

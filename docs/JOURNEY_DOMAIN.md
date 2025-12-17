@@ -3,7 +3,7 @@
 ## Metadata
 - **Status:** Active (read/composition domain)
 - **Last updated:** 2025-12-17
-- **Source of truth:** Repo code (Journey UI placeholder) + sandbox references
+- **Source of truth:** Repo code (Journey UI + BFF endpoints) + sandbox references
 
 ## Scope
 Journey Domain (“Din lekresa”) owns **read models and presentation composition**:
@@ -25,7 +25,7 @@ Journey is currently implemented as the **App dashboard** with partial real data
 - `/app` is a dashboard page implemented in `features/journey/AppDashboardPage.tsx`.
 - `/app/journey` exists and renders the same dashboard.
 - The dashboard reads Journey snapshot via `GET /api/journey/snapshot`.
-- There is still **no** `app/api/journey/*` API surface.
+- Journey BFF endpoints exist under `app/api/journey/*`.
 
 There is also a legacy placeholder component with hard-coded sessions:
 - `features/journey/JourneyPage.tsx`
@@ -113,11 +113,8 @@ Journey can remain “compose-on-read” initially. When scale demands it, add a
 - `journey_snapshot_cache` (per user + tenant) with TTL
 
 ## Known gaps / next concrete steps
-- Add a real route (e.g. `app/app/journey/page.tsx`) that renders `JourneyPage`.
-- Decide whether Journey is:
-  - a thin UI layer on top of Gamification snapshot + session queries, or
-  - its own API surface that composes multiple domains.
-- Fix sandbox references: either add the missing `features/journey/components/*` files or update `sandbox-modules.ts` to point to real components.
+- Add pagination (“Visa fler”) for the feed via `cursor`.
+- Align sandbox references: either add the missing `features/journey/components/*` files or update `sandbox-modules.ts` to point to real components.
 
 ## Validation checklist (once wired)
 - Journey route renders in app navigation.

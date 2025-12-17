@@ -79,6 +79,7 @@ Rekommenderad spegling i repo:
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md)
 	- Runbooks: [ops/README.md](ops/README.md)
+- API / Integration (aktuellt): [API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md)
 - DOMAIN_* (där det finns)
 
 ---
@@ -121,12 +122,12 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Play Domain** | Sessions (host + participants), Legendary Play realtime runtime (steps/phases/timer/roles/board), plan playback | ⭐ Dokumenterad |
 | **Planner Domain** | Planer, block/tidslinje, synlighet (private/tenant/public), anteckningar, play-projection | ⭐ Dokumenterad |
 | **Gamification Domain** | Achievements, badges, coins, streaks, levels/XP, challenges, events, leaderboards | ⭐ Dokumenterad |
-| **Journey Domain** | "Din lekresa" – dashboard/timeline över aktivitet och framsteg (placeholder i repo just nu) | ⭐ Dokumenterad |
+| **Journey Domain** | "Din lekresa" – dashboard/timeline över aktivitet och framsteg (read/composition, Journey BFF) | ⭐ Dokumenterad |
 | **Media Domain** | Standardbilder, illustrationer per produkt + huvudsyfte, kundens egna bilder, moderering, bildformat, media templates, versionering | ⭐ Dokumenterad |
 | **AI Domain** | AI-generering av lekar och planer, AI-illustrationer, AI-sökning, AI-förslag baserat på ålder/syfte/produkt, översättningshjälp | Placeholder |
 | **Translation Engine Domain** | i18n-logik, fallback-kedja (NO → SE → EN), import/export av språksträngar, batch-översättning, missing-key-detektor, admin UI för översättning | ⭐ Dokumenterad |
 | **Operations Domain** | Backups, migrations, monitoring, error tracking, incident logs, deploy pipelines, versionshantering, load testing, performance budgets | ⭐ Dokumenterad |
-| **API / Integration Domain** | REST/GraphQL endpoints, public API (framtida), webhooks, tokens & auth, rate limiting (om/när implementerat), API-error-struktur, integrations (Stripe, Supabase, e-post, push) | Placeholder |
+| **API / Integration Domain** | Endpoints, BFF contracts, webhooks, auth/tenancy conventions, error patterns (repo-anchored) | ⭐ Dokumenterad |
 | **Marketing / Public Site Domain** | Landningssidor, produktsidor, onboarding funnels, SEO, guides och artiklar, demo-mode, pricing pages, FAQ, try-before-pay-flöden | Placeholder |
 | **Content Management Domain (CMD)** | CSV import/export, massuppdatering av lekar, batch-översättning, batch-illustrationer, automatisk validering, versionskontroll (draft/published), importloggar, felrapporter, mapping engine | Placeholder |
 
@@ -208,10 +209,10 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Planner Domain** – Planer, block/tidslinje, synlighet, anteckningar, play-projection (se `docs/PLANNER_DOMAIN.md`)
 - [ ] **Planner Domain** – AI-generering och templates
 - [x] **Gamification Domain** – "Din Lekresa"-gamification (coins, streaks, achievements) (se `docs/GAMIFICATION_DOMAIN.md`)
-- [x] **Journey Domain** – "Din lekresa" dashboard/timeline (placeholder) (se `docs/JOURNEY_DOMAIN.md`)
+- [x] **Journey Domain** – "Din lekresa" dashboard/timeline (read/composition) (se `docs/JOURNEY_DOMAIN.md`)
 - [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/OPERATIONS_DOMAIN.md` + `docs/ops/*`)
-- [ ] **API/Integration Domain** – REST/GraphQL-spec
+- [x] **API/Integration Domain** – endpoints & conventions (se `docs/API_INTEGRATION_DOMAIN.md`)
 - [ ] **Marketing Domain** – Landningssidor och funnels
 
 ---

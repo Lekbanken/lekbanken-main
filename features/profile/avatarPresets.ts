@@ -5,9 +5,9 @@ export type AvatarPreset = {
 };
 
 const AVATAR_BASE =
-  (typeof process !== "undefined" && process.env.NEXT_PUBLIC_SUPABASE_URL
+  typeof process !== "undefined" && process.env.NEXT_PUBLIC_SUPABASE_URL
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars`
-    : "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/avatars");
+    : "http://localhost:54321/storage/v1/object/public/avatars";
 
 const url = (file: string) => `${AVATAR_BASE}/${file}`;
 

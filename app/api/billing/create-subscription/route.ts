@@ -51,13 +51,14 @@ export async function POST(request: NextRequest) {
 
     // Verify user has permission to create subscription for this tenant
     const { data: membership } = await supabase
-      .from('tenant_memberships')
+      .from('user_tenant_memberships')
       .select('role')
       .eq('tenant_id', tenantId)
       .eq('user_id', user.id)
       .single();
 
-    if (!membership || !['owner', 'admin'].includes(membership.role)) {
+    const membershipRole = membership?.role ?? null
+    if (!membershipRole || !['owner', 'admin'].includes(membershipRole)) {
       return NextResponse.json(
         { error: 'Forbidden: Only tenant owners/admins can create subscriptions' },
         { status: 403 }

@@ -141,6 +141,21 @@ export function validateGame(
       severity: 'error',
     });
   }
+
+  // sub_purpose_ids validation
+  if (game.sub_purpose_ids && game.sub_purpose_ids.length > 0) {
+    for (const purposeId of game.sub_purpose_ids) {
+      if (!isValidUUID(purposeId)) {
+        errors.push({
+          row: rowNumber,
+          column: 'sub_purpose_ids',
+          message: 'sub_purpose_ids innehåller ogiltigt UUID',
+          severity: 'error',
+        })
+        break
+      }
+    }
+  }
   
   // product_id validation
   if (game.product_id && !isValidUUID(game.product_id)) {

@@ -3,7 +3,7 @@
 ## Status Just Nu
 ✅ **Bygget fungerar** (med temporära `as any` casts)  
 ⏳ **30+ `as any` casts** hittade som behöver tas bort  
-⏳ **Vissa migrations** är körda (tenant_memberships har rätt kolumner)  
+⏳ **Vissa migrations** är körda (`user_tenant_memberships` har rätt kolumner; `tenant_memberships` kan vara en kompatibilitets-view)  
 ⏳ **Okänt** vilka tabeller som saknas (väntar på SQL query resultat)
 
 ---
@@ -43,8 +43,8 @@ SELECT
 ```
 📝 **Notera vilka som är ❌**
 
-#### Query 4 & 5: Kolla kolumner på tenants och tenant_memberships
-Vi vet redan att `tenant_memberships` har rätt kolumner ✅  
+#### Query 4 & 5: Kolla kolumner på tenants och user_tenant_memberships
+Vi vet redan att `user_tenant_memberships` har rätt kolumner ✅  
 Kolla `tenants` för att se om `type`, `status`, `demo_flag`, `metadata` finns.
 
 ---

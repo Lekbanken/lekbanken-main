@@ -19,6 +19,7 @@ import {
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from './client'
+import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import type { GlobalRole, UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 
@@ -47,13 +48,6 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
-
-function deriveEffectiveGlobalRole(profile: UserProfile | null, user: User | null): GlobalRole | null {
-  if (profile?.global_role) return profile.global_role as GlobalRole
-  if (user?.app_metadata?.role === 'system_admin') return 'system_admin'
-  if (profile?.role === 'superadmin' || profile?.role === 'admin') return 'system_admin'
-  return null
-}
 
 export function AuthProvider({
   children,

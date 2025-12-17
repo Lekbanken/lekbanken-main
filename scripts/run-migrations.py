@@ -26,7 +26,7 @@ def get_connection_string():
     
     print("❌ Database URL not found")
     print("\n📋 To get your connection string:")
-    print("1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/database")
+    print("1. Go to: https://supabase.com/dashboard → your project → Settings → Database")
     print("2. Copy the connection string (use Session mode for migrations)")
     print("3. Set environment variable or pass as argument\n")
     
@@ -107,8 +107,8 @@ def run_migrations(db_url):
         print("🎉 All migrations executed successfully!")
         print("\n📝 Next steps:")
         print("1. Verify tables in Supabase Dashboard → Table Editor")
-        print("2. Run: supabase gen types typescript --local > lib/supabase/types.ts")
-        print("3. Test service functions against live database")
+        print("2. Regenerate types: npm run db:types:remote (or scripts/regenerate-types.ps1)")
+        print("3. Run: npm run type-check")
 
 def main():
     parser = argparse.ArgumentParser(description="Execute Supabase migrations")

@@ -44,6 +44,7 @@ const METADATA_COLUMNS = [
 
 const REFERENCE_COLUMNS = [
   'main_purpose_id',
+  'sub_purpose_ids',
   'product_id',
   'owner_tenant_id',
   'cover_media_url',
@@ -127,6 +128,7 @@ function gameToRow(game: ExportableGame, options: ExportOptions): CsvRow {
     
     // References
     main_purpose_id: game.main_purpose_id,
+    sub_purpose_ids: game.sub_purpose_ids?.length ? JSON.stringify(game.sub_purpose_ids) : null,
     product_id: game.product_id,
     owner_tenant_id: game.owner_tenant_id,
     cover_media_url: game.cover_media_url || null,

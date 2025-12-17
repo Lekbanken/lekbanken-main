@@ -4,15 +4,9 @@ import { cookies } from 'next/headers'
 import type { User } from '@supabase/supabase-js'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { resolveTenant } from '@/lib/tenant/resolver'
+import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import type { AuthContext, GlobalRole, UserProfile } from '@/types/auth'
 import type { TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
-
-export function deriveEffectiveGlobalRole(profile: UserProfile | null, user: User | null): GlobalRole | null {
-  if (profile?.global_role) return profile.global_role as GlobalRole
-  if (user?.app_metadata?.role === 'system_admin') return 'system_admin'
-  if (profile?.role === 'superadmin' || profile?.role === 'admin') return 'system_admin'
-  return null
-}
 
 export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {
   const cookieStore = await cookies()

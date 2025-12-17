@@ -7,9 +7,25 @@ import os
 from pathlib import Path
 import sys
 import json
+import re
+
+
+def _resolve_project_ref() -> str | None:
+    project_ref = os.getenv("SUPABASE_PROJECT_REF") or os.getenv("SUPABASE_PROJECT_ID")
+    if project_ref:
+        return project_ref.strip()
+
+    config_path = Path(__file__).parent.parent / ".supabase" / "config.toml"
+    if config_path.exists():
+        content = config_path.read_text(encoding="utf-8")
+        match = re.search(r'^\\s*project_id\\s*=\\s*"([^"]+)"', content, re.MULTILINE)
+        if match:
+            return match.group(1).strip()
+
+    return None
 
 def run_migrations():
-    project_id = "qohhnufxididbmzqnjwg"
+    project_ref = _resolve_project_ref()
     
     # Get database password
     from getpass import getpass
@@ -27,7 +43,14 @@ def run_migrations():
     print("=" * 70)
     
     # Build connection string
-    host = "db.qohhnufxididbmzqnjwg.supabase.co"
+    host = os.getenv("SUPABASE_DB_HOST")
+    if not host:
+        if not project_ref:
+            project_ref = input("Enter Supabase project ref (e.g. abcdefghijklmnop): ").strip() or None
+        if not project_ref:
+            print("❌ Missing project ref. Set SUPABASE_PROJECT_REF or link via: supabase link --project-ref YOUR_PROJECT_REF")
+            sys.exit(1)
+        host = f"db.{project_ref}.supabase.co"
     port = "5432"
     database = "postgres"
     user = "postgres"
@@ -103,7 +126,10 @@ def run_migrations():
         print("\n🎉 Migrations completed!")
     else:
         print(f"\n💡 Alternative: Execute manually via Supabase Dashboard")
-        print(f"   URL: https://supabase.com/dashboard/project/{project_id}/sql")
+        if project_ref:
+            print(f"   URL: https://supabase.com/dashboard/project/{project_ref}/sql")
+        else:
+            print("   URL: https://supabase.com/dashboard")
 
 if __name__ == "__main__":
     run_migrations()

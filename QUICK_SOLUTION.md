@@ -5,7 +5,7 @@ Du behöver inte installera något eller köra script. Gör bara detta:
 ## Steg-för-steg (tar 5 minuter)
 
 ### 1. Öppna SQL Editor
-Gå till: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new
+Gå till: https://supabase.com/dashboard → ditt projekt → SQL Editor
 
 ### 2. Kopiera och Klistra in Migrations
 
@@ -40,4 +40,4 @@ Gå till **Table Editor** - du ska se 60+ nya tabeller.
 
 ---
 
-**Starta här**: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new
+**Starta här**: https://supabase.com/dashboard

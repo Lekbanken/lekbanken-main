@@ -29,7 +29,7 @@ This allows you to run local scripts. You'll only need to do this once.
 
 ### Step 2: Get Your Supabase Connection String
 
-1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/database
+1. Go to: https://supabase.com/dashboard → your project → Settings → Database
 2. Look for "Connection string" section
 3. Select **"Session"** mode (NOT "Connection pooler")
 4. Click the copy button
@@ -117,7 +117,7 @@ After migrations complete successfully, verify everything worked:
 
 ### 1. Check Tables in Supabase Dashboard
 
-1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg
+1. Go to: https://supabase.com/dashboard
 2. Click **"Table Editor"** in left sidebar
 3. You should see 60+ tables like:
    - `tenants`

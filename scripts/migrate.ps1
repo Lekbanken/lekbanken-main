@@ -1,5 +1,12 @@
 # Simple PostgreSQL Connection String Getter and Migration Runner
 
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSUseDeclaredVarsMoreThanAssignments',
+    '',
+    Justification = 'This script captures command output for error reporting only.'
+)]
+param()
+
 Write-Host "`n=== Supabase Migration Executor ===" -ForegroundColor Cyan
 
 # Check for psql
@@ -14,7 +21,7 @@ Write-Host "PostgreSQL client found" -ForegroundColor Green
 
 # Get connection string
 Write-Host "`nGet your connection string from:" -ForegroundColor Cyan
-Write-Host "https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/database" -ForegroundColor Blue
+Write-Host "https://supabase.com/dashboard → your project → Settings → Database" -ForegroundColor Blue
 Write-Host "Use 'Session' mode (not Connection pooler)" -ForegroundColor Yellow
 
 $connStr = Read-Host "`nEnter connection string"
@@ -24,11 +31,12 @@ if (-not $connStr) {
     exit 1
 }
 
-# Test connection
-Write-Host "`nTesting connection..." -ForegroundColor Cyan
-$test = & psql $connStr -c "SELECT version();" 2>&1
+# Check connection
+Write-Host "`nChecking connection..." -ForegroundColor Cyan
+$connectionCheckOutput = & psql $connStr -c "SELECT version();" 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Host "Connection failed" -ForegroundColor Red
+    Write-Host $connectionCheckOutput -ForegroundColor Red
     exit 1
 }
 Write-Host "Connection successful" -ForegroundColor Green
@@ -54,13 +62,17 @@ foreach ($migration in $migrations) {
     $name = $migration.Name
     Write-Host "Executing: $name" -ForegroundColor Yellow
     
-    $result = & psql $connStr -f $migration.FullName -v ON_ERROR_STOP=1 2>&1
+    $migrationOutput = & psql $connStr -f $migration.FullName -v ON_ERROR_STOP=1 2>&1
     
     if ($LASTEXITCODE -eq 0) {
         Write-Host "  OK" -ForegroundColor Green
         $success++
     } else {
         Write-Host "  FAILED" -ForegroundColor Red
+        $errorLines = $migrationOutput | Select-Object -First 3
+        foreach ($line in $errorLines) {
+            Write-Host "  $line" -ForegroundColor Red
+        }
         $failed++
     }
 }

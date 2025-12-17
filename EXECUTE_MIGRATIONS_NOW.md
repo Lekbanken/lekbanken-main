@@ -9,7 +9,7 @@ Since Option 2 (CLI) didn't work and we don't have psql, the **Dashboard method 
 ## 📋 Step-by-Step Instructions
 
 ### Step 1: Open Supabase Dashboard
-Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg
+Go to: https://supabase.com/dashboard
 
 ### Step 2: Open SQL Editor
 1. In the left sidebar, click **SQL Editor**
@@ -151,7 +151,7 @@ After all 14 migrations complete:
 ### Error: "Permission denied"
 - ❌ Using wrong credentials
 - Make sure you're logged in with the right account
-- Check project is correct (should be qohhnufxididbmzqnjwg)
+- Check project is correct
 
 ### Error: "Syntax error"
 - ❌ Migration file has corruption
@@ -201,4 +201,4 @@ Once all tables are created:
 **Difficulty**: Easy  
 **Success Rate**: 99%  
 
-Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new and start copying! 🚀
+Go to: https://supabase.com/dashboard → your project → SQL Editor and start copying!

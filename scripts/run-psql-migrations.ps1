@@ -2,7 +2,36 @@
 
 # Supabase Migration Runner using psql
 
-$host = "db.qohhnufxididbmzqnjwg.supabase.co"
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+    'PSAvoidAssignmentToAutomaticVariable',
+    '',
+    Justification = 'False positive in some analyzers; this script does not assign to $Host.'
+)]
+param()
+
+$projectRef = $env:SUPABASE_PROJECT_REF
+
+if (-not $projectRef) {
+    $configPath = Join-Path $PSScriptRoot "..\.supabase\config.toml"
+    if (Test-Path $configPath) {
+        $configText = Get-Content $configPath -Raw
+        $m = [regex]::Match($configText, '(?m)^\s*project_id\s*=\s*"([^"]+)"\s*$')
+        if ($m.Success) {
+            $projectRef = $m.Groups[1].Value
+        }
+    }
+}
+
+if (-not $projectRef) {
+    $projectRef = Read-Host "Enter Supabase project ref (e.g. abcdefghijklmnop)"
+}
+
+if (-not $projectRef) {
+    Write-Host "❌ Missing project ref. Set SUPABASE_PROJECT_REF or link via: supabase link --project-ref YOUR_PROJECT_REF" -ForegroundColor Red
+    exit 1
+}
+
+$dbEndpoint = if ($env:SUPABASE_DB_ENDPOINT) { $env:SUPABASE_DB_ENDPOINT } else { "db.$projectRef.supabase.co" }
 $port = 5432
 $database = "postgres"
 $user = "postgres"
@@ -23,7 +52,7 @@ $env:PGPASSWORD = $password
 Write-Host "`n🧪 Testing connection...`n"
 
 # Test connection
-$result = & psql -h $host -p $port -d $database -U $user -c "SELECT version();" 2>&1
+$result = & psql -h $dbEndpoint -p $port -d $database -U $user -c "SELECT version();" 2>&1
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Connection failed" -ForegroundColor Red
@@ -63,7 +92,7 @@ foreach ($migration in $migrations) {
     Write-Host -NoNewline "[$($success + $failed + 1)/$($migrations.Count)] $name... "
     
     try {
-        $result = & psql -h $host -p $port -d $database -U $user -f $filePath -v ON_ERROR_STOP=1 2>&1
+        $result = & psql -h $dbEndpoint -p $port -d $database -U $user -f $filePath -v ON_ERROR_STOP=1 2>&1
         
         if ($LASTEXITCODE -eq 0) {
             Write-Host "✅" -ForegroundColor Green

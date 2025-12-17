@@ -44,7 +44,7 @@ export async function POST(
     return NextResponse.json({ error: 'Invite expired' }, { status: 400 })
   }
 
-  const { error: memberError } = await supabase.from('tenant_memberships').upsert(
+  const { error: memberError } = await supabase.from('user_tenant_memberships').upsert(
     {
       tenant_id: invite.tenant_id,
       user_id: user.id,

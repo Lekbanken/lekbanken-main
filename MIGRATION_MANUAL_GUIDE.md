@@ -10,15 +10,15 @@
 - ⏳ Remaining: 11/14 migrations (04-13)
 
 ## Quick Links
-- **Supabase Dashboard**: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg
-- **SQL Editor**: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql
-- **Table Editor**: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/editor
+- **Supabase Dashboard**: https://supabase.com/dashboard
+- **SQL Editor**: https://supabase.com/dashboard → your project → SQL Editor
+- **Table Editor**: https://supabase.com/dashboard → your project → Table Editor
 
 ## How to Continue
 
 ### Method 1: Manual Execution via Dashboard (EASIEST)
 
-1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql
+1. Go to: https://supabase.com/dashboard → your project → SQL Editor
 2. Click **New Query**
 3. Copy entire content from `supabase/migrations/20251129000004_analytics_domain.sql`
 4. Paste into the SQL editor

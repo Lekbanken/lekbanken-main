@@ -9,10 +9,34 @@ import subprocess
 import sys
 from pathlib import Path
 from getpass import getpass
+import re
+
+
+def _resolve_project_ref() -> str | None:
+    project_ref = os.getenv("SUPABASE_PROJECT_REF") or os.getenv("SUPABASE_PROJECT_ID")
+    if project_ref:
+        return project_ref.strip()
+
+    config_path = Path(__file__).parent.parent / ".supabase" / "config.toml"
+    if config_path.exists():
+        content = config_path.read_text(encoding="utf-8")
+        match = re.search(r'^\\s*project_id\\s*=\\s*"([^"]+)"', content, re.MULTILINE)
+        if match:
+            return match.group(1).strip()
+
+    return None
 
 def run_migrations():
     # Supabase connection details
-    host = "db.qohhnufxididbmzqnjwg.supabase.co"
+    project_ref = _resolve_project_ref()
+    host = os.getenv("SUPABASE_DB_HOST")
+    if not host:
+        if not project_ref:
+            project_ref = input("Enter Supabase project ref (e.g. abcdefghijklmnop): ").strip() or None
+        if not project_ref:
+            print("❌ Missing project ref. Set SUPABASE_PROJECT_REF or link via: supabase link --project-ref YOUR_PROJECT_REF")
+            return False
+        host = f"db.{project_ref}.supabase.co"
     port = "5432"
     database = "postgres"
     user = "postgres"

@@ -53,6 +53,12 @@ export type CsvGameRow = {
   
   // References (optional)
   main_purpose_id?: string;
+  /**
+   * Secondary purposes.
+   * Preferred: JSON array string in CSV cell, e.g. ["uuid1","uuid2"].
+   */
+  sub_purpose_ids?: string;
+  /** Legacy: comma-separated UUIDs in a single cell */
   sub_purpose_id?: string;
   product_id?: string;
   owner_tenant_id?: string;
@@ -291,6 +297,7 @@ export type ExportableGame = {
   
   // References (for export info only)
   main_purpose_id: string | null;
+  sub_purpose_ids: string[];
   product_id: string | null;
   owner_tenant_id: string | null;
   cover_media_url?: string | null; // Read-only for export
@@ -324,7 +331,7 @@ export const CSV_COLUMNS = {
   ],
   
   // References
-  references: ['main_purpose_id', 'product_id', 'owner_tenant_id'],
+  references: ['main_purpose_id', 'sub_purpose_ids', 'product_id', 'owner_tenant_id'],
   
   // Validation
   validation: ['step_count'],

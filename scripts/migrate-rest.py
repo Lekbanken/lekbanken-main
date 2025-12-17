@@ -10,15 +10,26 @@ import json
 from pathlib import Path
 import urllib.request
 import urllib.error
+from urllib.parse import urlparse
 
 def main():
     print("\n🔄 Supabase Migration Executor (REST API)\n")
     
     # Get project info
-    project_id = "qohhnufxididbmzqnjwg"
-    
+    project_ref = os.getenv("SUPABASE_PROJECT_REF") or os.getenv("SUPABASE_PROJECT_ID")
+    if not project_ref:
+        supabase_url = os.getenv("SUPABASE_URL") or os.getenv("NEXT_PUBLIC_SUPABASE_URL")
+        if supabase_url:
+            try:
+                project_ref = urlparse(supabase_url).hostname.split(".")[0]
+            except Exception:
+                project_ref = None
+
+    if not project_ref:
+        project_ref = input("Enter Supabase project ref (e.g. abcdefghijklmnop): ").strip() or None
+
     print("📍 Get your credentials from:")
-    print("https://supabase.com/dashboard/project/{}/settings/api\n".format(project_id))
+    print("https://supabase.com/dashboard → your project → Settings → API\n")
     
     service_role_key = input("Enter your Service Role Key: ").strip()
     
@@ -28,7 +39,11 @@ def main():
     
     print("\n🧪 Testing connection...")
     
-    url = f"https://{project_id}.supabase.co/rest/v1/health"
+    if not project_ref:
+        print("❌ Missing project ref. Set SUPABASE_PROJECT_REF or SUPABASE_URL")
+        sys.exit(1)
+
+    url = f"https://{project_ref}.supabase.co/rest/v1/health"
     headers = {
         'Authorization': f'Bearer {service_role_key}',
         'Content-Type': 'application/json'

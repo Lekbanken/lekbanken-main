@@ -258,6 +258,42 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
   if (!boardConfigResult.success) {
     errors.push({ ...boardConfigResult.error, severity: 'error' });
   }
+
+  // Secondary purposes
+  const parseSecondaryPurposes = (): string[] => {
+    const rawJson = row.sub_purpose_ids?.trim();
+    if (rawJson) {
+      try {
+        const parsed = JSON.parse(rawJson);
+        if (Array.isArray(parsed)) {
+          return parsed.map((v) => String(v).trim()).filter(Boolean);
+        }
+        warnings.push({
+          row: rowNumber,
+          column: 'sub_purpose_ids',
+          message: 'sub_purpose_ids måste vara en JSON-array, ignorerar värdet',
+          severity: 'warning',
+        });
+        return [];
+      } catch {
+        // Fallback: treat as comma-separated list
+        warnings.push({
+          row: rowNumber,
+          column: 'sub_purpose_ids',
+          message: 'sub_purpose_ids kunde inte tolkas som JSON; tolkar som kommaseparerad lista',
+          severity: 'warning',
+        });
+        return rawJson.split(',').map((id) => id.trim()).filter(Boolean);
+      }
+    }
+
+    const legacy = row.sub_purpose_id?.trim();
+    if (legacy) {
+      return legacy.split(',').map((id) => id.trim()).filter(Boolean);
+    }
+
+    return [];
+  };
   const boardConfig = boardConfigResult.success ? boardConfigResult.data : null;
   
   // ==========================================================================
@@ -322,9 +358,7 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
     leader_tips: sanitizeText(row.leader_tips),
     
     main_purpose_id: row.main_purpose_id?.trim() || null,
-    sub_purpose_ids: row.sub_purpose_id?.trim() 
-      ? row.sub_purpose_id.split(',').map(id => id.trim()).filter(Boolean)
-      : [],
+    sub_purpose_ids: parseSecondaryPurposes(),
     product_id: row.product_id?.trim() || null,
     owner_tenant_id: row.owner_tenant_id?.trim() || null,
     

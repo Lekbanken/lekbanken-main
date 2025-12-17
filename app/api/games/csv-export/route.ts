@@ -108,6 +108,7 @@ export async function GET(request: Request) {
         leader_tips: g.leader_tips || null,
         
         main_purpose_id: g.main_purpose_id,
+        sub_purpose_ids: [],
         product_id: g.product_id,
         owner_tenant_id: g.owner_tenant_id,
         cover_media_url: null,
@@ -140,6 +141,16 @@ export async function GET(request: Request) {
           }));
         }
       }
+
+      // Fetch secondary purposes
+      const { data: secondaryPurposes } = await db
+        .from('game_secondary_purposes')
+        .select('purpose_id')
+        .eq('game_id', g.id);
+
+      exportGame.sub_purpose_ids = (secondaryPurposes ?? [])
+        .map((p: AnySupabase) => p.purpose_id)
+        .filter(Boolean);
       
       // Fetch materials if needed
       if (includeMaterials) {

@@ -4,12 +4,12 @@
 -- This script creates media entries and links them to purposes via media_templates
 -- 
 -- IMPORTANT: Replace BASE_URL with your actual Supabase storage URL
--- Example: https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media
+-- Example: https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/game-media
 
 -- Configuration
 DO $$
 DECLARE
-  base_url TEXT := 'https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media';
+  base_url TEXT := 'https://YOUR_PROJECT_REF.supabase.co/storage/v1/object/public/game-media';
   
   -- Purpose IDs
   samarbete_id UUID := '72a9b8ae-4b01-4c86-b1e3-9fcf9938ed54';

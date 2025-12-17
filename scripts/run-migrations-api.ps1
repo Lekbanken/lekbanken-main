@@ -4,7 +4,27 @@
 Write-Host "`n🔄 Supabase Migration Executor (REST API)`n" -ForegroundColor Cyan
 
 # Get credentials
-$projectId = "qohhnufxididbmzqnjwg"
+$projectId = $env:SUPABASE_PROJECT_REF
+
+if (-not $projectId) {
+    $configPath = Join-Path $PSScriptRoot "..\.supabase\config.toml"
+    if (Test-Path $configPath) {
+        $configText = Get-Content $configPath -Raw
+        $m = [regex]::Match($configText, '(?m)^\s*project_id\s*=\s*"([^"]+)"\s*$')
+        if ($m.Success) {
+            $projectId = $m.Groups[1].Value
+        }
+    }
+}
+
+if (-not $projectId) {
+    $projectId = Read-Host "Enter Supabase project ref (e.g. abcdefghijklmnop)"
+}
+
+if (-not $projectId) {
+    Write-Host "❌ Missing project ref. Set SUPABASE_PROJECT_REF or link via: supabase link --project-ref YOUR_PROJECT_REF" -ForegroundColor Red
+    exit 1
+}
 $serviceKey = Read-Host "Enter your Service Role Key"
 
 if (-not $serviceKey) {
@@ -40,26 +60,10 @@ foreach ($migration in $migrations) {
     try {
         # Read SQL file
         $sql = Get-Content $migration.FullName -Raw
-        
-        # Escape for JSON
-        $sqlEscaped = $sql -replace '\\', '\\\\' -replace '"', '\"' -replace "`n", '\n' -replace "`r", '\r'
-        
-        # Create request body
-        $body = @{
-            query = $sqlEscaped
-        } | ConvertTo-Json
 
-        # Make API call
-        $headers = @{
-            "Authorization" = "Bearer $serviceKey"
-            "Content-Type" = "application/json"
-        }
-
-        $uri = "https://$projectId.supabase.co/rest/v1/rpc/exec_sql"
-        
-        # This will fail because we don't have exec_sql function
-        # But let's try a simpler approach - just copy-paste instruction
-        Write-Host "⏳" -ForegroundColor Yellow
+        # NOTE: REST execution requires an RPC like exec_sql, which is not part of this repo.
+        # We keep this script as a helper that lists files + points to the dashboard.
+        Write-Host "⏳ ($($sql.Length) chars)" -ForegroundColor Yellow
         $success++
     }
     catch {

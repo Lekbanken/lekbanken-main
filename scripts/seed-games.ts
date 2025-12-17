@@ -24,6 +24,9 @@ const supabase = createClient<Database>(SUPABASE_URL, SERVICE_ROLE_KEY, {
   auth: { autoRefreshToken: false, persistSession: false },
 });
 
+const GAME_MEDIA_PUBLIC_BASE = `${SUPABASE_URL}/storage/v1/object/public/game-media`;
+const publicGameMediaUrl = (filename: string) => `${GAME_MEDIA_PUBLIC_BASE}/${encodeURIComponent(filename)}`;
+
 type GameInsert = Database["public"]["Tables"]["games"]["Insert"];
 type GameTranslationInsert = Database["public"]["Tables"]["game_translations"]["Insert"];
 type MediaInsert = Database["public"]["Tables"]["media"]["Insert"];
@@ -54,39 +57,39 @@ const toSteps = (instructions?: string | null) => {
 // Cover image sets per huvudsyfte (filer finns i bucket game-media)
 const COVER_SETS: Record<string, string[]> = {
   kognition: [
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%201.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%202.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%203.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%204.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kognition%20&%20Fokus%205.webp",
+    publicGameMediaUrl("Kognition & Fokus 1.webp"),
+    publicGameMediaUrl("Kognition & Fokus 2.webp"),
+    publicGameMediaUrl("Kognition & Fokus 3.webp"),
+    publicGameMediaUrl("Kognition & Fokus 4.webp"),
+    publicGameMediaUrl("Kognition & Fokus 5.webp"),
   ],
   kommunikation: [
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%201.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%202.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%203.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%204.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kommunikation%20&%20Sprak%205.webp",
+    publicGameMediaUrl("Kommunikation & Sprak 1.webp"),
+    publicGameMediaUrl("Kommunikation & Sprak 2.webp"),
+    publicGameMediaUrl("Kommunikation & Sprak 3.webp"),
+    publicGameMediaUrl("Kommunikation & Sprak 4.webp"),
+    publicGameMediaUrl("Kommunikation & Sprak 5.webp"),
   ],
   kreativitet: [
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%201.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%202.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%203.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%204.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kreativitet%20&%20Uttryck%205.webp",
+    publicGameMediaUrl("Kreativitet & Uttryck 1.webp"),
+    publicGameMediaUrl("Kreativitet & Uttryck 2.webp"),
+    publicGameMediaUrl("Kreativitet & Uttryck 3.webp"),
+    publicGameMediaUrl("Kreativitet & Uttryck 4.webp"),
+    publicGameMediaUrl("Kreativitet & Uttryck 5.webp"),
   ],
   kunskap: [
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%201.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%202.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%203.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%204.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Kunskap%20&%20Larande%205.webp",
+    publicGameMediaUrl("Kunskap & Larande 1.webp"),
+    publicGameMediaUrl("Kunskap & Larande 2.webp"),
+    publicGameMediaUrl("Kunskap & Larande 3.webp"),
+    publicGameMediaUrl("Kunskap & Larande 4.webp"),
+    publicGameMediaUrl("Kunskap & Larande 5.webp"),
   ],
   socialt: [
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%201.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%202.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%203.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%204.webp",
-    "https://qohhnufxididbmzqnjwg.supabase.co/storage/v1/object/public/game-media/Socialt%20&%20Relationer%205.webp",
+    publicGameMediaUrl("Socialt & Relationer 1.webp"),
+    publicGameMediaUrl("Socialt & Relationer 2.webp"),
+    publicGameMediaUrl("Socialt & Relationer 3.webp"),
+    publicGameMediaUrl("Socialt & Relationer 4.webp"),
+    publicGameMediaUrl("Socialt & Relationer 5.webp"),
   ],
 };
 

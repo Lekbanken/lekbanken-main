@@ -22,7 +22,7 @@ export async function GET() {
     .maybeSingle()
 
   const { data: memberships } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .select('tenant_id, role, status, is_primary')
     .eq('user_id', user.id)
 

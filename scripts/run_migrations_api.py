@@ -10,8 +10,6 @@ from getpass import getpass
 
 def run_migrations():
     # Configuration
-    project_id = "qohhnufxididbmzqnjwg"
-    
     # Get API key from user
     api_key = getpass("Enter your Supabase API key (from Settings → API → Project API Keys): ")
     
@@ -28,9 +26,6 @@ def run_migrations():
     
     failed_count = 0
     success_count = 0
-    
-    # Supabase SQL editor endpoint
-    base_url = f"https://api.supabase.com/projects/{project_id}"
     
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -60,7 +55,7 @@ def run_migrations():
     print(f"\n📊 MIGRATIONS READY:")
     print(f"   📋 Total: {len(migration_files)}")
     print(f"\n💡 RECOMMENDED METHOD:")
-    print(f"   1. Go to: https://supabase.com/dashboard/project/{project_id}/sql/new")
+    print("   1. Go to: https://supabase.com/dashboard → your project → SQL Editor")
     print(f"   2. Copy & paste each SQL file from supabase/migrations/")
     print(f"   3. Execute in order (00 → 13)")
     print(f"\n📝 Files to execute:")

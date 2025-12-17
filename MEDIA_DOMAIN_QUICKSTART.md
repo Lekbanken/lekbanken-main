@@ -13,7 +13,7 @@ You have **2 new migration files** ready to run:
 supabase db push
 
 # Or link to your project first
-supabase link --project-ref qohhnufxididbmzqnjwg
+supabase link --project-ref <your-supabase-project-ref>
 supabase db push
 ```
 
@@ -27,7 +27,7 @@ cd scripts
 ```
 
 ### Option 3: Manual Execution via Supabase Dashboard
-1. Go to https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new
+1. Go to https://supabase.com/dashboard/project/<your-supabase-project-ref>/sql/new
 2. Copy content from `supabase/migrations/20251210120000_media_domain_enhancements.sql`
 3. Run the query
 4. Repeat with `supabase/migrations/20251210120100_achievements_media_migration.sql`
@@ -39,11 +39,14 @@ cd scripts
 After migrations are executed:
 
 ```powershell
-# Option 1: Using local script
+# Option 1: Using npm script (linked project)
+npm run db:types:remote
+
+# Option 2: Using local script
 .\scripts\regenerate-types.ps1
 
-# Option 2: Using Supabase CLI
-npx supabase gen types typescript --project-id qohhnufxididbmzqnjwg > types/supabase.ts
+# Option 3: Using Supabase CLI
+supabase gen types typescript --linked > types/supabase.ts
 
 # Option 3: Manual from Supabase Studio
 # Go to API Docs → TypeScript → Copy generated types → Paste into types/supabase.ts
@@ -56,7 +59,7 @@ npx supabase gen types typescript --project-id qohhnufxididbmzqnjwg > types/supa
 1. **Check migrations ran:**
    ```powershell
    # Connect to DB and check tables exist
-   psql -h db.qohhnufxididbmzqnjwg.supabase.co -U postgres -d postgres
+   psql -h db.<your-supabase-project-ref>.supabase.co -U postgres -d postgres
    \dt media*
    # Should show: media, media_templates, media_ai_generations
    ```

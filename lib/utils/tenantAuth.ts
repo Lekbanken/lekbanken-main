@@ -14,7 +14,7 @@ export function isSystemAdmin(user: UserLike | null | undefined) {
 export async function isTenantAdmin(tenantId: string, userId: string) {
   const supabase = await createServerRlsClient()
   const { data, error } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
     .eq('user_id', userId)

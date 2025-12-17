@@ -14,7 +14,7 @@ export async function GET(
   const { tenantId } = await context.params
   const supabase = await createServerRlsClient()
   const { data, error } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .select('user_id, role, status, is_primary, created_at, updated_at')
     .eq('tenant_id', tenantId)
 
@@ -67,7 +67,7 @@ export async function POST(
   }
 
   const { data, error } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .insert({
       tenant_id: tenantId,
       user_id: body.user_id,

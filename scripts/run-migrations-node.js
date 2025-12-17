@@ -40,7 +40,7 @@ function getCredentials() {
   if (!url || !key) {
     log('\n❌ Missing Supabase credentials\n', 'red');
     log('To get your credentials:', 'yellow');
-    log('1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/api', 'cyan');
+    log('1. Go to: https://supabase.com/dashboard → your project → Settings → API', 'cyan');
     log('2. Copy Project URL and Service Role Key', 'cyan');
     log('3. Set environment variables:\n', 'cyan');
     log('   $env:SUPABASE_URL = "https://xxx.supabase.co"', 'blue');
@@ -129,7 +129,12 @@ async function main() {
   );
 
   log('💡 Alternative: Use Supabase Dashboard', 'blue');
-  log('1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new', 'cyan');
+  try {
+    const projectRef = new URL(credentials.url).hostname.split('.')[0];
+    log(`1. Go to: https://supabase.com/dashboard/project/${projectRef}/sql/new`, 'cyan');
+  } catch {
+    log('1. Go to: https://supabase.com/dashboard → your project → SQL Editor', 'cyan');
+  }
   log('2. Copy each migration file content (00-13 in order)', 'cyan');
   log('3. Execute each one', 'cyan');
   log('4. Done! ✅\n', 'cyan');

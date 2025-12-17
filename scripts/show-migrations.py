@@ -12,7 +12,7 @@ def main():
     print("🔄 SUPABASE MIGRATION SQL - READY TO COPY & PASTE")
     print("="*70)
     print("\nInstructions:")
-    print("1. Go to: https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/sql/new")
+    print("1. Go to: https://supabase.com/dashboard → your project → SQL Editor")
     print("2. For each migration below:")
     print("   - Copy all the SQL")
     print("   - Paste into SQL Editor")

@@ -13,7 +13,7 @@ async function requireUser() {
 
 async function userTenantRole(supabase: Awaited<ReturnType<typeof createServerRlsClient>>, tenantId: string) {
   const { data, error } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .select('role')
     .eq('tenant_id', tenantId)
     .eq('user_id', (await supabase.auth.getUser()).data.user?.id || '')

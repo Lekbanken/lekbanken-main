@@ -23,7 +23,7 @@ function askQuestion(question) {
 
 async function main() {
   console.log('📍 Get your connection string from:');
-  console.log('https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/database');
+  console.log('https://supabase.com/dashboard → your project → Settings → Database');
   console.log('Use "Session" mode (not "Connection pooler")\n');
 
   const connStr = await askQuestion('Enter connection string: ');

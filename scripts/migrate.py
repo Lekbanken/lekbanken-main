@@ -21,7 +21,7 @@ def main():
         import psycopg2
     
     print("📍 Get your connection string from:")
-    print("https://supabase.com/dashboard/project/qohhnufxididbmzqnjwg/settings/database")
+    print("https://supabase.com/dashboard → your project → Settings → Database")
     print("Use 'Session' mode (not 'Connection pooler')\n")
     
     conn_str = input("Enter connection string: ").strip()

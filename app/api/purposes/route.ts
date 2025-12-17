@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
   let query = supabase.from('purposes').select('*').order('created_at', { ascending: true })
   if (tenantId === 'null') {
-    query = query.eq('tenant_id', null)
+    query = query.is('tenant_id', null)
   } else if (tenantId) {
     query = query.eq('tenant_id', tenantId)
   }

@@ -7,7 +7,7 @@ import {
   CheckBadgeIcon,
   PauseCircleIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, useToast } from "@/components/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, EmptyState, LoadingState, Select, useToast } from "@/components/ui";
 import { SkeletonStats } from "@/components/ui/skeleton";
 import {
   AdminPageHeader,
@@ -401,10 +401,6 @@ export function ProductAdminPage() {
             <CardHeader className="border-b border-border bg-muted/30 px-6 py-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg font-semibold text-foreground">Product Directory</CardTitle>
-                <Button onClick={() => setCreateOpen(true)} size="sm">
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  Create product
-                </Button>
               </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -513,10 +509,44 @@ export function ProductAdminPage() {
             <CardTitle className="text-lg font-semibold text-foreground">Standardbilder</CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
-            <AdminEmptyState
-              title="Inga standardbilder"
-              description="Lägg till standardbilder kopplade till produkter i kommande iteration."
-            />
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
+                <p className="font-semibold text-foreground">Mappning Produkt × Huvudsyfte</p>
+                <p className="text-sm text-muted-foreground">
+                  Standardbilder väljs per kombination av produkt och huvudsyfte. Om en lek saknar egen omslagsbild
+                  och har produkt + huvudsyfte satt, används denna mappning.
+                </p>
+                <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
+                  <li>Välj produkt och huvudsyfte.</li>
+                  <li>Välj/ersätt standardbild (per tenant om relevant).</li>
+                  <li>Fallback: global standardbild om mappning saknas.</li>
+                </ul>
+                <p className="text-xs text-muted-foreground">
+                  API/storagemappning behöver införas: product_purpose_media (product_id, purpose_id, media_id, priority, tenant_id?).
+                </p>
+              </div>
+
+              <div className="space-y-3 rounded-lg border border-dashed border-border p-4">
+                <p className="font-semibold text-foreground">Snabbkonfiguration (kommmer)</p>
+                <p className="text-sm text-muted-foreground">
+                  Detta gränssnitt reserverat för uppladdning/val av media per kombination. Det aktiveras när API:erna finns.
+                </p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Produkt</label>
+                    <Select value={""} options={[{ value: "", label: "Välj" }]} disabled />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium text-foreground">Huvudsyfte</label>
+                    <Select value={""} options={[{ value: "", label: "Välj" }]} disabled />
+                  </div>
+                </div>
+                <Button variant="outline" size="sm" disabled>
+                  Välj standardbild (kommer snart)
+                </Button>
+                <p className="text-xs text-muted-foreground">När API:et är klart kopplas detta till media-picker och sparar till mappningstabellen.</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       )}

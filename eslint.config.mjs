@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "catalyst-ui-kit/**",
+    "types/supabase.ts",
   ]),
   {
     rules: {

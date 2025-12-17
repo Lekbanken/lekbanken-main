@@ -172,7 +172,7 @@ export async function GET(
     phases: phases || [],
     roles: roles || [],
     boardConfig: boardConfig || null,
-    secondaryPurposes: (secondaryPurposes || []).map((p) => p.purpose_id),
+    secondaryPurposes: (secondaryPurposes || []).map((p: { purpose_id: string }) => p.purpose_id),
     coverMedia: coverMedia
       ? {
           media_id: coverMedia.media_id,

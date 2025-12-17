@@ -40,6 +40,7 @@ type CoreForm = {
   play_mode: PlayMode;
   main_purpose_id: string;
   product_id: string | null;
+  taxonomy_category: string;
   energy_level: string | null;
   location_type: string | null;
   time_estimate_min: number | null;
@@ -68,6 +69,7 @@ const defaultCore: CoreForm = {
   play_mode: 'basic',
   main_purpose_id: '',
   product_id: null,
+  taxonomy_category: '',
   energy_level: null,
   location_type: null,
   time_estimate_min: null,
@@ -94,6 +96,15 @@ const locationOptions = [
   { value: 'indoor', label: 'Inomhus' },
   { value: 'outdoor', label: 'Utomhus' },
   { value: 'both', label: 'Båda' },
+];
+
+const taxonomyPresets = [
+  'Brädspel',
+  'Partylek',
+  'Ringlekar',
+  'Utelekar',
+  'Inomhuslek',
+  'Isbrytare',
 ];
 
 type GameBuilderPageProps = {
@@ -199,6 +210,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           play_mode: g.play_mode || 'basic',
           main_purpose_id: g.main_purpose_id || '',
           product_id: g.product_id,
+          taxonomy_category: g.category || '',
           energy_level: g.energy_level,
           location_type: g.location_type,
           time_estimate_min: g.time_estimate_min,
@@ -357,6 +369,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       const payload = {
         core: {
           ...core,
+          category: core.taxonomy_category || null,
           status: options?.status ?? core.status,
           name: core.name.trim(),
           short_description: core.short_description.trim(),
@@ -954,6 +967,30 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               </div>
 
               <Card className="p-6 space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Taxonomi / spelkategori</label>
+                  <Input
+                    value={core.taxonomy_category}
+                    placeholder="Ex. Ringlekar"
+                    onChange={(e) => setCore({ ...core, taxonomy_category: e.target.value })}
+                  />
+                  <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                    {taxonomyPresets.map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        className="rounded-full border border-border px-2 py-1 hover:border-primary hover:text-primary"
+                        onClick={() => setCore((prev) => ({ ...prev, taxonomy_category: preset }))}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                    <span className="text-[11px] text-muted-foreground/70">
+                      Behåller tidigare värde vid import; sparas som spelkategori i databasen.
+                    </span>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">Status</label>
                   <Select

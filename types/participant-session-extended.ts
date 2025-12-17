@@ -14,9 +14,13 @@ import type { TimerState, BoardState } from '@/types/play-runtime';
 type BaseParticipantSession = Database['public']['Tables']['participant_sessions']['Row'];
 
 /**
- * Extended participant session with runtime fields
+ * Extended participant session with runtime fields.
+ *
+ * NOTE: When runtime columns are present in generated Supabase types
+ * (e.g. timer_state / board_state as Json), this type provides a
+ * stronger runtime shape via Omit+redeclare.
  */
-export interface ParticipantSessionWithRuntime extends BaseParticipantSession {
+export type ParticipantSessionWithRuntime = Omit<BaseParticipantSession, 'timer_state' | 'board_state'> & {
   /** Current step index for basic play mode (0-based) */
   current_step_index?: number;
   /** Current phase index for facilitated/participants mode (0-based) */
@@ -24,8 +28,8 @@ export interface ParticipantSessionWithRuntime extends BaseParticipantSession {
   /** Event-driven timer state */
   timer_state?: TimerState | null;
   /** Runtime board overrides */
-  board_state?: BoardState | null;
-}
+  board_state: BoardState | null;
+};
 
 /**
  * Session role (snapshot from game_roles)

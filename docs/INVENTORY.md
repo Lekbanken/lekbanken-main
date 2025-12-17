@@ -70,6 +70,7 @@ Fält:
 | [docs/MEDIA_DOMAIN.md](MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |
 | [docs/NOTION.md](NOTION.md) | A | active | 2025-12-17 | - | Notion mirror rules |
+| [docs/OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ops/alerting.md](ops/alerting.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/backup_dr.md](ops/backup_dr.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/cicd_pipeline.md](ops/cicd_pipeline.md) | A | active | 2025-12-17 | - | Runbook |

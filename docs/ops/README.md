@@ -1,5 +1,7 @@
 # Ops / runbooks
 
+Canonical overview (domain doc): `docs/OPERATIONS_DOMAIN.md`
+
 Status: active  
 Owner: Ops/Platform  
 Last validated: 2025-12-17

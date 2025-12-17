@@ -73,6 +73,7 @@ Rekommenderad spegling i repo:
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
 - Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
+- Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
 - Media (aktuellt): [MEDIA_DOMAIN.md](MEDIA_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md)
@@ -118,7 +119,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Games Domain** | Lekdatabas, lekstruktur (Inför/Under/Efter/Reflektion), metadata, variationer, gruppstorlek/ålder/tid, koppling till syften och produkter | ⭐ Dokumenterad |
 | **Play Domain** | Sessions (host + participants), Legendary Play realtime runtime (steps/phases/timer/roles/board), plan playback | ⭐ Dokumenterad |
 | **Planner Domain** | Planer, block/tidslinje, synlighet (private/tenant/public), anteckningar, play-projection | ⭐ Dokumenterad |
-| **Gamification Domain** | "Din Lekresa" – poängsystem, tokens/valuta, badges/troféer, levels, milestones, easter eggs, butik/reward-shop, aktivitetshistorik | Placeholder |
+| **Gamification Domain** | Achievements, badges, coins, streaks, levels/XP, challenges, events, leaderboards | ⭐ Dokumenterad |
 | **Media Domain** | Standardbilder, illustrationer per produkt + huvudsyfte, kundens egna bilder, moderering, bildformat, media templates, versionering | ⭐ Dokumenterad |
 | **AI Domain** | AI-generering av lekar och planer, AI-illustrationer, AI-sökning, AI-förslag baserat på ålder/syfte/produkt, översättningshjälp | Placeholder |
 | **Translation Engine Domain** | i18n-logik, fallback-kedja (NO → SE → EN), import/export av språksträngar, batch-översättning, missing-key-detektor, admin UI för översättning | ⭐ Dokumenterad |

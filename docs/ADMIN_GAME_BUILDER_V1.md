@@ -1,50 +1,84 @@
-# Admin Game Builder V1 (MVP Spec)
+\# Admin Game Builder (builder API + v2 content)
 
-Goal: Ett enhetligt Game Builder-flöde i /admin/games som stödjer både enkla lekar och avancerade, play-redo upplevelser (roller, faser, bräden) utan separata “wizards”. Moduler aktiveras via valda Play Modes och progressiv disclosure.
+Goal: Ett enhetligt Game Builder-flöde i `/admin/games` som stödjer både enkla lekar och mer avancerade upplägg (faser/roller/board-config) utan separata “wizards”.
 
-## 1) Nuläge (repo-sammanfattning)
-- Data: `games` (core metadata: name, short_description, description, status, age_min/max, min/max players, time_estimate_min, energy_level_enum, location_type_enum, main_purpose_id, product_id, owner_tenant_id, materials[], instructions (text), translations via `game_translations` (title, short_description, materials[], instructions Json), media via `game_media` (cover/galleri).
-- Admin UI: /admin/games (list + modal create/edit), /admin/games/[gameId] (detail). Fält motsvarar ovan; instruktioner antingen enkel text eller translations.instructions (array av steg i vissa spel). Ingen modulär builder.
-- Play-konsumption: `app/app/games/[gameId]/page.tsx` pickTranslation(locale sv/no/en), använder translation.instructions (array av steps med title/description/duration) om finns; annars `game.instructions` (string). Play antar att instruktioner kan vara array eller text. Media laddas från `game_media`.
-- Participants/Play Sessions: separat domän (participant_sessions, participants) med Play MVP. Spel saknar idag explicit faser/roller/board-actions som Play Sessions kan nyttja.
+## Metadata
 
-## 2) Målbild: modulär Game Content Model
-Ett game består av GameCore + valbara moduler. Builder visar sektioner baserat på Play Mode (Basic / Facilitated / Roles+Participants). Allt i en ruta/flow, inga separata wizards.
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
 
-- **GameCore (obligatorisk)**: metadata (name, status, owner scope, product, main purpose, categories/tags, energy/location, age min/max, players min/max, duration min/max, short desc, full desc), media (cover krävs vid publish), localization (sv/no/en).
-- **Modules (aktiveras via toggles/Play Mode)**  
-  - SessionFlow: faser/rounds, ordning, rekommenderad persistence_mode, pause/resume regler.  
-  - Instruction Steps (struktur): steg med title/body/duration/media_ref/leader_script/participant_prompt/board_text, flags optional/conditional. Kan länkas till faser.  
-  - Play Readiness: materials list, prep steps, safety notes, leader tips, difficulty, accessibility, space requirements, group size constraints.  
-  - Participants/Roles: roll definitions (name, description, secrets/private/public), max_count, assignment strategy, role cards.  
-  - Actions: definiera schema för vote/answer/choice (prompt, options, validation, host override).  
-  - Public Board: vad som visas offentligt per fas (text/markdown, media refs, template key).  
-  - Variations: korta alternativa regler/house rules.  
-  - Localization: per-locale titlar, kortbeskrivning, steg, roller, board-texter, materials.  
-  - Gamification hooks (placeholder): event keys game_played/session_logged.
+## Related code (source of truth)
 
-## 3) Valideringsnivåer
-- Draft: Core metadata + status=draft.
-- Playable: Instruction Steps + Duration + Materials/Safety (om krävs) + minst en lokal (sv/NO/EN) komplett för titel + kortbeskrivning + steps.
-- Publishable: kvalitetssäkring (cover image satt, main purpose/product satt om krävs, translations “tillräckligt kompletta” i primär locale, inga blockerande TODO-fält).
-- Versioning: nytt fält `game_content_version` (t.ex. v1=befintlig, v2=modulär). Vid migrering sätt v2 men håll legacy fält synkade (se migration nedan).
+- UI entrypoints:
+  - `app/admin/games/page.tsx`
+  - `app/admin/games/new/page.tsx`
+  - `app/admin/games/[gameId]/edit/page.tsx`
+  - `app/admin/games/builder/*`
+  - `features/admin/games/GameAdminPage.tsx`
+- Builder API:
+  - `app/api/games/builder/route.ts` (POST)
+  - `app/api/games/builder/[id]/route.ts` (GET/PUT)
+- Runtime consumption (app):
+  - `lib/services/games.server.ts` (hämtar `game_steps`)
+  - `app/app/games/[gameId]/page.tsx` (renderar steps → fallback)
+- DB migrations:
+  - `supabase/migrations/20251216010000_game_builder_p0.sql` (game_steps, game_materials, games.*)
+  - `supabase/migrations/20251216020000_game_phases.sql` (game_phases + FK)
+  - `supabase/migrations/20251216030000_game_roles.sql` (game_roles + participant_role_assignments)
+  - `supabase/migrations/20251216040000_game_board_config.sql` (game_board_config)
 
-## 4) Migration / bakåtkompatibilitet
-- Behåll befintliga `games` fält. Lägg till nya tabeller:  
-  - `game_steps` (game_id, locale, phase_id nullable, order, title, body, duration_seconds, leader_script, participant_prompt, board_text, media_ref, optional_flag, conditional_flag).  
-  - `game_phases` (game_id, locale, name, description, order, entry_condition, exit_condition).  
-  - `game_roles` (game_id, locale, name, description, max_count, is_public, private_notes, assignment_strategy, board_text).  
-  - `game_actions` (game_id, phase_id nullable, action_type vote/answer/choice, payload_schema jsonb, host_override_allowed bool, prompt, options).  
-  - `game_boards` (game_id, phase_id nullable, locale, content jsonb or markdown, visibility public-only).  
-  - `game_materials` (game_id, locale, items[], safety_notes, prep_steps).  
-  - Option: `game_variations` (game_id, locale, title, description).  
-  - Add columns on `games`: `game_content_version` (default 'v1'), `play_mode` ('basic'|'facilitated'|'roles'), `duration_max`, `players_recommended`, `accessibility_notes`, `space_requirements`, `difficulty`, `leader_tips`.
-- Migration mapping:  
-  - `games.instructions` (string) → single `game_steps` entry (locale=null) as body.  
-  - `game_translations.instructions` (array) → insert ordered `game_steps` per locale.  
-  - `game_translations.materials` → `game_materials.items`; `short_description` -> core translation; `title` stays.  
-  - Keep legacy fields populated; Play still reads translation.instructions if present. New Play should prefer `game_steps` when `game_content_version = v2`, else fall back.
-- Play compatibility: update mappers to check `game_steps` (structured) first, fallback to translation.instructions array, else `games.instructions` text.
+## Validation checklist
+
+- `/admin/games/new` och `/admin/games/[id]/edit` fungerar och använder `/api/games/builder*`.
+- Builder sparar `games.game_content_version = 'v2'` och skriver `game_steps`.
+- App-detaljvyn visar steps i denna ordning: `game_steps` → `game_translations.instructions[]` → `games.instructions`.
+- Faser/roller/board-config sparas endast om motsvarande tabeller finns (migrations körda).
+
+---
+
+## 1) Nuläge (verifierat i repo)
+
+- **Admin UI**:
+  - Spellista: `/admin/games` (med knappar för Builder + CSV import/export).
+  - Builder: `/admin/games/new` och `/admin/games/[gameId]/edit`.
+  - Detalj: `/admin/games/[gameId]`.
+- **API**:
+  - `POST /api/games/builder` skapar ett spel (kräver `name` + `short_description`) och sätter `game_content_version='v2'`.
+  - `GET/PUT /api/games/builder/[id]` läser/sparar builder-data (core, steps, materials, phases, roles, boardConfig, secondaryPurposes, coverMedia).
+- **DB (nuvarande tabeller)**:
+  - `games` + `game_steps` + `game_materials`.
+  - `game_phases` (valfritt, om P2a är kört).
+  - `game_roles` + `participant_role_assignments` (valfritt, om P2b är kört).
+  - `game_board_config` (valfritt, om P2c är kört).
+  - Kopplingar som builder använder: `game_secondary_purposes`, `game_media` (cover).
+- **App (runtime-konsumption)**:
+  - `getGameById()` hämtar `steps:game_steps(*)` och `materials:game_materials(*)`.
+  - Speldetaljen (`/app/games/[gameId]`) renderar `game_steps` om de finns, annars fallback till `game_translations.instructions` (array), annars `games.instructions` (text).
+
+## 2) Modell: GameCore + builder-moduler
+
+Buildern organiserar innehåll i **GameCore** + valfria moduler som kan aktiveras via `play_mode`.
+
+- **GameCore (obligatorisk)**: metadata i `games` (name, short_description, status, owner_tenant_id, product/purpose, mm).
+- **Steps (struktur)**: `game_steps` (title/body/duration, leader_script/participant_prompt/board_text, optional/conditional).
+- **Materials (play readiness)**: `game_materials` (items, safety_notes, preparation).
+- **Phases/Rounds (P2a)**: `game_phases` och `game_steps.phase_id` (FK).
+- **Roles (P2b)**: `game_roles` (+ runtime `participant_role_assignments`).
+- **Board config (P2c)**: `game_board_config` (togglar + theme + bakgrund).
+- **Planerat/ej implementerat här**: “actions”-modell och per-fas board-content finns inte som DB-modell i nuvarande migrations; håll sånt i spec-dokument (t.ex. `GAME_BUILDER_UI_SPEC.md`) tills det finns i schema/API.
+
+## 3) Valideringsnivåer (praktiskt)
+
+- Draft: `name` + `short_description` (API kräver) + `status='draft'`.
+- Playable (guideline): minst ett steg (via `game_steps`) + rimlig metadata.
+- Publishable (guideline): cover satt (via `game_media` kind=cover), syfte/produkt enligt innehållskrav.
+- Versioning: `games.game_content_version` används som flagga (`v1` legacy, `v2` strukturerat innehåll). Builder skriver `v2`.
+
+## 4) Backåtkompatibilitet
+
+- Appen är tolerant: den renderar `game_steps` om de finns; annars fallback till `game_translations.instructions[]`; annars `games.instructions`.
+- Det innebär att gamla spel kan leva vidare utan att “konverteras” direkt.
 
 ## 5) Fältdjup (sektioner)
 **A) Core metadata**  
@@ -77,12 +111,11 @@ Ett game består av GameCore + valbara moduler. Builder visar sektioner baserat 
 **J) Gamification hooks**  
 - Placeholder fields for event keys (`game_played`, `session_logged`), no runtime implementation in P0.
 
-## 6) UI/UX riktlinjer (en builder, modulärt)
-- En route: `/admin/games/new` och `/admin/games/[id]/edit`.
-- Sektioner: Core, Play Readiness, Instructions, (optional) Phases, (optional) Roles, (optional) Actions, (optional) Board, Localization, Media, Validation.
-- Play Mode toggle (Basic/Facilitated/Roles) visar/döljer moduler. Basic visar bara Core+Instructions (enkla steg) + Media. Facilitated öppnar Play Readiness + Phases. Roles öppnar Roles + Actions + Board.
-- Progressiv disclosure: accordions per sektion, “Add phase/role/step” inline.
-- Validation banners per nivå (Draft/Playable/Publishable) med checklistor.
+## 5) UI/UX (routing och entrypoints)
+
+- Nya spel: `/admin/games/new`
+- Redigera: `/admin/games/[id]/edit`
+- Listan (`/admin/games`) länkar till Builder per rad samt en global “Builder”-knapp.
 
 ## 7) Implementationplan (faser)
 **P0 (MVP Builder & data-minimum)**  
@@ -106,18 +139,14 @@ Ett game består av GameCore + valbara moduler. Builder visar sektioner baserat 
 - Builder: sektioner för roller (kort), actions (schemaform), board content.  
 - Inga runtime-förändringar ännu; endast authoring + lagring.  
 
-## 8) Testplan (manuell, P0)
-1) Skapa nytt spel via `/admin/games/new` – fyll Core + 2 steps + cover; spara som draft; kontrollera att game_steps skrivs och game_content_version=v2.  
-2) Publicera: fyll cover + short desc + main purpose; se valideringschecklist går grön och status publish sparas.  
-3) Migrerat spel: öppna befintligt v1-spel → builder visar steps (mappat från legacy instructions); spara utan förändring; Play detail-sida laddas (fallback check).  
-4) Play detail: öppna `app/app/games/[id]` för nytt spel → instruktioner renderas från game_steps (om v2), annars fallback.  
-5) Materials/safety fylls → sparas i game_materials och visas i builder.  
-6) Quick-create modal (om kvar) → sparar v1 (minimalt), builder kan sedan uppgradera till v2.
+## 6) Testplan
 
-## 9) Nästa steg / TODO
-- Bygg P0 (schema + API + builder UI + mapper fallback).  
-- Lägg till admin/games navigation till nya builder routes och uppdatera gamla modaler att länka till builder.  
-- P1/P2 enligt planen ovan, efter P0 leverans.  
+Se `docs/TESTPLAN_GAME_BUILDER_P0.md`.
+
+## 7) Nästa steg / TODO
+
+- Om vi vill ha “actions” eller per-fas board-content: börja i DB-schema + API (inte i UI), och uppdatera sedan spec-dokument.
+- Dokumentera rollernas runtime-flöde (koppling till `participant_sessions`) när det finns UI/rutter för sessions.
 
 ## Referenser i kodbasen (nuvarande flöden)
 - Admin list/detail: `features/admin/games/*`, `app/admin/games` pages.  

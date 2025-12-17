@@ -1,8 +1,15 @@
 # Incident Response
 
-Status: proposed  
+Status: active  
 Owner: Ops/Platform  
-Last Updated: 2025-12-11
+Last validated: 2025-12-17
+
+## Related docs/code (source of truth)
+
+- Incident log template: `docs/ops/incidents.md`
+- CI/CD & rollback notes: `docs/ops/cicd_pipeline.md`
+- Backups & restore notes: `docs/ops/backup_dr.md`
+- Health endpoint (for basic uptime): `app/api/health/route.ts`
 
 ## Severity Matrix
 - **SEV1:** Prod outage, auth/billing down, data loss risk. Target: acknowledge < 5m, mitigate < 30m, resolve < 2h.
@@ -25,9 +32,9 @@ Last Updated: 2025-12-11
 6) **Postmortem:** Within 48h for SEV1/2, 5d for SEV3. Include timeline, root cause, blast radius, fixes, preventions.
 
 ## Communication Channels
-- Primary: Slack #status (alerts + human updates). Replace with actual channel when known.
-- Escalation: PagerDuty/phone for SEV1/2 (fill service/on-call rotation).
-- External (if needed): Status page or email template (TBD).
+- Primary: **TBD** (e.g. Slack/Teams channel).
+- Escalation: **TBD** (on-call rotation / phone tree / PagerDuty).
+- External (if needed): **TBD** (status page or email template).
 
 ## Runbooks to Keep Handy
 - Rollback deploy (see `docs/ops/cicd_pipeline.md`).
@@ -38,3 +45,9 @@ Last Updated: 2025-12-11
 ## Open Items
 - Add actual contact roster / on-call rotation (names, phone).
 - Add status page link and comms templates (Slack/email).
+
+## Validation checklist
+
+- Incident log lives in `docs/ops/incidents.md` (or link your ticket system here).
+- Rollback/restore actions refer to current runbooks.
+- Channels/on-call are explicitly documented (no placeholders) once decided.

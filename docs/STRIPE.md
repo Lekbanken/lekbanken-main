@@ -1,5 +1,28 @@
 # Stripe Integration Documentation
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- `lib/stripe/config.ts`
+- `lib/config/env.ts`
+- `app/api/billing/create-subscription/route.ts`
+- `app/api/billing/webhooks/stripe/route.ts`
+- `app/api/billing/tenants/[tenantId]/stripe-customer/route.ts`
+- `app/api/billing/tenants/[tenantId]/subscription/route.ts`
+- `app/api/billing/tenants/[tenantId]/invoices/stripe/route.ts`
+
+## Validation checklist
+
+- Environment variables described here exist in `lib/config/env.ts` and `.env.local.example`.
+- Key selection logic matches `lib/stripe/config.ts` (`STRIPE_USE_LIVE_KEYS` + production behavior).
+- Webhook route verifies signatures using the configured webhook secret.
+- API authorization rules (tenant owner/admin) are enforced in the routes listed above.
+
 ## Overview
 
 This document describes the complete Stripe integration in Lekbanken, including subscription management, payment processing, and webhook handling.

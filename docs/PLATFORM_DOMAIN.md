@@ -1,8 +1,31 @@
 # Platform Domain Documentation
 
 **Version:** 1.0  
-**Last Updated:** 2024-12-10  
-**Status:** Production-Ready (with P0+P1 fixes implemented)
+**Last Updated:** 2025-12-17  
+**Status:** Active (repo-anchored; avoid hardcoded ops/provider details)
+
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- `next.config.ts`
+- `proxy.ts`
+- `lib/config/env.ts`
+- `lib/utils/logger.ts`
+- `lib/supabase/server.ts`
+- `lib/supabase/client.ts`
+- `app/api/health/route.ts`
+- `app/api/media/*`
+- `docs/MEDIA_DOMAIN.md`
+- `.github/workflows/typecheck.yml`
+- `supabase/migrations/`
+- `supabase/verify_rls_coverage.sql`
+- `lib/supabase/database.types.ts` (generated)
+- `types/supabase.ts` (generated)
 
 ---
 
@@ -14,12 +37,12 @@ The Platform Domain encompasses the **foundational infrastructure** that support
 
 | Area | Scope |
 |------|-------|
-| **Deployment** | Vercel hosting, CI/CD, environment management |
+| **Deployment** | Hosting/provider config (external), CI checks, environment management |
 | **Database** | Supabase PostgreSQL, RLS policies, migrations |
 | **Storage** | Supabase Storage for media assets |
 | **Auth** | Supabase Auth with SSR-ready cookie sessions |
-| **Monitoring** | Sentry error tracking, structured logging |
-| **Security** | Rate limiting, RLS enforcement, environment validation |
+| **Monitoring** | Structured logging (error tracking not currently implemented) |
+| **Security** | RLS enforcement, environment validation (rate limiting if/when introduced) |
 | **API** | RESTful API routes, error handling, validation |
 
 ---
@@ -35,8 +58,8 @@ The Platform Domain encompasses the **foundational infrastructure** that support
 │                                                                 │
 │   Frontend                                                      │
 │   ─────────────                                                │
-│   Next.js 15 (App Router)                                      │
-│   React 18                                                      │
+│   Next.js 16 (App Router)                                      │
+│   React 19                                                      │
 │   TypeScript 5.x                                                │
 │   Tailwind CSS + Catalyst UI Kit                               │
 │                                                                 │
@@ -46,17 +69,17 @@ The Platform Domain encompasses the **foundational infrastructure** that support
 │   Supabase PostgreSQL (Database)                               │
 │   Supabase Auth (Authentication)                               │
 │   Supabase Storage (Media files)                               │
-│   Upstash Redis (Rate limiting)                                │
+│   Rate limiting (not currently implemented)                    │
 │                                                                 │
 │   Monitoring & Operations                                       │
 │   ──────────────────────────                                   │
-│   Sentry (Error tracking, APM)                                 │
+│   Error tracking (not currently implemented)                    │
 │   Structured Logging (lib/utils/logger.ts)                     │
 │   Environment Validation (lib/config/env.ts)                   │
 │                                                                 │
 │   Deployment                                                    │
 │   ──────────────                                               │
-│   Vercel (Hosting + Edge Network)                              │
+│   Hosting provider (external config)                            │
 │   GitHub Actions (CI/CD)                                        │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
@@ -81,35 +104,21 @@ features/
 - Shared authentication (Supabase Auth)
 - Shared database (Supabase PostgreSQL with RLS)
 - Shared storage (Supabase Storage)
-- Shared monitoring (Sentry, structured logs)
-- Shared security (rate limiting, environment validation)
+- Shared monitoring (structured logs)
+- Shared security (environment validation; rate limiting if/when introduced)
 
 ---
 
 ## 3. Deployment
 
-### 3.1 Hosting: Vercel
+### 3.1 Hosting (provider-agnostic)
 
-**Production URL:** https://app.lekbanken.no  
-**Deployment:** Automatic on push to `main` branch
+Repo:t är en Next.js-app och kan hostas hos valfri kompatibel hosting/provider. Exakta miljöer, domäner och deploy-trigger är **operativ konfiguration** och ska verifieras i hosting-projektets settings.
 
-**Vercel Features Used:**
-- **Edge Network** - Global CDN for static assets
-- **Serverless Functions** - API routes deployed as serverless functions
-- **Preview Deployments** - Unique URL per pull request
-- **Environment Variables** - Secure storage for secrets
-- **Analytics** - Web Vitals monitoring
-- **Automatic HTTPS** - SSL/TLS certificates
+**Build Configuration:** se `next.config.ts`
 
-**Build Configuration:**
-```json
-// next.config.ts
-{
-  "experimental": {
-    "turbo": true  // Uses Turbopack for faster builds
-  }
-}
-```
+- `turbopack.root = __dirname`
+- `images.remotePatterns` tillåter Supabase Storage public URLs (hostname härleds från `NEXT_PUBLIC_SUPABASE_URL`) + localhost patterns för dev.
 
 **Build Command:** `npm run build`  
 **Output Directory:** `.next`  
@@ -117,45 +126,39 @@ features/
 
 ### 3.2 CI/CD: GitHub Actions
 
-**Workflow:** `.github/workflows/type-check.yml`
+**Workflow:** `.github/workflows/typecheck.yml`
 
-```yaml
-name: Type Check
-on: [push, pull_request]
-jobs:
-  type-check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-      - run: npm ci
-      - run: npm run type-check
-```
+Triggers: `push` + `pull_request` på brancherna `main` och `develop`.
+
+Checks:
+
+- TypeScript (`npm run type-check`)
+- Grep-gate för `as any` i `app/` + `lib/` (exkluderar `types/supabase.ts`)
+- Build (`npm run build`) med `SKIP_ENV_VALIDATION=true` i workflow
 
 **Checks on Every Push:**
 - ✅ TypeScript compilation (`tsc --noEmit`)
-- ✅ Vercel preview deployment (automatic)
-- ⏳ Planned: ESLint, unit tests, E2E tests
+- ✅ Check for `as any` casts in `app/` and `lib/` (excludes `types/supabase.ts`)
+- ✅ Production build (`npm run build`)
 
 ### 3.3 Environment Management
 
 **Environments:**
 - **Development** - Local (`npm run dev`)
-- **Preview** - Vercel preview deployments (per PR)
-- **Production** - Vercel production (`main` branch)
+- **Preview** - Optional per-PR environment (if your hosting supports it)
+- **Production** - Your primary production environment
 
 **Environment Variables:**
 - Development: `.env.local` (not committed)
-- Vercel: Dashboard → Settings → Environment Variables
+- Hosting/provider: configure env vars in your hosting platform / secret manager
 
-**Critical Variables (Must be set in Vercel):**
+**Critical Variables (must be set in runtime env):**
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
 - `TENANT_COOKIE_SECRET`
-- `NEXT_PUBLIC_SENTRY_DSN` (recommended)
+
+If/when error tracking is introduced, document the required env vars in `docs/ENVIRONMENT_VARIABLES.md` and wire validation into `lib/config/env.ts`.
 
 See `docs/ENVIRONMENT_VARIABLES.md` for full reference.
 
@@ -166,19 +169,13 @@ See `docs/ENVIRONMENT_VARIABLES.md` for full reference.
 ### 4.1 Supabase PostgreSQL
 
 **Provider:** Supabase (hosted PostgreSQL)  
-**Version:** PostgreSQL 15+  
-**Access:** Via Supabase client (server-side) or RESTful API (client-side)
+**Version:** Provider-managed (verify in Supabase dashboard if needed)
 
-**Key Tables:**
-- `tenants` - Multi-tenant organization data
-- `users` - Extended user profiles (links to `auth.users`)
-- `games` - Game catalog
-- `plans` - Activity plans
-- `products` - Product categories
-- `purposes` - Educational purposes
-- `media` - Media asset metadata
-- `achievements` - Gamification achievements
-- (More tables per domain)
+**Schema source of truth:**
+- Migrations: `supabase/migrations/*.sql`
+- Generated types: `types/supabase.ts` (via `npm run db:types:remote`) and/or `lib/supabase/database.types.ts`
+
+Avoid hardcoding “key table” lists here; they drift quickly. Link to domain docs for table-level details.
 
 **Schema Management:**
 - Migrations: `supabase/migrations/*.sql`
@@ -194,17 +191,8 @@ See `docs/ENVIRONMENT_VARIABLES.md` for full reference.
 - **Role-Based Access** - Admin vs regular user permissions
 - **Privacy** - Users can only access their own data
 
-**Example Policy:**
-```sql
--- Users can only see games in their tenant
-CREATE POLICY "Users see own tenant games" ON games
-  FOR SELECT USING (
-    tenant_id IN (
-      SELECT tenant_id FROM user_tenants 
-      WHERE user_id = auth.uid()
-    )
-  );
-```
+RLS policies and grants should be treated as **migration-owned** (defined in `supabase/migrations/*`).
+Avoid copy/pasting example policies into this doc as if they are active in the database.
 
 **RLS Audit Script:**
 Run `supabase/verify_rls_coverage.sql` in Supabase SQL Editor to verify all tables have RLS enabled.
@@ -215,10 +203,10 @@ Run `supabase/verify_rls_coverage.sql` in Supabase SQL Editor to verify all tabl
 
 **Server-Side (API Routes):**
 ```typescript
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 
 export async function GET(request: Request) {
-  const supabase = await createServerSupabaseClient();
+  const supabase = await createServerRlsClient();
   const { data, error } = await supabase.from('games').select('*');
   // RLS policies automatically enforced based on user session
 }
@@ -226,18 +214,18 @@ export async function GET(request: Request) {
 
 **Client-Side (React Components):**
 ```typescript
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
-const supabase = createBrowserSupabaseClient();
+const supabase = createBrowserClient();
 const { data } = await supabase.from('games').select('*');
 ```
 
 **Admin Operations (Service Role):**
 ```typescript
-import { createAdminClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 // Bypasses RLS - use with extreme caution!
-const adminClient = await createAdminClient();
+const adminClient = createServiceRoleClient();
 const { data } = await adminClient.from('games').select('*');
 ```
 
@@ -247,23 +235,11 @@ const { data } = await adminClient.from('games').select('*');
 
 ### 5.1 Supabase Storage
 
-**Buckets:**
-- `media` - User-uploaded images, videos
-- `avatars` - User profile pictures
-- `achievements` - Badge icons, achievement assets
-- `custom_utmarkelser` - Custom achievement badges
+Buckets and access rules are configured in Supabase. In this repo:
+- The app uses a **signed upload URL** flow via `app/api/media/upload/route.ts` (and confirmation via `app/api/media/upload/confirm/route.ts`).
+- Bucket names should be treated as code/config and verified in the upload route (avoid duplicating full bucket inventories here).
 
-**Access Control:**
-- Public buckets: Anyone can read
-- Private buckets: RLS policies enforce access
-- Upload: Authenticated users only
-
-**Upload Example:**
-```typescript
-const { data, error } = await supabase.storage
-  .from('media')
-  .upload(`${tenantId}/${fileName}`, file);
-```
+See `docs/MEDIA_DOMAIN.md` for the current, repo-validated media/storage flow.
 
 ### 5.2 Media Management
 
@@ -273,12 +249,9 @@ const { data, error } = await supabase.storage
 - Progress indication
 - Error handling with structured logging
 
-**Media API Routes:**
-- `POST /api/media` - Create media record
-- `GET /api/media` - List media (tenant-scoped)
-- `PATCH /api/media/[id]` - Update metadata
-- `DELETE /api/media/[id]` - Delete media + file
-- `POST /api/media/upload` - Get signed upload URL
+**Media API surface:**
+- Canonical implementation lives under `app/api/media/*`.
+- Canonical documentation lives in `docs/MEDIA_DOMAIN.md`.
 
 ---
 
@@ -288,7 +261,7 @@ const { data, error } = await supabase.storage
 
 **Provider:** Supabase Auth (built on PostgreSQL + GoTrue)  
 **Session Storage:** HTTP-only cookies (SSR-ready)  
-**Session Duration:** 7 days (refresh tokens)
+**Session Duration:** Provider/config-dependent (do not assume a fixed duration in docs)
 
 **Auth Providers:**
 - Email/Password ✅
@@ -299,24 +272,24 @@ const { data, error } = await supabase.storage
 ```
 1. User signs in → Supabase creates session
 2. Session stored in HTTP-only cookie
-3. Middleware reads cookie on every request
-4. Supabase client auto-authenticates API calls
+3. Request layer (`proxy.ts`) enforces redirects + tenant resolution and sets `x-tenant-id` when applicable
+4. Server code uses `@supabase/ssr` (`createServerRlsClient`) to read/refresh sessions via cookies
 5. RLS policies enforce based on auth.uid()
 ```
 
 **Server-Side Session Access:**
 ```typescript
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 
-const supabase = await createServerSupabaseClient();
+const supabase = await createServerRlsClient();
 const { data: { user } } = await supabase.auth.getUser();
 ```
 
 **Client-Side:**
 ```typescript
-import { createBrowserSupabaseClient } from '@/lib/supabase/client';
+import { createBrowserClient } from '@/lib/supabase/client';
 
-const supabase = createBrowserSupabaseClient();
+const supabase = createBrowserClient();
 const { data: { session } } = await supabase.auth.getSession();
 ```
 
@@ -334,48 +307,15 @@ Users can belong to multiple tenants. Active tenant is stored client-side and se
 
 ## 7. Monitoring
 
-### 7.1 Error Tracking: Sentry
-
-**Sentry Configuration:**
-- **Client:** `sentry.client.config.ts` - Browser errors
-- **Server:** `sentry.server.config.ts` - API route errors
-- **Edge:** `sentry.edge.config.ts` - Middleware errors
-
-**Sampling Rates:**
-- **Production:** 10% trace sampling, 100% error sampling
-- **Development:** Disabled (logs to console instead)
-
-**Features Used:**
-- **Error Capture** - Uncaught exceptions, promise rejections
-- **Performance Monitoring** - Page load, API response times
-- **Session Replay** - Replay user sessions on errors
-- **User Context** - userId, email, tenant attached to errors
-
-**Manual Error Reporting:**
-```typescript
-import { logger } from '@/lib/utils/logger';
-
-try {
-  // risky operation
-} catch (error) {
-  logger.error('Operation failed', error, {
-    endpoint: '/api/games',
-    userId: user.id,
-    tenantId: tenant.id,
-  });
-  // Error automatically sent to Sentry if DSN configured
-}
-```
-
-### 7.2 Structured Logging
+### 7.1 Structured Logging
 
 **Logger:** `lib/utils/logger.ts`
 
 **Log Levels:**
 - `debug` - Verbose debugging info
 - `info` - General informational messages
-- `warn` - Warning messages (e.g., rate limit exceeded)
-- `error` - Error messages (automatically sent to Sentry)
+- `warn` - Warning messages (e.g., abuse prevention / throttling if introduced)
+- `error` - Error messages
 - `fatal` - Critical errors (app-breaking)
 
 **Output Format:**
@@ -390,12 +330,12 @@ import { logger } from '@/lib/utils/logger';
 logger.info('User logged in', { userId: user.id });
 
 // Warning
-logger.warn('Rate limit approached', { 
+logger.warn('Request spike detected', { 
   remaining: 5, 
   limit: 100 
 });
 
-// Error (sends to Sentry)
+// Error
 logger.error('Database query failed', error, {
   query: 'SELECT * FROM games',
   userId: user.id,
@@ -421,49 +361,11 @@ requestLogger.error('Failed to fetch games', error);
 
 ### 8.1 Rate Limiting
 
-**Implementation:** Upstash Redis + `@upstash/ratelimit`  
-**Configuration:** `lib/ratelimit.ts`
+Rate limiting is **not currently implemented** in this codebase.
 
-**Rate Limits:**
-| Endpoint Pattern | Limit | Window | Identifier |
-|------------------|-------|--------|------------|
-| `/api/*` (general) | 100 | 1 minute | IP address |
-| `/api/auth/*` | 10 | 15 minutes | IP address |
-| `/api/media/upload` | 10 | 1 minute | userId |
-| `/api/play/join` | 10 | 1 minute | IP address |
-| `/api/play/rejoin` | 30 | 1 minute | IP address |
-| `/api/play/state` | 60 | 1 minute | participantToken |
-
-**Response on Limit Exceeded:**
-```json
-HTTP/1.1 429 Too Many Requests
-X-RateLimit-Limit: 100
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1702213200
-Retry-After: 45
-
-{
-  "error": "rate_limit_exceeded",
-  "message": "Too many requests. Please try again later.",
-  "retryAfter": 45
-}
-```
-
-**Adding Rate Limiting to API Routes:**
-```typescript
-import { applyRateLimit } from '@/lib/utils/rate-limit-helpers';
-
-export async function POST(request: Request) {
-  // Check rate limit
-  const rateLimitResult = await applyRateLimit(request, 'auth');
-  if (rateLimitResult) return rateLimitResult; // 429 if exceeded
-  
-  // Continue with normal request handling...
-}
-```
-
-**Graceful Degradation:**
-If Upstash Redis is not configured, rate limiting is disabled (logs warning on startup).
+If/when it is introduced, document the implementation and wire it into:
+- `lib/config/env.ts` (feature-gated env validation)
+- API routes under `app/api/*` (consistent 429 responses)
 
 ### 8.2 Environment Validation
 
@@ -474,7 +376,6 @@ If Upstash Redis is not configured, rate limiting is disabled (logs warning on s
 - ✅ `NEXT_PUBLIC_SUPABASE_ANON_KEY` (required)
 - ⚠️ `SUPABASE_SERVICE_ROLE_KEY` (warns if missing)
 - ⚠️ Stripe keys (if `STRIPE_ENABLED=true`)
-- ⚠️ Upstash Redis (warns if missing)
 
 **Fail-Fast Behavior:**
 If critical variables are missing, the app **will not start**:
@@ -503,21 +404,10 @@ const supabaseUrl = env.supabase.url; // Type-safe, validated
 **Verification:**
 Run `supabase/verify_rls_coverage.sql` in Supabase SQL Editor:
 ```sql
--- Sample output:
--- ✅ tenants (RLS enabled)
--- ✅ games (RLS enabled)
--- ❌ logs (RLS not enabled) ⚠️
+-- Output lists tables with/without RLS. Treat any missing RLS as a security issue.
 ```
 
-**Critical Tables with RLS:**
-- `tenants` ✅
-- `users` ✅
-- `games` ✅
-- `plans` ✅
-- `products` ✅
-- `purposes` ✅
-- `media` ✅
-- `achievements` ✅
+Avoid hardcoding “critical tables” lists here; use the audit output + migrations as the canonical reference.
 
 ---
 
@@ -532,7 +422,7 @@ Run `supabase/verify_rls_coverage.sql` in Supabase SQL Editor:
 HTTP/1.1 200 OK
 
 {
-  "timestamp": "2024-12-10T10:30:00Z",
+  "timestamp": "2025-12-17T10:30:00Z",
   "status": "healthy",
   "version": "1.0.0",
   "checks": {
@@ -572,8 +462,8 @@ HTTP/1.1 503 Service Unavailable
 ```
 
 **Rate Limited:**
-- Same as general API: 100 requests/minute per IP
-- Prevents health check abuse
+- Not currently rate limited (no rate limiting implementation in the repo).
+- If rate limiting is introduced, consider exempting `/api/health` or setting a high limit to avoid false positives from uptime monitors.
 
 **Usage:**
 - Uptime monitoring (UptimeRobot, Pingdom, etc.)
@@ -680,9 +570,6 @@ npm run type-check
 
 # Lint
 npm run lint
-
-# Format code
-npm run format
 ```
 
 ### 11.3 Database Migrations
@@ -706,26 +593,22 @@ supabase db push
 Before deploying to production:
 
 ### Environment Variables
-- ✅ All required variables set in Vercel dashboard
+- ✅ All required variables set in the hosting/provider environment
 - ✅ `TENANT_COOKIE_SECRET` changed from default
-- ✅ `SENTRY_DSN` configured for error tracking
-- ✅ Upstash Redis credentials configured
 
 ### Security
 - ✅ RLS enabled on all tables (run `verify_rls_coverage.sql`)
 - ✅ Service role key only in server-side code
-- ✅ Rate limiting tested and working
-- ✅ HTTPS enforced (Vercel automatic)
+- ✅ HTTPS enforced (provider config)
 
 ### Monitoring
-- ✅ Sentry project created and tested
 - ✅ Structured logging implemented in critical paths
 - ✅ Health endpoint responding
 
 ### Testing
 - ✅ Type-check passes (`npm run type-check`)
 - ✅ Build succeeds (`npm run build`)
-- ✅ Manual testing in preview deployment
+- ✅ Manual testing in a preview/staging environment (if used)
 - ✅ Database migrations applied
 
 ### Documentation
@@ -740,14 +623,12 @@ Before deploying to production:
 ### Resolved (P0+P1 Fixes)
 - ✅ Missing environment validation (fixed: `lib/config/env.ts`)
 - ✅ No RLS audit (fixed: `verify_rls_coverage.sql`)
-- ✅ No error tracking (fixed: Sentry integration)
 - ✅ No structured logging (fixed: `lib/utils/logger.ts`)
-- ✅ No rate limiting (fixed: Upstash Redis integration)
 
 ### Pending (P2 - Medium Priority)
 - ⏳ Automated database migrations (Supabase CLI in CI/CD)
 - ⏳ Comprehensive test coverage (unit, integration, E2E)
-- ⏳ Performance monitoring dashboard (Sentry APM)
+- ⏳ Error tracking integration (if desired)
 - ⏳ API response caching strategy
 - ⏳ CDN configuration for media assets
 
@@ -755,7 +636,7 @@ Before deploying to production:
 - 🔮 Multi-region deployment (lower latency for global users)
 - 🔮 Database read replicas (scale reads independently)
 - 🔮 Advanced monitoring (custom Grafana dashboards)
-- 🔮 Kubernetes migration (if Vercel limitations hit)
+- 🔮 Kubernetes migration (if hosting/provider limitations hit)
 
 ---
 
@@ -766,16 +647,12 @@ Before deploying to production:
 **1. "Missing required environment variable"**
 - Solution: Copy `.env.local.example` to `.env.local` and fill in values
 
-**2. "Rate limiting disabled" (warning)**
-- Impact: Non-blocking, app works fine
-- Solution: Add Upstash Redis credentials (production only)
-
-**3. Database connection errors**
+**2. Database connection errors**
 - Check: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are correct
 - Verify: Supabase project is not paused (free tier auto-pauses after inactivity)
 
-**4. RLS policy blocks legitimate access**
-- Debug: Check user's tenant membership in `user_tenants` table
+**3. RLS policy blocks legitimate access**
+- Debug: Check user's tenant membership in `user_tenant_memberships` table
 - Verify: Policy uses `auth.uid()` correctly
 
 ### Getting Help
@@ -783,7 +660,7 @@ Before deploying to production:
 - **Documentation:** `docs/` folder
 - **Code Examples:** Search codebase for similar patterns
 - **Supabase Docs:** https://supabase.com/docs
-- **Vercel Docs:** https://vercel.com/docs
+- **Hosting provider docs:** (link your provider docs here)
 
 ---
 
@@ -793,11 +670,11 @@ Before deploying to production:
 
 ```
 lekbanken-main/
-├── app/                      # Next.js 15 App Router
+├── app/                      # Next.js App Router
 │   ├── (marketing)/          # Marketing pages
 │   ├── admin/                # Admin routes
 │   ├── api/                  # API routes
-│   │   ├── auth/             # Auth endpoints
+│   │   ├── accounts/         # Accounts/auth-related endpoints
 │   │   ├── media/            # Media endpoints
 │   │   ├── health/           # Health check
 │   │   └── ...
@@ -821,8 +698,8 @@ lekbanken-main/
 │   │   └── server.ts         # Server client
 │   ├── utils/
 │   │   ├── logger.ts         # Structured logging
-│   │   └── rate-limit-helpers.ts
-│   └── ratelimit.ts          # Rate limiting config
+│   │   └── ...
+│   └── ...
 │
 ├── supabase/
 │   ├── migrations/           # Database migrations
@@ -833,9 +710,6 @@ lekbanken-main/
 │   └── ENVIRONMENT_VARIABLES.md
 │
 ├── proxy.ts                  # Auth proxy (NOT middleware.ts!)
-├── sentry.client.config.ts   # Sentry browser config
-├── sentry.server.config.ts   # Sentry server config
-├── sentry.edge.config.ts     # Sentry edge config
 └── .env.local.example        # Environment template
 ```
 
@@ -843,13 +717,10 @@ lekbanken-main/
 
 ```json
 {
-  "next": "^15.0.0",
-  "react": "^18.0.0",
+  "next": "^16.0.7",
+  "react": "^19.x",
   "@supabase/supabase-js": "^2.x",
   "@supabase/ssr": "^0.x",
-  "@sentry/nextjs": "^8.x",
-  "@upstash/ratelimit": "^1.x",
-  "@upstash/redis": "^1.x",
   "zod": "^3.x"
 }
 ```

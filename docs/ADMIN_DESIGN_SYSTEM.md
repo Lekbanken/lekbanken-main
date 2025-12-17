@@ -2,6 +2,25 @@
 
 > A comprehensive design narrative and implementation guide for the Admin UI/UX
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- `components/admin/shared/AdminPageHeader.tsx`
+- `components/admin/shared/AdminPageLayout.tsx`
+- `components/admin/shared/` (empty/loading/error states)
+- `features/admin/` (reference pages implementing the patterns)
+
+## Validation checklist
+
+- New admin pages follow the documented structure (header → optional stats → table/forms → states).
+- Shared components used from `components/admin/shared/` (avoid one-off patterns).
+- UI changes do not introduce new hard-coded colors; prefer existing Tailwind/theme tokens.
+
 ---
 
 ## 1. Design Narrative

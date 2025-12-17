@@ -1,28 +1,40 @@
 # Backups & Disaster Recovery
 
-Status: proposed  
+Status: active  
 Owner: Ops/Platform  
-Last Updated: 2025-12-11
+Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- DB schema/migrations: `supabase/migrations/`
+- RLS audit: `supabase/verify_rls_coverage.sql`
+- Type generation: `npm run db:types:remote`, `scripts/regenerate-types.ps1`
+- Migrations helpers (optional): `scripts/run-psql-migrations.ps1`
+
+What this repo can verify:
+- The schema source of truth is `supabase/migrations/*`.
+- Type generation uses Supabase CLI (`supabase gen types ... --linked`) via `npm run db:types:remote` / `scripts/regenerate-types.ps1`.
 
 ## Backup Strategy
-- **Scope:** Supabase Postgres (data + WAL), storage assets (if used), config (env vars, service role keys stored in secrets).
-- **Cadence:**
-  - Full logical backup (pg_dump) daily.
-  - WAL/incremental (if enabled) every hour.
-  - Retention: 14 days hot, 60 days cold (object storage).
-- **Storage Targets:** Primary: Supabase-managed backups; Secondary: copy to cloud object storage bucket (immutable) — `s3://<org>-supabase-backups/` (replace with actual).
-- **Encryption:** At-rest via provider; in-transit via TLS.
+- **Scope:** Supabase Postgres (data), storage assets (if used), and configuration (env vars, keys in secrets).
+- **Cadence / Retention:** **TBD** (depends on Supabase plan + ops requirements). Start by defining target $RPO$ and $RTO$.
+- **Storage Targets:**
+  - Primary: Supabase-managed backups (verify in Supabase project settings).
+  - Optional secondary copy: external object storage (bucket/path **TBD**).
+- **Encryption:** At-rest/in-transit is provider-specific (verify for your setup).
 
 ## Restore & Verification
-- **Quarterly restore test:** Restore latest backup to a staging DB, run `npm run type-check` + critical smoke (auth, participants join/rejoin) against staging.
-- **RPO:** <= 1 hour (hourly WAL); **RTO:** <= 4 hours (staging restore + DNS/app redeploy).
+- **Quarterly restore test (recommended):** Restore latest backup to a staging project/DB, run `npm run type-check` + critical smoke (accounts, participants join/rejoin) against staging.
+- **RPO/RTO:** **TBD** (set targets and validate them with restore drills).
 - **Runbook (high level):**
-  1) Trigger restore from Supabase dashboard/CLI to new instance. Example CLI:  
-     `supabase db restore <backup-id> --project-ref <project-ref> --password <db-pass>`
-  2) Re-point staging env vars to restored DB (`SUPABASE_DB_URL`, anon/service keys if new project).
-  3) Run migrations diff check: `python scripts/run_migrations_cli.py --verify` (or `npm run db:verify`).
-  4) Run smoke tests; validate tenant isolation/RLS on staging.
-  5) If good: promote by swapping connection strings in prod env vars.
+  1) Trigger restore from Supabase dashboard to a staging project (or a restored DB instance).
+  2) Re-point staging env vars in the hosting platform (or local) to the restored project’s keys.
+  3) Validate schema alignment:
+    - Confirm migrations in `supabase/migrations/` are applied.
+    - Regenerate types: `npm run db:types:remote` (or `scripts/regenerate-types.ps1`).
+    - Run `npm run type-check`.
+  4) Validate RLS coverage by running `supabase/verify_rls_coverage.sql` in Supabase SQL Editor.
+  5) Run smoke tests; validate tenant isolation on staging.
 
 ## Access & Permissions
 - Backup/restore limited to platform admins with access to Supabase project + secrets.
@@ -35,3 +47,8 @@ Last Updated: 2025-12-11
 ## Open Items
 - Automate secondary copy to object storage and add checksum verification.
 - Fill in actual bucket name and project ref once confirmed.
+
+## Validation checklist
+- DR steps do not rely on repo-specific hardcoded project refs.
+- DB schema source of truth is `supabase/migrations/` and is reflected in `types/supabase.ts` after `db:types:remote`.
+- RLS coverage audit remains runnable via `supabase/verify_rls_coverage.sql`.

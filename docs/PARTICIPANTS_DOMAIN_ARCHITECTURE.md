@@ -2,8 +2,19 @@
 
 **Version:** 2.0  
 **Date:** 2025-12-10  
-**Status:** Design Phase  
+**Status:** Design Phase (historical spec; not source of truth)  
 **Based on:** DDD v1.0 Specification + Revised Design Discussion
+
+## Metadata
+
+- Owner: -
+- Status: archived
+- Last validated: 2025-12-17
+
+This document is a **design/architecture spec** and contains pseudo-schema and planned behavior.
+
+For the repo-anchored current implementation, see:
+- [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
 
 ---
 

@@ -1,29 +1,43 @@
-# Notion Documentation – Lekbanken
+# Notion (mirror) – Lekbanken
 
-Detta dokument innehåller alla länkar till Lekbankens Notion-workspace, som fungerar som **Single Source of Truth** för arkitektur, domänlogik, datamodeller och strategiska beslut.
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+Notion är kopplad till GitHub, men **repo:t är Single Source of Truth** för aktuell dokumentation.
+
+- **Repo (docs/ + sandbox/wiki)**: det som gäller här och nu (implementation, invariants, flöden, runbooks, DB/migrations, adminflöden).
+- **Notion**: spegel/portal (bra för browse, onboarding, beslutshistorik) men ska inte innehålla “egna sanningar” som avviker från repo.
+
+Startpunkter i repo:
+- docs start: [README.md](README.md)
+- docs inventering/index: [DOCS_INDEX.md](DOCS_INDEX.md)
+- docs full inventory (alla docs): [INVENTORY.md](INVENTORY.md)
+- AI/human-wiki: [sandbox/wiki/README.md](../sandbox/wiki/README.md)
+
+Målet är att undvika "code vibe drift": om något står i Notion men inte kan verifieras i repo så är det per definition misstänkt och ska uppdateras eller tas bort.
 
 ---
 
 ## 📚 Dokumentationsprinciper
 
-### Notion innehåller:
-- ✅ Domänlogik och arkitekturbeslut
-- ✅ Datamodeller, relationer och tabellscheman
-- ✅ Produktspecifikationer och roadmap
-- ✅ Workflows, processer och team-resurser
-- ✅ Design system och UI-principer
+### Repo innehåller (Source of Truth)
+- ✅ Implementation, API-yta, UI-flöden och invariants
+- ✅ DB/migrations + typgenerering + driftinstruktioner
+- ✅ “Hur systemet fungerar” (system map + domain maps) för humans och AI
 
-### GitHub innehåller:
-- ✅ Implementation-specifika detaljer
-- ✅ Setup-instruktioner och dev-miljö-guider
-- ✅ API endpoint-dokumentation (där det är kodsmart)
-- ✅ Kod-kommentarer för komplex logik
+### Notion innehåller (spegel)
+- ✅ Ingång/portal + länkar till repo-dokument
+- ✅ Beslutshistorik (ADR/decision log) om ni vill ha det där också
+- ✅ Roadmap/backlog om ni föredrar Notion som planeringsyta
 
-**Vi undviker duplicering** – strategiska beslut dokumenteras i Notion, implementation i kod och README/kommentarer.
+**Regel:** Om en Notion-sida beskriver teknik/struktur så ska den i första hand länka till motsvarande doc i repo.
 
 ---
 
-## 🔗 Huvudnavigering
+## 🔗 Huvudnavigering (Notion)
 
 | Länk | Beskrivning |
 |------|-------------|
@@ -31,15 +45,24 @@ Detta dokument innehåller alla länkar till Lekbankens Notion-workspace, som fu
 | [🏛️ Master Structure v1.0]() | Komplett systemöversikt med alla domäner och inline-databaser |
 | [🎉 Welcome to Lekbanken Workspace]() | Workspace entry point |
 
+⚠️ OBS: Fyll i länkarna när du har page IDs/URLs. Tills dess: utgå från repo.
+
 ---
 
-## 🏛️ Arkitektur & Domäner
+## 🏛️ Arkitektur & Domäner (Notion)
 
 | Länk | Beskrivning |
 |------|-------------|
 | [⭐ Domänstruktur: Lekbanken]() | Fullständig domänarkitektur med DDD-principer och ansvarsområden |
 | [⭐ Platform Domain]() | Vercel runtime, miljöer, deployment, routing, säkerhet, observability |
 | [Browse Domain]() | Sök, filter, rekommendationer, key tables |
+
+Rekommenderad spegling i repo:
+- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
+- Participants (aktuellt): [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
+	- Legacy spec: [PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md)
+- DOMAIN_* (där det finns)
 
 ---
 
@@ -85,7 +108,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **AI Domain** | AI-generering av lekar och planer, AI-illustrationer, AI-sökning, AI-förslag baserat på ålder/syfte/produkt, översättningshjälp | Placeholder |
 | **Translation Engine Domain** | i18n-logik, fallback-kedja (NO → SE → EN), import/export av språksträngar, batch-översättning, missing-key-detektor, admin UI för översättning | Placeholder |
 | **Operations Domain** | Backups, migrations, monitoring, error tracking, incident logs, deploy pipelines, versionshantering, load testing, performance budgets | Placeholder |
-| **API / Integration Domain** | REST/GraphQL endpoints, public API (framtida), webhooks, tokens & auth, rate limiting, API-error-struktur, integrations (Stripe, Supabase, e-post, push) | Placeholder |
+| **API / Integration Domain** | REST/GraphQL endpoints, public API (framtida), webhooks, tokens & auth, rate limiting (om/när implementerat), API-error-struktur, integrations (Stripe, Supabase, e-post, push) | Placeholder |
 | **Marketing / Public Site Domain** | Landningssidor, produktsidor, onboarding funnels, SEO, guides och artiklar, demo-mode, pricing pages, FAQ, try-before-pay-flöden | Placeholder |
 | **Content Management Domain (CMD)** | CSV import/export, massuppdatering av lekar, batch-översättning, batch-illustrationer, automatisk validering, versionskontroll (draft/published), importloggar, felrapporter, mapping engine | Placeholder |
 
@@ -128,33 +151,30 @@ Enligt [Master Structure v1.0]():
 
 ## 🚀 Platform & Tech Stack
 
-### Subdomäner (enligt Platform Domain)
+### URL:er
 
-| Subdomän | Syfte |
-|----------|-------|
-| `lekbanken.no` | Marketing site |
-| `app.lekbanken.no` | Huvudapplikation |
-| `admin.lekbanken.no` | Administrationspanel (CMD) |
-| `demo.lekbanken.no` | Offentlig demo |
-| `api.lekbanken.no` | API endpoints |
+Källan för “vad som faktiskt är deployat” är [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md).
+
+| URL | Syfte |
+|-----|------|
+| `app.lekbanken.no` | Produktion (app) |
 
 ### Miljöer
 
-- **Production** – Live-miljö
-- **Staging** – Pre-production test
-- **Preview** – Automatisk preview per PR (GitHub → Vercel)
-- **Local** – Lokal utveckling
+Miljö-/deployflöde kan förändras. Utgå från:
+
+- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- Ops/runbooks i `docs/ops/*`
+- Repo-workflows (t.ex. `.github/workflows/*` om de finns)
 
 ### Deployment & CI/CD
 
-- GitHub → Vercel integration
-- Automatiska preview-deploys per PR
-- Automatisk production deploy vid merge
-- Migrations pipeline för Supabase
-- Seed-data per miljö
-- Rollbacks & build history
+Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på repo:
 
-**Fullständig specifikation:** [⭐ Platform Domain]()
+- [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- [MIGRATIONS.md](MIGRATIONS.md)
+
+**Fullständig specifikation:** [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
 
 ---
 
@@ -180,32 +200,50 @@ Enligt [Master Structure v1.0]():
 
 | Dokumenttyp | Ägs av | Uppdateras av | Exempel |
 |-------------|--------|---------------|---------|
-| **Domänarkitektur** | Notion | Tech Lead / Architect | Domänstrukturen, Platform Domain |
-| **Datamodeller** | Notion | Tech Lead / Backend | Master Structure, Games DB schema |
-| **Produktspecifikationer** | Notion | Product Owner | Product Hub, feature specs |
-| **API-endpoints** | Notion (översikt) + GitHub (detaljer) | Backend team | API Library (Notion) + OpenAPI spec (GitHub) |
-| **Design system** | Notion | Design team | Design Hub, UI-komponenter |
-| **Setup-guider** | GitHub README | Engineering | Installation, env vars |
-| **Kod-specifika detaljer** | GitHub-kommentarer | Engineers | Algoritmer, edge cases |
-| **Workflows & processer** | Notion | Operations / PM | Operations Hub, Workflows |
+| **Domänarkitektur** | Repo (docs/ + sandbox/wiki) | Tech Lead / Architect | Platform Domain + system map |
+| **Datamodeller** | Repo (supabase/ + docs/) | Tech Lead / Backend | Migrations + schema/docs |
+| **Produktspecifikationer** | Repo (docs/) | Product Owner + Engineering | Product docs och kontrakt |
+| **API-endpoints** | Repo (kod) + docs (kontrakt) | Backend team | app/api/* + docs-referenser |
+| **Design system** | Repo (docs/ + components/) | Design/Engineering | Admin design system + UI-principer |
+| **Setup-guider** | Repo | Engineering | docs/ + README |
+| **Kod-specifika detaljer** | Repo (kod) | Engineers | Algoritmer, edge cases |
+| **Workflows & processer** | Repo (docs/ops) | Operations / PM | Runbooks och rutiner |
 
 ---
 
 ## 🔄 Synkronisering & Uppdateringar
 
 **När du uppdaterar arkitekturen:**
-1. Uppdatera Notion-sidorna först (single source of truth)
-2. Uppdatera eventuella referenser i GitHub README/docs om strukturen ändras
-3. Meddela teamet via Slack/Discord
+1. Uppdatera repo-docs först (Source of Truth)
+2. Uppdatera Notion-sidor som spegel (länka till rätt repo-dokument)
+3. Meddela teamet vid större ändringar
 
 **När du implementerar en ny feature:**
-1. Läs specifikationen i Notion
-2. Implementera i kod enligt domänens ansvar
-3. Uppdatera API Library (Notion) om nya endpoints skapas
-4. Lägg till kod-kommentarer för komplex logik
-5. Uppdatera Release Notes (Notion) när featuren deployas
+1. Implementera + uppdatera repo-docs i samma PR
+2. (Valfritt) Uppdatera Notion-spegeln efter merge
+
+### Notion ↔ GitHub (strategi)
+
+Vi kan köra en av dessa nivåer:
+
+**A) Manuell spegling (lägst friktion)**
+- Notion får en “Start Here”-sida som bara länkar till repo-dokument.
+- Uppdatering sker vid behov.
+
+**B) Semi-automatisk (rekommenderad start)**
+- Repo har en tydlig docs-nav + /sandbox/wiki.
+- Notion har en eller flera sidor som uppdateras av en enkel script-körning som publicerar indexet (t.ex. docs/README.md och sandbox/wiki/README.md).
+
+**C) Full automation (senare, om ROI finns)**
+- GitHub Action som vid merge till main uppdaterar Notion-sidor via Notion API.
+
+För automation behöver vi GitHub Secrets:
+- NOTION_TOKEN
+- NOTION_ROOT_PAGE_ID (eller DATABASE_ID om ni använder DB)
+
+Och ett beslut om *vad* som synkas (förslag: endast index + “System Map”, inte alla docs).
 
 ---
 
 **Maintainer:** Johan Schultz – johan@formgiver.no  
-**Last updated:** 2025-11-28
+**Last updated:** 2025-12-17

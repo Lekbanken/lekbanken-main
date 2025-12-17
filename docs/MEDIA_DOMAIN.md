@@ -1,88 +1,82 @@
 # Media Domain Documentation
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- DB schema:
+  - `supabase/migrations/20251208090000_games_translations_media.sql` (game_media + translations)
+  - `supabase/migrations/20251210120000_media_domain_enhancements.sql` (tenant isolation + templates + AI generations + RLS)
+  - `supabase/migrations/20251210120100_achievements_media_migration.sql` (achievements icon_media_id)
+- API:
+  - `app/api/media/route.ts`
+  - `app/api/media/[mediaId]/route.ts`
+  - `app/api/media/upload/route.ts`
+  - `app/api/media/upload/confirm/route.ts`
+  - `app/api/media/templates/route.ts`
+  - `app/api/media/templates/[templateId]/route.ts`
+  - `app/api/media/fallback/route.ts`
+- UI:
+  - `components/ui/media-picker.tsx`
+  - `features/admin/media/*`
+  - `app/admin/media/page.tsx`
+- Services:
+  - `lib/services/mediaFallback.server.ts`
+  - `lib/services/imageOptimization.server.ts`
+
+## Validation checklist
+
+- `media`, `media_templates`, `media_ai_generations` exist in `types/supabase.ts` and match the migrations.
+- API routes exist under `app/api/media/*` and match the endpoint list below.
+- Upload flow uses `createSignedUploadUrl` + `/api/media/upload/confirm`.
+- Upload endpoint bucket allowlist matches code: `game-media`, `custom_utmarkelser`, `tenant-media`.
+- Confirm endpoint uses `getPublicUrl` → bucket must allow public reads (eller byt till signed downloads).
+
 ## Overview
 
 The Media Domain handles all image and visual asset management in Lekbanken, including game covers, achievement badges, tenant logos, and template images.
 
 ## Architecture
 
-### Core Tables
+### Tables (canonical = DB + generated types)
 
-#### `media`
-Main media storage table with tenant isolation and metadata support.
+För exakta kolumner: se migrations ovan + `types/supabase.ts`.
 
-```sql
-- id: uuid (PK)
-- name: text (required)
-- type: enum('template', 'upload', 'ai')
-- url: text (required)
-- alt_text: text (optional)
-- tenant_id: uuid (FK to tenants, optional)
-- metadata: jsonb (responsive sizes, alt-text i18n, etc.)
-- created_at: timestamptz
-```
-
-#### `media_templates`
-Standard images mapped to product + purpose combinations.
-
-```sql
-- id: uuid (PK)
-- template_key: text (unique)
-- name: text
-- product_id: uuid (FK, optional)
-- main_purpose_id: uuid (FK, optional)
-- sub_purpose_id: uuid (FK, optional)
-- media_id: uuid (FK to media, required)
-- priority: integer (for ordering)
-- is_default: boolean (global fallback)
-```
-
-#### `game_media`
-Junction table linking games to media with ordering and classification.
-
-```sql
-- id: uuid (PK)
-- game_id: uuid (FK to games, required)
-- media_id: uuid (FK to media, required)
-- tenant_id: uuid (FK to tenants, optional)
-- kind: enum('cover', 'gallery')
-- position: integer
-- alt_text: text
-```
-
-#### `media_ai_generations`
-Tracking for AI-generated images (future use).
-
-```sql
-- id: uuid (PK)
-- media_id: uuid (FK to media)
-- tenant_id: uuid (FK to tenants, optional)
-- user_id: uuid (FK to users, optional)
-- prompt: text
-- model: text
-- parameters: jsonb
-- status: text
-```
+- `media`: central katalog av mediaobjekt (url, typ, tenant-scope, metadata). Obs: `media.game_id` finns historiskt men är markerat som deprecated.
+- `game_media`: kopplar spel → media (cover/gallery, ordering).
+- `media_templates`: mapping för standardbilder (product/purpose/sub-purpose) + priority + default.
+- `media_ai_generations`: framtida spårning för AI-genererat media.
 
 ## API Endpoints
 
 ### Media CRUD
 - `GET /api/media` - List media with filters (type, tenantId)
+  - Query params supported by current implementation: `tenantId`, `type`, `limit`, `offset`
+  - Special case: when `type=template` and `mainPurposeId` is provided, endpointen returnerar media via `media_templates` för det syftet.
 - `POST /api/media` - Create media record
-- `GET /api/media/:id` - Get single media
-- `PATCH /api/media/:id` - Update media
-- `DELETE /api/media/:id` - Delete media
+- `GET /api/media/[mediaId]` - Get single media
+- `PATCH /api/media/[mediaId]` - Update media
+- `DELETE /api/media/[mediaId]` - Delete media
 
 ### Upload Flow
 1. `POST /api/media/upload` - Get signed upload URL
 2. `PUT [signed URL]` - Upload file to Supabase Storage
-3. `POST /api/media/upload/confirm` - Get public URL
+3. `POST /api/media/upload/confirm` - Resolve URL (via `getPublicUrl`)
 4. `POST /api/media` - Create media record
 
 ### Fallback System
 - `GET /api/media/fallback?productId=X&mainPurposeId=Y&subPurposeId=Z`
   - Returns best matching template image
   - Hierarchy: sub-purpose → purpose+product → purpose → product → global
+
+### Template Management
+- `GET /api/media/templates` - List all mappings
+- `POST /api/media/templates` - Create mapping
+- `DELETE /api/media/templates/[templateId]` - Delete mapping
 
 ## Fallback Chain
 
@@ -97,9 +91,11 @@ When a game has no explicit cover image:
 ## Storage Buckets
 
 ### Supabase Storage
-- `game-media` - Game cover images (public)
-- `custom_utmarkelser` - Achievement badge assets (public)
-- `tenant-media` - Tenant-uploaded private media
+- `tenant-media` - Tenant-uppladdningar (används av nuvarande Admin UI: MediaPicker + TenantMediaBank)
+- `custom_utmarkelser` - Achievement assets (bucket förekommer i admin assets-kod)
+- `game-media` - Allowlistat i upload-API men används inte av nuvarande UI (reserverat/framtida)
+
+Note: The current confirm endpoint uses `getPublicUrl`. If a bucket is intended to be private, the download flow should use signed URLs instead.
 
 ## UI Components
 
@@ -121,6 +117,11 @@ Features:
 - Templates tab (standard images)
 - Upload tab (direct file upload)
 - Grid preview with selection
+
+### Admin Pages
+- Admin UI exists under `app/admin/media/page.tsx` and uses:
+  - `features/admin/media/TenantMediaBank.tsx`
+  - `features/admin/media/StandardImagesManager.tsx`
 
 ## Image Optimization
 
@@ -161,20 +162,11 @@ Store responsive variants in `media.metadata`:
 
 ## RLS Policies
 
-### media table
-- **SELECT**: Global media OR tenant member OR linked to accessible game
-- **INSERT**: Authenticated users for global/own tenant media
-- **UPDATE**: Tenant members for own tenant media, system_admin for global
-- **DELETE**: Same as UPDATE
+Källa: `supabase/migrations/20251210120000_media_domain_enhancements.sql`.
 
-### media_templates table
-- **SELECT**: Public read access
-- **ALL**: system_admin only
-
-### media_ai_generations table
-- **SELECT**: Own tenant or own user
-- **INSERT**: Own user, optionally for own tenant
-- **UPDATE**: Own user only
+- `media`: tenant-isolerat via `get_user_tenant_ids()` + global media (tenant_id null) + koppling via `game_media`.
+- `media_templates`: läsbar för alla, hanteras av system_admin.
+- `media_ai_generations`: läs/skriv för eget user/tenant-scope.
 
 ## Tenant Isolation
 
@@ -205,25 +197,18 @@ Future: Remove `media.game_id` column
 ## Best Practices
 
 ### Upload Workflow
-1. Validate file size (< 10MB) and dimensions (< 4096px)
+1. Validera filstorlek (API begränsar till 10MB via `/api/media/upload`)
 2. Request signed URL with tenant/bucket info
 3. Upload directly to Supabase Storage
 4. Confirm upload and get public URL
 5. Create `media` record with URL and metadata
 
+Obs: Dimensionvalidering/format-validering finns som helper i `lib/services/imageOptimization.server.ts` men körs inte i upload-API i nuläget.
+
 ### Using Fallbacks
 Always provide fallback parameters when displaying game covers:
 
-```typescript
-const fallback = await getGameCoverWithFallback({
-  gameId: game.id,
-  productId: game.product_id,
-  mainPurposeId: game.main_purpose_id,
-  subPurposeId: game.sub_purpose_id,
-})
-
-const imageUrl = fallback.url || '/default-game-cover.png'
-```
+Se `lib/services/mediaFallback.server.ts` och `GET /api/media/fallback` för hierarkin.
 
 ### Next.js Image Optimization
 Use Next.js `Image` component for automatic optimization:

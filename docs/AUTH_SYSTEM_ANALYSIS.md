@@ -1,5 +1,23 @@
 # 🔐 Auth System Full Analysis
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Last validated: 2025-12-17
+
+## Scope & status
+
+Detta är en **historisk analys/åtgärdslogg** (2024-12-07). Den ska inte användas som “current state” utan som kontext för varför saker ser ut som de gör.
+
+Aktuella källdokument (repo = SoT):
+
+- `docs/auth/routes.md`
+- `docs/auth/roles.md`
+- `docs/auth/tenant.md`
+
+---
+
 **Datum:** 2024-12-07  
 **Status:** ✅ ÅTGÄRDAT  
 **Syfte:** Identifiera och förbättra auth-flödet för professionell kvalitet

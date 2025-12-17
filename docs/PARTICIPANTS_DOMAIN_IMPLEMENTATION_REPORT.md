@@ -4,11 +4,42 @@
 **Assessed Version:** Current `main` branch  
 **Analysis Scope:** Complete repository scan for Participants Domain implementation
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Last validated: 2025-12-17
+
+## 2025-12-17 validation addendum (supersedes the original conclusion)
+
+The original finding (**"DOMAIN NOT IMPLEMENTED"**) is no longer accurate for the current repo state.
+
+Verified implementation exists and is the source of truth here:
+- [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
+
+High-signal evidence in code:
+- API routes:
+   - `app/api/participants/**` (sessions, tokens, participant mgmt)
+   - `app/api/play/**` (public participant surface; `join`/`rejoin` re-export participants handlers)
+- Core services:
+   - `lib/services/participants/session-service.ts`
+   - `lib/services/participants/session-code-generator.ts`
+   - `lib/services/participants/participant-token.ts`
+- Generated DB types include participant tables:
+   - `types/supabase.ts`
+
+Behavior confirmed from route handlers (examples):
+- Join enforces session status/expiry/capacity, generates token, inserts participant, logs activity.
+- Rejoin validates token and session, rejects `kicked/blocked`, restores participant to `active`.
+- Token lifecycle endpoints implement extend/revoke/cleanup.
+
+Everything below this addendum should be treated as a **historical snapshot (2025-12-10)** and may not match the current implementation.
+
 ---
 
 ## 1. Domain Summary (Real Implementation)
 
-### Current Reality: **DOMAIN NOT IMPLEMENTED**
+### Current Reality (as of 2025-12-10): **DOMAIN NOT IMPLEMENTED** (superseded)
 
 The Participants Domain as specified in DDD v1.0 **does not exist** in the current codebase. There is no implementation of:
 

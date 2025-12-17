@@ -1,5 +1,16 @@
 # Participants Domain MVP (Play Sessions)
 
+## Metadata
+
+- Owner: -
+- Status: archived
+- Last validated: 2025-12-17
+
+This document is an MVP/spec snapshot.
+
+For the repo-anchored current implementation surface, see:
+- [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
+
 This MVP reuses the existing participants domain but exposes a lightweight **/play** surface for hosts and participants inside the Next.js app.
 
 ## API (Next.js route handlers)

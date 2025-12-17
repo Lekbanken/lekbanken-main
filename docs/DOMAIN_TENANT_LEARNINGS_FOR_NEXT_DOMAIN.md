@@ -8,7 +8,8 @@ This document summarizes the main architectural and security learnings from the 
 
 The Tenant Domain now provides:
 
-- `tenants` and `tenant_memberships` with roles (owner/admin/editor/member).
+- `tenants` and `user_tenant_memberships` with roles (owner/admin/editor/member).
+- Note: `tenant_memberships` may exist as a compatibility view; prefer `user_tenant_memberships`.
 - API-first operations under `/api/tenants/*` using `createServerRlsClient`.
 - RLS driven by `get_user_tenant_ids()` and role checks.
 - Demo-tenant protection in API-level logic.

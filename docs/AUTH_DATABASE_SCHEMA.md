@@ -1,8 +1,73 @@
 # Lekbanken Auth Database Schema
 
-> Comprehensive documentation of authentication-related tables, RLS policies, triggers, and functions.
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- DB (migrations):
+  - `supabase/migrations/20251209120000_accounts_domain.sql` (global_role_enum, handle_new_user, membership normalization, helper functions)
+  - `supabase/migrations/20251208130000_role_enum_and_permissions.sql` (tenant_role_enum + helper function consolidation)
+  - `supabase/migrations/20251216000000_consolidate_roles.sql` (legacy role → global_role)
+  - `supabase/migrations/20251215000000_fix_profile_sync_on_update.sql` (profile sync hardening)
+- Generated DB types:
+  - `lib/supabase/database.types.ts`
+- Runtime role derivation:
+  - `lib/auth/role.ts`
+  - `lib/auth/server-context.ts`
+  - `lib/supabase/auth.tsx`
+
+## Validation checklist
+
+- `public.global_role_enum` matches `Database["public"]["Enums"]["global_role_enum"]`.
+- `public.tenant_role_enum` matches `Database["public"]["Enums"]["tenant_role_enum"]`.
+- `public.handle_new_user()` exists and is wired to `auth.users` via trigger.
+- Memberships are queried via `user_tenant_memberships` in code (treat `tenant_memberships` as compatibility-only).
+- Helper functions (`is_system_admin`, `get_user_tenant_ids`, `has_tenant_role`) match current migrations and include system-admin bypass.
 
 ---
+
+## Current schema (source of truth)
+
+Den här sektionen är den **aktuella** referensen. För exakta kolumner/typer: se `lib/supabase/database.types.ts` och migrations.
+
+### Enums
+
+- `global_role_enum`: `system_admin`, `private_user`, `demo_private_user`, `member`
+- `tenant_role_enum`: `owner`, `admin`, `editor`, `member` + (kan ha extra värden: `organisation_admin`, `organisation_user`, `demo_org_admin`, `demo_org_user`)
+
+### Core tables
+
+- `public.users` ("profile"/konto, synkas från `auth.users`)
+  - Nyckelkolumner (se typer): `id`, `email`, `full_name`, `avatar_url`, `language`, `email_verified`, `mfa_enforced`, `global_role`.
+  - `role` finns kvar för bakåtkompatibilitet men är **deprecated** (se `20251216000000_consolidate_roles.sql`).
+
+- `public.tenants` (organisationer)
+  - Många fält finns (slug, metadata, kontaktfält, status/type, etc). Undvik att duplicera schemat i text — använd genererade typer + migrations.
+
+- `public.user_tenant_memberships` (kan vara tabell eller view beroende på äldre schema)
+  - Kod ska använda namnet `user_tenant_memberships` konsekvent.
+  - `public.tenant_memberships` kan existera som view + INSTEAD OF rules för kompatibilitet (se `20251209120000_accounts_domain.sql`).
+  - Nyckelkolumner: `user_id`, `tenant_id`, `role` (`tenant_role_enum`), `is_primary`, `status`, `seat_assignment_id`, timestamps.
+
+### RLS helper functions (high level)
+
+- `is_system_admin()` (och alias `is_global_admin()`): avgör global admin via `public.users.global_role = 'system_admin'`.
+- `get_user_tenant_ids()`:
+  - För `system_admin`: returnerar alla tenant IDs.
+  - För vanliga användare: returnerar aktiva memberships (status = `active`).
+- `has_tenant_role(target_tenant, required_roles)`:
+  - För `system_admin`: alltid `true`.
+  - Annars: matchar membership på tenant + role (+ status = `active`).
+
+---
+
+## Legacy appendix (stale; pre-2025-12-17)
+
+Det som följer var en äldre "comprehensive" dump och kan innehålla felaktiga enums/kolumner/policies. Behålls tills det är helt bortstädat.
 
 ## 1. Core Auth Tables
 

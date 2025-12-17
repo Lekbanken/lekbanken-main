@@ -2,11 +2,29 @@
 
 This document provides a comprehensive reference for all environment variables used in the Lekbanken application.
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Validation checklist
+
+- Source of truth for validation rules: `lib/config/env.ts`.
+- `.env.local.example` exists and includes at least the required Supabase variables.
+- `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are required (the app fails fast if missing).
+- Other variables are optional and should be documented as feature-gated.
+
 ## Quick Start
 
 1. Copy `.env.local.example` to `.env.local`:
    ```bash
    cp .env.local.example .env.local
+   ```
+
+   On Windows PowerShell:
+   ```powershell
+   Copy-Item .env.local.example .env.local
    ```
 
 2. Fill in the required values (marked with ✅ in the tables below)
@@ -161,8 +179,6 @@ if (isFeatureEnabled('participantsDomain')) {
 # Required
 ✅ NEXT_PUBLIC_SUPABASE_URL
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
-✅ UPSTASH_REDIS_REST_URL
-✅ UPSTASH_REDIS_REST_TOKEN
 
 # Recommended
 ⭕ SUPABASE_SERVICE_ROLE_KEY (for admin features)
@@ -180,13 +196,7 @@ if (isFeatureEnabled('participantsDomain')) {
 ✅ NEXT_PUBLIC_SUPABASE_URL
 ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY
 ✅ SUPABASE_SERVICE_ROLE_KEY
-✅ UPSTASH_REDIS_REST_URL
-✅ UPSTASH_REDIS_REST_TOKEN
 ✅ TENANT_COOKIE_SECRET (strong random value)
-
-# Recommended
-⭕ NEXT_PUBLIC_SENTRY_DSN (error tracking)
-⭕ SENTRY_ENVIRONMENT=production
 
 # If using Stripe
 ⭕ STRIPE_ENABLED=true
@@ -216,7 +226,6 @@ The application validates environment variables at startup using `lib/config/env
 **Success Message (Development):**
 ```
 ✅ Environment variables validated successfully
-⚠️  Rate limiting disabled: UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN not configured
 ```
 
 ---
@@ -228,9 +237,8 @@ The application validates environment variables at startup using `lib/config/env
 - Fill in your Supabase project URL from https://app.supabase.com
 
 ### "Rate limiting disabled"
-- This is a warning, not an error
-- Application works without rate limiting (development only)
-- For production, create Upstash Redis database and add credentials
+- (Deprecated note) The codebase does not currently validate or require Upstash vars.
+- If rate limiting is reintroduced, document the variables and wire them into `lib/config/env.ts`.
 
 ### "Stripe is not enabled"
 - Set `STRIPE_ENABLED=true` in `.env.local`
@@ -263,10 +271,9 @@ The application validates environment variables at startup using `lib/config/env
    - Never expose to browser
    - Use for admin operations only
 
-5. **Enable Sentry in production**
-   - Catch errors before users report them
-   - Monitor performance issues
-   - Set up alerts for critical errors
+5. **Consider error tracking in production**
+   - Not currently implemented in this repo
+   - If introduced, document required env vars and wire validation into `lib/config/env.ts`
 
 ---
 
@@ -276,6 +283,4 @@ The application validates environment variables at startup using `lib/config/env
 - `lib/config/env.ts` - Validation logic and type-safe access
 - `docs/PLATFORM_DOMAIN.md` - Platform infrastructure documentation
 - Supabase Docs: https://supabase.com/docs
-- Upstash Docs: https://docs.upstash.com/redis
-- Sentry Docs: https://docs.sentry.io/platforms/javascript/guides/nextjs/
 - Stripe Docs: https://stripe.com/docs

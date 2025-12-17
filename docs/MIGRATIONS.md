@@ -1,5 +1,18 @@
 # Supabase Migration Execution Guide
 
+## Metadata
+
+- Owner: -
+- Status: active
+- Last validated: 2025-12-17
+
+## Validation checklist
+
+- Source of truth for applied migrations is the folder: `supabase/migrations/`.
+- After any schema change, regenerate types via `npm run db:types:remote` and commit the updated `types/supabase.ts` in the same PR.
+- `npm run type-check` passes after regeneration (no transient casts).
+- Docs never rely on a fixed migration count (folder contents are authoritative).
+
 ## ⚠️ KRITISKT: Efter Varje Migration
 
 **ALLTID** regenerera TypeScript types efter schema changes:
@@ -27,27 +40,14 @@ git commit -m "feat: migration with type regeneration"
 
 ## Overview
 
-This project has **14 database migrations** (created: Nov 29, 2025) that need to be executed to set up the complete MVP schema with all 15 domains.
+This repo uses **timestamped migrations** under `supabase/migrations/`.
+
+- The **authoritative list** is the folder itself (do not rely on a fixed migration count).
+- The original “2025-11-29” batch is only the initial baseline; many subsequent migrations refine auth/RLS, tenants, game builder, play runtime, etc.
 
 ### Migration Files
-```
-✅ 20251129000000_initial_schema.sql        - Base schema, tenants, users, auth
-✅ 20251129000001_fix_rls_security.sql      - RLS policy corrections
-✅ 20251129000002_play_domain.sql           - Game progress, scores, rewards
-✅ 20251129000003_support_domain.sql        - Support tickets, responses, categories
-✅ 20251129000004_analytics_domain.sql      - Events, metrics, dashboards
-✅ 20251129000005_billing_domain.sql        - Invoices, subscriptions, products
-✅ 20251129000006_seed_billing_plans.sql    - Seed billing plans data
-✅ 20251129000007_notifications_domain.sql  - User notifications, preferences
-✅ 20251129000008_social_domain.sql         - Friends, leaderboards, multiplayer
-✅ 20251129000009_content_planner_domain.sql - Content calendar, events
-✅ 20251129000010_marketplace_domain.sql    - Shop items, transactions, inventory
-✅ 20251129000011_moderation_domain.sql     - Moderation actions, reports, content
-✅ 20251129000012_achievements_advanced_domain.sql - Advanced achievements, badges
-✅ 20251129000013_personalization_domain.sql - User preferences, recommendations
-```
 
-**Total**: ~4,000+ lines of SQL, 60+ tables, 110+ indexes, comprehensive RLS policies
+See `supabase/migrations/`.
 
 ---
 

@@ -1,8 +1,8 @@
 # Incident Log
 
-Status: proposed  
+Status: active  
 Owner: Ops/Platform  
-Last Updated: 2025-12-11
+Last validated: 2025-12-17
 
 Use this table to log incidents. Add newest on top.
 

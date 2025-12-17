@@ -1,11 +1,34 @@
-## Testplan Game Builder P0
+## Testplan Game Builder (P0)
 
-### Syfte
-Verifiera att nya builder-flödet (P0) kan skapa och uppdatera spel med strukturerade steg och material utan att bryta befintlig visning i appen.
+## Metadata
 
-### Förutsättningar
+- Owner: -
+- Status: draft
+- Last validated: 2025-12-17
+
+## Related code (source of truth)
+
+- UI:
+   - `features/admin/games/GameAdminPage.tsx` (länkar till builder)
+   - `app/admin/games/new/page.tsx`
+   - `app/admin/games/[gameId]/edit/page.tsx`
+   - `app/admin/games/builder/*`
+- API:
+   - `app/api/games/builder/route.ts` (POST)
+   - `app/api/games/builder/[id]/route.ts` (GET/PUT)
+- Runtime:
+   - `lib/services/games.server.ts`
+   - `app/app/games/[gameId]/page.tsx`
+
+## Syfte
+
+Verifiera att builder-flödet (P0) kan skapa och uppdatera spel med strukturerade steg och material utan att bryta befintlig visning i appen.
+
+## Förutsättningar
+
 - Inloggad som admin med rättighet att skapa/uppdatera spel.
-- Migration 20251216010000_game_builder_p0.sql körd (tabeller game_steps, game_materials + nya kolumner på games).
+- Migration `20251216010000_game_builder_p0.sql` körd (tabeller `game_steps`, `game_materials` + nya kolumner på `games`).
+- Om du testar faser/roller/board-config: kör även `20251216020000_game_phases.sql`, `20251216030000_game_roles.sql`, `20251216040000_game_board_config.sql`.
 
 ### Manuella steg
 1) **Skapa nytt spel via builder**

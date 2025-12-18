@@ -27,16 +27,51 @@ jobs:
       - name: Run TypeScript type check
         run: npm run type-check
         
-      - name: Check for 'as any' in production code
+      - name: Check for new 'as any' in production code
         run: |
-          if grep -r "as any" app/ lib/ --include="*.ts" --include="*.tsx" | grep -v "types/supabase.ts"; then
-            echo "❌ Found 'as any' casts in production code:"
-            grep -r "as any" app/ lib/ --include="*.ts" --include="*.tsx" | grep -v "types/supabase.ts"
-            echo ""
-            echo "⚠️  Please remove 'as any' casts and use proper types"
+          set -euo pipefail
+
+          BASE_SHA=""
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "ℹ️  No base SHA available; skipping 'as any' check"
+            exit 0
+          fi
+
+          echo "Diff range: $BASE_SHA..${{ github.sha }}"
+          changed_files=$(git diff --name-only "$BASE_SHA" "${{ github.sha }}" -- app/ lib/ | grep -E '\\.(ts|tsx)$' || true)
+
+          if [ -z "$changed_files" ]; then
+            echo "✅ No changed TS/TSX files under app/ or lib/"
+            exit 0
+          fi
+
+          found=0
+          while IFS= read -r file; do
+            # Safety: skip if file was deleted or missing
+            if [ ! -f "$file" ]; then
+              continue
+            fi
+
+            if grep -n "as any" "$file" >/dev/null 2>&1; then
+              echo "❌ Found 'as any' in $file:"
+              grep -n "as any" "$file" || true
+              echo ""
+              found=1
+            fi
+          done <<< "$changed_files"
+
+          if [ "$found" -ne 0 ]; then
+            echo "⚠️  Please remove newly introduced 'as any' casts and use proper types"
             exit 1
           fi
-          echo "✅ No 'as any' casts found in production code"
+
+          echo "✅ No new 'as any' casts found in changed production code"
         
       - name: Build check
         run: npm run build

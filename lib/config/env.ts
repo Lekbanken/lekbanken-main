@@ -19,6 +19,12 @@ const isBrowser = typeof window !== 'undefined';
 function validateEnvironment() {
   // Skip validation in browser
   if (isBrowser) return;
+
+  // Allow CI/build pipelines to explicitly skip validation.
+  // This is useful for build-only checks where runtime secrets are not available.
+  if (process.env.SKIP_ENV_VALIDATION === 'true' || process.env.SKIP_ENV_VALIDATION === '1') {
+    return;
+  }
   
   const nodeEnv = process.env.NODE_ENV;
   

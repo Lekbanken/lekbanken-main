@@ -2,7 +2,6 @@
 
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { SideNav } from '@/components/app/SideNav'
-import { BottomNav } from '@/components/app/BottomNav'
 
 export default function AppShellSandbox() {
   return (
@@ -29,12 +28,14 @@ export default function AppShellSandbox() {
           <section>
             <h2 className="mb-4 text-lg font-semibold text-foreground">BottomNav (Mobile)</h2>
             <p className="mb-4 text-sm text-muted-foreground">
-              Visas på skärmar &lt;1024px. Fixed bottom, safe-area aware.
+              Förhandsvisas i en iframe (390px bred) så du slipper ändra fönsterstorlek.
             </p>
-            <div className="relative mx-auto h-[100px] w-full max-w-[400px] overflow-hidden rounded-lg border border-border bg-card">
-              <div className="absolute inset-x-0 bottom-0">
-                <BottomNav />
-              </div>
+            <div className="mx-auto w-[min(390px,100%)] overflow-hidden rounded-2xl border border-border bg-background">
+              <iframe
+                title="BottomNav mobile preview"
+                src="/sandbox/app/shell/mobile-preview"
+                className="h-[780px] w-full"
+              />
             </div>
           </section>
 

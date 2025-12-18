@@ -140,6 +140,7 @@ Enable or disable specific features.
 
 | Variable | Required | Purpose | Default | Example |
 |----------|----------|---------|---------|---------|
+| `FEATURE_AI` | ⭕ | Master switch for user-facing AI features | `false` | `true` |
 | `FEATURE_AI_SUGGESTIONS` | ⭕ | Enable AI-powered game suggestions | `false` | `true` |
 | `FEATURE_PARTICIPANTS` | ⭕ | Enable Participants Domain (anonymous sessions) | `false` | `true` |
 

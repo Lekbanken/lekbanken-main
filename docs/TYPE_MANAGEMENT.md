@@ -294,7 +294,7 @@ npm run lint                 # Run ESLint
 Om du stöter på problem:
 
 1. **Kolla documentation:**
-   - `TYPE_MISMATCHES_ANALYSIS.md` - Detaljerad analys
+   - `reports/TYPE_MISMATCHES_ANALYSIS.md` - Detaljerad analys
    - `docs/MIGRATIONS.md` - Migration guide
    
 2. **Verifiera databas:**

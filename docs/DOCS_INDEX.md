@@ -30,6 +30,9 @@ Fält:
 | TESTPLAN_GAME_BUILDER_P0.md | B | draft | - | - |
 | GAME_CSV_IMPORT_EXPORT_PLAN.md | B | draft | - | - |
 | CSV_IMPORT_FIELD_REFERENCE.md | A | active | 2025-12-17 | - |
+| BROWSE_DOMAIN.md | A | active | 2025-12-18 | - |
+| CONTENT_MANAGEMENT_DOMAIN.md | A | active | 2025-12-18 | - |
+| DATA_MODEL_DOMAIN.md | A | active | 2025-12-18 | - |
 | MEDIA_DOMAIN.md | A | active | 2025-12-17 | - |
 | PLATFORM_DOMAIN.md | A | active | 2025-12-17 | - |
 | PLATFORM_DOMAIN_VALIDATION_REPORT.md | C | draft | - | - |
@@ -44,7 +47,11 @@ Fält:
 | PLANNER_DOMAIN.md | A | active | 2025-12-17 | - |
 | GAMIFICATION_DOMAIN.md | A | active | 2025-12-17 | - |
 | JOURNEY_DOMAIN.md | A | active | 2025-12-17 | - |
+| MARKETING_DOMAIN.md | A | active | 2025-12-17 | - |
+| SUPPORT_DOMAIN.md | A | active | 2025-12-17 | - |
+| NOTIFICATIONS_DOMAIN.md | A | active | 2025-12-17 | - |
 | API_INTEGRATION_DOMAIN.md | A | active | 2025-12-17 | - |
+| AI_DOMAIN.md | A | active | 2025-12-18 | - |
 | PARTICIPANTS_DOMAIN_ARCHITECTURE.md | B | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md | C | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_MVP.md | B | archived | 2025-12-17 | - |
@@ -53,8 +60,9 @@ Fält:
 | TYPE_MANAGEMENT.md | A | draft | - | - |
 | VS_CODE_WORKFLOW.md | A | draft | - | - |
 | PROJECT_EXECUTION_PLAN.md | B | draft | - | - |
-| PROMPT_FOR_NEW_AI.md | E | draft | - | - |
+| prompts/PROMPT_FOR_NEW_AI.md | E | draft | - | - |
 | HANDOVER_2024-12-07.md | C | draft | - | - |
+| DOCS_NAMING_CONVENTIONS.md | A | draft | 2025-12-18 | - |
 
 ## Sub-index
 
@@ -63,6 +71,8 @@ Fält:
 - admin/: se admin/README.md
 - templates/: se templates/*
 - validation/: se validation/* (start: `validation/REALITY_CHECK_2025-12-17.md`)
+- reports/: se reports/README.md
+- prompts/: se prompts/README.md
 
 ## Nästa validering (rekommenderad ordning)
 

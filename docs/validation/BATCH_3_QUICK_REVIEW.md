@@ -125,7 +125,7 @@ Batch 3 consists of **11 previously validated domains** with existing TODO/LEARN
 **Key Features:**
 - `billing_products`, `tenant_subscriptions`, `subscription_seat_assignments`
 - API routes: `/api/billing/tenants/[id]/subscription`
-- Stripe integration working (see `STRIPE_COMPLETION_REPORT.md`)
+- Stripe integration working (see `reports/STRIPE_COMPLETION_REPORT.md`)
 - Service layer: `lib/services/billingService.ts`
 
 **Known Gaps:**
@@ -137,7 +137,7 @@ Batch 3 consists of **11 previously validated domains** with existing TODO/LEARN
 ---
 
 ### 7. Accounts Domain ✓
-**Documentation:** `AUTHORIZATION_SYSTEM_REPORT.md` (381 lines), `AUTH_DATABASE_SCHEMA.md` (411 lines)  
+**Documentation:** `reports/AUTHORIZATION_SYSTEM_REPORT.md` (381 lines), `AUTH_DATABASE_SCHEMA.md` (411 lines)  
 **Implementation Status:** Complete  
 **Key Features:**
 - 167 RLS policies documented

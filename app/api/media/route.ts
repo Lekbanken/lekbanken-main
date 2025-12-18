@@ -3,6 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import type { Json } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
+import { gateAi, forbidAiIfDisabled } from '@/lib/ai/gate'
 
 const mediaSchema = z.object({
   name: z.string().min(1).max(255),
@@ -22,6 +23,11 @@ export async function GET(request: NextRequest) {
   const mainPurposeId = searchParams.get('mainPurposeId')
   const limit = parseInt(searchParams.get('limit') || '50', 10)
   const offset = parseInt(searchParams.get('offset') || '0', 10)
+
+  if (type === 'ai') {
+    const gate = gateAi()
+    if (gate) return gate
+  }
 
   // Special handling for templates filtered by main_purpose_id
   if (type === 'template' && mainPurposeId) {
@@ -111,6 +117,11 @@ export async function POST(request: NextRequest) {
       { error: 'Invalid payload', details: parsed.error.flatten() },
       { status: 400 }
     )
+  }
+
+  if (parsed.data.type === 'ai') {
+    const gate = forbidAiIfDisabled()
+    if (gate) return gate
   }
 
   const { data, error } = await supabase

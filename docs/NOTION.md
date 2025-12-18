@@ -4,7 +4,7 @@
 
 - Owner: -
 - Status: active
-- Last validated: 2025-12-17
+- Last validated: 2025-12-18
 
 Notion är kopplad till GitHub, men **repo:t är Single Source of Truth** för aktuell dokumentation.
 
@@ -15,6 +15,9 @@ Startpunkter i repo:
 - docs start: [README.md](README.md)
 - docs inventering/index: [DOCS_INDEX.md](DOCS_INDEX.md)
 - docs full inventory (alla docs): [INVENTORY.md](INVENTORY.md)
+- docs naming/structure: [DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md)
+- docs reports (archive): [reports/README.md](reports/README.md)
+- docs prompts (archive): [prompts/README.md](prompts/README.md)
 - AI/human-wiki: [sandbox/wiki/README.md](../sandbox/wiki/README.md)
 
 Målet är att undvika "code vibe drift": om något står i Notion men inte kan verifieras i repo så är det per definition misstänkt och ska uppdateras eller tas bort.
@@ -55,10 +58,12 @@ Målet är att undvika "code vibe drift": om något står i Notion men inte kan 
 |------|-------------|
 | [⭐ Domänstruktur: Lekbanken]() | Fullständig domänarkitektur med DDD-principer och ansvarsområden |
 | [⭐ Platform Domain]() | Vercel runtime, miljöer, deployment, routing, säkerhet, observability |
-| [Browse Domain]() | Sök, filter, rekommendationer, key tables |
+| [Browse Domain](BROWSE_DOMAIN.md) | Sök, filter, rekommendationer, key tables |
 
 Rekommenderad spegling i repo:
 - [PLATFORM_DOMAIN.md](PLATFORM_DOMAIN.md)
+- Browse (aktuellt): [BROWSE_DOMAIN.md](BROWSE_DOMAIN.md)
+- Data Model (aktuellt): [DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md)
 - Auth/RBAC: [auth/README.md](auth/README.md) (aktuellt) + [AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) (historisk/archived)
 - Accounts (aktuellt): [ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md)
 - Participants (aktuellt): [PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md)
@@ -71,15 +76,20 @@ Rekommenderad spegling i repo:
 - Games (aktuellt): [GAMES_DOMAIN.md](GAMES_DOMAIN.md)
 	- Roadmap: [DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md)
 	- Learnings: [DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md)
+- Content Management (aktuellt): [CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md)
 - Play (aktuellt): [PLAY_DOMAIN.md](PLAY_DOMAIN.md)
 - Planner (aktuellt): [PLANNER_DOMAIN.md](PLANNER_DOMAIN.md)
 - Gamification (aktuellt): [GAMIFICATION_DOMAIN.md](GAMIFICATION_DOMAIN.md)
 - Journey (aktuellt): [JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md)
+- Marketing (aktuellt): [MARKETING_DOMAIN.md](MARKETING_DOMAIN.md)
 - Media (aktuellt): [MEDIA_DOMAIN.md](MEDIA_DOMAIN.md)
+- Notifications (aktuellt): [NOTIFICATIONS_DOMAIN.md](NOTIFICATIONS_DOMAIN.md)
+- Support (aktuellt): [SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md)
 - Translation Engine (aktuellt): [TRANSLATION_ENGINE_DOMAIN.md](TRANSLATION_ENGINE_DOMAIN.md)
 - Operations (aktuellt): [OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md)
 	- Runbooks: [ops/README.md](ops/README.md)
 - API / Integration (aktuellt): [API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md)
+- AI (gated): [AI_DOMAIN.md](AI_DOMAIN.md)
 - DOMAIN_* (där det finns)
 
 ---
@@ -114,6 +124,7 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | Domän | Ansvar | Status |
 |-------|--------|--------|
 | **Platform Domain** | Runtime (Vercel), miljöer, deployment, routing, subdomäner, feature flags, error handling, performance, security, release channels | ⭐ Dokumenterad |
+| **Data Model Domain** | Schema governance: migrations, typegen (TS), RLS-täckning, naming conventions och cross-domain invariants | ⭐ Dokumenterad |
 | **Accounts Domain** | Multi-tenant authentication, användarkonton, roller & behörigheter, språkpreferenser, sessionshantering, onboarding, e-postverifiering, 2FA | ⭐ Dokumenterad |
 | **Tenant Domain** | Tenant-inställningar, valda produkter, aktiva licenser, feature configuration, standardinställningar, admin users, användarbegränsningar | ⭐ Dokumenterad |
 | **Billing & Licenses Domain** | Produkttyper, paket, licenser, begränsningar per licens, Stripe/Vipps-integration, fakturering, förnyelse, seats/användarantal | ⭐ Dokumenterad |
@@ -124,12 +135,14 @@ Enligt [⭐ Domänstruktur: Lekbanken]():
 | **Gamification Domain** | Achievements, badges, coins, streaks, levels/XP, challenges, events, leaderboards | ⭐ Dokumenterad |
 | **Journey Domain** | "Din lekresa" – dashboard/timeline över aktivitet och framsteg (read/composition, Journey BFF) | ⭐ Dokumenterad |
 | **Media Domain** | Standardbilder, illustrationer per produkt + huvudsyfte, kundens egna bilder, moderering, bildformat, media templates, versionering | ⭐ Dokumenterad |
-| **AI Domain** | AI-generering av lekar och planer, AI-illustrationer, AI-sökning, AI-förslag baserat på ålder/syfte/produkt, översättningshjälp | Placeholder |
+| **AI Domain** | AI-funktioner (user-facing) – alltid feature-flag gated (default OFF) | ⭐ Dokumenterad |
 | **Translation Engine Domain** | i18n-logik, fallback-kedja (NO → SE → EN), import/export av språksträngar, batch-översättning, missing-key-detektor, admin UI för översättning | ⭐ Dokumenterad |
 | **Operations Domain** | Backups, migrations, monitoring, error tracking, incident logs, deploy pipelines, versionshantering, load testing, performance budgets | ⭐ Dokumenterad |
 | **API / Integration Domain** | Endpoints, BFF contracts, webhooks, auth/tenancy conventions, error patterns (repo-anchored) | ⭐ Dokumenterad |
-| **Marketing / Public Site Domain** | Landningssidor, produktsidor, onboarding funnels, SEO, guides och artiklar, demo-mode, pricing pages, FAQ, try-before-pay-flöden | Placeholder |
-| **Content Management Domain (CMD)** | CSV import/export, massuppdatering av lekar, batch-översättning, batch-illustrationer, automatisk validering, versionskontroll (draft/published), importloggar, felrapporter, mapping engine | Placeholder |
+| **Marketing / Public Site Domain** | Landningssidor, produktsidor, onboarding funnels, SEO, guides och artiklar, demo-mode, pricing pages, FAQ, try-before-pay-flöden | ⭐ Dokumenterad |
+| **Notifications Domain** | In-app notiser, preferenser, delivery log, admin-sändning | ⭐ Dokumenterad |
+| **Support Domain** | Feedback, support tickets, ticket messages, bug reports, admin-hantering | ⭐ Dokumenterad |
+| **Content Management Domain (CMD)** | CSV import/export, massuppdatering av lekar, versionskontroll (draft/published), builder-flöden och content planner primitives | ⭐ Dokumenterad |
 
 **Legend:**
 - ⭐ **Dokumenterad** – Sidan innehåller fullständig specifikation
@@ -201,7 +214,7 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 
 ### Domäner som behöver fyllas i:
 
-- [ ] **Data Model Domain** – Central schema-governance
+- [x] **Data Model Domain** – Central schema-governance (se `docs/DATA_MODEL_DOMAIN.md`)
 - [x] **Accounts Domain** – Auth-flöden och roller (se `docs/ACCOUNTS_DOMAIN.md` + `docs/auth/*`)
 - [x] **Tenant Domain** – Multi-tenancy-setup (se `docs/TENANT_DOMAIN.md`)
 - [x] **Billing & Licenses Domain** – Stripe/Vipps-integration (se `docs/BILLING_LICENSING_DOMAIN.md` + `docs/STRIPE.md`)
@@ -213,7 +226,10 @@ Notion kan sammanfatta principer, men “aktuellt läge” ska alltid peka på r
 - [x] **Translation Engine Domain** – i18n-fallback och batch-översättning (se `docs/TRANSLATION_ENGINE_DOMAIN.md`)
 - [x] **Operations Domain** – Drift och monitoring (se `docs/OPERATIONS_DOMAIN.md` + `docs/ops/*`)
 - [x] **API/Integration Domain** – endpoints & conventions (se `docs/API_INTEGRATION_DOMAIN.md`)
-- [ ] **Marketing Domain** – Landningssidor och funnels
+- [x] **Marketing Domain** – Landningssidor och funnels (se `docs/MARKETING_DOMAIN.md`)
+- [x] **Notifications Domain** – In-app notiser (se `docs/NOTIFICATIONS_DOMAIN.md`)
+- [x] **Support Domain** – Feedback + tickets (se `docs/SUPPORT_DOMAIN.md`)
+- [x] **Content Management Domain (CMD)** – Bulk ops (CSV import/export) + builder + content planner primitives (se `docs/CONTENT_MANAGEMENT_DOMAIN.md`)
 
 ---
 

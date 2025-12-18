@@ -266,7 +266,7 @@ CREATE POLICY "users_see_own_notifications"
 - **Services**: `lib/services/` (15 service layers)
 - **Pages**: `app/(marketing|admin|app)/` (20+ pages)
 - **Components**: `components/` (50+ components)
-- **Validation Report**: `COMPREHENSIVE_VALIDATION_REPORT.md`
+- **Validation Report**: `docs/reports/COMPREHENSIVE_VALIDATION_REPORT.md`
 - **Verification Script**: `scripts/verify-system.js`
 
 ### Command Reference
@@ -356,4 +356,4 @@ The Lekbanken MVP has been successfully completed with:
 
 **Status**: 🟢 **ALL GREEN - READY FOR NEXT PHASE**
 
-For detailed information, see `COMPREHENSIVE_VALIDATION_REPORT.md`
+For detailed information, see `docs/reports/COMPREHENSIVE_VALIDATION_REPORT.md`

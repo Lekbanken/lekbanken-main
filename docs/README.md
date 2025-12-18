@@ -9,11 +9,14 @@ Detta är den **aktuella** dokumentationen för Lekbanken.
 
 - Systemöversikt (för humans + AI): se [../sandbox/wiki/README.md](../sandbox/wiki/README.md)
 - Full inventory (alla docs): se [INVENTORY.md](INVENTORY.md)
+- Naming/struktur: se [DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md)
 - DB/migrations: MIGRATIONS.md
 - Auth/RBAC: auth/* (aktuellt) + AUTH_SYSTEM_ANALYSIS.md (historisk/archived)
 - Admin: ADMIN_OVERVIEW_REPORT.md + admin/
 - Games / Game Builder / CSV: ADMIN_GAME_BUILDER_V1.md, TESTPLAN_GAME_BUILDER_P0.md, GAME_BUILDER_UI_SPEC.md, CSV_IMPORT_FIELD_REFERENCE.md
 - Ops/runbooks: ops/
+- Rapporter/analys (arkiv): se [reports/README.md](reports/README.md)
+- Prompts (arkiv): se [prompts/README.md](prompts/README.md)
 
 ## Dokumentationskontrakt
 

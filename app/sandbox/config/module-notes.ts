@@ -9,6 +9,34 @@ export interface ModuleNotes {
 }
 
 export const moduleNotes: Record<string, ModuleNotes> = {
+  'repo-docs': {
+    notes: `
+- Renderar Markdown-filer från **docs/** (top-level) direkt i Sandbox UI
+- Syfte: onboarding/utforskning med samma shell/nav som övriga sandboxen
+- Dev-only: visas inte i production
+    `.trim(),
+    changelog: [{ date: '2025-12-18', note: 'Added repo docs viewer (docs/*.md rendered in UI)' }],
+    codeSnippet: `// Repo docs live here:
+docs/*.md
+
+// UI routes:
+/sandbox/docs/repo
+/sandbox/docs/repo/[slug]`,
+  },
+  wiki: {
+    notes: `
+- Renderar Markdown-filer från **sandbox/wiki** direkt i Sandbox UI
+- Syfte: onboarding/utbildning (läsbarhet + navigering), inte "source of truth"
+- Dev-only: visas inte i production
+    `.trim(),
+    changelog: [{ date: '2025-12-18', note: 'Added sandbox wiki viewer (markdown rendering in UI)' }],
+    codeSnippet: `// Wiki files live here:
+sandbox/wiki/*.md
+
+// UI routes:
+/sandbox/docs/wiki
+/sandbox/docs/wiki/[slug]`,
+  },
   typography: {
     notes: `
 - Uses **Inter** as primary sans-serif, **Merriweather** as secondary serif

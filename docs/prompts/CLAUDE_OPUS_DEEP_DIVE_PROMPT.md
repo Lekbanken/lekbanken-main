@@ -305,4 +305,4 @@ Ge den denna prompt och be den att:
 2. Identifiera alla problem
 3. Skapa den detaljerade rapporten
 4. Ge en stegvis handlingsplan
-5. Spara outputen som `CLAUDE_OPUS_ANALYSIS_REPORT.md` i repo-roten
+5. Spara outputen som `docs/reports/CLAUDE_OPUS_ANALYSIS_REPORT.md`

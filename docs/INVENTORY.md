@@ -35,6 +35,7 @@ Fält:
 | [docs/ADMIN_GAME_BUILDER_V1.md](ADMIN_GAME_BUILDER_V1.md) | A | active | 2025-12-17 | - | Game Builder (current) |
 | [docs/ADMIN_OVERVIEW_REPORT.md](ADMIN_OVERVIEW_REPORT.md) | C | draft | - | - | Report/overview |
 | [docs/AI_CODING_GUIDELINES.md](AI_CODING_GUIDELINES.md) | A | draft | - | - | Process/guidelines |
+| [docs/AI_DOMAIN.md](AI_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (feature-flag-first) |
 | [docs/ACCOUNTS_DOMAIN.md](ACCOUNTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/auth/architecture.md](auth/architecture.md) | A | active | 2025-12-17 | - | Auth architecture |
 | [docs/auth/debugging.md](auth/debugging.md) | A | active | 2025-12-17 | - | Runbook |
@@ -47,14 +48,18 @@ Fält:
 | [docs/AUTH_IMPLEMENTATION_TODO.md](AUTH_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
 | [docs/AUTH_SYSTEM_ANALYSIS.md](AUTH_SYSTEM_ANALYSIS.md) | C | archived | 2025-12-17 | - | Historical analysis / change log |
 | [docs/BADGE_BUILDER_UX_GUIDE.md](BADGE_BUILDER_UX_GUIDE.md) | B | draft | - | - | UX/spec |
+| [docs/BROWSE_DOMAIN.md](BROWSE_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/BROWSE_REWORK_NOTES.md](BROWSE_REWORK_NOTES.md) | C | draft | - | - | Notes |
 | [docs/CATALYST_UI_KIT.md](CATALYST_UI_KIT.md) | A | draft | - | - | Reference |
-| [docs/CHATGPT_GAME_CREATOR_PROMPT.md](CHATGPT_GAME_CREATOR_PROMPT.md) | E | draft | - | - | Prompt |
+| [docs/prompts/CHATGPT_GAME_CREATOR_PROMPT.md](prompts/CHATGPT_GAME_CREATOR_PROMPT.md) | E | draft | - | - | Prompt |
 | [docs/BILLING_LICENSING_DOMAIN.md](BILLING_LICENSING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
+| [docs/DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/DESIGN_CONSISTENCY_TODO.md](DESIGN_CONSISTENCY_TODO.md) | D | draft | - | - | Backlog |
 | [docs/DESIGN_IMPLEMENTATION_TODO.md](DESIGN_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
-| [docs/DOCS_INDEX.md](DOCS_INDEX.md) | A | draft | 2025-12-17 | - | Curated index |
+| [docs/DOCS_INDEX.md](DOCS_INDEX.md) | A | draft | 2025-12-18 | - | Curated index |
+| [docs/DOCS_NAMING_CONVENTIONS.md](DOCS_NAMING_CONVENTIONS.md) | A | draft | 2025-12-18 | - | Naming + structure conventions |
 | [docs/DOMAIN_GAMES_LEARNINGS.md](DOMAIN_GAMES_LEARNINGS.md) | C | draft | - | - | Learnings |
 | [docs/DOMAIN_GAMES_TODO.md](DOMAIN_GAMES_TODO.md) | D | draft | - | - | Backlog |
 | [docs/DOMAIN_PLANNER_TODO.md](DOMAIN_PLANNER_TODO.md) | D | draft | - | - | Backlog |
@@ -69,7 +74,9 @@ Fält:
 | [docs/HANDOVER_2024-12-07.md](HANDOVER_2024-12-07.md) | C | draft | - | - | Handover |
 | [docs/MEDIA_DOMAIN.md](MEDIA_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc |
 | [docs/MIGRATIONS.md](MIGRATIONS.md) | A | active | 2025-12-17 | - | Core reference |
-| [docs/NOTION.md](NOTION.md) | A | active | 2025-12-17 | - | Notion mirror rules |
+| [docs/MARKETING_DOMAIN.md](MARKETING_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
+| [docs/NOTION.md](NOTION.md) | A | active | 2025-12-18 | - | Notion mirror rules |
+| [docs/NOTIFICATIONS_DOMAIN.md](NOTIFICATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/OPERATIONS_DOMAIN.md](OPERATIONS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/ops/alerting.md](ops/alerting.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/backup_dr.md](ops/backup_dr.md) | A | active | 2025-12-17 | - | Runbook |
@@ -77,6 +84,19 @@ Fält:
 | [docs/ops/incident_response.md](ops/incident_response.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/incidents.md](ops/incidents.md) | A | active | 2025-12-17 | - | Runbook |
 | [docs/ops/README.md](ops/README.md) | A | active | 2025-12-17 | - | Sub-index |
+| [docs/prompts/README.md](prompts/README.md) | A | draft | 2025-12-18 | - | Index for prompts |
+| [docs/reports/README.md](reports/README.md) | A | draft | 2025-12-18 | - | Index for archived reports |
+| [docs/reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md](reports/ADMIN_ACCESS_INVESTIGATION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/ADMIN_AUTH_INVESTIGATION_REPORT.md](reports/ADMIN_AUTH_INVESTIGATION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/ADMIN_FEATURE_AUDIT_REPORT.md](reports/ADMIN_FEATURE_AUDIT_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/ADMIN_TECH_REVIEW.md](reports/ADMIN_TECH_REVIEW.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/AUTHORIZATION_SYSTEM_REPORT.md](reports/AUTHORIZATION_SYSTEM_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/CLAUDE_OPUS_ANALYSIS_REPORT.md](reports/CLAUDE_OPUS_ANALYSIS_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/COMPREHENSIVE_VALIDATION_REPORT.md](reports/COMPREHENSIVE_VALIDATION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/NAVIGATION_AUTH_FLOW_REPORT.md](reports/NAVIGATION_AUTH_FLOW_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/STRIPE_COMPLETION_REPORT.md](reports/STRIPE_COMPLETION_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/STRIPE_INVENTORY_REPORT.md](reports/STRIPE_INVENTORY_REPORT.md) | C | archived | - | - | Report (moved from repo root) |
+| [docs/reports/TYPE_MISMATCHES_ANALYSIS.md](reports/TYPE_MISMATCHES_ANALYSIS.md) | C | archived | - | - | Report (moved from repo root) |
 | [docs/PARTICIPANTS_DOMAIN.md](PARTICIPANTS_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/PARTICIPANTS_DOMAIN_ARCHITECTURE.md](PARTICIPANTS_DOMAIN_ARCHITECTURE.md) | B | archived | 2025-12-17 | - | Historical architecture/spec (pseudo-schema) |
 | [docs/PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md](PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md) | C | archived | 2025-12-17 | - | Historical report (superseded by 2025-12-17 addendum) |
@@ -92,10 +112,11 @@ Fält:
 | [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |
-| [docs/PROMPT_FOR_NEW_AI.md](PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |
+| [docs/prompts/PROMPT_FOR_NEW_AI.md](prompts/PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |
 | [docs/README.md](README.md) | A | draft | 2025-12-17 | - | Docs start |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | draft | - | - | Report |
 | [docs/STRIPE.md](STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
+| [docs/SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | - | - | UI reference |
 | [docs/TASK_11_12_TOKEN_SESSION_MANAGEMENT.md](TASK_11_12_TOKEN_SESSION_MANAGEMENT.md) | B | draft | - | - | Task/spec |
 | [docs/TASK_9_LIVE_PROGRESS.md](TASK_9_LIVE_PROGRESS.md) | B | draft | - | - | Task/spec |

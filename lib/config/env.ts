@@ -100,6 +100,7 @@ export const env = {
   // Feature Flags
   features: {
     stripeEnabled: process.env.STRIPE_ENABLED === 'true',
+    ai: process.env.FEATURE_AI === 'true',
     aiSuggestions: process.env.FEATURE_AI_SUGGESTIONS === 'true',
     participantsDomain: process.env.FEATURE_PARTICIPANTS === 'true',
   },

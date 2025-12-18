@@ -11,6 +11,7 @@ if (process.env.NODE_ENV === "production") {
 
 export default function SandboxIndex() {
   // Get categories in display order
+  const docs = getCategoryById('docs');
   const designSystem = getCategoryById('design-system');
   const app = getCategoryById('app');
   const admin = getCategoryById('admin');
@@ -24,6 +25,11 @@ export default function SandboxIndex() {
       description="Testa och utveckla komponenter isolerat."
     >
       <div className="space-y-8">
+        {/* Docs & Wiki */}
+        {docs && (
+          <CategorySection category={docs} />
+        )}
+
         {/* Design System - Show first 5 modules */}
         {designSystem && (
           <CategorySection category={designSystem} maxModules={5} />

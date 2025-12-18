@@ -1,10 +1,12 @@
-﻿'use client';
+﻿
+'use client';
 
 import type { ReactNode } from "react";
-import { useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useAuth } from "@/lib/supabase/auth";
+import { useTenant } from "@/lib/context/TenantContext";
+import { TenantRouteSync } from "./TenantRouteSync";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 /**
@@ -17,21 +19,17 @@ import { LoadingSpinner } from "@/components/ui/loading-spinner";
 export default function TenantAdminLayout({ children }: { children: ReactNode }) {
   const params = useParams();
   const tenantId = params.tenantId as string;
-  const { isSystemAdmin, isTenantAdmin, currentTenantId, isLoading: rbacLoading } = useRbac();
+  const { isSystemAdmin } = useRbac();
   const { isLoading: authLoading } = useAuth();
-  const router = useRouter();
+  const { userTenants, isLoadingTenants } = useTenant();
 
-  const isLoading = authLoading || rbacLoading;
-  
-  // Check if user has access to this tenant
-  const hasAccess = isSystemAdmin || (isTenantAdmin && currentTenantId === tenantId);
+  const isLoading = authLoading || isLoadingTenants;
 
-  useEffect(() => {
-    if (!isLoading && !hasAccess) {
-      // Redirect to admin dashboard with error message
-      router.replace('/admin?error=tenant_access_denied');
-    }
-  }, [isLoading, hasAccess, router]);
+  const membershipForRoute = userTenants.find((t) => t.id === tenantId)?.membership ?? null;
+  const hasTenantAccess = membershipForRoute ? ['owner', 'admin', 'editor'].includes(membershipForRoute.role as string) : false;
+
+  // Access for this route tenantId
+  const hasAccess = isSystemAdmin || hasTenantAccess;
 
   // Show loading spinner while checking permissions
   if (isLoading) {
@@ -59,6 +57,11 @@ export default function TenantAdminLayout({ children }: { children: ReactNode })
     );
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      <TenantRouteSync tenantId={tenantId} enabled={!isSystemAdmin && hasTenantAccess} />
+      {children}
+    </>
+  );
 }
 

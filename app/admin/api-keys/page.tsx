@@ -1,7 +1,9 @@
+import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
 import { KeyIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
 
-export default function ApiKeysPage() {
+export default async function ApiKeysPage() {
+  await requireSystemAdmin('/admin')
   return (
     <AdminPageLayout>
       <AdminPageHeader

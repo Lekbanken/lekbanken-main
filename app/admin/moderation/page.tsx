@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { Badge, Button, Card, CardContent } from '@/components/ui';
 import { ShieldExclamationIcon } from '@heroicons/react/24/outline';
 import {
@@ -127,6 +128,7 @@ export default function ModerationAdminPage() {
   }
 
   return (
+    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title="Moderering"
@@ -303,5 +305,6 @@ export default function ModerationAdminPage() {
         </Card>
       )}
     </AdminPageLayout>
+    </SystemAdminClientGuard>
   );
 }

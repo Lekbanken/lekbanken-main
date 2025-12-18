@@ -12,7 +12,13 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect('/auth/login?redirect=/admin')
   }
 
-  if (authContext.effectiveGlobalRole !== 'system_admin') {
+  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin'
+  const allowedTenantRoles = new Set(['owner', 'admin', 'editor'])
+  const hasTenantAdminAccess = (authContext.memberships ?? []).some((m) =>
+    allowedTenantRoles.has((m.role ?? 'member') as string)
+  )
+
+  if (!isSystemAdmin && !hasTenantAdminAccess) {
     redirect('/app')
   }
 

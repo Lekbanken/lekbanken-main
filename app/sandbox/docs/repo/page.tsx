@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { listRepoDocs } from './repo-files'
 
-if (process.env.NODE_ENV === 'production') {
-  notFound()
-}
+export const dynamic = 'force-dynamic'
 
 export default async function RepoDocsIndexPage() {
+  if (process.env.NODE_ENV === 'production') {
+    notFound()
+  }
+
   const docs = await listRepoDocs()
 
   function formatRelativePathForDisplay(relativePath: string): string {

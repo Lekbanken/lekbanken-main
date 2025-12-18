@@ -1,7 +1,9 @@
+import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
 import { MegaphoneIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
 
-export default function ReleaseNotesPage() {
+export default async function ReleaseNotesPage() {
+  await requireSystemAdmin('/admin')
   return (
     <AdminPageLayout>
       <AdminPageHeader

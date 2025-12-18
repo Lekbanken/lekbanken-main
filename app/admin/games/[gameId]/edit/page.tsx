@@ -1,6 +1,7 @@
 'use client';
 
 import { use } from 'react';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { GameBuilderPage } from '../../builder/GameBuilderPage';
 
 export default function GameBuilderEditPage({ 
@@ -9,5 +10,9 @@ export default function GameBuilderEditPage({
   params: Promise<{ gameId: string }> 
 }) {
   const { gameId } = use(params);
-  return <GameBuilderPage gameId={gameId} />;
+  return (
+    <SystemAdminClientGuard>
+      <GameBuilderPage gameId={gameId} />
+    </SystemAdminClientGuard>
+  );
 }

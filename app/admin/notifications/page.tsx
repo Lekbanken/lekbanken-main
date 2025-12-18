@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { sendBulkNotifications } from '@/lib/services/notificationsService';
 import { supabase } from '@/lib/supabase/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
@@ -129,6 +130,7 @@ export default function NotificationsAdminPage() {
   }
 
   return (
+    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title="Notifikationer"
@@ -287,5 +289,6 @@ export default function NotificationsAdminPage() {
         </Card>
       </div>
     </AdminPageLayout>
+    </SystemAdminClientGuard>
   );
 }

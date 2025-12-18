@@ -4,11 +4,13 @@ import { SandboxShell } from '../../../components/shell/SandboxShellV2'
 import { Markdown } from '../../../components/Markdown'
 import { readWikiPage } from '../wiki-files'
 
-if (process.env.NODE_ENV === 'production') {
-  notFound()
-}
+export const dynamic = 'force-dynamic'
 
 export default async function WikiPage({ params }: { params: Promise<{ slug: string }> }) {
+  if (process.env.NODE_ENV === 'production') {
+    notFound()
+  }
+
   const { slug } = await params
   const page = await readWikiPage(slug)
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard'
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -181,6 +182,7 @@ export default function ErrorManagementPage() {
       : 0
 
   return (
+    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title="Error Management"
@@ -387,5 +389,6 @@ export default function ErrorManagementPage() {
         </Card>
       </div>
     </AdminPageLayout>
+    </SystemAdminClientGuard>
   )
 }

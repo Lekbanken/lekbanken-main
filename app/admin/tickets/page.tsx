@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { Card, Badge, Input, Button } from '@/components/ui';
 import { TicketIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import {
@@ -142,6 +143,7 @@ export default function AdminTicketsPage() {
   }
 
   return (
+    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title="Ärenden"
@@ -407,5 +409,6 @@ export default function AdminTicketsPage() {
         )}
       </div>
     </AdminPageLayout>
+    </SystemAdminClientGuard>
   );
 }

@@ -1,7 +1,9 @@
+import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
 import { FlagIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
 
-export default function FeatureFlagsPage() {
+export default async function FeatureFlagsPage() {
+  await requireSystemAdmin('/admin')
   return (
     <AdminPageLayout>
       <AdminPageHeader

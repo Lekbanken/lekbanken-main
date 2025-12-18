@@ -9,6 +9,7 @@ import { AdminCommandPalette, useCommandPalette } from "./AdminCommandPalette";
 import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
 import { resetAuth } from "@/lib/supabase/resetAuth";
+import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 
 type AdminShellProps = {
   children: ReactNode;
@@ -22,6 +23,7 @@ export function AdminShell({ children }: AdminShellProps) {
   const router = useRouter();
   const { user, effectiveGlobalRole, isLoading } = useAuth();
   const { currentTenant, hasTenants, isLoadingTenants } = useTenant();
+  const { canAccessAdmin } = useRbac();
   const isRoleResolved = effectiveGlobalRole !== null;
 
   useEffect(() => {
@@ -51,8 +53,7 @@ export function AdminShell({ children }: AdminShellProps) {
   };
 
   const isGlobalAdmin = effectiveGlobalRole === "system_admin";
-  const hasAuthData = !!user && isGlobalAdmin;
-  const stillLoading = !hasAuthData && (isLoading || (!isGlobalAdmin && isLoadingTenants));
+  const stillLoading = isLoading || (!isGlobalAdmin && isLoadingTenants);
 
   if (stillLoading) {
     return (
@@ -86,7 +87,7 @@ export function AdminShell({ children }: AdminShellProps) {
   }
 
   const needsTenant = !isGlobalAdmin && !hasTenants && !isLoadingTenants;
-  const noAdminRole = isRoleResolved && !isGlobalAdmin;
+  const noAdminRole = isRoleResolved && !canAccessAdmin;
 
   console.log("[AdminShell] access check:", {
     user: !!user,

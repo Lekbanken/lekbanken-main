@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { supabase } from '@/lib/supabase/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { Cog6ToothIcon } from '@heroicons/react/24/outline';
@@ -143,6 +144,7 @@ export default function SettingsPage() {
   }
 
   return (
+    <SystemAdminClientGuard>
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -330,5 +332,6 @@ export default function SettingsPage() {
         )}
       </div>
     </div>
+    </SystemAdminClientGuard>
   );
 }

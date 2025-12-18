@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { listWikiPages } from './wiki-files'
 
-if (process.env.NODE_ENV === 'production') {
-  notFound()
-}
+export const dynamic = 'force-dynamic'
 
 export default async function WikiIndexPage() {
+  if (process.env.NODE_ENV === 'production') {
+    notFound()
+  }
+
   const pages = await listWikiPages()
 
   return (

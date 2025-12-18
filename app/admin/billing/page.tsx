@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { getBillingStats } from '@/lib/services/billingService';
 import {
   AdminPageHeader,
@@ -113,6 +114,7 @@ export default function BillingAdminPage() {
   }
 
   return (
+    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title="Fakturering"
@@ -212,5 +214,6 @@ export default function BillingAdminPage() {
         </CardContent>
       </Card>
     </AdminPageLayout>
+    </SystemAdminClientGuard>
   );
 }

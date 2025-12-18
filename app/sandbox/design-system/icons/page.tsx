@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useMemo, useState } from 'react'
-import { notFound } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,15 +11,20 @@ import { LogoControls } from '../../components/controls'
 import { LogoLockup } from '../../components/previews'
 import { useColors } from '../../store/sandbox-store'
 
-if (process.env.NODE_ENV === 'production') {
-  notFound()
-}
-
 type IconVariant = 'light-default' | 'dark-default' | 'light-test' | 'dark-test'
 type IconState = Record<IconVariant, string>
 const storageKey = 'lekbanken.icon-urls'
 
 export default function IconGuidelinesPage() {
+  const router = useRouter()
+  const isProd = process.env.NODE_ENV === 'production'
+
+  useEffect(() => {
+    if (isProd) {
+      router.replace('/')
+    }
+  }, [isProd, router])
+
   const [lightDefault, setLightDefault] = useState(() => {
     if (typeof window === 'undefined') return '/lekbanken-icon.png';
     try {
@@ -130,6 +135,10 @@ export default function IconGuidelinesPage() {
   ]
 
   const iconForLockup = colorScheme === 'dark' ? (darkTest || darkDefault) : (lightTest || lightDefault)
+
+  if (isProd) {
+    return null
+  }
 
   return (
     <SandboxShell

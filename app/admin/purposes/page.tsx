@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import {
   AdminBreadcrumbs,
   AdminEmptyState,
@@ -230,9 +231,11 @@ export default function PurposesPage() {
 
   if (!canView) {
     return (
-      <AdminPageLayout>
-        <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se syften." />
-      </AdminPageLayout>
+      <SystemAdminClientGuard>
+        <AdminPageLayout>
+          <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se syften." />
+        </AdminPageLayout>
+      </SystemAdminClientGuard>
     );
   }
 
@@ -246,33 +249,34 @@ export default function PurposesPage() {
       : tenantCustom.filter((p) => p.type === 'main');
 
   return (
-    <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Syften' }]} />
-      <AdminPageHeader
-        title="Syften & undersyften"
-        description="Hantera huvudsyften och undersyften som används i spel, produkter och filter."
-        icon={<FolderIcon className="h-8 w-8 text-primary" />}
-        actions={
-          <div className="flex items-center gap-2">
-            <Button size="sm" onClick={openCreate} disabled={activeTab === 'standard'}>
-              Nytt syfte
-            </Button>
-            <AdminExportButton
-              data={purposes}
-              columns={[
-                { header: 'ID', accessor: 'id' },
-                { header: 'Typ', accessor: 'type' },
-                { header: 'Nyckel', accessor: 'purpose_key' },
-                { header: 'Namn', accessor: 'name' },
-                { header: 'Parent ID', accessor: 'parent_id' },
-                { header: 'Tenant ID', accessor: (row) => (row as Purpose).tenant_id ?? '' },
-                { header: 'Standard', accessor: (row) => ((row as Purpose).is_standard ? 'ja' : 'nej') },
-              ]}
-              filename="purposes"
-            />
-          </div>
-        }
-      />
+    <SystemAdminClientGuard>
+      <AdminPageLayout>
+        <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Syften' }]} />
+        <AdminPageHeader
+          title="Syften & undersyften"
+          description="Hantera huvudsyften och undersyften som används i spel, produkter och filter."
+          icon={<FolderIcon className="h-8 w-8 text-primary" />}
+          actions={
+            <div className="flex items-center gap-2">
+              <Button size="sm" onClick={openCreate} disabled={activeTab === 'standard'}>
+                Nytt syfte
+              </Button>
+              <AdminExportButton
+                data={purposes}
+                columns={[
+                  { header: 'ID', accessor: 'id' },
+                  { header: 'Typ', accessor: 'type' },
+                  { header: 'Nyckel', accessor: 'purpose_key' },
+                  { header: 'Namn', accessor: 'name' },
+                  { header: 'Parent ID', accessor: 'parent_id' },
+                  { header: 'Tenant ID', accessor: (row) => (row as Purpose).tenant_id ?? '' },
+                  { header: 'Standard', accessor: (row) => ((row as Purpose).is_standard ? 'ja' : 'nej') },
+                ]}
+                filename="purposes"
+              />
+            </div>
+          }
+        />
 
       <AdminStatGrid className="mb-4">
         <AdminStatCard label="Huvudsyften" value={purposes.filter((p) => p.type === 'main').length} />
@@ -455,6 +459,7 @@ export default function PurposesPage() {
           </form>
         </DialogContent>
       </Dialog>
-    </AdminPageLayout>
+      </AdminPageLayout>
+    </SystemAdminClientGuard>
   );
 }

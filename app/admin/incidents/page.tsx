@@ -1,7 +1,9 @@
+import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from "@/components/admin/shared";
 
-export default function IncidentsPage() {
+export default async function IncidentsPage() {
+  await requireSystemAdmin('/admin')
   return (
     <AdminPageLayout>
       <AdminPageHeader

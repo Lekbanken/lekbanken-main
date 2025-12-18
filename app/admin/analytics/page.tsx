@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
+import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
@@ -81,20 +82,16 @@ export default function AnalyticsPage() {
     loadData();
   }, [user, currentTenant, dateRange]);
 
-  if (!user || !currentTenant) {
-    return (
-      <div className="min-h-screen bg-background p-4">
-        <div className="max-w-6xl mx-auto pt-20">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Analytics</h1>
-            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
-          </div>
+  const content = !user || !currentTenant ? (
+    <div className="min-h-screen bg-background p-4">
+      <div className="max-w-6xl mx-auto pt-20">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-foreground mb-4">Analytics</h1>
+          <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
         </div>
       </div>
-    );
-  }
-
-  return (
+    </div>
+  ) : (
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -399,4 +396,6 @@ export default function AnalyticsPage() {
       </div>
     </div>
   );
+
+  return <SystemAdminClientGuard>{content}</SystemAdminClientGuard>;
 }

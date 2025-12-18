@@ -1,11 +1,7 @@
-'use client'
-
 import { notFound } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 
-if (process.env.NODE_ENV === 'production') {
-  notFound()
-}
+export const dynamic = 'force-dynamic'
 
 const semanticTokens = [
   { name: 'text-foreground', description: 'Primär textfärg' },
@@ -51,6 +47,10 @@ const radiusTokens = [
 ]
 
 export default function DesignTokensPage() {
+  if (process.env.NODE_ENV === 'production') {
+    notFound()
+  }
+
   return (
     <SandboxShell
       moduleId="tokens"

@@ -15,7 +15,8 @@ SELECT
   CASE WHEN sm.version IS NULL THEN '❌' ELSE '✅' END AS registered
 FROM (VALUES
   ('20251217120000', 'planner_total_time_trigger'),
-  ('20251219090000', 'play_chat_messages')
+  ('20251219090000', 'play_chat_messages'),
+  ('20251219113000', 'legendary_play_primitives_v1')
 ) AS m(version, name)
 LEFT JOIN supabase_migrations.schema_migrations sm ON sm.version = m.version
 ORDER BY m.version;
@@ -27,7 +28,8 @@ ORDER BY m.version;
 -- INSERT INTO supabase_migrations.schema_migrations (version, name)
 -- VALUES
 --   ('20251217120000', 'planner_total_time_trigger'),
---   ('20251219090000', 'play_chat_messages')
+--   ('20251219090000', 'play_chat_messages'),
+--   ('20251219113000', 'legendary_play_primitives_v1')
 -- ON CONFLICT (version) DO NOTHING;
 
 -- 2. Kolla om kritiska tabeller finns
@@ -88,6 +90,41 @@ SELECT
     THEN '✅' ELSE '❌' 
   END AS play_chat_messages;
 
+-- 2b2. Kolla Legendary Play Primitives-tabeller
+SELECT
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'game_artifacts')
+    THEN '✅' ELSE '❌'
+  END AS game_artifacts,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'game_artifact_variants')
+    THEN '✅' ELSE '❌'
+  END AS game_artifact_variants,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_artifacts')
+    THEN '✅' ELSE '❌'
+  END AS session_artifacts,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_artifact_variants')
+    THEN '✅' ELSE '❌'
+  END AS session_artifact_variants,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_artifact_assignments')
+    THEN '✅' ELSE '❌'
+  END AS session_artifact_assignments,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_decisions')
+    THEN '✅' ELSE '❌'
+  END AS session_decisions,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_votes')
+    THEN '✅' ELSE '❌'
+  END AS session_votes,
+  CASE
+    WHEN EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'session_outcomes')
+    THEN '✅' ELSE '❌'
+  END AS session_outcomes;
+
 -- 2d. Kolla att is_global_admin() finns (används i flera RLS policies)
 SELECT
   CASE
@@ -110,6 +147,40 @@ JOIN pg_namespace n ON n.oid = c.relnamespace
 WHERE n.nspname = 'public'
   AND c.relname IN ('play_chat_messages', 'session_roles', 'session_events')
 ORDER BY c.relname;
+
+-- 2e2. Kolla att RLS är enabled på Legendary Play Primitives runtime tabeller
+SELECT
+  c.relname AS table_name,
+  CASE WHEN c.relrowsecurity THEN '✅' ELSE '❌' END AS rls_enabled
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND c.relname IN (
+    'session_artifacts',
+    'session_artifact_variants',
+    'session_artifact_assignments',
+    'session_decisions',
+    'session_votes',
+    'session_outcomes'
+  )
+ORDER BY c.relname;
+
+-- 2e3. Kolla att host policies finns för primitives runtime tabeller
+SELECT
+  tablename,
+  policyname,
+  cmd
+FROM pg_policies
+WHERE schemaname = 'public'
+  AND tablename IN (
+    'session_artifacts',
+    'session_artifact_variants',
+    'session_artifact_assignments',
+    'session_decisions',
+    'session_votes',
+    'session_outcomes'
+  )
+ORDER BY tablename, policyname;
 
 -- 2f. Kolla att chat-policies finns (host select/insert)
 SELECT

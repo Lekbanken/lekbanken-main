@@ -1,7 +1,7 @@
 'use client';
 
 import { Input, Textarea, Select } from "@/components/ui";
-import { AchievementItem } from "../../types";
+import type { AchievementItem } from "../../types";
 
 type MetadataFormProps = {
   value: AchievementItem;

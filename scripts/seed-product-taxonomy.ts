@@ -27,18 +27,6 @@ type PurposeInsert = Database["public"]["Tables"]["purposes"]["Insert"];
 type PurposeRow = Database["public"]["Tables"]["purposes"]["Row"];
 type ProductPurposeInsert = Database["public"]["Tables"]["product_purposes"]["Insert"];
 
-const productCategories = [
-  "Tränare",
-  "Pedagoger",
-  "Specialpedagog",
-  "Föräldrar",
-  "Arbetsplatsen",
-  "Event & högtider",
-  "Festligheter",
-  "Digitala aktiviteter",
-  "Ungdomsverksamhet",
-];
-
 const targetAudiences: Array<Omit<ProductInsert, "id" | "created_at" | "updated_at">> = [
   // Specialpedagog
   { product_key: "autismnpf", name: "Autism & NPF", category: "Specialpedagog", description: null },

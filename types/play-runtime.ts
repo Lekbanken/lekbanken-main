@@ -169,7 +169,15 @@ export interface SessionEvent {
 // =============================================================================
 
 export interface PlayBroadcastEvent {
-  type: 'state_change' | 'timer_update' | 'role_update' | 'board_update' | 'turn_update';
+  type:
+    | 'state_change'
+    | 'timer_update'
+    | 'role_update'
+    | 'board_update'
+    | 'turn_update'
+    | 'artifact_update'
+    | 'decision_update'
+    | 'outcome_update';
   payload: unknown;
   timestamp: string;
 }
@@ -213,6 +221,41 @@ export interface TurnBroadcast extends PlayBroadcastEvent {
   type: 'turn_update';
   payload: {
     next_starter_participant_id: string | null;
+  };
+}
+
+// =============================================================================
+// Legendary Play Primitives Broadcasts (Artifacts / Decisions / Outcomes)
+// =============================================================================
+
+export interface ArtifactBroadcast extends PlayBroadcastEvent {
+  type: 'artifact_update';
+  payload: {
+    action:
+      | 'snapshot'
+      | 'variant_revealed'
+      | 'variant_hidden'
+      | 'variant_highlighted'
+      | 'variant_unhighlighted'
+      | 'assigned'
+      | 'unassigned';
+    variant_id?: string;
+  };
+}
+
+export interface DecisionBroadcast extends PlayBroadcastEvent {
+  type: 'decision_update';
+  payload: {
+    action: 'created' | 'updated' | 'opened' | 'closed' | 'revealed' | 'vote_cast';
+    decision_id: string;
+  };
+}
+
+export interface OutcomeBroadcast extends PlayBroadcastEvent {
+  type: 'outcome_update';
+  payload: {
+    action: 'created' | 'revealed' | 'hidden';
+    outcome_id: string;
   };
 }
 

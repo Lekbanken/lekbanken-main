@@ -1,10 +1,11 @@
 'use client';
 
-import { MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import Link from "next/link";
 import { BuildingOffice2Icon, MagnifyingGlassIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { EmptyState, SkeletonTable } from "@/components/ui";
-import { OrganisationAdminItem, OrganisationStatus, statusLabels } from "../types";
+import type { OrganisationAdminItem, OrganisationStatus} from "../types";
+import { statusLabels } from "../types";
 import { OrganisationRowActions } from "./OrganisationRowActions";
 
 type OrganisationTableProps = {

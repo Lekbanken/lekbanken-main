@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDownIcon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { AchievementAsset, AchievementAssetType, AchievementLayerStackItem } from '../../types';
+import type { AchievementAsset, AchievementAssetType, AchievementLayerStackItem } from '../../types';
 
 type LayerDropdownSelectorProps = {
   label: string;

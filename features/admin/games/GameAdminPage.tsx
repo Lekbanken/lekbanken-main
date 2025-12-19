@@ -53,7 +53,7 @@ import { useRbac } from '@/features/admin/shared/hooks/useRbac';
 import type { Database } from '@/types/supabase';
 import { GameImportDialog } from './components/GameImportDialog';
 import { GameExportDialog } from './components/GameExportDialog';
-import type { GameFormValues, GameWithRelations, ImportableGame, SelectOption } from './types';
+import type { GameWithRelations, ImportableGame, SelectOption } from './types';
 
 type Filters = {
   search: string;
@@ -64,26 +64,6 @@ type Filters = {
 };
 
 const PAGE_SIZE = 25;
-
-function toGameFormPayload(values: GameFormValues) {
-  return {
-    name: values.name.trim(),
-    short_description: values.short_description.trim(),
-    description: values.description || null,
-    main_purpose_id: values.main_purpose_id,
-    product_id: values.product_id,
-    owner_tenant_id: values.owner_tenant_id,
-    category: values.category,
-    energy_level: values.energy_level,
-    location_type: values.location_type,
-    time_estimate_min: values.time_estimate_min,
-    min_players: values.min_players,
-    max_players: values.max_players,
-    age_min: values.age_min,
-    age_max: values.age_max,
-    status: values.status,
-  };
-}
 
 export function GameAdminPage() {
   const { can } = useRbac();

@@ -1,9 +1,10 @@
 'use client';
 
-import { MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { EnvelopeIcon, MagnifyingGlassIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { EmptyState, SkeletonTable } from "@/components/ui";
-import { UserAdminItem, UserRole, UserStatus, roleLabels, statusLabels } from "../types";
+import type { UserAdminItem, UserRole, UserStatus} from "../types";
+import { roleLabels, statusLabels } from "../types";
 import { UserRowActions } from "./UserRowActions";
 
 type UserTableProps = {

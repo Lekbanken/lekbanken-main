@@ -1,11 +1,10 @@
 import 'server-only'
 
 import { cookies } from 'next/headers'
-import type { User } from '@supabase/supabase-js'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { resolveTenant } from '@/lib/tenant/resolver'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
-import type { AuthContext, GlobalRole, UserProfile } from '@/types/auth'
+import type { AuthContext, UserProfile } from '@/types/auth'
 import type { TenantMembership, TenantRole, TenantWithMembership } from '@/types/tenant'
 
 export async function getServerAuthContext(pathname?: string): Promise<AuthContext> {

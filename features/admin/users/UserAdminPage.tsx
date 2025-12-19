@@ -21,7 +21,6 @@ import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/supabase/auth";
 import { useTenant } from "@/lib/context/TenantContext";
-import type { Database } from "@/types/supabase";
 import { createMockUsers } from "./data";
 import type { UserAdminItem, UserFilters, UserRole, UserStatus } from "./types";
 import { UserTable } from "./components/UserTable";

@@ -1,8 +1,8 @@
 'use client';
 
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { Input, Select, Button, Card, CardContent } from "@/components/ui";
-import { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
+import type { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
 import { AchievementCard } from "./AchievementCard";
 
 type AchievementListProps = {

@@ -1,4 +1,4 @@
-import { Capability, ProductAdminItem } from "./types";
+import type { Capability, ProductAdminItem } from "./types";
 
 const baseCapabilities: Capability[] = [
   { id: "cap-browse-view", key: "browse.view", label: "Browse library", group: "Browse" },

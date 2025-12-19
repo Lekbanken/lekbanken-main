@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from "react";
+import type { FormEvent} from "react";
+import { useEffect, useState } from "react";
 import { PencilSquareIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import {
   Button,
@@ -13,7 +14,8 @@ import {
   Input,
   Select,
 } from "@/components/ui";
-import { UserAdminItem, UserRole, UserStatus, roleLabels, statusLabels } from "../types";
+import type { UserAdminItem, UserRole, UserStatus} from "../types";
+import { roleLabels, statusLabels } from "../types";
 
 type UserEditDialogProps = {
   open: boolean;

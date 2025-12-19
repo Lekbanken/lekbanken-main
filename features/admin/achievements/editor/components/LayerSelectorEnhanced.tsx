@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import { AchievementAsset, AchievementAssetType } from "../../types";
+import type { AchievementAsset, AchievementAssetType } from "../../types";
 
 type LayerSelectorEnhancedProps = {
   title: string;

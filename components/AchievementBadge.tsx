@@ -1,6 +1,6 @@
 'use client';
 
-import { Achievement } from '@/lib/services/achievementService';
+import type { Achievement } from '@/lib/services/achievementService';
 import Image from 'next/image';
 
 interface AchievementBadgeProps {

@@ -50,8 +50,12 @@ export async function PATCH(
     metadata?: Record<string, unknown> | null
   }
 
-  // Cast to any for validation since body comes from request
-  const validation = validatePlanPayload(body as any, { mode: 'update' })
+  const validation = validatePlanPayload(
+    {
+      name: body.name,
+    },
+    { mode: 'update' }
+  )
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }

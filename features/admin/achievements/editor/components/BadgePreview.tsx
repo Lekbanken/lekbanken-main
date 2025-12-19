@@ -1,6 +1,6 @@
 'use client';
 
-import { AchievementAssetSize, AchievementIconConfig } from "../../types";
+import type { AchievementAssetSize, AchievementIconConfig } from "../../types";
 import { BadgePreviewEnhanced } from "./BadgePreviewEnhanced";
 
 type BadgePreviewProps = {

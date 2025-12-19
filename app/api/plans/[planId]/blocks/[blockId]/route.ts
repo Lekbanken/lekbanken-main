@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
-import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -39,8 +38,15 @@ export async function PATCH(
     is_optional?: boolean | null
   }
 
-  //  Cast to any for validation since body comes from request
-  const validation = validatePlanBlockPayload(body as any, { mode: 'update' })
+  const validation = validatePlanBlockPayload(
+    {
+      block_type: body.block_type,
+      game_id: body.game_id,
+      duration_minutes: body.duration_minutes,
+      position: body.position,
+    },
+    { mode: 'update' }
+  )
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }
@@ -104,7 +110,8 @@ export async function PATCH(
     const reorderPayload = orderedIds.map((id, idx) => ({ id, position: idx }))
     const { error: orderError } = await supabase
       .from('plan_blocks')
-      .upsert(reorderPayload as any)
+      // @ts-expect-error - upsert accepts partial rows for reordering
+      .upsert(reorderPayload)
     if (orderError) {
       console.error('[api/plans/:id/blocks/:blockId] reorder error', orderError)
       return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
@@ -165,7 +172,8 @@ export async function DELETE(
     const reorderPayload = remainingIds.map((id, idx) => ({ id, position: idx }))
     const { error: orderError } = await supabase
       .from('plan_blocks')
-      .upsert(reorderPayload as any)
+      // @ts-expect-error - upsert accepts partial rows for reordering
+      .upsert(reorderPayload)
     if (orderError) {
       console.error('[api/plans/:id/blocks/:blockId] reorder after delete error', orderError)
       return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })

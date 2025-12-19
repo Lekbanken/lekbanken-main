@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { getAssetsByType } from '../../assets';
-import { AchievementIconConfig, AchievementAssetType } from '../../types';
+import type { AchievementIconConfig, AchievementAssetType } from '../../types';
 
 // Standard Lekbanken palette for random selection
 const RANDOM_COLORS = [

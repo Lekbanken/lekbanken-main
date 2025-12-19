@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@/components/ui";
-import { AchievementItem, AchievementTheme } from "../types";
+import type { AchievementItem, AchievementTheme } from "../types";
 import { BadgePreview } from "../editor/components/BadgePreview";
 
 type AchievementCardProps = {

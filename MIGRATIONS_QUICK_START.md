@@ -42,6 +42,25 @@
 ### Step 4: Verify
 Go to **Table Editor** - you should see 60+ new tables ✅
 
+### Step 4b: Verify + migration registry (recommended)
+
+If you run migrations manually in **SQL Editor**, the schema can be updated while the migration registry table
+`supabase_migrations.schema_migrations` is still missing entries.
+
+To sanity-check both schema and registry:
+- Run `scripts/verify-migrations.sql` in Supabase SQL Editor.
+- If the schema checks are ✅ but `schema_migrations` is missing versions, you can register them manually.
+
+Example (only run after you have verified the schema objects exist):
+
+```sql
+INSERT INTO supabase_migrations.schema_migrations (version, name)
+VALUES
+   ('20251217120000', 'planner_total_time_trigger'),
+   ('20251219090000', 'play_chat_messages')
+ON CONFLICT (version) DO NOTHING;
+```
+
 ---
 
 ## 🤖 Automated Way (Using CLI)

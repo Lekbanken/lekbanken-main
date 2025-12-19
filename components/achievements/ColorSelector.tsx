@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
-import { ColorConfig, ColorToken, ThemeId } from '@/types/achievements-builder'
+import type { ColorConfig, ColorToken, ThemeId } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
 import { THEME_PRESETS } from './themes'
 

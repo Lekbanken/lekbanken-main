@@ -1,6 +1,6 @@
 'use client'
 
-import { BaseConfig, ThemePreset } from '@/types/achievements-builder'
+import type { BaseConfig, ThemePreset } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
 import { CircleBase, ShieldBase } from './svg'
 

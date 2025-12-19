@@ -1,7 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "../types/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "../types/supabase";
 
 const sizeFolders: Record<"sm" | "md" | "lg", string> = {
   sm: "SM - 128x128",

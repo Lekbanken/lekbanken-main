@@ -7,13 +7,14 @@
 
 'use client'
 
+import type {
+  ReactNode} from 'react';
 import {
   createContext,
   useContext,
   useEffect,
   useState,
   useCallback,
-  ReactNode,
   useMemo,
 } from 'react'
 import { useRouter } from 'next/navigation'
@@ -255,7 +256,7 @@ export function AuthProvider({
       if (!response.ok) {
         await supabase.auth.signOut()
       }
-    } catch (err) {
+    } catch {
       await supabase.auth.signOut()
     }
 

@@ -229,7 +229,7 @@ export function PlayPage({ gameId }: { gameId?: string }) {
     setTimerTotal(total);
     setTimerRemaining(total);
     setIsTimerRunning(false);
-  }, [step?.id]);
+  }, [step]);
 
   useEffect(() => {
     if (!isTimerRunning) return;

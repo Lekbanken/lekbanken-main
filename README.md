@@ -44,6 +44,16 @@ Plattformen riktar sig mot idrottsledare, föreningar, skolor och föräldrar, o
 Detta repo innehåller hela applikationen för `app.lekbanken.no`.  
 **All domänlogik och arkitekturbeslut dokumenteras i Notion.**
 
+## DB & migrations
+
+- Quick start (manual + CLI): [MIGRATIONS_QUICK_START.md](MIGRATIONS_QUICK_START.md)
+- Full guide: [docs/MIGRATIONS.md](docs/MIGRATIONS.md)
+- Verification (run in Supabase SQL Editor): [scripts/verify-migrations.sql](scripts/verify-migrations.sql)
+
+Note: If you execute migrations manually in Supabase SQL Editor, the schema can be updated even if
+`supabase_migrations.schema_migrations` is missing versions. The verification script calls this out and includes a safe
+registration snippet.
+
 ---
 
 ## 📚 Notion as Strategic Source of Truth

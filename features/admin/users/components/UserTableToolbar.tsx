@@ -1,9 +1,10 @@
 'use client';
 
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { MagnifyingGlassIcon, XMarkIcon, UserPlusIcon } from "@heroicons/react/24/outline";
 import { Button, Select } from "@/components/ui";
-import { UserFilters, UserRole, UserStatus, roleLabels, statusLabels } from "../types";
+import type { UserFilters, UserRole, UserStatus} from "../types";
+import { roleLabels, statusLabels } from "../types";
 
 type UserTableToolbarProps = {
   filters: UserFilters;

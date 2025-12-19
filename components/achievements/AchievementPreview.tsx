@@ -6,7 +6,7 @@ import { LayerBackDecoration } from './LayerBackDecoration'
 import { LayerFrontDecoration } from './LayerFrontDecoration'
 import { LayerSymbol } from './LayerSymbol'
 import { THEME_PRESETS } from './themes'
-import { AchievementState } from '@/types/achievements-builder'
+import type { AchievementState } from '@/types/achievements-builder'
 import { cn } from '@/lib/utils'
 
 interface AchievementPreviewProps {

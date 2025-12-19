@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
-import { getSocialLeaderboard, getFriendsLeaderboard, SocialLeaderboardEntry } from '@/lib/services/socialService'
+import type { SocialLeaderboardEntry } from '@/lib/services/socialService';
+import { getSocialLeaderboard, getFriendsLeaderboard } from '@/lib/services/socialService'
 import { supabase } from '@/lib/supabase/client'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui'
 import {

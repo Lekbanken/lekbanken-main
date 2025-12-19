@@ -9,7 +9,7 @@ import {
   DocumentDuplicateIcon,
   CheckIcon,
 } from '@heroicons/react/24/outline';
-import { AchievementIconConfig } from '../../types';
+import type { AchievementIconConfig } from '../../types';
 import { BadgePreviewEnhanced } from './BadgePreviewEnhanced';
 
 export type BadgePreset = {

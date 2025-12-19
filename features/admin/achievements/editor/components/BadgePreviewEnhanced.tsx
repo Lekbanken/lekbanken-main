@@ -1,6 +1,6 @@
 'use client';
 
-import { AchievementAssetSize, AchievementIconConfig, AchievementLayerStackItem, AchievementAssetType } from "../../types";
+import type { AchievementAssetSize, AchievementIconConfig, AchievementLayerStackItem, AchievementAssetType } from "../../types";
 import { resolveAssetUrl } from "../../assets";
 import { TintedLayerImage } from "./TintedLayerImage";
 import { getEffectiveColor, normalizeSize } from "../../icon-utils";

@@ -1,4 +1,4 @@
-import { OrganisationAdminItem } from "./types";
+import type { OrganisationAdminItem } from "./types";
 
 export const mockOrganisations: OrganisationAdminItem[] = [
   {

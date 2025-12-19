@@ -2,7 +2,7 @@
 
 import { CurrencyDollarIcon, SparklesIcon } from '@heroicons/react/24/solid';
 import { BadgePreviewEnhanced } from './BadgePreviewEnhanced';
-import { AchievementIconConfig, AchievementAssetType } from '../../types';
+import type { AchievementIconConfig, AchievementAssetType } from '../../types';
 
 type BadgeCardPreviewProps = {
   icon: AchievementIconConfig;

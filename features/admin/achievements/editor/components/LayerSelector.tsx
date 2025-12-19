@@ -1,6 +1,6 @@
 'use client';
 
-import { AchievementAsset, AchievementAssetType } from "../../types";
+import type { AchievementAsset, AchievementAssetType } from "../../types";
 
 type LayerSelectorProps = {
   title: string;

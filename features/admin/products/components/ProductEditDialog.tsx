@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from "react";
+import type { FormEvent} from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -14,7 +15,8 @@ import {
   Textarea,
 } from "@/components/ui";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { Capability, ProductAdminItem, ProductStatus, statusLabels } from "../types";
+import type { Capability, ProductAdminItem, ProductStatus} from "../types";
+import { statusLabels } from "../types";
 import { ProductCapabilitiesEditor } from "./ProductCapabilitiesEditor";
 
 type ProductEditDialogProps = {

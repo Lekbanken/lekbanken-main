@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Button, Badge } from "@/components/ui";
-import {
+import type {
   AchievementAssetSize,
   AchievementAssetType,
   AchievementItem,

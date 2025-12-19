@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import { OrganisationAdminItem, OrganisationStatus } from "../types";
+import type { OrganisationAdminItem, OrganisationStatus } from "../types";
 import {
   EllipsisHorizontalIcon,
   PencilSquareIcon,

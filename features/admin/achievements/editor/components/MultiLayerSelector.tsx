@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { AchievementAsset, AchievementAssetType, AchievementLayerStackItem } from "../../types";
+import type { AchievementAsset, AchievementAssetType, AchievementLayerStackItem } from "../../types";
 import Image from "next/image";
 
 type MultiLayerSelectorProps = {

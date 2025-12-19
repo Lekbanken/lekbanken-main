@@ -1,9 +1,10 @@
 'use client';
 
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { MagnifyingGlassIcon, XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Button, Select } from "@/components/ui";
-import { OrganisationFilters, OrganisationStatus, statusLabels } from "../types";
+import type { OrganisationFilters, OrganisationStatus} from "../types";
+import { statusLabels } from "../types";
 
 type OrganisationTableToolbarProps = {
   filters: OrganisationFilters;

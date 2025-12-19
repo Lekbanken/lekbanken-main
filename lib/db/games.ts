@@ -352,7 +352,7 @@ export async function filterGames(
     tenantId?: string
     productId?: string
     mainPurposeId?: string
-    energyLevel?: string
+    energyLevel?: Database['public']['Enums']['energy_level_enum']
     minTimeEstimate?: number
     maxTimeEstimate?: number
     minPlayers?: number
@@ -391,7 +391,7 @@ export async function filterGames(
   }
 
   if (filters.energyLevel) {
-    query = query.eq('energy_level', filters.energyLevel as any)
+    query = query.eq('energy_level', filters.energyLevel)
   }
 
   if (filters.minTimeEstimate !== undefined) {

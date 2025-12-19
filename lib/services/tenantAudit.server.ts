@@ -1,4 +1,5 @@
 import { createServerRlsClient } from '@/lib/supabase/server'
+import type { Json } from '@/types/supabase'
 
 export async function logTenantAuditEvent(params: {
   tenantId: string
@@ -12,6 +13,6 @@ export async function logTenantAuditEvent(params: {
     tenant_id: params.tenantId,
     actor_user_id: params.actorUserId,
     event_type: params.eventType,
-    payload: payload as any,
+    payload: payload as Json,
   })
 }

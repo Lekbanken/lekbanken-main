@@ -1,9 +1,9 @@
 'use client';
 
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { MagnifyingGlassIcon, FunnelIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui";
-import { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
+import type { AchievementFilters, AchievementItem, AchievementTheme } from "../types";
 import { AchievementLibraryCard } from "./AchievementLibraryCard";
 
 type AchievementLibraryGridProps = {

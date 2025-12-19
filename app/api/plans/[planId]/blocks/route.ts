@@ -38,8 +38,15 @@ export async function POST(
     is_optional?: boolean | null
   }
 
-  // Cast to any for validation since body comes from request
-  const validation = validatePlanBlockPayload(body as any, { mode: 'create' })
+  const validation = validatePlanBlockPayload(
+    {
+      block_type: body.block_type,
+      game_id: body.game_id,
+      duration_minutes: body.duration_minutes,
+      position: body.position,
+    },
+    { mode: 'create' }
+  )
   if (!validation.ok) {
     return NextResponse.json({ errors: validation.errors }, { status: 400 })
   }

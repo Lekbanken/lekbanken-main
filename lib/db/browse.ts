@@ -8,6 +8,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
 type BrowseSearchLog = Database['public']['Tables']['browse_search_logs']['Row']
+type EnergyLevel = Database['public']['Enums']['energy_level_enum']
 
 /**
  * Search games across all public games
@@ -18,7 +19,7 @@ export async function searchPublicGames(
     query?: string
     productId?: string
     mainPurposeId?: string
-    energyLevel?: string
+    energyLevel?: EnergyLevel
     minTimeMin?: number
     maxTimeMin?: number
     minPlayers?: number
@@ -59,7 +60,7 @@ export async function searchPublicGames(
   }
 
   if (options?.energyLevel) {
-    query = query.eq('energy_level', options.energyLevel as any)
+    query = query.eq('energy_level', options.energyLevel)
   }
 
   if (options?.minTimeMin !== undefined) {
@@ -324,7 +325,7 @@ export async function getFilteredGames(
   filters: {
     products?: string[]
     purposes?: string[]
-    energyLevels?: string[]
+    energyLevels?: EnergyLevel[]
     ageRange?: { min?: number; max?: number }
     playerRange?: { min?: number; max?: number }
     timeRange?: { min?: number; max?: number }
@@ -353,7 +354,7 @@ export async function getFilteredGames(
 
   // Energy level filter
   if (filters.energyLevels && filters.energyLevels.length > 0) {
-    query = query.in('energy_level', filters.energyLevels as any)
+    query = query.in('energy_level', filters.energyLevels)
   }
 
   // Age range

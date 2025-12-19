@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/supabase";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -71,7 +71,8 @@ async function ensureAdminUser() {
   );
   if (profileError) throw profileError;
 
-  const { error: membershipError } = await (supabase as any).from("user_tenant_memberships").upsert(
+  const db = supabase as unknown as SupabaseClient;
+  const { error: membershipError } = await db.from("user_tenant_memberships").upsert(
     {
       user_id: adminId,
       tenant_id: TENANT_ID,

@@ -1,4 +1,5 @@
-import { ReactNode, type KeyboardEvent } from "react";
+import type { ReactNode} from "react";
+import { type KeyboardEvent } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
 type SettingsItemProps = {

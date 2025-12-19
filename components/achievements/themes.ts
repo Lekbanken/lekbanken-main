@@ -1,4 +1,4 @@
-import { ThemePreset } from '@/types/achievements-builder'
+import type { ThemePreset } from '@/types/achievements-builder'
 
 export const THEME_PRESETS: ThemePreset[] = [
   {

@@ -86,6 +86,10 @@ npm run db:verify
 # Öppna sedan: scripts/verify-migrations.sql i Supabase Dashboard
 ```
 
+Note: If you executed migrations manually in Supabase SQL Editor, the schema may be updated even if
+`supabase_migrations.schema_migrations` does not show the corresponding versions yet.
+Use `scripts/verify-migrations.sql` to detect this mismatch and (when appropriate) register the missing entries.
+
 ---
 
 ## 🚫 Undvik 'as any' Casts

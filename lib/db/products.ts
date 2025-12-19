@@ -8,6 +8,8 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/supabase'
 
 type Product = Database['public']['Tables']['products']['Row']
+type ProductInsert = Database['public']['Tables']['products']['Insert']
+type ProductUpdate = Database['public']['Tables']['products']['Update']
 type Purpose = Database['public']['Tables']['purposes']['Row']
 
 /**
@@ -72,18 +74,11 @@ export async function getProductByKey(
  */
 export async function createProduct(
   supabase: SupabaseClient<Database>,
-  product: {
-    name: string
-    category: string
-    description?: string
-    status?: string
-    capabilities?: unknown
-    product_key?: string
-  }
+  product: ProductInsert
 ): Promise<Product> {
   const { data, error } = await supabase
     .from('products')
-    .insert([product] as any)
+    .insert(product)
     .select()
     .single()
 
@@ -97,17 +92,11 @@ export async function createProduct(
 export async function updateProduct(
   supabase: SupabaseClient<Database>,
   productId: string,
-  updates: {
-    name?: string
-    category?: string
-    description?: string
-    status?: string
-    capabilities?: unknown
-  }
+  updates: ProductUpdate
 ): Promise<Product> {
   const { data, error } = await supabase
     .from('products')
-    .update(updates as any)
+    .update(updates)
     .eq('id', productId)
     .select()
     .single()

@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import { UserAdminItem, UserStatus } from "../types";
+import type { UserAdminItem, UserStatus } from "../types";
 import {
   EllipsisHorizontalIcon,
   PencilSquareIcon,

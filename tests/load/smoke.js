@@ -12,7 +12,7 @@ export const options = {
   },
 }
 
-export default function () {
+export default function smokeTest() {
   // Health check
   const health = http.get(`${BASE_URL}/api/health`)
   check(health, { 'health 200': (r) => r.status === 200 })

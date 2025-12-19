@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useRef, useState } from 'react';
-import { AchievementItem } from '../../types';
+import type { AchievementItem } from '../../types';
 
 type HistoryState = {
   past: AchievementItem[];

@@ -1,6 +1,6 @@
 'use client'
 
-import { SymbolConfig, ThemePreset, SymbolType } from '@/types/achievements-builder'
+import type { SymbolConfig, ThemePreset, SymbolType } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
 import {
   FlameSymbol,

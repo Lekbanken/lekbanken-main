@@ -1,8 +1,8 @@
 'use client';
 
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { Button } from "@/components/ui";
-import { Capability } from "../types";
+import type { Capability } from "../types";
 
 type ProductCapabilitiesEditorProps = {
   capabilities: Capability[];

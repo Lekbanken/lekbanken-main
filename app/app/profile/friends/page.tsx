@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
+import type {
+  FriendRequest 
+} from '@/lib/services/socialService';
 import { 
   getFriends, 
   getFriendRequests, 
   sendFriendRequest, 
   acceptFriendRequest, 
   rejectFriendRequest, 
-  removeFriend,
-  FriendRequest 
+  removeFriend 
 } from '@/lib/services/socialService';
 import { supabase } from '@/lib/supabase/client';
 

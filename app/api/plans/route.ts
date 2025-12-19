@@ -29,7 +29,11 @@ export async function POST(request: Request) {
   const isSystemAdmin = role === 'system_admin' || role === 'admin'
 
   const validation = validatePlanPayload(
-    { ...body, owner_tenant_id: tenantId, visibility } as any,
+    {
+      name: body.name,
+      visibility,
+      owner_tenant_id: tenantId ?? undefined,
+    },
     { mode: 'create', isSystemAdmin }
   )
   if (!validation.ok) {

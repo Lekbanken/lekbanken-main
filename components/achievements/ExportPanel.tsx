@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useAchievementBuilderStore } from './store'
-import { AchievementExport } from '@/types/achievements-builder'
+import type { AchievementExport } from '@/types/achievements-builder'
 
 type Rarity = NonNullable<AchievementExport['metadata']>['rarity']
 

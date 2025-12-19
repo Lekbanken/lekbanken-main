@@ -1,7 +1,7 @@
 'use client'
 
 import { create } from 'zustand'
-import {
+import type {
   AchievementExport,
   AchievementState,
   BaseConfig,

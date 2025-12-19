@@ -3,9 +3,10 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/supabase/auth';
+import type {
+  AchievementProgress} from '@/lib/services/achievementService';
 import {
-  getUserAchievementProgress,
-  AchievementProgress,
+  getUserAchievementProgress
 } from '@/lib/services/achievementService';
 import AchievementBadge from '@/components/AchievementBadge';
 import { Button, Card, CardContent } from '@/components/ui';

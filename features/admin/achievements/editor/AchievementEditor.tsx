@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { AchievementItem, AchievementTheme } from "../types";
+import type { AchievementItem, AchievementTheme } from "../types";
 import { AchievementEditorWizard } from "./AchievementEditorWizard";
 
 type AchievementEditorProps = {

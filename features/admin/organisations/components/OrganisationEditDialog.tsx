@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from "react";
+import type { FormEvent} from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -13,7 +14,8 @@ import {
   Select,
 } from "@/components/ui";
 import { PencilSquareIcon } from "@heroicons/react/24/outline";
-import { OrganisationAdminItem, OrganisationStatus, statusLabels } from "../types";
+import type { OrganisationAdminItem, OrganisationStatus} from "../types";
+import { statusLabels } from "../types";
 
 type OrganisationEditDialogProps = {
   open: boolean;

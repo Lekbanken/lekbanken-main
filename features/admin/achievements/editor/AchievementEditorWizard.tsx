@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { WizardStepIndicator, WizardStep } from './components/WizardStepIndicator';
+import type { WizardStep } from './components/WizardStepIndicator';
+import { WizardStepIndicator } from './components/WizardStepIndicator';
 import { LayerDropdownSelector } from './components/LayerDropdownSelector';
 import { ColorInputWithPicker } from './components/ColorInputWithPicker';
 import { BadgeCardPreview, PreviewModeToggle } from './components/BadgeCardPreview';
@@ -10,7 +11,7 @@ import { ContrastTip } from './components/ContrastTip';
 import { RandomizeButton, useRandomBadge } from './components/RandomBadgeGenerator';
 import { PresetManager } from './components/PresetManager';
 import { getAssetsByType, getAssetById, resolveAssetUrl } from '../assets';
-import { AchievementItem, AchievementIconConfig, AchievementTheme } from '../types';
+import type { AchievementItem, AchievementIconConfig, AchievementTheme } from '../types';
 import { themes } from '../data';
 import { useBadgeHistory } from './hooks/useBadgeHistory';
 

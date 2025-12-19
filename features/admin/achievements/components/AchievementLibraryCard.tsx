@@ -2,7 +2,7 @@
 
 import { CheckIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { Badge, Button } from "@/components/ui";
-import { AchievementItem, AchievementTheme } from "../types";
+import type { AchievementItem, AchievementTheme } from "../types";
 import { BadgePreviewEnhanced } from "../editor/components/BadgePreviewEnhanced";
 
 type AchievementLibraryCardProps = {

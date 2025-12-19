@@ -1,6 +1,6 @@
 'use client';
 
-import { AchievementTheme } from "../../types";
+import type { AchievementTheme } from "../../types";
 
 type ThemeSelectorProps = {
   themes: AchievementTheme[];

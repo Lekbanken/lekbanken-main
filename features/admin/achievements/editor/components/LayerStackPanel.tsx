@@ -9,7 +9,7 @@ import {
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { Square3Stack3DIcon } from '@heroicons/react/24/solid';
-import { AchievementIconConfig } from '../../types';
+import type { AchievementIconConfig } from '../../types';
 
 type LayerInfo = {
   id: string;

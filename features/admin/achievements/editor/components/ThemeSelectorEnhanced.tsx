@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckIcon, SwatchIcon } from "@heroicons/react/24/outline";
-import { AchievementTheme } from "../../types";
+import type { AchievementTheme } from "../../types";
 import { Badge } from "@/components/ui";
 
 type ThemeSelectorEnhancedProps = {

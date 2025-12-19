@@ -29,6 +29,11 @@ import { ProductEditDialog } from "./components/ProductEditDialog";
 import { ProductCapabilitiesEditor } from "./components/ProductCapabilitiesEditor";
 
 type ProductRow = Database["public"]["Tables"]["products"]["Row"];
+type PurposeRow = Database["public"]["Tables"]["purposes"]["Row"];
+
+type ProductRowWithPurposes = ProductRow & {
+  purposes?: Array<{ purpose?: Pick<PurposeRow, "id" | "name" | "type" | "purpose_key"> | null }>
+};
 
 const PRODUCTS_PER_PAGE = 10;
 const fallbackStatus: ProductStatus = "active";
@@ -73,14 +78,14 @@ export function ProductAdminPage() {
         if (!productsRes.ok) {
           throw new Error(`Failed to load products (${productsRes.status})`);
         }
-        const json = (await productsRes.json()) as { products: ProductRow[] };
-        const mapped: ProductAdminItem[] = (json.products || []).map((row: ProductRow) => ({
+        const json = (await productsRes.json()) as { products: ProductRowWithPurposes[] };
+        const mapped: ProductAdminItem[] = (json.products || []).map((row) => ({
           id: row.id,
           name: row.name,
           category: row.category,
           description: row.description,
-          purposeId: (row as any)?.purposes?.[0]?.purpose?.id ?? null,
-          purposeName: (row as any)?.purposes?.[0]?.purpose?.name ?? null,
+          purposeId: row.purposes?.[0]?.purpose?.id ?? null,
+          purposeName: row.purposes?.[0]?.purpose?.name ?? null,
           status: (row.status as ProductStatus) || fallbackStatus,
           capabilities: Array.isArray(row.capabilities)
             ? (row.capabilities as unknown as ProductAdminItem["capabilities"])
@@ -89,11 +94,13 @@ export function ProductAdminPage() {
           updatedAt: row.updated_at,
         }));
 
-        const purposesJson = purposesRes.ok ? ((await purposesRes.json()) as { purposes?: any[] }) : { purposes: [] };
+        const purposesJson = purposesRes.ok
+          ? ((await purposesRes.json()) as { purposes?: PurposeRow[] })
+          : { purposes: [] as PurposeRow[] };
         const mainPurposeOptions =
           (purposesJson.purposes || [])
-            .filter((p: any) => p.type === "main")
-            .map((p: any) => ({ value: p.id as string, label: (p.name as string) || p.purpose_key || "Purpose" })) ?? [];
+            .filter((p) => p.type === "main")
+            .map((p) => ({ value: p.id as string, label: p.name || p.purpose_key || "Purpose" })) ?? [];
 
         if (!isMounted) return;
         setProducts(mapped);
@@ -199,7 +206,7 @@ export function ProductAdminPage() {
         name: updated.name,
         category: updated.category,
         description: updated.description,
-        purposeId: payload.purposeId ?? (payload as any).purposeId ?? null,
+        purposeId: payload.purposeId ?? null,
         purposeName: payload.purposeName ?? null,
         status: (updated.status as ProductStatus) || payload.status,
         capabilities: Array.isArray(updated.capabilities)

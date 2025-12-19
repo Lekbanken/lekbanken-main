@@ -1,9 +1,10 @@
 'use client';
 
-import { MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { CubeIcon, KeyIcon } from "@heroicons/react/24/outline";
 import { SkeletonTable } from "@/components/ui";
-import { ProductAdminItem, ProductStatus, statusLabels } from "../types";
+import type { ProductAdminItem, ProductStatus} from "../types";
+import { statusLabels } from "../types";
 import { ProductRowActions } from "./ProductRowActions";
 
 type ProductTableProps = {

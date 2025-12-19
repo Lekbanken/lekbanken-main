@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui";
-import { ProductAdminItem, ProductStatus } from "../types";
+import type { ProductAdminItem, ProductStatus } from "../types";
 import {
   EllipsisHorizontalIcon,
   PencilSquareIcon,

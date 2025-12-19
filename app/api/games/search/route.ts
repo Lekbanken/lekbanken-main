@@ -222,7 +222,7 @@ export async function POST(request: Request) {
           pageSize,
         },
         results_count: games.length,
-        result_ids: (games || []).slice(0, pageSize).map((g) => (g as any).id),
+        result_ids: (games as Array<{ id: string }>).slice(0, pageSize).map((g) => g.id),
         user_id: userId,
         tenant_id: tenantId,
       })

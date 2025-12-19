@@ -21,7 +21,7 @@ import { useAuth } from "@/lib/supabase/auth";
 import { supabase } from "@/lib/supabase/client";
 import type { Database } from "@/types/supabase";
 import { mockOrganisations, createMockOrganisation } from "./data";
-import { OrganisationAdminItem, OrganisationFilters, OrganisationStatus } from "./types";
+import type { OrganisationAdminItem, OrganisationFilters, OrganisationStatus } from "./types";
 import { OrganisationTable } from "./components/OrganisationTable";
 import { OrganisationTableToolbar } from "./components/OrganisationTableToolbar";
 import { OrganisationEditDialog } from "./components/OrganisationEditDialog";

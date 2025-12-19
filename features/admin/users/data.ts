@@ -1,4 +1,4 @@
-import { UserAdminItem } from "./types";
+import type { UserAdminItem } from "./types";
 
 const baseMockUsers: UserAdminItem[] = [
   {

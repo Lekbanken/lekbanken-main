@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logTenantAuditEvent } from '@/lib/services/tenantAudit.server'
-import type { Json } from '@/types/supabase'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
 import { readTenantIdFromCookies } from '@/lib/utils/tenantCookie'
 

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server'
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { buildPlayView, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'

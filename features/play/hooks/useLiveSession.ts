@@ -25,6 +25,9 @@ import type {
   RoleBroadcast,
   BoardBroadcast,
   TurnBroadcast,
+  ArtifactBroadcast,
+  DecisionBroadcast,
+  OutcomeBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -50,6 +53,12 @@ export interface UseLiveSessionOptions {
   onBoardUpdate?: (payload: BoardBroadcast['payload']) => void;
   /** Called when next starter/turn changes */
   onTurnUpdate?: (payload: TurnBroadcast['payload']) => void;
+  /** Called when artifacts change (snapshot/reveal/highlight/assign) */
+  onArtifactUpdate?: (payload: ArtifactBroadcast['payload']) => void;
+  /** Called when decisions change (create/open/close/reveal/vote) */
+  onDecisionUpdate?: (payload: DecisionBroadcast['payload']) => void;
+  /** Called when outcomes change (create/reveal/hide) */
+  onOutcomeUpdate?: (payload: OutcomeBroadcast['payload']) => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -91,6 +100,9 @@ export function useLiveSession({
   onRoleUpdate,
   onBoardUpdate,
   onTurnUpdate,
+  onArtifactUpdate,
+  onDecisionUpdate,
+  onOutcomeUpdate,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -171,8 +183,26 @@ export function useLiveSession({
         onTurnUpdate?.(payload);
         break;
       }
+
+      case 'artifact_update': {
+        const payload = (event as ArtifactBroadcast).payload;
+        onArtifactUpdate?.(payload);
+        break;
+      }
+
+      case 'decision_update': {
+        const payload = (event as DecisionBroadcast).payload;
+        onDecisionUpdate?.(payload);
+        break;
+      }
+
+      case 'outcome_update': {
+        const payload = (event as OutcomeBroadcast).payload;
+        onOutcomeUpdate?.(payload);
+        break;
+      }
     }
-  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate]);
+  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate, onArtifactUpdate, onDecisionUpdate, onOutcomeUpdate]);
   
   // Timer tick effect (recalculate display)
   useEffect(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { AchievementItem } from "../../types";
+import type { AchievementItem } from "../../types";
 
 type MetadataFormEnhancedProps = {
   value: AchievementItem;

@@ -1,4 +1,6 @@
 import { createServerRlsClient } from '@/lib/supabase/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import type { Json } from '@/types/supabase'
 
 export async function logUserAuditEvent(params: {
   userId: string
@@ -7,10 +9,10 @@ export async function logUserAuditEvent(params: {
   payload?: Record<string, unknown>
 }) {
   const supabase = await createServerRlsClient()
-  await (supabase as any).from('user_audit_logs').insert({
+  await (supabase as unknown as SupabaseClient).from('user_audit_logs').insert({
     user_id: params.userId,
     actor_user_id: params.actorUserId,
     event_type: params.eventType,
-    payload: params.payload ?? {},
+    payload: (params.payload ?? {}) as Json,
   })
 }

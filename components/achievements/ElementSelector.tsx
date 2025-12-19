@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAchievementBuilderStore } from './store'
-import { BaseType, DecorationType, SymbolType, ColorConfig } from '@/types/achievements-builder'
+import type { BaseType, DecorationType, SymbolType, ColorConfig } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
 import { ColorSelector } from './ColorSelector'
 import {

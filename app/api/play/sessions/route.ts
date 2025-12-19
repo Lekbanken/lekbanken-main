@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
+import type { CreateSessionOptions } from '@/lib/services/participants/session-service';
 
 export async function GET() {
   const supabase = await createServerRlsClient();
@@ -37,8 +38,8 @@ export async function GET() {
   });
 }
 
-export async function POST(request: Request) {
-  const rate = applyRateLimitMiddleware(request as any, 'api');
+export async function POST(request: NextRequest) {
+  const rate = applyRateLimitMiddleware(request, 'api');
   if (rate) return rate;
 
   const supabase = await createServerRlsClient();
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
     description: description?.trim(),
     gameId,
     planId,
-    settings: settings as any,
+    settings: settings as CreateSessionOptions['settings'],
     expiresAt,
   });
 

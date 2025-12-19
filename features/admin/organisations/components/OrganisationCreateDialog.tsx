@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from "react";
+import type { FormEvent} from "react";
+import { useState } from "react";
 import {
   Button,
   Dialog,
@@ -13,7 +14,8 @@ import {
   Select,
 } from "@/components/ui";
 import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
-import { OrganisationAdminItem, OrganisationStatus, statusLabels } from "../types";
+import type { OrganisationAdminItem, OrganisationStatus} from "../types";
+import { statusLabels } from "../types";
 
 type OrganisationCreateDialogProps = {
   open: boolean;

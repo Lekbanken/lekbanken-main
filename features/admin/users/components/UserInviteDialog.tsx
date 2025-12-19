@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, useState } from "react";
+import type { FormEvent} from "react";
+import { useState } from "react";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import {
   Button,
@@ -14,7 +15,8 @@ import {
   Select,
   Textarea,
 } from "@/components/ui";
-import { UserRole, roleLabels } from "../types";
+import type { UserRole} from "../types";
+import { roleLabels } from "../types";
 
 type UserInviteDialogProps = {
   open: boolean;

@@ -1,4 +1,4 @@
-import { AchievementItem, AchievementTheme } from "./types";
+import type { AchievementItem, AchievementTheme } from "./types";
 
 export const themes: AchievementTheme[] = [
   {

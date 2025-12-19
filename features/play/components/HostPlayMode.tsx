@@ -10,6 +10,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { FacilitatorDashboard } from './FacilitatorDashboard';
 import { RoleAssignerContainer } from './RoleAssignerContainer';
+import { ArtifactsPanel } from './ArtifactsPanel';
+import { DecisionsPanel } from './DecisionsPanel';
+import { OutcomePanel } from './OutcomePanel';
 import { getHostPlaySession, updatePlaySessionState, type PlaySessionData } from '../api';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,6 +21,9 @@ import {
   PlayIcon, 
   Cog6ToothIcon,
   UserGroupIcon,
+  CubeIcon,
+  ScaleIcon,
+  FlagIcon,
   ArrowLeftIcon,
 } from '@heroicons/react/24/outline';
 import type { SessionRuntimeState } from '@/types/play-runtime';
@@ -35,7 +41,7 @@ export interface HostPlayModeProps {
   participantCount?: number;
 }
 
-type PlayModeTab = 'facilitator' | 'roles' | 'settings';
+type PlayModeTab = 'facilitator' | 'artifacts' | 'decisions' | 'outcome' | 'roles' | 'settings';
 
 // =============================================================================
 // Component
@@ -162,6 +168,30 @@ export function HostPlayMode({
             Spela
           </Button>
           <Button
+            variant={activeTab === 'artifacts' ? 'primary' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('artifacts')}
+          >
+            <CubeIcon className="h-4 w-4 mr-1" />
+            Artefakter
+          </Button>
+          <Button
+            variant={activeTab === 'decisions' ? 'primary' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('decisions')}
+          >
+            <ScaleIcon className="h-4 w-4 mr-1" />
+            Beslut
+          </Button>
+          <Button
+            variant={activeTab === 'outcome' ? 'primary' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('outcome')}
+          >
+            <FlagIcon className="h-4 w-4 mr-1" />
+            Utfall
+          </Button>
+          <Button
             variant={activeTab === 'roles' ? 'primary' : 'ghost'}
             size="sm"
             onClick={() => setActiveTab('roles')}
@@ -202,6 +232,18 @@ export function HostPlayMode({
           onEndSession={handleEndSession}
           participantCount={participantCount}
         />
+      )}
+
+      {activeTab === 'artifacts' && (
+        <ArtifactsPanel sessionId={sessionId} />
+      )}
+
+      {activeTab === 'decisions' && (
+        <DecisionsPanel sessionId={sessionId} />
+      )}
+
+      {activeTab === 'outcome' && (
+        <OutcomePanel sessionId={sessionId} />
       )}
 
       {activeTab === 'roles' && (

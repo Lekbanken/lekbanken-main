@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PlusIcon, XMarkIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { Badge, Switch } from "@/components/ui";
-import { AchievementItem, ProfileFrameSyncConfig } from "../../types";
+import type { AchievementItem, ProfileFrameSyncConfig } from "../../types";
 
 type PublishingControlsProps = {
   value: AchievementItem;

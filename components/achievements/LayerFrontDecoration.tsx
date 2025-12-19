@@ -1,6 +1,6 @@
 'use client'
 
-import { DecorationConfig, ThemePreset, DecorationType } from '@/types/achievements-builder'
+import type { DecorationConfig, ThemePreset, DecorationType } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
 import {
   WingsDecoration,

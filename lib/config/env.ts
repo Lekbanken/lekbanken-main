@@ -116,8 +116,11 @@ export const env = {
 validateEnvironment();
 
 // Log successful initialization in development (server-side only)
-if (env.isDevelopment && !isBrowser) {
+// Guarded to avoid noisy logs during HMR / dev server reloads.
+const globalForEnv = globalThis as unknown as { __lekbanken_env_validated_logged?: boolean };
+if (env.isDevelopment && !isBrowser && !globalForEnv.__lekbanken_env_validated_logged) {
   console.log('✅ Environment variables validated successfully');
+  globalForEnv.__lekbanken_env_validated_logged = true;
 }
 
 // Helper to check if a feature is enabled

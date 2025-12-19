@@ -29,7 +29,8 @@ import {
 
 const SESSION_STORAGE_KEY = 'lekbanken_participant_token';
 const HEARTBEAT_INTERVAL = 10000; // 10 seconds
-const POLL_INTERVAL = 3000; // 3 seconds
+const POLL_INTERVAL = 15000; // 15 seconds
+const PLAYMODE_POLL_INTERVAL = 30000; // 30 seconds
 
 type ParticipantSessionClientProps = {
   code: string;
@@ -99,14 +100,21 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
   useEffect(() => {
     void loadData();
 
-    const pollInterval = setInterval(() => void loadData(), POLL_INTERVAL);
+    const pollMs = (() => {
+      const token = getToken();
+      const hasGame = Boolean(session?.gameId);
+      const isActive = session?.status === 'active';
+      return token && hasGame && isActive ? PLAYMODE_POLL_INTERVAL : POLL_INTERVAL;
+    })();
+
+    const pollInterval = setInterval(() => void loadData(), pollMs);
     const heartbeatInterval = setInterval(() => void sendHeartbeat(), HEARTBEAT_INTERVAL);
 
     return () => {
       clearInterval(pollInterval);
       clearInterval(heartbeatInterval);
     };
-  }, [loadData, sendHeartbeat]);
+  }, [loadData, sendHeartbeat, getToken, session?.gameId, session?.status]);
 
   // Try to rejoin if we have a token but no participant
   useEffect(() => {

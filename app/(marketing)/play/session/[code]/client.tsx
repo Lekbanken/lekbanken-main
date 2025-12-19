@@ -7,15 +7,17 @@ import {
   getParticipantMe, 
   heartbeat, 
   rejoinSession,
+  joinSession,
   type PlaySession,
   type Participant,
 } from '@/features/play-participant/api';
-import { loadParticipantAuth, clearParticipantAuth } from '@/features/play-participant/tokenStorage';
+import { loadParticipantAuth, clearParticipantAuth, saveParticipantAuth } from '@/features/play-participant/tokenStorage';
 import { ParticipantPlayMode } from '@/features/play/components/ParticipantPlayMode';
 import { 
   SessionStatusBadge, 
   ReconnectingBanner,
   SessionStatusMessage,
+  JoinSessionForm,
 } from '@/components/play';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -38,20 +40,23 @@ type ParticipantSessionClientProps = {
 
 export function ParticipantSessionClient({ code }: ParticipantSessionClientProps) {
   const router = useRouter();
+  const normalizedCode = code.toUpperCase();
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [joinLoading, setJoinLoading] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const getToken = useCallback(() => {
-    const fromSessionStorage = sessionStorage.getItem(`${SESSION_STORAGE_KEY}_${code}`);
+    const fromSessionStorage = sessionStorage.getItem(`${SESSION_STORAGE_KEY}_${normalizedCode}`);
     if (fromSessionStorage) return fromSessionStorage;
 
-    const stored = loadParticipantAuth(code);
+    const stored = loadParticipantAuth(normalizedCode);
     return stored?.token ?? null;
-  }, [code]);
+  }, [normalizedCode]);
 
   // Load session and participant data
   const loadData = useCallback(async () => {
@@ -59,12 +64,12 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     
     try {
       // Get public session info
-      const sessionRes = await getPublicSession(code);
+      const sessionRes = await getPublicSession(normalizedCode);
       setSession(sessionRes.session);
 
       // If we have a token, get our participant info
       if (token) {
-        const meRes = await getParticipantMe(code, token);
+        const meRes = await getParticipantMe(normalizedCode, token);
         setParticipant(meRes.participant);
       }
 
@@ -82,7 +87,7 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     } finally {
       setLoading(false);
     }
-  }, [code, getToken, session]);
+  }, [normalizedCode, getToken, session]);
 
   // Send heartbeat
   const sendHeartbeat = useCallback(async () => {
@@ -90,11 +95,11 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     if (!token) return;
 
     try {
-      await heartbeat(code, token);
+      await heartbeat(normalizedCode, token);
     } catch {
       // Heartbeat failed, will be handled by polling
     }
-  }, [code, getToken]);
+  }, [normalizedCode, getToken]);
 
   // Initial load and polling
   useEffect(() => {
@@ -122,15 +127,15 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     if (session && token && !participant && !loading) {
       void (async () => {
         try {
-          await rejoinSession({ sessionCode: code, participantToken: token });
+          await rejoinSession({ sessionCode: normalizedCode, participantToken: token });
           await loadData();
         } catch {
           // Token might be invalid, clear it
-          sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${code}`);
+          sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${normalizedCode}`);
         }
       })();
     }
-  }, [session, participant, loading, code, getToken, loadData]);
+  }, [session, participant, loading, normalizedCode, getToken, loadData]);
 
   const handleRetry = () => {
     setReconnectAttempts(0);
@@ -138,10 +143,44 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
   };
 
   const handleLeave = () => {
-    sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${code}`);
-    clearParticipantAuth(code);
+    sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${normalizedCode}`);
+    clearParticipantAuth(normalizedCode);
     router.push('/play');
   };
+
+  const handleInlineJoin = useCallback(async (_code: string, displayName: string) => {
+    setJoinLoading(true);
+    setJoinError(null);
+    try {
+      const result = await joinSession({ sessionCode: normalizedCode, displayName });
+      const token =
+        (result as { participantToken?: string }).participantToken ??
+        (result as { participant?: { token?: string } }).participant?.token;
+
+      const participantFromResult = (result as {
+        participant?: { id: string; sessionId: string; displayName: string };
+      }).participant;
+
+      if (!token || !participantFromResult?.id || !participantFromResult?.sessionId) {
+        setJoinError('Kunde inte spara anslutningen. Försök igen.');
+        return;
+      }
+
+      sessionStorage.setItem(`${SESSION_STORAGE_KEY}_${normalizedCode}`, token);
+      saveParticipantAuth(normalizedCode, {
+        token,
+        participantId: participantFromResult.id,
+        sessionId: participantFromResult.sessionId,
+        displayName: participantFromResult.displayName,
+      });
+
+      await loadData();
+    } catch (err) {
+      setJoinError(err instanceof Error ? err.message : 'Kunde inte gå med i sessionen');
+    } finally {
+      setJoinLoading(false);
+    }
+  }, [normalizedCode, loadData]);
 
   // Loading state
   if (loading) {
@@ -313,6 +352,23 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
         <div className="text-center text-muted-foreground">
           <p className="text-lg">Väntar på aktivitet...</p>
           <p className="text-sm mt-2">Innehåll kommer att visas här när sessionen startar.</p>
+
+          {/* If session is live and has a game, but we have no token, allow joining inline */}
+          {session?.status === 'active' && Boolean(session?.gameId) && !getToken() && (
+            <div className="mt-8">
+              <Card variant="elevated" className="mx-auto w-full max-w-md p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-2">Gå med för att se spelet</h2>
+                <p className="text-sm text-muted-foreground mb-6">
+                  Du är inte ansluten på den här enheten/fliken ännu.
+                </p>
+                <JoinSessionForm
+                  onSubmit={handleInlineJoin}
+                  isLoading={joinLoading}
+                  error={joinError}
+                />
+              </Card>
+            </div>
+          )}
         </div>
       </Card>
 

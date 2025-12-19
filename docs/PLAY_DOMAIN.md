@@ -2,7 +2,7 @@
 
 ## Metadata
 - **Status:** Active
-- **Last updated:** 2025-12-17
+- **Last updated:** 2025-12-19
 - **Source of truth:** Repo code (`app/app/play/**`, `app/(marketing)/play/**`, `app/api/play/**`, `features/play/**`, `features/play-participant/**`) + Supabase migrations (`supabase/migrations/*play*`)
 
 ## Scope
@@ -14,8 +14,12 @@ Play Domain owns the “run the activity” experience:
   - Event-driven timer (start/pause/resume/reset)
   - Board/public display state (message + visibility overrides)
   - Role snapshot + assignment for the session
+  - Play primitives (Artifacts + Decisions/Votes + Outcomes)
   - Near-realtime updates via Supabase Realtime **broadcast**
 - Planner playback mode (non-realtime): play through a stored plan
+
+Public (read-only) viewing:
+- `/board/[code]` renders a public board for a running session
 
 Non-goals (owned by other domains):
 - Authoring game content (Games Domain + builder)
@@ -73,11 +77,38 @@ Non-goals (owned by other domains):
   - `POST /api/play/sessions/[id]/roles` (snapshot game roles into session roles)
   - `GET /api/play/me/role?session_code=...` (participant’s assigned role)
 
+Primitives (Artifacts + Decisions/Votes + Outcomes):
+- API (host):
+  - `POST /api/play/sessions/[id]/artifacts` (snapshot artifacts/variants into session; one-time)
+  - `GET /api/play/sessions/[id]/artifacts` (host: full view incl. assignments)
+  - `PATCH /api/play/sessions/[id]/artifacts/state` (reveal/highlight/assign/unassign actions)
+  - `GET /api/play/sessions/[id]/decisions` (host: all decisions)
+  - `POST /api/play/sessions/[id]/decisions` (action-based: create/update/open/close/reveal)
+  - `GET /api/play/sessions/[id]/outcome` (host: all outcomes)
+  - `POST /api/play/sessions/[id]/outcome` (action-based: set/reveal/hide)
+- API (participant token):
+  - `GET /api/play/sessions/[id]/artifacts` (filtered to accessible variants)
+  - `GET /api/play/sessions/[id]/decisions` (only open + revealed)
+  - `GET /api/play/sessions/[id]/outcome` (only revealed)
+  - `POST /api/play/sessions/[id]/decisions/[decisionId]/vote`
+  - `GET /api/play/sessions/[id]/decisions/[decisionId]/results`
+
+Chat:
+- API:
+  - `GET /api/play/sessions/[id]/chat` (host: sees all; participant: sees public + own private-to-host)
+  - `POST /api/play/sessions/[id]/chat` (host or participant)
+
 ### 5) Planner playback (“Play plan”)
 - UI:
   - `app/app/play/plan/[planId]/page.tsx` → `features/play/PlayPlanPage.tsx`
 - API:
   - Plan playback reads plan data via Planner domain endpoints (not part of Legendary Play realtime runtime)
+
+### 6) Public board (`/board/[code]`)
+- UI:
+  - `app/board/[code]/page.tsx` (read-only; suitable for a big screen)
+- API:
+  - `GET /api/play/board/[code]` (public aggregated view)
 
 ## Data model (Supabase)
 
@@ -99,6 +130,19 @@ Introduced in migration `supabase/migrations/20251216160000_play_runtime_schema.
 - `session_events` (audit log)
 - RPC: `snapshot_game_roles_to_session(p_session_id, p_game_id, p_locale)` (SECURITY DEFINER)
 
+### Chat tables
+Introduced in migration `supabase/migrations/20251219090000_play_chat_messages.sql`:
+- `play_chat_messages` (public + private-to-host; optional anonymous)
+
+### Legendary Play primitives tables (Artifacts + Decisions/Votes + Outcomes)
+Introduced in migration `supabase/migrations/20251219113000_legendary_play_primitives_v1.sql`:
+- Author-time:
+  - `game_artifacts`, `game_artifact_variants`
+- Runtime:
+  - `session_artifacts`, `session_artifact_variants`, `session_artifact_assignments`
+  - `session_decisions`, `session_votes`
+  - `session_outcomes`
+
 ## Auth and security model
 - Hosts use the request-scoped Supabase client (RLS-aware) and are verified as:
   - `participant_sessions.host_user_id == auth.uid()` OR
@@ -116,6 +160,9 @@ Introduced in migration `supabase/migrations/20251216160000_play_runtime_schema.
   - `timer_update` (start/pause/resume/reset + timer_state)
   - `board_update` (message + overrides)
   - `role_update` (assignment/reveal)
+  - `artifact_update` (reveal/highlight/assign)
+  - `decision_update` (create/open/close/reveal)
+  - `outcome_update` (create/reveal)
 
 Timer is event-driven:
 - Server persists `timer_state` (started_at, duration_seconds, paused_at)
@@ -137,6 +184,17 @@ Timer is event-driven:
   - Board message persists and broadcasts.
 - Roles:
   - Snapshot roles creates `session_roles` and assignments appear on participant.
+- Chat:
+  - Participant can send `visibility=public` messages (visible to all).
+  - Participant can send `visibility=host` message; host sees sender name unless `anonymous=true`.
+- Primitives:
+  - Snapshot creates session primitives (`session_artifacts`, `session_decisions`, etc.) for the session.
+  - Participant “Mina artefakter” shows assigned artifacts and respects visibility rules.
+  - Decision open → participant can vote; vote is rejected if decision is not open.
+  - Decision reveal → participant can see results.
+  - Outcome reveal → board shows revealed outcomes.
+- Public board:
+  - `/board/[code]` renders for an active session and reflects board message, highlighted artifact, revealed public artifacts, revealed decision results, and revealed outcomes.
 - Security:
   - Host-only endpoints reject non-host (except system_admin).
   - Token endpoints reject expired/invalid tokens.

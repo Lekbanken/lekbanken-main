@@ -10,6 +10,8 @@ import {
   type PlaySession,
   type Participant,
 } from '@/features/play-participant/api';
+import { loadParticipantAuth, clearParticipantAuth } from '@/features/play-participant/tokenStorage';
+import { ParticipantPlayMode } from '@/features/play/components/ParticipantPlayMode';
 import { 
   SessionStatusBadge, 
   ReconnectingBanner,
@@ -43,7 +45,11 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
 
   const getToken = useCallback(() => {
-    return sessionStorage.getItem(`${SESSION_STORAGE_KEY}_${code}`);
+    const fromSessionStorage = sessionStorage.getItem(`${SESSION_STORAGE_KEY}_${code}`);
+    if (fromSessionStorage) return fromSessionStorage;
+
+    const stored = loadParticipantAuth(code);
+    return stored?.token ?? null;
   }, [code]);
 
   // Load session and participant data
@@ -125,6 +131,7 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
 
   const handleLeave = () => {
     sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${code}`);
+    clearParticipantAuth(code);
     router.push('/play');
   };
 
@@ -184,6 +191,36 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
             Gå med i en ny session
           </Button>
         </Card>
+      </div>
+    );
+  }
+
+  // Play mode view (active + game linked + participant token present)
+  const token = getToken();
+  const hasGame = Boolean(session?.gameId);
+  const shouldShowPlayMode = Boolean(token) && hasGame && session?.status === 'active';
+
+  if (shouldShowPlayMode && token) {
+    return (
+      <div className="min-h-[80vh] flex flex-col px-4 py-6">
+        <ReconnectingBanner
+          isReconnecting={isReconnecting}
+          attemptCount={reconnectAttempts}
+          maxAttempts={5}
+          onRetry={handleRetry}
+        />
+
+        <ParticipantPlayMode
+          sessionCode={code}
+          participantToken={token}
+          showRole={true}
+        />
+
+        <div className="mt-8 text-center">
+          <Button variant="ghost" size="sm" onClick={handleLeave}>
+            Lämna session
+          </Button>
+        </div>
       </div>
     );
   }

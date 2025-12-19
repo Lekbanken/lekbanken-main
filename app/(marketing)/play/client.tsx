@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { JoinSessionForm } from '@/components/play';
 import { joinSession } from '@/features/play-participant/api';
+import { saveParticipantAuth } from '@/features/play-participant/tokenStorage';
 import { Card } from '@/components/ui/card';
 import { PlayIcon } from '@heroicons/react/24/solid';
 
@@ -19,18 +20,35 @@ export function PlayJoinClient() {
     setError(null);
 
     try {
-      const result = await joinSession({ sessionCode: code, displayName });
+      const normalizedCode = code.toUpperCase();
+      const result = await joinSession({ sessionCode: normalizedCode, displayName });
+      const token =
+        // Back-compat (older client expectation)
+        (result as { participantToken?: string }).participantToken ??
+        // Current API shape
+        (result as { participant?: { token?: string } }).participant?.token;
       
       // Store participant token for session persistence
-      if (result.participantToken) {
+      if (token) {
         sessionStorage.setItem(
-          `${SESSION_STORAGE_KEY}_${code}`,
-          result.participantToken
+          `${SESSION_STORAGE_KEY}_${normalizedCode}`,
+          token
         );
+
+        const participant = (result as { participant?: { id: string; sessionId: string; displayName: string } })
+          .participant;
+        if (participant?.id && participant?.sessionId) {
+          saveParticipantAuth(normalizedCode, {
+            token,
+            participantId: participant.id,
+            sessionId: participant.sessionId,
+            displayName: participant.displayName,
+          });
+        }
       }
 
       // Navigate to session
-      router.push(`/play/session/${code}`);
+      router.push(`/play/session/${normalizedCode}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Kunde inte gå med i sessionen');
       setIsLoading(false);

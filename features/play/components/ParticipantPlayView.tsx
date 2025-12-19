@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ClockIcon,
   PauseCircleIcon,
@@ -32,6 +32,16 @@ import {
   sendSessionChatMessage,
   type ChatMessage,
 } from '@/features/play/api/chat-api';
+import {
+  getParticipantArtifacts,
+  getParticipantDecisions,
+  castParticipantVote,
+  getParticipantDecisionResults,
+  type ParticipantSessionArtifact,
+  type ParticipantSessionArtifactVariant,
+  type ParticipantDecision,
+  type DecisionResultsResponse,
+} from '@/features/play/api';
 
 // =============================================================================
 // Types
@@ -212,6 +222,64 @@ export function ParticipantPlayView({
   showRole = true,
   boardTheme,
 }: ParticipantPlayViewProps) {
+  // --------------------------------------------------------------------------
+  // Primitives (participant): Artifacts + Decisions
+  // --------------------------------------------------------------------------
+
+  const [artifacts, setArtifacts] = useState<ParticipantSessionArtifact[]>([]);
+  const [artifactVariants, setArtifactVariants] = useState<ParticipantSessionArtifactVariant[]>([]);
+  const [artifactsError, setArtifactsError] = useState<string | null>(null);
+
+  const [decisions, setDecisions] = useState<ParticipantDecision[]>([]);
+  const [decisionsError, setDecisionsError] = useState<string | null>(null);
+  const [selectedOptionByDecisionId, setSelectedOptionByDecisionId] = useState<Record<string, string>>({});
+  const [voteSendingByDecisionId, setVoteSendingByDecisionId] = useState<Record<string, boolean>>({});
+  const [voteMessageByDecisionId, setVoteMessageByDecisionId] = useState<Record<string, string | null>>({});
+  const [resultsByDecisionId, setResultsByDecisionId] = useState<Record<string, DecisionResultsResponse | null>>({});
+
+  const loadArtifacts = useCallback(async () => {
+    if (!participantToken) return;
+    try {
+      const data = await getParticipantArtifacts(sessionId, { participantToken });
+      setArtifacts(data.artifacts);
+      setArtifactVariants(data.variants);
+      setArtifactsError(null);
+    } catch (err) {
+      setArtifactsError(err instanceof Error ? err.message : 'Kunde inte ladda artefakter');
+    }
+  }, [sessionId, participantToken]);
+
+  const loadDecisions = useCallback(async () => {
+    if (!participantToken) return;
+    try {
+      const list = await getParticipantDecisions(sessionId, { participantToken });
+      setDecisions(list);
+      setDecisionsError(null);
+
+      // Fetch results for revealed decisions (best-effort)
+      const revealed = list.filter((d) => d.status === 'revealed');
+      if (revealed.length > 0) {
+        const entries = await Promise.all(
+          revealed.map(async (d) => {
+            try {
+              const res = await getParticipantDecisionResults(sessionId, d.id, { participantToken });
+              return [d.id, res] as const;
+            } catch {
+              return [d.id, null] as const;
+            }
+          })
+        );
+        setResultsByDecisionId((prev) => {
+          const next = { ...prev };
+          for (const [id, res] of entries) next[id] = res;
+          return next;
+        });
+      }
+    } catch (err) {
+      setDecisionsError(err instanceof Error ? err.message : 'Kunde inte ladda beslut');
+    }
+  }, [sessionId, participantToken]);
+
   // Subscribe to live session updates
   const {
     currentStepIndex,
@@ -224,6 +292,12 @@ export function ParticipantPlayView({
   } = useLiveSession({
     sessionId,
     initialState,
+    onArtifactUpdate: () => {
+      void loadArtifacts();
+    },
+    onDecisionUpdate: () => {
+      void loadDecisions();
+    },
   });
   
   // Current step data
@@ -257,6 +331,53 @@ export function ParticipantPlayView({
     if (chatMessages.length === 0) return undefined;
     return chatMessages[chatMessages.length - 1]?.createdAt;
   }, [chatMessages]);
+
+  useEffect(() => {
+    if (!participantToken) return;
+    if (isEnded) return;
+    void loadArtifacts();
+    void loadDecisions();
+  }, [participantToken, isEnded, loadArtifacts, loadDecisions]);
+
+  const variantsByArtifactId = useMemo(() => {
+    const map = new Map<string, ParticipantSessionArtifactVariant[]>();
+    for (const v of artifactVariants) {
+      const aId = v.session_artifact_id;
+      if (!aId) continue;
+      const list = map.get(aId) ?? [];
+      list.push(v);
+      map.set(aId, list);
+    }
+    for (const list of map.values()) {
+      list.sort((a, b) => (a.variant_order ?? 0) - (b.variant_order ?? 0));
+    }
+    return map;
+  }, [artifactVariants]);
+
+  const handleVote = async (decisionId: string) => {
+    if (!participantToken) return;
+    const optionKey = selectedOptionByDecisionId[decisionId];
+    if (!optionKey) {
+      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: 'Välj ett alternativ först.' }));
+      return;
+    }
+
+    setVoteSendingByDecisionId((prev) => ({ ...prev, [decisionId]: true }));
+    setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: null }));
+    try {
+      await castParticipantVote(sessionId, decisionId, { optionKey }, { participantToken });
+      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: 'Röst mottagen!' }));
+      // Refresh decisions (e.g. host might close/reveal)
+      void loadDecisions();
+    } catch (err) {
+      setVoteMessageByDecisionId((prev) => ({
+        ...prev,
+        [decisionId]: err instanceof Error ? err.message : 'Kunde inte rösta',
+      }));
+    } finally {
+      setVoteSendingByDecisionId((prev) => ({ ...prev, [decisionId]: false }));
+    }
+  };
 
   useEffect(() => {
     if (!participantToken) return;
@@ -453,6 +574,160 @@ export function ParticipantPlayView({
               Skicka
             </Button>
           </div>
+        </Card>
+      )}
+
+      {/* My Artifacts */}
+      {!isEnded && participantToken && (
+        <Card className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Mina artefakter</p>
+            <Button type="button" size="sm" variant="outline" onClick={() => void loadArtifacts()}>
+              Uppdatera
+            </Button>
+          </div>
+
+          {artifactsError && <p className="text-sm text-destructive">{artifactsError}</p>}
+
+          {artifacts.length === 0 || artifactVariants.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Inga artefakter just nu.</p>
+          ) : (
+            <div className="space-y-3">
+              {artifacts
+                .slice()
+                .sort((a, b) => (a.artifact_order ?? 0) - (b.artifact_order ?? 0))
+                .map((a) => {
+                  const vars = variantsByArtifactId.get(a.id) ?? [];
+                  if (vars.length === 0) return null;
+                  return (
+                    <div key={a.id} className="rounded-md border border-border p-3 space-y-2">
+                      <p className="text-sm font-medium text-foreground">{a.title ?? 'Artefakt'}</p>
+                      <div className="space-y-2">
+                        {vars.map((v) => {
+                          const visibility = v.visibility ?? 'public';
+                          const isPublicRevealed = visibility === 'public' && Boolean(v.revealed_at);
+                          const isHighlighted = Boolean(v.highlighted_at);
+
+                          return (
+                            <div key={v.id} className="rounded-md bg-muted/30 p-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="text-sm font-medium text-foreground">{v.title ?? 'Kort'}</p>
+                                {isPublicRevealed ? (
+                                  <Badge variant="secondary">Offentlig</Badge>
+                                ) : visibility === 'role_private' ? (
+                                  <Badge variant="secondary">Roll</Badge>
+                                ) : (
+                                  <Badge variant="secondary">Privat</Badge>
+                                )}
+                                {isHighlighted && <Badge variant="default">Markerad</Badge>}
+                              </div>
+                              {v.body && <p className="mt-1 text-sm text-muted-foreground">{v.body}</p>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          )}
+        </Card>
+      )}
+
+      {/* Decisions */}
+      {!isEnded && participantToken && (
+        <Card className="p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Beslut</p>
+            <Button type="button" size="sm" variant="outline" onClick={() => void loadDecisions()}>
+              Uppdatera
+            </Button>
+          </div>
+
+          {decisionsError && <p className="text-sm text-destructive">{decisionsError}</p>}
+
+          {decisions.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Inga beslut just nu.</p>
+          ) : (
+            <div className="space-y-3">
+              {decisions.map((d) => {
+                const selected = selectedOptionByDecisionId[d.id] ?? '';
+                const sending = Boolean(voteSendingByDecisionId[d.id]);
+                const msg = voteMessageByDecisionId[d.id];
+                const options = d.options ?? [];
+                const isOpen = d.status === 'open';
+                const isRevealed = d.status === 'revealed';
+                const results = resultsByDecisionId[d.id]?.results ?? null;
+
+                return (
+                  <div key={d.id} className="rounded-md border border-border p-3 space-y-2">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{d.title}</p>
+                        {d.prompt && <p className="text-sm text-muted-foreground">{d.prompt}</p>}
+                      </div>
+                      <Badge variant={isOpen ? 'default' : 'secondary'}>{d.status}</Badge>
+                    </div>
+
+                    {isOpen && options.length > 0 && (
+                      <div className="space-y-2">
+                        <div className="space-y-1">
+                          {options.map((o) => (
+                            <label key={o.key} className="flex items-center gap-2 text-sm">
+                              <input
+                                type="radio"
+                                name={`decision-${d.id}`}
+                                value={o.key}
+                                checked={selected === o.key}
+                                onChange={() =>
+                                  setSelectedOptionByDecisionId((prev) => ({ ...prev, [d.id]: o.key }))
+                                }
+                                disabled={sending}
+                              />
+                              <span className="text-foreground">{o.label}</span>
+                            </label>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            size="sm"
+                            onClick={() => void handleVote(d.id)}
+                            disabled={sending}
+                          >
+                            Rösta
+                          </Button>
+                          {msg && (
+                            <p className={`text-sm ${msg.includes('!') ? 'text-green-600' : 'text-muted-foreground'}`}>
+                              {msg}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {isRevealed && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-muted-foreground">Resultat:</p>
+                        {results ? (
+                          <div className="space-y-1">
+                            {results.map((r) => (
+                              <div key={r.key ?? r.label} className="flex items-center justify-between text-sm">
+                                <span className="text-foreground">{r.label ?? r.key}</span>
+                                <span className="text-muted-foreground">{r.count}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Resultaten är visade.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       )}
       

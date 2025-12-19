@@ -11,6 +11,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import type { Database } from '@/types/supabase';
+import type { BoardTheme } from '@/types/games';
 
 type GameStepRow = Database['public']['Tables']['game_steps']['Row'];
 type GamePhaseRow = Database['public']['Tables']['game_phases']['Row'];
@@ -150,6 +151,13 @@ export async function GET(
       .eq('id', session.game_id)
       .single();
 
+    // Board config (theme) - optional
+    const { data: boardConfig } = await supabaseAdmin
+      .from('game_board_config')
+      .select('theme')
+      .eq('game_id', session.game_id)
+      .maybeSingle();
+
     // Steps
     const { data: fallbackSteps } = await supabaseAdmin
       .from('game_steps')
@@ -245,6 +253,9 @@ export async function GET(
 
     return NextResponse.json({
       title: game?.name || session.display_name,
+      board: {
+        theme: (boardConfig?.theme as BoardTheme | null) ?? 'neutral',
+      },
       steps,
       phases,
     });

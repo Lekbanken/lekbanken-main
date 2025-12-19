@@ -50,6 +50,7 @@ export async function GET(request: Request) {
       status: participant.status,
       joinedAt: participant.joined_at,
       lastSeenAt: participant.last_seen_at,
+      isNextStarter: Boolean((participant.progress as Record<string, unknown> | null | undefined)?.isNextStarter),
     },
     session: {
       id: session.id,

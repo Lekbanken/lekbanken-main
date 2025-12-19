@@ -8,6 +8,7 @@
  */
 
 import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';
+import type { BoardTheme } from '@/types/games';
 
 // Local step/phase types for API responses
 // Must match StepPhaseNavigation.StepInfo and ParticipantPlayView.StepData
@@ -53,6 +54,8 @@ export interface PlaySessionData {
   sessionRoles: SessionRole[];
   /** Current runtime state */
   runtimeState: Partial<SessionRuntimeState>;
+  /** Board theme (from game board config) */
+  boardTheme?: BoardTheme;
   /** Participant count */
   participantCount: number;
 }
@@ -64,6 +67,8 @@ export interface ParticipantPlayData extends PlaySessionData {
   participantName: string;
   /** Participant ID */
   participantId: string;
+  /** Whether this participant is marked as next starter */
+  isNextStarter?: boolean;
 }
 
 // =============================================================================
@@ -95,6 +100,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
     let steps: StepInfo[] = [];
     let phases: PhaseInfo[] = [];
     let gameTitle = session.displayName || 'Session';
+    let boardTheme: BoardTheme | undefined;
 
     // If game is linked, fetch game+steps/phases through Play API
     if (session.gameId) {
@@ -107,6 +113,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
         gameTitle = gameData.title || gameTitle;
         steps = gameData.steps || [];
         phases = gameData.phases || [];
+        boardTheme = gameData.board?.theme;
       }
     }
     
@@ -138,6 +145,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
       phases,
       sessionRoles,
       runtimeState,
+      boardTheme,
       participantCount: session.participantCount ?? 0,
     };
   } catch (error) {
@@ -296,6 +304,7 @@ export async function getParticipantPlaySession(
     let steps: StepInfo[] = [];
     let phases: PhaseInfo[] = [];
     let gameTitle = session.displayName || 'Session';
+    let boardTheme: BoardTheme | undefined;
     
     // If game is linked, fetch public game data
     if (session.gameId) {
@@ -314,6 +323,7 @@ export async function getParticipantPlaySession(
           gameTitle = gameData.title || gameTitle;
           steps = gameData.steps || [];
           phases = gameData.phases || [];
+          boardTheme = gameData.board?.theme;
         }
       } catch {
         // Game data fetch failed, continue with defaults
@@ -355,10 +365,12 @@ export async function getParticipantPlaySession(
       phases,
       sessionRoles: [], // Participants don't see all roles
       runtimeState,
+      boardTheme,
       participantCount: session.participantCount ?? 0,
       assignedRole,
       participantName: participant.displayName,
       participantId: participant.id,
+      isNextStarter: Boolean(participant.isNextStarter),
     };
   } catch (error) {
     console.error('[getParticipantPlaySession] Error:', error);

@@ -7,6 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { ParticipantSessionWithRuntime } from '@/types/participant-session-extended';
 
@@ -17,6 +18,21 @@ interface StateUpdateRequest {
   duration_seconds?: number;
   message?: string | null;
   overrides?: Record<string, boolean>;
+}
+
+async function broadcastPlayEvent(sessionId: string, event: unknown) {
+  try {
+    const supabase = await createServiceRoleClient();
+    const channel = supabase.channel(`play:${sessionId}`);
+    await channel.send({
+      type: 'broadcast',
+      event: 'play_event',
+      payload: event,
+    });
+  } catch (error) {
+    // Best-effort: do not fail the request if realtime broadcast fails.
+    console.warn('[play/sessions/[id]/state] Failed to broadcast play event:', error);
+  }
 }
 
 export async function PATCH(
@@ -56,6 +72,9 @@ export async function PATCH(
     
     // Parse request
     const body: StateUpdateRequest = await request.json();
+
+    // Track which broadcast to emit (best-effort)
+    let broadcastEvent: unknown | null = null;
     
     switch (body.action) {
       case 'set_step':
@@ -63,6 +82,11 @@ export async function PATCH(
           return NextResponse.json({ error: 'Invalid step_index' }, { status: 400 });
         }
         await ParticipantSessionService.updateCurrentStep(sessionId, body.step_index);
+        broadcastEvent = {
+          type: 'state_change',
+          payload: { current_step_index: body.step_index },
+          timestamp: new Date().toISOString(),
+        };
         break;
         
       case 'set_phase':
@@ -70,6 +94,11 @@ export async function PATCH(
           return NextResponse.json({ error: 'Invalid phase_index' }, { status: 400 });
         }
         await ParticipantSessionService.updateCurrentPhase(sessionId, body.phase_index);
+        broadcastEvent = {
+          type: 'state_change',
+          payload: { current_phase_index: body.phase_index },
+          timestamp: new Date().toISOString(),
+        };
         break;
         
       case 'timer_start':
@@ -96,6 +125,14 @@ export async function PATCH(
           message: body.message ?? undefined,
           overrides: body.overrides,
         });
+        broadcastEvent = {
+          type: 'board_update',
+          payload: {
+            message: body.message ?? undefined,
+            overrides: body.overrides,
+          },
+          timestamp: new Date().toISOString(),
+        };
         break;
         
       default:
@@ -104,6 +141,34 @@ export async function PATCH(
     
     // Return updated session state
     const updatedSession = await ParticipantSessionService.getSessionById(sessionId) as ParticipantSessionWithRuntime | null;
+
+    // Timer broadcasts need the updated timer_state from DB.
+    if (
+      body.action === 'timer_start' ||
+      body.action === 'timer_pause' ||
+      body.action === 'timer_resume' ||
+      body.action === 'timer_reset'
+    ) {
+      const actionMap = {
+        timer_start: 'start',
+        timer_pause: 'pause',
+        timer_resume: 'resume',
+        timer_reset: 'reset',
+      } as const;
+
+      broadcastEvent = {
+        type: 'timer_update',
+        payload: {
+          action: actionMap[body.action],
+          timer_state: updatedSession?.timer_state ?? null,
+        },
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    if (broadcastEvent) {
+      await broadcastPlayEvent(sessionId, broadcastEvent);
+    }
     
     return NextResponse.json({
       success: true,

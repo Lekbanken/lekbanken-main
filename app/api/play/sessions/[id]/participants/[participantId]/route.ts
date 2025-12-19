@@ -1,7 +1,22 @@
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import type { PlayBroadcastEvent } from '@/types/play-runtime';
 
 type ParticipantAction = 'kick' | 'block' | 'setNextStarter' | 'setPosition';
+
+async function broadcastPlayEvent(sessionId: string, event: PlayBroadcastEvent) {
+  try {
+    const realtime = await createServiceRoleClient();
+    const channel = realtime.channel(`play:${sessionId}`);
+    await channel.send({
+      type: 'broadcast',
+      event: 'play_event',
+      payload: event,
+    });
+  } catch (err) {
+    console.warn('[participants action] broadcast failed (best-effort):', err);
+  }
+}
 
 export async function PATCH(
   request: Request,
@@ -94,6 +109,13 @@ export async function PATCH(
           .eq('session_id', sessionId);
 
         if (error) throw error;
+
+        await broadcastPlayEvent(sessionId, {
+          type: 'turn_update',
+          payload: { next_starter_participant_id: participantId },
+          timestamp: new Date().toISOString(),
+        });
+
         return NextResponse.json({ success: true, message: 'Next starter set' });
       }
 

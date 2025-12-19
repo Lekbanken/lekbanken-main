@@ -133,7 +133,10 @@ export function ParticipantPlayMode({
       role={role}
       initialState={playData.runtimeState}
       participantName={playData.participantName}
+      participantId={playData.participantId}
+      isNextStarter={playData.isNextStarter}
       showRole={showRole && !!role}
+      boardTheme={playData.boardTheme}
     />
   );
 }

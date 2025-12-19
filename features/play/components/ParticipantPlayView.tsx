@@ -23,6 +23,7 @@ import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import { RoleCard, type RoleCardData } from './RoleCard';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
+import type { BoardTheme } from '@/types/games';
 
 // =============================================================================
 // Types
@@ -52,8 +53,30 @@ export interface ParticipantPlayViewProps {
   initialState?: Partial<SessionRuntimeState>;
   /** Participant name */
   participantName?: string;
+  /** Participant id (used for turn indicator) */
+  participantId?: string;
+  /** Initial next-starter state from server */
+  isNextStarter?: boolean;
   /** Whether to show role card */
   showRole?: boolean;
+  /** Board theme (from game board config) */
+  boardTheme?: BoardTheme;
+}
+
+function getThemeAccentClasses(theme?: BoardTheme) {
+  switch (theme) {
+    case 'mystery':
+      return { label: 'text-slate-200', badge: 'bg-slate-800 text-slate-50' };
+    case 'party':
+      return { label: 'text-pink-600', badge: 'bg-pink-600 text-white' };
+    case 'sport':
+      return { label: 'text-green-600', badge: 'bg-green-600 text-white' };
+    case 'nature':
+      return { label: 'text-emerald-700', badge: 'bg-emerald-700 text-white' };
+    case 'neutral':
+    default:
+      return { label: 'text-primary', badge: 'bg-primary text-primary-foreground' };
+  }
 }
 
 // =============================================================================
@@ -173,7 +196,10 @@ export function ParticipantPlayView({
   role,
   initialState,
   participantName,
+  participantId,
+  isNextStarter: initialIsNextStarter,
   showRole = true,
+  boardTheme,
 }: ParticipantPlayViewProps) {
   // Subscribe to live session updates
   const {
@@ -182,6 +208,7 @@ export function ParticipantPlayView({
     status,
     timerState,
     boardState,
+    nextStarterParticipantId,
     connected,
   } = useLiveSession({
     sessionId,
@@ -196,13 +223,21 @@ export function ParticipantPlayView({
   const isPaused = status === 'paused';
   const isEnded = status === 'ended' || status === 'cancelled';
 
+  const themeAccent = getThemeAccentClasses(boardTheme);
+
+  const isNextStarter = Boolean(
+    participantId && nextStarterParticipantId
+      ? nextStarterParticipantId === participantId
+      : initialIsNextStarter
+  );
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-24">
       {/* Header */}
       <header className="space-y-3">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">Spela</p>
+            <p className={`text-xs font-bold uppercase tracking-widest ${themeAccent.label}`}>Spela</p>
             <h1 className="text-xl font-bold text-foreground sm:text-2xl">{gameTitle}</h1>
           </div>
           <StatusIndicator status={status} connected={connected} />
@@ -217,6 +252,13 @@ export function ParticipantPlayView({
       
       {/* Board Message */}
       <BoardMessage message={boardState?.message} />
+
+      {/* Turn Indicator */}
+      {isNextStarter && !isEnded && (
+        <Card className="border-2 border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm font-medium text-foreground">Du börjar nästa!</p>
+        </Card>
+      )}
       
       {/* Pause Overlay */}
       {isPaused && (
@@ -255,7 +297,7 @@ export function ParticipantPlayView({
           <div className="border-b border-border bg-muted/50 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${themeAccent.badge}`}>
                   {currentStepIndex + 1}
                 </span>
                 <span className="text-sm font-medium text-muted-foreground">

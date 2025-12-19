@@ -169,7 +169,7 @@ export interface SessionEvent {
 // =============================================================================
 
 export interface PlayBroadcastEvent {
-  type: 'state_change' | 'timer_update' | 'role_update' | 'board_update';
+  type: 'state_change' | 'timer_update' | 'role_update' | 'board_update' | 'turn_update';
   payload: unknown;
   timestamp: string;
 }
@@ -206,6 +206,13 @@ export interface BoardBroadcast extends PlayBroadcastEvent {
   payload: {
     message?: string;
     overrides?: BoardState['overrides'];
+  };
+}
+
+export interface TurnBroadcast extends PlayBroadcastEvent {
+  type: 'turn_update';
+  payload: {
+    next_starter_participant_id: string | null;
   };
 }
 

@@ -1,7 +1,23 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 type SessionStatus = 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
+
+async function broadcastPlayEvent(sessionId: string, event: unknown) {
+  try {
+    const supabase = await createServiceRoleClient();
+    const channel = supabase.channel(`play:${sessionId}`);
+    await channel.send({
+      type: 'broadcast',
+      event: 'play_event',
+      payload: event,
+    });
+  } catch (error) {
+    // Best-effort: do not fail the request if realtime broadcast fails.
+    console.warn('[play/sessions/[id]] Failed to broadcast play event:', error);
+  }
+}
 
 export async function GET(
   _request: Request,
@@ -82,6 +98,15 @@ export async function PATCH(
   if (updateError) {
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
+
+  // Broadcast status change for immediate participant UI updates.
+  await broadcastPlayEvent(id, {
+    type: 'state_change',
+    payload: {
+      status: nextStatus,
+    },
+    timestamp: new Date().toISOString(),
+  });
 
   return NextResponse.json({ success: true, status: nextStatus });
 }

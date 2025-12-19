@@ -24,6 +24,7 @@ import type {
   TimerBroadcast,
   RoleBroadcast,
   BoardBroadcast,
+  TurnBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -47,6 +48,8 @@ export interface UseLiveSessionOptions {
   onRoleUpdate?: (payload: RoleBroadcast['payload']) => void;
   /** Called when board is updated */
   onBoardUpdate?: (payload: BoardBroadcast['payload']) => void;
+  /** Called when next starter/turn changes */
+  onTurnUpdate?: (payload: TurnBroadcast['payload']) => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -66,6 +69,8 @@ export interface UseLiveSessionResult {
   timerDisplay: TimerDisplay;
   /** Board state */
   boardState: BoardState | null;
+  /** Next starter participant id (if set) */
+  nextStarterParticipantId: string | null;
   /** Connection status */
   connected: boolean;
   /** Is currently reconnecting? */
@@ -85,6 +90,7 @@ export function useLiveSession({
   onTimerUpdate,
   onRoleUpdate,
   onBoardUpdate,
+  onTurnUpdate,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -101,6 +107,7 @@ export function useLiveSession({
   const [status, setStatus] = useState<SessionRuntimeState['status']>(initialState?.status ?? 'active');
   const [timerState, setTimerState] = useState<TimerState | null>(initialState?.timer_state ?? null);
   const [boardState, setBoardState] = useState<BoardState | null>(initialState?.board_state ?? null);
+  const [nextStarterParticipantId, setNextStarterParticipantId] = useState<string | null>(null);
   const [lastEventAt, setLastEventAt] = useState<string | null>(null);
   
   // Timer display (calculated every tick)
@@ -157,8 +164,15 @@ export function useLiveSession({
         onBoardUpdate?.(payload);
         break;
       }
+
+      case 'turn_update': {
+        const payload = (event as TurnBroadcast).payload;
+        setNextStarterParticipantId(payload.next_starter_participant_id);
+        onTurnUpdate?.(payload);
+        break;
+      }
     }
-  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate]);
+  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate]);
   
   // Timer tick effect (recalculate display)
   useEffect(() => {
@@ -224,6 +238,7 @@ export function useLiveSession({
     timerState,
     timerDisplay,
     boardState,
+    nextStarterParticipantId,
     connected,
     reconnecting,
     lastEventAt,

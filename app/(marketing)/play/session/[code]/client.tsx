@@ -152,6 +152,11 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     setJoinLoading(true);
     setJoinError(null);
     try {
+      if (session?.status && session.status !== 'active') {
+        setJoinError('Sessionen är inte aktiv ännu. Be värden starta sessionen och försök igen.');
+        return;
+      }
+
       const result = await joinSession({ sessionCode: normalizedCode, displayName });
       const token =
         (result as { participantToken?: string }).participantToken ??
@@ -180,6 +185,15 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
     } finally {
       setJoinLoading(false);
     }
+  }, [normalizedCode, loadData, session?.status]);
+
+  const handleReconnect = useCallback(() => {
+    sessionStorage.removeItem(`${SESSION_STORAGE_KEY}_${normalizedCode}`);
+    clearParticipantAuth(normalizedCode);
+    setParticipant(null);
+    setJoinError(null);
+    setError(null);
+    void loadData();
   }, [normalizedCode, loadData]);
 
   // Loading state
@@ -353,8 +367,8 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
           <p className="text-lg">Väntar på aktivitet...</p>
           <p className="text-sm mt-2">Innehåll kommer att visas här när sessionen startar.</p>
 
-          {/* If session is live and has a game, but we have no token, allow joining inline */}
-          {session?.status === 'active' && Boolean(session?.gameId) && !getToken() && (
+          {/* If we have no token on this device/tab, allow joining inline */}
+          {!getToken() && (
             <div className="mt-8">
               <Card variant="elevated" className="mx-auto w-full max-w-md p-6">
                 <h2 className="text-lg font-semibold text-foreground mb-2">Gå med för att se spelet</h2>
@@ -366,6 +380,21 @@ export function ParticipantSessionClient({ code }: ParticipantSessionClientProps
                   isLoading={joinLoading}
                   error={joinError}
                 />
+              </Card>
+            </div>
+          )}
+
+          {/* If token exists but participant could not be resolved, offer reconnect */}
+          {getToken() && !participant && session?.status === 'active' && (
+            <div className="mt-8">
+              <Card variant="elevated" className="mx-auto w-full max-w-md p-6">
+                <h2 className="text-lg font-semibold text-foreground mb-2">Kan inte ansluta</h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Din anslutning verkar vara ogiltig på den här enheten. Försök ansluta igen.
+                </p>
+                <Button variant="primary" onClick={handleReconnect}>
+                  Anslut igen
+                </Button>
               </Card>
             </div>
           )}

@@ -1,0 +1,21 @@
+.coinIdle {
+  display: inline-block;
+  transform-style: preserve-3d;
+  will-change: transform;
+  animation: coinIdleSpin 10s linear infinite;
+}
+
+@keyframes coinIdleSpin {
+  from {
+    transform: perspective(900px) rotateX(8deg) rotateY(0deg);
+  }
+  to {
+    transform: perspective(900px) rotateX(8deg) rotateY(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .coinIdle {
+    animation: none !important;
+  }
+}

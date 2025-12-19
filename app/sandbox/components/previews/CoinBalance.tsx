@@ -1,6 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useColors, useSpacing } from '../../store/sandbox-store';
+import { CoinIdle } from '@/components/CoinIdle';
+
+const coinPngSrc = '/icons/app-nav/lekvaluta.png';
 
 export function CoinBalance() {
   const { accentHue } = useColors();
@@ -19,23 +23,38 @@ export function CoinBalance() {
           const px = sizeMap[size as keyof typeof sizeMap];
           return (
             <div key={size} className="flex flex-col items-center gap-2">
-              <div
-                className="flex items-center justify-center font-bold text-white"
-                style={{
-                  width: px,
-                  height: px,
-                  borderRadius: '50%',
-                  background: `linear-gradient(145deg, hsl(${accentHue}, 80%, 55%), hsl(${accentHue}, 70%, 40%))`,
-                  boxShadow: `0 2px 8px hsl(${accentHue}, 60%, 30%, 0.4)`,
-                  fontSize: px * 0.4,
-                }}
-              >
-                L
-              </div>
+              <Image
+                src={coinPngSrc}
+                alt="Lekvaluta"
+                width={px}
+                height={px}
+                className="block"
+              />
               <span className="text-[10px] uppercase text-muted-foreground">{size}</span>
             </div>
           );
         })}
+      </div>
+
+      {/* Fake-3D idle rotation (1 image + CSS) */}
+      <div className="space-y-3 border-t border-border pt-4">
+        <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          Coin idle (CSS)
+        </div>
+        <div className="flex flex-wrap items-center gap-6">
+          <div className="flex items-center gap-3">
+            <CoinIdle size={32} ariaLabel="Lekvaluta" />
+            <span className="text-xs text-muted-foreground">32px</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <CoinIdle size={48} ariaLabel="Lekvaluta" />
+            <span className="text-xs text-muted-foreground">48px</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <CoinIdle size={64} ariaLabel="Lekvaluta" />
+            <span className="text-xs text-muted-foreground">64px</span>
+          </div>
+        </div>
       </div>
 
       {/* Balance display variations */}
@@ -50,15 +69,7 @@ export function CoinBalance() {
             className="flex items-center gap-2 border border-border bg-card p-3"
             style={{ borderRadius }}
           >
-            <div
-              className="flex h-6 w-6 items-center justify-center text-xs font-bold text-white"
-              style={{
-                borderRadius: '50%',
-                background: `linear-gradient(145deg, hsl(${accentHue}, 80%, 55%), hsl(${accentHue}, 70%, 40%))`,
-              }}
-            >
-              L
-            </div>
+            <Image src={coinPngSrc} alt="Lekvaluta" width={24} height={24} className="block" />
             <span className="font-semibold tabular-nums">1,250</span>
           </div>
 
@@ -67,15 +78,7 @@ export function CoinBalance() {
             className="flex items-center gap-3 border border-border bg-card p-3"
             style={{ borderRadius }}
           >
-            <div
-              className="flex h-8 w-8 items-center justify-center text-sm font-bold text-white"
-              style={{
-                borderRadius: '50%',
-                background: `linear-gradient(145deg, hsl(${accentHue}, 80%, 55%), hsl(${accentHue}, 70%, 40%))`,
-              }}
-            >
-              L
-            </div>
+            <Image src={coinPngSrc} alt="Lekvaluta" width={32} height={32} className="block" />
             <div className="flex flex-col">
               <span className="text-xs text-muted-foreground">Balance</span>
               <span className="font-semibold tabular-nums">1,250</span>
@@ -89,16 +92,7 @@ export function CoinBalance() {
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div
-                  className="flex h-12 w-12 items-center justify-center text-lg font-bold text-white"
-                  style={{
-                    borderRadius: '50%',
-                    background: `linear-gradient(145deg, hsl(${accentHue}, 80%, 55%), hsl(${accentHue}, 70%, 40%))`,
-                    boxShadow: `0 2px 8px hsl(${accentHue}, 60%, 30%, 0.3)`,
-                  }}
-                >
-                  L
-                </div>
+                <Image src={coinPngSrc} alt="Lekvaluta" width={48} height={48} className="block" />
                 <div>
                   <div className="text-sm text-muted-foreground">Lekvalutan</div>
                   <div className="text-2xl font-bold tabular-nums">1,250</div>

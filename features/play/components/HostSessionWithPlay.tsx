@@ -157,8 +157,26 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     }
   };
 
-  const handleEnterPlayMode = () => {
-    setIsPlayMode(true);
+  const handleEnterPlayMode = async () => {
+    const currentSession = session;
+    if (!currentSession) return;
+    setActionPending(true);
+    setLoadingAction('start');
+    try {
+      // Participants only enter play mode when the session is active.
+      // Ensure we start the session before switching the host UI into play mode.
+      if (currentSession.status !== 'active' && currentSession.status !== 'paused') {
+        await updateSessionStatus(sessionId, 'start');
+      }
+
+      await loadData();
+      setIsPlayMode(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte starta spelläge');
+    } finally {
+      setActionPending(false);
+      setLoadingAction(undefined);
+    }
   };
 
   const handleExitPlayMode = () => {
@@ -202,6 +220,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
   const isLive = session.status === 'active' || session.status === 'paused';
   const hasGame = !!session.gameId;
+  const isEnded = session.status === 'ended' || session.status === 'cancelled';
 
   // Play mode view
   if (isPlayMode && hasGame && isLive) {
@@ -250,7 +269,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       )}
 
       {/* Play Mode CTA for sessions with games */}
-      {hasGame && isLive && (
+      {hasGame && !isEnded && (
         <Card className="p-6 bg-primary/5 border-primary/20">
           <div className="flex items-center justify-between">
             <div>
@@ -261,7 +280,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                 Denna session har ett spel kopplat. Starta spelläget för att facilitera.
               </p>
             </div>
-            <Button variant="primary" onClick={handleEnterPlayMode}>
+            <Button variant="primary" onClick={() => void handleEnterPlayMode()} disabled={actionPending}>
               <PlayIcon className="h-4 w-4 mr-2" />
               Starta spelläge
             </Button>

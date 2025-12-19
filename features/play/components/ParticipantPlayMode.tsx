@@ -135,6 +135,7 @@ export function ParticipantPlayMode({
       participantName={playData.participantName}
       participantId={playData.participantId}
       isNextStarter={playData.isNextStarter}
+      participantToken={participantToken}
       showRole={showRole && !!role}
       boardTheme={playData.boardTheme}
     />

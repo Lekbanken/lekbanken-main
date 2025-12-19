@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import {
   PlayIcon,
   PauseIcon,
@@ -32,6 +32,11 @@ import { TimerControl } from './TimerControl';
 import { StepPhaseNavigation, type StepInfo, type PhaseInfo } from './StepPhaseNavigation';
 import { createTimerState, pauseTimer, resumeTimer } from '@/lib/utils/timer-utils';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
+import {
+  getSessionChatMessages,
+  sendSessionChatMessage,
+  type ChatMessage,
+} from '@/features/play/api/chat-api';
 
 // =============================================================================
 // Types
@@ -76,6 +81,17 @@ export function FacilitatorDashboard({
   const [timerState, setTimerState] = useState<TimerState | null>(initialState?.timer_state ?? null);
   const [boardMessage, setBoardMessage] = useState(initialState?.board_state?.message ?? '');
   const [status, setStatus] = useState<SessionRuntimeState['status']>(initialState?.status ?? 'active');
+
+  // Chat (host)
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState('');
+  const [chatSending, setChatSending] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
+
+  const latestChatTimestamp = useMemo(() => {
+    if (chatMessages.length === 0) return undefined;
+    return chatMessages[chatMessages.length - 1]?.createdAt;
+  }, [chatMessages]);
   
   // UI state
   const [isSaving, setIsSaving] = useState(false);
@@ -228,6 +244,79 @@ export function FacilitatorDashboard({
   const defaultTimerDuration = currentStep?.durationMinutes 
     ? currentStep.durationMinutes * 60 
     : 300;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadInitial = async () => {
+      try {
+        const messages = await getSessionChatMessages(sessionId);
+        if (!cancelled) {
+          setChatMessages(messages);
+          setChatError(null);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setChatError(err instanceof Error ? err.message : 'Kunde inte ladda chatten');
+        }
+      }
+    };
+
+    void loadInitial();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId]);
+
+  useEffect(() => {
+    const interval = window.setInterval(async () => {
+      try {
+        const messages = await getSessionChatMessages(sessionId, { since: latestChatTimestamp });
+        if (messages.length > 0) {
+          setChatMessages((prev) => {
+            const seen = new Set(prev.map((m) => m.id));
+            const next = [...prev];
+            for (const m of messages) {
+              if (!seen.has(m.id)) next.push(m);
+            }
+            return next.slice(-400);
+          });
+        }
+      } catch {
+        // best-effort polling
+      }
+    }, 2000);
+
+    return () => window.clearInterval(interval);
+  }, [sessionId, latestChatTimestamp]);
+
+  const handleSendChat = useCallback(async () => {
+    const msg = chatInput.trim();
+    if (!msg) return;
+
+    setChatSending(true);
+    setChatError(null);
+    try {
+      await sendSessionChatMessage(sessionId, { message: msg, visibility: 'public' });
+      setChatInput('');
+
+      const messages = await getSessionChatMessages(sessionId, { since: latestChatTimestamp });
+      if (messages.length > 0) {
+        setChatMessages((prev) => {
+          const seen = new Set(prev.map((m) => m.id));
+          const next = [...prev];
+          for (const m of messages) {
+            if (!seen.has(m.id)) next.push(m);
+          }
+          return next.slice(-400);
+        });
+      }
+    } catch (err) {
+      setChatError(err instanceof Error ? err.message : 'Kunde inte skicka meddelandet');
+    } finally {
+      setChatSending(false);
+    }
+  }, [chatInput, latestChatTimestamp, sessionId]);
 
   return (
     <div className="space-y-6">
@@ -390,6 +479,56 @@ export function FacilitatorDashboard({
                   disabled={isSaving || status === 'ended'}
                 >
                   Rensa
+                </Button>
+              </div>
+            </div>
+          </Card>
+
+          {/* Chat */}
+          <Card className="p-4">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              <ChatBubbleBottomCenterTextIcon className="mr-2 inline h-4 w-4" />
+              Chatt
+            </h3>
+
+            <div className="space-y-3">
+              <div className="max-h-72 overflow-auto rounded-md border border-border p-3 space-y-2">
+                {chatMessages.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Inga meddelanden ännu.</p>
+                ) : (
+                  chatMessages.map((m) => (
+                    <div key={m.id} className="text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium text-foreground">{m.senderLabel}</span>
+                        {m.visibility === 'host' && <Badge variant="secondary">Privat</Badge>}
+                      </div>
+                      <p className="text-muted-foreground">{m.message}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {chatError && <p className="text-sm text-destructive">{chatError}</p>}
+
+              <div className="flex gap-2">
+                <Input
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Skriv till alla…"
+                  disabled={chatSending || status === 'ended'}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      void handleSendChat();
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  onClick={() => void handleSendChat()}
+                  disabled={chatSending || status === 'ended'}
+                >
+                  Skicka
                 </Button>
               </div>
             </div>

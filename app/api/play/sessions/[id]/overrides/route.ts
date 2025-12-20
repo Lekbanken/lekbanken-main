@@ -12,6 +12,7 @@
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import type { Json } from '@/types/supabase';
 
 type StepOverride = {
   id: string;
@@ -173,7 +174,7 @@ export async function PATCH(
 
   const { error: updateError } = await supabaseAdmin
     .from('participant_sessions')
-    .update({ settings: nextSettings })
+    .update({ settings: nextSettings as unknown as Json })
     .eq('id', sessionId);
 
   if (updateError) {

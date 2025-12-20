@@ -141,23 +141,34 @@ export async function POST(request: NextRequest, context: RouteContext) {
     
     // Recalculate assigned_count for all roles in this session
     // This ensures counts are accurate after delete + insert
-    const { data: allRoles } = await supabase
+    const { data: allRoles, error: rolesQueryError } = await supabase
       .from('session_roles')
       .select('id')
       .eq('session_id', sessionId);
     
-    if (allRoles) {
+    if (rolesQueryError) {
+      console.error('[Assignments API] Failed to fetch roles for count update:', rolesQueryError);
+    } else if (allRoles) {
       for (const role of allRoles) {
-        const { count } = await supabase
+        const { count: assignmentCount, error: countError } = await supabase
           .from('participant_role_assignments')
           .select('*', { count: 'exact', head: true })
           .eq('session_id', sessionId)
           .eq('session_role_id', role.id);
         
-        await supabase
+        if (countError) {
+          console.error('[Assignments API] Count error for role:', role.id, countError);
+          continue;
+        }
+        
+        const { error: updateError } = await supabase
           .from('session_roles')
-          .update({ assigned_count: count || 0 })
+          .update({ assigned_count: assignmentCount ?? 0 })
           .eq('id', role.id);
+        
+        if (updateError) {
+          console.error('[Assignments API] Update role count error:', role.id, updateError);
+        }
       }
     }
     

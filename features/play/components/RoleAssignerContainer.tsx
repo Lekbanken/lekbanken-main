@@ -117,13 +117,14 @@ export function RoleAssignerContainer({
         throw new Error('Kunde inte ta bort rolltilldelning');
       }
       
-      // Reload data
+      // Reload data and notify parent
       await loadData();
+      onAssignmentComplete?.();
     } catch (err) {
       console.error('[RoleAssignerContainer] Unassign error:', err);
       throw err;
     }
-  }, [sessionId, loadData]);
+  }, [sessionId, loadData, onAssignmentComplete]);
 
   // Loading state
   if (loading) {

@@ -114,8 +114,9 @@ export function useLiveSession({
   const [reconnecting, setReconnecting] = useState(false);
   
   // Session state
-  const [currentStepIndex, setCurrentStepIndex] = useState(initialState?.current_step_index ?? 0);
-  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(initialState?.current_phase_index ?? 0);
+  // Use -1 as default to indicate "not started yet"
+  const [currentStepIndex, setCurrentStepIndex] = useState(initialState?.current_step_index ?? -1);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(initialState?.current_phase_index ?? -1);
   const [status, setStatus] = useState<SessionRuntimeState['status']>(initialState?.status ?? 'active');
   const [timerState, setTimerState] = useState<TimerState | null>(initialState?.timer_state ?? null);
   const [boardState, setBoardState] = useState<BoardState | null>(initialState?.board_state ?? null);

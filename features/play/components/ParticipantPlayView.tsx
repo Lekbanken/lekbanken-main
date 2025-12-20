@@ -20,6 +20,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
@@ -53,6 +54,13 @@ export interface StepData {
   note?: string;
 }
 
+export interface PhaseData {
+  id: string;
+  name: string;
+  description?: string;
+  duration?: number | null;
+}
+
 export interface ParticipantPlayViewProps {
   /** Session ID */
   sessionId: string;
@@ -62,6 +70,8 @@ export interface ParticipantPlayViewProps {
   gameTitle: string;
   /** Steps data */
   steps: StepData[];
+  /** Phases data */
+  phases?: PhaseData[];
   /** Participant's assigned role (if any) */
   role?: RoleCardData;
   /** Initial state from server */
@@ -213,6 +223,7 @@ export function ParticipantPlayView({
   sessionCode,
   gameTitle,
   steps,
+  phases = [],
   role,
   initialState,
   participantName,
@@ -284,7 +295,7 @@ export function ParticipantPlayView({
   // Subscribe to live session updates
   const {
     currentStepIndex,
-    currentPhaseIndex: _currentPhaseIndex,
+    currentPhaseIndex,
     status,
     timerState,
     boardState,
@@ -393,9 +404,19 @@ export function ParticipantPlayView({
     }
   }, [participantToken, role, sessionId, steps, currentStepIndex]);
   
-  // Current step data
-  const currentStep = steps[currentStepIndex] || null;
+  // Current step data - handle "not started" state (index -1)
+  const stepNotStarted = currentStepIndex < 0;
+  const currentStep = stepNotStarted ? null : (steps[currentStepIndex] || null);
   const totalSteps = steps.length;
+
+  // Current phase data
+  const phaseNotStarted = currentPhaseIndex < 0;
+  const currentPhase = phaseNotStarted ? null : (phases[currentPhaseIndex] || null);
+  const totalPhases = phases.length;
+
+  // State for showing artifacts/decisions drawers
+  const [showArtifactsDrawer, setShowArtifactsDrawer] = useState(false);
+  const [showDecisionsDrawer, setShowDecisionsDrawer] = useState(false);
   
   // Session is paused
   const isPaused = status === 'paused';
@@ -469,11 +490,48 @@ export function ParticipantPlayView({
           <StatusIndicator status={status} connected={connected} />
         </div>
         
-        {participantName && (
-          <p className="text-sm text-muted-foreground">
-            Du spelar som <span className="font-medium text-foreground">{participantName}</span>
-          </p>
-        )}
+        {/* Player info row with artifact/decision buttons */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          {participantName && (
+            <p className="text-sm text-muted-foreground">
+              Du spelar som <span className="font-medium text-foreground">{participantName}</span>
+            </p>
+          )}
+          
+          {/* Small buttons for artifacts and decisions */}
+          {!isEnded && participantToken && (
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setShowArtifactsDrawer(!showArtifactsDrawer)}
+                className="gap-1 h-7 text-xs"
+              >
+                📦 Artefakter
+                {artifacts.length > 0 && (
+                  <span className="rounded-full bg-primary/10 px-1.5 text-primary">
+                    {artifacts.length}
+                  </span>
+                )}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => setShowDecisionsDrawer(!showDecisionsDrawer)}
+                className="gap-1 h-7 text-xs"
+              >
+                🗳️ Beslut
+                {decisions.filter(d => d.status === 'open').length > 0 && (
+                  <span className="rounded-full bg-destructive/10 px-1.5 text-destructive">
+                    {decisions.filter(d => d.status === 'open').length}
+                  </span>
+                )}
+              </Button>
+            </div>
+          )}
+        </div>
       </header>
       
       {/* Board Message */}
@@ -486,14 +544,32 @@ export function ParticipantPlayView({
         </Card>
       )}
 
-      {/* My Artifacts */}
-      {!isEnded && participantToken && (
-        <Card className="p-4 space-y-3">
+      {/* Current Phase Info - show instead of artifacts/decisions on main view */}
+      {currentPhase && !isEnded && (
+        <Card className="p-4 border-2 border-secondary/20 bg-secondary/5">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-secondary">Fas {currentPhaseIndex + 1} av {totalPhases}</p>
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">{currentPhase.name}</h3>
+          {currentPhase.description && (
+            <p className="mt-2 text-sm text-muted-foreground">{currentPhase.description}</p>
+          )}
+        </Card>
+      )}
+
+      {/* Artifacts Drawer (collapsible) */}
+      {showArtifactsDrawer && !isEnded && participantToken && (
+        <Card className="p-4 space-y-3 animate-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-foreground">Mina artefakter</p>
-            <Button type="button" size="sm" variant="outline" onClick={() => void loadArtifacts()}>
-              Uppdatera
-            </Button>
+            <div className="flex gap-2">
+              <Button type="button" size="sm" variant="ghost" onClick={() => void loadArtifacts()}>
+                ↻
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setShowArtifactsDrawer(false)}>
+                ✕
+              </Button>
+            </div>
           </div>
 
           {artifactsError && <p className="text-sm text-destructive">{artifactsError}</p>}
@@ -543,14 +619,19 @@ export function ParticipantPlayView({
         </Card>
       )}
 
-      {/* Decisions */}
-      {!isEnded && participantToken && (
-        <Card className="p-4 space-y-3">
+      {/* Decisions Drawer (collapsible) */}
+      {showDecisionsDrawer && !isEnded && participantToken && (
+        <Card className="p-4 space-y-3 animate-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
             <p className="text-sm font-semibold text-foreground">Beslut</p>
-            <Button type="button" size="sm" variant="outline" onClick={() => void loadDecisions()}>
-              Uppdatera
-            </Button>
+            <div className="flex gap-2">
+              <Button type="button" size="sm" variant="ghost" onClick={() => void loadDecisions()}>
+                ↻
+              </Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => setShowDecisionsDrawer(false)}>
+                ✕
+              </Button>
+            </div>
           </div>
 
           {decisionsError && <p className="text-sm text-destructive">{decisionsError}</p>}
@@ -649,6 +730,21 @@ export function ParticipantPlayView({
           </h2>
           <p className="mt-1 text-sm text-yellow-600 dark:text-yellow-500">
             Vänta på att ledaren startar igen
+          </p>
+        </Card>
+      )}
+
+      {/* Waiting for host to start - when step index is -1 */}
+      {stepNotStarted && !isEnded && !isPaused && (
+        <Card className="border-2 border-primary/20 bg-primary/5 p-6 text-center">
+          <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center animate-pulse">
+            <ClockIcon className="h-6 w-6 text-primary" />
+          </div>
+          <h2 className="mt-4 text-lg font-semibold text-foreground">
+            Väntar på lekledaren...
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Lekledaren har inte startat spelet ännu. Häng kvar så börjar vi snart!
           </p>
         </Card>
       )}
@@ -817,6 +913,90 @@ export function ParticipantPlayView({
           })()}
         </div>
       )}
+
+      {/* Decision Modal - shows automatically for open decisions */}
+      {(() => {
+        // Find first open decision that hasn't been voted on
+        const openDecision = decisions.find(d => d.status === 'open');
+        if (!openDecision || !participantToken || isEnded) return null;
+
+        const selected = selectedOptionByDecisionId[openDecision.id] ?? '';
+        const sending = Boolean(voteSendingByDecisionId[openDecision.id]);
+        const msg = voteMessageByDecisionId[openDecision.id];
+        const options = openDecision.options ?? [];
+        const hasVoted = msg?.includes('!');
+
+        // Don't show modal if already voted
+        if (hasVoted) return null;
+
+        return (
+          <Dialog open={true} onOpenChange={() => { /* Cannot close without voting */ }}>
+            <DialogContent 
+              className="max-w-md"
+              onPointerDownOutside={(e) => e.preventDefault()}
+              onEscapeKeyDown={(e) => e.preventDefault()}
+              onInteractOutside={(e) => e.preventDefault()}
+            >
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  🗳️ {openDecision.title}
+                </DialogTitle>
+                {openDecision.prompt && (
+                  <DialogDescription>{openDecision.prompt}</DialogDescription>
+                )}
+              </DialogHeader>
+
+              <div className="space-y-3 py-4">
+                {options.map((o) => (
+                  <label
+                    key={o.key}
+                    className={`flex items-center gap-3 p-3 rounded-lg border-2 cursor-pointer transition-colors ${
+                      selected === o.key
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-muted-foreground/50'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name={`modal-decision-${openDecision.id}`}
+                      value={o.key}
+                      checked={selected === o.key}
+                      onChange={() =>
+                        setSelectedOptionByDecisionId((prev) => ({ ...prev, [openDecision.id]: o.key }))
+                      }
+                      disabled={sending}
+                      className="sr-only"
+                    />
+                    <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                      selected === o.key ? 'border-primary' : 'border-muted-foreground/30'
+                    }`}>
+                      {selected === o.key && (
+                        <div className="h-2.5 w-2.5 rounded-full bg-primary" />
+                      )}
+                    </div>
+                    <span className="text-foreground font-medium">{o.label}</span>
+                  </label>
+                ))}
+              </div>
+
+              {msg && !msg.includes('!') && (
+                <p className="text-sm text-destructive">{msg}</p>
+              )}
+
+              <DialogFooter>
+                <Button
+                  onClick={() => void handleVote(openDecision.id)}
+                  disabled={sending || !selected}
+                  className="w-full"
+                  size="lg"
+                >
+                  {sending ? 'Röstar...' : 'Skicka röst'}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }

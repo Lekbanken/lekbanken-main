@@ -76,8 +76,9 @@ export function FacilitatorDashboard({
   participantCount = 0,
 }: FacilitatorDashboardProps) {
   // Local state (mirrors server state)
-  const [currentStepIndex, setCurrentStepIndex] = useState(initialState?.current_step_index ?? 0);
-  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(initialState?.current_phase_index ?? 0);
+  // Use -1 as default to indicate "not started yet"
+  const [currentStepIndex, setCurrentStepIndex] = useState(initialState?.current_step_index ?? -1);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(initialState?.current_phase_index ?? -1);
   const [timerState, setTimerState] = useState<TimerState | null>(initialState?.timer_state ?? null);
   const [boardMessage, setBoardMessage] = useState(initialState?.board_state?.message ?? '');
   const [status, setStatus] = useState<SessionRuntimeState['status']>(initialState?.status ?? 'active');
@@ -429,6 +430,7 @@ export function FacilitatorDashboard({
             onPhaseChange={handlePhaseChange}
             disabled={isSaving || status === 'ended'}
             showPhases={phases.length > 0}
+            unified
           />
         </div>
         

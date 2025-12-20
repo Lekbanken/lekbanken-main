@@ -131,6 +131,7 @@ export function ParticipantPlayMode({
       sessionCode={sessionCode}
       gameTitle={playData.gameTitle}
       steps={playData.steps}
+      phases={playData.phases}
       role={role}
       initialState={playData.runtimeState}
       participantName={playData.participantName}

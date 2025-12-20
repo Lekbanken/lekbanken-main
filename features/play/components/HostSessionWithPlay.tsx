@@ -40,7 +40,11 @@ import {
   ShareIcon, 
   QrCodeIcon,
   ExclamationCircleIcon,
+  UsersIcon,
+  UserGroupIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
+import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs';
 import type { SessionRole } from '@/types/play-runtime';
 
 const POLL_INTERVAL = 3000;
@@ -84,6 +88,9 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   
   // Play mode state
   const [isPlayMode, setIsPlayMode] = useState(false);
+  
+  // Lobby tabs state
+  const { activeTab: lobbyTab, setActiveTab: setLobbyTab } = useTabs('participants');
 
   const isLive = session?.status === 'active' || session?.status === 'paused';
   const hasGame = Boolean(session?.gameId);
@@ -433,6 +440,12 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   }
 
   // Regular lobby view
+  const lobbyTabs = [
+    { id: 'participants', label: 'Deltagare', icon: <UsersIcon className="h-4 w-4" />, badge: participants.length },
+    { id: 'roles', label: 'Roller', icon: <UserGroupIcon className="h-4 w-4" /> },
+    { id: 'settings', label: 'Inställningar', icon: <Cog6ToothIcon className="h-4 w-4" /> },
+  ];
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -488,172 +501,183 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         );
       })()}
 
-      {/* Main content */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Left column - Controls & Share */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Controls */}
+      {/* Lobby Tabs Navigation */}
+      <Tabs
+        tabs={lobbyTabs}
+        activeTab={lobbyTab}
+        onChange={setLobbyTab}
+        variant="underline"
+        size="md"
+      />
+
+      {/* Tab Content */}
+      <TabPanel id="participants" activeTab={lobbyTab} className="space-y-6">
+        <Card variant="elevated" className="p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Deltagare ({participants.length})
+          </h2>
+          <ParticipantList
+            participants={participants.map((p) => ({
+              id: p.id,
+              displayName: p.displayName,
+              status: p.status,
+              role: p.role,
+              position: p.position,
+              isNextStarter: p.isNextStarter,
+            }))}
+            showActions
+            isSessionEnded={session.status === 'ended'}
+            onKick={handleKick}
+            onBlock={handleBlock}
+            onSetNextStarter={handleSetNextStarter}
+            onSetPosition={handleSetPosition}
+          />
+        </Card>
+
+        {/* Share section for live sessions */}
+        {isLive && (
           <Card variant="elevated" className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Sessionskontroller
+              Dela session
             </h2>
-            <SessionControls
-              status={session.status}
-              onPause={() => doAction('pause')}
-              onResume={() => doAction('resume')}
-              onEnd={() => doAction('end')}
-              onShare={handleShare}
-              isLoading={actionPending}
-              loadingAction={loadingAction}
-              variant="full"
-            />
-          </Card>
-
-          {/* Share section for live sessions */}
-          {isLive && (
-            <Card variant="elevated" className="p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-4">
-                Dela session
-              </h2>
-              <div className="flex flex-col sm:flex-row gap-4 items-center">
-                {/* Large code display */}
-                <div className="flex-1 text-center sm:text-left">
-                  <p className="text-sm text-muted-foreground mb-1">Sessionskod</p>
-                  <p className="text-4xl font-mono font-bold text-primary tracking-widest">
-                    {session.sessionCode}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Deltagare går till <span className="font-medium">lekbanken.se/play</span>
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={handleShare}>
-                    <ShareIcon className="h-4 w-4" />
-                    {copied ? 'Kopierad!' : 'Dela'}
-                  </Button>
-                  <Button variant="outline" disabled>
-                    <QrCodeIcon className="h-4 w-4" />
-                    QR-kod
-                  </Button>
-                </div>
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+              {/* Large code display */}
+              <div className="flex-1 text-center sm:text-left">
+                <p className="text-sm text-muted-foreground mb-1">Sessionskod</p>
+                <p className="text-4xl font-mono font-bold text-primary tracking-widest">
+                  {session.sessionCode}
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  Deltagare går till <span className="font-medium">lekbanken.se/play</span>
+                </p>
               </div>
-            </Card>
-          )}
 
-          {/* Role assignment (Lobby) */}
-          {hasGame && !isEnded && (
-            <Card variant="elevated" className="p-6">
+              {/* Actions */}
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleShare}>
+                  <ShareIcon className="h-4 w-4" />
+                  {copied ? 'Kopierad!' : 'Dela'}
+                </Button>
+                <Button variant="outline" disabled>
+                  <QrCodeIcon className="h-4 w-4" />
+                  QR-kod
+                </Button>
+              </div>
+            </div>
+          </Card>
+        )}
+      </TabPanel>
+
+      <TabPanel id="roles" activeTab={lobbyTab} className="space-y-6">
+        {hasGame && !isEnded ? (
+          <Card variant="elevated" className="p-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Roller</h2>
+                <p className="text-sm text-muted-foreground">
+                  Tilldela roller i lobbyn innan ni går in i aktiv session.
+                </p>
+              </div>
+              {sessionRoles.length === 0 && (
+                <Button variant="outline" onClick={handleSnapshotRoles} disabled={rolesLoading}>
+                  Kopiera roller från spel
+                </Button>
+              )}
+            </div>
+
+            {rolesError && (
+              <div className="mt-4 text-sm text-destructive">{rolesError}</div>
+            )}
+
+            <div className="mt-4">
+              {rolesLoading ? (
+                <Skeleton className="h-24 w-full" />
+              ) : (
+                <RoleAssignerContainer
+                  sessionId={sessionId}
+                  sessionRoles={sessionRoles}
+                  onAssignmentComplete={() => void loadRoles()}
+                />
+              )}
+            </div>
+
+            <div className="mt-6 border-t border-border pt-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold text-foreground">Roller</h2>
+                  <h3 className="text-base font-semibold text-foreground">Hemliga instruktioner</h3>
                   <p className="text-sm text-muted-foreground">
-                    Tilldela roller i lobbyn innan ni går in i aktiv session.
+                    Lås upp när alla har fått en roll. Du kan bara låsa igen om ingen har hunnit visa sina hemligheter.
                   </p>
                 </div>
-                {sessionRoles.length === 0 && (
-                  <Button variant="outline" onClick={handleSnapshotRoles} disabled={rolesLoading}>
-                    Kopiera roller från spel
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => void handleSecretsAction('relock')}
+                    disabled={
+                      secretsLoading ||
+                      !secretsStatus?.unlockedAt ||
+                      (secretsStatus.revealedCount ?? 0) > 0
+                    }
+                  >
+                    Lås igen
                   </Button>
-                )}
+                  <Button
+                    onClick={() => void handleSecretsAction('unlock')}
+                    disabled={
+                      secretsLoading ||
+                      Boolean(secretsStatus?.unlockedAt) ||
+                      (secretsStatus?.participantCount ?? 0) > 0 &&
+                        (secretsStatus?.assignedCount ?? 0) < (secretsStatus?.participantCount ?? 0)
+                    }
+                  >
+                    Lås upp
+                  </Button>
+                </div>
               </div>
 
-              {rolesError && (
-                <div className="mt-4 text-sm text-destructive">{rolesError}</div>
+              {secretsError && (
+                <div className="mt-2 text-sm text-destructive">{secretsError}</div>
               )}
 
-              <div className="mt-4">
-                {rolesLoading ? (
-                  <Skeleton className="h-24 w-full" />
-                ) : (
-                  <RoleAssignerContainer
-                    sessionId={sessionId}
-                    sessionRoles={sessionRoles}
-                    onAssignmentComplete={() => void loadRoles()}
-                  />
-                )}
-              </div>
-
-              <div className="mt-6 border-t border-border pt-4">
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <h3 className="text-base font-semibold text-foreground">Hemliga instruktioner</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Lås upp när alla har fått en roll. Du kan bara låsa igen om ingen har hunnit visa sina hemligheter.
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => void handleSecretsAction('relock')}
-                      disabled={
-                        secretsLoading ||
-                        !secretsStatus?.unlockedAt ||
-                        (secretsStatus.revealedCount ?? 0) > 0
-                      }
-                    >
-                      Lås igen
-                    </Button>
-                    <Button
-                      onClick={() => void handleSecretsAction('unlock')}
-                      disabled={
-                        secretsLoading ||
-                        Boolean(secretsStatus?.unlockedAt) ||
-                        (secretsStatus?.participantCount ?? 0) > 0 &&
-                          (secretsStatus?.assignedCount ?? 0) < (secretsStatus?.participantCount ?? 0)
-                      }
-                    >
-                      Lås upp
-                    </Button>
-                  </div>
+              {secretsStatus && (
+                <div className="mt-3 text-sm text-muted-foreground">
+                  Status: {secretsStatus.unlockedAt ? 'Upplåst' : 'Låst'} · Deltagare: {secretsStatus.participantCount} · Tilldelade: {secretsStatus.assignedCount} · Visade: {secretsStatus.revealedCount}
                 </div>
+              )}
 
-                {secretsError && (
-                  <div className="mt-2 text-sm text-destructive">{secretsError}</div>
-                )}
-
-                {secretsStatus && (
-                  <div className="mt-3 text-sm text-muted-foreground">
-                    Status: {secretsStatus.unlockedAt ? 'Upplåst' : 'Låst'} · Deltagare: {secretsStatus.participantCount} · Tilldelade: {secretsStatus.assignedCount} · Visade: {secretsStatus.revealedCount}
-                  </div>
-                )}
-
-                {secretsStatus && !secretsStatus.unlockedAt && secretsStatus.participantCount > 0 && secretsStatus.assignedCount < secretsStatus.participantCount && (
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    Tips: Du kan låsa upp när alla har en roll.
-                  </div>
-                )}
-              </div>
-            </Card>
-          )}
-        </div>
-
-        {/* Right column - Participants */}
-        <div>
-          <Card variant="elevated" className="p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              Deltagare
-            </h2>
-            <ParticipantList
-              participants={participants.map((p) => ({
-                id: p.id,
-                displayName: p.displayName,
-                status: p.status,
-                role: p.role,
-                position: p.position,
-                isNextStarter: p.isNextStarter,
-              }))}
-              showActions
-              isSessionEnded={session.status === 'ended'}
-              onKick={handleKick}
-              onBlock={handleBlock}
-              onSetNextStarter={handleSetNextStarter}
-              onSetPosition={handleSetPosition}
-            />
+              {secretsStatus && !secretsStatus.unlockedAt && secretsStatus.participantCount > 0 && secretsStatus.assignedCount < secretsStatus.participantCount && (
+                <div className="mt-2 text-sm text-muted-foreground">
+                  Tips: Du kan låsa upp när alla har en roll.
+                </div>
+              )}
+            </div>
           </Card>
-        </div>
-      </div>
+        ) : (
+          <Card variant="elevated" className="p-6">
+            <p className="text-muted-foreground">
+              {isEnded ? 'Sessionen är avslutad.' : 'Inget spel är kopplat till sessionen.'}
+            </p>
+          </Card>
+        )}
+      </TabPanel>
+
+      <TabPanel id="settings" activeTab={lobbyTab} className="space-y-6">
+        <Card variant="elevated" className="p-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">
+            Sessionskontroller
+          </h2>
+          <SessionControls
+            status={session.status}
+            onPause={() => doAction('pause')}
+            onResume={() => doAction('resume')}
+            onEnd={() => doAction('end')}
+            onShare={handleShare}
+            isLoading={actionPending}
+            loadingAction={loadingAction}
+            variant="full"
+          />
+        </Card>
+      </TabPanel>
     </div>
   );
 }

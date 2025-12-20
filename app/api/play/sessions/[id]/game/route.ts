@@ -28,6 +28,7 @@ type StepInfo = {
   safety?: string;
   tag?: string;
   note?: string;
+  leaderScript?: string;
 };
 
 type PhaseInfo = {
@@ -237,6 +238,7 @@ export async function GET(
         duration: durationSeconds,
         materials: materialsRow?.items ?? undefined,
         safety: materialsRow?.safety_notes ?? undefined,
+        leaderScript: s.leader_script ?? undefined,
         // Future fields (kept for compatibility with existing UI)
         tag: undefined,
         note: undefined,

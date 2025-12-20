@@ -25,6 +25,7 @@ export interface StepInfo {
   safety?: string;
   tag?: string;
   note?: string;
+  leaderScript?: string;
 }
 
 export interface PhaseInfo {
@@ -132,9 +133,10 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
     }
     
     // Build runtime state from session
+    // Use -1 as default to indicate "not started yet"
     const runtimeState: Partial<SessionRuntimeState> = {
-      current_step_index: session.currentStepIndex ?? 0,
-      current_phase_index: session.currentPhaseIndex ?? 0,
+      current_step_index: session.currentStepIndex ?? -1,
+      current_phase_index: session.currentPhaseIndex ?? -1,
       timer_state: session.timerState ?? null,
       board_state: session.boardState ?? null,
       status: session.status ?? 'active',
@@ -354,9 +356,10 @@ export async function getParticipantPlaySession(
     }
     
     // Build runtime state
+    // Use -1 as default to indicate "not started yet"
     const runtimeState: Partial<SessionRuntimeState> = {
-      current_step_index: session.currentStepIndex ?? 0,
-      current_phase_index: session.currentPhaseIndex ?? 0,
+      current_step_index: session.currentStepIndex ?? -1,
+      current_phase_index: session.currentPhaseIndex ?? -1,
       timer_state: session.timerState ?? null,
       board_state: session.boardState ?? null,
       secret_instructions_unlocked_at: session.secretInstructionsUnlockedAt ?? null,

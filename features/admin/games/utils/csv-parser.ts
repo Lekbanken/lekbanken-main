@@ -20,6 +20,10 @@ import type {
   ParsedPhase,
   ParsedRole,
   ParsedBoardConfig,
+  ParsedArtifact,
+  ParsedArtifactVariant,
+  ParsedDecisionsPayload,
+  ParsedOutcomesPayload,
   ImportError,
 } from '@/types/csv-import';
 import type { PlayMode, PhaseType, TimerStyle, AssignmentStrategy } from '@/types/games';
@@ -46,6 +50,7 @@ const VALID_STATUSES = ['draft', 'published'];
 const VALID_PHASE_TYPES: PhaseType[] = ['intro', 'round', 'finale', 'break'];
 const VALID_TIMER_STYLES: TimerStyle[] = ['countdown', 'elapsed', 'trafficlight'];
 const VALID_ASSIGNMENT_STRATEGIES: AssignmentStrategy[] = ['random', 'leader_picks', 'player_picks'];
+const VALID_ARTIFACT_VISIBILITY = ['public', 'leader_only', 'role_private'] as const;
 const MAX_STEPS = 20;
 const MAX_TEXT = 10000;
 
@@ -174,35 +179,6 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
   }
   
   // ==========================================================================
-  // Parse steps
-  // ==========================================================================
-  
-  const stepsResult = parseInlineSteps(row, rowNumber);
-  errors.push(...stepsResult.errors);
-  warnings.push(...stepsResult.warnings);
-  
-  // Validate step count
-  const declaredStepCount = parseInteger(row.step_count);
-  if (declaredStepCount !== null && declaredStepCount > MAX_STEPS) {
-    errors.push({
-      row: rowNumber,
-      column: 'step_count',
-      message: `För många steg (${declaredStepCount}). Max ${MAX_STEPS} inline steg stöds. Använd JSON-format för fler.`,
-      severity: 'error',
-    });
-  }
-  
-  // At least one step required
-  if (stepsResult.steps.length === 0) {
-    errors.push({
-      row: rowNumber,
-      column: 'step_1_title',
-      message: 'Minst ett steg krävs (step_1_title och step_1_body)',
-      severity: 'error',
-    });
-  }
-  
-  // ==========================================================================
   // Parse JSON columns
   // ==========================================================================
   
@@ -259,6 +235,27 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
     errors.push({ ...boardConfigResult.error, severity: 'error' });
   }
 
+  // Artifacts (Play primitives)
+  const artifactsResult = parseJsonCell<unknown>(row.artifacts_json, rowNumber, 'artifacts_json');
+  if (!artifactsResult.success) {
+    errors.push({ ...artifactsResult.error, severity: 'error' });
+  }
+  const artifacts = validateArtifacts(
+    artifactsResult.success ? artifactsResult.data : null,
+    rowNumber,
+    warnings
+  );
+
+  // Decisions / Outcomes (currently runtime-only in DB schema)
+  const decisionsResult = parseJsonCell<ParsedDecisionsPayload>(row.decisions_json, rowNumber, 'decisions_json');
+  if (!decisionsResult.success) {
+    errors.push({ ...decisionsResult.error, severity: 'error' });
+  }
+  const outcomesResult = parseJsonCell<ParsedOutcomesPayload>(row.outcomes_json, rowNumber, 'outcomes_json');
+  if (!outcomesResult.success) {
+    errors.push({ ...outcomesResult.error, severity: 'error' });
+  }
+
   // Secondary purposes
   const parseSecondaryPurposes = (): string[] => {
     const rawJson = row.sub_purpose_ids?.trim();
@@ -294,7 +291,64 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
 
     return [];
   };
-  const boardConfig = boardConfigResult.success ? boardConfigResult.data : null;
+  const boardConfig = boardConfigResult.success
+    ? normalizeBoardConfig(boardConfigResult.data, rowNumber, warnings)
+    : null;
+
+  // ==========================================================================
+  // Parse steps (inline) + fallback synthesis from phases
+  // ==========================================================================
+
+  const stepsResult = parseInlineSteps(row, rowNumber);
+  errors.push(...stepsResult.errors);
+  warnings.push(...stepsResult.warnings);
+
+  // Validate step count
+  const declaredStepCount = parseInteger(row.step_count);
+  if (declaredStepCount !== null && declaredStepCount > MAX_STEPS) {
+    errors.push({
+      row: rowNumber,
+      column: 'step_count',
+      message: `För många steg (${declaredStepCount}). Max ${MAX_STEPS} inline steg stöds. Använd JSON-format för fler.`,
+      severity: 'error',
+    });
+  }
+
+  // If no inline steps, synthesize steps from phases for facilitated/participants.
+  // This allows phase-driven CSV rows without step_1_* columns.
+  let steps = stepsResult.steps;
+  if (steps.length === 0 && phases.length > 0 && (playMode === 'facilitated' || playMode === 'participants')) {
+    steps = phases
+      .slice()
+      .sort((a, b) => (a.phase_order ?? 0) - (b.phase_order ?? 0))
+      .map((p) => ({
+        step_order: p.phase_order,
+        title: p.name,
+        body: p.description ?? '',
+        duration_seconds: p.duration_seconds ?? null,
+        leader_script: null,
+        participant_prompt: null,
+        board_text: p.board_message ?? null,
+        optional: false,
+      }));
+
+    warnings.push({
+      row: rowNumber,
+      column: 'steps',
+      message: 'Inga inline-steg hittades; skapade steg automatiskt från phases_json',
+      severity: 'warning',
+    });
+  }
+
+  // At least one step required
+  if (steps.length === 0) {
+    errors.push({
+      row: rowNumber,
+      column: 'step_1_title',
+      message: 'Minst ett steg krävs (antingen inline step_1_* eller phases_json för att auto-generera)',
+      severity: 'error',
+    });
+  }
   
   // ==========================================================================
   // Parse optional fields
@@ -362,12 +416,53 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
     product_id: row.product_id?.trim() || null,
     owner_tenant_id: row.owner_tenant_id?.trim() || null,
     
-    steps: stepsResult.steps,
+    steps,
     materials,
     phases,
     roles,
     boardConfig,
+
+    artifacts: artifacts.length > 0 ? artifacts : undefined,
+    decisions: decisionsResult.success ? decisionsResult.data : undefined,
+    outcomes: outcomesResult.success ? outcomesResult.data : undefined,
   };
+
+  // If decisions/outcomes are provided, validate shape lightly and warn that DB import doesn't persist them yet.
+  if (row.decisions_json?.trim()) {
+    const ok = validateAnyJsonCollection(decisionsResult.success ? decisionsResult.data : null);
+    if (!ok) {
+      warnings.push({
+        row: rowNumber,
+        column: 'decisions_json',
+        message: 'decisions_json bör vara en array eller ett objekt; kontrollera exportformatet',
+        severity: 'warning',
+      });
+    }
+    warnings.push({
+      row: rowNumber,
+      column: 'decisions_json',
+      message: 'decisions_json läses och valideras, men importeras inte till DB (endast runtime-tabeller finns idag)',
+      severity: 'warning',
+    });
+  }
+
+  if (row.outcomes_json?.trim()) {
+    const ok = validateAnyJsonCollection(outcomesResult.success ? outcomesResult.data : null);
+    if (!ok) {
+      warnings.push({
+        row: rowNumber,
+        column: 'outcomes_json',
+        message: 'outcomes_json bör vara en array eller ett objekt; kontrollera exportformatet',
+        severity: 'warning',
+      });
+    }
+    warnings.push({
+      row: rowNumber,
+      column: 'outcomes_json',
+      message: 'outcomes_json läses och valideras, men importeras inte till DB (endast runtime-tabeller finns idag)',
+      severity: 'warning',
+    });
+  }
   
   return { game, errors, warnings };
 }
@@ -458,17 +553,100 @@ function validatePhases(
     return [];
   }
   
-  return phases.map((phase, i) => ({
-    phase_order: phase.phase_order ?? i + 1,
-    name: phase.name || `Fas ${i + 1}`,
-    phase_type: VALID_PHASE_TYPES.includes(phase.phase_type) ? phase.phase_type : 'round',
-    duration_seconds: phase.duration_seconds ?? null,
-    timer_visible: phase.timer_visible ?? true,
-    timer_style: VALID_TIMER_STYLES.includes(phase.timer_style) ? phase.timer_style : 'countdown',
-    description: phase.description ?? null,
-    board_message: phase.board_message ?? null,
-    auto_advance: phase.auto_advance ?? false,
-  }));
+  // Accept common aliases used in external CSV generators:
+  // - phase_index (number) -> phase_order
+  // - title (string) -> name
+  return phases.map((phase, i) => {
+    const rec = phase as unknown as Record<string, unknown>;
+    const phaseOrder =
+      typeof (rec.phase_order as unknown) === 'number'
+        ? (rec.phase_order as number)
+        : typeof rec.phase_index === 'number'
+          ? (rec.phase_index as number)
+          : i + 1;
+
+    const name =
+      (typeof rec.name === 'string' && rec.name.trim())
+        ? rec.name.trim()
+        : (typeof rec.title === 'string' && rec.title.trim())
+          ? rec.title.trim()
+          : `Fas ${i + 1}`;
+
+    const phaseType =
+      (typeof rec.phase_type === 'string' && VALID_PHASE_TYPES.includes(rec.phase_type as PhaseType))
+        ? (rec.phase_type as PhaseType)
+        : 'round';
+
+    const durationSeconds = typeof rec.duration_seconds === 'number' ? (rec.duration_seconds as number) : null;
+    const timerVisible = typeof rec.timer_visible === 'boolean' ? (rec.timer_visible as boolean) : true;
+    const timerStyle =
+      (typeof rec.timer_style === 'string' && VALID_TIMER_STYLES.includes(rec.timer_style as TimerStyle))
+        ? (rec.timer_style as TimerStyle)
+        : 'countdown';
+
+    const description = typeof rec.description === 'string' ? (rec.description as string) : null;
+    const boardMessage = typeof rec.board_message === 'string' ? (rec.board_message as string) : null;
+    const autoAdvance = typeof rec.auto_advance === 'boolean' ? (rec.auto_advance as boolean) : false;
+
+    return {
+      phase_order: phaseOrder,
+      name,
+      phase_type: phaseType,
+      duration_seconds: durationSeconds,
+      timer_visible: timerVisible,
+      timer_style: timerStyle,
+      description,
+      board_message: boardMessage,
+      auto_advance: autoAdvance,
+    };
+  });
+}
+
+function normalizeBoardConfig(
+  raw: ParsedBoardConfig | null,
+  rowNumber: number,
+  warnings: ImportError[]
+): ParsedBoardConfig | null {
+  if (!raw || typeof raw !== 'object') return null;
+
+  const rec = raw as unknown as Record<string, unknown>;
+
+  // Map legacy keys -> current schema
+  const showCurrentPhase =
+    typeof rec.show_current_phase === 'boolean'
+      ? (rec.show_current_phase as boolean)
+      : typeof rec.show_phase === 'boolean'
+        ? (rec.show_phase as boolean)
+        : true;
+
+  const showTimer = typeof rec.show_timer === 'boolean' ? (rec.show_timer as boolean) : true;
+
+  // Theme: accept anything but coerce to known themes
+  const themeRaw = typeof rec.theme === 'string' ? rec.theme : 'neutral';
+  const allowedThemes = new Set(['mystery', 'party', 'sport', 'nature', 'neutral']);
+  const theme = allowedThemes.has(themeRaw) ? (themeRaw as ParsedBoardConfig['theme']) : 'neutral';
+  if (theme !== themeRaw) {
+    warnings.push({
+      row: rowNumber,
+      column: 'board_config_json',
+      message: `Okänt board theme "${themeRaw}"; använder 'neutral'`,
+      severity: 'warning',
+    });
+  }
+
+  return {
+    show_game_name: typeof rec.show_game_name === 'boolean' ? (rec.show_game_name as boolean) : true,
+    show_current_phase: showCurrentPhase,
+    show_timer: showTimer,
+    show_participants: typeof rec.show_participants === 'boolean' ? (rec.show_participants as boolean) : true,
+    show_public_roles: typeof rec.show_public_roles === 'boolean' ? (rec.show_public_roles as boolean) : true,
+    show_leaderboard: typeof rec.show_leaderboard === 'boolean' ? (rec.show_leaderboard as boolean) : false,
+    show_qr_code: typeof rec.show_qr_code === 'boolean' ? (rec.show_qr_code as boolean) : false,
+    welcome_message: typeof rec.welcome_message === 'string' ? (rec.welcome_message as string) : null,
+    theme,
+    background_color: typeof rec.background_color === 'string' ? (rec.background_color as string) : null,
+    layout_variant: typeof rec.layout_variant === 'string' ? (rec.layout_variant as ParsedBoardConfig['layout_variant']) : 'standard',
+  };
 }
 
 function validateRoles(
@@ -506,6 +684,150 @@ function validateRoles(
     scaling_rules: role.scaling_rules ?? null,
     conflicts_with: Array.isArray(role.conflicts_with) ? role.conflicts_with : [],
   }));
+}
+
+function validateArtifacts(
+  raw: unknown,
+  rowNumber: number,
+  warnings: ImportError[]
+): ParsedArtifact[] {
+  if (raw === null || raw === undefined) return [];
+
+  const artifactsArray: unknown[] =
+    Array.isArray(raw)
+      ? raw
+      : (typeof raw === 'object' && raw !== null && Array.isArray((raw as Record<string, unknown>).artifacts))
+        ? ((raw as Record<string, unknown>).artifacts as unknown[])
+        : [];
+
+  if (artifactsArray.length === 0) {
+    warnings.push({
+      row: rowNumber,
+      column: 'artifacts_json',
+      message: 'artifacts_json finns men kunde inte tolkas som en array (förväntar array eller { artifacts: [...] })',
+      severity: 'warning',
+    });
+    return [];
+  }
+
+  const artifacts: ParsedArtifact[] = [];
+
+  for (let i = 0; i < artifactsArray.length; i++) {
+    const item = artifactsArray[i];
+    if (typeof item !== 'object' || item === null) continue;
+    const rec = item as Record<string, unknown>;
+
+    const title = typeof rec.title === 'string' ? rec.title.trim() : '';
+    if (!title) {
+      warnings.push({
+        row: rowNumber,
+        column: 'artifacts_json',
+        message: `Artefakt #${i + 1} saknar title; ignorerar`,
+        severity: 'warning',
+      });
+      continue;
+    }
+
+    const artifactOrder =
+      typeof rec.artifact_order === 'number'
+        ? (rec.artifact_order as number)
+        : typeof rec.order === 'number'
+          ? (rec.order as number)
+          : i + 1;
+
+    const locale = typeof rec.locale === 'string' ? rec.locale : null;
+    const description = typeof rec.description === 'string' ? rec.description : null;
+    const artifactType = typeof rec.artifact_type === 'string' ? rec.artifact_type : 'card';
+    const tags = Array.isArray(rec.tags) ? (rec.tags.map((t) => String(t)).filter(Boolean) as string[]) : [];
+
+    const variantsRaw =
+      Array.isArray(rec.variants)
+        ? (rec.variants as unknown[])
+        : Array.isArray(rec.items)
+          ? (rec.items as unknown[])
+          : [];
+
+    const variants: ParsedArtifactVariant[] = [];
+    for (let j = 0; j < variantsRaw.length; j++) {
+      const v = variantsRaw[j];
+      if (typeof v !== 'object' || v === null) continue;
+      const vrec = v as Record<string, unknown>;
+
+      const variantOrder =
+        typeof vrec.variant_order === 'number'
+          ? (vrec.variant_order as number)
+          : typeof vrec.order === 'number'
+            ? (vrec.order as number)
+            : j + 1;
+
+      const visibilityRaw = typeof vrec.visibility === 'string' ? vrec.visibility : 'public';
+      const visibility = (VALID_ARTIFACT_VISIBILITY as readonly string[]).includes(visibilityRaw)
+        ? (visibilityRaw as (typeof VALID_ARTIFACT_VISIBILITY)[number])
+        : 'public';
+
+      if (visibility !== visibilityRaw) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Variant #${j + 1} i artefakt "${title}": okänd visibility "${visibilityRaw}"; använder 'public'`,
+          severity: 'warning',
+        });
+      }
+
+      const variantTitle = typeof vrec.title === 'string' ? vrec.title : null;
+      const body = typeof vrec.body === 'string' ? vrec.body : null;
+      const mediaRef = typeof vrec.media_ref === 'string' ? vrec.media_ref : null;
+
+      const visibleToRoleId = typeof vrec.visible_to_role_id === 'string' ? vrec.visible_to_role_id : null;
+      const visibleToRoleOrder = typeof vrec.visible_to_role_order === 'number' ? vrec.visible_to_role_order : null;
+      const visibleToRoleName = typeof vrec.visible_to_role_name === 'string' ? vrec.visible_to_role_name : null;
+
+      const metadata = (typeof vrec.metadata === 'object' && vrec.metadata !== null) ? (vrec.metadata as Record<string, unknown>) : null;
+
+      variants.push({
+        variant_order: variantOrder,
+        visibility,
+        visible_to_role_id: visibleToRoleId,
+        visible_to_role_order: visibleToRoleOrder,
+        visible_to_role_name: visibleToRoleName,
+        title: variantTitle,
+        body,
+        media_ref: mediaRef,
+        metadata,
+      });
+    }
+
+    if (variants.length === 0) {
+      warnings.push({
+        row: rowNumber,
+        column: 'artifacts_json',
+        message: `Artefakt "${title}" saknar variants; importerar artefakten utan variants`,
+        severity: 'warning',
+      });
+    }
+
+    const metadata = (typeof rec.metadata === 'object' && rec.metadata !== null) ? (rec.metadata as Record<string, unknown>) : null;
+
+    artifacts.push({
+      artifact_order: artifactOrder,
+      locale,
+      title,
+      description,
+      artifact_type: artifactType,
+      tags,
+      metadata,
+      variants,
+    });
+  }
+
+  return artifacts;
+}
+
+function validateAnyJsonCollection(value: unknown): boolean {
+  if (value === null || value === undefined) return true;
+  if (Array.isArray(value)) return true;
+  if (typeof value === 'object') return true;
+  return false;
 }
 
 // =============================================================================

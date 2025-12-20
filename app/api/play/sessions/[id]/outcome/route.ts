@@ -179,3 +179,87 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   return jsonError('Unknown action', 400);
 }
+
+type OutcomePutBody = {
+  id?: string;
+  title: string;
+  body?: string | null;
+  outcome_type?: string;
+  related_decision_id?: string | null;
+  revealed?: boolean;
+};
+
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id: sessionId } = await params;
+
+  const supabase = await createServerRlsClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) return jsonError('Unauthorized', 401);
+
+  const session = await ParticipantSessionService.getSessionById(sessionId);
+  if (!session) return jsonError('Session not found', 404);
+  if (session.host_user_id !== user.id) return jsonError('Only host can manage outcomes', 403);
+
+  const raw = (await request.json().catch(() => null)) as OutcomePutBody | null;
+  if (!raw || typeof raw !== 'object') return jsonError('Invalid body', 400);
+
+  const title = typeof raw.title === 'string' ? raw.title.trim() : '';
+  if (!title) return jsonError('Missing title', 400);
+
+  const outcomeType = typeof raw.outcome_type === 'string' ? raw.outcome_type : 'text';
+  const outcomeBody = typeof raw.body === 'string' ? raw.body : null;
+  const revealedAt = raw.revealed ? new Date().toISOString() : null;
+
+  const service = await createServiceRoleClient();
+
+  if (raw.id) {
+    const { error } = await service
+      .from('session_outcomes')
+      .update({
+        title,
+        body: outcomeBody,
+        outcome_type: outcomeType,
+        related_decision_id: raw.related_decision_id ?? null,
+        revealed_at: revealedAt,
+      })
+      .eq('id', raw.id)
+      .eq('session_id', sessionId);
+
+    if (error) return jsonError('Failed to update outcome', 500);
+
+    await broadcastPlayEvent(sessionId, {
+      type: 'outcome_update',
+      payload: { action: 'updated', outcome_id: raw.id },
+      timestamp: new Date().toISOString(),
+    });
+
+    return NextResponse.json({ success: true, id: raw.id }, { status: 200 });
+  }
+
+  const { data, error } = await service
+    .from('session_outcomes')
+    .insert({
+      session_id: sessionId,
+      title,
+      body: outcomeBody,
+      outcome_type: outcomeType,
+      related_decision_id: raw.related_decision_id ?? null,
+      revealed_at: revealedAt,
+      created_by: user.id,
+    })
+    .select('id')
+    .single();
+
+  if (error || !data) return jsonError('Failed to create outcome', 500);
+
+  await broadcastPlayEvent(sessionId, {
+    type: 'outcome_update',
+    payload: { action: 'created', outcome_id: data.id },
+    timestamp: new Date().toISOString(),
+  });
+
+  return NextResponse.json({ success: true, id: data.id }, { status: 201 });
+}

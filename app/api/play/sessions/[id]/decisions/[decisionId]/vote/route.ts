@@ -78,24 +78,21 @@ export async function POST(
   // Enforce single-choice: clear previous votes for this decision + participant
   const participantId = participant.id as string;
 
-  const { error: delErr } = await service
+  const { error: upsertErr } = await service
     .from('session_votes')
-    .delete()
-    .eq('decision_id', decisionId)
-    .eq('participant_id', participantId);
+    .upsert(
+      {
+        decision_id: decisionId,
+        participant_id: participantId,
+        option_key: optionKey,
+        value: {},
+      },
+      {
+        onConflict: 'decision_id,participant_id',
+      }
+    );
 
-  if (delErr) return jsonError('Failed to record vote', 500);
-
-  const { error: insErr } = await service
-    .from('session_votes')
-    .insert({
-      decision_id: decisionId,
-      participant_id: participantId,
-      option_key: optionKey,
-      value: {},
-    });
-
-  if (insErr) return jsonError('Failed to record vote', 500);
+  if (upsertErr) return jsonError('Failed to record vote', 500);
 
   // Broadcast without participant identity
   await broadcastPlayEvent(sessionId, {

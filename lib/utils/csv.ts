@@ -69,6 +69,13 @@ export function parseCSV<T extends Record<string, string> = Record<string, strin
     const nextChar = content[i + 1];
     
     if (inQuotes) {
+      // Non-standard but common: allow JSON-style backslash escaping inside quoted CSV fields.
+      // Example: " inside a quoted cell.
+      if (char === '\\' && nextChar === '"') {
+        currentField += '"';
+        i++; // Skip the escaped quote
+        continue;
+      }
       if (char === '"') {
         if (nextChar === '"') {
           // Escaped quote

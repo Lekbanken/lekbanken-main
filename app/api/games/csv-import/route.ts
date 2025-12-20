@@ -97,6 +97,10 @@ export async function POST(request: Request) {
           phases: item.phases || [],
           roles: item.roles || [],
           boardConfig: item.boardConfig || null,
+
+          artifacts: item.artifacts || undefined,
+          decisions: item.decisions || undefined,
+          outcomes: item.outcomes || undefined,
         }));
       } catch {
         return NextResponse.json(
@@ -274,7 +278,7 @@ export async function POST(request: Request) {
         skipped: failedCount,
       },
       errors: importErrors,
-      warnings: validationResult.allWarnings,
+      warnings: [...parseWarnings, ...validationResult.allWarnings],
     });
 
   } catch (error) {
@@ -303,6 +307,9 @@ async function importRelatedData(
     await db.from('game_roles').delete().eq('game_id', gameId);
     await db.from('game_board_config').delete().eq('game_id', gameId);
     await db.from('game_secondary_purposes').delete().eq('game_id', gameId);
+
+    // Play primitives (artifacts) - delete artifacts by game_id (variants cascade)
+    await db.from('game_artifacts').delete().eq('game_id', gameId);
   }
 
   // Insert secondary purposes (sub-purposes)
@@ -393,5 +400,70 @@ async function importRelatedData(
       background_color: game.boardConfig.background_color,
       layout_variant: game.boardConfig.layout_variant,
     });
+  }
+
+  // Insert artifacts (author-time primitives)
+  if (game.artifacts && game.artifacts.length > 0) {
+    // Build a role map for resolving visible_to_role_* aliases
+    const { data: roleRows } = await db
+      .from('game_roles')
+      .select('id, role_order, name')
+      .eq('game_id', gameId);
+
+    const roleByOrder = new Map<number, string>();
+    const roleByName = new Map<string, string>();
+    for (const r of roleRows ?? []) {
+      if (typeof r.role_order === 'number' && r.id) roleByOrder.set(r.role_order as number, r.id as string);
+      if (typeof r.name === 'string' && r.id) roleByName.set((r.name as string).toLowerCase(), r.id as string);
+    }
+
+    for (const artifact of game.artifacts) {
+      const { data: insertedArtifact, error: aErr } = await db
+        .from('game_artifacts')
+        .insert({
+          game_id: gameId,
+          locale: artifact.locale,
+          title: artifact.title,
+          description: artifact.description,
+          artifact_type: artifact.artifact_type,
+          artifact_order: artifact.artifact_order,
+          tags: artifact.tags,
+          metadata: artifact.metadata ?? {},
+        })
+        .select('id')
+        .single();
+
+      if (aErr || !insertedArtifact?.id) {
+        throw new Error(aErr?.message || 'Kunde inte skapa game_artifact');
+      }
+
+      const artifactId = insertedArtifact.id as string;
+
+      if (artifact.variants && artifact.variants.length > 0) {
+        const variantRows = artifact.variants.map((v) => {
+          let visibleToRoleId = v.visible_to_role_id ?? null;
+          if (!visibleToRoleId && typeof v.visible_to_role_order === 'number') {
+            visibleToRoleId = roleByOrder.get(v.visible_to_role_order) ?? null;
+          }
+          if (!visibleToRoleId && typeof v.visible_to_role_name === 'string') {
+            visibleToRoleId = roleByName.get(v.visible_to_role_name.toLowerCase()) ?? null;
+          }
+
+          return {
+            artifact_id: artifactId,
+            visibility: v.visibility,
+            visible_to_role_id: visibleToRoleId,
+            title: v.title,
+            body: v.body,
+            media_ref: v.media_ref ?? null,
+            variant_order: v.variant_order,
+            metadata: v.metadata ?? {},
+          };
+        });
+
+        const { error: vErr } = await db.from('game_artifact_variants').insert(variantRows);
+        if (vErr) throw new Error(vErr.message);
+      }
+    }
   }
 }

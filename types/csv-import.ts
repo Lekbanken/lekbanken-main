@@ -71,6 +71,9 @@ export type CsvGameRow = {
   phases_json?: string;
   roles_json?: string;
   board_config_json?: string;
+  artifacts_json?: string;
+  decisions_json?: string;
+  outcomes_json?: string;
   
   // Inline steps (step_1_title, step_1_body, step_1_duration, etc.)
   // These are dynamic and handled separately
@@ -139,6 +142,39 @@ export type ParsedBoardConfig = {
   layout_variant: BoardLayout;
 };
 
+// =============================================================================
+// Play primitives (author-time) via CSV
+// =============================================================================
+
+export type ParsedArtifactVisibility = 'public' | 'leader_only' | 'role_private';
+
+export type ParsedArtifactVariant = {
+  variant_order: number;
+  visibility: ParsedArtifactVisibility;
+  visible_to_role_id?: string | null;
+  /** Optional aliases that can be resolved during import */
+  visible_to_role_order?: number | null;
+  visible_to_role_name?: string | null;
+  title: string | null;
+  body: string | null;
+  media_ref?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+export type ParsedArtifact = {
+  artifact_order: number;
+  locale: string | null;
+  title: string;
+  description: string | null;
+  artifact_type: string;
+  tags: string[];
+  metadata?: Record<string, unknown> | null;
+  variants: ParsedArtifactVariant[];
+};
+
+export type ParsedDecisionsPayload = unknown;
+export type ParsedOutcomesPayload = unknown;
+
 export type ParsedGame = {
   // Identity
   game_key: string;
@@ -178,6 +214,11 @@ export type ParsedGame = {
   phases: ParsedPhase[];
   roles: ParsedRole[];
   boardConfig: ParsedBoardConfig | null;
+
+  /** Optional play primitives provided by newer CSV generators */
+  artifacts?: ParsedArtifact[];
+  decisions?: ParsedDecisionsPayload;
+  outcomes?: ParsedOutcomesPayload;
 };
 
 // =============================================================================

@@ -36,6 +36,29 @@ export interface PhaseInfo {
   duration?: number | null;
 }
 
+export interface AdminOverrides {
+  steps?: Array<{
+    id: string;
+    title?: string;
+    description?: string;
+    durationMinutes?: number;
+    order?: number;
+  }>;
+  phases?: Array<{
+    id: string;
+    name?: string;
+    description?: string;
+    duration?: number | null;
+    order?: number;
+  }>;
+  safety?: {
+    safetyNotes?: string;
+    accessibilityNotes?: string;
+    spaceRequirements?: string;
+    leaderTips?: string;
+  };
+}
+
 // =============================================================================
 // Types
 // =============================================================================
@@ -156,6 +179,67 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
   } catch (error) {
     console.error('[getHostPlaySession] Error:', error);
     return null;
+  }
+}
+
+// =============================================================================
+// Admin Overrides API
+// =============================================================================
+
+export async function getSessionOverrides(sessionId: string): Promise<AdminOverrides | null> {
+  try {
+    const res = await fetch(`/api/play/sessions/${sessionId}/overrides`, { cache: 'no-store' });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { overrides?: AdminOverrides };
+    return data.overrides ?? null;
+  } catch (error) {
+    console.error('[getSessionOverrides] Error:', error);
+    return null;
+  }
+}
+
+export async function updateSessionOverrides(
+  sessionId: string,
+  overrides: AdminOverrides
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/play/sessions/${sessionId}/overrides`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(overrides),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error('[updateSessionOverrides] Error:', error);
+    return false;
+  }
+}
+
+export type SessionRoleUpdate = {
+  id: string;
+  name?: string;
+  public_description?: string;
+  private_instructions?: string;
+  min_count?: number;
+  max_count?: number | null;
+  icon?: string | null;
+  color?: string | null;
+};
+
+export async function updateSessionRoles(
+  sessionId: string,
+  roles: SessionRoleUpdate[]
+): Promise<boolean> {
+  try {
+    const res = await fetch(`/api/play/sessions/${sessionId}/roles`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roles }),
+    });
+    return res.ok;
+  } catch (error) {
+    console.error('[updateSessionRoles] Error:', error);
+    return false;
   }
 }
 

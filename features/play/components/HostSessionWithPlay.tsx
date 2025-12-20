@@ -46,6 +46,8 @@ import {
 } from '@heroicons/react/24/outline';
 import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs';
 import type { SessionRole } from '@/types/play-runtime';
+import type { AdminOverrides, SessionRoleUpdate, StepInfo as GameStepInfo, PhaseInfo as GamePhaseInfo } from '@/features/play/api/session-api';
+import { getSessionOverrides, updateSessionOverrides, updateSessionRoles } from '@/features/play/api/session-api';
 
 const POLL_INTERVAL = 3000;
 
@@ -75,6 +77,22 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   const [sessionRoles, setSessionRoles] = useState<SessionRole[]>([]);
   const [rolesLoading, setRolesLoading] = useState(false);
   const [rolesError, setRolesError] = useState<string | null>(null);
+
+  // Session overrides (steps, phases, safety)
+  const [overridesLoading, setOverridesLoading] = useState(false);
+
+  // Game structure (to display editable fields)
+  const [gameSteps, setGameSteps] = useState<GameStepInfo[]>([]);
+  const [gamePhases, setGamePhases] = useState<GamePhaseInfo[]>([]);
+  const [gameSafety, setGameSafety] = useState<AdminOverrides['safety'] | undefined>(undefined);
+
+  // Draft state for overrides
+  const [stepDrafts, setStepDrafts] = useState<Record<string, Partial<GameStepInfo> & { order?: number }>>({});
+  const [phaseDrafts, setPhaseDrafts] = useState<Record<string, Partial<GamePhaseInfo> & { order?: number }>>({});
+  const [safetyDraft, setSafetyDraft] = useState<AdminOverrides['safety'] | undefined>(undefined);
+
+  // Draft state for roles
+  const [roleDrafts, setRoleDrafts] = useState<Record<string, SessionRoleUpdate>>({});
 
   // Secret instructions controls (host)
   const [secretsLoading, setSecretsLoading] = useState(false);
@@ -132,6 +150,20 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       }
       const data = (await res.json()) as { roles?: SessionRole[] };
       setSessionRoles(data.roles ?? []);
+      const drafts: Record<string, SessionRoleUpdate> = {};
+      (data.roles ?? []).forEach((role) => {
+        drafts[role.id] = {
+          id: role.id,
+          name: role.name,
+          public_description: (role as { public_description?: string }).public_description,
+          private_instructions: (role as { private_instructions?: string }).private_instructions,
+          min_count: (role as { min_count?: number }).min_count,
+          max_count: (role as { max_count?: number | null }).max_count,
+          icon: (role as { icon?: string | null }).icon,
+          color: (role as { color?: string | null }).color,
+        };
+      });
+      setRoleDrafts(drafts);
       setRolesError(null);
     } catch (err) {
       setRolesError(err instanceof Error ? err.message : 'Kunde inte ladda roller');
@@ -165,13 +197,61 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     }
   }, [sessionId]);
 
+  const loadGameStructure = useCallback(async () => {
+    setOverridesLoading(true);
+    try {
+      const [gameRes, overridesRes] = await Promise.all([
+        fetch(`/api/play/sessions/${sessionId}/game`, { cache: 'no-store' }),
+        getSessionOverrides(sessionId),
+      ]);
+
+      if (gameRes.ok) {
+        const data = await gameRes.json();
+        setGameSteps((data.steps as GameStepInfo[]) ?? []);
+        setGamePhases((data.phases as GamePhaseInfo[]) ?? []);
+        setGameSafety((data.safety as AdminOverrides['safety']) ?? undefined);
+
+        const stepDraftInit: Record<string, Partial<GameStepInfo> & { order?: number }> = {};
+        for (const step of (data.steps as GameStepInfo[]) ?? []) {
+          stepDraftInit[step.id] = {
+            title: step.title,
+            description: step.description,
+            durationMinutes: step.durationMinutes,
+            order: step.index,
+          };
+        }
+        setStepDrafts(stepDraftInit);
+
+        const phaseDraftInit: Record<string, Partial<GamePhaseInfo> & { order?: number }> = {};
+        for (const phase of (data.phases as GamePhaseInfo[]) ?? []) {
+          phaseDraftInit[phase.id] = {
+            name: phase.name,
+            description: phase.description,
+            duration: phase.duration,
+            order: phase.index,
+          };
+        }
+        setPhaseDrafts(phaseDraftInit);
+      }
+
+      if (overridesRes) {
+        if (overridesRes.safety) setSafetyDraft(overridesRes.safety);
+      }
+    } catch (err) {
+      console.error('[HostSessionWithPlay] loadGameStructure error', err);
+    } finally {
+      setOverridesLoading(false);
+    }
+  }, [sessionId]);
+
   useEffect(() => {
     void loadData();
     void loadRoles();
     void loadSecrets();
+    void loadGameStructure();
     const interval = setInterval(() => void loadData(), POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [loadData, loadRoles, loadSecrets]);
+  }, [loadData, loadRoles, loadSecrets, loadGameStructure]);
 
   const handleSnapshotRoles = async () => {
     setRolesLoading(true);
@@ -362,6 +442,67 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     if (action === 'end_session') {
       await updateSessionStatus(sessionId, 'end');
       await loadData();
+    }
+  };
+
+  const handleSaveOverrides = async () => {
+    setOverridesLoading(true);
+    try {
+      const payload: AdminOverrides = {
+        steps: Object.entries(stepDrafts).map(([id, draft]) => ({
+          id,
+          title: draft.title,
+          description: draft.description,
+          durationMinutes: typeof draft.durationMinutes === 'number' ? draft.durationMinutes : undefined,
+          order: typeof draft.order === 'number' ? draft.order : undefined,
+        })),
+        phases: Object.entries(phaseDrafts).map(([id, draft]) => ({
+          id,
+          name: draft.name,
+          description: draft.description,
+          duration: draft.duration ?? undefined,
+          order: typeof draft.order === 'number' ? draft.order : undefined,
+        })),
+        safety: safetyDraft,
+      };
+
+      const ok = await updateSessionOverrides(sessionId, payload);
+      if (!ok) throw new Error('Kunde inte spara sessionens overrides');
+      toast.success('Sessionens inställningar sparades');
+      await loadGameStructure();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Kunde inte spara inställningar');
+    } finally {
+      setOverridesLoading(false);
+    }
+  };
+
+  const handleResetOverrides = async () => {
+    setOverridesLoading(true);
+    try {
+      const ok = await updateSessionOverrides(sessionId, {});
+      if (!ok) throw new Error('Kunde inte återställa overrides');
+      toast.success('Overrides återställda');
+      await loadGameStructure();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Kunde inte återställa');
+    } finally {
+      setOverridesLoading(false);
+    }
+  };
+
+  const handleSaveRoleEdits = async () => {
+    setRolesLoading(true);
+    try {
+      const updates = Object.values(roleDrafts);
+      const ok = await updateSessionRoles(sessionId, updates);
+      if (!ok) throw new Error('Kunde inte spara roller');
+      toast.success('Roller sparade för sessionen');
+      await loadRoles();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Kunde inte spara roller');
+    } finally {
+      setRolesLoading(false);
     }
   };
 
@@ -676,6 +817,301 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
             loadingAction={loadingAction}
             variant="full"
           />
+        </Card>
+
+        <Card variant="elevated" className="p-6 space-y-4">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-foreground">Admin-inställningar (endast denna session)</h2>
+              <p className="text-sm text-muted-foreground">Justera steg, säkerhet, faser och roller utan att ändra spelets originaldata.</p>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => void handleResetOverrides()} disabled={overridesLoading}>
+                Återställ overrides
+              </Button>
+              <Button size="sm" onClick={() => void handleSaveOverrides()} disabled={overridesLoading}>
+                Spara sessionens ändringar
+              </Button>
+            </div>
+          </div>
+
+          {/* Steps */}
+          <div className="border border-border/70 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Steg-för-steg</h3>
+              <span className="text-xs text-muted-foreground">Titel, beskrivning, tid, ordning</span>
+            </div>
+            <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
+              {gameSteps.map((step, idx) => {
+                const draft = stepDrafts[step.id] ?? {};
+                return (
+                  <div key={step.id} className="rounded-md border border-border/60 p-3 space-y-2 bg-muted/30">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">{idx + 1}. {step.title}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <label className="flex items-center gap-1">
+                          Ordning
+                          <input
+                            type="number"
+                            className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.order ?? idx}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
+                              setStepDrafts((prev) => ({
+                                ...prev,
+                                [step.id]: { ...prev[step.id], order: Number.isFinite(value) ? value : undefined },
+                              }));
+                            }}
+                          />
+                        </label>
+                        <label className="flex items-center gap-1">
+                          Tid (min)
+                          <input
+                            type="number"
+                            className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.durationMinutes ?? ''}
+                            placeholder={step.durationMinutes?.toString() ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? undefined : Number(e.target.value);
+                              setStepDrafts((prev) => ({
+                                ...prev,
+                                [step.id]: { ...prev[step.id], durationMinutes: Number.isFinite(value as number) ? (value as number) : undefined },
+                              }));
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      value={draft.title ?? ''}
+                      placeholder={step.title}
+                      onChange={(e) => setStepDrafts((prev) => ({ ...prev, [step.id]: { ...prev[step.id], title: e.target.value } }))}
+                    />
+                    <textarea
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      rows={3}
+                      value={draft.description ?? ''}
+                      placeholder={step.description}
+                      onChange={(e) => setStepDrafts((prev) => ({ ...prev, [step.id]: { ...prev[step.id], description: e.target.value } }))}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Safety & Inclusion */}
+          <div className="border border-border/70 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Säkerhet & Inkludering</h3>
+              <span className="text-xs text-muted-foreground">Säkerhet, tillgänglighet, utrymme, ledartips</span>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Säkerhetsnoteringar</label>
+                <textarea
+                  className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                  rows={3}
+                  value={safetyDraft?.safetyNotes ?? ''}
+                  placeholder={gameSafety?.safetyNotes ?? ''}
+                  onChange={(e) => setSafetyDraft((prev) => ({ ...prev, safetyNotes: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Tillgänglighetsnoteringar</label>
+                <textarea
+                  className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                  rows={3}
+                  value={safetyDraft?.accessibilityNotes ?? ''}
+                  placeholder={gameSafety?.accessibilityNotes ?? ''}
+                  onChange={(e) => setSafetyDraft((prev) => ({ ...prev, accessibilityNotes: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Utrymmeskrav</label>
+                <textarea
+                  className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                  rows={3}
+                  value={safetyDraft?.spaceRequirements ?? ''}
+                  placeholder={gameSafety?.spaceRequirements ?? ''}
+                  onChange={(e) => setSafetyDraft((prev) => ({ ...prev, spaceRequirements: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs text-muted-foreground">Ledartips</label>
+                <textarea
+                  className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                  rows={3}
+                  value={safetyDraft?.leaderTips ?? ''}
+                  placeholder={gameSafety?.leaderTips ?? ''}
+                  onChange={(e) => setSafetyDraft((prev) => ({ ...prev, leaderTips: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Phases */}
+          <div className="border border-border/70 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Faser & Rundor</h3>
+              <span className="text-xs text-muted-foreground">Namn, beskrivning, tid, ordning</span>
+            </div>
+            <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+              {gamePhases.map((phase, idx) => {
+                const draft = phaseDrafts[phase.id] ?? {};
+                return (
+                  <div key={phase.id} className="rounded-md border border-border/60 p-3 space-y-2 bg-muted/30">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold">{idx + 1}. {phase.name}</span>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <label className="flex items-center gap-1">
+                          Ordning
+                          <input
+                            type="number"
+                            className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.order ?? idx}
+                            onChange={(e) => {
+                              const value = Number(e.target.value);
+                              setPhaseDrafts((prev) => ({
+                                ...prev,
+                                [phase.id]: { ...prev[phase.id], order: Number.isFinite(value) ? value : undefined },
+                              }));
+                            }}
+                          />
+                        </label>
+                        <label className="flex items-center gap-1">
+                          Tid (sek)
+                          <input
+                            type="number"
+                            className="w-20 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.duration ?? ''}
+                            placeholder={phase.duration?.toString() ?? ''}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? undefined : Number(e.target.value);
+                              setPhaseDrafts((prev) => ({
+                                ...prev,
+                                [phase.id]: { ...prev[phase.id], duration: Number.isFinite(value as number) ? (value as number) : undefined },
+                              }));
+                            }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <input
+                      type="text"
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      value={draft.name ?? ''}
+                      placeholder={phase.name}
+                      onChange={(e) => setPhaseDrafts((prev) => ({ ...prev, [phase.id]: { ...prev[phase.id], name: e.target.value } }))}
+                    />
+                    <textarea
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      rows={2}
+                      value={draft.description ?? ''}
+                      placeholder={phase.description ?? ''}
+                      onChange={(e) => setPhaseDrafts((prev) => ({ ...prev, [phase.id]: { ...prev[phase.id], description: e.target.value } }))}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Roles */}
+          <div className="border border-border/70 rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-foreground">Roller (sessionens kopia)</h3>
+              <span className="text-xs text-muted-foreground">Namn, beskrivning, min/max, instruktioner, ikon/färg</span>
+            </div>
+            <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+              {sessionRoles.map((role) => {
+                const draft = roleDrafts[role.id] ?? { id: role.id };
+                return (
+                  <div key={role.id} className="rounded-md border border-border/60 p-3 space-y-2 bg-muted/30">
+                    <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                      <input
+                        type="text"
+                        className="w-full md:w-1/2 rounded border border-input bg-background px-3 py-2 text-sm"
+                        value={draft.name ?? ''}
+                        placeholder={role.name}
+                        onChange={(e) => setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, name: e.target.value } }))}
+                      />
+                      <div className="flex gap-2 text-xs text-muted-foreground">
+                        <label className="flex items-center gap-1">
+                          Min
+                          <input
+                            type="number"
+                            className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.min_count ?? ''}
+                            placeholder={(role as { min_count?: number }).min_count?.toString() ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value === '' ? undefined : Number(e.target.value);
+                              setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, min_count: Number.isFinite(v as number) ? (v as number) : undefined } }));
+                            }}
+                          />
+                        </label>
+                        <label className="flex items-center gap-1">
+                          Max
+                          <input
+                            type="number"
+                            className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={draft.max_count ?? ''}
+                            placeholder={(role as { max_count?: number | null }).max_count?.toString() ?? ''}
+                            onChange={(e) => {
+                              const v = e.target.value === '' ? undefined : Number(e.target.value);
+                              setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, max_count: Number.isFinite(v as number) ? (v as number) : null } }));
+                            }}
+                          />
+                        </label>
+                        <label className="flex items-center gap-1">
+                          Ikon
+                          <input
+                            type="text"
+                            className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={(draft as { icon?: string | null }).icon ?? ''}
+                            placeholder={(role as { icon?: string | null }).icon ?? ''}
+                            onChange={(e) => setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, icon: e.target.value } }))}
+                          />
+                        </label>
+                        <label className="flex items-center gap-1">
+                          Färg
+                          <input
+                            type="text"
+                            className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
+                            value={(draft as { color?: string | null }).color ?? ''}
+                            placeholder={(role as { color?: string | null }).color ?? ''}
+                            onChange={(e) => setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, color: e.target.value } }))}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                    <textarea
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      rows={2}
+                      value={draft.public_description ?? ''}
+                      placeholder={(role as { public_description?: string }).public_description ?? ''}
+                      onChange={(e) => setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, public_description: e.target.value } }))}
+                    />
+                    <textarea
+                      className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                      rows={3}
+                      value={draft.private_instructions ?? ''}
+                      placeholder={(role as { private_instructions?: string }).private_instructions ?? ''}
+                      onChange={(e) => setRoleDrafts((prev) => ({ ...prev, [role.id]: { ...prev[role.id], id: role.id, private_instructions: e.target.value } }))}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex justify-end">
+              <Button onClick={() => void handleSaveRoleEdits()} disabled={rolesLoading}>
+                Spara roller
+              </Button>
+            </div>
+          </div>
         </Card>
       </TabPanel>
     </div>

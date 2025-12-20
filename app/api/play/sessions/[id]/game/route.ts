@@ -39,6 +39,103 @@ type PhaseInfo = {
   duration?: number | null;
 };
 
+type AdminOverrides = {
+  steps?: Array<{
+    id: string;
+    title?: string;
+    description?: string;
+    durationMinutes?: number;
+    order?: number;
+  }>;
+  phases?: Array<{
+    id: string;
+    name?: string;
+    description?: string;
+    duration?: number | null;
+    order?: number;
+  }>;
+  safety?: {
+    safetyNotes?: string;
+    accessibilityNotes?: string;
+    spaceRequirements?: string;
+    leaderTips?: string;
+  };
+};
+
+function applyStepOverrides(steps: StepInfo[], overrides?: AdminOverrides['steps']): StepInfo[] {
+  if (!overrides || overrides.length === 0) return steps;
+
+  const map = new Map(overrides.map((o) => [o.id, o]));
+
+  const merged = steps.map((step) => {
+    const override = map.get(step.id);
+    if (!override) return step;
+
+    const durationMinutes = override.durationMinutes ?? step.durationMinutes;
+    const duration = durationMinutes ? durationMinutes * 60 : step.duration;
+
+    return {
+      ...step,
+      title: override.title ?? step.title,
+      description: override.description ?? step.description,
+      content: override.description ?? step.content,
+      durationMinutes,
+      duration,
+      index: step.index, // will be reindexed after sorting
+    };
+  });
+
+  const hasOrder = overrides.some((o) => typeof o.order === 'number');
+  if (!hasOrder) return merged;
+
+  const orderMap = new Map(overrides.filter((o) => typeof o.order === 'number').map((o) => [o.id, o.order as number]));
+
+  const reordered = [...merged].sort((a, b) => {
+    const ao = orderMap.get(a.id);
+    const bo = orderMap.get(b.id);
+    if (ao === undefined && bo === undefined) return a.index - b.index;
+    if (ao === undefined) return 1;
+    if (bo === undefined) return -1;
+    return ao - bo;
+  });
+
+  return reordered.map((step, index) => ({ ...step, index }));
+}
+
+function applyPhaseOverrides(phases: PhaseInfo[], overrides?: AdminOverrides['phases']): PhaseInfo[] {
+  if (!overrides || overrides.length === 0) return phases;
+
+  const map = new Map(overrides.map((o) => [o.id, o]));
+
+  const merged = phases.map((phase) => {
+    const override = map.get(phase.id);
+    if (!override) return phase;
+    return {
+      ...phase,
+      name: override.name ?? phase.name,
+      description: override.description ?? phase.description,
+      duration: override.duration !== undefined ? override.duration : phase.duration,
+      index: phase.index,
+    };
+  });
+
+  const hasOrder = overrides.some((o) => typeof o.order === 'number');
+  if (!hasOrder) return merged;
+
+  const orderMap = new Map(overrides.filter((o) => typeof o.order === 'number').map((o) => [o.id, o.order as number]));
+
+  const reordered = [...merged].sort((a, b) => {
+    const ao = orderMap.get(a.id);
+    const bo = orderMap.get(b.id);
+    if (ao === undefined && bo === undefined) return a.index - b.index;
+    if (ao === undefined) return 1;
+    if (bo === undefined) return -1;
+    return ao - bo;
+  });
+
+  return reordered.map((phase, index) => ({ ...phase, index }));
+}
+
 function pickLocalizedByOrder<T extends { step_order?: number; phase_order?: number }>(
   fallbackRows: T[],
   localeRows: T[],
@@ -73,7 +170,7 @@ export async function GET(
 
     const { data: session, error: sessionError } = await supabaseAdmin
       .from('participant_sessions')
-      .select('id, display_name, host_user_id, game_id')
+      .select('id, display_name, host_user_id, game_id, settings')
       .eq('id', sessionId)
       .single();
 
@@ -224,6 +321,8 @@ export async function GET(
       'phase_order'
     );
 
+    const adminOverrides = ((session.settings as { admin_overrides?: AdminOverrides } | null)?.admin_overrides) ?? {};
+
     const steps: StepInfo[] = mergedSteps.map((s, index) => {
       const durationSeconds = s.duration_seconds ?? null;
       const durationMinutes = durationSeconds ? Math.ceil(durationSeconds / 60) : undefined;
@@ -253,13 +352,22 @@ export async function GET(
       duration: p.duration_seconds ?? null,
     }));
 
+    const mergedStepsWithOverrides = applyStepOverrides(steps, adminOverrides.steps);
+    const mergedPhasesWithOverrides = applyPhaseOverrides(phases, adminOverrides.phases);
+
     return NextResponse.json({
       title: game?.name || session.display_name,
       board: {
         theme: (boardConfig?.theme as BoardTheme | null) ?? 'neutral',
       },
-      steps,
-      phases,
+      steps: mergedStepsWithOverrides,
+      phases: mergedPhasesWithOverrides,
+      safety: {
+        safetyNotes: adminOverrides.safety?.safetyNotes ?? materialsRow?.safety_notes ?? undefined,
+        accessibilityNotes: adminOverrides.safety?.accessibilityNotes,
+        spaceRequirements: adminOverrides.safety?.spaceRequirements,
+        leaderTips: adminOverrides.safety?.leaderTips,
+      },
     });
   } catch (error) {
     console.error('Error fetching session game content:', error);

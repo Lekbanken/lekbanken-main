@@ -11,6 +11,38 @@ function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
+function getCurrentStepPhase(session: {
+  current_step_index?: number | null;
+  current_phase_index?: number | null;
+}) {
+  const currentStep = typeof session.current_step_index === 'number' ? session.current_step_index : 0;
+  const currentPhase = typeof session.current_phase_index === 'number' ? session.current_phase_index : 0;
+  return { currentStep, currentPhase };
+}
+
+function isUnlockedForPosition(
+  itemStep: number | null | undefined,
+  itemPhase: number | null | undefined,
+  current: { currentStep: number; currentPhase: number }
+) {
+  if (typeof itemStep !== 'number') return true;
+  if (current.currentStep > itemStep) return true;
+  if (current.currentStep < itemStep) return false;
+  if (typeof itemPhase !== 'number') return true;
+  return current.currentPhase >= itemPhase;
+}
+
+function readStepPhaseFromMetadata(metadata: Json | null | undefined) {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return { stepIndex: null as number | null, phaseIndex: null as number | null };
+  }
+
+  const rec = metadata as Record<string, unknown>;
+  const stepIndex = typeof rec.step_index === 'number' ? rec.step_index : null;
+  const phaseIndex = typeof rec.phase_index === 'number' ? rec.phase_index : null;
+  return { stepIndex, phaseIndex };
+}
+
 async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
   const token = request.headers.get('x-participant-token');
   if (token) {
@@ -71,6 +103,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
+
+  const current = getCurrentStepPhase(session);
 
   const viewer = await resolveViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
@@ -168,6 +202,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const visibility = v.visibility as string;
     const revealedAt = v.revealed_at as string | null;
     const visibleToRoleId = v.visible_to_session_role_id as string | null;
+
+    const { stepIndex, phaseIndex } = readStepPhaseFromMetadata((v.metadata as Json | null) ?? null);
+    if (!isUnlockedForPosition(stepIndex, phaseIndex, current)) continue;
 
     if (visibility === 'leader_only') continue;
 

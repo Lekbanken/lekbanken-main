@@ -10,6 +10,27 @@ type Viewer =
   | { type: 'host'; userId: string }
   | { type: 'participant'; participantId: string };
 
+function getCurrentStepPhase(session: {
+  current_step_index?: number | null;
+  current_phase_index?: number | null;
+}) {
+  const currentStep = typeof session.current_step_index === 'number' ? session.current_step_index : 0;
+  const currentPhase = typeof session.current_phase_index === 'number' ? session.current_phase_index : 0;
+  return { currentStep, currentPhase };
+}
+
+function isUnlockedForPosition(
+  itemStep: number | null | undefined,
+  itemPhase: number | null | undefined,
+  current: { currentStep: number; currentPhase: number }
+) {
+  if (typeof itemStep !== 'number') return true;
+  if (current.currentStep > itemStep) return true;
+  if (current.currentStep < itemStep) return false;
+  if (typeof itemPhase !== 'number') return true;
+  return current.currentPhase >= itemPhase;
+}
+
 async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
   const token = request.headers.get('x-participant-token');
   if (token) {
@@ -55,6 +76,8 @@ export async function GET(
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
 
+  const current = getCurrentStepPhase(session);
+
   const viewer = await resolveViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
 
@@ -62,7 +85,7 @@ export async function GET(
 
   const { data: decision, error: dErr } = await service
     .from('session_decisions')
-    .select('id, session_id, title, status, options, revealed_at')
+    .select('id, session_id, title, status, options, revealed_at, step_index, phase_index')
     .eq('id', decisionId)
     .eq('session_id', sessionId)
     .single();
@@ -72,6 +95,12 @@ export async function GET(
   if (viewer.type === 'participant') {
     if (!decision.revealed_at && (decision.status as string) !== 'revealed') {
       return jsonError('Results not revealed', 403);
+    }
+
+    const stepIndex = (decision.step_index as number | null) ?? null;
+    const phaseIndex = (decision.phase_index as number | null) ?? null;
+    if (!isUnlockedForPosition(stepIndex, phaseIndex, current)) {
+      return jsonError('Results not available yet', 403);
     }
   }
 

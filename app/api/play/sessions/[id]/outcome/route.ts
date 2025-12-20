@@ -10,6 +10,27 @@ type Viewer =
   | { type: 'host'; userId: string }
   | { type: 'participant'; participantId: string };
 
+function getCurrentStepPhase(session: {
+  current_step_index?: number | null;
+  current_phase_index?: number | null;
+}) {
+  const currentStep = typeof session.current_step_index === 'number' ? session.current_step_index : 0;
+  const currentPhase = typeof session.current_phase_index === 'number' ? session.current_phase_index : 0;
+  return { currentStep, currentPhase };
+}
+
+function isUnlockedForPosition(
+  itemStep: number | null | undefined,
+  itemPhase: number | null | undefined,
+  current: { currentStep: number; currentPhase: number }
+) {
+  if (typeof itemStep !== 'number') return true;
+  if (current.currentStep > itemStep) return true;
+  if (current.currentStep < itemStep) return false;
+  if (typeof itemPhase !== 'number') return true;
+  return current.currentPhase >= itemPhase;
+}
+
 async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
   const token = request.headers.get('x-participant-token');
   if (token) {
@@ -71,13 +92,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
 
+  const current = getCurrentStepPhase(session);
+
   const viewer = await resolveViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
 
   const service = await createServiceRoleClient();
   const { data: outcomes, error } = await service
     .from('session_outcomes')
-    .select('id, session_id, title, body, outcome_type, related_decision_id, revealed_at, created_at')
+    .select(
+      'id, session_id, title, body, outcome_type, related_decision_id, revealed_at, step_index, phase_index, created_at'
+    )
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true });
 
@@ -87,7 +112,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ outcomes: outcomes ?? [] }, { status: 200 });
   }
 
-  const visible = (outcomes ?? []).filter((o) => Boolean(o.revealed_at));
+  const visible = (outcomes ?? []).filter((o) => {
+    if (!o.revealed_at) return false;
+    const stepIndex = (o.step_index as number | null) ?? null;
+    const phaseIndex = (o.phase_index as number | null) ?? null;
+    return isUnlockedForPosition(stepIndex, phaseIndex, current);
+  });
   return NextResponse.json({ outcomes: visible }, { status: 200 });
 }
 
@@ -104,6 +134,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
   if (session.host_user_id !== user.id) return jsonError('Only host can manage outcomes', 403);
+
+  const current = getCurrentStepPhase(session);
 
   const body = (await request.json().catch(() => null)) as OutcomeBody | null;
   if (!body || typeof body !== 'object') return jsonError('Invalid body', 400);
@@ -125,6 +157,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         body: outcomeBody,
         outcome_type: outcomeType,
         related_decision_id: body.related_decision_id ?? null,
+        step_index: current.currentStep,
+        phase_index: current.currentPhase,
         created_by: user.id,
       })
       .select('id')
@@ -203,6 +237,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (!session) return jsonError('Session not found', 404);
   if (session.host_user_id !== user.id) return jsonError('Only host can manage outcomes', 403);
 
+  const current = getCurrentStepPhase(session);
+
   const raw = (await request.json().catch(() => null)) as OutcomePutBody | null;
   if (!raw || typeof raw !== 'object') return jsonError('Invalid body', 400);
 
@@ -248,6 +284,8 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       outcome_type: outcomeType,
       related_decision_id: raw.related_decision_id ?? null,
       revealed_at: revealedAt,
+      step_index: current.currentStep,
+      phase_index: current.currentPhase,
       created_by: user.id,
     })
     .select('id')

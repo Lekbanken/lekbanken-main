@@ -69,6 +69,9 @@ export interface ParticipantPlayData extends PlaySessionData {
   participantId: string;
   /** Whether this participant is marked as next starter */
   isNextStarter?: boolean;
+
+  /** When this participant has revealed their own secret role instructions */
+  secretRoleRevealedAt: string | null;
 }
 
 // =============================================================================
@@ -332,6 +335,7 @@ export async function getParticipantPlaySession(
     
     // Fetch participant's assigned role
     let assignedRole: SessionRole | null = null;
+    let secretRoleRevealedAt: string | null = null;
     try {
       const roleRes = await fetch(`/api/play/me/role?session_code=${sessionCode}`, {
         headers: {
@@ -343,6 +347,7 @@ export async function getParticipantPlaySession(
       if (roleRes.ok) {
         const roleData = await roleRes.json();
         assignedRole = roleData.role || null;
+        secretRoleRevealedAt = roleData.secretRevealedAt || null;
       }
     } catch {
       // Role fetch failed, continue without role
@@ -354,6 +359,8 @@ export async function getParticipantPlaySession(
       current_phase_index: session.currentPhaseIndex ?? 0,
       timer_state: session.timerState ?? null,
       board_state: session.boardState ?? null,
+      secret_instructions_unlocked_at: session.secretInstructionsUnlockedAt ?? null,
+      secret_instructions_unlocked_by: session.secretInstructionsUnlockedBy ?? null,
       status: session.status ?? 'active',
     };
     
@@ -371,6 +378,7 @@ export async function getParticipantPlaySession(
       participantName: participant.displayName,
       participantId: participant.id,
       isNextStarter: Boolean(participant.isNextStarter),
+      secretRoleRevealedAt,
     };
   } catch (error) {
     console.error('[getParticipantPlaySession] Error:', error);

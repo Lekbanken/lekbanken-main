@@ -31,6 +31,9 @@ export type { RoleCardProps, RoleCardData } from './RoleCard';
 export { HostPlayMode } from './HostPlayMode';
 export type { HostPlayModeProps } from './HostPlayMode';
 
+export { ActiveSessionShell } from './ActiveSessionShell';
+export type { ActiveSessionRole, ActiveSessionShellProps } from './ActiveSessionShell';
+
 export { ParticipantPlayMode } from './ParticipantPlayMode';
 export type { ParticipantPlayModeProps } from './ParticipantPlayMode';
 

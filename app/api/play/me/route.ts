@@ -65,6 +65,10 @@ export async function GET(request: Request) {
       currentPhaseIndex: session.current_phase_index,
       timerState: session.timer_state,
       boardState: session.board_state,
+      secretInstructionsUnlockedAt:
+        (session as Record<string, unknown>).secret_instructions_unlocked_at ?? null,
+      secretInstructionsUnlockedBy:
+        (session as Record<string, unknown>).secret_instructions_unlocked_by ?? null,
       settings: session.settings,
       expiresAt: session.expires_at,
     },

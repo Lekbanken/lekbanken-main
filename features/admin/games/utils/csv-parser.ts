@@ -782,7 +782,48 @@ function validateArtifacts(
       const visibleToRoleOrder = typeof vrec.visible_to_role_order === 'number' ? vrec.visible_to_role_order : null;
       const visibleToRoleName = typeof vrec.visible_to_role_name === 'string' ? vrec.visible_to_role_name : null;
 
-      const metadata = (typeof vrec.metadata === 'object' && vrec.metadata !== null) ? (vrec.metadata as Record<string, unknown>) : null;
+      let metadata = (typeof vrec.metadata === 'object' && vrec.metadata !== null)
+        ? (vrec.metadata as Record<string, unknown>)
+        : null;
+
+      const stepIndexRaw = vrec.step_index;
+      const phaseIndexRaw = vrec.phase_index;
+
+      const stepIndex =
+        typeof stepIndexRaw === 'number' && Number.isFinite(stepIndexRaw)
+          ? Math.max(0, Math.floor(stepIndexRaw))
+          : null;
+
+      const phaseIndex =
+        typeof phaseIndexRaw === 'number' && Number.isFinite(phaseIndexRaw)
+          ? Math.max(0, Math.floor(phaseIndexRaw))
+          : null;
+
+      if (stepIndexRaw !== undefined && stepIndex === null) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Variant #${j + 1} i artefakt "${title}": ogiltigt step_index; ignorerar`,
+          severity: 'warning',
+        });
+      }
+
+      if (phaseIndexRaw !== undefined && phaseIndex === null) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Variant #${j + 1} i artefakt "${title}": ogiltigt phase_index; ignorerar`,
+          severity: 'warning',
+        });
+      }
+
+      if (stepIndex !== null || phaseIndex !== null) {
+        metadata = {
+          ...(metadata ?? {}),
+          ...(stepIndex !== null ? { step_index: stepIndex } : null),
+          ...(phaseIndex !== null ? { phase_index: phaseIndex } : null),
+        };
+      }
 
       variants.push({
         variant_order: variantOrder,

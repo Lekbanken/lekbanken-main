@@ -59,6 +59,10 @@ export interface SessionRuntimeState {
   timer_state: TimerState | null;
   /** Board runtime state */
   board_state: BoardState | null;
+
+  // Secret instructions gate (host-controlled)
+  secret_instructions_unlocked_at?: string | null;
+  secret_instructions_unlocked_by?: string | null;
   /** Session status */
   status: 'active' | 'paused' | 'ended' | 'cancelled';
 }
@@ -188,6 +192,10 @@ export interface StateChangeBroadcast extends PlayBroadcastEvent {
     current_step_index?: number;
     current_phase_index?: number;
     status?: string;
+
+    // Secret instructions gate (host-controlled)
+    secret_instructions_unlocked_at?: string | null;
+    secret_instructions_unlocked_by?: string | null;
   };
 }
 

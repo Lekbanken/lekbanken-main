@@ -82,11 +82,36 @@ function parseOptions(value: unknown): DecisionOption[] | null {
   return options;
 }
 
+function getCurrentStepPhase(session: {
+  current_step_index?: number | null;
+  current_phase_index?: number | null;
+}) {
+  const currentStep = typeof session.current_step_index === 'number' ? session.current_step_index : 0;
+  const currentPhase = typeof session.current_phase_index === 'number' ? session.current_phase_index : 0;
+  return { currentStep, currentPhase };
+}
+
+function isUnlockedForPosition(
+  itemStep: number | null | undefined,
+  itemPhase: number | null | undefined,
+  current: { currentStep: number; currentPhase: number }
+) {
+  if (typeof itemStep !== 'number') return true;
+  if (current.currentStep > itemStep) return true;
+  if (current.currentStep < itemStep) return false;
+
+  // current step == item step
+  if (typeof itemPhase !== 'number') return true;
+  return current.currentPhase >= itemPhase;
+}
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: sessionId } = await params;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
+
+  const current = getCurrentStepPhase(session);
 
   const viewer = await resolveViewer(sessionId, request);
   if (!viewer) return jsonError('Unauthorized', 401);
@@ -109,7 +134,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const visible = (decisions ?? []).filter((d) => {
     const status = d.status as string;
-    return status === 'open' || status === 'revealed';
+    if (!(status === 'open' || status === 'revealed')) return false;
+
+    const stepIndex = (d.step_index as number | null) ?? null;
+    const phaseIndex = (d.phase_index as number | null) ?? null;
+    return isUnlockedForPosition(stepIndex, phaseIndex, current);
   });
 
   return NextResponse.json({ decisions: visible }, { status: 200 });
@@ -128,6 +157,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
   if (session.host_user_id !== user.id) return jsonError('Only host can manage decisions', 403);
+
+  const current = getCurrentStepPhase(session);
 
   const body = (await request.json().catch(() => null)) as Record<string, unknown> | null;
   if (!body) return jsonError('Invalid body', 400);
@@ -159,6 +190,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         status: 'draft',
         allow_anonymous: allowAnonymous,
         max_choices: maxChoices,
+        step_index: current.currentStep,
+        phase_index: current.currentPhase,
         created_by: user.id,
       })
       .select('id')

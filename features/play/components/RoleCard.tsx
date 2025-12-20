@@ -44,6 +44,8 @@ export interface RoleCardProps {
   hintsRevealed?: boolean;
   /** Called when user requests to reveal hints */
   onRevealHints?: () => void;
+  /** Called when user requests a hint from the host */
+  onRequestHint?: () => void;
   /** Whether the card is interactive */
   interactive?: boolean;
   /** Custom class name */
@@ -90,6 +92,7 @@ export function RoleCard({
   showPrivate = true,
   hintsRevealed = false,
   onRevealHints,
+  onRequestHint,
   interactive = true,
   className = '',
 }: RoleCardProps) {
@@ -231,16 +234,30 @@ export function RoleCard({
               </p>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleRevealHints}
-              disabled={!interactive}
-              className="w-full gap-2"
-            >
-              <LightBulbIcon className="h-4 w-4" />
-              Visa tips (om du kör fast)
-            </Button>
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRevealHints}
+                disabled={!interactive}
+                className="w-full gap-2"
+              >
+                <LightBulbIcon className="h-4 w-4" />
+                Visa tips (om du kör fast)
+              </Button>
+
+              {onRequestHint && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onRequestHint}
+                  disabled={!interactive}
+                  className="w-full"
+                >
+                  Be om ledtråd av lekledaren
+                </Button>
+              )}
+            </div>
           )}
         </div>
       )}

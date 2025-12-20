@@ -128,6 +128,7 @@ export function ParticipantPlayMode({
   return (
     <ParticipantPlayView
       sessionId={playData.sessionId}
+      sessionCode={sessionCode}
       gameTitle={playData.gameTitle}
       steps={playData.steps}
       role={role}
@@ -137,6 +138,7 @@ export function ParticipantPlayMode({
       isNextStarter={playData.isNextStarter}
       participantToken={participantToken}
       showRole={showRole && !!role}
+      secretRoleRevealedAt={playData.secretRoleRevealedAt}
       boardTheme={playData.boardTheme}
     />
   );

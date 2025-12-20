@@ -54,11 +54,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Token expired' }, { status: 401 });
     }
 
+    // Note: keep '*' so it compiles even if generated Supabase types lag behind migrations.
     const { data: assignment } = await supabase
       .from('participant_role_assignments')
       .select(
         `
-        revealed_at,
+        *,
         session_role:session_roles(
           *
         )
@@ -74,6 +75,8 @@ export async function GET(request: Request) {
     return NextResponse.json({
       role,
       revealedAt: (assignment as unknown as { revealed_at: string | null } | null)?.revealed_at ?? null,
+      secretRevealedAt:
+        (assignment as unknown as Record<string, unknown> | null)?.secret_instructions_revealed_at ?? null,
     });
   } catch (error) {
     console.error('Error fetching participant role:', error);

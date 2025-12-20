@@ -37,6 +37,8 @@ export interface HostPlayModeProps {
   sessionId: string;
   /** Callback when user wants to exit play mode */
   onExitPlayMode?: () => void;
+  /** Whether to show the internal exit button (defaults to true). */
+  showExitButton?: boolean;
   /** Number of participants */
   participantCount?: number;
 }
@@ -50,6 +52,7 @@ type PlayModeTab = 'facilitator' | 'artifacts' | 'decisions' | 'outcome' | 'role
 export function HostPlayMode({
   sessionId,
   onExitPlayMode,
+  showExitButton = true,
   participantCount = 0,
 }: HostPlayModeProps) {
   // Data state
@@ -214,10 +217,12 @@ export function HostPlayMode({
           </Button>
         </div>
         
-        <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
-          <ArrowLeftIcon className="h-4 w-4 mr-1" />
-          Lobby
-        </Button>
+        {showExitButton && (
+          <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
+            <ArrowLeftIcon className="h-4 w-4 mr-1" />
+            Lobby
+          </Button>
+        )}
       </div>
 
       {/* Tab content */}

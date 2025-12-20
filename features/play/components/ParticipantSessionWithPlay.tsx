@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   getPublicSession, 
@@ -23,6 +23,9 @@ import {
   SessionStatusMessage,
 } from '@/components/play';
 import { ParticipantPlayMode } from './ParticipantPlayMode';
+import { ActiveSessionShell } from './ActiveSessionShell';
+import { SessionChatDrawer } from '@/features/play/components/SessionChatDrawer';
+import { useSessionChat } from '@/features/play/hooks/useSessionChat';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -34,6 +37,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const SESSION_STORAGE_KEY = 'lekbanken_participant_token';
+const ACTIVE_JOIN_PREF_KEY = 'lekbanken_active_join_pref';
 const HEARTBEAT_INTERVAL = 10000; // 10 seconds
 const POLL_INTERVAL = 3000; // 3 seconds
 
@@ -49,6 +53,13 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
   const [error, setError] = useState<string | null>(null);
   const [isReconnecting, setIsReconnecting] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
+
+  // Active session mode UI state
+  const [activeSessionOpen, setActiveSessionOpen] = useState(false);
+  const [joinGateSecondsLeft, setJoinGateSecondsLeft] = useState<number | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
+
+  const joinPrefKey = useMemo(() => `${ACTIVE_JOIN_PREF_KEY}_${code}`, [code]);
 
   const getToken = useCallback(() => {
     if (typeof window === 'undefined') return null;
@@ -141,6 +152,78 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     router.push('/play');
   };
 
+  const setJoinPreference = useCallback((value: 'join' | 'later') => {
+    if (typeof window === 'undefined') return;
+    try {
+      sessionStorage.setItem(joinPrefKey, value);
+    } catch {
+      // ignore
+    }
+  }, [joinPrefKey]);
+
+  const getJoinPreference = useCallback((): 'join' | 'later' | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const v = sessionStorage.getItem(joinPrefKey);
+      if (v === 'join' || v === 'later') return v;
+      return null;
+    } catch {
+      return null;
+    }
+  }, [joinPrefKey]);
+
+  // Check if we should offer Active Session Mode (game linked and participant joined)
+  const hasGame = Boolean(session?.gameId);
+  const token = getToken();
+  const isSessionActive = session?.status === 'active';
+  const canEnterActiveSession = Boolean(hasGame && participant && token && isSessionActive);
+
+  const shouldRenderActiveSessionShell = Boolean(token && canEnterActiveSession && activeSessionOpen);
+
+  const chat = useSessionChat({
+    sessionId: session?.id ?? '',
+    role: 'participant',
+    participantToken: token ?? undefined,
+    isOpen: chatOpen,
+    enabled: Boolean(shouldRenderActiveSessionShell && token && session?.id),
+  });
+
+  const { markAllRead } = chat;
+  useEffect(() => {
+    if (chatOpen) markAllRead();
+  }, [chatOpen, markAllRead]);
+
+  // Gate: when host starts session, show 5s countdown + choices.
+  useEffect(() => {
+    if (!canEnterActiveSession) {
+      setActiveSessionOpen(false);
+      setJoinGateSecondsLeft(null);
+      return;
+    }
+
+    const pref = getJoinPreference();
+    if (pref === 'later') {
+      setActiveSessionOpen(false);
+      setJoinGateSecondsLeft(null);
+      return;
+    }
+
+    if (activeSessionOpen) return;
+    setJoinGateSecondsLeft(5);
+  }, [activeSessionOpen, canEnterActiveSession, getJoinPreference]);
+
+  useEffect(() => {
+    if (joinGateSecondsLeft === null) return;
+    if (joinGateSecondsLeft <= 0) {
+      setJoinPreference('join');
+      setJoinGateSecondsLeft(null);
+      setActiveSessionOpen(true);
+      return;
+    }
+    const t = window.setTimeout(() => setJoinGateSecondsLeft((s) => (s === null ? s : s - 1)), 1000);
+    return () => window.clearTimeout(t);
+  }, [joinGateSecondsLeft, setJoinPreference]);
+
   // Loading state
   if (loading) {
     return (
@@ -197,40 +280,6 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             Gå med i en ny session
           </Button>
         </Card>
-      </div>
-    );
-  }
-
-  // Check if we should show play mode (game linked and participant joined)
-  const hasGame = !!session?.gameId;
-  const token = getToken();
-  const shouldShowPlayMode = hasGame && participant && token && session?.status === 'active';
-
-  // Active session with play mode
-  if (shouldShowPlayMode) {
-    return (
-      <div className="min-h-[80vh] flex flex-col px-4 py-6">
-        {/* Reconnecting banner */}
-        <ReconnectingBanner
-          isReconnecting={isReconnecting}
-          attemptCount={reconnectAttempts}
-          maxAttempts={5}
-          onRetry={handleRetry}
-        />
-        
-        {/* Play mode content */}
-        <ParticipantPlayMode
-          sessionCode={code}
-          participantToken={token}
-          showRole={true}
-        />
-
-        {/* Leave button */}
-        <div className="mt-8 text-center">
-          <Button variant="ghost" size="sm" onClick={handleLeave}>
-            Lämna session
-          </Button>
-        </div>
       </div>
     );
   }
@@ -319,6 +368,46 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
               ? 'Spelinnehåll visas här när värden startar.'
               : 'Innehåll kommer att visas här när sessionen startar.'}
           </p>
+
+          {canEnterActiveSession && !activeSessionOpen && getJoinPreference() === 'later' && (
+            <div className="mt-6">
+              <Button variant="primary" onClick={() => {
+                setJoinPreference('join');
+                setActiveSessionOpen(true);
+              }}>
+                Delta i sessionen
+              </Button>
+            </div>
+          )}
+
+          {canEnterActiveSession && !activeSessionOpen && joinGateSecondsLeft !== null && (
+            <div className="mt-6 space-y-3">
+              <div className="text-sm text-muted-foreground">Sessionen är aktiv. Startar om</div>
+              <div className="text-2xl font-semibold text-foreground">{joinGateSecondsLeft}s</div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setJoinPreference('join');
+                    setJoinGateSecondsLeft(null);
+                    setActiveSessionOpen(true);
+                  }}
+                >
+                  Gå med nu
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setJoinPreference('later');
+                    setJoinGateSecondsLeft(null);
+                    setActiveSessionOpen(false);
+                  }}
+                >
+                  Inte ännu
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -328,6 +417,40 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
           Lämna session
         </Button>
       </div>
+
+      {shouldRenderActiveSessionShell && token && (
+        <ActiveSessionShell
+          role="participant"
+          open
+          title={session?.displayName ?? 'Aktiv session'}
+          onRequestClose={() => setActiveSessionOpen(false)}
+          chatUnreadCount={chat.unreadCount}
+          onOpenChat={() => setChatOpen(true)}
+        >
+          <ReconnectingBanner
+            isReconnecting={isReconnecting}
+            attemptCount={reconnectAttempts}
+            maxAttempts={5}
+            onRetry={handleRetry}
+          />
+
+          <ParticipantPlayMode
+            sessionCode={code}
+            participantToken={token}
+            showRole={true}
+          />
+
+          <SessionChatDrawer
+            open={chatOpen}
+            onClose={() => setChatOpen(false)}
+            role="participant"
+            messages={chat.messages}
+            error={chat.error}
+            sending={chat.sending}
+            onSend={chat.send}
+          />
+        </ActiveSessionShell>
+      )}
     </div>
   );
 }

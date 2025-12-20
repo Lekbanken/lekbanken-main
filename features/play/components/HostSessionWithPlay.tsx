@@ -27,6 +27,10 @@ import {
   SessionStatusMessage,
 } from '@/components/play';
 import { HostPlayMode } from '@/features/play';
+import { ActiveSessionShell } from '@/features/play/components/ActiveSessionShell';
+import { RoleAssignerContainer } from '@/features/play/components/RoleAssignerContainer';
+import { SessionChatDrawer } from '@/features/play/components/SessionChatDrawer';
+import { useSessionChat } from '@/features/play/hooks/useSessionChat';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +40,7 @@ import {
   ExclamationCircleIcon,
   PlayIcon,
 } from '@heroicons/react/24/outline';
+import type { SessionRole } from '@/types/play-runtime';
 
 const POLL_INTERVAL = 3000;
 
@@ -57,9 +62,41 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   const [actionPending, setActionPending] = useState(false);
   const [loadingAction, setLoadingAction] = useState<string | undefined>();
   const [copied, setCopied] = useState(false);
+
+  const [chatOpen, setChatOpen] = useState(false);
+
+  // Role assignment in lobby
+  const [sessionRoles, setSessionRoles] = useState<SessionRole[]>([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState<string | null>(null);
+
+  // Secret instructions controls (host)
+  const [secretsLoading, setSecretsLoading] = useState(false);
+  const [secretsError, setSecretsError] = useState<string | null>(null);
+  const [secretsStatus, setSecretsStatus] = useState<{
+    unlockedAt: string | null;
+    participantCount: number;
+    assignedCount: number;
+    revealedCount: number;
+  } | null>(null);
   
   // Play mode state
   const [isPlayMode, setIsPlayMode] = useState(false);
+
+  const isLive = session?.status === 'active' || session?.status === 'paused';
+  const hasGame = Boolean(session?.gameId);
+
+  const chat = useSessionChat({
+    sessionId,
+    role: 'host',
+    isOpen: chatOpen,
+    enabled: Boolean(isPlayMode && isLive && hasGame),
+  });
+
+  const { markAllRead } = chat;
+  useEffect(() => {
+    if (chatOpen) markAllRead();
+  }, [chatOpen, markAllRead]);
 
   const loadData = useCallback(async () => {
     try {
@@ -77,11 +114,129 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     }
   }, [sessionId]);
 
+  const loadRoles = useCallback(async () => {
+    setRolesLoading(true);
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/roles`, { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error('Kunde inte ladda roller');
+      }
+      const data = (await res.json()) as { roles?: SessionRole[] };
+      setSessionRoles(data.roles ?? []);
+      setRolesError(null);
+    } catch (err) {
+      setRolesError(err instanceof Error ? err.message : 'Kunde inte ladda roller');
+    } finally {
+      setRolesLoading(false);
+    }
+  }, [sessionId]);
+
+  const loadSecrets = useCallback(async () => {
+    setSecretsLoading(true);
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/secrets`, { cache: 'no-store' });
+      if (!res.ok) {
+        throw new Error('Kunde inte ladda hemlighetsstatus');
+      }
+      const data = (await res.json()) as {
+        session?: { secret_instructions_unlocked_at?: string | null };
+        stats?: { participant_count?: number; assigned_count?: number; revealed_count?: number };
+      };
+      setSecretsStatus({
+        unlockedAt: data.session?.secret_instructions_unlocked_at ?? null,
+        participantCount: data.stats?.participant_count ?? 0,
+        assignedCount: data.stats?.assigned_count ?? 0,
+        revealedCount: data.stats?.revealed_count ?? 0,
+      });
+      setSecretsError(null);
+    } catch (err) {
+      setSecretsError(err instanceof Error ? err.message : 'Kunde inte ladda hemlighetsstatus');
+    } finally {
+      setSecretsLoading(false);
+    }
+  }, [sessionId]);
+
   useEffect(() => {
     void loadData();
+    void loadRoles();
+    void loadSecrets();
     const interval = setInterval(() => void loadData(), POLL_INTERVAL);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [loadData, loadRoles, loadSecrets]);
+
+  const handleSnapshotRoles = async () => {
+    setRolesLoading(true);
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/roles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Kunde inte kopiera roller');
+      }
+
+      await loadRoles();
+    } catch (err) {
+      setRolesError(err instanceof Error ? err.message : 'Kunde inte kopiera roller');
+    } finally {
+      setRolesLoading(false);
+    }
+  };
+
+  const handleSecretsAction = async (action: 'unlock' | 'relock') => {
+    setSecretsLoading(true);
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/secrets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const err = data as {
+          error?: string;
+          stats?: { participant_count?: number; assigned_count?: number };
+          revealed_count?: number;
+        };
+
+        if (res.status === 409 && action === 'unlock' && err.stats) {
+          throw new Error(
+            `Tilldela roller först (tilldelade ${err.stats.assigned_count ?? 0} av ${err.stats.participant_count ?? 0}).`
+          );
+        }
+
+        if (res.status === 409 && action === 'relock' && typeof err.revealed_count === 'number') {
+          throw new Error('Kan inte låsa igen: minst en deltagare har redan visat sina hemligheter.');
+        }
+
+        throw new Error(err.error ?? 'Kunde inte uppdatera');
+      }
+
+      const ok = data as {
+        session?: { secret_instructions_unlocked_at?: string | null };
+        stats?: { participant_count?: number; assigned_count?: number; revealed_count?: number };
+      };
+
+      if (ok.session || ok.stats) {
+        setSecretsStatus((prev) => ({
+          unlockedAt: ok.session?.secret_instructions_unlocked_at ?? prev?.unlockedAt ?? null,
+          participantCount: ok.stats?.participant_count ?? prev?.participantCount ?? 0,
+          assignedCount: ok.stats?.assigned_count ?? prev?.assignedCount ?? 0,
+          revealedCount: ok.stats?.revealed_count ?? prev?.revealedCount ?? 0,
+        }));
+      } else {
+        // Fallback for unexpected response shape
+        await loadSecrets();
+      }
+    } catch (err) {
+      setSecretsError(err instanceof Error ? err.message : 'Kunde inte uppdatera');
+    } finally {
+      setSecretsLoading(false);
+    }
+  };
 
   const doAction = async (action: 'start' | 'pause' | 'resume' | 'end') => {
     setActionPending(true);
@@ -183,6 +338,17 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     setIsPlayMode(false);
   };
 
+  const handleHostExitAction = async (action: 'continue_active' | 'pause_session' | 'end_session') => {
+    if (action === 'pause_session') {
+      await updateSessionStatus(sessionId, 'pause');
+      await loadData();
+    }
+    if (action === 'end_session') {
+      await updateSessionStatus(sessionId, 'end');
+      await loadData();
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -218,30 +384,42 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
   if (!session) return null;
 
-  const isLive = session.status === 'active' || session.status === 'paused';
-  const hasGame = !!session.gameId;
   const isEnded = session.status === 'ended' || session.status === 'cancelled';
 
   // Play mode view
   if (isPlayMode && hasGame && isLive) {
     return (
-      <div className="space-y-6">
-        {/* Minimal header in play mode */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold">{session.displayName}</h1>
-          <div className="flex items-center gap-4">
-            <span className="font-mono text-lg font-bold text-primary">
-              {session.sessionCode}
-            </span>
-          </div>
+      <ActiveSessionShell
+        role="host"
+        open
+        title={session.displayName}
+        onRequestClose={handleExitPlayMode}
+        onHostExitAction={handleHostExitAction}
+        chatUnreadCount={chat.unreadCount}
+        onOpenChat={() => setChatOpen(true)}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">Sessionskod</div>
+          <div className="font-mono text-base font-bold text-primary">{session.sessionCode}</div>
         </div>
-        
+
         <HostPlayMode
           sessionId={sessionId}
           onExitPlayMode={handleExitPlayMode}
+          showExitButton={false}
           participantCount={participants.length}
         />
-      </div>
+
+        <SessionChatDrawer
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+          role="host"
+          messages={chat.messages}
+          error={chat.error}
+          sending={chat.sending}
+          onSend={chat.send}
+        />
+      </ActiveSessionShell>
     );
   }
 
@@ -338,6 +516,92 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                     QR-kod
                   </Button>
                 </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Role assignment (Lobby) */}
+          {hasGame && !isEnded && (
+            <Card variant="elevated" className="p-6">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-foreground">Roller</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Tilldela roller i lobbyn innan ni går in i aktiv session.
+                  </p>
+                </div>
+                {sessionRoles.length === 0 && (
+                  <Button variant="outline" onClick={handleSnapshotRoles} disabled={rolesLoading}>
+                    Kopiera roller från spel
+                  </Button>
+                )}
+              </div>
+
+              {rolesError && (
+                <div className="mt-4 text-sm text-destructive">{rolesError}</div>
+              )}
+
+              <div className="mt-4">
+                {rolesLoading ? (
+                  <Skeleton className="h-24 w-full" />
+                ) : (
+                  <RoleAssignerContainer
+                    sessionId={sessionId}
+                    sessionRoles={sessionRoles}
+                    onAssignmentComplete={() => void loadRoles()}
+                  />
+                )}
+              </div>
+
+              <div className="mt-6 border-t border-border pt-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h3 className="text-base font-semibold text-foreground">Hemliga instruktioner</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Lås upp när alla har fått en roll. Du kan bara låsa igen om ingen har hunnit visa sina hemligheter.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => void handleSecretsAction('relock')}
+                      disabled={
+                        secretsLoading ||
+                        !secretsStatus?.unlockedAt ||
+                        (secretsStatus.revealedCount ?? 0) > 0
+                      }
+                    >
+                      Lås igen
+                    </Button>
+                    <Button
+                      onClick={() => void handleSecretsAction('unlock')}
+                      disabled={
+                        secretsLoading ||
+                        Boolean(secretsStatus?.unlockedAt) ||
+                        (secretsStatus?.participantCount ?? 0) > 0 &&
+                          (secretsStatus?.assignedCount ?? 0) < (secretsStatus?.participantCount ?? 0)
+                      }
+                    >
+                      Lås upp
+                    </Button>
+                  </div>
+                </div>
+
+                {secretsError && (
+                  <div className="mt-2 text-sm text-destructive">{secretsError}</div>
+                )}
+
+                {secretsStatus && (
+                  <div className="mt-3 text-sm text-muted-foreground">
+                    Status: {secretsStatus.unlockedAt ? 'Upplåst' : 'Låst'} · Deltagare: {secretsStatus.participantCount} · Tilldelade: {secretsStatus.assignedCount} · Visade: {secretsStatus.revealedCount}
+                  </div>
+                )}
+
+                {secretsStatus && !secretsStatus.unlockedAt && secretsStatus.participantCount > 0 && secretsStatus.assignedCount < secretsStatus.participantCount && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Tips: Du kan låsa upp när alla har en roll.
+                  </div>
+                )}
               </div>
             </Card>
           )}

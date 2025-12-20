@@ -20,18 +20,13 @@ import {
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import { RoleCard, type RoleCardData } from './RoleCard';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
-import {
-  getSessionChatMessages,
-  sendSessionChatMessage,
-  type ChatMessage,
-} from '@/features/play/api/chat-api';
+import { sendSessionChatMessage } from '@/features/play/api/chat-api';
 import {
   getParticipantArtifacts,
   getParticipantDecisions,
@@ -61,6 +56,8 @@ export interface StepData {
 export interface ParticipantPlayViewProps {
   /** Session ID */
   sessionId: string;
+  /** Session code (needed for token-auth participant endpoints) */
+  sessionCode?: string;
   /** Game title */
   gameTitle: string;
   /** Steps data */
@@ -79,6 +76,8 @@ export interface ParticipantPlayViewProps {
   participantToken?: string;
   /** Whether to show role card */
   showRole?: boolean;
+  /** When this participant revealed their secret role instructions */
+  secretRoleRevealedAt?: string | null;
   /** Board theme (from game board config) */
   boardTheme?: BoardTheme;
 }
@@ -211,6 +210,7 @@ function BoardMessage({ message }: BoardMessageProps) {
 
 export function ParticipantPlayView({
   sessionId,
+  sessionCode,
   gameTitle,
   steps,
   role,
@@ -220,6 +220,7 @@ export function ParticipantPlayView({
   isNextStarter: initialIsNextStarter,
   participantToken,
   showRole = true,
+  secretRoleRevealedAt,
   boardTheme,
 }: ParticipantPlayViewProps) {
   // --------------------------------------------------------------------------
@@ -292,6 +293,12 @@ export function ParticipantPlayView({
   } = useLiveSession({
     sessionId,
     initialState,
+    onStateChange: (payload) => {
+      const unlockedAt = (payload as Partial<SessionRuntimeState>).secret_instructions_unlocked_at;
+      const unlockedBy = (payload as Partial<SessionRuntimeState>).secret_instructions_unlocked_by;
+      if (unlockedAt !== undefined) setSecretUnlockedAt(unlockedAt ?? null);
+      if (unlockedBy !== undefined) setSecretUnlockedBy(unlockedBy ?? null);
+    },
     onArtifactUpdate: () => {
       void loadArtifacts();
     },
@@ -299,6 +306,92 @@ export function ParticipantPlayView({
       void loadDecisions();
     },
   });
+
+  // --------------------------------------------------------------------------
+  // Secret Instructions (participant gate)
+  // --------------------------------------------------------------------------
+
+  const [secretUnlockedAt, setSecretUnlockedAt] = useState<string | null>(
+    (initialState?.secret_instructions_unlocked_at as string | null | undefined) ?? null
+  );
+  const [secretUnlockedBy, setSecretUnlockedBy] = useState<string | null>(
+    (initialState?.secret_instructions_unlocked_by as string | null | undefined) ?? null
+  );
+  const [secretRevealedAt, setSecretRevealedAt] = useState<string | null>(secretRoleRevealedAt ?? null);
+  const [secretRevealLoading, setSecretRevealLoading] = useState(false);
+  const [secretRevealError, setSecretRevealError] = useState<string | null>(null);
+
+  const [hintRequestSending, setHintRequestSending] = useState(false);
+  const [hintRequestError, setHintRequestError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSecretUnlockedAt(
+      (initialState?.secret_instructions_unlocked_at as string | null | undefined) ?? null
+    );
+    setSecretUnlockedBy(
+      (initialState?.secret_instructions_unlocked_by as string | null | undefined) ?? null
+    );
+  }, [
+    initialState?.secret_instructions_unlocked_at,
+    initialState?.secret_instructions_unlocked_by,
+  ]);
+
+  useEffect(() => {
+    setSecretRevealedAt(secretRoleRevealedAt ?? null);
+  }, [secretRoleRevealedAt]);
+
+  const handleRevealSecretInstructions = useCallback(async () => {
+    if (!participantToken || !sessionCode) return;
+    setSecretRevealLoading(true);
+    try {
+      const res = await fetch(`/api/play/me/role/reveal?session_code=${sessionCode}`, {
+        method: 'POST',
+        headers: {
+          'x-participant-token': participantToken,
+        },
+      });
+
+      const data = (await res.json().catch(() => ({}))) as { secretRevealedAt?: string; error?: string };
+      if (!res.ok) {
+        throw new Error(data.error ?? 'Kunde inte visa instruktionerna');
+      }
+
+      setSecretRevealedAt(data.secretRevealedAt ?? new Date().toISOString());
+      setSecretRevealError(null);
+    } catch (err) {
+      setSecretRevealError(err instanceof Error ? err.message : 'Kunde inte visa instruktionerna');
+    } finally {
+      setSecretRevealLoading(false);
+    }
+  }, [participantToken, sessionCode]);
+
+  const handleRequestHintFromHost = useCallback(async () => {
+    if (!participantToken) return;
+    if (!role) return;
+
+    setHintRequestSending(true);
+    setHintRequestError(null);
+    try {
+      const stepTitle = steps[currentStepIndex]?.title;
+      const msg = stepTitle
+        ? `Jag behöver en ledtråd. Steg: ${stepTitle}.`
+        : 'Jag behöver en ledtråd.';
+
+      await sendSessionChatMessage(
+        sessionId,
+        {
+          message: msg,
+          visibility: 'host',
+          anonymous: false,
+        },
+        { participantToken }
+      );
+    } catch (err) {
+      setHintRequestError(err instanceof Error ? err.message : 'Kunde inte be om ledtråd');
+    } finally {
+      setHintRequestSending(false);
+    }
+  }, [participantToken, role, sessionId, steps, currentStepIndex]);
   
   // Current step data
   const currentStep = steps[currentStepIndex] || null;
@@ -315,22 +408,6 @@ export function ParticipantPlayView({
       ? nextStarterParticipantId === participantId
       : initialIsNextStarter
   );
-
-  // --------------------------------------------------------------------------
-  // Chat (participant)
-  // --------------------------------------------------------------------------
-
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [chatInput, setChatInput] = useState('');
-  const [chatTarget, setChatTarget] = useState<'public' | 'host'>('public');
-  const [chatAnonymous, setChatAnonymous] = useState(false);
-  const [chatSending, setChatSending] = useState(false);
-  const [chatError, setChatError] = useState<string | null>(null);
-
-  const latestChatTimestamp = useMemo(() => {
-    if (chatMessages.length === 0) return undefined;
-    return chatMessages[chatMessages.length - 1]?.createdAt;
-  }, [chatMessages]);
 
   useEffect(() => {
     if (!participantToken) return;
@@ -379,98 +456,6 @@ export function ParticipantPlayView({
     }
   };
 
-  useEffect(() => {
-    if (!participantToken) return;
-    let cancelled = false;
-
-    const loadInitial = async () => {
-      try {
-        const messages = await getSessionChatMessages(sessionId, { participantToken });
-        if (!cancelled) {
-          setChatMessages(messages);
-          setChatError(null);
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setChatError(err instanceof Error ? err.message : 'Kunde inte ladda chatten');
-        }
-      }
-    };
-
-    void loadInitial();
-    return () => {
-      cancelled = true;
-    };
-  }, [sessionId, participantToken]);
-
-  useEffect(() => {
-    if (!participantToken) return;
-
-    const interval = window.setInterval(async () => {
-      try {
-        const messages = await getSessionChatMessages(sessionId, {
-          participantToken,
-          since: latestChatTimestamp,
-        });
-        if (messages.length > 0) {
-          setChatMessages((prev) => {
-            const seen = new Set(prev.map((m) => m.id));
-            const next = [...prev];
-            for (const m of messages) {
-              if (!seen.has(m.id)) next.push(m);
-            }
-            return next.slice(-200);
-          });
-        }
-      } catch {
-        // best-effort polling
-      }
-    }, 2000);
-
-    return () => window.clearInterval(interval);
-  }, [sessionId, participantToken, latestChatTimestamp]);
-
-  const handleSendChat = async () => {
-    if (!participantToken) return;
-    const msg = chatInput.trim();
-    if (!msg) return;
-
-    setChatSending(true);
-    setChatError(null);
-    try {
-      await sendSessionChatMessage(
-        sessionId,
-        {
-          message: msg,
-          visibility: chatTarget,
-          anonymous: chatTarget === 'host' ? chatAnonymous : false,
-        },
-        { participantToken }
-      );
-      setChatInput('');
-      setChatAnonymous(false);
-
-      // Pull immediately to reflect the new message (avoid relying only on polling)
-      const messages = await getSessionChatMessages(sessionId, {
-        participantToken,
-        since: latestChatTimestamp,
-      });
-      if (messages.length > 0) {
-        setChatMessages((prev) => {
-          const seen = new Set(prev.map((m) => m.id));
-          const next = [...prev];
-          for (const m of messages) {
-            if (!seen.has(m.id)) next.push(m);
-          }
-          return next.slice(-200);
-        });
-      }
-    } catch (err) {
-      setChatError(err instanceof Error ? err.message : 'Kunde inte skicka meddelandet');
-    } finally {
-      setChatSending(false);
-    }
-  };
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-24">
@@ -498,82 +483,6 @@ export function ParticipantPlayView({
       {isNextStarter && !isEnded && (
         <Card className="border-2 border-primary/20 bg-primary/5 p-4">
           <p className="text-sm font-medium text-foreground">Du börjar nästa!</p>
-        </Card>
-      )}
-
-      {/* Chat */}
-      {!isEnded && participantToken && (
-        <Card className="p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Chatt</p>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                size="sm"
-                variant={chatTarget === 'public' ? 'primary' : 'outline'}
-                onClick={() => setChatTarget('public')}
-              >
-                Till alla
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={chatTarget === 'host' ? 'primary' : 'outline'}
-                onClick={() => setChatTarget('host')}
-              >
-                Privat till lekledare
-              </Button>
-            </div>
-          </div>
-
-          {chatTarget === 'host' && (
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={chatAnonymous}
-                onChange={(e) => setChatAnonymous(e.target.checked)}
-              />
-              Skicka anonymt
-            </label>
-          )}
-
-          <div className="max-h-64 overflow-auto rounded-md border border-border p-3 space-y-2">
-            {chatMessages.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Inga meddelanden ännu.</p>
-            ) : (
-              chatMessages.map((m) => (
-                <div key={m.id} className="text-sm">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground">{m.senderLabel}</span>
-                    {m.visibility === 'host' && (
-                      <Badge variant="secondary">Privat</Badge>
-                    )}
-                  </div>
-                  <p className="text-muted-foreground">{m.message}</p>
-                </div>
-              ))
-            )}
-          </div>
-
-          {chatError && <p className="text-sm text-destructive">{chatError}</p>}
-
-          <div className="flex gap-2">
-            <Input
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder={chatTarget === 'public' ? 'Skriv till alla…' : 'Skriv privat till lekledaren…'}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  void handleSendChat();
-                }
-              }}
-              disabled={chatSending}
-            />
-            <Button type="button" onClick={() => void handleSendChat()} disabled={chatSending}>
-              Skicka
-            </Button>
-          </div>
         </Card>
       )}
 
@@ -852,7 +761,60 @@ export function ParticipantPlayView({
       {/* Role Card */}
       {showRole && role && !isEnded && (
         <div className="pt-4">
-          <RoleCard role={role} variant="full" showPrivate={true} />
+          {(() => {
+            const secretsUnlocked = Boolean(secretUnlockedAt);
+            const secretsRevealed = Boolean(secretRevealedAt);
+
+            return (
+              <div className="space-y-3">
+                {!secretsUnlocked && (
+                  <Card className="p-4">
+                    <p className="text-sm text-muted-foreground">
+                      Hemliga instruktioner är låsta tills lekledaren låser upp dem.
+                    </p>
+                  </Card>
+                )}
+
+                {secretsUnlocked && !secretsRevealed && (
+                  <Card className="p-4">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-foreground">Hemliga instruktioner</p>
+                        <p className="text-sm text-muted-foreground">
+                          Klicka för att visa dina hemliga instruktioner.
+                        </p>
+                        {secretUnlockedBy && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Upplåst {secretUnlockedAt ? new Date(secretUnlockedAt).toLocaleTimeString() : ''}
+                          </p>
+                        )}
+                      </div>
+                      <Button
+                        onClick={() => void handleRevealSecretInstructions()}
+                        disabled={secretRevealLoading || !participantToken || !sessionCode}
+                      >
+                        {secretRevealLoading ? 'Visar…' : 'Visa'}
+                      </Button>
+                    </div>
+                    {secretRevealError && (
+                      <div className="mt-2 text-sm text-destructive">{secretRevealError}</div>
+                    )}
+                  </Card>
+                )}
+
+                <RoleCard
+                  role={role}
+                  variant="full"
+                  showPrivate={secretsUnlocked && secretsRevealed}
+                  onRequestHint={secretsUnlocked && secretsRevealed && role.private_hints ? () => void handleRequestHintFromHost() : undefined}
+                  interactive={!hintRequestSending}
+                />
+                {hintRequestError && (
+                  <div className="text-sm text-destructive">{hintRequestError}</div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
     </div>

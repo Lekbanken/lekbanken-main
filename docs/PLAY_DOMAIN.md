@@ -10,10 +10,12 @@ Play Domain owns the “run the activity” experience:
 - Host creates and manages **participant sessions** (lobby, participants list, status)
 - Participants join via a **6-character session code** (anonymous token-based access)
 - “Legendary Play” runtime:
+  - Active Session Overlay (locks navigation until exit to lobby)
   - Step/phase navigation
   - Event-driven timer (start/pause/resume/reset)
   - Board/public display state (message + visibility overrides)
   - Role snapshot + assignment for the session
+  - Secret instruction gating (host unlock + participant reveal)
   - Play primitives (Artifacts + Decisions/Votes + Outcomes)
   - Near-realtime updates via Supabase Realtime **broadcast**
 - Planner playback mode (non-realtime): play through a stored plan
@@ -77,6 +79,14 @@ Non-goals (owned by other domains):
   - `POST /api/play/sessions/[id]/roles` (snapshot game roles into session roles)
   - `GET /api/play/me/role?session_code=...` (participant’s assigned role)
 
+#### Active Session Overlay: UX contract
+
+When the Active Session Overlay is active:
+- AppShell is disabled (no navigation to other areas of Lekbanken)
+- The only supported exit is “Tillbaka till Lobbyn”
+
+Rationale: This makes the running session the single focus, keeps tablet/desktop behavior consistent, and provides a clear contract to say “no” to future feature requests that introduce side navigation while a session is running.
+
 Primitives (Artifacts + Decisions/Votes + Outcomes):
 - API (host):
   - `POST /api/play/sessions/[id]/artifacts` (snapshot artifacts/variants into session; one-time)
@@ -110,6 +120,10 @@ Chat:
 - API:
   - `GET /api/play/board/[code]` (public aggregated view)
 
+Design note:
+- Public Board is a presentation layer, not a game engine.
+- It renders revealed/highlighted state for the session (plus board message / timer display), and intentionally does not apply step/phase gating logic beyond what is already implied by “revealed”.
+
 ## Data model (Supabase)
 
 ### Core session tables
@@ -118,6 +132,8 @@ Chat:
   - Lifecycle: `status`, `paused_at`, `ended_at`, `expires_at`
   - Links: `game_id`, `plan_id`
   - Runtime (Legendary Play): `current_step_index`, `current_phase_index`, `timer_state` (jsonb), `board_state` (jsonb)
+  - Secret instruction gating:
+    - `secret_instructions_unlocked_at`, `secret_instructions_unlocked_by`
 - `participants`
   - Anonymous participant identity + token: `participant_token`, `token_expires_at`
   - Presence: `last_seen_at`, `disconnected_at`, `status` (active/blocked/kicked…)
@@ -129,6 +145,10 @@ Introduced in migration `supabase/migrations/20251216160000_play_runtime_schema.
 - `participant_role_assignments` (assign a `session_role_id` to a participant)
 - `session_events` (audit log)
 - RPC: `snapshot_game_roles_to_session(p_session_id, p_game_id, p_locale)` (SECURITY DEFINER)
+
+Secret instruction semantics:
+- Unlock = the host enables the system to allow reveal (session-level gate)
+- Reveal = an individual participant chooses to view their secret instructions (participant-level action)
 
 ### Chat tables
 Introduced in migration `supabase/migrations/20251219090000_play_chat_messages.sql`:
@@ -173,6 +193,22 @@ Timer is event-driven:
 - Participant join UI currently stores tokens in `sessionStorage` (separate from `features/play-participant/tokenStorage.ts` localStorage helper).
 - Planner playback is separate from Legendary Play runtime (different state and persistence model).
 
+## Future work (PR6 candidates, optional)
+
+These are logical next steps that build on the existing schema and audit log.
+
+- PR6-A: Author-time UI for Artifacts
+  - Goal: CRUD UI in the game builder for `artifacts_json` / variants (no new runtime logic).
+  - Rationale: the data model already supports artifacts/variants + step/phase gating; creators currently author this via CSV/JSON.
+
+- PR6-B: Session transcript / export
+  - Goal: export a readable “session story” (e.g. JSON/PDF) based on:
+    - `session_events` (timeline)
+    - decisions + votes + results
+    - outcomes
+    - (optional) revealed/highlighted artifact state
+  - Rationale: supports debrief, training, and documentation.
+
 ## Validation checklist
 - Host session lifecycle:
   - Create session → list → open details → pause/resume/end works.
@@ -184,6 +220,7 @@ Timer is event-driven:
   - Board message persists and broadcasts.
 - Roles:
   - Snapshot roles creates `session_roles` and assignments appear on participant.
+  - Secret instructions remain locked until host unlock; reveal is tracked per participant.
 - Chat:
   - Participant can send `visibility=public` messages (visible to all).
   - Participant can send `visibility=host` message; host sees sender name unless `anonymous=true`.

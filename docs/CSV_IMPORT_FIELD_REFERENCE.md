@@ -1,7 +1,7 @@
 # CSV Import - Fältreferens för Lekproduktion
 
-> **Version:** 1.3  
-> **Senast uppdaterad:** 2025-12-17  
+> **Version:** 1.4  
+> **Senast uppdaterad:** 2025-12-20  
 > **Syfte:** Komplett guide för att massproducera lekar via CSV-import
 
 ## Metadata
@@ -376,6 +376,56 @@ Konfiguration av publik tavla.
 | `background_color` | string | null | Hex-färg för bakgrund |
 | `layout_variant` | enum | `standard` | `standard`, `fullscreen` |
 
+### 6.5 artifacts_json (Play primitives: artefakter)
+
+Artefakter kan importeras som en JSON-struktur i en cell. De används i **Legendary Play** (participants) och kan innehålla flera **variants**.
+
+**Viktigt om step/phase-gating:**
+- Du kan låsa upp en variant först vid en viss tidpunkt genom att ange `step_index` och/eller `phase_index` på varianten.
+- Indexen är **0-baserade** (första steget = `0`, första fasen = `0`).
+- Fälten sparas i varianten som `metadata.step_index` / `metadata.phase_index`.
+
+**Author-time vs runtime (viktigt):**
+- CSV-importen beskriver **potential** (vad som *kan* finnas i en session).
+- En session snapshot skapar **verklighet** (vilka artefakter/varianter som faktiskt finns i just den sessionen).
+- Step/phase-gating är därför *författat i CSV* men *tillämpas vid runtime i sessionen* när deltagare hämtar innehåll.
+
+```json
+[
+  {
+    "title": "Ledtrådar",
+    "artifact_order": 1,
+    "artifact_type": "card",
+    "tags": ["mystery"],
+    "metadata": {},
+    "variants": [
+      {
+        "variant_order": 1,
+        "visibility": "public",
+        "title": "Ledtråd 1",
+        "body": "En kort ledtråd…",
+        "step_index": 0,
+        "phase_index": 0,
+        "metadata": {"difficulty": "easy"}
+      },
+      {
+        "variant_order": 2,
+        "visibility": "role_private",
+        "visible_to_role_order": 1,
+        "title": "Hemlig ledtråd",
+        "body": "Syns bara för en roll",
+        "step_index": 1
+      }
+    ]
+  }
+]
+```
+
+**Exempel i CSV-cell (kort):**
+```
+"[{""title"":""Ledtrådar"",""artifact_order"":1,""variants"":[{""variant_order"":1,""visibility"":""public"",""title"":""Ledtråd 1"",""body"":""…"",""step_index"":0,""phase_index"":0}]}]"
+```
+
 ---
 
 ## 8. Valideringsregler
@@ -417,7 +467,7 @@ kom-som-du-ar-001,"Kom som du är!","Snabb reaktionslek med rörelser","En enkel
 
 ### 8.2 Deltagarlek med roller (participants)
 
-Se [example-participants-game.csv](examples/example-participants-game.csv) för komplett Maffia-exempel.
+Se [docs/examples/example-participants-game.csv](docs/examples/example-participants-game.csv) för komplett Maffia-exempel.
 
 ---
 

@@ -163,10 +163,13 @@ export async function PATCH(
 
   const supabaseAdmin = await createServiceRoleClient();
 
-  const nextSettings = {
-    ...(session.settings as Record<string, unknown> | null)?.valueOf?.() ?? session.settings ?? {},
+  const rawSettings = (session.settings as unknown) ?? {};
+  const baseSettings = typeof rawSettings === 'object' && rawSettings !== null ? (rawSettings as Record<string, unknown>) : {};
+
+  const nextSettings: Record<string, unknown> = {
+    ...baseSettings,
     admin_overrides: sanitized,
-  } as Record<string, unknown>;
+  };
 
   const { error: updateError } = await supabaseAdmin
     .from('participant_sessions')

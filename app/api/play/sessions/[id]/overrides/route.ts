@@ -53,7 +53,7 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
     ? (payload.steps
         .map((s) =>
           isObject(s) && typeof s.id === 'string'
-            ? {
+            ? ({
                 id: s.id,
                 title: typeof s.title === 'string' ? s.title : undefined,
                 description: typeof s.description === 'string' ? s.description : undefined,
@@ -64,17 +64,17 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
                 order: typeof (s as { order?: unknown }).order === 'number'
                   ? (s as { order: number }).order
                   : undefined,
-              }
+              } satisfies StepOverride)
             : null
         )
-        .filter((item): item is StepOverride => Boolean(item)))
+        .filter(Boolean) as StepOverride[])
     : undefined;
 
   const phases = Array.isArray(payload.phases)
     ? (payload.phases
         .map((p) =>
           isObject(p) && typeof p.id === 'string'
-            ? {
+            ? ({
                 id: p.id,
                 name: typeof p.name === 'string' ? p.name : undefined,
                 description: typeof p.description === 'string' ? p.description : undefined,
@@ -85,10 +85,10 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
                 order: typeof (p as { order?: unknown }).order === 'number'
                   ? (p as { order: number }).order
                   : undefined,
-              }
+              } satisfies PhaseOverride)
             : null
         )
-        .filter((item): item is PhaseOverride => Boolean(item)))
+        .filter(Boolean) as PhaseOverride[])
     : undefined;
 
   const safetyPayload = isObject(payload.safety) ? payload.safety : undefined;

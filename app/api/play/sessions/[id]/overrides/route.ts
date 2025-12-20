@@ -50,7 +50,7 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
   if (!isObject(payload)) return {};
 
   const steps = Array.isArray(payload.steps)
-    ? payload.steps
+    ? (payload.steps
         .map((s) =>
           isObject(s) && typeof s.id === 'string'
             ? {
@@ -67,11 +67,11 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
               }
             : null
         )
-        .filter(Boolean)
+        .filter((item): item is StepOverride => Boolean(item)))
     : undefined;
 
   const phases = Array.isArray(payload.phases)
-    ? payload.phases
+    ? (payload.phases
         .map((p) =>
           isObject(p) && typeof p.id === 'string'
             ? {
@@ -88,7 +88,7 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
               }
             : null
         )
-        .filter(Boolean)
+        .filter((item): item is PhaseOverride => Boolean(item)))
     : undefined;
 
   const safetyPayload = isObject(payload.safety) ? payload.safety : undefined;

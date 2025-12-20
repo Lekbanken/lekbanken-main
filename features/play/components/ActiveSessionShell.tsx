@@ -115,9 +115,11 @@ export function ActiveSessionShell({
 
   const hostConfirm = (
     <Card variant="elevated" className="w-full max-w-lg p-6">
-      <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">Leave active session</h2>
-        <p className="text-sm text-muted-foreground">You are about to leave the active session.</p>
+      <div className="space-y-4">
+        <h2 className="text-lg font-semibold text-foreground">Lämna aktiv session</h2>
+        <p className="text-sm text-muted-foreground">
+          Du är på väg att lämna sessionen. Vad vill du göra med sessionen?
+        </p>
         <div className="grid gap-2 pt-2">
           <Button
             variant="outline"
@@ -126,7 +128,7 @@ export function ActiveSessionShell({
               setConfirmOpen(false);
             }}
           >
-            Cancel
+            Avbryt
           </Button>
           <Button
             variant="default"
@@ -142,7 +144,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Session continues as ACTIVE
+            Lämna – sessionen fortsätter som AKTIV
           </Button>
           <Button
             variant="outline"
@@ -158,7 +160,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Session is PAUSED
+            Lämna – sessionen PAUSAS
           </Button>
           <Button
             variant="destructive"
@@ -174,7 +176,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Session is ENDED
+            Lämna – sessionen AVSLUTAS
           </Button>
         </div>
       </div>

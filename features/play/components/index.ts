@@ -41,6 +41,14 @@ export { HostSessionWithPlayClient } from './HostSessionWithPlay';
 
 export { ParticipantSessionWithPlayClient } from './ParticipantSessionWithPlay';
 
+export { PreflightChecklist, buildPreflightItems } from './PreflightChecklist';
+export type {
+  PreflightChecklistProps,
+  ChecklistItem,
+  ChecklistItemStatus,
+  SessionChecklistState,
+} from './PreflightChecklist';
+
 // Existing components
 export { NavigationControls } from './NavigationControls';
 export { SessionHeader } from './SessionHeader';

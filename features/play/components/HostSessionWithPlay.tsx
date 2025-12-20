@@ -29,16 +29,17 @@ import {
 import { HostPlayMode } from '@/features/play';
 import { ActiveSessionShell } from '@/features/play/components/ActiveSessionShell';
 import { RoleAssignerContainer } from '@/features/play/components/RoleAssignerContainer';
+import { PreflightChecklist, buildPreflightItems } from '@/features/play/components/PreflightChecklist';
 import { SessionChatDrawer } from '@/features/play/components/SessionChatDrawer';
 import { useSessionChat } from '@/features/play/hooks/useSessionChat';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/components/ui/toast';
 import { 
   ShareIcon, 
   QrCodeIcon,
   ExclamationCircleIcon,
-  PlayIcon,
 } from '@heroicons/react/24/outline';
 import type { SessionRole } from '@/types/play-runtime';
 
@@ -55,6 +56,7 @@ type ParticipantWithExtras = Participant & {
 
 export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProps) {
   const router = useRouter();
+  const toast = useToast();
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participants, setParticipants] = useState<ParticipantWithExtras[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,6 +168,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
   const handleSnapshotRoles = async () => {
     setRolesLoading(true);
+    setRolesError(null);
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/roles`, {
         method: 'POST',
@@ -173,14 +176,20 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         body: JSON.stringify({}),
       });
 
+      const data = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error ?? 'Kunde inte kopiera roller');
+        const errMsg = (data as { error?: string }).error ?? 'Kunde inte kopiera roller';
+        throw new Error(errMsg);
       }
 
+      const count = (data as { count?: number }).count ?? 0;
+      toast.success(`${count} roller kopierade till sessionen`);
       await loadRoles();
     } catch (err) {
-      setRolesError(err instanceof Error ? err.message : 'Kunde inte kopiera roller');
+      const errMsg = err instanceof Error ? err.message : 'Kunde inte kopiera roller';
+      setRolesError(errMsg);
+      toast.error(errMsg);
     } finally {
       setRolesLoading(false);
     }
@@ -446,25 +455,38 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         />
       )}
 
-      {/* Play Mode CTA for sessions with games */}
-      {hasGame && !isEnded && (
-        <Card className="p-6 bg-primary/5 border-primary/20">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                Spelläge tillgängligt
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Denna session har ett spel kopplat. Starta spelläget för att facilitera.
-              </p>
-            </div>
-            <Button variant="primary" onClick={() => void handleEnterPlayMode()} disabled={actionPending}>
-              <PlayIcon className="h-4 w-4 mr-2" />
-              Starta spelläge
-            </Button>
-          </div>
-        </Card>
-      )}
+      {/* Pre-flight Checklist for sessions with games */}
+      {hasGame && !isEnded && (() => {
+        // Build checklist state
+        const rolesAssignedCount = sessionRoles.reduce((acc, role) => {
+          // Count assignments for this role from the role data or fall back to 0
+          return acc + ((role as unknown as { assigned_count?: number }).assigned_count ?? 0);
+        }, 0);
+        
+        const checklistState = {
+          participantCount: participants.length,
+          hasGame: Boolean(session?.gameId),
+          rolesSnapshotted: sessionRoles.length > 0,
+          rolesAssignedCount,
+          totalRoles: sessionRoles.length,
+        };
+        
+        const items = buildPreflightItems(checklistState, {
+          onSnapshotRoles: handleSnapshotRoles,
+        });
+        
+        // Can start if no errors (warnings are allowed)
+        const canStart = !items.some((i) => i.status === 'error');
+        
+        return (
+          <PreflightChecklist
+            items={items}
+            canStart={canStart}
+            onStart={() => void handleEnterPlayMode()}
+            isStarting={actionPending}
+          />
+        );
+      })()}
 
       {/* Main content */}
       <div className="grid gap-6 lg:grid-cols-3">

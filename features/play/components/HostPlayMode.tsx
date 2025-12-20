@@ -43,7 +43,10 @@ export interface HostPlayModeProps {
   participantCount?: number;
 }
 
-type PlayModeTab = 'facilitator' | 'artifacts' | 'decisions' | 'outcome' | 'roles' | 'settings';
+// Navigation zones: Play (main), Content (artifacts/decisions/outcomes), Manage (roles/settings)
+type PlayModeZone = 'play' | 'content' | 'manage';
+type ContentSubTab = 'artifacts' | 'decisions' | 'outcome';
+type ManageSubTab = 'roles' | 'settings';
 
 // =============================================================================
 // Component
@@ -60,8 +63,10 @@ export function HostPlayMode({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
-  // UI state
-  const [activeTab, setActiveTab] = useState<PlayModeTab>('facilitator');
+  // UI state - simplified 3-zone navigation
+  const [activeZone, setActiveZone] = useState<PlayModeZone>('play');
+  const [contentSubTab, setContentSubTab] = useState<ContentSubTab>('artifacts');
+  const [manageSubTab, setManageSubTab] = useState<ManageSubTab>('roles');
 
   // Load play session data
   const loadData = useCallback(async () => {
@@ -113,8 +118,8 @@ export function HostPlayMode({
   const handleRolesAssigned = useCallback(() => {
     // Reload data to get updated assignments
     void loadData();
-    // Switch to facilitator view
-    setActiveTab('facilitator');
+    // Switch to play view
+    setActiveZone('play');
   }, [loadData]);
 
   // Loading state
@@ -159,61 +164,35 @@ export function HostPlayMode({
 
   return (
     <div className="space-y-4">
-      {/* Tab navigation */}
+      {/* Simplified 3-zone navigation */}
       <div className="flex items-center justify-between border-b border-border pb-4">
-        <div className="flex gap-2">
+        <div className="flex gap-1 rounded-lg bg-muted p-1">
           <Button
-            variant={activeTab === 'facilitator' ? 'primary' : 'ghost'}
+            variant={activeZone === 'play' ? 'primary' : 'ghost'}
             size="sm"
-            onClick={() => setActiveTab('facilitator')}
+            onClick={() => setActiveZone('play')}
+            className="min-w-[80px]"
           >
-            <PlayIcon className="h-4 w-4 mr-1" />
+            <PlayIcon className="h-4 w-4 mr-1.5" />
             Spela
           </Button>
           <Button
-            variant={activeTab === 'artifacts' ? 'primary' : 'ghost'}
+            variant={activeZone === 'content' ? 'primary' : 'ghost'}
             size="sm"
-            onClick={() => setActiveTab('artifacts')}
+            onClick={() => setActiveZone('content')}
+            className="min-w-[80px]"
           >
-            <CubeIcon className="h-4 w-4 mr-1" />
-            Artefakter
+            <CubeIcon className="h-4 w-4 mr-1.5" />
+            Innehåll
           </Button>
           <Button
-            variant={activeTab === 'decisions' ? 'primary' : 'ghost'}
+            variant={activeZone === 'manage' ? 'primary' : 'ghost'}
             size="sm"
-            onClick={() => setActiveTab('decisions')}
+            onClick={() => setActiveZone('manage')}
+            className="min-w-[80px]"
           >
-            <ScaleIcon className="h-4 w-4 mr-1" />
-            Beslut
-          </Button>
-          <Button
-            variant={activeTab === 'outcome' ? 'primary' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('outcome')}
-          >
-            <FlagIcon className="h-4 w-4 mr-1" />
-            Utfall
-          </Button>
-          <Button
-            variant={activeTab === 'roles' ? 'primary' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('roles')}
-          >
-            <UserGroupIcon className="h-4 w-4 mr-1" />
-            Roller
-            {playData.sessionRoles.length > 0 && (
-              <span className="ml-1 text-xs opacity-75">
-                ({playData.sessionRoles.length})
-              </span>
-            )}
-          </Button>
-          <Button
-            variant={activeTab === 'settings' ? 'primary' : 'ghost'}
-            size="sm"
-            onClick={() => setActiveTab('settings')}
-          >
-            <Cog6ToothIcon className="h-4 w-4 mr-1" />
-            Inställningar
+            <Cog6ToothIcon className="h-4 w-4 mr-1.5" />
+            Hantera
           </Button>
         </div>
         
@@ -225,8 +204,8 @@ export function HostPlayMode({
         )}
       </div>
 
-      {/* Tab content */}
-      {activeTab === 'facilitator' && (
+      {/* Zone: Play - Main facilitator dashboard */}
+      {activeZone === 'play' && (
         <FacilitatorDashboard
           sessionId={sessionId}
           gameTitle={playData.gameTitle}
@@ -239,39 +218,94 @@ export function HostPlayMode({
         />
       )}
 
-      {activeTab === 'artifacts' && (
-        <ArtifactsPanel sessionId={sessionId} />
+      {/* Zone: Content - Artifacts, Decisions, Outcomes */}
+      {activeZone === 'content' && (
+        <div className="space-y-4">
+          {/* Sub-tabs for content zone */}
+          <div className="flex gap-2 border-b border-border/50 pb-3">
+            <Button
+              variant={contentSubTab === 'artifacts' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setContentSubTab('artifacts')}
+            >
+              <CubeIcon className="h-4 w-4 mr-1" />
+              Artefakter
+            </Button>
+            <Button
+              variant={contentSubTab === 'decisions' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setContentSubTab('decisions')}
+            >
+              <ScaleIcon className="h-4 w-4 mr-1" />
+              Beslut
+            </Button>
+            <Button
+              variant={contentSubTab === 'outcome' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setContentSubTab('outcome')}
+            >
+              <FlagIcon className="h-4 w-4 mr-1" />
+              Utfall
+            </Button>
+          </div>
+
+          {contentSubTab === 'artifacts' && <ArtifactsPanel sessionId={sessionId} />}
+          {contentSubTab === 'decisions' && <DecisionsPanel sessionId={sessionId} />}
+          {contentSubTab === 'outcome' && <OutcomePanel sessionId={sessionId} />}
+        </div>
       )}
 
-      {activeTab === 'decisions' && (
-        <DecisionsPanel sessionId={sessionId} />
-      )}
+      {/* Zone: Manage - Roles, Settings */}
+      {activeZone === 'manage' && (
+        <div className="space-y-4">
+          {/* Sub-tabs for manage zone */}
+          <div className="flex gap-2 border-b border-border/50 pb-3">
+            <Button
+              variant={manageSubTab === 'roles' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setManageSubTab('roles')}
+            >
+              <UserGroupIcon className="h-4 w-4 mr-1" />
+              Roller
+              {playData.sessionRoles.length > 0 && (
+                <span className="ml-1 text-xs opacity-75">
+                  ({playData.sessionRoles.length})
+                </span>
+              )}
+            </Button>
+            <Button
+              variant={manageSubTab === 'settings' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setManageSubTab('settings')}
+            >
+              <Cog6ToothIcon className="h-4 w-4 mr-1" />
+              Inställningar
+            </Button>
+          </div>
 
-      {activeTab === 'outcome' && (
-        <OutcomePanel sessionId={sessionId} />
-      )}
+          {manageSubTab === 'roles' && (
+            <RoleAssignerContainer
+              sessionId={sessionId}
+              sessionRoles={playData.sessionRoles}
+              onAssignmentComplete={handleRolesAssigned}
+            />
+          )}
 
-      {activeTab === 'roles' && (
-        <RoleAssignerContainer
-          sessionId={sessionId}
-          sessionRoles={playData.sessionRoles}
-          onAssignmentComplete={handleRolesAssigned}
-        />
-      )}
-
-      {activeTab === 'settings' && (
-        <Card className="p-6">
-          <h2 className="text-lg font-semibold mb-4">Spelinställningar</h2>
-          <p className="text-muted-foreground">
-            Inställningar för spelet kommer här i framtida versioner.
-          </p>
-          <ul className="mt-4 text-sm text-muted-foreground list-disc list-inside space-y-1">
-            <li>Timer-inställningar</li>
-            <li>Automatisk stegframsteg</li>
-            <li>Ljudeffekter</li>
-            <li>Deltagarbegränsningar</li>
-          </ul>
-        </Card>
+          {manageSubTab === 'settings' && (
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold mb-4">Spelinställningar</h2>
+              <p className="text-muted-foreground">
+                Inställningar för spelet kommer här i framtida versioner.
+              </p>
+              <ul className="mt-4 text-sm text-muted-foreground list-disc list-inside space-y-1">
+                <li>Timer-inställningar</li>
+                <li>Automatisk stegframsteg</li>
+                <li>Ljudeffekter</li>
+                <li>Deltagarbegränsningar</li>
+              </ul>
+            </Card>
+          )}
+        </div>
       )}
     </div>
   );

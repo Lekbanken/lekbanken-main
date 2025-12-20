@@ -107,7 +107,20 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
     
-    // Insert assignments
+    // First, delete any existing assignments for these participants
+    // (each participant can only have one role in a session)
+    const { error: deleteError } = await supabase
+      .from('participant_role_assignments')
+      .delete()
+      .eq('session_id', sessionId)
+      .in('participant_id', participantIds);
+    
+    if (deleteError) {
+      console.error('[Assignments API] Delete existing error:', deleteError);
+      return NextResponse.json({ error: 'Failed to update assignments' }, { status: 500 });
+    }
+    
+    // Insert new assignments
     const insertData = body.assignments.map((a) => ({
       session_id: sessionId,
       participant_id: a.participantId,
@@ -118,10 +131,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     
     const { data: inserted, error: insertError } = await supabase
       .from('participant_role_assignments')
-      .upsert(insertData, {
-        onConflict: 'session_id,participant_id',
-        ignoreDuplicates: false,
-      })
+      .insert(insertData)
       .select();
     
     if (insertError) {
@@ -129,30 +139,25 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: 'Failed to create assignments' }, { status: 500 });
     }
     
-    // Update assigned_count on session_roles
-    // Group by roleId and count
-    const roleCountUpdates = new Map<string, number>();
-    for (const assignment of body.assignments) {
-      roleCountUpdates.set(
-        assignment.roleId,
-        (roleCountUpdates.get(assignment.roleId) || 0) + 1
-      );
-    }
+    // Recalculate assigned_count for all roles in this session
+    // This ensures counts are accurate after delete + insert
+    const { data: allRoles } = await supabase
+      .from('session_roles')
+      .select('id')
+      .eq('session_id', sessionId);
     
-    // Update each role's count
-    for (const [roleId, count] of roleCountUpdates) {
-      // Get current count first
-      const { data: currentRole } = await supabase
-        .from('session_roles')
-        .select('assigned_count')
-        .eq('id', roleId)
-        .single();
-      
-      if (currentRole) {
+    if (allRoles) {
+      for (const role of allRoles) {
+        const { count } = await supabase
+          .from('participant_role_assignments')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', sessionId)
+          .eq('session_role_id', role.id);
+        
         await supabase
           .from('session_roles')
-          .update({ assigned_count: currentRole.assigned_count + count })
-          .eq('id', roleId);
+          .update({ assigned_count: count || 0 })
+          .eq('id', role.id);
       }
     }
     

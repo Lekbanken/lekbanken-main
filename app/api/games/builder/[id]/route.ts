@@ -47,6 +47,29 @@ type MaterialsPayload = {
   preparation?: string | null;
 };
 
+type ArtifactVariantPayload = {
+  title?: string | null;
+  body?: string | null;
+  media_ref?: string | null;
+  variant_order?: number;
+  visibility?: string;
+  visible_to_role_id?: string | null;
+  metadata?: Record<string, unknown> | null;
+  step_index?: number | null;
+  phase_index?: number | null;
+};
+
+type ArtifactPayload = {
+  title?: string;
+  description?: string | null;
+  artifact_type?: string;
+  artifact_order?: number;
+  tags?: string[] | null;
+  metadata?: Record<string, unknown> | null;
+  locale?: string | null;
+  variants?: ArtifactVariantPayload[];
+};
+
 type PhasePayload = {
   locale?: string | null;
   name: string;
@@ -99,6 +122,7 @@ type BuilderBody = {
   phases?: PhasePayload[];
   roles?: RolePayload[];
   boardConfig?: BoardConfigPayload;
+  artifacts?: ArtifactPayload[];
   secondaryPurposes?: string[];
   coverMediaId?: string | null;
 };
@@ -165,6 +189,33 @@ export async function GET(
     .limit(1)
     .maybeSingle();
 
+  const { data: artifacts } = await supabase
+    .from('game_artifacts')
+    .select('*')
+    .eq('game_id', id)
+    .order('artifact_order', { ascending: true });
+
+  const artifactIds = (artifacts ?? []).map((a: { id: string }) => a.id).filter(Boolean);
+  const { data: artifactVariants } = artifactIds.length
+    ? await supabase
+        .from('game_artifact_variants')
+        .select('*')
+        .in('artifact_id', artifactIds)
+        .order('variant_order', { ascending: true })
+    : { data: [] as unknown[] | null };
+
+  const variantsByArtifact: Record<string, unknown[]> = {};
+  (artifactVariants ?? []).forEach((v: { artifact_id: string }) => {
+    const key = v.artifact_id as string;
+    variantsByArtifact[key] = variantsByArtifact[key] || [];
+    variantsByArtifact[key].push(v);
+  });
+
+  const artifactsWithVariants = (artifacts ?? []).map((a) => ({
+    ...a,
+    variants: variantsByArtifact[a.id as string] ?? [],
+  }));
+
   return NextResponse.json({
     game,
     steps: steps || [],
@@ -180,6 +231,7 @@ export async function GET(
           alt_text: (coverMedia.media as { alt_text?: string | null } | null)?.alt_text ?? null,
         }
       : null,
+    artifacts: artifactsWithVariants,
   });
 }
 
@@ -359,6 +411,71 @@ export async function PUT(
       position: 0,
       tenant_id: core.owner_tenant_id ?? null,
     });
+  }
+
+  // Replace artifacts and variants
+  const artifacts = body.artifacts ?? [];
+  const { data: existingArtifacts } = await supabase
+    .from('game_artifacts')
+    .select('id')
+    .eq('game_id', id);
+
+  const artifactIds = (existingArtifacts ?? []).map((a: { id: string }) => a.id as string);
+  if (artifactIds.length > 0) {
+    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIds);
+  }
+  await supabase.from('game_artifacts').delete().eq('game_id', id);
+
+  if (artifacts.length > 0) {
+    const artifactRows = artifacts.map((a, idx) => ({
+      game_id: id,
+      artifact_order: a.artifact_order ?? idx,
+      artifact_type: a.artifact_type ?? 'card',
+      title: (a.title ?? '').trim() || 'Artefakt',
+      description: a.description ?? null,
+      tags: a.tags ?? [],
+      metadata: a.metadata ?? null,
+      locale: a.locale ?? null,
+    }));
+
+    const { data: insertedArtifacts, error: artifactsError } = await supabase
+      .from('game_artifacts')
+      .insert(artifactRows)
+      .select();
+
+    if (artifactsError) {
+      return NextResponse.json({ error: 'Failed to save artifacts', details: artifactsError.message }, { status: 500 });
+    }
+
+    const variantRows = insertedArtifacts.flatMap((art, idx) => {
+      const source = artifacts[idx];
+      const variants = source?.variants ?? [];
+
+      return variants.map((v, j) => {
+        const meta: Record<string, unknown> = { ...(v.metadata ?? {}) };
+        if (v.step_index !== undefined && v.step_index !== null) meta.step_index = v.step_index;
+        if (v.phase_index !== undefined && v.phase_index !== null) meta.phase_index = v.phase_index;
+        const hasMetadata = Object.keys(meta).length > 0;
+
+        return {
+          artifact_id: art.id as string,
+          variant_order: v.variant_order ?? j,
+          visibility: v.visibility ?? 'public',
+          visible_to_role_id: v.visible_to_role_id ?? null,
+          title: v.title ?? null,
+          body: v.body ?? null,
+          media_ref: v.media_ref ?? null,
+          metadata: hasMetadata ? meta : null,
+        };
+      });
+    });
+
+    if (variantRows.length > 0) {
+      const { error: variantsError } = await supabase.from('game_artifact_variants').insert(variantRows);
+      if (variantsError) {
+        return NextResponse.json({ error: 'Failed to save artifact variants', details: variantsError.message }, { status: 500 });
+      }
+    }
   }
 
   return NextResponse.json({ success: true });

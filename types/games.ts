@@ -15,6 +15,63 @@ export type BoardTheme = 'mystery' | 'party' | 'sport' | 'nature' | 'neutral';
 export type BoardLayout = 'standard' | 'fullscreen';  // 'compact' removed for MVP
 
 // =============================================================================
+// Game Artifacts (author-time)
+// =============================================================================
+
+export type ArtifactVisibility = 'public' | 'leader_only' | 'role_private';
+
+export type GameArtifactVariant = {
+  id: string;
+  artifact_id: string;
+  title: string | null;
+  body: string | null;
+  media_ref: string | null;
+  variant_order: number;
+  visibility: ArtifactVisibility;
+  visible_to_role_id: string | null;
+  metadata: Record<string, unknown> | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type GameArtifact = {
+  id: string;
+  game_id: string;
+  title: string;
+  description: string | null;
+  artifact_type: string;
+  artifact_order: number;
+  tags: string[];
+  metadata: Record<string, unknown> | null;
+  locale: string | null;
+  variants?: GameArtifactVariant[];
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ArtifactFormData = {
+  id: string;
+  title: string;
+  description: string;
+  artifact_type: string;
+  tags: string[];
+  metadata?: Record<string, unknown> | null;
+  variants: ArtifactVariantFormData[];
+};
+
+export type ArtifactVariantFormData = {
+  id: string;
+  title: string;
+  body: string;
+  media_ref: string;
+  visibility: ArtifactVisibility;
+  visible_to_role_id: string | null;
+  step_index: number | null;
+  phase_index: number | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+// =============================================================================
 // Game Steps
 // =============================================================================
 
@@ -214,4 +271,5 @@ export type GameBuilderData = {
   phases: GamePhase[];
   roles: GameRole[];
   boardConfig: GameBoardConfig | null;
+  artifacts?: GameArtifact[];
 };

@@ -15,6 +15,7 @@ import {
   RoleEditor,
   BoardEditor,
   StandardImagePicker,
+  ArtifactEditor,
   type BuilderSection,
   type QualityState,
   type StepData,
@@ -22,6 +23,7 @@ import {
   type RoleData,
   type BoardConfigData,
 } from './components';
+import type { ArtifactFormData, ArtifactVariantFormData } from '@/types/games';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
 
@@ -107,6 +109,23 @@ const taxonomyPresets = [
   'Isbrytare',
 ];
 
+const makeId = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
+    ? crypto.randomUUID()
+    : `id-${Math.random().toString(36).slice(2, 9)}`;
+
+const createVariantForm = (): ArtifactVariantFormData => ({
+  id: makeId(),
+  title: '',
+  body: '',
+  media_ref: '',
+  visibility: 'public',
+  visible_to_role_id: null,
+  step_index: null,
+  phase_index: null,
+  metadata: null,
+});
+
 type GameBuilderPageProps = {
   gameId?: string;
 };
@@ -125,6 +144,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   });
   const [phases, setPhases] = useState<PhaseData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
+  const [artifacts, setArtifacts] = useState<ArtifactFormData[]>([]);
   const [purposes, setPurposes] = useState<Purpose[]>([]);
   const [subPurposeIds, setSubPurposeIds] = useState<string[]>([]);
   const [cover, setCover] = useState<{ mediaId: string | null; url: string | null }>({ mediaId: null, url: null });
@@ -283,6 +303,49 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         );
         setRoles(loadedRoles);
 
+        const normalizeVariant = (variant: unknown, variantIndex: number): ArtifactVariantFormData => {
+          const v = (variant || {}) as Record<string, unknown>;
+          const rawMeta = (v.metadata as Record<string, unknown> | null) ?? null;
+          const meta = rawMeta && typeof rawMeta === 'object' ? { ...rawMeta } : null;
+          const stepIndex = typeof (meta?.step_index as unknown) === 'number' ? (meta?.step_index as number) : null;
+          const phaseIndex = typeof (meta?.phase_index as unknown) === 'number' ? (meta?.phase_index as number) : null;
+          if (meta && 'step_index' in meta) delete (meta as Record<string, unknown>).step_index;
+          if (meta && 'phase_index' in meta) delete (meta as Record<string, unknown>).phase_index;
+
+          const visibility = (v.visibility as ArtifactVariantFormData['visibility']) ?? 'public';
+
+          return {
+            id: (v.id as string) || `variant-${variantIndex}`,
+            title: (v.title as string) || '',
+            body: (v.body as string) || '',
+            media_ref: (v.media_ref as string) || '',
+            visibility: visibility === 'leader_only' || visibility === 'role_private' ? visibility : 'public',
+            visible_to_role_id: (v.visible_to_role_id as string | null) ?? null,
+            step_index: stepIndex,
+            phase_index: phaseIndex,
+            metadata: meta,
+          };
+        };
+
+        const normalizeArtifact = (artifact: unknown, idx: number): ArtifactFormData => {
+          const a = (artifact || {}) as Record<string, unknown>;
+          const variantsRaw = Array.isArray(a.variants) ? (a.variants as unknown[]) : [];
+          const variants = variantsRaw.map((v, j) => normalizeVariant(v, j));
+
+          return {
+            id: (a.id as string) || `artifact-${idx}`,
+            title: (a.title as string) || '',
+            description: (a.description as string) || '',
+            artifact_type: (a.artifact_type as string) || 'card',
+            tags: Array.isArray(a.tags) ? (a.tags as unknown[]).map((t) => String(t)).filter(Boolean) : [],
+            metadata: (a.metadata as Record<string, unknown> | null) ?? null,
+            variants: variants.length > 0 ? variants : [createVariantForm()],
+          };
+        };
+
+        const loadedArtifacts = ((data.artifacts as unknown[]) ?? []).map((a, idx) => normalizeArtifact(a, idx));
+        setArtifacts(loadedArtifacts);
+
         if (Array.isArray(data.secondaryPurposes)) {
           setSubPurposeIds((data.secondaryPurposes as string[]).filter(Boolean));
         }
@@ -352,13 +415,14 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     if (materials.safety_notes) completed.push('sakerhet');
     if (phases.length > 0) completed.push('faser');
     if (roles.length > 0) completed.push('roller');
+    if (artifacts.length > 0) completed.push('artifacts');
     // Board config is complete if at least one element is visible or welcome_message is set
     const hasBoardContent = boardConfig.show_game_name || boardConfig.show_current_phase ||
       boardConfig.show_timer || boardConfig.show_participants || boardConfig.show_public_roles ||
       boardConfig.show_qr_code || boardConfig.welcome_message.trim();
     if (hasBoardContent) completed.push('tavla');
     return completed;
-  }, [qualityState, steps, materials, phases, roles, boardConfig]);
+  }, [qualityState, steps, materials, phases, roles, artifacts, boardConfig]);
 
   // Save handler
   const handleSave = useCallback(async (options?: { status?: 'draft' | 'published' }) => {
@@ -412,6 +476,36 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           scaling_rules: r.scaling_rules,
           conflicts_with: r.conflicts_with,
         })),
+        artifacts: artifacts.map((a, idx) => {
+          const variants = a.variants.map((v, j) => {
+            const meta: Record<string, unknown> = { ...(v.metadata ?? {}) };
+            if (v.step_index !== null && v.step_index !== undefined) meta.step_index = v.step_index;
+            if (v.phase_index !== null && v.phase_index !== undefined) meta.phase_index = v.phase_index;
+            const hasMeta = Object.keys(meta).length > 0;
+
+            return {
+              title: v.title || null,
+              body: v.body || null,
+              media_ref: v.media_ref || null,
+              variant_order: j,
+              visibility: v.visibility,
+              visible_to_role_id: v.visible_to_role_id || null,
+              metadata: hasMeta ? meta : null,
+              step_index: v.step_index,
+              phase_index: v.phase_index,
+            };
+          });
+
+          return {
+            title: a.title,
+            description: a.description || null,
+            artifact_type: a.artifact_type || 'card',
+            artifact_order: idx,
+            tags: a.tags,
+            metadata: a.metadata ?? null,
+            variants,
+          };
+        }),
         boardConfig: {
           show_game_name: boardConfig.show_game_name,
           show_current_phase: boardConfig.show_current_phase,
@@ -451,7 +545,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [core, steps, materials, phases, roles, boardConfig, gameId, router, subPurposeIds, cover]);
+  }, [core, steps, materials, phases, roles, artifacts, boardConfig, gameId, router, subPurposeIds, cover]);
 
   // Publish handler
   const handlePublish = useCallback(async () => {
@@ -865,6 +959,32 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                 phases={phases}
                 onChange={setPhases}
               />
+            </section>
+          )}
+
+          {/* Artifacts Section */}
+          {activeSection === 'artifacts' && (
+            <section className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-1">Artifakter</h2>
+                <p className="text-sm text-muted-foreground">
+                  Skapa artefakter med varianter som kan låsas upp per steg/fas och begränsas per roll.
+                </p>
+              </div>
+
+              <ArtifactEditor
+                artifacts={artifacts}
+                roles={roles}
+                stepCount={steps.length}
+                phaseCount={phases.length}
+                onChange={setArtifacts}
+              />
+
+              {roles.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Tips: Lägg till roller för att kunna göra privata varianter per roll.
+                </p>
+              )}
             </section>
           )}
 

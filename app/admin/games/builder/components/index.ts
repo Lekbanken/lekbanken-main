@@ -7,3 +7,4 @@ export { PhaseEditor, type PhaseData } from './PhaseEditor';
 export { RoleEditor, type RoleData } from './RoleEditor';
 export { BoardEditor, type BoardConfigData } from './BoardEditor';
 export { StandardImagePicker } from './StandardImagePicker';
+export { ArtifactEditor } from './ArtifactEditor';

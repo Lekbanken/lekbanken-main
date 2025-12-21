@@ -248,6 +248,7 @@ export function ParticipantPlayView({
   const [voteSendingByDecisionId, setVoteSendingByDecisionId] = useState<Record<string, boolean>>({});
   const [voteMessageByDecisionId, setVoteMessageByDecisionId] = useState<Record<string, string | null>>({});
   const [resultsByDecisionId, setResultsByDecisionId] = useState<Record<string, DecisionResultsResponse | null>>({});
+  const [submittedVoteByDecisionId, setSubmittedVoteByDecisionId] = useState<Record<string, boolean>>({});
 
   const loadArtifacts = useCallback(async () => {
     if (!participantToken) return;
@@ -465,6 +466,7 @@ export function ParticipantPlayView({
     try {
       await castParticipantVote(sessionId, decisionId, { optionKey }, { participantToken });
       setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: 'Röst mottagen!' }));
+      setSubmittedVoteByDecisionId((prev) => ({ ...prev, [decisionId]: true }));
       // Refresh decisions (e.g. host might close/reveal)
       void loadDecisions();
     } catch (err) {
@@ -924,13 +926,13 @@ export function ParticipantPlayView({
         const sending = Boolean(voteSendingByDecisionId[openDecision.id]);
         const msg = voteMessageByDecisionId[openDecision.id];
         const options = openDecision.options ?? [];
-        const hasVoted = msg?.includes('!');
+        const hasVoted = Boolean(submittedVoteByDecisionId[openDecision.id]);
 
         // Don't show modal if already voted
         if (hasVoted) return null;
 
         return (
-          <Dialog open={true} onOpenChange={() => { /* Cannot close without voting */ }}>
+          <Dialog open={true} modal onOpenChange={() => { /* Cannot close without voting */ }}>
             <DialogContent 
               className="max-w-md"
               onPointerDownOutside={(e) => e.preventDefault()}

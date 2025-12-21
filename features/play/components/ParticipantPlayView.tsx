@@ -20,7 +20,6 @@ import {
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
@@ -55,7 +54,6 @@ export interface StepData {
 }
 
 export interface PhaseData {
-  id: string;
   name: string;
   description?: string;
   duration?: number | null;
@@ -249,6 +247,7 @@ export function ParticipantPlayView({
   const [voteMessageByDecisionId, setVoteMessageByDecisionId] = useState<Record<string, string | null>>({});
   const [resultsByDecisionId, setResultsByDecisionId] = useState<Record<string, DecisionResultsResponse | null>>({});
   const [submittedVoteByDecisionId, setSubmittedVoteByDecisionId] = useState<Record<string, boolean>>({});
+  const [bodyLocked, setBodyLocked] = useState(false);
 
   const loadArtifacts = useCallback(async () => {
     if (!participantToken) return;
@@ -437,6 +436,36 @@ export function ParticipantPlayView({
     void loadArtifacts();
     void loadDecisions();
   }, [participantToken, isEnded, loadArtifacts, loadDecisions]);
+
+  // Lock body scroll when a blocking decision modal is active
+  useEffect(() => {
+    const openDecision = decisions.find((d) => d.status === 'open');
+    const hasVoted = openDecision ? Boolean(submittedVoteByDecisionId[openDecision.id]) : false;
+    const shouldLock = Boolean(openDecision) && !hasVoted && !isEnded;
+
+    if (shouldLock && !bodyLocked) {
+      setBodyLocked(true);
+      const prev = document.body.style.overflow;
+      document.body.dataset.prevOverflow = prev;
+      document.body.style.overflow = 'hidden';
+    }
+
+    if ((!shouldLock || isEnded) && bodyLocked) {
+      const prev = document.body.dataset.prevOverflow ?? '';
+      document.body.style.overflow = prev;
+      delete document.body.dataset.prevOverflow;
+      setBodyLocked(false);
+    }
+
+    return () => {
+      if (bodyLocked) {
+        const prev = document.body.dataset.prevOverflow ?? '';
+        document.body.style.overflow = prev;
+        delete document.body.dataset.prevOverflow;
+        setBodyLocked(false);
+      }
+    };
+  }, [decisions, submittedVoteByDecisionId, isEnded, bodyLocked]);
 
   const variantsByArtifactId = useMemo(() => {
     const map = new Map<string, ParticipantSessionArtifactVariant[]>();
@@ -916,10 +945,9 @@ export function ParticipantPlayView({
         </div>
       )}
 
-      {/* Decision Modal - shows automatically for open decisions */}
+      {/* Decision Modal - shows automatically for open decisions (blocking) */}
       {(() => {
-        // Find first open decision that hasn't been voted on
-        const openDecision = decisions.find(d => d.status === 'open');
+        const openDecision = decisions.find((d) => d.status === 'open');
         if (!openDecision || !participantToken || isEnded) return null;
 
         const selected = selectedOptionByDecisionId[openDecision.id] ?? '';
@@ -928,27 +956,30 @@ export function ParticipantPlayView({
         const options = openDecision.options ?? [];
         const hasVoted = Boolean(submittedVoteByDecisionId[openDecision.id]);
 
-        // Don't show modal if already voted
         if (hasVoted) return null;
 
         return (
-          <Dialog open={true} modal onOpenChange={() => { /* Cannot close without voting */ }}>
-            <DialogContent 
-              className="max-w-md"
-              onPointerDownOutside={(e) => e.preventDefault()}
-              onEscapeKeyDown={(e) => e.preventDefault()}
-              onInteractOutside={(e) => e.preventDefault()}
-            >
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  🗳️ {openDecision.title}
-                </DialogTitle>
-                {openDecision.prompt && (
-                  <DialogDescription>{openDecision.prompt}</DialogDescription>
-                )}
-              </DialogHeader>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xl">🗳️</div>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary">Beslut</p>
+                  <p className="text-lg font-semibold text-foreground">{openDecision.title}</p>
+                </div>
+              </div>
 
-              <div className="space-y-3 py-4">
+              {openDecision.prompt && (
+                <p className="mt-2 text-sm text-muted-foreground">{openDecision.prompt}</p>
+              )}
+
+              <div className="mt-4 space-y-3">
+                {options.length === 0 && (
+                  <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
+                    Inga alternativ tillgängliga för detta beslut än.
+                  </div>
+                )}
+
                 {options.map((o) => (
                   <label
                     key={o.key}
@@ -982,21 +1013,26 @@ export function ParticipantPlayView({
               </div>
 
               {msg && !msg.includes('!') && (
-                <p className="text-sm text-destructive">{msg}</p>
+                <p className="mt-3 text-sm text-destructive">{msg}</p>
               )}
 
-              <DialogFooter>
+              <div className="mt-5">
                 <Button
                   onClick={() => void handleVote(openDecision.id)}
-                  disabled={sending || !selected}
+                  disabled={sending || !selected || options.length === 0}
                   className="w-full"
                   size="lg"
                 >
                   {sending ? 'Röstar...' : 'Skicka röst'}
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                {options.length === 0 && (
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Lekledaren behöver lägga till alternativ innan du kan rösta.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
         );
       })()}
     </div>

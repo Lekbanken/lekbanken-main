@@ -25,3 +25,37 @@ export { JoinSessionForm } from './JoinSessionForm';
 
 // Feedback components
 export { SessionStatusMessage, ReconnectingBanner } from './SessionFeedback';
+
+// Immersion components (Sprint 1)
+export { TypewriterText } from './TypewriterText';
+export { CountdownOverlay } from './CountdownOverlay';
+
+// Keypad components (Sprint 3)
+export { Keypad } from './Keypad';
+export { KeypadDisplay } from './KeypadDisplay';
+
+// Trigger components (Sprint 4)
+export { TriggerCard } from './TriggerCard';
+export { TriggerList } from './TriggerList';
+export { TriggerWizard } from './TriggerWizard';
+
+// Lobby components (Sprint 4)
+export { LobbyHub, LobbySectionCard } from './LobbyHub';
+export { ReadinessBadge } from './ReadinessBadge';
+export * from './lobby';
+
+// Keypad components (Phase 2)
+export { AlphaKeypad } from './AlphaKeypad';
+
+// Story components (Phase 2)
+export { StoryOverlay } from './StoryOverlay';
+
+// Hooks
+export { useTypewriter } from './hooks/useTypewriter';
+export { useCountdown } from './hooks/useCountdown';
+export { useKeypad } from './hooks/useKeypad';
+export { useTrigger } from './hooks/useTrigger';
+export { useSound } from './hooks/useSound';
+export type { TypewriterSpeed } from './hooks/useTypewriter';
+export type { UseTriggerOptions, UseTriggerReturn } from './hooks/useTrigger';
+

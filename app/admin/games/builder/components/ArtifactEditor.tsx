@@ -118,19 +118,33 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               />
             </div>
             <div className="flex items-center gap-2">
-              <Button type="button" variant="ghost" size="icon" onClick={() => moveArtifact(idx, -1)} disabled={idx === 0}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0"
+                onClick={() => moveArtifact(idx, -1)}
+                disabled={idx === 0}
+              >
                 <ArrowUpIcon className="h-4 w-4" />
               </Button>
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
+                size="sm"
+                className="h-9 w-9 p-0"
                 onClick={() => moveArtifact(idx, 1)}
                 disabled={idx === artifacts.length - 1}
               >
                 <ArrowDownIcon className="h-4 w-4" />
               </Button>
-              <Button type="button" variant="ghost" size="icon" onClick={() => removeArtifact(idx)}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-9 w-9 p-0"
+                onClick={() => removeArtifact(idx)}
+              >
                 <TrashIcon className="h-4 w-4" />
               </Button>
             </div>
@@ -178,7 +192,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 <p className="text-sm font-semibold text-foreground">Varianter</p>
                 <p className="text-xs text-muted-foreground">Styr synlighet, rollåtkomst och när varianten kan låsas upp.</p>
               </div>
-              <Button type="button" size="sm" variant="secondary" onClick={() => updateArtifact(idx, { variants: [...artifact.variants, createVariant()] })}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={() => updateArtifact(idx, { variants: [...artifact.variants, createVariant()] })}
+              >
                 <PlusIcon className="h-4 w-4 mr-1.5" /> Lägg till variant
               </Button>
             </div>
@@ -197,7 +216,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        className="h-9 w-9 p-0"
                         onClick={() => moveVariant(idx, vIdx, -1)}
                         disabled={vIdx === 0}
                       >
@@ -206,7 +226,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        className="h-9 w-9 p-0"
                         onClick={() => moveVariant(idx, vIdx, 1)}
                         disabled={vIdx === artifact.variants.length - 1}
                       >
@@ -215,7 +236,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       <Button
                         type="button"
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        className="h-9 w-9 p-0"
                         onClick={() => removeVariant(idx, vIdx)}
                         disabled={artifact.variants.length <= 1}
                       >

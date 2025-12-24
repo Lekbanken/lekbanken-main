@@ -191,7 +191,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to save artifacts', details: artifactsError.message }, { status: 500 });
     }
 
-    const variantRows = insertedArtifacts.flatMap((art, idx) => {
+    const insertedArtifactsSafe = (insertedArtifacts ?? []) as Array<{ id: string }>;
+
+    const variantRows = insertedArtifactsSafe.flatMap((art: { id: string }, idx: number) => {
       const source = artifacts[idx];
       const variants = source?.variants ?? [];
 
@@ -202,7 +204,7 @@ export async function POST(request: Request) {
         const hasMetadata = Object.keys(meta).length > 0;
 
         return {
-          artifact_id: art.id as string,
+          artifact_id: art.id,
           variant_order: v.variant_order ?? j,
           visibility: v.visibility ?? 'public',
           visible_to_role_id: v.visible_to_role_id ?? null,

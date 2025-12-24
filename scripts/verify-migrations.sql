@@ -167,9 +167,14 @@ ORDER BY c.relname;
 
 -- 2e3. Kolla att host policies finns för primitives runtime tabeller
 SELECT
+  schemaname,
   tablename,
   policyname,
-  cmd
+  permissive,
+  roles,
+  cmd,
+  qual AS using_expression,
+  with_check AS with_check_expression
 FROM pg_policies
 WHERE schemaname = 'public'
   AND tablename IN (
@@ -180,7 +185,37 @@ WHERE schemaname = 'public'
     'session_votes',
     'session_outcomes'
   )
-ORDER BY tablename, policyname;
+ORDER BY tablename, policyname, cmd;
+
+-- 2e3b. Guardrail: flagga policies som saknar villkor (potentiellt farligt)
+-- SELECT/DELETE/UPDATE bör normalt ha USING (qual). INSERT bör normalt ha WITH CHECK.
+SELECT
+  schemaname,
+  tablename,
+  policyname,
+  cmd,
+  CASE
+    WHEN cmd IN ('SELECT', 'DELETE', 'UPDATE') AND qual IS NULL THEN '❌ Missing USING (qual)'
+    WHEN cmd = 'INSERT' AND with_check IS NULL THEN '❌ Missing WITH CHECK'
+    WHEN qual IS NULL AND with_check IS NULL THEN '❌ Missing USING + WITH CHECK'
+    ELSE '✅'
+  END AS policy_health
+FROM pg_policies
+WHERE schemaname = 'public'
+  AND tablename IN (
+    'session_artifacts',
+    'session_artifact_variants',
+    'session_artifact_assignments',
+    'session_decisions',
+    'session_votes',
+    'session_outcomes'
+  )
+  AND (
+    (cmd IN ('SELECT', 'DELETE', 'UPDATE') AND qual IS NULL)
+    OR (cmd = 'INSERT' AND with_check IS NULL)
+    OR (qual IS NULL AND with_check IS NULL)
+  )
+ORDER BY tablename, policyname, cmd;
 
 -- 2f. Kolla att chat-policies finns (host select/insert)
 SELECT

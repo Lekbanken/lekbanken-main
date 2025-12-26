@@ -328,6 +328,80 @@ export function validateGame(
     }
   }
   
+  // ==========================================================================
+  // Artifact validation (applies to both CSV and JSON imports)
+  // ==========================================================================
+  
+  if (game.artifacts && game.artifacts.length > 0) {
+    const gameKey = game.game_key || 'unknown';
+    
+    for (let i = 0; i < game.artifacts.length; i++) {
+      const artifact = game.artifacts[i];
+      const artifactTitle = artifact.title || `Artifact #${i + 1}`;
+      
+      // Keypad-specific validation
+      if (artifact.artifact_type === 'keypad') {
+        const metadata = artifact.metadata as Record<string, unknown> | null | undefined;
+        
+        if (!metadata) {
+          errors.push({
+            row: rowNumber,
+            column: 'artifacts',
+            message: `[game_key: ${gameKey}] Keypad "${artifactTitle}" saknar metadata. Fix: lägg till metadata-objekt med correctCode.`,
+            severity: 'error',
+          });
+          continue;
+        }
+        
+        const correctCode = metadata.correctCode;
+        
+        if (correctCode === undefined || correctCode === null) {
+          errors.push({
+            row: rowNumber,
+            column: 'artifacts',
+            message: `[game_key: ${gameKey}] Keypad "${artifactTitle}" saknar correctCode i metadata.`,
+            severity: 'error',
+          });
+        } else if (typeof correctCode === 'number') {
+          // CRITICAL: Numbers lose leading zeros
+          errors.push({
+            row: rowNumber,
+            column: 'artifacts',
+            message: `[game_key: ${gameKey}] Keypad "${artifactTitle}": correctCode är ett tal (${correctCode}), leading zeros kan ha gått förlorade! Fix: ange correctCode som sträng "${String(correctCode).padStart(4, '0')}".`,
+            severity: 'error',
+          });
+        } else if (typeof correctCode !== 'string') {
+          errors.push({
+            row: rowNumber,
+            column: 'artifacts',
+            message: `[game_key: ${gameKey}] Keypad "${artifactTitle}": correctCode måste vara en sträng, fick ${typeof correctCode}.`,
+            severity: 'error',
+          });
+        }
+      }
+      
+      // Validate variants
+      if (artifact.variants && artifact.variants.length > 0) {
+        for (let j = 0; j < artifact.variants.length; j++) {
+          const variant = artifact.variants[j];
+          
+          // role_private must have role reference
+          if (variant.visibility === 'role_private') {
+            const hasRoleRef = variant.visible_to_role_id || variant.visible_to_role_order || variant.visible_to_role_name;
+            if (!hasRoleRef) {
+              errors.push({
+                row: rowNumber,
+                column: 'artifacts',
+                message: `[game_key: ${gameKey}] Artefakt "${artifactTitle}", variant #${j + 1}: visibility='role_private' men saknar rollreferens. Fix: lägg till visible_to_role_order, visible_to_role_id, eller visible_to_role_name.`,
+                severity: 'error',
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+  
   const isValid = errors.length === 0;
   
   return { isValid, errors, warnings };

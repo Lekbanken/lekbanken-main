@@ -1,0 +1,269 @@
+[
+  {
+    "game_key": "notodden-escape-nb",
+    "name": "Notodden Escape: Rjukan-mysteriet",
+    "short_description": "Et spennende escape room-spill satt i Rjukan, Telemark. Finn kodene, lås opp safe, og løs mysteriet!",
+    "description": "I dette spillet tar dere på dere rollene som en gruppe etterforskere som må løse mysteriet om den forsvunne vitenskapskvinnen fra Rjukan. Bruk ledetråder, samarbeid, og lås opp safe for å avsløre sannheten.",
+    "play_mode": "participants",
+    "status": "draft",
+    "locale": "nb-NO",
+    "energy_level": "medium",
+    "location_type": "indoor",
+    "time_estimate_min": 30,
+    "duration_max": 45,
+    "min_players": 4,
+    "max_players": 12,
+    "players_recommended": 8,
+    "age_min": 12,
+    "age_max": null,
+    "difficulty": "medium",
+    "accessibility_notes": "Krever leseferdigheter og samarbeid",
+    "space_requirements": "Ett rom med plass til gruppediskusjon",
+    "leader_tips": "Gi hint etter 10 minutter hvis gruppen sitter fast på keypad-oppgaven.",
+    "steps": [
+      {
+        "step_order": 1,
+        "title": "Velkommen",
+        "body": "Velkommen til Notodden Escape! Dere er nå etterforskerteamet som skal løse mysteriet.",
+        "duration_seconds": 60,
+        "leader_script": "Les opp velkomstteksten og sørg for at alle forstår premisset.",
+        "participant_prompt": "Lytt til introduksjonen og forbered dere.",
+        "board_text": "🕵️ Mysteriet begynner..."
+      },
+      {
+        "step_order": 2,
+        "title": "Rolletildeling",
+        "body": "Hver deltaker får en rolle med hemmelige instruksjoner. Les din rolle nøye!",
+        "duration_seconds": 120,
+        "leader_script": "Del ut roller via appen. Gi deltakerne tid til å lese.",
+        "participant_prompt": "Les din rolleinformasjon. Del ikke hemmelige detaljer med andre enda."
+      },
+      {
+        "step_order": 3,
+        "title": "Finn ledetrådene",
+        "body": "Let etter ledetråder i rommet. Dere trenger minst tre ledetråder for å komme videre.",
+        "duration_seconds": 300,
+        "leader_script": "Observer gruppens fremgang. Gi subtile hint om nødvendig.",
+        "participant_prompt": "Samarbeid og del funn med gruppen.",
+        "board_text": "🔍 Søk etter ledetråder..."
+      },
+      {
+        "step_order": 4,
+        "title": "Keypaden",
+        "body": "Dere har funnet en safe med en keypad! Kombiner ledetrådene for å finne den riktige koden.",
+        "duration_seconds": 300,
+        "leader_script": "Keypaden vises på deltakernes skjerm. Koden er 0451.",
+        "participant_prompt": "Snakk sammen for å finne koden. Skriv inn på keypaden.",
+        "board_text": "🔐 Lås opp safe..."
+      },
+      {
+        "step_order": 5,
+        "title": "Løsningen",
+        "body": "Safen er åpen! Inni finner dere bevisene som løser mysteriet.",
+        "duration_seconds": 120,
+        "leader_script": "Forklar løsningen og knyt sammen trådene.",
+        "participant_prompt": "Hør på oppsummeringen."
+      },
+      {
+        "step_order": 6,
+        "title": "Avslutning",
+        "body": "Gratulerer! Dere har løst Rjukan-mysteriet. Takk for at dere spilte!",
+        "duration_seconds": 60,
+        "board_text": "🎉 Mysteriet er løst!"
+      }
+    ],
+    "phases": [
+      {
+        "phase_order": 1,
+        "name": "Introduksjon",
+        "phase_type": "intro",
+        "duration_seconds": 180,
+        "timer_visible": true,
+        "timer_style": "countdown",
+        "description": "Velkommen og rolletildeling",
+        "board_message": "🕵️ Mysteriet begynner snart...",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 2,
+        "name": "Etterforskning",
+        "phase_type": "round",
+        "duration_seconds": 600,
+        "timer_visible": true,
+        "timer_style": "countdown",
+        "description": "Finn ledetråder og lås opp safe",
+        "board_message": "🔍 Etterforskning pågår",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 3,
+        "name": "Løsning",
+        "phase_type": "finale",
+        "duration_seconds": 180,
+        "timer_visible": false,
+        "timer_style": "countdown",
+        "description": "Avsløring og avslutning",
+        "board_message": "🎉 Løsningen avsløres!",
+        "auto_advance": false
+      }
+    ],
+    "roles": [
+      {
+        "role_order": 1,
+        "name": "Detektiven",
+        "icon": "🕵️",
+        "color": "#3B82F6",
+        "public_description": "En erfaren etterforsker med skarpt blikk for detaljer.",
+        "private_instructions": "Du vet at vitenskapskvinnen jobbet med tungtvann-eksperimenter. Denne informasjonen er hemmelig. Første siffer i koden er 0.",
+        "private_hints": "Se etter gamle dokumenter med tekniske tegninger.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 2,
+        "name": "Historikeren",
+        "icon": "📚",
+        "color": "#F59E0B",
+        "public_description": "En ekspert på lokalhistorie fra Telemark.",
+        "private_instructions": "Du vet at et viktig hendelse skjedde på en spesifikk dato. Andre siffer i koden er 4.",
+        "private_hints": "Avisutklipp fra 1940-tallet kan være nyttige.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 3,
+        "name": "Ingeniøren",
+        "icon": "⚙️",
+        "color": "#10B981",
+        "public_description": "En teknisk ekspert som forstår gamle maskiner.",
+        "private_instructions": "Du vet at safen er produsert av et firma som brukte bestemte kodemønster. Tredje siffer er 5.",
+        "private_hints": "Sjekk safe-produsentens merke for hint.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 4,
+        "name": "Journalisten",
+        "icon": "📰",
+        "color": "#8B5CF6",
+        "public_description": "En nysgjerrig reporter som graver etter sannheten.",
+        "private_instructions": "Du har hørt rykter om et hemmelig nummer. Fjerde siffer i koden er 1.",
+        "private_hints": "Intervju de andre rollene for å samle informasjon.",
+        "min_count": 1,
+        "max_count": 3,
+        "assignment_strategy": "random"
+      }
+    ],
+    "boardConfig": {
+      "show_game_name": true,
+      "show_current_phase": true,
+      "show_timer": true,
+      "show_participants": true,
+      "show_public_roles": true,
+      "show_leaderboard": false,
+      "show_qr_code": true,
+      "welcome_message": "Velkommen til Notodden Escape!",
+      "theme": "dark",
+      "background_color": "#1F2937",
+      "layout_variant": "centered"
+    },
+    "artifacts": [
+      {
+        "artifact_order": 1,
+        "locale": "nb-NO",
+        "title": "Velkomstbrev",
+        "description": "Et offisielt brev som forklarer oppdraget",
+        "artifact_type": "card",
+        "tags": ["intro", "story"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "title": "Brev fra politimesteren",
+            "body": "Kjære etterforskere,\n\nVi ber om deres hjelp til å løse et mysterium som har plaget Rjukan i årtier. En fremtredende vitenskapskvinne forsvant under mystiske omstendigheter. Vi tror svarene ligger i hennes gamle laboratorium.\n\nLykke til!\n\n- Politimester Hansen",
+            "metadata": {
+              "step_index": 0,
+              "phase_index": 0
+            }
+          }
+        ]
+      },
+      {
+        "artifact_order": 2,
+        "locale": "nb-NO",
+        "title": "Laboratoriesafen",
+        "description": "En gammel safe som krever en 4-sifret kode",
+        "artifact_type": "keypad",
+        "tags": ["puzzle", "main"],
+        "metadata": {
+          "correctCode": "0451",
+          "codeLength": 4,
+          "maxAttempts": 3,
+          "lockOnFail": true,
+          "successMessage": "Safen åpnes! Inni finner dere bevisene!",
+          "failMessage": "Feil kode. Prøv igjen.",
+          "lockedMessage": "Safen er låst permanent. Be spilleder om hjelp."
+        },
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "title": "Laboratoriesafen",
+            "body": "En robust safe fra 1940-tallet. Den har en numerisk keypad med sifrene 0-9.",
+            "metadata": {
+              "step_index": 3,
+              "phase_index": 1
+            }
+          }
+        ]
+      },
+      {
+        "artifact_order": 3,
+        "locale": "nb-NO",
+        "title": "Detektivens hemmelige notat",
+        "description": "Et hemmelig dokument kun for Detektiven",
+        "artifact_type": "card",
+        "tags": ["secret", "clue"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "role_private",
+            "visible_to_role_order": 1,
+            "title": "Konfidensielt notat",
+            "body": "FORTROLIG:\n\nJeg har funnet et gammelt laboratorienotat. Det nevner eksperimenter med tungtvann og en safe. Første siffer i koden starter med null (0).\n\nDel denne informasjonen varsomt med de andre.",
+            "metadata": {
+              "step_index": 2,
+              "phase_index": 1
+            }
+          }
+        ]
+      },
+      {
+        "artifact_order": 4,
+        "locale": "nb-NO",
+        "title": "Ledetråd: Avisutklipp",
+        "description": "Et gammelt avisutklipp med viktig informasjon",
+        "artifact_type": "card",
+        "tags": ["clue", "public"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "title": "Avisutklipp fra Rjukan Dagblad, 1943",
+            "body": "MYSTISK FORSVINNING VED HYDROFABRIKKEN\n\nDr. Ingrid Larsen, leder for et hemmelig forskningsprosjekt, har ikke blitt sett siden forrige uke. Politiet ber om tips.\n\n(Hint: Legg merke til årstallet og tenk på historiske hendelser...)",
+            "metadata": {
+              "step_index": 2,
+              "phase_index": 1
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

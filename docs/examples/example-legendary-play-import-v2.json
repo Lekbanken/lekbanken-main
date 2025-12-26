@@ -1,0 +1,253 @@
+[
+  {
+    "game_key": "notodden-escape-nb",
+    "name": "Notodden Escape: Rjukan-mysteriet (Versjon 2)",
+    "short_description": "Et oppdatert escape room-spill satt i Rjukan. Ny kode, nye roller, nye utfordringer!",
+    "description": "OPPDATERT VERSJON: I dette spillet tar dere på dere rollene som en gruppe etterforskere som må løse mysteriet om den forsvunne vitenskapskvinnen fra Rjukan. Denne versjonen har endret kode og nye roller.",
+    "play_mode": "participants",
+    "status": "draft",
+    "locale": "nb-NO",
+    "energy_level": "high",
+    "location_type": "indoor",
+    "time_estimate_min": 35,
+    "duration_max": 50,
+    "min_players": 5,
+    "max_players": 15,
+    "players_recommended": 10,
+    "age_min": 14,
+    "age_max": null,
+    "difficulty": "hard",
+    "accessibility_notes": "Krever leseferdigheter, samarbeid og problemløsning",
+    "space_requirements": "Ett stort rom med plass til gruppediskusjon",
+    "leader_tips": "Denne versjonen er vanskeligere. Gi hint etter 15 minutter.",
+    "steps": [
+      {
+        "step_order": 1,
+        "title": "Velkommen (Oppdatert)",
+        "body": "Velkommen til Notodden Escape v2! Mysteriet er dypere enn dere tror.",
+        "duration_seconds": 90,
+        "leader_script": "Les opp den nye velkomstteksten.",
+        "participant_prompt": "Lytt nøye til de nye reglene.",
+        "board_text": "🕵️ Det virkelige mysteriet begynner..."
+      },
+      {
+        "step_order": 2,
+        "title": "Nye roller",
+        "body": "Rollene er oppdatert med mer kompleks informasjon.",
+        "duration_seconds": 150,
+        "leader_script": "Gi deltakerne ekstra tid til å forstå de nye rollene."
+      },
+      {
+        "step_order": 3,
+        "title": "Utvidet etterforskning",
+        "body": "Det er flere ledetråder å finne denne gangen.",
+        "duration_seconds": 400,
+        "board_text": "🔍 Søk grundig..."
+      },
+      {
+        "step_order": 4,
+        "title": "Den nye keypaden",
+        "body": "Safen har fått en ny kode! Denne gangen er det vanskeligere.",
+        "duration_seconds": 400,
+        "leader_script": "NY KODE: 1984",
+        "board_text": "🔐 Ny utfordring..."
+      },
+      {
+        "step_order": 5,
+        "title": "Bonus-utfordring",
+        "body": "En ekstra gåte for de som klarer keypaden raskt.",
+        "duration_seconds": 180
+      },
+      {
+        "step_order": 6,
+        "title": "Den store avsløringen",
+        "body": "Sannheten om mysteriet er mer komplisert enn noen hadde trodd.",
+        "duration_seconds": 180
+      }
+    ],
+    "phases": [
+      {
+        "phase_order": 1,
+        "name": "Oppstart",
+        "phase_type": "intro",
+        "duration_seconds": 240,
+        "timer_visible": true,
+        "timer_style": "countdown",
+        "description": "Velkommen og grundig rolletildeling",
+        "board_message": "🕵️ Forbered dere...",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 2,
+        "name": "Hovedetterforskning",
+        "phase_type": "round",
+        "duration_seconds": 800,
+        "timer_visible": true,
+        "timer_style": "countdown",
+        "description": "Utvidet etterforskningsfase",
+        "board_message": "🔍 Tiden tikker...",
+        "auto_advance": false
+      },
+      {
+        "phase_order": 3,
+        "name": "Finalen",
+        "phase_type": "finale",
+        "duration_seconds": 360,
+        "timer_visible": true,
+        "timer_style": "elapsed",
+        "description": "Avsløring og bonus",
+        "board_message": "🎉 Sannheten avsløres!",
+        "auto_advance": false
+      }
+    ],
+    "roles": [
+      {
+        "role_order": 1,
+        "name": "Sjefsdetektiven",
+        "icon": "🔍",
+        "color": "#1D4ED8",
+        "public_description": "Leder for etterforskningsteamet med 20 års erfaring.",
+        "private_instructions": "Du er lederen. Første siffer i den NYE koden er 1. Koordiner teamet ditt.",
+        "private_hints": "Hold oversikt over hva alle finner.",
+        "min_count": 1,
+        "max_count": 1,
+        "assignment_strategy": "leader_picks"
+      },
+      {
+        "role_order": 2,
+        "name": "Arkivaren",
+        "icon": "📜",
+        "color": "#D97706",
+        "public_description": "Ekspert på gamle dokumenter og arkiver.",
+        "private_instructions": "Du har funnet et gammelt dokument. Andre siffer er 9. Orwell hadde rett.",
+        "private_hints": "Litterære referanser kan være viktige.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 3,
+        "name": "Kryptografen",
+        "icon": "🔢",
+        "color": "#059669",
+        "public_description": "Spesialist på koder og kryptering.",
+        "private_instructions": "Du har knekt en del av koden. Tredje siffer er 8. Tenk på årstall.",
+        "private_hints": "Tall har ofte historisk betydning.",
+        "min_count": 1,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 4,
+        "name": "Feltforskeren",
+        "icon": "🏔️",
+        "color": "#7C3AED",
+        "public_description": "Kjenner terrenget og lokalhistorien i Telemark.",
+        "private_instructions": "Du vet at fjerde siffer er 4. Rjukan-operasjonen var viktig.",
+        "private_hints": "Krigshistorie fra området er relevant.",
+        "min_count": 1,
+        "max_count": 3,
+        "assignment_strategy": "random"
+      },
+      {
+        "role_order": 5,
+        "name": "Vitnet",
+        "icon": "👁️",
+        "color": "#EC4899",
+        "public_description": "En mystisk person som kanskje vet mer enn de sier.",
+        "private_instructions": "Du er egentlig en etterkommer av Dr. Larsen. Del dette kun hvis du stoler på gruppen.",
+        "private_hints": "Familiehistorie kan avsløre mye.",
+        "min_count": 0,
+        "max_count": 2,
+        "assignment_strategy": "random"
+      }
+    ],
+    "boardConfig": {
+      "show_game_name": true,
+      "show_current_phase": true,
+      "show_timer": true,
+      "show_participants": true,
+      "show_public_roles": true,
+      "show_leaderboard": false,
+      "show_qr_code": true,
+      "welcome_message": "Velkommen til Notodden Escape v2 - Vanskeligere enn noensinne!",
+      "theme": "dark",
+      "background_color": "#111827",
+      "layout_variant": "centered"
+    },
+    "artifacts": [
+      {
+        "artifact_order": 1,
+        "locale": "nb-NO",
+        "title": "Oppdatert velkomstbrev",
+        "description": "Et nytt offisielt brev med mer bakgrunnshistorie",
+        "artifact_type": "card",
+        "tags": ["intro", "story", "v2"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "title": "Brev fra den nye politimesteren",
+            "body": "Kjære etterforskere,\n\nNye bevis har dukket opp i saken om Dr. Larsen. Vi trenger deres ekspertise umiddelbart. Denne gangen er innsatsen høyere.\n\nKoden til safen er endret. Vær forberedt.\n\n- Politimester Johansen",
+            "metadata": {
+              "step_index": 0,
+              "phase_index": 0
+            }
+          }
+        ]
+      },
+      {
+        "artifact_order": 2,
+        "locale": "nb-NO",
+        "title": "Den nye laboratoriesafen",
+        "description": "Safen har fått en oppgradert sikkerhetskode",
+        "artifact_type": "keypad",
+        "tags": ["puzzle", "main", "v2"],
+        "metadata": {
+          "correctCode": "1984",
+          "codeLength": 4,
+          "maxAttempts": 2,
+          "lockOnFail": true,
+          "successMessage": "Imponerende! Safen åpnes og avslører dype hemmeligheter!",
+          "failMessage": "Feil kode. Kun ett forsøk igjen!",
+          "lockedMessage": "Safen er permanent låst. Mysteriet forblir uløst."
+        },
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "public",
+            "title": "Oppgradert safe",
+            "body": "En modernisert safe med forsterket sikkerhet. Kun 2 forsøk tillatt denne gangen!",
+            "metadata": {
+              "step_index": 3,
+              "phase_index": 1
+            }
+          }
+        ]
+      },
+      {
+        "artifact_order": 3,
+        "locale": "nb-NO",
+        "title": "Sjefsdetektivens dossier",
+        "description": "Hemmelig informasjon kun for Sjefsdetektiven",
+        "artifact_type": "card",
+        "tags": ["secret", "clue", "v2"],
+        "metadata": {},
+        "variants": [
+          {
+            "variant_order": 1,
+            "visibility": "role_private",
+            "visible_to_role_order": 1,
+            "title": "Topphemmelig dossier",
+            "body": "KLASSIFISERT:\n\nEtter 20 års etterforskning har jeg samlet følgende:\n- Første siffer starter med 1\n- Koden refererer til et berømt årstall\n- George Orwell kan gi et hint\n\nBruk denne informasjonen klokt.",
+            "metadata": {
+              "step_index": 1,
+              "phase_index": 0
+            }
+          }
+        ]
+      }
+    ]
+  }
+]

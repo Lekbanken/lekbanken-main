@@ -100,7 +100,7 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
     transition,
   };
 
-  const config = phaseTypeConfig[phase.phase_type];
+  const config = phaseTypeConfig[phase.phase_type] ?? phaseTypeConfig.round;
   const durationMin = phase.duration_seconds ? Math.round(phase.duration_seconds / 60) : null;
 
   return (
@@ -450,7 +450,7 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
       {phases.length > 0 && (
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {phases.map((phase, idx) => {
-            const config = phaseTypeConfig[phase.phase_type];
+            const config = phaseTypeConfig[phase.phase_type] ?? phaseTypeConfig.round;
             return (
               <div key={phase.id} className="flex items-center gap-2">
                 <div

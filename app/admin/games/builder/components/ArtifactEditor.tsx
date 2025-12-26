@@ -239,6 +239,74 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                   placeholder="Låst uppnådd! Du har hittat ledtråden."
                 />
               </div>
+
+              {/* Advanced keypad settings */}
+              <details className="group">
+                <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2">
+                  <span className="group-open:rotate-90 transition-transform">▶</span>
+                  Avancerade inställningar
+                </summary>
+                <div className="mt-3 space-y-4 pl-4 border-l-2 border-amber-500/20">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Max försök</label>
+                      <Input
+                        type="number"
+                        min={0}
+                        max={10}
+                        value={(artifact.metadata?.maxAttempts as number) || ''}
+                        onChange={(e) => {
+                          const val = e.target.value === '' ? null : Math.max(0, Math.min(10, parseInt(e.target.value, 10) || 0));
+                          updateArtifact(idx, {
+                            metadata: { ...artifact.metadata, maxAttempts: val },
+                          });
+                        }}
+                        placeholder="Obegränsat"
+                      />
+                      <p className="text-xs text-muted-foreground">0 eller tom = obegränsat</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-foreground">Lås vid misslyckande</label>
+                      <Select
+                        value={(artifact.metadata?.lockOnFail as boolean) ? 'true' : 'false'}
+                        onChange={(e) =>
+                          updateArtifact(idx, {
+                            metadata: { ...artifact.metadata, lockOnFail: e.target.value === 'true' },
+                          })
+                        }
+                        options={[
+                          { value: 'false', label: 'Nej – kan försöka igen' },
+                          { value: 'true', label: 'Ja – låses permanent' },
+                        ]}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Meddelande vid fel kod</label>
+                    <Input
+                      value={(artifact.metadata?.failMessage as string) || ''}
+                      onChange={(e) =>
+                        updateArtifact(idx, {
+                          metadata: { ...artifact.metadata, failMessage: e.target.value },
+                        })
+                      }
+                      placeholder="Fel kod! Försök igen."
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Meddelande när låst</label>
+                    <Input
+                      value={(artifact.metadata?.lockedMessage as string) || ''}
+                      onChange={(e) =>
+                        updateArtifact(idx, {
+                          metadata: { ...artifact.metadata, lockedMessage: e.target.value },
+                        })
+                      }
+                      placeholder="Keypaden är låst. Kontakta spelledaren."
+                    />
+                  </div>
+                </div>
+              </details>
             </div>
           )}
 

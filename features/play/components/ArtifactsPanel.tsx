@@ -10,6 +10,17 @@ type KeypadMetadata = {
   correctCode?: string;
   codeLength?: number;
   successMessage?: string;
+  // Advanced settings
+  maxAttempts?: number;
+  lockOnFail?: boolean;
+  failMessage?: string;
+  lockedMessage?: string;
+};
+
+type KeypadState = {
+  attemptCount: number;
+  isLockedOut: boolean;
+  unlockedAt?: Date;
 };
 
 type SessionArtifact = {
@@ -38,6 +49,20 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
   const [artifacts, setArtifacts] = useState<SessionArtifact[]>([]);
   const [variants, setVariants] = useState<SessionArtifactVariant[]>([]);
   const [unlockedKeypads, setUnlockedKeypads] = useState<Set<string>>(new Set());
+  const [keypadStates, setKeypadStates] = useState<Map<string, KeypadState>>(new Map());
+
+  const getKeypadState = useCallback((artifactId: string): KeypadState => {
+    return keypadStates.get(artifactId) || { attemptCount: 0, isLockedOut: false };
+  }, [keypadStates]);
+
+  const updateKeypadState = useCallback((artifactId: string, update: Partial<KeypadState>) => {
+    setKeypadStates((prev) => {
+      const next = new Map(prev);
+      const current = next.get(artifactId) || { attemptCount: 0, isLockedOut: false };
+      next.set(artifactId, { ...current, ...update });
+      return next;
+    });
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -158,21 +183,36 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
             const correctCode = a.metadata?.correctCode || '1234';
             const codeLength = a.metadata?.codeLength || correctCode.length;
             const successMessage = a.metadata?.successMessage;
+            const maxAttempts = a.metadata?.maxAttempts || undefined;
+            const lockOnFail = a.metadata?.lockOnFail ?? false;
+            const _failMessage = a.metadata?.failMessage || 'Fel kod!'; // Used by Keypad internally
+            const lockedMessage = a.metadata?.lockedMessage || 'Keypaden är låst.';
+            
             const isUnlocked = unlockedKeypads.has(a.id);
+            const keypadState = getKeypadState(a.id);
+            const isLockedOut = keypadState.isLockedOut;
+            const attemptsRemaining = maxAttempts ? maxAttempts - keypadState.attemptCount : undefined;
 
             return (
               <Card key={a.id} className="p-6 space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">🔐</span>
+                      <span className="text-lg">{isLockedOut ? '🔒' : '🔐'}</span>
                       <h3 className="font-medium">{a.title}</h3>
                     </div>
                     {a.description && <p className="text-sm text-muted-foreground mt-1">{a.description}</p>}
                   </div>
-                  <Badge variant={isUnlocked ? 'default' : 'secondary'}>
-                    {isUnlocked ? 'Upplåst' : 'Låst'}
-                  </Badge>
+                  <div className="flex flex-col items-end gap-1">
+                    <Badge variant={isUnlocked ? 'default' : isLockedOut ? 'destructive' : 'secondary'}>
+                      {isUnlocked ? 'Upplåst' : isLockedOut ? 'Låst ut' : 'Låst'}
+                    </Badge>
+                    {maxAttempts && !isUnlocked && !isLockedOut && (
+                      <span className="text-xs text-muted-foreground">
+                        {attemptsRemaining} försök kvar
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {isUnlocked ? (
@@ -191,14 +231,23 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                       </div>
                     )}
                   </div>
+                ) : isLockedOut ? (
+                  <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-center">
+                    <p className="text-sm font-medium text-destructive">
+                      🔒 {lockedMessage}
+                    </p>
+                  </div>
                 ) : (
                   <Keypad
                     correctCode={correctCode}
                     codeLength={codeLength}
                     title={a.title || 'Ange koden'}
                     size="md"
+                    maxAttempts={maxAttempts}
+                    showAttempts={Boolean(maxAttempts)}
                     onSuccess={() => {
                       setUnlockedKeypads((prev) => new Set([...prev, a.id]));
+                      updateKeypadState(a.id, { unlockedAt: new Date() });
                       // Optionally auto-reveal variants
                       if (vs.length > 0) {
                         vs.forEach((v) => {
@@ -206,6 +255,16 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                             updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: true });
                           }
                         });
+                      }
+                    }}
+                    onWrongCode={() => {
+                      updateKeypadState(a.id, { 
+                        attemptCount: keypadState.attemptCount + 1 
+                      });
+                    }}
+                    onLockout={() => {
+                      if (lockOnFail) {
+                        updateKeypadState(a.id, { isLockedOut: true });
                       }
                     }}
                   />

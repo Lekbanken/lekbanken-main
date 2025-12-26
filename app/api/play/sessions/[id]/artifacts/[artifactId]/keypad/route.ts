@@ -169,16 +169,12 @@ export async function POST(
 
   // Use atomic RPC function to prevent race conditions
   // This uses FOR UPDATE lock to ensure only one attempt can succeed
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: rpcResult, error: rpcError } = await (supabase.rpc as any)(
-    'attempt_keypad_unlock',
-    {
-      p_artifact_id: artifactId,
-      p_entered_code: enteredCode,
-      p_participant_id: participant.participantId,
-      p_participant_name: participant.displayName,
-    }
-  );
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('attempt_keypad_unlock', {
+    p_artifact_id: artifactId,
+    p_entered_code: enteredCode,
+    p_participant_id: participant.participantId,
+    p_participant_name: participant.displayName,
+  });
 
   if (rpcError) {
     console.error('[keypad/route] RPC error:', rpcError);

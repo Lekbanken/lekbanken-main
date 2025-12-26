@@ -191,9 +191,6 @@ export async function POST(
     unlocked_by?: string;
   };
 
-  // Parse config for messages (RPC returns default messages)
-  const config = parseKeypadConfig(artifact.metadata);
-
   // Build response
   const response: KeypadAttemptResponse = {
     status: result.status as 'success' | 'fail' | 'locked' | 'already_unlocked',

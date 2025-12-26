@@ -39,7 +39,6 @@ import {
   type ParticipantDecision,
   type DecisionResultsResponse,
   type SanitizedKeypadMetadata,
-  type KeypadAttemptResponse,
 } from '@/features/play/api';
 
 // =============================================================================

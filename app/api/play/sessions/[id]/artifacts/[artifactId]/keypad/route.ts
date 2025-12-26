@@ -151,10 +151,10 @@ export async function POST(
 
   const supabase = await createServiceRoleClient();
 
-  // Fetch the artifact
+  // Verify artifact belongs to this session first
   const { data: artifact, error: artifactErr } = await supabase
     .from('session_artifacts')
-    .select('id, session_id, title, artifact_type, metadata')
+    .select('id, session_id, artifact_type, metadata')
     .eq('id', artifactId)
     .eq('session_id', sessionId)
     .single();
@@ -167,58 +167,51 @@ export async function POST(
     return jsonError('Artifact is not a keypad', 400);
   }
 
+  // Use atomic RPC function to prevent race conditions
+  // This uses FOR UPDATE lock to ensure only one attempt can succeed
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data: rpcResult, error: rpcError } = await (supabase.rpc as any)(
+    'attempt_keypad_unlock',
+    {
+      p_artifact_id: artifactId,
+      p_entered_code: enteredCode,
+      p_participant_id: participant.participantId,
+      p_participant_name: participant.displayName,
+    }
+  );
+
+  if (rpcError) {
+    console.error('[keypad/route] RPC error:', rpcError);
+    return jsonError('Failed to process keypad attempt', 500);
+  }
+
+  const result = rpcResult as {
+    status: string;
+    message: string;
+    is_unlocked: boolean;
+    is_locked_out: boolean;
+    attempt_count: number;
+    attempts_left?: number | null;
+    unlocked_by?: string;
+  };
+
+  // Parse config for messages (RPC returns default messages)
   const config = parseKeypadConfig(artifact.metadata);
-  const currentState = parseKeypadState(artifact.metadata);
 
-  // Check if already unlocked
-  if (currentState.isUnlocked) {
-    const response: KeypadAttemptResponse = {
-      status: 'already_unlocked',
-      message: config.successMessage || 'Keypaden är redan upplåst!',
-      keypadState: {
-        isUnlocked: true,
-        isLockedOut: false,
-        attemptCount: currentState.attemptCount,
-      },
-    };
-    return NextResponse.json(response, { status: 200 });
-  }
+  // Build response
+  const response: KeypadAttemptResponse = {
+    status: result.status as 'success' | 'fail' | 'locked' | 'already_unlocked',
+    message: result.message,
+    attemptsLeft: result.attempts_left ?? undefined,
+    keypadState: {
+      isUnlocked: result.is_unlocked,
+      isLockedOut: result.is_locked_out,
+      attemptCount: result.attempt_count,
+    },
+  };
 
-  // Check if locked out
-  if (currentState.isLockedOut) {
-    const response: KeypadAttemptResponse = {
-      status: 'locked',
-      message: config.lockedMessage || 'Keypaden är låst.',
-      keypadState: {
-        isUnlocked: false,
-        isLockedOut: true,
-        attemptCount: currentState.attemptCount,
-      },
-    };
-    return NextResponse.json(response, { status: 200 });
-  }
-
-  // Validate the code
-  const correctCode = config.correctCode || '';
-  const isCorrect = enteredCode === correctCode;
-
-  const newAttemptCount = currentState.attemptCount + 1;
-  const maxAttempts = config.maxAttempts;
-  const lockOnFail = config.lockOnFail ?? false;
-
-  let newState: KeypadState;
-  let response: KeypadAttemptResponse;
-
-  if (isCorrect) {
-    // SUCCESS
-    newState = {
-      attemptCount: newAttemptCount,
-      isUnlocked: true,
-      isLockedOut: false,
-      unlockedAt: new Date().toISOString(),
-      unlockedByParticipantId: participant.participantId,
-    };
-
+  // Handle post-unlock actions (reveal variants, broadcast)
+  if (result.status === 'success') {
     // Find public variants to reveal
     const { data: variants } = await supabase
       .from('session_artifact_variants')
@@ -237,94 +230,31 @@ export async function POST(
         .in('id', variantsToReveal);
     }
 
-    response = {
-      status: 'success',
-      message: config.successMessage || 'Koden är korrekt!',
-      revealVariantIds: variantsToReveal,
-      keypadState: {
-        isUnlocked: true,
-        isLockedOut: false,
-        attemptCount: newAttemptCount,
-      },
-    };
+    response.revealVariantIds = variantsToReveal;
 
-    // Broadcast unlock event
+    // Broadcast unlock event (no enteredCode or correctCode!)
     await broadcastKeypadEvent(sessionId, artifactId, 'keypad_unlocked', {
       unlockedBy: participant.displayName,
       participantId: participant.participantId,
       revealedVariants: variantsToReveal.length,
     });
 
-  } else {
-    // FAIL
-    const attemptsLeft = maxAttempts ? Math.max(0, maxAttempts - newAttemptCount) : undefined;
-    const shouldLock = Boolean(maxAttempts && newAttemptCount >= maxAttempts && lockOnFail);
+  } else if (result.status === 'locked') {
+    // Broadcast lockout event
+    await broadcastKeypadEvent(sessionId, artifactId, 'keypad_locked_out', {
+      lockedBy: participant.displayName,
+      participantId: participant.participantId,
+      totalAttempts: result.attempt_count,
+    });
 
-    newState = {
-      attemptCount: newAttemptCount,
-      isUnlocked: false,
-      isLockedOut: shouldLock,
-      unlockedAt: null,
-      unlockedByParticipantId: null,
-    };
-
-    if (shouldLock) {
-      response = {
-        status: 'locked',
-        message: config.lockedMessage || 'Keypaden är nu låst.',
-        attemptsLeft: 0,
-        keypadState: {
-          isUnlocked: false,
-          isLockedOut: true,
-          attemptCount: newAttemptCount,
-        },
-      };
-
-      await broadcastKeypadEvent(sessionId, artifactId, 'keypad_locked_out', {
-        lockedBy: participant.displayName,
-        participantId: participant.participantId,
-        totalAttempts: newAttemptCount,
-      });
-
-    } else {
-      response = {
-        status: 'fail',
-        message: config.failMessage || 'Fel kod!',
-        attemptsLeft,
-        keypadState: {
-          isUnlocked: false,
-          isLockedOut: false,
-          attemptCount: newAttemptCount,
-        },
-      };
-
-      await broadcastKeypadEvent(sessionId, artifactId, 'keypad_attempt_failed', {
-        attemptBy: participant.displayName,
-        participantId: participant.participantId,
-        attemptCount: newAttemptCount,
-        attemptsLeft,
-      });
-    }
-  }
-
-  // Persist the new state to session_artifacts.metadata
-  const existingMetadata = (artifact.metadata && typeof artifact.metadata === 'object' && !Array.isArray(artifact.metadata))
-    ? (artifact.metadata as Record<string, unknown>)
-    : {};
-
-  const updatedMetadata = {
-    ...existingMetadata,
-    keypadState: newState,
-  };
-
-  const { error: updateErr } = await supabase
-    .from('session_artifacts')
-    .update({ metadata: updatedMetadata as Json })
-    .eq('id', artifactId);
-
-  if (updateErr) {
-    console.error('[keypad/route] Failed to update keypad state:', updateErr);
-    return jsonError('Failed to update keypad state', 500);
+  } else if (result.status === 'fail') {
+    // Broadcast failed attempt (no enteredCode!)
+    await broadcastKeypadEvent(sessionId, artifactId, 'keypad_attempt_failed', {
+      attemptBy: participant.displayName,
+      participantId: participant.participantId,
+      attemptCount: result.attempt_count,
+      attemptsLeft: result.attempts_left,
+    });
   }
 
   return NextResponse.json(response, { status: 200 });

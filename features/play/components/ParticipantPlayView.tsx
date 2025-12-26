@@ -20,6 +20,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
@@ -32,10 +33,13 @@ import {
   getParticipantDecisions,
   castParticipantVote,
   getParticipantDecisionResults,
+  submitKeypadCode,
   type ParticipantSessionArtifact,
   type ParticipantSessionArtifactVariant,
   type ParticipantDecision,
   type DecisionResultsResponse,
+  type SanitizedKeypadMetadata,
+  type KeypadAttemptResponse,
 } from '@/features/play/api';
 
 // =============================================================================
@@ -249,6 +253,11 @@ export function ParticipantPlayView({
   const [submittedVoteByDecisionId, setSubmittedVoteByDecisionId] = useState<Record<string, boolean>>({});
   const [bodyLocked, setBodyLocked] = useState(false);
 
+  // Keypad UI state
+  const [keypadCodes, setKeypadCodes] = useState<Record<string, string>>({});
+  const [keypadSubmitting, setKeypadSubmitting] = useState<Record<string, boolean>>({});
+  const [keypadMessages, setKeypadMessages] = useState<Record<string, { type: 'success' | 'error'; text: string } | null>>({});
+
   const loadArtifacts = useCallback(async () => {
     if (!participantToken) return;
     try {
@@ -291,6 +300,40 @@ export function ParticipantPlayView({
       setDecisionsError(err instanceof Error ? err.message : 'Kunde inte ladda beslut');
     }
   }, [sessionId, participantToken]);
+
+  /**
+   * Submit keypad code for server-side validation.
+   * correctCode is NEVER exposed to the participant.
+   */
+  const handleKeypadSubmit = useCallback(async (artifactId: string, enteredCode: string) => {
+    if (!participantToken || !enteredCode.trim()) return;
+
+    setKeypadSubmitting((prev) => ({ ...prev, [artifactId]: true }));
+    setKeypadMessages((prev) => ({ ...prev, [artifactId]: null }));
+
+    try {
+      const result = await submitKeypadCode(sessionId, artifactId, enteredCode, { participantToken });
+      
+      const messageType = result.status === 'success' || result.status === 'already_unlocked' ? 'success' : 'error';
+      setKeypadMessages((prev) => ({ ...prev, [artifactId]: { type: messageType, text: result.message } }));
+
+      // Clear code on success or lockout
+      if (result.status === 'success' || result.status === 'locked') {
+        setKeypadCodes((prev) => ({ ...prev, [artifactId]: '' }));
+      }
+
+      // Reload artifacts to get updated state and revealed variants
+      await loadArtifacts();
+
+    } catch (err) {
+      setKeypadMessages((prev) => ({ 
+        ...prev, 
+        [artifactId]: { type: 'error', text: err instanceof Error ? err.message : 'Serverfel' }
+      }));
+    } finally {
+      setKeypadSubmitting((prev) => ({ ...prev, [artifactId]: false }));
+    }
+  }, [sessionId, participantToken, loadArtifacts]);
 
   // Subscribe to live session updates
   const {
@@ -605,7 +648,7 @@ export function ParticipantPlayView({
 
           {artifactsError && <p className="text-sm text-destructive">{artifactsError}</p>}
 
-          {artifacts.length === 0 || artifactVariants.length === 0 ? (
+          {artifacts.length === 0 ? (
             <p className="text-sm text-muted-foreground">Inga artefakter just nu.</p>
           ) : (
             <div className="space-y-3">
@@ -614,7 +657,109 @@ export function ParticipantPlayView({
                 .sort((a, b) => (a.artifact_order ?? 0) - (b.artifact_order ?? 0))
                 .map((a) => {
                   const vars = variantsByArtifactId.get(a.id) ?? [];
+                  
+                  // Keypad artifact - special rendering
+                  if (a.artifact_type === 'keypad') {
+                    const meta = (a.metadata ?? {}) as Partial<SanitizedKeypadMetadata>;
+                    const keypadState = meta.keypadState ?? { isUnlocked: false, isLockedOut: false, attemptCount: 0 };
+                    const codeLength = meta.codeLength ?? 4;
+                    const maxAttempts = meta.maxAttempts;
+                    const successMessage = meta.successMessage || 'Koden är korrekt!';
+                    const lockedMessage = meta.lockedMessage || 'Keypaden är låst.';
+
+                    const isUnlocked = keypadState.isUnlocked;
+                    const isLockedOut = keypadState.isLockedOut;
+                    const attemptsRemaining = maxAttempts != null ? Math.max(0, maxAttempts - keypadState.attemptCount) : null;
+
+                    const enteredCode = keypadCodes[a.id] || '';
+                    const isSubmitting = Boolean(keypadSubmitting[a.id]);
+                    const message = keypadMessages[a.id];
+
+                    return (
+                      <div key={a.id} className="rounded-md border border-border p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span>{isLockedOut ? '🔒' : isUnlocked ? '🔓' : '🔐'}</span>
+                            <p className="text-sm font-medium text-foreground">{a.title ?? 'Keypad'}</p>
+                          </div>
+                          <Badge variant={isUnlocked ? 'default' : isLockedOut ? 'destructive' : 'secondary'}>
+                            {isUnlocked ? 'Upplåst' : isLockedOut ? 'Låst' : 'Lås'}
+                          </Badge>
+                        </div>
+                        {a.description && <p className="text-xs text-muted-foreground">{a.description}</p>}
+
+                        {isUnlocked ? (
+                          <div className="rounded bg-green-500/10 border border-green-500/30 p-2 text-center">
+                            <p className="text-xs font-medium text-green-600 dark:text-green-400">✓ {successMessage}</p>
+                            {vars.length > 0 && (
+                              <div className="mt-2 space-y-1 text-left">
+                                {vars.map((v) => (
+                                  <div key={v.id} className="rounded bg-muted/30 p-2">
+                                    <p className="text-sm font-medium">{v.title || 'Upplåst'}</p>
+                                    {v.body && <p className="text-xs text-muted-foreground">{v.body}</p>}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ) : isLockedOut ? (
+                          <div className="rounded bg-destructive/10 border border-destructive/30 p-2 text-center">
+                            <p className="text-xs font-medium text-destructive">🔒 {lockedMessage}</p>
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            <div className="flex gap-2">
+                              <Input
+                                type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                maxLength={codeLength}
+                                placeholder={'•'.repeat(codeLength)}
+                                value={enteredCode}
+                                onChange={(e) => {
+                                  const val = e.target.value.replace(/\D/g, '').slice(0, codeLength);
+                                  setKeypadCodes((prev) => ({ ...prev, [a.id]: val }));
+                                  // Clear error on input
+                                  if (message?.type === 'error') {
+                                    setKeypadMessages((prev) => ({ ...prev, [a.id]: null }));
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && enteredCode.length === codeLength && !isSubmitting) {
+                                    void handleKeypadSubmit(a.id, enteredCode);
+                                  }
+                                }}
+                                disabled={isSubmitting}
+                                className={`text-center text-lg tracking-[0.3em] font-mono h-9 ${
+                                  message?.type === 'error' ? 'animate-shake border-destructive' : ''
+                                }`}
+                              />
+                              <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => handleKeypadSubmit(a.id, enteredCode)}
+                                disabled={enteredCode.length !== codeLength || isSubmitting}
+                              >
+                                {isSubmitting ? '...' : '→'}
+                              </Button>
+                            </div>
+                            {attemptsRemaining !== null && (
+                              <p className="text-xs text-muted-foreground text-center">{attemptsRemaining} försök kvar</p>
+                            )}
+                            {message && (
+                              <p className={`text-xs text-center ${message.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
+                                {message.text}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+
+                  // Standard artifact - skip if no variants
                   if (vars.length === 0) return null;
+
                   return (
                     <div key={a.id} className="rounded-md border border-border p-3 space-y-2">
                       <p className="text-sm font-medium text-foreground">{a.title ?? 'Artefakt'}</p>

@@ -319,6 +319,14 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                         onChange={(e) => {
                           const val = e.target.value.replace(/\D/g, '').slice(0, codeLength);
                           setKeypadCodes((prev) => new Map(prev).set(a.id, val));
+                          // Clear error message when user starts typing
+                          if (message?.type === 'error') {
+                            setKeypadMessages((prev) => {
+                              const next = new Map(prev);
+                              next.delete(a.id);
+                              return next;
+                            });
+                          }
                         }}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && enteredCode.length === codeLength && !isSubmitting) {
@@ -326,7 +334,9 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                           }
                         }}
                         disabled={isSubmitting}
-                        className="text-center text-2xl tracking-[0.5em] font-mono"
+                        className={`text-center text-2xl tracking-[0.5em] font-mono transition-transform ${
+                          message?.type === 'error' ? 'animate-shake border-destructive' : ''
+                        }`}
                       />
                       <Button
                         onClick={() => submitKeypadCode(a.id, enteredCode)}
@@ -338,7 +348,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
 
                     {/* Feedback message */}
                     {message && (
-                      <p className={`text-sm ${message.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
+                      <p className={`text-sm text-center ${message.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
                         {message.text}
                       </p>
                     )}

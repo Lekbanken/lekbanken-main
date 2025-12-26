@@ -15,9 +15,13 @@ export {
   getParticipantDecisions,
   castParticipantVote,
   getParticipantDecisionResults,
+  submitKeypadCode,
   type ParticipantSessionArtifact,
   type ParticipantSessionArtifactVariant,
   type ParticipantDecision,
   type DecisionOption,
   type DecisionResultsResponse,
+  type KeypadState,
+  type SanitizedKeypadMetadata,
+  type KeypadAttemptResponse,
 } from './primitives-api';

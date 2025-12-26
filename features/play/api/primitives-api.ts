@@ -4,10 +4,32 @@
  * Client-side helpers for artifacts + decisions/voting.
  */
 
+/** Keypad state returned from server (correctCode is NEVER included) */
+export interface KeypadState {
+  isUnlocked: boolean;
+  isLockedOut: boolean;
+  attemptCount: number;
+  unlockedAt?: string | null;
+}
+
+/** Sanitized keypad metadata for participants (correctCode stripped) */
+export interface SanitizedKeypadMetadata {
+  codeLength: number;
+  maxAttempts: number | null;
+  successMessage: string | null;
+  failMessage: string | null;
+  lockedMessage: string | null;
+  keypadState: KeypadState;
+}
+
 export interface ParticipantSessionArtifact {
   id: string;
   title?: string | null;
+  description?: string | null;
+  artifact_type?: string | null;
   artifact_order?: number | null;
+  /** Sanitized metadata - correctCode is NEVER included for participants */
+  metadata?: SanitizedKeypadMetadata | Record<string, unknown> | null;
 }
 
 export type ArtifactVisibility = 'public' | 'leader_only' | 'role_private';
@@ -166,4 +188,41 @@ export async function getParticipantDecisionResults(
   }
 
   return (await res.json()) as DecisionResultsResponse;
+}
+
+// =============================================================================
+// Keypad API (server-side validation - correctCode never exposed)
+// =============================================================================
+
+export interface KeypadAttemptResponse {
+  status: 'success' | 'fail' | 'locked' | 'already_unlocked';
+  message: string;
+  attemptsLeft?: number;
+  revealVariantIds?: string[];
+  keypadState: KeypadState;
+}
+
+export async function submitKeypadCode(
+  sessionId: string,
+  artifactId: string,
+  enteredCode: string,
+  options: { participantToken?: string }
+): Promise<KeypadAttemptResponse> {
+  const token = requireToken(options.participantToken);
+  const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/${artifactId}/keypad`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-participant-token': token,
+    },
+    body: JSON.stringify({ enteredCode }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const msg = typeof err?.error === 'string' ? err.error : `Keypad validation failed: ${res.status}`;
+    throw new Error(msg);
+  }
+
+  return (await res.json()) as KeypadAttemptResponse;
 }

@@ -426,6 +426,61 @@ Artefakter kan importeras som en JSON-struktur i en cell. De används i **Legend
 "[{""title"":""Ledtrådar"",""artifact_order"":1,""variants"":[{""variant_order"":1,""visibility"":""public"",""title"":""Ledtråd 1"",""body"":""…"",""step_index"":0,""phase_index"":0}]}]"
 ```
 
+### 6.5.1 Keypad-artefakter (artifact_type: "keypad")
+
+Keypads är pinkods-lås som deltagare måste låsa upp. **Viktigt:** Koden valideras server-side och exponeras ALDRIG till deltagare.
+
+**Keypad-specifika metadata-fält:**
+
+| Fält | Typ | Default | Beskrivning |
+|------|-----|---------|-------------|
+| `correctCode` | string | - | **Obligatoriskt.** Koden som krävs för att låsa upp. **OBS:** Ange som sträng, citera i CSV vid leading zeros. |
+| `codeLength` | number | 4 | Antal siffror/tecken (för UI-visning) |
+| `maxAttempts` | number \| null | null | Max antal försök. `null` = obegränsat |
+| `lockOnFail` | boolean | false | Om `true`: lås keypaden permanent efter `maxAttempts` |
+| `successMessage` | string | "Koden är korrekt!" | Meddelande vid rätt kod |
+| `failMessage` | string | "Fel kod, försök igen." | Meddelande vid fel kod |
+| `lockedMessage` | string | "Keypaden är låst." | Meddelande när keypaden är permanent låst |
+
+**⚠️ VIKTIGT: Leading zeros i CSV**
+
+Om koden börjar med noll (t.ex. `0451`), **måste** du citera värdet som sträng i JSON:
+- ✅ `"correctCode": "0451"` - Korrekt
+- ❌ `"correctCode": 0451` - FEL (tolkas som siffra, tappar leading zero)
+
+**Keypad-artefakt exempel (JSON):**
+```json
+[
+  {
+    "title": "Kassaskåpet",
+    "artifact_order": 1,
+    "artifact_type": "keypad",
+    "metadata": {
+      "correctCode": "0451",
+      "codeLength": 4,
+      "maxAttempts": 3,
+      "lockOnFail": true,
+      "successMessage": "Kassaskåpet öppnas!",
+      "failMessage": "Fel kod. Försök igen.",
+      "lockedMessage": "Larmet har gått av. Kassaskåpet är låst."
+    },
+    "variants": [
+      {
+        "variant_order": 1,
+        "visibility": "public",
+        "title": "Hemligt dokument",
+        "body": "Du hittar ett gammalt brev med en ledtråd..."
+      }
+    ]
+  }
+]
+```
+
+**CSV-cell format (citerad JSON):**
+```
+"[{""title"":""Kassaskåpet"",""artifact_type"":""keypad"",""artifact_order"":1,""metadata"":{""correctCode"":""0451"",""codeLength"":4,""maxAttempts"":3,""lockOnFail"":true},""variants"":[{""variant_order"":1,""visibility"":""public"",""title"":""Hemligt dokument"",""body"":""...""}]}]"
+```
+
 ---
 
 ## 8. Valideringsregler

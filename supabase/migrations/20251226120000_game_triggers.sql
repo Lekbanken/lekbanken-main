@@ -60,7 +60,7 @@ COMMENT ON COLUMN public.game_triggers.delay_seconds IS 'Optional delay before e
 
 CREATE TABLE IF NOT EXISTS public.session_triggers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL REFERENCES public.sessions(id) ON DELETE CASCADE,
+  session_id UUID NOT NULL REFERENCES public.game_sessions(id) ON DELETE CASCADE,
   source_trigger_id UUID REFERENCES public.game_triggers(id) ON DELETE SET NULL,
   
   -- Copy of game_trigger fields
@@ -159,14 +159,14 @@ CREATE POLICY "game_triggers_delete" ON public.game_triggers
     )
   );
 
--- session_triggers: Session owner or facilitator can manage
+-- session_triggers: Session owner or tenant member can manage
 CREATE POLICY "session_triggers_select" ON public.session_triggers
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM public.sessions s
+      SELECT 1 FROM public.game_sessions s
       WHERE s.id = session_triggers.session_id
       AND (
-        s.host_id = auth.uid()
+        s.user_id = auth.uid()
         OR s.tenant_id IN (
           SELECT tenant_id FROM public.tenant_members WHERE user_id = auth.uid()
         )
@@ -177,10 +177,10 @@ CREATE POLICY "session_triggers_select" ON public.session_triggers
 CREATE POLICY "session_triggers_update" ON public.session_triggers
   FOR UPDATE USING (
     EXISTS (
-      SELECT 1 FROM public.sessions s
+      SELECT 1 FROM public.game_sessions s
       WHERE s.id = session_triggers.session_id
       AND (
-        s.host_id = auth.uid()
+        s.user_id = auth.uid()
         OR s.tenant_id IN (
           SELECT tenant_id FROM public.tenant_members 
           WHERE user_id = auth.uid() 

@@ -8,8 +8,5 @@ ALTER TABLE public.game_steps
 -- Valid values: 'instant', 'typewriter', 'dramatic'
 COMMENT ON COLUMN public.game_steps.display_mode IS 'Text reveal mode: instant (default), typewriter (character by character), dramatic (slower, with sound)';
 
--- Add to session_steps as well (runtime snapshot)
-ALTER TABLE public.session_steps
-  ADD COLUMN IF NOT EXISTS display_mode TEXT DEFAULT 'instant';
-
-COMMENT ON COLUMN public.session_steps.display_mode IS 'Text reveal mode: instant, typewriter, or dramatic';
+-- Note: session_steps table doesn't exist yet in current schema.
+-- display_mode will be copied at runtime when session is created.

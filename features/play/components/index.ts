@@ -53,3 +53,7 @@ export type {
 export { NavigationControls } from './NavigationControls';
 export { SessionHeader } from './SessionHeader';
 export { StepViewer } from './StepViewer';
+
+// Trigger components
+export { TriggerPanel } from './TriggerPanel';
+export type { TriggerPanelProps } from './TriggerPanel';

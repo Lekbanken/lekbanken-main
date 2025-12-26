@@ -9,3 +9,11 @@ export type { UseLiveSessionOptions, UseLiveSessionResult } from './useLiveSessi
 
 export { usePlayBroadcast } from './usePlayBroadcast';
 export type { UsePlayBroadcastOptions, UsePlayBroadcastResult } from './usePlayBroadcast';
+
+export { useTriggerEngine } from './useTriggerEngine';
+export type {
+  TriggerEvent,
+  TriggerActionContext,
+  UseTriggerEngineOptions,
+  UseTriggerEngineReturn,
+} from './useTriggerEngine';

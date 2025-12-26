@@ -8,3 +8,4 @@ export { RoleEditor, type RoleData } from './RoleEditor';
 export { BoardEditor, type BoardConfigData } from './BoardEditor';
 export { StandardImagePicker } from './StandardImagePicker';
 export { ArtifactEditor } from './ArtifactEditor';
+export { TriggerEditor } from './TriggerEditor';

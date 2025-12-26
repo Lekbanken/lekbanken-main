@@ -274,4 +274,48 @@ export type GameBuilderData = {
   roles: GameRole[];
   boardConfig: GameBoardConfig | null;
   artifacts?: GameArtifact[];
+  triggers?: GameTrigger[];
+};
+
+// =============================================================================
+// Game Triggers (Declarative Automation)
+// =============================================================================
+
+import type { TriggerCondition, TriggerAction, TriggerStatus } from './trigger';
+
+/** Trigger stored in game_triggers table */
+export type GameTrigger = {
+  id: string;
+  game_id: string;
+  name: string;
+  description: string | null;
+  enabled: boolean;
+  condition: TriggerCondition;
+  actions: TriggerAction[];
+  execute_once: boolean;
+  delay_seconds: number;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Form data for creating/editing triggers */
+export type TriggerFormData = {
+  id?: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  condition: TriggerCondition;
+  actions: TriggerAction[];
+  execute_once: boolean;
+  delay_seconds: number;
+};
+
+/** Runtime trigger in session_triggers table */
+export type SessionTrigger = GameTrigger & {
+  session_id: string;
+  source_trigger_id: string | null;
+  status: TriggerStatus;
+  fired_at: string | null;
+  fired_count: number;
 };

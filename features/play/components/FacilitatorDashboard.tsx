@@ -31,8 +31,10 @@ import { Badge } from '@/components/ui/badge';
 import { usePlayBroadcast } from '@/features/play/hooks/usePlayBroadcast';
 import { TimerControl } from './TimerControl';
 import { StepPhaseNavigation, type StepInfo, type PhaseInfo } from './StepPhaseNavigation';
+import { TriggerPanel } from './TriggerPanel';
 import { createTimerState, pauseTimer, resumeTimer } from '@/lib/utils/timer-utils';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
+import type { SessionTrigger } from '@/types/games';
 import {
   getSessionChatMessages,
   sendSessionChatMessage,
@@ -54,8 +56,12 @@ export interface FacilitatorDashboardProps {
   phases?: PhaseInfo[];
   /** Initial runtime state from server */
   initialState?: Partial<SessionRuntimeState>;
+  /** Session triggers for automation */
+  triggers?: SessionTrigger[];
   /** Called when session state is updated via API */
   onStateUpdate?: (updates: Partial<SessionRuntimeState>) => Promise<void>;
+  /** Called when a trigger is manually fired */
+  onTriggerFire?: (triggerId: string) => Promise<void>;
   /** Called when session ends */
   onEndSession?: () => void;
   /** Number of active participants */
@@ -72,7 +78,9 @@ export function FacilitatorDashboard({
   steps,
   phases = [],
   initialState,
+  triggers = [],
   onStateUpdate,
+  onTriggerFire,
   onEndSession,
   participantCount = 0,
 }: FacilitatorDashboardProps) {
@@ -554,6 +562,15 @@ export function FacilitatorDashboard({
           </Card>
         </div>
       </div>
+      
+      {/* Trigger Panel (if triggers exist) */}
+      {triggers.length > 0 && (
+        <TriggerPanel
+          triggers={triggers}
+          onFireTrigger={onTriggerFire}
+          disabled={isSaving || status === 'ended'}
+        />
+      )}
       
       {/* Saving indicator */}
       {isSaving && (

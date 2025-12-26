@@ -113,6 +113,9 @@ interface CountdownOverlayProps {
 | Extend Artifact model for keypad type | P0 | 4h | ✅ |
 | Host configuration UI | P0 | 6h | ✅ |
 | Keypad artifact rendering | P0 | 4h | ✅ |
+| **Server-side code validation** | P0 | 4h | ✅ |
+| **State persistence in session_artifacts** | P0 | 2h | ✅ |
+| **Keypad state broadcast events** | P1 | 2h | ✅ |
 
 **Files created:**
 ```

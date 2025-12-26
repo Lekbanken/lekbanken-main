@@ -778,6 +778,17 @@ function validateArtifacts(
       const body = typeof vrec.body === 'string' ? vrec.body : null;
       const mediaRef = typeof vrec.media_ref === 'string' ? vrec.media_ref : null;
 
+      // Check for role_private visibility requiring a role reference
+      const hasRoleRef = vrec.visible_to_role_id || vrec.visible_to_role_order || vrec.visible_to_role_name;
+      if (visibility === 'role_private' && !hasRoleRef) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Variant #${j + 1} i artefakt "${title}": visibility är 'role_private' men saknar visible_to_role_id/order/name. Varianten kommer inte visas för någon.`,
+          severity: 'warning',
+        });
+      }
+
       const visibleToRoleId = typeof vrec.visible_to_role_id === 'string' ? vrec.visible_to_role_id : null;
       const visibleToRoleOrder = typeof vrec.visible_to_role_order === 'number' ? vrec.visible_to_role_order : null;
       const visibleToRoleName = typeof vrec.visible_to_role_name === 'string' ? vrec.visible_to_role_name : null;
@@ -848,6 +859,71 @@ function validateArtifacts(
     }
 
     const metadata = (typeof rec.metadata === 'object' && rec.metadata !== null) ? (rec.metadata as Record<string, unknown>) : null;
+
+    // Keypad-specific validation
+    if (artifactType === 'keypad' && metadata) {
+      const correctCode = metadata.correctCode;
+      
+      // Validate correctCode exists
+      if (correctCode === undefined || correctCode === null) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad-artefakt "${title}" saknar correctCode i metadata; keypaden kommer inte fungera`,
+          severity: 'warning',
+        });
+      } else if (typeof correctCode === 'number') {
+        // CRITICAL: correctCode should be string to preserve leading zeros
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad "${title}": correctCode är ett tal (${correctCode}). Använd sträng för att bevara leading zeros, t.ex. "0451" istället för 0451`,
+          severity: 'warning',
+        });
+        // Convert to string to prevent data loss
+        metadata.correctCode = String(correctCode);
+      } else if (typeof correctCode !== 'string') {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad "${title}": correctCode måste vara en sträng`,
+          severity: 'warning',
+        });
+      }
+
+      // Validate codeLength if present
+      const codeLength = metadata.codeLength;
+      if (codeLength !== undefined && typeof codeLength !== 'number') {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad "${title}": codeLength bör vara ett tal`,
+          severity: 'warning',
+        });
+      }
+
+      // Validate maxAttempts if present
+      const maxAttempts = metadata.maxAttempts;
+      if (maxAttempts !== undefined && maxAttempts !== null && typeof maxAttempts !== 'number') {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad "${title}": maxAttempts bör vara ett tal eller null`,
+          severity: 'warning',
+        });
+      }
+
+      // Validate lockOnFail if present
+      const lockOnFail = metadata.lockOnFail;
+      if (lockOnFail !== undefined && typeof lockOnFail !== 'boolean') {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad "${title}": lockOnFail bör vara true/false`,
+          severity: 'warning',
+        });
+      }
+    }
 
     artifacts.push({
       artifact_order: artifactOrder,

@@ -1,14 +1,14 @@
 # CSV Import - Fältreferens för Lekproduktion
 
-> **Version:** 1.4  
-> **Senast uppdaterad:** 2025-12-20  
-> **Syfte:** Komplett guide för att massproducera lekar via CSV-import
+> **Version:** 2.0  
+> **Senast uppdaterad:** 2025-12-26  
+> **Syfte:** Komplett guide för att massproducera lekar via CSV-import – nu med full Legendary Play-support
 
 ## Metadata
 
 - Owner: -
 - Status: active
-- Last validated: 2025-12-17
+- Last validated: 2025-12-26
 
 ## Related code (source of truth)
 
@@ -24,6 +24,10 @@
 - Importen accepterar `sub_purpose_ids` (preferred: JSON-array i cell) och stöder `sub_purpose_id` som legacy.
 - Exporten skriver `sub_purpose_ids` i det dokumenterade formatet.
 - `types/csv-import.ts` matchar kolumnnamn/format som beskrivs här.
+- **artifacts_json** stöder alla artifact types inklusive keypads
+- **Keypad correctCode** behandlas alltid som sträng (leading zeros bevaras)
+- **decisions_json / outcomes_json** läses men persisteras EJ (endast runtime-tabeller finns)
+- **Triggers** stöds EJ ännu – varken i import eller runtime
 
 ---
 
@@ -39,6 +43,8 @@
 8. [Valideringsregler](#8-valideringsregler)
 9. [Kompletta exempel](#9-kompletta-exempel)
 10. [Tips för AI-generering](#10-tips-för-ai-generering)
+11. [CSV Authoring Guide](#11-csv-authoring-guide)
+12. [Begränsningar och ej stödda funktioner](#12-begränsningar-och-ej-stödda-funktioner)
 
 ---
 
@@ -658,3 +664,134 @@ ORDER BY level, parent_id NULLS FIRST, name;
 ```
 
 Tips: spara gärna resultatet som CSV och kopiera in `id`-värdena i din import.
+---
+
+## 11. CSV Authoring Guide
+
+### 11.1 Grundläggande formateringsregler
+
+#### Citering (quoting)
+
+| Scenario | Exempel | Resultat |
+|----------|---------|----------|
+| Vanlig text utan komma | `Hej alla` | OK |
+| Text med komma | `"Hej, alla"` | ✅ Måste citeras |
+| Text med radbrytning | `"Rad 1\nRad 2"` | ✅ Måste citeras |
+| Citattecken i text | `"Han sa ""Hej"""` | ✅ Dubbla citattecken |
+
+#### JSON-i-CSV
+
+När du inkluderar JSON i en CSV-cell:
+
+```csv
+# FEL - citattecken ej escapade
+artifacts_json
+[{"title":"Test"}]
+
+# RÄTT - hela cellen citerad + inre citattecken dubblade
+artifacts_json
+"[{""title"":""Test""}]"
+```
+
+**Tips:** Validera alltid JSON först i en online JSON-validator innan du kopierar in i CSV.
+
+### 11.2 Newlines i textfält
+
+För flerradiga instruktioner använd `\n` (escaped newline) eller verkliga radbrytningar med citering:
+
+```csv
+step_1_body
+"Steg 1: Gör detta.
+
+Steg 2: Gör detta sen."
+```
+
+### 11.3 Locale/språk-hantering
+
+**Nuvarande begränsning:** `locale`-fältet läses av parsern men persisteras INTE till databasen vid import. Alla lekar importeras utan explicit locale.
+
+### 11.4 Vanliga valideringsfel och lösningar
+
+| Fel | Orsak | Lösning |
+|-----|-------|---------|
+| `Namn saknas (obligatoriskt)` | `name`-kolumnen är tom | Fyll i lekens namn |
+| `Kort beskrivning saknas` | `short_description` tom | Fyll i kort beskrivning |
+| `Kunde inte tolka JSON` | Ogiltig JSON i `*_json` kolumn | Validera JSON, escapea `"` som `""` |
+| `Ogiltigt play_mode` | Fel spelläge angivet | Använd `basic`, `facilitated`, eller `participants` |
+| `main_purpose_id saknas` | Varning (ej error) | Lägg till giltigt UUID från `purposes`-tabellen |
+| `decisions_json läses men importeras inte` | Varning | Detta är förväntat – decisions är runtime-only |
+
+### 11.5 När välja CSV vs JSON import?
+
+| Scenario | Rekommendation |
+|----------|----------------|
+| Enkel batch-import av basic-lekar | **CSV** |
+| Export → redigera → import cycle | **CSV** |
+| Komplexa artifacts med djupa nästlingar | **JSON** |
+| Programmatiskt genererade lekar | **JSON** |
+| Manuell redigering i kalkylark | **CSV** |
+| Fler än 20 steg | **JSON** (CSV max 20 inline) |
+
+---
+
+## 12. Begränsningar och ej stödda funktioner
+
+### 12.1 Beslut och Utfall (Decisions / Outcomes)
+
+⚠️ **Partiellt stöd:**
+
+- `decisions_json` och `outcomes_json` **läses och valideras** av parsern
+- De **importeras INTE till databasen** (det finns endast runtime-tabeller)
+- Vid import visas en **varning** (ej error)
+
+**Framtida plan:** När author-time decisions-tabeller skapas kommer dessa att stödjas fullt ut.
+
+### 12.2 Triggers
+
+❌ **Ej stödd:**
+
+Triggers (automatiska åtgärder baserade på events) stöds **varken i import eller runtime** ännu.
+
+Om du lägger till trigger-relaterad metadata i `artifacts_json` kommer den att sparas i `metadata`-fältet men **inte tolkas av runtime**.
+
+### 12.3 Export – begränsad round-trip
+
+⚠️ **Viktig begränsning:**
+
+Exporten (`csv-export`) inkluderar **INTE** följande:
+
+- `artifacts_json` – artefakter exporteras inte
+- `decisions_json` / `outcomes_json`
+
+Detta innebär att **export → import inte ger full round-trip** för Legendary Play-lekar.
+
+**Workaround:** Använd JSON-export för fullständig data, eller exportera artefakter separat via Supabase.
+
+### 12.4 Keypad – sessionsglobal state
+
+Keypad-artefakter har **sessionsglobal** state:
+
+- När en deltagare låser upp keypaden påverkas **alla** deltagare
+- Det finns ingen per-deltagare keypad-state
+- `attemptCount`, `isUnlocked`, `isLockedOut` lagras i `session_artifacts.metadata.keypadState`
+
+### 12.5 step_index / phase_index semantik
+
+**Viktigt att förstå:**
+
+- Index är **0-baserade** (första steget = `0`, första fasen = `0`)
+- Dessa fält anger **när en variant blir synlig** under session-runtime
+- De påverkar INTE spelordning eller UI-layout vid author-time
+- Gating tillämpas av `ParticipantPlayView` vid hämtning
+
+---
+
+## Appendix D: Exempel-CSV:er
+
+| Fil | Beskrivning |
+|-----|-------------|
+| `docs/examples/example-basic-games.csv` | Tre enkla basic-lekar |
+| `docs/examples/example-participants-game.csv` | Maffia med roller och faser |
+| `docs/examples/example-legendary-play-complete.csv` | **Komplett** Legendary Play med keypad, gating, roller |
+
+Se `docs/examples/README-legendary-play-example.md` för detaljerad genomgång av golden example.

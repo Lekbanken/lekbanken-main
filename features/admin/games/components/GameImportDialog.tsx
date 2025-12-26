@@ -170,9 +170,13 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
             <ArrowUpTrayIcon className="h-6 w-6 text-primary" />
           </div>
           <DialogTitle>Importera spel</DialogTitle>
-          <DialogDescription>
-            Importera spel från CSV eller JSON-fil. CSV stöder upp till 20 inline-steg.
-            Använd <code>game_key</code> för att uppdatera befintliga spel.
+          <DialogDescription className="space-y-1">
+            <span className="block">
+              Importera spel från CSV eller JSON-fil. Stöder Legendary Play: keypads, roller, faser och artefakter.
+            </span>
+            <span className="block text-xs text-muted-foreground">
+              CSV: max 20 inline-steg, enkel batch-import. JSON: fullständig struktur, komplexa spel.
+            </span>
           </DialogDescription>
         </DialogHeader>
 
@@ -261,11 +265,11 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           {/* Options */}
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
-              <Label htmlFor="upsertMode" className="cursor-pointer">
+              <Label htmlFor="upsertMode" className="cursor-pointer font-medium">
                 Upsert-läge
               </Label>
-              <p className="text-xs text-muted-foreground">
-                Uppdatera befintliga spel baserat på <code>game_key</code>
+              <p className="text-xs text-muted-foreground max-w-md">
+                När aktiverat: spel med samma <code className="px-1 py-0.5 bg-muted rounded">game_key</code> uppdateras istället för att skapa dubbletter. Relaterad data (steg, roller, artefakter) ersätts helt.
               </p>
             </div>
             <Switch

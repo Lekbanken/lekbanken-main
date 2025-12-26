@@ -114,7 +114,7 @@ CREATE POLICY "game_triggers_select" ON public.game_triggers
     EXISTS (
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
-      AND g.tenant_id IN (
+      AND g.owner_tenant_id IN (
         SELECT tenant_id FROM public.user_tenant_memberships WHERE user_id = auth.uid()
       )
     )
@@ -125,7 +125,7 @@ CREATE POLICY "game_triggers_insert" ON public.game_triggers
     EXISTS (
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
-      AND g.tenant_id IN (
+      AND g.owner_tenant_id IN (
         SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')
@@ -138,7 +138,7 @@ CREATE POLICY "game_triggers_update" ON public.game_triggers
     EXISTS (
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
-      AND g.tenant_id IN (
+      AND g.owner_tenant_id IN (
         SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')
@@ -151,7 +151,7 @@ CREATE POLICY "game_triggers_delete" ON public.game_triggers
     EXISTS (
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
-      AND g.tenant_id IN (
+      AND g.owner_tenant_id IN (
         SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')

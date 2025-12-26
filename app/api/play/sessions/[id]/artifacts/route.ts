@@ -43,6 +43,43 @@ function readStepPhaseFromMetadata(metadata: Json | null | undefined) {
   return { stepIndex, phaseIndex };
 }
 
+/**
+ * Sanitize artifact metadata for participant view.
+ * SECURITY: Removes correctCode and other host-only fields.
+ * Preserves keypadState for UI display and non-sensitive config.
+ */
+function sanitizeMetadataForParticipant(metadata: Json | null, artifactType: string | null): Json | null {
+  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+    return null;
+  }
+
+  const m = metadata as Record<string, unknown>;
+
+  // For keypads, return sanitized config + state
+  if (artifactType === 'keypad') {
+    const keypadState = m.keypadState as Record<string, unknown> | undefined;
+    const safeKeypadState = {
+      isUnlocked: Boolean(keypadState?.isUnlocked),
+      isLockedOut: Boolean(keypadState?.isLockedOut),
+      attemptCount: typeof keypadState?.attemptCount === 'number' ? keypadState.attemptCount : 0,
+      unlockedAt: typeof keypadState?.unlockedAt === 'string' ? keypadState.unlockedAt : null,
+    };
+    return {
+      // Safe config fields (no correctCode!)
+      codeLength: typeof m.codeLength === 'number' ? m.codeLength : 4,
+      maxAttempts: typeof m.maxAttempts === 'number' ? m.maxAttempts : null,
+      successMessage: typeof m.successMessage === 'string' ? m.successMessage : null,
+      failMessage: typeof m.failMessage === 'string' ? m.failMessage : null,
+      lockedMessage: typeof m.lockedMessage === 'string' ? m.lockedMessage : null,
+      // Keypad state (session-global)
+      keypadState: safeKeypadState,
+    } as unknown as Json;
+  }
+
+  // For other artifact types, return null (or could return safe subset)
+  return null;
+}
+
 async function resolveViewer(sessionId: string, request: Request): Promise<Viewer | null> {
   const token = request.headers.get('x-participant-token');
   if (token) {
@@ -171,10 +208,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     .map((a) => a.session_artifact_variant_id as string)
     .filter(Boolean);
 
-  // Fetch all session artifacts ids (for revealed public variants)
+  // Fetch all session artifacts (for revealed public variants)
+  // Include artifact_type and metadata for keypad state (sanitized below)
   const { data: artifacts, error: aErr } = await service
     .from('session_artifacts')
-    .select('id, title, artifact_order')
+    .select('id, title, description, artifact_type, artifact_order, metadata')
     .eq('session_id', sessionId)
     .order('artifact_order', { ascending: true });
 
@@ -224,9 +262,20 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const variants = (allVariants ?? []).filter((v) => accessibleVariantIds.has(v.id as string));
+
+  // Sanitize artifacts for participant view (remove correctCode, etc.)
+  const sanitizedArtifacts = (artifacts ?? []).map((a) => ({
+    id: a.id,
+    title: a.title,
+    description: a.description,
+    artifact_type: a.artifact_type,
+    artifact_order: a.artifact_order,
+    metadata: sanitizeMetadataForParticipant(a.metadata as Json | null, a.artifact_type as string | null),
+  }));
+
   return NextResponse.json(
     {
-      artifacts: artifacts ?? [],
+      artifacts: sanitizedArtifacts,
       variants,
     },
     { status: 200 }

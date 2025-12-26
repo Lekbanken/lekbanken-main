@@ -4,23 +4,23 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Keypad } from '@/components/play/Keypad';
+import { Input } from '@/components/ui/input';
 
+/**
+ * Sanitized keypad metadata (from server - correctCode is NEVER included)
+ */
 type KeypadMetadata = {
-  correctCode?: string;
   codeLength?: number;
-  successMessage?: string;
-  // Advanced settings
-  maxAttempts?: number;
-  lockOnFail?: boolean;
-  failMessage?: string;
-  lockedMessage?: string;
-};
-
-type KeypadState = {
-  attemptCount: number;
-  isLockedOut: boolean;
-  unlockedAt?: Date;
+  maxAttempts?: number | null;
+  successMessage?: string | null;
+  failMessage?: string | null;
+  lockedMessage?: string | null;
+  keypadState?: {
+    isUnlocked: boolean;
+    isLockedOut: boolean;
+    attemptCount: number;
+    unlockedAt: string | null;
+  };
 };
 
 type SessionArtifact = {
@@ -43,26 +43,28 @@ type SessionArtifactVariant = {
   highlighted_at?: string | null;
 };
 
+type KeypadAttemptResponse = {
+  status: 'success' | 'fail' | 'locked' | 'already_unlocked';
+  message: string;
+  attemptsLeft?: number;
+  revealVariantIds?: string[];
+  keypadState: {
+    isUnlocked: boolean;
+    isLockedOut: boolean;
+    attemptCount: number;
+  };
+};
+
 export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [artifacts, setArtifacts] = useState<SessionArtifact[]>([]);
   const [variants, setVariants] = useState<SessionArtifactVariant[]>([]);
-  const [unlockedKeypads, setUnlockedKeypads] = useState<Set<string>>(new Set());
-  const [keypadStates, setKeypadStates] = useState<Map<string, KeypadState>>(new Map());
-
-  const getKeypadState = useCallback((artifactId: string): KeypadState => {
-    return keypadStates.get(artifactId) || { attemptCount: 0, isLockedOut: false };
-  }, [keypadStates]);
-
-  const updateKeypadState = useCallback((artifactId: string, update: Partial<KeypadState>) => {
-    setKeypadStates((prev) => {
-      const next = new Map(prev);
-      const current = next.get(artifactId) || { attemptCount: 0, isLockedOut: false };
-      next.set(artifactId, { ...current, ...update });
-      return next;
-    });
-  }, []);
+  
+  // Keypad UI state (code entry, submission status)
+  const [keypadCodes, setKeypadCodes] = useState<Map<string, string>>(new Map());
+  const [keypadSubmitting, setKeypadSubmitting] = useState<Set<string>>(new Set());
+  const [keypadMessages, setKeypadMessages] = useState<Map<string, { type: 'success' | 'error'; text: string }>>(new Map());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -127,6 +129,68 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
     [sessionId, load]
   );
 
+  /**
+   * Submit keypad code to server for validation.
+   * Server validates code, updates session state, and returns result.
+   * correctCode is NEVER exposed to the client.
+   */
+  const submitKeypadCode = useCallback(
+    async (artifactId: string, enteredCode: string) => {
+      if (!enteredCode.trim()) return;
+
+      setKeypadSubmitting((prev) => new Set([...prev, artifactId]));
+      setKeypadMessages((prev) => {
+        const next = new Map(prev);
+        next.delete(artifactId);
+        return next;
+      });
+
+      try {
+        const res = await fetch(`/api/play/sessions/${sessionId}/artifacts/${artifactId}/keypad`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enteredCode }),
+        });
+
+        const data: KeypadAttemptResponse = await res.json();
+
+        if (!res.ok) {
+          setKeypadMessages((prev) => new Map(prev).set(artifactId, { type: 'error', text: 'Serverfel' }));
+          return;
+        }
+
+        // Update local message
+        const messageType = data.status === 'success' || data.status === 'already_unlocked' ? 'success' : 'error';
+        setKeypadMessages((prev) => new Map(prev).set(artifactId, { type: messageType, text: data.message }));
+
+        // Clear entered code on success or lockout
+        if (data.status === 'success' || data.status === 'locked') {
+          setKeypadCodes((prev) => {
+            const next = new Map(prev);
+            next.delete(artifactId);
+            return next;
+          });
+        }
+
+        // Reload artifacts to get updated state
+        await load();
+
+      } catch (e) {
+        setKeypadMessages((prev) => new Map(prev).set(artifactId, { 
+          type: 'error', 
+          text: e instanceof Error ? e.message : 'Något gick fel' 
+        }));
+      } finally {
+        setKeypadSubmitting((prev) => {
+          const next = new Set(prev);
+          next.delete(artifactId);
+          return next;
+        });
+      }
+    },
+    [sessionId, load]
+  );
+
   if (loading) {
     return (
       <Card className="p-6">
@@ -178,27 +242,31 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
         artifacts.map((a) => {
           const vs = variantsByArtifact.get(a.id) ?? [];
 
-          // Keypad artifact rendering
+          // Keypad artifact rendering (server-side validation - correctCode never exposed)
           if (a.artifact_type === 'keypad') {
-            const correctCode = a.metadata?.correctCode || '1234';
-            const codeLength = a.metadata?.codeLength || correctCode.length;
-            const successMessage = a.metadata?.successMessage;
-            const maxAttempts = a.metadata?.maxAttempts || undefined;
-            const lockOnFail = a.metadata?.lockOnFail ?? false;
-            const _failMessage = a.metadata?.failMessage || 'Fel kod!'; // Used by Keypad internally
-            const lockedMessage = a.metadata?.lockedMessage || 'Keypaden är låst.';
+            const meta = a.metadata || {};
+            const codeLength = meta.codeLength || 4;
+            const maxAttempts = meta.maxAttempts;
+            const successMessage = meta.successMessage || 'Koden är korrekt!';
+            const lockedMessage = meta.lockedMessage || 'Keypaden är låst.';
             
-            const isUnlocked = unlockedKeypads.has(a.id);
-            const keypadState = getKeypadState(a.id);
+            // Server-provided state
+            const keypadState = meta.keypadState || { isUnlocked: false, isLockedOut: false, attemptCount: 0 };
+            const isUnlocked = keypadState.isUnlocked;
             const isLockedOut = keypadState.isLockedOut;
-            const attemptsRemaining = maxAttempts ? maxAttempts - keypadState.attemptCount : undefined;
+            const attemptsRemaining = maxAttempts ? Math.max(0, maxAttempts - keypadState.attemptCount) : null;
+
+            // Local UI state
+            const enteredCode = keypadCodes.get(a.id) || '';
+            const isSubmitting = keypadSubmitting.has(a.id);
+            const message = keypadMessages.get(a.id);
 
             return (
               <Card key={a.id} className="p-6 space-y-4">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{isLockedOut ? '🔒' : '🔐'}</span>
+                      <span className="text-lg">{isLockedOut ? '🔒' : isUnlocked ? '🔓' : '🔐'}</span>
                       <h3 className="font-medium">{a.title}</h3>
                     </div>
                     {a.description && <p className="text-sm text-muted-foreground mt-1">{a.description}</p>}
@@ -207,7 +275,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                     <Badge variant={isUnlocked ? 'default' : isLockedOut ? 'destructive' : 'secondary'}>
                       {isUnlocked ? 'Upplåst' : isLockedOut ? 'Låst ut' : 'Låst'}
                     </Badge>
-                    {maxAttempts && !isUnlocked && !isLockedOut && (
+                    {attemptsRemaining !== null && !isUnlocked && !isLockedOut && (
                       <span className="text-xs text-muted-foreground">
                         {attemptsRemaining} försök kvar
                       </span>
@@ -218,7 +286,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                 {isUnlocked ? (
                   <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-center">
                     <p className="text-sm font-medium text-green-600 dark:text-green-400">
-                      ✓ {successMessage || 'Koden är korrekt!'}
+                      ✓ {successMessage}
                     </p>
                     {vs.length > 0 && (
                       <div className="mt-3 space-y-2 text-left">
@@ -238,36 +306,55 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                     </p>
                   </div>
                 ) : (
-                  <Keypad
-                    correctCode={correctCode}
-                    codeLength={codeLength}
-                    title={a.title || 'Ange koden'}
-                    size="md"
-                    maxAttempts={maxAttempts}
-                    showAttempts={Boolean(maxAttempts)}
-                    onSuccess={() => {
-                      setUnlockedKeypads((prev) => new Set([...prev, a.id]));
-                      updateKeypadState(a.id, { unlockedAt: new Date() });
-                      // Optionally auto-reveal variants
-                      if (vs.length > 0) {
-                        vs.forEach((v) => {
-                          if (v.visibility === 'public' && !v.revealed_at) {
-                            updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: true });
+                  <div className="space-y-3">
+                    {/* Code entry - server validates, never exposes correctCode */}
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={codeLength}
+                        placeholder={'•'.repeat(codeLength)}
+                        value={enteredCode}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '').slice(0, codeLength);
+                          setKeypadCodes((prev) => new Map(prev).set(a.id, val));
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && enteredCode.length === codeLength && !isSubmitting) {
+                            void submitKeypadCode(a.id, enteredCode);
                           }
-                        });
-                      }
-                    }}
-                    onWrongCode={() => {
-                      updateKeypadState(a.id, { 
-                        attemptCount: keypadState.attemptCount + 1 
-                      });
-                    }}
-                    onLockout={() => {
-                      if (lockOnFail) {
-                        updateKeypadState(a.id, { isLockedOut: true });
-                      }
-                    }}
-                  />
+                        }}
+                        disabled={isSubmitting}
+                        className="text-center text-2xl tracking-[0.5em] font-mono"
+                      />
+                      <Button
+                        onClick={() => submitKeypadCode(a.id, enteredCode)}
+                        disabled={enteredCode.length !== codeLength || isSubmitting}
+                      >
+                        {isSubmitting ? 'Kontrollerar...' : 'Lås upp'}
+                      </Button>
+                    </div>
+
+                    {/* Feedback message */}
+                    {message && (
+                      <p className={`text-sm ${message.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
+                        {message.text}
+                      </p>
+                    )}
+
+                    {/* Code dots visualization */}
+                    <div className="flex justify-center gap-2">
+                      {Array.from({ length: codeLength }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-3 w-3 rounded-full transition-colors ${
+                            i < enteredCode.length ? 'bg-primary' : 'bg-muted'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 )}
               </Card>
             );

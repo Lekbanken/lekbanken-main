@@ -115,7 +115,7 @@ CREATE POLICY "game_triggers_select" ON public.game_triggers
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
       AND g.tenant_id IN (
-        SELECT tenant_id FROM public.tenant_members WHERE user_id = auth.uid()
+        SELECT tenant_id FROM public.user_tenant_memberships WHERE user_id = auth.uid()
       )
     )
   );
@@ -126,7 +126,7 @@ CREATE POLICY "game_triggers_insert" ON public.game_triggers
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
       AND g.tenant_id IN (
-        SELECT tenant_id FROM public.tenant_members 
+        SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')
       )
@@ -139,7 +139,7 @@ CREATE POLICY "game_triggers_update" ON public.game_triggers
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
       AND g.tenant_id IN (
-        SELECT tenant_id FROM public.tenant_members 
+        SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')
       )
@@ -152,7 +152,7 @@ CREATE POLICY "game_triggers_delete" ON public.game_triggers
       SELECT 1 FROM public.games g
       WHERE g.id = game_triggers.game_id
       AND g.tenant_id IN (
-        SELECT tenant_id FROM public.tenant_members 
+        SELECT tenant_id FROM public.user_tenant_memberships 
         WHERE user_id = auth.uid() 
         AND role IN ('owner', 'admin', 'member')
       )
@@ -168,7 +168,7 @@ CREATE POLICY "session_triggers_select" ON public.session_triggers
       AND (
         s.user_id = auth.uid()
         OR s.tenant_id IN (
-          SELECT tenant_id FROM public.tenant_members WHERE user_id = auth.uid()
+          SELECT tenant_id FROM public.user_tenant_memberships WHERE user_id = auth.uid()
         )
       )
     )
@@ -182,7 +182,7 @@ CREATE POLICY "session_triggers_update" ON public.session_triggers
       AND (
         s.user_id = auth.uid()
         OR s.tenant_id IN (
-          SELECT tenant_id FROM public.tenant_members 
+          SELECT tenant_id FROM public.user_tenant_memberships 
           WHERE user_id = auth.uid() 
           AND role IN ('owner', 'admin', 'member')
         )

@@ -719,7 +719,8 @@ Steg 2: Gör detta sen."
 | `Kunde inte tolka JSON` | Ogiltig JSON i `*_json` kolumn | Validera JSON, escapea `"` som `""` |
 | `Ogiltigt play_mode` | Fel spelläge angivet | Använd `basic`, `facilitated`, eller `participants` |
 | `main_purpose_id saknas` | Varning (ej error) | Lägg till giltigt UUID från `purposes`-tabellen |
-| `decisions_json läses men importeras inte` | Varning | Detta är förväntat – decisions är runtime-only |
+| `correctCode är ett tal` | **FEL (blockerar)** - Leading zeros förlorade | Citera koden: `"correctCode": "0451"` |
+| `role_private saknar rollreferens` | **FEL (blockerar)** - Variant skulle ej synas | Lägg till `visible_to_role_order` eller `visible_to_role_id` |
 
 ### 11.5 När välja CSV vs JSON import?
 
@@ -738,11 +739,13 @@ Steg 2: Gör detta sen."
 
 ### 12.1 Beslut och Utfall (Decisions / Outcomes)
 
-⚠️ **Partiellt stöd:**
+❌ **EJ STÖDD för game templates:**
 
-- `decisions_json` och `outcomes_json` **läses och valideras** av parsern
-- De **importeras INTE till databasen** (det finns endast runtime-tabeller)
-- Vid import visas en **varning** (ej error)
+- `decisions_json` och `outcomes_json` **parsas** men **sparas INTE** till databasen
+- Det finns inga author-time tabeller för decisions/outcomes – endast runtime-tabeller (`session_decisions`, `session_outcomes`)
+- Om du inkluderar dessa kolumner ignoreras de med en varning
+
+**Framtida:** När author-time schema för beslut/utfall läggs till kan CSV-stöd implementeras. Tills dess, använd Game Builder UI för att konfigurera beslutslogik.
 
 **Framtida plan:** När author-time decisions-tabeller skapas kommer dessa att stödjas fullt ut.
 

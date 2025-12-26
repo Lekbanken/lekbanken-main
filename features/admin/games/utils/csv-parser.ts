@@ -243,6 +243,7 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
   const artifacts = validateArtifacts(
     artifactsResult.success ? artifactsResult.data : null,
     rowNumber,
+    errors,
     warnings
   );
 
@@ -689,6 +690,7 @@ function validateRoles(
 function validateArtifacts(
   raw: unknown,
   rowNumber: number,
+  errors: ImportError[],
   warnings: ImportError[]
 ): ParsedArtifact[] {
   if (raw === null || raw === undefined) return [];
@@ -781,12 +783,13 @@ function validateArtifacts(
       // Check for role_private visibility requiring a role reference
       const hasRoleRef = vrec.visible_to_role_id || vrec.visible_to_role_order || vrec.visible_to_role_name;
       if (visibility === 'role_private' && !hasRoleRef) {
-        warnings.push({
+        errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Variant #${j + 1} i artefakt "${title}": visibility är 'role_private' men saknar visible_to_role_id/order/name. Varianten kommer inte visas för någon.`,
-          severity: 'warning',
+          message: `Variant #${j + 1} i artefakt "${title}": visibility är 'role_private' men saknar rollreferens. Ange visible_to_role_id, visible_to_role_order, eller visible_to_role_name.`,
+          severity: 'error',
         });
+        continue; // Skip this variant - it would never be shown to anyone
       }
 
       const visibleToRoleId = typeof vrec.visible_to_role_id === 'string' ? vrec.visible_to_role_id : null;
@@ -861,34 +864,46 @@ function validateArtifacts(
     const metadata = (typeof rec.metadata === 'object' && rec.metadata !== null) ? (rec.metadata as Record<string, unknown>) : null;
 
     // Keypad-specific validation
-    if (artifactType === 'keypad' && metadata) {
+    if (artifactType === 'keypad') {
+      if (!metadata) {
+        errors.push({
+          row: rowNumber,
+          column: 'artifacts_json',
+          message: `Keypad-artefakt "${title}" saknar metadata. Keypads kräver minst correctCode.`,
+          severity: 'error',
+        });
+        continue; // Skip this artifact
+      }
+
       const correctCode = metadata.correctCode;
       
       // Validate correctCode exists
       if (correctCode === undefined || correctCode === null) {
-        warnings.push({
+        errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad-artefakt "${title}" saknar correctCode i metadata; keypaden kommer inte fungera`,
-          severity: 'warning',
+          message: `Keypad-artefakt "${title}" saknar correctCode i metadata. Keypads kräver en kod.`,
+          severity: 'error',
         });
+        continue; // Skip this artifact
       } else if (typeof correctCode === 'number') {
-        // CRITICAL: correctCode should be string to preserve leading zeros
-        warnings.push({
+        // CRITICAL: Leading zeros are LOST when CSV parses 0451 as number 451
+        // This MUST be a hard error - auto-convert cannot recover leading zeros
+        errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad "${title}": correctCode är ett tal (${correctCode}). Använd sträng för att bevara leading zeros, t.ex. "0451" istället för 0451`,
-          severity: 'warning',
+          message: `Keypad "${title}": correctCode är ett tal (${correctCode}). Leading zeros kan ha gått förlorade! Fix: sätt citattecken i JSON: "correctCode": "${String(correctCode).padStart(4, '0')}" eller använd korrekt sträng direkt.`,
+          severity: 'error',
         });
-        // Convert to string to prevent data loss
-        metadata.correctCode = String(correctCode);
+        continue; // Skip this artifact - data integrity cannot be guaranteed
       } else if (typeof correctCode !== 'string') {
-        warnings.push({
+        errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad "${title}": correctCode måste vara en sträng`,
-          severity: 'warning',
+          message: `Keypad "${title}": correctCode måste vara en sträng, fick ${typeof correctCode}`,
+          severity: 'error',
         });
+        continue; // Skip this artifact
       }
 
       // Validate codeLength if present

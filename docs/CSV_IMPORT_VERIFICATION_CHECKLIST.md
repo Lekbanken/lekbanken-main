@@ -121,31 +121,55 @@
 - [ ] Verify 3 games created with correct steps
 - [ ] Verify no regression in simple imports
 
-### 16. Re-Import (Upsert)
+### 16. Re-Import (Upsert) - CRITICAL: Verify Complete Replacement
 
 - [ ] Re-import `example-legendary-play-complete.csv` with Upsert enabled
 - [ ] Verify game updates (not duplicated)
 - [ ] Verify artifact count is still 4 (not doubled)
+- [ ] **Query DB to verify NO orphaned data:**
+  ```sql
+  -- Should return 4 artifacts for this game
+  SELECT COUNT(*) FROM game_artifacts WHERE game_id = '<game-id>';
+  
+  -- Should return 3 roles
+  SELECT COUNT(*) FROM game_roles WHERE game_id = '<game-id>';
+  
+  -- Should return 4 phases
+  SELECT COUNT(*) FROM game_phases WHERE game_id = '<game-id>';
+  ```
+- [ ] Modify CSV to remove 1 artifact, re-import, verify only 3 artifacts remain
+
+### 17. Role Snapshot After Import
+
+- [ ] Start new session for imported game
+- [ ] Click "Kopiera roller från spel" (if applicable)
+- [ ] Verify roles appear in session_roles
+- [ ] Verify participants can be assigned roles
+- [ ] **If roles don't appear:** Check network response for errors
 
 ---
 
 ## Edge Cases
 
-### 17. Keypad Leading Zero Preservation
+### 18. Keypad Leading Zero - MUST FAIL
 
-- [ ] Query database: `SELECT metadata FROM game_artifacts WHERE title = 'Kassaskåpet'`
-- [ ] Verify `correctCode` is `"0451"` (not `451`)
+- [ ] Create test CSV with keypad `correctCode` as number: `"correctCode": 451` (no quotes around number)
+- [ ] Import and verify **ERROR** (not warning) appears
+- [ ] Verify import is **blocked** (not just warned)
+- [ ] Error message should include: "Leading zeros kan ha gått förlorade"
 
-### 18. Invalid Keypad (Warning)
-
-- [ ] Create test CSV with keypad `correctCode` as number (no quotes)
-- [ ] Import and verify warning about leading zeros appears
-- [ ] Verify code is auto-converted to string
-
-### 19. role_private Without Role (Warning)
+### 19. role_private Without Role - MUST FAIL
 
 - [ ] Create test CSV with `visibility: role_private` but no `visible_to_role_*`
-- [ ] Import and verify warning about missing role reference
+- [ ] Import and verify **ERROR** (not warning) appears
+- [ ] Verify that specific variant is **not imported**
+- [ ] Error message should include: "saknar rollreferens"
+
+### 20. Keypad Without correctCode - MUST FAIL
+
+- [ ] Create test CSV with `artifact_type: keypad` but no `correctCode` in metadata
+- [ ] Import and verify **ERROR** appears
+- [ ] Verify keypad artifact is **not imported**
 
 ---
 

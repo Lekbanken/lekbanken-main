@@ -13,6 +13,7 @@ import {
   LanguageIcon,
   Cog6ToothIcon,
   Squares2X2Icon,
+  BoltIcon,
 } from '@heroicons/react/24/outline';
 
 export type BuilderSection = 
@@ -21,6 +22,7 @@ export type BuilderSection =
   | 'material'
   | 'sakerhet'
   | 'artifacts'
+  | 'triggers'
   | 'spellage'
   | 'faser'
   | 'roller'
@@ -42,6 +44,7 @@ const sections: SectionConfig[] = [
   { id: 'material', label: 'Material', icon: CubeIcon },
   { id: 'sakerhet', label: 'Säkerhet & Inkludering', icon: ShieldCheckIcon },
   { id: 'artifacts', label: 'Artifakter', icon: Squares2X2Icon, advanced: true, requiresMode: ['participants'] },
+  { id: 'triggers', label: 'Triggers', icon: BoltIcon, advanced: true, requiresMode: ['participants'] },
   { id: 'spellage', label: 'Spelläge', icon: AdjustmentsHorizontalIcon, advanced: true },
   { id: 'faser', label: 'Faser & Rundor', icon: ClockIcon, advanced: true, requiresMode: ['facilitated', 'participants'] },
   { id: 'roller', label: 'Roller', icon: UserGroupIcon, advanced: true, requiresMode: ['participants'] },

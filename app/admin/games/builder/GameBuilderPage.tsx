@@ -16,6 +16,7 @@ import {
   BoardEditor,
   StandardImagePicker,
   ArtifactEditor,
+  TriggerEditor,
   type BuilderSection,
   type QualityState,
   type StepData,
@@ -23,7 +24,7 @@ import {
   type RoleData,
   type BoardConfigData,
 } from './components';
-import type { ArtifactFormData, ArtifactVariantFormData } from '@/types/games';
+import type { ArtifactFormData, ArtifactVariantFormData, TriggerFormData } from '@/types/games';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
 
@@ -145,6 +146,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const [phases, setPhases] = useState<PhaseData[]>([]);
   const [roles, setRoles] = useState<RoleData[]>([]);
   const [artifacts, setArtifacts] = useState<ArtifactFormData[]>([]);
+  const [triggers, setTriggers] = useState<TriggerFormData[]>([]);
   const [purposes, setPurposes] = useState<Purpose[]>([]);
   const [subPurposeIds, setSubPurposeIds] = useState<string[]>([]);
   const [cover, setCover] = useState<{ mediaId: string | null; url: string | null }>({ mediaId: null, url: null });
@@ -346,6 +348,21 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         const loadedArtifacts = ((data.artifacts as unknown[]) ?? []).map((a, idx) => normalizeArtifact(a, idx));
         setArtifacts(loadedArtifacts);
 
+        // Load triggers
+        const loadedTriggers = ((data.triggers as Partial<TriggerFormData>[] | undefined) ?? []).map(
+          (t) => ({
+            id: t.id || `trigger-${Math.random().toString(36).slice(2, 9)}`,
+            name: t.name || 'Trigger',
+            description: t.description || '',
+            enabled: t.enabled ?? true,
+            condition: t.condition || { type: 'manual' },
+            actions: t.actions || [],
+            execute_once: t.execute_once ?? true,
+            delay_seconds: t.delay_seconds ?? 0,
+          })
+        );
+        setTriggers(loadedTriggers);
+
         if (Array.isArray(data.secondaryPurposes)) {
           setSubPurposeIds((data.secondaryPurposes as string[]).filter(Boolean));
         }
@@ -416,13 +433,14 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     if (phases.length > 0) completed.push('faser');
     if (roles.length > 0) completed.push('roller');
     if (artifacts.length > 0) completed.push('artifacts');
+    if (triggers.length > 0) completed.push('triggers');
     // Board config is complete if at least one element is visible or welcome_message is set
     const hasBoardContent = boardConfig.show_game_name || boardConfig.show_current_phase ||
       boardConfig.show_timer || boardConfig.show_participants || boardConfig.show_public_roles ||
       boardConfig.show_qr_code || boardConfig.welcome_message.trim();
     if (hasBoardContent) completed.push('tavla');
     return completed;
-  }, [qualityState, steps, materials, phases, roles, artifacts, boardConfig]);
+  }, [qualityState, steps, materials, phases, roles, artifacts, triggers, boardConfig]);
 
   // Save handler
   const handleSave = useCallback(async (options?: { status?: 'draft' | 'published' }) => {
@@ -519,6 +537,16 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           background_color: boardConfig.background_color || null,
           layout_variant: boardConfig.layout_variant,
         },
+        triggers: triggers.map((t, idx) => ({
+          name: t.name,
+          description: t.description || null,
+          enabled: t.enabled,
+          condition: t.condition,
+          actions: t.actions,
+          execute_once: t.execute_once,
+          delay_seconds: t.delay_seconds,
+          sort_order: idx,
+        })),
         secondaryPurposes: subPurposeIds,
         coverMediaId: cover.mediaId,
       };
@@ -545,7 +573,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [core, steps, materials, phases, roles, artifacts, boardConfig, gameId, router, subPurposeIds, cover]);
+  }, [core, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameId, router, subPurposeIds, cover]);
 
   // Publish handler
   const handlePublish = useCallback(async () => {
@@ -983,6 +1011,32 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               {roles.length === 0 && (
                 <p className="text-xs text-muted-foreground">
                   Tips: Lägg till roller för att kunna göra privata varianter per roll.
+                </p>
+              )}
+            </section>
+          )}
+
+          {/* Triggers Section */}
+          {activeSection === 'triggers' && (
+            <section className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-1">Triggers</h2>
+                <p className="text-sm text-muted-foreground">
+                  Automatisera spelet med &quot;När X händer, gör Y&quot;-regler.
+                </p>
+              </div>
+
+              <TriggerEditor
+                triggers={triggers}
+                phases={phases.map((p, idx) => ({ id: p.id || `phase-${idx}`, game_id: gameId || '', name: p.name, phase_type: p.phase_type, phase_order: idx, duration_seconds: p.duration_seconds, timer_visible: p.timer_visible, timer_style: p.timer_style, description: p.description, board_message: p.board_message, auto_advance: p.auto_advance, locale: null, created_at: '', updated_at: '' }))}
+                steps={steps.map((s, idx) => ({ id: s.id || `step-${idx}`, game_id: gameId || '', step_order: idx, title: s.title || null, body: s.body || null, duration_seconds: s.duration_seconds, leader_script: s.leader_script || null, display_mode: s.display_mode || null, locale: null, phase_id: null, participant_prompt: null, board_text: null, media_ref: null, optional: false, conditional: null, created_at: '', updated_at: '' }))}
+                artifacts={artifacts.map((a, idx) => ({ id: a.id || `artifact-${idx}`, game_id: gameId || '', title: a.title, description: a.description, artifact_type: a.artifact_type, artifact_order: idx, tags: a.tags, metadata: a.metadata || null, locale: null }))}
+                onChange={setTriggers}
+              />
+
+              {artifacts.length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Tips: Lägg till artifakter (t.ex. keypads) för att kunna trigga på deras händelser.
                 </p>
               )}
             </section>

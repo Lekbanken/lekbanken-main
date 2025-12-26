@@ -115,6 +115,17 @@ type BoardConfigPayload = {
   layout_variant?: string;
 };
 
+type TriggerPayload = {
+  name: string;
+  description?: string | null;
+  enabled?: boolean;
+  condition: Record<string, unknown>;
+  actions: Record<string, unknown>[];
+  execute_once?: boolean;
+  delay_seconds?: number;
+  sort_order?: number;
+};
+
 type BuilderBody = {
   core?: CorePayload;
   steps?: StepPayload[];
@@ -123,6 +134,7 @@ type BuilderBody = {
   roles?: RolePayload[];
   boardConfig?: BoardConfigPayload;
   artifacts?: ArtifactPayload[];
+  triggers?: TriggerPayload[];
   secondaryPurposes?: string[];
   coverMediaId?: string | null;
 };
@@ -216,6 +228,13 @@ export async function GET(
     variants: variantsByArtifact[a.id] ?? [],
   }));
 
+  // Fetch triggers
+  const { data: triggers } = await supabase
+    .from('game_triggers')
+    .select('*')
+    .eq('game_id', id)
+    .order('sort_order', { ascending: true });
+
   return NextResponse.json({
     game,
     steps: steps || [],
@@ -232,6 +251,7 @@ export async function GET(
         }
       : null,
     artifacts: artifactsWithVariants,
+    triggers: triggers || [],
   });
 }
 
@@ -477,6 +497,27 @@ export async function PUT(
       if (variantsError) {
         return NextResponse.json({ error: 'Failed to save artifact variants', details: variantsError.message }, { status: 500 });
       }
+    }
+  }
+
+  // Replace triggers (delete all, insert new)
+  const triggers = body.triggers ?? [];
+  await supabase.from('game_triggers').delete().eq('game_id', id);
+  if (triggers.length > 0) {
+    const triggerRows = triggers.map((t, idx) => ({
+      game_id: id,
+      name: t.name || 'Trigger',
+      description: t.description ?? null,
+      enabled: t.enabled ?? true,
+      condition: t.condition,
+      actions: t.actions ?? [],
+      execute_once: t.execute_once ?? false,
+      delay_seconds: t.delay_seconds ?? 0,
+      sort_order: t.sort_order ?? idx,
+    }));
+    const { error: triggersError } = await supabase.from('game_triggers').insert(triggerRows);
+    if (triggersError) {
+      return NextResponse.json({ error: 'Failed to save triggers', details: triggersError.message }, { status: 500 });
     }
   }
 

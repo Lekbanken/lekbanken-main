@@ -14,6 +14,7 @@ import { ArtifactsPanel } from './ArtifactsPanel';
 import { DecisionsPanel } from './DecisionsPanel';
 import { OutcomePanel } from './OutcomePanel';
 import { getHostPlaySession, updatePlaySessionState, type PlaySessionData } from '../api';
+import type { SessionTrigger } from '@/types/games';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -60,6 +61,7 @@ export function HostPlayMode({
 }: HostPlayModeProps) {
   // Data state
   const [playData, setPlayData] = useState<PlaySessionData | null>(null);
+  const [triggers, setTriggers] = useState<SessionTrigger[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -84,10 +86,46 @@ export function HostPlayMode({
       setLoading(false);
     }
   }, [sessionId]);
+  // Load triggers (snapshot if needed)
+  const loadTriggers = useCallback(async () => {
+    try {
+      // Try to get existing session triggers
+      const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
+        cache: 'no-store',
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.triggers && data.triggers.length > 0) {
+          setTriggers(data.triggers);
+          return;
+        }
+      }
 
+      // If no triggers exist, try to snapshot from game
+      const snapshotRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (snapshotRes.ok) {
+        // Reload triggers after snapshot
+        const reloadRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
+          cache: 'no-store',
+        });
+        if (reloadRes.ok) {
+          const reloadData = await reloadRes.json();
+          setTriggers(reloadData.triggers || []);
+        }
+      }
+    } catch (err) {
+      console.warn('[HostPlayMode] Failed to load triggers:', err);
+    }
+  }, [sessionId]);
   useEffect(() => {
     void loadData();
-  }, [loadData]);
+    void loadTriggers();
+  }, [loadData, loadTriggers]);
 
   // Handle state updates
   const handleStateUpdate = useCallback(async (updates: Partial<SessionRuntimeState>) => {
@@ -113,6 +151,30 @@ export function HostPlayMode({
     // This should be handled by the parent component
     onExitPlayMode?.();
   }, [onExitPlayMode]);
+
+  // Handle trigger fire
+  const handleTriggerFire = useCallback(async (triggerId: string) => {
+    try {
+      const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ triggerId, action: 'fire' }),
+      });
+
+      if (res.ok) {
+        // Update local state
+        setTriggers((prev) =>
+          prev.map((t) =>
+            t.id === triggerId
+              ? { ...t, status: 'fired' as const, fired_count: (t.fired_count || 0) + 1, fired_at: new Date().toISOString() }
+              : t
+          )
+        );
+      }
+    } catch (err) {
+      console.error('[HostPlayMode] Failed to fire trigger:', err);
+    }
+  }, [sessionId]);
 
   // Handle role assignment complete
   const handleRolesAssigned = useCallback(() => {
@@ -212,7 +274,9 @@ export function HostPlayMode({
           steps={playData.steps}
           phases={playData.phases}
           initialState={playData.runtimeState}
+          triggers={triggers}
           onStateUpdate={handleStateUpdate}
+          onTriggerFire={handleTriggerFire}
           onEndSession={handleEndSession}
           participantCount={participantCount}
         />

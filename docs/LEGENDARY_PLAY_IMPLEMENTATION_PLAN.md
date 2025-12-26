@@ -110,9 +110,9 @@ interface CountdownOverlayProps {
 | Wrong code shake animation | P1 | 2h | ✅ |
 | Correct code success state | P0 | 2h | ✅ |
 | Haptic feedback (vibration API) | P2 | 1h | ✅ |
-| Extend Artifact model for keypad type | P0 | 4h | ⬜ |
-| Host configuration UI | P0 | 6h | ⬜ |
-| Keypad artifact rendering | P0 | 4h | ⬜ |
+| Extend Artifact model for keypad type | P0 | 4h | ✅ |
+| Host configuration UI | P0 | 6h | ✅ |
+| Keypad artifact rendering | P0 | 4h | ✅ |
 
 **Files created:**
 ```

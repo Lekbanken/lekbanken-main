@@ -4,6 +4,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Keypad } from '@/components/play/Keypad';
+
+type KeypadMetadata = {
+  correctCode?: string;
+  codeLength?: number;
+  successMessage?: string;
+};
 
 type SessionArtifact = {
   id: string;
@@ -11,6 +18,7 @@ type SessionArtifact = {
   description?: string | null;
   artifact_type?: string | null;
   artifact_order?: number;
+  metadata?: KeypadMetadata | null;
 };
 
 type SessionArtifactVariant = {
@@ -29,6 +37,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [artifacts, setArtifacts] = useState<SessionArtifact[]>([]);
   const [variants, setVariants] = useState<SessionArtifactVariant[]>([]);
+  const [unlockedKeypads, setUnlockedKeypads] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -143,6 +152,69 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       ) : (
         artifacts.map((a) => {
           const vs = variantsByArtifact.get(a.id) ?? [];
+
+          // Keypad artifact rendering
+          if (a.artifact_type === 'keypad') {
+            const correctCode = a.metadata?.correctCode || '1234';
+            const codeLength = a.metadata?.codeLength || correctCode.length;
+            const successMessage = a.metadata?.successMessage;
+            const isUnlocked = unlockedKeypads.has(a.id);
+
+            return (
+              <Card key={a.id} className="p-6 space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg">🔐</span>
+                      <h3 className="font-medium">{a.title}</h3>
+                    </div>
+                    {a.description && <p className="text-sm text-muted-foreground mt-1">{a.description}</p>}
+                  </div>
+                  <Badge variant={isUnlocked ? 'default' : 'secondary'}>
+                    {isUnlocked ? 'Upplåst' : 'Låst'}
+                  </Badge>
+                </div>
+
+                {isUnlocked ? (
+                  <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4 text-center">
+                    <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                      ✓ {successMessage || 'Koden är korrekt!'}
+                    </p>
+                    {vs.length > 0 && (
+                      <div className="mt-3 space-y-2 text-left">
+                        {vs.map((v) => (
+                          <div key={v.id} className="rounded border border-border p-2 text-sm">
+                            <p className="font-medium">{v.title || 'Upplåst innehåll'}</p>
+                            {v.body && <p className="text-muted-foreground">{v.body}</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Keypad
+                    correctCode={correctCode}
+                    codeLength={codeLength}
+                    title={a.title || 'Ange koden'}
+                    size="md"
+                    onSuccess={() => {
+                      setUnlockedKeypads((prev) => new Set([...prev, a.id]));
+                      // Optionally auto-reveal variants
+                      if (vs.length > 0) {
+                        vs.forEach((v) => {
+                          if (v.visibility === 'public' && !v.revealed_at) {
+                            updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: true });
+                          }
+                        });
+                      }
+                    }}
+                  />
+                )}
+              </Card>
+            );
+          }
+
+          // Standard artifact rendering (card, document, image, etc.)
           return (
             <Card key={a.id} className="p-6 space-y-3">
               <div className="flex items-start justify-between gap-4">

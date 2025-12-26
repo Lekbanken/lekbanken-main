@@ -20,6 +20,13 @@ const visibilityOptions = [
   { value: 'role_private', label: 'Privat för roll' },
 ] satisfies { value: ArtifactVisibility; label: string }[];
 
+const artifactTypeOptions = [
+  { value: 'card', label: 'Kort' },
+  { value: 'keypad', label: 'Pinkod (Keypad)' },
+  { value: 'document', label: 'Dokument' },
+  { value: 'image', label: 'Bild' },
+];
+
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
@@ -153,10 +160,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">Typ</label>
-              <Input
+              <Select
                 value={artifact.artifact_type}
                 onChange={(e) => updateArtifact(idx, { artifact_type: e.target.value })}
-                placeholder="card"
+                options={artifactTypeOptions}
               />
             </div>
             <div className="space-y-2">
@@ -175,6 +182,65 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               />
             </div>
           </div>
+
+          {/* Keypad-specific configuration */}
+          {artifact.artifact_type === 'keypad' && (
+            <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🔐</span>
+                <h4 className="text-sm font-semibold text-foreground">Pinkod-inställningar</h4>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Korrekt kod</label>
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={(artifact.metadata?.correctCode as string) || ''}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, '');
+                      updateArtifact(idx, {
+                        metadata: { ...artifact.metadata, correctCode: val },
+                      });
+                    }}
+                    placeholder="1234"
+                    maxLength={8}
+                  />
+                  <p className="text-xs text-muted-foreground">Endast siffror (max 8)</p>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Kodlängd</label>
+                  <Input
+                    type="number"
+                    min={2}
+                    max={8}
+                    value={(artifact.metadata?.codeLength as number) || 4}
+                    onChange={(e) => {
+                      const val = Math.max(2, Math.min(8, parseInt(e.target.value, 10) || 4));
+                      updateArtifact(idx, {
+                        metadata: { ...artifact.metadata, codeLength: val },
+                      });
+                    }}
+                    placeholder="4"
+                  />
+                  <p className="text-xs text-muted-foreground">Antal siffror i koden (2-8)</p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Meddelande vid rätt kod (valfritt)</label>
+                <Input
+                  value={(artifact.metadata?.successMessage as string) || ''}
+                  onChange={(e) =>
+                    updateArtifact(idx, {
+                      metadata: { ...artifact.metadata, successMessage: e.target.value },
+                    })
+                  }
+                  placeholder="Låst uppnådd! Du har hittat ledtråden."
+                />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Beskrivning</label>

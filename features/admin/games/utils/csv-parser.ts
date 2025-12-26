@@ -243,6 +243,7 @@ function parseGameRow(row: Record<string, string>, rowNumber: number): RowParseR
   const artifacts = validateArtifacts(
     artifactsResult.success ? artifactsResult.data : null,
     rowNumber,
+    gameKey,
     errors,
     warnings
   );
@@ -690,6 +691,7 @@ function validateRoles(
 function validateArtifacts(
   raw: unknown,
   rowNumber: number,
+  gameKey: string,
   errors: ImportError[],
   warnings: ImportError[]
 ): ParsedArtifact[] {
@@ -786,7 +788,7 @@ function validateArtifacts(
         errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Variant #${j + 1} i artefakt "${title}": visibility är 'role_private' men saknar rollreferens. Ange visible_to_role_id, visible_to_role_order, eller visible_to_role_name.`,
+          message: `[Rad ${rowNumber}, game_key: ${gameKey}] Variant #${j + 1} i artefakt "${title}": visibility='role_private' men saknar rollreferens. Fix i CSV: lägg till "visible_to_role_order": 1 (eller visible_to_role_name/visible_to_role_id).`,
           severity: 'error',
         });
         continue; // Skip this variant - it would never be shown to anyone
@@ -869,7 +871,7 @@ function validateArtifacts(
         errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad-artefakt "${title}" saknar metadata. Keypads kräver minst correctCode.`,
+          message: `[Rad ${rowNumber}, game_key: ${gameKey}] Keypad "${title}" saknar metadata. Fix i CSV: lägg till metadata-objekt i artifacts_json, ex: {"correctCode": "0451", ...}`,
           severity: 'error',
         });
         continue; // Skip this artifact
@@ -882,7 +884,7 @@ function validateArtifacts(
         errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad-artefakt "${title}" saknar correctCode i metadata. Keypads kräver en kod.`,
+          message: `[Rad ${rowNumber}, game_key: ${gameKey}] Keypad "${title}" saknar correctCode. Fix i CSV: artifacts_json måste innehålla {"correctCode": "din-kod", ...}`,
           severity: 'error',
         });
         continue; // Skip this artifact
@@ -892,7 +894,7 @@ function validateArtifacts(
         errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad "${title}": correctCode är ett tal (${correctCode}). Leading zeros kan ha gått förlorade! Fix: sätt citattecken i JSON: "correctCode": "${String(correctCode).padStart(4, '0')}" eller använd korrekt sträng direkt.`,
+          message: `[Rad ${rowNumber}, game_key: ${gameKey}] Keypad "${title}": correctCode är ett tal (${correctCode}), leading zeros kan ha gått förlorade! Fix i CSV: metadata_correctCode måste vara "${String(correctCode).padStart(4, '0')}" (med citattecken i JSON).`,
           severity: 'error',
         });
         continue; // Skip this artifact - data integrity cannot be guaranteed
@@ -900,7 +902,7 @@ function validateArtifacts(
         errors.push({
           row: rowNumber,
           column: 'artifacts_json',
-          message: `Keypad "${title}": correctCode måste vara en sträng, fick ${typeof correctCode}`,
+          message: `[Rad ${rowNumber}, game_key: ${gameKey}] Keypad "${title}": correctCode måste vara en sträng, fick ${typeof correctCode}. Fix i CSV: ange "correctCode": "din-kod"`,
           severity: 'error',
         });
         continue; // Skip this artifact

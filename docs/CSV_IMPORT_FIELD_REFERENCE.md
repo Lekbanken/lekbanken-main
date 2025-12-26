@@ -45,6 +45,7 @@
 10. [Tips för AI-generering](#10-tips-för-ai-generering)
 11. [CSV Authoring Guide](#11-csv-authoring-guide)
 12. [Begränsningar och ej stödda funktioner](#12-begränsningar-och-ej-stödda-funktioner)
+13. [Round-trip kontrakt](#13-round-trip-kontrakt)
 
 ---
 
@@ -786,6 +787,78 @@ Keypad-artefakter har **sessionsglobal** state:
 - Dessa fält anger **när en variant blir synlig** under session-runtime
 - De påverkar INTE spelordning eller UI-layout vid author-time
 - Gating tillämpas av `ParticipantPlayView` vid hämtning
+
+---
+
+## 13. Round-trip kontrakt
+
+Detta avsnitt dokumenterar exakt vad som kan exporteras och återimporteras utan förlust.
+
+### 13.1 Fulla round-trip (export → import utan förlust)
+
+✅ **CSV-export inkluderar:**
+
+| Fält | Format | Notering |
+|------|--------|----------|
+| Basmeta | Kolumner | name, short_description, description, play_mode, status, locale, etc. |
+| Steg | step_1..step_20 | Upp till 20 inline-steg |
+| phases_json | JSON-cell | Alla faser |
+| roles_json | JSON-cell | Alla roller |
+| board_config_json | JSON-cell | Tavla-konfiguration |
+| materials_json | JSON-cell | Material och säkerhetsnoteringar |
+| sub_purpose_ids | JSON-cell | Sekundära syften |
+
+### 13.2 Förlustbringande fält (LOSSY)
+
+❌ **Följande exporteras EJ och går förlorade vid round-trip:**
+
+| Fält | Orsak | Workaround |
+|------|-------|------------|
+| `artifacts_json` | csv-export inkluderar inte artefakter | Använd JSON-export eller Supabase query |
+| `decisions_json` | Endast runtime-tabeller finns | Ej tillgängligt, väntar på author-time schema |
+| `outcomes_json` | Endast runtime-tabeller finns | Ej tillgängligt, väntar på author-time schema |
+| Keypad state | Session-specifik data | Endast initial metadata sparas |
+
+### 13.3 Partiella round-trips
+
+⚠️ **Om du exporterar ett spel med artefakter och återimporterar CSV:**
+
+- Basmeta, steg, faser, roller: **Bevaras**
+- Artefakter: **FÖRSVINNER** (måste återskapas manuellt)
+- För escape room / Legendary Play: **Använd JSON-export istället**
+
+### 13.4 Rekommendation per användningsfall
+
+| Användningsfall | Rekommenderat format |
+|-----------------|---------------------|
+| Enkel basic-lek batch-import | CSV |
+| Facilitated lek med faser | CSV |
+| Participants lek med roller (utan artefakter) | CSV |
+| Escape room med keypads | **JSON** |
+| Lek med role_private artefakter | **JSON** |
+| Full backup för återställning | **JSON + Supabase export** |
+
+### 13.5 Validering av round-trip
+
+För att verifiera att en round-trip fungerar:
+
+1. Exportera spel till CSV
+2. Radera spelet (eller använd ny game_key)
+3. Importera CSV med upsert=false
+4. Jämför:
+   ```sql
+   -- Förväntat: identiska värden
+   SELECT name, short_description, play_mode, status
+   FROM games WHERE game_key = '<game_key>';
+   
+   -- Förväntat: samma antal
+   SELECT COUNT(*) FROM game_steps WHERE game_id = '<game_id>';
+   SELECT COUNT(*) FROM game_phases WHERE game_id = '<game_id>';
+   SELECT COUNT(*) FROM game_roles WHERE game_id = '<game_id>';
+   
+   -- Förväntat: 0 (artefakter exporteras EJ)
+   SELECT COUNT(*) FROM game_artifacts WHERE game_id = '<game_id>';
+   ```
 
 ---
 

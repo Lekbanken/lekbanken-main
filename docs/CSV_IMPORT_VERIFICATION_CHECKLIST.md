@@ -139,6 +139,33 @@
   ```
 - [ ] Modify CSV to remove 1 artifact, re-import, verify only 3 artifacts remain
 
+### 16b. FK Violations Check (After Upsert)
+
+- [ ] **Verify no orphaned variants reference deleted artifacts:**
+  ```sql
+  SELECT v.id, v.artifact_id
+  FROM game_artifact_variants v
+  LEFT JOIN game_artifacts a ON v.artifact_id = a.id
+  WHERE a.id IS NULL;
+  -- Should return 0 rows
+  ```
+- [ ] **Verify no stale role references in variants:**
+  ```sql
+  SELECT v.id, v.visible_to_role_id
+  FROM game_artifact_variants v
+  WHERE v.visible_to_role_id IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM game_roles r WHERE r.id = v.visible_to_role_id);
+  -- Should return 0 rows
+  ```
+- [ ] **Verify cascade delete worked on session data (if applicable):**
+  ```sql
+  SELECT sa.id, sa.game_artifact_id
+  FROM session_artifacts sa
+  WHERE sa.game_artifact_id IS NOT NULL
+    AND NOT EXISTS (SELECT 1 FROM game_artifacts ga WHERE ga.id = sa.game_artifact_id);
+  -- Should return 0 rows (unless orphan protection exists)
+  ```
+
 ### 17. Role Snapshot After Import
 
 - [ ] Start new session for imported game

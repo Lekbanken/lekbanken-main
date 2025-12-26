@@ -172,10 +172,10 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           <DialogTitle>Importera spel</DialogTitle>
           <DialogDescription className="space-y-1">
             <span className="block">
-              Importera spel från CSV eller JSON-fil. Stöder Legendary Play: keypads, roller, faser och artefakter.
+              Importera spel från CSV eller JSON. Stöder Legendary Play: keypads, roller, faser och artefakter.
             </span>
             <span className="block text-xs text-muted-foreground">
-              CSV: max 20 inline-steg, enkel batch-import. JSON: fullständig struktur, komplexa spel.
+              CSV: max 20 steg, keypads, roller, faser (ej decisions/outcomes). JSON: fullständig struktur.
             </span>
           </DialogDescription>
         </DialogHeader>

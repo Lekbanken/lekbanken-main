@@ -21,6 +21,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { CountdownOverlay, TypewriterText } from '@/components/play';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
@@ -54,6 +55,7 @@ export interface StepData {
   safety?: string;
   tag?: string;
   note?: string;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic';
 }
 
 export interface PhaseData {
@@ -257,6 +259,12 @@ export function ParticipantPlayView({
   const [keypadSubmitting, setKeypadSubmitting] = useState<Record<string, boolean>>({});
   const [keypadMessages, setKeypadMessages] = useState<Record<string, { type: 'success' | 'error'; text: string } | null>>({});
 
+  // Countdown overlay state
+  const [countdownOpen, setCountdownOpen] = useState(false);
+  const [countdownDuration, setCountdownDuration] = useState(5);
+  const [countdownMessage, setCountdownMessage] = useState<string | undefined>();
+  const [countdownVariant, setCountdownVariant] = useState<'default' | 'dramatic'>('default');
+
   const loadArtifacts = useCallback(async () => {
     if (!participantToken) return;
     try {
@@ -357,6 +365,16 @@ export function ParticipantPlayView({
     },
     onDecisionUpdate: () => {
       void loadDecisions();
+    },
+    onCountdown: (payload) => {
+      if (payload.action === 'show') {
+        setCountdownDuration(payload.duration);
+        setCountdownMessage(payload.message);
+        setCountdownVariant(payload.variant ?? 'default');
+        setCountdownOpen(true);
+      } else if (payload.action === 'skip' || payload.action === 'complete') {
+        setCountdownOpen(false);
+      }
     },
   });
 
@@ -963,7 +981,19 @@ export function ParticipantPlayView({
           
           <div className="p-4 space-y-4">
             <h2 className="text-lg font-semibold text-foreground">{currentStep.title}</h2>
-            <p className="text-sm leading-relaxed text-muted-foreground">{currentStep.description}</p>
+            {currentStep.display_mode && currentStep.display_mode !== 'instant' ? (
+              <TypewriterText
+                key={`step-${currentStep.id}-${currentStepIndex}`}
+                text={currentStep.description}
+                speed={currentStep.display_mode === 'dramatic' ? 'dramatic' : 'normal'}
+                variant="default"
+                showProgress
+                allowSkip
+                className="text-sm leading-relaxed text-muted-foreground"
+              />
+            ) : (
+              <p className="text-sm leading-relaxed text-muted-foreground">{currentStep.description}</p>
+            )}
             
             {/* Materials */}
             {currentStep.materials && currentStep.materials.length > 0 && (
@@ -1179,6 +1209,16 @@ export function ParticipantPlayView({
           </div>
         );
       })()}
+
+      {/* Countdown Overlay - triggered by host */}
+      <CountdownOverlay
+        duration={countdownDuration}
+        message={countdownMessage}
+        variant={countdownVariant}
+        isOpen={countdownOpen}
+        onComplete={() => setCountdownOpen(false)}
+        onSkip={() => setCountdownOpen(false)}
+      />
     </div>
   );
 }

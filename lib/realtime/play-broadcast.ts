@@ -13,6 +13,7 @@ import type {
   TimerBroadcast,
   RoleBroadcast,
   BoardBroadcast,
+  CountdownBroadcast,
   TimerState,
   BoardState,
 } from '@/types/play-runtime';
@@ -121,6 +122,27 @@ export function createBoardBroadcast(
     payload: {
       message,
       overrides,
+    },
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Create a countdown broadcast event.
+ */
+export function createCountdownBroadcast(
+  action: 'show' | 'skip' | 'complete',
+  duration: number,
+  message?: string,
+  variant?: 'default' | 'dramatic'
+): CountdownBroadcast {
+  return {
+    type: 'countdown',
+    payload: {
+      action,
+      duration,
+      message,
+      variant,
     },
     timestamp: new Date().toISOString(),
   };
@@ -266,6 +288,18 @@ export class PlayBroadcaster {
     overrides?: BoardState['overrides']
   ): Promise<boolean> {
     return this.send(createBoardBroadcast(message, overrides));
+  }
+
+  /**
+   * Send a countdown broadcast.
+   */
+  async sendCountdown(
+    action: 'show' | 'skip' | 'complete',
+    duration: number,
+    message?: string,
+    variant?: 'default' | 'dramatic'
+  ): Promise<boolean> {
+    return this.send(createCountdownBroadcast(action, duration, message, variant));
   }
 }
 

@@ -54,6 +54,13 @@ export interface UsePlayBroadcastResult {
     message?: string,
     overrides?: BoardState['overrides']
   ) => Promise<boolean>;
+  /** Broadcast countdown overlay */
+  broadcastCountdown: (
+    action: 'show' | 'skip' | 'complete',
+    duration: number,
+    message?: string,
+    variant?: 'default' | 'dramatic'
+  ) => Promise<boolean>;
 }
 
 // =============================================================================
@@ -152,6 +159,20 @@ export function usePlayBroadcast({
     },
     []
   );
+
+  // Broadcast countdown overlay
+  const broadcastCountdown = useCallback(
+    async (
+      action: 'show' | 'skip' | 'complete',
+      duration: number,
+      message?: string,
+      variant?: 'default' | 'dramatic'
+    ): Promise<boolean> => {
+      if (!broadcasterRef.current) return false;
+      return broadcasterRef.current.sendCountdown(action, duration, message, variant);
+    },
+    []
+  );
   
   return {
     connected,
@@ -161,5 +182,6 @@ export function usePlayBroadcast({
     broadcastTimerUpdate,
     broadcastRoleUpdate,
     broadcastBoardUpdate,
+    broadcastCountdown,
   };
 }

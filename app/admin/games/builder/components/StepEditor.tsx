@@ -19,7 +19,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
-import { Button, Input, Textarea } from '@/components/ui';
+import { Button, Input, Textarea, Select } from '@/components/ui';
 import {
   Bars3Icon,
   TrashIcon,
@@ -34,6 +34,7 @@ export type StepData = {
   body: string;
   duration_seconds: number | null;
   leader_script?: string;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic';
 };
 
 type SortableStepItemProps = {
@@ -216,6 +217,29 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
               }
               placeholder="Ex. 120 (2 minuter)"
             />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              ✨ Textvisning
+            </label>
+            <Select
+              value={formData.display_mode || 'instant'}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  display_mode: e.target.value as 'instant' | 'typewriter' | 'dramatic',
+                })
+              }
+              options={[
+                { value: 'instant', label: 'Direkt (standard)' },
+                { value: 'typewriter', label: '✍️ Typewriter – tecken för tecken' },
+                { value: 'dramatic', label: '🎭 Dramatisk – långsam med paus' },
+              ]}
+            />
+            <p className="text-xs text-muted-foreground">
+              Hur beskrivningen visas för deltagare
+            </p>
           </div>
         </div>
 

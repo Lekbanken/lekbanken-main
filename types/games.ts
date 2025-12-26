@@ -90,6 +90,7 @@ export type GameStep = {
   media_ref: string | null;
   optional: boolean;
   conditional: string | null;
+  display_mode: 'instant' | 'typewriter' | 'dramatic' | null;
   created_at: string;
   updated_at: string;
 };
@@ -101,6 +102,7 @@ export type StepFormData = {
   duration_seconds: number | null;
   leader_script: string | null;
   phase_id?: string | null;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic';
 };
 
 // =============================================================================

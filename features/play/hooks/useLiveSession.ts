@@ -28,6 +28,7 @@ import type {
   ArtifactBroadcast,
   DecisionBroadcast,
   OutcomeBroadcast,
+  CountdownBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -59,6 +60,8 @@ export interface UseLiveSessionOptions {
   onDecisionUpdate?: (payload: DecisionBroadcast['payload']) => void;
   /** Called when outcomes change (create/reveal/hide) */
   onOutcomeUpdate?: (payload: OutcomeBroadcast['payload']) => void;
+  /** Called when countdown overlay should be shown */
+  onCountdown?: (payload: CountdownBroadcast['payload']) => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -103,6 +106,7 @@ export function useLiveSession({
   onArtifactUpdate,
   onDecisionUpdate,
   onOutcomeUpdate,
+  onCountdown,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -202,8 +206,14 @@ export function useLiveSession({
         onOutcomeUpdate?.(payload);
         break;
       }
+
+      case 'countdown': {
+        const payload = (event as CountdownBroadcast).payload;
+        onCountdown?.(payload);
+        break;
+      }
     }
-  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate, onArtifactUpdate, onDecisionUpdate, onOutcomeUpdate]);
+  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate, onArtifactUpdate, onDecisionUpdate, onOutcomeUpdate, onCountdown]);
   
   // Timer tick effect (recalculate display)
   useEffect(() => {

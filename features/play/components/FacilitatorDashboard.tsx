@@ -22,6 +22,7 @@ import {
   ChatBubbleBottomCenterTextIcon,
   UserGroupIcon,
   Cog6ToothIcon,
+  ClockIcon,
 } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -103,7 +104,8 @@ export function FacilitatorDashboard({
     connected, 
     broadcastStateChange, 
     broadcastTimerUpdate, 
-    broadcastBoardUpdate 
+    broadcastBoardUpdate,
+    broadcastCountdown 
   } = usePlayBroadcast({ sessionId });
   
   // ==========================================================================
@@ -409,6 +411,21 @@ export function FacilitatorDashboard({
               >
                 <StopIcon className="h-4 w-4" />
                 Avsluta
+              </Button>
+            )}
+
+            {/* Countdown Overlay Button */}
+            {status === 'active' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void broadcastCountdown('show', 5, 'Nästa moment startar om')}
+                disabled={isSaving}
+                className="gap-1.5"
+                title="Visa nedräkning för deltagare"
+              >
+                <ClockIcon className="h-4 w-4" />
+                5s
               </Button>
             )}
           </div>

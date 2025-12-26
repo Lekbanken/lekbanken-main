@@ -181,7 +181,8 @@ export interface PlayBroadcastEvent {
     | 'turn_update'
     | 'artifact_update'
     | 'decision_update'
-    | 'outcome_update';
+    | 'outcome_update'
+    | 'countdown';
   payload: unknown;
   timestamp: string;
 }
@@ -264,6 +265,16 @@ export interface OutcomeBroadcast extends PlayBroadcastEvent {
   payload: {
     action: 'created' | 'revealed' | 'hidden';
     outcome_id: string;
+  };
+}
+
+export interface CountdownBroadcast extends PlayBroadcastEvent {
+  type: 'countdown';
+  payload: {
+    action: 'show' | 'skip' | 'complete';
+    duration: number;
+    message?: string;
+    variant?: 'default' | 'dramatic';
   };
 }
 

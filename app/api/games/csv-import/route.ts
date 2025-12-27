@@ -101,6 +101,7 @@ export async function POST(request: Request) {
           artifacts: item.artifacts || undefined,
           decisions: item.decisions || undefined,
           outcomes: item.outcomes || undefined,
+          triggers: item.triggers || undefined,
         }));
       } catch {
         return NextResponse.json(
@@ -310,6 +311,9 @@ async function importRelatedData(
 
     // Play primitives (artifacts) - delete artifacts by game_id (variants cascade)
     await db.from('game_artifacts').delete().eq('game_id', gameId);
+    
+    // Triggers - delete existing triggers
+    await db.from('game_triggers').delete().eq('game_id', gameId);
   }
 
   // Insert secondary purposes (sub-purposes)
@@ -466,4 +470,130 @@ async function importRelatedData(
       }
     }
   }
+
+  // Insert triggers (automation rules)
+  if (game.triggers && game.triggers.length > 0) {
+    // Build lookup maps for resolving order-based aliases to IDs
+    const { data: stepRows } = await db
+      .from('game_steps')
+      .select('id, step_order')
+      .eq('game_id', gameId);
+    
+    const { data: phaseRows } = await db
+      .from('game_phases')
+      .select('id, phase_order')
+      .eq('game_id', gameId);
+    
+    const { data: artifactRows } = await db
+      .from('game_artifacts')
+      .select('id, artifact_order')
+      .eq('game_id', gameId);
+
+    const stepByOrder = new Map<number, string>();
+    for (const s of stepRows ?? []) {
+      if (typeof s.step_order === 'number' && s.id) {
+        stepByOrder.set(s.step_order as number, s.id as string);
+      }
+    }
+
+    const phaseByOrder = new Map<number, string>();
+    for (const p of phaseRows ?? []) {
+      if (typeof p.phase_order === 'number' && p.id) {
+        phaseByOrder.set(p.phase_order as number, p.id as string);
+      }
+    }
+
+    const artifactByOrder = new Map<number, string>();
+    for (const a of artifactRows ?? []) {
+      if (typeof a.artifact_order === 'number' && a.id) {
+        artifactByOrder.set(a.artifact_order as number, a.id as string);
+      }
+    }
+
+    const triggerRows = game.triggers.map((trigger, index) => {
+      // Resolve condition IDs from order aliases
+      const resolvedCondition = resolveConditionIds(
+        trigger.condition,
+        stepByOrder,
+        phaseByOrder,
+        artifactByOrder
+      );
+
+      // Resolve action IDs from order aliases
+      const resolvedActions = trigger.actions.map(action => 
+        resolveActionIds(action, artifactByOrder)
+      );
+
+      return {
+        game_id: gameId,
+        name: trigger.name,
+        description: trigger.description ?? null,
+        enabled: trigger.enabled ?? true,
+        condition: resolvedCondition,
+        actions: resolvedActions,
+        execute_once: trigger.execute_once ?? false,
+        delay_seconds: trigger.delay_seconds ?? 0,
+        sort_order: trigger.sort_order ?? index,
+      };
+    });
+
+    const { error: triggerErr } = await db.from('game_triggers').insert(triggerRows);
+    if (triggerErr) throw new Error(triggerErr.message);
+  }
+}
+
+/**
+ * Resolve order-based aliases in trigger conditions to actual IDs
+ */
+function resolveConditionIds(
+  condition: AnySupabase,
+  stepByOrder: Map<number, string>,
+  phaseByOrder: Map<number, string>,
+  artifactByOrder: Map<number, string>
+): AnySupabase {
+  const resolved = { ...condition };
+  
+  // Step-related conditions
+  if ((condition.type === 'step_started' || condition.type === 'step_completed') && !condition.stepId && typeof condition.stepOrder === 'number') {
+    resolved.stepId = stepByOrder.get(condition.stepOrder) ?? null;
+    delete resolved.stepOrder;
+  }
+  
+  // Phase-related conditions
+  if ((condition.type === 'phase_started' || condition.type === 'phase_completed') && !condition.phaseId && typeof condition.phaseOrder === 'number') {
+    resolved.phaseId = phaseByOrder.get(condition.phaseOrder) ?? null;
+    delete resolved.phaseOrder;
+  }
+  
+  // Artifact-related conditions
+  if (condition.type === 'artifact_unlocked' && !condition.artifactId && typeof condition.artifactOrder === 'number') {
+    resolved.artifactId = artifactByOrder.get(condition.artifactOrder) ?? null;
+    delete resolved.artifactOrder;
+  }
+  
+  // Keypad conditions (keypadId is typically an artifact ID)
+  if ((condition.type === 'keypad_correct' || condition.type === 'keypad_failed') && !condition.keypadId && typeof condition.artifactOrder === 'number') {
+    resolved.keypadId = artifactByOrder.get(condition.artifactOrder) ?? null;
+    delete resolved.artifactOrder;
+  }
+  
+  return resolved;
+}
+
+/**
+ * Resolve order-based aliases in trigger actions to actual IDs
+ */
+function resolveActionIds(
+  action: AnySupabase,
+  artifactByOrder: Map<number, string>
+): AnySupabase {
+  const resolved = { ...action };
+  
+  // Artifact-related actions
+  if ((action.type === 'reveal_artifact' || action.type === 'hide_artifact') && !action.artifactId && typeof action.artifactOrder === 'number') {
+    resolved.artifactId = artifactByOrder.get(action.artifactOrder) ?? null;
+    delete resolved.artifactOrder;
+  }
+  
+  return resolved;
 }

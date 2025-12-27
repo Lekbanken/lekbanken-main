@@ -1,14 +1,14 @@
 # CSV Import - Fältreferens för Lekproduktion
 
-> **Version:** 2.0  
-> **Senast uppdaterad:** 2025-12-26  
+> **Version:** 2.1  
+> **Senast uppdaterad:** 2025-12-27  
 > **Syfte:** Komplett guide för att massproducera lekar via CSV-import – nu med full Legendary Play-support
 
 ## Metadata
 
 - Owner: -
 - Status: active
-- Last validated: 2025-12-26
+- Last validated: 2025-12-27
 
 ## Related code (source of truth)
 
@@ -27,7 +27,7 @@
 - **artifacts_json** stöder alla artifact types inklusive keypads
 - **Keypad correctCode** behandlas alltid som sträng (leading zeros bevaras)
 - **decisions_json / outcomes_json** läses men persisteras EJ (endast runtime-tabeller finns)
-- **Triggers** stöds EJ ännu – varken i import eller runtime
+- **triggers** stöds i JSON-import (se avsnitt 7.7)
 
 ---
 
@@ -238,12 +238,16 @@ För varje steg N (1-20):
 | `step_N_title` | string | Stegetts titel. Kort och beskrivande. Exempel: `"Samla deltagarna"` |
 | `step_N_body` | string | Detaljerade instruktioner. Kan vara flera meningar. |
 | `step_N_duration` | integer | Uppskattad tid i sekunder. Exempel: `60` (1 minut), `300` (5 minuter) |
+| `step_N_leader_script` | string | *(Valfritt)* Privata instruktioner synliga endast för spelledaren. |
+| `step_N_participant_prompt` | string | *(Valfritt)* Text som visas för deltagare. |
+| `step_N_board_text` | string | *(Valfritt)* Text som visas på publik tavla. |
+| `step_N_optional` | boolean | *(Valfritt)* Om steget är valfritt. Default: `false` |
 
 ### Exempel
 
 ```csv
-step_1_title,step_1_body,step_1_duration,step_2_title,step_2_body,step_2_duration
-"Samla deltagarna","Be alla ställa sig i en ring mitt i rummet.",60,"Förklara reglerna","Gå igenom spelreglerna steg för steg...",120
+step_1_title,step_1_body,step_1_duration,step_1_leader_script,step_2_title,step_2_body,step_2_duration
+"Samla deltagarna","Be alla ställa sig i en ring.","60","OBS: Vänta tills alla satt sig","Förklara reglerna","Gå igenom spelreglerna...","120"
 ```
 
 ### Regler för steg
@@ -486,6 +490,88 @@ Om koden börjar med noll (t.ex. `0451`), **måste** du citera värdet som strä
 **CSV-cell format (citerad JSON):**
 ```
 "[{""title"":""Kassaskåpet"",""artifact_type"":""keypad"",""artifact_order"":1,""metadata"":{""correctCode"":""0451"",""codeLength"":4,""maxAttempts"":3,""lockOnFail"":true},""variants"":[{""variant_order"":1,""visibility"":""public"",""title"":""Hemligt dokument"",""body"":""...""}]}]"
+```
+
+### 6.7 triggers (JSON-import only)
+
+Triggers definierar automationsregler: "När X händer, gör Y". Endast stödd i JSON-import (inte inline CSV).
+
+#### Struktur
+
+```json
+[
+  {
+    "name": "Lås upp ledtråd",
+    "description": "Visar ledtråd när steg 2 startar",
+    "enabled": true,
+    "condition": { "type": "step_started", "stepOrder": 2 },
+    "actions": [
+      { "type": "reveal_artifact", "artifactOrder": 1 }
+    ],
+    "execute_once": true,
+    "delay_seconds": 0
+  }
+]
+```
+
+#### Condition-typer (NÄR)
+
+| type | Parametrar | Beskrivning |
+|------|-----------|-------------|
+| `manual` | – | Spelledaren trycker på en knapp |
+| `step_started` | `stepId` eller `stepOrder` | När ett visst steg påbörjas |
+| `step_completed` | `stepId` eller `stepOrder` | När ett visst steg avslutas |
+| `phase_started` | `phaseId` eller `phaseOrder` | När en fas påbörjas |
+| `phase_completed` | `phaseId` eller `phaseOrder` | När en fas avslutas |
+| `artifact_unlocked` | `artifactId` eller `artifactOrder` | När en artefakt visas |
+| `keypad_correct` | `keypadId` eller `artifactOrder` | När rätt kod anges |
+| `keypad_failed` | `keypadId` eller `artifactOrder` | När max antal försök nåtts |
+| `timer_ended` | `timerId` | När en timer går ut |
+| `decision_resolved` | `decisionId`, `outcome?` | När röstning avslutats |
+
+> **Tips:** Använd `stepOrder`, `phaseOrder`, `artifactOrder` (1-baserat index) vid import. Dessa mappas automatiskt till UUID:er.
+
+#### Action-typer (DÅ)
+
+| type | Parametrar | Beskrivning |
+|------|-----------|-------------|
+| `reveal_artifact` | `artifactId` eller `artifactOrder` | Visa en dold artefakt |
+| `hide_artifact` | `artifactId` eller `artifactOrder` | Dölj en synlig artefakt |
+| `unlock_decision` | `decisionId` | Aktivera röstning |
+| `lock_decision` | `decisionId` | Inaktivera röstning |
+| `advance_step` | – | Gå till nästa steg |
+| `advance_phase` | – | Gå till nästa fas |
+| `start_timer` | `duration`, `name` | Starta en nedräkning (sekunder) |
+| `send_message` | `message`, `style?` | Skicka meddelande till tavlan |
+| `play_sound` | `soundId` | Spela ett ljudeffekt |
+| `show_countdown` | `duration`, `message` | Visa countdown-overlay |
+| `reset_keypad` | `keypadId` | Återställ keypad till låst |
+
+#### Exempel: Kassaskåp → Visa skatten
+
+```json
+{
+  "triggers": [
+    {
+      "name": "Kassaskåpet öppnas",
+      "condition": { "type": "keypad_correct", "artifactOrder": 1 },
+      "actions": [
+        { "type": "reveal_artifact", "artifactOrder": 2 },
+        { "type": "send_message", "message": "💰 Skatten är avslöjad!", "style": "dramatic" }
+      ],
+      "execute_once": true
+    },
+    {
+      "name": "Starta nedräkning",
+      "condition": { "type": "phase_started", "phaseOrder": 2 },
+      "actions": [
+        { "type": "start_timer", "duration": 300, "name": "Utrymning" },
+        { "type": "send_message", "message": "⏰ Ni har 5 minuter!", "style": "typewriter" }
+      ],
+      "execute_once": true
+    }
+  ]
+}
 ```
 
 ---
@@ -752,11 +838,13 @@ Steg 2: Gör detta sen."
 
 ### 12.2 Triggers
 
-❌ **Ej stödd:**
+✅ **Stöds via JSON-import:**
 
-Triggers (automatiska åtgärder baserade på events) stöds **varken i import eller runtime** ännu.
+Triggers (automatiska åtgärder baserade på events) stöds nu i JSON-import. Se avsnitt 7.7 för fullständig dokumentation.
 
-Om du lägger till trigger-relaterad metadata i `artifacts_json` kommer den att sparas i `metadata`-fältet men **inte tolkas av runtime**.
+- **Import:** `triggers`-array i JSON-format
+- **Export:** EJ inkluderad i CSV-export ännu (använd Supabase eller JSON-export)
+- **Runtime:** Triggers kopieras till `session_triggers` vid session-start
 
 ### 12.3 Export – begränsad round-trip
 

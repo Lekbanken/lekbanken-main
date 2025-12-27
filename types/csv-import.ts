@@ -175,6 +175,54 @@ export type ParsedArtifact = {
 export type ParsedDecisionsPayload = unknown;
 export type ParsedOutcomesPayload = unknown;
 
+// =============================================================================
+// Triggers (import format)
+// =============================================================================
+
+/**
+ * Condition types for triggers.
+ * When importing, use stepOrder/phaseOrder aliases which get resolved to IDs.
+ */
+export type ParsedTriggerCondition = 
+  | { type: 'manual' }
+  | { type: 'step_started'; stepId?: string; stepOrder?: number }
+  | { type: 'step_completed'; stepId?: string; stepOrder?: number }
+  | { type: 'phase_started'; phaseId?: string; phaseOrder?: number }
+  | { type: 'phase_completed'; phaseId?: string; phaseOrder?: number }
+  | { type: 'artifact_unlocked'; artifactId?: string; artifactOrder?: number }
+  | { type: 'keypad_correct'; keypadId?: string; artifactOrder?: number }
+  | { type: 'keypad_failed'; keypadId?: string; artifactOrder?: number }
+  | { type: 'timer_ended'; timerId: string }
+  | { type: 'decision_resolved'; decisionId: string; outcome?: string };
+
+/**
+ * Action types for triggers.
+ * When importing, use artifactOrder aliases which get resolved to IDs.
+ */
+export type ParsedTriggerAction = 
+  | { type: 'reveal_artifact'; artifactId?: string; artifactOrder?: number }
+  | { type: 'hide_artifact'; artifactId?: string; artifactOrder?: number }
+  | { type: 'unlock_decision'; decisionId: string }
+  | { type: 'lock_decision'; decisionId: string }
+  | { type: 'advance_step' }
+  | { type: 'advance_phase' }
+  | { type: 'start_timer'; duration: number; name: string }
+  | { type: 'send_message'; message: string; style?: 'normal' | 'dramatic' | 'typewriter' }
+  | { type: 'play_sound'; soundId: string }
+  | { type: 'show_countdown'; duration: number; message: string }
+  | { type: 'reset_keypad'; keypadId: string };
+
+export type ParsedTrigger = {
+  name: string;
+  description?: string | null;
+  enabled?: boolean;
+  condition: ParsedTriggerCondition;
+  actions: ParsedTriggerAction[];
+  execute_once?: boolean;
+  delay_seconds?: number;
+  sort_order?: number;
+};
+
 export type ParsedGame = {
   // Identity
   game_key: string;
@@ -219,6 +267,9 @@ export type ParsedGame = {
   artifacts?: ParsedArtifact[];
   decisions?: ParsedDecisionsPayload;
   outcomes?: ParsedOutcomesPayload;
+  
+  /** Triggers (automation rules) */
+  triggers?: ParsedTrigger[];
 };
 
 // =============================================================================

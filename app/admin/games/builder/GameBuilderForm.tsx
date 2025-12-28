@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input, Textarea, Select, Button } from '@/components/ui';
+import { Input, Textarea, Select, Button, HelpText } from '@/components/ui';
 
 type StepForm = {
   title: string;
@@ -211,6 +211,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
             onChange={(e) => setCore({ ...core, short_description: e.target.value })}
             rows={2}
           />
+          <HelpText>Visas i spelbiblioteket och hjälper spelare välja rätt spel.</HelpText>
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">Full beskrivning</label>
@@ -219,6 +220,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
             onChange={(e) => setCore({ ...core, description: e.target.value })}
             rows={4}
           />
+          <HelpText>Detaljerad beskrivning som visas när spelet öppnas. Förklara temat och upplägget.</HelpText>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           <div className="space-y-1">
@@ -228,6 +230,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
               value={core.time_estimate_min ?? ''}
               onChange={(e) => setCore({ ...core, time_estimate_min: e.target.value ? Number(e.target.value) : null })}
             />
+            <HelpText>Uppskattad speltid i minuter.</HelpText>
           </div>
           <div className="space-y-1">
             <label className="text-sm text-muted-foreground">Spelare min</label>
@@ -236,6 +239,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
               value={core.min_players ?? ''}
               onChange={(e) => setCore({ ...core, min_players: e.target.value ? Number(e.target.value) : null })}
             />
+            <HelpText>Minsta antal deltagare.</HelpText>
           </div>
           <div className="space-y-1">
             <label className="text-sm text-muted-foreground">Spelare max</label>
@@ -244,6 +248,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
               value={core.max_players ?? ''}
               onChange={(e) => setCore({ ...core, max_players: e.target.value ? Number(e.target.value) : null })}
             />
+            <HelpText>Max antal deltagare som kan delta.</HelpText>
           </div>
         </div>
       </div>

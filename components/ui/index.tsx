@@ -58,3 +58,7 @@ export { Tabs, TabPanel, useTabs } from "./tabs";
 
 // Data Display
 export { Avatar, AvatarWithStatus, AvatarGroup } from "./avatar";
+
+// Help & Tooltips
+export { Tooltip, InfoTooltip, LabelWithTooltip } from "./tooltip";
+export { HelpText, SectionIntro, FeatureExplainer, EmptyStateGuide } from "./help-text";

@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Card, Button, Input, Textarea, Select } from '@/components/ui';
+import { Card, Button, Input, Textarea, Select, HelpText } from '@/components/ui';
 import {
   PlusIcon,
   ClockIcon,
@@ -259,6 +259,7 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
             onChange={(e) => setForm({ ...form, phase_type: e.target.value as PhaseType })}
             options={phaseTypeOptions}
           />
+          <HelpText>Intro = välkomst, Runda = huvudspel, Final = avslutning, Paus = vilopaus.</HelpText>
         </div>
 
         {/* Description */}
@@ -343,6 +344,7 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
             rows={2}
             placeholder="Visas på projektorn under denna fas"
           />
+          <HelpText>Detta meddelande visas på tavlan/projektorn under hela fasen.</HelpText>
         </div>
       </div>
 

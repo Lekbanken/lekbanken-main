@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { Card, Button, Select } from '@/components/ui';
+import { Card, Button, Select, HelpText } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
   PlayIcon,
@@ -377,6 +377,13 @@ export function TriggerSimulator({
               Stäng
             </Button>
           </div>
+        </div>
+
+        {/* Intro help */}
+        <div className="px-4 pt-3">
+          <HelpText variant="tip">
+            Testa dina triggers utan att starta en riktig session. Välj en händelse eller klicka på en manuell trigger för att se vad som händer.
+          </HelpText>
         </div>
 
         {/* Content */}

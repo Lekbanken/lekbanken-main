@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Card, Button, Input, Select } from '@/components/ui';
+import { Card, Button, Input, Select, HelpText } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
   XMarkIcon,
@@ -308,6 +308,15 @@ export function ArtifactWizard({
             <XMarkIcon className="h-5 w-5" />
           </Button>
         </div>
+
+        {/* Intro help */}
+        {!customizing && (
+          <div className="px-4 pt-3">
+            <HelpText>
+              Artefakter är ledtrådar, keypads och dokument som deltagarna interagerar med. Välj en mall nedan eller börja från scratch.
+            </HelpText>
+          </div>
+        )}
 
         {/* Content */}
         {!customizing ? (

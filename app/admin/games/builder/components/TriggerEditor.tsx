@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { Card, Button, Input, Select } from '@/components/ui';
+import { Card, Button, Input, Select, HelpText, FeatureExplainer } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
   ArrowDownIcon,
@@ -606,6 +606,13 @@ export function TriggerEditor({
           <strong>Importfel:</strong> {importError}
         </div>
       )}
+
+      {/* Intro explainer for triggers */}
+      <FeatureExplainer
+        title="Hur triggers fungerar"
+        description="Triggers automatiserar leken: när ett villkor uppfylls (t.ex. ett steg slutförs eller tid går ut) utförs en eller flera åtgärder automatiskt."
+        example="När 5 minuter återstår → Visa en ledtråd"
+      />
 
       {triggers.length === 0 && (
         <Card className="p-6 text-center text-foreground-secondary">

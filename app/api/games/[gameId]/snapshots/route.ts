@@ -9,20 +9,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServiceRoleClient, createServerRlsClient } from '@/lib/supabase/server';
 
 // =============================================================================
-// GET /api/games/[id]/snapshots - List snapshots
+// GET /api/games/[gameId]/snapshots - List snapshots
 // =============================================================================
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ gameId: string }> }
 ) {
   try {
-    const { id: gameId } = await params;
+    const { gameId } = await params;
     const supabase = createServiceRoleClient();
 
-    // Use raw query since types may not exist yet
     const { data: snapshots, error } = await supabase
-      .from('game_snapshots' as 'games') // Type hack until types are regenerated
+      .from('game_snapshots')
       .select(`
         id,
         game_id,
@@ -64,15 +63,15 @@ export async function GET(
 }
 
 // =============================================================================
-// POST /api/games/[id]/snapshots - Create snapshot
+// POST /api/games/[gameId]/snapshots - Create snapshot
 // =============================================================================
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ gameId: string }> }
 ) {
   try {
-    const { id: gameId } = await params;
+    const { gameId } = await params;
     const rlsClient = await createServerRlsClient();
     const supabase = createServiceRoleClient();
 
@@ -89,15 +88,11 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
     const versionLabel = body.versionLabel as string | undefined;
 
-    // Try to create snapshot via RPC (may not exist yet)
-    const { data: snapshotId, error } = await supabase.rpc(
-      'create_game_snapshot' as 'snapshot_game_roles_to_session', // Type hack
-      {
-        p_game_id: gameId,
-        p_version_label: versionLabel ?? null,
-        p_created_by: user.id,
-      } as unknown as { p_session_id: string; p_game_id: string; p_locale?: string }
-    );
+    const { data: snapshotId, error } = await supabase.rpc('create_game_snapshot', {
+      p_game_id: gameId,
+      p_version_label: versionLabel,
+      p_created_by: user.id,
+    });
 
     if (error) {
       // RPC might not exist yet
@@ -116,9 +111,9 @@ export async function POST(
 
     // Fetch the created snapshot
     const { data: snapshot } = await supabase
-      .from('game_snapshots' as 'games')
+      .from('game_snapshots')
       .select('id, version, version_label, created_at')
-      .eq('id', snapshotId as unknown as string)
+      .eq('id', snapshotId)
       .single();
 
     return NextResponse.json({

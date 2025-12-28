@@ -31,6 +31,7 @@ import type {
   CountdownBroadcast,
   SignalReceivedBroadcast,
   TimeBankChangedBroadcast,
+  PuzzleBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -68,6 +69,8 @@ export interface UseLiveSessionOptions {
   onSignalReceived?: (payload: SignalReceivedBroadcast['payload']) => void;
   /** Called when time bank changes */
   onTimeBankChanged?: (payload: TimeBankChangedBroadcast['payload']) => void;
+  /** Called when puzzle state changes */
+  onPuzzleUpdate?: (payload: PuzzleBroadcast['payload']) => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -115,6 +118,7 @@ export function useLiveSession({
   onCountdown,
   onSignalReceived,
   onTimeBankChanged,
+  onPuzzleUpdate,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -232,6 +236,12 @@ export function useLiveSession({
         onTimeBankChanged?.(payload);
         break;
       }
+
+      case 'puzzle_update': {
+        const payload = (event as PuzzleBroadcast).payload;
+        onPuzzleUpdate?.(payload);
+        break;
+      }
     }
   }, [
     onStateChange,
@@ -244,6 +254,8 @@ export function useLiveSession({
     onOutcomeUpdate,
     onCountdown,
     onSignalReceived,
+    onTimeBankChanged,
+    onPuzzleUpdate,
     onTimeBankChanged,
   ]);
   

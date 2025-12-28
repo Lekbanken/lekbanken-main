@@ -10,6 +10,13 @@ export type { UseLiveSessionOptions, UseLiveSessionResult } from './useLiveSessi
 export { usePlayBroadcast } from './usePlayBroadcast';
 export type { UsePlayBroadcastOptions, UsePlayBroadcastResult } from './usePlayBroadcast';
 
+export { usePuzzleRealtime } from './usePuzzleRealtime';
+export type { 
+  UsePuzzleRealtimeOptions, 
+  UsePuzzleRealtimeResult,
+  PuzzleStateData,
+} from './usePuzzleRealtime';
+
 export { useTriggerEngine } from './useTriggerEngine';
 export type {
   TriggerEvent,

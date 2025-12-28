@@ -7,9 +7,10 @@
  * Acts as a dispatcher for all puzzle module components.
  * 
  * Each component uses config/state patterns from @/types/puzzle-modules.
+ * Integrates with real-time sync via usePuzzleRealtime hook.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ import {
   LogicGrid,
   SoundLevelMeter,
 } from '@/components/play';
+import { usePuzzleRealtime } from '@/features/play/hooks';
 import type { ArtifactType } from '@/types/games';
 import type {
   RiddleConfig,
@@ -86,6 +88,10 @@ export interface PuzzleArtifactRendererProps {
   artifact: PuzzleArtifactData;
   sessionId: string;
   participantToken: string;
+  participantId?: string;
+  teamId?: string;
+  /** Enable real-time sync (default: true) */
+  enableRealtime?: boolean;
   onStateChange?: () => void;
 }
 
@@ -118,13 +124,53 @@ export function PuzzleArtifactRenderer({
   artifact,
   sessionId,
   participantToken,
+  participantId,
+  teamId,
+  enableRealtime = true,
   onStateChange,
 }: PuzzleArtifactRendererProps) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [puzzleState, setPuzzleState] = useState<PuzzleState>(
-    (artifact.metadata?.puzzleState as PuzzleState) || {}
+  
+  // Initial state from artifact metadata
+  const initialPuzzleState = useMemo(() => 
+    (artifact.metadata?.puzzleState as PuzzleState) || {},
+    [artifact.metadata?.puzzleState]
   );
+
+  // Real-time puzzle state sync
+  const {
+    state: realtimeState,
+    connected: realtimeConnected,
+    updateState: updateRealtimeState,
+    broadcastStateChange,
+    isSolved: _isSolved,
+    isLocked,
+  } = usePuzzleRealtime({
+    sessionId,
+    artifactId: artifact.id,
+    participantId,
+    teamId,
+    initialState: initialPuzzleState,
+    onStateChange: onStateChange ? () => onStateChange() : undefined,
+    onSolved: onStateChange ? () => onStateChange() : undefined,
+    enabled: enableRealtime,
+  });
+
+  // Use realtime state if enabled, otherwise local state
+  const [localPuzzleState, setLocalPuzzleState] = useState<PuzzleState>(initialPuzzleState);
+  const puzzleState = enableRealtime ? (realtimeState as PuzzleState) : localPuzzleState;
+  
+  // Memoize setPuzzleState to avoid changing dependency on every render
+  const setPuzzleState = useMemo(() => {
+    if (enableRealtime) {
+      return (state: PuzzleState | ((prev: PuzzleState) => PuzzleState)) => {
+        const newState = typeof state === 'function' ? state(puzzleState) : state;
+        updateRealtimeState(newState);
+      };
+    }
+    return setLocalPuzzleState;
+  }, [enableRealtime, puzzleState, updateRealtimeState]);
 
   const meta = artifact.metadata || {};
   const artifactType = artifact.artifact_type as ArtifactType | null;
@@ -132,12 +178,24 @@ export function PuzzleArtifactRenderer({
   // Generic submit handler
   const handleSubmit = useCallback(
     async (puzzleType: string, payload: Record<string, unknown>) => {
+      // Don't allow submission if locked
+      if (isLocked) {
+        setMessage({ type: 'error', text: 'Pusslet är låst av spelledaren' });
+        return;
+      }
+      
       setLoading(true);
       setMessage(null);
       try {
         const result = await submitPuzzle(sessionId, artifact.id, { puzzleType, ...payload }, participantToken);
         if (result.state) {
-          setPuzzleState(result.state as PuzzleState);
+          const newState = result.state as PuzzleState;
+          setPuzzleState(newState);
+          
+          // Broadcast state change if realtime is enabled
+          if (enableRealtime && realtimeConnected) {
+            await broadcastStateChange(newState);
+          }
         }
         setMessage({
           type: result.status === 'success' || result.status === 'already_solved' ? 'success' : 'error',
@@ -152,7 +210,7 @@ export function PuzzleArtifactRenderer({
         setLoading(false);
       }
     },
-    [sessionId, artifact.id, participantToken, onStateChange]
+    [sessionId, artifact.id, participantToken, onStateChange, isLocked, enableRealtime, realtimeConnected, broadcastStateChange, setPuzzleState]
   );
 
   // ==========================================================================

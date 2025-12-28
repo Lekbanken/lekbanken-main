@@ -184,7 +184,8 @@ export interface PlayBroadcastEvent {
     | 'outcome_update'
     | 'countdown'
     | 'signal_received'
-    | 'time_bank_changed';
+    | 'time_bank_changed'
+    | 'puzzle_update';
   payload: unknown;
   timestamp: string;
 }
@@ -303,6 +304,35 @@ export interface CountdownBroadcast extends PlayBroadcastEvent {
     duration: number;
     message?: string;
     variant?: 'default' | 'dramatic';
+  };
+}
+
+// =============================================================================
+// Puzzle Broadcasts (Real-time puzzle state sync)
+// =============================================================================
+
+/**
+ * PuzzleBroadcast - Sent when puzzle state changes.
+ * 
+ * Actions:
+ * - state_changed: Puzzle state was updated (solved, attempt, etc.)
+ * - locked: Host locked the puzzle
+ * - unlocked: Host unlocked the puzzle
+ * - hint_revealed: A hint was revealed
+ * - reset: Puzzle was reset to initial state
+ */
+export interface PuzzleBroadcast extends PlayBroadcastEvent {
+  type: 'puzzle_update';
+  payload: {
+    action: 'state_changed' | 'locked' | 'unlocked' | 'hint_revealed' | 'reset';
+    artifact_id: string;
+    participant_id?: string;
+    team_id?: string;
+    puzzle_type?: string;
+    /** Partial or full state update */
+    state?: Record<string, unknown>;
+    /** Optional message to display */
+    message?: string;
   };
 }
 

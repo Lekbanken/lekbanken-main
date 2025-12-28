@@ -14,6 +14,7 @@ import type {
   RoleBroadcast,
   BoardBroadcast,
   CountdownBroadcast,
+  PuzzleBroadcast,
   TimerState,
   BoardState,
 } from '@/types/play-runtime';
@@ -53,6 +54,8 @@ export const PLAY_BROADCAST_EVENTS = {
   ROLE_UPDATE: 'role_update',
   /** Board message/config update */
   BOARD_UPDATE: 'board_update',
+  /** Puzzle state update */
+  PUZZLE_UPDATE: 'puzzle_update',
 } as const;
 
 // =============================================================================
@@ -144,6 +147,19 @@ export function createCountdownBroadcast(
       message,
       variant,
     },
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Create a puzzle broadcast event.
+ */
+export function createPuzzleBroadcast(
+  payload: PuzzleBroadcast['payload']
+): PuzzleBroadcast {
+  return {
+    type: 'puzzle_update',
+    payload,
     timestamp: new Date().toISOString(),
   };
 }
@@ -300,6 +316,15 @@ export class PlayBroadcaster {
     variant?: 'default' | 'dramatic'
   ): Promise<boolean> {
     return this.send(createCountdownBroadcast(action, duration, message, variant));
+  }
+
+  /**
+   * Send a puzzle update broadcast.
+   */
+  async sendPuzzleUpdate(
+    payload: PuzzleBroadcast['payload']
+  ): Promise<boolean> {
+    return this.send(createPuzzleBroadcast(payload));
   }
 }
 

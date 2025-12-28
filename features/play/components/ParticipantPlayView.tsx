@@ -32,6 +32,7 @@ import { RoleCard, type RoleCardData } from './RoleCard';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
 import { sendSessionChatMessage } from '@/features/play/api/chat-api';
+import { PuzzleArtifactRenderer } from '@/features/play/components/PuzzleArtifactRenderer';
 import {
   getParticipantArtifacts,
   getParticipantDecisions,
@@ -782,6 +783,32 @@ export function ParticipantPlayView({
                           </div>
                         )}
                       </div>
+                    );
+                  }
+
+                  // Puzzle artifacts - use PuzzleArtifactRenderer
+                  const puzzleTypes = [
+                    'riddle', 'counter', 'audio', 'multi_answer', 'qr_gate',
+                    'hint_container', 'hotspot', 'tile_puzzle', 'cipher',
+                    'logic_grid', 'prop_confirmation', 'location_check',
+                    'sound_level', 'replay_marker',
+                  ];
+                  if (puzzleTypes.includes(a.artifact_type ?? '')) {
+                    return (
+                      <PuzzleArtifactRenderer
+                        key={a.id}
+                        artifact={{
+                          id: a.id,
+                          title: a.title ?? null,
+                          description: a.description ?? null,
+                          artifact_type: a.artifact_type ?? null,
+                          artifact_order: a.artifact_order ?? undefined,
+                          metadata: a.metadata as Record<string, unknown> | null,
+                        }}
+                        sessionId={sessionId}
+                        participantToken={participantToken || ''}
+                        onStateChange={loadArtifacts}
+                      />
                     );
                   }
 

@@ -57,3 +57,7 @@ export { StepViewer } from './StepViewer';
 // Trigger components
 export { TriggerPanel } from './TriggerPanel';
 export type { TriggerPanelProps } from './TriggerPanel';
+
+// Puzzle artifact renderer
+export { PuzzleArtifactRenderer } from './PuzzleArtifactRenderer';
+export type { PuzzleArtifactRendererProps, PuzzleArtifactData, PuzzleState } from './PuzzleArtifactRenderer';

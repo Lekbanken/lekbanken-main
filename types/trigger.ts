@@ -97,6 +97,27 @@ export interface AudioAcknowledgedCondition {
   audioId: string;
 }
 
+/** Multi-answer verification complete condition */
+export interface MultiAnswerCompleteCondition {
+  type: 'multi_answer_complete';
+  /** Multi-answer artifact ID */
+  multiAnswerId: string;
+}
+
+/** QR/NFC scan verified condition */
+export interface ScanVerifiedCondition {
+  type: 'scan_verified';
+  /** Scan gate artifact ID */
+  scanGateId: string;
+}
+
+/** Hint requested condition */
+export interface HintRequestedCondition {
+  type: 'hint_requested';
+  /** Optional specific hint ID */
+  hintId?: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -112,7 +133,10 @@ export type TriggerCondition =
   | SignalReceivedCondition
   | CounterReachedCondition
   | RiddleCorrectCondition
-  | AudioAcknowledgedCondition;
+  | AudioAcknowledgedCondition
+  | MultiAnswerCompleteCondition
+  | ScanVerifiedCondition
+  | HintRequestedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -223,6 +247,21 @@ export interface ResetRiddleAction {
   riddleId: string;
 }
 
+/** Send a hint to participants */
+export interface SendHintAction {
+  type: 'send_hint';
+  /** Hint ID to reveal, or 'next' for next available */
+  hintId: string;
+  /** Skip cooldown */
+  skipCooldown?: boolean;
+}
+
+/** Reset scan gate state */
+export interface ResetScanGateAction {
+  type: 'reset_scan_gate';
+  scanGateId: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -240,7 +279,9 @@ export type TriggerAction =
   | TimeBankApplyDeltaAction
   | IncrementCounterAction
   | ResetCounterAction
-  | ResetRiddleAction;
+  | ResetRiddleAction
+  | SendHintAction
+  | ResetScanGateAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];

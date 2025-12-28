@@ -55,6 +55,11 @@ export { CounterDisplay, InteractiveCounter } from './Counter';
 export { RiddleInput, useRiddle } from './RiddleInput';
 export { AudioPlayer } from './AudioPlayer';
 
+// Puzzle modules (Fas 2)
+export { MultiAnswerForm } from './MultiAnswerForm';
+export { QRScanner } from './QRScanner';
+export { HintPanel, HintControl, useHintSystem } from './HintPanel';
+
 // Hooks
 export { useTypewriter } from './hooks/useTypewriter';
 export { useCountdown } from './hooks/useCountdown';

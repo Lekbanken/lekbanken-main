@@ -74,6 +74,29 @@ export interface SignalReceivedCondition {
   channel?: string;
 }
 
+/** Counter reached target condition */
+export interface CounterReachedCondition {
+  type: 'counter_reached';
+  /** Counter key to watch */
+  counterKey: string;
+  /** Target value (optional - uses counter's target if not set) */
+  targetValue?: number;
+}
+
+/** Riddle answered correctly condition */
+export interface RiddleCorrectCondition {
+  type: 'riddle_correct';
+  /** Riddle artifact ID */
+  riddleId: string;
+}
+
+/** Audio acknowledged condition */
+export interface AudioAcknowledgedCondition {
+  type: 'audio_acknowledged';
+  /** Audio artifact ID */
+  audioId: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -86,7 +109,10 @@ export type TriggerCondition =
   | KeypadCorrectCondition
   | KeypadFailedCondition
   | ManualCondition
-  | SignalReceivedCondition;
+  | SignalReceivedCondition
+  | CounterReachedCondition
+  | RiddleCorrectCondition
+  | AudioAcknowledgedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -178,6 +204,25 @@ export interface TimeBankApplyDeltaAction {
   maxBalanceSeconds?: number;
 }
 
+/** Increment a counter */
+export interface IncrementCounterAction {
+  type: 'increment_counter';
+  counterKey: string;
+  amount?: number; // default: 1
+}
+
+/** Reset a counter to initial value */
+export interface ResetCounterAction {
+  type: 'reset_counter';
+  counterKey: string;
+}
+
+/** Reset a riddle to allow new attempts */
+export interface ResetRiddleAction {
+  type: 'reset_riddle';
+  riddleId: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -192,7 +237,10 @@ export type TriggerAction =
   | ShowCountdownAction
   | ResetKeypadAction
   | SendSignalAction
-  | TimeBankApplyDeltaAction;
+  | TimeBankApplyDeltaAction
+  | IncrementCounterAction
+  | ResetCounterAction
+  | ResetRiddleAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];

@@ -50,6 +50,11 @@ export { AlphaKeypad } from './AlphaKeypad';
 // Story components (Phase 2)
 export { StoryOverlay } from './StoryOverlay';
 
+// Puzzle modules (Fas 1)
+export { CounterDisplay, InteractiveCounter } from './Counter';
+export { RiddleInput, useRiddle } from './RiddleInput';
+export { AudioPlayer } from './AudioPlayer';
+
 // Hooks
 export { useTypewriter } from './hooks/useTypewriter';
 export { useCountdown } from './hooks/useCountdown';

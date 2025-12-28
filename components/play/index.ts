@@ -60,6 +60,11 @@ export { MultiAnswerForm } from './MultiAnswerForm';
 export { QRScanner } from './QRScanner';
 export { HintPanel, HintControl, useHintSystem } from './HintPanel';
 
+// Puzzle modules (Fas 3)
+export { HotspotImage, useHotspotGame } from './HotspotImage';
+export { TilePuzzle, useTilePuzzle } from './TilePuzzle';
+export { CipherDecoder, useCipherDecoder } from './CipherDecoder';
+
 // Hooks
 export { useTypewriter } from './hooks/useTypewriter';
 export { useCountdown } from './hooks/useCountdown';

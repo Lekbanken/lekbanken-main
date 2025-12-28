@@ -118,6 +118,36 @@ export interface HintRequestedCondition {
   hintId?: string;
 }
 
+/** Hotspot found condition */
+export interface HotspotFoundCondition {
+  type: 'hotspot_found';
+  /** Hotspot hunt artifact ID */
+  hotspotHuntId: string;
+  /** Specific hotspot ID (optional - any hotspot if not set) */
+  hotspotId?: string;
+}
+
+/** Hotspot hunt complete condition */
+export interface HotspotHuntCompleteCondition {
+  type: 'hotspot_hunt_complete';
+  /** Hotspot hunt artifact ID */
+  hotspotHuntId: string;
+}
+
+/** Tile puzzle completed condition */
+export interface TilePuzzleCompleteCondition {
+  type: 'tile_puzzle_complete';
+  /** Tile puzzle artifact ID */
+  tilePuzzleId: string;
+}
+
+/** Cipher decoded condition */
+export interface CipherDecodedCondition {
+  type: 'cipher_decoded';
+  /** Cipher puzzle artifact ID */
+  cipherId: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -136,7 +166,11 @@ export type TriggerCondition =
   | AudioAcknowledgedCondition
   | MultiAnswerCompleteCondition
   | ScanVerifiedCondition
-  | HintRequestedCondition;
+  | HintRequestedCondition
+  | HotspotFoundCondition
+  | HotspotHuntCompleteCondition
+  | TilePuzzleCompleteCondition
+  | CipherDecodedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -262,6 +296,24 @@ export interface ResetScanGateAction {
   scanGateId: string;
 }
 
+/** Reset hotspot hunt state */
+export interface ResetHotspotHuntAction {
+  type: 'reset_hotspot_hunt';
+  hotspotHuntId: string;
+}
+
+/** Reset tile puzzle to shuffled state */
+export interface ResetTilePuzzleAction {
+  type: 'reset_tile_puzzle';
+  tilePuzzleId: string;
+}
+
+/** Reset cipher decoder state */
+export interface ResetCipherAction {
+  type: 'reset_cipher';
+  cipherId: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -281,7 +333,10 @@ export type TriggerAction =
   | ResetCounterAction
   | ResetRiddleAction
   | SendHintAction
-  | ResetScanGateAction;
+  | ResetScanGateAction
+  | ResetHotspotHuntAction
+  | ResetTilePuzzleAction
+  | ResetCipherAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];

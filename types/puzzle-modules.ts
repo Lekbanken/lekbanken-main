@@ -281,3 +281,202 @@ export interface HintState {
   totalPenaltyTime: number;
   totalPenaltyPoints: number;
 }
+
+// ============================================================================
+// Image Hotspot Hunt Module (#2)
+// ============================================================================
+
+export interface Hotspot {
+  /** Unique ID */
+  id: string;
+  /** X position (0-100 percentage) */
+  x: number;
+  /** Y position (0-100 percentage) */
+  y: number;
+  /** Radius for hit detection (percentage) */
+  radius: number;
+  /** Label shown on find */
+  label?: string;
+  /** Is this hotspot required for completion? */
+  required?: boolean;
+  /** Reveal artifact when found */
+  revealArtifactId?: string;
+}
+
+export interface HotspotConfig {
+  /** Image artifact ID */
+  imageArtifactId: string;
+  /** Image URL (alternative to artifact) */
+  imageUrl?: string;
+  /** List of hotspots */
+  hotspots: Hotspot[];
+  /** Require all hotspots to complete */
+  requireAll?: boolean;
+  /** Show found count */
+  showProgress?: boolean;
+  /** Allow pinch-zoom */
+  allowZoom?: boolean;
+  /** Feedback on find (vibration/sound) */
+  hapticFeedback?: boolean;
+}
+
+export interface HotspotState {
+  foundHotspotIds: string[];
+  isComplete: boolean;
+  foundCount: number;
+  requiredCount: number;
+}
+
+// ============================================================================
+// Jigsaw / Tile Puzzle Module (#3)
+// ============================================================================
+
+export type TileGridSize = '2x2' | '3x3' | '4x4' | '3x2' | '4x3';
+
+export interface TilePosition {
+  row: number;
+  col: number;
+}
+
+export interface Tile {
+  /** Unique tile ID */
+  id: string;
+  /** Correct position */
+  correctPosition: TilePosition;
+  /** Current position */
+  currentPosition: TilePosition;
+  /** Image crop (calculated from grid) */
+  imageCrop?: { x: number; y: number; width: number; height: number };
+}
+
+export interface TilePuzzleConfig {
+  /** Image artifact ID */
+  imageArtifactId: string;
+  /** Image URL (alternative to artifact) */
+  imageUrl?: string;
+  /** Grid size */
+  gridSize: TileGridSize;
+  /** Enable snap-to-position */
+  snapToGrid?: boolean;
+  /** Shuffle on start */
+  shuffleOnStart?: boolean;
+  /** Show preview image */
+  showPreview?: boolean;
+}
+
+export interface TilePuzzleState {
+  tiles: Tile[];
+  isComplete: boolean;
+  moveCount: number;
+  startedAt?: string;
+  completedAt?: string;
+}
+
+// ============================================================================
+// Language Decoder / Cipher Module (#9)
+// ============================================================================
+
+export type CipherType = 'caesar' | 'substitution' | 'atbash' | 'custom';
+
+export interface CipherConfig {
+  /** Cipher type */
+  cipherType: CipherType;
+  /** Encoded message */
+  encodedMessage: string;
+  /** Key artifact ID (shows the cipher key) */
+  keyArtifactId?: string;
+  /** Caesar shift (for caesar cipher) */
+  caesarShift?: number;
+  /** Substitution map (for substitution cipher) */
+  substitutionMap?: Record<string, string>;
+  /** Expected plaintext answer */
+  expectedPlaintext: string;
+  /** Normalize mode for answer matching */
+  normalizeMode?: RiddleNormalizeMode;
+  /** Show decoder helper UI */
+  showDecoderUI?: boolean;
+}
+
+export interface CipherState {
+  currentGuess: string;
+  isDecoded: boolean;
+  attemptsUsed: number;
+  decodedAt?: string;
+}
+
+// ============================================================================
+// Cipher Helper Functions
+// ============================================================================
+
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+/**
+ * Apply Caesar cipher shift
+ */
+export function caesarEncode(text: string, shift: number): string {
+  return text.toUpperCase().split('').map(char => {
+    const index = ALPHABET.indexOf(char);
+    if (index === -1) return char;
+    const newIndex = (index + shift + 26) % 26;
+    return ALPHABET[newIndex];
+  }).join('');
+}
+
+export function caesarDecode(text: string, shift: number): string {
+  return caesarEncode(text, -shift);
+}
+
+/**
+ * Apply Atbash cipher (reverse alphabet)
+ */
+export function atbashEncode(text: string): string {
+  return text.toUpperCase().split('').map(char => {
+    const index = ALPHABET.indexOf(char);
+    if (index === -1) return char;
+    return ALPHABET[25 - index];
+  }).join('');
+}
+
+/**
+ * Apply substitution cipher
+ */
+export function substitutionEncode(
+  text: string,
+  map: Record<string, string>
+): string {
+  return text.toUpperCase().split('').map(char => {
+    return map[char] ?? char;
+  }).join('');
+}
+
+export function substitutionDecode(
+  text: string,
+  map: Record<string, string>
+): string {
+  // Reverse the map
+  const reverseMap: Record<string, string> = {};
+  for (const [key, value] of Object.entries(map)) {
+    reverseMap[value] = key;
+  }
+  return substitutionEncode(text, reverseMap);
+}
+
+/**
+ * Parse grid size string to dimensions
+ */
+export function parseGridSize(size: TileGridSize): { rows: number; cols: number } {
+  const [cols, rows] = size.split('x').map(Number);
+  return { rows, cols };
+}
+
+/**
+ * Check if tile puzzle is solved
+ */
+export function isTilePuzzleSolved(tiles: Tile[]): boolean {
+  return tiles.every(
+    tile =>
+      tile.currentPosition.row === tile.correctPosition.row &&
+      tile.currentPosition.col === tile.correctPosition.col
+  );
+}
+

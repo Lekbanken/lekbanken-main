@@ -1,7 +1,8 @@
 # Puzzle Modules – End-to-End Integration Status
 
 > Skapad: 2024-12-28  
-> Status: Analys klar – Handlingsplan listar prioriterade nästa steg
+> Uppdaterad: 2024-12-28  
+> Status: ✅ **INTEGRATION SLUTFÖRD** – Fas A-E klara
 
 ---
 
@@ -23,272 +24,211 @@ Vi har **15 puzzle-moduler** implementerade som frontend-komponenter i `componen
 
 ---
 
-## 2. Nuläge: Vad är integrerat?
+## 2. Integration Slutförd ✅
 
-### 2.1 Database Schema (Supabase)
+### Fas A-B: Admin Builder + API (commits 0d6d1b5, e4f3397)
 
-| Tabell | Beskrivning | Puzzle-stöd |
-|--------|-------------|-------------|
-| `game_artifacts` | Author-time artefakter | ✅ Generiskt metadata-fält (JSONB) |
-| `game_artifact_variants` | Varianter per artefakt | ✅ Generiskt metadata |
-| `session_artifacts` | Runtime-snapshot | ✅ Kopierar metadata |
-| `session_artifact_variants` | Runtime-varianter | ✅ revealed_at, highlighted_at |
-| `session_decisions` | Röstnings-primitiv | ✅ Kan användas av MultiAnswer |
-| `session_votes` | Röster | ✅ Stödjer puzzle-voting |
-| `session_outcomes` | Resultat | ✅ Kan visa puzzle-resultat |
+| Uppgift | Status | Detaljer |
+|---------|--------|----------|
+| Utöka ArtifactType enum | ✅ | 13 nya typer i `types/games.ts` |
+| Puzzle config panels | ✅ | PuzzleConfigSection i ArtifactEditor |
+| ArtifactWizard templates | ✅ | 8 nya puzzle-mallar |
+| POST puzzle/submit API | ✅ | `/api/play/sessions/[id]/artifacts/[artifactId]/puzzle` |
+| Type definitions | ✅ | Komplett `types/puzzle-modules.ts` |
 
-**Schema-analys:**  
-Det generiska `metadata: JSONB`-fältet på artifacts ger oss möjlighet att lagra puzzle-specifik konfiguration utan nya migrationer. Däremot saknas:
+### Fas C: Participant Session View (commit e4f3397)
 
-| Saknas | Användning |
-|--------|-----------|
-| `session_puzzle_state` | Runtime-state för Counter, Riddle, Cipher, etc. |
-| `session_hints` | Hint-request & unlock tracking |
-| `session_location_checks` | GPS-verifiering per deltagare |
-| `session_replay_markers` | Tidsstämplar för replay |
+| Uppgift | Status | Detaljer |
+|---------|--------|----------|
+| PuzzleArtifactRenderer | ✅ | Dispatcher för alla 13 puzzle-typer |
+| Puzzle state sync | ✅ | Via usePuzzleRealtime hook |
+| API integration | ✅ | POST requests med participant token |
 
-### 2.2 API Routes
+### Fas D: Host Dashboard (commit 53b2c51)
 
-**Befintliga routes i `app/api/play/`:**
+| Uppgift | Status | Detaljer |
+|---------|--------|----------|
+| PuzzleProgressPanel | ✅ | Visar puzzle status per deltagare/team |
+| PropConfirmationManager | ✅ | Host-gränssnitt för prop-godkännanden |
+| Puzzle progress API | ✅ | `GET /api/play/sessions/[id]/puzzles/progress` |
+| Prop confirmations API | ✅ | `GET/PATCH /api/play/sessions/[id]/puzzles/props` |
+| HostPlayMode integration | ✅ | Ny "Pussel" sub-tab |
+
+### Fas E: Real-time Sync (commit 83d2483)
+
+| Uppgift | Status | Detaljer |
+|---------|--------|----------|
+| PuzzleBroadcast type | ✅ | Ny broadcast-typ i play-runtime.ts |
+| createPuzzleBroadcast() | ✅ | I lib/realtime/play-broadcast.ts |
+| usePuzzleRealtime hook | ✅ | Ny hook för real-time state sync |
+| useLiveSession integration | ✅ | onPuzzleUpdate callback |
+| PuzzleArtifactRenderer RT | ✅ | Real-time aktiverad, locked state |
+
+---
+
+## 3. Arkitektur
 
 ```
-/api/play/
-├── board/           – Board state
-├── heartbeat/       – Session heartbeat
-├── join/            – Join session
-├── me/              – Participant info
-├── rejoin/          – Rejoin session
-├── session/         – Session state
-└── sessions/        – Session CRUD + artifacts + decisions
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           ADMIN BUILDER                                  │
+│  ┌─────────────────┐     ┌────────────────────┐     ┌─────────────────┐ │
+│  │ ArtifactEditor  │────▶│ PuzzleConfigSection│────▶│ artifact.metadata│ │
+│  │ (13 puzzle typer)│     │ (type-specific UI) │     │ (JSONB config)   │ │
+│  └─────────────────┘     └────────────────────┘     └─────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        SESSION RUNTIME                                   │
+│  ┌─────────────────┐     ┌────────────────────┐     ┌─────────────────┐ │
+│  │ session_artifacts│────▶│ PuzzleArtifact     │────▶│ puzzleState     │ │
+│  │ (copied metadata)│     │ Renderer           │     │ (in metadata)   │ │
+│  └─────────────────┘     └────────────────────┘     └─────────────────┘ │
+│           │                       │                         │           │
+│           │                       ▼                         │           │
+│           │              ┌────────────────────┐             │           │
+│           │              │ usePuzzleRealtime  │◀────────────┘           │
+│           │              │ (state sync hook)  │                         │
+│           │              └────────────────────┘                         │
+│           │                       │                                     │
+│           ▼                       ▼                                     │
+│  ┌─────────────────┐     ┌────────────────────┐                         │
+│  │ POST /puzzle    │◀───▶│ PuzzleBroadcast    │                         │
+│  │ (submit answer) │     │ (realtime events)  │                         │
+│  └─────────────────┘     └────────────────────┘                         │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         HOST DASHBOARD                                   │
+│  ┌─────────────────┐     ┌────────────────────┐                         │
+│  │ PuzzleProgress  │     │ PropConfirmation   │                         │
+│  │ Panel           │     │ Manager            │                         │
+│  └─────────────────┘     └────────────────────┘                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Puzzle-specifika endpoints saknas:**
-
-| Endpoint | Syfte |
-|----------|-------|
-| `POST /api/play/sessions/[id]/puzzle/[puzzleId]/submit` | Riddle/Cipher submit |
-| `POST /api/play/sessions/[id]/puzzle/[puzzleId]/counter` | Increment counter |
-| `GET /api/play/sessions/[id]/hints` | Tillgängliga hints |
-| `POST /api/play/sessions/[id]/hints/[hintId]/request` | Request hint |
-| `POST /api/play/sessions/[id]/location-check/verify` | GPS-verifiering |
-| `POST /api/play/sessions/[id]/prop-confirm/[propId]` | Leader confirms prop |
-
-### 2.3 Admin Builder (Game Builder)
-
-**Befintlig artifact_type-lista i `ArtifactEditor.tsx`:**
-
-```ts
-const artifactTypeOptions = [
-  { value: 'card', label: 'Kort' },
-  { value: 'keypad', label: 'Pinkod (Keypad)' },
-  { value: 'document', label: 'Dokument' },
-  { value: 'image', label: 'Bild' },
-];
-```
-
-**Saknas:**
-
-| artifact_type | Modul |
-|---------------|-------|
-| `counter` | Counter |
-| `riddle` | RiddleInput |
-| `audio` | AudioPlayer |
-| `multi_answer` | MultiAnswerForm |
-| `qr_scanner` | QRScanner |
-| `hint_container` | HintPanel |
-| `hotspot` | HotspotImage |
-| `tile_puzzle` | TilePuzzle |
-| `cipher` | CipherDecoder |
-| `prop_confirmation` | PropConfirmation |
-| `location_check` | LocationCheck |
-| `logic_grid` | LogicGrid |
-| `sound_level` | SoundLevelMeter |
-| `replay_marker` | ReplayMarker |
-
-### 2.4 ArtifactWizard Templates
-
-**Befintliga templates i `ArtifactWizard.tsx`:**
-- Escape Room Keypad
-- Digital Keypad
-- Hemlig ledtråd
-- Mysteriekort
-- Rollhemlighet
-- Quizsvar
-- Fakta-kort
-- Bild-ledtråd
-- Tom artefakt
-
-**Saknas:** Templates för alla 14 nya puzzle-moduler
-
-### 2.5 Participant Session View
-
-**Befintlig rendering i `ParticipantPlayView.tsx`:**
-- Keypad rendering med code submit
-- Card/Document/Image rendering
-
-**Saknas:** Rendering-logik för de 14 nya puzzle-typerna
-
-### 2.6 Host Session View (Facilitator Dashboard)
-
-**Befintliga features:**
-- Step/Phase navigation
-- Timer control
-- Signal panel
-- Artifacts panel (keypad state tracking)
-
-**Saknas:**
-- Hint management panel
-- Prop confirmation controls
-- Location verify dashboard
-- Counter/Puzzle state overview
-
 ---
 
-## 3. Integrationsplan (Prioriterad)
-
-### Fas A: Schema & API (Backend) – 1-2 dagar
-
-#### A1. Utöka artifact_type enum (ej migration – frontend + validation)
-```ts
-// types/games.ts
-export type ArtifactType = 
-  | 'card' | 'keypad' | 'document' | 'image'
-  | 'counter' | 'riddle' | 'audio' 
-  | 'multi_answer' | 'qr_gate' | 'hint_container'
-  | 'hotspot' | 'tile_puzzle' | 'cipher'
-  | 'prop_confirmation' | 'location_check'
-  | 'logic_grid' | 'sound_level' | 'replay_marker';
-```
-
-#### A2. Session puzzle state table (migration)
-```sql
-CREATE TABLE public.session_puzzle_states (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  session_id UUID NOT NULL REFERENCES public.participant_sessions(id) ON DELETE CASCADE,
-  artifact_id UUID NOT NULL REFERENCES public.session_artifacts(id) ON DELETE CASCADE,
-  puzzle_type TEXT NOT NULL,
-  state JSONB NOT NULL DEFAULT '{}',
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE(session_id, artifact_id)
-);
-```
-
-#### A3. Puzzle API routes
-- `POST /api/play/sessions/[id]/puzzle/submit` – Generic puzzle submit
-- `POST /api/play/sessions/[id]/hints/request` – Hint request
-- `POST /api/play/sessions/[id]/verify-location` – GPS verify
-
----
-
-### Fas B: Admin Builder UI – 1-2 dagar
-
-#### B1. Utöka artifactTypeOptions
-Lägg till alla 14 nya typer i `ArtifactEditor.tsx`
-
-#### B2. Puzzle-specifika konfigurationspaneler
-Varje puzzle-typ behöver en konfigurationspanel i ArtifactEditor:
-- Counter: target, perRole, label
-- Riddle: correctAnswers[], normalizeMode, maxAttempts
-- Audio: url, requireAck, autoplay
-- Hotspot: imageUrl, zones[], revealMode
-- TilePuzzle: imageUrl, gridSize
-- Cipher: method, shift/keyword, plaintext
-- Etc.
-
-#### B3. Nya ArtifactWizard templates
-Lägg till 14 nya mallar med relevanta kategorier:
-- Escape Room: Counter, Riddle, Cipher, Hotspot, TilePuzzle, LogicGrid
-- Party: Audio, SoundLevel, PropConfirmation
-- Educational: MultiAnswer, QRScanner
-- General: HintContainer, LocationCheck, ReplayMarker
-
----
-
-### Fas C: Participant Session View – 1-2 dagar
-
-#### C1. Puzzle renderer dispatcher
-```tsx
-function renderPuzzleArtifact(artifact: SessionArtifact, state: PuzzleState) {
-  switch (artifact.artifact_type) {
-    case 'counter':
-      return <InteractiveCounter config={...} state={state} onIncrement={...} />;
-    case 'riddle':
-      return <RiddleInput config={...} onSubmit={...} />;
-    // ... etc
-  }
-}
-```
-
-#### C2. Hook för puzzle state sync
-```tsx
-const { puzzleStates, submitPuzzle, requestHint } = usePuzzleSync(sessionId);
-```
-
-#### C3. Realtime state updates
-Prenumerera på `session_puzzle_states` via Supabase Realtime
-
----
-
-### Fas D: Host Dashboard – 1 dag
-
-#### D1. Puzzle State Overview Panel
-Visa alla puzzle-artefakter med current state per deltagare/team
-
-#### D2. Hint Management
-- Lista pending hint requests
-- Approve/Send hints
-- Track hint usage
-
-#### D3. Prop Confirmation & Location Verify
-- PropConfirmControl i host dashboard
-- LocationConfirmControl för manuell override
-
----
-
-### Fas E: Trigger Integration – 0.5 dagar
-
-Koppla trigger-systemet till puzzle events:
-- `counter_reached` → Fire action
-- `riddle_correct` → Fire action
-- `tile_puzzle_complete` → Fire action
-- Etc.
-
----
-
-## 4. Snabbstart: Minimal viable integration
-
-Om vi vill snabbt testa **en** modul End-to-End:
-
-### Riddle Module (Enklast)
-
-1. **ArtifactEditor:** Lägg till `artifact_type: 'riddle'` + config panel
-2. **API:** `POST /api/play/sessions/[id]/puzzle/submit` med server-side answer check
-3. **ParticipantPlayView:** Rendera `<RiddleInput>` för `artifact_type === 'riddle'`
-4. **State:** Lagra attempts + solved i artifact metadata (no new table)
-
-**Estimat:** 2-3 timmar
-
----
-
-## 5. Nästa steg
-
-1. **Beslut:** Vilken fas ska vi börja med? (A → B → C → D)
-2. **Val av pilot-modul:** Riddle (enklast) eller Counter (vanligast)?
-3. **Migration:** Behöver vi `session_puzzle_states` tabell eller räcker metadata?
-
----
-
-## Appendix: Fil-mappning
+## 4. Fil-mappning (Uppdaterad)
 
 | Lager | Fil(er) | Ansvar |
 |-------|---------|--------|
-| **Types** | `types/games.ts`, `types/puzzle-modules.ts`, `types/trigger.ts` | Alla typdefintioner |
+| **Types** | `types/games.ts` | ArtifactType enum (13 nya typer) |
+| **Types** | `types/puzzle-modules.ts` | Alla puzzle Config/State interfaces |
+| **Types** | `types/play-runtime.ts` | PuzzleBroadcast typ |
 | **Components** | `components/play/*.tsx` | 15 puzzle-komponenter |
 | **Admin Builder** | `app/admin/games/builder/components/ArtifactEditor.tsx` | artifact_type config |
-| **Admin Wizard** | `app/admin/games/builder/components/ArtifactWizard.tsx` | Mallar |
-| **Session View** | `features/play/components/ParticipantPlayView.tsx` | Deltagare rendering |
-| **Host View** | `features/play/components/FacilitatorDashboard.tsx` | Lekledare panel |
-| **API** | `app/api/play/sessions/[id]/...` | Session endpoints |
-| **Schema** | `supabase/migrations/` | DB migrations |
+| **Admin Builder** | `app/admin/games/builder/components/PuzzleConfigSection.tsx` | Puzzle-specifika paneler |
+| **Admin Wizard** | `app/admin/games/builder/components/ArtifactWizard.tsx` | 8 nya puzzle-mallar |
+| **Session View** | `features/play/components/PuzzleArtifactRenderer.tsx` | Puzzle rendering dispatcher |
+| **Host View** | `features/play/components/PuzzleProgressPanel.tsx` | Puzzle progress overview |
+| **Host View** | `features/play/components/PropConfirmationManager.tsx` | Prop approval UI |
+| **Host View** | `features/play/components/HostPlayMode.tsx` | Integrerad "Pussel" tab |
+| **Hooks** | `features/play/hooks/usePuzzleRealtime.ts` | Real-time state sync |
+| **Hooks** | `features/play/hooks/useLiveSession.ts` | onPuzzleUpdate callback |
+| **Realtime** | `lib/realtime/play-broadcast.ts` | createPuzzleBroadcast, sendPuzzleUpdate |
+| **API** | `app/api/play/sessions/[id]/artifacts/[artifactId]/puzzle/route.ts` | Puzzle submit |
+| **API** | `app/api/play/sessions/[id]/puzzles/progress/route.ts` | Host puzzle progress |
+| **API** | `app/api/play/sessions/[id]/puzzles/props/route.ts` | Prop confirmations |
+
+---
+
+## 5. Puzzle-moduler och deras Config/State
+
+| Modul | artifact_type | Config Interface | State Interface |
+|-------|---------------|------------------|-----------------|
+| Counter | `counter` | CounterConfig | CounterState |
+| Riddle | `riddle` | RiddleConfig | RiddleState |
+| Audio | `audio` | AudioConfig | AudioState |
+| MultiAnswer | `multi_answer` | MultiAnswerConfig | MultiAnswerState |
+| QRScanner | `qr_gate` | ScanGateConfig | ScanGateState |
+| HintPanel | `hint_container` | HintConfig | HintState |
+| Hotspot | `hotspot` | HotspotConfig | HotspotState |
+| TilePuzzle | `tile_puzzle` | TilePuzzleConfig | TilePuzzleState |
+| Cipher | `cipher` | CipherConfig | CipherState |
+| PropRequest | `prop_confirmation` | PropConfirmationConfig | PropConfirmationState |
+| LocationCheck | `location_check` | LocationCheckConfig | LocationCheckState |
+| LogicGrid | `logic_grid` | LogicGridConfig | LogicGridState |
+| SoundLevel | `sound_level` | SoundLevelConfig | SoundLevelState |
+
+---
+
+## 6. Broadcast Events
+
+### PuzzleBroadcast Actions
+
+| Action | Beskrivning | Payload |
+|--------|-------------|---------|
+| `state_changed` | Puzzle state uppdaterad | `{ artifact_id, state, participant_id?, team_id? }` |
+| `locked` | Host låste pusslet | `{ artifact_id }` |
+| `unlocked` | Host låste upp pusslet | `{ artifact_id }` |
+| `hint_revealed` | Ledtråd avslöjad | `{ artifact_id, message }` |
+| `reset` | Pussel återställt | `{ artifact_id }` |
+
+---
+
+## 7. API Endpoints
+
+### Puzzle Submit
+```
+POST /api/play/sessions/[id]/artifacts/[artifactId]/puzzle
+Headers: x-participant-token
+Body: { puzzleType, answer?, value?, ... }
+Response: { status, message, state }
+```
+
+### Host Puzzle Progress
+```
+GET /api/play/sessions/[id]/puzzles/progress
+Response: { artifacts[], participants[], progress[], stats }
+```
+
+### Prop Confirmations
+```
+GET /api/play/sessions/[id]/puzzles/props
+Response: { requests[], timestamp }
+
+PATCH /api/play/sessions/[id]/puzzles/props
+Body: { requestId, action: 'confirm'|'reject', hostNotes? }
+Response: { success, requestId, action, timestamp }
+```
+
+---
+
+## 8. Commit-historik
+
+| Commit | Fas | Beskrivning |
+|--------|-----|-------------|
+| `0d6d1b5` | A-B | Admin Builder + API för puzzle-moduler |
+| `e4f3397` | C | PuzzleArtifactRenderer för participant view |
+| `53b2c51` | D | Host Dashboard integration |
+| `83d2483` | E | Real-time Sync & Participant State |
+
+---
+
+## 9. Nästa Steg (Framtida Förbättringar)
+
+### Trigger Integration
+- Koppla trigger-systemet till puzzle events
+- `puzzle_solved` → Fire action
+- `counter_reached` → Fire action
+
+### Session Puzzle States Table (Valfritt)
+Om metadata-lagring blir problematisk, skapa dedikerad tabell:
+```sql
+CREATE TABLE session_puzzle_states (
+  id UUID PRIMARY KEY,
+  session_id UUID REFERENCES participant_sessions(id),
+  artifact_id UUID REFERENCES session_artifacts(id),
+  participant_id UUID REFERENCES session_participants(id),
+  state JSONB NOT NULL DEFAULT '{}',
+  UNIQUE(session_id, artifact_id, participant_id)
+);
+```
+
+### Utökade Puzzle-moduler
+- ReplayMarker implementation
+- Avancerad LogicGrid med hints
+- Multi-player Counter syncing
 

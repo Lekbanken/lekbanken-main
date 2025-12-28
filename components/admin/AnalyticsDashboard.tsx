@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Card, Button } from '@/components/ui';
+import { Card, Button, HelpText } from '@/components/ui';
 import {
   ChartBarIcon,
   ClockIcon,
@@ -142,6 +142,10 @@ export function AnalyticsDashboard() {
         </Button>
       </div>
 
+      <HelpText variant="info">
+        Statistiken uppdateras i realtid. Klicka på &quot;Uppdatera&quot; för att hämta senaste data.
+      </HelpText>
+
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
@@ -177,6 +181,9 @@ export function AnalyticsDashboard() {
             <h3 className="text-lg font-semibold">Senaste sessioner</h3>
             <ClockIcon className="h-5 w-5 text-muted-foreground" />
           </div>
+          <HelpText className="mb-3">
+            Visar de senaste spelsessionerna med status och antal deltagare.
+          </HelpText>
           
           {overview.recent_sessions.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
@@ -215,6 +222,9 @@ export function AnalyticsDashboard() {
             <h3 className="text-lg font-semibold">Populära spel</h3>
             <ChatBubbleBottomCenterTextIcon className="h-5 w-5 text-muted-foreground" />
           </div>
+          <HelpText className="mb-3">
+            Spel rankade efter antal genomförda sessioner.
+          </HelpText>
           
           {overview.popular_games.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">

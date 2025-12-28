@@ -13,6 +13,8 @@ import { RoleAssignerContainer } from './RoleAssignerContainer';
 import { ArtifactsPanel } from './ArtifactsPanel';
 import { DecisionsPanel } from './DecisionsPanel';
 import { OutcomePanel } from './OutcomePanel';
+import { PuzzleProgressPanel } from './PuzzleProgressPanel';
+import { PropConfirmationManager } from './PropConfirmationManager';
 import { getHostPlaySession, updatePlaySessionState, type PlaySessionData } from '../api';
 import type { SessionTrigger } from '@/types/games';
 import { Card } from '@/components/ui/card';
@@ -26,6 +28,7 @@ import {
   ScaleIcon,
   FlagIcon,
   ArrowLeftIcon,
+  PuzzlePieceIcon,
 } from '@heroicons/react/24/outline';
 import type { SessionRuntimeState } from '@/types/play-runtime';
 
@@ -46,7 +49,7 @@ export interface HostPlayModeProps {
 
 // Navigation zones: Play (main), Content (artifacts/decisions/outcomes), Manage (roles/settings)
 type PlayModeZone = 'play' | 'content' | 'manage';
-type ContentSubTab = 'artifacts' | 'decisions' | 'outcome';
+type ContentSubTab = 'artifacts' | 'decisions' | 'outcome' | 'puzzles';
 type ManageSubTab = 'roles' | 'settings';
 
 // =============================================================================
@@ -295,7 +298,7 @@ export function HostPlayMode({
         />
       )}
 
-      {/* Zone: Content - Artifacts, Decisions, Outcomes */}
+      {/* Zone: Content - Artifacts, Decisions, Outcomes, Puzzles */}
       {activeZone === 'content' && (
         <div className="space-y-4">
           {/* Sub-tabs for content zone */}
@@ -307,6 +310,14 @@ export function HostPlayMode({
             >
               <CubeIcon className="h-4 w-4 mr-1" />
               Artefakter
+            </Button>
+            <Button
+              variant={contentSubTab === 'puzzles' ? 'outline' : 'ghost'}
+              size="sm"
+              onClick={() => setContentSubTab('puzzles')}
+            >
+              <PuzzlePieceIcon className="h-4 w-4 mr-1" />
+              Pussel
             </Button>
             <Button
               variant={contentSubTab === 'decisions' ? 'outline' : 'ghost'}
@@ -327,6 +338,12 @@ export function HostPlayMode({
           </div>
 
           {contentSubTab === 'artifacts' && <ArtifactsPanel sessionId={sessionId} />}
+          {contentSubTab === 'puzzles' && (
+            <div className="space-y-4">
+              <PropConfirmationManager sessionId={sessionId} />
+              <PuzzleProgressPanel sessionId={sessionId} />
+            </div>
+          )}
           {contentSubTab === 'decisions' && <DecisionsPanel sessionId={sessionId} />}
           {contentSubTab === 'outcome' && <OutcomePanel sessionId={sessionId} />}
         </div>

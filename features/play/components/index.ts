@@ -61,3 +61,10 @@ export type { TriggerPanelProps } from './TriggerPanel';
 // Puzzle artifact renderer
 export { PuzzleArtifactRenderer } from './PuzzleArtifactRenderer';
 export type { PuzzleArtifactRendererProps, PuzzleArtifactData, PuzzleState } from './PuzzleArtifactRenderer';
+
+// Host puzzle management
+export { PuzzleProgressPanel } from './PuzzleProgressPanel';
+export type { PuzzleProgressPanelProps, PuzzleStatus } from './PuzzleProgressPanel';
+
+export { PropConfirmationManager } from './PropConfirmationManager';
+export type { PropConfirmationManagerProps, PropRequest } from './PropConfirmationManager';

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useRef } from 'react';
-import { Card, Button, Input, Select, HelpText, FeatureExplainer } from '@/components/ui';
+import { Card, Button, Input, Select, FeatureExplainer } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
   ArrowDownIcon,

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback, type ReactNode } from 'react';
+import { useState, useRef, useCallback, useId, type ReactNode } from 'react';
 
 // =============================================================================
 // Types
@@ -66,7 +66,7 @@ export function Tooltip({
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tooltipId = useRef(`tooltip-${Math.random().toString(36).slice(2, 9)}`);
+  const tooltipId = useId();
 
   const showTooltip = useCallback(() => {
     if (disabled) return;
@@ -93,13 +93,13 @@ export function Tooltip({
       onFocus={showTooltip}
       onBlur={hideTooltip}
     >
-      <span aria-describedby={isVisible ? tooltipId.current : undefined}>
+      <span aria-describedby={isVisible ? tooltipId : undefined}>
         {children}
       </span>
 
       {isVisible && (
         <span
-          id={tooltipId.current}
+          id={tooltipId}
           role="tooltip"
           className={`
             absolute z-50 px-2 py-1.5 text-xs font-medium

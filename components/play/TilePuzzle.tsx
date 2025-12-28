@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
-  ArrowPathIcon,
   CheckCircleIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -36,18 +35,18 @@ export function TilePuzzle({
 }: TilePuzzleProps) {
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [justCompleted, setJustCompleted] = useState(false);
 
   const { rows, cols } = parseGridSize(config.gridSize);
   const imageSrc = config.imageUrl || `/api/artifacts/${config.imageArtifactId}`;
 
-  // Check for completion
+  // Track completion to fire callback only once
+  const wasCompleteRef = useRef(state.isComplete);
   useEffect(() => {
-    if (state.isComplete && !justCompleted) {
-      setJustCompleted(true);
+    if (state.isComplete && !wasCompleteRef.current) {
+      wasCompleteRef.current = true;
       onComplete?.();
     }
-  }, [state.isComplete, justCompleted, onComplete]);
+  });
 
   // Get tile at position
   const getTileAtPosition = useCallback(
@@ -98,11 +97,6 @@ export function TilePuzzle({
     handleDrop(targetRow, targetCol);
   };
 
-  // Calculate tile size based on container
-  const tileSize = useMemo(() => {
-    return { width: `${100 / cols}%`, height: `${100 / rows}%` };
-  }, [rows, cols]);
-
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
       {/* Controls */}
@@ -134,6 +128,7 @@ export function TilePuzzle({
       {/* Preview image (optional) */}
       {showPreview && (
         <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-700">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
             alt="Facitbild"

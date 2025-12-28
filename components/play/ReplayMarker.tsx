@@ -237,7 +237,7 @@ function MarkerIcon({ type, className = '' }: MarkerIconProps) {
 // useReplayMarkers – Hook for managing replay markers
 // ============================================================================
 
-export function useReplayMarkers(config: ReplayMarkerConfig) {
+export function useReplayMarkers(_config: ReplayMarkerConfig) {
   const [state, setState] = useState<ReplayMarkerState>({
     markers: [],
   });

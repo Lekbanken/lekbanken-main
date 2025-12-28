@@ -73,6 +73,7 @@ export function PropRequest({
       {/* Prop info */}
       <div className="p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
         {config.propImageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={config.propImageUrl}
             alt={config.propDescription}
@@ -103,6 +104,7 @@ export function PropRequest({
           )}
           
           {state.photoUrl && (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={state.photoUrl}
               alt="Captured prop"
@@ -207,6 +209,7 @@ export function PropConfirmControl({
       {state.photoUrl && (
         <div>
           <p className="text-sm font-medium mb-2">Foto-bevis:</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={state.photoUrl}
             alt="Prop evidence"
@@ -219,6 +222,7 @@ export function PropConfirmControl({
       {config.propImageUrl && (
         <div>
           <p className="text-sm font-medium mb-2">Förväntat föremål:</p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={config.propImageUrl}
             alt="Expected prop"
@@ -314,7 +318,7 @@ function PropStatusBadge({ status }: PropStatusBadgeProps) {
 // usePropConfirmation – Hook for managing prop confirmation state
 // ============================================================================
 
-export function usePropConfirmation(config: PropConfirmationConfig) {
+export function usePropConfirmation(_config: PropConfirmationConfig) {
   const [state, setState] = useState<PropConfirmationState>({
     status: 'pending',
   });

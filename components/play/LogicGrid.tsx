@@ -4,10 +4,8 @@ import { useState, useCallback, useMemo } from 'react';
 import {
   CheckCircleIcon,
   LightBulbIcon,
-  ArrowPathIcon,
   XMarkIcon,
   CheckIcon,
-  QuestionMarkCircleIcon,
 } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import type {
@@ -37,7 +35,7 @@ export function LogicGrid({
   state,
   onCellChange,
   onRevealClue,
-  onSolved,
+  onSolved: _onSolved,
   className = '',
 }: LogicGridProps) {
   const [selectedSection, setSelectedSection] = useState<{
@@ -118,7 +116,7 @@ export function LogicGrid({
           <h4 className="font-semibold">Ledtrådar</h4>
         </div>
         <ol className="list-decimal list-inside space-y-1 text-sm">
-          {visibleClues.map((clue, idx) => (
+          {visibleClues.map((clue) => (
             <li key={clue.id} className="text-zinc-700 dark:text-zinc-300">
               {clue.text}
             </li>

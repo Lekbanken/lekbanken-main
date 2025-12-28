@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
-import type { HotspotConfig, HotspotState, Hotspot } from '@/types/puzzle-modules';
+import type { HotspotConfig, HotspotState } from '@/types/puzzle-modules';
 
 // ============================================================================
 // HotspotImage – Interactive image with hidden hotspots to find
@@ -137,7 +137,7 @@ export function HotspotImage({
     });
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = (_e: React.TouchEvent) => {
     if (lastTap) {
       const timeDiff = Date.now() - lastTap.time;
       if (timeDiff < 300) {
@@ -192,6 +192,7 @@ export function HotspotImage({
             transition: isDragging ? 'none' : 'transform 0.2s ease-out',
           }}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
             alt="Sök efter gömda objekt"

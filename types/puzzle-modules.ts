@@ -480,3 +480,138 @@ export function isTilePuzzleSolved(tiles: Tile[]): boolean {
   );
 }
 
+// ============================================================================
+// Prop Confirmation Module (#22)
+// ============================================================================
+
+export interface PropConfirmationConfig {
+  /** Unique ID for this prop check */
+  propId: string;
+  /** Description of the prop to show */
+  propDescription: string;
+  /** Optional image of the expected prop */
+  propImageUrl?: string;
+  /** Instructions for the participant */
+  instructions: string;
+  /** Require photo evidence */
+  requirePhoto?: boolean;
+  /** Allow partial confirmation */
+  allowPartial?: boolean;
+  /** Timeout before auto-fail (seconds) */
+  timeoutSeconds?: number;
+}
+
+export type PropConfirmationStatus = 'pending' | 'waiting' | 'confirmed' | 'rejected' | 'timeout';
+
+export interface PropConfirmationState {
+  status: PropConfirmationStatus;
+  requestedAt?: string;
+  confirmedAt?: string;
+  confirmedBy?: string;
+  photoUrl?: string;
+  notes?: string;
+}
+
+// ============================================================================
+// Location Check Module (#23)
+// ============================================================================
+
+export interface GeoCoordinate {
+  latitude: number;
+  longitude: number;
+}
+
+export type LocationCheckType = 'gps' | 'beacon' | 'qr' | 'manual';
+
+export interface LocationCheckConfig {
+  /** Unique ID for this location check */
+  locationId: string;
+  /** Location name */
+  locationName: string;
+  /** Check type */
+  checkType: LocationCheckType;
+  /** Target coordinates (for GPS) */
+  targetCoordinates?: GeoCoordinate;
+  /** Radius in meters for GPS match */
+  radiusMeters?: number;
+  /** Beacon ID (for beacon check) */
+  beaconId?: string;
+  /** QR code value (for QR check) */
+  qrCodeValue?: string;
+  /** Description/hint for finding the location */
+  hint?: string;
+  /** Show distance to target */
+  showDistance?: boolean;
+  /** Show compass direction */
+  showCompass?: boolean;
+}
+
+export interface LocationCheckState {
+  isVerified: boolean;
+  currentCoordinates?: GeoCoordinate;
+  distanceMeters?: number;
+  lastCheckAt?: string;
+  verifiedAt?: string;
+}
+
+/**
+ * Calculate distance between two coordinates (Haversine formula)
+ */
+export function calculateDistance(
+  from: GeoCoordinate,
+  to: GeoCoordinate
+): number {
+  const R = 6371000; // Earth's radius in meters
+  const φ1 = (from.latitude * Math.PI) / 180;
+  const φ2 = (to.latitude * Math.PI) / 180;
+  const Δφ = ((to.latitude - from.latitude) * Math.PI) / 180;
+  const Δλ = ((to.longitude - from.longitude) * Math.PI) / 180;
+
+  const a =
+    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return R * c;
+}
+
+/**
+ * Check if location is within radius
+ */
+export function isWithinRadius(
+  current: GeoCoordinate,
+  target: GeoCoordinate,
+  radiusMeters: number
+): boolean {
+  return calculateDistance(current, target) <= radiusMeters;
+}
+
+/**
+ * Calculate bearing from one coordinate to another
+ */
+export function calculateBearing(
+  from: GeoCoordinate,
+  to: GeoCoordinate
+): number {
+  const φ1 = (from.latitude * Math.PI) / 180;
+  const φ2 = (to.latitude * Math.PI) / 180;
+  const Δλ = ((to.longitude - from.longitude) * Math.PI) / 180;
+
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x =
+    Math.cos(φ1) * Math.sin(φ2) -
+    Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  const θ = Math.atan2(y, x);
+
+  return ((θ * 180) / Math.PI + 360) % 360; // Bearing in degrees
+}
+
+/**
+ * Get compass direction from bearing
+ */
+export function bearingToDirection(bearing: number): string {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(bearing / 45) % 8;
+  return directions[index];
+}
+

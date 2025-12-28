@@ -65,6 +65,10 @@ export { HotspotImage, useHotspotGame } from './HotspotImage';
 export { TilePuzzle, useTilePuzzle } from './TilePuzzle';
 export { CipherDecoder, useCipherDecoder } from './CipherDecoder';
 
+// Puzzle modules (Fas 4)
+export { PropRequest, PropConfirmControl, usePropConfirmation } from './PropConfirmation';
+export { LocationCheck, LocationConfirmControl, useLocationCheck } from './LocationCheck';
+
 // Hooks
 export { useTypewriter } from './hooks/useTypewriter';
 export { useCountdown } from './hooks/useCountdown';

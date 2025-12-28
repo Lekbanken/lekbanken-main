@@ -148,6 +148,27 @@ export interface CipherDecodedCondition {
   cipherId: string;
 }
 
+/** Prop confirmed condition */
+export interface PropConfirmedCondition {
+  type: 'prop_confirmed';
+  /** Prop confirmation artifact ID */
+  propId: string;
+}
+
+/** Prop rejected condition */
+export interface PropRejectedCondition {
+  type: 'prop_rejected';
+  /** Prop confirmation artifact ID */
+  propId: string;
+}
+
+/** Location verified condition */
+export interface LocationVerifiedCondition {
+  type: 'location_verified';
+  /** Location check artifact ID */
+  locationId: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -170,7 +191,10 @@ export type TriggerCondition =
   | HotspotFoundCondition
   | HotspotHuntCompleteCondition
   | TilePuzzleCompleteCondition
-  | CipherDecodedCondition;
+  | CipherDecodedCondition
+  | PropConfirmedCondition
+  | PropRejectedCondition
+  | LocationVerifiedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -314,6 +338,18 @@ export interface ResetCipherAction {
   cipherId: string;
 }
 
+/** Reset prop confirmation state */
+export interface ResetPropAction {
+  type: 'reset_prop';
+  propId: string;
+}
+
+/** Reset location check state */
+export interface ResetLocationAction {
+  type: 'reset_location';
+  locationId: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -336,7 +372,9 @@ export type TriggerAction =
   | ResetScanGateAction
   | ResetHotspotHuntAction
   | ResetTilePuzzleAction
-  | ResetCipherAction;
+  | ResetCipherAction
+  | ResetPropAction
+  | ResetLocationAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];

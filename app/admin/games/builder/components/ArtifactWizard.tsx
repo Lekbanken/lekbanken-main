@@ -36,7 +36,9 @@ type ArtifactWizardProps = {
 // =============================================================================
 
 const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
+  // =============================================================================
   // Escape Room
+  // =============================================================================
   {
     id: 'keypad-basic',
     name: 'Keypad (4 siffror)',
@@ -75,10 +77,161 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
     },
   },
   {
+    id: 'riddle-puzzle',
+    name: 'Gåta / Fråga',
+    description: 'En gåta med textinmatning för svar',
+    icon: '❓',
+    category: 'escape_room',
+    artifact: {
+      title: 'Gåtan',
+      artifact_type: 'riddle',
+      metadata: {
+        prompt: 'Vad har fyra ben men kan inte gå?',
+        correctAnswers: ['bord', 'ett bord', 'table'],
+        normalizeMode: 'fuzzy',
+        maxAttempts: null,
+      },
+    },
+  },
+  {
+    id: 'cipher-caesar',
+    name: 'Caesar-chiffer',
+    description: 'Krypterat meddelande med bokstavsförskjutning',
+    icon: '🔤',
+    category: 'escape_room',
+    artifact: {
+      title: 'Krypterat meddelande',
+      artifact_type: 'cipher',
+      metadata: {
+        cipherMethod: 'caesar',
+        cipherKey: '3',
+        plaintext: 'hemligheten finns under trappan',
+      },
+    },
+  },
+  {
+    id: 'hotspot-image',
+    name: 'Klickbar bild',
+    description: 'Bild med dolda zoner att hitta',
+    icon: '🎯',
+    category: 'escape_room',
+    artifact: {
+      title: 'Sök i bilden',
+      artifact_type: 'hotspot',
+      metadata: {
+        imageUrl: '',
+        zones: [],
+        showFeedback: true,
+        requiredHits: null,
+      },
+    },
+  },
+  {
+    id: 'tile-puzzle',
+    name: 'Pusselspel (3x3)',
+    description: 'Sliding tile puzzle för att avslöja en bild',
+    icon: '🧩',
+    category: 'escape_room',
+    artifact: {
+      title: 'Pusslet',
+      artifact_type: 'tile_puzzle',
+      metadata: {
+        imageUrl: '',
+        gridSize: 3,
+        showPreview: false,
+      },
+    },
+  },
+  {
+    id: 'logic-grid',
+    name: 'Logikrutnät',
+    description: 'Logikpussel där saker ska matchas',
+    icon: '🧠',
+    category: 'escape_room',
+    artifact: {
+      title: 'Vem gjorde vad?',
+      artifact_type: 'logic_grid',
+      metadata: {
+        rows: ['Alice', 'Bob', 'Charlie'],
+        columns: ['Röd', 'Grön', 'Blå'],
+        solution: { Alice: 'Röd', Bob: 'Grön', Charlie: 'Blå' },
+      },
+    },
+  },
+  {
+    id: 'counter-clues',
+    name: 'Ledtrådsräknare',
+    description: 'Räkna hittade ledtrådar eller framsteg',
+    icon: '🔢',
+    category: 'escape_room',
+    artifact: {
+      title: 'Hittade ledtrådar',
+      artifact_type: 'counter',
+      metadata: {
+        initialValue: 0,
+        target: 5,
+        step: 1,
+        label: 'Ledtrådar',
+      },
+    },
+  },
+  {
+    id: 'hint-container',
+    name: 'Tips-behållare',
+    description: 'Progressiva tips som kan avslöjas',
+    icon: '💡',
+    category: 'escape_room',
+    artifact: {
+      title: 'Tips',
+      artifact_type: 'hint_container',
+      metadata: {
+        hints: [
+          'Titta under mattan',
+          'Det finns en nyckel gömd',
+          'Nyckeln passar i skåpet till höger',
+        ],
+        maxHints: null,
+        penaltyPerHint: 0,
+      },
+    },
+  },
+  {
+    id: 'qr-gate',
+    name: 'QR-kod checkpoint',
+    description: 'Skanna QR-kod för att fortsätta',
+    icon: '📱',
+    category: 'escape_room',
+    artifact: {
+      title: 'Skanna koden',
+      artifact_type: 'qr_gate',
+      metadata: {
+        expectedValue: 'SECRET123',
+        successMessage: '✅ Rätt kod! Fortsätt till nästa ledtråd.',
+      },
+    },
+  },
+  {
+    id: 'location-checkpoint',
+    name: 'Plats-checkpoint',
+    description: 'GPS-verifiering för stadsspel',
+    icon: '📍',
+    category: 'escape_room',
+    artifact: {
+      title: 'Hitta platsen',
+      artifact_type: 'location_check',
+      metadata: {
+        latitude: 59.3293,
+        longitude: 18.0686,
+        radius: 50,
+        locationName: 'Stortorget',
+      },
+    },
+  },
+  {
     id: 'clue-card',
     name: 'Ledtråd/Hint',
     description: 'Ett kort med en ledtråd som kan avslöjas',
-    icon: '💡',
+    icon: '🃏',
     category: 'escape_room',
     artifact: {
       title: 'Ledtråd',
@@ -112,7 +265,9 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
     },
   },
 
+  // =============================================================================
   // Party Game
+  // =============================================================================
   {
     id: 'reveal-card',
     name: 'Avslöjande kort',
@@ -151,13 +306,62 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
       ],
     },
   },
+  {
+    id: 'audio-clue',
+    name: 'Ljudledtråd',
+    description: 'Ljudklipp som spelas upp för deltagarna',
+    icon: '🔊',
+    category: 'party',
+    artifact: {
+      title: 'Lyssna noga',
+      artifact_type: 'audio',
+      metadata: {
+        audioUrl: '',
+        autoplay: false,
+        requireAck: true,
+      },
+    },
+  },
+  {
+    id: 'sound-trigger',
+    name: 'Ljudaktivering',
+    description: 'Aktiveras när deltagarna gör ljud',
+    icon: '🎤',
+    category: 'party',
+    artifact: {
+      title: 'Ropa högt!',
+      artifact_type: 'sound_level',
+      metadata: {
+        threshold: 70,
+        holdDuration: 2,
+        instruction: 'Ropa högt för att öppna dörren!',
+      },
+    },
+  },
+  {
+    id: 'prop-check',
+    name: 'Rekvisita-check',
+    description: 'Spelledaren bekräftar att deltagare har rätt sak',
+    icon: '📦',
+    category: 'party',
+    artifact: {
+      title: 'Visa upp föremålet',
+      artifact_type: 'prop_confirmation',
+      metadata: {
+        propName: 'Guldnyckeln',
+        instruction: 'Visa upp guldnyckeln för spelledaren för att fortsätta.',
+      },
+    },
+  },
 
+  // =============================================================================
   // Educational
+  // =============================================================================
   {
     id: 'quiz-answer',
     name: 'Quizsvar',
     description: 'Keypad för quiz-frågor med siffersvar',
-    icon: '❓',
+    icon: '🔢',
     category: 'educational',
     artifact: {
       title: 'Fråga',
@@ -168,6 +372,38 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
         codeLength: 2,
         successMessage: '✅ Rätt svar!',
         failMessage: '❌ Fel svar. Försök igen!',
+      },
+    },
+  },
+  {
+    id: 'text-question',
+    name: 'Textfråga',
+    description: 'Öppen fråga med textsvar',
+    icon: '❓',
+    category: 'educational',
+    artifact: {
+      title: 'Svara på frågan',
+      artifact_type: 'riddle',
+      metadata: {
+        prompt: 'Vad är huvudstaden i Sverige?',
+        correctAnswers: ['stockholm', 'Stockholm'],
+        normalizeMode: 'fuzzy',
+        maxAttempts: 3,
+      },
+    },
+  },
+  {
+    id: 'checklist',
+    name: 'Checklista',
+    description: 'Flera saker att bocka av',
+    icon: '✅',
+    category: 'educational',
+    artifact: {
+      title: 'Checklista',
+      artifact_type: 'multi_answer',
+      metadata: {
+        items: ['Uppgift 1', 'Uppgift 2', 'Uppgift 3'],
+        requiredCount: null,
       },
     },
   },
@@ -183,7 +419,9 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
     },
   },
 
+  // =============================================================================
   // General
+  // =============================================================================
   {
     id: 'image-reveal',
     name: 'Bild att avslöja',
@@ -193,6 +431,21 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
     artifact: {
       title: 'Bild',
       artifact_type: 'image',
+    },
+  },
+  {
+    id: 'replay-marker',
+    name: 'Replay-markör',
+    description: 'Låt deltagare markera viktiga ögonblick',
+    icon: '⏱️',
+    category: 'general',
+    artifact: {
+      title: 'Markera ögonblick',
+      artifact_type: 'replay_marker',
+      metadata: {
+        maxMarkers: null,
+        allowLabels: true,
+      },
     },
   },
   {

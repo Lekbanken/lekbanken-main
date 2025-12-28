@@ -14,6 +14,35 @@ export type AssignmentStrategy = 'random' | 'leader_picks' | 'player_picks';
 export type BoardTheme = 'mystery' | 'party' | 'sport' | 'nature' | 'neutral';
 export type BoardLayout = 'standard' | 'fullscreen';  // 'compact' removed for MVP
 
+/**
+ * All supported artifact types for the game builder.
+ * These correspond to puzzle modules in components/play/.
+ */
+export type ArtifactType =
+  // Basic content
+  | 'card'
+  | 'document'
+  | 'image'
+  // Code & Input puzzles
+  | 'keypad'
+  | 'riddle'
+  | 'multi_answer'
+  // Media & Interaction
+  | 'audio'
+  | 'hotspot'
+  | 'tile_puzzle'
+  // Cryptography & Logic
+  | 'cipher'
+  | 'logic_grid'
+  // Special mechanics
+  | 'counter'
+  | 'qr_gate'
+  | 'hint_container'
+  | 'prop_confirmation'
+  | 'location_check'
+  | 'sound_level'
+  | 'replay_marker';
+
 // =============================================================================
 // Game Artifacts (author-time)
 // =============================================================================

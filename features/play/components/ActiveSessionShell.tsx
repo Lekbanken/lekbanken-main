@@ -187,7 +187,7 @@ export function ActiveSessionShell({
     <div
       className={cn(
         'fixed inset-0 z-[70] flex flex-col bg-background/95 backdrop-blur-sm',
-        'overscroll-contain',
+        'overscroll-contain overflow-hidden',
       )}
       role="dialog"
       aria-modal="true"
@@ -197,7 +197,7 @@ export function ActiveSessionShell({
       <div className="hidden lg:block absolute inset-0 bg-black/40" aria-hidden="true" />
 
       {/* Container: fullscreen on mobile; centered modal on desktop */}
-      <div className="relative flex h-full w-full flex-col lg:mx-auto lg:my-8 lg:max-w-5xl">
+      <div className="relative flex h-full w-full flex-col overflow-hidden lg:mx-auto lg:my-8 lg:max-h-[calc(100vh-4rem)] lg:max-w-5xl">
         <div
           className={cn(
             'flex items-center justify-between border-b border-border bg-background/90 px-3 py-3 backdrop-blur',

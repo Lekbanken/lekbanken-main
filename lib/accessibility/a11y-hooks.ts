@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useCallback, useMemo, useState } from 'react';
+import { useEffect, useCallback, useMemo, useRef, useState } from 'react';
 import {
   prefersReducedMotion,
   prefersHighContrast,
   announceToScreenReader,
   registerShortcut,
-  KEYBOARD_SHORTCUTS,
   createLiveRegion,
 } from './a11y-utils';
 
@@ -18,11 +17,11 @@ import {
  * Hook to detect reduced motion preference
  */
 export function useReducedMotion(): boolean {
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(() =>
+    typeof window !== 'undefined' ? prefersReducedMotion() : false
+  );
 
   useEffect(() => {
-    setReducedMotion(prefersReducedMotion());
-
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
 
@@ -41,11 +40,11 @@ export function useReducedMotion(): boolean {
  * Hook to detect high contrast preference
  */
 export function useHighContrast(): boolean {
-  const [highContrast, setHighContrast] = useState(false);
+  const [highContrast, setHighContrast] = useState(() =>
+    typeof window !== 'undefined' ? prefersHighContrast() : false
+  );
 
   useEffect(() => {
-    setHighContrast(prefersHighContrast());
-
     const mediaQuery = window.matchMedia('(prefers-contrast: more)');
     const handler = (e: MediaQueryListEvent) => setHighContrast(e.matches);
 
@@ -82,19 +81,22 @@ export function useAnnounce() {
  * Hook for managing a live region
  */
 export function useLiveRegion(priority: 'polite' | 'assertive' = 'polite') {
-  const [region, setRegion] = useState<ReturnType<typeof createLiveRegion> | null>(null);
+  const regionRef = useRef<ReturnType<typeof createLiveRegion> | null>(null);
 
   useEffect(() => {
     const liveRegion = createLiveRegion(priority);
-    setRegion(liveRegion);
-    return () => liveRegion.destroy();
+    regionRef.current = liveRegion;
+    return () => {
+      regionRef.current = null;
+      liveRegion.destroy();
+    };
   }, [priority]);
 
   const announce = useCallback(
     (message: string) => {
-      region?.announce(message);
+      regionRef.current?.announce(message);
     },
-    [region]
+    []
   );
 
   return announce;
@@ -104,7 +106,7 @@ export function useLiveRegion(priority: 'polite' | 'assertive' = 'polite') {
 // useKeyboardShortcuts Hook
 // =============================================================================
 
-type ShortcutKey = keyof typeof KEYBOARD_SHORTCUTS;
+type ShortcutKey = Parameters<typeof registerShortcut>[0];
 type ShortcutHandler = () => void;
 
 interface ShortcutOptions {

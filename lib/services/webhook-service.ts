@@ -1,4 +1,6 @@
 import { createHmac } from 'crypto';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '@/types/supabase';
 import type { 
   WebhookConfig, 
   WebhookEventType, 
@@ -172,7 +174,7 @@ export async function queueWebhook<T>(
  */
 export async function getTenantWebhookConfigs(
   tenantId: string,
-  supabase: ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>
+  supabase: SupabaseClient<Database>
 ): Promise<WebhookConfig[]> {
   // This would query a webhooks table - placeholder implementation
   const { data } = await supabase
@@ -204,7 +206,7 @@ export async function broadcastEvent<T>(
   event: WebhookEventType,
   data: T,
   tenantId: string,
-  supabase: ReturnType<typeof import('@/lib/supabase/server').createServiceRoleClient>
+  supabase: SupabaseClient<Database>
 ): Promise<{ delivered: number; failed: number; skipped: number }> {
   const configs = await getTenantWebhookConfigs(tenantId, supabase);
   

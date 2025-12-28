@@ -9,12 +9,11 @@ import {
   ArrowPathIcon,
   BoltIcon,
   CheckCircleIcon,
-  XCircleIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline';
 import type { TriggerFormData, GamePhase, GameStep, GameArtifact } from '@/types/games';
 import type { TriggerCondition, TriggerAction } from '@/types/trigger';
-import { getConditionLabel, getActionLabel } from '@/types/trigger';
+import { getActionLabel } from '@/types/trigger';
 
 // =============================================================================
 // Types

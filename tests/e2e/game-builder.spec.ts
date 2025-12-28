@@ -1,4 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator } from '@playwright/test';
+
+async function selectOptionByLabel(select: Locator, label: RegExp) {
+  const option = select.locator('option').filter({ hasText: label }).first();
+  const value = await option.getAttribute('value');
+  if (value) {
+    await select.selectOption(value);
+    return;
+  }
+
+  const labels = await select.locator('option').allTextContents();
+  const idx = labels.findIndex((t) => label.test(t));
+  if (idx >= 0) {
+    await select.selectOption({ index: idx });
+  }
+}
 
 /**
  * E2E Tests: Game Builder
@@ -85,7 +100,7 @@ test.describe('Game Builder', () => {
     // Select step type if available
     const stepType = page.getByLabel(/type/i);
     if (await stepType.isVisible()) {
-      await stepType.selectOption({ label: /narrative|text/i });
+      await selectOptionByLabel(stepType, /narrative|text/i);
     }
 
     // Add content
@@ -117,7 +132,7 @@ test.describe('Game Builder', () => {
     // Set condition
     const conditionType = page.getByLabel(/condition.*type|when/i);
     if (await conditionType.isVisible()) {
-      await conditionType.selectOption({ label: /time|timer/i });
+      await selectOptionByLabel(conditionType, /time|timer/i);
     }
 
     // Set time threshold
@@ -129,7 +144,7 @@ test.describe('Game Builder', () => {
     // Set action
     const actionType = page.getByLabel(/action.*type|then/i);
     if (await actionType.isVisible()) {
-      await actionType.selectOption({ label: /show.*clue|reveal/i });
+      await selectOptionByLabel(actionType, /show.*clue|reveal/i);
     }
 
     // Save trigger
@@ -154,7 +169,7 @@ test.describe('Game Builder', () => {
     
     const artifactType = page.getByLabel(/type/i);
     if (await artifactType.isVisible()) {
-      await artifactType.selectOption({ label: /document|text/i });
+      await selectOptionByLabel(artifactType, /document|text/i);
     }
 
     // Add content

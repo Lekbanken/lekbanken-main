@@ -6,10 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import {
   XMarkIcon,
   SparklesIcon,
-  DocumentTextIcon,
-  PhotoIcon,
   LockClosedIcon,
-  CubeIcon,
   PlusIcon,
 } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVisibility } from '@/types/games';
@@ -262,7 +259,7 @@ export function ArtifactWizard({
   isOpen,
   onClose,
   onComplete,
-  roles = [],
+  roles: _roles = [],
 }: ArtifactWizardProps) {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ArtifactTemplate | null>(null);

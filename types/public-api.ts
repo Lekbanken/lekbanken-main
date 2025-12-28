@@ -4,6 +4,8 @@
  * Types for the read-only public API and webhook system.
  */
 
+import type { TimelineEvent } from '@/types/analytics';
+
 // =============================================================================
 // Webhook Configuration
 // =============================================================================
@@ -167,7 +169,7 @@ export interface PublicSessionDetails extends Omit<PublicSessionSummary, 'curren
     display_name: string | null;
     joined_at: string;
   }[];
-  events?: import('@/types/analytics').TimelineEvent[];
+  events?: TimelineEvent[];
   current_phase_name?: string;
   time_bank_balance?: number;
   events_count?: number;

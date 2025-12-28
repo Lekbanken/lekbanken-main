@@ -7,7 +7,6 @@ import {
   ArchiveBoxIcon,
   PlusIcon,
   ClockIcon,
-  CheckCircleIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
 import { formatSnapshotVersion } from '@/types/game-snapshot';
@@ -64,7 +63,7 @@ export function SnapshotManager({
       } else {
         setSnapshots(data.snapshots ?? []);
       }
-    } catch (err) {
+    } catch {
       setError('Kunde inte hämta versioner');
     } finally {
       setLoading(false);
@@ -95,7 +94,7 @@ export function SnapshotManager({
         fetchSnapshots();
         onSnapshotCreated?.(data.snapshot);
       }
-    } catch (err) {
+    } catch {
       setError('Kunde inte skapa version');
     } finally {
       setCreating(false);

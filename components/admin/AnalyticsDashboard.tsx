@@ -13,13 +13,6 @@ import {
 } from '@heroicons/react/24/outline';
 import type { DashboardOverview, SessionSummary } from '@/types/analytics';
 
-function formatDuration(seconds: number | null): string {
-  if (seconds === null) return '-';
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}m ${secs}s`;
-}
-
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleString('sv-SE', {
     month: 'short',

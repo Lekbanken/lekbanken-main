@@ -37,6 +37,7 @@ test.describe('Participant Experience', () => {
 
     // Should see waiting room or game content
     const content = page.locator('[data-testid="lobby"], [data-testid="game-content"]');
+    await expect(content).toBeVisible();
     
     // Participant name should be visible if joined
     const nameInput = page.getByLabel(/name|display name/i);

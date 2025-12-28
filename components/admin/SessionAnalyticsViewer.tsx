@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Card, Button } from '@/components/ui';
 import {
   ArrowPathIcon,
@@ -103,7 +103,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'timebank'>('overview');
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -116,11 +116,11 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
     } finally {
       setLoading(false);
     }
-  };
+  }, [sessionId]);
 
   useEffect(() => {
     fetchAnalytics();
-  }, [sessionId]);
+  }, [fetchAnalytics]);
 
   if (loading) {
     return (

@@ -70,7 +70,7 @@ export function useTenantFeatures({ tenant }: UseTenantFeaturesProps): UseTenant
   const config = useMemo<TenantFeatureConfig>(() => {
     if (!tenant?.metadata) return {};
     return parseTenantFeatureConfig(tenant.metadata as Record<string, unknown>);
-  }, [tenant?.metadata]);
+  }, [tenant]);
 
   const enabledFeatures = useMemo(
     () => getEnabledFeatures(tier, config),

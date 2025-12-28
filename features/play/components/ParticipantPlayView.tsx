@@ -24,6 +24,9 @@ import { Input } from '@/components/ui/input';
 import { CountdownOverlay, TypewriterText } from '@/components/play';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
+import { ParticipantSignalMicroUI } from '@/features/play/components/ParticipantSignalMicroUI';
+import { ParticipantTimeBankDisplay } from '@/features/play/components/ParticipantTimeBankDisplay';
+import { isFeatureEnabled } from '@/lib/config/env';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import { RoleCard, type RoleCardData } from './RoleCard';
 import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
@@ -578,7 +581,10 @@ export function ParticipantPlayView({
             <p className={`text-xs font-bold uppercase tracking-widest ${themeAccent.label}`}>Spela</p>
             <h1 className="text-xl font-bold text-foreground sm:text-2xl">{gameTitle}</h1>
           </div>
-          <StatusIndicator status={status} connected={connected} />
+          <div className="flex flex-col items-end gap-1">
+            <StatusIndicator status={status} connected={connected} />
+            {isFeatureEnabled('timeBank') && <ParticipantTimeBankDisplay sessionId={sessionId} />}
+          </div>
         </div>
         
         {/* Player info row with artifact/decision buttons */}
@@ -627,6 +633,11 @@ export function ParticipantPlayView({
       
       {/* Board Message */}
       <BoardMessage message={boardState?.message} />
+
+      {/* 1-tap Signals */}
+      {!isEnded && participantToken && isFeatureEnabled('signals') && (
+        <ParticipantSignalMicroUI sessionId={sessionId} participantToken={participantToken} />
+      )}
 
       {/* Turn Indicator */}
       {isNextStarter && !isEnded && (

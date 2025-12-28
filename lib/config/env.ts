@@ -109,6 +109,10 @@ export const env = {
     ai: process.env.FEATURE_AI === 'true',
     aiSuggestions: process.env.FEATURE_AI_SUGGESTIONS === 'true',
     participantsDomain: process.env.FEATURE_PARTICIPANTS === 'true',
+    /** Signals primitives (lobby/play UIs, API). Default on in dev, off in prod until piloted. */
+    signals: process.env.FEATURE_SIGNALS === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Time Bank primitives. Default on in dev, off in prod until piloted. */
+    timeBank: process.env.FEATURE_TIME_BANK === 'true' || (process.env.NODE_ENV === 'development'),
   },
 } as const;
 

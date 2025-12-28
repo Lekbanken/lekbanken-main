@@ -319,3 +319,54 @@ export type SessionTrigger = GameTrigger & {
   fired_at: string | null;
   fired_count: number;
 };
+
+// =============================================================================
+// Game Decisions (Templates for Polls/Votes)
+// =============================================================================
+
+/** Decision type determines display and behavior */
+export type DecisionType = 'poll' | 'vote' | 'quiz' | 'rating' | 'ranking';
+
+/** Option for a decision */
+export type DecisionOption = {
+  key: string;
+  label: string;
+  description?: string;
+  media_ref?: string;
+  correct?: boolean; // for quiz type
+  order: number;
+};
+
+/** Decision template stored in game definition (JSONB in game_data or dedicated table) */
+export type GameDecision = {
+  id: string;
+  title: string;
+  prompt: string;
+  decision_type: DecisionType;
+  options: DecisionOption[];
+  allow_anonymous: boolean;
+  allow_multiple: boolean;
+  max_choices: number;
+  auto_close_seconds: number | null;
+  reveal_on_close: boolean;
+  step_index: number | null; // when to show (optional)
+  phase_index: number | null;
+  sort_order: number;
+  metadata?: Record<string, unknown> | null;
+};
+
+/** Form data for creating/editing decisions */
+export type DecisionFormData = {
+  id?: string;
+  title: string;
+  prompt: string;
+  decision_type: DecisionType;
+  options: DecisionOption[];
+  allow_anonymous: boolean;
+  allow_multiple: boolean;
+  max_choices: number;
+  auto_close_seconds: number | null;
+  reveal_on_close: boolean;
+  step_index: number | null;
+  phase_index: number | null;
+};

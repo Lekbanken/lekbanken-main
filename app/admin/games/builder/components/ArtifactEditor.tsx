@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Card, Button, Input, Textarea, Select } from '@/components/ui';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon, EyeIcon } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
 import type { RoleData } from './RoleEditor';
+import { ArtifactWizard } from './ArtifactWizard';
 
 type ArtifactEditorProps = {
   artifacts: ArtifactFormData[];
@@ -59,10 +60,18 @@ function createArtifact(): ArtifactFormData {
 }
 
 export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChange }: ArtifactEditorProps) {
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [previewArtifact, setPreviewArtifact] = useState<ArtifactFormData | null>(null);
+
   const roleOptions = useMemo(
     () => roles.map((r) => ({ value: r.id, label: r.name || 'Roll' })),
     [roles]
   );
+
+  const handleWizardComplete = (artifact: ArtifactFormData) => {
+    onChange([...artifacts, artifact]);
+    setWizardOpen(false);
+  };
 
   const updateArtifact = (index: number, next: Partial<ArtifactFormData>) => {
     const draft = [...artifacts];
@@ -113,15 +122,53 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
 
   return (
     <div className="space-y-4">
+      {/* Artifact Wizard */}
+      <ArtifactWizard
+        isOpen={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onComplete={handleWizardComplete}
+        roles={roles.map((r) => ({ id: r.id, name: r.name }))}
+      />
+
+      {/* Header with buttons */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Artefakter ({artifacts.length})</h3>
+          <p className="text-sm text-muted-foreground">Ledtrådar, keypads, dokument och media</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
+            <SparklesIcon className="h-4 w-4 mr-1" />
+            Wizard
+          </Button>
+          <Button size="sm" onClick={() => onChange([...artifacts, createArtifact()])}>
+            <PlusIcon className="h-4 w-4 mr-1" />
+            Lägg till
+          </Button>
+        </div>
+      </div>
+
+      {artifacts.length === 0 && (
+        <Card className="p-6 text-center text-muted-foreground">
+          <p className="text-sm">Inga artefakter ännu.</p>
+          <p className="text-xs mt-1">Använd Wizard för att snabbt skapa artefakter, eller lägg till manuellt.</p>
+        </Card>
+      )}
+
       {artifacts.map((artifact, idx) => (
         <Card key={artifact.id} className="p-4 space-y-4 border-border/70">
           <div className="flex items-center justify-between gap-3">
-            <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Artefakt</p>
+            <div className="flex items-center gap-3">
+              <span className="text-xl">
+                {artifact.artifact_type === 'keypad' ? '🔐' :
+                 artifact.artifact_type === 'document' ? '📄' :
+                 artifact.artifact_type === 'image' ? '🖼️' : '📇'}
+              </span>
               <Input
                 value={artifact.title}
                 onChange={(e) => updateArtifact(idx, { title: e.target.value })}
                 placeholder="Titel"
+                className="font-medium"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -465,11 +512,6 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
         </Card>
       ))}
 
-      <div className="flex justify-start">
-        <Button type="button" onClick={() => onChange([...artifacts, createArtifact()])}>
-          <PlusIcon className="h-4 w-4 mr-1.5" /> Lägg till artefakt
-        </Button>
-      </div>
     </div>
   );
 }

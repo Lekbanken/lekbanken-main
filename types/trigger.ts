@@ -67,6 +67,13 @@ export interface ManualCondition {
   type: 'manual';
 }
 
+/** Signal condition (append-only signal feed) */
+export interface SignalReceivedCondition {
+  type: 'signal_received';
+  /** Optional channel filter; if omitted, any channel matches */
+  channel?: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -78,7 +85,8 @@ export type TriggerCondition =
   | ArtifactUnlockedCondition
   | KeypadCorrectCondition
   | KeypadFailedCondition
-  | ManualCondition;
+  | ManualCondition
+  | SignalReceivedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -154,6 +162,22 @@ export interface ResetKeypadAction {
   keypadId: string;
 }
 
+/** Send a signal into the session signal feed */
+export interface SendSignalAction {
+  type: 'send_signal';
+  channel: string;
+  message: string;
+}
+
+/** Apply a delta to the session time bank */
+export interface TimeBankApplyDeltaAction {
+  type: 'time_bank_apply_delta';
+  deltaSeconds: number;
+  reason: string;
+  minBalanceSeconds?: number;
+  maxBalanceSeconds?: number;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -166,7 +190,9 @@ export type TriggerAction =
   | SendMessageAction
   | PlaySoundAction
   | ShowCountdownAction
-  | ResetKeypadAction;
+  | ResetKeypadAction
+  | SendSignalAction
+  | TimeBankApplyDeltaAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];
@@ -267,6 +293,7 @@ export const CONDITION_OPTIONS: ConditionMeta[] = [
   { type: 'artifact_unlocked', label: 'Artifact unlocked', icon: '📦', description: 'When an artifact is revealed', requiresSelection: true },
   { type: 'keypad_correct', label: 'Keypad solved', icon: '🔐', description: 'When correct code entered', requiresSelection: true },
   { type: 'keypad_failed', label: 'Keypad failed', icon: '🚫', description: 'When max attempts reached', requiresSelection: true },
+  { type: 'signal_received', label: 'Signal received', icon: '📡', description: 'When a signal is emitted on a channel', requiresSelection: false },
   { type: 'manual', label: 'Manual trigger', icon: '🎯', description: 'Host presses a button', requiresSelection: false },
 ];
 
@@ -280,6 +307,8 @@ export const ACTION_OPTIONS: ActionMeta[] = [
   { type: 'advance_phase', label: 'Advance phase', icon: '🎭', description: 'Move to the next phase' },
   { type: 'start_timer', label: 'Start timer', icon: '⏱️', description: 'Begin a countdown timer' },
   { type: 'send_message', label: 'Send message', icon: '💬', description: 'Post to the wall/board' },
+  { type: 'send_signal', label: 'Send signal', icon: '📡', description: 'Emit a signal on a channel' },
+  { type: 'time_bank_apply_delta', label: 'Time bank delta', icon: '⏳', description: 'Add/remove seconds from the session time bank' },
   { type: 'play_sound', label: 'Play sound', icon: '🔊', description: 'Play an audio effect' },
   { type: 'show_countdown', label: 'Show countdown', icon: '⏳', description: 'Display countdown overlay' },
   { type: 'reset_keypad', label: 'Reset keypad', icon: '🔄', description: 'Reset keypad to locked state' },

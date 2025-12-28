@@ -153,26 +153,39 @@ export function HostPlayMode({
   }, [onExitPlayMode]);
 
   // Handle trigger fire
-  const handleTriggerFire = useCallback(async (triggerId: string) => {
+  const handleTriggerAction = useCallback(async (triggerId: string, action: 'fire' | 'disable' | 'arm') => {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ triggerId, action: 'fire' }),
+        body: JSON.stringify({ triggerId, action }),
       });
 
       if (res.ok) {
         // Update local state
-        setTriggers((prev) =>
-          prev.map((t) =>
-            t.id === triggerId
-              ? { ...t, status: 'fired' as const, fired_count: (t.fired_count || 0) + 1, fired_at: new Date().toISOString() }
-              : t
-          )
-        );
+        setTriggers((prev) => {
+          return prev.map((t) => {
+            if (t.id !== triggerId) return t;
+            if (action === 'fire') {
+              return {
+                ...t,
+                status: 'fired' as const,
+                fired_count: (t.fired_count || 0) + 1,
+                fired_at: new Date().toISOString(),
+              };
+            }
+            if (action === 'disable') {
+              return { ...t, status: 'disabled' as const };
+            }
+            if (action === 'arm') {
+              return { ...t, status: 'armed' as const };
+            }
+            return t;
+          });
+        });
       }
     } catch (err) {
-      console.error('[HostPlayMode] Failed to fire trigger:', err);
+      console.error('[HostPlayMode] Failed to update trigger:', err);
     }
   }, [sessionId]);
 
@@ -276,7 +289,7 @@ export function HostPlayMode({
           initialState={playData.runtimeState}
           triggers={triggers}
           onStateUpdate={handleStateUpdate}
-          onTriggerFire={handleTriggerFire}
+          onTriggerAction={handleTriggerAction}
           onEndSession={handleEndSession}
           participantCount={participantCount}
         />

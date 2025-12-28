@@ -43,11 +43,16 @@ import {
   UsersIcon,
   UserGroupIcon,
   Cog6ToothIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
+import { SignalIcon } from '@heroicons/react/24/solid';
 import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs';
 import type { SessionRole } from '@/types/play-runtime';
 import type { AdminOverrides, SessionRoleUpdate, StepInfo as GameStepInfo, PhaseInfo as GamePhaseInfo } from '@/features/play/api/session-api';
 import { getSessionOverrides, updateSessionOverrides, updateSessionRoles } from '@/features/play/api/session-api';
+import { TimeBankPanel } from '@/features/play/components/TimeBankPanel';
+import { SignalPanel } from '@/features/play/components/SignalPanel';
+import { isFeatureEnabled } from '@/lib/config/env';
 
 const POLL_INTERVAL = 3000;
 
@@ -584,6 +589,8 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   const lobbyTabs = [
     { id: 'participants', label: 'Deltagare', icon: <UsersIcon className="h-4 w-4" />, badge: participants.length },
     { id: 'roles', label: 'Roller', icon: <UserGroupIcon className="h-4 w-4" /> },
+    ...(isFeatureEnabled('signals') ? [{ id: 'signals', label: 'Signals', icon: <SignalIcon className="h-4 w-4" /> }] : []),
+    ...(isFeatureEnabled('timeBank') ? [{ id: 'timebank', label: 'Tidsbank', icon: <ClockIcon className="h-4 w-4" /> }] : []),
     { id: 'settings', label: 'Inställningar', icon: <Cog6ToothIcon className="h-4 w-4" /> },
   ];
 
@@ -801,6 +808,18 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           </Card>
         )}
       </TabPanel>
+
+      {isFeatureEnabled('signals') && (
+        <TabPanel id="signals" activeTab={lobbyTab} className="space-y-6">
+          <SignalPanel sessionId={sessionId} disabled={actionPending || session.status === 'ended'} />
+        </TabPanel>
+      )}
+
+      {isFeatureEnabled('timeBank') && (
+        <TabPanel id="timebank" activeTab={lobbyTab} className="space-y-6">
+          <TimeBankPanel sessionId={sessionId} disabled={actionPending || session.status === 'ended'} />
+        </TabPanel>
+      )}
 
       <TabPanel id="settings" activeTab={lobbyTab} className="space-y-6">
         <Card variant="elevated" className="p-6">

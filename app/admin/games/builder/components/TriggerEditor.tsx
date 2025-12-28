@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { Card, Button, Input, Select } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -9,10 +9,19 @@ import {
   PlusIcon,
   TrashIcon,
   BoltIcon,
+  SparklesIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
+  Squares2X2Icon,
+  PlayIcon,
 } from '@heroicons/react/24/outline';
 import type { TriggerFormData, GamePhase, GameStep, GameArtifact } from '@/types/games';
-import type { TriggerCondition, TriggerAction, TriggerConditionType, TriggerActionType } from '@/types/trigger';
+import type { TriggerCondition, TriggerAction, TriggerConditionType, TriggerActionType, TriggerConfig } from '@/types/trigger';
 import { CONDITION_OPTIONS, ACTION_OPTIONS, getConditionLabel, getActionLabel } from '@/types/trigger';
+import { TriggerWizard } from '@/components/play/TriggerWizard';
+import { downloadTriggersCSV, importTriggersFromFile } from '@/features/admin/games/utils/trigger-csv';
+import { TemplatePickerDialog } from './TemplatePickerDialog';
+import { TriggerSimulator } from './TriggerSimulator';
 
 type TriggerEditorProps = {
   triggers: TriggerFormData[];
@@ -85,7 +94,15 @@ function ConditionEditor({
     }
   };
 
-  const needsTarget = condition.type !== 'manual';
+  const needsTargetSelect =
+    condition.type === 'step_started' ||
+    condition.type === 'step_completed' ||
+    condition.type === 'phase_started' ||
+    condition.type === 'phase_completed' ||
+    condition.type === 'keypad_correct' ||
+    condition.type === 'keypad_failed' ||
+    condition.type === 'artifact_unlocked';
+
   const targetOptions = getTargetOptions(condition.type);
   const currentTargetId =
     'stepId' in condition ? condition.stepId :
@@ -98,6 +115,8 @@ function ConditionEditor({
     const newType = e.target.value as TriggerConditionType;
     if (newType === 'manual') {
       onChange({ type: 'manual' });
+    } else if (newType === 'signal_received') {
+      onChange({ type: 'signal_received', channel: '' });
     } else if (newType === 'step_started' || newType === 'step_completed') {
       onChange({ type: newType, stepId: '' });
     } else if (newType === 'phase_started' || newType === 'phase_completed') {
@@ -136,13 +155,22 @@ function ConditionEditor({
         onChange={handleConditionTypeChange}
         placeholder="Välj villkor..."
       />
-      {needsTarget && targetOptions.length > 0 && (
+      {needsTargetSelect && targetOptions.length > 0 && (
         <Select
           className="w-48"
           value={currentTargetId}
           options={targetOptions}
           onChange={handleTargetChange}
           placeholder="Välj mål..."
+        />
+      )}
+
+      {condition.type === 'signal_received' && (
+        <Input
+          className="w-48"
+          value={condition.channel ?? ''}
+          onChange={(e) => onChange({ ...condition, channel: e.target.value })}
+          placeholder="Kanal (t.ex. clue:found)"
         />
       )}
     </div>
@@ -188,6 +216,12 @@ function ActionEditor({
         break;
       case 'send_message':
         newAction = { type: 'send_message', message: '', style: 'normal' };
+        break;
+      case 'send_signal':
+        newAction = { type: 'send_signal', channel: '', message: '' };
+        break;
+      case 'time_bank_apply_delta':
+        newAction = { type: 'time_bank_apply_delta', deltaSeconds: 30, reason: 'trigger' };
         break;
       case 'advance_step':
         newAction = { type: 'advance_step' };
@@ -298,6 +332,47 @@ function ActionEditor({
               />
             </>
           )}
+
+          {action.type === 'send_signal' && (
+            <>
+              <Input
+                className="w-40"
+                value={action.channel}
+                onChange={(e) => updateAction(idx, { ...action, channel: e.target.value })}
+                placeholder="Kanal..."
+              />
+              <Input
+                className="flex-1 min-w-32"
+                value={action.message}
+                onChange={(e) => updateAction(idx, { ...action, message: e.target.value })}
+                placeholder="Meddelande..."
+              />
+            </>
+          )}
+
+          {action.type === 'time_bank_apply_delta' && (
+            <>
+              <Input
+                type="number"
+                className="w-24"
+                value={action.deltaSeconds}
+                onChange={(e) =>
+                  updateAction(idx, {
+                    ...action,
+                    deltaSeconds: Number.isFinite(parseInt(e.target.value)) ? parseInt(e.target.value) : 0,
+                  })
+                }
+                step={1}
+              />
+              <span className="text-xs text-foreground-secondary">sek</span>
+              <Input
+                className="w-40"
+                value={action.reason}
+                onChange={(e) => updateAction(idx, { ...action, reason: e.target.value })}
+                placeholder="Orsak..."
+              />
+            </>
+          )}
           
           {action.type === 'start_timer' && (
             <>
@@ -344,6 +419,47 @@ export function TriggerEditor({
   onChange,
 }: TriggerEditorProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [wizardOpen, setWizardOpen] = useState(false);
+  const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [simulatorOpen, setSimulatorOpen] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const keypads = useMemo(
+    () => artifacts.filter((a) => a.artifact_type === 'keypad'),
+    [artifacts]
+  );
+
+  const handleExport = useCallback(() => {
+    downloadTriggersCSV(triggers, 'triggers.csv');
+  }, [triggers]);
+
+  const handleImportClick = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
+
+  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setImportError(null);
+    try {
+      const result = await importTriggersFromFile(file);
+      if (result.errors.length > 0) {
+        setImportError(result.errors.join('; '));
+      }
+      if (result.triggers.length > 0) {
+        onChange([...triggers, ...result.triggers]);
+      }
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import misslyckades');
+    }
+    
+    // Reset input so same file can be imported again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [triggers, onChange]);
 
   const updateTrigger = (index: number, next: Partial<TriggerFormData>) => {
     const draft = [...triggers];
@@ -370,18 +486,126 @@ export function TriggerEditor({
     setExpandedId(newTrigger.id ?? null);
   };
 
+  const handleWizardComplete = useCallback((config: TriggerConfig) => {
+    const newTrigger: TriggerFormData = {
+      id: makeId(),
+      name: config.name,
+      description: '',
+      enabled: true,
+      condition: config.when,
+      actions: config.then,
+      execute_once: config.executeOnce ?? true,
+      delay_seconds: config.delaySeconds ?? 0,
+    };
+    onChange([...triggers, newTrigger]);
+    setWizardOpen(false);
+  }, [triggers, onChange]);
+
   return (
     <div className="space-y-4">
+      {/* Wizard Modal */}
+      {wizardOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-xl">
+            <TriggerWizard
+              onComplete={handleWizardComplete}
+              onCancel={() => setWizardOpen(false)}
+              steps={steps.map((s) => ({ id: s.id, name: s.title || `Steg ${s.step_order + 1}` }))}
+              phases={phases.map((p) => ({ id: p.id, name: p.name }))}
+              artifacts={artifacts.map((a) => ({ id: a.id, name: a.title }))}
+              keypads={keypads.map((k) => ({ id: k.id, name: k.title }))}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Template Picker Dialog */}
+      <TemplatePickerDialog
+        isOpen={templatePickerOpen}
+        onClose={() => setTemplatePickerOpen(false)}
+        onSelect={(newTriggers) => {
+          onChange([...triggers, ...newTriggers]);
+        }}
+      />
+
+      {/* Trigger Simulator */}
+      <TriggerSimulator
+        triggers={triggers}
+        phases={phases}
+        steps={steps}
+        artifacts={artifacts}
+        isOpen={simulatorOpen}
+        onClose={() => setSimulatorOpen(false)}
+      />
+
+      {/* Hidden file input for import */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".csv"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <BoltIcon className="h-5 w-5 text-yellow-500" />
           Triggers ({triggers.length})
         </h3>
-        <Button variant="outline" size="sm" onClick={addTrigger}>
-          <PlusIcon className="h-4 w-4 mr-1" />
-          Lägg till trigger
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setSimulatorOpen(true)}
+            disabled={triggers.length === 0}
+            title="Testa triggers i simulator"
+          >
+            <PlayIcon className="h-4 w-4 mr-1" />
+            Testa
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleExport}
+            disabled={triggers.length === 0}
+            title="Exportera triggers till CSV"
+          >
+            <ArrowDownTrayIcon className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleImportClick}
+            title="Importera triggers från CSV"
+          >
+            <ArrowUpTrayIcon className="h-4 w-4" />
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setTemplatePickerOpen(true)}
+            title="Välj från mallbibliotek"
+          >
+            <Squares2X2Icon className="h-4 w-4 mr-1" />
+            Mallar
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
+            <SparklesIcon className="h-4 w-4 mr-1" />
+            Wizard
+          </Button>
+          <Button variant="outline" size="sm" onClick={addTrigger}>
+            <PlusIcon className="h-4 w-4 mr-1" />
+            Lägg till trigger
+          </Button>
+        </div>
       </div>
+
+      {/* Import error message */}
+      {importError && (
+        <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
+          <strong>Importfel:</strong> {importError}
+        </div>
+      )}
 
       {triggers.length === 0 && (
         <Card className="p-6 text-center text-foreground-secondary">

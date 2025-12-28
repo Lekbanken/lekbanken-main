@@ -182,9 +182,37 @@ export interface PlayBroadcastEvent {
     | 'artifact_update'
     | 'decision_update'
     | 'outcome_update'
-    | 'countdown';
+    | 'countdown'
+    | 'signal_received'
+    | 'time_bank_changed';
   payload: unknown;
   timestamp: string;
+}
+
+export interface SignalReceivedBroadcast extends PlayBroadcastEvent {
+  type: 'signal_received';
+  payload: {
+    id: string;
+    channel: string;
+    payload: unknown;
+    sender_user_id: string | null;
+    sender_participant_id: string | null;
+    created_at: string;
+  };
+}
+
+export interface TimeBankChangedBroadcast extends PlayBroadcastEvent {
+  type: 'time_bank_changed';
+  payload: {
+    sessionId: string;
+    result: {
+      status: 'applied' | 'clamped';
+      previous_balance: number;
+      new_balance: number;
+      requested_delta: number;
+      applied_delta: number;
+    };
+  };
 }
 
 export interface StateChangeBroadcast extends PlayBroadcastEvent {

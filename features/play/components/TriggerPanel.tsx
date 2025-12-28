@@ -73,12 +73,12 @@ export function TriggerPanel({
   return (
     <Card className="p-4">
       {/* Header - always visible */}
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between text-left"
-      >
-        <div className="flex items-center gap-2">
+      <div className="flex w-full items-center justify-between">
+        <button
+          type="button"
+          onClick={() => setExpanded(!expanded)}
+          className="flex items-center gap-2 text-left"
+        >
           <BoltIcon className="h-5 w-5 text-yellow-500" />
           <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Triggers
@@ -91,7 +91,12 @@ export function TriggerPanel({
               {firedCount} avfyrade
             </Badge>
           )}
-        </div>
+          {expanded ? (
+            <ChevronUpIcon className="h-4 w-4 text-muted-foreground" />
+          ) : (
+            <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
+          )}
+        </button>
         <div className="flex items-center gap-2">
           {/* Quick-fire buttons for manual triggers (always visible) */}
           {!expanded && manualTriggers.length > 0 && (
@@ -101,10 +106,7 @@ export function TriggerPanel({
                   key={trigger.id}
                   variant="outline"
                   size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    void handleFireTrigger(trigger.id);
-                  }}
+                  onClick={() => void handleFireTrigger(trigger.id)}
                   disabled={disabled || firingId === trigger.id}
                   className="gap-1 px-2"
                   title={trigger.name}
@@ -120,13 +122,8 @@ export function TriggerPanel({
               )}
             </div>
           )}
-          {expanded ? (
-            <ChevronUpIcon className="h-4 w-4 text-muted-foreground" />
-          ) : (
-            <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
-          )}
         </div>
-      </button>
+      </div>
 
       {/* Expanded content */}
       {expanded && (

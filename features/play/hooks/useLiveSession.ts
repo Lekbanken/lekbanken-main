@@ -29,6 +29,8 @@ import type {
   DecisionBroadcast,
   OutcomeBroadcast,
   CountdownBroadcast,
+  SignalReceivedBroadcast,
+  TimeBankChangedBroadcast,
   SessionRuntimeState,
   TimerState,
   TimerDisplay,
@@ -62,6 +64,10 @@ export interface UseLiveSessionOptions {
   onOutcomeUpdate?: (payload: OutcomeBroadcast['payload']) => void;
   /** Called when countdown overlay should be shown */
   onCountdown?: (payload: CountdownBroadcast['payload']) => void;
+  /** Called when a signal is received */
+  onSignalReceived?: (payload: SignalReceivedBroadcast['payload']) => void;
+  /** Called when time bank changes */
+  onTimeBankChanged?: (payload: TimeBankChangedBroadcast['payload']) => void;
   /** Whether subscription is enabled */
   enabled?: boolean;
   /** Timer tick interval in ms (default: 1000) */
@@ -107,6 +113,8 @@ export function useLiveSession({
   onDecisionUpdate,
   onOutcomeUpdate,
   onCountdown,
+  onSignalReceived,
+  onTimeBankChanged,
   enabled = true,
   timerTickInterval = 1000,
 }: UseLiveSessionOptions): UseLiveSessionResult {
@@ -212,8 +220,32 @@ export function useLiveSession({
         onCountdown?.(payload);
         break;
       }
+
+      case 'signal_received': {
+        const payload = (event as SignalReceivedBroadcast).payload;
+        onSignalReceived?.(payload);
+        break;
+      }
+
+      case 'time_bank_changed': {
+        const payload = (event as TimeBankChangedBroadcast).payload;
+        onTimeBankChanged?.(payload);
+        break;
+      }
     }
-  }, [onStateChange, onTimerUpdate, onRoleUpdate, onBoardUpdate, onTurnUpdate, onArtifactUpdate, onDecisionUpdate, onOutcomeUpdate, onCountdown]);
+  }, [
+    onStateChange,
+    onTimerUpdate,
+    onRoleUpdate,
+    onBoardUpdate,
+    onTurnUpdate,
+    onArtifactUpdate,
+    onDecisionUpdate,
+    onOutcomeUpdate,
+    onCountdown,
+    onSignalReceived,
+    onTimeBankChanged,
+  ]);
   
   // Timer tick effect (recalculate display)
   useEffect(() => {

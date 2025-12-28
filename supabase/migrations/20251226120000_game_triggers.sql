@@ -109,6 +109,7 @@ ALTER TABLE public.game_triggers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.session_triggers ENABLE ROW LEVEL SECURITY;
 
 -- game_triggers: Same as game_artifacts (game owner can manage)
+DROP POLICY IF EXISTS "game_triggers_select" ON public.game_triggers;
 CREATE POLICY "game_triggers_select" ON public.game_triggers
   FOR SELECT USING (
     EXISTS (
@@ -120,6 +121,7 @@ CREATE POLICY "game_triggers_select" ON public.game_triggers
     )
   );
 
+DROP POLICY IF EXISTS "game_triggers_insert" ON public.game_triggers;
 CREATE POLICY "game_triggers_insert" ON public.game_triggers
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -133,6 +135,7 @@ CREATE POLICY "game_triggers_insert" ON public.game_triggers
     )
   );
 
+DROP POLICY IF EXISTS "game_triggers_update" ON public.game_triggers;
 CREATE POLICY "game_triggers_update" ON public.game_triggers
   FOR UPDATE USING (
     EXISTS (
@@ -146,6 +149,7 @@ CREATE POLICY "game_triggers_update" ON public.game_triggers
     )
   );
 
+DROP POLICY IF EXISTS "game_triggers_delete" ON public.game_triggers;
 CREATE POLICY "game_triggers_delete" ON public.game_triggers
   FOR DELETE USING (
     EXISTS (
@@ -160,6 +164,7 @@ CREATE POLICY "game_triggers_delete" ON public.game_triggers
   );
 
 -- session_triggers: Session owner or tenant member can manage
+DROP POLICY IF EXISTS "session_triggers_select" ON public.session_triggers;
 CREATE POLICY "session_triggers_select" ON public.session_triggers
   FOR SELECT USING (
     EXISTS (
@@ -174,6 +179,7 @@ CREATE POLICY "session_triggers_select" ON public.session_triggers
     )
   );
 
+DROP POLICY IF EXISTS "session_triggers_update" ON public.session_triggers;
 CREATE POLICY "session_triggers_update" ON public.session_triggers
   FOR UPDATE USING (
     EXISTS (

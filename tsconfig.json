@@ -35,5 +35,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "catalyst-ui-kit", "**/*.test.ts", "**/*.test.tsx"]
+  "exclude": ["node_modules", "catalyst-ui-kit", "**/*.test.ts", "**/*.test.tsx", "tests/e2e/**"]
 }

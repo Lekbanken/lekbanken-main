@@ -17,3 +17,5 @@ export type {
   UseTriggerEngineOptions,
   UseTriggerEngineReturn,
 } from './useTriggerEngine';
+
+export { withSignalAndTimeBank } from './withSignalAndTimeBank';

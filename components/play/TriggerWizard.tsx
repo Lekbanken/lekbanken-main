@@ -163,6 +163,7 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
       initialConfig?.when?.type ?? null
     );
     const [conditionTargetId, setConditionTargetId] = useState('');
+    const [conditionChannel, setConditionChannel] = useState('');
     const [actions, setActions] = useState<TriggerAction[]>(initialConfig?.then ?? []);
     const [executeOnce, setExecuteOnce] = useState(initialConfig?.executeOnce ?? true);
     const [delaySeconds, setDelaySeconds] = useState(initialConfig?.delaySeconds ?? 0);
@@ -190,10 +191,12 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
           return { type: conditionType, keypadId: conditionTargetId };
         case 'manual':
           return { type: 'manual' };
+        case 'signal_received':
+          return { type: 'signal_received', channel: conditionChannel };
         default:
           return null;
       }
-    }, [conditionType, conditionTargetId]);
+    }, [conditionType, conditionTargetId, conditionChannel]);
 
     // Build full config
     const buildConfig = useCallback((): TriggerConfig | null => {
@@ -234,6 +237,7 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
 
     // Check if condition needs target selection
     const conditionNeedsTarget = conditionType && conditionType !== 'manual';
+    const conditionNeedsChannel = conditionType === 'signal_received';
 
     // Navigation
     const goNext = () => {
@@ -282,6 +286,12 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
         case 'reset_keypad':
           newAction = { type: 'reset_keypad', keypadId: '' };
           break;
+        case 'send_signal':
+          newAction = { type: 'send_signal', channel: '', message: '' };
+          break;
+        case 'time_bank_apply_delta':
+          newAction = { type: 'time_bank_apply_delta', deltaSeconds: 30, reason: 'trigger' };
+          break;
         case 'advance_step':
           newAction = { type: 'advance_step' };
           break;
@@ -320,7 +330,11 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
         case 'name':
           return name.trim().length > 0;
         case 'condition':
-          return conditionType && (!conditionNeedsTarget || conditionTargetId);
+          return (
+            !!conditionType &&
+            (!conditionNeedsTarget || conditionTargetId) &&
+            (!conditionNeedsChannel || conditionChannel.trim().length > 0)
+          );
         case 'actions':
           return actions.length > 0;
         case 'options':
@@ -376,6 +390,7 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
                     onClick={() => {
                       setConditionType(option.type);
                       setConditionTargetId('');
+                      setConditionChannel('');
                     }}
                   />
                 ))}
@@ -405,6 +420,19 @@ export const TriggerWizard = forwardRef<HTMLDivElement, TriggerWizardProps>(
                       placeholder="Enter ID..."
                     />
                   )}
+                </div>
+              )}
+
+              {conditionNeedsChannel && (
+                <div className="mt-4 p-4 bg-surface-secondary rounded-lg">
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    Channel:
+                  </label>
+                  <Input
+                    value={conditionChannel}
+                    onChange={(e) => setConditionChannel(e.target.value)}
+                    placeholder="e.g., clue:found"
+                  />
                 </div>
               )}
             </div>

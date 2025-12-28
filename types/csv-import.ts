@@ -193,7 +193,8 @@ export type ParsedTriggerCondition =
   | { type: 'keypad_correct'; keypadId?: string; artifactOrder?: number }
   | { type: 'keypad_failed'; keypadId?: string; artifactOrder?: number }
   | { type: 'timer_ended'; timerId: string }
-  | { type: 'decision_resolved'; decisionId: string; outcome?: string };
+  | { type: 'decision_resolved'; decisionId: string; outcome?: string }
+  | { type: 'signal_received'; channel?: string };
 
 /**
  * Action types for triggers.
@@ -208,6 +209,8 @@ export type ParsedTriggerAction =
   | { type: 'advance_phase' }
   | { type: 'start_timer'; duration: number; name: string }
   | { type: 'send_message'; message: string; style?: 'normal' | 'dramatic' | 'typewriter' }
+  | { type: 'send_signal'; channel: string; message: string }
+  | { type: 'time_bank_apply_delta'; deltaSeconds: number; reason: string; minBalanceSeconds?: number; maxBalanceSeconds?: number }
   | { type: 'play_sound'; soundId: string }
   | { type: 'show_countdown'; duration: number; message: string }
   | { type: 'reset_keypad'; keypadId: string };

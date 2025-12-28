@@ -19,6 +19,7 @@ export type TriggerEvent =
   | { type: 'artifact_unlocked'; artifactId: string }
   | { type: 'timer_ended'; timerId: string }
   | { type: 'decision_resolved'; decisionId: string; outcome?: string }
+  | { type: 'signal_received'; channel: string; payload?: unknown; sender_user_id?: string; sender_participant_id?: string }
   | { type: 'manual'; triggerId: string };
 
 export interface TriggerActionContext {
@@ -37,6 +38,20 @@ export interface TriggerActionContext {
   startTimer?: (duration: number, name: string) => Promise<void>;
   /** Send message to board */
   sendBoardMessage?: (message: string, style: 'normal' | 'dramatic' | 'typewriter') => Promise<void>;
+
+  /** Emit a signal on a channel */
+  sendSignal?: (channel: string, payload: unknown) => Promise<void>;
+
+  /** Apply a delta to the session time bank */
+  applyTimeBankDelta?: (
+    deltaSeconds: number,
+    reason: string,
+    options?: {
+      minBalanceSeconds?: number;
+      maxBalanceSeconds?: number;
+      metadata?: Record<string, unknown> | null;
+    }
+  ) => Promise<void>;
 }
 
 export interface UseTriggerEngineOptions {
@@ -102,6 +117,13 @@ function conditionMatches(condition: TriggerCondition, event: TriggerEvent): boo
       // Manual triggers are only fired explicitly, not by events
       return false;
 
+    case 'signal_received':
+      if (!('channel' in event)) return false;
+      if ('channel' in condition && condition.channel && condition.channel.trim().length > 0) {
+        return condition.channel === event.channel;
+      }
+      return true;
+
     default:
       return false;
   }
@@ -153,6 +175,26 @@ async function executeAction(
     case 'send_message':
       if (context.sendBoardMessage) {
         await context.sendBoardMessage(action.message, action.style);
+      }
+      break;
+
+    case 'send_signal':
+      if (context.sendSignal) {
+        await context.sendSignal(action.channel, { message: action.message });
+      } else {
+        console.log(`[TriggerEngine] send_signal not yet implemented`, action);
+      }
+      break;
+
+    case 'time_bank_apply_delta':
+      if (context.applyTimeBankDelta) {
+        await context.applyTimeBankDelta(action.deltaSeconds, action.reason, {
+          minBalanceSeconds: action.minBalanceSeconds,
+          maxBalanceSeconds: action.maxBalanceSeconds,
+          metadata: null,
+        });
+      } else {
+        console.log(`[TriggerEngine] time_bank_apply_delta not yet implemented`, action);
       }
       break;
 

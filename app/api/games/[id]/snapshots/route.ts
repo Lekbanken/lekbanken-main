@@ -1,0 +1,135 @@
+/**
+ * Game Snapshots API
+ *
+ * POST - Create a new snapshot for a game
+ * GET  - List snapshots for a game
+ */
+
+import { NextRequest, NextResponse } from 'next/server';
+import { createServiceRoleClient, createServerRlsClient } from '@/lib/supabase/server';
+
+// =============================================================================
+// GET /api/games/[id]/snapshots - List snapshots
+// =============================================================================
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: gameId } = await params;
+    const supabase = createServiceRoleClient();
+
+    // Use raw query since types may not exist yet
+    const { data: snapshots, error } = await supabase
+      .from('game_snapshots' as 'games') // Type hack until types are regenerated
+      .select(`
+        id,
+        game_id,
+        version,
+        version_label,
+        includes_steps,
+        includes_phases,
+        includes_roles,
+        includes_artifacts,
+        includes_triggers,
+        includes_board_config,
+        checksum,
+        created_by,
+        created_at
+      `)
+      .eq('game_id', gameId)
+      .order('version', { ascending: false });
+
+    if (error) {
+      // Table might not exist yet
+      if (error.code === '42P01') {
+        return NextResponse.json({ snapshots: [], message: 'Snapshot table not yet created' });
+      }
+      console.error('[snapshots] List error:', error);
+      return NextResponse.json(
+        { error: 'Failed to list snapshots', details: error.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ snapshots: snapshots ?? [] });
+  } catch (err) {
+    console.error('[snapshots] Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+// =============================================================================
+// POST /api/games/[id]/snapshots - Create snapshot
+// =============================================================================
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id: gameId } = await params;
+    const rlsClient = await createServerRlsClient();
+    const supabase = createServiceRoleClient();
+
+    // Get current user
+    const {
+      data: { user },
+    } = await rlsClient.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Parse body
+    const body = await request.json().catch(() => ({}));
+    const versionLabel = body.versionLabel as string | undefined;
+
+    // Try to create snapshot via RPC (may not exist yet)
+    const { data: snapshotId, error } = await supabase.rpc(
+      'create_game_snapshot' as 'snapshot_game_roles_to_session', // Type hack
+      {
+        p_game_id: gameId,
+        p_version_label: versionLabel ?? null,
+        p_created_by: user.id,
+      } as unknown as { p_session_id: string; p_game_id: string; p_locale?: string }
+    );
+
+    if (error) {
+      // RPC might not exist yet
+      if (error.code === '42883') {
+        return NextResponse.json(
+          { error: 'Snapshot system not yet deployed. Run migrations first.' },
+          { status: 501 }
+        );
+      }
+      console.error('[snapshots] Create error:', error);
+      return NextResponse.json(
+        { error: 'Failed to create snapshot', details: error.message },
+        { status: 500 }
+      );
+    }
+
+    // Fetch the created snapshot
+    const { data: snapshot } = await supabase
+      .from('game_snapshots' as 'games')
+      .select('id, version, version_label, created_at')
+      .eq('id', snapshotId as unknown as string)
+      .single();
+
+    return NextResponse.json({
+      success: true,
+      snapshot: snapshot ?? { id: snapshotId },
+    });
+  } catch (err) {
+    console.error('[snapshots] Unexpected error:', err);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}

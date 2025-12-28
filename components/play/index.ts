@@ -69,6 +69,11 @@ export { CipherDecoder, useCipherDecoder } from './CipherDecoder';
 export { PropRequest, PropConfirmControl, usePropConfirmation } from './PropConfirmation';
 export { LocationCheck, LocationConfirmControl, useLocationCheck } from './LocationCheck';
 
+// Puzzle modules (Fas 5)
+export { LogicGrid, useLogicGrid } from './LogicGrid';
+export { SoundLevelMeter, useSoundLevel } from './SoundLevelMeter';
+export { ReplayTimeline, useReplayMarkers } from './ReplayMarker';
+
 // Hooks
 export { useTypewriter } from './hooks/useTypewriter';
 export { useCountdown } from './hooks/useCountdown';

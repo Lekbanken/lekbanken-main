@@ -169,6 +169,27 @@ export interface LocationVerifiedCondition {
   locationId: string;
 }
 
+/** Logic grid solved condition */
+export interface LogicGridSolvedCondition {
+  type: 'logic_grid_solved';
+  /** Logic grid artifact ID */
+  gridId: string;
+}
+
+/** Sound level triggered condition */
+export interface SoundLevelTriggeredCondition {
+  type: 'sound_level_triggered';
+  /** Sound level meter artifact ID */
+  soundMeterId: string;
+}
+
+/** Replay marker added condition */
+export interface ReplayMarkerAddedCondition {
+  type: 'replay_marker_added';
+  /** Optional marker type filter */
+  markerType?: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -194,7 +215,10 @@ export type TriggerCondition =
   | CipherDecodedCondition
   | PropConfirmedCondition
   | PropRejectedCondition
-  | LocationVerifiedCondition;
+  | LocationVerifiedCondition
+  | LogicGridSolvedCondition
+  | SoundLevelTriggeredCondition
+  | ReplayMarkerAddedCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -350,6 +374,25 @@ export interface ResetLocationAction {
   locationId: string;
 }
 
+/** Reset logic grid state */
+export interface ResetLogicGridAction {
+  type: 'reset_logic_grid';
+  gridId: string;
+}
+
+/** Reset sound level meter state */
+export interface ResetSoundMeterAction {
+  type: 'reset_sound_meter';
+  soundMeterId: string;
+}
+
+/** Add replay marker action */
+export interface AddReplayMarkerAction {
+  type: 'add_replay_marker';
+  markerType: string;
+  label: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -374,7 +417,10 @@ export type TriggerAction =
   | ResetTilePuzzleAction
   | ResetCipherAction
   | ResetPropAction
-  | ResetLocationAction;
+  | ResetLocationAction
+  | ResetLogicGridAction
+  | ResetSoundMeterAction
+  | AddReplayMarkerAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];

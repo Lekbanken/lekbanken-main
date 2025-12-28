@@ -615,3 +615,159 @@ export function bearingToDirection(bearing: number): string {
   return directions[index];
 }
 
+// ============================================================================
+// Logic Grid Puzzle Module (#17)
+// ============================================================================
+
+export interface LogicGridCategory {
+  /** Category ID */
+  id: string;
+  /** Category name (e.g., "Person", "Färg", "Husdjur") */
+  name: string;
+  /** Category items */
+  items: string[];
+}
+
+export type LogicGridCellValue = 'yes' | 'no' | 'unknown';
+
+export interface LogicGridCell {
+  /** Row category ID */
+  rowCategoryId: string;
+  /** Row item index */
+  rowItemIndex: number;
+  /** Column category ID */
+  colCategoryId: string;
+  /** Column item index */
+  colItemIndex: number;
+  /** Cell value */
+  value: LogicGridCellValue;
+}
+
+export interface LogicGridClue {
+  /** Clue ID */
+  id: string;
+  /** Clue text */
+  text: string;
+  /** Is clue revealed? */
+  revealed?: boolean;
+}
+
+export interface LogicGridConfig {
+  /** Puzzle title */
+  title: string;
+  /** Categories (minimum 3, typically 4-5) */
+  categories: LogicGridCategory[];
+  /** Clues for solving */
+  clues: LogicGridClue[];
+  /** Solution grid (for validation) */
+  solution: LogicGridCell[];
+  /** Show clue reveal buttons */
+  progressiveClues?: boolean;
+}
+
+export interface LogicGridState {
+  /** Current grid state */
+  cells: LogicGridCell[];
+  /** Revealed clue IDs */
+  revealedClueIds: string[];
+  /** Is solved */
+  isSolved: boolean;
+  /** Moves made */
+  moveCount: number;
+  /** Started at */
+  startedAt?: string;
+  /** Solved at */
+  solvedAt?: string;
+}
+
+// ============================================================================
+// Sound Level Meter Module (#20)
+// ============================================================================
+
+export type SoundTriggerMode = 'threshold' | 'sustained' | 'peak';
+
+export interface SoundLevelConfig {
+  /** Trigger mode */
+  triggerMode: SoundTriggerMode;
+  /** Threshold level (0-100) */
+  thresholdLevel: number;
+  /** Duration to sustain above threshold (seconds) */
+  sustainDuration?: number;
+  /** Label for the sound activity */
+  activityLabel: string;
+  /** Instructions */
+  instructions?: string;
+  /** Show live meter */
+  showMeter?: boolean;
+  /** Show progress toward goal */
+  showProgress?: boolean;
+}
+
+export interface SoundLevelState {
+  currentLevel: number;
+  peakLevel: number;
+  isTriggered: boolean;
+  sustainedSeconds: number;
+  triggeredAt?: string;
+}
+
+// ============================================================================
+// Replay Marker Module (#24)
+// ============================================================================
+
+export type ReplayMarkerType = 'highlight' | 'bookmark' | 'note' | 'error';
+
+export interface ReplayMarker {
+  /** Marker ID */
+  id: string;
+  /** Marker type */
+  type: ReplayMarkerType;
+  /** Timestamp in session (seconds from start) */
+  timestampSeconds: number;
+  /** Label */
+  label: string;
+  /** Optional note */
+  note?: string;
+  /** Created by (participant/host ID) */
+  createdBy?: string;
+  /** Created at */
+  createdAt: string;
+}
+
+export interface ReplayMarkerConfig {
+  /** Allow participants to add markers */
+  allowParticipantMarkers?: boolean;
+  /** Available marker types */
+  availableTypes: ReplayMarkerType[];
+  /** Auto-mark on certain events */
+  autoMarkEvents?: string[];
+}
+
+export interface ReplayMarkerState {
+  markers: ReplayMarker[];
+}
+
+/**
+ * Check if logic grid is solved
+ */
+export function isLogicGridSolved(
+  cells: LogicGridCell[],
+  solution: LogicGridCell[]
+): boolean {
+  // Get only 'yes' cells from both
+  const currentYes = cells.filter(c => c.value === 'yes');
+  const solutionYes = solution.filter(c => c.value === 'yes');
+
+  if (currentYes.length !== solutionYes.length) return false;
+
+  return solutionYes.every(sol =>
+    currentYes.some(
+      cur =>
+        cur.rowCategoryId === sol.rowCategoryId &&
+        cur.rowItemIndex === sol.rowItemIndex &&
+        cur.colCategoryId === sol.colCategoryId &&
+        cur.colItemIndex === sol.colItemIndex
+    )
+  );
+}
+

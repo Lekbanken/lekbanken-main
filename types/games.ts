@@ -41,7 +41,11 @@ export type ArtifactType =
   | 'prop_confirmation'
   | 'location_check'
   | 'sound_level'
-  | 'replay_marker';
+  | 'replay_marker'
+  // Session Cockpit artifacts (Task 2.1-2.3)
+  | 'signal_generator'
+  | 'time_bank_step'
+  | 'empty_artifact';
 
 // =============================================================================
 // Game Artifacts (author-time)

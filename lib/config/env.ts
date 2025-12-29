@@ -113,6 +113,16 @@ export const env = {
     signals: process.env.FEATURE_SIGNALS === 'true' || (process.env.NODE_ENV === 'development'),
     /** Time Bank primitives. Default on in dev, off in prod until piloted. */
     timeBank: process.env.FEATURE_TIME_BANK === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Session Cockpit: Unified host shell for Lobby + Director Mode. */
+    sessionCockpit: process.env.FEATURE_SESSION_COCKPIT === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Director Mode as drawer overlay instead of fullscreen switch. */
+    directorModeDrawer: process.env.FEATURE_DIRECTOR_MODE_DRAWER === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Leader Script: Host-only instructions per step. */
+    leaderScript: process.env.FEATURE_LEADER_SCRIPT === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Event logging and live event feed. */
+    eventLogging: process.env.FEATURE_EVENT_LOGGING === 'true' || (process.env.NODE_ENV === 'development'),
+    /** Trigger kill switch: Emergency disable all triggers. */
+    triggerKillSwitch: process.env.FEATURE_TRIGGER_KILL_SWITCH === 'true' || (process.env.NODE_ENV === 'development'),
   },
 } as const;
 

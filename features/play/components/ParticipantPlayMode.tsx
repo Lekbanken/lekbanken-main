@@ -130,7 +130,10 @@ export function ParticipantPlayMode({
       sessionId={playData.sessionId}
       sessionCode={sessionCode}
       gameTitle={playData.gameTitle}
-      steps={playData.steps}
+      steps={playData.steps.map((s) => ({
+        ...s,
+        display_mode: s.display_mode ?? undefined,
+      }))}
       phases={playData.phases}
       role={role}
       initialState={playData.runtimeState}

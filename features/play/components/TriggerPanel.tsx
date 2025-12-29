@@ -26,10 +26,11 @@ export interface TriggerPanelProps {
 // =============================================================================
 
 function StatusBadge({ status }: { status: SessionTrigger['status'] }) {
-  const variants = {
-    armed: { variant: 'success' as const, label: 'Redo', dot: true },
-    fired: { variant: 'warning' as const, label: 'Avfyrad', dot: false },
-    disabled: { variant: 'secondary' as const, label: 'Inaktiv', dot: false },
+  const variants: Record<SessionTrigger['status'], { variant: 'success' | 'warning' | 'secondary'; label: string; dot: boolean }> = {
+    armed: { variant: 'success', label: 'Redo', dot: true },
+    fired: { variant: 'warning', label: 'Avfyrad', dot: false },
+    disabled: { variant: 'secondary', label: 'Inaktiv', dot: false },
+    error: { variant: 'warning', label: 'Fel', dot: true },
   };
 
   const { variant, label, dot } = variants[status];

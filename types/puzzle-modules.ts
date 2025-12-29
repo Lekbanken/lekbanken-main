@@ -771,3 +771,119 @@ export function isLogicGridSolved(
   );
 }
 
+// ============================================================================
+// Signal Generator Module (Task 2.1)
+// ============================================================================
+
+export type SignalOutputType = 'audio' | 'vibration' | 'visual' | 'notification';
+
+export interface SignalGeneratorConfig {
+  /** Unique signal key for trigger matching */
+  signalKey: string;
+  /** Display label */
+  label: string;
+  /** Output types to use when triggered */
+  outputs: SignalOutputType[];
+  /** Audio file URL (for audio output) */
+  audioUrl?: string;
+  /** Vibration pattern in ms [on, off, on, ...] */
+  vibrationPattern?: number[];
+  /** Visual flash color (hex) */
+  flashColor?: string;
+  /** Visual flash duration in ms */
+  flashDuration?: number;
+  /** Notification title */
+  notificationTitle?: string;
+  /** Notification body */
+  notificationBody?: string;
+  /** Allow host to test signal in lobby */
+  testableInLobby?: boolean;
+  /** Cooldown between triggers in ms */
+  cooldownMs?: number;
+}
+
+export interface SignalGeneratorState {
+  lastTriggered: string | null;
+  triggerCount: number;
+  isCooldown: boolean;
+  cooldownEndsAt: string | null;
+}
+
+// ============================================================================
+// Time Bank / Final Timer Module (Task 2.2)
+// ============================================================================
+
+export type TimeBankDisplayStyle = 'countdown' | 'progress' | 'dramatic';
+
+export interface TimeBankStepConfig {
+  /** Initial time in seconds */
+  initialSeconds: number;
+  /** Display style */
+  displayStyle: TimeBankDisplayStyle;
+  /** Warning threshold in seconds (shows warning styling) */
+  warningThreshold?: number;
+  /** Critical threshold in seconds (shows critical styling) */
+  criticalThreshold?: number;
+  /** Allow host to add/remove time */
+  allowHostAdjustment?: boolean;
+  /** Min adjustment in seconds (negative for removing time) */
+  minAdjustmentSeconds?: number;
+  /** Max adjustment in seconds */
+  maxAdjustmentSeconds?: number;
+  /** Auto-pause when session pauses */
+  pauseWithSession?: boolean;
+  /** Trigger key when timer expires */
+  expiryTriggerKey?: string;
+  /** Show +/- controls to host */
+  showControls?: boolean;
+  /** Play audio warning at threshold */
+  audioWarning?: boolean;
+}
+
+export interface TimeBankStepState {
+  remainingSeconds: number;
+  isPaused: boolean;
+  isExpired: boolean;
+  adjustments: Array<{
+    delta: number;
+    reason: string;
+    timestamp: string;
+  }>;
+  startedAt: string | null;
+  pausedAt: string | null;
+}
+
+// ============================================================================
+// Empty Artifact / Placeholder Module (Task 2.3)
+// ============================================================================
+
+export type EmptyArtifactPurpose = 
+  | 'placeholder'       // Generic placeholder for future content
+  | 'host_note'         // Host-only note or reminder
+  | 'custom_integration' // Slot for custom JS/embed
+  | 'break_marker';      // Visual break in artifact list
+
+export interface EmptyArtifactConfig {
+  /** Purpose of this empty slot */
+  purpose: EmptyArtifactPurpose;
+  /** Placeholder text to show */
+  placeholderText?: string;
+  /** Host-only note (not shown to participants) */
+  hostNote?: string;
+  /** Custom embed HTML (for custom_integration) */
+  embedHtml?: string;
+  /** Background color (hex) */
+  backgroundColor?: string;
+  /** Min height in pixels */
+  minHeight?: number;
+  /** Show border/outline */
+  showBorder?: boolean;
+  /** Icon to display */
+  icon?: string;
+}
+
+export interface EmptyArtifactState {
+  isRevealed: boolean;
+  customData?: Record<string, unknown>;
+}
+

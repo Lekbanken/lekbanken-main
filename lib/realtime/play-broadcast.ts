@@ -14,6 +14,7 @@ import type {
   RoleBroadcast,
   BoardBroadcast,
   CountdownBroadcast,
+  StoryOverlayBroadcast,
   PuzzleBroadcast,
   TimerState,
   BoardState,
@@ -147,6 +148,19 @@ export function createCountdownBroadcast(
       message,
       variant,
     },
+    timestamp: new Date().toISOString(),
+  };
+}
+
+/**
+ * Create a story overlay broadcast event.
+ */
+export function createStoryOverlayBroadcast(
+  payload: StoryOverlayBroadcast['payload']
+): StoryOverlayBroadcast {
+  return {
+    type: 'story_overlay',
+    payload,
     timestamp: new Date().toISOString(),
   };
 }
@@ -316,6 +330,15 @@ export class PlayBroadcaster {
     variant?: 'default' | 'dramatic'
   ): Promise<boolean> {
     return this.send(createCountdownBroadcast(action, duration, message, variant));
+  }
+
+  /**
+   * Send a story overlay broadcast.
+   */
+  async sendStoryOverlay(
+    payload: StoryOverlayBroadcast['payload']
+  ): Promise<boolean> {
+    return this.send(createStoryOverlayBroadcast(payload));
   }
 
   /**

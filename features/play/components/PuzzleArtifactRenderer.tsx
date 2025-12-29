@@ -964,6 +964,156 @@ export function PuzzleArtifactRenderer({
   }
 
   // ==========================================================================
+  // Signal Generator (Task 2.1) - Displays signal trigger UI
+  // ==========================================================================
+  if (artifactType === 'signal_generator') {
+    const config = (artifact.metadata as { signalConfig?: { label?: string; outputs?: string[] } })?.signalConfig;
+    const label = config?.label ?? 'Signal';
+    const outputs = config?.outputs ?? ['visual'];
+    
+    return (
+      <Card className="p-4 border-l-4 border-l-primary">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="font-medium text-foreground">{artifact.title ?? label}</div>
+            <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+              {outputs.includes('audio') && <span>🔊</span>}
+              {outputs.includes('vibration') && <span>📳</span>}
+              {outputs.includes('visual') && <span>💡</span>}
+              {outputs.includes('notification') && <span>🔔</span>}
+              <span>{outputs.length} signalkällor</span>
+            </div>
+          </div>
+          <Badge variant="secondary" size="sm">Signal</Badge>
+        </div>
+        {artifact.description && (
+          <p className="text-sm text-muted-foreground mt-2">{artifact.description}</p>
+        )}
+      </Card>
+    );
+  }
+
+  // ==========================================================================
+  // Time Bank Step (Task 2.2) - Displays countdown timer
+  // ==========================================================================
+  if (artifactType === 'time_bank_step') {
+    const config = (artifact.metadata as { 
+      timerConfig?: { 
+        initialSeconds?: number; 
+        displayStyle?: string;
+        warningThreshold?: number;
+        criticalThreshold?: number;
+      } 
+    })?.timerConfig;
+    
+    const initialSeconds = config?.initialSeconds ?? 300;
+    const displayStyle = config?.displayStyle ?? 'countdown';
+    const warningThreshold = config?.warningThreshold ?? 60;
+    const criticalThreshold = config?.criticalThreshold ?? 30;
+    
+    // Get remaining from state (or use initial)
+    const remaining = (puzzleState as { remainingSeconds?: number })?.remainingSeconds ?? initialSeconds;
+    const isPaused = (puzzleState as { isPaused?: boolean })?.isPaused ?? false;
+    const isExpired = remaining <= 0;
+    
+    // Format time
+    const minutes = Math.floor(remaining / 60);
+    const seconds = remaining % 60;
+    const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    
+    // Determine visual state
+    const isCritical = remaining <= criticalThreshold;
+    const isWarning = remaining <= warningThreshold && !isCritical;
+    
+    return (
+      <Card className={`p-6 text-center ${isCritical ? 'border-destructive bg-destructive/5' : isWarning ? 'border-warning bg-warning/5' : ''}`}>
+        <div className="text-sm text-muted-foreground mb-2">
+          {artifact.title ?? 'Tid kvar'}
+        </div>
+        <div className={`text-4xl font-mono font-bold ${isCritical ? 'text-destructive animate-pulse' : isWarning ? 'text-warning' : 'text-foreground'}`}>
+          {isExpired ? '0:00' : timeDisplay}
+        </div>
+        {isPaused && (
+          <Badge variant="warning" size="sm" className="mt-2">
+            ⏸️ Pausad
+          </Badge>
+        )}
+        {isExpired && (
+          <Badge variant="destructive" size="sm" className="mt-2">
+            ⏰ Tiden är ute!
+          </Badge>
+        )}
+        {displayStyle === 'progress' && !isExpired && (
+          <div className="mt-4 h-2 bg-muted rounded-full overflow-hidden">
+            <div 
+              className={`h-full transition-all duration-1000 ${isCritical ? 'bg-destructive' : isWarning ? 'bg-warning' : 'bg-primary'}`}
+              style={{ width: `${(remaining / initialSeconds) * 100}%` }}
+            />
+          </div>
+        )}
+      </Card>
+    );
+  }
+
+  // ==========================================================================
+  // Empty Artifact (Task 2.3) - Placeholder or custom slot
+  // ==========================================================================
+  if (artifactType === 'empty_artifact') {
+    const config = (artifact.metadata as { 
+      emptyConfig?: { 
+        purpose?: string;
+        placeholderText?: string;
+        backgroundColor?: string;
+        minHeight?: number;
+        showBorder?: boolean;
+        icon?: string;
+      } 
+    })?.emptyConfig;
+    
+    const purpose = config?.purpose ?? 'placeholder';
+    const placeholderText = config?.placeholderText ?? '';
+    const minHeight = config?.minHeight ?? 100;
+    const showBorder = config?.showBorder ?? true;
+    const icon = config?.icon ?? '📦';
+    
+    // Host notes are not rendered for participants
+    if (purpose === 'host_note') {
+      return null;
+    }
+    
+    // Break markers render as a visual divider
+    if (purpose === 'break_marker') {
+      return (
+        <div className="py-4 flex items-center gap-4">
+          <div className="flex-1 h-px bg-border" />
+          {placeholderText && (
+            <span className="text-sm text-muted-foreground">{placeholderText}</span>
+          )}
+          <div className="flex-1 h-px bg-border" />
+        </div>
+      );
+    }
+    
+    return (
+      <Card 
+        className={`flex items-center justify-center ${showBorder ? 'border-dashed border-2' : 'border-0'}`}
+        style={{ 
+          minHeight: `${minHeight}px`,
+          backgroundColor: config?.backgroundColor ?? undefined,
+        }}
+      >
+        <div className="text-center text-muted-foreground p-4">
+          <span className="text-2xl block mb-2">{icon}</span>
+          {placeholderText && <p className="text-sm">{placeholderText}</p>}
+          {!placeholderText && purpose === 'placeholder' && (
+            <p className="text-sm">Innehåll kommer snart...</p>
+          )}
+        </div>
+      </Card>
+    );
+  }
+
+  // ==========================================================================
   // Unsupported/Unknown artifact type
   // ==========================================================================
   return null;

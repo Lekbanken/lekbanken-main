@@ -24,6 +24,7 @@ type StepInfo = {
   content?: string;
   durationMinutes?: number;
   duration?: number | null;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
   materials?: string[];
   safety?: string;
   tag?: string;
@@ -46,6 +47,7 @@ type AdminOverrides = {
     description?: string;
     durationMinutes?: number;
     order?: number;
+    display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
   }>;
   phases?: Array<{
     id: string;
@@ -81,6 +83,7 @@ function applyStepOverrides(steps: StepInfo[], overrides?: AdminOverrides['steps
       content: override.description ?? step.content,
       durationMinutes,
       duration,
+      display_mode: override.display_mode ?? step.display_mode,
       index: step.index, // will be reindexed after sorting
     };
   });
@@ -327,6 +330,11 @@ export async function GET(
       const durationSeconds = s.duration_seconds ?? null;
       const durationMinutes = durationSeconds ? Math.ceil(durationSeconds / 60) : undefined;
 
+      const displayMode =
+        s.display_mode === 'instant' || s.display_mode === 'typewriter' || s.display_mode === 'dramatic'
+          ? s.display_mode
+          : null;
+
       return {
         id: s.id,
         index,
@@ -335,6 +343,7 @@ export async function GET(
         content: s.body || '',
         durationMinutes,
         duration: durationSeconds,
+        display_mode: displayMode,
         materials: materialsRow?.items ?? undefined,
         safety: materialsRow?.safety_notes ?? undefined,
         leaderScript: s.leader_script ?? undefined,

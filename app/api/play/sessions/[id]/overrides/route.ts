@@ -20,6 +20,7 @@ type StepOverride = {
   description?: string;
   durationMinutes?: number;
   order?: number;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
 };
 
 type PhaseOverride = {
@@ -47,6 +48,8 @@ function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+const DISPLAY_MODES = new Set(['instant', 'typewriter', 'dramatic']);
+
 function sanitizeOverrides(payload: unknown): AdminOverrides {
   if (!isObject(payload)) return {};
 
@@ -64,6 +67,9 @@ function sanitizeOverrides(payload: unknown): AdminOverrides {
                     : undefined,
                 order: typeof (s as { order?: unknown }).order === 'number'
                   ? (s as { order: number }).order
+                  : undefined,
+                display_mode: DISPLAY_MODES.has((s as { display_mode?: unknown }).display_mode as string)
+                  ? ((s as { display_mode: 'instant' | 'typewriter' | 'dramatic' }).display_mode ?? null)
                   : undefined,
               } satisfies StepOverride)
             : null

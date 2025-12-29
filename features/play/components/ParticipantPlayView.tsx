@@ -21,7 +21,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { CountdownOverlay, TypewriterText } from '@/components/play';
+import { CountdownOverlay, StoryOverlay, TypewriterText, type TypewriterSpeed } from '@/components/play';
 import { useLiveSession } from '@/features/play/hooks/useLiveSession';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { ParticipantSignalMicroUI } from '@/features/play/components/ParticipantSignalMicroUI';
@@ -269,6 +269,17 @@ export function ParticipantPlayView({
   const [countdownMessage, setCountdownMessage] = useState<string | undefined>();
   const [countdownVariant, setCountdownVariant] = useState<'default' | 'dramatic'>('default');
 
+  // Story overlay state
+  const [storyOverlayOpen, setStoryOverlayOpen] = useState(false);
+  const [storyOverlayText, setStoryOverlayText] = useState('');
+  const [storyOverlayTitle, setStoryOverlayTitle] = useState<string | undefined>();
+  const [storyOverlaySpeed, setStoryOverlaySpeed] = useState<TypewriterSpeed>('dramatic');
+  const [storyOverlayTheme, setStoryOverlayTheme] = useState<'dark' | 'light' | 'dramatic'>('dramatic');
+  const [storyOverlayShowProgress, setStoryOverlayShowProgress] = useState(true);
+  const [storyOverlayAllowSkip, setStoryOverlayAllowSkip] = useState(true);
+  const [storyOverlayAllowParticipantSkip, setStoryOverlayAllowParticipantSkip] = useState(false);
+  const [storyOverlayAllowClose, setStoryOverlayAllowClose] = useState(true);
+
   const loadArtifacts = useCallback(async () => {
     if (!participantToken) return;
     try {
@@ -378,6 +389,21 @@ export function ParticipantPlayView({
         setCountdownOpen(true);
       } else if (payload.action === 'skip' || payload.action === 'complete') {
         setCountdownOpen(false);
+      }
+    },
+    onStoryOverlay: (payload) => {
+      if (payload.action === 'show') {
+        setStoryOverlayText(payload.text ?? '');
+        setStoryOverlayTitle(payload.title);
+        setStoryOverlaySpeed(payload.speed ?? 'dramatic');
+        setStoryOverlayTheme(payload.theme ?? 'dramatic');
+        setStoryOverlayShowProgress(payload.showProgress ?? true);
+        setStoryOverlayAllowSkip(payload.allowSkip ?? true);
+        setStoryOverlayAllowParticipantSkip(payload.allowParticipantSkip ?? false);
+        setStoryOverlayAllowClose(payload.allowClose ?? true);
+        setStoryOverlayOpen(true);
+      } else {
+        setStoryOverlayOpen(false);
       }
     },
   });
@@ -1256,6 +1282,23 @@ export function ParticipantPlayView({
         isOpen={countdownOpen}
         onComplete={() => setCountdownOpen(false)}
         onSkip={() => setCountdownOpen(false)}
+      />
+
+      {/* Story Overlay - triggered by host */}
+      <StoryOverlay
+        isOpen={storyOverlayOpen}
+        text={storyOverlayText}
+        title={storyOverlayTitle}
+        speed={storyOverlaySpeed}
+        theme={storyOverlayTheme}
+        showProgress={storyOverlayShowProgress}
+        allowSkip={storyOverlayAllowSkip}
+        allowParticipantSkip={storyOverlayAllowParticipantSkip}
+        allowClose={storyOverlayAllowClose}
+        isHost={false}
+        onClose={() => setStoryOverlayOpen(false)}
+        onSkip={() => setStoryOverlayOpen(false)}
+        onComplete={() => undefined}
       />
     </div>
   );

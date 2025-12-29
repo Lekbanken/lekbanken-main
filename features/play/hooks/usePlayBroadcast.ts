@@ -61,6 +61,18 @@ export interface UsePlayBroadcastResult {
     message?: string,
     variant?: 'default' | 'dramatic'
   ) => Promise<boolean>;
+  /** Broadcast story overlay */
+  broadcastStoryOverlay: (payload: {
+    action: 'show' | 'skip' | 'complete' | 'close';
+    text?: string;
+    title?: string;
+    speed?: 'fast' | 'normal' | 'dramatic' | 'instant';
+    theme?: 'dark' | 'light' | 'dramatic';
+    showProgress?: boolean;
+    allowSkip?: boolean;
+    allowParticipantSkip?: boolean;
+    allowClose?: boolean;
+  }) => Promise<boolean>;
 }
 
 // =============================================================================
@@ -173,6 +185,25 @@ export function usePlayBroadcast({
     },
     []
   );
+
+  // Broadcast story overlay
+  const broadcastStoryOverlay = useCallback(
+    async (payload: {
+      action: 'show' | 'skip' | 'complete' | 'close';
+      text?: string;
+      title?: string;
+      speed?: 'fast' | 'normal' | 'dramatic' | 'instant';
+      theme?: 'dark' | 'light' | 'dramatic';
+      showProgress?: boolean;
+      allowSkip?: boolean;
+      allowParticipantSkip?: boolean;
+      allowClose?: boolean;
+    }): Promise<boolean> => {
+      if (!broadcasterRef.current) return false;
+      return broadcasterRef.current.sendStoryOverlay(payload);
+    },
+    []
+  );
   
   return {
     connected,
@@ -183,5 +214,6 @@ export function usePlayBroadcast({
     broadcastRoleUpdate,
     broadcastBoardUpdate,
     broadcastCountdown,
+    broadcastStoryOverlay,
   };
 }

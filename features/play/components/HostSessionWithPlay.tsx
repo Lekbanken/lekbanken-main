@@ -222,6 +222,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
             title: step.title,
             description: step.description,
             durationMinutes: step.durationMinutes,
+            display_mode: (step as { display_mode?: GameStepInfo['display_mode'] }).display_mode,
             order: step.index,
           };
         }
@@ -459,6 +460,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           title: draft.title,
           description: draft.description,
           durationMinutes: typeof draft.durationMinutes === 'number' ? draft.durationMinutes : undefined,
+          display_mode: (draft as { display_mode?: GameStepInfo['display_mode'] }).display_mode,
           order: typeof draft.order === 'number' ? draft.order : undefined,
         })),
         phases: Object.entries(phaseDrafts).map(([id, draft]) => ({

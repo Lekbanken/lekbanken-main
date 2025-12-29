@@ -183,6 +183,7 @@ export interface PlayBroadcastEvent {
     | 'decision_update'
     | 'outcome_update'
     | 'countdown'
+    | 'story_overlay'
     | 'signal_received'
     | 'time_bank_changed'
     | 'puzzle_update';
@@ -304,6 +305,21 @@ export interface CountdownBroadcast extends PlayBroadcastEvent {
     duration: number;
     message?: string;
     variant?: 'default' | 'dramatic';
+  };
+}
+
+export interface StoryOverlayBroadcast extends PlayBroadcastEvent {
+  type: 'story_overlay';
+  payload: {
+    action: 'show' | 'skip' | 'complete' | 'close';
+    text?: string;
+    title?: string;
+    speed?: 'fast' | 'normal' | 'dramatic' | 'instant';
+    theme?: 'dark' | 'light' | 'dramatic';
+    showProgress?: boolean;
+    allowSkip?: boolean;
+    allowParticipantSkip?: boolean;
+    allowClose?: boolean;
   };
 }
 

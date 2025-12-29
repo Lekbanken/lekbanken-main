@@ -14,6 +14,13 @@ type SignalPanelProps = {
   disabled?: boolean;
 };
 
+type SignalPreset = {
+  id: string;
+  label: string;
+  channel: string;
+  message?: string;
+};
+
 function formatSignalText(payload: unknown): string {
   if (!payload) return '';
   if (typeof payload === 'string') return payload;
@@ -49,6 +56,15 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
   const [channel, setChannel] = useState('');
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
+
+  const presets: SignalPreset[] = [
+    { id: 'ready', label: 'Redo', channel: 'READY', message: 'Redo' },
+    { id: 'hint', label: 'Ledtråd', channel: 'HINT', message: 'Ledtråd tillgänglig' },
+    { id: 'attention', label: 'Fokus', channel: 'ATTENTION', message: 'Samla uppmärksamhet' },
+    { id: 'pause', label: 'Paus', channel: 'PAUSE', message: 'Pausa nu' },
+    { id: 'found', label: 'Hittat', channel: 'FOUND', message: 'Fynd bekräftat' },
+    { id: 'sos', label: 'SOS', channel: 'SOS', message: 'Behöver hjälp' },
+  ];
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -93,6 +109,12 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
     return channels;
   }, [signals]);
 
+  const suggestedChannels = useMemo(() => {
+    const suggested = ['READY', 'HINT', 'ATTENTION', 'PAUSE', 'FOUND', 'SOS'];
+    const merged = [...quickChannels, ...suggested];
+    return merged.filter((value, index) => merged.indexOf(value) === index).slice(0, 8);
+  }, [quickChannels]);
+
   const handleSend = useCallback(async () => {
     const c = channel.trim();
     const m = message.trim();
@@ -112,12 +134,31 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
     }
   }, [sessionId, channel, message, load]);
 
+  const handlePresetSend = useCallback(async (preset: SignalPreset) => {
+    if (disabled || sending) return;
+    setSending(true);
+    setError(null);
+    try {
+      await sendSessionSignal(sessionId, {
+        channel: preset.channel,
+        message: preset.message ?? preset.label,
+      });
+      setChannel(preset.channel);
+      setMessage('');
+      void load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Kunde inte skicka signal');
+    } finally {
+      setSending(false);
+    }
+  }, [disabled, sending, sessionId, load]);
+
   return (
     <Card variant="elevated" className="p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold text-foreground">Signals</h2>
-          <p className="text-sm text-muted-foreground">Skicka enkla events (t.ex. READY, SOS, FOUND).</p>
+          <p className="text-sm text-muted-foreground">Skicka snabba events med färdiga knappar eller egen kanal.</p>
         </div>
         <Badge variant={connected ? 'success' : 'secondary'} size="sm">
           {connected ? 'Live' : 'Offline'}
@@ -127,11 +168,29 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
       {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
 
       <div className="mt-4 space-y-3">
+        <div className="space-y-2">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Snabbknappar</h3>
+          <div className="flex flex-wrap gap-2">
+            {presets.map((preset) => (
+              <Button
+                key={preset.id}
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => void handlePresetSend(preset)}
+                disabled={disabled || sending}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+        </div>
+
         <div className="flex flex-col gap-2 sm:flex-row">
           <Input
             value={channel}
             onChange={(e) => setChannel(e.target.value)}
-            placeholder="Kanal"
+            placeholder="Kanal (t.ex. READY)"
             disabled={disabled || sending}
           />
           <Input
@@ -155,9 +214,9 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
           </Button>
         </div>
 
-        {quickChannels.length > 0 && (
+        {suggestedChannels.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {quickChannels.map((c) => (
+            {suggestedChannels.map((c) => (
               <Button
                 key={c}
                 type="button"

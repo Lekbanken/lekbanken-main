@@ -68,3 +68,81 @@ export type { PuzzleProgressPanelProps, PuzzleStatus } from './PuzzleProgressPan
 
 export { PropConfirmationManager } from './PropConfirmationManager';
 export type { PropConfirmationManagerProps, PropRequest } from './PropConfirmationManager';
+
+// Session Cockpit (unified host experience)
+export { SessionCockpit, useSessionCockpit } from './SessionCockpit';
+export type { SessionCockpitProps } from './SessionCockpit';
+
+export { DirectorModeDrawer } from './DirectorModeDrawer';
+export type { DirectorModeDrawerProps } from './DirectorModeDrawer';
+
+export { StoryViewModal } from './StoryViewModal';
+export type { StoryViewModalProps } from './StoryViewModal';
+
+// Signal components
+export { SignalPresetEditor } from './SignalPresetEditor';
+export type {
+  SignalPresetEditorProps,
+  SignalPreset,
+  SignalType,
+  SignalPattern,
+  SignalStep,
+} from './SignalPresetEditor';
+
+export { SignalCapabilityTest } from './SignalCapabilityTest';
+export type { SignalCapabilityTestProps } from './SignalCapabilityTest';
+
+// TimeBank components
+export { TimeBankRuleEditor, DEFAULT_TIMEBANK_CONFIG } from './TimeBankRuleEditor';
+export type {
+  TimeBankRuleEditorProps,
+  TimeBankConfig,
+  TimeBankRule,
+  TimeBankRuleTrigger,
+  TimeBankOperator,
+} from './TimeBankRuleEditor';
+
+export { TimeBankLivePanel } from './TimeBankLivePanel';
+export type { TimeBankLivePanelProps } from './TimeBankLivePanel';
+
+// Trigger debug & safety components
+export { TriggerLivePanel } from './TriggerLivePanel';
+export type { TriggerLivePanelProps } from './TriggerLivePanel';
+
+export { TriggerKillSwitch } from './TriggerKillSwitch';
+export type { TriggerKillSwitchProps } from './TriggerKillSwitch';
+
+export { TriggerDryRunPanel } from './TriggerDryRunPanel';
+export type { TriggerDryRunPanelProps, SimulationEvent, SimulationResult } from './TriggerDryRunPanel';
+
+// Event system & observability
+export { EventFeedPanel } from './EventFeedPanel';
+export type { EventFeedPanelProps } from './EventFeedPanel';
+
+// Keyboard shortcuts
+export { ShortcutHelpPanel, KeyboardShortcutIndicator } from './ShortcutHelpPanel';
+export type { ShortcutHelpPanelProps, KeyboardShortcutIndicatorProps } from './ShortcutHelpPanel';
+
+// Readiness indicator (confidence meter)
+export { ReadinessIndicator } from './ReadinessIndicator';
+export type { ReadinessIndicatorProps } from './ReadinessIndicator';
+
+// Trigger template library
+export { TriggerTemplateLibrary } from './TriggerTemplateLibrary';
+export type { TriggerTemplateLibraryProps } from './TriggerTemplateLibrary';
+
+// Batch artifact operations
+export { BatchArtifactPanel } from './BatchArtifactPanel';
+export type { BatchArtifactPanelProps } from './BatchArtifactPanel';
+
+// Session timeline
+export { SessionTimeline, CompactTimeline } from './SessionTimeline';
+export type { SessionTimelineProps, CompactTimelineProps } from './SessionTimeline';
+
+// Analytics dashboard
+export { AnalyticsDashboard, AnalyticsSummaryCard } from './AnalyticsDashboard';
+export type { AnalyticsDashboardProps, AnalyticsSummaryCardProps } from './AnalyticsDashboard';
+
+// Multi-language leader script
+export { LeaderScriptPanel, CompactScriptLine } from './LeaderScriptPanel';
+export type { LeaderScriptPanelProps, CompactScriptLineProps } from './LeaderScriptPanel';

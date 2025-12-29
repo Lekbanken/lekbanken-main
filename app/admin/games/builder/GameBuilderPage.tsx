@@ -24,6 +24,8 @@ import {
   type RoleData,
   type BoardConfigData,
 } from './components';
+import { ValidationPanel } from './components/ValidationPanel';
+import { validateGameRefs, type GameDataForValidation } from './utils/validateGameRefs';
 import type { ArtifactFormData, ArtifactVariantFormData, TriggerFormData } from '@/types/games';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
@@ -402,6 +404,26 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     })();
   }, [gameId]);
 
+  // Validation result (Task 2.6)
+  const validationResult = useMemo(() => {
+    const dataForValidation: GameDataForValidation = {
+      artifacts,
+      triggers: triggers
+        .filter((t): t is typeof t & { id: string } => Boolean(t.id))
+        .map((t) => ({
+          id: t.id,
+          name: t.name,
+          enabled: t.enabled,
+          condition: t.condition,
+          actions: t.actions,
+        })),
+      steps: steps.map((s) => ({ id: s.id, title: s.title })),
+      phases: phases.map((p) => ({ id: p.id, name: p.name })),
+      roles: roles.map((r) => ({ id: r.id, name: r.name })),
+    };
+    return validateGameRefs(dataForValidation);
+  }, [artifacts, triggers, steps, phases, roles]);
+
   // Quality state calculation
   const qualityState: QualityState = useMemo(() => ({
     name: Boolean(core.name.trim()),
@@ -419,9 +441,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       (steps.length > 0 || core.description.trim()) &&
       cover.mediaId
     ),
-    noValidationErrors: true,
+    noValidationErrors: validationResult.isValid,
     reviewed: false,
-  }), [core, steps, subPurposeIds, cover]);
+  }), [core, steps, subPurposeIds, cover, validationResult.isValid]);
 
   // Completed sections
   const completedSections = useMemo(() => {
@@ -1199,11 +1221,34 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         </main>
 
         {/* Right sidebar - Quality checklist */}
-        <aside className="hidden xl:block w-72 border-l border-border bg-muted/30 min-h-[calc(100vh-4rem)]">
+        <aside className="hidden xl:block w-72 border-l border-border bg-muted/30 min-h-[calc(100vh-4rem)] overflow-y-auto">
           <QualityChecklist
             state={qualityState}
             status={core.status}
           />
+          
+          {/* Validation Panel (Task 2.6) */}
+          {(artifacts.length > 0 || triggers.length > 0) && (
+            <div className="p-4 border-t">
+              <ValidationPanel
+                result={validationResult}
+                onNavigateToItem={(section, _itemId) => {
+                  // Navigate to the relevant section
+                  if (section === 'triggers') {
+                    setActiveSection('triggers');
+                  } else if (section === 'artifacts') {
+                    setActiveSection('artifacts');
+                  } else if (section === 'steps') {
+                    setActiveSection('steg');
+                  } else if (section === 'phases') {
+                    setActiveSection('faser');
+                  } else if (section === 'roles') {
+                    setActiveSection('roller');
+                  }
+                }}
+              />
+            </div>
+          )}
         </aside>
       </div>
     </div>

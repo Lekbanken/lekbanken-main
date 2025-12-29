@@ -29,6 +29,7 @@ import type {
   DecisionBroadcast,
   OutcomeBroadcast,
   CountdownBroadcast,
+  StoryOverlayBroadcast,
   SignalReceivedBroadcast,
   TimeBankChangedBroadcast,
   PuzzleBroadcast,
@@ -65,6 +66,8 @@ export interface UseLiveSessionOptions {
   onOutcomeUpdate?: (payload: OutcomeBroadcast['payload']) => void;
   /** Called when countdown overlay should be shown */
   onCountdown?: (payload: CountdownBroadcast['payload']) => void;
+  /** Called when story overlay should be shown */
+  onStoryOverlay?: (payload: StoryOverlayBroadcast['payload']) => void;
   /** Called when a signal is received */
   onSignalReceived?: (payload: SignalReceivedBroadcast['payload']) => void;
   /** Called when time bank changes */
@@ -116,6 +119,7 @@ export function useLiveSession({
   onDecisionUpdate,
   onOutcomeUpdate,
   onCountdown,
+  onStoryOverlay,
   onSignalReceived,
   onTimeBankChanged,
   onPuzzleUpdate,
@@ -225,6 +229,12 @@ export function useLiveSession({
         break;
       }
 
+      case 'story_overlay': {
+        const payload = (event as StoryOverlayBroadcast).payload;
+        onStoryOverlay?.(payload);
+        break;
+      }
+
       case 'signal_received': {
         const payload = (event as SignalReceivedBroadcast).payload;
         onSignalReceived?.(payload);
@@ -253,10 +263,10 @@ export function useLiveSession({
     onDecisionUpdate,
     onOutcomeUpdate,
     onCountdown,
+    onStoryOverlay,
     onSignalReceived,
     onTimeBankChanged,
     onPuzzleUpdate,
-    onTimeBankChanged,
   ]);
   
   // Timer tick effect (recalculate display)

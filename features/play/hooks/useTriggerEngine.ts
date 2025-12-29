@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useEffect } from 'react';
+import { useCallback, useRef, useEffect, useState } from 'react';
 import type { SessionTrigger } from '@/types/games';
 import type { TriggerCondition, TriggerAction, TriggerConditionType } from '@/types/trigger';
 
@@ -20,7 +20,27 @@ export type TriggerEvent =
   | { type: 'timer_ended'; timerId: string }
   | { type: 'decision_resolved'; decisionId: string; outcome?: string }
   | { type: 'signal_received'; channel: string; payload?: unknown; sender_user_id?: string; sender_participant_id?: string }
-  | { type: 'manual'; triggerId: string };
+  | { type: 'manual'; triggerId: string }
+  // Puzzle module events (Task 2.4)
+  | { type: 'counter_reached'; counterKey: string; value: number }
+  | { type: 'riddle_correct'; riddleId: string }
+  | { type: 'audio_acknowledged'; audioId: string }
+  | { type: 'multi_answer_complete'; multiAnswerId: string }
+  | { type: 'scan_verified'; scanGateId: string }
+  | { type: 'prop_confirmed'; propId: string }
+  | { type: 'prop_rejected'; propId: string }
+  | { type: 'location_verified'; locationId: string }
+  | { type: 'logic_grid_solved'; gridId: string }
+  | { type: 'sound_level_triggered'; soundMeterId: string }
+  | { type: 'hotspot_found'; hotspotHuntId: string; hotspotId?: string }
+  | { type: 'hotspot_hunt_complete'; hotspotHuntId: string }
+  | { type: 'tile_puzzle_complete'; tilePuzzleId: string }
+  | { type: 'cipher_decoded'; cipherId: string }
+  | { type: 'hint_requested'; hintId?: string }
+  | { type: 'replay_marker_added'; markerType?: string }
+  // Session Cockpit events (Task 2.1-2.2)
+  | { type: 'time_bank_expired'; timeBankId?: string }
+  | { type: 'signal_generator_triggered'; signalGeneratorId: string; signalKey?: string };
 
 export interface TriggerActionContext {
   sessionId: string;
@@ -52,6 +72,20 @@ export interface TriggerActionContext {
       metadata?: Record<string, unknown> | null;
     }
   ) => Promise<void>;
+
+  // New action handlers (Task 2.5)
+  /** Show leader script panel */
+  showLeaderScript?: (stepId?: string, customScript?: string, autoDismissSeconds?: number) => Promise<void>;
+  /** Trigger a signal generator artifact */
+  triggerSignal?: (signalGeneratorId: string) => Promise<void>;
+  /** Pause or resume time bank */
+  pauseTimeBank?: (pause: boolean, timeBankId?: string) => Promise<void>;
+  /** Add a replay marker */
+  addReplayMarker?: (markerType: string, label: string) => Promise<void>;
+  /** Increment a counter */
+  incrementCounter?: (counterKey: string, amount: number) => Promise<void>;
+  /** Send a hint */
+  sendHint?: (hintId: string, skipCooldown?: boolean) => Promise<void>;
 }
 
 export interface UseTriggerEngineOptions {
@@ -64,9 +98,19 @@ export interface UseTriggerEngineOptions {
   /** Called when a trigger fires */
   onTriggerFired?: (trigger: SessionTrigger, actions: TriggerAction[]) => void;
   /** Called to update trigger status in database */
-  onTriggerStatusUpdate?: (triggerId: string, status: 'armed' | 'fired' | 'disabled') => Promise<void>;
+  onTriggerStatusUpdate?: (triggerId: string, status: 'armed' | 'fired' | 'disabled' | 'error') => Promise<void>;
+  /** Called when a trigger encounters an error */
+  onTriggerError?: (trigger: SessionTrigger, error: Error, action?: TriggerAction) => void;
   /** Whether the engine is enabled */
   enabled?: boolean;
+}
+
+export interface TriggerError {
+  triggerId: string;
+  triggerName: string;
+  actionType?: string;
+  errorMessage: string;
+  timestamp: Date;
 }
 
 export interface UseTriggerEngineReturn {
@@ -76,6 +120,10 @@ export interface UseTriggerEngineReturn {
   fireTrigger: (triggerId: string) => Promise<void>;
   /** Get triggers that match a condition type */
   getTriggersForCondition: (conditionType: TriggerConditionType) => SessionTrigger[];
+  /** Recent trigger errors (kept in memory for display) */
+  recentErrors: TriggerError[];
+  /** Clear all errors */
+  clearErrors: () => void;
 }
 
 // =============================================================================
@@ -121,6 +169,80 @@ function conditionMatches(condition: TriggerCondition, event: TriggerEvent): boo
       if (!('channel' in event)) return false;
       if ('channel' in condition && condition.channel && condition.channel.trim().length > 0) {
         return condition.channel === event.channel;
+      }
+      return true;
+
+    // New conditions (Task 2.4)
+    case 'counter_reached':
+      return 'counterKey' in condition && 'counterKey' in event && condition.counterKey === event.counterKey;
+
+    case 'riddle_correct':
+      return 'riddleId' in condition && 'riddleId' in event && condition.riddleId === event.riddleId;
+
+    case 'audio_acknowledged':
+      return 'audioId' in condition && 'audioId' in event && condition.audioId === event.audioId;
+
+    case 'multi_answer_complete':
+      return 'multiAnswerId' in condition && 'multiAnswerId' in event && condition.multiAnswerId === event.multiAnswerId;
+
+    case 'scan_verified':
+      return 'scanGateId' in condition && 'scanGateId' in event && condition.scanGateId === event.scanGateId;
+
+    case 'prop_confirmed':
+    case 'prop_rejected':
+      return 'propId' in condition && 'propId' in event && condition.propId === event.propId;
+
+    case 'location_verified':
+      return 'locationId' in condition && 'locationId' in event && condition.locationId === event.locationId;
+
+    case 'logic_grid_solved':
+      return 'gridId' in condition && 'gridId' in event && condition.gridId === event.gridId;
+
+    case 'sound_level_triggered':
+      return 'soundMeterId' in condition && 'soundMeterId' in event && condition.soundMeterId === event.soundMeterId;
+
+    case 'time_bank_expired':
+      // Match session time bank or specific time bank artifact
+      if ('timeBankId' in condition && condition.timeBankId) {
+        return 'timeBankId' in event && condition.timeBankId === event.timeBankId;
+      }
+      return true; // Any time bank expired event matches if no specific ID
+
+    case 'signal_generator_triggered':
+      if (!('signalGeneratorId' in condition) || !('signalGeneratorId' in event)) return false;
+      if (condition.signalGeneratorId !== event.signalGeneratorId) return false;
+      // Optional signal key match
+      if ('signalKey' in condition && condition.signalKey && 'signalKey' in event) {
+        return condition.signalKey === event.signalKey;
+      }
+      return true;
+
+    case 'hotspot_found':
+      if (!('hotspotHuntId' in condition) || !('hotspotHuntId' in event)) return false;
+      if (condition.hotspotHuntId !== event.hotspotHuntId) return false;
+      if ('hotspotId' in condition && condition.hotspotId && 'hotspotId' in event) {
+        return condition.hotspotId === event.hotspotId;
+      }
+      return true;
+
+    case 'hotspot_hunt_complete':
+      return 'hotspotHuntId' in condition && 'hotspotHuntId' in event && condition.hotspotHuntId === event.hotspotHuntId;
+
+    case 'tile_puzzle_complete':
+      return 'tilePuzzleId' in condition && 'tilePuzzleId' in event && condition.tilePuzzleId === event.tilePuzzleId;
+
+    case 'cipher_decoded':
+      return 'cipherId' in condition && 'cipherId' in event && condition.cipherId === event.cipherId;
+
+    case 'hint_requested':
+      if ('hintId' in condition && condition.hintId && 'hintId' in event) {
+        return condition.hintId === event.hintId;
+      }
+      return true; // Any hint requested matches if no specific ID
+
+    case 'replay_marker_added':
+      if ('markerType' in condition && condition.markerType && 'markerType' in event) {
+        return condition.markerType === event.markerType;
       }
       return true;
 
@@ -214,6 +336,63 @@ async function executeAction(
       console.log(`[TriggerEngine] reset_keypad not yet implemented`, action);
       break;
 
+    // New actions (Task 2.5)
+    case 'show_leader_script':
+      if (context.showLeaderScript) {
+        await context.showLeaderScript(action.stepId, action.customScript, action.autoDismissSeconds);
+      } else {
+        console.log(`[TriggerEngine] show_leader_script triggered`, action);
+      }
+      break;
+
+    case 'trigger_signal':
+      if (context.triggerSignal) {
+        await context.triggerSignal(action.signalGeneratorId);
+      } else {
+        console.log(`[TriggerEngine] trigger_signal triggered`, action);
+      }
+      break;
+
+    case 'time_bank_pause':
+      if (context.pauseTimeBank) {
+        await context.pauseTimeBank(action.pause, action.timeBankId);
+      } else {
+        console.log(`[TriggerEngine] time_bank_pause triggered`, action);
+      }
+      break;
+
+    case 'add_replay_marker':
+      if (context.addReplayMarker) {
+        await context.addReplayMarker(action.markerType, action.label);
+      } else {
+        console.log(`[TriggerEngine] add_replay_marker triggered`, action);
+      }
+      break;
+
+    case 'increment_counter':
+      if (context.incrementCounter) {
+        await context.incrementCounter(action.counterKey, action.amount ?? 1);
+      } else {
+        console.log(`[TriggerEngine] increment_counter not yet implemented`, action);
+      }
+      break;
+
+    case 'reset_counter':
+      console.log(`[TriggerEngine] reset_counter not yet implemented`, action);
+      break;
+
+    case 'reset_riddle':
+      console.log(`[TriggerEngine] reset_riddle not yet implemented`, action);
+      break;
+
+    case 'send_hint':
+      if (context.sendHint) {
+        await context.sendHint(action.hintId, action.skipCooldown);
+      } else {
+        console.log(`[TriggerEngine] send_hint not yet implemented`, action);
+      }
+      break;
+
     default:
       console.warn(`[TriggerEngine] Unknown action type:`, action);
   }
@@ -229,6 +408,7 @@ export function useTriggerEngine({
   actionContext,
   onTriggerFired,
   onTriggerStatusUpdate,
+  onTriggerError,
   enabled = true,
 }: UseTriggerEngineOptions): UseTriggerEngineReturn {
   // Keep a ref to triggers to avoid stale closures
@@ -237,19 +417,62 @@ export function useTriggerEngine({
     triggersRef.current = triggers;
   }, [triggers]);
 
+  // Track recent errors in memory
+  const [recentErrors, setRecentErrors] = useState<TriggerError[]>([]);
+  const MAX_ERRORS = 20;
+
+  const addError = useCallback((trigger: SessionTrigger, error: Error, action?: TriggerAction) => {
+    const triggerError: TriggerError = {
+      triggerId: trigger.id,
+      triggerName: trigger.name,
+      actionType: action?.type,
+      errorMessage: error.message,
+      timestamp: new Date(),
+    };
+    
+    setRecentErrors((prev) => {
+      const updated = [triggerError, ...prev].slice(0, MAX_ERRORS);
+      return updated;
+    });
+    
+    // Call external error handler
+    onTriggerError?.(trigger, error, action);
+  }, [onTriggerError]);
+
+  const clearErrors = useCallback(() => {
+    setRecentErrors([]);
+  }, []);
+
   // Execute a trigger's actions with optional delay
   const executeTrigger = useCallback(
     async (trigger: SessionTrigger) => {
       const executeActions = async () => {
         console.log(`[TriggerEngine] Firing trigger: ${trigger.name}`);
 
+        let hasError = false;
+        let lastError: Error | null = null;
+
         // Execute actions in sequence
         for (const action of trigger.actions) {
           try {
             await executeAction(action, actionContext);
           } catch (error) {
+            hasError = true;
+            lastError = error instanceof Error ? error : new Error(String(error));
             console.error(`[TriggerEngine] Action failed:`, action, error);
+            addError(trigger, lastError, action);
+            // Continue with other actions even if one fails
           }
+        }
+
+        // If any action failed, update status to error
+        if (hasError && onTriggerStatusUpdate) {
+          try {
+            await onTriggerStatusUpdate(trigger.id, 'error');
+          } catch (error) {
+            console.error(`[TriggerEngine] Failed to update trigger error status:`, error);
+          }
+          return; // Don't notify as fired if there was an error
         }
 
         // Notify callback
@@ -275,7 +498,7 @@ export function useTriggerEngine({
         await executeActions();
       }
     },
-    [actionContext, onTriggerFired, onTriggerStatusUpdate]
+    [actionContext, onTriggerFired, onTriggerStatusUpdate, addError]
   );
 
   // Process an event and fire matching triggers
@@ -334,6 +557,8 @@ export function useTriggerEngine({
     processEvent,
     fireTrigger,
     getTriggersForCondition,
+    recentErrors,
+    clearErrors,
   };
 }
 

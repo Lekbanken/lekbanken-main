@@ -62,3 +62,34 @@ export { Avatar, AvatarWithStatus, AvatarGroup } from "./avatar";
 // Help & Tooltips
 export { Tooltip, InfoTooltip, LabelWithTooltip } from "./tooltip";
 export { HelpText, SectionIntro, FeatureExplainer, EmptyStateGuide } from "./help-text";
+
+// Additional UI Components
+export { Progress } from "./progress";
+export { Checkbox } from "./checkbox";
+export { ScrollArea, ScrollBar } from "./scroll-area";
+export { Collapsible, CollapsibleTrigger, CollapsibleContent } from "./collapsible";
+export { Popover, PopoverTrigger, PopoverContent } from "./popover";
+export {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "./alert-dialog";
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableRow,
+  TableHead,
+  TableCell,
+  TableCaption,
+} from "./table";
+export { Slider } from "./slider";

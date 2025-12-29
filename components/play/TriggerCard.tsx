@@ -50,6 +50,7 @@ function StatusBadge({ status }: { status: TriggerStatus }) {
     armed: { variant: 'success', label: 'Armed' },
     fired: { variant: 'warning', label: 'Fired' },
     disabled: { variant: 'secondary', label: 'Disabled' },
+    error: { variant: 'warning', label: 'Error' },
   };
 
   const { variant, label } = variants[status];

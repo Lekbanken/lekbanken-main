@@ -190,6 +190,22 @@ export interface ReplayMarkerAddedCondition {
   markerType?: string;
 }
 
+/** Time bank expired condition (Task 2.2) */
+export interface TimeBankExpiredCondition {
+  type: 'time_bank_expired';
+  /** Time bank artifact ID (optional - default session time bank) */
+  timeBankId?: string;
+}
+
+/** Signal generator triggered condition (Task 2.1) */
+export interface SignalGeneratorTriggeredCondition {
+  type: 'signal_generator_triggered';
+  /** Signal generator artifact ID */
+  signalGeneratorId: string;
+  /** Signal key to match */
+  signalKey?: string;
+}
+
 /** All possible trigger conditions */
 export type TriggerCondition =
   | StepStartedCondition
@@ -218,7 +234,9 @@ export type TriggerCondition =
   | LocationVerifiedCondition
   | LogicGridSolvedCondition
   | SoundLevelTriggeredCondition
-  | ReplayMarkerAddedCondition;
+  | ReplayMarkerAddedCondition
+  | TimeBankExpiredCondition
+  | SignalGeneratorTriggeredCondition;
 
 /** Condition types for UI dropdowns */
 export type TriggerConditionType = TriggerCondition['type'];
@@ -393,6 +411,33 @@ export interface AddReplayMarkerAction {
   label: string;
 }
 
+/** Show leader script panel with specific content (Task 2.5) */
+export interface ShowLeaderScriptAction {
+  type: 'show_leader_script';
+  /** Step ID to show script for (optional - current step if not set) */
+  stepId?: string;
+  /** Custom script content (optional - uses step's leader_script if not set) */
+  customScript?: string;
+  /** Auto-dismiss after seconds (optional) */
+  autoDismissSeconds?: number;
+}
+
+/** Trigger a signal generator artifact (Task 2.1) */
+export interface TriggerSignalAction {
+  type: 'trigger_signal';
+  /** Signal generator artifact ID */
+  signalGeneratorId: string;
+}
+
+/** Pause/resume time bank (Task 2.2) */
+export interface TimeBankPauseAction {
+  type: 'time_bank_pause';
+  /** Pause (true) or resume (false) */
+  pause: boolean;
+  /** Time bank artifact ID (optional - default session time bank) */
+  timeBankId?: string;
+}
+
 /** All possible trigger actions */
 export type TriggerAction =
   | RevealArtifactAction
@@ -420,7 +465,10 @@ export type TriggerAction =
   | ResetLocationAction
   | ResetLogicGridAction
   | ResetSoundMeterAction
-  | AddReplayMarkerAction;
+  | AddReplayMarkerAction
+  | ShowLeaderScriptAction
+  | TriggerSignalAction
+  | TimeBankPauseAction;
 
 /** Action types for UI dropdowns */
 export type TriggerActionType = TriggerAction['type'];
@@ -430,7 +478,7 @@ export type TriggerActionType = TriggerAction['type'];
 // ============================================================================
 
 /** Status of a trigger */
-export type TriggerStatus = 'armed' | 'fired' | 'disabled';
+export type TriggerStatus = 'armed' | 'fired' | 'disabled' | 'error';
 
 /** A complete trigger definition */
 export interface Trigger {
@@ -457,6 +505,13 @@ export interface Trigger {
   firedAt?: Date;
   /** Number of times this trigger has fired */
   firedCount: number;
+  
+  /** Last error message (if status is 'error') */
+  lastError?: string;
+  /** Timestamp of last error */
+  lastErrorAt?: Date;
+  /** Number of times this trigger has errored */
+  errorCount: number;
   
   /** Creation timestamp */
   createdAt: Date;

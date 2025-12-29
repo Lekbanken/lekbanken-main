@@ -20,6 +20,7 @@ export interface StepInfo {
   content?: string;
   durationMinutes?: number;
   duration?: number | null;
+  display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
   media?: { type: string; url: string };
   materials?: string[];
   safety?: string;
@@ -43,6 +44,7 @@ export interface AdminOverrides {
     description?: string;
     durationMinutes?: number;
     order?: number;
+    display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
   }>;
   phases?: Array<{
     id: string;

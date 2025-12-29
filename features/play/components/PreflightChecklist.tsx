@@ -185,6 +185,14 @@ export interface SessionChecklistState {
   totalRoles: number;
   artifactsSnapshotted?: boolean;
   secretsUnlocked?: boolean;
+  // Extended checks (Task 1.5)
+  hasSecretInstructions?: boolean;
+  secretsRevealedCount?: number;
+  hasTriggers?: boolean;
+  triggersSnapshotted?: boolean;
+  armedTriggersCount?: number;
+  signalCapabilitiesTested?: boolean;
+  roleMinCountsStatus?: Array<{ roleId: string; name: string; min: number; assigned: number; met: boolean }>;
 }
 
 export function buildPreflightItems(
@@ -192,11 +200,13 @@ export function buildPreflightItems(
   actions: {
     onSnapshotRoles?: () => void;
     onAssignRoles?: () => void;
+    onUnlockSecrets?: () => void;
+    onTestSignals?: () => void;
   }
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
 
-  // Participants check
+  // 1. Participants check
   items.push({
     id: 'participants',
     label: 'Deltagare',
@@ -207,7 +217,7 @@ export function buildPreflightItems(
         : 'Inga deltagare har gått med ännu',
   });
 
-  // Game check
+  // 2. Game check
   if (!state.hasGame) {
     items.push({
       id: 'game',
@@ -215,31 +225,50 @@ export function buildPreflightItems(
       status: 'error',
       detail: 'Sessionen har inget spel kopplat',
     });
+    return items; // Early return - can't continue without game
   }
 
-  // Roles snapshot check
-  if (state.hasGame) {
-    if (!state.rolesSnapshotted) {
+  // 3. Roles snapshot check
+  if (!state.rolesSnapshotted) {
+    items.push({
+      id: 'roles-snapshot',
+      label: 'Roller kopierade',
+      status: 'error',
+      detail: 'Kopiera roller från spelet innan du kan tilldela dem',
+      action: actions.onSnapshotRoles
+        ? { label: 'Kopiera roller', onClick: actions.onSnapshotRoles }
+        : undefined,
+    });
+  } else {
+    items.push({
+      id: 'roles-snapshot',
+      label: 'Roller kopierade',
+      status: 'ready',
+      detail: `${state.totalRoles} roller kopierade från spelet`,
+    });
+
+    // 4. Roles assignment check
+    if (state.roleMinCountsStatus && state.roleMinCountsStatus.length > 0) {
+      const minCountsMet = state.roleMinCountsStatus.every((r) => r.met);
+      const someAssigned = state.rolesAssignedCount > 0;
+
       items.push({
-        id: 'roles-snapshot',
-        label: 'Roller kopierade',
-        status: 'error',
-        detail: 'Kopiera roller från spelet innan du kan tilldela dem',
-        action: actions.onSnapshotRoles
-          ? { label: 'Kopiera roller', onClick: actions.onSnapshotRoles }
-          : undefined,
+        id: 'roles-assigned',
+        label: 'Roller tilldelade',
+        status: minCountsMet ? 'ready' : someAssigned ? 'warning' : 'pending',
+        detail: minCountsMet
+          ? 'Alla minimikrav uppfyllda'
+          : state.roleMinCountsStatus
+              .filter((r) => !r.met)
+              .map((r) => `${r.name}: ${r.assigned}/${r.min}`)
+              .join(', '),
+        action:
+          !minCountsMet && actions.onAssignRoles
+            ? { label: 'Tilldela roller', onClick: actions.onAssignRoles }
+            : undefined,
       });
     } else {
-      items.push({
-        id: 'roles-snapshot',
-        label: 'Roller kopierade',
-        status: 'ready',
-        detail: `${state.totalRoles} roller kopierade från spelet`,
-      });
-    }
-
-    // Roles assignment check
-    if (state.rolesSnapshotted) {
+      // Fallback for simpler role check
       const allAssigned =
         state.participantCount > 0 &&
         state.rolesAssignedCount >= state.participantCount;
@@ -260,6 +289,71 @@ export function buildPreflightItems(
             : undefined,
       });
     }
+  }
+
+  // 5. Secrets check (if applicable)
+  if (state.hasSecretInstructions) {
+    const allRolesAssigned = state.rolesAssignedCount >= state.participantCount;
+    const secretsRevealedCount = state.secretsRevealedCount ?? 0;
+
+    items.push({
+      id: 'secrets',
+      label: 'Hemliga instruktioner',
+      status: state.secretsUnlocked
+        ? 'ready'
+        : allRolesAssigned
+          ? 'warning'
+          : 'pending',
+      detail: state.secretsUnlocked
+        ? `Upplåsta (${secretsRevealedCount}/${state.participantCount} har visat)`
+        : allRolesAssigned
+          ? 'Redo att låsas upp'
+          : 'Tilldela roller först',
+      action:
+        !state.secretsUnlocked && allRolesAssigned && actions.onUnlockSecrets
+          ? { label: 'Lås upp', onClick: actions.onUnlockSecrets }
+          : undefined,
+    });
+  }
+
+  // 6. Artifacts check
+  if (state.artifactsSnapshotted !== undefined) {
+    items.push({
+      id: 'artifacts',
+      label: 'Artefakter',
+      status: state.artifactsSnapshotted ? 'ready' : 'pending',
+      detail: state.artifactsSnapshotted
+        ? 'Artefakter redo för sessionen'
+        : 'Artefakter laddas automatiskt vid start',
+    });
+  }
+
+  // 7. Triggers check
+  if (state.hasTriggers) {
+    items.push({
+      id: 'triggers',
+      label: 'Triggers',
+      status: state.triggersSnapshotted ? 'ready' : 'pending',
+      detail: state.triggersSnapshotted
+        ? `${state.armedTriggersCount ?? 0} triggers redo`
+        : 'Triggers laddas automatiskt vid start',
+    });
+  }
+
+  // 8. Signal capabilities check
+  if (state.signalCapabilitiesTested !== undefined) {
+    items.push({
+      id: 'signals',
+      label: 'Signaler',
+      status: state.signalCapabilitiesTested ? 'ready' : 'pending',
+      detail: state.signalCapabilitiesTested
+        ? 'Signalkällor testade'
+        : 'Testa signalkällor (valfritt)',
+      action:
+        !state.signalCapabilitiesTested && actions.onTestSignals
+          ? { label: 'Testa', onClick: actions.onTestSignals }
+          : undefined,
+    });
   }
 
   return items;

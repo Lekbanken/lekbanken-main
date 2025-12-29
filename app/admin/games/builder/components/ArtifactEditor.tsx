@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { Card, Button, Input, Textarea, Select } from '@/components/ui';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
 import type { RoleData } from './RoleEditor';
 import { ArtifactWizard } from './ArtifactWizard';
@@ -45,6 +45,10 @@ const artifactTypeOptions = [
   { value: 'location_check', label: '📍 Platsverifiering' },
   { value: 'sound_level', label: '🎤 Ljudnivå-detektor' },
   { value: 'replay_marker', label: '⏱️ Replay-markör' },
+  // Session Cockpit (Task 2.1-2.3)
+  { value: 'signal_generator', label: '📢 Signalgenerator' },
+  { value: 'time_bank_step', label: '⏳ Tidsbank / Final timer' },
+  { value: 'empty_artifact', label: '📦 Tom slot (placeholder)' },
 ];
 
 const makeId = () =>
@@ -80,7 +84,6 @@ function createArtifact(): ArtifactFormData {
 
 export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChange }: ArtifactEditorProps) {
   const [wizardOpen, setWizardOpen] = useState(false);
-  const [previewArtifact, setPreviewArtifact] = useState<ArtifactFormData | null>(null);
 
   const roleOptions = useMemo(
     () => roles.map((r) => ({ value: r.id, label: r.name || 'Roll' })),
@@ -780,7 +783,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                💡 Lösningen definieras i JSON: solution: {'{'}"Alice": "Röd", "Bob": "Grön"{'}'}
+                💡 Lösningen definieras i JSON:{' '}
+                <code className="font-mono">solution: {'{"Alice": "Röd", "Bob": "Grön"}'}</code>
               </p>
             </div>
           )}

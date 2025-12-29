@@ -1,4 +1,5 @@
 export * from './auth'
 export * from './tenant'
 export * from './games'
+export * from './session-cockpit'
 export type { Database } from './supabase'

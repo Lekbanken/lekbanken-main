@@ -201,6 +201,7 @@ export function useTrigger(options: UseTriggerOptions = {}): UseTriggerReturn {
       executeOnce: config.executeOnce ?? false,
       delaySeconds: config.delaySeconds,
       firedCount: 0,
+      errorCount: 0,
       createdAt: now,
       updatedAt: now,
     };

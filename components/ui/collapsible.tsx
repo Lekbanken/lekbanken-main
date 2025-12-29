@@ -5,7 +5,13 @@ import {
   useContext,
   useState,
   type ReactNode,
+  type ReactElement,
   type HTMLAttributes,
+  type KeyboardEvent,
+  type MouseEvent,
+  type Ref,
+  isValidElement,
+  cloneElement,
   forwardRef,
 } from 'react';
 import { cn } from '@/lib/utils';
@@ -73,25 +79,71 @@ export function Collapsible({
 // Collapsible Trigger
 // =============================================================================
 
-interface CollapsibleTriggerProps extends HTMLAttributes<HTMLButtonElement> {
+interface CollapsibleTriggerProps extends HTMLAttributes<HTMLElement> {
   asChild?: boolean;
 }
 
-export const CollapsibleTrigger = forwardRef<HTMLButtonElement, CollapsibleTriggerProps>(
-  ({ children, className, asChild: _asChild, onClick, ...props }, ref) => {
+export const CollapsibleTrigger = forwardRef<HTMLElement, CollapsibleTriggerProps>(
+  ({ children, className, asChild = false, onClick, onKeyDown, ...props }, ref) => {
     const { isOpen, toggle } = useCollapsible();
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    type ChildProps = {
+      className?: string;
+      onClick?: (event: MouseEvent<HTMLElement>) => void;
+      onKeyDown?: (event: KeyboardEvent<HTMLElement>) => void;
+      role?: string;
+      tabIndex?: number;
+      type?: string;
+      'aria-expanded'?: boolean;
+    };
+
+    const handleClick = (e: MouseEvent<HTMLElement>) => {
       toggle();
       onClick?.(e);
     };
 
+    if (asChild && isValidElement(children)) {
+      const child = children as ReactElement<ChildProps>;
+      const childProps = child.props;
+      const isButtonElement = typeof children.type === 'string' && children.type === 'button';
+
+      const handleChildClick = (event: MouseEvent<HTMLElement>) => {
+        toggle();
+        childProps.onClick?.(event);
+        onClick?.(event);
+      };
+
+      const handleChildKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+        if (!isButtonElement && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          toggle();
+        }
+        childProps.onKeyDown?.(event);
+        onKeyDown?.(event);
+      };
+
+      return cloneElement(child, {
+        onClick: handleChildClick,
+        onKeyDown: handleChildKeyDown,
+        className: cn(className, childProps.className),
+        'aria-expanded': isOpen,
+        ...(props as unknown as Partial<ChildProps>),
+        ...(isButtonElement
+          ? { type: childProps.type ?? 'button' }
+          : {
+              role: childProps.role ?? 'button',
+              tabIndex: childProps.tabIndex ?? 0,
+            }),
+      });
+    }
+
     return (
       <button
-        ref={ref}
+        ref={ref as Ref<HTMLButtonElement>}
         type="button"
         aria-expanded={isOpen}
-        onClick={handleClick}
+        onClick={handleClick as (e: MouseEvent<HTMLButtonElement>) => void}
+        onKeyDown={onKeyDown as (e: KeyboardEvent<HTMLButtonElement>) => void}
         className={cn('flex items-center gap-2', className)}
         {...props}
       >

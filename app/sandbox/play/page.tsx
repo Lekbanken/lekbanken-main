@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
-import { ArrowLeftIcon, PlayIcon, ArrowPathIcon, BoltIcon, ClockIcon, SparklesIcon, LockClosedIcon, UsersIcon, SpeakerWaveIcon, BookOpenIcon } from '@heroicons/react/24/solid';
+import { PlayIcon, ArrowPathIcon, BoltIcon, ClockIcon, SparklesIcon, LockClosedIcon, UsersIcon, SpeakerWaveIcon, BookOpenIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { SandboxShell } from '../components/shell/SandboxShellV2';
+import { getModuleById } from '../config/sandbox-modules';
 import { 
   TypewriterText, 
   CountdownOverlay, 
@@ -40,6 +41,8 @@ Vad betyder detta? Och vad är det för stjärnor som nämns?`,
 type DemoTextKey = keyof typeof DEMO_TEXTS;
 
 export default function PlaySandboxPage() {
+  const playModule = getModuleById('play');
+
   const [typewriterSpeed, setTypewriterSpeed] = useState<TypewriterSpeed>('normal');
   const [typewriterText, setTypewriterText] = useState<DemoTextKey>('medium');
   const [typewriterKey, setTypewriterKey] = useState(0);
@@ -204,27 +207,20 @@ export default function PlaySandboxPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
-        <div className="container flex h-14 items-center gap-4">
-          <Link href="/sandbox" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeftIcon className="h-4 w-4" />
-            <span>Sandbox</span>
-          </Link>
-          <div className="flex-1" />
+    <SandboxShell
+      moduleId="play"
+      title={playModule?.module.label ?? 'Play Immersion'}
+      description={playModule?.module.description ?? 'Play components sandbox'}
+    >
+      <div className="space-y-12">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-semibold text-foreground">Play Immersion Components</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Typewriter text reveal, countdown overlays, keypad, triggers och lobby UI
+            </p>
+          </div>
           <Badge variant="accent">Sprint 1-4 + Phase 2</Badge>
-        </div>
-      </header>
-
-      {/* Content */}
-      <main className="container py-8 space-y-12">
-        {/* Page Title */}
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Play Immersion Components</h1>
-          <p className="mt-2 text-muted-foreground">
-            Typewriter text reveal och countdown overlay för Legendary Play
-          </p>
         </div>
 
         {/* Typewriter Section */}
@@ -879,7 +875,7 @@ export default function PlaySandboxPage() {
             </CardContent>
           </Card>
         </section>
-      </main>
+      </div>
 
       {/* Countdown Overlay */}
       <CountdownOverlay
@@ -914,6 +910,6 @@ export default function PlaySandboxPage() {
           console.log('Story skipped!');
         }}
       />
-    </div>
+    </SandboxShell>
   );
 }

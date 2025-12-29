@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FAFC"/>
+      <stop offset="1" stop-color="#ECFEFF"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bg)"/>
+
+  <text x="60" y="90" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="44" fill="#0F172A">Karta</text>
+  <text x="60" y="135" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#334155">Klicka på ett rum för att gå dit.</text>
+
+  <!-- Rooms -->
+  <rect x="160" y="260" width="340" height="320" rx="28" fill="#E0F2FE" stroke="#0284C7" stroke-width="6"/>
+  <rect x="700" y="300" width="340" height="320" rx="28" fill="#ECFCCB" stroke="#65A30D" stroke-width="6"/>
+
+  <text x="280" y="360" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="38" fill="#0F172A">Rum A</text>
+  <text x="820" y="400" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="38" fill="#0F172A">Rum B</text>
+
+  <!-- Click markers around hotspot centers (28%,45%) and (72%,55%) -->
+  <circle cx="336" cy="360" r="28" fill="#0EA5E9" opacity="0.25"/>
+  <circle cx="864" cy="440" r="28" fill="#84CC16" opacity="0.25"/>
+
+  <text x="60" y="740" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="18" fill="#475569">
+    Hotspots (för prototyp): Rum A ~ 28%/45%, Rum B ~ 72%/55%.
+  </text>
+</svg>

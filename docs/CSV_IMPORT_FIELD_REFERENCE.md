@@ -704,6 +704,16 @@ step_2_duration
 ... (upp till step_20)
 ```
 
+### Canonical CSV-header (source of truth)
+
+Den canonical CSV-headern (dvs den som UI och import-validering utgår från) kommer från `getAllCsvColumns()` i `types/csv-import.ts`.
+
+<!-- CANONICAL_CSV_HEADER_START -->
+```csv
+game_key,name,short_description,description,play_mode,status,locale,energy_level,location_type,time_estimate_min,duration_max,min_players,max_players,players_recommended,age_min,age_max,difficulty,accessibility_notes,space_requirements,leader_tips,main_purpose_id,sub_purpose_ids,product_id,owner_tenant_id,step_count,materials_json,phases_json,roles_json,board_config_json,step_1_title,step_1_body,step_1_duration,step_2_title,step_2_body,step_2_duration,step_3_title,step_3_body,step_3_duration,step_4_title,step_4_body,step_4_duration,step_5_title,step_5_body,step_5_duration,step_6_title,step_6_body,step_6_duration,step_7_title,step_7_body,step_7_duration,step_8_title,step_8_body,step_8_duration,step_9_title,step_9_body,step_9_duration,step_10_title,step_10_body,step_10_duration,step_11_title,step_11_body,step_11_duration,step_12_title,step_12_body,step_12_duration,step_13_title,step_13_body,step_13_duration,step_14_title,step_14_body,step_14_duration,step_15_title,step_15_body,step_15_duration,step_16_title,step_16_body,step_16_duration,step_17_title,step_17_body,step_17_duration,step_18_title,step_18_body,step_18_duration,step_19_title,step_19_body,step_19_duration,step_20_title,step_20_body,step_20_duration
+```
+<!-- CANONICAL_CSV_HEADER_END -->
+
 ---
 
 ## Appendix B: Felsökning

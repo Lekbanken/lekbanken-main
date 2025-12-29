@@ -285,6 +285,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         displayName: p.displayName,
         status: mapStatus(p.status),
         role: p.role,
+        position: (p as { position?: number | null }).position ?? null,
+        isNextStarter: (p as { isNextStarter?: boolean }).isNextStarter ?? false,
         joinedAt: p.joinedAt ?? new Date().toISOString(),
         lastSeenAt: p.lastSeenAt,
       }));

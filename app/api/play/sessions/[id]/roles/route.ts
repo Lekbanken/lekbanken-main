@@ -26,13 +26,28 @@ export async function GET(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     
-    const roles = await ParticipantSessionService.getSessionRoles(sessionId);
-    
     // Check if requester is host (for full role info) or participant (limited info)
     const supabase = await createServerRlsClient();
     const { data: { user } } = await supabase.auth.getUser();
     
     const isHost = user?.id === session.host_user_id;
+
+    let roles = await ParticipantSessionService.getSessionRoles(sessionId);
+
+    if (isHost && roles.length === 0 && session.game_id) {
+      try {
+        const count = await ParticipantSessionService.snapshotGameRoles(
+          sessionId,
+          session.game_id
+        );
+
+        if (count > 0) {
+          roles = await ParticipantSessionService.getSessionRoles(sessionId);
+        }
+      } catch (error) {
+        console.warn('Failed to auto-snapshot roles for session', error);
+      }
+    }
     
     if (isHost) {
       // Host sees everything

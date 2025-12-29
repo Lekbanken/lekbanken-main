@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ClockIcon,
   PauseCircleIcon,
@@ -29,7 +29,7 @@ import { ParticipantTimeBankDisplay } from '@/features/play/components/Participa
 import { isFeatureEnabled } from '@/lib/config/env';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import { RoleCard, type RoleCardData } from './RoleCard';
-import type { TimerState, SessionRuntimeState } from '@/types/play-runtime';
+import type { TimerState, SessionRuntimeState, SignalReceivedBroadcast } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
 import { sendSessionChatMessage } from '@/features/play/api/chat-api';
 import { PuzzleArtifactRenderer } from '@/features/play/components/PuzzleArtifactRenderer';
@@ -357,6 +357,54 @@ export function ParticipantPlayView({
     }
   }, [sessionId, participantToken, loadArtifacts]);
 
+  const [signalToast, setSignalToast] = useState<{
+    id: string;
+    channel: string;
+    message: string;
+    createdAt: string;
+  } | null>(null);
+  const signalToastTimerRef = useRef<number | null>(null);
+
+  const formatSignalText = useCallback((payload: unknown): string => {
+    if (!payload) return '';
+    if (typeof payload === 'string') return payload;
+    if (typeof payload === 'object' && payload !== null && 'message' in payload) {
+      const msg = (payload as { message?: unknown }).message;
+      if (typeof msg === 'string') return msg;
+    }
+    try {
+      return JSON.stringify(payload);
+    } catch {
+      return '';
+    }
+  }, []);
+
+  const handleSignalToast = useCallback((payload: SignalReceivedBroadcast['payload']) => {
+    const message = formatSignalText(payload.payload);
+    const fallback = message || `Signal: ${payload.channel}`;
+    setSignalToast({
+      id: payload.id,
+      channel: payload.channel,
+      message: fallback,
+      createdAt: payload.created_at,
+    });
+
+    if (signalToastTimerRef.current) {
+      window.clearTimeout(signalToastTimerRef.current);
+    }
+    signalToastTimerRef.current = window.setTimeout(() => {
+      setSignalToast(null);
+    }, 4000);
+  }, [formatSignalText]);
+
+  useEffect(() => {
+    return () => {
+      if (signalToastTimerRef.current) {
+        window.clearTimeout(signalToastTimerRef.current);
+      }
+    };
+  }, []);
+
   // Subscribe to live session updates
   const {
     currentStepIndex,
@@ -406,6 +454,7 @@ export function ParticipantPlayView({
         setStoryOverlayOpen(false);
       }
     },
+    onSignalReceived: handleSignalToast,
   });
 
   // --------------------------------------------------------------------------
@@ -601,6 +650,17 @@ export function ParticipantPlayView({
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-4 pb-24">
+      {signalToast && (
+        <div className="fixed bottom-4 left-1/2 z-50 w-[min(90%,420px)] -translate-x-1/2">
+          <Card className="flex items-center gap-2 border border-primary/20 bg-card/95 p-3 shadow-lg">
+            <SignalIcon className="h-4 w-4 text-primary" />
+            <Badge variant="secondary" size="sm">
+              {signalToast.channel}
+            </Badge>
+            <span className="text-sm text-foreground">{signalToast.message}</span>
+          </Card>
+        </div>
+      )}
       {/* Header */}
       <header className="space-y-3">
         <div className="flex items-start justify-between gap-4">

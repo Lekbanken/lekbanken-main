@@ -249,12 +249,35 @@ export function parseJsonCell<T>(
     return { success: true, data: parsed as T };
   } catch (e) {
     const error = e instanceof Error ? e.message : 'Invalid JSON';
+
+    // Try to extract byte/char position from common V8/Node error messages.
+    const posMatch = /position\s+(\d+)/i.exec(error);
+    const position = posMatch ? Number(posMatch[1]) : null;
+
+    const contextChars = 50;
+    let contextInfo = '';
+    if (typeof position === 'number' && Number.isFinite(position) && position >= 0) {
+      const start = Math.max(0, position - contextChars);
+      const end = Math.min(value.length, position + contextChars);
+      const snippet = value.slice(start, end);
+
+      const prefix = value.slice(0, position);
+      const lines = prefix.split(/\r?\n/);
+      const jsonLine = lines.length;
+      const jsonColumn = lines[lines.length - 1]?.length ? lines[lines.length - 1]!.length + 1 : 1;
+
+      contextInfo = ` Near position ${position} (line ${jsonLine}, col ${jsonColumn}): ${JSON.stringify(snippet)}`;
+    }
+
+    const guidance =
+      ' Tips: JSON måste använda dubbla citattecken (\") och om JSON ligger i en CSV-cell måste alla \" i JSON skrivas som \"\" (dubbla citattecken) för att CSV ska vara giltig.';
+
     return {
       success: false,
       error: {
         row: rowNumber,
         column: columnName,
-        message: `Invalid JSON in ${columnName}: ${error}`,
+        message: `Invalid JSON in ${columnName}: ${error}.${contextInfo}${guidance}`,
       },
     };
   }

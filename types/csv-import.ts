@@ -403,6 +403,10 @@ export type ExportableGame = {
   phases: ParsedPhase[];
   roles: ParsedRole[];
   boardConfig: ParsedBoardConfig | null;
+
+  /** Full-fidelity (Legendary) JSON export/import */
+  artifacts?: ParsedArtifact[];
+  triggers?: ParsedTrigger[];
 };
 
 // =============================================================================

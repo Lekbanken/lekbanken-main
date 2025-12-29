@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7FEE7"/>
+      <stop offset="1" stop-color="#ECFCCB"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bg)"/>
+  <text x="60" y="90" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="44" fill="#0F172A">Rum B</text>
+  <text x="60" y="135" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#334155">Exempel: en gåta + en dörr-trigger.</text>
+
+  <!-- Board -->
+  <rect x="240" y="210" width="720" height="420" rx="26" fill="#D9F99D" stroke="#65A30D" stroke-width="6"/>
+
+  <!-- Riddle (artifact) near (42%,50%) => (504,400) -->
+  <g transform="translate(504 400)">
+    <rect x="-80" y="-60" width="160" height="120" rx="18" fill="#FEF3C7" stroke="#B45309" stroke-width="6"/>
+    <path d="M-40 -20 H40" stroke="#B45309" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-40 0 H40" stroke="#B45309" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-40 20 H20" stroke="#B45309" stroke-width="6" stroke-linecap="round"/>
+    <text x="-22" y="95" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#0F172A">Gåta</text>
+  </g>
+
+  <!-- Door (trigger) near (78%,60%) => (936,480) -->
+  <g transform="translate(936 480)">
+    <rect x="-60" y="-90" width="120" height="180" rx="18" fill="#E2E8F0" stroke="#334155" stroke-width="6"/>
+    <circle cx="25" cy="10" r="10" fill="#334155"/>
+    <text x="-26" y="125" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#0F172A">Dörr</text>
+  </g>
+
+  <!-- Back marker near (12%,14%) => (144,112) -->
+  <g transform="translate(144 112)">
+    <circle cx="0" cy="0" r="36" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="6"/>
+    <path d="M12 -14 L-10 0 L12 14" fill="none" stroke="#1D4ED8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="-28" y="70" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="20" fill="#0F172A">Karta</text>
+  </g>
+</svg>

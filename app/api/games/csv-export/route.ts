@@ -12,6 +12,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { generateGamesCsv, generateGamesJson } from '@/features/admin/games/utils/csv-generator';
+import { actionIdsToOrderAliases, conditionIdsToOrderAliases } from '@/lib/games/trigger-order-alias';
 import type { ExportableGame, ExportOptions } from '@/types/csv-import';
 
 // Temporary type overrides until Supabase types are regenerated
@@ -243,6 +244,109 @@ export async function GET(request: Request) {
             layout_variant: bc.layout_variant as 'standard' | 'fullscreen',
           };
         }
+      }
+
+      // Full-fidelity (Legendary) export for JSON format
+      if (format === 'json') {
+        // Build lookup maps for converting trigger references into order-based aliases
+        const { data: stepOrderRows } = await db
+          .from('game_steps')
+          .select('id, step_order')
+          .eq('game_id', g.id);
+        const { data: phaseOrderRows } = await db
+          .from('game_phases')
+          .select('id, phase_order')
+          .eq('game_id', g.id);
+
+        const stepOrderById = new Map<string, number>();
+        for (const s of stepOrderRows ?? []) {
+          if (s?.id && typeof s.step_order === 'number') stepOrderById.set(s.id as string, s.step_order as number);
+        }
+        const phaseOrderById = new Map<string, number>();
+        for (const p of phaseOrderRows ?? []) {
+          if (p?.id && typeof p.phase_order === 'number') phaseOrderById.set(p.id as string, p.phase_order as number);
+        }
+
+        // Artifacts + variants
+        const { data: artifacts } = await db
+          .from('game_artifacts')
+          .select('*')
+          .eq('game_id', g.id)
+          .order('artifact_order', { ascending: true });
+
+        const artifactOrderById = new Map<string, number>();
+        for (const a of artifacts ?? []) {
+          if (a?.id && typeof a.artifact_order === 'number') artifactOrderById.set(a.id as string, a.artifact_order as number);
+        }
+
+        if (artifacts && artifacts.length > 0) {
+          const artifactIds = artifacts.map((a: AnySupabase) => a.id).filter(Boolean);
+
+          const { data: variants } = artifactIds.length
+            ? await db
+                .from('game_artifact_variants')
+                .select('*')
+                .in('artifact_id', artifactIds)
+                .order('variant_order', { ascending: true })
+            : { data: [] as AnySupabase[] };
+
+          const variantsByArtifactId = new Map<string, AnySupabase[]>();
+          for (const v of variants ?? []) {
+            if (!v?.artifact_id) continue;
+            const list = variantsByArtifactId.get(v.artifact_id as string) ?? [];
+            list.push(v);
+            variantsByArtifactId.set(v.artifact_id as string, list);
+          }
+
+          exportGame.artifacts = artifacts.map((a: AnySupabase) => {
+            const artifactId = a.id as string;
+            const artifactVariants = variantsByArtifactId.get(artifactId) ?? [];
+            return {
+              artifact_order: a.artifact_order,
+              locale: a.locale ?? null,
+              title: a.title,
+              description: a.description ?? null,
+              artifact_type: a.artifact_type,
+              tags: a.tags ?? [],
+              metadata: a.metadata ?? {},
+              variants: artifactVariants.map((v: AnySupabase) => ({
+                variant_order: v.variant_order,
+                visibility: v.visibility,
+                visible_to_role_id: v.visible_to_role_id ?? null,
+                title: v.title ?? null,
+                body: v.body ?? null,
+                media_ref: v.media_ref ?? null,
+                metadata: v.metadata ?? {},
+              })),
+            };
+          });
+        } else {
+          exportGame.artifacts = [];
+        }
+
+        // Triggers
+        const { data: triggers } = await db
+          .from('game_triggers')
+          .select('*')
+          .eq('game_id', g.id)
+          .order('sort_order', { ascending: true });
+
+        exportGame.triggers = (triggers ?? []).map((t: AnySupabase) => {
+          const condition = conditionIdsToOrderAliases(t.condition, { stepOrderById, phaseOrderById, artifactOrderById });
+          const actions = Array.isArray(t.actions)
+            ? t.actions.map((a: AnySupabase) => actionIdsToOrderAliases(a, { artifactOrderById }))
+            : [];
+          return {
+            name: t.name,
+            description: t.description ?? null,
+            enabled: t.enabled ?? true,
+            condition,
+            actions,
+            execute_once: t.execute_once ?? false,
+            delay_seconds: t.delay_seconds ?? 0,
+            sort_order: t.sort_order ?? 0,
+          };
+        });
       }
       
       exportableGames.push(exportGame);

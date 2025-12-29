@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabPanel } from '@/components/ui/tabs';
+import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/config/env';
 import {
@@ -24,8 +25,11 @@ import {
   ChevronRightIcon,
   ClipboardDocumentCheckIcon,
   ChatBubbleLeftRightIcon,
+  FlagIcon,
+  UserMinusIcon,
 } from '@heroicons/react/24/outline';
 import { useSessionState } from '../hooks/useSessionState';
+import { useSignalCapabilities } from '../hooks/useSignalCapabilities';
 import { useSessionChat } from '../hooks/useSessionChat';
 import { useSessionEvents } from '../hooks/useSessionEvents';
 import { DirectorModeDrawer } from './DirectorModeDrawer';
@@ -38,6 +42,8 @@ import { SessionChatDrawer } from './SessionChatDrawer';
 import { SessionStoryPanel } from './SessionStoryPanel';
 import { LobbyHub } from '@/components/play';
 import { StoryViewModal } from './StoryViewModal';
+import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
+import { kickParticipant, setNextStarter } from '@/features/play-participant/api';
 import type { SessionCockpitState, CockpitParticipant, UseSessionStateReturn, SessionEvent as CockpitEvent } from '@/types/session-cockpit';
 import type { SessionEvent as EventFeedEvent } from '@/types/session-event';
 import type { SessionRole } from '@/types/play-runtime';
@@ -248,12 +254,16 @@ function ParticipantWithRoleRow({
   roles,
   onAssignRole,
   onUnassignRole,
+  onKick,
+  onMarkNext,
   isDisabled,
 }: {
   participant: CockpitParticipant;
   roles: SessionRole[];
   onAssignRole: (participantId: string, roleId: string | null) => void;
   onUnassignRole: (participantId: string) => void;
+  onKick: (participantId: string, displayName?: string) => void;
+  onMarkNext: (participantId: string) => void;
   isDisabled: boolean;
 }) {
   const currentRole = roles.find((r) => r.id === participant.assignedRoleId);
@@ -271,6 +281,11 @@ function ParticipantWithRoleRow({
           <div className="font-medium text-foreground truncate">
             {participant.displayName ?? 'Anonym deltagare'}
           </div>
+          {participant.isNextStarter && (
+            <Badge variant="outline" className="mt-1 w-fit text-[10px]">
+              Nasta tur
+            </Badge>
+          )}
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             {isConnected ? (
               <span className="text-green-600">● Online</span>
@@ -306,6 +321,24 @@ function ParticipantWithRoleRow({
             ))}
           </select>
         )}
+        <Button
+          variant={participant.isNextStarter ? 'primary' : 'outline'}
+          size="sm"
+          onClick={() => onMarkNext(participant.id)}
+          disabled={isDisabled}
+          className="px-2"
+        >
+          <FlagIcon className="h-4 w-4" />
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={() => onKick(participant.id, participant.displayName)}
+          disabled={isDisabled}
+          className="px-2"
+        >
+          <UserMinusIcon className="h-4 w-4" />
+        </Button>
       </div>
     </div>
   );
@@ -317,7 +350,9 @@ function ParticipantsTab({
   onAssignRole,
   onUnassignRole,
   onSnapshotRoles,
-  isActive,
+  onKickParticipant,
+  onMarkNext,
+  isReadOnly,
   isLoading,
 }: {
   participants: CockpitParticipant[];
@@ -325,7 +360,9 @@ function ParticipantsTab({
   onAssignRole: (participantId: string, roleId: string | null) => void;
   onUnassignRole: (participantId: string) => void;
   onSnapshotRoles?: () => void;
-  isActive: boolean;
+  onKickParticipant: (participantId: string, displayName?: string) => void;
+  onMarkNext: (participantId: string) => void;
+  isReadOnly: boolean;
   isLoading: boolean;
 }) {
   const connectedCount = participants.filter((p) => p.status === 'active' || p.status === 'joined').length;
@@ -362,7 +399,7 @@ function ParticipantsTab({
           <Button
             size="sm"
             onClick={onSnapshotRoles}
-            disabled={!onSnapshotRoles || isActive || isLoading}
+            disabled={!onSnapshotRoles || isReadOnly || isLoading}
           >
             Kopiera roller
           </Button>
@@ -431,7 +468,9 @@ function ParticipantsTab({
               roles={roles}
               onAssignRole={onAssignRole}
               onUnassignRole={onUnassignRole}
-              isDisabled={isActive}
+              onKick={onKickParticipant}
+              onMarkNext={onMarkNext}
+              isDisabled={isReadOnly}
             />
           ))
         )}
@@ -545,16 +584,88 @@ export function SessionCockpit({
     disableAllTriggers,
     sendSignal,
     applyTimeBankDelta,
+    refresh,
   } = sessionState;
 
   const showSignals = isFeatureEnabled('signals');
   const showTimeBank = isFeatureEnabled('timeBank');
   const showEvents = isFeatureEnabled('eventLogging');
 
+  const {
+    capabilities,
+    flashScreen,
+    playSound,
+    vibrate,
+    flashTorch,
+    sendNotification,
+    activateAudioGate,
+    audioGateActive,
+  } = useSignalCapabilities({ autoDetect: showSignals });
+
+  const toast = useToast();
+
+  const signalPresets = useMemo(() => {
+    const presets: Array<{
+      id: string;
+      name: string;
+      type: 'torch' | 'audio' | 'vibration' | 'screen_flash' | 'notification';
+      color?: string;
+      disabled?: boolean;
+      disabledReason?: string;
+    }> = [];
+
+    if (capabilities.screenFlash.status === 'available') {
+      presets.push({ id: 'screen_flash', name: 'Skarmblink', type: 'screen_flash', color: '#ffffff' });
+    }
+    if (capabilities.vibration.status === 'available') {
+      presets.push({ id: 'vibration', name: 'Vibration', type: 'vibration' });
+    }
+    if (capabilities.torch.status === 'available') {
+      presets.push({ id: 'torch', name: 'Ficklampa', type: 'torch' });
+    }
+    if (capabilities.audio.status === 'available') {
+      presets.push({ id: 'audio', name: 'Ljudsignal', type: 'audio' });
+    }
+    const notificationStatus = capabilities.notification.status;
+    const notificationDisabled = notificationStatus !== 'available';
+    let notificationReason: string | undefined;
+    if (notificationDisabled) {
+      switch (notificationStatus) {
+        case 'denied':
+          notificationReason = 'blocked in browser';
+          break;
+        case 'unavailable':
+          notificationReason = 'not supported in browser';
+          break;
+        case 'error':
+          notificationReason = 'permission error';
+          break;
+        case 'unknown':
+          notificationReason = 'permission pending';
+          break;
+        default:
+          notificationReason = 'not available';
+          break;
+      }
+    }
+    presets.push({
+      id: 'notification',
+      name: 'Notis',
+      type: 'notification',
+      disabled: notificationDisabled,
+      disabledReason: notificationReason,
+    });
+
+    return presets;
+  }, [capabilities]);
+
   const [activeTab, setActiveTab] = useState<CockpitTab>('overview');
   const [showChecklist, setShowChecklist] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
+  const [roleDrafts, setRoleDrafts] = useState<Record<string, SessionRoleUpdate>>({});
+  const [rolesSaving, setRolesSaving] = useState(false);
+  const [rolesSaveError, setRolesSaveError] = useState<string | null>(null);
   
   // Initialize director mode state based on session status
   const [directorModeOpen, setDirectorModeOpen] = useState(
@@ -588,6 +699,138 @@ export function SessionCockpit({
     sessionId,
     realtime: showEvents,
   });
+
+  useEffect(() => {
+    if (sessionRoles.length === 0) {
+      setRoleDrafts({});
+      return;
+    }
+
+    setRoleDrafts((prev) => {
+      const next: Record<string, SessionRoleUpdate> = {};
+      for (const role of sessionRoles) {
+        next[role.id] = prev[role.id] ?? {
+          id: role.id,
+          name: role.name,
+          public_description: role.public_description ?? '',
+          private_instructions: role.private_instructions ?? '',
+          min_count: role.min_count,
+          max_count: role.max_count ?? null,
+          icon: role.icon ?? '',
+          color: role.color ?? '',
+        };
+      }
+      return next;
+    });
+  }, [sessionRoles]);
+
+  const handleSaveRoleEdits = useCallback(async () => {
+    if (sessionRoles.length === 0) return;
+    setRolesSaving(true);
+    setRolesSaveError(null);
+    try {
+      const updates = Object.values(roleDrafts);
+      const ok = await updateSessionRoles(sessionId, updates);
+      if (!ok) {
+        throw new Error('Failed to save session roles');
+      }
+      await refresh();
+    } catch (error) {
+      setRolesSaveError(
+        error instanceof Error ? error.message : 'Failed to save session roles'
+      );
+    } finally {
+      setRolesSaving(false);
+    }
+  }, [refresh, roleDrafts, sessionId, sessionRoles.length]);
+
+  const handleExecuteSignal = useCallback(async (type: string, config: Record<string, unknown>) => {
+    switch (type) {
+      case 'screen_flash': {
+        const color = typeof config.color === 'string' ? config.color : '#ffffff';
+        const duration = typeof config.durationMs === 'number' ? config.durationMs : undefined;
+        await flashScreen(color, duration);
+        break;
+      }
+      case 'vibration': {
+        const pattern = Array.isArray(config.pattern)
+          ? (config.pattern.filter((p) => typeof p === 'number') as number[])
+          : undefined;
+        await vibrate(pattern);
+        break;
+      }
+      case 'torch': {
+        const duration = typeof config.durationMs === 'number' ? config.durationMs : undefined;
+        await flashTorch(duration);
+        break;
+      }
+      case 'audio': {
+        if (!audioGateActive) {
+          await activateAudioGate();
+        }
+        const url = typeof config.url === 'string' ? config.url : undefined;
+        await playSound(url);
+        break;
+      }
+      case 'notification': {
+        const title = typeof config.title === 'string' ? config.title : 'Signal';
+        const body = typeof config.body === 'string' ? config.body : undefined;
+        const forceToast = config.forceToast === true;
+        const notificationStatus = capabilities.notification.status;
+        let sent = false;
+        if (!forceToast && notificationStatus === 'available') {
+          sent = await sendNotification(title, body);
+        }
+        if (!sent) {
+          let fallbackTitle = 'In-app notification';
+          if (!forceToast) {
+            switch (notificationStatus) {
+              case 'denied':
+                fallbackTitle = 'Notifications blocked';
+                break;
+              case 'unavailable':
+                fallbackTitle = 'Notifications not supported';
+                break;
+              case 'error':
+                fallbackTitle = 'Notification error';
+                break;
+              case 'unknown':
+                fallbackTitle = 'Notification pending';
+                break;
+              default:
+                fallbackTitle = 'Notification';
+                break;
+            }
+          }
+          const fallbackMessage = body ? `${title}: ${body}` : title;
+          toast.info(fallbackMessage, fallbackTitle);
+        }
+        break;
+      }
+    }
+  }, [activateAudioGate, audioGateActive, capabilities.notification.status, flashScreen, flashTorch, playSound, sendNotification, toast, vibrate]);
+
+  const handleKickParticipant = useCallback(async (participantId: string, displayName?: string) => {
+    if (typeof window !== 'undefined') {
+      const label = displayName ? `Ta bort ${displayName} fran sessionen?` : 'Ta bort deltagaren fran sessionen?';
+      if (!window.confirm(label)) return;
+    }
+    try {
+      await kickParticipant(sessionId, participantId);
+      await refresh();
+    } catch (error) {
+      console.warn('Failed to remove participant', error);
+    }
+  }, [refresh, sessionId]);
+
+  const handleMarkNext = useCallback(async (participantId: string) => {
+    try {
+      await setNextStarter(sessionId, participantId);
+      await refresh();
+    } catch (error) {
+      console.warn('Failed to mark next starter', error);
+    }
+  }, [refresh, sessionId]);
 
   const drawerEvents = useMemo<CockpitEvent[]>(() => {
     if (!showEvents) return [];
@@ -883,7 +1126,9 @@ export function SessionCockpit({
                 unassignRole(participantId);
               }}
               onSnapshotRoles={snapshotRoles}
-              isActive={status !== 'lobby'}
+              isReadOnly={status === 'ended'}
+              onKickParticipant={handleKickParticipant}
+              onMarkNext={handleMarkNext}
               isLoading={isLoading}
             />
           </TabPanel>
@@ -920,7 +1165,7 @@ export function SessionCockpit({
             </TabPanel>
           )}
           
-          <TabPanel id="settings" activeTab={activeTab}>
+          <TabPanel id="settings" activeTab={activeTab} className="space-y-6">
             <Card className="p-6">
               <h3 className="font-medium mb-4">Session settings</h3>
               <p className="text-sm text-muted-foreground">
@@ -929,6 +1174,148 @@ export function SessionCockpit({
               <Button variant="outline" size="sm" className="mt-4" onClick={() => setActiveTab('story')}>
                 Open Story
               </Button>
+            </Card>
+
+            <Card className="p-6 space-y-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="font-medium">Session roles (session copy)</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Update role text and limits for this session without changing the game template.
+                  </p>
+                </div>
+                <Button
+                  onClick={() => void handleSaveRoleEdits()}
+                  disabled={rolesSaving || sessionRoles.length === 0}
+                >
+                  Save roles
+                </Button>
+              </div>
+
+              {rolesSaveError && (
+                <div className="text-sm text-destructive">{rolesSaveError}</div>
+              )}
+
+              {sessionRoles.length === 0 ? (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    No roles snapshotted yet. Copy roles in the Roles tab to enable edits here.
+                  </p>
+                  <Button variant="outline" size="sm" onClick={() => void snapshotRoles()}>
+                    Copy roles
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
+                  {sessionRoles.map((role) => {
+                    const draft = roleDrafts[role.id] ?? { id: role.id };
+                    return (
+                      <div key={role.id} className="rounded-md border border-border/60 p-3 space-y-2 bg-muted/30">
+                        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                          <input
+                            type="text"
+                            className="w-full md:w-1/2 rounded border border-input bg-background px-3 py-2 text-sm"
+                            value={draft.name ?? ''}
+                            placeholder={role.name}
+                            onChange={(e) => setRoleDrafts((prev) => ({
+                              ...prev,
+                              [role.id]: { ...prev[role.id], id: role.id, name: e.target.value },
+                            }))}
+                          />
+                          <div className="flex gap-2 text-xs text-muted-foreground">
+                            <label className="flex items-center gap-1">
+                              Min
+                              <input
+                                type="number"
+                                className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                                value={draft.min_count ?? ''}
+                                placeholder={role.min_count?.toString() ?? ''}
+                                onChange={(e) => {
+                                  const value = e.target.value === '' ? undefined : Number(e.target.value);
+                                  setRoleDrafts((prev) => ({
+                                    ...prev,
+                                    [role.id]: {
+                                      ...prev[role.id],
+                                      id: role.id,
+                                      min_count: Number.isFinite(value as number) ? (value as number) : undefined,
+                                    },
+                                  }));
+                                }}
+                              />
+                            </label>
+                            <label className="flex items-center gap-1">
+                              Max
+                              <input
+                                type="number"
+                                className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
+                                value={draft.max_count ?? ''}
+                                placeholder={role.max_count?.toString() ?? ''}
+                                onChange={(e) => {
+                                  const value = e.target.value === '' ? undefined : Number(e.target.value);
+                                  setRoleDrafts((prev) => ({
+                                    ...prev,
+                                    [role.id]: {
+                                      ...prev[role.id],
+                                      id: role.id,
+                                      max_count: Number.isFinite(value as number) ? (value as number) : null,
+                                    },
+                                  }));
+                                }}
+                              />
+                            </label>
+                            <label className="flex items-center gap-1">
+                              Icon
+                              <input
+                                type="text"
+                                className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
+                                value={draft.icon ?? ''}
+                                placeholder={role.icon ?? ''}
+                                onChange={(e) => setRoleDrafts((prev) => ({
+                                  ...prev,
+                                  [role.id]: { ...prev[role.id], id: role.id, icon: e.target.value },
+                                }))}
+                              />
+                            </label>
+                            <label className="flex items-center gap-1">
+                              Color
+                              <input
+                                type="text"
+                                className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
+                                value={draft.color ?? ''}
+                                placeholder={role.color ?? ''}
+                                onChange={(e) => setRoleDrafts((prev) => ({
+                                  ...prev,
+                                  [role.id]: { ...prev[role.id], id: role.id, color: e.target.value },
+                                }))}
+                              />
+                            </label>
+                          </div>
+                        </div>
+                        <textarea
+                          className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                          rows={2}
+                          value={draft.public_description ?? ''}
+                          placeholder={role.public_description ?? ''}
+                          onChange={(e) => setRoleDrafts((prev) => ({
+                            ...prev,
+                            [role.id]: { ...prev[role.id], id: role.id, public_description: e.target.value },
+                          }))}
+                        />
+                        <textarea
+                          className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
+                          rows={3}
+                          value={draft.private_instructions ?? ''}
+                          placeholder={role.private_instructions ?? ''}
+                          onChange={(e) => setRoleDrafts((prev) => ({
+                            ...prev,
+                            [role.id]: { ...prev[role.id], id: role.id, private_instructions: e.target.value },
+                          }))}
+                        />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </Card>
           </TabPanel>
         </main>
@@ -946,6 +1333,7 @@ export function SessionCockpit({
           currentPhaseIndex={currentPhaseIndex}
           triggers={triggers}
           recentSignals={recentSignals}
+          signalPresets={signalPresets}
           events={drawerEvents}
           timeBankBalance={timeBankBalance}
           timeBankPaused={timeBankPaused}
@@ -957,6 +1345,7 @@ export function SessionCockpit({
           onFireTrigger={fireTrigger}
           onDisableAllTriggers={disableAllTriggers}
           onSendSignal={sendSignal}
+          onExecuteSignal={handleExecuteSignal}
           onTimeBankDelta={applyTimeBankDelta}
         />
 

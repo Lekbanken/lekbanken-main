@@ -13,7 +13,9 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { parseCsvGames } from '@/features/admin/games/utils/csv-parser';
+import { parseGamesFromJsonPayload } from '@/features/admin/games/utils/json-game-import';
 import { validateGames } from '@/features/admin/games/utils/game-validator';
+import { actionOrderAliasesToIds, conditionOrderAliasesToIds } from '@/lib/games/trigger-order-alias';
 import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError } from '@/types/csv-import';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,52 +59,7 @@ export async function POST(request: Request) {
     } else {
       // JSON format
       try {
-        const jsonData = JSON.parse(data);
-        if (!Array.isArray(jsonData)) {
-          return NextResponse.json(
-            { error: 'JSON måste vara en array' },
-            { status: 400 }
-          );
-        }
-        // Convert JSON to ParsedGame format
-        parsedGames = jsonData.map((item: AnySupabase) => ({
-          game_key: item.game_key || null,
-          name: item.name || '',
-          short_description: item.short_description || '',
-          description: item.description || null,
-          play_mode: item.play_mode || 'basic',
-          status: item.status || 'draft',
-          locale: item.locale || 'sv-SE',
-          energy_level: item.energy_level || null,
-          location_type: item.location_type || null,
-          time_estimate_min: item.time_estimate_min || null,
-          duration_max: item.duration_max || null,
-          min_players: item.min_players || null,
-          max_players: item.max_players || null,
-          players_recommended: item.players_recommended || null,
-          age_min: item.age_min || null,
-          age_max: item.age_max || null,
-          difficulty: item.difficulty || null,
-          accessibility_notes: item.accessibility_notes || null,
-          space_requirements: item.space_requirements || null,
-          leader_tips: item.leader_tips || null,
-          main_purpose_id: item.main_purpose_id || null,
-          sub_purpose_ids: Array.isArray(item.sub_purpose_ids) 
-            ? item.sub_purpose_ids 
-            : (item.sub_purpose_id ? [item.sub_purpose_id] : []),
-          product_id: item.product_id || null,
-          owner_tenant_id: item.owner_tenant_id || null,
-          steps: item.steps || [],
-          materials: item.materials || null,
-          phases: item.phases || [],
-          roles: item.roles || [],
-          boardConfig: item.boardConfig || null,
-
-          artifacts: item.artifacts || undefined,
-          decisions: item.decisions || undefined,
-          outcomes: item.outcomes || undefined,
-          triggers: item.triggers || undefined,
-        }));
+        parsedGames = parseGamesFromJsonPayload(data);
       } catch {
         return NextResponse.json(
           { error: 'Kunde inte tolka JSON-data' },
@@ -512,16 +469,15 @@ async function importRelatedData(
 
     const triggerRows = game.triggers.map((trigger, index) => {
       // Resolve condition IDs from order aliases
-      const resolvedCondition = resolveConditionIds(
-        trigger.condition,
-        stepByOrder,
-        phaseByOrder,
-        artifactByOrder
-      );
+      const resolvedCondition = conditionOrderAliasesToIds(trigger.condition, {
+        stepIdByOrder: stepByOrder,
+        phaseIdByOrder: phaseByOrder,
+        artifactIdByOrder: artifactByOrder,
+      });
 
       // Resolve action IDs from order aliases
-      const resolvedActions = trigger.actions.map(action => 
-        resolveActionIds(action, artifactByOrder)
+      const resolvedActions = trigger.actions.map(action =>
+        actionOrderAliasesToIds(action, { artifactIdByOrder: artifactByOrder })
       );
 
       return {
@@ -542,58 +498,3 @@ async function importRelatedData(
   }
 }
 
-/**
- * Resolve order-based aliases in trigger conditions to actual IDs
- */
-function resolveConditionIds(
-  condition: AnySupabase,
-  stepByOrder: Map<number, string>,
-  phaseByOrder: Map<number, string>,
-  artifactByOrder: Map<number, string>
-): AnySupabase {
-  const resolved = { ...condition };
-  
-  // Step-related conditions
-  if ((condition.type === 'step_started' || condition.type === 'step_completed') && !condition.stepId && typeof condition.stepOrder === 'number') {
-    resolved.stepId = stepByOrder.get(condition.stepOrder) ?? null;
-    delete resolved.stepOrder;
-  }
-  
-  // Phase-related conditions
-  if ((condition.type === 'phase_started' || condition.type === 'phase_completed') && !condition.phaseId && typeof condition.phaseOrder === 'number') {
-    resolved.phaseId = phaseByOrder.get(condition.phaseOrder) ?? null;
-    delete resolved.phaseOrder;
-  }
-  
-  // Artifact-related conditions
-  if (condition.type === 'artifact_unlocked' && !condition.artifactId && typeof condition.artifactOrder === 'number') {
-    resolved.artifactId = artifactByOrder.get(condition.artifactOrder) ?? null;
-    delete resolved.artifactOrder;
-  }
-  
-  // Keypad conditions (keypadId is typically an artifact ID)
-  if ((condition.type === 'keypad_correct' || condition.type === 'keypad_failed') && !condition.keypadId && typeof condition.artifactOrder === 'number') {
-    resolved.keypadId = artifactByOrder.get(condition.artifactOrder) ?? null;
-    delete resolved.artifactOrder;
-  }
-  
-  return resolved;
-}
-
-/**
- * Resolve order-based aliases in trigger actions to actual IDs
- */
-function resolveActionIds(
-  action: AnySupabase,
-  artifactByOrder: Map<number, string>
-): AnySupabase {
-  const resolved = { ...action };
-  
-  // Artifact-related actions
-  if ((action.type === 'reveal_artifact' || action.type === 'hide_artifact') && !action.artifactId && typeof action.artifactOrder === 'number') {
-    resolved.artifactId = artifactByOrder.get(action.artifactOrder) ?? null;
-    delete resolved.artifactOrder;
-  }
-  
-  return resolved;
-}

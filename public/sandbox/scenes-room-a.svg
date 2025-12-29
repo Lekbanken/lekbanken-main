@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F0F9FF"/>
+      <stop offset="1" stop-color="#E0F2FE"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="0" y="0" width="1200" height="800" fill="url(#bg)"/>
+  <text x="60" y="90" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="44" fill="#0F172A">Rum A</text>
+  <text x="60" y="135" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#334155">Exempel: en lapp + ett kodlås.</text>
+
+  <!-- Desk -->
+  <rect x="220" y="430" width="520" height="260" rx="22" fill="#BAE6FD" stroke="#0284C7" stroke-width="6"/>
+
+  <!-- Note (trigger) near (30%,62%) => (360,496) -->
+  <g transform="translate(360 496)">
+    <rect x="-55" y="-55" width="110" height="110" rx="14" fill="#FEF3C7" stroke="#B45309" stroke-width="6"/>
+    <path d="M-30 -10 H30" stroke="#B45309" stroke-width="6" stroke-linecap="round"/>
+    <path d="M-30 10 H30" stroke="#B45309" stroke-width="6" stroke-linecap="round"/>
+    <text x="-18" y="90" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#0F172A">Lapp</text>
+  </g>
+
+  <!-- Keypad (artifact) near (65%,52%) => (780,416) -->
+  <g transform="translate(780 416)">
+    <rect x="-70" y="-90" width="140" height="180" rx="22" fill="#E2E8F0" stroke="#334155" stroke-width="6"/>
+    <rect x="-40" y="-65" width="80" height="30" rx="8" fill="#94A3B8"/>
+    <g fill="#64748B">
+      <circle cx="-25" cy="0" r="8"/>
+      <circle cx="0" cy="0" r="8"/>
+      <circle cx="25" cy="0" r="8"/>
+      <circle cx="-25" cy="30" r="8"/>
+      <circle cx="0" cy="30" r="8"/>
+      <circle cx="25" cy="30" r="8"/>
+      <circle cx="-25" cy="60" r="8"/>
+      <circle cx="0" cy="60" r="8"/>
+      <circle cx="25" cy="60" r="8"/>
+    </g>
+    <text x="-30" y="125" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="22" fill="#0F172A">Kodlås</text>
+  </g>
+
+  <!-- Back marker near (12%,14%) => (144,112) -->
+  <g transform="translate(144 112)">
+    <circle cx="0" cy="0" r="36" fill="#DBEAFE" stroke="#1D4ED8" stroke-width="6"/>
+    <path d="M12 -14 L-10 0 L12 14" fill="none" stroke="#1D4ED8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="-28" y="70" font-family="system-ui, -apple-system, Segoe UI, Roboto, sans-serif" font-size="20" fill="#0F172A">Karta</text>
+  </g>
+</svg>

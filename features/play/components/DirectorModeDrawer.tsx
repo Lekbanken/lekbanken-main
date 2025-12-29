@@ -66,6 +66,16 @@ export interface DirectorModeDrawerProps {
   
   /** Recent signals */
   recentSignals: Signal[];
+
+  /** Optional device signal presets */
+  signalPresets?: Array<{
+    id: string;
+    name: string;
+    type: 'torch' | 'audio' | 'vibration' | 'screen_flash' | 'notification';
+    color?: string;
+    disabled?: boolean;
+    disabledReason?: string;
+  }>;
   
   /** Recent events */
   events: SessionEvent[];
@@ -86,6 +96,7 @@ export interface DirectorModeDrawerProps {
   onFireTrigger: (triggerId: string) => Promise<void>;
   onDisableAllTriggers: () => Promise<void>;
   onSendSignal: (channel: string, payload: unknown) => Promise<void>;
+  onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
   onTimeBankDelta: (delta: number, reason: string) => Promise<void>;
   
   /** Optional class name */
@@ -297,6 +308,8 @@ function SignalQuickPanel({
     name: string;
     type: 'torch' | 'audio' | 'vibration' | 'screen_flash' | 'notification';
     color?: string;
+    disabled?: boolean;
+    disabledReason?: string;
   }>;
   onSend: (channel: string, payload: unknown) => void;
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
@@ -312,8 +325,8 @@ function SignalQuickPanel({
     setMessage('');
   };
 
-  const handleExecutePreset = async (preset: { id: string; type: string; color?: string }) => {
-    if (!onExecuteSignal) return;
+  const handleExecutePreset = async (preset: { id: string; type: string; color?: string; disabled?: boolean }) => {
+    if (!onExecuteSignal || preset.disabled) return;
     
     setExecutingSignal(preset.id);
     try {
@@ -343,6 +356,9 @@ function SignalQuickPanel({
     }
   };
 
+  const notificationPreset = presets.find((preset) => preset.type === 'notification');
+  const notificationStatus = notificationPreset?.disabled ? notificationPreset.disabledReason : null;
+
   return (
     <div className="space-y-4">
       {/* Device signal presets */}
@@ -358,8 +374,9 @@ function SignalQuickPanel({
                 variant="outline"
                 size="sm"
                 onClick={() => handleExecutePreset(p)}
-                disabled={executingSignal === p.id}
+                disabled={executingSignal === p.id || p.disabled}
                 className="gap-1"
+                title={p.disabled && p.disabledReason ? p.disabledReason : undefined}
                 style={p.type === 'screen_flash' && p.color ? {
                   borderColor: p.color,
                   color: p.color,
@@ -373,6 +390,24 @@ function SignalQuickPanel({
               </Button>
             ))}
           </div>
+          {notificationStatus && (
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>Notifications: {notificationStatus}</span>
+              {onExecuteSignal && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => void onExecuteSignal('notification', {
+                    forceToast: true,
+                    title: 'Notification',
+                    body: 'In-app toast',
+                  })}
+                >
+                  Show in-app toast
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       )}
       
@@ -587,6 +622,7 @@ export function DirectorModeDrawer({
   currentPhaseIndex: _currentPhaseIndex, // Reserved for phase navigation
   triggers,
   recentSignals,
+  signalPresets,
   events,
   timeBankBalance,
   timeBankPaused,
@@ -598,6 +634,7 @@ export function DirectorModeDrawer({
   onFireTrigger,
   onDisableAllTriggers,
   onSendSignal,
+  onExecuteSignal,
   onTimeBankDelta,
   className,
 }: DirectorModeDrawerProps) {
@@ -806,7 +843,9 @@ export function DirectorModeDrawer({
               {activeTab === 'signals' && (
                 <SignalQuickPanel
                   recentSignals={recentSignals}
+                  presets={signalPresets}
                   onSend={onSendSignal}
+                  onExecuteSignal={onExecuteSignal}
                 />
               )}
               

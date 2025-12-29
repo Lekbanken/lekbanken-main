@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
 import {
   PlayIcon,
   PauseIcon,
@@ -37,7 +37,7 @@ import { TriggerPanel } from '@/features/play/components/TriggerPanel';
 import { createTimerState, pauseTimer, resumeTimer } from '@/lib/utils/timer-utils';
 import type { TimerState, SessionRuntimeState, SignalReceivedBroadcast } from '@/types/play-runtime';
 import type { SessionTrigger } from '@/types/games';
-import type { TriggerActionContext } from '@/features/play/hooks';
+import type { TriggerActionContext, TriggerEvent } from '@/features/play/hooks';
 import {
   getSessionChatMessages,
   sendSessionChatMessage,
@@ -117,6 +117,7 @@ export function FacilitatorDashboard({
   // UI state
   const [isSaving, setIsSaving] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const processEventRef = useRef<((event: TriggerEvent) => Promise<void>) | null>(null);
   
   // Broadcast hook
   const { 
@@ -139,6 +140,14 @@ export function FacilitatorDashboard({
       if (!signalChannel) {
         setSignalChannel(payload.channel);
       }
+      const triggerEvent: TriggerEvent = {
+        type: 'signal_received',
+        channel: payload.channel,
+        payload: payload.payload,
+        sender_user_id: payload.sender_user_id ?? undefined,
+        sender_participant_id: payload.sender_participant_id ?? undefined,
+      };
+      void processEventRef.current?.(triggerEvent);
     },
   });
 
@@ -305,6 +314,10 @@ export function FacilitatorDashboard({
     },
     enabled: true,
   });
+
+  useEffect(() => {
+    processEventRef.current = processEvent;
+  }, [processEvent]);
 
   const handleManualTriggerFire = useCallback(
     async (triggerId: string) => {

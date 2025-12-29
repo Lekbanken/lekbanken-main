@@ -6,6 +6,7 @@
  */
 
 import { generateCSV } from '@/lib/utils/csv';
+import { CSV_COLUMNS, getStepColumns } from '@/types/csv-import';
 import type { ExportableGame, ExportOptions } from '@/types/csv-import';
 
 // =============================================================================
@@ -14,82 +15,29 @@ import type { ExportableGame, ExportOptions } from '@/types/csv-import';
 
 const MAX_STEPS = 20;
 
-// Column definitions in order
-const CORE_COLUMNS = [
-  'id',
-  'game_key',
-  'name',
-  'short_description',
-  'description',
-  'play_mode',
-  'status',
-  'locale',
-];
-
-const METADATA_COLUMNS = [
-  'energy_level',
-  'location_type',
-  'time_estimate_min',
-  'duration_max',
-  'min_players',
-  'max_players',
-  'players_recommended',
-  'age_min',
-  'age_max',
-  'difficulty',
-  'accessibility_notes',
-  'space_requirements',
-  'leader_tips',
-];
-
-const REFERENCE_COLUMNS = [
-  'main_purpose_id',
-  'sub_purpose_ids',
-  'product_id',
-  'owner_tenant_id',
-  'cover_media_url',
-];
-
-const VALIDATION_COLUMNS = [
-  'step_count',
-];
-
-// =============================================================================
-// Column Generators
-// =============================================================================
-
-function getStepColumns(maxSteps: number = MAX_STEPS): string[] {
-  const columns: string[] = [];
-  for (let i = 1; i <= maxSteps; i++) {
-    columns.push(`step_${i}_title`, `step_${i}_body`, `step_${i}_duration`);
-  }
-  return columns;
-}
-
 function getAllColumns(options: ExportOptions): string[] {
-  const columns = [...CORE_COLUMNS, ...METADATA_COLUMNS, ...REFERENCE_COLUMNS];
-  
+  // Keep export CSV aligned with the canonical import contract:
+  // identity → metadata → references → validation → json → inline steps
+  const columns: string[] = [
+    ...CSV_COLUMNS.identity,
+    ...CSV_COLUMNS.metadata,
+    ...CSV_COLUMNS.references,
+  ];
+
   if (options.includeSteps) {
-    columns.push(...VALIDATION_COLUMNS);
+    columns.push(...CSV_COLUMNS.validation);
+  }
+
+  // JSON columns in canonical order (subset based on include flags)
+  if (options.includeMaterials) columns.push('materials_json');
+  if (options.includePhases) columns.push('phases_json');
+  if (options.includeRoles) columns.push('roles_json');
+  if (options.includeBoardConfig) columns.push('board_config_json');
+
+  if (options.includeSteps) {
     columns.push(...getStepColumns());
   }
-  
-  if (options.includeMaterials) {
-    columns.push('materials_json');
-  }
-  
-  if (options.includePhases) {
-    columns.push('phases_json');
-  }
-  
-  if (options.includeRoles) {
-    columns.push('roles_json');
-  }
-  
-  if (options.includeBoardConfig) {
-    columns.push('board_config_json');
-  }
-  
+
   return columns;
 }
 
@@ -102,7 +50,6 @@ type CsvRow = Record<string, string | number | null>;
 function gameToRow(game: ExportableGame, options: ExportOptions): CsvRow {
   const row: CsvRow = {
     // Core
-    id: game.id,
     game_key: game.game_key,
     name: game.name,
     short_description: game.short_description,
@@ -131,7 +78,6 @@ function gameToRow(game: ExportableGame, options: ExportOptions): CsvRow {
     sub_purpose_ids: game.sub_purpose_ids?.length ? JSON.stringify(game.sub_purpose_ids) : null,
     product_id: game.product_id,
     owner_tenant_id: game.owner_tenant_id,
-    cover_media_url: game.cover_media_url || null,
   };
   
   // Add steps

@@ -94,6 +94,8 @@ When a game has no explicit cover image:
 - `tenant-media` - Tenant-uppladdningar (används av nuvarande Admin UI: MediaPicker + TenantMediaBank)
 - `custom_utmarkelser` - Achievement assets (bucket förekommer i admin assets-kod)
 - `game-media` - Allowlistat i upload-API men används inte av nuvarande UI (reserverat/framtida)
+- `media-images` - (NY) Avsett för uppladdade bilder för Play Artifacts (hotspots m.m.)
+- `media-audio` - (NY) Avsett för uppladdade ljudfiler för Play Artifacts
 
 Note: The current confirm endpoint uses `getPublicUrl`. If a bucket is intended to be private, the download flow should use signed URLs instead.
 

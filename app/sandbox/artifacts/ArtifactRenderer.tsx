@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Keypad } from '@/components/play/Keypad';
@@ -58,6 +58,233 @@ function safeParseConfig(scenario: SandboxArtifactScenario, configOverride: unkn
 }
 
 type ReplayMarkerRuntimeState = Extract<SandboxArtifactRuntimeState, { kind: 'replay_marker' }>;
+
+type StorageRef = { bucket: string; path: string };
+
+function isStorageRef(value: unknown): value is StorageRef {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'bucket' in value &&
+    'path' in value &&
+    typeof (value as { bucket?: unknown }).bucket === 'string' &&
+    typeof (value as { path?: unknown }).path === 'string'
+  );
+}
+
+function useResolvedStorageRefUrl(ref: StorageRef | null | undefined) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!ref) return;
+
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      setIsLoading(true);
+      setError(null);
+    });
+
+    fetch('/api/media/upload/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bucket: ref.bucket, path: ref.path }),
+    })
+      .then(async (res) => {
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({}));
+          throw new Error(typeof errorData?.error === 'string' ? errorData.error : 'Failed to resolve media URL');
+        }
+        return res.json() as Promise<{ url: string }>;
+      })
+      .then((data) => {
+        if (cancelled) return;
+        setUrl(data.url);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        setUrl(null);
+        setError(err instanceof Error ? err.message : 'Failed to resolve media URL');
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [ref]);
+
+  return {
+    url: ref ? url : null,
+    error: ref ? error : null,
+    isLoading: ref ? isLoading : false,
+  };
+}
+
+type HotspotRuntimeState = Extract<SandboxArtifactRuntimeState, { kind: 'hotspot' }>;
+
+type HotspotArtifactCardProps = {
+  role: ArtifactRole;
+  scenarioId: SandboxArtifactScenarioId;
+  hotspotConfigInput: unknown;
+  runtime: HotspotRuntimeState;
+  updateRuntimeState: (
+    scenarioId: SandboxArtifactScenarioId,
+    updater: (prev: SandboxArtifactRuntimeState) => SandboxArtifactRuntimeState
+  ) => void;
+  log: (
+    type: 'config_updated' | 'state_updated' | 'reset' | 'solved' | 'failed' | 'revealed' | 'custom',
+    payload?: Record<string, unknown>
+  ) => void;
+};
+
+function HotspotArtifactCard({
+  role,
+  scenarioId,
+  hotspotConfigInput,
+  runtime,
+  updateRuntimeState,
+  log,
+}: HotspotArtifactCardProps) {
+  const raw = hotspotConfigInput as unknown;
+  const imageRef =
+    typeof raw === 'object' && raw !== null && isStorageRef((raw as Record<string, unknown>)['imageRef'])
+      ? ((raw as Record<string, unknown>)['imageRef'] as StorageRef)
+      : null;
+
+  const { url: resolvedImageUrl, error: resolveError, isLoading } = useResolvedStorageRefUrl(imageRef);
+  const hotspotConfig = useMemo(() => {
+    const cfg = hotspotConfigInput as HotspotConfig & { imageRef?: StorageRef };
+    const next: HotspotConfig = {
+      ...cfg,
+      imageUrl: resolvedImageUrl ?? cfg.imageUrl,
+      hotspots: Array.isArray(cfg.hotspots) ? cfg.hotspots : [],
+    };
+    return next;
+  }, [hotspotConfigInput, resolvedImageUrl]);
+
+  const requiredHotspots = hotspotConfig.hotspots.filter((h) => h.required !== false);
+  const requiredCount = hotspotConfig.requireAll ? requiredHotspots.length : requiredHotspots.length;
+  const state = runtime.state;
+
+  return (
+    <Card className="p-4 space-y-4">
+      <div className="text-sm text-muted-foreground">{role.toUpperCase()} • hotspot</div>
+
+      {imageRef && isLoading && (
+        <div className="text-sm text-muted-foreground">Laddar bild…</div>
+      )}
+      {imageRef && resolveError && (
+        <div className="text-sm text-destructive">Kunde inte ladda bild: {resolveError}</div>
+      )}
+
+      {(!imageRef || resolvedImageUrl) && (
+        <HotspotImage
+          config={hotspotConfig}
+          state={state}
+          onHotspotFound={(hotspotId) =>
+            updateRuntimeState(scenarioId, (prevRuntime) => {
+              if (prevRuntime.kind !== 'hotspot') return prevRuntime;
+              const prev = prevRuntime.state;
+              if (prev.foundHotspotIds.includes(hotspotId)) return prevRuntime;
+              const foundHotspotIds = [...prev.foundHotspotIds, hotspotId];
+              const foundCount = foundHotspotIds.length;
+              const isComplete = foundCount >= requiredCount;
+              log('revealed', { artifactType: 'hotspot', hotspotId, foundCount, requiredCount });
+              if (isComplete && !prev.isComplete) {
+                log('solved', { artifactType: 'hotspot' });
+              }
+              return {
+                kind: 'hotspot',
+                state: { ...prev, foundHotspotIds, foundCount, isComplete },
+              };
+            })
+          }
+        />
+      )}
+
+      {role === 'participant' && !state.isComplete && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              updateRuntimeState(scenarioId, (prevRuntime) => {
+                if (prevRuntime.kind !== 'hotspot') return prevRuntime;
+                return {
+                  kind: 'hotspot',
+                  state: {
+                    ...prevRuntime.state,
+                    isComplete: true,
+                    foundCount: prevRuntime.state.requiredCount,
+                    foundHotspotIds: hotspotConfig.hotspots.map((h) => h.id),
+                  },
+                };
+              });
+              log('solved', { artifactType: 'hotspot', via: 'fallback' });
+            }}
+          >
+            Jag klarade det
+          </Button>
+        </div>
+      )}
+    </Card>
+  );
+}
+
+type AudioArtifactCardProps = {
+  role: ArtifactRole;
+  audioConfigInput: unknown;
+};
+
+function AudioArtifactCard({ role, audioConfigInput }: AudioArtifactCardProps) {
+  const raw = audioConfigInput as unknown;
+  const audioRef =
+    typeof raw === 'object' && raw !== null && isStorageRef((raw as Record<string, unknown>)['audioRef'])
+      ? ((raw as Record<string, unknown>)['audioRef'] as StorageRef)
+      : null;
+
+  const { url: resolvedAudioUrl, error: resolveError, isLoading } = useResolvedStorageRefUrl(audioRef);
+
+  const audioConfig = audioConfigInput as {
+    src?: string;
+    audioRef?: StorageRef;
+    config?: Partial<AudioConfig>;
+    title?: string;
+    size?: 'sm' | 'md' | 'lg';
+  };
+
+  const src = audioConfig.src ?? resolvedAudioUrl ?? null;
+
+  return (
+    <Card className="p-4 space-y-4">
+      <div className="text-sm text-muted-foreground">{role.toUpperCase()} • audio</div>
+
+      {audioRef && isLoading && (
+        <div className="text-sm text-muted-foreground">Laddar ljud…</div>
+      )}
+      {audioRef && resolveError && (
+        <div className="text-sm text-destructive">Kunde inte ladda ljud: {resolveError}</div>
+      )}
+
+      {!src ? (
+        <div className="text-sm text-destructive">Ogiltig config: saknar src eller audioRef.</div>
+      ) : (
+        <AudioPlayer
+          src={src}
+          config={audioConfig.config}
+          title={audioConfig.title}
+          size={audioConfig.size}
+        />
+      )}
+    </Card>
+  );
+}
 
 type ReplayMarkerArtifactCardProps = {
   role: ArtifactRole;
@@ -535,64 +762,17 @@ export function ArtifactRenderer({ scenario, role, configOverride }: Props) {
   }
 
   if (scenario.artifactType === 'hotspot') {
-    const hotspotConfig = config as HotspotConfig;
-    const requiredHotspots = hotspotConfig.hotspots.filter((h) => h.required !== false);
-    const requiredCount = hotspotConfig.requireAll ? requiredHotspots.length : requiredHotspots.length;
-
     if (!runtime || runtime.kind !== 'hotspot') return stateMismatch('hotspot');
-    const state = runtime.state;
 
     return (
-      <Card className="p-4 space-y-4">
-        <div className="text-sm text-muted-foreground">{role.toUpperCase()} • hotspot</div>
-        <HotspotImage
-          config={hotspotConfig}
-          state={state}
-          onHotspotFound={(hotspotId) =>
-            updateRuntimeState(scenario.id, (prevRuntime) => {
-              if (prevRuntime.kind !== 'hotspot') return prevRuntime;
-              const prev = prevRuntime.state;
-              if (prev.foundHotspotIds.includes(hotspotId)) return prevRuntime;
-              const foundHotspotIds = [...prev.foundHotspotIds, hotspotId];
-              const foundCount = foundHotspotIds.length;
-              const isComplete = foundCount >= requiredCount;
-              log('revealed', { artifactType: 'hotspot', hotspotId, foundCount, requiredCount });
-              if (isComplete && !prev.isComplete) {
-                log('solved', { artifactType: 'hotspot' });
-              }
-              return {
-                kind: 'hotspot',
-                state: { ...prev, foundHotspotIds, foundCount, isComplete },
-              };
-            })
-          }
-        />
-        {role === 'participant' && !state.isComplete && (
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                updateRuntimeState(scenario.id, (prevRuntime) => {
-                  if (prevRuntime.kind !== 'hotspot') return prevRuntime;
-                  return {
-                    kind: 'hotspot',
-                    state: {
-                      ...prevRuntime.state,
-                      isComplete: true,
-                      foundCount: prevRuntime.state.requiredCount,
-                      foundHotspotIds: hotspotConfig.hotspots.map((h) => h.id),
-                    },
-                  };
-                });
-                log('solved', { artifactType: 'hotspot', via: 'fallback' });
-              }}
-            >
-              Jag klarade det
-            </Button>
-          </div>
-        )}
-      </Card>
+      <HotspotArtifactCard
+        role={role}
+        scenarioId={scenario.id}
+        hotspotConfigInput={config}
+        runtime={runtime}
+        updateRuntimeState={updateRuntimeState}
+        log={log}
+      />
     );
   }
 
@@ -1025,24 +1205,7 @@ export function ArtifactRenderer({ scenario, role, configOverride }: Props) {
   }
 
   if (scenario.artifactType === 'audio') {
-    const audioConfig = config as {
-      src: string;
-      config?: Partial<AudioConfig>;
-      title?: string;
-      size?: 'sm' | 'md' | 'lg';
-    };
-
-    return (
-      <Card className="p-4 space-y-4">
-        <div className="text-sm text-muted-foreground">{role.toUpperCase()} • audio</div>
-        <AudioPlayer
-          src={audioConfig.src}
-          config={audioConfig.config}
-          title={audioConfig.title}
-          size={audioConfig.size}
-        />
-      </Card>
-    );
+    return <AudioArtifactCard role={role} audioConfigInput={config} />;
   }
 
   if (scenario.artifactType === 'sound_level') {

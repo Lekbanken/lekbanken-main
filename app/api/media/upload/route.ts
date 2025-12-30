@@ -8,7 +8,9 @@ const uploadSchema = z.object({
   fileType: z.string().min(1),
   fileSize: z.number().int().positive().max(10 * 1024 * 1024), // 10MB max
   tenantId: z.string().uuid().optional().nullable(),
-  bucket: z.enum(['game-media', 'custom_utmarkelser', 'tenant-media']).default('tenant-media'),
+  bucket: z
+    .enum(['game-media', 'custom_utmarkelser', 'tenant-media', 'media-images', 'media-audio'])
+    .default('tenant-media'),
 })
 
 export async function POST(request: NextRequest) {
@@ -52,8 +54,17 @@ export async function POST(request: NextRequest) {
       filePath,
       userId: user.id
     })
+
+    const debug = process.env.NODE_ENV !== 'production'
+      ? {
+          message: signedError?.message,
+          name: (signedError as unknown as { name?: string } | undefined)?.name,
+          status: (signedError as unknown as { status?: number } | undefined)?.status,
+        }
+      : undefined
+
     return NextResponse.json(
-      { error: 'Failed to generate upload URL' },
+      { error: 'Failed to generate upload URL', debug },
       { status: 500 }
     )
   }

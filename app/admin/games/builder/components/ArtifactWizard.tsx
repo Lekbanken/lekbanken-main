@@ -120,6 +120,7 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
       artifact_type: 'hotspot',
       metadata: {
         imageUrl: '',
+        imageRef: null,
         zones: [],
         showFeedback: true,
         requiredHits: null,
@@ -317,6 +318,7 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
       artifact_type: 'audio',
       metadata: {
         audioUrl: '',
+        audioRef: null,
         autoplay: false,
         requireAck: true,
       },

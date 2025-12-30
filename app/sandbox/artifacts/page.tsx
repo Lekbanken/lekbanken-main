@@ -7,6 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ArtifactRenderer } from './ArtifactRenderer';
 import {
+  InteractiveImageEditor,
+  type InteractiveImageEditorValue,
+} from '@/components/ui/interactive-image-editor';
+import {
+  AudioUploadEditor,
+  type AudioUploadEditorValue,
+} from '@/components/ui/audio-upload-editor';
+import {
   sandboxArtifactScenarios,
   type SandboxArtifactScenarioId,
 } from './registry';
@@ -114,6 +122,157 @@ function AdminConfigCard({
           Apply
         </Button>
       </div>
+    </Card>
+  );
+}
+
+type AdminMediaEditorsProps = {
+  scenario: (typeof sandboxArtifactScenarios)[number];
+  configs: Record<SandboxArtifactScenarioId, unknown>;
+  resetAfterApply: boolean;
+  setConfig: (scenarioId: SandboxArtifactScenarioId, config: unknown) => void;
+  setRuntimeState: (
+    scenarioId: SandboxArtifactScenarioId,
+    state: ReturnType<typeof createInitialRuntimeStateForScenario>
+  ) => void;
+};
+
+function AdminHotspotEditorCard({ scenario, configs, resetAfterApply, setConfig, setRuntimeState }: AdminMediaEditorsProps) {
+  const cfg = configs[scenario.id] ?? scenario.defaultConfig;
+  const parsed = scenario.configSchema.safeParse(cfg);
+
+  if (!parsed.success) {
+    return (
+      <Card className="p-4 space-y-2">
+        <div className="text-sm font-medium">Admin: Hotspot editor</div>
+        <div className="text-sm text-destructive">Config matchar inte schema (kan inte visa editor).</div>
+      </Card>
+    );
+  }
+
+  const config = parsed.data as Record<string, unknown>;
+  const hotspotsRaw = config['hotspots'];
+  const zones = Array.isArray(hotspotsRaw)
+    ? hotspotsRaw
+        .map((h) => (isRecord(h) ? h : null))
+        .filter((h): h is Record<string, unknown> => Boolean(h))
+        .flatMap((h) => {
+          const id = typeof h.id === 'string' ? h.id : null;
+          const x = typeof h.x === 'number' ? h.x : null;
+          const y = typeof h.y === 'number' ? h.y : null;
+          const radius = typeof h.radius === 'number' ? h.radius : null;
+          if (!id || x === null || y === null || radius === null) return [];
+          return [
+            {
+              id,
+              x,
+              y,
+              radius,
+              label: typeof h.label === 'string' ? h.label : undefined,
+              required: typeof h.required === 'boolean' ? h.required : undefined,
+            },
+          ];
+        })
+    : [];
+
+  const imageRefRaw = config['imageRef'];
+  const value: InteractiveImageEditorValue = {
+    imageRef: isRecord(imageRefRaw) && typeof imageRefRaw.bucket === 'string' && typeof imageRefRaw.path === 'string'
+      ? (imageRefRaw as InteractiveImageEditorValue['imageRef'])
+      : null,
+    zones,
+  };
+
+  return (
+    <Card className="p-4 space-y-3">
+      <div className="text-sm font-medium">Admin: Hotspot editor</div>
+      <InteractiveImageEditor
+        value={value}
+        tenantId={null}
+        onChange={(next) => {
+          const nextConfig: Record<string, unknown> = {
+            ...config,
+            imageRef: next.imageRef ?? undefined,
+            hotspots: next.zones.map((z) => ({
+              id: z.id,
+              x: z.x,
+              y: z.y,
+              radius: z.radius,
+              label: z.label,
+              required: z.required,
+            })),
+          };
+
+          if (next.imageRef) {
+            delete nextConfig.imageUrl;
+          }
+
+          setConfig(scenario.id, nextConfig);
+          if (resetAfterApply) {
+            setRuntimeState(scenario.id, createInitialRuntimeStateForScenario(scenario, nextConfig));
+          }
+        }}
+      />
+    </Card>
+  );
+}
+
+function AdminAudioEditorCard({ scenario, configs, resetAfterApply, setConfig, setRuntimeState }: AdminMediaEditorsProps) {
+  const cfg = configs[scenario.id] ?? scenario.defaultConfig;
+  const parsed = scenario.configSchema.safeParse(cfg);
+
+  if (!parsed.success) {
+    return (
+      <Card className="p-4 space-y-2">
+        <div className="text-sm font-medium">Admin: Audio editor</div>
+        <div className="text-sm text-destructive">Config matchar inte schema (kan inte visa editor).</div>
+      </Card>
+    );
+  }
+
+  const config = parsed.data as Record<string, unknown>;
+  const audioRefRaw = config['audioRef'];
+  const audioRef = isRecord(audioRefRaw) && typeof audioRefRaw.bucket === 'string' && typeof audioRefRaw.path === 'string'
+    ? (audioRefRaw as AudioUploadEditorValue['audioRef'])
+    : null;
+  const configObjRaw = config['config'];
+  const configObj = isRecord(configObjRaw) ? configObjRaw : null;
+
+  const value: AudioUploadEditorValue = {
+    audioRef,
+    autoPlay: configObj ? Boolean(configObj.autoPlay) : false,
+    requireAck: configObj ? Boolean(configObj.requireAck) : false,
+  };
+
+  return (
+    <Card className="p-4 space-y-3">
+      <div className="text-sm font-medium">Admin: Audio editor</div>
+      <AudioUploadEditor
+        value={value}
+        tenantId={null}
+        onChange={(next) => {
+          const existingConfigRaw = config['config'];
+          const existingConfig = isRecord(existingConfigRaw) ? existingConfigRaw : {};
+          const nextConfig: Record<string, unknown> = {
+            ...config,
+            audioRef: next.audioRef ?? undefined,
+            config: {
+              ...existingConfig,
+              autoPlay: next.autoPlay,
+              requireAck: next.requireAck,
+            },
+          };
+
+          if (next.audioRef) {
+            delete nextConfig.src;
+          }
+
+          setConfig(scenario.id, nextConfig);
+          if (resetAfterApply) {
+            setRuntimeState(scenario.id, createInitialRuntimeStateForScenario(scenario, nextConfig));
+          }
+        }}
+      />
     </Card>
   );
 }
@@ -265,15 +424,39 @@ export default function SandboxArtifactsPage() {
         </Card>
 
         {scenario && activeRole === 'admin' && (
-          <AdminConfigCard
-            key={scenario.id}
-            scenario={scenario}
-            configs={configs}
-            resetAfterApply={resetAfterApply}
-            setResetAfterApply={setResetAfterApply}
-            setConfig={setConfig}
-            setRuntimeState={setRuntimeState}
-          />
+          <>
+            {scenario.artifactType === 'hotspot' && (
+              <AdminHotspotEditorCard
+                key={`${scenario.id}-hotspot-editor`}
+                scenario={scenario}
+                configs={configs}
+                resetAfterApply={resetAfterApply}
+                setConfig={setConfig}
+                setRuntimeState={setRuntimeState}
+              />
+            )}
+
+            {scenario.artifactType === 'audio' && (
+              <AdminAudioEditorCard
+                key={`${scenario.id}-audio-editor`}
+                scenario={scenario}
+                configs={configs}
+                resetAfterApply={resetAfterApply}
+                setConfig={setConfig}
+                setRuntimeState={setRuntimeState}
+              />
+            )}
+
+            <AdminConfigCard
+              key={scenario.id}
+              scenario={scenario}
+              configs={configs}
+              resetAfterApply={resetAfterApply}
+              setResetAfterApply={setResetAfterApply}
+              setConfig={setConfig}
+              setRuntimeState={setRuntimeState}
+            />
+          </>
         )}
 
         {scenario && (activeRole === 'host' || activeRole === 'admin') && runtime && (

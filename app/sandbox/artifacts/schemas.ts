@@ -13,6 +13,20 @@ const isoDateString = z
 export const artifactRoleSchema = z.enum(['admin', 'host', 'participant']);
 export type ArtifactRole = z.infer<typeof artifactRoleSchema>;
 
+export const storageBucketSchema = z.enum([
+  'game-media',
+  'custom_utmarkelser',
+  'tenant-media',
+  'media-images',
+  'media-audio',
+]);
+
+export const storageRefSchema = z.object({
+  bucket: storageBucketSchema,
+  path: nonEmptyString,
+});
+export type StorageRef = z.infer<typeof storageRefSchema>;
+
 // -----------------------------------------------------------------------------
 // Keypad (components/play/Keypad)
 // -----------------------------------------------------------------------------
@@ -89,7 +103,8 @@ export const hotspotConfigSchema = z.object({
       z.string().regex(/^\//, { message: 'imageUrl must be an absolute URL or a /path' }),
     ])
     .optional(),
-  hotspots: z.array(hotspotSchema).min(1),
+  imageRef: storageRefSchema.optional(),
+  hotspots: z.array(hotspotSchema).min(0),
   requireAll: z.boolean().optional(),
   showProgress: z.boolean().optional(),
   allowZoom: z.boolean().optional(),
@@ -238,25 +253,32 @@ export type PropConfirmationConfigInput = z.infer<typeof propConfirmationConfigS
 // Audio (components/play/AudioPlayer)
 // -----------------------------------------------------------------------------
 
-export const audioArtifactConfigSchema = z.object({
-  src: z.union([
-    z.string().url(),
-    z.string().regex(/^\//, { message: 'src must be an absolute URL or a /path' }),
-  ]),
-  config: z
-    .object({
-      requireAck: z.boolean().optional(),
-      ackButtonText: z.string().optional(),
-      showTranscript: z.boolean().optional(),
-      transcriptText: z.string().optional(),
-      autoPlay: z.boolean().optional(),
-      loop: z.boolean().optional(),
-      requireHeadphones: z.boolean().optional(),
-    })
-    .optional(),
-  title: z.string().optional(),
-  size: z.enum(['sm', 'md', 'lg']).optional(),
-});
+export const audioArtifactConfigSchema = z
+  .object({
+    src: z
+      .union([
+        z.string().url(),
+        z.string().regex(/^\//, { message: 'src must be an absolute URL or a /path' }),
+      ])
+      .optional(),
+    audioRef: storageRefSchema.optional(),
+    config: z
+      .object({
+        requireAck: z.boolean().optional(),
+        ackButtonText: z.string().optional(),
+        showTranscript: z.boolean().optional(),
+        transcriptText: z.string().optional(),
+        autoPlay: z.boolean().optional(),
+        loop: z.boolean().optional(),
+        requireHeadphones: z.boolean().optional(),
+      })
+      .optional(),
+    title: z.string().optional(),
+    size: z.enum(['sm', 'md', 'lg']).optional(),
+  })
+  .refine((value) => Boolean(value.src || value.audioRef), {
+    message: 'Either src or audioRef is required',
+  });
 export type AudioArtifactConfigInput = z.infer<typeof audioArtifactConfigSchema>;
 
 // -----------------------------------------------------------------------------

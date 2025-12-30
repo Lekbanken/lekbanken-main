@@ -6,6 +6,19 @@ import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon } from '@
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
 import type { RoleData } from './RoleEditor';
 import { ArtifactWizard } from './ArtifactWizard';
+import { AudioUploadEditor, type AudioUploadEditorValue } from '@/components/ui/audio-upload-editor';
+import { InteractiveImageEditor, type InteractiveImageEditorValue } from '@/components/ui/interactive-image-editor';
+
+type StorageRef = { bucket: string; path: string };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isStorageRef(value: unknown): value is StorageRef {
+  if (!isRecord(value)) return false;
+  return typeof value.bucket === 'string' && typeof value.path === 'string' && value.bucket.length > 0 && value.path.length > 0;
+}
 
 type ArtifactEditorProps = {
   artifacts: ArtifactFormData[];
@@ -526,8 +539,35 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 <span className="text-lg">🔊</span>
                 <h4 className="text-sm font-semibold text-foreground">Ljudklipp-inställningar</h4>
               </div>
+              <AudioUploadEditor
+                tenantId={null}
+                value={((): AudioUploadEditorValue => {
+                  const raw = artifact.metadata as unknown;
+                  const meta = isRecord(raw) ? raw : {};
+                  const audioRef = isStorageRef(meta.audioRef)
+                    ? (meta.audioRef as unknown as AudioUploadEditorValue['audioRef'])
+                    : null;
+                  const autoPlay = meta.autoplay === true || meta.autoPlay === true;
+                  const requireAck = meta.requireAck === true;
+                  return { audioRef, autoPlay, requireAck };
+                })()}
+                onChange={(next) => {
+                  const raw = artifact.metadata as unknown;
+                  const meta = isRecord(raw) ? raw : {};
+                  updateArtifact(idx, {
+                    metadata: {
+                      ...meta,
+                      audioRef: next.audioRef ?? undefined,
+                      autoplay: next.autoPlay,
+                      autoPlay: next.autoPlay,
+                      requireAck: next.requireAck,
+                    },
+                  });
+                }}
+              />
+
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Ljud-URL</label>
+                <label className="text-sm font-medium text-foreground">Ljud-URL (valfritt)</label>
                 <Input
                   value={(artifact.metadata?.audioUrl as string) || ''}
                   onChange={(e) =>
@@ -537,38 +577,6 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                   }
                   placeholder="https://example.com/audio.mp3"
                 />
-              </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Autoplay</label>
-                  <Select
-                    value={(artifact.metadata?.autoplay as boolean) ? 'true' : 'false'}
-                    onChange={(e) =>
-                      updateArtifact(idx, {
-                        metadata: { ...artifact.metadata, autoplay: e.target.value === 'true' },
-                      })
-                    }
-                    options={[
-                      { value: 'false', label: 'Nej – deltagaren startar' },
-                      { value: 'true', label: 'Ja – spela automatiskt' },
-                    ]}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Kräv bekräftelse</label>
-                  <Select
-                    value={(artifact.metadata?.requireAck as boolean) ? 'true' : 'false'}
-                    onChange={(e) =>
-                      updateArtifact(idx, {
-                        metadata: { ...artifact.metadata, requireAck: e.target.value === 'true' },
-                      })
-                    }
-                    options={[
-                      { value: 'false', label: 'Nej' },
-                      { value: 'true', label: 'Ja – "Jag har lyssnat"' },
-                    ]}
-                  />
-                </div>
               </div>
             </div>
           )}
@@ -580,6 +588,33 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 <span className="text-lg">🎯</span>
                 <h4 className="text-sm font-semibold text-foreground">Klickbar bild-inställningar</h4>
               </div>
+
+              <InteractiveImageEditor
+                tenantId={null}
+                value={((): InteractiveImageEditorValue => {
+                  const raw = artifact.metadata as unknown;
+                  const meta = isRecord(raw) ? raw : {};
+                  const imageRef = isStorageRef(meta.imageRef)
+                    ? (meta.imageRef as unknown as InteractiveImageEditorValue['imageRef'])
+                    : null;
+                  const zones = Array.isArray(meta.zones)
+                    ? (meta.zones as unknown as InteractiveImageEditorValue['zones'])
+                    : [];
+                  return { imageRef, zones };
+                })()}
+                onChange={(next) => {
+                  const raw = artifact.metadata as unknown;
+                  const meta = isRecord(raw) ? raw : {};
+                  updateArtifact(idx, {
+                    metadata: {
+                      ...meta,
+                      imageRef: next.imageRef ?? undefined,
+                      zones: next.zones,
+                    },
+                  });
+                }}
+              />
+
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Bild-URL</label>
                 <Input

@@ -52,6 +52,13 @@ All Supabase configuration is **required** for the application to function.
 - `SUPABASE_SERVICE_ROLE_KEY` is server-side only, never expose in client code
 - Service role key is optional but recommended for admin features
 
+**Storage Notes (Development):**
+- Media upload flows depend on Supabase Storage buckets + RLS policies existing in your project.
+- For artifact media uploads (hotspot images + audio), the app expects private buckets `media-images` and `media-audio`.
+   - Migration: [supabase/migrations/20251229090000_media_artifact_buckets.sql](supabase/migrations/20251229090000_media_artifact_buckets.sql)
+   - Apply (local): `npx supabase db push`
+   - Apply (linked/remote): `npx supabase db push --linked`
+
 ---
 
 ### Stripe (Optional - Payment Processing)

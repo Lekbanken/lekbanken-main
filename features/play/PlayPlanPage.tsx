@@ -15,8 +15,6 @@ const DEFAULT_STEP_DURATION_MINUTES = 5;
 const STORAGE_PREFIX = "play-run:";
 const PROGRESS_DEBOUNCE_MS = 800;
 
-const PROGRESS_DEBOUNCE_MS = 800;
-
 type ErrorCode = "not-found" | "network" | null;
 
 /**

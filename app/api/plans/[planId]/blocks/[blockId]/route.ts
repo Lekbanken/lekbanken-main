@@ -143,6 +143,10 @@ export async function PATCH(
           kind,
           media_id,
           position
+          ,
+          media:media (
+            url
+          )
         )
       )
     `)

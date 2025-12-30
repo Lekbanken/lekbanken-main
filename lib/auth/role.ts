@@ -23,7 +23,10 @@ export function deriveEffectiveGlobalRoleFromUser(user: User | null): GlobalRole
   return globalRole ?? null
 }
 
-export function deriveEffectiveGlobalRole(profile: UserProfile | null, user: User | null): GlobalRole | null {
+export function deriveEffectiveGlobalRole(
+  profile: Partial<Pick<UserProfile, 'global_role' | 'role'>> | null,
+  user: User | null
+): GlobalRole | null {
   if (profile?.global_role) return profile.global_role as GlobalRole
 
   const fromUser = deriveEffectiveGlobalRoleFromUser(user)

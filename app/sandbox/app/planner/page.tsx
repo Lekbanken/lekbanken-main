@@ -1,244 +1,713 @@
 'use client'
 
+import { useMemo, useState } from 'react'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Input } from '@/components/ui'
 import {
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Input,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  Switch,
+  Textarea,
+} from '@/components/ui'
+import { AddGameButton } from '@/features/planner/components/AddGameButton'
+import { GamePicker } from '@/features/planner/components/GamePicker'
+import { PreviewDialog } from '@/features/planner/components/PreviewDialog'
+import { ShareDialog } from '@/features/planner/components/ShareDialog'
+import { VersionsDialog } from '@/features/planner/components/VersionsDialog'
+import { cn } from '@/lib/utils'
+import type { PlannerBlock, PlannerPlan, PlannerStatus, PlannerVisibility } from '@/types/planner'
+import type { VersionWithCurrent } from '@/features/planner/api'
+import {
+  Bars3BottomLeftIcon,
   CalendarDaysIcon,
-  ClockIcon,
-  PlusIcon,
-  CheckCircleIcon,
-  PlayIcon,
-  ChevronUpIcon,
   ChevronDownIcon,
+  ChevronRightIcon,
+  ClipboardDocumentListIcon,
+  ClockIcon,
+  EyeIcon,
+  PauseIcon,
+  PencilSquareIcon,
+  PlayIcon,
+  PlusIcon,
+  Squares2X2Icon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline'
-import { CheckCircleIcon as CheckCircleSolidIcon } from '@heroicons/react/24/solid'
+
+const demoPlanId = 'plan-demo-001'
+
+type PlanSummary = {
+  id: string
+  name: string
+  status: PlannerStatus
+  visibility: PlannerVisibility
+  blocks: number
+  minutes: number
+  updatedAt: string
+}
+
+const planSummaries: PlanSummary[] = [
+  {
+    id: demoPlanId,
+    name: 'Detta är en testplan',
+    status: 'draft',
+    visibility: 'private',
+    blocks: 4,
+    minutes: 40,
+    updatedAt: 'Idag 10:24',
+  },
+  {
+    id: 'plan-demo-002',
+    name: 'Skattjakt i skogen',
+    status: 'published',
+    visibility: 'public',
+    blocks: 6,
+    minutes: 55,
+    updatedAt: 'Igår 17:05',
+  },
+  {
+    id: 'plan-demo-003',
+    name: 'Inomhus: samarbetsstationer',
+    status: 'modified',
+    visibility: 'tenant',
+    blocks: 5,
+    minutes: 35,
+    updatedAt: '2025-01-22',
+  },
+]
+
+const statusLabels: Record<PlannerStatus, string> = {
+  draft: 'Utkast',
+  published: 'Publicerad',
+  modified: 'Ändrad',
+  archived: 'Arkiverad',
+}
+
+const statusBadgeVariants: Record<PlannerStatus, 'warning' | 'success' | 'primary'> = {
+  draft: 'warning',
+  published: 'success',
+  modified: 'primary',
+  archived: 'warning',
+}
+
+const visibilityLabels: Record<PlannerVisibility, string> = {
+  private: 'Privat',
+  tenant: 'Organisation',
+  public: 'Publik',
+}
+
+const blockMeta: Record<
+  PlannerBlock['blockType'],
+  { label: string; className: string; icon: typeof PlayIcon }
+> = {
+  game: {
+    label: 'Lek',
+    className: 'bg-primary/10 text-primary',
+    icon: PlayIcon,
+  },
+  pause: {
+    label: 'Paus',
+    className: 'bg-amber-500/10 text-amber-600',
+    icon: PauseIcon,
+  },
+  preparation: {
+    label: 'Förberedelse',
+    className: 'bg-indigo-500/10 text-indigo-600',
+    icon: ClipboardDocumentListIcon,
+  },
+  custom: {
+    label: 'Notis',
+    className: 'bg-slate-500/10 text-slate-600',
+    icon: PencilSquareIcon,
+  },
+}
+
+const seedSearchResults = [
+  {
+    id: 'game-1',
+    slug: 'skattjakt-mini',
+    time_estimate_min: 20,
+    image_url: '/avatars/greenmoss.png',
+    translations: [
+      {
+        title: 'Skattjakt Mini',
+        short_description: 'Lättskött skattjakt med ledtrådar och checkpoints.',
+      },
+    ],
+  },
+  {
+    id: 'game-2',
+    slug: 'reflektionsrunda',
+    time_estimate_min: 10,
+    image_url: '/avatars/greygravel.png',
+    translations: [
+      {
+        title: 'Reflektionsrundan',
+        short_description: 'Avslutningsrunda med frågor och tryggt tempo.',
+      },
+    ],
+  },
+  {
+    id: 'game-3',
+    slug: 'energi-boost',
+    time_estimate_min: 15,
+    image_url: '/avatars/redmagma.png',
+    translations: [
+      {
+        title: 'Energi-boost',
+        short_description: 'Kort, pulshöjande lek för att väcka gruppen.',
+      },
+    ],
+  },
+]
+
+const demoVersions: VersionWithCurrent[] = [
+  {
+    id: 'version-3',
+    planId: demoPlanId,
+    versionNumber: 3,
+    name: 'Detta är en testplan',
+    description: 'Nuvarande publicerad version.',
+    totalTimeMinutes: 40,
+    publishedAt: '2025-02-10T09:30:00Z',
+    publishedBy: 'user-1',
+    isCurrent: true,
+  },
+  {
+    id: 'version-2',
+    planId: demoPlanId,
+    versionNumber: 2,
+    name: 'Detta är en testplan',
+    description: 'Förra publiceringen med kortare paus.',
+    totalTimeMinutes: 35,
+    publishedAt: '2025-01-18T14:00:00Z',
+    publishedBy: 'user-1',
+    isCurrent: false,
+  },
+]
+
+const initialBlocks: PlannerBlock[] = [
+  {
+    id: 'block-1',
+    planId: demoPlanId,
+    position: 1,
+    blockType: 'preparation',
+    title: 'Förberedelser',
+    notes: 'Sätt upp stationer och dela in lag.',
+    durationMinutes: 5,
+  },
+  {
+    id: 'block-2',
+    planId: demoPlanId,
+    position: 2,
+    blockType: 'game',
+    durationMinutes: 20,
+    game: {
+      id: 'game-1',
+      title: 'Skattjakt Mini',
+      shortDescription: 'Ledtrådar, karta och checkpoints.',
+      coverUrl: '/avatars/greenmoss.png',
+      energyLevel: 'medium',
+      locationType: 'outdoor',
+    },
+  },
+  {
+    id: 'block-3',
+    planId: demoPlanId,
+    position: 3,
+    blockType: 'pause',
+    title: 'Vattenpaus',
+    notes: 'Kort paus för vatten och omgruppering.',
+    durationMinutes: 5,
+  },
+  {
+    id: 'block-4',
+    planId: demoPlanId,
+    position: 4,
+    blockType: 'custom',
+    title: 'Reflektion',
+    notes: 'Snabb runda: vad lärde vi oss?',
+    durationMinutes: 10,
+    isOptional: true,
+  },
+]
 
 export default function PlannerSandboxPage() {
+  const [selectedPlanId, setSelectedPlanId] = useState(demoPlanId)
+  const [visibility, setVisibility] = useState<PlannerVisibility>('private')
+  const [status, setStatus] = useState<PlannerStatus>('draft')
+  const [planTitle, setPlanTitle] = useState('Detta är en testplan')
+  const [planDescription, setPlanDescription] = useState(
+    'Bygg sekvenser av lekar och starta direkt i Play. Här visas ett fullt planeringsflöde.'
+  )
+  const [blocks, setBlocks] = useState<PlannerBlock[]>(initialBlocks)
+  const [showPlanList, setShowPlanList] = useState(false)
+  const [showGamePicker, setShowGamePicker] = useState(false)
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false)
+  const [showShareDialog, setShowShareDialog] = useState(false)
+  const [showVersionsDialog, setShowVersionsDialog] = useState(false)
+
+  const totalMinutes = blocks.reduce((sum, block) => sum + (block.durationMinutes ?? 0), 0)
+
+  const demoPlan: PlannerPlan = useMemo(
+    () => ({
+      id: demoPlanId,
+      ownerUserId: 'demo-user',
+      name: planTitle,
+      description: planDescription,
+      visibility,
+      status,
+      totalTimeMinutes: totalMinutes,
+      updatedAt: '2025-02-10T10:24:00Z',
+      blocks,
+      notes: {
+        privateNote: {
+          id: 'note-private',
+          content: 'Kom ihåg att dubbelkolla material innan start.',
+          updatedAt: '2025-02-10T09:50:00Z',
+          updatedBy: 'Du',
+        },
+        tenantNote: {
+          id: 'note-tenant',
+          content: 'Planen passar bra för 8-14 deltagare.',
+          updatedAt: '2025-02-09T16:30:00Z',
+          updatedBy: 'Team',
+        },
+      },
+    }),
+    [blocks, planDescription, planTitle, status, totalMinutes, visibility]
+  )
+
+  const planListPanel = (
+    <Card className="border-border/60">
+      <CardHeader className="space-y-4">
+        <div className="flex items-center justify-between">
+          <CardTitle>Mina planer</CardTitle>
+          <Button size="sm" variant="outline" className="gap-1">
+            <PlusIcon className="h-4 w-4" />
+            Ny plan
+          </Button>
+        </div>
+        <Input placeholder="Sök planer..." />
+        <div className="flex flex-wrap gap-2">
+          <Button size="sm">Alla</Button>
+          <Button size="sm" variant="outline">Utkast</Button>
+          <Button size="sm" variant="outline">Publicerade</Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {planSummaries.map((plan) => (
+          <button
+            key={plan.id}
+            type="button"
+            onClick={() => setSelectedPlanId(plan.id)}
+            className={cn(
+              'flex w-full items-start justify-between rounded-xl border p-4 text-left transition',
+              plan.id === selectedPlanId
+                ? 'border-primary/50 bg-primary/5 shadow-sm'
+                : 'border-border/60 bg-card hover:border-primary/30 hover:bg-muted/40'
+            )}
+          >
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-foreground">{plan.name}</span>
+                <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                <Badge variant={statusBadgeVariants[plan.status]} size="sm">
+                  {statusLabels[plan.status]}
+                </Badge>
+                <Badge variant="outline" size="sm">
+                  {visibilityLabels[plan.visibility]}
+                </Badge>
+                <span>{plan.blocks} block</span>
+                <span>{plan.minutes} min</span>
+              </div>
+            </div>
+            <span className="text-xs text-muted-foreground">{plan.updatedAt}</span>
+          </button>
+        ))}
+      </CardContent>
+    </Card>
+  )
+
+  const handleAddBlockType = (type: PlannerBlock['blockType']) => {
+    if (type === 'game') {
+      setShowGamePicker(true)
+      return
+    }
+
+    const newBlock: PlannerBlock = {
+      id: `block-${Date.now()}`,
+      planId: demoPlanId,
+      position: blocks.length + 1,
+      blockType: type,
+      title: type === 'pause' ? 'Paus' : type === 'preparation' ? 'Förberedelse' : 'Notis',
+      durationMinutes: type === 'pause' ? 5 : 10,
+      notes: 'Uppdatera texten för att passa planen.',
+    }
+    setBlocks((prev) => [...prev, newBlock])
+    setStatus('modified')
+  }
+
+  const handleGameSelected = (game: { id: string; title: string; duration: number | null }) => {
+    const newBlock: PlannerBlock = {
+      id: `block-${Date.now()}`,
+      planId: demoPlanId,
+      position: blocks.length + 1,
+      blockType: 'game',
+      durationMinutes: game.duration ?? 15,
+      game: {
+        id: game.id,
+        title: game.title,
+        shortDescription: 'Ny lek från biblioteket.',
+        coverUrl: '/avatars/pinksky.png',
+      },
+    }
+    setBlocks((prev) => [...prev, newBlock])
+    setStatus('modified')
+  }
+
+  const handleExport = () => {
+    const rows = [
+      ['Position', 'Typ', 'Titel', 'Minuter'],
+      ...blocks.map((block, index) => [
+        String(index + 1),
+        blockMeta[block.blockType].label,
+        block.blockType === 'game' ? block.game?.title ?? 'Okänd lek' : block.title ?? 'Block',
+        String(block.durationMinutes ?? 0),
+      ]),
+    ]
+    const csv = rows.map((row) => row.join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${planTitle.replace(/\s+/g, '-').toLowerCase()}.csv`
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <SandboxShell
       moduleId="app-planner"
       title="Planner"
-      description="Preview av planerare-komponenter för app-sektionen"
+      description="Planering, blockflöde och delning i appens design"
     >
-      <div className="space-y-8">
-        {/* Stats Preview */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Stats Overview</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-primary">3</div>
-                <div className="text-sm text-gray-600">Totalt mål</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-500">1</div>
-                <div className="text-sm text-gray-600">Avklarade</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-accent">5</div>
-                <div className="text-sm text-gray-600">Aktiviteter idag</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-500">2</div>
-                <div className="text-sm text-gray-600">Genomförda</div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-3 lg:hidden">
+          <Sheet open={showPlanList} onOpenChange={setShowPlanList}>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="justify-between">
+                Mina planer
+                <ChevronDownIcon className="h-4 w-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-full sm:max-w-sm">
+              <SheetHeader>
+                <SheetTitle>Mina planer</SheetTitle>
+              </SheetHeader>
+              <div className="mt-4">{planListPanel}</div>
+            </SheetContent>
+          </Sheet>
+        </div>
 
-        {/* Goals Card */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Goals Card</h2>
-          <Card className="max-w-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCircleIcon className="h-5 w-5 text-primary" />
-                Mina mål
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {/* Add Goal Form */}
-              <div className="p-3 bg-gray-50 rounded-lg space-y-2 border border-gray-200">
-                <Input placeholder="Skriv ditt nya mål..." />
-                <div className="flex gap-2">
-                  <Button size="sm">Lägg till</Button>
-                  <Button size="sm" variant="outline">Avbryt</Button>
-                </div>
-              </div>
+        <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
+          <div className="hidden lg:block">{planListPanel}</div>
 
-              {/* Active Goal */}
-              <div className="p-3 rounded-lg border bg-white border-gray-200 hover:border-primary/30 transition-all">
-                <div className="flex items-start gap-3">
-                  <CheckCircleIcon className="h-5 w-5 text-gray-400 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-gray-900">
-                        Genomför 5 utomhusaktiviteter
-                      </span>
-                      <Badge variant="destructive" size="sm">Hög</Badge>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Ta gruppen utomhus minst 5 gånger denna vecka
-                    </p>
-                    <div className="mt-2">
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-500">Progress</span>
-                        <span className="text-primary font-medium">60%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-primary rounded-full w-3/5" />
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-2">
-                      <CalendarDaysIcon className="h-3 w-3" />
-                      2025-02-07
-                    </div>
+          <div className="space-y-6">
+            <Card className="border-border/60">
+              <CardContent className="space-y-6 p-6">
+                <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant={statusBadgeVariants[status]} size="sm">
+                      {statusLabels[status]}
+                    </Badge>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-1">
+                          {visibilityLabels[visibility]}
+                          <ChevronDownIcon className="h-3.5 w-3.5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuItem onClick={() => setVisibility('private')}>
+                          Privat
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setVisibility('tenant')}>
+                          Organisation
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setVisibility('public')}>
+                          Publik
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <span className="text-sm text-muted-foreground">
+                      {blocks.length} block · {totalMinutes} min
+                    </span>
+                  </div>
+
+                  <div className="hidden flex-wrap gap-2 md:flex">
+                    <Button variant="outline" size="sm" onClick={() => setShowVersionsDialog(true)}>
+                      Versioner
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowPreviewDialog(true)}>
+                      Förhandsgranska
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => setShowShareDialog(true)}>
+                      Dela
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleExport}>
+                      Exportera
+                    </Button>
+                    <Button size="sm">Publicera</Button>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 md:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          Åtgärder
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setShowVersionsDialog(true)}>
+                          Versioner
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowPreviewDialog(true)}>
+                          Förhandsgranska
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setShowShareDialog(true)}>
+                          Dela
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleExport}>
+                          Exportera
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <Button size="sm">Publicera</Button>
                   </div>
                 </div>
-              </div>
 
-              {/* Completed Goal */}
-              <div className="p-3 rounded-lg border bg-green-50 border-green-200">
-                <div className="flex items-start gap-3">
-                  <CheckCircleSolidIcon className="h-5 w-5 text-green-500 mt-0.5" />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-500 line-through">
-                        Samarbetsövningar
-                      </span>
-                      <Badge variant="success" size="sm">Låg</Badge>
-                    </div>
-                    <p className="text-sm text-gray-400 mt-1">
-                      Fokusera på teambuilding-aktiviteter
-                    </p>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Titel</label>
+                    <Input
+                      value={planTitle}
+                      onChange={(event) => setPlanTitle(event.target.value)}
+                      placeholder="Skriv planens titel"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Beskrivning</label>
+                    <Textarea
+                      value={planDescription}
+                      onChange={(event) => setPlanDescription(event.target.value)}
+                      placeholder="Kort beskrivning av planen"
+                      rows={3}
+                    />
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+              </CardContent>
+            </Card>
 
-        {/* Schedule Card */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Schedule Card</h2>
-          <Card className="max-w-lg">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <ClockIcon className="h-5 w-5 text-accent" />
-                  Dagens schema
-                </CardTitle>
-                <Badge variant="primary">Mån 27 jan</Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {/* Completed Activity */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 opacity-60">
-                <div className="text-sm font-medium text-gray-600 w-12">09:00</div>
-                <div className="h-3 w-3 rounded-full bg-green-500" />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-500 line-through">Morgonsamling</div>
-                  <div className="text-xs text-gray-500">15 min</div>
+            <Card className="border-border/60">
+              <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <CardTitle>Block i planen</CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Dra, byt ordning och justera tidsåtgång.
+                  </p>
                 </div>
-                <CheckCircleSolidIcon className="h-5 w-5 text-green-500" />
-              </div>
+                <Button variant="outline" size="sm" className="gap-1">
+                  <Squares2X2Icon className="h-4 w-4" />
+                  Byt vy
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {blocks.map((block, index) => {
+                  const meta = blockMeta[block.blockType]
+                  const Icon = meta.icon
+                  return (
+                    <div
+                      key={block.id}
+                      className="flex flex-col gap-3 rounded-xl border border-border/60 bg-card p-4 transition hover:border-primary/30"
+                    >
+                      <div className="flex flex-wrap items-start gap-4">
+                        <div className="flex items-center gap-2 text-muted-foreground">
+                          <Bars3BottomLeftIcon className="h-4 w-4" />
+                          <span className="text-xs font-medium">{index + 1}</span>
+                        </div>
 
-              {/* Active Activity */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20">
-                <div className="text-sm font-medium text-gray-600 w-12">10:00</div>
-                <div className="h-3 w-3 rounded-full bg-primary animate-pulse" />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">Utomhuslek: Kurragömma</div>
-                  <div className="text-xs text-gray-500">30 min</div>
-                </div>
-                <Badge variant="primary" className="flex items-center gap-1">
-                  <PlayIcon className="h-3 w-3" />
-                  Pågår
-                </Badge>
-              </div>
+                        <div className="flex flex-1 items-start justify-between gap-4">
+                          <div className="space-y-2">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className={cn('flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium', meta.className)}>
+                                <Icon className="h-3.5 w-3.5" />
+                                {meta.label}
+                              </span>
+                              {block.isOptional && (
+                                <Badge variant="outline" size="sm">Valfri</Badge>
+                              )}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-foreground">
+                                {block.blockType === 'game'
+                                  ? block.game?.title ?? 'Okänd lek'
+                                  : block.title}
+                              </p>
+                              {block.notes && (
+                                <p className="text-sm text-muted-foreground">{block.notes}</p>
+                              )}
+                            </div>
+                          </div>
 
-              {/* Pending Activity */}
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-gray-200">
-                <div className="text-sm font-medium text-gray-600 w-12">11:00</div>
-                <div className="h-3 w-3 rounded-full bg-gray-300" />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">Kreativ stund</div>
-                  <div className="text-xs text-gray-500">45 min</div>
-                </div>
-                <div className="flex gap-1">
-                  <button className="p-1 text-gray-400 hover:text-gray-600">
-                    <ChevronUpIcon className="h-4 w-4" />
-                  </button>
-                  <button className="p-1 text-gray-400 hover:text-gray-600">
-                    <ChevronDownIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <ClockIcon className="h-4 w-4" />
+                            <span>{block.durationMinutes ?? 0} min</span>
+                          </div>
+                        </div>
+                      </div>
 
-              {/* Add Activity Button */}
-              <button className="w-full p-3 border-2 border-dashed border-gray-200 rounded-lg text-gray-500 hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2">
-                <PlusIcon className="h-5 w-5" />
-                Lägg till aktivitet
-              </button>
-            </CardContent>
-          </Card>
-        </section>
+                      {block.blockType === 'game' && (
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                          <Badge variant="secondary" size="sm" className="gap-1">
+                            <UserGroupIcon className="h-3 w-3" />
+                            8-12 deltagare
+                          </Badge>
+                          <Badge variant="secondary" size="sm">
+                            Energi: Medel
+                          </Badge>
+                          <Badge variant="secondary" size="sm">
+                            Plats: Ute
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
 
-        {/* Active Banner */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Active Activity Banner</h2>
-          <Card className="bg-gradient-to-r from-primary to-accent text-white max-w-lg">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
+                <AddGameButton onAdd={handleAddBlockType} />
+              </CardContent>
+            </Card>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <Card className="border-border/60">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Privata anteckningar</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Syns bara för dig.
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    Auto-spara
+                    <Switch checked />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Textarea rows={4} defaultValue="Kom ihåg att fördela roller vid start." />
+                </CardContent>
+              </Card>
+
+              <Card className="border-border/60">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Delade anteckningar</CardTitle>
+                    <p className="text-sm text-muted-foreground">
+                      Syns för organisationen.
+                    </p>
+                  </div>
+                  <Badge variant="primary" size="sm">Delad</Badge>
+                </CardHeader>
+                <CardContent>
+                  <Textarea rows={4} defaultValue="Planen passar bra för 45-60 minuter." />
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-border/60">
+              <CardContent className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <PlayIcon className="h-5 w-5" />
                   </div>
                   <div>
-                    <div className="text-sm text-white/80">Pågående aktivitet</div>
-                    <div className="font-semibold text-lg">Utomhuslek: Kurragömma</div>
+                    <p className="text-sm text-muted-foreground">Redo att köra planen?</p>
+                    <p className="font-semibold text-foreground">Starta plan i Play</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="text-sm text-white/80">Tid kvar</div>
-                  <div className="font-semibold">30 min</div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" className="gap-1">
+                    <EyeIcon className="h-4 w-4" />
+                    Förhandsgranska
+                  </Button>
+                  <Button className="gap-1">
+                    <PlayIcon className="h-4 w-4" />
+                    Starta plan
+                  </Button>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </section>
+              </CardContent>
+            </Card>
 
-        {/* Priority Badges */}
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Priority Badges</h2>
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="destructive">Hög prioritet</Badge>
-            <Badge variant="warning">Medel prioritet</Badge>
-            <Badge variant="success">Låg prioritet</Badge>
-            <Badge variant="primary">Aktiv</Badge>
-            <Badge variant="outline">Väntande</Badge>
+            <Card className="border-dashed border-primary/30 bg-primary/5">
+              <CardContent className="space-y-3 p-5 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2 text-foreground">
+                  <CalendarDaysIcon className="h-4 w-4 text-primary" />
+                  <span className="font-medium">Mobilförslag</span>
+                </div>
+                <ul className="list-disc space-y-1 pl-5">
+                  <li>Planlistan öppnas som sheet (knappen “Mina planer”).</li>
+                  <li>Åtgärder samlas i en kompakt meny för att spara plats.</li>
+                  <li>CTA-raden ligger som sticky block längst ner.</li>
+                </ul>
+              </CardContent>
+            </Card>
           </div>
-        </section>
-
-        {/* Notes */}
-        <div className="mt-8 rounded-xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">Implementationsnoteringar</h2>
-          <ul className="mt-4 list-inside list-disc space-y-2 text-sm text-muted-foreground">
-            <li>Målkort med checkbar progress</li>
-            <li>Sorterbara aktiviteter med pil-knappar</li>
-            <li>Drag-and-drop placeholder</li>
-            <li>Active activity banner med gradient</li>
-          </ul>
-
-          <p className="mt-6 text-xs text-muted-foreground">Senast uppdaterad: 2024-11-30</p>
         </div>
       </div>
+
+      <GamePicker
+        open={showGamePicker}
+        onOpenChange={setShowGamePicker}
+        onSelect={handleGameSelected}
+        seedResults={seedSearchResults}
+        initialQuery="skatt"
+      />
+      <VersionsDialog
+        open={showVersionsDialog}
+        onOpenChange={setShowVersionsDialog}
+        planId={demoPlanId}
+        versionsOverride={demoVersions}
+      />
+      <PreviewDialog
+        open={showPreviewDialog}
+        onOpenChange={setShowPreviewDialog}
+        plan={demoPlan}
+      />
+      <ShareDialog
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
+        planId={demoPlanId}
+        planName={planTitle}
+        visibility={visibility}
+      />
     </SandboxShell>
   )
 }

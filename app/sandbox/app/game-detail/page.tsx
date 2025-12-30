@@ -1,7 +1,7 @@
 ﻿'use client'
 
 import Image from 'next/image'
-import { useEffect, useState, type ComponentType, type ReactNode, type SVGProps } from 'react'
+import { useState, type ComponentType, type ReactNode, type SVGProps } from 'react'
 
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
 import { Badge, Button, Card, CardContent, Switch } from '@/components/ui'
@@ -243,6 +243,43 @@ const sectionGroupOrder: SectionDefinition['group'][] = ['Intro', 'Innehåll', '
 
 const STORAGE_KEY_VISIBILITY = 'sandbox-game-detail:visibility'
 const STORAGE_KEY_SELECTED = 'sandbox-game-detail:selected'
+
+const buildDefaultVisibilityByExample = () => {
+  const initial: Record<string, Record<SectionId, boolean>> = {}
+  gameExamples.forEach((game) => {
+    initial[game.id] = { ...defaultVisibility }
+  })
+  return initial
+}
+
+const readStoredVisibility = () => {
+  if (typeof window === 'undefined') {
+    return buildDefaultVisibilityByExample()
+  }
+
+  const storedVisibility = window.localStorage.getItem(STORAGE_KEY_VISIBILITY)
+  if (!storedVisibility) {
+    return buildDefaultVisibilityByExample()
+  }
+
+  try {
+    const parsed = JSON.parse(storedVisibility) as Record<string, Partial<Record<SectionId, boolean>>>
+    const merged: Record<string, Record<SectionId, boolean>> = {}
+    gameExamples.forEach((game) => {
+      merged[game.id] = { ...defaultVisibility, ...(parsed[game.id] ?? {}) }
+    })
+    return merged
+  } catch {
+    return buildDefaultVisibilityByExample()
+  }
+}
+
+const readStoredSelectedExample = () => {
+  if (typeof window === 'undefined') {
+    return null
+  }
+  return window.localStorage.getItem(STORAGE_KEY_SELECTED)
+}
 
 const playModeConfig: Record<PlayMode, { label: string; border: string; badge: string; hero: string }> = {
   basic: {
@@ -673,6 +710,11 @@ const participantsExample: GameExample = {
 
 const gameExamples = [basicExample, facilitatedExample, participantsExample]
 
+const decodeUnicode = (value: string) =>
+  value.replace(/\\u([0-9a-fA-F]{4})/g, (_, code) =>
+    String.fromCharCode(parseInt(code, 16))
+  )
+
 type SectionCardProps = {
   title: string
   icon?: IconType
@@ -682,13 +724,15 @@ type SectionCardProps = {
 }
 
 function SectionCard({ title, icon: Icon, description, children, className }: SectionCardProps) {
+  const safeTitle = decodeUnicode(title)
+  const safeDescription = description ? decodeUnicode(description) : undefined
   return (
     <section className={cn('rounded-2xl border border-border/60 bg-background p-4 sm:p-5', className)}>
       <div className="flex items-center gap-2">
         {Icon ? <Icon className="h-4 w-4 text-primary" /> : null}
-        <h3 className="text-base font-semibold text-foreground">{title}</h3>
+        <h3 className="text-base font-semibold text-foreground">{safeTitle}</h3>
       </div>
-      {description ? <p className="mt-2 text-sm text-muted-foreground">{description}</p> : null}
+      {safeDescription ? <p className="mt-2 text-sm text-muted-foreground">{safeDescription}</p> : null}
       {children ? <div className="mt-3 space-y-3">{children}</div> : null}
     </section>
   )
@@ -987,38 +1031,13 @@ function MetadataList({ meta }: { meta: GameExample['meta'] }) {
 }
 
 export default function GameDetailSandbox() {
-  const [visibilityByExample, setVisibilityByExample] = useState<Record<string, Record<SectionId, boolean>>>(() => {
-    const initial: Record<string, Record<SectionId, boolean>> = {}
-    gameExamples.forEach((game) => {
-      initial[game.id] = { ...defaultVisibility }
-    })
-    return initial
-  })
-  const [selectedExampleId, setSelectedExampleId] = useState<string | null>(null)
+  const [visibilityByExample, setVisibilityByExample] = useState<Record<string, Record<SectionId, boolean>>>(() =>
+    readStoredVisibility()
+  )
+  const [selectedExampleId, setSelectedExampleId] = useState<string | null>(() =>
+    readStoredSelectedExample()
+  )
   const [savedAtByExample, setSavedAtByExample] = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    const storedVisibility = window.localStorage.getItem(STORAGE_KEY_VISIBILITY)
-    if (storedVisibility) {
-      try {
-        const parsed = JSON.parse(storedVisibility) as Record<string, Partial<Record<SectionId, boolean>>>
-        setVisibilityByExample(() => {
-          const merged: Record<string, Record<SectionId, boolean>> = {}
-          gameExamples.forEach((game) => {
-            merged[game.id] = { ...defaultVisibility, ...(parsed[game.id] ?? {}) }
-          })
-          return merged
-        })
-      } catch {
-        // Ignore malformed local storage.
-      }
-    }
-
-    const storedSelected = window.localStorage.getItem(STORAGE_KEY_SELECTED)
-    if (storedSelected) {
-      setSelectedExampleId(storedSelected)
-    }
-  }, [])
 
   const handleToggle = (exampleId: string, sectionId: SectionId) => {
     setVisibilityByExample((prev) => ({
@@ -1089,9 +1108,9 @@ export default function GameDetailSandbox() {
 
                     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                       {sectionGroupOrder.map((group) => (
-                        <div key={group} className="space-y-2">
+                        <div key={decodeUnicode(group)} className="space-y-2">
                           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                            {group}
+                            {decodeUnicode(group)}
                           </p>
                           <div className="space-y-2">
                             {sectionGroups[group].map((section) => {
@@ -1104,7 +1123,7 @@ export default function GameDetailSandbox() {
                                   className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-background/80 px-3 py-2"
                                 >
                                   <div>
-                                    <p className="text-sm font-medium text-foreground">{section.label}</p>
+                                    <p className="text-sm font-medium text-foreground">{decodeUnicode(section.label)}</p>
                                     {!isAvailable ? (
                                       <p className="text-xs text-muted-foreground">Saknas i exemplet</p>
                                     ) : null}
@@ -1428,4 +1447,5 @@ export default function GameDetailSandbox() {
     </SandboxShell>
   )
 }
+
 

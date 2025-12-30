@@ -2,13 +2,13 @@ import 'server-only'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Tables } from '@/types/supabase'
-import type { PlannerPlan, PlannerPlayView, PlannerBlock, PlannerPlayBlock, PlannerGameSummary } from '@/types/planner'
+import type { PlannerPlan, PlannerPlayView, PlannerBlock, PlannerPlayBlock, PlannerGameSummary, PlannerStatus } from '@/types/planner'
 
 type PlanRow = Tables<'plans'>
 type BlockRow = Tables<'plan_blocks'> & {
   game?: (Tables<'games'> & {
     translations?: Tables<'game_translations'>[] | null
-    media?: Tables<'game_media'>[] | null
+    media?: (Tables<'game_media'> & { media?: Pick<Tables<'media'>, 'url'> | null })[] | null
   }) | null
 }
 
@@ -34,12 +34,12 @@ function pickTranslation(
   )
 }
 
-function getCoverUrl(media?: Tables<'game_media'>[] | null) {
+function getCoverUrl(media?: (Tables<'game_media'> & { media?: Pick<Tables<'media'>, 'url'> | null })[] | null) {
   if (!media) return null
   const cover = media
     .filter((m) => m.kind === 'cover')
     .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))[0]
-  return cover?.media_id ?? null
+  return cover?.media?.url ?? cover?.media_id ?? null
 }
 
 function mapGameSummary(
@@ -138,7 +138,8 @@ function buildPlanModel(
     name: row.name,
     description: row.description,
     visibility: row.visibility,
-    status: (row as { status?: string }).status ?? 'draft',
+    status: (((row as { status?: string }).status ?? 'draft') as PlannerStatus),
+    ownerUserId: row.owner_user_id,
     ownerTenantId: row.owner_tenant_id,
     totalTimeMinutes: totalDuration,
     currentVersionId: (row as { current_version_id?: string | null }).current_version_id ?? null,
@@ -280,7 +281,7 @@ export async function fetchPlanWithRelations(
           game:games(
             *,
             translations:game_translations(*),
-            media:game_media(*)
+            media:game_media(*, media:media(url))
           )
         ),
         private_notes:plan_notes_private(*),

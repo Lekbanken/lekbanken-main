@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { toPlannerPlan, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'
-import type { PlannerPlan } from '@/types/planner'
 import {
   buildCapabilityContextFromMemberships,
   derivePlanCapabilities,
@@ -14,7 +13,7 @@ type PlanRow = Tables<'plans'>
 type BlockRow = Tables<'plan_blocks'> & {
   game?: (Tables<'games'> & {
     translations?: Tables<'game_translations'>[] | null
-    media?: Tables<'game_media'>[] | null
+    media?: (Tables<'game_media'> & { media?: Pick<Tables<'media'>, 'url'> | null })[] | null
   }) | null
 }
 
@@ -58,7 +57,7 @@ export async function POST(request: Request) {
           game:games(
             *,
             translations:game_translations(*),
-            media:game_media(*)
+            media:game_media(*, media:media(url))
           )
         )
       `,
@@ -92,7 +91,9 @@ export async function POST(request: Request) {
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
-  const memberships = membershipsResult.data ?? []
+  const memberships = (membershipsResult.data ?? [])
+    .filter((m) => Boolean(m.tenant_id) && Boolean(m.role))
+    .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
     userId: user.id,
@@ -100,12 +101,12 @@ export async function POST(request: Request) {
     memberships,
   })
 
-  const plans = (data ?? []).map((row: PlanRow & { blocks?: BlockRow[] | null }) => {
-    const plan = toPlannerPlan(row, DEFAULT_LOCALE_ORDER)
+  const plans = (data ?? []).map((row) => {
+    const plan = toPlannerPlan(row as unknown as PlanRow & { blocks?: BlockRow[] | null }, DEFAULT_LOCALE_ORDER)
     const caps = derivePlanCapabilities(capabilityCtx, {
-      ownerUserId: row.owner_user_id,
-      ownerTenantId: row.owner_tenant_id,
-      visibility: row.visibility,
+      ownerUserId: (row as unknown as PlanRow).owner_user_id,
+      ownerTenantId: (row as unknown as PlanRow).owner_tenant_id,
+      visibility: (row as unknown as PlanRow).visibility,
     })
     return {
       ...plan,

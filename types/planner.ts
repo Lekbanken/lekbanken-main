@@ -54,6 +54,7 @@ export type PlannerPlan = {
   description?: string | null
   visibility: PlannerVisibility
   status: PlannerStatus
+  ownerUserId: string
   ownerTenantId?: string | null
   totalTimeMinutes?: number | null
   currentVersionId?: string | null

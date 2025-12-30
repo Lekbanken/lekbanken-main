@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanPayload } from '@/lib/validation/plans'
-import type { Json } from '@/types/supabase'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
 import {
   buildCapabilityContextFromMemberships,
@@ -48,7 +47,9 @@ export async function GET(
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
-  const memberships = membershipsResult.data ?? []
+  const memberships = (membershipsResult.data ?? [])
+    .filter((m) => Boolean(m.tenant_id) && Boolean(m.role))
+    .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
     userId: user.id,
@@ -102,7 +103,9 @@ export async function PATCH(
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
-  const memberships = membershipsResult.data ?? []
+  const memberships = (membershipsResult.data ?? [])
+    .filter((m) => Boolean(m.tenant_id) && Boolean(m.role))
+    .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
     userId: user.id,
@@ -141,15 +144,25 @@ export async function PATCH(
     return NextResponse.json({ error: { code: 'VALIDATION_ERROR', message: 'Validation failed', details: validation.errors } }, { status: 400 })
   }
 
+  // Build update payload - only include fields that are actually provided
+  const updatePayload: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+    updated_by: user.id,
+  }
+  
+  if (body.name !== undefined) {
+    updatePayload.name = body.name
+  }
+  if (body.description !== undefined) {
+    updatePayload.description = body.description
+  }
+  if (body.metadata !== undefined) {
+    updatePayload.metadata = body.metadata
+  }
+
   const { error } = await supabase
     .from('plans')
-    .update({
-      name: body.name,
-      description: body.description,
-      metadata: (body.metadata ?? undefined) as Json | undefined,
-      updated_at: new Date().toISOString(),
-      updated_by: user.id,
-    })
+    .update(updatePayload)
     .eq('id', planId)
 
   if (error) {
@@ -201,7 +214,9 @@ export async function DELETE(
   ])
 
   const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
-  const memberships = membershipsResult.data ?? []
+  const memberships = (membershipsResult.data ?? [])
+    .filter((m) => Boolean(m.tenant_id) && Boolean(m.role))
+    .map((m) => ({ tenant_id: m.tenant_id as string, role: m.role as string }))
 
   const capabilityCtx = buildCapabilityContextFromMemberships({
     userId: user.id,

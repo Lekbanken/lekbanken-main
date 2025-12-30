@@ -3,6 +3,7 @@ import type {
   PlannerBlock,
   PlannerBlockType,
   PlannerVisibility,
+  PlannerStatus,
   PlannerGameSummary,
 } from '@/types/planner'
 
@@ -13,6 +14,7 @@ export type {
   PlannerBlock,
   PlannerBlockType,
   PlannerVisibility,
+  PlannerStatus,
   PlannerGameSummary,
   PlanCapabilities,
 }

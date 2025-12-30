@@ -8,6 +8,10 @@ import { useState, useRef, useCallback, useId, type ReactNode } from 'react';
 
 type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
+interface TooltipProviderProps {
+  children: ReactNode;
+}
+
 interface TooltipProps {
   /** The content to show in the tooltip */
   content: ReactNode;
@@ -124,6 +128,14 @@ export function Tooltip({
 // =============================================================================
 // InfoTooltip Component (ⓘ icon with tooltip)
 // =============================================================================
+
+// =============================================================================
+// TooltipProvider (compat shim)
+// =============================================================================
+
+export function TooltipProvider({ children }: TooltipProviderProps) {
+  return <>{children}</>;
+}
 
 export function InfoTooltip({
   content,

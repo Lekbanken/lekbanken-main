@@ -147,6 +147,10 @@ export async function POST(
           kind,
           media_id,
           position
+          ,
+          media:media (
+            url
+          )
         )
       )
     `)

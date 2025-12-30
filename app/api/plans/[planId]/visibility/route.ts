@@ -1,7 +1,9 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server'
+import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import type { UserProfile } from '@/types/auth'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -31,8 +33,13 @@ export async function POST(
     owner_tenant_id?: string | null
   }
 
-  const role = (user.app_metadata as { role?: string } | null)?.role ?? null
-  const isSystemAdmin = role === 'system_admin' || role === 'admin'
+  const { data: profile } = await supabase
+    .from('users')
+    .select('global_role,role')
+    .eq('id', user.id)
+    .maybeSingle()
+  const effectiveGlobalRole = deriveEffectiveGlobalRole((profile as UserProfile | null) ?? null, user)
+  const isSystemAdmin = effectiveGlobalRole === 'system_admin'
   const headerTenant = await getRequestTenantId()
 
   const { plan } = await fetchPlanWithRelations(planId)

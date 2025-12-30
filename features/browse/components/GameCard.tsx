@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BoltIcon, ClockIcon, HomeIcon, SunIcon, UsersIcon } from "@heroicons/react/24/outline";
+import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { Game } from "../types";
 
@@ -27,16 +28,35 @@ const environmentConfig: Record<Game["environment"], { label: string; icon: type
   both: { label: "Inne/Ute", icon: HomeIcon },
 };
 
+const playModeConfig: Record<
+  NonNullable<Game["playMode"]>,
+  { label: string; cardClass: string; badgeClass: string }
+> = {
+  basic: { label: "Enkel lek", cardClass: "", badgeClass: "" },
+  facilitated: {
+    label: "Ledd aktivitet",
+    cardClass: "bg-primary/20 border-primary/30 hover:border-primary/50",
+    badgeClass: "bg-primary/30 text-primary ring-1 ring-primary/40",
+  },
+  participants: {
+    label: "Deltagarlek",
+    cardClass: "bg-yellow/20 border-yellow/40 hover:border-yellow/60",
+    badgeClass: "bg-yellow text-foreground ring-1 ring-yellow/40",
+  },
+};
+
 export function GameCard({ game, layout = "grid" }: GameCardProps) {
   const energy = energyConfig[game.energyLevel];
   const EnvIcon = environmentConfig[game.environment].icon;
   const isList = layout === "list";
+  const playMode = game.playMode ? playModeConfig[game.playMode] : null;
 
   return (
     <Link href={`/app/games/${game.id}`} className="block">
       <article
         className={cn(
           "group rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-border",
+          playMode?.cardClass,
           isList && "flex gap-4"
         )}
       >
@@ -70,6 +90,11 @@ export function GameCard({ game, layout = "grid" }: GameCardProps) {
                   <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-foreground">
                     {game.purpose}
                   </span>
+                )}
+                {playMode && playMode.label !== "Enkel lek" && (
+                  <Badge size="sm" className={cn("border-0", playMode.badgeClass)}>
+                    {playMode.label}
+                  </Badge>
                 )}
               </div>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">

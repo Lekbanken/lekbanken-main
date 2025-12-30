@@ -287,6 +287,18 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
     ],
     codeSnippet: `// See /sandbox/app for full component demos`,
   },
+  'app-game-detail': {
+    notes: `
+- Sandboxvy f\u00f6r lek-detalj
+- Visar tre spell\u00e4gen sida vid sida
+- Anv\u00e4nd f\u00f6r att testa badges, border och layout
+    `.trim(),
+    changelog: [
+      { date: '2025-12-30', note: 'Added game detail comparison view for play modes' },
+    ],
+    codeSnippet: `// UI route:
+/sandbox/app/game-detail`,
+  },
 
   'admin-main': {
     notes: `

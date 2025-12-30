@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import {
   PlayIcon,
@@ -6,13 +6,25 @@ import {
   Squares2X2Icon,
   BookmarkIcon,
   MagnifyingGlassIcon,
+  ArrowUpOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import { AddGameButton } from "./AddGameButton";
 import { BlockRow } from "./GameRow";
 import type { PlannerBlock, PlannerPlan, PlannerVisibility } from "../types";
+import { useAutoSave } from "../hooks/useActionFeedback";
 import clsx from "clsx";
 
 type SessionEditorProps = {
@@ -22,13 +34,14 @@ type SessionEditorProps = {
     type: PlannerBlock["blockType"],
     extras?: Partial<PlannerBlock> & { game_id?: string | null }
   ) => Promise<void>;
-  onUpdateBlock: (blockId: string, updates: Partial<PlannerBlock> & { position?: number }) => Promise<void>;
   onDeleteBlock: (blockId: string) => Promise<void>;
   onSavePrivateNote: (content: string) => Promise<void>;
   onSaveTenantNote?: (content: string) => Promise<void>;
   onVisibilityChange: (visibility: PlannerVisibility) => Promise<void>;
   onReorderBlocks: (blockIds: string[]) => Promise<void>;
+  onPublish?: () => Promise<void>;
   canSetPublicVisibility?: boolean;
+  isPublishing?: boolean;
 };
 
 type GameSearchResult = {
@@ -50,20 +63,18 @@ export function SessionEditor({
   plan,
   onPlanChange,
   onAddBlock,
-   
-  onUpdateBlock: _onUpdateBlock,
   onDeleteBlock,
   onSavePrivateNote,
   onSaveTenantNote,
   onVisibilityChange,
   onReorderBlocks,
+  onPublish,
   canSetPublicVisibility = false,
+  isPublishing = false,
 }: SessionEditorProps) {
   const [localPlan, setLocalPlan] = useState<PlannerPlan>(plan);
   const [noteContent, setNoteContent] = useState<string>(plan.notes?.privateNote?.content ?? "");
-  const [isSavingNote, setIsSavingNote] = useState(false);
   const [tenantNoteContent, setTenantNoteContent] = useState<string>(plan.notes?.tenantNote?.content ?? "");
-  const [isSavingTenantNote, setIsSavingTenantNote] = useState(false);
   const [gameQuery, setGameQuery] = useState("");
   const [gameResults, setGameResults] = useState<GameSearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -72,10 +83,36 @@ export function SessionEditor({
   const [isTypingDesc, setIsTypingDesc] = useState(false);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [isReordering, setIsReordering] = useState(false);
+  const [blockToDelete, setBlockToDelete] = useState<PlannerBlock | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const titleUpdateTimer = useRef<NodeJS.Timeout | null>(null);
   const descUpdateTimer = useRef<NodeJS.Timeout | null>(null);
   const titleTypingReset = useRef<NodeJS.Timeout | null>(null);
   const descTypingReset = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-save private notes
+  const savePrivateNote = useCallback(async (content: string) => {
+    await onSavePrivateNote(content);
+  }, [onSavePrivateNote]);
+  
+  const { isSaving: isSavingNote, isDirty: isPrivateNoteDirty } = useAutoSave(
+    noteContent,
+    savePrivateNote,
+    { debounceMs: 1500 }
+  );
+
+  // Auto-save tenant notes
+  const saveTenantNote = useCallback(async (content: string) => {
+    if (onSaveTenantNote) {
+      await onSaveTenantNote(content);
+    }
+  }, [onSaveTenantNote]);
+
+  const { isSaving: isSavingTenantNote, isDirty: isTenantNoteDirty } = useAutoSave(
+    tenantNoteContent,
+    saveTenantNote,
+    { debounceMs: 1500, enabled: !!onSaveTenantNote && localPlan.visibility !== "private" && !!localPlan.ownerTenantId }
+  );
 
   useEffect(() => {
     const shouldSyncTitle = !isTypingTitle || localPlan.id !== plan.id;
@@ -152,28 +189,23 @@ export function SessionEditor({
     }
   };
 
-  const handleRemoveBlock = async (blockId: string) => {
-    await onDeleteBlock(blockId);
+  const handleRemoveBlock = (block: PlannerBlock) => {
+    setBlockToDelete(block);
+  };
+
+  const confirmDeleteBlock = async () => {
+    if (!blockToDelete) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteBlock(blockToDelete.id);
+    } finally {
+      setIsDeleting(false);
+      setBlockToDelete(null);
+    }
   };
 
   const handleAddBlock = async (type: PlannerBlock["blockType"], gameId?: string | null, duration?: number | null) => {
     await onAddBlock(type, { game_id: gameId, durationMinutes: duration ?? null });
-  };
-
-  const handleSaveNote = async () => {
-    setIsSavingNote(true);
-    await onSavePrivateNote(noteContent);
-    setIsSavingNote(false);
-  };
-
-  const handleSaveTenantNote = async () => {
-    if (!onSaveTenantNote) return;
-    setIsSavingTenantNote(true);
-    try {
-      await onSaveTenantNote(tenantNoteContent);
-    } finally {
-      setIsSavingTenantNote(false);
-    }
   };
 
   const searchGames = async () => {
@@ -202,8 +234,9 @@ export function SessionEditor({
               value={localPlan.name}
               onChange={(e) => void handleTitleChange(e.target.value)}
               placeholder="Plantitel..."
-              className="border-0 border-b-2 border-transparent bg-transparent px-0 text-xl font-semibold placeholder:text-muted-foreground/50 focus:border-primary focus:ring-0 focus-visible:ring-0"
+              className="flex-1 min-w-[200px] border-0 border-b-2 border-transparent bg-transparent px-0 text-xl font-semibold placeholder:text-muted-foreground/50 focus:border-primary focus:ring-0 focus-visible:ring-0"
             />
+            <StatusBadge status={localPlan.status} />
             <VisibilitySwitcher
               value={localPlan.visibility}
               canSetPublic={canSetPublicVisibility}
@@ -229,14 +262,9 @@ export function SessionEditor({
               <BookmarkIcon className="h-4 w-4 text-muted-foreground" />
               <h3 className="text-sm font-semibold">Tenant-anteckningar</h3>
             </div>
-            <Button
-              size="sm"
-              variant="ghost"
-              disabled={isSavingTenantNote || !onSaveTenantNote}
-              onClick={() => void handleSaveTenantNote()}
-            >
-              {isSavingTenantNote ? "Sparar..." : "Spara"}
-            </Button>
+            <span className="text-xs text-muted-foreground">
+              {isSavingTenantNote ? "Sparar..." : isTenantNoteDirty ? "Osparad" : "Sparad"}
+            </span>
           </div>
           <Textarea
             value={tenantNoteContent}
@@ -302,7 +330,7 @@ export function SessionEditor({
                   total={localPlan.blocks.length}
                   onMoveUp={() => void moveBlock(block, -1)}
                   onMoveDown={() => void moveBlock(block, 1)}
-                  onRemove={() => void handleRemoveBlock(block.id)}
+                  onRemove={() => handleRemoveBlock(block)}
                 />
               </div>
             ))}
@@ -368,9 +396,9 @@ export function SessionEditor({
             <BookmarkIcon className="h-4 w-4 text-muted-foreground" />
             <h3 className="text-sm font-semibold">Privata anteckningar</h3>
           </div>
-          <Button size="sm" variant="ghost" disabled={isSavingNote} onClick={() => void handleSaveNote()}>
-            {isSavingNote ? "Sparar..." : "Spara"}
-          </Button>
+          <span className="text-xs text-muted-foreground">
+            {isSavingNote ? "Sparar..." : isPrivateNoteDirty ? "Osparad" : "Sparad"}
+          </span>
         </div>
         <Textarea
           value={noteContent}
@@ -396,12 +424,46 @@ export function SessionEditor({
               </span>
             )}
           </Button>
-          <Button variant="outline" className="h-12 gap-2">
-            <BookmarkIcon className="h-4 w-4" />
-            <span className="hidden sm:inline">Spara</span>
-          </Button>
+          {onPublish && (
+            <Button 
+              variant="outline" 
+              className="h-12 gap-2"
+              onClick={() => void onPublish()}
+              disabled={isPublishing || localPlan.blocks.length === 0}
+            >
+              <ArrowUpOnSquareIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">
+                {isPublishing ? "Publicerar..." : localPlan.status === 'draft' ? "Publicera" : "Publicera ny version"}
+              </span>
+            </Button>
+          )}
         </div>
       </div>
+
+      {/* Delete Block Confirmation Dialog */}
+      <AlertDialog open={!!blockToDelete} onOpenChange={(open) => !open && setBlockToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ta bort block?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {blockToDelete?.blockType === "game" && blockToDelete.game
+                ? `Vill du ta bort "${blockToDelete.game.title}" från planen?`
+                : `Vill du ta bort detta ${blockToDelete?.blockType === "pause" ? "pausblock" : blockToDelete?.blockType === "preparation" ? "förberedelser" : "block"} från planen?`}
+              {" "}Denna åtgärd kan inte ångras.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Avbryt</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => void confirmDeleteBlock()}
+              variant="destructive"
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Tar bort..." : "Ta bort"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
@@ -446,5 +508,20 @@ function VisibilitySwitcher({
         </button>
       ))}
     </div>
+  );
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const config: Record<string, { label: string; className: string }> = {
+    draft: { label: "Utkast", className: "bg-muted text-muted-foreground" },
+    published: { label: "Publicerad", className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" },
+    modified: { label: "Ändrad", className: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400" },
+    archived: { label: "Arkiverad", className: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400" },
+  };
+  const { label, className } = config[status] ?? config.draft;
+  return (
+    <span className={clsx("rounded-full px-2.5 py-0.5 text-xs font-medium", className)}>
+      {label}
+    </span>
   );
 }

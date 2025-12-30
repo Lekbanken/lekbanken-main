@@ -57,23 +57,19 @@ export async function POST(
     return NextResponse.json({ error: 'blockIds must match current blocks' }, { status: 400 })
   }
 
-  const byId = new Map(existingBlocks?.map((b) => [b.id, b]))
-  const reorderPayload = blockIds.map((id, idx) => {
-    const ref = byId.get(id)
-    return {
-      id,
-      position: idx,
-      plan_id: planId,
-      block_type: ref?.block_type ?? 'custom',
+  // Update positions one by one (upsert with partial data doesn't work reliably)
+  for (let idx = 0; idx < blockIds.length; idx++) {
+    const blockId = blockIds[idx]
+    const { error: updateError } = await supabase
+      .from('plan_blocks')
+      .update({ position: idx })
+      .eq('id', blockId)
+      .eq('plan_id', planId)
+    
+    if (updateError) {
+      console.error('[api/plans/:id/blocks/reorder] update error for block', blockId, updateError)
+      return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
     }
-  })
-
-  const { error: orderError } = await supabase
-    .from('plan_blocks')
-    .upsert(reorderPayload, { onConflict: 'id' })
-  if (orderError) {
-    console.error('[api/plans/:id/blocks/reorder] reorder error', orderError)
-    return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
   }
 
   // Refresh and update total duration

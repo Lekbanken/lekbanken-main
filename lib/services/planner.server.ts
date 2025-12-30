@@ -64,7 +64,14 @@ function mapBlocks(
   localeOrder: string[] = DEFAULT_LOCALE_ORDER
 ): PlannerBlock[] {
   if (!blocks || blocks.length === 0) return []
-  return blocks.map((block) => ({
+  return blocks.map((block) => mapSingleBlockInternal(block, localeOrder))
+}
+
+function mapSingleBlockInternal(
+  block: BlockRow,
+  localeOrder: string[] = DEFAULT_LOCALE_ORDER
+): PlannerBlock {
+  return {
     id: block.id,
     planId: block.plan_id,
     position: block.position,
@@ -75,7 +82,26 @@ function mapBlocks(
     isOptional: block.is_optional,
     metadata: block.metadata as Record<string, unknown> | null,
     game: block.block_type === 'game' ? mapGameSummary(block.game, localeOrder) : null,
-  }))
+  }
+}
+
+/**
+ * Maps a raw Supabase block row to PlannerBlock type.
+ * Exported for use in mutation API responses.
+ */
+export function mapBlockToPlanner(
+  rawBlock: Tables<'plan_blocks'> & {
+    games?: (Tables<'games'> & {
+      translations?: Tables<'game_translations'>[] | null
+      media?: Tables<'game_media'>[] | null
+    }) | null
+  },
+  localeOrder: string[] = DEFAULT_LOCALE_ORDER
+): PlannerBlock {
+  // Handle "games" (plural) from the API select
+  const game = rawBlock.games ?? null
+  const blockRow: BlockRow = { ...rawBlock, game }
+  return mapSingleBlockInternal(blockRow, localeOrder)
 }
 
 function pickLatestNote<T extends PrivateNoteRow | TenantNoteRow>(notes?: T[] | null) {
@@ -112,8 +138,11 @@ function buildPlanModel(
     name: row.name,
     description: row.description,
     visibility: row.visibility,
+    status: (row as { status?: string }).status ?? 'draft',
     ownerTenantId: row.owner_tenant_id,
     totalTimeMinutes: totalDuration,
+    currentVersionId: (row as { current_version_id?: string | null }).current_version_id ?? null,
+    currentVersion: null, // Populated separately if needed
     updatedAt: row.updated_at,
     metadata: row.metadata as Record<string, unknown> | null,
     blocks,
@@ -237,7 +266,7 @@ export function buildPlayView(
 export async function fetchPlanWithRelations(
   planId: string,
   options: { localeOrder?: string[]; withNotes?: boolean } = {}
-): Promise<{ plan: PlannerPlan | null; error?: string }> {
+): Promise<{ plan: PlannerPlan | null; raw: PlanWithRelations | null; error?: string }> {
   const supabase = await createServerRlsClient()
   const localeOrder = options.localeOrder ?? DEFAULT_LOCALE_ORDER
 
@@ -264,12 +293,13 @@ export async function fetchPlanWithRelations(
 
   if (error) {
     console.error('[planner] fetchPlanWithRelations error', error)
-    return { plan: null, error: 'not_found' }
+    return { plan: null, raw: null, error: 'not_found' }
   }
 
-  if (!data) return { plan: null, error: 'not_found' }
+  if (!data) return { plan: null, raw: null, error: 'not_found' }
 
-  return { plan: buildPlanModel(data as PlanWithRelations, localeOrder) }
+  const rawData = data as PlanWithRelations
+  return { plan: buildPlanModel(rawData, localeOrder), raw: rawData }
 }
 
 export function sortBlocks(blocks: PlannerBlock[]) {

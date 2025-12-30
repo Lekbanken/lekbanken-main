@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
-import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import { mapBlockToPlanner } from '@/lib/services/planner.server'
 import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -104,18 +104,64 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to create block' }, { status: 500 })
   }
 
-  // Reorder positions to be sequential
+  // Reorder positions to be sequential using individual updates
   const orderedIds = existingBlocks?.map((b) => b.id) ?? []
   orderedIds.splice(insertPosition, 0, newBlock.id)
 
-  const updates = orderedIds.map((id, idx) => ({ id, position: idx }))
-  // @ts-expect-error - upsert with partial update for reordering
-  const { error: orderError } = await supabase.from('plan_blocks').upsert(updates, { onConflict: 'id' })
-  if (orderError) {
-    console.error('[api/plans/:id/blocks] reorder error', orderError)
-    return NextResponse.json({ error: 'Failed to reorder blocks' }, { status: 500 })
+  // Update positions one by one (upsert doesn't work for partial updates)
+  for (let idx = 0; idx < orderedIds.length; idx++) {
+    const blockId = orderedIds[idx]
+    const { error: orderError } = await supabase
+      .from('plan_blocks')
+      .update({ position: idx })
+      .eq('id', blockId)
+    
+    if (orderError) {
+      console.error('[api/plans/:id/blocks] reorder error for block', blockId, orderError)
+      // Continue anyway, position ordering is not critical
+    }
   }
 
-  const refreshed = await fetchPlanWithRelations(planId)
-  return NextResponse.json({ plan: refreshed.plan }, { status: 201 })
+  // Fetch the created block with game relation for client
+  const { data: createdBlock, error: fetchError } = await supabase
+    .from('plan_blocks')
+    .select(`
+      *,
+      games (
+        id,
+        name,
+        slug,
+        description,
+        min_players,
+        max_players,
+        time_estimate_min,
+        time_estimate_max,
+        energy_level,
+        location_type,
+        translations:game_translations (
+          locale,
+          title,
+          short_description
+        ),
+        media:game_media (
+          kind,
+          media_id,
+          position
+        )
+      )
+    `)
+    .eq('id', newBlock.id)
+    .single()
+
+  if (fetchError || !createdBlock) {
+    console.error('[api/plans/:id/blocks] fetch created block error', fetchError)
+    // Return basic block without game relation if fetch fails
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fallbackBlock = mapBlockToPlanner(newBlock as any)
+    return NextResponse.json({ block: fallbackBlock }, { status: 201 })
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mappedBlock = mapBlockToPlanner(createdBlock as any)
+  return NextResponse.json({ block: mappedBlock }, { status: 201 })
 }

@@ -3,6 +3,12 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 import { toPlannerPlan, DEFAULT_LOCALE_ORDER } from '@/lib/services/planner.server'
 import type { Tables } from '@/types/supabase'
 import type { PlannerPlan } from '@/types/planner'
+import {
+  buildCapabilityContextFromMemberships,
+  derivePlanCapabilities,
+  capabilitiesToObject,
+} from '@/lib/auth/capabilities'
+import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 
 type PlanRow = Tables<'plans'>
 type BlockRow = Tables<'plan_blocks'> & {
@@ -27,7 +33,7 @@ export async function POST(request: Request) {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json({ error: { code: 'UNAUTHORIZED', message: 'Unauthorized' } }, { status: 401 })
   }
 
   const {
@@ -38,7 +44,9 @@ export async function POST(request: Request) {
     pageSize = 20,
   } = (await request.json().catch(() => ({}))) as SearchBody
 
-  const offset = (page - 1) * pageSize
+  // Clamp pageSize to reasonable limits
+  const safePageSize = Math.min(Math.max(pageSize, 1), 100)
+  const offset = (page - 1) * safePageSize
 
   let query = supabase
     .from('plans')
@@ -68,22 +76,53 @@ export async function POST(request: Request) {
     query = query.or(`owner_tenant_id.eq.${tenantId},visibility.eq.public`)
   }
 
-  query = query.range(offset, offset + pageSize - 1)
+  query = query.range(offset, offset + safePageSize - 1)
 
   const { data, error, count } = await query
 
   if (error) {
     console.error('[api/plans/search] error', error)
-    return NextResponse.json({ error: 'Failed to search plans' }, { status: 500 })
+    return NextResponse.json({ error: { code: 'SEARCH_FAILED', message: 'Failed to search plans' } }, { status: 500 })
   }
 
-  const plans: PlannerPlan[] =
-    data?.map((row: PlanRow & { blocks?: BlockRow[] | null }) =>
-      toPlannerPlan(row, DEFAULT_LOCALE_ORDER)
-    ) ?? []
+  // Get user context for capabilities
+  const [profileResult, membershipsResult] = await Promise.all([
+    supabase.from('users').select('global_role').eq('id', user.id).single(),
+    supabase.from('user_tenant_memberships').select('tenant_id, role').eq('user_id', user.id),
+  ])
+
+  const globalRole = deriveEffectiveGlobalRole(profileResult.data, user)
+  const memberships = membershipsResult.data ?? []
+
+  const capabilityCtx = buildCapabilityContextFromMemberships({
+    userId: user.id,
+    globalRole,
+    memberships,
+  })
+
+  const plans = (data ?? []).map((row: PlanRow & { blocks?: BlockRow[] | null }) => {
+    const plan = toPlannerPlan(row, DEFAULT_LOCALE_ORDER)
+    const caps = derivePlanCapabilities(capabilityCtx, {
+      ownerUserId: row.owner_user_id,
+      ownerTenantId: row.owner_tenant_id,
+      visibility: row.visibility,
+    })
+    return {
+      ...plan,
+      _capabilities: capabilitiesToObject(caps),
+    }
+  })
 
   const total = count ?? plans.length
-  const hasMore = offset + pageSize < total
+  const hasMore = offset + safePageSize < total
 
-  return NextResponse.json({ plans, total, page, pageSize, hasMore })
+  return NextResponse.json({
+    plans,
+    pagination: {
+      page,
+      pageSize: safePageSize,
+      total,
+      hasMore,
+    },
+  })
 }

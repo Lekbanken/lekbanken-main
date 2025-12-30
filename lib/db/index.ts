@@ -58,23 +58,9 @@ export {
   filterGames,
 } from './games'
 
-// Plans queries
-export {
-  getPlanById,
-  getPlansForUser,
-  getTenantPlans,
-  getPublicPlans,
-  createPlan,
-  updatePlan,
-  deletePlan,
-  addGameToPlan,
-  removeGameFromPlan,
-  updatePlanGames,
-  getPlanGames,
-  calculatePlanTime,
-  duplicatePlan,
-  searchPlans,
-} from './plans'
+// NOTE: Plans queries removed in Sprint 4 cleanup.
+// The old lib/db/plans.ts used legacy plan_games table.
+// All plan queries now use direct API routes in /api/plans/*.
 
 // Billing queries
 export {

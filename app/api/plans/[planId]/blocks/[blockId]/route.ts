@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validatePlanBlockPayload } from '@/lib/validation/plans'
-import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import { mapBlockToPlanner } from '@/lib/services/planner.server'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -118,8 +118,45 @@ export async function PATCH(
     }
   }
 
-  const refreshed = await fetchPlanWithRelations(planId)
-  return NextResponse.json({ plan: refreshed.plan })
+  // Fetch updated block with game relation
+  const { data: updatedBlock, error: fetchError } = await supabase
+    .from('plan_blocks')
+    .select(`
+      *,
+      games (
+        id,
+        name,
+        slug,
+        description,
+        min_players,
+        max_players,
+        time_estimate_min,
+        time_estimate_max,
+        energy_level,
+        location_type,
+        translations:game_translations (
+          locale,
+          title,
+          short_description
+        ),
+        media:game_media (
+          kind,
+          media_id,
+          position
+        )
+      )
+    `)
+    .eq('id', blockId)
+    .single()
+
+  if (fetchError || !updatedBlock) {
+    console.error('[api/plans/:id/blocks/:blockId] fetch updated block error', fetchError)
+    return NextResponse.json({ error: { code: 'FETCH_ERROR', message: 'Block updated but could not fetch result' } }, { status: 500 })
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mappedBlock = mapBlockToPlanner(updatedBlock as any)
+  return NextResponse.json({ block: mappedBlock })
 }
 
 export async function DELETE(
@@ -180,6 +217,5 @@ export async function DELETE(
     }
   }
 
-  const refreshed = await fetchPlanWithRelations(planId)
-  return NextResponse.json({ plan: refreshed.plan })
+  return NextResponse.json({ deleted: true, id: blockId })
 }

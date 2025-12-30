@@ -1,13 +1,28 @@
-import type { PlannerPlan, PlannerPlayView } from '@/types/planner'
+import type { PlannerPlan, PlannerBlock, PlannerVersion } from '@/types/planner'
+import type { PlanCapabilities } from '@/lib/auth/capabilities'
 
-type ErrorPayload = { error?: string; errors?: string[] }
+type ErrorPayload = { error?: string | { code?: string; message?: string }; errors?: string[] }
+
+type PlanWithCapabilities = PlannerPlan & { _capabilities?: PlanCapabilities }
+
+export type PlanSearchResult = {
+  plans: PlanWithCapabilities[]
+  pagination: {
+    page: number
+    pageSize: number
+    total: number
+    hasMore: boolean
+  }
+}
 
 async function handleJson<T>(res: Response): Promise<T> {
   if (!res.ok) {
     const payload = (await res.json().catch(() => ({}))) as ErrorPayload
     const errors = payload?.errors
+    const errorObj = typeof payload?.error === 'object' ? payload.error : null
     const message =
-      payload?.error ||
+      errorObj?.message ||
+      (typeof payload?.error === 'string' ? payload.error : undefined) ||
       (Array.isArray(errors) ? errors.join(', ') : undefined) ||
       res.statusText
     throw new Error(message || 'Request failed')
@@ -15,14 +30,23 @@ async function handleJson<T>(res: Response): Promise<T> {
   return (await res.json()) as T
 }
 
-export async function fetchPlans(query?: { search?: string; tenantId?: string | null }) {
+export async function fetchPlans(query?: { search?: string; tenantId?: string | null; page?: number; pageSize?: number }): Promise<PlanWithCapabilities[]> {
   const res = await fetch('/api/plans/search', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ page: 1, pageSize: 50, ...query }),
   })
-  const data = await handleJson<{ plans: PlannerPlan[] }>(res)
+  const data = await handleJson<PlanSearchResult>(res)
   return data.plans
+}
+
+export async function fetchPlansWithPagination(query?: { search?: string; tenantId?: string | null; page?: number; pageSize?: number }): Promise<PlanSearchResult> {
+  const res = await fetch('/api/plans/search', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ page: 1, pageSize: 20, ...query }),
+  })
+  return handleJson<PlanSearchResult>(res)
 }
 
 export async function fetchPlan(planId: string) {
@@ -85,14 +109,14 @@ export async function addBlock(
     metadata?: Record<string, unknown> | null
     is_optional?: boolean | null
   }
-) {
+): Promise<PlannerBlock> {
   const res = await fetch(`/api/plans/${planId}/blocks`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-  const data = await handleJson<{ plan: PlannerPlan }>(res)
-  return data.plan
+  const data = await handleJson<{ block: PlannerBlock }>(res)
+  return data.block
 }
 
 export async function updateBlock(
@@ -108,22 +132,30 @@ export async function updateBlock(
     metadata?: Record<string, unknown> | null
     is_optional?: boolean | null
   }
-) {
+): Promise<PlannerBlock> {
   const res = await fetch(`/api/plans/${planId}/blocks/${blockId}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-  const data = await handleJson<{ plan: PlannerPlan }>(res)
-  return data.plan
+  const data = await handleJson<{ block: PlannerBlock }>(res)
+  return data.block
 }
 
-export async function deleteBlock(planId: string, blockId: string) {
+export async function deleteBlock(planId: string, blockId: string): Promise<{ deleted: boolean; id: string }> {
   const res = await fetch(`/api/plans/${planId}/blocks/${blockId}`, {
     method: 'DELETE',
   })
-  const data = await handleJson<{ plan: PlannerPlan }>(res)
-  return data.plan
+  const data = await handleJson<{ deleted: boolean; id: string }>(res)
+  return data
+}
+
+export async function deletePlan(planId: string) {
+  const res = await fetch(`/api/plans/${planId}`, {
+    method: 'DELETE',
+  })
+  const data = await handleJson<{ deleted: boolean; id: string }>(res)
+  return data
 }
 
 export async function reorderBlocks(planId: string, blockIds: string[]) {
@@ -154,8 +186,40 @@ export async function saveTenantNote(planId: string, content: string, tenantId?:
   await handleJson(res)
 }
 
-export async function fetchPlayablePlan(planId: string) {
-  const res = await fetch(`/api/plans/${planId}/play`)
-  const data = await handleJson<{ play: PlannerPlayView }>(res)
-  return data.play
+// NOTE: fetchPlayablePlan removed in Sprint 4 cleanup.
+// Use features/play/api.ts:startRun() for new Run-based play flow.
+// Legacy: fetchLegacyPlayView() still available for backward compatibility.
+
+// -----------------------------------------------------------------------------
+// Versioning API
+// -----------------------------------------------------------------------------
+
+export type PublishResult = {
+  version: PlannerVersion
+  plan: { id: string; status: string; currentVersionId: string }
+}
+
+export type VersionWithCurrent = PlannerVersion & { isCurrent: boolean }
+
+export type VersionsResult = {
+  versions: VersionWithCurrent[]
+  currentVersionId: string | null
+}
+
+/**
+ * Publish the current plan state as a new version.
+ */
+export async function publishPlan(planId: string): Promise<PublishResult> {
+  const res = await fetch(`/api/plans/${planId}/publish`, {
+    method: 'POST',
+  })
+  return handleJson<PublishResult>(res)
+}
+
+/**
+ * Fetch all published versions of a plan.
+ */
+export async function fetchPlanVersions(planId: string): Promise<VersionsResult> {
+  const res = await fetch(`/api/plans/${planId}/versions`)
+  return handleJson<VersionsResult>(res)
 }

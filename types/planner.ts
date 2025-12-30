@@ -1,5 +1,6 @@
 export type PlannerVisibility = 'private' | 'tenant' | 'public'
 export type PlannerBlockType = 'game' | 'pause' | 'preparation' | 'custom'
+export type PlannerStatus = 'draft' | 'published' | 'modified' | 'archived'
 
 export type PlannerGameSummary = {
   id: string
@@ -36,13 +37,27 @@ export type PlannerNotes = {
   tenantNote?: PlannerNote | null
 }
 
+export type PlannerVersion = {
+  id: string
+  planId: string
+  versionNumber: number
+  name: string
+  description?: string | null
+  totalTimeMinutes: number
+  publishedAt: string
+  publishedBy: string
+}
+
 export type PlannerPlan = {
   id: string
   name: string
   description?: string | null
   visibility: PlannerVisibility
+  status: PlannerStatus
   ownerTenantId?: string | null
   totalTimeMinutes?: number | null
+  currentVersionId?: string | null
+  currentVersion?: PlannerVersion | null
   updatedAt: string
   metadata?: Record<string, unknown> | null
   blocks: PlannerBlock[]

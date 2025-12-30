@@ -4,27 +4,25 @@ import { useEffect, useMemo, useState } from "react";
 import { PlannerPageLayout } from "./components/PlannerPageLayout";
 import { SessionEditor } from "./components/SessionEditor";
 import { SessionList } from "./components/SessionList";
-import { createPlan, fetchPlans, updatePlan, addBlock, updateBlock, deleteBlock, savePrivateNote, saveTenantNote, updateVisibility, reorderBlocks } from "./api";
-import type { PlannerPlan, PlannerBlock, PlannerVisibility } from "./types";
+import { createPlan, fetchPlans, updatePlan, addBlock, deleteBlock, savePrivateNote, saveTenantNote, updateVisibility, reorderBlocks, publishPlan } from "./api";
+import type { PlannerPlan, PlannerBlock, PlannerVisibility, PlannerStatus } from "./types";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/lib/supabase/auth";
-import { isSystemAdmin } from "@/lib/utils/authRoles";
+import { useActionFeedback } from "./hooks/useActionFeedback";
 
 export function PlannerPage() {
   const [plans, setPlans] = useState<PlannerPlan[]>([]);
   const [activePlanId, setActivePlanId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { user, userProfile } = useAuth();
-  const canSetPublic = isSystemAdmin(
-    user ? { id: user.id, app_metadata: { role: (user.app_metadata as { role?: string } | null)?.role } } : null,
-    userProfile?.global_role ?? null
-  );
+  const [initialLoadError, setInitialLoadError] = useState<string | null>(null);
+  const { effectiveGlobalRole } = useAuth();
+  const canSetPublic = effectiveGlobalRole === "system_admin";
+  const { withFeedback, withSilentFeedback, isPending } = useActionFeedback();
 
   const loadPlans = async () => {
     setIsLoading(true);
-    setError(null);
+    setInitialLoadError(null);
     try {
       const data = await fetchPlans();
       setPlans(data);
@@ -33,7 +31,7 @@ export function PlannerPage() {
       }
     } catch (err) {
       console.error(err);
-      setError("Kunde inte ladda planer");
+      setInitialLoadError("Kunde inte ladda planer");
     } finally {
       setIsLoading(false);
     }
@@ -54,26 +52,65 @@ export function PlannerPage() {
     setActivePlanId(next.id);
   };
 
+  // Helper to add a block to local plan state
+  const addBlockToState = (planId: string, block: PlannerBlock) => {
+    setPlans((prev) =>
+      prev.map((plan) => {
+        if (plan.id !== planId) return plan;
+        const blocks = [...plan.blocks, block].sort((a, b) => a.position - b.position);
+        return { ...plan, blocks };
+      })
+    );
+  };
+
+  // Helper to update a block in local plan state
+  const updateBlockInState = (planId: string, block: PlannerBlock) => {
+    setPlans((prev) =>
+      prev.map((plan) => {
+        if (plan.id !== planId) return plan;
+        const blocks = plan.blocks.map((b) => (b.id === block.id ? block : b));
+        return { ...plan, blocks };
+      })
+    );
+  };
+
+  // Helper to remove a block from local plan state
+  const removeBlockFromState = (planId: string, blockId: string) => {
+    setPlans((prev) =>
+      prev.map((plan) => {
+        if (plan.id !== planId) return plan;
+        const blocks = plan.blocks
+          .filter((b) => b.id !== blockId)
+          .map((b, idx) => ({ ...b, position: idx }));
+        return { ...plan, blocks };
+      })
+    );
+  };
+
   const handleCreate = async () => {
-    try {
-      const plan = await createPlan({ name: "Ny plan" });
-      setPlans((prev) => [plan, ...prev]);
-      setActivePlanId(plan.id);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte skapa plan");
-    }
+    await withFeedback(
+      'create-plan',
+      async () => {
+        const plan = await createPlan({ name: "Ny plan" });
+        setPlans((prev) => [plan, ...prev]);
+        setActivePlanId(plan.id);
+        return plan;
+      },
+      { errorMessage: "Kunde inte skapa plan" }
+    );
   };
 
   const handlePlanChange = async (planId: string, updates: { name?: string; description?: string | null }) => {
     if (!planId) return;
-    try {
-      const updated = await updatePlan(planId, updates);
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte uppdatera plan");
-    }
+    await withSilentFeedback(
+      `update-plan-${planId}`,
+      async () => {
+        const updated = await updatePlan(planId, updates);
+        updatePlanState(updated);
+        return updated;
+      },
+      { errorMessage: "Kunde inte uppdatera plan" }
+    );
   };
 
   const handleAddBlock = async (
@@ -81,105 +118,126 @@ export function PlannerPage() {
     extras?: Partial<PlannerBlock> & { game_id?: string | null }
   ) => {
     if (!activePlan) return;
-    try {
-      const updated = await addBlock(activePlan.id, {
-        block_type: type,
-        game_id: extras?.game_id,
-        duration_minutes: extras?.durationMinutes ?? null,
-        title: extras?.title ?? null,
-        notes: extras?.notes ?? null,
-        position: extras?.position,
-        metadata: extras?.metadata ?? null,
-        is_optional: extras?.isOptional ?? null,
-      });
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte lägga till block");
-    }
+    await withFeedback(
+      `add-block-${activePlan.id}`,
+      async () => {
+        const block = await addBlock(activePlan.id, {
+          block_type: type,
+          game_id: extras?.game_id,
+          duration_minutes: extras?.durationMinutes ?? null,
+          title: extras?.title ?? null,
+          notes: extras?.notes ?? null,
+          position: extras?.position,
+          metadata: extras?.metadata ?? null,
+          is_optional: extras?.isOptional ?? null,
+        });
+        addBlockToState(activePlan.id, block);
+        return block;
+      },
+      { errorMessage: "Kunde inte lägga till block" }
+    );
   };
 
-  const handleUpdateBlock = async (blockId: string, updates: Partial<PlannerBlock> & { position?: number }) => {
-    if (!activePlan) return;
-    try {
-      const updated = await updateBlock(activePlan.id, blockId, {
-        block_type: updates.blockType,
-        game_id: updates.game?.id,
-        duration_minutes: updates.durationMinutes,
-        title: updates.title,
-        notes: updates.notes,
-        position: updates.position,
-        metadata: updates.metadata ?? undefined,
-        is_optional: updates.isOptional ?? undefined,
-      });
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte uppdatera block");
-    }
-  };
+  // NOTE: handleUpdateBlock removed in Sprint 4 cleanup.
+  // Block updates are handled via auto-save or inline editing.
 
   const handleDeleteBlock = async (blockId: string) => {
     if (!activePlan) return;
-    try {
-      const updated = await deleteBlock(activePlan.id, blockId);
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte ta bort block");
-    }
+    await withFeedback(
+      `delete-block-${blockId}`,
+      async () => {
+        const result = await deleteBlock(activePlan.id, blockId);
+        removeBlockFromState(activePlan.id, blockId);
+        return result;
+      },
+      { errorMessage: "Kunde inte ta bort block" }
+    );
   };
 
   const handleSaveNote = async (content: string) => {
     if (!activePlan) return;
-    try {
-      await savePrivateNote(activePlan.id, content);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte spara anteckning");
-    }
+    await withSilentFeedback(
+      `save-private-note-${activePlan.id}`,
+      async () => {
+        await savePrivateNote(activePlan.id, content);
+      },
+      { errorMessage: "Kunde inte spara anteckning" }
+    );
   };
 
   const handleSaveTenantNote = async (content: string) => {
     if (!activePlan) return;
-    try {
-      await saveTenantNote(activePlan.id, content, activePlan.ownerTenantId ?? null);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte spara tenant-anteckning");
-    }
+    await withSilentFeedback(
+      `save-tenant-note-${activePlan.id}`,
+      async () => {
+        await saveTenantNote(activePlan.id, content, activePlan.ownerTenantId ?? null);
+      },
+      { errorMessage: "Kunde inte spara tenant-anteckning" }
+    );
   };
 
   const handleVisibilityChange = async (planId: string, visibility: PlannerVisibility) => {
-    try {
-      const updated = await updateVisibility(planId, {
-        visibility,
-        owner_tenant_id: activePlan?.ownerTenantId ?? null,
-      });
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      const message =
-        err instanceof Error && err.message.toLowerCase().includes("public visibility")
-          ? "Endast systemadmin kan sätta planer som publika."
-          : "Kunde inte uppdatera synlighet";
-      setError(message);
-    }
+    await withFeedback(
+      `visibility-${planId}`,
+      async () => {
+        const updated = await updateVisibility(planId, {
+          visibility,
+          owner_tenant_id: activePlan?.ownerTenantId ?? null,
+        });
+        updatePlanState(updated);
+        return updated;
+      },
+      { 
+        errorMessage: "Kunde inte uppdatera synlighet",
+        showErrorDetails: true 
+      }
+    );
   };
 
   const handleReorderBlocks = async (orderedIds: string[]) => {
     if (!activePlan) return;
-    try {
-      const updated = await reorderBlocks(activePlan.id, orderedIds);
-      updatePlanState(updated);
-    } catch (err) {
-      console.error(err);
-      setError("Kunde inte ändra blockordning");
-    }
+    await withSilentFeedback(
+      `reorder-blocks-${activePlan.id}`,
+      async () => {
+        const updated = await reorderBlocks(activePlan.id, orderedIds);
+        updatePlanState(updated);
+        return updated;
+      },
+      { errorMessage: "Kunde inte ändra blockordning" }
+    );
   };
 
-  if (error) {
-    return <ErrorState title="Kunde inte ladda Planner" description={error} onRetry={() => void loadPlans()} />;
+  const handlePublish = async () => {
+    if (!activePlan) return;
+    await withFeedback(
+      `publish-${activePlan.id}`,
+      async () => {
+        const result = await publishPlan(activePlan.id);
+        // Update plan state with new status and version
+        setPlans((prev) =>
+          prev.map((p) =>
+            p.id === activePlan.id
+              ? {
+                  ...p,
+                  status: result.plan.status as PlannerStatus,
+                  currentVersionId: result.plan.currentVersionId,
+                  currentVersion: result.version,
+                }
+              : p
+          )
+        );
+        return result;
+      },
+      { 
+        errorMessage: "Kunde inte publicera plan",
+        successMessage: "Planen har publicerats!"
+      }
+    );
+  };
+
+  // Only show full-page error for initial load failure
+  if (initialLoadError) {
+    return <ErrorState title="Kunde inte ladda Planner" description={initialLoadError} onRetry={() => void loadPlans()} />;
   }
 
   if (isLoading && !activePlan) {
@@ -200,13 +258,14 @@ export function PlannerPage() {
             plan={activePlan}
             onPlanChange={handlePlanChange}
             onAddBlock={handleAddBlock}
-            onUpdateBlock={handleUpdateBlock}
             onDeleteBlock={handleDeleteBlock}
             onSavePrivateNote={handleSaveNote}
             onSaveTenantNote={handleSaveTenantNote}
             canSetPublicVisibility={canSetPublic}
             onVisibilityChange={(visibility) => handleVisibilityChange(activePlan.id, visibility)}
             onReorderBlocks={handleReorderBlocks}
+            onPublish={handlePublish}
+            isPublishing={isPending(`publish-${activePlan.id}`)}
           />
         ) : null}
       </div>

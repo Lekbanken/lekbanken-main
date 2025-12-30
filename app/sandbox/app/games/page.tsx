@@ -28,6 +28,7 @@ const mockGames = [
     minPlayers: 3,
     maxPlayers: 20,
     timeEstimate: 30,
+    playMode: 'basic' as const,
   },
   { 
     id: '2', 
@@ -39,6 +40,7 @@ const mockGames = [
     minPlayers: 2,
     maxPlayers: 6,
     timeEstimate: 45,
+    playMode: 'facilitated' as const,
   },
   { 
     id: '3', 
@@ -50,6 +52,7 @@ const mockGames = [
     minPlayers: 6,
     maxPlayers: 30,
     timeEstimate: 20,
+    playMode: 'participants' as const,
   },
   { 
     id: '4', 
@@ -61,6 +64,7 @@ const mockGames = [
     minPlayers: 4,
     maxPlayers: 12,
     timeEstimate: 30,
+    playMode: 'basic' as const,
   },
   { 
     id: '5', 
@@ -72,6 +76,7 @@ const mockGames = [
     minPlayers: 4,
     maxPlayers: 25,
     timeEstimate: 15,
+    playMode: 'facilitated' as const,
   },
   { 
     id: '6', 
@@ -83,6 +88,7 @@ const mockGames = [
     minPlayers: 2,
     maxPlayers: 10,
     timeEstimate: 60,
+    playMode: 'participants' as const,
   },
 ]
 
@@ -92,6 +98,24 @@ const energyOptions = [
   { value: 'medium', label: 'Medium energi' },
   { value: 'high', label: 'Hög energi' },
 ]
+
+const playModeConfig = {
+  basic: {
+    label: 'Enkel lek',
+    border: 'border-border',
+    badge: 'bg-muted text-muted-foreground ring-1 ring-border',
+  },
+  facilitated: {
+    label: 'Ledd aktivitet',
+    border: 'border-primary/50',
+    badge: 'bg-primary/10 text-primary ring-1 ring-primary/30',
+  },
+  participants: {
+    label: 'Deltagarlek',
+    border: 'border-yellow/60',
+    badge: 'bg-yellow/20 text-foreground ring-1 ring-yellow/40',
+  },
+}
 
 export default function GamesSandbox() {
   const [search, setSearch] = useState('')
@@ -115,6 +139,15 @@ export default function GamesSandbox() {
       default:
         return null
     }
+  }
+
+  const getPlayModeBadge = (mode: 'basic' | 'facilitated' | 'participants') => {
+    const meta = playModeConfig[mode]
+    return (
+      <Badge size="sm" className={meta.badge}>
+        {meta.label}
+      </Badge>
+    )
   }
 
   return (
@@ -153,6 +186,7 @@ export default function GamesSandbox() {
                 maxPlayers={game.maxPlayers}
                 energyLevel={game.energyLevel}
                 isFavorite={game.id === '1'}
+                playMode={game.playMode}
               />
             ))}
           </div>
@@ -246,19 +280,21 @@ export default function GamesSandbox() {
                 maxPlayers={game.maxPlayers}
                 energyLevel={game.energyLevel}
                 isFavorite={game.id === '2'}
+                playMode={game.playMode}
               />
             ))}
           </div>
         ) : (
           <div className="space-y-3">
             {filteredGames.map((game) => (
-              <Card key={game.id} className="hover:shadow-md transition-shadow">
+              <Card key={game.id} className={`hover:shadow-md transition-shadow ${playModeConfig[game.playMode].border}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h3 className="font-semibold text-gray-900">{game.name}</h3>
                         {getEnergyBadge(game.energyLevel)}
+                        {getPlayModeBadge(game.playMode)}
                       </div>
                       <p className="text-sm text-gray-600 line-clamp-2 mb-2">
                         {game.description}

@@ -1,8 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 type GameCardVariant = "default" | "compact" | "featured";
+type PlayMode = "basic" | "facilitated" | "participants";
 
 interface GameCardProps {
   id: string;
@@ -19,6 +21,7 @@ interface GameCardProps {
   playCount?: number | null;
   isFavorite?: boolean;
   variant?: GameCardVariant;
+  playMode?: PlayMode | null;
   categories?: string[];
 }
 
@@ -26,6 +29,24 @@ const energyConfig = {
   low: { label: "Lugn", variant: "success" as const },
   medium: { label: "Mellan", variant: "warning" as const },
   high: { label: "H\u00f6g energi", variant: "destructive" as const },
+};
+
+const playModeConfig: Record<PlayMode, { label: string; border: string; badge: string }> = {
+  basic: {
+    label: "Enkel lek",
+    border: "border-border",
+    badge: "bg-muted text-muted-foreground ring-1 ring-border",
+  },
+  facilitated: {
+    label: "Ledd aktivitet",
+    border: "border-primary/50",
+    badge: "bg-primary/10 text-primary ring-1 ring-primary/30",
+  },
+  participants: {
+    label: "Deltagarlek",
+    border: "border-yellow/60",
+    badge: "bg-yellow/20 text-foreground ring-1 ring-yellow/40",
+  },
 };
 
 export function GameCard({
@@ -43,6 +64,7 @@ export function GameCard({
   playCount,
   isFavorite = false,
   variant = "default",
+  playMode = null,
   categories = [],
 }: GameCardProps) {
   const ageRange = ageMin && ageMax ? `${ageMin}-${ageMax} \u00e5r` : ageMin ? `${ageMin}+ \u00e5r` : null;
@@ -52,11 +74,18 @@ export function GameCard({
       : minPlayers
         ? `${minPlayers}+ spelare`
         : null;
+  const playModeMeta = playMode ? playModeConfig[playMode] : null;
 
   if (variant === "compact") {
     return (
       <Link href={`/app/games/${id}`} className="group block">
-        <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-3 transition-all hover:border-primary hover:shadow-md">
+        <div
+          className={cn(
+            "flex items-center gap-4 rounded-xl border bg-card p-3 transition-all hover:shadow-md",
+            playModeMeta?.border ?? "border-border",
+            playMode ? "" : "hover:border-primary"
+          )}
+        >
           {/* Thumbnail */}
           <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg bg-gradient-to-br from-primary/20 to-accent/20">
             {imageUrl ? (
@@ -68,7 +97,14 @@ export function GameCard({
 
           {/* Content */}
           <div className="min-w-0 flex-1">
-            <h3 className="truncate font-semibold text-foreground group-hover:text-primary">{name}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="truncate font-semibold text-foreground group-hover:text-primary">{name}</h3>
+              {playModeMeta && (
+                <Badge size="sm" className={cn("border-0", playModeMeta.badge)}>
+                  {playModeMeta.label}
+                </Badge>
+              )}
+            </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
               {ageRange && <span>{ageRange}</span>}
               {timeEstimate && <span>- {timeEstimate} min</span>}
@@ -88,12 +124,18 @@ export function GameCard({
   }
 
   if (variant === "featured") {
+    const featuredBorder = playModeMeta?.border ?? "border-primary";
     return (
       <Link href={`/app/games/${id}`} className="group block">
-        <div className="relative overflow-hidden rounded-2xl border-2 border-primary bg-card shadow-lg transition-all hover:shadow-xl">
+        <div className={cn("relative overflow-hidden rounded-2xl border-2 bg-card shadow-lg transition-all hover:shadow-xl", featuredBorder)}>
           {/* Featured badge */}
-          <div className="absolute left-4 top-4 z-10">
+          <div className="absolute left-4 top-4 z-10 flex flex-wrap gap-2">
             <Badge variant="primary">* Utvald</Badge>
+            {playModeMeta && (
+              <Badge size="sm" className={cn("border-0", playModeMeta.badge)}>
+                {playModeMeta.label}
+              </Badge>
+            )}
           </div>
 
           {/* Favorite button */}
@@ -165,7 +207,13 @@ export function GameCard({
   // Default variant
   return (
     <Link href={`/app/games/${id}`} className="group block">
-      <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:border-primary hover:shadow-md">
+      <div
+        className={cn(
+          "overflow-hidden rounded-2xl border bg-card shadow-sm transition-all hover:shadow-md",
+          playModeMeta?.border ?? "border-border",
+          playMode ? "" : "hover:border-primary"
+        )}
+      >
         {/* Favorite button */}
         <div className="relative">
           <button
@@ -216,6 +264,11 @@ export function GameCard({
             {ageRange && (
               <Badge variant="primary" size="sm">
                 {ageRange}
+              </Badge>
+            )}
+            {playModeMeta && (
+              <Badge size="sm" className={cn("border-0", playModeMeta.badge)}>
+                {playModeMeta.label}
               </Badge>
             )}
             {energyLevel && (

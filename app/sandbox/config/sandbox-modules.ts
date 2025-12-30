@@ -193,6 +193,14 @@ export const sandboxCategories: SandboxCategory[] = [
         routes: ['/app/games', '/app/browse'],
       },
       { 
+        id: 'app-game-detail', 
+        label: 'Game Detail / Lek', 
+        href: '/sandbox/app/game-detail', 
+        description: 'Detaljvy f\u00f6r en lek, med spell\u00e4gen', 
+        status: 'design',
+        routes: ['/app/games/[gameId]'],
+      },
+      { 
         id: 'app-profile', 
         label: 'Profile / Profil', 
         href: '/sandbox/app/profile', 

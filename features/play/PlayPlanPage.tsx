@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
@@ -8,53 +8,32 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { SessionHeader } from "./components/SessionHeader";
 import { StepViewer } from "./components/StepViewer";
 import { NavigationControls } from "./components/NavigationControls";
-import type { Step } from "./types";
+import { startRun, updateRunProgress, fetchLegacyPlayView } from "./api";
+import type { Step, Run, RunStep } from "./types";
 
 const DEFAULT_STEP_DURATION_MINUTES = 5;
-const STORAGE_PREFIX = "play-plan:";
+const STORAGE_PREFIX = "play-run:";
+const PROGRESS_DEBOUNCE_MS = 800;
 
-type ProgressStatus = "not_started" | "in_progress" | "completed" | "abandoned";
-
-type PlanPlayProgress = {
-  current_block_id?: string | null;
-  current_position?: number | null;
-  status?: ProgressStatus;
-  metadata?: Record<string, unknown> | null;
-};
-
-type PlannerPlayGame = {
-  id: string;
-  title: string;
-  summary?: string | null;
-  materials?: string[] | null;
-  steps: { title: string; description?: string | null; durationMinutes?: number | null }[];
-};
-
-type PlannerPlayBlock = {
-  id: string;
-  type: string;
-  title: string;
-  durationMinutes?: number | null;
-  notes?: string | null;
-  game?: PlannerPlayGame | null;
-};
-
-type PlannerPlayView = {
-  planId: string;
-  name: string;
-  totalDurationMinutes?: number | null;
-  blocks: PlannerPlayBlock[];
-};
+const PROGRESS_DEBOUNCE_MS = 800;
 
 type ErrorCode = "not-found" | "network" | null;
 
-type PlanRun = {
-  id: string;
-  name: string;
-  steps: Step[];
-  blockCount: number;
-  totalDurationMinutes?: number | null;
-};
+/**
+ * Convert RunStep to legacy Step format for StepViewer compatibility
+ */
+function runStepToStep(rs: RunStep): Step {
+  return {
+    id: rs.id,
+    title: rs.title,
+    description: rs.description,
+    durationMinutes: rs.durationMinutes,
+    materials: rs.materials,
+    safety: rs.safety,
+    tag: rs.tag,
+    note: rs.note,
+  };
+}
 
 function clampStep(index: number, total: number) {
   if (total <= 0) return 0;
@@ -66,70 +45,32 @@ function getStepDurationSeconds(step?: Step | null) {
   return Math.max(30, Math.round(minutes * 60));
 }
 
-function mapPlanToRun(play: PlannerPlayView | null): PlanRun | null {
-  if (!play) return null;
-  const steps: Step[] = [];
-
-  play.blocks.forEach((block) => {
-    const tag = block.title || (block.type === "pause" ? "Paus" : "Moment");
-    const baseDuration = block.durationMinutes ?? undefined;
-
-    if (block.game && Array.isArray(block.game.steps) && block.game.steps.length > 0) {
-      const materials = (block.game.materials || []).filter((item): item is string => Boolean(item));
-      block.game.steps.forEach((s, stepIdx) => {
-        const step: Step = {
-          id: `${block.id}:${stepIdx}`,
-          title: s.title || `Steg ${stepIdx + 1}`,
-          description: s.description || "",
-          durationMinutes: typeof s.durationMinutes === "number" ? s.durationMinutes ?? undefined : baseDuration,
-          materials: stepIdx === 0 && materials.length > 0 ? materials : undefined,
-          tag,
-          note: stepIdx === 0 ? block.notes || undefined : undefined,
-        };
-        steps.push(step);
-      });
-    } else {
-      steps.push({
-        id: `${block.id}:note`,
-        title: tag,
-        description: block.notes || "Fortsätt när gruppen är redo.",
-        durationMinutes: baseDuration,
-        tag,
-      });
-    }
-  });
-
-  if (steps.length === 0) return null;
-
-  return {
-    id: play.planId,
-    name: play.name,
-    steps,
-    blockCount: play.blocks.length,
-    totalDurationMinutes: play.totalDurationMinutes ?? undefined,
-  };
-}
-
 export function PlayPlanPage({ planId }: { planId?: string }) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<ErrorCode>(null);
-  const [plan, setPlan] = useState<PlanRun | null>(null);
+  const [run, setRun] = useState<Run | null>(null);
   const [timerRemaining, setTimerRemaining] = useState(0);
   const [timerTotal, setTimerTotal] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const restoredTimerRef = useRef(false);
   const saveProgressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastProgressRef = useRef<string>("");
-  const blockPositionByIdRef = useRef<Record<string, number>>({});
 
-  const storageKey = planId ? `${STORAGE_PREFIX}${planId}` : null;
+  const storageKey = run?.id ? `${STORAGE_PREFIX}${run.id}` : null;
 
-  const totalSteps = plan?.steps.length ?? 0;
-  const step = useMemo(() => plan?.steps[currentStep], [plan, currentStep]);
+  const totalSteps = run?.steps.length ?? 0;
+  const step = useMemo(() => {
+    if (!run || !run.steps[currentStep]) return null;
+    return runStepToStep(run.steps[currentStep]);
+  }, [run, currentStep]);
 
-  const loadPlan = async () => {
+  /**
+   * Start or resume a run for this plan.
+   * Uses new Run API, falls back to legacy play view for unpublished plans.
+   */
+  const loadRun = useCallback(async () => {
     if (!planId) {
       setIsLoading(false);
       setErrorCode("not-found");
@@ -138,52 +79,127 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
 
     setIsLoading(true);
     setErrorCode(null);
-    try {
-      const res = await fetch(`/api/plans/${planId}/play`);
 
-      if (res.status === 404) {
-        setPlan(null);
-        setErrorCode("not-found");
-        return;
-      }
+    // Try new Run API first
+    const result = await startRun(planId);
 
-      if (!res.ok) {
-        setPlan(null);
-        setErrorCode("network");
-        return;
-      }
-
-      const json = (await res.json()) as { play: PlannerPlayView };
-      blockPositionByIdRef.current = Object.fromEntries(
-        (json.play?.blocks ?? []).map((b, idx) => [b.id, idx])
-      );
-      const mapped = mapPlanToRun(json.play);
-      if (!mapped) {
-        setPlan(null);
-        setErrorCode("not-found");
-        return;
-      }
-
-      setPlan(mapped);
-      setCurrentStep(0);
+    if (result.success) {
+      setRun(result.data.run);
+      setCurrentStep(result.data.run.currentStepIndex);
       setErrorCode(null);
       restoredTimerRef.current = false;
-    } catch (err) {
-      console.error("Failed to load plan", err);
-      setPlan(null);
-      setErrorCode("network");
-    } finally {
       setIsLoading(false);
+      return;
     }
-  };
 
-  useEffect(() => {
-    void loadPlan();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Fallback for legacy plans or errors
+    if (result.error.code === "NOT_FOUND" || result.error.code === "VALIDATION_ERROR") {
+      // Try legacy API for backward compatibility
+      const legacyResult = await fetchLegacyPlayView(planId);
+      if (legacyResult.success && legacyResult.data.play) {
+        const legacyRun = mapLegacyPlayToRun(legacyResult.data.play);
+        if (legacyRun) {
+          setRun(legacyRun);
+          setCurrentStep(0);
+          setErrorCode(null);
+          restoredTimerRef.current = false;
+          setIsLoading(false);
+          return;
+        }
+      }
+      setErrorCode("not-found");
+    } else {
+      setErrorCode("network");
+    }
+    
+    setRun(null);
+    setIsLoading(false);
   }, [planId]);
 
+  // Legacy fallback: convert old play view to Run format
+  function mapLegacyPlayToRun(play: {
+    planId: string;
+    name: string;
+    totalDurationMinutes?: number | null;
+    blocks: Array<{
+      id: string;
+      type: string;
+      title: string;
+      durationMinutes?: number | null;
+      notes?: string | null;
+      game?: {
+        id: string;
+        title: string;
+        summary?: string | null;
+        materials?: string[] | null;
+        steps: Array<{ title: string; description?: string | null; durationMinutes?: number | null }>;
+      } | null;
+    }>;
+  }): Run | null {
+    const steps: RunStep[] = [];
+    let stepIndex = 0;
+
+    play.blocks.forEach((block) => {
+      const tag = block.title || (block.type === "pause" ? "Paus" : "Moment");
+      const baseDuration = block.durationMinutes ?? DEFAULT_STEP_DURATION_MINUTES;
+
+      if (block.game?.steps && block.game.steps.length > 0) {
+        const materials = (block.game.materials || []).filter((item): item is string => Boolean(item));
+        block.game.steps.forEach((s, idx) => {
+          steps.push({
+            id: `${block.id}:${idx}`,
+            index: stepIndex++,
+            blockId: block.id,
+            blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
+            title: s.title || `Steg ${idx + 1}`,
+            description: s.description || "",
+            durationMinutes: s.durationMinutes ?? baseDuration,
+            materials: idx === 0 && materials.length > 0 ? materials : undefined,
+            tag,
+            note: idx === 0 ? block.notes || undefined : undefined,
+            gameSnapshot: block.game ? { id: block.game.id, title: block.game.title } : null,
+          });
+        });
+      } else {
+        steps.push({
+          id: `${block.id}:0`,
+          index: stepIndex++,
+          blockId: block.id,
+          blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
+          title: tag,
+          description: block.notes || "Fortsätt när gruppen är redo.",
+          durationMinutes: baseDuration,
+          tag,
+          gameSnapshot: null,
+        });
+      }
+    });
+
+    if (steps.length === 0) return null;
+
+    return {
+      id: `legacy-${play.planId}`,
+      planId: play.planId,
+      planVersionId: "legacy",
+      versionNumber: 0,
+      name: play.name,
+      status: "in_progress",
+      steps,
+      blockCount: play.blocks.length,
+      totalDurationMinutes: play.totalDurationMinutes ?? steps.reduce((sum, s) => sum + s.durationMinutes, 0),
+      currentStepIndex: 0,
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+    };
+  }
+
   useEffect(() => {
-    if (!planId || !plan || !totalSteps) return;
+    void loadRun();
+  }, [loadRun]);
+
+  // Restore progress from localStorage
+  useEffect(() => {
+    if (!run || !totalSteps) return;
 
     try {
       const raw = storageKey ? window.localStorage.getItem(storageKey) : null;
@@ -198,7 +214,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
 
       if (savedLocal) {
         const safeIndex = clampStep(savedLocal?.stepIndex ?? 0, totalSteps);
-        const targetStep = plan.steps[safeIndex];
+        const targetStep = run.steps[safeIndex] ? runStepToStep(run.steps[safeIndex]) : null;
         const defaultTotal = getStepDurationSeconds(targetStep);
         const savedTotal =
           savedLocal?.timerTotalSeconds && savedLocal.timerTotalSeconds > 0
@@ -214,83 +230,43 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
         setTimerRemaining(savedRemaining);
         setIsTimerRunning(Boolean(savedLocal?.isRunning && savedRemaining > 0));
         restoredTimerRef.current = true;
-        return;
       }
-
-      void (async () => {
-        try {
-          const res = await fetch(`/api/plans/${planId}/progress`);
-          if (!res.ok) return;
-          const json = (await res.json()) as { progress: PlanPlayProgress | null };
-          const progress = json.progress;
-          const meta = (progress?.metadata ?? {}) as Record<string, unknown>;
-
-          const stepIndexMeta = typeof meta.stepIndex === "number" ? (meta.stepIndex as number) : null;
-
-          let inferredIndex = 0;
-          if (stepIndexMeta !== null) {
-            inferredIndex = stepIndexMeta;
-          } else if (progress?.current_block_id) {
-            const prefix = `${progress.current_block_id}:`;
-            const found = plan.steps.findIndex((s) => s.id.startsWith(prefix));
-            inferredIndex = found >= 0 ? found : 0;
-          }
-
-          const safeIndex = clampStep(inferredIndex, totalSteps);
-          const targetStep = plan.steps[safeIndex];
-          const defaultTotal = getStepDurationSeconds(targetStep);
-          const totalSeconds =
-            typeof meta.timerTotalSeconds === "number" && (meta.timerTotalSeconds as number) > 0
-              ? (meta.timerTotalSeconds as number)
-              : defaultTotal;
-          const remainingSeconds =
-            typeof meta.remainingSeconds === "number" && (meta.remainingSeconds as number) > 0
-              ? Math.min(meta.remainingSeconds as number, totalSeconds)
-              : totalSeconds;
-          const isRunning = Boolean(meta.isRunning && remainingSeconds > 0);
-
-          setCurrentStep(safeIndex);
-          setTimerTotal(totalSeconds);
-          setTimerRemaining(remainingSeconds);
-          setIsTimerRunning(isRunning);
-          restoredTimerRef.current = true;
-        } catch (err) {
-          console.warn("Failed to restore remote progress", err);
-        }
-      })();
     } catch (err) {
       console.warn("Failed to restore play state", err);
       setCurrentStep(0);
-      const targetStep = plan.steps[0];
+      const targetStep = run.steps[0] ? runStepToStep(run.steps[0]) : null;
       const total = getStepDurationSeconds(targetStep);
       setTimerTotal(total);
       setTimerRemaining(total);
       setIsTimerRunning(false);
     }
-  }, [planId, plan, totalSteps, storageKey]);
+  }, [run, totalSteps, storageKey]);
 
+  // Save progress to localStorage and server
   useEffect(() => {
-    if (!storageKey || !plan || !totalSteps) return;
+    if (!storageKey || !run || !totalSteps) return;
+    
     const payload = {
       stepIndex: currentStep,
       remainingSeconds: timerRemaining,
       timerTotalSeconds: timerTotal,
       isRunning: isTimerRunning,
     };
+    
+    // Save to localStorage
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(payload));
     } catch (err) {
       console.warn("Failed to persist play state", err);
     }
 
-    if (!planId) return;
-    const blockId = plan.steps[currentStep]?.id.split(":")[0] || null;
-    const blockPosition = blockId ? blockPositionByIdRef.current[blockId] ?? null : null;
+    // Save to server (debounced)
     const progressPayload = {
-      current_block_id: blockId,
-      current_position: blockPosition,
+      currentStepIndex: currentStep,
       status: "in_progress" as const,
-      metadata: payload,
+      timerRemaining,
+      timerTotal,
+      isTimerRunning,
     };
     const serialized = JSON.stringify(progressPayload);
     if (serialized === lastProgressRef.current) return;
@@ -300,13 +276,9 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
       clearTimeout(saveProgressTimerRef.current);
     }
     saveProgressTimerRef.current = setTimeout(() => {
-      void fetch(`/api/plans/${planId}/progress`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(progressPayload),
-      }).catch(() => null);
-    }, 800);
-  }, [storageKey, plan, totalSteps, currentStep, timerRemaining, timerTotal, isTimerRunning, planId]);
+      void updateRunProgress(run.id, progressPayload).catch(() => null);
+    }, PROGRESS_DEBOUNCE_MS);
+  }, [storageKey, run, totalSteps, currentStep, timerRemaining, timerTotal, isTimerRunning]);
 
   useEffect(() => {
     if (!step) return;
@@ -387,13 +359,13 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
       <ErrorState
         title="Kunde inte ladda planen"
         description="Kontrollera uppkoppling eller försök igen."
-        onRetry={loadPlan}
+        onRetry={loadRun}
         onGoBack={handleBack}
       />
     );
   }
 
-  if (isLoading || !plan || !step) {
+  if (isLoading || !run || !step) {
     return (
       <div className="space-y-4">
         <div className="space-y-2">
@@ -423,14 +395,14 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   }
 
   const meta = [
-    { label: "Moment", value: `${plan.blockCount} block` },
-    plan.totalDurationMinutes ? { label: "Längd", value: `${plan.totalDurationMinutes} min` } : null,
+    { label: "Moment", value: `${run.blockCount} block` },
+    run.totalDurationMinutes ? { label: "Längd", value: `${run.totalDurationMinutes} min` } : null,
   ].filter((m): m is { label: string; value: string } => Boolean(m?.value));
 
   return (
     <div className="space-y-4 pb-44">
       <SessionHeader
-        title={plan.name}
+        title={run.name}
         summary="Planerat pass"
         meta={meta}
       />

@@ -47,6 +47,10 @@ function mapDbGameToGame(dbGame: DbGame): Game {
     dbGame.secondary_purposes?.map((p) => p?.purpose?.name).filter(Boolean)[0] ||
     dbGame.category ||
     "aktivitet";
+  const playMode =
+    dbGame.play_mode === "participants" || dbGame.play_mode === "facilitated" || dbGame.play_mode === "basic"
+      ? dbGame.play_mode
+      : "basic";
 
   return {
     id: dbGame.id,
@@ -61,6 +65,7 @@ function mapDbGameToGame(dbGame: DbGame): Game {
     energyLevel: (dbGame.energy_level as Game["energyLevel"]) ?? "medium",
     environment: getEnvironment(dbGame.location_type),
     purpose: purposeName,
+    playMode,
     imageUrl: coverUrl,
     productName: dbGame.product?.name ?? null,
   };
@@ -438,5 +443,4 @@ export function BrowsePage() {
     </div>
   );
 }
-
 

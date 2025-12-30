@@ -12,6 +12,7 @@ export type Game = {
   energyLevel: EnergyLevel;
   environment: Environment;
   purpose: string;
+  playMode?: "basic" | "facilitated" | "participants" | null;
   imageUrl?: string | null;
   productName?: string | null;
 };

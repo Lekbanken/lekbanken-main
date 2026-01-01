@@ -30,7 +30,7 @@ export function AchievementAdminPage() {
   const [achievements, setAchievements] = useState<AchievementItem[]>(
     mockAchievements.map((a) => ({ ...a, icon: normalizeIconConfig(a.icon) })),
   );
-  const [filters, setFilters] = useState<AchievementFilters>({ search: "", theme: "all", sort: "recent" });
+  const [filters, setFilters] = useState<AchievementFilters>({ search: "", theme: "all", status: "all", sort: "recent" });
   const [editing, setEditing] = useState<AchievementItem | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -49,7 +49,11 @@ export function AchievementAdminPage() {
         .includes(query),
     );
     const byTheme = filters.theme === "all" ? bySearch : bySearch.filter((ach) => ach.icon.themeId === filters.theme);
-    const sorted = [...byTheme].sort((a, b) => {
+    const byStatus =
+      filters.status === 'all'
+        ? byTheme
+        : byTheme.filter((ach) => (ach.status ?? 'draft') === filters.status);
+    const sorted = [...byStatus].sort((a, b) => {
       if (filters.sort === "name") return a.title.localeCompare(b.title);
       return (b.rewardCoins ?? 0) - (a.rewardCoins ?? 0);
     });

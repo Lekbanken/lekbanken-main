@@ -1,0 +1,666 @@
+'use client';
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  SparklesIcon,
+  PlusIcon,
+  Squares2X2Icon,
+} from '@heroicons/react/24/outline';
+import { useRouter, useSearchParams } from 'next/navigation';
+
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui';
+import {
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminBreadcrumbs,
+} from '@/components/admin/shared';
+import { useRbac } from '@/features/admin/shared/hooks/useRbac';
+import { useTenant } from '@/lib/context/TenantContext';
+import { useAuth } from '@/lib/supabase/auth';
+import { awardBuilderExportSchemaV1, type AwardBuilderExportV1 } from '@/lib/validation/awardBuilderExportSchemaV1';
+
+import { themes } from '@/features/admin/achievements/data';
+import type { AchievementFilters, AchievementItem, AchievementTheme } from '@/features/admin/achievements/types';
+import { normalizeIconConfig } from '@/features/admin/achievements/icon-utils';
+import { AchievementLibraryGrid } from '@/features/admin/achievements/components/AchievementLibraryGrid';
+import { AchievementEditor } from '@/features/admin/achievements/editor/AchievementEditor';
+
+type AwardBuilderExportListRow = {
+  id: string;
+  tenant_id: string | null;
+  scope_type: 'global' | 'tenant' | string;
+  schema_version: string;
+  exported_at: string;
+  exported_by_user_id: string | null;
+  exported_by_tool: string | null;
+  export?: unknown;
+  created_at: string;
+  updated_at: string;
+};
+
+type AwardBuilderExportRow = {
+  id: string;
+  tenant_id: string | null;
+  scope_type: 'global' | 'tenant' | string;
+  schema_version: string;
+  exported_at: string;
+  exported_by_user_id: string | null;
+  exported_by_tool: string | null;
+  export: unknown;
+  created_at: string;
+  updated_at: string;
+};
+
+type BuilderPayloadV1 = {
+  /**
+   * Builder/editor payload stored inside canonical schema:
+   * `achievements[0].unlock.unlock_criteria.params.builder.badge`
+   */
+  badge: Partial<AchievementItem>;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function parseCanonicalExportOrThrow(exportJson: unknown): AwardBuilderExportV1 {
+  const parsed = awardBuilderExportSchemaV1.safeParse(exportJson);
+  if (!parsed.success) {
+    const details = parsed.error.flatten();
+    throw new Error(`Export JSON does not match AWARD_BUILDER_EXPORT_SCHEMA_V1: ${JSON.stringify(details)}`);
+  }
+  return parsed.data;
+}
+
+function readBuilderPayloadOrThrow(exportV1: AwardBuilderExportV1): BuilderPayloadV1 {
+  const p = exportV1.achievements[0]?.unlock?.unlock_criteria?.params;
+  if (!isRecord(p)) {
+    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params');
+  }
+
+  const builder = (p as Record<string, unknown>).builder;
+  if (!isRecord(builder)) {
+    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params.builder');
+  }
+
+  const badge = builder.badge;
+  if (!isRecord(badge)) {
+    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params.builder.badge');
+  }
+
+  return { badge: badge as unknown as Partial<AchievementItem> };
+}
+
+function extractBadgeItem(exportId: string, exportJson: unknown): AchievementItem {
+  const exportV1 = parseCanonicalExportOrThrow(exportJson);
+  const payload = readBuilderPayloadOrThrow(exportV1);
+
+  // Ensure the editor always uses exportId as the stable identifier.
+  const badge = payload.badge;
+  const icon = normalizeIconConfig(badge.icon);
+
+  return {
+    ...badge,
+    id: exportId,
+    title: typeof badge.title === 'string' ? badge.title : exportV1.achievements[0]?.name ?? '',
+    description: typeof badge.description === 'string' ? badge.description : exportV1.achievements[0]?.description ?? undefined,
+    icon,
+    status: badge.status ?? 'draft',
+    version: typeof badge.version === 'number' ? badge.version : 1,
+  } as AchievementItem;
+}
+
+function buildExportJson(args: {
+  scope: { type: 'tenant'; tenantId: string } | { type: 'global' };
+  actorUserId: string;
+  tool: string;
+  nowIso: string;
+  exportId: string;
+  badge: AchievementItem;
+}): AwardBuilderExportV1 {
+  const publish_scope =
+    args.scope.type === 'global'
+      ? ({ type: 'global', tenant_id: null } as const)
+      : ({ type: 'tenant', tenant_id: args.scope.tenantId } as const);
+
+  const name = args.badge.title ?? '';
+  const description = args.badge.description ?? args.badge.subtitle ?? '';
+
+  const exportV1: AwardBuilderExportV1 = {
+    schema_version: '1.0',
+    exported_at: args.nowIso,
+    exported_by: {
+      user_id: args.actorUserId,
+      tool: args.tool,
+    },
+    publish_scope,
+    achievements: [
+      {
+        achievement_key: args.exportId,
+        name,
+        description,
+        icon: {
+          icon_media_id: null,
+          icon_url_legacy: null,
+        },
+        badge: {
+          badge_color: null,
+        },
+        visibility: {
+          is_easter_egg: false,
+          hint_text: null,
+        },
+        unlock: {
+          condition_type: 'manual',
+          condition_value: null,
+          unlock_criteria: {
+            type: 'manual',
+            params: {
+              builder: {
+                badge: args.badge,
+              } satisfies BuilderPayloadV1,
+            },
+          },
+        },
+      },
+    ],
+  };
+
+  // Hard guarantee: do not emit non-canonical JSON.
+  return parseCanonicalExportOrThrow(exportV1);
+}
+
+export function LibraryBadgesPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const { user } = useAuth();
+
+  const { can } = useRbac();
+  const { currentTenant, isLoadingTenants } = useTenant();
+
+  const canView = can('admin.achievements.list');
+  const canCreate = can('admin.achievements.create');
+  const canEdit = can('admin.achievements.edit');
+
+  const tenantId = currentTenant?.id ?? null;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  const [_rows, setRows] = useState<AwardBuilderExportListRow[]>([]);
+  const [badges, setBadges] = useState<AchievementItem[]>([]);
+  const [filters, setFilters] = useState<AchievementFilters>({
+    search: '',
+    theme: 'all',
+    status: 'all',
+    sort: 'recent',
+  });
+
+  const exportId = searchParams.get('exportId');
+  const [editing, setEditing] = useState<AchievementItem | null>(null);
+
+  const themeMap = useMemo<Record<string, AchievementTheme>>(
+    () => Object.fromEntries(themes.map((t) => [t.id, t])),
+    [],
+  );
+
+  const refreshList = useCallback(async () => {
+    if (!tenantId) return;
+
+    setIsLoading(true);
+    setLoadError(null);
+
+    try {
+      const res = await fetch(`/api/admin/award-builder/exports?scopeType=tenant&tenantId=${tenantId}`);
+      const json = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        const msg = typeof json?.error === 'string' ? json.error : 'Failed to load badges';
+        throw new Error(msg);
+      }
+
+      const nextRows = (json?.exports ?? []) as AwardBuilderExportListRow[];
+      setRows(nextRows);
+
+      const nextBadges: AchievementItem[] = [];
+      for (const r of nextRows) {
+        try {
+          nextBadges.push(extractBadgeItem(r.id, r.export));
+        } catch (e) {
+          // Strict mode: schema violations are surfaced to the user.
+          const msg = e instanceof Error ? e.message : 'Export JSON invalid'
+          throw new Error(msg)
+        }
+      }
+
+      setBadges(nextBadges);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load badges';
+      setLoadError(message);
+      setRows([]);
+      setBadges([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tenantId]);
+
+  const loadOneIfNeeded = useCallback(
+    async (targetId: string) => {
+      if (!tenantId) return;
+
+      // If already in list, just select it.
+      const existing = badges.find((b) => b.id === targetId);
+      if (existing) {
+        setEditing(existing);
+        return;
+      }
+
+      setIsLoading(true);
+      setLoadError(null);
+
+      try {
+        const res = await fetch(`/api/admin/award-builder/exports/${targetId}`);
+        const json = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          const msg = typeof json?.error === 'string' ? json.error : 'Failed to load badge';
+          throw new Error(msg);
+        }
+
+        const row = json?.export as AwardBuilderExportRow | undefined;
+        const item = extractBadgeItem(row?.id ?? targetId, row?.export);
+
+        setBadges((prev) => {
+          if (prev.some((p) => p.id === item.id)) return prev;
+          return [item, ...prev];
+        });
+        setRows((prev) => {
+          if (!row) return prev;
+          if (prev.some((p) => p.id === row.id)) return prev;
+          return [row as AwardBuilderExportListRow, ...prev];
+        });
+        setEditing(item);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load badge';
+        setLoadError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [badges, tenantId],
+  );
+
+  useEffect(() => {
+    if (!tenantId) return;
+    refreshList();
+  }, [tenantId, refreshList]);
+
+  useEffect(() => {
+    if (!exportId) {
+      setEditing(null);
+      return;
+    }
+    void loadOneIfNeeded(exportId);
+  }, [exportId, loadOneIfNeeded]);
+
+  const filtered = useMemo(() => {
+    const query = filters.search.toLowerCase();
+    const bySearch = badges.filter((ach) =>
+      [
+        ach.title,
+        ach.subtitle ?? '',
+        ach.icon.symbol?.id ?? '',
+        ...(ach.icon.backgrounds?.map((b) => b.id) ?? []),
+        ...(ach.icon.foregrounds?.map((f) => f.id) ?? []),
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(query),
+    );
+    const byTheme =
+      filters.theme === 'all' ? bySearch : bySearch.filter((ach) => ach.icon.themeId === filters.theme);
+    const byStatus =
+      filters.status === 'all'
+        ? byTheme
+        : byTheme.filter((ach) => (ach.status ?? 'draft') === filters.status);
+
+    const sorted = [...byStatus].sort((a, b) => {
+      if (filters.sort === 'name') return a.title.localeCompare(b.title);
+      return (b.rewardCoins ?? 0) - (a.rewardCoins ?? 0);
+    });
+
+    return sorted;
+  }, [badges, filters]);
+
+  const setExportId = useCallback(
+    (next: string | null) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (next) params.set('exportId', next);
+      else params.delete('exportId');
+      const qs = params.toString();
+      router.replace(qs ? `/admin/library/badges?${qs}` : '/admin/library/badges');
+    },
+    [router, searchParams],
+  );
+
+  const handleCreate = useCallback(async () => {
+    if (!tenantId) return;
+    if (!user?.id) throw new Error('Unauthorized');
+
+    const draft: AchievementItem = {
+      id: `temp-${Date.now()}`,
+      title: '',
+      subtitle: '',
+      rewardCoins: 0,
+      icon: normalizeIconConfig({
+        mode: 'theme',
+        themeId: themes[0]?.id ?? 'gold',
+        size: 'lg',
+        base: { id: 'base_circle' },
+        symbol: null,
+        backgrounds: [],
+        foregrounds: [],
+      }),
+      profileFrameSync: { enabled: false },
+      publishedRoles: [],
+      status: 'draft',
+      version: 1,
+    };
+
+    const res = await fetch('/api/admin/award-builder/exports', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scopeType: 'tenant',
+        tenantId,
+        schemaVersion: '1.0',
+        exportedByTool: 'admin-library-badges',
+        export: buildExportJson({
+          scope: { type: 'tenant', tenantId },
+          actorUserId: user.id,
+          tool: 'admin-library-badges',
+          nowIso: new Date().toISOString(),
+          exportId: draft.id,
+          badge: draft,
+        }),
+      }),
+    });
+
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = typeof json?.error === 'string' ? json.error : 'Failed to create badge';
+      throw new Error(msg);
+    }
+
+    const id = String(json?.id ?? '');
+    if (!id) throw new Error('Failed to create badge (missing id)');
+
+    // Immediately rewrite the export using the real exportId to ensure canonical identity.
+    const created: AchievementItem = { ...draft, id };
+    const canonical = buildExportJson({
+      scope: { type: 'tenant', tenantId },
+      actorUserId: user.id,
+      tool: 'admin-library-badges',
+      nowIso: new Date().toISOString(),
+      exportId: id,
+      badge: created,
+    });
+
+    const put = await fetch(`/api/admin/award-builder/exports/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        schemaVersion: '1.0',
+        exportedAt: new Date().toISOString(),
+        exportedByTool: 'admin-library-badges',
+        export: canonical,
+      }),
+    });
+
+    if (!put.ok) {
+      const putJson = await put.json().catch(() => ({}))
+      const msg = typeof putJson?.error === 'string' ? putJson.error : 'Failed to finalize badge export'
+      throw new Error(msg)
+    }
+
+    setBadges((prev) => [created, ...prev]);
+    setRows((prev) => [{
+      id,
+      tenant_id: tenantId,
+      scope_type: 'tenant',
+      schema_version: '1.0',
+      exported_at: new Date().toISOString(),
+      exported_by_user_id: user.id,
+      exported_by_tool: 'admin-library-badges',
+      export: canonical,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    }, ...prev]);
+    setExportId(id);
+  }, [setExportId, tenantId, user?.id]);
+
+  const handleEdit = useCallback(
+    (item: AchievementItem) => {
+      setExportId(item.id);
+    },
+    [setExportId],
+  );
+
+  const handleCancel = useCallback(() => {
+    setExportId(null);
+  }, [setExportId]);
+
+  const handleSave = useCallback(
+    async (item: AchievementItem) => {
+      if (!tenantId) throw new Error('No active tenant');
+      if (!canEdit) throw new Error('Forbidden');
+      if (!user?.id) throw new Error('Unauthorized');
+
+      const current = badges.find((b) => b.id === item.id);
+      const nextVersion = (current?.version ?? item.version ?? 1) + 1;
+      const nextItem: AchievementItem = { ...item, version: nextVersion };
+
+      const exportJson = buildExportJson({
+        scope: { type: 'tenant', tenantId },
+        actorUserId: user.id,
+        tool: 'admin-library-badges',
+        nowIso: new Date().toISOString(),
+        exportId: nextItem.id,
+        badge: nextItem,
+      });
+
+      const res = await fetch(`/api/admin/award-builder/exports/${item.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          schemaVersion: '1.0',
+          exportedAt: new Date().toISOString(),
+          exportedByTool: 'admin-library-badges',
+          export: exportJson,
+        }),
+      });
+
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = typeof json?.error === 'string' ? json.error : 'Failed to save badge';
+        throw new Error(msg);
+      }
+
+      setBadges((prev) => prev.map((b) => (b.id === nextItem.id ? nextItem : b)));
+      setRows((prev) =>
+        prev.map((r) => (r.id === nextItem.id ? { ...r, export: exportJson, updated_at: new Date().toISOString() } : r)),
+      );
+      setEditing(nextItem);
+    },
+    [badges, canEdit, tenantId, user?.id],
+  );
+
+  const publishedCount = badges.filter((b) => b.status === 'published').length;
+  const draftCount = badges.filter((b) => (b.status ?? 'draft') === 'draft').length;
+
+  return (
+    <AdminPageLayout>
+      <AdminBreadcrumbs
+        items={[
+          { label: 'Startsida', href: '/admin' },
+          { label: 'Bibliotek' },
+          { label: 'Badges' },
+        ]}
+      />
+
+      <AdminPageHeader
+        icon={<SparklesIcon className="h-6 w-6" />}
+        title="Bibliotek"
+        description="Hantera badges (via builder exports)"
+        actions={
+          canCreate && (
+            <Button
+              onClick={() => {
+                void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
+              }}
+              className="gap-2 shadow-sm"
+              disabled={!tenantId || isLoadingTenants}
+            >
+              <PlusIcon className="h-4 w-4" />
+              Skapa Badge
+            </Button>
+          )
+        }
+      />
+
+      {!canView && (
+        <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+          Du saknar behörighet att visa Bibliotek.
+        </div>
+      )}
+
+      {canView && (
+        <>
+          {loadError && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              {loadError}
+            </div>
+          )}
+
+          {!tenantId && !isLoadingTenants && (
+            <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
+              Välj en organisation (active tenant) för att visa biblioteket.
+            </div>
+          )}
+
+          {/* Badge Library Section */}
+          <section>
+            <Card className="border-border/50 overflow-hidden">
+              <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-transparent px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Squares2X2Icon className="h-5 w-5 text-muted-foreground" />
+                    <div>
+                      <CardTitle className="text-base">Badges</CardTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {isLoading ? 'Loading…' : `${filtered.length} badge${filtered.length !== 1 ? 's' : ''}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" size="sm">
+                      {publishedCount} published
+                    </Badge>
+                    <Badge variant="outline" size="sm">
+                      {draftCount} drafts
+                    </Badge>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <AchievementLibraryGrid
+                  achievements={filtered}
+                  themes={themeMap}
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  onEdit={handleEdit}
+                  onCreate={() => {
+                    void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
+                  }}
+                  selectedId={editing?.id}
+                />
+              </CardContent>
+            </Card>
+          </section>
+
+          {/* Builder Section */}
+          <section>
+            <Card className="border-border/50 overflow-hidden">
+              <CardHeader className="border-b border-border/40 bg-gradient-to-r from-primary/5 to-transparent px-5 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <SparklesIcon className="h-4 w-4" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-base">
+                        {editing ? 'Edit Badge' : 'Badge Builder'}
+                      </CardTitle>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {editing ? `Editing: ${editing.title || 'Untitled'}` : 'Select a badge from the library'}
+                      </p>
+                    </div>
+                  </div>
+                  {editing && (
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={editing.status === 'published' ? 'success' : 'secondary'}
+                        size="sm"
+                        dot
+                      >
+                        {editing.status === 'published' ? 'Published' : 'Draft'}
+                      </Badge>
+                      {editing.version && (
+                        <Badge variant="outline" size="sm">
+                          v{editing.version}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                {editing ? (
+                  <AchievementEditor
+                    value={editing}
+                    themes={themes}
+                    onChange={handleSave}
+                    onCancel={handleCancel}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center p-16 text-center">
+                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 text-primary">
+                      <SparklesIcon className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-foreground">Select or create a badge</h3>
+                    <p className="mt-2 max-w-sm text-sm text-muted-foreground">
+                      Choose a badge from the library above or create a new one to start building its layers, colors, and metadata.
+                    </p>
+                    {canCreate && (
+                      <Button
+                        onClick={() => {
+                          void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
+                        }}
+                        className="mt-6 gap-2"
+                        disabled={!tenantId}
+                      >
+                        <PlusIcon className="h-4 w-4" />
+                        Create Badge
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </section>
+        </>
+      )}
+    </AdminPageLayout>
+  );
+}

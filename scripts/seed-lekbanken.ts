@@ -91,6 +91,7 @@ async function ensureAchievements(adminId: string) {
   const achievements = [
     {
       achievement_key: "seed-planmaster",
+      tenant_id: TENANT_ID,
       name: "Planeringsproffset",
       description: "Skapa din första plan i Lekbanken.",
       condition_type: "plan_created",
@@ -99,6 +100,7 @@ async function ensureAchievements(adminId: string) {
     },
     {
       achievement_key: "seed-coach",
+      tenant_id: TENANT_ID,
       name: "Coach",
       description: "Tilldela en lek till ett lag.",
       condition_type: "assignment",
@@ -107,6 +109,7 @@ async function ensureAchievements(adminId: string) {
     },
     {
       achievement_key: "seed-streak",
+      tenant_id: TENANT_ID,
       name: "Rutinkungen",
       description: "Logga in tre dagar i rad.",
       condition_type: "login_streak",
@@ -116,7 +119,7 @@ async function ensureAchievements(adminId: string) {
   ];
 
   const { data: upserted, error } = await supabase.from("achievements").upsert(achievements, {
-    onConflict: "achievement_key",
+    onConflict: "scope_tenant_id,achievement_key",
     defaultToNull: false,
   }).select("id, achievement_key");
   if (error) throw error;

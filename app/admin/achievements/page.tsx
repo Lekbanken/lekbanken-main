@@ -1,5 +1,5 @@
-import { AchievementAdminPage } from "@/features/admin/achievements/AchievementAdminPage";
+import { redirect } from 'next/navigation';
 
 export default function AchievementsPage() {
-  return <AchievementAdminPage />;
+  redirect('/admin/library/badges');
 }

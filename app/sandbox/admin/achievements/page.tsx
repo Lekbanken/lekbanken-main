@@ -1,7 +1,7 @@
 'use client';
 
 import { SandboxShell } from '../../components/shell/SandboxShellV2';
-import AchievementAdminPage from "@/app/admin/achievements/page";
+import { AchievementAdminPage } from '@/features/admin/achievements/AchievementAdminPage';
 
 export default function SandboxAchievementsPage() {
   return (

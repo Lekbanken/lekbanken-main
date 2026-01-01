@@ -357,7 +357,7 @@ export async function getAchievementLeaderboard(
   tenantId: string,
   seasonNumber?: number,
   limit: number = 50
-): Promise<any[] | null> {
+): Promise<unknown[] | null> {
   try {
     const query = supabase.from('achievement_leaderboards');
     let q = query

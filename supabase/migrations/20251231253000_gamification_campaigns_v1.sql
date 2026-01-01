@@ -19,8 +19,18 @@ create table if not exists public.gamification_campaigns (
   updated_at timestamptz not null default now()
 );
 
-alter table public.gamification_campaigns
-  add constraint gamification_campaigns_valid_timeframe check (ends_at > starts_at);
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint c
+    where c.conname = 'gamification_campaigns_valid_timeframe'
+      and c.conrelid = 'public.gamification_campaigns'::regclass
+  ) then
+    execute 'alter table public.gamification_campaigns add constraint gamification_campaigns_valid_timeframe check (ends_at > starts_at)';
+  end if;
+end
+$$;
 
 create index if not exists idx_gamification_campaigns_tenant_active
   on public.gamification_campaigns(tenant_id, is_active, starts_at, ends_at);

@@ -155,7 +155,7 @@ export const adminSecondaryNavItems: AdminNavItem[] = [
 // Settings/System navigation items  
 export const adminSettingsNavItems: AdminNavItem[] = [
   { href: '/admin/leaderboard', label: 'Leaderboard', icon: iconLeaderboard },
-  { href: '/admin/achievements', label: 'Achievements', icon: iconAchievements },
+  { href: '/admin/library/badges', label: 'Bibliotek', icon: iconAchievements },
   { href: '/admin/achievements-advanced', label: 'Achievements Advanced', icon: iconAchievements },
   { href: '/admin/gamification/awards', label: 'Belöningar', icon: iconAchievements },
   { href: '/admin/gamification/analytics', label: 'Gamification-analys', icon: iconAnalytics },

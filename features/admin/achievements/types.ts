@@ -81,5 +81,6 @@ export type AchievementItem = {
 export type AchievementFilters = {
   search: string;
   theme: string | "all";
+  status: "all" | "draft" | "published";
   sort: "recent" | "name";
 };

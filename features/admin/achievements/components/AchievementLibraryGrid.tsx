@@ -37,6 +37,10 @@ export function AchievementLibraryGrid({
     onFiltersChange({ ...filters, sort: event.target.value as AchievementFilters["sort"] });
   };
 
+  const handleStatus = (event: ChangeEvent<HTMLSelectElement>) => {
+    onFiltersChange({ ...filters, status: event.target.value as AchievementFilters["status"] });
+  };
+
   return (
     <div>
       {/* Filter Bar */}
@@ -74,6 +78,20 @@ export function AchievementLibraryGrid({
           </select>
         </div>
 
+        {/* Status Filter */}
+        <select
+          aria-label="Filter by status"
+          value={filters.status}
+          onChange={handleStatus}
+          className="rounded-lg border border-border/60 bg-background px-3 py-2 text-sm 
+                     cursor-pointer transition-colors hover:border-primary/40
+                     focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="all">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+
         {/* Sort */}
         <select
           aria-label="Sort achievements"
@@ -102,11 +120,11 @@ export function AchievementLibraryGrid({
           </div>
           <h3 className="text-base font-semibold text-foreground">No achievements found</h3>
           <p className="mt-1 max-w-xs text-sm text-muted-foreground">
-            {filters.search || filters.theme !== 'all' 
+            {filters.search || filters.theme !== 'all' || filters.status !== 'all'
               ? "Try adjusting your search or filter criteria."
               : "Create your first achievement badge to get started."}
           </p>
-          {(!filters.search && filters.theme === 'all') && (
+          {(!filters.search && filters.theme === 'all' && filters.status === 'all') && (
             <Button onClick={onCreate} variant="outline" size="sm" className="mt-4 gap-1.5">
               <PlusIcon className="h-4 w-4" />
               Create first badge

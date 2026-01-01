@@ -88,9 +88,48 @@ CREATE TABLE IF NOT EXISTS runs (
 COMMENT ON TABLE runs IS 'Play session instances. Each user playing a published plan version creates a run.';
 
 CREATE INDEX IF NOT EXISTS idx_runs_user ON runs(user_id);
-CREATE INDEX IF NOT EXISTS idx_runs_plan ON runs(plan_id);
-CREATE INDEX IF NOT EXISTS idx_runs_version ON runs(plan_version_id);
-CREATE INDEX IF NOT EXISTS idx_runs_status ON runs(status) WHERE status IN ('not_started', 'in_progress');
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'runs'
+      AND column_name = 'plan_id'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_runs_plan ON runs(plan_id)';
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'runs'
+      AND column_name = 'plan_version_id'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_runs_version ON runs(plan_version_id)';
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'runs'
+      AND column_name = 'status'
+  ) THEN
+    EXECUTE $sql$CREATE INDEX IF NOT EXISTS idx_runs_status ON runs(status) WHERE status IN ('not_started', 'in_progress')$sql$;
+  END IF;
+END
+$$;
 
 -- Unique constraint: one active run per user per version
 CREATE UNIQUE INDEX IF NOT EXISTS idx_runs_active_per_user_version 
@@ -107,56 +146,121 @@ ALTER TABLE plan_version_blocks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE runs ENABLE ROW LEVEL SECURITY;
 
 -- plan_versions: same read rules as plans, no UPDATE/DELETE
-CREATE POLICY "users_can_select_plan_versions" ON plan_versions
-  FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM plans p
-      WHERE p.id = plan_versions.plan_id
-      AND (
-        p.visibility = 'public'
-        OR p.owner_user_id = auth.uid()
-        OR (p.visibility = 'tenant' AND p.owner_tenant_id = ANY(get_user_tenant_ids()))
-      )
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'plan_versions'
+      AND policyname = 'users_can_select_plan_versions'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "users_can_select_plan_versions" ON plan_versions
+        FOR SELECT TO authenticated
+        USING (
+          EXISTS (
+            SELECT 1 FROM plans p
+            WHERE p.id = plan_versions.plan_id
+              AND (
+                p.visibility = 'public'
+                OR p.owner_user_id = auth.uid()
+                OR (p.visibility = 'tenant' AND p.owner_tenant_id = ANY(get_user_tenant_ids()))
+              )
+          )
+        );
+    $policy$;
+  END IF;
+END
+$$;
 
-CREATE POLICY "plan_owner_can_insert_versions" ON plan_versions
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM plans p
-      WHERE p.id = plan_versions.plan_id
-      AND p.owner_user_id = auth.uid()
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'plan_versions'
+      AND policyname = 'plan_owner_can_insert_versions'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "plan_owner_can_insert_versions" ON plan_versions
+        FOR INSERT TO authenticated
+        WITH CHECK (
+          EXISTS (
+            SELECT 1 FROM plans p
+            WHERE p.id = plan_versions.plan_id
+              AND p.owner_user_id = auth.uid()
+          )
+        );
+    $policy$;
+  END IF;
+END
+$$;
 
 -- plan_version_blocks: read-only based on version access
-CREATE POLICY "users_can_select_version_blocks" ON plan_version_blocks
-  FOR SELECT TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM plan_versions pv
-      WHERE pv.id = plan_version_blocks.plan_version_id
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'plan_version_blocks'
+      AND policyname = 'users_can_select_version_blocks'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "users_can_select_version_blocks" ON plan_version_blocks
+        FOR SELECT TO authenticated
+        USING (
+          EXISTS (
+            SELECT 1 FROM plan_versions pv
+            WHERE pv.id = plan_version_blocks.plan_version_id
+          )
+        );
+    $policy$;
+  END IF;
+END
+$$;
 
-CREATE POLICY "plan_owner_can_insert_version_blocks" ON plan_version_blocks
-  FOR INSERT TO authenticated
-  WITH CHECK (
-    EXISTS (
-      SELECT 1 FROM plan_versions pv
-      JOIN plans p ON p.id = pv.plan_id
-      WHERE pv.id = plan_version_blocks.plan_version_id
-      AND p.owner_user_id = auth.uid()
-    )
-  );
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'plan_version_blocks'
+      AND policyname = 'plan_owner_can_insert_version_blocks'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "plan_owner_can_insert_version_blocks" ON plan_version_blocks
+        FOR INSERT TO authenticated
+        WITH CHECK (
+          EXISTS (
+            SELECT 1 FROM plan_versions pv
+            JOIN plans p ON p.id = pv.plan_id
+            WHERE pv.id = plan_version_blocks.plan_version_id
+              AND p.owner_user_id = auth.uid()
+          )
+        );
+    $policy$;
+  END IF;
+END
+$$;
 
 -- runs: users can only manage their own runs
-CREATE POLICY "users_can_manage_own_runs" ON runs
-  FOR ALL TO authenticated
-  USING (user_id = auth.uid())
-  WITH CHECK (user_id = auth.uid());
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE schemaname = 'public'
+      AND tablename = 'runs'
+      AND policyname = 'users_can_manage_own_runs'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "users_can_manage_own_runs" ON runs
+        FOR ALL TO authenticated
+        USING (user_id = auth.uid())
+        WITH CHECK (user_id = auth.uid());
+    $policy$;
+  END IF;
+END
+$$;
 
 -- -----------------------------------------------------------------------------
 -- 6. Helper functions

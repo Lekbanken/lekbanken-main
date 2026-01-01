@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { AchievementItem, AchievementTheme } from "../types";
 import { AchievementEditorWizard } from "./AchievementEditorWizard";
@@ -8,21 +8,31 @@ import { AchievementEditorWizard } from "./AchievementEditorWizard";
 type AchievementEditorProps = {
   value: AchievementItem;
   themes: AchievementTheme[];
-  onChange: (value: AchievementItem) => void;
+  onChange: (value: AchievementItem) => void | Promise<void>;
   onCancel: () => void;
 };
 
 export function AchievementEditor({ value, onChange, onCancel }: AchievementEditorProps) {
   const [draft, setDraft] = useState<AchievementItem>(value);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
-  const handleSave = () => {
+  useEffect(() => {
+    setDraft(value);
+    setSaveError(null);
+  }, [value]);
+
+  const handleSave = async () => {
     setIsSaving(true);
-    // Simulate save delay for UX feedback
-    setTimeout(() => {
-      onChange(draft);
+    setSaveError(null);
+    try {
+      await onChange(draft);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save';
+      setSaveError(message);
+    } finally {
       setIsSaving(false);
-    }, 300);
+    }
   };
 
   return (
@@ -43,6 +53,14 @@ export function AchievementEditor({ value, onChange, onCancel }: AchievementEdit
         onSave={handleSave}
         isSaving={isSaving}
       />
+
+      {saveError && (
+        <div className="px-5 pb-5">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            {saveError}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

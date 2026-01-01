@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { isSystemAdmin } from '@/lib/utils/tenantAuth'
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,10 @@ const schema = z.object({
  * - Requires system_admin
  * - Uses service role + DB function for atomicity & idempotency
  */
-export async function PATCH(request: Request, context: { params: Promise<{ requestId: string }> }) {
+export async function PATCH(request: NextRequest, context: { params: Promise<{ requestId: string }> }) {
+  const rate = applyRateLimitMiddleware(request, 'strict')
+  if (rate) return rate
+
   const { requestId } = await context.params
 
   const supabase = await createServerRlsClient()

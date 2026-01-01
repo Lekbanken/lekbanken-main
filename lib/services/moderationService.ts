@@ -74,6 +74,16 @@ export interface ModerationStats {
   average_resolution_time: number;
 }
 
+export interface ModerationQueueItem {
+  id: string;
+  priority: string;
+  content_reports?: Array<{ reason: string; content_type: string; description?: string }>;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
 // Content Reports
 export async function getContentReports(
   tenantId: string,
@@ -336,7 +346,7 @@ export async function removeUserRestriction(restrictionId: string): Promise<bool
 export async function getModerationQueue(
   tenantId: string,
   status: string = 'pending'
-): Promise<any | null> {
+): Promise<ModerationQueueItem[] | null> {
   try {
     const query = supabase.from('moderation_queue');
     const { data, error } = await query
@@ -351,7 +361,37 @@ export async function getModerationQueue(
       return null;
     }
 
-    return data || [];
+    const rows = Array.isArray(data) ? data : [];
+    return rows
+      .filter(isRecord)
+      .map((row) => {
+        const id = typeof row.id === 'string' ? row.id : String(row.id ?? '');
+        const priority = typeof row.priority === 'string' ? row.priority : String(row.priority ?? '');
+
+        const rawReports = row.content_reports;
+        const reportsArray: Array<{ reason: string; content_type: string; description?: string }> = [];
+
+        if (Array.isArray(rawReports)) {
+          for (const r of rawReports) {
+            if (!isRecord(r)) continue;
+            const reason = typeof r.reason === 'string' ? r.reason : '';
+            const content_type = typeof r.content_type === 'string' ? r.content_type : '';
+            const description = typeof r.description === 'string' ? r.description : undefined;
+            reportsArray.push({ reason, content_type, description });
+          }
+        } else if (isRecord(rawReports)) {
+          const reason = typeof rawReports.reason === 'string' ? rawReports.reason : '';
+          const content_type = typeof rawReports.content_type === 'string' ? rawReports.content_type : '';
+          const description = typeof rawReports.description === 'string' ? rawReports.description : undefined;
+          reportsArray.push({ reason, content_type, description });
+        }
+
+        return {
+          id,
+          priority,
+          content_reports: reportsArray,
+        } satisfies ModerationQueueItem;
+      });
   } catch (err) {
     console.error('Error fetching queue:', err);
     return null;

@@ -1,6 +1,6 @@
 # LEKBANKEN — GAMIFICATION DOMAIN (ENTERPRISE MASTER PLAN)
 
-Last updated: 2025-12-31
+Last updated: 2026-01-01
 Owner: Gamification (bounded context)
 Audience: Product, Engineering, Design, Ops
 
@@ -8,11 +8,15 @@ Audience: Product, Engineering, Design, Ops
 
 | Decision | Chosen | Rationale | Revisit? |
 |--------|--------|-----------|----------|
-| Achievements scope | Global per user | Same leader across tenants | Maybe |
+| Achievements scope | Hybrid (global + tenant) | Global baseline + tenant-specific additions without forking the whole system | Maybe |
 | DiceCoin wallet | Per tenant | Avoid cross-tenant economy | Maybe |
 | Ledger model | Append-only | Audit & reversibility | No |
 | Admin awards | Manual + message | Motivation & recognition | No |
 | Easter eggs | Hidden hints | Delight & mystery | No |
+| Award Builder canonical source | Versioned export schema (UIs as clients) | Avoid split-brain; both builder UIs must import/export the same schema | Maybe |
+| Currency naming | Keep `coin_*` in DB; DiceCoin in UI | Minimizes migration risk while keeping product language consistent | Maybe |
+| Shop refunds | No refunds (MVP) | Simplest economy semantics; support via admin awards when needed | Maybe |
+| Admin visibility default | Aggregates-by-default | Minimizes privacy risk; allow explicit support/debug access via capability | Maybe |
 
 ## Executive summary
 Gamification i Lekbanken finns redan som en fungerande första vertikal slice: databas-tabeller för coins/progress/streaks, en snapshot-API (`/api/gamification`), samt UI för lekledare under `/app/gamification`. Achievements har ett etablerat schema (Play Domain) och en omfattande Admin-baserad “badge/achievement builder” (Utmärkelseskaparen) med wizard/editor UI.
@@ -25,6 +29,25 @@ Nästa steg är att lyfta detta till enterprise-nivå för LEKLEDARE (inte delta
 - Introducera Shop/Inventory/DisplaySlots för dashboard-cosmetics som växer med levels.
 
 Dokumentet är en körplan: inventering → målbild → roadmap → implementation.
+
+## Current status (as of 2026-01-01)
+
+### What is done (implemented in repo)
+- ✅ Event contract v1 + server-side trigger evaluation (coins + achievements) via service role.
+- ✅ DiceCoin ledger hardening v1 via DB functions + server API endpoints (idempotent, race-safe).
+- ✅ Achievements overview UX (unlocked + locked + easter egg rule) + pinning 1–3 achievements to dashboard.
+- ✅ Minimal Shop backend (items + purchase + inventory + apply/loadout).
+- ✅ Admin manual awards (coins + message) with audit trail.
+- ✅ Admin analytics dashboards + service-only DB functions.
+- ✅ Phase 3 capabilities implemented: award approvals, automation rules, anomaly heuristics, daily rollups.
+
+### What remains (mostly decisions + consolidation)
+- 🔶 Consolidate Award Builder into a single canonical export/persistence model (requires review).
+- 🔶 Implement hybrid achievements scope in DB (global + tenant) and align seed/scripts/queries.
+
+### How to keep this plan up to date
+- When a TODO below is completed: mark it `[x]`, add a short note with date and link to PR/commit.
+- When a decision is made: update “Decision Log (Canonical)” and the relevant “Open decisions” item.
 
 ## Inventory (What exists today)
 
@@ -220,8 +243,14 @@ Dokumentet är en körplan: inventering → målbild → roadmap → implementat
   - Easter egg: frågetecken utan hint
 - Lekledare kan “pin” 1–3 achievements till dashboard.
 
+Scope decision (2026-01-01): Hybrid definitions
+- Global achievements: `tenant_id = NULL`
+- Tenant achievements: `tenant_id = <tenant>`
+- UX rule: DiceCoin-sidan visar en merged view (global + tenant) scoped to current tenant.
+
 ### Shop
 - Målbild: cosmetics-only i MVP (ingen betalning), köps med DiceCoin.
+- Refunds (MVP): inga refunds. Support/compensation sker via admin awards (audit + idempotency).
 - Categories:
   - profilbilder
   - ramar till containers i dashboard
@@ -250,7 +279,7 @@ Dokumentet är en körplan: inventering → målbild → roadmap → implementat
 - `gamification_levels` (config):
   - `level`, `required_xp`, `unlocks jsonb`, `created_at`
 - `achievement_definitions` (future-proof wrapper) OR extend `achievements`:
-  - add fields: `is_easter_egg boolean`, `hint_text`, `visibility_scope`, `tenant_id?` (decision)
+  - add fields: `is_easter_egg boolean`, `hint_text`, `visibility_scope`, `tenant_id` (nullable; NULL = global)
 - `leader_profile`:
   - `user_id`, `tenant_id`, `display_achievement_ids uuid[] (max 3)`, `cosmetic_loadout jsonb`
 - Shop:
@@ -263,7 +292,11 @@ Dokumentet är en körplan: inventering → målbild → roadmap → implementat
   - Lekledare: only own wallet/ledger/inventory/profile.
   - Tenant admin: can view tenant aggregates and manage tenant-scoped awards/campaigns.
   - System admin: global scope.
-- NOTE (risk): current policies for coins/user_achievements allow tenant members to select other users’ rows via `tenant_id = ANY(get_user_tenant_ids())`. This should likely be restricted to tenant admins only.
+- ✅ Implemented: personal progression reads are capability-gated in DB (self/system_admin/tenant admin only).
+  - Reference: `supabase/migrations/20251231180000_gamification_rls_tighten_personal.sql`.
+
+Admin visibility decision (2026-01-01): aggregates-by-default
+- Tenant admins should primarily see aggregates; per-user access should be explicit (capability + policy + audit intent).
 
 ### RLS target matrix (no SQL yet)
 
@@ -286,6 +319,38 @@ Notes:
 - “UPDATE own” ovan betyder i praktiken: write paths via server/API; client writes bör undvikas även om RLS kan tillåta.
 - Tenant admin access till individdata bör vara explicit (capability + policy), inte en bieffekt av “tenant member”.
 - Ledger ska vara append-only: inga deletes/updates på entries; reversals = nya entries.
+
+### RLS intent notes (v1)
+
+Syfte: göra policy-intentioner tydliga så vi inte “råkar” ge mer åtkomst än tänkt när domänen växer.
+
+- Wallet/Ledger (`user_coins`, `coin_transactions`, `apply_coin_transaction_v1`):
+  - Lekledare: läsa egen balans + egen historik.
+  - Tenant admin (owner/admin): läsa inom tenant för support/utredning; mutationer via admin-API (inte direkt klient-write).
+  - Service role: enda actor som får skapa/muta “finansiella” entries (append-only + reversals).
+
+- Progress/Streaks (`user_progress`, `user_streaks`):
+  - Lekledare: läsa/uppdatera sin egen progression (helst via server), aldrig skriva andra användares rader.
+  - Tenant admin: i normalfallet aggregat; individ-read endast om uttrycklig capability/behörighet.
+
+- Achievements:
+  - Definitions (`achievements`): läsbart för alla authenticated; skrivs av admin tooling/service role.
+  - Unlocks (`user_achievements`): lekledare läser sin egen; tenant admin får endast se andra vid explicit admin-behov.
+
+- Leader profile / pins / cosmetics (`leader_profile`):
+  - Lekledare: läsa/uppdatera sin egen pinned list + loadout.
+  - Tenant admin: read-only för support/debug, inte för “browsing”.
+
+- Shop + inventory (`shop_items`, `shop_prices`, `user_purchases`, `player_cosmetics`, `user_powerup_inventory`):
+  - Lekledare: läsa katalog + sin egen inventory/purchases; köp sker via service-only DB functions.
+  - Tenant admin: se aggregat + ev. stöd-read för support; undvik write via klient.
+
+- Admin + audit (`tenant_audit_logs`, award approvals/requests):
+  - Endast admin (owner/admin) och system_admin ska kunna läsa inom scope; service role skriver alltid.
+
+- Events + analytics (`gamification_events`, daily summaries):
+  - Skriv endast via server/service role (idempotent ingestion).
+  - Läs: admin-scoped (tenant/system) för dashboards, inte för vanliga lekledare.
 
 ### Indexing and performance
 - Ledger: `(tenant_id, user_id, created_at desc)` + `(idempotency_key)` unique.
@@ -495,8 +560,9 @@ Implementation notes (current repo state):
   - UI: toggle pins in `/app/gamification/achievements` and display on `/app` dashboard
 
 Hardening notes:
-- For true idempotency under concurrency, the DB function should serialize calls per idempotency key (e.g. `pg_advisory_xact_lock(...)`).
-- Restrict EXECUTE on coin-mutation functions to `service_role` only.
+- ✅ Implemented: idempotency under concurrency is serialized per key (via `pg_advisory_xact_lock(...)`).
+- ✅ Implemented: EXECUTE on coin-mutation functions is restricted to `service_role` (revoked from public/anon/authenticated).
+- Reference: migration `supabase/migrations/20251231153500_apply_coin_transaction_v1_concurrency_and_grants.sql`.
 
 ### Step 5 — Analytics
 - [x] Emit events + store for reporting.
@@ -509,17 +575,61 @@ Implementation notes (current repo state):
   - DB: `public.admin_get_gamification_analytics_v5(...)` (service role only)
 
 ## Open decisions (max 10, only the ones that matter)
-1. Should `achievements` be global-only or tenant-scoped (add `tenant_id`)?
-2. Canonical Award Builder: which implementation is “source of truth”?
-3. Coin currency naming: DiceCoin everywhere (UI + DB naming) vs keep `coin_*` tables.
-4. RLS rule: should tenant admins see per-user balances, or only aggregates by default?
+1. ✅ Achievements scope decided (2026-01-01): Hybrid (global + tenant) via nullable `tenant_id`.
+2. ✅ Canonical Award Builder decided (2026-01-01): versioned export schema is source of truth; UIs are clients.
+3. ✅ Currency naming decided (2026-01-01): keep `coin_*` in DB; DiceCoin in UI.
+4. ✅ Admin visibility default decided (2026-01-01): aggregates-by-default; explicit per-user access only.
 5. Level model: fixed curve vs configurable per tenant?
 6. How to represent easter egg achievements in DB (`is_easter_egg`, `hint_text`)?
-7. Should purchases be refundable? If yes, what policy + ledger reversal rules?
+7. ✅ Refunds decided (2026-01-01): no refunds in MVP.
 8. Do we need approvals for tenant_admin awards above threshold in Phase 2?
   - ✅ Implemented in Phase 3: awards above `GAMIFICATION_AWARD_APPROVAL_THRESHOLD` create a pending request requiring system_admin approve/reject.
 9. Where do we persist dashboard cosmetics: `users` profile prefs vs dedicated `leader_profile` table?
 10. Event ingestion: DB-triggered vs API-based (recommended: API-based for validation/idempotency).
+
+## TODO backlog (remaining work)
+
+### A) Decisions to lock (blockers)
+- [x] Decide achievements scope: global-only vs tenant-scoped definitions (`achievements.tenant_id?`).
+  - 2026-01-01: decided Hybrid (global + tenant).
+- [x] Decide canonical Award Builder source of truth + export schema versioning strategy.
+  - 2026-01-01: decided versioned export schema (UIs as clients).
+- [x] Decide currency naming strategy: keep `coin_*` or migrate toward DiceCoin naming (DB + API + UI).
+  - 2026-01-01: decided keep `coin_*` in DB; DiceCoin in UI.
+- [x] Decide refunds policy for Shop purchases (allowed? windows? reversal semantics?).
+  - 2026-01-01: decided no refunds in MVP.
+- [x] Decide default admin visibility model: per-user balances vs aggregates-by-default (capability gated).
+  - 2026-01-01: decided aggregates-by-default.
+- [ ] Decide level model governance: fixed curve vs configurable per tenant (and where it is authored).
+
+### B) Award Builder consolidation (requires review)
+- [ ] Define canonical export format (versioned) and map fields required by gamification UX:
+  - `is_easter_egg`, `hint_text`, `unlock_criteria`.
+- [ ] Add thin persistence layer so Admin Achievements UI persists to DB without reworking builder UX.
+- [ ] Add “Publish scope” controls aligned with roles: global (system_admin) vs tenant (tenant_admin).
+
+### C) Role/RLS harmonization
+- [x] Audit advanced achievements/challenges tables/policies for legacy role assumptions (e.g. `role = 'admin'`) and align with `system_admin/tenant_admin/lekledare`.
+  - 2026-01-01: updated advanced achievements admin policies to treat tenant admin as `owner|admin` (migration: `supabase/migrations/20260101121000_advanced_achievements_rls_admin_roles_v1.sql`).
+- [x] Verify that tenant-level reads of personal progression are capability-gated (no tenant-member leakage).
+  - 2026-01-01: already enforced via `supabase/migrations/20251231180000_gamification_rls_tighten_personal.sql`.
+- [x] Add a short “RLS intent” note per table family (wallet/ledger/unlocks/inventory) to reduce drift.
+  - 2026-01-01: added “RLS intent notes (v1)” in this document.
+
+### D) Operational hardening
+- [x] Add reconciliation runbook for wallets vs ledger and how to recover from partial failures.
+  - 2026-01-01: added `docs/gamification/GAMIFICATION_RECONCILIATION_RUNBOOK.md`.
+- [x] Add monitoring/alerts for:
+  - idempotency collisions/spikes,
+  - abnormal mint/burn bursts,
+  - award approval queue backlog.
+  - 2026-01-01: added `docs/gamification/GAMIFICATION_MONITORING_ALERTS.md`.
+- [x] Confirm rate limiting posture for event ingestion + admin award endpoints.
+  - 2026-01-01: applied `applyRateLimitMiddleware` to `/api/gamification/events` (api) and admin award endpoints (strict).
+
+### E) Documentation alignment
+- [ ] Keep this plan’s “Inventory” section aligned with current routes/DB objects when new features land.
+- [ ] Add a short changelog entry here when major mechanics change (ledger semantics, shop rules, award approvals).
 
 ## Proposed changes to Award Builder (MUST be isolated; no changes without review)
 

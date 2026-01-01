@@ -9,8 +9,19 @@
 -- 1. Drop RLS Policies for plan_games
 -- ----------------------------------------------------------------------------
 
-DROP POLICY IF EXISTS "users_can_select_plan_games" ON plan_games;
-DROP POLICY IF EXISTS "users_can_manage_own_plan_games" ON plan_games;
+DO $$
+BEGIN
+	IF EXISTS (
+		SELECT 1
+		FROM information_schema.tables
+		WHERE table_schema = 'public'
+			AND table_name = 'plan_games'
+	) THEN
+		EXECUTE 'DROP POLICY IF EXISTS "users_can_select_plan_games" ON plan_games';
+		EXECUTE 'DROP POLICY IF EXISTS "users_can_manage_own_plan_games" ON plan_games';
+	END IF;
+END
+$$;
 
 -- ----------------------------------------------------------------------------
 -- 2. Drop Indexes for plan_games

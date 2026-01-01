@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { z } from 'zod'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
+import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter'
 import type { Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -26,6 +27,9 @@ const schema = z.object({
  * - Idempotent via unique index (tenant_id, source, idempotency_key)
  */
 export async function POST(request: Request) {
+  const rate = applyRateLimitMiddleware(request as NextRequest, 'api')
+  if (rate) return rate
+
   const supabase = await createServerRlsClient()
   const { data: { user }, error: userError } = await supabase.auth.getUser()
 

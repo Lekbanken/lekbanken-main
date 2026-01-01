@@ -14,6 +14,7 @@ import {
   getModerationStats,
   createModerationAction,
   type ContentReport,
+  type ModerationQueueItem,
   type ModerationStats,
 } from '@/lib/services/moderationService';
 import {
@@ -26,12 +27,7 @@ import {
 } from '@/components/admin/shared';
 
 type TabType = 'queue' | 'reports' | 'stats';
-
-interface QueueItem {
-  id: string;
-  priority: string;
-  content_reports?: Array<{ reason: string; content_type: string; description?: string }>;
-}
+type QueueItem = ModerationQueueItem;
 
 export default function ModerationAdminPage() {
   const { user } = useAuth();

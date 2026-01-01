@@ -1,7 +1,7 @@
 # Lekbanken Admin — Library (Bibliotek) Master Implementation
 
 Last updated: 2026-01-01
-Status: IN PROGRESS
+Status: IN PROGRESS (tenant-scope MVP complete; global-scope deferred)
 Owner: Admin (Library module)
 Scope: Library-first IA for Badges only (MVP)
 
@@ -37,7 +37,7 @@ Scope: Library-first IA for Badges only (MVP)
 - [x] Support:
   - Search
   - Status filter (Draft/Published)
-  - Create → POST export → open builder with `exportId`
+  - Create → POST export (create row) → PUT rewrite to canonical identity → open builder with `exportId`
   - Open existing → load export by `exportId` and hydrate builder
   - Save → PUT export (same `exportId`) and update list
 - [x] States:
@@ -46,9 +46,9 @@ Scope: Library-first IA for Badges only (MVP)
   - Error
 
 ### Step 3 — Multi-tenant & scope
-- [ ] Tenant-scope is default.
-- [ ] Global-scope is available only to system_admin (future UI toggle; can be deferred).
-- [ ] TenantId must come from existing active-tenant mechanism.
+- [x] Tenant-scope is default.
+- [ ] Global-scope is available only to system_admin (API enforces; UI toggle deferred).
+- [x] TenantId must come from existing active-tenant mechanism.
 
 ## Files / routes to be touched (expected)
 - Navigation:
@@ -62,8 +62,8 @@ Scope: Library-first IA for Badges only (MVP)
   - `features/admin/achievements/*` components reused by Library Badges
 
 ## Known limitations (explicit)
-- Publish workflow may not be fully implemented end-to-end; status can live in export metadata until a proper publish pipeline exists.
-- `award_builder_exports` is created via migration and may not be present in generated Supabase TS types; local TS types or `as any` may be used for API wiring.
+- Publish workflow is not implemented end-to-end; Draft/Published is currently a UI/editor concept stored inside the builder payload at `unlock_criteria.params.builder.badge.status`.
+- `award_builder_exports` is created via migration and may not be present in generated Supabase TS types until types are regenerated; API routes locally augment typing and cast validated exports to `Json`.
 
 ## Current Export JSON (as implemented)
 

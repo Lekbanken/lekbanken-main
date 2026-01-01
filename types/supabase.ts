@@ -101,10 +101,14 @@ export type Database = {
           condition_value: number | null
           created_at: string
           description: string | null
+          hint_text: string | null
           icon_media_id: string | null
           icon_url: string | null
           id: string
+          is_easter_egg: boolean
           name: string
+          scope_tenant_id: string | null
+          tenant_id: string | null
         }
         Insert: {
           achievement_key?: string | null
@@ -113,10 +117,14 @@ export type Database = {
           condition_value?: number | null
           created_at?: string
           description?: string | null
+          hint_text?: string | null
           icon_media_id?: string | null
           icon_url?: string | null
           id?: string
+          is_easter_egg?: boolean
           name: string
+          scope_tenant_id?: string | null
+          tenant_id?: string | null
         }
         Update: {
           achievement_key?: string | null
@@ -125,10 +133,14 @@ export type Database = {
           condition_value?: number | null
           created_at?: string
           description?: string | null
+          hint_text?: string | null
           icon_media_id?: string | null
           icon_url?: string | null
           id?: string
+          is_easter_egg?: boolean
           name?: string
+          scope_tenant_id?: string | null
+          tenant_id?: string | null
         }
         Relationships: [
           {
@@ -136,6 +148,13 @@ export type Database = {
             columns: ["icon_media_id"]
             isOneToOne: false
             referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "achievements_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -183,6 +202,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "analytics_timeseries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      award_builder_exports: {
+        Row: {
+          created_at: string
+          export: Json
+          exported_at: string
+          exported_by_tool: string | null
+          exported_by_user_id: string | null
+          id: string
+          schema_version: string
+          scope_type: string
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          export: Json
+          exported_at?: string
+          exported_by_tool?: string | null
+          exported_by_user_id?: string | null
+          id?: string
+          schema_version: string
+          scope_type: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          export?: Json
+          exported_at?: string
+          exported_by_tool?: string | null
+          exported_by_user_id?: string | null
+          id?: string
+          schema_version?: string
+          scope_type?: string
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "award_builder_exports_tenant_id_fkey"
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -686,6 +752,11 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          idempotency_key: string | null
+          metadata: Json | null
+          reason_code: string | null
+          reversal_of: string | null
+          source: string | null
           tenant_id: string | null
           type: string
           user_id: string
@@ -695,6 +766,11 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          idempotency_key?: string | null
+          metadata?: Json | null
+          reason_code?: string | null
+          reversal_of?: string | null
+          source?: string | null
           tenant_id?: string | null
           type: string
           user_id: string
@@ -704,11 +780,23 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          idempotency_key?: string | null
+          metadata?: Json | null
+          reason_code?: string | null
+          reversal_of?: string | null
+          source?: string | null
           tenant_id?: string | null
           type?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "coin_transactions_reversal_of_fkey"
+            columns: ["reversal_of"]
+            isOneToOne: false
+            referencedRelation: "coin_transactions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "coin_transactions_tenant_id_fkey"
             columns: ["tenant_id"]
@@ -2466,571 +2554,6 @@ export type Database = {
           },
         ]
       }
-      gamification_events: {
-        Row: {
-          actor_user_id: string
-          created_at: string
-          event_type: string
-          id: string
-          idempotency_key: string
-          metadata: Json | null
-          source: string
-          tenant_id: string | null
-        }
-        Insert: {
-          actor_user_id: string
-          created_at?: string
-          event_type: string
-          id?: string
-          idempotency_key: string
-          metadata?: Json | null
-          source: string
-          tenant_id?: string | null
-        }
-        Update: {
-          actor_user_id?: string
-          created_at?: string
-          event_type?: string
-          id?: string
-          idempotency_key?: string
-          metadata?: Json | null
-          source?: string
-          tenant_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_events_actor_user_id_fkey"
-            columns: ["actor_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_events_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_admin_awards: {
-        Row: {
-          amount: number
-          actor_user_id: string | null
-          award_type: string
-          created_at: string
-          id: string
-          idempotency_key: string
-          message: string | null
-          source: string
-          tenant_id: string
-        }
-        Insert: {
-          amount: number
-          actor_user_id?: string | null
-          award_type: string
-          created_at?: string
-          id?: string
-          idempotency_key: string
-          message?: string | null
-          source?: string
-          tenant_id: string
-        }
-        Update: {
-          amount?: number
-          actor_user_id?: string | null
-          award_type?: string
-          created_at?: string
-          id?: string
-          idempotency_key?: string
-          message?: string | null
-          source?: string
-          tenant_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_admin_awards_actor_user_id_fkey"
-            columns: ["actor_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_awards_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_admin_award_recipients: {
-        Row: {
-          award_id: string
-          balance_after: number | null
-          coin_transaction_id: string | null
-          created_at: string
-          id: string
-          tenant_id: string
-          user_id: string
-        }
-        Insert: {
-          award_id: string
-          balance_after?: number | null
-          coin_transaction_id?: string | null
-          created_at?: string
-          id?: string
-          tenant_id: string
-          user_id: string
-        }
-        Update: {
-          award_id?: string
-          balance_after?: number | null
-          coin_transaction_id?: string | null
-          created_at?: string
-          id?: string
-          tenant_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_admin_award_recipients_award_id_fkey"
-            columns: ["award_id"]
-            isOneToOne: false
-            referencedRelation: "gamification_admin_awards"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_recipients_coin_transaction_id_fkey"
-            columns: ["coin_transaction_id"]
-            isOneToOne: false
-            referencedRelation: "coin_transactions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_recipients_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_recipients_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_admin_award_requests: {
-        Row: {
-          amount: number
-          award_id: string | null
-          created_at: string
-          decided_at: string | null
-          decided_by_user_id: string | null
-          id: string
-          idempotency_key: string
-          message: string | null
-          requester_user_id: string | null
-          status: string
-          tenant_id: string
-        }
-        Insert: {
-          amount: number
-          award_id?: string | null
-          created_at?: string
-          decided_at?: string | null
-          decided_by_user_id?: string | null
-          id?: string
-          idempotency_key: string
-          message?: string | null
-          requester_user_id?: string | null
-          status?: string
-          tenant_id: string
-        }
-        Update: {
-          amount?: number
-          award_id?: string | null
-          created_at?: string
-          decided_at?: string | null
-          decided_by_user_id?: string | null
-          id?: string
-          idempotency_key?: string
-          message?: string | null
-          requester_user_id?: string | null
-          status?: string
-          tenant_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_admin_award_requests_award_id_fkey"
-            columns: ["award_id"]
-            isOneToOne: false
-            referencedRelation: "gamification_admin_awards"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_requests_decided_by_user_id_fkey"
-            columns: ["decided_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_requests_requester_user_id_fkey"
-            columns: ["requester_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_requests_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_admin_award_request_recipients: {
-        Row: {
-          created_at: string
-          id: string
-          request_id: string
-          tenant_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          request_id: string
-          tenant_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          request_id?: string
-          tenant_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_admin_award_request_recipients_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "gamification_admin_award_requests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_request_recipients_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_admin_award_request_recipients_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_automation_rules: {
-        Row: {
-          created_at: string
-          created_by_user_id: string | null
-          event_type: string
-          id: string
-          is_active: boolean
-          name: string
-          reward_amount: number
-          tenant_id: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          created_by_user_id?: string | null
-          event_type: string
-          id?: string
-          is_active?: boolean
-          name: string
-          reward_amount: number
-          tenant_id: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          created_by_user_id?: string | null
-          event_type?: string
-          id?: string
-          is_active?: boolean
-          name?: string
-          reward_amount?: number
-          tenant_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_automation_rules_created_by_user_id_fkey"
-            columns: ["created_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_automation_rules_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_campaigns: {
-        Row: {
-          bonus_amount: number
-          budget_amount: number | null
-          created_at: string
-          created_by_user_id: string | null
-          ends_at: string
-          event_type: string
-          id: string
-          idempotency_key: string | null
-          is_active: boolean
-          name: string
-          source_template_id: string | null
-          spent_amount: number
-          starts_at: string
-          tenant_id: string
-          updated_at: string
-        }
-        Insert: {
-          bonus_amount: number
-          budget_amount?: number | null
-          created_at?: string
-          created_by_user_id?: string | null
-          ends_at: string
-          event_type: string
-          id?: string
-          idempotency_key?: string | null
-          is_active?: boolean
-          name: string
-          source_template_id?: string | null
-          spent_amount?: number
-          starts_at: string
-          tenant_id: string
-          updated_at?: string
-        }
-        Update: {
-          bonus_amount?: number
-          budget_amount?: number | null
-          created_at?: string
-          created_by_user_id?: string | null
-          ends_at?: string
-          event_type?: string
-          id?: string
-          idempotency_key?: string | null
-          is_active?: boolean
-          name?: string
-          source_template_id?: string | null
-          spent_amount?: number
-          starts_at?: string
-          tenant_id?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_campaigns_created_by_user_id_fkey"
-            columns: ["created_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_campaigns_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_campaigns_source_template_id_fkey"
-            columns: ["source_template_id"]
-            isOneToOne: false
-            referencedRelation: "gamification_campaign_templates"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_campaign_templates: {
-        Row: {
-          bonus_amount: number
-          budget_amount: number | null
-          created_at: string
-          created_by_user_id: string | null
-          duration_days: number
-          event_type: string
-          id: string
-          is_active_default: boolean
-          label: string
-          name: string
-          sort_order: number
-          tenant_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          bonus_amount: number
-          budget_amount?: number | null
-          created_at?: string
-          created_by_user_id?: string | null
-          duration_days: number
-          event_type: string
-          id?: string
-          is_active_default?: boolean
-          label: string
-          name: string
-          sort_order?: number
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          bonus_amount?: number
-          budget_amount?: number | null
-          created_at?: string
-          created_by_user_id?: string | null
-          duration_days?: number
-          event_type?: string
-          id?: string
-          is_active_default?: boolean
-          label?: string
-          name?: string
-          sort_order?: number
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_campaign_templates_created_by_user_id_fkey"
-            columns: ["created_by_user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "gamification_campaign_templates_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_level_definitions: {
-        Row: {
-          created_at: string
-          id: string
-          level: number
-          name: string | null
-          next_level_xp: number
-          next_reward: string | null
-          reward_asset_key: string | null
-          tenant_id: string | null
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          level: number
-          name?: string | null
-          next_level_xp?: number
-          next_reward?: string | null
-          reward_asset_key?: string | null
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          level?: number
-          name?: string | null
-          next_level_xp?: number
-          next_reward?: string | null
-          reward_asset_key?: string | null
-          tenant_id?: string | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_level_definitions_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      gamification_daily_summaries: {
-        Row: {
-          tenant_id: string
-          day: string
-          earned: number
-          spent: number
-          tx_count: number
-          events_count: number
-          awards_total: number
-          awards_count: number
-          purchases_count: number
-          purchases_spent: number
-          campaign_bonus_total: number
-          automation_total: number
-          updated_at: string
-        }
-        Insert: {
-          tenant_id: string
-          day: string
-          earned?: number
-          spent?: number
-          tx_count?: number
-          events_count?: number
-          awards_total?: number
-          awards_count?: number
-          purchases_count?: number
-          purchases_spent?: number
-          campaign_bonus_total?: number
-          automation_total?: number
-          updated_at?: string
-        }
-        Update: {
-          tenant_id?: string
-          day?: string
-          earned?: number
-          spent?: number
-          tx_count?: number
-          events_count?: number
-          awards_total?: number
-          awards_count?: number
-          purchases_count?: number
-          purchases_spent?: number
-          campaign_bonus_total?: number
-          automation_total?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "gamification_daily_summaries_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       games: {
         Row: {
           accessibility_notes: string | null
@@ -3189,6 +2712,571 @@ export type Database = {
             columns: ["updated_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_admin_award_recipients: {
+        Row: {
+          award_id: string
+          balance_after: number | null
+          coin_transaction_id: string | null
+          created_at: string
+          id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          award_id: string
+          balance_after?: number | null
+          coin_transaction_id?: string | null
+          created_at?: string
+          id?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          award_id?: string
+          balance_after?: number | null
+          coin_transaction_id?: string | null
+          created_at?: string
+          id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_admin_award_recipients_award_id_fkey"
+            columns: ["award_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_admin_awards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_recipients_coin_transaction_id_fkey"
+            columns: ["coin_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "coin_transactions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_recipients_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_recipients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_admin_award_request_recipients: {
+        Row: {
+          created_at: string
+          id: string
+          request_id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          request_id: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          request_id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_admin_award_request_recipients_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_admin_award_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_request_recipients_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_request_recipients_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_admin_award_requests: {
+        Row: {
+          amount: number
+          award_id: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by_user_id: string | null
+          id: string
+          idempotency_key: string
+          message: string | null
+          requester_user_id: string | null
+          status: string
+          tenant_id: string
+        }
+        Insert: {
+          amount: number
+          award_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by_user_id?: string | null
+          id?: string
+          idempotency_key: string
+          message?: string | null
+          requester_user_id?: string | null
+          status?: string
+          tenant_id: string
+        }
+        Update: {
+          amount?: number
+          award_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by_user_id?: string | null
+          id?: string
+          idempotency_key?: string
+          message?: string | null
+          requester_user_id?: string | null
+          status?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_admin_award_requests_award_id_fkey"
+            columns: ["award_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_admin_awards"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_requests_decided_by_user_id_fkey"
+            columns: ["decided_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_requests_requester_user_id_fkey"
+            columns: ["requester_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_award_requests_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_admin_awards: {
+        Row: {
+          actor_user_id: string | null
+          amount: number
+          award_type: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          message: string | null
+          source: string
+          tenant_id: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          amount: number
+          award_type: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          message?: string | null
+          source?: string
+          tenant_id: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          amount?: number
+          award_type?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          message?: string | null
+          source?: string
+          tenant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_admin_awards_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_admin_awards_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_automation_rules: {
+        Row: {
+          created_at: string
+          created_by_user_id: string | null
+          event_type: string
+          id: string
+          is_active: boolean
+          name: string
+          reward_amount: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_user_id?: string | null
+          event_type: string
+          id?: string
+          is_active?: boolean
+          name: string
+          reward_amount: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by_user_id?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          reward_amount?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_automation_rules_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_automation_rules_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_campaign_templates: {
+        Row: {
+          bonus_amount: number
+          budget_amount: number | null
+          created_at: string
+          created_by_user_id: string | null
+          duration_days: number
+          event_type: string
+          id: string
+          is_active_default: boolean
+          label: string
+          name: string
+          sort_order: number
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          bonus_amount: number
+          budget_amount?: number | null
+          created_at?: string
+          created_by_user_id?: string | null
+          duration_days: number
+          event_type: string
+          id?: string
+          is_active_default?: boolean
+          label: string
+          name: string
+          sort_order?: number
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bonus_amount?: number
+          budget_amount?: number | null
+          created_at?: string
+          created_by_user_id?: string | null
+          duration_days?: number
+          event_type?: string
+          id?: string
+          is_active_default?: boolean
+          label?: string
+          name?: string
+          sort_order?: number
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_campaign_templates_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_campaign_templates_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_campaigns: {
+        Row: {
+          bonus_amount: number
+          budget_amount: number | null
+          created_at: string
+          created_by_user_id: string | null
+          ends_at: string
+          event_type: string
+          id: string
+          idempotency_key: string | null
+          is_active: boolean
+          name: string
+          source_template_id: string | null
+          spent_amount: number
+          starts_at: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          bonus_amount: number
+          budget_amount?: number | null
+          created_at?: string
+          created_by_user_id?: string | null
+          ends_at: string
+          event_type: string
+          id?: string
+          idempotency_key?: string | null
+          is_active?: boolean
+          name: string
+          source_template_id?: string | null
+          spent_amount?: number
+          starts_at: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          bonus_amount?: number
+          budget_amount?: number | null
+          created_at?: string
+          created_by_user_id?: string | null
+          ends_at?: string
+          event_type?: string
+          id?: string
+          idempotency_key?: string | null
+          is_active?: boolean
+          name?: string
+          source_template_id?: string | null
+          spent_amount?: number
+          starts_at?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_campaigns_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_campaigns_source_template_id_fkey"
+            columns: ["source_template_id"]
+            isOneToOne: false
+            referencedRelation: "gamification_campaign_templates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_campaigns_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_daily_summaries: {
+        Row: {
+          automation_total: number
+          awards_count: number
+          awards_total: number
+          campaign_bonus_total: number
+          day: string
+          earned: number
+          events_count: number
+          purchases_count: number
+          purchases_spent: number
+          spent: number
+          tenant_id: string
+          tx_count: number
+          updated_at: string
+        }
+        Insert: {
+          automation_total?: number
+          awards_count?: number
+          awards_total?: number
+          campaign_bonus_total?: number
+          day: string
+          earned?: number
+          events_count?: number
+          purchases_count?: number
+          purchases_spent?: number
+          spent?: number
+          tenant_id: string
+          tx_count?: number
+          updated_at?: string
+        }
+        Update: {
+          automation_total?: number
+          awards_count?: number
+          awards_total?: number
+          campaign_bonus_total?: number
+          day?: string
+          earned?: number
+          events_count?: number
+          purchases_count?: number
+          purchases_spent?: number
+          spent?: number
+          tenant_id?: string
+          tx_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_daily_summaries_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_events: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          event_type: string
+          id: string
+          idempotency_key: string
+          metadata: Json | null
+          source: string
+          tenant_id: string | null
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          idempotency_key: string
+          metadata?: Json | null
+          source: string
+          tenant_id?: string | null
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          idempotency_key?: string
+          metadata?: Json | null
+          source?: string
+          tenant_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_events_actor_user_id_fkey"
+            columns: ["actor_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gamification_events_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gamification_level_definitions: {
+        Row: {
+          created_at: string
+          id: string
+          level: number
+          name: string | null
+          next_level_xp: number
+          next_reward: string | null
+          reward_asset_key: string | null
+          tenant_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: number
+          name?: string | null
+          next_level_xp?: number
+          next_reward?: string | null
+          reward_asset_key?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: number
+          name?: string | null
+          next_level_xp?: number
+          next_reward?: string | null
+          reward_asset_key?: string | null
+          tenant_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gamification_level_definitions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
             referencedColumns: ["id"]
           },
         ]
@@ -3358,6 +3446,48 @@ export type Database = {
           },
         ]
       }
+      leader_profile: {
+        Row: {
+          created_at: string
+          display_achievement_ids: string[]
+          id: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_achievement_ids?: string[]
+          id?: string
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_achievement_ids?: string[]
+          id?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leader_profile_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leader_profile_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leaderboards: {
         Row: {
           avg_score: number | null
@@ -3424,48 +3554,6 @@ export type Database = {
           },
           {
             foreignKeyName: "leaderboards_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      leader_profile: {
-        Row: {
-          created_at: string
-          display_achievement_ids: string[]
-          id: string
-          tenant_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          display_achievement_ids?: string[]
-          id?: string
-          tenant_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          display_achievement_ids?: string[]
-          id?: string
-          tenant_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "leader_profile_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "leader_profile_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -3592,48 +3680,6 @@ export type Database = {
           },
           {
             foreignKeyName: "marketplace_analytics_tenant_id_fkey"
-      leader_profile: {
-        Row: {
-          created_at: string
-          display_achievement_ids: string[]
-          id: string
-          tenant_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          display_achievement_ids?: string[]
-          id?: string
-          tenant_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          display_achievement_ids?: string[]
-          id?: string
-          tenant_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "leader_profile_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "leader_profile_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
@@ -8321,6 +8367,175 @@ export type Database = {
           },
         ]
       }
+      user_powerup_consumptions: {
+        Row: {
+          created_at: string
+          id: string
+          idempotency_key: string
+          shop_item_id: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          shop_item_id: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          shop_item_id?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_powerup_consumptions_shop_item_id_fkey"
+            columns: ["shop_item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_consumptions_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_consumptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_powerup_effects: {
+        Row: {
+          consumption_id: string
+          created_at: string
+          effect_type: string
+          expires_at: string
+          id: string
+          multiplier: number
+          shop_item_id: string
+          starts_at: string
+          tenant_id: string
+          user_id: string
+        }
+        Insert: {
+          consumption_id: string
+          created_at?: string
+          effect_type: string
+          expires_at: string
+          id?: string
+          multiplier?: number
+          shop_item_id: string
+          starts_at?: string
+          tenant_id: string
+          user_id: string
+        }
+        Update: {
+          consumption_id?: string
+          created_at?: string
+          effect_type?: string
+          expires_at?: string
+          id?: string
+          multiplier?: number
+          shop_item_id?: string
+          starts_at?: string
+          tenant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_powerup_effects_consumption_id_fkey"
+            columns: ["consumption_id"]
+            isOneToOne: false
+            referencedRelation: "user_powerup_consumptions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_effects_shop_item_id_fkey"
+            columns: ["shop_item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_effects_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_effects_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_powerup_inventory: {
+        Row: {
+          created_at: string
+          id: string
+          quantity: number
+          shop_item_id: string
+          tenant_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          shop_item_id: string
+          tenant_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          quantity?: number
+          shop_item_id?: string
+          tenant_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_powerup_inventory_shop_item_id_fkey"
+            columns: ["shop_item_id"]
+            isOneToOne: false
+            referencedRelation: "shop_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_inventory_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_powerup_inventory_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_preferences: {
         Row: {
           allow_friend_requests: boolean | null
@@ -8513,13 +8728,13 @@ export type Database = {
       }
       user_purchases: {
         Row: {
+          coin_transaction_id: string | null
           created_at: string | null
           currency_id: string
           gifted_from_user_id: string | null
           id: string
           idempotency_key: string | null
           is_gift: boolean | null
-          coin_transaction_id: string | null
           price_paid: number
           quantity: number | null
           shop_item_id: string
@@ -8527,13 +8742,13 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          coin_transaction_id?: string | null
           created_at?: string | null
           currency_id: string
           gifted_from_user_id?: string | null
           id?: string
           idempotency_key?: string | null
           is_gift?: boolean | null
-          coin_transaction_id?: string | null
           price_paid: number
           quantity?: number | null
           shop_item_id: string
@@ -8541,13 +8756,13 @@ export type Database = {
           user_id: string
         }
         Update: {
+          coin_transaction_id?: string | null
           created_at?: string | null
           currency_id?: string
           gifted_from_user_id?: string | null
           id?: string
           idempotency_key?: string | null
           is_gift?: boolean | null
-          coin_transaction_id?: string | null
           price_paid?: number
           quantity?: number | null
           shop_item_id?: string
@@ -8555,6 +8770,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_purchases_coin_transaction_id_fkey"
+            columns: ["coin_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "coin_transactions"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_purchases_currency_id_fkey"
             columns: ["currency_id"]
@@ -8585,175 +8807,6 @@ export type Database = {
           },
           {
             foreignKeyName: "user_purchases_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_powerup_consumptions: {
-        Row: {
-          created_at: string
-          id: string
-          idempotency_key: string
-          shop_item_id: string
-          tenant_id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          idempotency_key: string
-          shop_item_id: string
-          tenant_id: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          idempotency_key?: string
-          shop_item_id?: string
-          tenant_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_powerup_consumptions_shop_item_id_fkey"
-            columns: ["shop_item_id"]
-            isOneToOne: false
-            referencedRelation: "shop_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_consumptions_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_consumptions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_powerup_effects: {
-        Row: {
-          consumption_id: string
-          created_at: string
-          effect_type: string
-          expires_at: string
-          id: string
-          multiplier: number
-          shop_item_id: string
-          starts_at: string
-          tenant_id: string
-          user_id: string
-        }
-        Insert: {
-          consumption_id: string
-          created_at?: string
-          effect_type: string
-          expires_at: string
-          id?: string
-          multiplier?: number
-          shop_item_id: string
-          starts_at?: string
-          tenant_id: string
-          user_id: string
-        }
-        Update: {
-          consumption_id?: string
-          created_at?: string
-          effect_type?: string
-          expires_at?: string
-          id?: string
-          multiplier?: number
-          shop_item_id?: string
-          starts_at?: string
-          tenant_id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_powerup_effects_consumption_id_fkey"
-            columns: ["consumption_id"]
-            isOneToOne: false
-            referencedRelation: "user_powerup_consumptions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_effects_shop_item_id_fkey"
-            columns: ["shop_item_id"]
-            isOneToOne: false
-            referencedRelation: "shop_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_effects_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_effects_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_powerup_inventory: {
-        Row: {
-          created_at: string
-          id: string
-          quantity: number
-          shop_item_id: string
-          tenant_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          quantity?: number
-          shop_item_id: string
-          tenant_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          quantity?: number
-          shop_item_id?: string
-          tenant_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_powerup_inventory_shop_item_id_fkey"
-            columns: ["shop_item_id"]
-            isOneToOne: false
-            referencedRelation: "shop_items"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_inventory_tenant_id_fkey"
-            columns: ["tenant_id"]
-            isOneToOne: false
-            referencedRelation: "tenants"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_powerup_inventory_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"
@@ -9131,6 +9184,183 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_award_coins_v1: {
+        Args: {
+          p_actor_user_id: string
+          p_amount: number
+          p_idempotency_key: string
+          p_message: string
+          p_target_user_ids: string[]
+          p_tenant_id: string
+        }
+        Returns: {
+          award_id: string
+          balance: number
+          coin_transaction_id: string
+          recipient_user_id: string
+        }[]
+      }
+      admin_decide_award_request_v1: {
+        Args: {
+          p_action: string
+          p_decider_user_id: string
+          p_request_id: string
+        }
+        Returns: {
+          award_id: string
+          awarded_count: number
+          request_id: string
+          status: string
+        }[]
+      }
+      admin_get_campaign_analytics_v1: {
+        Args: {
+          p_campaign_id: string
+          p_tenant_id: string
+          p_window_days?: number
+        }
+        Returns: {
+          campaign_id: string
+          daily: Json
+          since: string
+          tenant_id: string
+          totals: Json
+          window_days: number
+        }[]
+      }
+      admin_get_gamification_analytics_v1: {
+        Args: { p_tenant_id: string; p_window_days?: number }
+        Returns: {
+          awards: Json
+          economy: Json
+          events: Json
+          shop: Json
+          since: string
+          tenant_id: string
+          window_days: number
+        }[]
+      }
+      admin_get_gamification_analytics_v2: {
+        Args: { p_tenant_id: string; p_window_days?: number }
+        Returns: {
+          awards: Json
+          campaigns: Json
+          economy: Json
+          events: Json
+          shop: Json
+          since: string
+          tenant_id: string
+          window_days: number
+        }[]
+      }
+      admin_get_gamification_analytics_v3: {
+        Args: { p_tenant_id: string; p_window_days?: number }
+        Returns: {
+          automations: Json
+          awards: Json
+          campaigns: Json
+          economy: Json
+          events: Json
+          shop: Json
+          since: string
+          tenant_id: string
+          window_days: number
+        }[]
+      }
+      admin_get_gamification_analytics_v4: {
+        Args: { p_tenant_id: string; p_window_days?: number }
+        Returns: {
+          anomalies: Json
+          automations: Json
+          awards: Json
+          campaigns: Json
+          economy: Json
+          events: Json
+          shop: Json
+          since: string
+          tenant_id: string
+          window_days: number
+        }[]
+      }
+      admin_get_gamification_analytics_v5: {
+        Args: { p_tenant_id: string; p_window_days?: number }
+        Returns: {
+          anomalies: Json
+          automations: Json
+          awards: Json
+          campaigns: Json
+          economy: Json
+          events: Json
+          shop: Json
+          since: string
+          tenant_id: string
+          window_days: number
+        }[]
+      }
+      admin_request_award_coins_v1: {
+        Args: {
+          p_actor_user_id: string
+          p_amount: number
+          p_idempotency_key: string
+          p_message: string
+          p_target_user_ids: string[]
+          p_tenant_id: string
+        }
+        Returns: {
+          recipient_count: number
+          request_id: string
+          status: string
+        }[]
+      }
+      apply_automation_rule_reward_v1: {
+        Args: {
+          p_event_id: string
+          p_event_type: string
+          p_idempotency_key: string
+          p_rule_id: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: {
+          applied: boolean
+          balance: number
+          coin_transaction_id: string
+          reward_amount: number
+        }[]
+      }
+      apply_campaign_bonus_v1: {
+        Args: {
+          p_campaign_id: string
+          p_event_id: string
+          p_event_type: string
+          p_idempotency_key: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: {
+          applied: boolean
+          balance: number
+          bonus_amount: number
+          coin_transaction_id: string
+        }[]
+      }
+      apply_coin_transaction_v1: {
+        Args: {
+          p_amount: number
+          p_description?: string
+          p_idempotency_key: string
+          p_metadata?: Json
+          p_reason_code: string
+          p_source?: string
+          p_tenant_id: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: {
+          balance: number
+          transaction_id: string
+        }[]
+      }
       attempt_keypad_unlock: {
         Args: {
           p_artifact_id: string
@@ -9140,6 +9370,17 @@ export type Database = {
         }
         Returns: Json
       }
+      consume_powerup_v1: {
+        Args: {
+          p_idempotency_key: string
+          p_shop_item_id: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: {
+          remaining_quantity: number
+        }[]
+      }
       create_game_snapshot: {
         Args: {
           p_created_by?: string
@@ -9147,6 +9388,19 @@ export type Database = {
           p_version_label?: string
         }
         Returns: string
+      }
+      create_gamification_campaign_from_template_v1: {
+        Args: {
+          p_actor_user_id?: string
+          p_idempotency_key?: string
+          p_starts_at?: string
+          p_template_id: string
+          p_tenant_id: string
+        }
+        Returns: {
+          campaign_id: string
+          created: boolean
+        }[]
       }
       create_session_with_snapshot: {
         Args: {
@@ -9159,6 +9413,24 @@ export type Database = {
           join_code: string
           session_id: string
           snapshot_id: string
+        }[]
+      }
+      get_active_coin_multiplier_v1: {
+        Args: { p_at: string; p_tenant_id: string; p_user_id: string }
+        Returns: {
+          effect_id: string
+          multiplier: number
+        }[]
+      }
+      get_gamification_level_definitions_v1: {
+        Args: { p_tenant_id?: string }
+        Returns: {
+          level: number
+          name: string
+          next_level_xp: number
+          next_reward: string
+          reward_asset_key: string
+          scope_tenant_id: string
         }[]
       }
       get_latest_game_snapshot: { Args: { p_game_id: string }; Returns: string }
@@ -9220,276 +9492,6 @@ export type Database = {
       is_global_admin: { Args: never; Returns: boolean }
       is_system_admin: { Args: never; Returns: boolean }
       is_tenant_member: { Args: { target_tenant: string }; Returns: boolean }
-      admin_award_coins_v1: {
-        Args: {
-          p_tenant_id: string
-          p_actor_user_id: string
-          p_target_user_ids: string[]
-          p_amount: number
-          p_message: string | null
-          p_idempotency_key: string
-        }
-        Returns: {
-          award_id: string
-          recipient_user_id: string
-          coin_transaction_id: string
-          balance: number
-        }[]
-      }
-      admin_request_award_coins_v1: {
-        Args: {
-          p_tenant_id: string
-          p_actor_user_id: string
-          p_target_user_ids: string[]
-          p_amount: number
-          p_message: string | null
-          p_idempotency_key: string
-        }
-        Returns: {
-          request_id: string
-          status: string
-          recipient_count: number
-        }[]
-      }
-      admin_decide_award_request_v1: {
-        Args: {
-          p_request_id: string
-          p_decider_user_id: string
-          p_action: string
-        }
-        Returns: {
-          request_id: string
-          status: string
-          award_id: string | null
-          awarded_count: number
-        }[]
-      }
-      admin_get_gamification_analytics_v1: {
-        Args: {
-          p_tenant_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          window_days: number
-          since: string
-          economy: Json
-          events: Json
-          awards: Json
-          shop: Json
-        }[]
-      }
-      admin_get_gamification_analytics_v2: {
-        Args: {
-          p_tenant_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          window_days: number
-          since: string
-          economy: Json
-          events: Json
-          awards: Json
-          shop: Json
-          campaigns: Json
-        }[]
-      }
-      admin_get_gamification_analytics_v3: {
-        Args: {
-          p_tenant_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          window_days: number
-          since: string
-          economy: Json
-          events: Json
-          awards: Json
-          shop: Json
-          campaigns: Json
-          automations: Json
-        }[]
-      }
-      admin_get_gamification_analytics_v4: {
-        Args: {
-          p_tenant_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          window_days: number
-          since: string
-          economy: Json
-          events: Json
-          awards: Json
-          shop: Json
-          campaigns: Json
-          automations: Json
-          anomalies: Json
-        }[]
-      }
-      admin_get_gamification_analytics_v5: {
-        Args: {
-          p_tenant_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          window_days: number
-          since: string
-          economy: Json
-          events: Json
-          awards: Json
-          shop: Json
-          campaigns: Json
-          automations: Json
-          anomalies: Json
-        }[]
-      }
-      admin_get_campaign_analytics_v1: {
-        Args: {
-          p_tenant_id: string
-          p_campaign_id: string
-          p_window_days?: number
-        }
-        Returns: {
-          tenant_id: string
-          campaign_id: string
-          window_days: number
-          since: string
-          totals: Json
-          daily: Json
-        }[]
-      }
-      apply_coin_transaction_v1: {
-        Args: {
-          p_user_id: string
-          p_tenant_id: string
-          p_type: string
-          p_amount: number
-          p_reason_code: string
-          p_idempotency_key: string
-          p_description?: string | null
-          p_source?: string | null
-          p_metadata?: Json | null
-        }
-        Returns: {
-          transaction_id: string
-          balance: number
-        }[]
-      }
-      refresh_gamification_daily_summaries_v1: {
-        Args: {
-          p_tenant_id: string
-          p_days?: number
-        }
-        Returns: number
-      }
-      apply_campaign_bonus_v1: {
-        Args: {
-          p_campaign_id: string
-          p_user_id: string
-          p_tenant_id: string
-          p_event_id: string
-          p_event_type: string
-          p_idempotency_key: string
-        }
-        Returns: {
-          applied: boolean
-          coin_transaction_id: string | null
-          balance: number
-          bonus_amount: number
-        }[]
-      }
-      create_gamification_campaign_from_template_v1: {
-        Args: {
-          p_tenant_id: string
-          p_template_id: string
-          p_starts_at?: string
-          p_actor_user_id?: string | null
-          p_idempotency_key?: string | null
-        }
-        Returns: {
-          campaign_id: string
-          created: boolean
-        }[]
-      }
-      apply_automation_rule_reward_v1: {
-        Args: {
-          p_rule_id: string
-          p_user_id: string
-          p_tenant_id: string
-          p_event_id: string
-          p_event_type: string
-          p_idempotency_key: string
-        }
-        Returns: {
-          applied: boolean
-          coin_transaction_id: string | null
-          balance: number
-          reward_amount: number
-        }[]
-      }
-      purchase_shop_item_v1: {
-        Args: {
-          p_user_id: string
-          p_tenant_id: string
-          p_shop_item_id: string
-          p_idempotency_key: string
-        }
-        Returns: {
-          purchase_id: string
-          coin_transaction_id: string
-          balance: number
-        }[]
-      }
-      consume_powerup_v1: {
-        Args: {
-          p_user_id: string
-          p_tenant_id: string
-          p_shop_item_id: string
-          p_idempotency_key: string
-        }
-        Returns: {
-          remaining_quantity: number
-        }[]
-      }
-      get_active_coin_multiplier_v1: {
-        Args: {
-          p_user_id: string
-          p_tenant_id: string
-          p_at: string
-        }
-        Returns: {
-          multiplier: number
-          effect_id: string
-        }[]
-      }
-      get_gamification_level_definitions_v1: {
-        Args: {
-          p_tenant_id?: string
-        }
-        Returns: {
-          level: number
-          name: string | null
-          next_level_xp: number
-          next_reward: string | null
-          reward_asset_key: string | null
-          scope_tenant_id: string | null
-        }[]
-      }
-      replace_gamification_level_definitions_v1: {
-        Args: {
-          p_tenant_id: string
-          p_levels: Json
-          p_actor_user_id?: string | null
-        }
-        Returns: {
-          replaced_count: number
-        }[]
-      }
       log_session_event: {
         Args: {
           p_actor_id?: string
@@ -9508,9 +9510,32 @@ export type Database = {
         }
         Returns: string
       }
+      purchase_shop_item_v1: {
+        Args: {
+          p_idempotency_key: string
+          p_shop_item_id: string
+          p_tenant_id: string
+          p_user_id: string
+        }
+        Returns: {
+          balance: number
+          coin_transaction_id: string
+          purchase_id: string
+        }[]
+      }
       recalc_plan_total_time_minutes: {
         Args: { p_plan_id: string }
         Returns: undefined
+      }
+      refresh_gamification_daily_summaries_v1: {
+        Args: { p_days?: number; p_tenant_id: string }
+        Returns: number
+      }
+      replace_gamification_level_definitions_v1: {
+        Args: { p_actor_user_id?: string; p_levels: Json; p_tenant_id: string }
+        Returns: {
+          replaced_count: number
+        }[]
       }
       session_trigger_clear_error: {
         Args: { p_trigger_id: string }

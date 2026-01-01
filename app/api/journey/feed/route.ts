@@ -127,7 +127,7 @@ export async function GET(req: Request) {
       type: 'achievement_unlocked',
       occurredAt,
       title: `Upplåste: ${name}`,
-      href: '/app/profile/achievements',
+      href: '/app/gamification/achievements',
       meta: { achievementId: ua.achievement_id },
     });
   }

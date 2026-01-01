@@ -11,8 +11,10 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
   const isInProgress = achievement.status === "in_progress";
   const isLocked = achievement.status === "locked";
 
+  const displayName = isLocked ? "???" : achievement.name;
+
   // Fallback icon - use emoji or first letter
-  const displayIcon = achievement.icon || achievement.name.charAt(0).toUpperCase();
+  const displayIcon = isLocked ? "❓" : achievement.icon || achievement.name.charAt(0).toUpperCase();
 
   return (
     <div
@@ -50,7 +52,7 @@ export function AchievementCard({ achievement }: AchievementCardProps) {
           isLocked ? "text-muted-foreground" : "text-foreground"
         }`}
       >
-        {achievement.name}
+        {displayName}
       </p>
 
       {/* Status Indicator */}

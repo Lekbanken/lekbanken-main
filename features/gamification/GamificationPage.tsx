@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { SparklesIcon } from "@heroicons/react/24/outline";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageTitleHeader } from "@/components/app/PageTitleHeader";
+import { appNavItems } from "@/components/app/nav-items";
 import { fetchGamificationSnapshot, type GamificationPayload } from "./api";
 import { ProgressOverview } from "./components/ProgressOverview";
 import { AchievementsSection } from "./components/AchievementsSection";
@@ -19,6 +21,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   const [data, setData] = useState<GamificationPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const dicecoinIcon = appNavItems.find((item) => item.href === "/app/gamification")?.icon;
 
   useEffect(() => {
     let isMounted = true;
@@ -90,17 +93,43 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   return (
     <div className="space-y-6 pb-32">
       {/* Page Header */}
-      <header className="space-y-1">
-        <div className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <SparklesIcon className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Gamification</p>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Din progress</h1>
-          </div>
-        </div>
-      </header>
+      <PageTitleHeader
+        icon={dicecoinIcon}
+        title="DICECOIN"
+        subtitle="Din progress"
+      />
+
+
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <Link
+          href="/app/gamification/achievements"
+          className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
+        >
+          Utmärkelser
+          <p className="mt-1 text-xs font-normal text-muted-foreground">Visa alla och pinna till dashboard</p>
+        </Link>
+        <Link
+          href="/app/profile/coins"
+          className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
+        >
+          Mynthistorik
+          <p className="mt-1 text-xs font-normal text-muted-foreground">Senaste transaktioner och saldo</p>
+        </Link>
+        <Link
+          href="/app/shop"
+          className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
+        >
+          Butik
+          <p className="mt-1 text-xs font-normal text-muted-foreground">Cosmetics och powerups</p>
+        </Link>
+        <Link
+          href="/app/gamification/events"
+          className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
+        >
+          Eventlogg
+          <p className="mt-1 text-xs font-normal text-muted-foreground">Read-only, senaste händelser</p>
+        </Link>
+      </div>
 
       <ProgressOverview progress={data.progress} />
       <AchievementsSection achievements={data.achievements} />

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase/client';
 
 // Types
@@ -87,7 +86,7 @@ export async function getActiveChallenges(
   limit: number = 20
 ): Promise<CommunityChallenge[] | null> {
   try {
-    const query = supabase.from('community_challenges' as any) as any;
+    const query = supabase.from('community_challenges');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -113,7 +112,7 @@ export async function createChallenge(
   challenge: Omit<CommunityChallenge, 'id' | 'tenant_id' | 'participation_count' | 'completion_count' | 'created_by_user_id' | 'created_at' | 'updated_at'>
 ): Promise<CommunityChallenge | null> {
   try {
-    const query = supabase.from('community_challenges' as any) as any;
+    const query = supabase.from('community_challenges');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -143,7 +142,7 @@ export async function joinChallenge(
   challengeId: string
 ): Promise<ChallengeParticipation | null> {
   try {
-    const query = supabase.from('challenge_participation' as any) as any;
+    const query = supabase.from('challenge_participation');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -172,7 +171,7 @@ export async function updateChallengeProgress(
   progressValue: number
 ): Promise<ChallengeParticipation | null> {
   try {
-    const query = supabase.from('challenge_participation' as any) as any;
+    const query = supabase.from('challenge_participation');
     const { data, error } = await query
       .update({
         progress_value: progressValue,
@@ -200,7 +199,7 @@ export async function getActiveEvents(
   limit: number = 10
 ): Promise<LimitedTimeEvent[] | null> {
   try {
-    const query = supabase.from('limited_time_events' as any) as any;
+    const query = supabase.from('limited_time_events');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -226,7 +225,7 @@ export async function createEvent(
   event: Omit<LimitedTimeEvent, 'id' | 'tenant_id' | 'participant_count' | 'completion_count' | 'created_by_user_id' | 'created_at' | 'updated_at'>
 ): Promise<LimitedTimeEvent | null> {
   try {
-    const query = supabase.from('limited_time_events' as any) as any;
+    const query = supabase.from('limited_time_events');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -256,7 +255,7 @@ export async function getEventRewards(
   onlyClaimed: boolean = false
 ): Promise<EventReward[] | null> {
   try {
-    const query = supabase.from('event_rewards' as any) as any;
+    const query = supabase.from('event_rewards');
     let q = query
       .select('*')
       .eq('user_id', userId)
@@ -280,7 +279,7 @@ export async function getEventRewards(
 
 export async function claimEventReward(rewardId: string): Promise<EventReward | null> {
   try {
-    const query = supabase.from('event_rewards' as any) as any;
+    const query = supabase.from('event_rewards');
     const { data, error } = await query
       .update({
         claimed: true,
@@ -308,7 +307,7 @@ export async function getSeasonalAchievements(
   seasonNumber: number
 ): Promise<SeasonalAchievement[] | null> {
   try {
-    const query = supabase.from('seasonal_achievements' as any) as any;
+    const query = supabase.from('seasonal_achievements');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -332,7 +331,7 @@ export async function createSeasonalAchievement(
   achievement: Omit<SeasonalAchievement, 'id' | 'tenant_id' | 'created_at' | 'updated_at'>
 ): Promise<SeasonalAchievement | null> {
   try {
-    const query = supabase.from('seasonal_achievements' as any) as any;
+    const query = supabase.from('seasonal_achievements');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -360,7 +359,7 @@ export async function getAchievementLeaderboard(
   limit: number = 50
 ): Promise<any[] | null> {
   try {
-    const query = supabase.from('achievement_leaderboards' as any) as any;
+    const query = supabase.from('achievement_leaderboards');
     let q = query
       .select('*, users(id, full_name)')
       .eq('tenant_id', tenantId);
@@ -394,7 +393,7 @@ export async function updateAchievementStats(
   }
 ): Promise<boolean> {
   try {
-    const query = supabase.from('achievement_leaderboards' as any) as any;
+    const query = supabase.from('achievement_leaderboards');
     const { error } = await query
       .update({
         ...stats,

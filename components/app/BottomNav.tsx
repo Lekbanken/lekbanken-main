@@ -1,17 +1,23 @@
-﻿"use client";
+"use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/supabase/auth";
 import { appNavItems } from "./nav-items";
 
 export function BottomNav() {
   const pathname = usePathname();
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, effectiveGlobalRole } = useAuth();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const displayName = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || "Profil";
   const avatarUrl = userProfile?.avatar_url;
+  const isAdmin = effectiveGlobalRole === "system_admin";
 
   return (
     <nav
@@ -32,34 +38,104 @@ export function BottomNav() {
           ) : (
             tab.icon
           );
+
+          const buttonClasses =
+            "group flex flex-col items-center justify-center gap-0.5 py-2 active:scale-95 transition-transform duration-100";
+          const iconClasses = `flex items-center justify-center rounded-2xl transition-all duration-200 ${
+            isPlayTab ? "h-12 w-12" : "h-11 w-11"
+          } ${
+            active
+              ? "bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/25"
+              : "text-muted-foreground group-hover:bg-muted group-hover:text-foreground"
+          }`;
+          const labelClasses = `text-[11px] font-medium tracking-wide transition-colors ${
+            active ? "text-primary font-semibold" : "text-muted-foreground"
+          }`;
+
+          if (isProfileTab) {
+            return (
+              <button
+                key={tab.href}
+                type="button"
+                aria-label={tab.label}
+                aria-current={active ? "page" : undefined}
+                className={buttonClasses}
+                onClick={() => setProfileOpen(true)}
+              >
+                <span className={iconClasses}>{iconNode}</span>
+                <span className={labelClasses}>{tab.label}</span>
+              </button>
+            );
+          }
+
           return (
             <Link
               key={tab.href}
               href={tab.href}
               aria-label={tab.label}
               aria-current={active ? "page" : undefined}
-              className="group flex flex-col items-center justify-center gap-0.5 py-2 active:scale-95 transition-transform duration-100"
+              className={buttonClasses}
             >
-              <span
-                className={`flex items-center justify-center rounded-2xl transition-all duration-200 ${
-                  isPlayTab ? "h-12 w-12" : "h-11 w-11"
-                } ${
-                  active
-                    ? "bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/25"
-                    : "text-muted-foreground group-hover:bg-muted group-hover:text-foreground"
-                }`}
-              >
-                {iconNode}
-              </span>
-              <span className={`text-[11px] font-medium tracking-wide transition-colors ${
-                active ? "text-primary font-semibold" : "text-muted-foreground"
-              }`}>
-                {tab.label}
-              </span>
+              <span className={iconClasses}>{iconNode}</span>
+              <span className={labelClasses}>{tab.label}</span>
             </Link>
           );
         })}
       </div>
+
+      <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
+        <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-6 pt-4 sm:hidden">
+          <SheetHeader className="flex flex-row items-center justify-between">
+            <SheetTitle>Profil</SheetTitle>
+            <SheetClose asChild>
+              <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
+                <XMarkIcon className="h-5 w-5" />
+              </Button>
+            </SheetClose>
+          </SheetHeader>
+
+          <div className="mt-4 grid gap-3">
+            {isAdmin && (
+              <SheetClose asChild>
+                <Link
+                  href="/admin"
+                  className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-sm font-medium text-foreground"
+                >
+                  Admin
+                  <span className="text-xs text-muted-foreground">/admin</span>
+                </Link>
+              </SheetClose>
+            )}
+            <SheetClose asChild>
+              <Link
+                href="/app"
+                className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-sm font-medium text-foreground"
+              >
+                App
+                <span className="text-xs text-muted-foreground">/app</span>
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                href="/app/profile"
+                className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-sm font-medium text-foreground"
+              >
+                Profil
+                <span className="text-xs text-muted-foreground">/app/profile</span>
+              </Link>
+            </SheetClose>
+            <SheetClose asChild>
+              <Link
+                href="/"
+                className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-sm font-medium text-foreground"
+              >
+                Marketing
+                <span className="text-xs text-muted-foreground">/</span>
+              </Link>
+            </SheetClose>
+          </div>
+        </SheetContent>
+      </Sheet>
     </nav>
   );
 }

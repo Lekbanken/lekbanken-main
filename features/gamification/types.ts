@@ -9,6 +9,8 @@ export type Achievement = {
   progress?: number; // 0-100 when in progress
   points?: number;
   requirement?: string;
+  hintText?: string | null;
+  isEasterEgg?: boolean;
 };
 
 export type CoinTransaction = {
@@ -32,6 +34,7 @@ export type StreakSummary = {
 
 export type ProgressSnapshot = {
   level: number;
+  levelName?: string;
   currentXp: number;
   nextLevelXp: number;
   completedAchievements: number;

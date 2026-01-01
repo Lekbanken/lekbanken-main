@@ -9,7 +9,7 @@ import type {
   ProgressSnapshot,
   StreakSummary,
 } from "@/features/gamification/types";
-import type { Database } from "@/lib/supabase/types";
+import type { Database } from "@/types/supabase";
 
 type AchievementRow = {
   id: string;
@@ -18,6 +18,8 @@ type AchievementRow = {
   icon_url?: string | null;
   condition_type?: string | null;
   condition_value?: number | null;
+  is_easter_egg?: boolean | null;
+  hint_text?: string | null;
 };
 
 type UserAchievementRow = {
@@ -46,6 +48,16 @@ type UserProgressRow = {
   level: number | null;
   current_xp: number | null;
   next_level_xp: number | null;
+  tenant_id?: string | null;
+};
+
+type LevelDefinitionRow = {
+  level: number;
+  name: string | null;
+  next_level_xp: number;
+  next_reward: string | null;
+  reward_asset_key: string | null;
+  scope_tenant_id: string | null;
 };
 
 type GamificationDatabase = Database & {
@@ -73,7 +85,16 @@ function inferRequirement(conditionType?: string, conditionValue?: number | null
 }
 
 function mapAchievements(
-  achievements: Array<{ id: string; name: string; description?: string | null; icon_url?: string | null; condition_type?: string | null; condition_value?: number | null }>,
+  achievements: Array<{
+    id: string;
+    name: string;
+    description?: string | null;
+    icon_url?: string | null;
+    condition_type?: string | null;
+    condition_value?: number | null;
+    is_easter_egg?: boolean | null;
+    hint_text?: string | null;
+  }>,
   unlocked: Array<{ achievement_id: string }>
 ): Achievement[] {
   const unlockedSet = new Set(unlocked.map((a) => a.achievement_id));
@@ -88,6 +109,8 @@ function mapAchievements(
       icon: a.icon_url ?? undefined,
       points,
       requirement: inferRequirement(a.condition_type ?? undefined, a.condition_value ?? undefined),
+      hintText: a.hint_text ?? null,
+      isEasterEgg: Boolean(a.is_easter_egg ?? false),
     } satisfies Achievement;
   });
 }
@@ -127,6 +150,19 @@ function mapProgress(row: { level?: number | null; current_xp?: number | null; n
   };
 }
 
+function applyLevelDefinitions(progress: ProgressSnapshot, levelDefs: LevelDefinitionRow[] | null): ProgressSnapshot {
+  const defs = Array.isArray(levelDefs) ? levelDefs : [];
+  const current = defs.find((d) => d.level === progress.level) ?? null;
+
+  return {
+    ...progress,
+    levelName: current?.name ?? progress.levelName,
+    nextLevelXp: typeof current?.next_level_xp === 'number' ? current.next_level_xp : progress.nextLevelXp,
+    nextReward: current?.next_reward ?? progress.nextReward,
+    rewardAssetKey: current?.reward_asset_key ?? progress.rewardAssetKey,
+  };
+}
+
 export async function GET() {
   const supabase = (await createServerRlsClient()) as unknown as GamificationClient;
   const {
@@ -143,7 +179,7 @@ export async function GET() {
   const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, progressRes] = await Promise.all([
     supabase
       .from("achievements")
-      .select("id,name,description,icon_url,condition_type,condition_value")
+      .select("id,name,description,icon_url,condition_type,condition_value,is_easter_egg,hint_text")
       .order("created_at", { ascending: true }),
     supabase.from("user_achievements").select("achievement_id").eq("user_id", userId),
     supabase
@@ -167,7 +203,7 @@ export async function GET() {
       .maybeSingle(),
     supabase
       .from("user_progress")
-      .select("level,current_xp,next_level_xp")
+      .select("level,current_xp,next_level_xp,tenant_id")
       .eq("user_id", userId)
       .limit(1)
       .maybeSingle(),
@@ -176,7 +212,18 @@ export async function GET() {
   const achievements = mapAchievements(achievementsRes.data ?? [], userAchievementsRes.data ?? []);
   const coins = mapCoins(coinsRes.data ?? null, txRes.data ?? null);
   const streak = mapStreak(streakRes.data ?? null);
-  const progress = mapProgress(progressRes.data ?? null, achievements);
+  const baseProgress = mapProgress(progressRes.data ?? null, achievements);
+
+  const tenantId = (progressRes.data as { tenant_id?: string | null } | null)?.tenant_id ?? null;
+  let levelDefs: LevelDefinitionRow[] | null = null;
+  try {
+    const res = await supabase.rpc('get_gamification_level_definitions_v1', { p_tenant_id: tenantId ?? undefined })
+    levelDefs = (res.data as LevelDefinitionRow[] | null) ?? null
+  } catch {
+    levelDefs = null
+  }
+
+  const progress = applyLevelDefinitions(baseProgress, levelDefs);
 
   const payload: GamificationPayload = {
     achievements,

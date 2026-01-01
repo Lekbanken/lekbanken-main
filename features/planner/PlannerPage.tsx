@@ -18,6 +18,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/ui/error-state";
+import { PageTitleHeader } from "@/components/app/PageTitleHeader";
+import { appNavItems } from "@/components/app/nav-items";
 import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
@@ -540,10 +542,16 @@ export function PlannerPage() {
     isPending(`update-plan-desc-${activePlan?.id}`);
   const showTenantNotes = activePlan?.visibility !== "private";
   const canEditTenantNotes = Boolean(showTenantNotes && currentTenant);
+  const plannerIcon = appNavItems.find((item) => item.href === "/app/planner")?.icon;
 
   return (
     <TooltipProvider>
       <div className="space-y-6">
+        <PageTitleHeader
+          icon={plannerIcon ?? <span className="text-sm font-semibold">P</span>}
+          title="PLANERA"
+          subtitle="Planläggaren"
+        />
         <div className="flex flex-col gap-3 lg:hidden">
           <Sheet open={showPlanList} onOpenChange={setShowPlanList}>
             <SheetTrigger asChild>

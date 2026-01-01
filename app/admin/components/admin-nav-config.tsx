@@ -235,6 +235,7 @@ export const adminNavConfig: AdminNavConfig = [
     items: [
       { id: 'leaderboard', href: '/admin/leaderboard', label: 'Leaderboard', icon: navIcons.leaderboard },
       { id: 'achievements', href: '/admin/achievements', label: 'Achievements', icon: navIcons.achievements, permission: 'admin.achievements.list' },
+      { id: 'gamification-levels', href: '/admin/gamification/levels', label: 'Levels', icon: navIcons.settings },
       { id: 'personalization', href: '/admin/personalization', label: 'Personalisering', icon: navIcons.personalization },
       { id: 'marketplace', href: '/admin/marketplace', label: 'Butik', icon: navIcons.marketplace },
     ],

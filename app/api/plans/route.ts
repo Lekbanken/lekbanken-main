@@ -3,6 +3,7 @@ import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
 import type { Json } from '@/types/supabase'
 import type { UserProfile } from '@/types/auth'
 
@@ -65,6 +66,22 @@ export async function POST(request: Request) {
   if (error) {
     console.error('[api/plans] create error', error)
     return NextResponse.json({ error: 'Failed to create plan' }, { status: 500 })
+  }
+
+  try {
+    await logGamificationEventV1({
+      tenantId,
+      actorUserId: user.id,
+      eventType: 'plan_created',
+      source: 'planner',
+      idempotencyKey: `plan:${data.id}:created`,
+      metadata: {
+        planId: data.id,
+        visibility,
+      },
+    })
+  } catch (e) {
+    console.warn('[api/plans] gamification event log failed', e)
   }
 
   const { plan } = await fetchPlanWithRelations(data.id)

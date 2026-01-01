@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { listHostSessions, type PlaySession } from '@/features/play-participant/api';
 import { SessionCard, SessionCardSkeleton } from '@/components/play';
+import { PageTitleHeader } from '@/components/app/PageTitleHeader';
+import { appNavItems } from '@/components/app/nav-items';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { 
@@ -47,24 +49,29 @@ export function HostSessionsClient() {
     : sessions.filter((s) => s.status === filter);
 
   const activeSessions = sessions.filter((s) => s.status === 'active' || s.status === 'paused');
+  const playNavIcon = appNavItems.find((item) => item.href === '/app/play')?.icon;
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Mina sessioner</h1>
-          <p className="text-muted-foreground">
-            {activeSessions.length > 0 
-              ? `${activeSessions.length} aktiv${activeSessions.length > 1 ? 'a' : ''} session${activeSessions.length > 1 ? 'er' : ''}`
-              : 'Inga aktiva sessioner'
-            }
-          </p>
-        </div>
-        <Button variant="primary" href="/app/browse">
-          <PlusIcon className="h-4 w-4" />
-          Ny session
-        </Button>
+      <PageTitleHeader
+        icon={playNavIcon ?? <PlayIcon className="h-5 w-5" />}
+        title="SPELA"
+        subtitle="Lekledarcentralen"
+        rightSlot={
+          <Button variant="primary" href="/app/browse">
+            <PlusIcon className="h-4 w-4" />
+            Ny session
+          </Button>
+        }
+      />
+
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold text-foreground">Mina sessioner</h2>
+        <p className="text-sm text-muted-foreground">
+          {activeSessions.length > 0
+            ? `${activeSessions.length} aktiv${activeSessions.length > 1 ? 'a' : ''} session${activeSessions.length > 1 ? 'er' : ''}`
+            : 'Inga aktiva sessioner'}
+        </p>
       </div>
 
       {/* Error */}

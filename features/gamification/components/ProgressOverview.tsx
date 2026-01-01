@@ -2,20 +2,13 @@
 
 import type { ProgressSnapshot } from '../types'
 
-const levelNames: Record<number, string> = {
-  1: 'Nybörjare',
-  2: 'Upptäckare',
-  3: 'Utforskare',
-  4: 'Vägvisare',
-  5: 'Mästare',
-}
-
 interface ProgressOverviewProps {
   progress: ProgressSnapshot
 }
 
 export function ProgressOverview({ progress }: ProgressOverviewProps) {
-  const xpPercent = Math.round((progress.currentXp / progress.nextLevelXp) * 100)
+  const denom = typeof progress.nextLevelXp === 'number' && progress.nextLevelXp > 0 ? progress.nextLevelXp : 1
+  const xpPercent = Math.max(0, Math.min(100, Math.round((progress.currentXp / denom) * 100)))
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
@@ -28,7 +21,7 @@ export function ProgressOverview({ progress }: ProgressOverviewProps) {
         </div>
         <div>
           <p className="font-medium text-zinc-900 dark:text-white">
-            Nivå {progress.level} - {levelNames[progress.level] || `Nivå ${progress.level}`}
+            Nivå {progress.level} - {progress.levelName || `Nivå ${progress.level}`}
           </p>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">
             {progress.currentXp.toLocaleString('sv-SE')} / {progress.nextLevelXp.toLocaleString('sv-SE')} XP

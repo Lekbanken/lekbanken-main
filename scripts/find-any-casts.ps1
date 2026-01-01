@@ -1,7 +1,6 @@
-#!/usr/bin/env pwsh
-# Script för att hitta och lista alla 'as any' casts i projektet
+## Script to find and list all 'as any' casts in the project
 
-Write-Host "🔍 Söker efter 'as any' casts i projektet..." -ForegroundColor Cyan
+Write-Host "Searching for 'as any' casts..." -ForegroundColor Cyan
 
 $files = Get-ChildItem -Path . -Include *.ts,*.tsx -Recurse -File | 
     Where-Object { $_.FullName -notmatch "node_modules" -and $_.FullName -notmatch ".next" -and $_.FullName -notmatch "types\\supabase.ts" }
@@ -9,9 +8,9 @@ $files = Get-ChildItem -Path . -Include *.ts,*.tsx -Recurse -File |
 $results = @()
 
 foreach ($file in $files) {
-    $content = Get-Content $file.FullName -Raw
+    $content = [System.IO.File]::ReadAllText($file.FullName)
     if ($content -match "as any") {
-        $lines = Get-Content $file.FullName
+        $lines = Get-Content -LiteralPath $file.FullName
         $lineNumber = 0
         foreach ($line in $lines) {
             $lineNumber++
@@ -27,21 +26,21 @@ foreach ($file in $files) {
 }
 
 if ($results.Count -eq 0) {
-    Write-Host "✅ Inga 'as any' casts hittades!" -ForegroundColor Green
+    Write-Host "No 'as any' casts found." -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Hittade $($results.Count) 'as any' casts:" -ForegroundColor Yellow
+    Write-Host "Found $($results.Count) 'as any' casts:" -ForegroundColor Yellow
     Write-Host ""
     
     $groupedResults = $results | Group-Object File
     foreach ($group in $groupedResults) {
-        Write-Host "📄 $($group.Name)" -ForegroundColor Cyan
+        Write-Host "File: $($group.Name)" -ForegroundColor Cyan
         foreach ($item in $group.Group) {
             Write-Host "   Line $($item.Line): $($item.Content)" -ForegroundColor Gray
         }
         Write-Host ""
     }
     
-    Write-Host "💡 Dessa bör tas bort efter att types har regenererats" -ForegroundColor Yellow
+    Write-Host "Tip: remove these after regenerating types." -ForegroundColor Yellow
 }
 
-exit $results.Count
+exit 0

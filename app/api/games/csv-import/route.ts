@@ -17,9 +17,7 @@ import { parseGamesFromJsonPayload } from '@/features/admin/games/utils/json-gam
 import { validateGames } from '@/features/admin/games/utils/game-validator';
 import { actionOrderAliasesToIds, conditionOrderAliasesToIds } from '@/lib/games/trigger-order-alias';
 import type { ParsedGame, DryRunResult, DryRunGamePreview, ImportError } from '@/types/csv-import';
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabase = any;
+import type { Json } from '@/types/supabase';
 
 type ImportPayload = {
   data: string;
@@ -131,7 +129,7 @@ export async function POST(request: Request) {
 
     // Proceed with actual import (only valid games)
     const supabase = await createServiceRoleClient();
-    const db = supabase as AnySupabase;
+    const db = supabase;
 
     let createdCount = 0;
     let updatedCount = 0;
@@ -252,7 +250,7 @@ export async function POST(request: Request) {
  * Import related data for a game (steps, materials, phases, roles, boardConfig)
  */
 async function importRelatedData(
-  db: AnySupabase,
+  db: Awaited<ReturnType<typeof createServiceRoleClient>>,
   gameId: string,
   game: ParsedGame,
   isUpdate: boolean
@@ -389,7 +387,7 @@ async function importRelatedData(
           artifact_type: artifact.artifact_type,
           artifact_order: artifact.artifact_order,
           tags: artifact.tags,
-          metadata: artifact.metadata ?? {},
+          metadata: (artifact.metadata ?? {}) as Json,
         })
         .select('id')
         .single();
@@ -418,7 +416,7 @@ async function importRelatedData(
             body: v.body,
             media_ref: v.media_ref ?? null,
             variant_order: v.variant_order,
-            metadata: v.metadata ?? {},
+            metadata: (v.metadata ?? {}) as Json,
           };
         });
 
@@ -485,8 +483,8 @@ async function importRelatedData(
         name: trigger.name,
         description: trigger.description ?? null,
         enabled: trigger.enabled ?? true,
-        condition: resolvedCondition,
-        actions: resolvedActions,
+        condition: resolvedCondition as Json,
+        actions: resolvedActions as Json,
         execute_once: trigger.execute_once ?? false,
         delay_seconds: trigger.delay_seconds ?? 0,
         sort_order: trigger.sort_order ?? index,

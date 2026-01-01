@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server';
 
 type SessionStatus = 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
 
@@ -69,7 +70,7 @@ export async function PATCH(
 
   const { data: session, error } = await supabase
     .from('participant_sessions')
-    .select('id, host_user_id, status')
+    .select('id, host_user_id, status, tenant_id, game_id, plan_id')
     .eq('id', id)
     .single();
 
@@ -97,6 +98,25 @@ export async function PATCH(
 
   if (updateError) {
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
+  }
+
+  if (nextStatus === 'ended') {
+    try {
+      await logGamificationEventV1({
+        tenantId: (session.tenant_id as string | null) ?? null,
+        actorUserId: user.id,
+        eventType: 'session_completed',
+        source: 'play',
+        idempotencyKey: `participant_session:${id}:ended`,
+        metadata: {
+          participantSessionId: id,
+          gameId: (session.game_id as string | null) ?? null,
+          planId: (session.plan_id as string | null) ?? null,
+        },
+      })
+    } catch (e) {
+      console.warn('[play/sessions/[id]] gamification event log failed', e)
+    }
   }
 
   // Broadcast status change for immediate participant UI updates.

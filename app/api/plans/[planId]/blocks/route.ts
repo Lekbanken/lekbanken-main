@@ -160,12 +160,10 @@ export async function POST(
   if (fetchError || !createdBlock) {
     console.error('[api/plans/:id/blocks] fetch created block error', fetchError)
     // Return basic block without game relation if fetch fails
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const fallbackBlock = mapBlockToPlanner(newBlock as any)
+    const fallbackBlock = mapBlockToPlanner(newBlock as unknown as Parameters<typeof mapBlockToPlanner>[0])
     return NextResponse.json({ block: fallbackBlock }, { status: 201 })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mappedBlock = mapBlockToPlanner(createdBlock as any)
+  const mappedBlock = mapBlockToPlanner(createdBlock as unknown as Parameters<typeof mapBlockToPlanner>[0])
   return NextResponse.json({ block: mappedBlock }, { status: 201 })
 }

@@ -67,15 +67,13 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
           )}
         </div>
 
-        {summary.recentTransactions.length > 3 && (
-          <Link
-            href="/app/profile/coins"
-            className="flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
-          >
-            Se transaktionshistorik
-            <ChevronRightIcon className="h-4 w-4" />
-          </Link>
-        )}
+        <Link
+          href="/app/profile/coins"
+          className="flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
+        >
+          Se transaktionshistorik
+          <ChevronRightIcon className="h-4 w-4" />
+        </Link>
       </div>
     </section>
   );

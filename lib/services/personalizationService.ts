@@ -84,8 +84,7 @@ export interface InterestProfile {
 // User Preferences Functions
 export async function getUserPreferences(tenantId: string, userId: string): Promise<UserPreference | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -110,8 +109,7 @@ export async function updateUserPreferences(
   updates: Partial<UserPreference>
 ): Promise<UserPreference | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences');
     const { data, error } = await query
       .update(updates)
       .eq('tenant_id', tenantId)
@@ -137,8 +135,7 @@ export async function createUserPreferences(
   preferences: Omit<UserPreference, 'id' | 'created_at' | 'updated_at' | 'tenant_id' | 'user_id'>
 ): Promise<UserPreference | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('user_preferences' as any) as any;
+    const query = supabase.from('user_preferences');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -167,8 +164,8 @@ export async function getSavedItems(
   itemType?: string
 ): Promise<SavedItem[] | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('saved_items' as any) as any)
+    let query = supabase
+      .from('saved_items')
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -199,11 +196,12 @@ export async function saveItem(
   itemTitle?: string
 ): Promise<SavedItem | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('saved_items' as any) as any;
+    const query = supabase.from('saved_items');
     const { data, error } = await query
       .upsert(
         {
+          tenant_id: tenantId,
+          user_id: userId,
           item_type: itemType,
           item_id: itemId,
           item_title: itemTitle,
@@ -234,8 +232,7 @@ export async function removeSavedItem(
   itemId: string
 ): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('saved_items' as any) as any;
+    const query = supabase.from('saved_items');
     const { error } = await query
       .delete()
       .eq('tenant_id', tenantId)
@@ -265,8 +262,7 @@ export async function trackPersonalizationEvent(
   itemTitle?: string
 ): Promise<PersonalizationEvent | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('personalization_events' as any) as any;
+    const query = supabase.from('personalization_events');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -298,8 +294,8 @@ export async function getPersonalizationEvents(
   limit: number = 100
 ): Promise<PersonalizationEvent[] | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let query = (supabase.from('personalization_events' as any) as any)
+    let query = supabase
+      .from('personalization_events')
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -331,8 +327,7 @@ export async function getRecommendations(
   limit: number = 20
 ): Promise<RecommendationItem[] | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('recommendation_history' as any) as any;
+    const query = supabase.from('recommendation_history');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -358,8 +353,7 @@ export async function trackRecommendationClick(
   recommendationId: string
 ): Promise<RecommendationItem | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('recommendation_history' as any) as any;
+    const query = supabase.from('recommendation_history');
     const { data, error } = await query
       .update({
         was_clicked: true,
@@ -390,8 +384,7 @@ export async function getInterestProfiles(
   limit: number = 50
 ): Promise<InterestProfile[] | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('interest_profiles' as any) as any;
+    const query = supabase.from('interest_profiles');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -419,11 +412,12 @@ export async function updateInterestProfile(
   activity: number = 0
 ): Promise<InterestProfile | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('interest_profiles' as any) as any;
+    const query = supabase.from('interest_profiles');
     const { data, error } = await query
       .upsert(
         {
+          tenant_id: tenantId,
+          user_id: userId,
           interest_category: category,
           interest_weight: weight,
           interest_activity: activity,
@@ -455,8 +449,7 @@ export async function getContentPreferences(
   limit: number = 50
 ): Promise<Record<string, unknown>[] | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('content_preferences' as any) as any;
+    const query = supabase.from('content_preferences');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -484,10 +477,11 @@ export async function updateContentPreference(
   frequencyPreference?: string
 ): Promise<Record<string, unknown> | null> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const query = supabase.from('content_preferences' as any) as any;
+    const query = supabase.from('content_preferences');
     const { data, error } = await query
       .upsert({
+        tenant_id: tenantId,
+        user_id: userId,
         content_category: category,
         preference_level: preferenceLevel,
         frequency_preference: frequencyPreference,
@@ -517,8 +511,8 @@ export async function getPersonalizationStats(
 ): Promise<Record<string, unknown> | null> {
   try {
     // Get event counts
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const eventsQuery = (supabase.from('personalization_events' as any) as any)
+    const eventsQuery = supabase
+      .from('personalization_events')
       .select('event_type', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -526,8 +520,8 @@ export async function getPersonalizationStats(
     const { count: eventCount } = await eventsQuery;
 
     // Get saved items count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const savedQuery = (supabase.from('saved_items' as any) as any)
+    const savedQuery = supabase
+      .from('saved_items')
       .select('id', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -535,8 +529,8 @@ export async function getPersonalizationStats(
     const { count: savedCount } = await savedQuery;
 
     // Get interests count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const interestsQuery = (supabase.from('interest_profiles' as any) as any)
+    const interestsQuery = supabase
+      .from('interest_profiles')
       .select('id', { count: 'exact' })
       .eq('tenant_id', tenantId)
       .eq('user_id', userId);
@@ -559,67 +553,68 @@ export async function getTenantPersonalizationStats(
 ): Promise<Record<string, unknown> | null> {
   try {
     // Get total users with preferences
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const usersQuery = (supabase.from('user_preferences' as any) as any)
+    const usersQuery = supabase
+      .from('user_preferences')
       .select('user_id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
     const { count: totalUsers } = await usersQuery;
 
     // Get language distribution
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const langQuery = (supabase.from('user_preferences' as any) as any)
-      .select('preferred_language')
+    const langQuery = supabase
+      .from('user_preferences')
+      .select('language')
       .eq('tenant_id', tenantId);
 
     const { data: langData } = await langQuery;
     const languageDistribution = (langData as Array<Record<string, unknown>>)
       ?.reduce((acc: Record<string, number>, row) => {
-        const lang = (row.preferred_language as string) || 'unknown';
+        const lang = (row.language as string) || 'unknown';
         acc[lang] = (acc[lang] || 0) + 1;
         return acc;
       }, {} as Record<string, number>) || {};
 
     // Get theme distribution
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const themeQuery = (supabase.from('user_preferences' as any) as any)
-      .select('preferred_theme')
+    const themeQuery = supabase
+      .from('user_preferences')
+      .select('theme')
       .eq('tenant_id', tenantId);
 
     const { data: themeData } = await themeQuery;
     const themeDistribution = (themeData as Array<Record<string, unknown>>)
       ?.reduce((acc: Record<string, number>, row) => {
-        const theme = (row.preferred_theme as string) || 'unknown';
+        const theme = (row.theme as string) || 'unknown';
         acc[theme] = (acc[theme] || 0) + 1;
         return acc;
       }, {} as Record<string, number>) || {};
 
     // Get interest profiles count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const profilesQuery = (supabase.from('interest_profiles' as any) as any)
+    const profilesQuery = supabase
+      .from('interest_profiles')
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
     const { count: totalProfiles } = await profilesQuery;
 
     // Get content preferences count
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const contentQuery = (supabase.from('content_preferences' as any) as any)
+    const contentQuery = supabase
+      .from('content_preferences')
       .select('id', { count: 'exact', head: true })
       .eq('tenant_id', tenantId);
 
     const { count: totalContentPrefs } = await contentQuery;
 
     // Get recommendation stats
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const recQuery = (supabase.from('recommendation_history' as any) as any)
-      .select('id, clicked, completed')
+    const recQuery = supabase
+      .from('recommendation_history')
+      .select('id, was_clicked, was_completed')
       .eq('tenant_id', tenantId);
 
-    const { data: recData, count: totalRecs } = await recQuery;
+    const { data: recData } = await recQuery;
     const recommendations = (recData as Array<Record<string, unknown>>) || [];
-    const clicks = recommendations.filter((r) => r.clicked).length;
-    const completions = recommendations.filter((r) => r.completed).length;
+    const totalRecs = recommendations.length;
+    const clicks = recommendations.filter((r) => Boolean(r.was_clicked)).length;
+    const completions = recommendations.filter((r) => Boolean(r.was_completed)).length;
     const ctr = totalRecs ? clicks / totalRecs : 0;
     const completionRate = totalRecs ? completions / totalRecs : 0;
 

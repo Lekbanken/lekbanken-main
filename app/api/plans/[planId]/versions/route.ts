@@ -43,8 +43,7 @@ export async function GET(
   }
 
   // Verify plan exists and user has access (RLS handles this)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: plan, error: planError } = await (supabase as any)
+  const { data: plan, error: planError } = await supabase
     .from('plans')
     .select('id, name, current_version_id')
     .eq('id', planId)
@@ -58,8 +57,7 @@ export async function GET(
   }
 
   // Fetch all versions
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: versions, error: versionsError } = await (supabase as any)
+  const { data: versions, error: versionsError } = await supabase
     .from('plan_versions')
     .select(`
       id,

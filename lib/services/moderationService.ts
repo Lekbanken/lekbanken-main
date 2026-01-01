@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase/client';
 
 // Types
@@ -81,7 +80,7 @@ export async function getContentReports(
   filter?: { status?: string; priority?: string; limit?: number }
 ): Promise<ContentReport[] | null> {
   try {
-    const query = supabase.from('content_reports' as any) as any;
+    const query = supabase.from('content_reports');
     let q = query.select('*').eq('tenant_id', tenantId);
 
     if (filter?.status) q = q.eq('status', filter.status);
@@ -109,7 +108,7 @@ export async function createContentReport(
   report: Omit<ContentReport, 'id' | 'tenant_id' | 'reported_by_user_id' | 'status' | 'assigned_to_user_id' | 'resolution_reason' | 'resolved_at' | 'created_at' | 'updated_at'>
 ): Promise<ContentReport | null> {
   try {
-    const query = supabase.from('content_reports' as any) as any;
+    const query = supabase.from('content_reports');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -137,7 +136,7 @@ export async function updateContentReport(
   updates: Partial<ContentReport>
 ): Promise<ContentReport | null> {
   try {
-    const query = supabase.from('content_reports' as any) as any;
+    const query = supabase.from('content_reports');
     const { data, error } = await query
       .update(updates)
       .eq('id', reportId)
@@ -162,7 +161,7 @@ export async function getContentFilterRules(
   onlyActive: boolean = true
 ): Promise<ContentFilterRule[] | null> {
   try {
-    const query = supabase.from('content_filter_rules' as any) as any;
+    const query = supabase.from('content_filter_rules');
     let q = query.select('*').eq('tenant_id', tenantId);
 
     if (onlyActive) q = q.eq('is_active', true);
@@ -187,7 +186,7 @@ export async function createFilterRule(
   rule: Omit<ContentFilterRule, 'id' | 'tenant_id' | 'created_by_user_id' | 'created_at' | 'updated_at'>
 ): Promise<ContentFilterRule | null> {
   try {
-    const query = supabase.from('content_filter_rules' as any) as any;
+    const query = supabase.from('content_filter_rules');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -216,7 +215,7 @@ export async function createModerationAction(
   action: Omit<ModerationAction, 'id' | 'tenant_id' | 'taken_by_user_id' | 'created_at' | 'updated_at'>
 ): Promise<ModerationAction | null> {
   try {
-    const query = supabase.from('moderation_actions' as any) as any;
+    const query = supabase.from('moderation_actions');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -243,7 +242,7 @@ export async function getModerationActions(
   limit: number = 50
 ): Promise<ModerationAction[] | null> {
   try {
-    const query = supabase.from('moderation_actions' as any) as any;
+    const query = supabase.from('moderation_actions');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -265,7 +264,7 @@ export async function getModerationActions(
 // User Restrictions
 export async function getUserRestrictions(userId: string, tenantId: string): Promise<UserRestriction[] | null> {
   try {
-    const query = supabase.from('user_restrictions' as any) as any;
+    const query = supabase.from('user_restrictions');
     const { data, error } = await query
       .select('*')
       .eq('user_id', userId)
@@ -291,7 +290,7 @@ export async function addUserRestriction(
   restriction: Omit<UserRestriction, 'id' | 'tenant_id' | 'user_id' | 'active' | 'appeal_count' | 'created_by_user_id' | 'created_at' | 'updated_at'>
 ): Promise<UserRestriction | null> {
   try {
-    const query = supabase.from('user_restrictions' as any) as any;
+    const query = supabase.from('user_restrictions');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -318,7 +317,7 @@ export async function addUserRestriction(
 
 export async function removeUserRestriction(restrictionId: string): Promise<boolean> {
   try {
-    const query = supabase.from('user_restrictions' as any) as any;
+    const query = supabase.from('user_restrictions');
     const { error } = await query.update({ active: false }).eq('id', restrictionId);
 
     if (error) {
@@ -339,7 +338,7 @@ export async function getModerationQueue(
   status: string = 'pending'
 ): Promise<any | null> {
   try {
-    const query = supabase.from('moderation_queue' as any) as any;
+    const query = supabase.from('moderation_queue');
     const { data, error } = await query
       .select('*, content_reports(*)')
       .eq('tenant_id', tenantId)
@@ -361,7 +360,7 @@ export async function getModerationQueue(
 
 export async function assignQueueItem(queueId: string, moderatorId: string): Promise<boolean> {
   try {
-    const query = supabase.from('moderation_queue' as any) as any;
+    const query = supabase.from('moderation_queue');
     const { error } = await query
       .update({
         assigned_to_user_id: moderatorId,
@@ -384,7 +383,7 @@ export async function assignQueueItem(queueId: string, moderatorId: string): Pro
 
 export async function completeQueueItem(queueId: string): Promise<boolean> {
   try {
-    const query = supabase.from('moderation_queue' as any) as any;
+    const query = supabase.from('moderation_queue');
     const { error } = await query
       .update({
         status: 'completed',
@@ -410,7 +409,7 @@ export async function getModerationStats(tenantId: string, days: number = 30): P
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - days);
 
-    const query = supabase.from('moderation_analytics' as any) as any;
+    const query = supabase.from('moderation_analytics');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)

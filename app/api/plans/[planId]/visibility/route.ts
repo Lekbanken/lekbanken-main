@@ -3,6 +3,7 @@ import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server
 import { deriveEffectiveGlobalRole } from '@/lib/auth/role'
 import { validatePlanPayload } from '@/lib/validation/plans'
 import { fetchPlanWithRelations } from '@/lib/services/planner.server'
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
 import type { UserProfile } from '@/types/auth'
 
 function normalizeId(value: string | string[] | undefined) {
@@ -72,6 +73,26 @@ export async function POST(
   if (error) {
     console.error('[api/plans/:id/visibility] update error', error)
     return NextResponse.json({ error: 'Failed to update visibility' }, { status: 500 })
+  }
+
+  const eventTenantId = targetVisibility === 'tenant' ? targetTenant : plan.ownerTenantId ?? null
+  try {
+    await logGamificationEventV1({
+      tenantId: eventTenantId,
+      actorUserId: user.id,
+      eventType: 'plan_visibility_changed',
+      source: 'planner',
+      idempotencyKey: `plan:${planId}:visibility:${targetVisibility}:${eventTenantId ?? 'null'}`,
+      metadata: {
+        planId,
+        fromVisibility: plan.visibility,
+        toVisibility: targetVisibility,
+        fromTenantId: plan.ownerTenantId ?? null,
+        toTenantId: eventTenantId,
+      },
+    })
+  } catch (e) {
+    console.warn('[api/plans/:id/visibility] gamification event log failed', e)
   }
 
   const refreshed = await fetchPlanWithRelations(planId)

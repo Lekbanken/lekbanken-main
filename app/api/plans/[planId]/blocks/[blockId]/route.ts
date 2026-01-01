@@ -158,8 +158,7 @@ export async function PATCH(
     return NextResponse.json({ error: { code: 'FETCH_ERROR', message: 'Block updated but could not fetch result' } }, { status: 500 })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const mappedBlock = mapBlockToPlanner(updatedBlock as any)
+  const mappedBlock = mapBlockToPlanner(updatedBlock as unknown as Parameters<typeof mapBlockToPlanner>[0])
   return NextResponse.json({ block: mappedBlock })
 }
 

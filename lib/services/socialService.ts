@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase/client';
 
 // Types
@@ -52,7 +51,8 @@ export async function sendFriendRequest(
   recipientId: string
 ): Promise<FriendRequest | null> {
   try {
-    const { data, error } = await (supabase.from('friend_requests' as any) as any)
+    const { data, error } = await supabase
+      .from('friend_requests')
       .insert({
         requester_id: requesterId,
         recipient_id: recipientId,
@@ -75,7 +75,8 @@ export async function sendFriendRequest(
 
 export async function acceptFriendRequest(requestId: string): Promise<FriendRequest | null> {
   try {
-    const { data: request, error: getError } = await (supabase.from('friend_requests' as any) as any)
+    const { data: request, error: getError } = await supabase
+      .from('friend_requests')
       .select('*')
       .eq('id', requestId)
       .single();
@@ -85,7 +86,8 @@ export async function acceptFriendRequest(requestId: string): Promise<FriendRequ
       return null;
     }
 
-    const { error: insertError } = await (supabase.from('friends' as any) as any)
+    const { error: insertError } = await supabase
+      .from('friends')
       .insert({
         user_id_1: [request.requester_id, request.recipient_id].sort()[0],
         user_id_2: [request.requester_id, request.recipient_id].sort()[1],
@@ -96,7 +98,8 @@ export async function acceptFriendRequest(requestId: string): Promise<FriendRequ
       return null;
     }
 
-    const { data, error } = await (supabase.from('friend_requests' as any) as any)
+    const { data, error } = await supabase
+      .from('friend_requests')
       .update({
         status: 'accepted',
         responded_at: new Date().toISOString(),
@@ -119,7 +122,8 @@ export async function acceptFriendRequest(requestId: string): Promise<FriendRequ
 
 export async function rejectFriendRequest(requestId: string): Promise<boolean> {
   try {
-    const { error } = await (supabase.from('friend_requests' as any) as any)
+    const { error } = await supabase
+      .from('friend_requests')
       .update({
         status: 'rejected',
         responded_at: new Date().toISOString(),
@@ -142,7 +146,8 @@ export async function removeFriend(userId1: string, userId2: string): Promise<bo
   try {
     const sortedIds = [userId1, userId2].sort();
 
-    const { error } = await (supabase.from('friends' as any) as any)
+    const { error } = await supabase
+      .from('friends')
       .delete()
       .eq('user_id_1', sortedIds[0])
       .eq('user_id_2', sortedIds[1]);
@@ -161,7 +166,8 @@ export async function removeFriend(userId1: string, userId2: string): Promise<bo
 
 export async function getFriends(userId: string): Promise<Friend[] | null> {
   try {
-    const { data, error } = await (supabase.from('friends' as any) as any)
+    const { data, error } = await supabase
+      .from('friends')
       .select('*')
       .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`);
 
@@ -182,7 +188,7 @@ export async function getFriendRequests(
   filter: 'received' | 'sent' | 'all' = 'all'
 ): Promise<FriendRequest[] | null> {
   try {
-    let query = (supabase.from('friend_requests' as any) as any).select('*');
+    let query = supabase.from('friend_requests').select('*');
 
     if (filter === 'received') {
       query = query.eq('recipient_id', userId).eq('status', 'pending');
@@ -214,7 +220,8 @@ export async function getSocialLeaderboard(
   offset = 0
 ): Promise<SocialLeaderboardEntry[] | null> {
   try {
-    const { data, error } = await (supabase.from('social_leaderboards' as any) as any)
+    const { data, error } = await supabase
+      .from('social_leaderboards')
       .select('*')
       .eq('tenant_id', tenantId)
       .eq('game_id', gameId)
@@ -252,7 +259,8 @@ export async function getFriendsLeaderboard(
       return [];
     }
 
-    const { data, error } = await (supabase.from('social_leaderboards' as any) as any)
+    const { data, error } = await supabase
+      .from('social_leaderboards')
       .select('*')
       .eq('game_id', gameId)
       .in('user_id', friendIds)
@@ -285,9 +293,12 @@ export async function updateLeaderboardEntry(
   }
 ): Promise<SocialLeaderboardEntry | null> {
   try {
-    const { data, error } = await (supabase.from('social_leaderboards' as any) as any)
+    const { data, error } = await supabase
+      .from('social_leaderboards')
       .upsert(
         {
+          tenant_id: tenantId,
+          user_id: userId,
           game_id: gameId,
           score: params.score || 0,
           total_plays: params.totalPlays,
@@ -323,7 +334,8 @@ export async function createMultiplayerSession(
   maxPlayers = 2
 ): Promise<MultiplayerSession | null> {
   try {
-    const { data, error } = await (supabase.from('multiplayer_sessions' as any) as any)
+    const { data, error } = await supabase
+      .from('multiplayer_sessions')
       .insert({
         game_id: gameId,
         created_by_user_id: userId,
@@ -340,8 +352,8 @@ export async function createMultiplayerSession(
     }
 
     // Add creator as participant
-    await (supabase.from('multiplayer_participants' as any) as any).insert({
-      session_id: (data as any).id,
+    await supabase.from('multiplayer_participants').insert({
+      session_id: data.id,
       user_id: userId,
     });
 
@@ -358,25 +370,27 @@ export async function joinMultiplayerSession(
 ): Promise<boolean> {
   try {
     // Check if session is full
-    const { data: session, error: sessionError } = await (supabase
-      .from('multiplayer_sessions' as any) as any)
+    const { data: session, error: sessionError } = await supabase
+      .from('multiplayer_sessions')
       .select('current_players, max_players, status')
       .eq('id', sessionId)
       .single();
 
-    if (sessionError || !session || (session as any).status !== 'waiting') {
+    if (sessionError || !session || session.status !== 'waiting') {
       console.error('Session not available');
       return false;
     }
 
-    if ((session as any).current_players >= (session as any).max_players) {
+    const currentPlayers = session.current_players ?? 0;
+    const maxPlayers = session.max_players ?? 0;
+    if (currentPlayers >= maxPlayers) {
       console.error('Session is full');
       return false;
     }
 
     // Add participant
-    const { error: participantError } = await (supabase
-      .from('multiplayer_participants' as any) as any)
+    const { error: participantError } = await supabase
+      .from('multiplayer_participants')
       .insert({
         session_id: sessionId,
         user_id: userId,
@@ -388,13 +402,11 @@ export async function joinMultiplayerSession(
     }
 
     // Update session player count
-    await (supabase.from('multiplayer_sessions' as any) as any)
+    await supabase
+      .from('multiplayer_sessions')
       .update({
-        current_players: (session as any).current_players + 1,
-        status:
-          (session as any).current_players + 1 === (session as any).max_players
-            ? 'in_progress'
-            : 'waiting',
+        current_players: currentPlayers + 1,
+        status: currentPlayers + 1 === maxPlayers ? 'in_progress' : 'waiting',
       })
       .eq('id', sessionId);
 
@@ -410,7 +422,8 @@ export async function endMultiplayerSession(
   winnerUserId?: string
 ): Promise<boolean> {
   try {
-    const { error } = await (supabase.from('multiplayer_sessions' as any) as any)
+    const { error } = await supabase
+      .from('multiplayer_sessions')
       .update({
         status: 'completed',
         ended_at: new Date().toISOString(),
@@ -432,7 +445,8 @@ export async function endMultiplayerSession(
 
 export async function getMultiplayerSession(sessionId: string): Promise<MultiplayerSession | null> {
   try {
-    const { data, error } = await (supabase.from('multiplayer_sessions' as any) as any)
+    const { data, error } = await supabase
+      .from('multiplayer_sessions')
       .select('*')
       .eq('id', sessionId)
       .single();

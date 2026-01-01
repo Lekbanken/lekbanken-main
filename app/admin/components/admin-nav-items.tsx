@@ -156,6 +156,12 @@ export const adminSecondaryNavItems: AdminNavItem[] = [
 export const adminSettingsNavItems: AdminNavItem[] = [
   { href: '/admin/leaderboard', label: 'Leaderboard', icon: iconLeaderboard },
   { href: '/admin/achievements', label: 'Achievements', icon: iconAchievements },
+  { href: '/admin/achievements-advanced', label: 'Achievements Advanced', icon: iconAchievements },
+  { href: '/admin/gamification/awards', label: 'Belöningar', icon: iconAchievements },
+  { href: '/admin/gamification/analytics', label: 'Gamification-analys', icon: iconAnalytics },
+  { href: '/admin/gamification/campaigns', label: 'Kampanjer', icon: iconAnalytics },
+  { href: '/admin/gamification/automation', label: 'Automation', icon: iconSettings },
+  { href: '/admin/gamification/levels', label: 'Levels', icon: iconSettings },
   { href: '/admin/personalization', label: 'Personalisering', icon: iconPersonalization },
   { href: '/admin/marketplace', label: 'Butik', icon: iconMarketplace },
   { href: '/admin/settings', label: 'Inställningar', icon: iconSettings },

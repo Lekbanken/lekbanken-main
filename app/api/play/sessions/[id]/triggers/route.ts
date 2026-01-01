@@ -12,16 +12,13 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
-
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
 async function broadcastPlayEvent(sessionId: string, event: unknown) {
   try {
-    const supabase = await createServiceRoleClient();
+    const supabase = createServiceRoleClient();
     await supabase.channel(`play:${sessionId}`).send({
       type: 'broadcast',
       event: 'play_event',
@@ -50,7 +47,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   if (!session) return jsonError('Session not found', 404);
   if (session.host_user_id !== user.id) return jsonError('Only host can view triggers', 403);
 
-  const service = await createServiceRoleClient() as SupabaseAny;
+  const service = createServiceRoleClient();
 
   const { data: triggers, error } = await service
     .from('session_triggers')
@@ -83,7 +80,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   if (session.host_user_id !== user.id) return jsonError('Only host can snapshot triggers', 403);
   if (!session.game_id) return jsonError('Session has no associated game', 400);
 
-  const service = await createServiceRoleClient() as SupabaseAny;
+  const service = createServiceRoleClient();
 
   // Prevent double-snapshot
   const { data: existing } = await service
@@ -111,8 +108,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
   }
 
   // Create session_triggers copies
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const triggerInserts = (gameTriggers as any[]).map((t: any) => ({
+  const triggerInserts = gameTriggers.map((t) => ({
     session_id: sessionId,
     source_trigger_id: t.id,
     name: t.name,
@@ -180,7 +176,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return jsonError('Invalid action. Must be fire, disable, or arm', 400);
   }
 
-  const service = await createServiceRoleClient() as SupabaseAny;
+  const service = createServiceRoleClient();
 
   // Get current trigger
   const { data: trigger, error: tErr } = await service

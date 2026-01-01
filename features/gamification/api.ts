@@ -15,6 +15,32 @@ export async function fetchGamificationSnapshot(): Promise<GamificationPayload> 
   return payload;
 }
 
+export type PinnedAchievementsPayload = {
+  tenantId: string;
+  pinnedIds: string[];
+  achievements: Array<{ id: string; name: string; description: string | null; icon_url?: string | null }>;
+};
+
+export async function fetchPinnedAchievements(tenantId: string): Promise<PinnedAchievementsPayload> {
+  const res = await fetch(`/api/gamification/pins?tenantId=${encodeURIComponent(tenantId)}`, { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error(`Pinned achievements API failed with status ${res.status}`);
+  }
+  return (await res.json()) as PinnedAchievementsPayload;
+}
+
+export async function savePinnedAchievements(payload: { tenantId: string; achievementIds: string[] }): Promise<{ tenantId: string; pinnedIds: string[] }> {
+  const res = await fetch('/api/gamification/pins', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    throw new Error(`Save pins API failed with status ${res.status}`)
+  }
+  return (await res.json()) as { tenantId: string; pinnedIds: string[] }
+}
+
 // Optional fallback for Storybook/sandbox while backend data is empty
 export async function fetchGamificationSnapshotMock(): Promise<GamificationPayload> {
   return {

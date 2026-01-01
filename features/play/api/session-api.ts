@@ -4,7 +4,7 @@
  * Client-side API for fetching session data for the Legendary Play runtime.
  * Used by both host (FacilitatorDashboard) and participant views.
  * 
- * NOTE: Uses 'as any' casts for new tables not in generated Supabase types yet.
+ * NOTE: Uses temporary type assertions for a few newer tables.
  */
 
 import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';

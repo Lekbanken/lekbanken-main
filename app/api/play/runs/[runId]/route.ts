@@ -40,8 +40,7 @@ export async function GET(
   }
 
   // Fetch run
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: run, error: runError } = await (supabase as any)
+  const { data: run, error: runError } = await supabase
     .from('runs')
     .select('*')
     .eq('id', runId)
@@ -56,16 +55,14 @@ export async function GET(
   }
 
   // Fetch version to get name and blocks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: version } = await (supabase as any)
+  const { data: version } = await supabase
     .from('plan_versions')
-    .select('id, version_number, name, total_time_minutes')
+    .select('id, plan_id, version_number, name, total_time_minutes')
     .eq('id', run.plan_version_id)
     .single()
 
   // Fetch version blocks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: blocks } = await (supabase as any)
+  const { data: blocks } = await supabase
     .from('plan_version_blocks')
     .select('*')
     .eq('plan_version_id', run.plan_version_id)
@@ -74,9 +71,16 @@ export async function GET(
   // Regenerate steps from blocks
   const steps = generateStepsFromBlocks(blocks || [])
 
+  const runMetadata = (run.metadata ?? null) as unknown as {
+    timerRemaining?: number
+    timerTotal?: number
+    isTimerRunning?: boolean
+    planId?: string
+  } | null
+
   const runResponse: Run = {
     id: run.id,
-    planId: run.plan_id,
+    planId: version?.plan_id ?? (typeof runMetadata?.planId === 'string' ? runMetadata.planId : ''),
     planVersionId: run.plan_version_id,
     versionNumber: version?.version_number ?? 0,
     name: version?.name ?? 'Okänd plan',
@@ -84,19 +88,19 @@ export async function GET(
     steps,
     blockCount: (blocks || []).length,
     totalDurationMinutes: version?.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
-    currentStepIndex: run.current_step_index ?? 0,
-    startedAt: run.started_at,
+    currentStepIndex: run.current_step ?? 0,
+    startedAt: run.started_at ?? run.created_at ?? new Date().toISOString(),
     completedAt: run.completed_at,
   }
 
   const progress = {
     runId: run.id,
-    currentStepIndex: run.current_step_index ?? 0,
+    currentStepIndex: run.current_step ?? 0,
     status: run.status,
-    timerRemaining: run.metadata?.timerRemaining,
-    timerTotal: run.metadata?.timerTotal,
-    isTimerRunning: run.metadata?.isTimerRunning,
-    updatedAt: run.updated_at,
+    timerRemaining: runMetadata?.timerRemaining,
+    timerTotal: runMetadata?.timerTotal,
+    isTimerRunning: runMetadata?.isTimerRunning,
+    updatedAt: run.created_at ?? new Date().toISOString(),
   }
 
   return NextResponse.json({ run: runResponse, progress })
@@ -109,17 +113,8 @@ type VersionBlock = {
   duration_minutes: number
   title: string | null
   notes: string | null
-  is_optional: boolean
-  game_snapshot: {
-    id: string
-    title: string
-    shortDescription?: string | null
-    instructions?: Array<{
-      title: string
-      description?: string | null
-      durationMinutes?: number | null
-    }> | null
-  } | null
+  is_optional: boolean | null
+  game_snapshot: unknown | null
 }
 
 const DEFAULT_STEP_DURATION = 5
@@ -132,9 +127,20 @@ function generateStepsFromBlocks(blocks: VersionBlock[]): RunStep[] {
     const tag = block.title || getBlockTypeLabel(block.block_type)
     const baseDuration = block.duration_minutes || DEFAULT_STEP_DURATION
 
-    if (block.game_snapshot?.instructions && block.game_snapshot.instructions.length > 0) {
-      for (let i = 0; i < block.game_snapshot.instructions.length; i++) {
-        const instruction = block.game_snapshot.instructions[i]
+    const snapshot = (block.game_snapshot ?? null) as unknown as {
+      id: string
+      title: string
+      shortDescription?: string | null
+      instructions?: Array<{
+        title: string
+        description?: string | null
+        durationMinutes?: number | null
+      }> | null
+    } | null
+
+    if (snapshot?.instructions && snapshot.instructions.length > 0) {
+      for (let i = 0; i < snapshot.instructions.length; i++) {
+        const instruction = snapshot.instructions[i]
         steps.push({
           id: `${block.id}:${i}`,
           index: stepIndex++,
@@ -146,9 +152,9 @@ function generateStepsFromBlocks(blocks: VersionBlock[]): RunStep[] {
           tag,
           note: i === 0 ? block.notes || undefined : undefined,
           gameSnapshot: {
-            id: block.game_snapshot.id,
-            title: block.game_snapshot.title,
-            shortDescription: block.game_snapshot.shortDescription,
+            id: snapshot.id,
+            title: snapshot.title,
+            shortDescription: snapshot.shortDescription,
           },
         })
       }
@@ -162,10 +168,10 @@ function generateStepsFromBlocks(blocks: VersionBlock[]): RunStep[] {
         description: block.notes || getBlockTypeDefaultDescription(block.block_type),
         durationMinutes: baseDuration,
         tag,
-        gameSnapshot: block.game_snapshot ? {
-          id: block.game_snapshot.id,
-          title: block.game_snapshot.title,
-          shortDescription: block.game_snapshot.shortDescription,
+        gameSnapshot: snapshot ? {
+          id: snapshot.id,
+          title: snapshot.title,
+          shortDescription: snapshot.shortDescription,
         } : undefined,
       })
     }

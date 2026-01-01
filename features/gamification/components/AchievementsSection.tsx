@@ -16,7 +16,7 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <TrophyIcon className="h-5 w-5 text-primary" />
-          <h2 className="text-sm font-semibold text-foreground">Achievements</h2>
+          <h2 className="text-sm font-semibold text-foreground">Utmärkelser</h2>
         </div>
         <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
           {unlocked}/{achievements.length}
@@ -41,15 +41,13 @@ export function AchievementsSection({ achievements }: AchievementsSectionProps) 
       )}
 
       {/* View All Link */}
-      {achievements.length > 6 && (
-        <Link
-          href="/app/profile/achievements"
-          className="flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
-        >
-          Visa alla achievements
-          <ChevronRightIcon className="h-4 w-4" />
-        </Link>
-      )}
+      <Link
+        href="/app/gamification/achievements"
+        className="flex items-center justify-center gap-1 text-sm font-medium text-primary hover:underline"
+      >
+        Visa alla utmärkelser
+        <ChevronRightIcon className="h-4 w-4" />
+      </Link>
     </section>
   );
 }

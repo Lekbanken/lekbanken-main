@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 
+import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,6 +88,7 @@ export function ProfilePage() {
   const [profileInitialized, setProfileInitialized] = useState(false);
 
   const email = user?.email || "";
+  const displayName = fullName || userProfile?.full_name || user?.user_metadata?.full_name || email || "Profil";
 
   useEffect(() => {
     if (userProfile) {
@@ -256,14 +258,11 @@ export function ProfilePage() {
 
   return (
     <div className="space-y-6 pb-32">
-      <header className="flex items-center gap-3">
-        <Avatar src={avatar || undefined} name={fullName || email || initials} size="lg" />
-        <div>
-          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Profil</p>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">{fullName || "Din profil"}</h1>
-          <p className="text-sm text-muted-foreground">{email}</p>
-        </div>
-      </header>
+      <PageTitleHeader
+        icon={<Avatar src={avatar || undefined} name={displayName || initials} size="sm" />}
+        title="PROFIL"
+        subtitle={displayName}
+      />
 
       <Card>
         <CardHeader>

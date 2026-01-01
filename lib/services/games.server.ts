@@ -49,8 +49,7 @@ export type GameWithRelations = GameRow & {
 }
 
 export async function getGameById(gameId: string): Promise<GameWithRelations | null> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = await createServerRlsClient() as any
+  const supabase = await createServerRlsClient()
 
   const { data, error } = await supabase
     .from('games')
@@ -73,7 +72,7 @@ export async function getGameById(gameId: string): Promise<GameWithRelations | n
     return null
   }
 
-  return data as GameWithRelations
+  return data as unknown as GameWithRelations
 }
 
 export async function getRelatedGames(

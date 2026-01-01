@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { RunStatus } from '@/features/play/types'
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
+import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -64,12 +66,10 @@ export async function POST(
   }
 
   // Update real run
-  const updatePayload: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
-  }
+  const updatePayload: Record<string, unknown> = {}
 
   if (typeof payload.currentStepIndex === 'number') {
-    updatePayload.current_step_index = payload.currentStepIndex
+    updatePayload.current_step = payload.currentStepIndex
   }
 
   if (payload.status) {
@@ -92,16 +92,15 @@ export async function POST(
   }
 
   if (Object.keys(metadataUpdate).length > 0) {
-    updatePayload.metadata = metadataUpdate
+    updatePayload.metadata = metadataUpdate as Json
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: run, error } = await (supabase as any)
+  const { data: run, error } = await supabase
     .from('runs')
     .update(updatePayload)
     .eq('id', runId)
     .eq('user_id', user.id) // Ensure user owns the run
-    .select('id, current_step_index, status, metadata, updated_at')
+    .select('id, tenant_id, plan_version_id, current_step, status, metadata, completed_at, created_at')
     .single()
 
   if (error) {
@@ -120,15 +119,45 @@ export async function POST(
     })
   }
 
+  const runMetadata = (run.metadata ?? null) as unknown as {
+    timerRemaining?: number
+    timerTotal?: number
+    isTimerRunning?: boolean
+    planId?: string
+  } | null
+
+  const planIdFromMetadata = typeof runMetadata?.planId === 'string' ? runMetadata.planId : null
+
+  if (payload.status === 'completed' && run.status === 'completed') {
+    try {
+      await logGamificationEventV1({
+        tenantId: (run.tenant_id as string | null) ?? null,
+        actorUserId: user.id,
+        eventType: 'run_completed',
+        source: 'play',
+        idempotencyKey: `run:${run.id}:completed`,
+        metadata: {
+          runId: run.id,
+          planId: planIdFromMetadata,
+          planVersionId: (run.plan_version_id as string | null) ?? null,
+          completedAt: (run.completed_at as string | null) ?? null,
+        },
+      })
+    } catch (e) {
+      // Best-effort: do not fail the request if gamification event logging fails.
+      console.warn('[api/play/runs/:id/progress] gamification event log failed', e)
+    }
+  }
+
   return NextResponse.json({
     progress: {
       runId: run.id,
-      currentStepIndex: run.current_step_index,
+      currentStepIndex: run.current_step,
       status: run.status,
-      timerRemaining: run.metadata?.timerRemaining,
-      timerTotal: run.metadata?.timerTotal,
-      isTimerRunning: run.metadata?.isTimerRunning,
-      updatedAt: run.updated_at,
+      timerRemaining: runMetadata?.timerRemaining,
+      timerTotal: runMetadata?.timerTotal,
+      isTimerRunning: runMetadata?.isTimerRunning,
+      updatedAt: new Date().toISOString(),
     },
   })
 }
@@ -162,10 +191,9 @@ export async function GET(
     return NextResponse.json({ progress: null })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: run, error } = await (supabase as any)
+  const { data: run, error } = await supabase
     .from('runs')
-    .select('id, current_step_index, status, metadata, updated_at')
+    .select('id, current_step, status, metadata, created_at')
     .eq('id', runId)
     .eq('user_id', user.id)
     .single()
@@ -174,15 +202,21 @@ export async function GET(
     return NextResponse.json({ progress: null })
   }
 
+  const runMetadata = (run.metadata ?? null) as unknown as {
+    timerRemaining?: number
+    timerTotal?: number
+    isTimerRunning?: boolean
+  } | null
+
   return NextResponse.json({
     progress: {
       runId: run.id,
-      currentStepIndex: run.current_step_index,
+      currentStepIndex: run.current_step,
       status: run.status,
-      timerRemaining: run.metadata?.timerRemaining,
-      timerTotal: run.metadata?.timerTotal,
-      isTimerRunning: run.metadata?.isTimerRunning,
-      updatedAt: run.updated_at,
+      timerRemaining: runMetadata?.timerRemaining,
+      timerTotal: runMetadata?.timerTotal,
+      isTimerRunning: runMetadata?.isTimerRunning,
+      updatedAt: run.created_at ?? new Date().toISOString(),
     },
   })
 }

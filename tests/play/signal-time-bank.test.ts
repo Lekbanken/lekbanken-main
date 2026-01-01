@@ -13,12 +13,15 @@
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { randomUUID } from 'node:crypto';
+import type { Database } from '@/types/supabase';
 
 const TEST_SUPABASE_URL = process.env.TEST_SUPABASE_URL ?? '';
 const TEST_SUPABASE_SERVICE_KEY = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY ?? '';
 
-let supabase: SupabaseClient | null = null;
+let supabase: SupabaseClient<Database> | null = null;
 let sessionId: string | null = null;
+let tenantId: string | null = null;
 
 const dbTestsEnabled =
   TEST_SUPABASE_URL.length > 0 && TEST_SUPABASE_SERVICE_KEY.length > 0;
@@ -26,14 +29,34 @@ const dbTestsEnabled =
 beforeAll(async () => {
   if (!dbTestsEnabled) return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase = createClient(TEST_SUPABASE_URL, TEST_SUPABASE_SERVICE_KEY) as any;
+  supabase = createClient<Database>(TEST_SUPABASE_URL, TEST_SUPABASE_SERVICE_KEY);
+
+  // Create a test tenant (participant_sessions has a FK to tenants)
+  const { data: tenant, error: tenantError } = await supabase
+    .from('tenants')
+    .insert({
+      name: `Test Tenant ${Date.now()}`,
+      type: 'test',
+    })
+    .select('id')
+    .single();
+
+  if (tenantError || !tenant?.id) {
+    throw new Error(tenantError?.message || 'Failed to create test tenant');
+  }
+  tenantId = tenant.id;
 
   // Create a test session for use in these tests
   // (Assumes participant_sessions table allows service-role insert)
   const { data, error } = await supabase!
     .from('participant_sessions')
-    .insert({ code: `T${Date.now()}`, status: 'active', host_user_id: null })
+    .insert({
+      tenant_id: tenantId,
+      host_user_id: randomUUID(),
+      display_name: 'Test Session',
+      session_code: `T${Date.now()}`,
+      status: 'active',
+    })
     .select('id')
     .single();
 
@@ -50,6 +73,10 @@ afterAll(async () => {
   await supabase.from('session_time_bank').delete().eq('session_id', sessionId);
   await supabase.from('session_signals').delete().eq('session_id', sessionId);
   await supabase.from('participant_sessions').delete().eq('id', sessionId);
+
+  if (tenantId) {
+    await supabase.from('tenants').delete().eq('id', tenantId);
+  }
 });
 
 describe('time_bank_apply_delta (DB)', () => {

@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
-import { Button, Card, CardContent, Badge, Input } from '@/components/ui'
+import { Button, Card, CardContent, Badge, Input, useToast } from '@/components/ui'
 import {
   ShoppingBagIcon,
   SparklesIcon,
@@ -16,13 +16,14 @@ import {
   BoltIcon,
 } from '@heroicons/react/24/outline'
 import { StarIcon as StarSolidIcon } from '@heroicons/react/24/solid'
+import { useTenant } from '@/lib/context/TenantContext'
 
 // Types
 interface ShopItem {
   id: string
   name: string
   description: string
-  category: 'cosmetic' | 'powerup' | 'bundle' | 'season_pass'
+  category: string
   price: number
   currency: 'coins' | 'gems'
   imageUrl?: string
@@ -30,69 +31,28 @@ interface ShopItem {
   isNew?: boolean
   isFeatured?: boolean
   discount?: number
+  requiredLevel?: number
 }
 
-// Mock data
-const mockItems: ShopItem[] = [
-  {
-    id: '1',
-    name: 'Gyllene Avatar-ram',
-    description: 'En glänsande gyllene ram för din profilbild',
-    category: 'cosmetic',
-    price: 500,
-    currency: 'coins',
-    rarity: 'epic',
-    isNew: true,
-  },
-  {
-    id: '2',
-    name: 'XP-boost (24h)',
-    description: 'Dubbel XP på alla aktiviteter i 24 timmar',
-    category: 'powerup',
-    price: 200,
-    currency: 'coins',
-    rarity: 'rare',
-  },
-  {
-    id: '3',
-    name: 'Vinter-bundle',
-    description: 'Innehåller snöflingor-avatar, vintertema och 3x XP-boost',
-    category: 'bundle',
-    price: 50,
-    currency: 'gems',
-    rarity: 'legendary',
-    isFeatured: true,
-    discount: 20,
-  },
-  {
-    id: '4',
-    name: 'Säsongspass Vår 2025',
-    description: 'Lås upp exklusiva belöningar under hela vårsäsongen',
-    category: 'season_pass',
-    price: 100,
-    currency: 'gems',
-    rarity: 'epic',
-  },
-  {
-    id: '5',
-    name: 'Regnbågs-emoji',
-    description: 'Använd en regnbågs-emoji i ditt namn',
-    category: 'cosmetic',
-    price: 150,
-    currency: 'coins',
-    rarity: 'common',
-  },
-  {
-    id: '6',
-    name: 'Poäng-multiplikator',
-    description: 'Få 1.5x poäng på nästa 5 aktiviteter',
-    category: 'powerup',
-    price: 300,
-    currency: 'coins',
-    rarity: 'rare',
-    isNew: true,
-  },
-]
+type BaseShopCategory = 'cosmetic' | 'powerup' | 'bundle' | 'season_pass'
+
+function baseCategory(category: string): BaseShopCategory | null {
+  const raw = typeof category === 'string' ? category : ''
+  const base = raw.includes(':') ? raw.split(':', 1)[0] : raw
+  if (base === 'cosmetic' || base === 'powerup' || base === 'bundle' || base === 'season_pass') return base
+  return null
+}
+
+type ShopOverviewPayload = {
+  tenantId: string
+  userLevel: number
+  coinBalance: number
+  gemBalance: number
+  ownedItemIds: string[]
+  ownedQuantitiesByItemId?: Record<string, number>
+  activeBoost?: { multiplier: number; expiresAt: string } | null
+  items: ShopItem[]
+}
 
 const CATEGORIES = [
   { id: 'all', name: 'Alla', icon: Squares2X2Icon },
@@ -129,22 +89,237 @@ function getRarityLabel(rarity: string) {
 }
 
 export default function ShopPage() {
-  const [items] = useState<ShopItem[]>(mockItems)
+  const toast = useToast()
+  const { currentTenant } = useTenant()
+  const tenantId = currentTenant?.id ?? null
+
+  const [items, setItems] = useState<ShopItem[]>([])
+  const [ownedItemIds, setOwnedItemIds] = useState<string[]>([])
+  const [ownedQuantitiesByItemId, setOwnedQuantitiesByItemId] = useState<Record<string, number>>({})
+  const [activeBoost, setActiveBoost] = useState<{ multiplier: number; expiresAt: string } | null>(null)
+  const [nowMs, setNowMs] = useState(() => Date.now())
+  const [coinBalance, setCoinBalance] = useState(0)
+  const [gemBalance, setGemBalance] = useState(0)
+  const [userLevel, setUserLevel] = useState(1)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isBuyingId, setIsBuyingId] = useState<string | null>(null)
+  const [isConsumingId, setIsConsumingId] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  // Mock balances
-  const coinBalance = 1250
-  const gemBalance = 35
+  useEffect(() => {
+    let isMounted = true
+
+    const load = async () => {
+      if (!tenantId) {
+        if (isMounted) {
+          setItems([])
+          setOwnedItemIds([])
+          setCoinBalance(0)
+          setGemBalance(0)
+          setIsLoading(false)
+        }
+        return
+      }
+
+      try {
+        setIsLoading(true)
+        const res = await fetch(`/api/shop?tenantId=${encodeURIComponent(tenantId)}`, { cache: 'no-store' })
+        if (!res.ok) throw new Error(`Shop API failed with status ${res.status}`)
+        const payload = (await res.json()) as ShopOverviewPayload
+        if (!isMounted) return
+        setItems(payload.items ?? [])
+        setOwnedItemIds(payload.ownedItemIds ?? [])
+        setOwnedQuantitiesByItemId(payload.ownedQuantitiesByItemId ?? {})
+        setActiveBoost(payload.activeBoost ?? null)
+        setCoinBalance(payload.coinBalance ?? 0)
+        setGemBalance(payload.gemBalance ?? 0)
+        setUserLevel(typeof payload.userLevel === 'number' && Number.isFinite(payload.userLevel) ? payload.userLevel : 1)
+      } catch {
+        if (!isMounted) return
+        setItems([])
+        setOwnedItemIds([])
+        setOwnedQuantitiesByItemId({})
+        setActiveBoost(null)
+        setCoinBalance(0)
+        setGemBalance(0)
+        setUserLevel(1)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    load()
+    return () => {
+      isMounted = false
+    }
+  }, [tenantId])
+
+  useEffect(() => {
+    const id = setInterval(() => setNowMs(Date.now()), 60_000)
+    return () => clearInterval(id)
+  }, [])
+
+  const activeBoostLabel = useMemo(() => {
+    if (!activeBoost?.expiresAt) return null
+    const expiresMs = Date.parse(activeBoost.expiresAt)
+    if (!Number.isFinite(expiresMs)) return null
+    const diffMs = Math.max(0, expiresMs - nowMs)
+    const totalMinutes = Math.floor(diffMs / 60_000)
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
+
+    const parts: string[] = []
+    if (hours > 0) parts.push(`${hours}h`)
+    parts.push(`${minutes}m`)
+    return `${activeBoost.multiplier}x (${parts.join(' ')} kvar)`
+  }, [activeBoost, nowMs])
+
+  const featuredItem = useMemo(() => items.find((item) => item.isFeatured), [items])
 
   const filteredItems = items.filter((item) => {
-    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory
+      const matchesCategory =
+        selectedCategory === 'all' || (baseCategory(item.category) !== null && baseCategory(item.category) === selectedCategory)
     const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesCategory && matchesSearch
   })
 
-  const featuredItem = items.find((item) => item.isFeatured)
+  const canBuyItem = (item: ShopItem) => {
+    if (!tenantId) return false
+
+    const requiredLevel = typeof item.requiredLevel === 'number' ? item.requiredLevel : 1
+    if (requiredLevel > 1 && userLevel < requiredLevel) return false
+
+    // MVP supports purchases with DiceCoin only.
+    if (item.currency !== 'coins') return false
+    // Non-consumables: prevent repurchase.
+    const base = baseCategory(item.category)
+    if (base !== 'powerup' && base !== 'bundle' && ownedItemIds.includes(item.id)) return false
+    return true
+  }
+
+  const isLevelLocked = useCallback(
+    (item: ShopItem) => {
+      const requiredLevel = typeof item.requiredLevel === 'number' ? item.requiredLevel : 1
+      return requiredLevel > 1 && userLevel < requiredLevel
+    },
+    [userLevel]
+  )
+
+  const isCategoryLocked = useCallback(
+    (categoryId: string) => {
+      if (categoryId === 'all') return false
+      const candidates = items.filter((item) => baseCategory(item.category) === categoryId)
+      if (candidates.length === 0) return true
+      return candidates.every((item) => isLevelLocked(item))
+    },
+    [items, isLevelLocked]
+  )
+
+  useEffect(() => {
+    if (selectedCategory === 'all') return
+    if (isCategoryLocked(selectedCategory)) {
+      setSelectedCategory('all')
+    }
+  }, [isCategoryLocked, selectedCategory])
+
+  const isOwned = (item: ShopItem) => {
+    const base = baseCategory(item.category)
+    return base !== 'powerup' && base !== 'bundle' && ownedItemIds.includes(item.id)
+  }
+
+  const getPowerupQuantity = (item: ShopItem) => {
+    if (baseCategory(item.category) !== 'powerup') return 0
+    return ownedQuantitiesByItemId[item.id] ?? 0
+  }
+
+  const buyItem = async (item: ShopItem) => {
+    if (!tenantId) return
+    if (!canBuyItem(item)) return
+    const idempotencyKey = `shop:${item.id}:${Date.now()}`
+
+    setIsBuyingId(item.id)
+    try {
+      const res = await fetch('/api/shop', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId, itemId: item.id, idempotencyKey }),
+      })
+
+      if (!res.ok) {
+        if (res.status === 409) {
+          toast.warning('Du har inte tillräckligt med mynt.', 'Otillräckligt saldo')
+        } else if (res.status === 401) {
+          toast.error('Du behöver logga in för att köpa.', 'Inte inloggad')
+        } else if (res.status === 403) {
+          const json = (await res.json().catch(() => null)) as
+            | { code?: string; requiredLevel?: number | null }
+            | null
+          if (json?.code === 'LEVEL_LOCKED') {
+            const required = typeof json.requiredLevel === 'number' ? json.requiredLevel : item.requiredLevel
+            toast.warning(`Du behöver nå nivå ${required ?? '?'} för att köpa detta.`, 'Låst')
+          } else {
+            toast.error('Du saknar behörighet i denna tenant.', 'Åtkomst nekad')
+          }
+        } else {
+          toast.error('Försök igen om en stund.', 'Köp misslyckades')
+        }
+        return
+      }
+
+      const payload = (await res.json()) as { balance?: number | null }
+      setOwnedItemIds((prev) => Array.from(new Set([...prev, item.id])))
+      if (baseCategory(item.category) === 'powerup') {
+        setOwnedQuantitiesByItemId((prev) => ({
+          ...prev,
+          [item.id]: (prev[item.id] ?? 0) + 1,
+        }))
+      }
+      if (typeof payload.balance === 'number') setCoinBalance(payload.balance)
+
+      toast.success('Köpet är genomfört.', 'Köpt')
+    } finally {
+      setIsBuyingId(null)
+    }
+  }
+
+  const canConsumePowerup = (item: ShopItem) => {
+    if (!tenantId) return false
+    if (baseCategory(item.category) !== 'powerup') return false
+    return getPowerupQuantity(item) > 0
+  }
+
+  const consumePowerup = async (item: ShopItem) => {
+    if (!tenantId) return
+    if (!canConsumePowerup(item)) return
+
+    const idempotencyKey = `consume:${item.id}:${Date.now()}`
+    setIsConsumingId(item.id)
+    try {
+      const res = await fetch('/api/shop/powerups/consume', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tenantId, itemId: item.id, idempotencyKey }),
+      })
+
+      if (!res.ok) {
+        if (res.status === 409) {
+          toast.warning('Du har inga kvar att använda.', 'Inga powerups kvar')
+        } else {
+          toast.error('Försök igen om en stund.', 'Kunde inte använda')
+        }
+        return
+      }
+
+      const payload = (await res.json()) as { remainingQuantity?: number | null }
+      const remaining = typeof payload.remainingQuantity === 'number' ? payload.remainingQuantity : 0
+      setOwnedQuantitiesByItemId((prev) => ({ ...prev, [item.id]: Math.max(0, remaining) }))
+      toast.success('Powerup använd.', 'Använd')
+    } finally {
+      setIsConsumingId(null)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -153,6 +328,11 @@ export default function ShopPage() {
         <div>
           <h1 className="text-2xl font-bold text-foreground">Butik</h1>
           <p className="text-muted-foreground mt-1">Byt poäng mot belöningar och power-ups</p>
+          {activeBoostLabel && (
+            <div className="mt-2">
+              <Badge variant="accent">Aktiv boost: {activeBoostLabel}</Badge>
+            </div>
+          )}
         </div>
       </div>
 
@@ -207,6 +387,11 @@ export default function ShopPage() {
                       <StarSolidIcon className="h-3 w-3" />
                       Utvalt
                     </Badge>
+                    {isLevelLocked(featuredItem) && (
+                      <Badge variant="default">
+                        Låst: nivå {featuredItem.requiredLevel ?? '?'}
+                      </Badge>
+                    )}
                     <Badge variant={getRarityColor(featuredItem.rarity) as 'warning' | 'primary' | 'accent' | 'default'}>
                       {getRarityLabel(featuredItem.rarity)}
                     </Badge>
@@ -219,7 +404,11 @@ export default function ShopPage() {
                 </div>
                 <div className="flex items-center justify-between mt-4">
                   <div className="flex items-center gap-1">
-                    <SparklesIcon className="h-5 w-5 text-purple-500" />
+                    {featuredItem.currency === 'coins' ? (
+                      <CurrencyDollarIcon className="h-5 w-5 text-yellow-500" />
+                    ) : (
+                      <SparklesIcon className="h-5 w-5 text-purple-500" />
+                    )}
                     <span className="font-bold text-lg">{featuredItem.price}</span>
                     {featuredItem.discount && (
                       <span className="text-sm text-muted-foreground line-through ml-1">
@@ -227,9 +416,13 @@ export default function ShopPage() {
                       </span>
                     )}
                   </div>
-                  <Button>
+                  <Button
+                    disabled={isLoading || isBuyingId === featuredItem.id || !canBuyItem(featuredItem)}
+                    loading={isBuyingId === featuredItem.id}
+                    onClick={() => buyItem(featuredItem)}
+                  >
                     <ShoppingBagIcon className="h-4 w-4 mr-1" />
-                    Köp nu
+                    {isOwned(featuredItem) ? 'Ägs' : 'Köp nu'}
                   </Button>
                 </div>
               </div>
@@ -277,6 +470,7 @@ export default function ShopPage() {
               variant={selectedCategory === category.id ? 'default' : 'outline'}
               size="sm"
               onClick={() => setSelectedCategory(category.id)}
+              disabled={isLoading || isCategoryLocked(category.id)}
               className="flex-shrink-0"
             >
               <Icon className="h-4 w-4 mr-1" />
@@ -323,6 +517,16 @@ export default function ShopPage() {
                 {/* Badges */}
                 <div className="flex gap-1 mb-1 flex-wrap">
                   {item.isNew && <Badge variant="accent" size="sm">Ny!</Badge>}
+                  {isLevelLocked(item) && (
+                    <Badge variant="default" size="sm">
+                      Låst: nivå {item.requiredLevel ?? '?'}
+                    </Badge>
+                  )}
+                  {baseCategory(item.category) === 'powerup' && getPowerupQuantity(item) > 0 && (
+                    <Badge variant="default" size="sm">
+                      x{getPowerupQuantity(item)}
+                    </Badge>
+                  )}
                   <Badge
                     variant={getRarityColor(item.rarity) as 'warning' | 'primary' | 'accent' | 'default'}
                     size="sm"
@@ -349,9 +553,27 @@ export default function ShopPage() {
                   )}
                   <span className="font-bold text-sm">{item.price}</span>
                 </div>
-                <Button size="sm" variant="outline">
-                  Köp
-                </Button>
+                <div className="flex items-center gap-2">
+                  {baseCategory(item.category) === 'powerup' && getPowerupQuantity(item) > 0 && (
+                    <Button
+                      size="sm"
+                      disabled={isLoading || isConsumingId === item.id || !canConsumePowerup(item)}
+                      loading={isConsumingId === item.id}
+                      onClick={() => consumePowerup(item)}
+                    >
+                      Använd
+                    </Button>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={isLoading || isBuyingId === item.id || !canBuyItem(item)}
+                    loading={isBuyingId === item.id}
+                    onClick={() => buyItem(item)}
+                  >
+                    {isOwned(item) ? 'Ägs' : 'Köp'}
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { Button, Card, CardContent } from '@/components/ui';
 import {
@@ -10,92 +10,61 @@ import {
   CalendarIcon,
 } from '@heroicons/react/24/outline';
 
-// Types
-interface Transaction {
+type Transaction = {
   id: string;
   type: 'earn' | 'spend';
   amount: number;
   description: string;
   date: string;
-  category: string;
-}
+};
 
-// Mock data
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    type: 'earn',
-    amount: 50,
-    description: 'Genomförde daglig utmaning',
-    date: '2025-01-27',
-    category: 'challenge',
-  },
-  {
-    id: '2',
-    type: 'earn',
-    amount: 25,
-    description: 'Spelade "Bollkull"',
-    date: '2025-01-27',
-    category: 'game',
-  },
-  {
-    id: '3',
-    type: 'spend',
-    amount: 200,
-    description: 'Köpte XP-boost',
-    date: '2025-01-26',
-    category: 'shop',
-  },
-  {
-    id: '4',
-    type: 'earn',
-    amount: 100,
-    description: 'Ny achievement: Samarbetare',
-    date: '2025-01-26',
-    category: 'achievement',
-  },
-  {
-    id: '5',
-    type: 'earn',
-    amount: 10,
-    description: 'Daglig inloggningsbonus',
-    date: '2025-01-25',
-    category: 'bonus',
-  },
-  {
-    id: '6',
-    type: 'spend',
-    amount: 150,
-    description: 'Köpte Regnbågs-emoji',
-    date: '2025-01-24',
-    category: 'shop',
-  },
-  {
-    id: '7',
-    type: 'earn',
-    amount: 75,
-    description: 'Veckoutmaning klar',
-    date: '2025-01-23',
-    category: 'challenge',
-  },
-];
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('sv-SE', {
-    day: 'numeric',
-    month: 'short',
-  });
-}
+type CoinsPayload = {
+  coins: {
+    balance: number;
+    recentTransactions: Transaction[];
+  };
+};
 
 export default function CoinsHistoryPage() {
-  const [transactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [balance, setBalance] = useState(0);
   const [filter, setFilter] = useState<'all' | 'earn' | 'spend'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredTransactions = transactions.filter((tx) => {
-    if (filter === 'earn') return tx.type === 'earn';
-    if (filter === 'spend') return tx.type === 'spend';
-    return true;
-  });
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        const res = await fetch('/api/gamification', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Kunde inte h?mta myntdata');
+        const payload = (await res.json()) as CoinsPayload;
+        if (!isMounted) return;
+        setTransactions(payload.coins?.recentTransactions ?? []);
+        setBalance(payload.coins?.balance ?? 0);
+        setError(null);
+      } catch (err) {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : 'Kunde inte h?mta myntdata');
+        setTransactions([]);
+        setBalance(0);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredTransactions = useMemo(() => {
+    if (filter === 'earn') return transactions.filter((tx) => tx.type === 'earn');
+    if (filter === 'spend') return transactions.filter((tx) => tx.type === 'spend');
+    return transactions;
+  }, [filter, transactions]);
 
   const totalEarned = transactions
     .filter((tx) => tx.type === 'earn')
@@ -104,8 +73,6 @@ export default function CoinsHistoryPage() {
   const totalSpent = transactions
     .filter((tx) => tx.type === 'spend')
     .reduce((sum, tx) => sum + tx.amount, 0);
-
-  const balance = totalEarned - totalSpent;
 
   return (
     <div className="space-y-6 pb-32">
@@ -124,13 +91,22 @@ export default function CoinsHistoryPage() {
           <h1 className="text-xl font-bold tracking-tight text-foreground">
             Mynthistorik
           </h1>
+          <p className="text-xs text-muted-foreground">Visar senaste 10 transaktioner</p>
         </div>
       </header>
+
+      {error && (
+        <Card className="border-destructive/40">
+          <CardContent className="p-4 text-sm text-destructive">
+            {error}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Balance Card */}
       <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
         <CardContent className="p-6 text-center">
-          <span className="text-4xl mb-2 block">🪙</span>
+          <span className="text-4xl mb-2 block">??</span>
           <p className="text-3xl font-bold text-foreground tabular-nums">
             {balance.toLocaleString()}
           </p>
@@ -144,7 +120,7 @@ export default function CoinsHistoryPage() {
                   +{totalEarned.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">Tjänat</p>
+              <p className="text-xs text-muted-foreground">Tj?nat (senaste 10)</p>
             </div>
             <div className="rounded-xl bg-rose-500/10 p-3">
               <div className="flex items-center justify-center gap-1 text-rose-500">
@@ -153,7 +129,7 @@ export default function CoinsHistoryPage() {
                   -{totalSpent.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">Spenderat</p>
+              <p className="text-xs text-muted-foreground">Spenderat (senaste 10)</p>
             </div>
           </div>
         </CardContent>
@@ -174,7 +150,7 @@ export default function CoinsHistoryPage() {
           onClick={() => setFilter('earn')}
         >
           <ArrowUpIcon className="h-4 w-4 mr-1" />
-          Tjänat
+          Tj?nat
         </Button>
         <Button
           variant={filter === 'spend' ? 'default' : 'outline'}
@@ -189,7 +165,9 @@ export default function CoinsHistoryPage() {
       {/* Transaction List */}
       <Card>
         <CardContent className="divide-y divide-border">
-          {filteredTransactions.length === 0 ? (
+          {isLoading ? (
+            <div className="py-12 text-center text-muted-foreground">Laddar transaktioner...</div>
+          ) : filteredTransactions.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
               Inga transaktioner att visa.
             </div>
@@ -214,11 +192,11 @@ export default function CoinsHistoryPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">
-                    {tx.description}
+                    {tx.description || 'Ok?nd transaktion'}
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <CalendarIcon className="h-3 w-3" />
-                    {formatDate(tx.date)}
+                    {tx.date}
                   </p>
                 </div>
                 <span

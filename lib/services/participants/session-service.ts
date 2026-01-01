@@ -9,6 +9,7 @@ import { createServiceRoleClient } from '@/lib/supabase/server';
 import { generateUniqueSessionCode } from './session-code-generator';
 import { logger } from '@/lib/utils/logger';
 import type { Database } from '@/types/supabase';
+import type { Json } from '@/types/supabase';
 
 type ParticipantSession = Database['public']['Tables']['participant_sessions']['Row'];
 type ParticipantSessionInsert = Database['public']['Tables']['participant_sessions']['Insert'];
@@ -346,12 +347,7 @@ export class ParticipantSessionService {
 
   // ===========================================================================
   // RUNTIME STATE METHODS (PR1: Legendary Play)
-  // NOTE: These methods require migration 20251216160000 to be applied.
-  // After applying the migration, regenerate types with: npx supabase gen types typescript
-  // The `as any` casts can then be removed and replaced with proper types.
   // ===========================================================================
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
 
   /**
    * Update current step index
@@ -359,9 +355,8 @@ export class ParticipantSessionService {
    */
   static async updateCurrentStep(sessionId: string, stepIndex: number): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ current_step_index: stepIndex })
       .eq('id', sessionId);
@@ -381,9 +376,8 @@ export class ParticipantSessionService {
    */
   static async updateCurrentPhase(sessionId: string, phaseIndex: number): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ current_phase_index: phaseIndex })
       .eq('id', sessionId);
@@ -403,15 +397,14 @@ export class ParticipantSessionService {
    */
   static async startTimer(sessionId: string, durationSeconds: number): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    const timerState = {
+
+    const timerState: Json = {
       started_at: new Date().toISOString(),
       duration_seconds: durationSeconds,
       paused_at: null,
     };
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ timer_state: timerState })
       .eq('id', sessionId);
@@ -430,9 +423,8 @@ export class ParticipantSessionService {
    */
   static async pauseTimer(sessionId: string): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { data: session, error: fetchError } = await (supabase as any)
+
+    const { data: session, error: fetchError } = await supabase
       .from('participant_sessions')
       .select('timer_state')
       .eq('id', sessionId)
@@ -442,17 +434,18 @@ export class ParticipantSessionService {
       throw new Error('No active timer to pause');
     }
     
-    const currentState = session.timer_state as { started_at: string; duration_seconds: number; paused_at: string | null };
+    type TimerState = { started_at: string; duration_seconds: number; paused_at: string | null };
+    const currentState = session.timer_state as unknown as TimerState;
     if (currentState.paused_at) {
       return; // Already paused
     }
-    
-    const timerState = {
+
+    const timerState: Json = {
       ...currentState,
       paused_at: new Date().toISOString(),
     };
-    
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ timer_state: timerState })
       .eq('id', sessionId);
@@ -471,9 +464,8 @@ export class ParticipantSessionService {
    */
   static async resumeTimer(sessionId: string): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { data: session, error: fetchError } = await (supabase as any)
+
+    const { data: session, error: fetchError } = await supabase
       .from('participant_sessions')
       .select('timer_state')
       .eq('id', sessionId)
@@ -483,7 +475,8 @@ export class ParticipantSessionService {
       throw new Error('No timer to resume');
     }
     
-    const currentState = session.timer_state as { started_at: string; duration_seconds: number; paused_at: string | null };
+    type TimerState = { started_at: string; duration_seconds: number; paused_at: string | null };
+    const currentState = session.timer_state as unknown as TimerState;
     if (!currentState.paused_at) {
       return; // Not paused
     }
@@ -494,13 +487,13 @@ export class ParticipantSessionService {
     const originalStart = new Date(currentState.started_at).getTime();
     const adjustedStart = new Date(originalStart + pauseDuration);
     
-    const timerState = {
+    const timerState: Json = {
       started_at: adjustedStart.toISOString(),
       duration_seconds: currentState.duration_seconds,
       paused_at: null,
     };
-    
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ timer_state: timerState })
       .eq('id', sessionId);
@@ -519,9 +512,8 @@ export class ParticipantSessionService {
    */
   static async resetTimer(sessionId: string): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
       .update({ timer_state: null })
       .eq('id', sessionId);
@@ -543,11 +535,10 @@ export class ParticipantSessionService {
     boardState: { message?: string; overrides?: Record<string, boolean> } | null
   ): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new columns added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('participant_sessions')
-      .update({ board_state: boardState })
+      .update({ board_state: boardState as Json })
       .eq('id', sessionId);
     
     if (error) {
@@ -568,13 +559,11 @@ export class ParticipantSessionService {
     locale?: string
   ): Promise<number> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new RPC added in migration 20251216160000
-    const { data, error } = await (supabase as any)
-      .rpc('snapshot_game_roles_to_session', {
+
+    const { data, error } = await supabase.rpc('snapshot_game_roles_to_session', {
         p_session_id: sessionId,
         p_game_id: gameId,
-        p_locale: locale || null,
+        p_locale: locale || undefined,
       });
     
     if (error) {
@@ -594,9 +583,8 @@ export class ParticipantSessionService {
    */
   static async getSessionRoles(sessionId: string): Promise<unknown[]> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new table added in migration 20251216160000
-    const { data, error } = await (supabase as any)
+
+    const { data, error } = await supabase
       .from('session_roles')
       .select('*')
       .eq('session_id', sessionId)
@@ -622,14 +610,13 @@ export class ParticipantSessionService {
     actorParticipantId?: string
   ): Promise<void> {
     const supabase = await createServiceRoleClient();
-    
-    // Cast to any - new table added in migration 20251216160000
-    const { error } = await (supabase as any)
+
+    const { error } = await supabase
       .from('session_events')
       .insert({
         session_id: sessionId,
         event_type: eventType,
-        event_data: eventData,
+        event_data: eventData as Json,
         actor_user_id: actorUserId || null,
         actor_participant_id: actorParticipantId || null,
       });
@@ -640,5 +627,4 @@ export class ParticipantSessionService {
     }
   }
 
-  /* eslint-enable @typescript-eslint/no-explicit-any */
 }

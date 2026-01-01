@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import type { Run, RunStep, RunStatus } from '@/features/play/types'
+import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -29,7 +30,7 @@ type VersionBlock = {
   duration_minutes: number
   title: string | null
   notes: string | null
-  is_optional: boolean
+  is_optional: boolean | null
   game_snapshot: GameSnapshot | null
 }
 
@@ -59,8 +60,7 @@ export async function POST(
   }
 
   // Fetch plan with current version
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: plan, error: planError } = await (supabase as any)
+  const { data: plan, error: planError } = await supabase
     .from('plans')
     .select('id, name, status, current_version_id')
     .eq('id', planId)
@@ -81,8 +81,7 @@ export async function POST(
   }
 
   // Fetch the current version with its blocks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: version, error: versionError } = await (supabase as any)
+  const { data: version, error: versionError } = await supabase
     .from('plan_versions')
     .select(`
       id,
@@ -105,8 +104,7 @@ export async function POST(
   }
 
   // Fetch version blocks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: versionBlocks, error: blocksError } = await (supabase as any)
+  const { data: versionBlocks, error: blocksError } = await supabase
     .from('plan_version_blocks')
     .select('*')
     .eq('plan_version_id', version.id)
@@ -134,19 +132,18 @@ export async function POST(
 
   // Create run record
   const runPayload = {
-    plan_id: planId,
     plan_version_id: version.id,
     user_id: user.id,
     status: 'in_progress' as RunStatus,
-    current_step_index: 0,
-    metadata: {
+    current_step: 0,
+    metadata: ({
+      planId,
       stepsGenerated: steps.length,
       versionNumber: version.version_number,
-    },
+    } as Json),
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: runData, error: runError } = await (supabase as any)
+  const { data: runData, error: runError } = await supabase
     .from('runs')
     .insert(runPayload)
     .select('*')
@@ -162,7 +159,7 @@ export async function POST(
 
   const run: Run = {
     id: runData.id,
-    planId: runData.plan_id,
+    planId,
     planVersionId: runData.plan_version_id,
     versionNumber: version.version_number,
     name: version.name,
@@ -171,7 +168,7 @@ export async function POST(
     blockCount: blocks.length,
     totalDurationMinutes: version.total_time_minutes || steps.reduce((sum, s) => sum + s.durationMinutes, 0),
     currentStepIndex: 0,
-    startedAt: runData.started_at || new Date().toISOString(),
+    startedAt: runData.started_at || runData.created_at || new Date().toISOString(),
     completedAt: null,
   }
 
@@ -183,8 +180,7 @@ export async function POST(
  * Maintains backward compatibility with existing plans.
  */
 async function startFromDraftPlan(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  supabase: any,
+  supabase: Awaited<ReturnType<typeof createServerRlsClient>>,
   planId: string,
   planName: string,
   _userId: string
@@ -224,12 +220,12 @@ async function startFromDraftPlan(
   const versionBlocks: VersionBlock[] = blocks.map((b: {
     id: string
     position: number
-    block_type: string
-    duration_minutes: number
+    block_type: 'game' | 'pause' | 'preparation' | 'custom'
+    duration_minutes: number | null
     title: string | null
     notes: string | null
-    is_optional: boolean
-    game?: {
+    is_optional: boolean | null
+    game: {
       id: string
       translations?: Array<{
         locale: string
@@ -246,7 +242,7 @@ async function startFromDraftPlan(
       id: b.id,
       position: b.position,
       block_type: b.block_type,
-      duration_minutes: b.duration_minutes,
+      duration_minutes: b.duration_minutes ?? DEFAULT_STEP_DURATION,
       title: b.title,
       notes: b.notes,
       is_optional: b.is_optional,

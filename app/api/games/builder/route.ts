@@ -1,5 +1,31 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import type { Database, Json } from '@/types/supabase';
+
+type EnergyLevel = Database['public']['Enums']['energy_level_enum'];
+type LocationType = Database['public']['Enums']['location_type_enum'];
+
+type GameStatus = 'draft' | 'published';
+
+function asEnergyLevel(value: unknown): EnergyLevel | null {
+  if (value === 'low' || value === 'medium' || value === 'high') return value;
+  return null;
+}
+
+function asLocationType(value: unknown): LocationType | null {
+  if (value === 'indoor' || value === 'outdoor' || value === 'both') return value;
+  return null;
+}
+
+function asGameStatus(value: unknown): GameStatus {
+  if (value === 'published') return 'published';
+  return 'draft';
+}
+
+function toJson(value: unknown): Json | null {
+  if (value === null || value === undefined) return null;
+  return value as Json;
+}
 
 type CorePayload = {
   name: string;
@@ -80,8 +106,7 @@ type BuilderBody = {
 };
 
 export async function POST(request: Request) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const supabase = await createServiceRoleClient() as any;
+  const supabase = createServiceRoleClient();
   const body = (await request.json().catch(() => ({}))) as BuilderBody;
 
   const core = body.core;
@@ -93,13 +118,13 @@ export async function POST(request: Request) {
     name: core.name.trim(),
     short_description: core.short_description.trim(),
     description: core.description ?? null,
-    status: core.status ?? 'draft',
+    status: asGameStatus(core.status),
     main_purpose_id: core.main_purpose_id ?? null,
     product_id: core.product_id ?? null,
     owner_tenant_id: core.owner_tenant_id ?? null,
     category: core.category ?? null,
-    energy_level: core.energy_level ?? null,
-    location_type: core.location_type ?? null,
+    energy_level: asEnergyLevel(core.energy_level),
+    location_type: asLocationType(core.location_type),
     time_estimate_min: core.time_estimate_min ?? null,
     duration_max: core.duration_max ?? null,
     min_players: core.min_players ?? null,
@@ -178,7 +203,7 @@ export async function POST(request: Request) {
       title: (a.title ?? '').trim() || 'Artefakt',
       description: a.description ?? null,
       tags: a.tags ?? [],
-      metadata: a.metadata ?? null,
+      metadata: toJson(a.metadata),
       locale: a.locale ?? null,
     }));
 
@@ -211,7 +236,7 @@ export async function POST(request: Request) {
           title: v.title ?? null,
           body: v.body ?? null,
           media_ref: v.media_ref ?? null,
-          metadata: hasMetadata ? meta : null,
+          metadata: hasMetadata ? toJson(meta) : null,
         };
       });
     });

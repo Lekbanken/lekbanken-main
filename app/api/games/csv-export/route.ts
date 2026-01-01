@@ -13,11 +13,15 @@ import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { generateGamesCsv, generateGamesJson } from '@/features/admin/games/utils/csv-generator';
 import { actionIdsToOrderAliases, conditionIdsToOrderAliases } from '@/lib/games/trigger-order-alias';
-import type { ExportableGame, ExportOptions } from '@/types/csv-import';
+import type { ExportableGame, ExportOptions, ParsedArtifactVisibility, ParsedTriggerAction, ParsedTriggerCondition } from '@/types/csv-import';
+import type { Database } from '@/types/supabase';
 
-// Temporary type overrides until Supabase types are regenerated
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnySupabase = any;
+type GameArtifactVariantRow = Database['public']['Tables']['game_artifact_variants']['Row'];
+
+function asParsedVisibility(value: string | null | undefined): ParsedArtifactVisibility {
+  if (value === 'leader_only' || value === 'role_private' || value === 'public') return value;
+  return 'public';
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -77,13 +81,9 @@ export async function GET(request: Request) {
     
     // Fetch related data for each game
     const exportableGames: ExportableGame[] = [];
-    
-    // Use 'any' cast for supabase client to bypass missing table types
-    const db = supabase as AnySupabase;
 
     for (const game of games) {
-      // Cast game to any to access properties that may not be in outdated types
-      const g = game as AnySupabase;
+      const g = game;
       const exportGame: ExportableGame = {
         id: g.id,
         game_key: g.game_key || `game-${g.id.slice(0, 8)}`,
@@ -123,14 +123,14 @@ export async function GET(request: Request) {
       
       // Fetch steps if needed
       if (includeSteps) {
-        const { data: steps } = await db
+        const { data: steps } = await supabase
           .from('game_steps')
           .select('*')
           .eq('game_id', g.id)
           .order('step_order', { ascending: true });
         
         if (steps) {
-          exportGame.steps = steps.map((s: AnySupabase) => ({
+          exportGame.steps = steps.map((s) => ({
             step_order: s.step_order,
             title: s.title || '',
             body: s.body || '',
@@ -138,72 +138,71 @@ export async function GET(request: Request) {
             leader_script: s.leader_script,
             participant_prompt: s.participant_prompt,
             board_text: s.board_text,
-            optional: s.optional || false,
+            optional: s.optional ?? false,
           }));
         }
       }
 
       // Fetch secondary purposes
-      const { data: secondaryPurposes } = await db
+      const { data: secondaryPurposes } = await supabase
         .from('game_secondary_purposes')
         .select('purpose_id')
         .eq('game_id', g.id);
 
       exportGame.sub_purpose_ids = (secondaryPurposes ?? [])
-        .map((p: AnySupabase) => p.purpose_id)
+        .map((p) => p.purpose_id)
         .filter(Boolean);
       
       // Fetch materials if needed
       if (includeMaterials) {
-        const { data: materials } = await db
+        const { data: materials } = await supabase
           .from('game_materials')
           .select('*')
           .eq('game_id', g.id)
           .maybeSingle();
         
         if (materials) {
-          const m = materials as AnySupabase;
           exportGame.materials = {
-            items: m.items || [],
-            safety_notes: m.safety_notes,
-            preparation: m.preparation,
+            items: materials.items || [],
+            safety_notes: materials.safety_notes,
+            preparation: materials.preparation,
           };
         }
       }
       
       // Fetch phases if needed
       if (includePhases) {
-        const { data: phases } = await db
+        const { data: phases } = await supabase
           .from('game_phases')
           .select('*')
           .eq('game_id', g.id)
           .order('phase_order', { ascending: true });
         
         if (phases) {
-          exportGame.phases = phases.map((p: AnySupabase) => ({
+          exportGame.phases = phases.map((p) => ({
             phase_order: p.phase_order,
             name: p.name,
             phase_type: p.phase_type as 'intro' | 'round' | 'finale' | 'break',
             duration_seconds: p.duration_seconds,
-            timer_visible: p.timer_visible,
+            timer_visible: p.timer_visible ?? true,
             timer_style: p.timer_style as 'countdown' | 'elapsed' | 'trafficlight',
             description: p.description,
             board_message: p.board_message,
-            auto_advance: p.auto_advance,
+            auto_advance: p.auto_advance ?? false,
           }));
         }
       }
       
       // Fetch roles if needed
       if (includeRoles) {
-        const { data: roles } = await db
+        const { data: roles } = await supabase
           .from('game_roles')
           .select('*')
           .eq('game_id', g.id)
           .order('role_order', { ascending: true });
         
         if (roles) {
-          exportGame.roles = roles.map((r: AnySupabase) => ({
+          exportGame.roles = roles.map((r) => ({
             role_order: r.role_order,
             name: r.name,
             icon: r.icon,
@@ -214,7 +213,7 @@ export async function GET(request: Request) {
             min_count: r.min_count,
             max_count: r.max_count,
             assignment_strategy: r.assignment_strategy as 'random' | 'leader_picks' | 'player_picks',
-            scaling_rules: r.scaling_rules as Record<string, number> | null,
+            scaling_rules: r.scaling_rules as unknown as Record<string, number> | null,
             conflicts_with: r.conflicts_with || [],
           }));
         }
@@ -222,26 +221,25 @@ export async function GET(request: Request) {
       
       // Fetch board config if needed
       if (includeBoardConfig) {
-        const { data: boardConfig } = await db
+        const { data: boardConfig } = await supabase
           .from('game_board_config')
           .select('*')
           .eq('game_id', g.id)
           .maybeSingle();
         
         if (boardConfig) {
-          const bc = boardConfig as AnySupabase;
           exportGame.boardConfig = {
-            show_game_name: bc.show_game_name,
-            show_current_phase: bc.show_current_phase,
-            show_timer: bc.show_timer,
-            show_participants: bc.show_participants,
-            show_public_roles: bc.show_public_roles,
-            show_leaderboard: bc.show_leaderboard,
-            show_qr_code: bc.show_qr_code,
-            welcome_message: bc.welcome_message,
-            theme: bc.theme as 'mystery' | 'party' | 'sport' | 'nature' | 'neutral',
-            background_color: bc.background_color,
-            layout_variant: bc.layout_variant as 'standard' | 'fullscreen',
+            show_game_name: boardConfig.show_game_name ?? true,
+            show_current_phase: boardConfig.show_current_phase ?? true,
+            show_timer: boardConfig.show_timer ?? true,
+            show_participants: boardConfig.show_participants ?? true,
+            show_public_roles: boardConfig.show_public_roles ?? true,
+            show_leaderboard: boardConfig.show_leaderboard ?? false,
+            show_qr_code: boardConfig.show_qr_code ?? false,
+            welcome_message: boardConfig.welcome_message,
+            theme: boardConfig.theme as 'mystery' | 'party' | 'sport' | 'nature' | 'neutral',
+            background_color: boardConfig.background_color,
+            layout_variant: boardConfig.layout_variant as 'standard' | 'fullscreen',
           };
         }
       }
@@ -249,26 +247,26 @@ export async function GET(request: Request) {
       // Full-fidelity (Legendary) export for JSON format
       if (format === 'json') {
         // Build lookup maps for converting trigger references into order-based aliases
-        const { data: stepOrderRows } = await db
+        const { data: stepOrderRows } = await supabase
           .from('game_steps')
           .select('id, step_order')
           .eq('game_id', g.id);
-        const { data: phaseOrderRows } = await db
+        const { data: phaseOrderRows } = await supabase
           .from('game_phases')
           .select('id, phase_order')
           .eq('game_id', g.id);
 
         const stepOrderById = new Map<string, number>();
         for (const s of stepOrderRows ?? []) {
-          if (s?.id && typeof s.step_order === 'number') stepOrderById.set(s.id as string, s.step_order as number);
+          if (s?.id && typeof s.step_order === 'number') stepOrderById.set(s.id, s.step_order);
         }
         const phaseOrderById = new Map<string, number>();
         for (const p of phaseOrderRows ?? []) {
-          if (p?.id && typeof p.phase_order === 'number') phaseOrderById.set(p.id as string, p.phase_order as number);
+          if (p?.id && typeof p.phase_order === 'number') phaseOrderById.set(p.id, p.phase_order);
         }
 
         // Artifacts + variants
-        const { data: artifacts } = await db
+        const { data: artifacts } = await supabase
           .from('game_artifacts')
           .select('*')
           .eq('game_id', g.id)
@@ -276,30 +274,32 @@ export async function GET(request: Request) {
 
         const artifactOrderById = new Map<string, number>();
         for (const a of artifacts ?? []) {
-          if (a?.id && typeof a.artifact_order === 'number') artifactOrderById.set(a.id as string, a.artifact_order as number);
+          if (a?.id && typeof a.artifact_order === 'number') artifactOrderById.set(a.id, a.artifact_order);
         }
 
         if (artifacts && artifacts.length > 0) {
-          const artifactIds = artifacts.map((a: AnySupabase) => a.id).filter(Boolean);
+          const artifactIds = artifacts.map((a) => a.id).filter(Boolean);
 
-          const { data: variants } = artifactIds.length
-            ? await db
-                .from('game_artifact_variants')
-                .select('*')
-                .in('artifact_id', artifactIds)
-                .order('variant_order', { ascending: true })
-            : { data: [] as AnySupabase[] };
-
-          const variantsByArtifactId = new Map<string, AnySupabase[]>();
-          for (const v of variants ?? []) {
-            if (!v?.artifact_id) continue;
-            const list = variantsByArtifactId.get(v.artifact_id as string) ?? [];
-            list.push(v);
-            variantsByArtifactId.set(v.artifact_id as string, list);
+          let variants: GameArtifactVariantRow[] = [];
+          if (artifactIds.length) {
+            const { data } = await supabase
+              .from('game_artifact_variants')
+              .select('*')
+              .in('artifact_id', artifactIds)
+              .order('variant_order', { ascending: true });
+            variants = data ?? [];
           }
 
-          exportGame.artifacts = artifacts.map((a: AnySupabase) => {
-            const artifactId = a.id as string;
+          const variantsByArtifactId = new Map<string, GameArtifactVariantRow[]>();
+          for (const v of variants ?? []) {
+            if (!v?.artifact_id) continue;
+            const list = variantsByArtifactId.get(v.artifact_id) ?? [];
+            list.push(v);
+            variantsByArtifactId.set(v.artifact_id, list);
+          }
+
+          exportGame.artifacts = artifacts.map((a) => {
+            const artifactId = a.id;
             const artifactVariants = variantsByArtifactId.get(artifactId) ?? [];
             return {
               artifact_order: a.artifact_order,
@@ -308,15 +308,15 @@ export async function GET(request: Request) {
               description: a.description ?? null,
               artifact_type: a.artifact_type,
               tags: a.tags ?? [],
-              metadata: a.metadata ?? {},
-              variants: artifactVariants.map((v: AnySupabase) => ({
+              metadata: (a.metadata ?? {}) as unknown as Record<string, unknown>,
+              variants: artifactVariants.map((v) => ({
                 variant_order: v.variant_order,
-                visibility: v.visibility,
+                visibility: asParsedVisibility(v.visibility),
                 visible_to_role_id: v.visible_to_role_id ?? null,
                 title: v.title ?? null,
                 body: v.body ?? null,
                 media_ref: v.media_ref ?? null,
-                metadata: v.metadata ?? {},
+                metadata: (v.metadata ?? {}) as unknown as Record<string, unknown>,
               })),
             };
           });
@@ -325,17 +325,17 @@ export async function GET(request: Request) {
         }
 
         // Triggers
-        const { data: triggers } = await db
+        const { data: triggers } = await supabase
           .from('game_triggers')
           .select('*')
           .eq('game_id', g.id)
           .order('sort_order', { ascending: true });
 
-        exportGame.triggers = (triggers ?? []).map((t: AnySupabase) => {
-          const condition = conditionIdsToOrderAliases(t.condition, { stepOrderById, phaseOrderById, artifactOrderById });
+        exportGame.triggers = (triggers ?? []).map((t) => {
+          const condition = conditionIdsToOrderAliases(t.condition, { stepOrderById, phaseOrderById, artifactOrderById }) as unknown as ParsedTriggerCondition;
           const actions = Array.isArray(t.actions)
-            ? t.actions.map((a: AnySupabase) => actionIdsToOrderAliases(a, { artifactOrderById }))
-            : [];
+            ? (t.actions.map((a) => actionIdsToOrderAliases(a, { artifactOrderById })) as unknown as ParsedTriggerAction[])
+            : ([] as ParsedTriggerAction[]);
           return {
             name: t.name,
             description: t.description ?? null,

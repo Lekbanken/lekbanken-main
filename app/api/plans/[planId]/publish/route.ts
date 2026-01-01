@@ -7,7 +7,9 @@ import {
   planToResource,
   buildCapabilityContextFromMemberships,
 } from '@/lib/auth/capabilities'
+import { logGamificationEventV1 } from '@/lib/services/gamification-events.server'
 import type { GlobalRole } from '@/types/auth'
+import type { Json } from '@/types/supabase'
 
 function normalizeId(value: string | string[] | undefined) {
   const id = Array.isArray(value) ? value?.[0] : value
@@ -90,8 +92,7 @@ export async function POST(
   }
 
   // Get next version number by querying existing versions
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: existingVersions, error: versionsError } = await (supabase as any)
+  const { data: existingVersions, error: versionsError } = await supabase
     .from('plan_versions')
     .select('version_number')
     .eq('plan_id', planId)
@@ -101,9 +102,7 @@ export async function POST(
   if (versionsError) {
     console.error('[api/plans/:id/publish] version query error', versionsError)
   }
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const lastVersion = (existingVersions as any)?.[0]?.version_number ?? 0
+  const lastVersion = existingVersions?.[0]?.version_number ?? 0
   const nextVersionNumber = (lastVersion as number) + 1
 
   // Create version record
@@ -113,12 +112,11 @@ export async function POST(
     name: plan.name,
     description: plan.description ?? null,
     total_time_minutes: plan.totalTimeMinutes ?? 0,
-    metadata: plan.metadata ?? {},
+    metadata: (plan.metadata ?? {}) as Json,
     published_by: user.id,
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: versionData, error: insertVersionError } = await (supabase as any)
+  const { data: versionData, error: insertVersionError } = await supabase
     .from('plan_versions')
     .insert(versionPayload)
     .select('*')
@@ -144,7 +142,7 @@ export async function POST(
     notes: block.notes ?? null,
     is_optional: block.isOptional ?? false,
     game_id: block.game?.id ?? null,
-    game_snapshot: block.game
+    game_snapshot: (block.game
       ? {
           id: block.game.id,
           title: block.game.title,
@@ -154,20 +152,18 @@ export async function POST(
           energyLevel: block.game.energyLevel,
           locationType: block.game.locationType,
         }
-      : null,
-    metadata: block.metadata ?? {},
+      : null) as Json | null,
+    metadata: (block.metadata ?? {}) as Json,
   }))
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: insertBlocksError } = await (supabase as any)
+  const { error: insertBlocksError } = await supabase
     .from('plan_version_blocks')
     .insert(versionBlocks)
 
   if (insertBlocksError) {
     console.error('[api/plans/:id/publish] insert version blocks error', insertBlocksError)
     // Rollback: delete the version
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase as any).from('plan_versions').delete().eq('id', version.id)
+    await supabase.from('plan_versions').delete().eq('id', version.id)
     return NextResponse.json(
       { error: { code: 'SERVER_ERROR', message: 'Failed to create version blocks' } },
       { status: 500 }
@@ -189,6 +185,24 @@ export async function POST(
     console.error('[api/plans/:id/publish] update plan error', updatePlanError)
     // Note: version is already created, so plan may be in inconsistent state
     // In production, this should be a transaction
+  }
+
+  try {
+    await logGamificationEventV1({
+      tenantId: raw.owner_tenant_id ?? null,
+      actorUserId: user.id,
+      eventType: 'plan_published',
+      source: 'planner',
+      idempotencyKey: `plan:${planId}:published:${version.id}`,
+      metadata: {
+        planId,
+        versionId: version.id,
+        versionNumber: version.version_number,
+        published: !updatePlanError,
+      },
+    })
+  } catch (e) {
+    console.warn('[api/plans/:id/publish] gamification event log failed', e)
   }
 
   return NextResponse.json({

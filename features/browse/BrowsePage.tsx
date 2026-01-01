@@ -13,6 +13,8 @@ import { SearchBar } from "./components/SearchBar";
 import type { BrowseFilters, FilterOptions, Game, SortOption } from "./types";
 import type { Tables } from "@/types/supabase";
 import { cn } from "@/lib/utils";
+import { PageTitleHeader } from "@/components/app/PageTitleHeader";
+import { appNavItems } from "@/components/app/nav-items";
 
 type GameMediaWithAsset = Tables<"game_media"> & { media?: Tables<"media"> | null };
 
@@ -304,12 +306,16 @@ export function BrowsePage() {
     setPage(1);
   };
 
+
+  const browseIcon = appNavItems.find((item) => item.href === "/app/browse")?.icon;
+
   return (
     <div className="space-y-4">
-      <header className="space-y-0.5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">Upptäck</p>
-        <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Hitta rätt aktivitet</h1>
-      </header>
+                  <PageTitleHeader
+        icon={browseIcon}
+        title="UPPTÄCK"
+        subtitle="Hitta rätt aktivitet"
+      />
 
       {featuredGames.length > 0 && (
         <section className="rounded-2xl border border-border/60 bg-gradient-to-r from-primary/5 via-card to-card px-4 py-4">

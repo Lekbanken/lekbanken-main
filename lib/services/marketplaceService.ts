@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { supabase } from '@/lib/supabase/client';
+import type { Json } from '@/types/supabase';
 
 // Types
 export interface VirtualCurrency {
@@ -45,7 +45,7 @@ export interface ShopItem {
   created_by_user_id: string | null;
   created_at: string;
   updated_at: string;
-  metadata: Record<string, unknown>;
+  metadata: Json;
 }
 
 export interface UserPurchase {
@@ -87,7 +87,7 @@ export interface MarketplaceStats {
 // Virtual Currencies
 export async function getVirtualCurrencies(tenantId: string): Promise<VirtualCurrency[] | null> {
   try {
-    const query = supabase.from('virtual_currencies' as any) as any;
+    const query = supabase.from('virtual_currencies');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -108,7 +108,7 @@ export async function getVirtualCurrencies(tenantId: string): Promise<VirtualCur
 // User Currency Balances
 export async function getUserCurrencyBalances(userId: string, tenantId: string): Promise<UserCurrencyBalance[] | null> {
   try {
-    const query = supabase.from('user_currency_balances' as any) as any;
+    const query = supabase.from('user_currency_balances');
     const { data, error } = await query
       .select('*')
       .eq('user_id', userId)
@@ -134,7 +134,7 @@ export async function addCurrency(
 ): Promise<UserCurrencyBalance | null> {
   try {
     // Get or create balance
-    const query = supabase.from('user_currency_balances' as any) as any;
+    const query = supabase.from('user_currency_balances');
     const { data: balance, error: fetchError } = await query
       .select('*')
       .eq('user_id', userId)
@@ -149,7 +149,7 @@ export async function addCurrency(
 
     if (!balance) {
       // Create new balance
-      const createQuery = supabase.from('user_currency_balances' as any) as any;
+      const createQuery = supabase.from('user_currency_balances');
       const { data: newBalance, error: createError } = await createQuery
         .insert({
           tenant_id: tenantId,
@@ -171,7 +171,7 @@ export async function addCurrency(
     }
 
     // Update existing balance
-    const updateQuery = supabase.from('user_currency_balances' as any) as any;
+    const updateQuery = supabase.from('user_currency_balances');
     const { data: updated, error: updateError } = await updateQuery
       .update({
         balance: (balance.balance as number) + amount,
@@ -202,7 +202,7 @@ export async function spendCurrency(
   amount: number
 ): Promise<UserCurrencyBalance | null> {
   try {
-    const query = supabase.from('user_currency_balances' as any) as any;
+    const query = supabase.from('user_currency_balances');
     const { data: balance, error: fetchError } = await query
       .select('*')
       .eq('user_id', userId)
@@ -220,7 +220,7 @@ export async function spendCurrency(
       return null;
     }
 
-    const updateQuery = supabase.from('user_currency_balances' as any) as any;
+    const updateQuery = supabase.from('user_currency_balances');
     const { data: updated, error: updateError } = await updateQuery
       .update({
         balance: (balance.balance as number) - amount,
@@ -250,9 +250,7 @@ export async function getShopItems(
   filter?: { category?: string; onlyFeatured?: boolean; onlyAvailable?: boolean }
 ): Promise<ShopItem[] | null> {
   try {
-    let query = supabase.from('shop_items' as any) as any;
-
-    query = query.select('*').eq('tenant_id', tenantId);
+    let query = supabase.from('shop_items').select('*').eq('tenant_id', tenantId);
 
     if (filter?.category) query = query.eq('category', filter.category);
     if (filter?.onlyFeatured) query = query.eq('is_featured', true);
@@ -280,7 +278,7 @@ export async function createShopItem(
   item: Omit<ShopItem, 'id' | 'tenant_id' | 'created_by_user_id' | 'created_at' | 'updated_at' | 'quantity_sold'>
 ): Promise<ShopItem | null> {
   try {
-    const query = supabase.from('shop_items' as any) as any;
+    const query = supabase.from('shop_items');
     const { data, error } = await query
       .insert({
         tenant_id: tenantId,
@@ -304,7 +302,7 @@ export async function createShopItem(
 
 export async function updateShopItem(id: string, updates: Partial<ShopItem>): Promise<ShopItem | null> {
   try {
-    const query = supabase.from('shop_items' as any) as any;
+    const query = supabase.from('shop_items');
     const { data, error } = await query
       .update(updates)
       .eq('id', id)
@@ -326,7 +324,7 @@ export async function updateShopItem(id: string, updates: Partial<ShopItem>): Pr
 // User Purchases
 export async function getUserPurchases(userId: string, tenantId: string): Promise<UserPurchase[] | null> {
   try {
-    const query = supabase.from('user_purchases' as any) as any;
+    const query = supabase.from('user_purchases');
     const { data, error } = await query
       .select('*')
       .eq('user_id', userId)
@@ -353,7 +351,7 @@ export async function purchaseShopItem(
 ): Promise<{ purchase: UserPurchase; newBalance: UserCurrencyBalance } | null> {
   try {
     // Get shop item
-    const itemQuery = supabase.from('shop_items' as any) as any;
+    const itemQuery = supabase.from('shop_items');
     const { data: item, error: itemError } = await itemQuery
       .select('*')
       .eq('id', shopItemId)
@@ -381,7 +379,7 @@ export async function purchaseShopItem(
     }
 
     // Record purchase
-    const purchaseQuery = supabase.from('user_purchases' as any) as any;
+    const purchaseQuery = supabase.from('user_purchases');
     const { data: purchase, error: purchaseError } = await purchaseQuery
       .insert({
         tenant_id: tenantId,
@@ -414,7 +412,7 @@ export async function purchaseShopItem(
 // Promo Codes
 export async function validatePromoCode(tenantId: string, code: string): Promise<PromoCode | null> {
   try {
-    const query = supabase.from('promo_codes' as any) as any;
+    const query = supabase.from('promo_codes');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -451,7 +449,7 @@ export async function validatePromoCode(tenantId: string, code: string): Promise
 
 export async function applyPromoCode(promoId: string): Promise<boolean> {
   try {
-    const query = supabase.from('promo_codes' as any) as any;
+    const query = supabase.from('promo_codes');
     const { data: promo, error: fetchError } = await query
       .select('*')
       .eq('id', promoId)
@@ -462,7 +460,7 @@ export async function applyPromoCode(promoId: string): Promise<boolean> {
       return false;
     }
 
-    const updateQuery = supabase.from('promo_codes' as any) as any;
+    const updateQuery = supabase.from('promo_codes');
     const { error: updateError } = await updateQuery
       .update({
         times_used: (promo.times_used as number) + 1,
@@ -488,7 +486,7 @@ export async function getMarketplaceStats(tenantId: string, days: number = 30): 
     const fromDate = new Date();
     fromDate.setDate(fromDate.getDate() - days);
 
-    const query = supabase.from('marketplace_analytics' as any) as any;
+    const query = supabase.from('marketplace_analytics');
     const { data, error } = await query
       .select('*')
       .eq('tenant_id', tenantId)
@@ -526,7 +524,7 @@ export async function getMarketplaceStats(tenantId: string, days: number = 30): 
 
 export async function getTopSellingItems(tenantId: string, limit: number = 10): Promise<ShopItem[] | null> {
   try {
-    const query = supabase.from('user_purchases' as any) as any;
+    const query = supabase.from('user_purchases');
     const { data, error } = await query
       .select('shop_item_id, shop_items(*)')
       .eq('tenant_id', tenantId)

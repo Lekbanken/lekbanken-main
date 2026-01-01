@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       p_amount: amount,
       p_reason_code: reasonCode,
       p_idempotency_key: idempotencyKey,
-      p_description: description ?? null,
+      p_description: description ?? undefined,
       p_source: 'admin',
       p_metadata: (metadata ?? null) as unknown as Json,
     })

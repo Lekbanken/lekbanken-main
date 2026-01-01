@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         p_actor_user_id: user.id,
         p_target_user_ids: targetUserIds,
         p_amount: amount,
-        p_message: message ?? null,
+        p_message: message ?? '',
         p_idempotency_key: idempotencyKey,
       })
 
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       p_actor_user_id: user.id,
       p_target_user_ids: targetUserIds,
       p_amount: amount,
-      p_message: message ?? null,
+      p_message: message ?? '',
       p_idempotency_key: idempotencyKey,
     })
 

@@ -47,7 +47,7 @@ Scope: Library-first IA for Badges only (MVP)
 
 ### Step 3 — Multi-tenant & scope
 - [x] Tenant-scope is default.
-- [ ] Global-scope is available only to system_admin (API enforces; UI toggle deferred).
+- [x] Global-scope is available only to system_admin (API enforces; UI toggle implemented).
 - [x] TenantId must come from existing active-tenant mechanism.
 
 ## Files / routes to be touched (expected)

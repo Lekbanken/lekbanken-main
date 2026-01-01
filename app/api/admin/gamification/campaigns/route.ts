@@ -108,7 +108,7 @@ export async function POST(request: Request) {
       p_template_id: parsed.data.templateId,
       p_starts_at: startsAt,
       p_actor_user_id: user.id,
-      p_idempotency_key: parsed.data.idempotencyKey ?? null,
+      p_idempotency_key: parsed.data.idempotencyKey ?? undefined,
     })
 
     if (rpcError) {

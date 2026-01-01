@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -176,7 +176,7 @@ export function LibraryBadgesPage() {
 
   const { user } = useAuth();
 
-  const { can } = useRbac();
+  const { can, isSystemAdmin } = useRbac();
   const { currentTenant, isLoadingTenants } = useTenant();
 
   const canView = can('admin.achievements.list');
@@ -184,6 +184,10 @@ export function LibraryBadgesPage() {
   const canEdit = can('admin.achievements.edit');
 
   const tenantId = currentTenant?.id ?? null;
+
+  const scopeTypeParam = searchParams.get('scopeType');
+  const requestedScopeType = scopeTypeParam === 'global' ? 'global' : 'tenant';
+  const scopeType: 'tenant' | 'global' = isSystemAdmin ? requestedScopeType : 'tenant';
 
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -206,13 +210,29 @@ export function LibraryBadgesPage() {
   );
 
   const refreshList = useCallback(async () => {
-    if (!tenantId) return;
+    if (scopeType === 'tenant' && !tenantId) {
+      setLoadError('No active tenant');
+      setRows([]);
+      setBadges([]);
+      return;
+    }
+
+    if (scopeType === 'global' && !isSystemAdmin) {
+      setLoadError('Forbidden');
+      setRows([]);
+      setBadges([]);
+      return;
+    }
 
     setIsLoading(true);
     setLoadError(null);
 
     try {
-      const res = await fetch(`/api/admin/award-builder/exports?scopeType=tenant&tenantId=${tenantId}`);
+      const url =
+        scopeType === 'global'
+          ? '/api/admin/award-builder/exports?scopeType=global'
+          : `/api/admin/award-builder/exports?scopeType=tenant&tenantId=${tenantId}`;
+      const res = await fetch(url);
       const json = await res.json().catch(() => ({}));
 
       if (!res.ok) {
@@ -243,12 +263,10 @@ export function LibraryBadgesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [tenantId]);
+  }, [isSystemAdmin, scopeType, tenantId]);
 
   const loadOneIfNeeded = useCallback(
     async (targetId: string) => {
-      if (!tenantId) return;
-
       // If already in list, just select it.
       const existing = badges.find((b) => b.id === targetId);
       if (existing) {
@@ -288,13 +306,14 @@ export function LibraryBadgesPage() {
         setIsLoading(false);
       }
     },
-    [badges, tenantId],
+    [badges],
   );
 
   useEffect(() => {
-    if (!tenantId) return;
+    if (scopeType === 'tenant' && !tenantId) return;
+    if (scopeType === 'global' && !isSystemAdmin) return;
     refreshList();
-  }, [tenantId, refreshList]);
+  }, [isSystemAdmin, scopeType, tenantId, refreshList]);
 
   useEffect(() => {
     if (!exportId) {
@@ -344,9 +363,30 @@ export function LibraryBadgesPage() {
     [router, searchParams],
   );
 
+  const setScope = useCallback(
+    (next: 'tenant' | 'global') => {
+      const params = new URLSearchParams(searchParams.toString());
+
+      // Switching scope invalidates the current editor context.
+      params.delete('exportId');
+      params.set('scopeType', next);
+
+      const qs = params.toString();
+      router.replace(qs ? `/admin/library/badges?${qs}` : '/admin/library/badges');
+    },
+    [router, searchParams],
+  );
+
   const handleCreate = useCallback(async () => {
-    if (!tenantId) return;
+    if (scopeType === 'tenant' && !tenantId) throw new Error('No active tenant');
+    if (scopeType === 'global' && !isSystemAdmin) throw new Error('Forbidden');
     if (!user?.id) throw new Error('Unauthorized');
+
+    const resolvedTenantId = scopeType === 'tenant' ? tenantId : null;
+    const scope =
+      scopeType === 'global'
+        ? ({ type: 'global' } as const)
+        : ({ type: 'tenant', tenantId: resolvedTenantId as string } as const);
 
     const draft: AchievementItem = {
       id: `temp-${Date.now()}`,
@@ -372,12 +412,12 @@ export function LibraryBadgesPage() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        scopeType: 'tenant',
-        tenantId,
+        scopeType,
+        tenantId: resolvedTenantId,
         schemaVersion: '1.0',
         exportedByTool: 'admin-library-badges',
         export: buildExportJson({
-          scope: { type: 'tenant', tenantId },
+          scope,
           actorUserId: user.id,
           tool: 'admin-library-badges',
           nowIso: new Date().toISOString(),
@@ -399,7 +439,7 @@ export function LibraryBadgesPage() {
     // Immediately rewrite the export using the real exportId to ensure canonical identity.
     const created: AchievementItem = { ...draft, id };
     const canonical = buildExportJson({
-      scope: { type: 'tenant', tenantId },
+      scope,
       actorUserId: user.id,
       tool: 'admin-library-badges',
       nowIso: new Date().toISOString(),
@@ -427,8 +467,8 @@ export function LibraryBadgesPage() {
     setBadges((prev) => [created, ...prev]);
     setRows((prev) => [{
       id,
-      tenant_id: tenantId,
-      scope_type: 'tenant',
+      tenant_id: resolvedTenantId,
+      scope_type: scopeType,
       schema_version: '1.0',
       exported_at: new Date().toISOString(),
       exported_by_user_id: user.id,
@@ -438,7 +478,7 @@ export function LibraryBadgesPage() {
       updated_at: new Date().toISOString(),
     }, ...prev]);
     setExportId(id);
-  }, [setExportId, tenantId, user?.id]);
+  }, [isSystemAdmin, scopeType, setExportId, tenantId, user?.id]);
 
   const handleEdit = useCallback(
     (item: AchievementItem) => {
@@ -453,16 +493,23 @@ export function LibraryBadgesPage() {
 
   const handleSave = useCallback(
     async (item: AchievementItem) => {
-      if (!tenantId) throw new Error('No active tenant');
+      if (scopeType === 'tenant' && !tenantId) throw new Error('No active tenant');
+      if (scopeType === 'global' && !isSystemAdmin) throw new Error('Forbidden');
       if (!canEdit) throw new Error('Forbidden');
       if (!user?.id) throw new Error('Unauthorized');
+
+      const resolvedTenantId = scopeType === 'tenant' ? tenantId : null;
+      const scope =
+        scopeType === 'global'
+          ? ({ type: 'global' } as const)
+          : ({ type: 'tenant', tenantId: resolvedTenantId as string } as const);
 
       const current = badges.find((b) => b.id === item.id);
       const nextVersion = (current?.version ?? item.version ?? 1) + 1;
       const nextItem: AchievementItem = { ...item, version: nextVersion };
 
       const exportJson = buildExportJson({
-        scope: { type: 'tenant', tenantId },
+        scope,
         actorUserId: user.id,
         tool: 'admin-library-badges',
         nowIso: new Date().toISOString(),
@@ -493,7 +540,7 @@ export function LibraryBadgesPage() {
       );
       setEditing(nextItem);
     },
-    [badges, canEdit, tenantId, user?.id],
+    [badges, canEdit, isSystemAdmin, scopeType, tenantId, user?.id],
   );
 
   const publishedCount = badges.filter((b) => b.status === 'published').length;
@@ -514,18 +561,34 @@ export function LibraryBadgesPage() {
         title="Bibliotek"
         description="Hantera badges (via builder exports)"
         actions={
-          canCreate && (
-            <Button
-              onClick={() => {
-                void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
-              }}
-              className="gap-2 shadow-sm"
-              disabled={!tenantId || isLoadingTenants}
-            >
-              <PlusIcon className="h-4 w-4" />
-              Skapa Badge
-            </Button>
-          )
+          <>
+            {isSystemAdmin && (
+              <div className="w-44">
+                <Select
+                  aria-label="Scope"
+                  value={scopeType}
+                  onChange={(e) => setScope((e.target.value as 'tenant' | 'global') || 'tenant')}
+                  options={[
+                    { value: 'tenant', label: 'Tenant' },
+                    { value: 'global', label: 'Global' },
+                  ]}
+                />
+              </div>
+            )}
+
+            {canCreate && (
+              <Button
+                onClick={() => {
+                  void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
+                }}
+                className="gap-2 shadow-sm"
+                disabled={(scopeType === 'tenant' && (!tenantId || isLoadingTenants)) || (scopeType === 'global' && !isSystemAdmin)}
+              >
+                <PlusIcon className="h-4 w-4" />
+                Skapa Badge
+              </Button>
+            )}
+          </>
         }
       />
 
@@ -543,7 +606,7 @@ export function LibraryBadgesPage() {
             </div>
           )}
 
-          {!tenantId && !isLoadingTenants && (
+          {scopeType === 'tenant' && !tenantId && !isLoadingTenants && (
             <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
               Välj en organisation (active tenant) för att visa biblioteket.
             </div>
@@ -648,7 +711,7 @@ export function LibraryBadgesPage() {
                           void handleCreate().catch((e) => setLoadError(e instanceof Error ? e.message : 'Failed to create'));
                         }}
                         className="mt-6 gap-2"
-                        disabled={!tenantId}
+                        disabled={(scopeType === 'tenant' && !tenantId) || (scopeType === 'global' && !isSystemAdmin)}
                       >
                         <PlusIcon className="h-4 w-4" />
                         Create Badge

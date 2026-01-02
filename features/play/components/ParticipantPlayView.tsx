@@ -27,6 +27,7 @@ import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { ParticipantSignalMicroUI } from '@/features/play/components/ParticipantSignalMicroUI';
 import { ParticipantTimeBankDisplay } from '@/features/play/components/ParticipantTimeBankDisplay';
 import { isFeatureEnabled } from '@/lib/config/env';
+import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import { RoleCard, type RoleCardData } from './RoleCard';
 import type { TimerState, SessionRuntimeState, SignalReceivedBroadcast } from '@/types/play-runtime';
@@ -91,6 +92,7 @@ export interface ParticipantPlayViewProps {
   isNextStarter?: boolean;
   /** Participant token (used for chat API) */
   participantToken?: string;
+  tools?: Array<{ tool_key: string; enabled?: boolean; scope?: string }>;
   /** Whether to show role card */
   showRole?: boolean;
   /** When this participant revealed their secret role instructions */
@@ -237,6 +239,7 @@ export function ParticipantPlayView({
   participantId,
   isNextStarter: initialIsNextStarter,
   participantToken,
+  tools: _tools,
   showRole = true,
   secretRoleRevealedAt,
   boardTheme,
@@ -713,6 +716,14 @@ export function ParticipantPlayView({
                   </span>
                 )}
               </Button>
+
+              {/* Toolbelt (MVP: Dice Roller v1) */}
+              <Toolbelt
+                sessionId={sessionId}
+                role="participant"
+                participantToken={participantToken}
+                buttonClassName="gap-1 h-7 text-xs"
+              />
             </div>
           )}
         </div>

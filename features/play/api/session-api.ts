@@ -82,6 +82,8 @@ export interface PlaySessionData {
   runtimeState: Partial<SessionRuntimeState>;
   /** Board theme (from game board config) */
   boardTheme?: BoardTheme;
+  /** Enabled tools for this game's toolbelt */
+  tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }>;
   /** Participant count */
   participantCount: number;
 }
@@ -130,6 +132,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
     let phases: PhaseInfo[] = [];
     let gameTitle = session.displayName || 'Session';
     let boardTheme: BoardTheme | undefined;
+    let tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }> = [];
 
     // If game is linked, fetch game+steps/phases through Play API
     if (session.gameId) {
@@ -143,6 +146,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
         steps = gameData.steps || [];
         phases = gameData.phases || [];
         boardTheme = gameData.board?.theme;
+        tools = Array.isArray(gameData.tools) ? gameData.tools : [];
       }
     }
     
@@ -176,6 +180,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
       sessionRoles,
       runtimeState,
       boardTheme,
+      tools,
       participantCount: session.participantCount ?? 0,
     };
   } catch (error) {
@@ -396,6 +401,7 @@ export async function getParticipantPlaySession(
     let phases: PhaseInfo[] = [];
     let gameTitle = session.displayName || 'Session';
     let boardTheme: BoardTheme | undefined;
+    let tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }> = [];
     
     // If game is linked, fetch public game data
     if (session.gameId) {
@@ -415,6 +421,7 @@ export async function getParticipantPlaySession(
           steps = gameData.steps || [];
           phases = gameData.phases || [];
           boardTheme = gameData.board?.theme;
+          tools = Array.isArray(gameData.tools) ? gameData.tools : [];
         }
       } catch {
         // Game data fetch failed, continue with defaults
@@ -462,6 +469,7 @@ export async function getParticipantPlaySession(
       sessionRoles: [], // Participants don't see all roles
       runtimeState,
       boardTheme,
+      tools,
       participantCount: session.participantCount ?? 0,
       assignedRole,
       participantName: participant.displayName,

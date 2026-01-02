@@ -2554,6 +2554,44 @@ export type Database = {
           },
         ]
       }
+      game_tools: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          game_id: string
+          id: string
+          scope: string
+          tool_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          game_id: string
+          id?: string
+          scope?: string
+          tool_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          game_id?: string
+          id?: string
+          scope?: string
+          tool_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_tools_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           accessibility_notes: string | null

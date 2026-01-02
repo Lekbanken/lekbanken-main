@@ -42,6 +42,7 @@ import { SessionChatDrawer } from './SessionChatDrawer';
 import { SessionStoryPanel } from './SessionStoryPanel';
 import { LobbyHub } from '@/components/play';
 import { StoryViewModal } from './StoryViewModal';
+import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
 import { kickParticipant, setNextStarter } from '@/features/play-participant/api';
 import type { SessionCockpitState, CockpitParticipant, UseSessionStateReturn, SessionEvent as CockpitEvent } from '@/types/session-cockpit';
@@ -113,6 +114,7 @@ function SessionHeader({
   session,
   status,
   participantCount,
+  sessionId,
   onEnterDirectorMode,
   isPending,
   onOpenChat,
@@ -121,6 +123,7 @@ function SessionHeader({
   session: SessionInfo | null;
   status: SessionCockpitState['status'];
   participantCount: number;
+  sessionId: string;
   onEnterDirectorMode: () => void;
   isPending: boolean;
   onOpenChat?: () => void;
@@ -171,6 +174,13 @@ function SessionHeader({
             )}
           </Button>
         )}
+
+        <Toolbelt
+          sessionId={sessionId}
+          role="host"
+          buttonLabel="🧰"
+        />
+
         {status === 'lobby' && (
           <Button
             onClick={onEnterDirectorMode}
@@ -1053,6 +1063,7 @@ export function SessionCockpit({
           session={session}
           status={status}
           participantCount={participants.length}
+          sessionId={sessionId}
           onEnterDirectorMode={handleEnterDirectorMode}
           isPending={isLoading}
           onOpenChat={chatEnabled ? () => setChatOpen(true) : undefined}

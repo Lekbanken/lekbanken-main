@@ -12,6 +12,7 @@ import {
   TvIcon,
   LanguageIcon,
   Cog6ToothIcon,
+  WrenchScrewdriverIcon,
   Squares2X2Icon,
   BoltIcon,
 } from '@heroicons/react/24/outline';
@@ -27,6 +28,7 @@ export type BuilderSection =
   | 'faser'
   | 'roller'
   | 'tavla'
+  | 'verktyg'
   | 'oversattningar'
   | 'installningar';
 
@@ -49,6 +51,7 @@ const sections: SectionConfig[] = [
   { id: 'faser', label: 'Faser & Rundor', icon: ClockIcon, advanced: true, requiresMode: ['facilitated', 'participants'] },
   { id: 'roller', label: 'Roller', icon: UserGroupIcon, advanced: true, requiresMode: ['participants'] },
   { id: 'tavla', label: 'Publik Tavla', icon: TvIcon, advanced: true, requiresMode: ['participants'] },
+  { id: 'verktyg', label: 'Verktyg (Toolbelt)', icon: WrenchScrewdriverIcon, advanced: true, requiresMode: ['facilitated', 'participants'] },
   { id: 'oversattningar', label: 'Översättningar', icon: LanguageIcon },
   { id: 'installningar', label: 'Inställningar', icon: Cog6ToothIcon },
 ];

@@ -15,6 +15,7 @@ import type { BoardTheme } from '@/types/games';
 
 type GameStepRow = Database['public']['Tables']['game_steps']['Row'];
 type GamePhaseRow = Database['public']['Tables']['game_phases']['Row'];
+type GameToolRow = Database['public']['Tables']['game_tools']['Row'];
 
 type StepInfo = {
   id: string;
@@ -39,6 +40,8 @@ type PhaseInfo = {
   description?: string;
   duration?: number | null;
 };
+
+type ToolInfo = Pick<GameToolRow, 'tool_key' | 'enabled' | 'scope'>;
 
 type AdminOverrides = {
   steps?: Array<{
@@ -259,6 +262,13 @@ export async function GET(
       .eq('game_id', session.game_id)
       .maybeSingle();
 
+    // Enabled toolbelt tools for this game
+    const { data: tools } = await supabaseAdmin
+      .from('game_tools')
+      .select('tool_key, enabled, scope')
+      .eq('game_id', session.game_id)
+      .eq('enabled', true);
+
     // Steps
     const { data: fallbackSteps } = await supabaseAdmin
       .from('game_steps')
@@ -371,6 +381,7 @@ export async function GET(
       },
       steps: mergedStepsWithOverrides,
       phases: mergedPhasesWithOverrides,
+      tools: (tools ?? []) as ToolInfo[],
       safety: {
         safetyNotes: adminOverrides.safety?.safetyNotes ?? materialsRow?.safety_notes ?? undefined,
         accessibilityNotes: adminOverrides.safety?.accessibilityNotes,

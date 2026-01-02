@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { Database, Json } from '@/types/supabase';
+import { TOOL_REGISTRY } from '@/features/tools/registry';
 
 type EnergyLevel = Database['public']['Enums']['energy_level_enum'];
 type LocationType = Database['public']['Enums']['location_type_enum'];
@@ -152,6 +153,12 @@ type TriggerPayload = {
   sort_order?: number;
 };
 
+type GameToolPayload = {
+  tool_key: string;
+  enabled?: boolean;
+  scope?: string;
+};
+
 type BuilderBody = {
   core?: CorePayload;
   steps?: StepPayload[];
@@ -163,7 +170,15 @@ type BuilderBody = {
   triggers?: TriggerPayload[];
   secondaryPurposes?: string[];
   coverMediaId?: string | null;
+  tools?: GameToolPayload[];
 };
+
+const VALID_TOOL_KEYS = new Set<string>(TOOL_REGISTRY.map((t) => t.key));
+
+function normalizeToolScope(value: unknown): 'host' | 'participants' | 'both' {
+  if (value === 'host' || value === 'participants' || value === 'both') return value;
+  return 'both';
+}
 
 export async function GET(
   _request: Request,
@@ -211,6 +226,12 @@ export async function GET(
     .select('*')
     .eq('game_id', id)
     .maybeSingle();
+
+  const { data: gameTools } = await supabase
+    .from('game_tools')
+    .select('tool_key, enabled, scope')
+    .eq('game_id', id)
+    .order('created_at', { ascending: true });
 
   const { data: secondaryPurposes } = await supabase
     .from('game_secondary_purposes')
@@ -269,6 +290,7 @@ export async function GET(
     phases: phases || [],
     roles: roles || [],
     boardConfig: boardConfig || null,
+    gameTools: gameTools || [],
     secondaryPurposes: (secondaryPurposes || []).map((p: { purpose_id: string }) => p.purpose_id),
     coverMedia: coverMedia
       ? {
@@ -373,6 +395,24 @@ export async function PUT(
       purpose_id: purposeId,
     }));
     await supabase.from('game_secondary_purposes').insert(purposeRows);
+  }
+
+  // Replace toolbelt configuration (optional)
+  if (Array.isArray(body.tools)) {
+    const rows = body.tools
+      .filter((t) => t && typeof t === 'object')
+      .map((t) => ({
+        game_id: id,
+        tool_key: String(t.tool_key || '').trim(),
+        enabled: typeof t.enabled === 'boolean' ? t.enabled : true,
+        scope: normalizeToolScope(t.scope),
+      }))
+      .filter((t) => t.tool_key && VALID_TOOL_KEYS.has(t.tool_key));
+
+    // Keep schema simple: we persist one row per tool key (even when disabled)
+    if (rows.length > 0) {
+      await supabase.from('game_tools').upsert(rows, { onConflict: 'game_id,tool_key' });
+    }
   }
 
   // Replace phases (upsert pattern: delete all, insert new)

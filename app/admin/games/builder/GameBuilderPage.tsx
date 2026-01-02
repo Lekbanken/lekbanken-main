@@ -27,6 +27,8 @@ import {
 import { ValidationPanel } from './components/ValidationPanel';
 import { validateGameRefs, type GameDataForValidation } from './utils/validateGameRefs';
 import type { ArtifactFormData, ArtifactVariantFormData, TriggerFormData } from '@/types/games';
+import { TOOL_REGISTRY } from '@/features/tools/registry';
+import type { ToolKey, ToolScope } from '@/features/tools/types';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
 
@@ -133,6 +135,18 @@ type GameBuilderPageProps = {
   gameId?: string;
 };
 
+type GameToolForm = {
+  tool_key: ToolKey;
+  enabled: boolean;
+  scope: ToolScope;
+};
+
+const DEFAULT_GAME_TOOLS: GameToolForm[] = TOOL_REGISTRY.map((tool) => ({
+  tool_key: tool.key,
+  enabled: false,
+  scope: tool.defaultScope,
+}));
+
 export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const router = useRouter();
   const isEditing = Boolean(gameId);
@@ -152,6 +166,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const [purposes, setPurposes] = useState<Purpose[]>([]);
   const [subPurposeIds, setSubPurposeIds] = useState<string[]>([]);
   const [cover, setCover] = useState<{ mediaId: string | null; url: string | null }>({ mediaId: null, url: null });
+  const [gameTools, setGameTools] = useState<GameToolForm[]>(DEFAULT_GAME_TOOLS);
   const [boardConfig, setBoardConfig] = useState<BoardConfigData>({
     show_game_name: true,
     show_current_phase: true,
@@ -396,6 +411,27 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             });
           }
         }
+
+        // Load toolbelt configuration
+        const incomingTools = Array.isArray(data.gameTools) ? (data.gameTools as unknown[]) : [];
+        const byKey = new Map<string, { enabled?: unknown; scope?: unknown }>();
+        for (const raw of incomingTools) {
+          if (!raw || typeof raw !== 'object') continue;
+          const rec = raw as Record<string, unknown>;
+          const toolKey = rec.tool_key;
+          if (typeof toolKey !== 'string') continue;
+          byKey.set(toolKey, { enabled: rec.enabled, scope: rec.scope });
+        }
+
+        setGameTools(
+          DEFAULT_GAME_TOOLS.map((tool) => {
+            const row = byKey.get(tool.tool_key);
+            const enabled = typeof row?.enabled === 'boolean' ? row.enabled : tool.enabled;
+            const scopeRaw = row?.scope;
+            const scope: ToolScope = scopeRaw === 'host' || scopeRaw === 'participants' || scopeRaw === 'both' ? scopeRaw : tool.scope;
+            return { ...tool, enabled, scope };
+          })
+        );
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Kunde inte ladda data');
       } finally {
@@ -461,8 +497,10 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       boardConfig.show_timer || boardConfig.show_participants || boardConfig.show_public_roles ||
       boardConfig.show_qr_code || boardConfig.welcome_message.trim();
     if (hasBoardContent) completed.push('tavla');
+
+    if (gameTools.some((t) => t.enabled)) completed.push('verktyg');
     return completed;
-  }, [qualityState, steps, materials, phases, roles, artifacts, triggers, boardConfig]);
+  }, [qualityState, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameTools]);
 
   // Save handler
   const handleSave = useCallback(async (options?: { status?: 'draft' | 'published' }) => {
@@ -571,6 +609,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         })),
         secondaryPurposes: subPurposeIds,
         coverMediaId: cover.mediaId,
+        tools: gameTools,
       };
 
       const res = await fetch(
@@ -595,7 +634,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       setSaveStatus('error');
       setError(err instanceof Error ? err.message : 'Ett fel uppstod');
     }
-  }, [core, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameId, router, subPurposeIds, cover]);
+  }, [core, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameId, router, subPurposeIds, cover, gameTools]);
 
   // Publish handler
   const handlePublish = useCallback(async () => {
@@ -1096,6 +1135,76 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                 gameName={core.name}
                 onChange={setBoardConfig}
               />
+            </section>
+          )}
+
+          {/* Verktyg (Toolbelt) Section */}
+          {activeSection === 'verktyg' && (
+            <section className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-foreground mb-1">Verktyg (Toolbelt)</h2>
+                <p className="text-sm text-muted-foreground">
+                  Aktivera verktyg som kan användas under en spelsession. (MVP: endast Dice Roller v1)
+                </p>
+              </div>
+
+              <Card className="p-6 space-y-4">
+                {TOOL_REGISTRY.map((tool) => {
+                  const current = gameTools.find((t) => t.tool_key === tool.key) ?? {
+                    tool_key: tool.key,
+                    enabled: false,
+                    scope: tool.defaultScope,
+                  };
+
+                  return (
+                    <div key={tool.key} className="rounded-lg border border-border p-4 space-y-3">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="checkbox"
+                              className="h-4 w-4 rounded border-border"
+                              checked={current.enabled}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setGameTools((prev) =>
+                                  prev.map((t) => (t.tool_key === tool.key ? { ...t, enabled: checked } : t))
+                                );
+                              }}
+                            />
+                            <span className="text-sm font-medium text-foreground">{tool.name}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground">{tool.description}</p>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium text-foreground">Tillgänglig för</label>
+                          <Select
+                            value={current.scope}
+                            onChange={(e) => {
+                              const value = e.target.value as ToolScope;
+                              setGameTools((prev) =>
+                                prev.map((t) => (t.tool_key === tool.key ? { ...t, scope: value } : t))
+                              );
+                            }}
+                            options={[
+                              { value: 'host', label: 'Ledare' },
+                              { value: 'participants', label: 'Deltagare' },
+                              { value: 'both', label: 'Båda' },
+                            ]}
+                            disabled={!current.enabled}
+                          />
+                          <p className="text-xs text-muted-foreground">
+                            Styr om verktyget visas för ledare, deltagare eller båda.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </Card>
             </section>
           )}
 

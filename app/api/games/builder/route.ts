@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import type { Database, Json } from '@/types/supabase';
+import { TOOL_REGISTRY } from '@/features/tools/registry';
 
 type EnergyLevel = Database['public']['Enums']['energy_level_enum'];
 type LocationType = Database['public']['Enums']['location_type_enum'];
@@ -96,6 +97,12 @@ type ArtifactPayload = {
   variants?: ArtifactVariantPayload[];
 };
 
+type GameToolPayload = {
+  tool_key: string;
+  enabled?: boolean;
+  scope?: string;
+};
+
 type BuilderBody = {
   core?: CorePayload;
   steps?: StepPayload[];
@@ -103,7 +110,15 @@ type BuilderBody = {
   artifacts?: ArtifactPayload[];
   secondaryPurposes?: string[];
   coverMediaId?: string | null;
+  tools?: GameToolPayload[];
 };
+
+const VALID_TOOL_KEYS = new Set<string>(TOOL_REGISTRY.map((t) => t.key));
+
+function normalizeToolScope(value: unknown): 'host' | 'participants' | 'both' {
+  if (value === 'host' || value === 'participants' || value === 'both') return value;
+  return 'both';
+}
 
 export async function POST(request: Request) {
   const supabase = createServiceRoleClient();
@@ -246,6 +261,23 @@ export async function POST(request: Request) {
       if (variantsError) {
         return NextResponse.json({ error: 'Failed to save artifact variants', details: variantsError.message }, { status: 500 });
       }
+    }
+  }
+
+  // Save toolbelt configuration (optional)
+  if (Array.isArray(body.tools) && body.tools.length > 0) {
+    const rows = body.tools
+      .filter((t) => t && typeof t === 'object')
+      .map((t) => ({
+        game_id: game.id,
+        tool_key: String(t.tool_key || '').trim(),
+        enabled: typeof t.enabled === 'boolean' ? t.enabled : true,
+        scope: normalizeToolScope(t.scope),
+      }))
+      .filter((t) => t.tool_key && VALID_TOOL_KEYS.has(t.tool_key));
+
+    if (rows.length > 0) {
+      await supabase.from('game_tools').upsert(rows, { onConflict: 'game_id,tool_key' });
     }
   }
 

@@ -144,6 +144,7 @@ export function ParticipantPlayMode({
       showRole={showRole && !!role}
       secretRoleRevealedAt={playData.secretRoleRevealedAt}
       boardTheme={playData.boardTheme}
+      tools={playData.tools}
     />
   );
 }

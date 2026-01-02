@@ -66,80 +66,90 @@ async function requireAdmin(tenantId: string) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json().catch(() => ({}))
-  const parsed = createSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+  try {
+    const body = await request.json().catch(() => ({}))
+    const parsed = createSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const { tenantId, item } = parsed.data
+    const auth = await requireAdmin(tenantId)
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
+    }
+
+    // Server-only write
+    const admin = createServiceRoleClient()
+
+    const { data, error } = await admin
+      .from('shop_items')
+      .insert({
+        tenant_id: tenantId,
+        created_by_user_id: auth.user.id,
+        name: item.name,
+        description: item.description ?? null,
+        category: item.category,
+        image_url: item.image_url ?? null,
+        price: item.price,
+        currency_id: item.currency_id,
+        quantity_limit: item.quantity_limit ?? null,
+        is_featured: item.is_featured ?? false,
+        is_available: item.is_available ?? true,
+        sort_order: item.sort_order ?? 0,
+        metadata: ((item.metadata ?? {}) as unknown as Json),
+      })
+      .select('*')
+      .single()
+
+    if (error) {
+      const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
+      return NextResponse.json({ error: 'Failed to create item', details: message }, { status: 500 })
+    }
+
+    return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error'
+    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
   }
-
-  const { tenantId, item } = parsed.data
-  const auth = await requireAdmin(tenantId)
-  if (!auth.ok) {
-    return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
-  }
-
-  // Server-only write
-  const admin = createServiceRoleClient()
-
-  const { data, error } = await admin
-    .from('shop_items')
-    .insert({
-      tenant_id: tenantId,
-      created_by_user_id: auth.user.id,
-      name: item.name,
-      description: item.description ?? null,
-      category: item.category,
-      image_url: item.image_url ?? null,
-      price: item.price,
-      currency_id: item.currency_id,
-      quantity_limit: item.quantity_limit ?? null,
-      is_featured: item.is_featured ?? false,
-      is_available: item.is_available ?? true,
-      sort_order: item.sort_order ?? 0,
-      metadata: ((item.metadata ?? {}) as unknown as Json),
-    })
-    .select('*')
-    .single()
-
-  if (error) {
-    const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
-    return NextResponse.json({ error: 'Failed to create item', details: message }, { status: 500 })
-  }
-
-  return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
 }
 
 export async function PATCH(request: Request) {
-  const body = await request.json().catch(() => ({}))
-  const parsed = patchSchema.safeParse(body)
-  if (!parsed.success) {
-    return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+  try {
+    const body = await request.json().catch(() => ({}))
+    const parsed = patchSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', details: parsed.error.flatten() }, { status: 400 })
+    }
+
+    const { tenantId, itemId, updates } = parsed.data
+    const auth = await requireAdmin(tenantId)
+    if (!auth.ok) {
+      return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
+    }
+
+    const admin = createServiceRoleClient()
+
+    const patch: Record<string, unknown> = {
+      updated_at: new Date().toISOString(),
+    }
+
+    for (const key of Object.keys(updates)) {
+      const value = (updates as Record<string, unknown>)[key]
+      if (value === undefined) continue
+      patch[key] = value
+    }
+
+    const { data, error } = await admin.from('shop_items').update(patch).eq('id', itemId).eq('tenant_id', tenantId).select('*').single()
+
+    if (error) {
+      const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
+      return NextResponse.json({ error: 'Failed to update item', details: message }, { status: 500 })
+    }
+
+    return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
+  } catch (e) {
+    const message = e instanceof Error ? e.message : 'Unknown error'
+    return NextResponse.json({ error: 'Server error', details: message }, { status: 500 })
   }
-
-  const { tenantId, itemId, updates } = parsed.data
-  const auth = await requireAdmin(tenantId)
-  if (!auth.ok) {
-    return NextResponse.json({ error: auth.status === 401 ? 'Unauthorized' : 'Forbidden' }, { status: auth.status })
-  }
-
-  const admin = createServiceRoleClient()
-
-  const patch: Record<string, unknown> = {
-    updated_at: new Date().toISOString(),
-  }
-
-  for (const key of Object.keys(updates)) {
-    const value = (updates as Record<string, unknown>)[key]
-    if (value === undefined) continue
-    patch[key] = value
-  }
-
-  const { data, error } = await admin.from('shop_items').update(patch).eq('id', itemId).eq('tenant_id', tenantId).select('*').single()
-
-  if (error) {
-    const message = typeof error?.message === 'string' ? error.message : 'Unknown error'
-    return NextResponse.json({ error: 'Failed to update item', details: message }, { status: 500 })
-  }
-
-  return NextResponse.json({ item: data as ShopItemRow }, { status: 200 })
 }

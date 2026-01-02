@@ -228,6 +228,17 @@ export default function MarketplaceAdminPage() {
     return `${seconds}s`;
   };
 
+  const readApiError = async (res: Response) => {
+    const contentType = res.headers.get('content-type') ?? '';
+    if (contentType.includes('application/json')) {
+      const json = await res.json().catch(() => null);
+      return { status: res.status, statusText: res.statusText, contentType, json, text: null as string | null };
+    }
+
+    const text = await res.text().catch(() => null);
+    return { status: res.status, statusText: res.statusText, contentType, json: null as unknown, text };
+  };
+
   const handleSaveItem = async () => {
     if (!user || !currentTenant) return;
 
@@ -256,7 +267,7 @@ export default function MarketplaceAdminPage() {
         });
 
         if (!res.ok) {
-          console.error('Failed to update item', await res.json().catch(() => ({})));
+          console.error('Failed to update item', await readApiError(res));
           return;
         }
 
@@ -293,7 +304,7 @@ export default function MarketplaceAdminPage() {
       });
 
       if (!res.ok) {
-        console.error('Failed to create item', await res.json().catch(() => ({})));
+        console.error('Failed to create item', await readApiError(res));
         return;
       }
 
@@ -324,7 +335,7 @@ export default function MarketplaceAdminPage() {
       });
 
       if (!res.ok) {
-        console.error('Failed to update item', await res.json().catch(() => ({})));
+        console.error('Failed to update item', await readApiError(res));
         return;
       }
 

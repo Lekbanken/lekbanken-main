@@ -1,7 +1,10 @@
 import type { CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
 
-const VIEWBOX_WIDTH = 1000;
-const VIEWBOX_HEIGHT = 600;
+// Portrait canvas (mobile-first)
+const VIEWBOX_WIDTH = 600;
+const VIEWBOX_HEIGHT = 1000;
+
+const FIELD_MARGIN = 10;
 
 function clamp01(value: number): number {
   if (Number.isNaN(value)) return 0;
@@ -38,6 +41,27 @@ function escapeXml(text: string): string {
 }
 
 export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
+  const innerW = VIEWBOX_WIDTH - FIELD_MARGIN * 2;
+  const innerH = VIEWBOX_HEIGHT - FIELD_MARGIN * 2;
+  const centerX = VIEWBOX_WIDTH / 2;
+  const centerY = VIEWBOX_HEIGHT / 2;
+  const centerCircleR = Math.round(Math.min(VIEWBOX_WIDTH, VIEWBOX_HEIGHT) * 0.12);
+
+  // Generic field markings (more visual structure than just a border + center line).
+  const penaltyW = innerW * 0.6;
+  const penaltyH = innerH * 0.18;
+  const goalW = innerW * 0.32;
+  const goalH = innerH * 0.08;
+  const penaltyX = (VIEWBOX_WIDTH - penaltyW) / 2;
+  const goalX = (VIEWBOX_WIDTH - goalW) / 2;
+  const topPenaltyY = FIELD_MARGIN;
+  const bottomPenaltyY = VIEWBOX_HEIGHT - FIELD_MARGIN - penaltyH;
+  const topGoalY = FIELD_MARGIN;
+  const bottomGoalY = VIEWBOX_HEIGHT - FIELD_MARGIN - goalH;
+  const spotOffset = penaltyH * 0.65;
+  const topSpotY = FIELD_MARGIN + spotOffset;
+  const bottomSpotY = VIEWBOX_HEIGHT - FIELD_MARGIN - spotOffset;
+
   const defs = `
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
@@ -47,9 +71,17 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
 
   const field = `
   <g>
-    <rect x="10" y="10" width="980" height="580" rx="18" ry="18" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="2" />
-    <line x1="500" y1="10" x2="500" y2="590" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <circle cx="500" cy="300" r="70" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <rect x="${FIELD_MARGIN}" y="${FIELD_MARGIN}" width="${innerW}" height="${innerH}" rx="18" ry="18" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="2" />
+    <line x1="${FIELD_MARGIN}" y1="${centerY}" x2="${VIEWBOX_WIDTH - FIELD_MARGIN}" y2="${centerY}" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <circle cx="${centerX}" cy="${centerY}" r="${centerCircleR}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+
+    <rect x="${penaltyX}" y="${topPenaltyY}" width="${penaltyW}" height="${penaltyH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <rect x="${goalX}" y="${topGoalY}" width="${goalW}" height="${goalH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <circle cx="${centerX}" cy="${topSpotY}" r="3" fill="currentColor" fill-opacity="0.18" />
+
+    <rect x="${penaltyX}" y="${bottomPenaltyY}" width="${penaltyW}" height="${penaltyH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <rect x="${goalX}" y="${bottomGoalY}" width="${goalW}" height="${goalH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
+    <circle cx="${centerX}" cy="${bottomSpotY}" r="3" fill="currentColor" fill-opacity="0.18" />
   </g>`;
 
   const arrows = doc.arrows
@@ -58,10 +90,13 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
       const to = posToPx(a.to);
       const dash = a.style.pattern === 'dashed' ? ' stroke-dasharray="8 6"' : '';
       const marker = a.style.arrowhead ? ' marker-end="url(#arrowhead)"' : '';
+      const labelText = a.label ? escapeXml(a.label) : '';
+      const labelX = (from.x + to.x) / 2;
+      const labelY = (from.y + to.y) / 2 - 10;
       const label = a.label
-        ? `<text x="${(from.x + to.x) / 2}" y="${(from.y + to.y) / 2}" font-size="14" text-anchor="middle" fill="currentColor" fill-opacity="0.8">${escapeXml(
-            a.label
-          )}</text>`
+        ? `
+    <text x="${labelX}" y="${labelY}" font-size="14" text-anchor="middle" fill="none" stroke="white" stroke-opacity="0.9" stroke-width="4" stroke-linejoin="round">${labelText}</text>
+    <text x="${labelX}" y="${labelY}" font-size="14" text-anchor="middle" fill="currentColor" fill-opacity="0.85">${labelText}</text>`
         : '';
 
       return `
@@ -86,10 +121,15 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
       }
 
       const fill = o.type === 'marker' ? 'fill="currentColor" fill-opacity="0.12"' : 'fill="none"';
-      const label = o.style.label
-        ? `<text x="${x}" y="${y + 5}" font-size="14" text-anchor="middle" fill="currentColor" fill-opacity="0.9">${escapeXml(
-            o.style.label
-          )}</text>`
+      const labelValue = o.style.label?.trim() ? escapeXml(o.style.label) : '';
+      const isShort = labelValue.length > 0 && labelValue.length <= 2;
+      const labelX = x;
+      const labelY = isShort ? y + 5 : y - r - 8;
+      const labelFontSize = isShort ? 16 : 14;
+      const label = labelValue
+        ? `
+    <text x="${labelX}" y="${labelY}" font-size="${labelFontSize}" text-anchor="middle" fill="none" stroke="white" stroke-opacity="0.9" stroke-width="4" stroke-linejoin="round">${labelValue}</text>
+    <text x="${labelX}" y="${labelY}" font-size="${labelFontSize}" text-anchor="middle" fill="currentColor" fill-opacity="0.9">${labelValue}</text>`
         : '';
 
       return `

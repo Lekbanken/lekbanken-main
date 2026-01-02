@@ -251,6 +251,13 @@ export const adminNavConfig: AdminNavConfig = [
         icon: navIcons.achievements,
         permission: 'admin.achievements.list',
       },
+      {
+        id: 'library-coach-diagrams',
+        href: '/admin/library/coach-diagrams',
+        label: 'Coach Diagrams',
+        icon: navIcons.achievements,
+        permission: 'admin.content.list',
+      },
     ],
   },
   {

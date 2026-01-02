@@ -103,10 +103,11 @@ async function requireAuth() {
   return { user, response: null };
 }
 
-function getAppUrl(): string | null {
+function getAppUrlFromRequest(req: NextRequest): string {
   const url = process.env.NEXT_PUBLIC_APP_URL;
-  if (!url) return null;
-  return url.replace(/\/$/, '');
+  if (url) return url.replace(/\/$/, '');
+  // Fallback: derive from incoming request (works in local dev without extra env).
+  return new URL(req.url).origin;
 }
 
 export async function GET(req: NextRequest) {
@@ -197,10 +198,7 @@ export async function POST(req: NextRequest) {
     if (!allowed) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const appUrl = getAppUrl();
-  if (!appUrl) {
-    return NextResponse.json({ error: 'Server misconfigured', details: { NEXT_PUBLIC_APP_URL: ['Missing'] } }, { status: 500 });
-  }
+  const appUrl = getAppUrlFromRequest(req);
 
   const admin = createServiceRoleClient() as unknown as SupabaseClient<DatabaseWithMediaAndCoachDiagrams>;
 

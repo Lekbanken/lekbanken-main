@@ -54,6 +54,26 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
   const router = useRouter();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
+  const fieldMargin = 10;
+  const fieldInnerW = diagramViewBox.width - fieldMargin * 2;
+  const fieldInnerH = diagramViewBox.height - fieldMargin * 2;
+  const fieldCenterX = diagramViewBox.width / 2;
+  const fieldCenterY = diagramViewBox.height / 2;
+  const fieldCenterCircleR = Math.round(Math.min(diagramViewBox.width, diagramViewBox.height) * 0.12);
+  const penaltyW = fieldInnerW * 0.6;
+  const penaltyH = fieldInnerH * 0.18;
+  const goalW = fieldInnerW * 0.32;
+  const goalH = fieldInnerH * 0.08;
+  const penaltyX = (diagramViewBox.width - penaltyW) / 2;
+  const goalX = (diagramViewBox.width - goalW) / 2;
+  const topPenaltyY = fieldMargin;
+  const bottomPenaltyY = diagramViewBox.height - fieldMargin - penaltyH;
+  const topGoalY = fieldMargin;
+  const bottomGoalY = diagramViewBox.height - fieldMargin - goalH;
+  const spotOffset = penaltyH * 0.65;
+  const topSpotY = fieldMargin + spotOffset;
+  const bottomSpotY = diagramViewBox.height - fieldMargin - spotOffset;
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -596,7 +616,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
         <Card className="p-4">
           <div className="text-sm font-medium mb-3">Förhandsvisning</div>
 
-          <div className="aspect-[5/3] w-full overflow-hidden rounded-xl border bg-background">
+          <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
             <svg
               ref={svgRef}
               viewBox={`0 0 ${diagramViewBox.width} ${diagramViewBox.height}`}
@@ -606,9 +626,42 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
               onPointerUp={onSvgPointerUp}
             >
               {/* Render field */}
-              <rect x={10} y={10} width={980} height={580} rx={18} ry={18} fill="none" stroke="currentColor" strokeOpacity={0.35} strokeWidth={2} />
-              <line x1={500} y1={10} x2={500} y2={590} stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-              <circle cx={500} cy={300} r={70} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
+              <rect
+                x={fieldMargin}
+                y={fieldMargin}
+                width={fieldInnerW}
+                height={fieldInnerH}
+                rx={18}
+                ry={18}
+                fill="none"
+                stroke="currentColor"
+                strokeOpacity={0.35}
+                strokeWidth={2}
+              />
+              <line
+                x1={fieldMargin}
+                y1={fieldCenterY}
+                x2={diagramViewBox.width - fieldMargin}
+                y2={fieldCenterY}
+                stroke="currentColor"
+                strokeOpacity={0.18}
+                strokeWidth={2}
+              />
+              <circle
+                cx={fieldCenterX}
+                cy={fieldCenterY}
+                r={fieldCenterCircleR}
+                fill="none"
+                stroke="currentColor"
+                strokeOpacity={0.18}
+                strokeWidth={2}
+              />
+              <rect x={penaltyX} y={topPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
+              <rect x={goalX} y={topGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
+              <circle cx={fieldCenterX} cy={topSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
+              <rect x={penaltyX} y={bottomPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
+              <rect x={goalX} y={bottomGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
+              <circle cx={fieldCenterX} cy={bottomSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
 
               <defs>
                 <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
@@ -622,8 +675,21 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                 const to = { x: a.to.x * diagramViewBox.width, y: a.to.y * diagramViewBox.height };
                 const dash = a.style.pattern === 'dashed' ? '8 6' : undefined;
                 const isSelected = selection.kind === 'arrow' && selection.id === a.id;
+                const label = a.label?.trim() ? a.label : null;
+                const labelX = (from.x + to.x) / 2;
+                const labelY = (from.y + to.y) / 2 - 10;
                 return (
                   <g key={a.id} data-arrow-id={a.id}>
+                    {/* Wide invisible hit target for mobile */}
+                    <line
+                      x1={from.x}
+                      y1={from.y}
+                      x2={to.x}
+                      y2={to.y}
+                      stroke="transparent"
+                      strokeWidth={18}
+                      strokeLinecap="round"
+                    />
                     <line
                       x1={from.x}
                       y1={from.y}
@@ -636,14 +702,32 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                       strokeDasharray={dash}
                       markerEnd={a.style.arrowhead ? 'url(#arrowhead)' : undefined}
                     />
-                    {a.label && (
-                      <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2} fontSize={14} textAnchor="middle" fill="currentColor" fillOpacity={0.8}>
-                        {a.label}
-                      </text>
+                    {label && (
+                      <>
+                        <text
+                          x={labelX}
+                          y={labelY}
+                          fontSize={14}
+                          textAnchor="middle"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth={4}
+                          strokeLinejoin="round"
+                          strokeOpacity={0.9}
+                        >
+                          {label}
+                        </text>
+                        <text x={labelX} y={labelY} fontSize={14} textAnchor="middle" fill="currentColor" fillOpacity={0.85}>
+                          {label}
+                        </text>
+                      </>
                     )}
 
                     {isSelected && (
                       <>
+                        {/* Slightly larger hit targets for endpoints */}
+                        <circle cx={from.x} cy={from.y} r={18} fill="transparent" stroke="transparent" />
+                        <circle cx={to.x} cy={to.y} r={18} fill="transparent" stroke="transparent" />
                         <circle cx={from.x} cy={from.y} r={10} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeOpacity={0.6} />
                         <circle cx={to.x} cy={to.y} r={10} fill="currentColor" fillOpacity={0.12} stroke="currentColor" strokeOpacity={0.6} />
                       </>
@@ -658,10 +742,15 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                 const y = o.position.y * diagramViewBox.height;
                 const r = o.style.size === 'sm' ? 14 : o.style.size === 'lg' ? 26 : 20;
                 const isSelected = selection.kind === 'object' && selection.id === o.id;
+                const label = o.style.label?.trim() ? o.style.label : null;
+                const isShort = label ? label.length <= 2 : false;
+                const labelY = isShort ? y + 5 : y - r - 8;
+                const labelFontSize = isShort ? 16 : 14;
 
                 if (o.type === 'ball') {
                   return (
                     <g key={o.id} data-object-id={o.id}>
+                      <circle cx={x} cy={y} r={Math.max(20, r + 12)} fill="transparent" stroke="transparent" />
                       <circle cx={x} cy={y} r={Math.max(10, r - 6)} fill="currentColor" fillOpacity={0.9} />
                       {isSelected && <circle cx={x} cy={y} r={r} fill="none" stroke="currentColor" strokeOpacity={0.6} strokeWidth={2} />}
                     </g>
@@ -673,6 +762,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
 
                 return (
                   <g key={o.id} data-object-id={o.id}>
+                    <circle cx={x} cy={y} r={r + 14} fill="transparent" stroke="transparent" />
                     <circle
                       cx={x}
                       cy={y}
@@ -683,10 +773,25 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                       strokeOpacity={isSelected ? 1 : 0.85}
                       strokeWidth={3}
                     />
-                    {o.style.label && (
-                      <text x={x} y={y + 5} fontSize={14} textAnchor="middle" fill="currentColor" fillOpacity={0.9}>
-                        {o.style.label}
-                      </text>
+                    {label && (
+                      <>
+                        <text
+                          x={x}
+                          y={labelY}
+                          fontSize={labelFontSize}
+                          textAnchor="middle"
+                          fill="none"
+                          stroke="white"
+                          strokeWidth={4}
+                          strokeLinejoin="round"
+                          strokeOpacity={0.9}
+                        >
+                          {label}
+                        </text>
+                        <text x={x} y={labelY} fontSize={labelFontSize} textAnchor="middle" fill="currentColor" fillOpacity={0.9}>
+                          {label}
+                        </text>
+                      </>
                     )}
                   </g>
                 );

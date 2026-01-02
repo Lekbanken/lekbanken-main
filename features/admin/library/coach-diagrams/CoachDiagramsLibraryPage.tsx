@@ -63,14 +63,18 @@ export function CoachDiagramsLibraryPage() {
   }, [fetchDiagrams]);
 
   const makeUuidV4 = () => {
-    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-      const fn = (crypto as unknown as { randomUUID?: () => string }).randomUUID;
-      if (typeof fn === 'function') return fn();
+    const webCrypto = (globalThis as unknown as { crypto?: Crypto }).crypto;
+    if (webCrypto && typeof webCrypto.randomUUID === 'function') {
+      // Must be called with `crypto` as receiver; unbound calls can throw “illegal invocation”.
+      return webCrypto.randomUUID();
     }
 
     // RFC 4122 v4 using getRandomValues
     const bytes = new Uint8Array(16);
-    crypto.getRandomValues(bytes);
+    if (!webCrypto || typeof webCrypto.getRandomValues !== 'function') {
+      throw new Error('crypto.getRandomValues is not available');
+    }
+    webCrypto.getRandomValues(bytes);
     bytes[6] = (bytes[6] & 0x0f) | 0x40;
     bytes[8] = (bytes[8] & 0x3f) | 0x80;
 

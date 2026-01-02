@@ -56,6 +56,7 @@ export interface StepData {
   title: string;
   description: string;
   durationMinutes?: number;
+  media?: { type: string; url: string; altText?: string };
   materials?: string[];
   safety?: string;
   tag?: string;
@@ -1128,6 +1129,18 @@ export function ParticipantPlayView({
               />
             ) : (
               <p className="text-sm leading-relaxed text-muted-foreground">{currentStep.description}</p>
+            )}
+
+            {/* Instruction media (read-only) */}
+            {currentStep.media?.url && (
+              <div className="overflow-hidden rounded-xl border bg-muted/20">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={currentStep.media.url}
+                  alt={currentStep.media.altText ?? currentStep.title}
+                  className="h-auto w-full"
+                />
+              </div>
             )}
             
             {/* Materials */}

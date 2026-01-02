@@ -233,6 +233,7 @@ export function getNavPermission(href: string): AdminPermission | null {
     '/admin/achievements': 'admin.achievements.list',
     '/admin/library': 'admin.achievements.list',
     '/admin/library/badges': 'admin.achievements.list',
+    '/admin/library/coach-diagrams': 'admin.content.list',
     '/admin/billing': 'admin.billing.view',
     '/admin/moderation': 'admin.moderation.view',
     '/admin/tickets': 'admin.tickets.view',

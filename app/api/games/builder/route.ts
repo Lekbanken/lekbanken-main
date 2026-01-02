@@ -8,6 +8,74 @@ type LocationType = Database['public']['Enums']['location_type_enum'];
 
 type GameStatus = 'draft' | 'published';
 
+function isUuid(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+async function resolveMediaRefsToGameMediaIds(params: {
+  supabase: ReturnType<typeof createServiceRoleClient>;
+  gameId: string;
+  tenantId: string | null;
+  refs: string[];
+}) {
+  const { supabase, gameId, tenantId, refs } = params;
+  const uniqueRefs = Array.from(new Set(refs.filter((r) => isUuid(r))));
+  const mapping = new Map<string, string>();
+  if (uniqueRefs.length === 0) return mapping;
+
+  const { data: existingRows } = await supabase
+    .from('game_media')
+    .select('id, media_id, kind, position')
+    .eq('game_id', gameId);
+
+  const gameMediaIds = new Set<string>();
+  const galleryByMediaId = new Map<string, string>();
+  let maxGalleryPosition = 0;
+
+  for (const row of (existingRows ?? []) as Array<{ id: string; media_id: string; kind: string; position: number }>) {
+    gameMediaIds.add(row.id);
+    if (row.kind === 'gallery') {
+      galleryByMediaId.set(row.media_id, row.id);
+      if (typeof row.position === 'number') maxGalleryPosition = Math.max(maxGalleryPosition, row.position);
+    }
+  }
+
+  for (const ref of uniqueRefs) {
+    if (gameMediaIds.has(ref)) {
+      mapping.set(ref, ref);
+      continue;
+    }
+
+    const existingGalleryId = galleryByMediaId.get(ref);
+    if (existingGalleryId) {
+      mapping.set(ref, existingGalleryId);
+      continue;
+    }
+
+    maxGalleryPosition += 1;
+    const { data: inserted, error } = await supabase
+      .from('game_media')
+      .insert({
+        game_id: gameId,
+        media_id: ref,
+        kind: 'gallery',
+        position: maxGalleryPosition,
+        tenant_id: tenantId,
+      })
+      .select('id')
+      .single();
+
+    if (!error && inserted?.id) {
+      mapping.set(ref, inserted.id);
+      gameMediaIds.add(inserted.id);
+      galleryByMediaId.set(ref, inserted.id);
+    }
+  }
+
+  return mapping;
+}
+
 function asEnergyLevel(value: unknown): EnergyLevel | null {
   if (value === 'low' || value === 'medium' || value === 'high') return value;
   return null;
@@ -179,6 +247,22 @@ export async function POST(request: Request) {
     });
   }
 
+  const rawStepRefs = (body.steps ?? [])
+    .map((s) => s.media_ref)
+    .filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+  const rawVariantRefs = (body.artifacts ?? [])
+    .flatMap((a) => a.variants ?? [])
+    .map((v) => v.media_ref)
+    .filter((v): v is string => typeof v === 'string' && v.length > 0);
+
+  const mediaRefMap = await resolveMediaRefsToGameMediaIds({
+    supabase,
+    gameId: game.id,
+    tenantId: core.owner_tenant_id ?? null,
+    refs: [...rawStepRefs, ...rawVariantRefs],
+  });
+
   const steps = body.steps ?? [];
   if (steps.length > 0) {
     const rows = steps.map((s, idx) => ({
@@ -191,7 +275,7 @@ export async function POST(request: Request) {
       leader_script: s.leader_script ?? null,
       participant_prompt: s.participant_prompt ?? null,
       board_text: s.board_text ?? null,
-      media_ref: s.media_ref ?? null,
+      media_ref: isUuid(s.media_ref) ? (mediaRefMap.get(s.media_ref) ?? null) : null,
       optional: s.optional ?? false,
       conditional: s.conditional ?? null,
     }));
@@ -250,7 +334,9 @@ export async function POST(request: Request) {
           visible_to_role_id: v.visible_to_role_id ?? null,
           title: v.title ?? null,
           body: v.body ?? null,
-          media_ref: v.media_ref ?? null,
+          media_ref: typeof v.media_ref === 'string' && isUuid(v.media_ref)
+            ? (mediaRefMap.get(v.media_ref) ?? null)
+            : null,
           metadata: hasMetadata ? toJson(meta) : null,
         };
       });
@@ -277,7 +363,25 @@ export async function POST(request: Request) {
       .filter((t) => t.tool_key && VALID_TOOL_KEYS.has(t.tool_key));
 
     if (rows.length > 0) {
-      await supabase.from('game_tools').upsert(rows, { onConflict: 'game_id,tool_key' });
+      const { error: toolsError } = await supabase.from('game_tools').upsert(rows, { onConflict: 'game_id,tool_key' });
+      if (toolsError) {
+        if (toolsError.code === 'PGRST205') {
+          return NextResponse.json(
+            {
+              error:
+                "Toolbelt DB is not migrated: missing table public.game_tools. Apply migration supabase/migrations/20260102120000_game_tools_v1.sql and reload PostgREST schema.",
+              details: {
+                message: toolsError.message,
+                code: toolsError.code,
+                hint: toolsError.hint,
+                details: toolsError.details,
+              },
+            },
+            { status: 500 }
+          );
+        }
+        return NextResponse.json({ error: 'Failed to save tools', details: toolsError.message }, { status: 500 });
+      }
     }
   }
 

@@ -9642,7 +9642,7 @@ export type Database = {
         | "canceled"
       language_code_enum: "NO" | "SE" | "EN"
       location_type_enum: "indoor" | "outdoor" | "both"
-      media_type_enum: "template" | "upload" | "ai"
+      media_type_enum: "template" | "upload" | "ai" | "diagram"
       participant_role: "observer" | "player" | "team_lead" | "facilitator"
       participant_session_status:
         | "active"
@@ -9837,7 +9837,7 @@ export const Constants = {
       ],
       language_code_enum: ["NO", "SE", "EN"],
       location_type_enum: ["indoor", "outdoor", "both"],
-      media_type_enum: ["template", "upload", "ai"],
+      media_type_enum: ["template", "upload", "ai", "diagram"],
       participant_role: ["observer", "player", "team_lead", "facilitator"],
       participant_session_status: [
         "active",

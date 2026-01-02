@@ -8,6 +8,7 @@ import type { ToolKey, ToolRole } from '../types';
 import { isScopeAllowedForRole } from '../types';
 import { getEnabledToolsForSession, type GameToolRow } from '../api';
 import { DiceRollerV1 } from './DiceRollerV1';
+import { CoachDiagramBuilderV1 } from './CoachDiagramBuilderV1';
 
 function useIsDesktopSm(): boolean {
   const [isDesktop, setIsDesktop] = useState(false);
@@ -71,9 +72,6 @@ export function Toolbelt({
     });
   }, [tools, role]);
 
-  // If nothing is enabled/allowed, don't render a trigger at all.
-  if (tools && availableToolDefs.length === 0) return null;
-
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
     if (nextOpen && !activeTool && availableToolDefs.length > 0) {
@@ -96,30 +94,39 @@ export function Toolbelt({
           <SheetTitle>Verktyg</SheetTitle>
         </SheetHeader>
 
-        <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr]">
-          <div className="space-y-2">
-            {availableToolDefs.map((tool) => (
-              <button
-                key={tool.key}
-                type="button"
-                className={
-                  activeTool === tool.key
-                    ? 'w-full rounded-lg border border-border bg-muted px-3 py-2 text-left text-sm font-medium'
-                    : 'w-full rounded-lg border border-border px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted'
-                }
-                onClick={() => setActiveTool(tool.key)}
-              >
-                {tool.name}
-              </button>
-            ))}
+        {tools && availableToolDefs.length === 0 ? (
+          <div className="mt-4 text-sm text-muted-foreground">
+            Inga verktyg är aktiverade för det här spelet.
           </div>
+        ) : (
 
-          <div className="min-h-[180px]">
-            {activeTool === 'dice_roller_v1' && (
-              <DiceRollerV1 />
-            )}
+          <div className="mt-4 grid gap-4 sm:grid-cols-[200px_1fr]">
+            <div className="space-y-2">
+              {availableToolDefs.map((tool) => (
+                <button
+                  key={tool.key}
+                  type="button"
+                  className={
+                    activeTool === tool.key
+                      ? 'w-full rounded-lg border border-border bg-muted px-3 py-2 text-left text-sm font-medium'
+                      : 'w-full rounded-lg border border-border px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted'
+                  }
+                  onClick={() => setActiveTool(tool.key)}
+                >
+                  {tool.name}
+                </button>
+              ))}
+            </div>
+
+            <div className="min-h-[180px]">
+              {activeTool === 'dice_roller_v1' && <DiceRollerV1 />}
+
+              {activeTool === 'coach_diagram_builder_v1' && (
+                <CoachDiagramBuilderV1 sessionId={sessionId} participantToken={participantToken} />
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </SheetContent>
     </Sheet>
   );

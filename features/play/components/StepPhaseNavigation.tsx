@@ -27,6 +27,7 @@ export interface StepInfo {
   description?: string;
   durationMinutes?: number;
   leaderScript?: string;
+  media?: { type: string; url: string; altText?: string };
 }
 
 export interface PhaseInfo {
@@ -273,7 +274,7 @@ export function StepPhaseNavigation({
         </div>
 
         {/* Step content: description + leader script */}
-        {!stepNotStarted && currentStep && (currentStep.description || currentStep.leaderScript) && (
+        {!stepNotStarted && currentStep && (currentStep.description || currentStep.leaderScript || currentStep.media?.url) && (
           <div className="space-y-3 rounded-xl bg-muted/50 p-3">
             {currentStep.description && (
               <div>
@@ -283,6 +284,23 @@ export function StepPhaseNavigation({
                 <p className="text-sm text-foreground whitespace-pre-wrap">{currentStep.description}</p>
               </div>
             )}
+
+            {currentStep.media?.url && (
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                  Media
+                </p>
+                <div className="overflow-hidden rounded-lg border bg-background">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={currentStep.media.url}
+                    alt={currentStep.media.altText ?? currentStep.title}
+                    className="h-auto w-full"
+                  />
+                </div>
+              </div>
+            )}
+
             {currentStep.leaderScript && (
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">

@@ -15,7 +15,7 @@ type Media = {
   name: string
   url: string
   alt_text: string | null
-  type: 'template' | 'upload' | 'ai'
+  type: 'template' | 'upload' | 'ai' | 'diagram'
   created_at: string
 }
 
@@ -28,6 +28,7 @@ type MediaPickerProps = {
   trigger?: React.ReactNode
   allowUpload?: boolean
   allowTemplate?: boolean
+  libraryType?: 'upload' | 'diagram'
 }
 
 export function MediaPicker({
@@ -39,6 +40,7 @@ export function MediaPicker({
   trigger,
   allowUpload = true,
   allowTemplate = true,
+  libraryType = 'upload',
 }: MediaPickerProps) {
   const [open, setOpen] = useState(false)
   const [media, setMedia] = useState<Media[]>([])
@@ -54,7 +56,7 @@ export function MediaPicker({
     ...(allowUpload ? [{ id: 'upload', label: 'Ladda upp', disabled: false }] : []),
   ]
 
-  const loadMedia = async (type?: 'template' | 'upload') => {
+  const loadMedia = async (type?: 'template' | 'upload' | 'diagram') => {
     setLoading(true)
     try {
       const params = new URLSearchParams({ limit: '50' })
@@ -187,15 +189,16 @@ export function MediaPicker({
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId)
-    if (tabId === 'library') loadMedia('upload')
+    if (tabId === 'library') loadMedia(libraryType)
     else if (tabId === 'templates') loadMedia('template')
+    else if (tabId === 'upload') loadMedia('upload')
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {trigger || (
-          <Button variant="outline" onClick={() => loadMedia()}>
+          <Button variant="outline" onClick={() => loadMedia(libraryType)}>
             Select Media
           </Button>
         )}

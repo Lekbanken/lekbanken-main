@@ -26,6 +26,7 @@ type StepInfo = {
   durationMinutes?: number;
   duration?: number | null;
   display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
+  media?: { type: string; url: string; altText?: string };
   materials?: string[];
   safety?: string;
   tag?: string;
@@ -292,6 +293,36 @@ export async function GET(
       'step_order'
     );
 
+    // Resolve media references for steps (game_steps.media_ref -> game_media.id -> media)
+    const mediaRefIds = Array.from(
+      new Set(
+        (mergedSteps || [])
+          .map((s) => (s as GameStepRow & { media_ref?: string | null }).media_ref ?? null)
+          .filter((v): v is string => typeof v === 'string' && v.length > 0)
+      )
+    );
+
+    const stepMediaByGameMediaId = new Map<string, { type: string; url: string; altText?: string }>();
+    if (mediaRefIds.length > 0) {
+      const { data: gameMediaRows } = await supabaseAdmin
+        .from('game_media')
+        .select('id, media:media_id (id, url, type, alt_text, name)')
+        .in('id', mediaRefIds);
+
+      for (const row of (gameMediaRows ?? []) as Array<{
+        id: string;
+        media?: { id: string; url: string | null; type: string; alt_text: string | null; name: string | null } | null;
+      }>) {
+        const media = row.media;
+        if (!media?.url) continue;
+        stepMediaByGameMediaId.set(row.id, {
+          type: String(media.type ?? 'unknown'),
+          url: media.url,
+          altText: media.alt_text ?? media.name ?? undefined,
+        });
+      }
+    }
+
     // Materials/safety (single row)
     const { data: materialsRowLocale } = locale
       ? await supabaseAdmin
@@ -345,6 +376,9 @@ export async function GET(
           ? s.display_mode
           : null;
 
+      const mediaRef = (s as GameStepRow & { media_ref?: string | null }).media_ref ?? null;
+      const media = mediaRef ? stepMediaByGameMediaId.get(mediaRef) : undefined;
+
       return {
         id: s.id,
         index,
@@ -354,6 +388,7 @@ export async function GET(
         durationMinutes,
         duration: durationSeconds,
         display_mode: displayMode,
+        media,
         materials: materialsRow?.items ?? undefined,
         safety: materialsRow?.safety_notes ?? undefined,
         leaderScript: s.leader_script ?? undefined,

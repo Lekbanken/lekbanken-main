@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { z } from 'zod'
-import type { Json } from '@/types/supabase'
+import type { Database, Json } from '@/types/supabase'
 import { logger } from '@/lib/utils/logger'
 import { gateAi, forbidAiIfDisabled } from '@/lib/ai/gate'
+
+type MediaType = Database['public']['Tables']['media']['Row']['type']
 
 const mediaSchema = z.object({
   name: z.string().min(1).max(255),
@@ -75,8 +77,8 @@ export async function GET(request: NextRequest) {
     query = query.eq('tenant_id', tenantId)
   }
 
-  if (type && ['template', 'upload', 'ai'].includes(type)) {
-    query = query.eq('type', type as 'template' | 'upload' | 'ai')
+  if (type && ['template', 'upload', 'ai', 'diagram'].includes(type)) {
+    query = query.eq('type', type as MediaType)
   }
 
   const { data, error, count } = await query

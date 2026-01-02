@@ -235,7 +235,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     void (async () => {
       setError(null);
       try {
-        const res = await fetch(`/api/games/builder/${gameId}`);
+        const res = await fetch(`/api/games/builder/${gameId}`, { cache: 'no-store' });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Kunde inte ladda spel');
         
@@ -271,6 +271,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             body: s.body || '',
             duration_seconds: s.duration_seconds ?? null,
             leader_script: s.leader_script || '',
+            media_ref: (s as { media_ref?: string | null }).media_ref ?? '',
           })
         );
         setSteps(loadedSteps);
@@ -523,6 +524,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           duration_seconds: s.duration_seconds,
           leader_script: s.leader_script || null,
           step_order: idx,
+          media_ref: s.media_ref || null,
         })),
         materials: {
           items: materials.items,
@@ -622,7 +624,16 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Misslyckades att spara');
+      if (!res.ok) {
+        const detailsText =
+          data?.details
+            ? typeof data.details === 'string'
+              ? data.details
+              : JSON.stringify(data.details)
+            : '';
+        const msg = data?.error || 'Misslyckades att spara';
+        throw new Error(detailsText ? `${msg} (${detailsText})` : msg);
+      }
 
       setSaveStatus('saved');
       setLastSaved(new Date());
@@ -1090,7 +1101,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               <TriggerEditor
                 triggers={triggers}
                 phases={phases.map((p, idx) => ({ id: p.id || `phase-${idx}`, game_id: gameId || '', name: p.name, phase_type: p.phase_type, phase_order: idx, duration_seconds: p.duration_seconds, timer_visible: p.timer_visible, timer_style: p.timer_style, description: p.description, board_message: p.board_message, auto_advance: p.auto_advance, locale: null, created_at: '', updated_at: '' }))}
-                steps={steps.map((s, idx) => ({ id: s.id || `step-${idx}`, game_id: gameId || '', step_order: idx, title: s.title || null, body: s.body || null, duration_seconds: s.duration_seconds, leader_script: s.leader_script || null, display_mode: s.display_mode || null, locale: null, phase_id: null, participant_prompt: null, board_text: null, media_ref: null, optional: false, conditional: null, created_at: '', updated_at: '' }))}
+                steps={steps.map((s, idx) => ({ id: s.id || `step-${idx}`, game_id: gameId || '', step_order: idx, title: s.title || null, body: s.body || null, duration_seconds: s.duration_seconds, leader_script: s.leader_script || null, display_mode: s.display_mode || null, locale: null, phase_id: null, participant_prompt: null, board_text: null, media_ref: s.media_ref || null, optional: false, conditional: null, created_at: '', updated_at: '' }))}
                 artifacts={artifacts.map((a, idx) => ({ id: a.id || `artifact-${idx}`, game_id: gameId || '', title: a.title, description: a.description, artifact_type: a.artifact_type, artifact_order: idx, tags: a.tags, metadata: a.metadata || null, locale: null }))}
                 onChange={setTriggers}
               />
@@ -1144,7 +1155,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               <div>
                 <h2 className="text-xl font-semibold text-foreground mb-1">Verktyg (Toolbelt)</h2>
                 <p className="text-sm text-muted-foreground">
-                  Aktivera verktyg som kan användas under en spelsession. (MVP: endast Dice Roller v1)
+                  Aktivera verktyg som kan användas under en spelsession.
                 </p>
               </div>
 

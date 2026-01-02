@@ -20,6 +20,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { cn } from '@/lib/utils';
 import { Button, Input, Textarea, Select } from '@/components/ui';
+import { MediaPicker } from '@/components/ui/media-picker';
 import {
   Bars3Icon,
   TrashIcon,
@@ -35,6 +36,7 @@ export type StepData = {
   duration_seconds: number | null;
   leader_script?: string;
   display_mode?: 'instant' | 'typewriter' | 'dramatic';
+  media_ref?: string;
 };
 
 type SortableStepItemProps = {
@@ -134,8 +136,13 @@ type StepEditorDrawerProps = {
 };
 
 function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
-  const [formData, setFormData] = useState<StepData>(
-    step || { id: '', title: '', body: '', duration_seconds: null }
+  const [formData, setFormData] = useState<StepData>(() =>
+    step
+      ? { ...step, media_ref: step.media_ref ?? '' }
+      : { id: '', title: '', body: '', duration_seconds: null, media_ref: '' }
+  );
+  const [diagramUrl, setDiagramUrl] = useState<string | null>(() =>
+    step?.media_ref ? `/api/coach-diagrams/${step.media_ref}/svg` : null
   );
 
   if (!step) return null;
@@ -240,6 +247,48 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
             <p className="text-xs text-muted-foreground">
               Hur beskrivningen visas för deltagare
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">🧩 Diagram (valfritt)</label>
+            <div className="flex items-center gap-2">
+              <MediaPicker
+                value={formData.media_ref || null}
+                libraryType="diagram"
+                allowUpload={false}
+                allowTemplate={false}
+                onSelect={(mediaId, url) => {
+                  setFormData({ ...formData, media_ref: mediaId });
+                  setDiagramUrl(url);
+                }}
+                trigger={
+                  <Button type="button" variant="outline" size="sm">
+                    Välj diagram
+                  </Button>
+                }
+              />
+              {formData.media_ref && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setFormData({ ...formData, media_ref: '' });
+                    setDiagramUrl(null);
+                  }}
+                >
+                  Rensa
+                </Button>
+              )}
+            </div>
+            {diagramUrl ? (
+              <div className="overflow-hidden rounded-lg border bg-muted/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={diagramUrl} alt="Valt diagram" className="h-auto w-full" />
+              </div>
+            ) : formData.media_ref ? (
+              <p className="text-xs text-muted-foreground">Valt: {formData.media_ref}</p>
+            ) : null}
           </div>
         </div>
 

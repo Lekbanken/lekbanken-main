@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { ConversationCardsCollectionArtifact } from '@/features/play/components/ConversationCardsCollectionArtifact';
 
 /**
  * Sanitized keypad metadata (from server - correctCode is NEVER included)
@@ -29,7 +30,7 @@ type SessionArtifact = {
   description?: string | null;
   artifact_type?: string | null;
   artifact_order?: number;
-  metadata?: KeypadMetadata | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 type SessionArtifactVariant = {
@@ -242,9 +243,22 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
         artifacts.map((a) => {
           const vs = variantsByArtifact.get(a.id) ?? [];
 
+          if (a.artifact_type === 'conversation_cards_collection') {
+            return (
+              <ConversationCardsCollectionArtifact
+                key={a.id}
+                sessionId={sessionId}
+                participantToken={null}
+                artifactTitle={a.title ?? null}
+                artifactDescription={a.description ?? null}
+                metadata={a.metadata ?? null}
+              />
+            );
+          }
+
           // Keypad artifact rendering (server-side validation - correctCode never exposed)
           if (a.artifact_type === 'keypad') {
-            const meta = a.metadata || {};
+            const meta = (a.metadata || {}) as KeypadMetadata;
             const codeLength = meta.codeLength || 4;
             const maxAttempts = meta.maxAttempts;
             const successMessage = meta.successMessage || 'Koden är korrekt!';

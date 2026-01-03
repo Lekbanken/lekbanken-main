@@ -215,6 +215,7 @@ export const adminNavConfig: AdminNavConfig = [
     title: 'Verktyg',
     items: [
       { id: 'analytics', href: '/admin/analytics', label: 'Analys', icon: navIcons.analytics },
+      { id: 'conversation-cards', href: '/admin/toolbelt/conversation-cards', label: 'Samtalskort', icon: navIcons.key, permission: 'admin.conversation_cards.manage' },
       { id: 'tools', href: '/admin/tools', label: 'Verktyg (Toolbelt)', icon: navIcons.key, systemAdminOnly: true },
       { id: 'billing', href: '/admin/billing', label: 'Fakturering', icon: navIcons.billing, permission: 'admin.billing.view' },
       { id: 'moderation', href: '/admin/moderation', label: 'Moderering', icon: navIcons.moderation, permission: 'admin.moderation.view', systemAdminOnly: true },

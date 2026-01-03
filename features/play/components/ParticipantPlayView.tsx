@@ -34,6 +34,7 @@ import type { TimerState, SessionRuntimeState, SignalReceivedBroadcast } from '@
 import type { BoardTheme } from '@/types/games';
 import { sendSessionChatMessage } from '@/features/play/api/chat-api';
 import { PuzzleArtifactRenderer } from '@/features/play/components/PuzzleArtifactRenderer';
+import { ConversationCardsCollectionArtifact } from '@/features/play/components/ConversationCardsCollectionArtifact';
 import {
   getParticipantArtifacts,
   getParticipantDecisions,
@@ -784,6 +785,19 @@ export function ParticipantPlayView({
                 .sort((a, b) => (a.artifact_order ?? 0) - (b.artifact_order ?? 0))
                 .map((a) => {
                   const vars = variantsByArtifactId.get(a.id) ?? [];
+
+                  if (a.artifact_type === 'conversation_cards_collection') {
+                    return (
+                      <ConversationCardsCollectionArtifact
+                        key={a.id}
+                        sessionId={sessionId}
+                        participantToken={participantToken}
+                        artifactTitle={a.title ?? null}
+                        artifactDescription={a.description ?? null}
+                        metadata={(a.metadata ?? null) as Record<string, unknown> | null}
+                      />
+                    );
+                  }
                   
                   // Keypad artifact - special rendering
                   if (a.artifact_type === 'keypad') {

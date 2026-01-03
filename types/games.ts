@@ -23,6 +23,8 @@ export type ArtifactType =
   | 'card'
   | 'document'
   | 'image'
+  // Toolbelt artifacts
+   | 'conversation_cards_collection'
   // Code & Input puzzles
   | 'keypad'
   | 'riddle'

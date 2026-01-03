@@ -76,6 +76,13 @@ function sanitizeMetadataForParticipant(metadata: Json | null, artifactType: str
     } as unknown as Json;
   }
 
+  // Conversation cards artifact: safe to expose collection id (no secrets)
+  if (artifactType === 'conversation_cards_collection') {
+    const collectionId = typeof m.conversation_card_collection_id === 'string' ? m.conversation_card_collection_id : null;
+    if (!collectionId) return null;
+    return { conversation_card_collection_id: collectionId } as unknown as Json;
+  }
+
   // For other artifact types, return null (or could return safe subset)
   return null;
 }

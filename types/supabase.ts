@@ -746,6 +746,65 @@ export type Database = {
           },
         ]
       }
+      coach_diagram_exports: {
+        Row: {
+          created_at: string
+          document: Json
+          exported_at: string
+          exported_by_tool: string | null
+          exported_by_user_id: string | null
+          field_template_id: string
+          id: string
+          schema_version: string
+          scope_type: string
+          sport_type: string
+          svg: string
+          tenant_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          document: Json
+          exported_at?: string
+          exported_by_tool?: string | null
+          exported_by_user_id?: string | null
+          field_template_id: string
+          id?: string
+          schema_version: string
+          scope_type: string
+          sport_type: string
+          svg: string
+          tenant_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          document?: Json
+          exported_at?: string
+          exported_by_tool?: string | null
+          exported_by_user_id?: string | null
+          field_template_id?: string
+          id?: string
+          schema_version?: string
+          scope_type?: string
+          sport_type?: string
+          svg?: string
+          tenant_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coach_diagram_exports_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coin_transactions: {
         Row: {
           amount: number
@@ -1349,6 +1408,156 @@ export type Database = {
             columns: ["tenant_id"]
             isOneToOne: false
             referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_card_collection_secondary_purposes: {
+        Row: {
+          collection_id: string
+          purpose_id: string
+        }
+        Insert: {
+          collection_id: string
+          purpose_id: string
+        }
+        Update: {
+          collection_id?: string
+          purpose_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_card_collection_secondary_purpo_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_card_collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_card_collection_secondary_purposes_purpose_id_fkey"
+            columns: ["purpose_id"]
+            isOneToOne: false
+            referencedRelation: "purposes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_card_collections: {
+        Row: {
+          audience: string | null
+          created_at: string
+          created_by_user_id: string | null
+          description: string | null
+          id: string
+          language: string | null
+          main_purpose_id: string | null
+          scope_type: string
+          status: string
+          tenant_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          description?: string | null
+          id?: string
+          language?: string | null
+          main_purpose_id?: string | null
+          scope_type?: string
+          status?: string
+          tenant_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          description?: string | null
+          id?: string
+          language?: string | null
+          main_purpose_id?: string | null
+          scope_type?: string
+          status?: string
+          tenant_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_card_collections_created_by_user_id_fkey"
+            columns: ["created_by_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_card_collections_main_purpose_id_fkey"
+            columns: ["main_purpose_id"]
+            isOneToOne: false
+            referencedRelation: "purposes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_card_collections_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversation_cards: {
+        Row: {
+          card_title: string | null
+          collection_id: string
+          created_at: string
+          followup_1: string | null
+          followup_2: string | null
+          followup_3: string | null
+          id: string
+          leader_tip: string | null
+          metadata: Json | null
+          primary_prompt: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          card_title?: string | null
+          collection_id: string
+          created_at?: string
+          followup_1?: string | null
+          followup_2?: string | null
+          followup_3?: string | null
+          id?: string
+          leader_tip?: string | null
+          metadata?: Json | null
+          primary_prompt: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          card_title?: string | null
+          collection_id?: string
+          created_at?: string
+          followup_1?: string | null
+          followup_2?: string | null
+          followup_3?: string | null
+          id?: string
+          leader_tip?: string | null
+          metadata?: Json | null
+          primary_prompt?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_cards_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "conversation_card_collections"
             referencedColumns: ["id"]
           },
         ]
@@ -2460,6 +2669,44 @@ export type Database = {
           },
         ]
       }
+      game_tools: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          game_id: string
+          id: string
+          scope: string
+          tool_key: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          game_id: string
+          id?: string
+          scope?: string
+          tool_key: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          game_id?: string
+          id?: string
+          scope?: string
+          tool_key?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_tools_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_translations: {
         Row: {
           created_at: string
@@ -2547,44 +2794,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "game_triggers_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "games"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      game_tools: {
-        Row: {
-          created_at: string
-          enabled: boolean
-          game_id: string
-          id: string
-          scope: string
-          tool_key: string
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          enabled?: boolean
-          game_id: string
-          id?: string
-          scope?: string
-          tool_key: string
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          enabled?: boolean
-          game_id?: string
-          id?: string
-          scope?: string
-          tool_key?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "game_tools_game_id_fkey"
             columns: ["game_id"]
             isOneToOne: false
             referencedRelation: "games"

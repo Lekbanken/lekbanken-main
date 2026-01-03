@@ -1,4 +1,4 @@
-export type ToolKey = 'dice_roller_v1' | 'coach_diagram_builder_v1';
+export type ToolKey = 'dice_roller_v1' | 'coach_diagram_builder_v1' | 'conversation_cards_v1';
 
 export type ToolScope = 'host' | 'participants' | 'both';
 

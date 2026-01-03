@@ -9,6 +9,7 @@ import { isScopeAllowedForRole } from '../types';
 import { getEnabledToolsForSession, type GameToolRow } from '../api';
 import { DiceRollerV1 } from './DiceRollerV1';
 import { CoachDiagramBuilderV1 } from './CoachDiagramBuilderV1';
+import { ConversationCardsV1 } from './ConversationCardsV1';
 
 function useIsDesktopSm(): boolean {
   const [isDesktop, setIsDesktop] = useState(false);
@@ -124,6 +125,8 @@ export function Toolbelt({
               {activeTool === 'coach_diagram_builder_v1' && (
                 <CoachDiagramBuilderV1 sessionId={sessionId} participantToken={participantToken} />
               )}
+
+              {activeTool === 'conversation_cards_v1' && <ConversationCardsV1 />}
             </div>
           </div>
         )}

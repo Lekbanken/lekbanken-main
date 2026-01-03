@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Card, Button, Input, Textarea, Select } from '@/components/ui';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
@@ -39,6 +39,8 @@ const artifactTypeOptions = [
   { value: 'card', label: 'Kort' },
   { value: 'document', label: 'Dokument' },
   { value: 'image', label: 'Bild' },
+  // Verktyg
+  { value: 'conversation_cards_collection', label: '🗣️ Samtalskort (lek)' },
   // Kod & Input
   { value: 'keypad', label: '🔐 Pinkod (Keypad)' },
   { value: 'riddle', label: '❓ Gåta / Fråga' },
@@ -97,6 +99,42 @@ function createArtifact(): ArtifactFormData {
 
 export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChange }: ArtifactEditorProps) {
   const [wizardOpen, setWizardOpen] = useState(false);
+
+  const [conversationDecks, setConversationDecks] = useState<Array<{ id: string; title: string }>>([]);
+  const [conversationDecksError, setConversationDecksError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadConversationDecks() {
+      // Only load if needed
+      if (!artifacts.some((a) => a.artifact_type === 'conversation_cards_collection')) return;
+
+      setConversationDecksError(null);
+      try {
+        const res = await fetch('/api/admin/toolbelt/conversation-cards/collections', { cache: 'no-store' });
+        const data = (await res.json().catch(() => ({}))) as {
+          collections?: Array<{ id: string; title: string; status?: string | null }>;
+          error?: string;
+        };
+        if (!res.ok) throw new Error(typeof data?.error === 'string' ? data.error : 'Kunde inte ladda samtalskorts-lekar');
+
+        const published = (data.collections ?? []).filter((c) => c.status === 'published');
+        const items = published
+          .filter((c) => typeof c.id === 'string' && typeof c.title === 'string')
+          .map((c) => ({ id: c.id, title: c.title }));
+
+        if (!cancelled) setConversationDecks(items);
+      } catch (e) {
+        if (!cancelled) setConversationDecksError(e instanceof Error ? e.message : 'Kunde inte ladda samtalskorts-lekar');
+      }
+    }
+
+    void loadConversationDecks();
+    return () => {
+      cancelled = true;
+    };
+  }, [artifacts]);
 
   const roleOptions = useMemo(
     () => roles.map((r) => ({ value: r.id, label: r.name || 'Roll' })),
@@ -389,6 +427,39 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                   </div>
                 </div>
               </details>
+            </div>
+          )}
+
+          {artifact.artifact_type === 'conversation_cards_collection' && (
+            <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🗣️</span>
+                <h4 className="text-sm font-semibold text-foreground">Samtalskort</h4>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Välj lek (endast publicerade)</label>
+                <Select
+                  value={typeof artifact.metadata?.conversation_card_collection_id === 'string' ? (artifact.metadata.conversation_card_collection_id as string) : ''}
+                  onChange={(e) => {
+                    const nextId = e.target.value;
+                    updateArtifact(idx, {
+                      metadata: {
+                        ...(artifact.metadata ?? {}),
+                        conversation_card_collection_id: nextId,
+                      },
+                    });
+                  }}
+                  options={[
+                    { value: '', label: '— Välj —' },
+                    ...conversationDecks.map((d) => ({ value: d.id, label: d.title })),
+                  ]}
+                />
+                {conversationDecksError && <p className="text-xs text-destructive">{conversationDecksError}</p>}
+                <p className="text-xs text-muted-foreground">
+                  Artefakten visar leken read-only för deltagare och lekledare.
+                </p>
+              </div>
             </div>
           )}
 

@@ -37,12 +37,13 @@
 
 ## Implementation status
 - Done:
-  - Migration: `supabase/migrations/20260103200000_consolidate_tenant_naming.sql`
-  - Code: `app/api/plans/[planId]/publish/route.ts` uses canonical table
-  - Types: `types/supabase.ts`, `lib/supabase/database.types.ts`, `types/tenant.ts`
-- In progress: -
+  - Migration: `supabase/migrations/20260104120000_consolidate_tenant_naming.sql` ✅
+  - Code: All TypeScript code uses `user_tenant_memberships` (canonical table)
+  - Types: `types/supabase.ts`, `lib/supabase/database.types.ts`, `types/tenant.ts` aligned
+  - RLS: `is_system_admin()` bypass on users, tenants, user_tenant_memberships
+  - Functions: `is_tenant_member`, `get_user_tenant_ids`, `has_tenant_role` use canonical table
 - Remaining:
-  - Run SQL audit queries in Supabase to confirm table/view/policy state
+  - Run `npx supabase db push --include-all` to apply migration
   - Run the test plan below (admin access + Playwright)
 
 ## Test plan

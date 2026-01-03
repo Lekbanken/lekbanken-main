@@ -33,7 +33,7 @@ export const coachDiagramDocumentSchemaV1 = z
     schemaVersion: z.literal(1),
     id: z.string().uuid(),
     title: z.string().min(1).max(120),
-    sportType: z.enum(['football', 'basketball', 'handball', 'custom']),
+    sportType: z.enum(['football', 'basketball', 'handball', 'hockey', 'innebandy', 'custom']),
     fieldTemplateId: z.string().min(1).max(64),
     objects: z.array(objectSchemaV1),
     arrows: z.array(arrowSchemaV1),

@@ -11,6 +11,7 @@ import { Select } from '@/components/ui/select';
 
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
 import { diagramViewBox, renderDiagramSvg } from '@/features/admin/library/coach-diagrams/svg';
+import { getCourtBackgroundUrl } from '@/features/admin/library/coach-diagrams/courtBackgrounds';
 
 type SessionGameResponse = {
   steps?: Array<{ media?: { type?: string; url?: string; altText?: string } | null } | null>;
@@ -96,6 +97,7 @@ export function CoachDiagramBuilderV1({
     if (selection.kind !== 'arrow') return null;
     return doc.arrows.find((a) => a.id === selection.id) ?? null;
   }, [doc, selection]);
+  const backgroundUrl = doc ? getCourtBackgroundUrl(doc.sportType) : null;
 
   const toolOptions = useMemo(() => {
     return diagramIds.map((id) => ({ value: id, label: id }));
@@ -653,55 +655,30 @@ export function CoachDiagramBuilderV1({
               </div>
             ) : (
               <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
-                <svg
-                  ref={svgRef}
-                  viewBox={`0 0 ${diagramViewBox.width} ${diagramViewBox.height}`}
-                  className="h-full w-full text-foreground"
-                  onPointerDown={onSvgPointerDown}
-                  onPointerMove={onSvgPointerMove}
-                  onPointerUp={onSvgPointerUp}
-                >
-                  {(() => {
-                    const fieldMargin = 10;
-                    const fieldInnerW = diagramViewBox.width - fieldMargin * 2;
-                    const fieldInnerH = diagramViewBox.height - fieldMargin * 2;
-                    const centerX = diagramViewBox.width / 2;
-                    const centerY = diagramViewBox.height / 2;
-                    const centerCircleR = Math.round(Math.min(diagramViewBox.width, diagramViewBox.height) * 0.12);
-                    const penaltyW = fieldInnerW * 0.6;
-                    const penaltyH = fieldInnerH * 0.18;
-                    const goalW = fieldInnerW * 0.32;
-                    const goalH = fieldInnerH * 0.08;
-                    const penaltyX = (diagramViewBox.width - penaltyW) / 2;
-                    const goalX = (diagramViewBox.width - goalW) / 2;
-                    const topPenaltyY = fieldMargin;
-                    const bottomPenaltyY = diagramViewBox.height - fieldMargin - penaltyH;
-                    const topGoalY = fieldMargin;
-                    const bottomGoalY = diagramViewBox.height - fieldMargin - goalH;
-                    const spotOffset = penaltyH * 0.65;
-                    const topSpotY = fieldMargin + spotOffset;
-                    const bottomSpotY = diagramViewBox.height - fieldMargin - spotOffset;
-
-                    return (
-                      <>
-                        <rect x={fieldMargin} y={fieldMargin} width={fieldInnerW} height={fieldInnerH} rx={18} ry={18} fill="none" stroke="currentColor" strokeOpacity={0.35} strokeWidth={2} />
-                        <line x1={fieldMargin} y1={centerY} x2={diagramViewBox.width - fieldMargin} y2={centerY} stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <circle cx={centerX} cy={centerY} r={centerCircleR} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <rect x={penaltyX} y={topPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <rect x={goalX} y={topGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <circle cx={centerX} cy={topSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
-                        <rect x={penaltyX} y={bottomPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <rect x={goalX} y={bottomGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-                        <circle cx={centerX} cy={bottomSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
-                      </>
-                    );
-                  })()}
-
-                  <defs>
-                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                      <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
-                    </marker>
-                  </defs>
+                <div className="relative h-full w-full">
+                  {backgroundUrl && (
+                    <Image
+                      src={backgroundUrl}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(max-width: 1024px) 100vw, 600px"
+                      className="object-contain pointer-events-none"
+                    />
+                  )}
+                  <svg
+                    ref={svgRef}
+                    viewBox={`0 0 ${diagramViewBox.width} ${diagramViewBox.height}`}
+                    className="relative z-10 h-full w-full text-foreground"
+                    onPointerDown={onSvgPointerDown}
+                    onPointerMove={onSvgPointerMove}
+                    onPointerUp={onSvgPointerUp}
+                  >
+                    <defs>
+                      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                        <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
+                      </marker>
+                    </defs>
 
                   {doc?.arrows.map((a) => {
                     const from = { x: a.from.x * diagramViewBox.width, y: a.from.y * diagramViewBox.height };
@@ -832,6 +809,7 @@ export function CoachDiagramBuilderV1({
                   )}
                 </svg>
               </div>
+            </div>
             )}
           </Card>
         </div>

@@ -4,7 +4,6 @@ import type { CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchema
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 1000;
 
-const FIELD_MARGIN = 10;
 
 function clamp01(value: number): number {
   if (Number.isNaN(value)) return 0;
@@ -41,48 +40,12 @@ function escapeXml(text: string): string {
 }
 
 export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
-  const innerW = VIEWBOX_WIDTH - FIELD_MARGIN * 2;
-  const innerH = VIEWBOX_HEIGHT - FIELD_MARGIN * 2;
-  const centerX = VIEWBOX_WIDTH / 2;
-  const centerY = VIEWBOX_HEIGHT / 2;
-  const centerCircleR = Math.round(Math.min(VIEWBOX_WIDTH, VIEWBOX_HEIGHT) * 0.12);
-
-  // Generic field markings (more visual structure than just a border + center line).
-  const penaltyW = innerW * 0.6;
-  const penaltyH = innerH * 0.18;
-  const goalW = innerW * 0.32;
-  const goalH = innerH * 0.08;
-  const penaltyX = (VIEWBOX_WIDTH - penaltyW) / 2;
-  const goalX = (VIEWBOX_WIDTH - goalW) / 2;
-  const topPenaltyY = FIELD_MARGIN;
-  const bottomPenaltyY = VIEWBOX_HEIGHT - FIELD_MARGIN - penaltyH;
-  const topGoalY = FIELD_MARGIN;
-  const bottomGoalY = VIEWBOX_HEIGHT - FIELD_MARGIN - goalH;
-  const spotOffset = penaltyH * 0.65;
-  const topSpotY = FIELD_MARGIN + spotOffset;
-  const bottomSpotY = VIEWBOX_HEIGHT - FIELD_MARGIN - spotOffset;
-
   const defs = `
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
     </marker>
   </defs>`;
-
-  const field = `
-  <g>
-    <rect x="${FIELD_MARGIN}" y="${FIELD_MARGIN}" width="${innerW}" height="${innerH}" rx="18" ry="18" fill="none" stroke="currentColor" stroke-opacity="0.35" stroke-width="2" />
-    <line x1="${FIELD_MARGIN}" y1="${centerY}" x2="${VIEWBOX_WIDTH - FIELD_MARGIN}" y2="${centerY}" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <circle cx="${centerX}" cy="${centerY}" r="${centerCircleR}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-
-    <rect x="${penaltyX}" y="${topPenaltyY}" width="${penaltyW}" height="${penaltyH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <rect x="${goalX}" y="${topGoalY}" width="${goalW}" height="${goalH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <circle cx="${centerX}" cy="${topSpotY}" r="3" fill="currentColor" fill-opacity="0.18" />
-
-    <rect x="${penaltyX}" y="${bottomPenaltyY}" width="${penaltyW}" height="${penaltyH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <rect x="${goalX}" y="${bottomGoalY}" width="${goalW}" height="${goalH}" fill="none" stroke="currentColor" stroke-opacity="0.18" stroke-width="2" />
-    <circle cx="${centerX}" cy="${bottomSpotY}" r="3" fill="currentColor" fill-opacity="0.18" />
-  </g>`;
 
   const arrows = doc.arrows
     .map((a) => {
@@ -145,7 +108,6 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}" width="${VIEWBOX_WIDTH}" height="${VIEWBOX_HEIGHT}" role="img" aria-label="${title}">
 ${defs}
-${field}
 ${arrows}
 ${objects}
 </svg>`;

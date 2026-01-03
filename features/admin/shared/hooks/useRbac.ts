@@ -54,7 +54,9 @@ export type AdminPermission =
   // Participants
   | 'admin.participants.list'
   | 'admin.participants.view'
-  | 'admin.participants.moderate';
+  | 'admin.participants.moderate'
+  // Toolbelt libraries
+  | 'admin.conversation_cards.manage';
 
 /**
  * Admin role types
@@ -126,6 +128,9 @@ const permissionChecks: Record<AdminPermission, PermissionCheck> = {
   'admin.participants.list': (sys, tr) => sys || Boolean(tr),
   'admin.participants.view': (sys, tr) => sys || Boolean(tr),
   'admin.participants.moderate': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
+
+  // Toolbelt libraries - system_admin or tenant admin
+  'admin.conversation_cards.manage': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
 };
 
 /**
@@ -243,6 +248,7 @@ export function getNavPermission(href: string): AdminPermission | null {
     '/admin/system-health': 'admin.system.view',
     '/admin/settings': 'admin.settings.view',
     '/admin/notifications': 'admin.notifications.send',
+    '/admin/toolbelt/conversation-cards': 'admin.conversation_cards.manage',
   };
 
   // Check exact match first

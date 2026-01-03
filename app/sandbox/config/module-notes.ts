@@ -107,6 +107,79 @@ const palette = generateAccentPalette(262); // Lekbanken purple
 <AchievementBadgePreview tier="gold" />`,
   },
 
+  'gamification-hub': {
+    notes: `
+- Hub for gamification surfaces and test paths
+- Uses mock data for previews and links to real routes
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added gamification sandbox hub and subpages' },
+    ],
+    codeSnippet: `// Hub route:
+/sandbox/gamification`,
+  },
+
+  'gamification-dicecoin': {
+    notes: `
+- DiceCoin balance + transaction previews
+- Admin award flow references
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added DiceCoin sandbox page' },
+    ],
+    codeSnippet: `// Route:
+/sandbox/gamification/dicecoin`,
+  },
+
+  'gamification-achievements': {
+    notes: `
+- Achievement cards, progress, and pinning context
+- Snapshot uses mock data, real routes need auth
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added achievements sandbox page' },
+    ],
+    codeSnippet: `// Route:
+/sandbox/gamification/achievements`,
+  },
+
+  'gamification-badges': {
+    notes: `
+- Badge component preview + admin builder context
+- Backed by award_builder_exports schema
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added badges sandbox page' },
+    ],
+    codeSnippet: `// Route:
+/sandbox/gamification/badges`,
+  },
+
+  'gamification-rewards': {
+    notes: `
+- Shop + unlockable surfaces
+- Links to app shop and admin marketplace
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added rewards sandbox page' },
+    ],
+    codeSnippet: `// Route:
+/sandbox/gamification/rewards`,
+  },
+
+  'gamification-library-exports': {
+    notes: `
+- Award builder export schema snapshot
+- Links to exports API + docs
+    `.trim(),
+    changelog: [
+      { date: '2026-01-03', note: 'Added library exports sandbox page' },
+    ],
+    codeSnippet: `// Route:
+/sandbox/gamification/library-exports`,
+  },
+
+
   spacing: {
     notes: `
 - Base spacing unit: 4px (default), configurable 2-8px

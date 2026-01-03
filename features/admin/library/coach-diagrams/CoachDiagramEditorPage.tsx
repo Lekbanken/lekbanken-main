@@ -1,11 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
 import { renderDiagramSvg, diagramViewBox } from './svg';
+import { getCourtBackgroundUrl } from './courtBackgrounds';
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState } from '@/components/admin/shared';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -54,26 +56,6 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
   const router = useRouter();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
-  const fieldMargin = 10;
-  const fieldInnerW = diagramViewBox.width - fieldMargin * 2;
-  const fieldInnerH = diagramViewBox.height - fieldMargin * 2;
-  const fieldCenterX = diagramViewBox.width / 2;
-  const fieldCenterY = diagramViewBox.height / 2;
-  const fieldCenterCircleR = Math.round(Math.min(diagramViewBox.width, diagramViewBox.height) * 0.12);
-  const penaltyW = fieldInnerW * 0.6;
-  const penaltyH = fieldInnerH * 0.18;
-  const goalW = fieldInnerW * 0.32;
-  const goalH = fieldInnerH * 0.08;
-  const penaltyX = (diagramViewBox.width - penaltyW) / 2;
-  const goalX = (diagramViewBox.width - goalW) / 2;
-  const topPenaltyY = fieldMargin;
-  const bottomPenaltyY = diagramViewBox.height - fieldMargin - penaltyH;
-  const topGoalY = fieldMargin;
-  const bottomGoalY = diagramViewBox.height - fieldMargin - goalH;
-  const spotOffset = penaltyH * 0.65;
-  const topSpotY = fieldMargin + spotOffset;
-  const bottomSpotY = diagramViewBox.height - fieldMargin - spotOffset;
-
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -111,6 +93,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
     if (!doc) return null;
     return renderDiagramSvg(doc);
   }, [doc]);
+  const backgroundUrl = doc ? getCourtBackgroundUrl(doc.sportType) : null;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -505,6 +488,8 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                   { value: 'football', label: 'Fotboll' },
                   { value: 'basketball', label: 'Basket' },
                   { value: 'handball', label: 'Handboll' },
+                  { value: 'hockey', label: 'Hockey' },
+                  { value: 'innebandy', label: 'Innebandy' },
                   { value: 'custom', label: 'Custom' },
                 ]}
               >
@@ -617,57 +602,30 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
           <div className="text-sm font-medium mb-3">Förhandsvisning</div>
 
           <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
-            <svg
-              ref={svgRef}
-              viewBox={`0 0 ${diagramViewBox.width} ${diagramViewBox.height}`}
-              className="h-full w-full text-foreground"
-              onPointerDown={onSvgPointerDown}
-              onPointerMove={onSvgPointerMove}
-              onPointerUp={onSvgPointerUp}
-            >
-              {/* Render field */}
-              <rect
-                x={fieldMargin}
-                y={fieldMargin}
-                width={fieldInnerW}
-                height={fieldInnerH}
-                rx={18}
-                ry={18}
-                fill="none"
-                stroke="currentColor"
-                strokeOpacity={0.35}
-                strokeWidth={2}
-              />
-              <line
-                x1={fieldMargin}
-                y1={fieldCenterY}
-                x2={diagramViewBox.width - fieldMargin}
-                y2={fieldCenterY}
-                stroke="currentColor"
-                strokeOpacity={0.18}
-                strokeWidth={2}
-              />
-              <circle
-                cx={fieldCenterX}
-                cy={fieldCenterY}
-                r={fieldCenterCircleR}
-                fill="none"
-                stroke="currentColor"
-                strokeOpacity={0.18}
-                strokeWidth={2}
-              />
-              <rect x={penaltyX} y={topPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-              <rect x={goalX} y={topGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-              <circle cx={fieldCenterX} cy={topSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
-              <rect x={penaltyX} y={bottomPenaltyY} width={penaltyW} height={penaltyH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-              <rect x={goalX} y={bottomGoalY} width={goalW} height={goalH} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeWidth={2} />
-              <circle cx={fieldCenterX} cy={bottomSpotY} r={3} fill="currentColor" fillOpacity={0.18} />
-
-              <defs>
-                <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
-                  <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
-                </marker>
-              </defs>
+            <div className="relative h-full w-full">
+              {backgroundUrl && (
+                <Image
+                  src={backgroundUrl}
+                  alt=""
+                  aria-hidden="true"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 600px"
+                  className="object-contain pointer-events-none"
+                />
+              )}
+              <svg
+                ref={svgRef}
+                viewBox={`0 0 ${diagramViewBox.width} ${diagramViewBox.height}`}
+                className="relative z-10 h-full w-full text-foreground"
+                onPointerDown={onSvgPointerDown}
+                onPointerMove={onSvgPointerMove}
+                onPointerUp={onSvgPointerUp}
+              >
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+                    <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
+                  </marker>
+                </defs>
 
               {/* Arrows */}
               {doc.arrows.map((a) => {
@@ -810,6 +768,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                 />
               )}
             </svg>
+            </div>
           </div>
 
           <div className="mt-3 text-xs text-muted-foreground">

@@ -16,6 +16,7 @@
 # playwright
 /playwright-report/
 /test-results/
+/tests/.auth/*.json
 
 # next.js
 /.next/

@@ -48,6 +48,9 @@ interface FormData {
 export default function MarketplaceAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
+
+  const tenantId = currentTenant?.id;
+
   const [items, setItems] = useState<ShopItem[]>([]);
   const [stats, setStats] = useState<MarketplaceStats | null>(null);
   const [topItems, setTopItems] = useState<ShopItem[]>([]);
@@ -76,15 +79,15 @@ export default function MarketplaceAdminPage() {
   });
 
   useEffect(() => {
-    if (!currentTenant) return;
+    if (!tenantId) return;
 
     const loadData = async () => {
       try {
         const [itemsData, statsData, topItemsData, currenciesData] = await Promise.all([
-          getShopItems(currentTenant.id),
-          getMarketplaceStats(currentTenant.id),
-          getTopSellingItems(currentTenant.id),
-          getVirtualCurrencies(currentTenant.id),
+          getShopItems(tenantId),
+          getMarketplaceStats(tenantId),
+          getTopSellingItems(tenantId),
+          getVirtualCurrencies(tenantId),
         ]);
 
         setItems(itemsData || []);
@@ -106,7 +109,7 @@ export default function MarketplaceAdminPage() {
     };
 
     loadData();
-  }, [currentTenant]);
+  }, [tenantId]);
 
   const openCreateModal = () => {
     setEditingItem(null);

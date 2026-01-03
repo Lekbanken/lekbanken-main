@@ -37,6 +37,10 @@ type ResourceType = 'all' | 'game' | 'product' | 'user' | 'tenant' | 'media' | '
 export default function AuditLogsPage() {
   const { user } = useAuth()
   const { currentTenant } = useTenant()
+
+  const userId = user?.id
+  const tenantId = currentTenant?.id
+
   const [logs, setLogs] = useState<AuditLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [actionFilter, setActionFilter] = useState<ActionType>('all')
@@ -49,76 +53,75 @@ export default function AuditLogsPage() {
     endDate: new Date().toISOString().split('T')[0],
   })
 
-  const loadLogs = async () => {
-    if (!currentTenant) return
-
-    setIsLoading(true)
-    const supabase = createBrowserClient()
-
-    const startDateISO = new Date(dateRange.startDate).toISOString()
-    const endDateISO = new Date(
-      new Date(dateRange.endDate).getTime() + 24 * 60 * 60 * 1000
-    ).toISOString()
-
-    let query = supabase
-      .from('tenant_audit_logs')
-      .select('*')
-      .eq('tenant_id', currentTenant.id)
-      .gte('created_at', startDateISO)
-      .lte('created_at', endDateISO)
-      .order('created_at', { ascending: false })
-      .limit(500)
-
-    if (actionFilter !== 'all') {
-      query = query.ilike('action', `%${actionFilter}%`)
-    }
-
-    if (resourceFilter !== 'all') {
-      query = query.eq('resource_type', resourceFilter)
-    }
-
-    if (searchQuery) {
-      query = query.or(
-        `action.ilike.%${searchQuery}%,resource_type.ilike.%${searchQuery}%,resource_id.ilike.%${searchQuery}%`
-      )
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      logger.error('Failed to load audit logs', error, {
-        page: 'audit-logs',
-        tenantId: currentTenant.id,
-        userId: user?.id
-      })
-    } else if (data) {
-      // Fetch user emails for logs
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userIds = [...new Set(data.map((log: any) => log.user_id).filter(Boolean))]
-      const { data: users } = await supabase
-        .from('user_profiles')
-        .select('user_id, email')
-        .in('user_id', userIds as string[])
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const userMap = new Map(users?.map((u: any) => [u.user_id, u.email]) || [])
-
-      setLogs(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data.map((log: any) => ({
-          ...log,
-          user_email: log.user_id ? userMap.get(log.user_id) : undefined,
-        }))
-      )
-    }
-
-    setIsLoading(false)
-  }
-
   useEffect(() => {
+    if (!tenantId) return
+
+    const loadLogs = async () => {
+      setIsLoading(true)
+      const supabase = createBrowserClient()
+
+      const startDateISO = new Date(dateRange.startDate).toISOString()
+      const endDateISO = new Date(
+        new Date(dateRange.endDate).getTime() + 24 * 60 * 60 * 1000
+      ).toISOString()
+
+      let query = supabase
+        .from('tenant_audit_logs')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .gte('created_at', startDateISO)
+        .lte('created_at', endDateISO)
+        .order('created_at', { ascending: false })
+        .limit(500)
+
+      if (actionFilter !== 'all') {
+        query = query.ilike('action', `%${actionFilter}%`)
+      }
+
+      if (resourceFilter !== 'all') {
+        query = query.eq('resource_type', resourceFilter)
+      }
+
+      if (searchQuery) {
+        query = query.or(
+          `action.ilike.%${searchQuery}%,resource_type.ilike.%${searchQuery}%,resource_id.ilike.%${searchQuery}%`
+        )
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        logger.error('Failed to load audit logs', error, {
+          page: 'audit-logs',
+          tenantId: tenantId,
+          userId: userId
+        })
+      } else if (data) {
+        // Fetch user emails for logs
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userIds = [...new Set(data.map((log: any) => log.user_id).filter(Boolean))]
+        const { data: users } = await supabase
+          .from('user_profiles')
+          .select('user_id, email')
+          .in('user_id', userIds as string[])
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const userMap = new Map(users?.map((u: any) => [u.user_id, u.email]) || [])
+
+        setLogs(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data.map((log: any) => ({
+            ...log,
+            user_email: log.user_id ? userMap.get(log.user_id) : undefined,
+          }))
+        )
+      }
+
+      setIsLoading(false)
+    }
+
     void loadLogs()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTenant, actionFilter, resourceFilter, dateRange])
+  }, [tenantId, userId, actionFilter, resourceFilter, dateRange, searchQuery])
 
   const exportToCSV = () => {
     const headers = [
@@ -301,12 +304,9 @@ export default function AuditLogsPage() {
             />
           </div>
 
-          <button
-            onClick={loadLogs}
-            className="w-full px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Tillämpa filter
-          </button>
+          <p className="text-xs text-muted-foreground text-center">
+            Filter tillämpas automatiskt
+          </p>
         </CardContent>
       </Card>
 

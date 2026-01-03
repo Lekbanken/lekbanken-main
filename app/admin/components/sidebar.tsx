@@ -3,12 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Badge } from '@/components/ui/badge'
-import { 
-  adminMainNavItems, 
-  adminSecondaryNavItems, 
-  adminSettingsNavItems,
-  type AdminNavItem 
-} from './admin-nav-items'
+import { adminNavGroups, type AdminNavItem } from './admin-nav-items'
 
 function NavSection({ 
   title, 
@@ -76,9 +71,9 @@ export function AdminSidebar() {
 
       {/* Navigation */}
       <div className="flex flex-col gap-6 p-4">
-        <NavSection items={adminMainNavItems} />
-        <NavSection title="Verktyg" items={adminSecondaryNavItems} />
-        <NavSection title="System" items={adminSettingsNavItems} />
+        {adminNavGroups.map((group) => (
+          <NavSection key={group.id} title={group.title} items={group.items} />
+        ))}
       </div>
 
       {/* Footer */}

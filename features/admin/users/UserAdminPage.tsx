@@ -31,8 +31,7 @@ import { UserTablePagination } from "./components/UserTablePagination";
 
 const USERS_PER_PAGE = 15;
 
-// Note: user_tenant_memberships table type not in generated types yet
-// Using manual type definition until DB types are regenerated
+// Note: manual type to include joined users/tenants fields from the query.
 type MembershipRow = {
   id: string;
   user_id: string;
@@ -81,12 +80,14 @@ export function UserAdminPage() {
   const [editingUser, setEditingUser] = useState<UserAdminItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const userId = user?.id;
+
   const loadUsers = useCallback(async () => {
     const isGlobalAdmin = effectiveGlobalRole === "system_admin";
     const tenantId = currentTenant?.id;
     const tenantName = currentTenant?.name;
 
-    if (!user) {
+    if (!userId) {
       setIsLoadingUsers(false);
       return;
     }
@@ -128,12 +129,18 @@ export function UserAdminPage() {
       setUsers(mapped);
     } catch (err) {
       console.error("Failed to load users", err);
-      setError("Failed to load users from Supabase. Showing sample data instead.");
-      setUsers(createMockUsers(tenantName || "Global"));
+      // Only use mock data in development to avoid masking real errors in production
+      if (process.env.NODE_ENV === 'development') {
+        setError("Failed to load users from Supabase. Showing sample data instead.");
+        setUsers(createMockUsers(tenantName || "Global"));
+      } else {
+        setError("Failed to load users. Please try again later.");
+        setUsers([]);
+      }
     } finally {
       setIsLoadingUsers(false);
     }
-  }, [currentTenant, user, effectiveGlobalRole]);
+  }, [currentTenant?.id, currentTenant?.name, userId, effectiveGlobalRole]);
 
   useEffect(() => {
     let cancelled = false;
@@ -188,7 +195,16 @@ export function UserAdminPage() {
 
       if (payload.name) {
         // Best-effort update of user full_name
-        void supabase.from("users").update({ full_name: payload.name }).eq("id", editingUser.userId ?? editingUser.id);
+        const { error: nameError } = await supabase
+          .from("users")
+          .update({ full_name: payload.name })
+          .eq("id", editingUser.userId ?? editingUser.id)
+          .select()
+          .single();
+        
+        if (nameError) {
+          console.warn("Could not update user name:", nameError);
+        }
       }
 
       setUsers((prev) =>

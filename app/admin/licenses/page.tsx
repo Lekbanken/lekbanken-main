@@ -57,6 +57,8 @@ export default function LicensesPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const tenantId = currentTenant?.id;
+
   const [licenses, setLicenses] = useState<LicenseRow[]>([]);
   const [stats, setStats] = useState<LicenseStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,7 +137,7 @@ export default function LicensesPage() {
     };
 
     void loadData();
-  }, [currentTenant]);
+  }, [tenantId]);
 
   const filtered = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();

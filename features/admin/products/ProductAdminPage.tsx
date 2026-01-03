@@ -63,8 +63,10 @@ export function ProductAdminPage() {
 
   const baseCapabilities = useMemo(() => getBaseCapabilities(), []);
 
+  const userId = user?.id;
+
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       setIsLoading(false);
       return;
     }
@@ -120,7 +122,7 @@ export function ProductAdminPage() {
     return () => {
       isMounted = false;
     };
-  }, [user, user?.id, baseCapabilities]);
+  }, [userId, baseCapabilities]);
 
   const handleFiltersChange = (next: Partial<ProductFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));

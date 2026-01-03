@@ -24,6 +24,9 @@ export default function AnalyticsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const userId = user?.id;
+  const tenantId = currentTenant?.id;
+
   // States
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange>(() => {
@@ -52,7 +55,7 @@ export default function AnalyticsPage() {
 
   // Load analytics data
   useEffect(() => {
-    if (!user || !currentTenant) return;
+    if (!userId || !tenantId) return;
 
     const loadData = async () => {
       setIsLoading(true);
@@ -61,12 +64,12 @@ export default function AnalyticsPage() {
       const endDateISO = new Date(new Date(dateRange.endDate).getTime() + 24 * 60 * 60 * 1000).toISOString();
 
       const [pageStats, pages, sessions, features, errors, errorList] = await Promise.all([
-        getPageViewStats(currentTenant.id, startDateISO, endDateISO),
-        getTopPages(currentTenant.id, 5),
-        getSessionStats(currentTenant.id, startDateISO, endDateISO),
-        getTopFeatures(currentTenant.id, 5),
-        getErrorStats(currentTenant.id, startDateISO, endDateISO),
-        getTopErrors(currentTenant.id, 5),
+        getPageViewStats(tenantId, startDateISO, endDateISO),
+        getTopPages(tenantId, 5),
+        getSessionStats(tenantId, startDateISO, endDateISO),
+        getTopFeatures(tenantId, 5),
+        getErrorStats(tenantId, startDateISO, endDateISO),
+        getTopErrors(tenantId, 5),
       ]);
 
       if (pageStats) setPageViewStats(pageStats);
@@ -80,7 +83,7 @@ export default function AnalyticsPage() {
     };
 
     loadData();
-  }, [user, currentTenant, dateRange]);
+  }, [userId, tenantId, dateRange]);
 
   const content = !user || !currentTenant ? (
     <div className="min-h-screen bg-background p-4">

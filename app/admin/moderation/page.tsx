@@ -33,6 +33,8 @@ export default function ModerationAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const tenantId = currentTenant?.id;
+
   const [reports, setReports] = useState<ContentReport[]>([]);
   const [stats, setStats] = useState<ModerationStats | null>(null);
   const [queue, setQueue] = useState<QueueItem[]>([]);
@@ -42,16 +44,16 @@ export default function ModerationAdminPage() {
   const [selectedReport, setSelectedReport] = useState<ContentReport | null>(null);
 
   useEffect(() => {
-    if (!currentTenant) return;
+    if (!tenantId) return;
 
     const loadData = async () => {
       setLoading(true);
       setError(null);
       try {
         const [reportsData, queueData, statsData] = await Promise.all([
-          getContentReports(currentTenant.id, { status: 'pending', limit: 100 }),
-          getModerationQueue(currentTenant.id, 'pending'),
-          getModerationStats(currentTenant.id),
+          getContentReports(tenantId, { status: 'pending', limit: 100 }),
+          getModerationQueue(tenantId, 'pending'),
+          getModerationStats(tenantId),
         ]);
 
         setReports(reportsData || []);
@@ -66,7 +68,7 @@ export default function ModerationAdminPage() {
     };
 
     void loadData();
-  }, [currentTenant]);
+  }, [tenantId]);
 
   const handleResolveReport = async (report: ContentReport, action: string) => {
     if (!user || !currentTenant) return;

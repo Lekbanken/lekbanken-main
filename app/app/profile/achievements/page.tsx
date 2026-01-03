@@ -19,17 +19,20 @@ import {
 
 export default function AchievementsPage() {
   const { user } = useAuth();
+
+  const userId = user?.id;
+
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [filterType, setFilterType] = useState<'all' | 'unlocked' | 'locked'>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const loadAchievements = async () => {
-      if (!user) return;
+    if (!userId) return;
 
+    const loadAchievements = async () => {
       try {
         setIsLoading(true);
-        const progress = await getUserAchievementProgress(user.id);
+        const progress = await getUserAchievementProgress(userId);
         setAchievements(progress);
       } catch (err) {
         console.error('Error loading achievements:', err);
@@ -39,7 +42,7 @@ export default function AchievementsPage() {
     };
 
     loadAchievements();
-  }, [user]);
+  }, [userId]);
 
   const filteredAchievements = achievements.filter((item) => {
     if (filterType === 'unlocked') return item.isUnlocked;

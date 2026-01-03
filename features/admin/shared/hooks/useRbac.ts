@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import type { TenantRole } from '@/types/tenant';
@@ -29,6 +30,8 @@ export type AdminPermission =
   // Content
   | 'admin.content.list'
   | 'admin.content.edit'
+  // Planner
+  | 'admin.planner.list'
   // Sessions
   | 'admin.sessions.list'
   | 'admin.sessions.view'
@@ -96,6 +99,9 @@ const permissionChecks: Record<AdminPermission, PermissionCheck> = {
   // Content - system_admin or tenant editor+
   'admin.content.list': (sys, tr) => sys || Boolean(tr),
   'admin.content.edit': (sys, tr) => sys || tr === 'owner' || tr === 'admin' || tr === 'editor',
+
+  // Planner - system_admin or tenant editor+
+  'admin.planner.list': (sys, tr) => sys || Boolean(tr),
 
   // Sessions - system_admin or tenant admin
   'admin.sessions.list': (sys, tr) => sys || tr === 'owner' || tr === 'admin',
@@ -171,31 +177,44 @@ export function useRbac() {
 
   /**
    * Check if user has a specific permission
+   * Memoized to prevent unnecessary re-renders
    */
-  const can = (permission: AdminPermission): boolean => {
+  const can = useCallback((permission: AdminPermission): boolean => {
     const check = permissionChecks[permission];
     if (!check) return false;
     return check(isSystemAdmin, tenantRole);
-  };
+  }, [isSystemAdmin, tenantRole]);
 
   /**
    * Check multiple permissions (all must be true)
    */
-  const canAll = (...permissions: AdminPermission[]): boolean => {
-    return permissions.every(p => can(p));
-  };
+  const canAll = useCallback((...permissions: AdminPermission[]): boolean => {
+    return permissions.every(p => {
+      const check = permissionChecks[p];
+      if (!check) return false;
+      return check(isSystemAdmin, tenantRole);
+    });
+  }, [isSystemAdmin, tenantRole]);
 
   /**
    * Check multiple permissions (any can be true)
    */
-  const canAny = (...permissions: AdminPermission[]): boolean => {
-    return permissions.some(p => can(p));
-  };
+  const canAny = useCallback((...permissions: AdminPermission[]): boolean => {
+    return permissions.some(p => {
+      const check = permissionChecks[p];
+      if (!check) return false;
+      return check(isSystemAdmin, tenantRole);
+    });
+  }, [isSystemAdmin, tenantRole]);
 
   // Combined loading state
   const isLoading = authLoading || isLoadingTenants;
 
-  return {
+  // Memoize admin role computation
+  const adminRole = useMemo(() => getAdminRole(), [isSystemAdmin, isTenantAdmin, isTenantEditor]);
+
+  // Memoize the entire return object to prevent unnecessary re-renders
+  return useMemo(() => ({
     // Loading state
     isLoading,
 
@@ -205,7 +224,7 @@ export function useRbac() {
     canAny,
     
     // Role info
-    adminRole: getAdminRole(),
+    adminRole,
     isSystemAdmin,
     isTenantAdmin,
     isTenantEditor,
@@ -220,7 +239,20 @@ export function useRbac() {
     canAccessSystemAdmin: isSystemAdmin,
     canAccessTenantAdmin: isTenantAdmin || isTenantEditor,
     canAccessAdmin: isSystemAdmin || isTenantAdmin || isTenantEditor,
-  };
+  }), [
+    isLoading,
+    can,
+    canAll,
+    canAny,
+    adminRole,
+    isSystemAdmin,
+    isTenantAdmin,
+    isTenantEditor,
+    currentTenant?.id,
+    currentTenant?.name,
+    hasTenants,
+    tenantRole,
+  ]);
 }
 
 /**
@@ -234,6 +266,7 @@ export function getNavPermission(href: string): AdminPermission | null {
     '/admin/products': 'admin.products.list',
     '/admin/games': 'admin.games.list',
     '/admin/content': 'admin.content.list',
+    '/admin/planner': 'admin.planner.list',
     '/admin/sessions': 'admin.sessions.list',
     '/admin/achievements': 'admin.achievements.list',
     '/admin/library': 'admin.achievements.list',

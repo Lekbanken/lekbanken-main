@@ -15,8 +15,9 @@ async function loadPlan(planId: string): Promise<PlannerPlan | null> {
   return data.plan
 }
 
-export default async function PlannerPlanDetailPage({ params }: { params: { planId: string } }) {
-  const plan = await loadPlan(params.planId)
+export default async function PlannerPlanDetailPage({ params }: { params: Promise<{ planId: string }> }) {
+  const { planId } = await params
+  const plan = await loadPlan(planId)
   if (!plan) {
     notFound()
   }

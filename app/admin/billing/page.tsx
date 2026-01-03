@@ -83,16 +83,19 @@ export default function BillingAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const userId = user?.id;
+  const tenantId = currentTenant?.id;
+
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!user || !currentTenant) return;
+    if (!userId || !tenantId) return;
 
     const loadStats = async () => {
       setIsLoading(true);
       try {
-        const billingStats = await getBillingStats(currentTenant.id);
+        const billingStats = await getBillingStats(tenantId);
         setStats(billingStats);
       } catch (err) {
         console.error('Error loading billing stats:', err);
@@ -101,7 +104,7 @@ export default function BillingAdminPage() {
     };
 
     loadStats();
-  }, [user, currentTenant]);
+  }, [userId, tenantId]);
 
   if (!user) {
     return (

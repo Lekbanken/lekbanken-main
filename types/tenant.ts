@@ -3,8 +3,8 @@ import type { Database } from '@/types/supabase'
 export type TenantRole = Database['public']['Enums']['tenant_role_enum']
 export type Tenant = Database['public']['Tables']['tenants']['Row']
 
-// View-backed membership row, optionally hydrated with tenant
-export type TenantMembership = Database['public']['Views']['user_tenant_memberships']['Row'] & {
+// Membership row, optionally hydrated with tenant
+export type TenantMembership = Database['public']['Tables']['user_tenant_memberships']['Row'] & {
   tenant?: Tenant | null
 }
 

@@ -62,8 +62,10 @@ export function OrganisationAdminPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const userId = user?.id;
+
   const loadOrganisations = useCallback(async () => {
-    if (!user) {
+    if (!userId) {
       setIsLoading(false);
       return;
     }
@@ -104,7 +106,7 @@ export function OrganisationAdminPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [userId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -181,42 +183,86 @@ export function OrganisationAdminPage() {
     }
   };
 
-  const handleEditSubmit = (payload: OrganisationAdminItem) => {
+  const handleEditSubmit = async (payload: OrganisationAdminItem) => {
     const updatedAt = new Date().toISOString();
     const slug = payload.slug?.trim() || slugify(payload.name);
-    setOrganisations((prev) => prev.map((org) => (org.id === payload.id ? payload : org)));
-    setEditingOrg(null);
-    void supabase
-      .from("tenants")
-      .update({
-        name: payload.name,
-        status: payload.status,
-        slug: slug || null,
-        contact_name: payload.contactName,
-        contact_email: payload.contactEmail,
-        contact_phone: payload.contactPhone,
-        updated_at: updatedAt,
-      })
-      .eq("id", payload.id);
-    success("Changes saved.", "Organisation updated");
+    
+    try {
+      const { error: updateError } = await supabase
+        .from("tenants")
+        .update({
+          name: payload.name,
+          status: payload.status,
+          slug: slug || null,
+          contact_name: payload.contactName,
+          contact_email: payload.contactEmail,
+          contact_phone: payload.contactPhone,
+          updated_at: updatedAt,
+        })
+        .eq("id", payload.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Only update local state after successful save
+      setOrganisations((prev) => prev.map((org) => (org.id === payload.id ? { ...payload, slug, updatedAt } : org)));
+      setEditingOrg(null);
+      success("Ändringar sparade.", "Organisation uppdaterad");
+    } catch (err) {
+      console.error("Failed to update organisation", err);
+      const message = err instanceof Error ? err.message : "Kunde inte spara ändringar.";
+      setError(message);
+      // Keep dialog open so user can retry
+    }
   };
 
-  const handleStatusChange = (orgId: string, status: OrganisationStatus) => {
+  const handleStatusChange = async (orgId: string, status: OrganisationStatus) => {
     const updatedAt = new Date().toISOString();
-    setOrganisations((prev) =>
-      prev.map((org) => (org.id === orgId ? { ...org, status, updatedAt } : org)),
-    );
-    void supabase
-      .from("tenants")
-      .update({ status, updated_at: updatedAt })
-      .eq("id", orgId);
-    success(`Organisation is now ${status}.`, "Status updated");
+    
+    try {
+      const { error: updateError } = await supabase
+        .from("tenants")
+        .update({ status, updated_at: updatedAt })
+        .eq("id", orgId)
+        .select()
+        .single();
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setOrganisations((prev) =>
+        prev.map((org) => (org.id === orgId ? { ...org, status, updatedAt } : org)),
+      );
+      success(`Organisation är nu ${status === 'active' ? 'aktiv' : 'inaktiv'}.`, "Status uppdaterad");
+    } catch (err) {
+      console.error("Failed to update status", err);
+      const message = err instanceof Error ? err.message : "Kunde inte uppdatera status.";
+      setError(message);
+    }
   };
 
-  const handleRemove = (orgId: string) => {
-    setOrganisations((prev) => prev.filter((org) => org.id !== orgId));
-    void supabase.from("tenants").delete().eq("id", orgId);
-    warning("Organisation borttagen.");
+  const handleRemove = async (orgId: string) => {
+    try {
+      const { error: deleteError } = await supabase
+        .from("tenants")
+        .delete()
+        .eq("id", orgId);
+
+      if (deleteError) {
+        throw deleteError;
+      }
+
+      setOrganisations((prev) => prev.filter((org) => org.id !== orgId));
+      warning("Organisation borttagen.");
+    } catch (err) {
+      console.error("Failed to delete organisation", err);
+      const message = err instanceof Error ? err.message : "Kunde inte ta bort organisation.";
+      setError(message);
+    }
   };
 
   const filteredOrganisations = useMemo(() => {
@@ -302,7 +348,9 @@ export function OrganisationAdminPage() {
     );
   }
 
-  if (!user || !canViewTenants) {
+  // Only show access denied if we have NO loaded data AND user lacks permission
+  // This prevents flashing "access denied" during re-auth when data is already loaded
+  if ((!userId || !canViewTenants) && organisations.length === 0) {
     return (
       <AdminPageLayout>
         <AdminBreadcrumbs items={[

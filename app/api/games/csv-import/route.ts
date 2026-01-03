@@ -4,6 +4,8 @@
  * POST /api/games/csv-import
  * Imports games from CSV or JSON format.
  * 
+ * @requires system_admin or tenant_admin role
+ * 
  * Supports:
  * - dry_run mode for validation without database changes
  * - upsert mode for updating existing games by game_key
@@ -11,7 +13,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
 import { parseCsvGames } from '@/features/admin/games/utils/csv-parser';
 import { parseGamesFromJsonPayload } from '@/features/admin/games/utils/json-game-import';
 import { validateGames } from '@/features/admin/games/utils/game-validator';
@@ -24,12 +27,31 @@ type ImportPayload = {
   format: 'csv' | 'json';
   dry_run?: boolean;
   upsert?: boolean;
+  tenant_id?: string;
 };
 
 export async function POST(request: Request) {
   try {
+    // Authentication check
+    const authClient = await createServerRlsClient();
+    const { data: { user }, error: userError } = await authClient.auth.getUser();
+    
+    if (userError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = (await request.json()) as ImportPayload;
-    const { data, format, dry_run = false, upsert = true } = body;
+    const { data, format, dry_run = false, upsert = true, tenant_id } = body;
+
+    // Authorization: system_admin for global, tenant_admin for tenant-scoped
+    if (tenant_id) {
+      const hasAccess = await assertTenantAdminOrSystem(tenant_id, user);
+      if (!hasAccess) {
+        return NextResponse.json({ error: 'Forbidden - tenant admin required' }, { status: 403 });
+      }
+    } else if (!isSystemAdmin(user)) {
+      return NextResponse.json({ error: 'Forbidden - system_admin required for global import' }, { status: 403 });
+    }
 
     if (!data || typeof data !== 'string') {
       return NextResponse.json(

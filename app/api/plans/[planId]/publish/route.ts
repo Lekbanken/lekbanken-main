@@ -63,7 +63,7 @@ export async function POST(
 
   // Check capabilities
   const { data: memberships } = await supabase
-    .from('tenant_memberships')
+    .from('user_tenant_memberships')
     .select('tenant_id, role')
     .eq('user_id', user.id)
 

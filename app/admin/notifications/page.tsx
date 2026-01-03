@@ -19,6 +19,9 @@ export default function NotificationsAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const userId = user?.id;
+  const tenantId = currentTenant?.id;
+
   const [tenantUsers, setTenantUsers] = useState<User[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +38,7 @@ export default function NotificationsAdminPage() {
   const [actionLabel, setActionLabel] = useState('');
 
   useEffect(() => {
-    if (!user || !currentTenant) return;
+    if (!userId || !tenantId) return;
 
     const loadUsers = async () => {
       setLoading(true);
@@ -44,7 +47,7 @@ export default function NotificationsAdminPage() {
         const { data, error: queryError } = await supabase
           .from('user_tenant_memberships')
           .select('user_id, users(id, email)')
-          .eq('tenant_id', currentTenant.id)
+          .eq('tenant_id', tenantId)
           .limit(200);
 
         if (queryError) {
@@ -68,7 +71,7 @@ export default function NotificationsAdminPage() {
     };
 
     void loadUsers();
-  }, [user, currentTenant]);
+  }, [userId, tenantId]);
 
   const canSend = useMemo(() => {
     if (!currentTenant) return false;

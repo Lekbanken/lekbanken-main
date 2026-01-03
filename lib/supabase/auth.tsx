@@ -70,6 +70,7 @@ export function AuthProvider({
 
   const ensureProfile = useCallback(async (currentUser: User) => {
     try {
+      // ONLY query by ID - never by email (email can have orphaned profiles)
       const { data: profile, error } = await supabase
         .from('users')
         .select('*')
@@ -83,24 +84,25 @@ export function AuthProvider({
 
       if (profile) return profile as UserProfile
 
-      if (currentUser.email) {
-        const { data: emailProfile, error: emailError } = await supabase
-          .from('users')
-          .select('*')
-          .eq('email', currentUser.email)
-          .maybeSingle()
-
-        if (emailError && emailError.code !== 'PGRST116') {
-          console.warn('ensureProfile email fallback error:', emailError)
-        }
-
-        if (emailProfile) {
-          return emailProfile as UserProfile
-        }
+      // No profile found by ID - this means the user needs a profile created
+      // DO NOT fallback to email lookup as it can return orphaned/wrong profiles
+      console.warn('ensureProfile: no profile found for auth user', currentUser.id, currentUser.email)
+      
+      // Return a minimal synthetic profile from auth user metadata
+      // The real profile should be created server-side via trigger or API
+      const syntheticProfile: Partial<UserProfile> = {
+        id: currentUser.id,
+        email: currentUser.email ?? undefined,
+        full_name: (currentUser.user_metadata?.full_name as string) ?? 
+                   (currentUser.user_metadata?.name as string) ?? 
+                   currentUser.email?.split('@')[0] ?? undefined,
+        avatar_url: (currentUser.user_metadata?.avatar_url as string) ?? 
+                    (currentUser.user_metadata?.picture as string) ?? undefined,
+        created_at: currentUser.created_at,
+        updated_at: new Date().toISOString(),
       }
-
-      console.warn('ensureProfile: profile missing and upsert skipped (RLS/client)', currentUser.id)
-      return null
+      
+      return syntheticProfile as UserProfile
     } catch (err) {
       console.error('ensureProfile error:', err)
       return null

@@ -6,12 +6,13 @@ import { readRepoDoc } from '../repo-files'
 
 export const dynamic = 'force-dynamic'
 
-export default async function RepoDocPage({ params }: { params: { slug: string[] } }) {
+export default async function RepoDocPage({ params }: { params: Promise<{ slug: string[] }> }) {
   if (process.env.NODE_ENV === 'production') {
     notFound()
   }
 
-  const page = await readRepoDoc(params.slug)
+  const { slug } = await params
+  const page = await readRepoDoc(slug)
 
   if (!page) {
     notFound()

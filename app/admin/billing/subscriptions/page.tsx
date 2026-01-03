@@ -67,6 +67,8 @@ export default function SubscriptionsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const tenantId = currentTenant?.id;
+
   // State
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [stats, setStats] = useState<SubscriptionStats | null>(null);
@@ -102,11 +104,11 @@ export default function SubscriptionsPage() {
 
   useEffect(() => {
     const loadData = async () => {
-      if (!currentTenant) return;
+      if (!tenantId) return;
       setIsLoading(true);
       setLoadError(null);
       try {
-        const res = await fetch(`/api/billing/tenants/${currentTenant.id}/subscription`);
+        const res = await fetch(`/api/billing/tenants/${tenantId}/subscription`);
         if (!res.ok) throw new Error('Failed to load subscription');
         const json = await res.json();
         const sub: Subscription | null = json.subscription ?? null;
@@ -123,7 +125,7 @@ export default function SubscriptionsPage() {
     };
 
     loadData();
-  }, [currentTenant, calculateStats]);
+  }, [tenantId, calculateStats]);
 
   const filteredSubscriptions = subscriptions.filter((sub) => {
     if (searchQuery && !(sub.billing_product?.name || '').toLowerCase().includes(searchQuery.toLowerCase())) {

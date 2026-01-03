@@ -115,6 +115,8 @@ export default function LeaderboardAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const tenantId = currentTenant?.id;
+
   // State
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [stats, setStats] = useState<LeaderboardStats | null>(null);
@@ -135,12 +137,12 @@ export default function LeaderboardAdminPage() {
       
       // Try to load from Supabase first
       try {
-        if (currentTenant) {
+        if (tenantId) {
           // Attempt to get real leaderboard data
           const { data: leaderboardData } = await supabase
             .from('achievement_leaderboards')
             .select('*')
-            .eq('tenant_id', currentTenant.id)
+            .eq('tenant_id', tenantId)
             .order('total_points', { ascending: false })
             .limit(50);
 
@@ -179,7 +181,7 @@ export default function LeaderboardAdminPage() {
     };
 
     loadData();
-  }, [currentTenant, timeframe]);
+  }, [tenantId, timeframe]);
 
   // Filter and sort data
   const filteredEntries = entries.filter((entry) => {

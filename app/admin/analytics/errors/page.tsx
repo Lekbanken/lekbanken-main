@@ -48,68 +48,71 @@ interface ErrorSummary {
 export default function ErrorManagementPage() {
   const { user } = useAuth()
   const { currentTenant } = useTenant()
+
+  const tenantId = currentTenant?.id
+
   const [errors, setErrors] = useState<ErrorSummary[]>([])
   const [selectedError, setSelectedError] = useState<ErrorDetail | null>(null)
   const [errorInstances, setErrorInstances] = useState<ErrorDetail[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filter, setFilter] = useState<'all' | 'unresolved' | 'resolved'>('unresolved')
-
-  const loadErrors = async () => {
-    if (!currentTenant) return
-
-    setIsLoading(true)
-    const supabase = createBrowserClient()
-
-    // Get error summary
-    const topErrors = await getTopErrors(currentTenant.id, 50)
-    if (topErrors) {
-      setErrors(
-        topErrors.map((e) => ({
-          error_type: e.type,
-          error_message: e.message,
-          count: e.count,
-          first_seen: '',
-          last_seen: '',
-          resolved_count: 0,
-        }))
-      )
-    }
-
-    // Get detailed errors
-    let query = supabase
-      .from('error_tracking')
-      .select('*')
-      .eq('tenant_id', currentTenant.id)
-      .order('created_at', { ascending: false })
-      .limit(100)
-
-    if (filter === 'unresolved') {
-      query = query.eq('resolved', false)
-    } else if (filter === 'resolved') {
-      query = query.eq('resolved', true)
-    }
-
-    const { data } = await query
-    if (data) {
-      setErrorInstances(data)
-    }
-
-    setIsLoading(false)
-  }
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
+    if (!tenantId) return
+
+    const loadErrors = async () => {
+      setIsLoading(true)
+      const supabase = createBrowserClient()
+
+      // Get error summary
+      const topErrors = await getTopErrors(tenantId, 50)
+      if (topErrors) {
+        setErrors(
+          topErrors.map((e) => ({
+            error_type: e.type,
+            error_message: e.message,
+            count: e.count,
+            first_seen: '',
+            last_seen: '',
+            resolved_count: 0,
+          }))
+        )
+      }
+
+      // Get detailed errors
+      let query = supabase
+        .from('error_tracking')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false })
+        .limit(100)
+
+      if (filter === 'unresolved') {
+        query = query.eq('resolved', false)
+      } else if (filter === 'resolved') {
+        query = query.eq('resolved', true)
+      }
+
+      const { data } = await query
+      if (data) {
+        setErrorInstances(data)
+      }
+
+      setIsLoading(false)
+    }
+
     void loadErrors()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTenant, filter])
+  }, [tenantId, filter, refreshKey])
 
   const selectError = async (error: ErrorSummary) => {
-    if (!currentTenant) return
+    if (!tenantId) return
 
     const supabase = createBrowserClient()
     const { data } = await supabase
       .from('error_tracking')
       .select('*')
-      .eq('tenant_id', currentTenant.id)
+      .eq('tenant_id', tenantId)
       .eq('error_type', error.error_type)
       .eq('error_message', error.error_message)
       .order('created_at', { ascending: false })
@@ -134,12 +137,12 @@ export default function ErrorManagementPage() {
 
     if (!error) {
       setSelectedError(null)
-      loadErrors()
+      setRefreshKey((k) => k + 1)
     }
   }
 
   const resolveAllInstances = async (errorType: string, errorMessage: string) => {
-    if (!user || !currentTenant) return
+    if (!user || !tenantId) return
 
     const supabase = createBrowserClient()
     const { error } = await supabase
@@ -147,18 +150,18 @@ export default function ErrorManagementPage() {
       .update({
         resolved: true,
       })
-      .eq('tenant_id', currentTenant.id)
+      .eq('tenant_id', tenantId)
       .eq('error_type', errorType)
       .eq('error_message', errorMessage)
       .eq('resolved', false)
 
     if (!error) {
       setSelectedError(null)
-      loadErrors()
+      setRefreshKey((k) => k + 1)
     }
   }
 
-  if (!user || !currentTenant) {
+  if (!user || !tenantId) {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">

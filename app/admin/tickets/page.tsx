@@ -30,6 +30,9 @@ export default function AdminTicketsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const userId = user?.id;
+  const tenantId = currentTenant?.id;
+
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [stats, setStats] = useState<SupportStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -52,7 +55,7 @@ export default function AdminTicketsPage() {
 
   // Load tickets + stats
   useEffect(() => {
-    if (!user || !currentTenant) return;
+    if (!userId || !tenantId) return;
     setIsLoading(true);
     setError(null);
 
@@ -60,8 +63,8 @@ export default function AdminTicketsPage() {
     const loadData = async () => {
       try {
         const [ticketsData, statsData] = await Promise.all([
-          getAdminTickets(currentTenant.id, statusFilter || undefined, priorityFilter || undefined, itemsPerPage, offset),
-          getTicketStats(currentTenant.id),
+          getAdminTickets(tenantId, statusFilter || undefined, priorityFilter || undefined, itemsPerPage, offset),
+          getTicketStats(tenantId),
         ]);
         if (ticketsData) setTickets(ticketsData);
         if (statsData) setStats(statsData);
@@ -73,7 +76,7 @@ export default function AdminTicketsPage() {
       }
     };
     void loadData();
-  }, [user, currentTenant, statusFilter, priorityFilter, currentPage]);
+  }, [userId, tenantId, statusFilter, priorityFilter, currentPage]);
 
   // Load messages for selected ticket
   useEffect(() => {

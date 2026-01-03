@@ -4,13 +4,16 @@
  * GET /api/games/csv-export
  * Exports games to CSV or JSON format with optional filtering.
  * 
+ * @requires system_admin or tenant_admin role
+ * 
  * NOTE: Uses 'any' typing for related tables (game_steps, game_phases, etc.)
  * because Supabase types are not yet regenerated after migrations.
  * Run `supabase gen types typescript` to fix this.
  */
 
 import { NextResponse } from 'next/server';
-import { createServiceRoleClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isSystemAdmin, assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
 import { generateGamesCsv, generateGamesJson } from '@/features/admin/games/utils/csv-generator';
 import { actionIdsToOrderAliases, conditionIdsToOrderAliases } from '@/lib/games/trigger-order-alias';
 import type { ExportableGame, ExportOptions, ParsedArtifactVisibility, ParsedTriggerAction, ParsedTriggerCondition } from '@/types/csv-import';
@@ -24,6 +27,14 @@ function asParsedVisibility(value: string | null | undefined): ParsedArtifactVis
 }
 
 export async function GET(request: Request) {
+  // Authentication check
+  const authClient = await createServerRlsClient();
+  const { data: { user }, error: userError } = await authClient.auth.getUser();
+  
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { searchParams } = new URL(request.url);
   
   // Parse query parameters
@@ -35,6 +46,16 @@ export async function GET(request: Request) {
   const includeRoles = searchParams.get('includeRoles') !== 'false';
   const includeBoardConfig = searchParams.get('includeBoardConfig') !== 'false';
   const tenantId = searchParams.get('tenantId');
+
+  // Authorization: system_admin for global, tenant_admin for tenant-scoped
+  if (tenantId && tenantId !== 'global') {
+    const hasAccess = await assertTenantAdminOrSystem(tenantId, user);
+    if (!hasAccess) {
+      return NextResponse.json({ error: 'Forbidden - tenant admin required' }, { status: 403 });
+    }
+  } else if (!isSystemAdmin(user)) {
+    return NextResponse.json({ error: 'Forbidden - system_admin required for global export' }, { status: 403 });
+  }
   
   // Parse game IDs if provided
   const gameIds = idsParam ? idsParam.split(',').filter(Boolean) : null;

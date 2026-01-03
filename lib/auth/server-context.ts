@@ -26,11 +26,28 @@ export async function getServerAuthContext(pathname?: string): Promise<AuthConte
   }
 
   const [profileResult, membershipsResult] = await Promise.all([
-    supabase.from('users').select('*').eq('id', user.id).single(),
+    supabase.from('users').select('*').eq('id', user.id).maybeSingle(),
     supabase.from('user_tenant_memberships').select('*, tenant:tenants(*)').eq('user_id', user.id),
   ])
 
-  const profile = (profileResult.data as UserProfile | null) ?? null
+  // Build profile from DB or fallback to auth user metadata
+  let profile: UserProfile | null = profileResult.data as UserProfile | null
+  
+  if (!profile && user) {
+    // Create synthetic profile from auth user metadata when DB profile is missing
+    profile = {
+      id: user.id,
+      email: user.email ?? null,
+      full_name: (user.user_metadata?.full_name as string) ?? 
+                 (user.user_metadata?.name as string) ?? 
+                 user.email?.split('@')[0] ?? null,
+      avatar_url: (user.user_metadata?.avatar_url as string) ?? 
+                  (user.user_metadata?.picture as string) ?? null,
+      created_at: user.created_at,
+      updated_at: new Date().toISOString(),
+    } as UserProfile
+  }
+  
   const memberships = (membershipsResult.data as TenantMembership[] | null) ?? []
   const effectiveGlobalRole = deriveEffectiveGlobalRole(profile, user)
 

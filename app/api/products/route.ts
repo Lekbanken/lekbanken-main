@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { validateProductPayload } from '@/lib/validation/products'
+import { isSystemAdmin } from '@/lib/utils/tenantAuth'
 import type { Database } from '@/types/supabase'
 
 type ProductRow = Database['public']['Tables']['products']['Row']
@@ -23,6 +24,16 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
+
+  // Authentication: only system_admin can create products
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  if (!isSystemAdmin(user)) {
+    return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 })
+  }
+
   const body = (await request.json().catch(() => ({}))) as Partial<ProductRow>
 
   const validation = validateProductPayload(body, { mode: 'create' })

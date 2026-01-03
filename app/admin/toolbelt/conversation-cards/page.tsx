@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
 import { useTenant } from '@/lib/context/TenantContext'
 import {
@@ -12,7 +12,11 @@ import {
   AdminFilterSelect,
 } from '@/components/admin/shared'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle, Select } from '@/components/ui'
-import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleLeftRightIcon, ArrowUpTrayIcon, PlusIcon } from '@heroicons/react/24/outline'
+import {
+  ConversationCardsInfoDialog,
+  ConversationCardsImportDialog,
+} from '@/features/conversation-cards/components'
 
 type Purpose = {
   id: string
@@ -87,37 +91,40 @@ export default function ConversationCardsAdminPage() {
     return subs.filter((p) => p.parent_id === selectedMain)
   }, [purposes, filters.mainPurposeId])
 
-  useEffect(() => {
-    void (async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const params = new URLSearchParams()
-        params.set('scopeType', filters.scopeType)
-        if (filters.status !== 'all') params.set('status', filters.status)
-        if (filters.mainPurposeId !== 'all') params.set('mainPurposeId', filters.mainPurposeId)
-        if (filters.subPurposeId !== 'all') params.set('subPurposeId', filters.subPurposeId)
+  const showCreate = canManage && (isSystemAdmin || isTenantAdmin)
+  const [importOpen, setImportOpen] = useState(false)
 
-        if (filters.scopeType === 'tenant') {
-          const tenantId = currentTenantId ?? currentTenant?.id ?? ''
-          if (tenantId) params.set('tenantId', tenantId)
-        }
+  const loadCollections = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const params = new URLSearchParams()
+      params.set('scopeType', filters.scopeType)
+      if (filters.status !== 'all') params.set('status', filters.status)
+      if (filters.mainPurposeId !== 'all') params.set('mainPurposeId', filters.mainPurposeId)
+      if (filters.subPurposeId !== 'all') params.set('subPurposeId', filters.subPurposeId)
 
-        const res = await fetch(`/api/admin/toolbelt/conversation-cards/collections?${params.toString()}`, {
-          cache: 'no-store',
-        })
-        const data = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda samlingar')
-        setCollections((data.collections ?? []) as CollectionListRow[])
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Kunde inte ladda samlingar')
-      } finally {
-        setLoading(false)
+      if (filters.scopeType === 'tenant') {
+        const tenantId = currentTenantId ?? currentTenant?.id ?? ''
+        if (tenantId) params.set('tenantId', tenantId)
       }
-    })()
+
+      const res = await fetch(`/api/admin/toolbelt/conversation-cards/collections?${params.toString()}`, {
+        cache: 'no-store',
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.error || 'Kunde inte ladda samlingar')
+      setCollections((data.collections ?? []) as CollectionListRow[])
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Kunde inte ladda samlingar')
+    } finally {
+      setLoading(false)
+    }
   }, [filters, currentTenantId, currentTenant?.id])
 
-  const showCreate = canManage && (isSystemAdmin || isTenantAdmin)
+  useEffect(() => {
+    void loadCollections()
+  }, [loadCollections])
 
   const statusBadge = (status: 'draft' | 'published') => (
     <Badge variant={status === 'published' ? 'default' : 'secondary'}>{status === 'published' ? 'Published' : 'Draft'}</Badge>
@@ -132,10 +139,31 @@ export default function ConversationCardsAdminPage() {
         description="Hantera samtalskortssamlingar (Toolbelt) och importera kort via CSV."
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
-          showCreate ? (
-            <Button href="/admin/toolbelt/conversation-cards/new">Skapa samling</Button>
-          ) : null
+          <div className="flex items-center gap-2">
+            <ConversationCardsInfoDialog />
+            {showCreate && (
+              <>
+                <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+                  <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
+                  Importera
+                </Button>
+                <Button size="sm" href="/admin/toolbelt/conversation-cards/new">
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  Skapa samling
+                </Button>
+              </>
+            )}
+          </div>
         }
+      />
+
+      {/* Import Dialog */}
+      <ConversationCardsImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImportComplete={() => void loadCollections()}
+        currentTenantId={currentTenantId ?? currentTenant?.id ?? null}
+        isSystemAdmin={isSystemAdmin}
       />
 
       <Card>

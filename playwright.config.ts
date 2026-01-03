@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env.local for test credentials
+dotenv.config({ path: path.resolve(__dirname, '.env.local') });
 
 /**
  * Playwright configuration for E2E tests
@@ -55,10 +60,22 @@ export default defineConfig({
     const allBrowsers = !!process.env.CI || process.env.PW_ALL_BROWSERS === '1';
 
     const base = [
-      /* Setup project for authentication */
+      /* Setup projects for authentication - runs different auth setup for each role */
       {
         name: 'setup',
-        testMatch: /.*\.setup\.ts/,
+        testMatch: /auth\.setup\.ts$/,
+      },
+      {
+        name: 'setup:system-admin',
+        testMatch: /auth\.setup\.system-admin\.ts$/,
+      },
+      {
+        name: 'setup:tenant-admin',
+        testMatch: /auth\.setup\.tenant-admin\.ts$/,
+      },
+      {
+        name: 'setup:regular-user',
+        testMatch: /auth\.setup\.regular-user\.ts$/,
       },
 
       {
@@ -66,7 +83,7 @@ export default defineConfig({
         use: {
           ...devices['Desktop Chrome'],
         },
-        dependencies: ['setup'],
+        dependencies: ['setup', 'setup:system-admin', 'setup:tenant-admin', 'setup:regular-user'],
       },
     ];
 

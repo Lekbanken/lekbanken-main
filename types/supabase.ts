@@ -7895,7 +7895,7 @@ export type Database = {
           },
         ]
       }
-      tenant_memberships: {
+      user_tenant_memberships: {
         Row: {
           created_at: string
           id: string
@@ -9348,7 +9348,7 @@ export type Database = {
           },
         ]
       }
-      user_tenant_memberships: {
+      tenant_memberships: {
         Row: {
           created_at: string | null
           id: string | null
@@ -9426,7 +9426,7 @@ export type Database = {
         }
         SetofOptions: {
           from: "*"
-          to: "tenant_memberships"
+          to: "user_tenant_memberships"
           isOneToOne: true
           isSetofReturn: false
         }

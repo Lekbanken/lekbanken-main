@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useTenant } from '@/lib/context/TenantContext'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
@@ -33,9 +33,9 @@ function formatNumber(n: number) {
   return new Intl.NumberFormat('sv-SE').format(n)
 }
 
-export default function CampaignDetailAdminPage(props: { params: { campaignId: string } }) {
+export default function CampaignDetailAdminPage(props: { params: Promise<{ campaignId: string }> }) {
   const { currentTenant } = useTenant()
-  const campaignId = props.params.campaignId
+  const { campaignId } = use(props.params)
 
   const [campaign, setCampaign] = useState<CampaignRow | null>(null)
   const [analytics, setAnalytics] = useState<CampaignAnalyticsPayload | null>(null)

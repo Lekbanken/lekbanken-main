@@ -26,6 +26,9 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
+  const userId = user?.id;
+  const tenantId = currentTenant?.id;
+
   // States
   const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +38,7 @@ export default function SettingsPage() {
 
   // Load tenant info
   useEffect(() => {
-    if (!user || !currentTenant) return;
+    if (!userId || !tenantId) return;
 
     const loadTenantInfo = async () => {
       setIsLoading(true);
@@ -44,7 +47,7 @@ export default function SettingsPage() {
         const { data: tenant, error: tenantError } = await supabase
           .from('tenants')
           .select('*')
-          .eq('id', currentTenant.id)
+          .eq('id', tenantId)
           .single();
 
         if (tenantError) {
@@ -56,19 +59,19 @@ export default function SettingsPage() {
         const { count: memberCount } = await supabase
           .from('user_tenant_memberships')
           .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', currentTenant.id);
+          .eq('tenant_id', tenantId);
 
         // Get game count
         const { count: gameCount } = await supabase
           .from('games')
           .select('*', { count: 'exact', head: true })
-          .eq('owner_tenant_id', currentTenant.id);
+          .eq('owner_tenant_id', tenantId);
 
         // Get session count
         const { count: sessionCount } = await supabase
           .from('game_sessions')
           .select('*', { count: 'exact', head: true })
-          .eq('tenant_id', currentTenant.id);
+          .eq('tenant_id', tenantId);
 
         setTenantInfo({
           id: tenant.id,
@@ -95,7 +98,7 @@ export default function SettingsPage() {
     };
 
     loadTenantInfo();
-  }, [user, currentTenant]);
+  }, [userId, tenantId]);
 
   const handleSaveChanges = async () => {
     if (!currentTenant || !tenantInfo) return;

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { SandboxShell } from '../../components/shell/SandboxShellV2'
+import { ConversationCardsSandbox } from './ConversationCardsSandbox'
 
 export const dynamic = 'force-dynamic'
 
@@ -102,6 +103,15 @@ export default function ConversationCardsDocsPage() {
           <p className="text-xs text-muted-foreground">
             Obs: tills Supabase-typer är regenererade kan viss serverkod använda tillfälliga casts.
           </p>
+        </div>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h2 className="text-base font-semibold text-foreground">UX-varianter</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Utforskning av anvandarupplevelse (drawer-first) for Samtalskort.
+          </p>
+          <div className="mt-6">
+            <ConversationCardsSandbox />
+          </div>
         </div>
       </div>
     </SandboxShell>

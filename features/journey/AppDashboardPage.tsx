@@ -115,6 +115,9 @@ export default function AppDashboardPage() {
   const { user, userProfile, isLoading: authLoading } = useAuth()
   const { currentTenant, isLoadingTenants } = useTenant()
 
+  const userId = user?.id
+  const tenantId = currentTenant?.id
+
   const [snapshot, setSnapshot] = useState<JourneySnapshot | null>(null)
   const [activities, setActivities] = useState<JourneyActivity[]>([])
   const [isActivitiesLoading, setIsActivitiesLoading] = useState(false)
@@ -129,7 +132,6 @@ export default function AppDashboardPage() {
     const load = async () => {
       try {
         setIsActivitiesLoading(true)
-        const tenantId = currentTenant?.id ?? null
         const [snapshotPayload, feedPayload, pinnedPayload] = await Promise.all([
           fetchJourneySnapshot(),
           fetchJourneyFeed({ limit: 10 }),
@@ -150,21 +152,20 @@ export default function AppDashboardPage() {
       }
     }
 
-    if (user) {
+    if (userId) {
       load()
     }
 
     return () => {
       isMounted = false
     }
-  }, [user, currentTenant?.id])
+  }, [userId, tenantId])
 
   useEffect(() => {
     let isMounted = true
 
     const loadCosmetics = async () => {
-      const tenantId = currentTenant?.id
-      if (!user || !tenantId) return
+      if (!userId || !tenantId) return
 
       try {
         setIsCosmeticsLoading(true)
@@ -195,7 +196,7 @@ export default function AppDashboardPage() {
     return () => {
       isMounted = false
     }
-  }, [user, currentTenant?.id])
+  }, [userId, tenantId])
 
   const equipCosmetic = useCallback(
     async (itemId: string) => {

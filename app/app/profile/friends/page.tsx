@@ -23,6 +23,8 @@ interface FriendInfo {
 export default function FriendsPage() {
   const { user } = useAuth();
 
+  const userId = user?.id;
+
   const [friendsList, setFriendsList] = useState<FriendInfo[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<FriendRequest[]>([]);
   const [sentRequests, setSentRequests] = useState<FriendRequest[]>([]);
@@ -33,20 +35,20 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<FriendInfo[]>([]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!userId) return;
 
     const loadData = async () => {
       setIsLoading(true);
       try {
         const [friends, received, sent] = await Promise.all([
-          getFriends(user.id),
-          getFriendRequests(user.id, 'received'),
-          getFriendRequests(user.id, 'sent'),
+          getFriends(userId),
+          getFriendRequests(userId, 'received'),
+          getFriendRequests(userId, 'sent'),
         ]);
 
         // Fetch friend details
         if (friends && friends.length > 0) {
-          const friendIds = friends.map((f) => (f.user_id_1 === user.id ? f.user_id_2 : f.user_id_1));
+          const friendIds = friends.map((f) => (f.user_id_1 === userId ? f.user_id_2 : f.user_id_1));
 
           const { data: friendDetails } = await supabase
             .from('users')
@@ -65,7 +67,7 @@ export default function FriendsPage() {
     };
 
     loadData();
-  }, [user]);
+  }, [userId]);
 
   const handleSearchUsers = async (email: string) => {
     if (!email.trim()) {

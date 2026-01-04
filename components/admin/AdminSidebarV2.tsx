@@ -439,13 +439,11 @@ export function AdminSidebarV2({
 
   return (
     <aside
-      className={`hidden h-screen flex-shrink-0 transition-all duration-200 ease-in-out lg:block ${
+      className={`sticky top-0 hidden h-screen flex-shrink-0 transition-all duration-200 ease-in-out lg:block ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
-      <div className="sticky top-0 h-screen">
-        <SidebarContent collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
-      </div>
+      <SidebarContent collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
     </aside>
   )
 }

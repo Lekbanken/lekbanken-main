@@ -166,10 +166,10 @@ export function AdminShellV2({ children }: AdminShellV2Props) {
         />
 
         {/* Main content area */}
-        <div className="flex min-h-screen flex-1 flex-col">
+        <div className="flex h-screen flex-1 flex-col overflow-hidden">
           <AdminTopbarV2 onToggleSidebar={() => setIsMobileNavOpen(true)} />
           
-          <main className="flex-1 bg-muted/30">
+          <main className="flex-1 overflow-y-auto bg-muted/30">
             <div className="p-4 lg:p-6 xl:p-8">
               {children}
             </div>

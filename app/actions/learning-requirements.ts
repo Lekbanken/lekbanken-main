@@ -1,4 +1,3 @@
-// @ts-nocheck
 // TODO: Regenerate Supabase types after applying learning domain migration
 'use server'
 

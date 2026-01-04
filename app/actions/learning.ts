@@ -1,11 +1,10 @@
-// @ts-nocheck
 // TODO: Regenerate Supabase types after applying learning domain migration
 // Run: npx supabase gen types typescript --local > types/supabase.ts
 'use server'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
-import type { QuizAnswer, LearningCourseAttempt } from '@/types/learning'
+import type { QuizAnswer } from '@/types/learning'
 
 export type SubmitQuizResult = {
   success: boolean

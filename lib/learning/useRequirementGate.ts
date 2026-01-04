@@ -69,7 +69,7 @@ export function useRequirementGate({
     } finally {
       setIsLoading(false)
     }
-  }, [target.kind, target.id, tenantId, enabled, onBlocked])
+  }, [target, tenantId, enabled, onBlocked])
 
   useEffect(() => {
     check()

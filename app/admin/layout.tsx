@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
 import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
-import { AdminShell } from '@/components/admin/AdminShell'
+import { AdminShellV2 } from '@/components/admin/AdminShellV2'
 import { ToastProvider } from '@/components/ui'
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
@@ -28,9 +28,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       initialTenant={authContext.activeTenant}
       initialRole={authContext.activeTenantRole}
       initialMemberships={authContext.memberships}
+      isSystemAdmin={isSystemAdmin}
     >
       <ToastProvider>
-        <AdminShell>{children}</AdminShell>
+        <AdminShellV2>{children}</AdminShellV2>
       </ToastProvider>
     </TenantProvider>
   )

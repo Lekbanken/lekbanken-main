@@ -250,11 +250,11 @@ CREATE POLICY "tenant_admins_manage_learning_courses"
 ON learning_courses FOR ALL
 USING (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 )
 WITH CHECK (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 );
 
 -- LEARNING_PATHS: Similar pattern
@@ -274,11 +274,11 @@ CREATE POLICY "tenant_admins_manage_learning_paths"
 ON learning_paths FOR ALL
 USING (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 )
 WITH CHECK (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 );
 
 -- LEARNING_PATH_NODES: Follow path access
@@ -328,7 +328,7 @@ CREATE POLICY "tenant_admins_view_progress"
 ON learning_user_progress FOR SELECT
 USING (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 );
 
 -- LEARNING_COURSE_ATTEMPTS: Users see own, admins see tenant
@@ -346,7 +346,7 @@ CREATE POLICY "tenant_admins_view_attempts"
 ON learning_course_attempts FOR SELECT
 USING (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 );
 
 -- LEARNING_REQUIREMENTS: Viewable by affected users, manageable by admins
@@ -366,11 +366,11 @@ CREATE POLICY "tenant_admins_manage_learning_requirements"
 ON learning_requirements FOR ALL
 USING (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 )
 WITH CHECK (
   tenant_id = ANY(get_user_tenant_ids())
-  AND has_tenant_role(tenant_id, 'admin')
+  AND has_tenant_role(tenant_id, 'admin'::public.tenant_role_enum)
 );
 
 -- =========================================

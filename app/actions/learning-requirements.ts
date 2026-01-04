@@ -1,4 +1,3 @@
-// TODO: Regenerate Supabase types after applying learning domain migration
 'use server'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
@@ -60,12 +59,25 @@ export async function checkRequirements(
     }
   }
 
+  // Cast the JSON result to expected shape
+  const typedResult = result as unknown as {
+    satisfied?: boolean
+    total?: number
+    completed?: number
+    remaining?: number
+    unsatisfiedCourses?: Array<{
+      courseId: string
+      courseTitle: string
+      courseSlug: string
+    }>
+  } | null
+
   return {
-    satisfied: result?.satisfied ?? true,
-    total: result?.total ?? 0,
-    completed: result?.completed ?? 0,
-    remaining: result?.remaining ?? 0,
-    unsatisfiedCourses: result?.unsatisfiedCourses ?? [],
+    satisfied: typedResult?.satisfied ?? true,
+    total: typedResult?.total ?? 0,
+    completed: typedResult?.completed ?? 0,
+    remaining: typedResult?.remaining ?? 0,
+    unsatisfiedCourses: typedResult?.unsatisfiedCourses ?? [],
   }
 }
 
@@ -122,12 +134,12 @@ export async function createRequirement(
   const { data: isAdmin } = await supabase
     .rpc('is_system_admin')
 
-  if (!isAdmin) {
+  if (!isAdmin && tenantId) {
     // Check if tenant admin
     const { data: hasTenantRole } = await supabase
       .rpc('has_tenant_role', {
-        _tenant_id: tenantId,
-        _role: 'admin',
+        p_tenant_id: tenantId,
+        required_role: 'admin',
       })
     
     if (!hasTenantRole) {

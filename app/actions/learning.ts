@@ -1,5 +1,3 @@
-// TODO: Regenerate Supabase types after applying learning domain migration
-// Run: npx supabase gen types typescript --local > types/supabase.ts
 'use server'
 
 import { createServerRlsClient } from '@/lib/supabase/server'
@@ -76,14 +74,8 @@ export async function startCourseAttempt(
     return { success: false, error: 'Failed to create attempt' }
   }
 
-  // Increment attempts count
-  await supabase.rpc('increment', {
-    row_id: user.id,
-    table_name: 'learning_user_progress',
-    column_name: 'attempts_count',
-  }).catch(() => {
-    // Fallback if RPC doesn't exist
-  })
+  // Note: attempts_count is incremented by database trigger or handled in progress update
+  // No separate RPC call needed
 
   return { success: true, attemptId: attempt.id }
 }
@@ -170,12 +162,25 @@ export async function submitQuizAnswers(
 
   // Update user progress
   const progressStatus = passed ? 'completed' : 'failed'
+  
+  // First fetch existing best_score to compare
+  const { data: existingProgress } = await supabase
+    .from('learning_user_progress')
+    .select('best_score')
+    .eq('user_id', user.id)
+    .eq('tenant_id', tenantId)
+    .eq('course_id', courseId)
+    .single()
+  
+  const currentBestScore = existingProgress?.best_score ?? 0
+  const newBestScore = Math.max(score, currentBestScore)
+  
   const { error: progressError } = await supabase
     .from('learning_user_progress')
     .update({
       status: progressStatus,
       last_score: score,
-      best_score: supabase.rpc('greatest', { a: score, b: 0 }), // Will be handled by trigger
+      best_score: newBestScore,
       last_attempt_at: new Date().toISOString(),
       completed_at: passed ? new Date().toISOString() : null,
     })

@@ -1,5 +1,3 @@
-// TODO: Regenerate Supabase types after applying learning domain migration
-// Run: npx supabase gen types typescript --local > types/supabase.ts
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
 

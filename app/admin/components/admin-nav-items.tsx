@@ -66,6 +66,16 @@ export const adminNavGroups: AdminNavGroup[] = [
     ],
   },
   {
+    id: 'learning',
+    title: 'Utbildning',
+    items: [
+      { href: '/admin/learning', label: 'Översikt', icon: navIcons.learning },
+      { href: '/admin/learning/courses', label: 'Kurser', icon: navIcons.learning },
+      { href: '/admin/learning/paths', label: 'Lärstigar', icon: navIcons.learning },
+      { href: '/admin/learning/requirements', label: 'Krav & Grind', icon: navIcons.learning },
+    ],
+  },
+  {
     id: 'operations',
     title: 'Operativt / Live',
     items: [

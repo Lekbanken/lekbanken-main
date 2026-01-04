@@ -193,6 +193,12 @@ export const navIcons = {
       <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" />
     </svg>
   ),
+  learning: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+      <path d="M6 12v5c3 3 9 3 12 0v-5" />
+    </svg>
+  ),
 };
 
 export const adminNavConfig: AdminNavConfig = [
@@ -261,6 +267,16 @@ export const adminNavConfig: AdminNavConfig = [
       { id: 'achievements', href: '/admin/gamification/achievements', label: 'Achievements', icon: navIcons.achievements },
       { id: 'shop-rewards', href: '/admin/gamification/shop-rewards', label: 'Shop & Rewards', icon: navIcons.marketplace },
       { id: 'library-exports', href: '/admin/gamification/library-exports', label: 'Library Exports', icon: navIcons.content },
+    ],
+  },
+  {
+    id: 'learning',
+    title: 'Utbildning',
+    items: [
+      { id: 'learning-hub', href: '/admin/learning', label: 'Översikt', icon: navIcons.learning },
+      { id: 'learning-courses', href: '/admin/learning/courses', label: 'Kurser', icon: navIcons.learning },
+      { id: 'learning-paths', href: '/admin/learning/paths', label: 'Lärstigar', icon: navIcons.learning },
+      { id: 'learning-requirements', href: '/admin/learning/requirements', label: 'Krav & Grind', icon: navIcons.learning },
     ],
   },
   {

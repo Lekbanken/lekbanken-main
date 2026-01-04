@@ -5,6 +5,7 @@
   MegaphoneIcon,
   CubeIcon,
   SparklesIcon,
+  AcademicCapIcon,
 } from '@heroicons/react/24/outline';
 
 // -----------------------------------------------------------------------------
@@ -213,6 +214,33 @@ export const sandboxCategories: SandboxCategory[] = [
         status: 'implemented',
         components: ['@/lib/validation/awardBuilderExportSchemaV1', '@/docs/gamification/AWARD_BUILDER_EXPORT_SCHEMA_V1.md'],
         routes: ['/api/admin/award-builder/exports', '/api/admin/award-builder/exports/[exportId]'],
+      },
+    ],
+  },
+  {
+    id: 'learning',
+    label: 'Learning',
+    href: '/sandbox/learning',
+    description: 'Lekledarutbildning - kurser, lärstigar och krav',
+    icon: AcademicCapIcon,
+    modules: [
+      {
+        id: 'learning-admin',
+        label: 'Admin Courses',
+        href: '/sandbox/learning/admin',
+        description: 'Kurshantering för administratörer',
+        status: 'implemented',
+        components: ['@/app/sandbox/learning/admin/*'],
+        routes: ['/admin/learning', '/admin/learning/courses', '/admin/learning/paths', '/admin/learning/requirements'],
+      },
+      {
+        id: 'learning-learner',
+        label: 'Learner Journey',
+        href: '/sandbox/learning/learner',
+        description: 'Kursvy och quiz för deltagare',
+        status: 'implemented',
+        components: ['@/app/sandbox/learning/learner/*'],
+        routes: ['/app/learning', '/app/learning/course/*'],
       },
     ],
   },

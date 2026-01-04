@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import { Badge } from '@/components/ui/badge'
@@ -23,6 +24,7 @@ import {
   Cog6ToothIcon,
   BuildingOffice2Icon,
 } from '@heroicons/react/24/outline'
+import type { SystemDesignConfig } from '@/types/design'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -34,6 +36,7 @@ interface AdminSidebarV2Props {
   onClose?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
+  systemDesign?: SystemDesignConfig
 }
 
 // ---------------------------------------------------------------------------
@@ -214,10 +217,12 @@ function SidebarContent({
   onNavigate,
   collapsed = false,
   onToggleCollapse,
+  systemDesign,
 }: {
   onNavigate?: () => void
   collapsed?: boolean
   onToggleCollapse?: () => void
+  systemDesign?: SystemDesignConfig
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -292,12 +297,24 @@ function SidebarContent({
       {/* Logo area */}
       <div className={`flex h-16 items-center border-b border-slate-800 ${collapsed ? 'justify-center px-2' : 'px-4'}`}>
         <Link href="/admin" className="flex items-center gap-3" onClick={onNavigate}>
-          {/* Lekbanken brand mark */}
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-purple-500 to-pink-500 shadow-lg shadow-primary/25">
-            <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="currentColor">
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-            </svg>
-          </div>
+          {/* Brand mark - use systemDesign icon if available */}
+          {systemDesign?.brand?.iconUrl ? (
+            <div className="relative h-9 w-9 overflow-hidden rounded-xl shadow-lg shadow-primary/25">
+              <Image
+                src={systemDesign.brand.iconUrl}
+                alt="Lekbanken"
+                fill
+                className="object-cover"
+                sizes="36px"
+              />
+            </div>
+          ) : (
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary via-purple-500 to-pink-500 shadow-lg shadow-primary/25">
+              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+          )}
           {!collapsed && (
             <div>
               <p className="text-sm font-bold text-white tracking-tight">Lekbanken</p>
@@ -426,12 +443,13 @@ export function AdminSidebarV2({
   onClose,
   collapsed = false,
   onToggleCollapse,
+  systemDesign,
 }: AdminSidebarV2Props) {
   if (variant === 'mobile') {
     return (
       <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
         <SheetContent side="left" className="w-72 border-slate-800 bg-slate-900 p-0">
-          <SidebarContent onNavigate={onClose} />
+          <SidebarContent onNavigate={onClose} systemDesign={systemDesign} />
         </SheetContent>
       </Sheet>
     )
@@ -443,7 +461,7 @@ export function AdminSidebarV2({
         collapsed ? 'w-16' : 'w-64'
       }`}
     >
-      <SidebarContent collapsed={collapsed} onToggleCollapse={onToggleCollapse} />
+      <SidebarContent collapsed={collapsed} onToggleCollapse={onToggleCollapse} systemDesign={systemDesign} />
     </aside>
   )
 }

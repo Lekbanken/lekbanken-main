@@ -133,6 +133,7 @@ const systemAdminCategories: AdminNavCategory[] = [
     label: 'System',
     icon: 'settings',
     items: [
+      { id: 'design', label: 'Design', href: '/admin/design', icon: 'swatch', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'notifications', label: 'Notifikationer', href: '/admin/notifications', icon: 'notifications', permission: 'admin.notifications.send' },
       { id: 'feature-flags', label: 'Feature Flags', href: '/admin/feature-flags', icon: 'flag', permission: 'admin.system.view' },
       { id: 'api-keys', label: 'API-nycklar', href: '/admin/api-keys', icon: 'key', permission: 'admin.system.view' },

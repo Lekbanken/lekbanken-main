@@ -199,6 +199,15 @@ export const navIcons = {
       <path d="M6 12v5c3 3 9 3 12 0v-5" />
     </svg>
   ),
+  swatch: (
+    <svg viewBox="0 0 24 24" className={navIconClass} fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z" />
+      <path d="M14 14h6v6h-6z" fill="currentColor" opacity="0.3" />
+      <circle cx="7" cy="7" r="1" fill="currentColor" />
+      <circle cx="17" cy="7" r="1" fill="currentColor" />
+      <circle cx="7" cy="17" r="1" fill="currentColor" />
+    </svg>
+  ),
 };
 
 export const adminNavConfig: AdminNavConfig = [

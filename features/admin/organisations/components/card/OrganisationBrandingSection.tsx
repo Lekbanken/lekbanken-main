@@ -5,20 +5,26 @@ import {
   PhotoIcon,
   SwatchIcon,
   ArrowPathIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { Switch } from "@/components/ui";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase/client";
+import { setTenantBrandingEnabled } from "@/app/actions/design";
 import type { TenantBranding } from "../../types";
 
 type OrganisationBrandingSectionProps = {
   tenantId: string;
   branding: TenantBranding | null;
   organisationName: string;
+  brandingEnabled?: boolean;
+  isSystemAdmin?: boolean;
   onRefresh: () => void;
 };
 
@@ -92,6 +98,8 @@ export function OrganisationBrandingSection({
   tenantId,
   branding,
   organisationName,
+  brandingEnabled = false,
+  isSystemAdmin = false,
   onRefresh,
 }: OrganisationBrandingSectionProps) {
   const { success, error: toastError } = useToast();
@@ -99,6 +107,8 @@ export function OrganisationBrandingSection({
   
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isTogglingBranding, setIsTogglingBranding] = useState(false);
+  const [localBrandingEnabled, setLocalBrandingEnabled] = useState(brandingEnabled);
   
   // Local state for form
   const [brandNameOverride, setBrandNameOverride] = useState(branding?.brandNameOverride || '');
@@ -106,6 +116,25 @@ export function OrganisationBrandingSection({
   const [secondaryColor, setSecondaryColor] = useState<string | null>(branding?.secondaryColor || null);
   const [accentColor, setAccentColor] = useState<string | null>(branding?.accentColor || null);
   const [theme, setTheme] = useState<string>(branding?.theme || 'auto');
+  
+  // Handle branding toggle (system admin only)
+  const handleBrandingToggle = async (enabled: boolean) => {
+    setIsTogglingBranding(true);
+    try {
+      const result = await setTenantBrandingEnabled(tenantId, enabled);
+      if (result.success) {
+        setLocalBrandingEnabled(enabled);
+        success(enabled ? 'Tenant branding aktiverat' : 'Tenant branding inaktiverat');
+        onRefresh();
+      } else {
+        toastError(result.error || 'Kunde inte ändra inställningen');
+      }
+    } catch {
+      toastError('Ett fel uppstod');
+    } finally {
+      setIsTogglingBranding(false);
+    }
+  };
   
   // Handle logo upload
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -273,6 +302,29 @@ export function OrganisationBrandingSection({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Tenant Branding Toggle (System Admin only) */}
+        {isSystemAdmin && (
+          <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-3">
+              <SparklesIcon className="h-5 w-5 text-primary" />
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">Tenant Branding</span>
+                  <Badge variant="outline" className="text-[10px]">Betald funktion</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Tillåter organisationen att anpassa logotyp och varumärkesfärger
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={localBrandingEnabled}
+              onCheckedChange={handleBrandingToggle}
+              disabled={isTogglingBranding}
+            />
+          </div>
+        )}
+
         {/* Logo section */}
         <div className="space-y-3">
           <Label className="text-sm font-medium">Logotyp</Label>

@@ -115,6 +115,10 @@ function StatusBadge({ status }: { status: TenantStatus }) {
 export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps) {
   const router = useRouter();
   const { success, error: toastError } = useToast();
+  // Dynamic import to avoid circular dependency issues
+  const { useAuth } = require('@/lib/supabase/auth');
+  const { effectiveGlobalRole } = useAuth();
+  const isSystemAdmin = effectiveGlobalRole === 'system_admin';
   
   const [organisation, setOrganisation] = useState<OrganisationDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -283,6 +287,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
         mainLanguage: tenant.main_language,
         defaultTheme: tenant.default_theme,
         trialEndsAt: tenant.trial_ends_at,
+        brandingEnabled: tenant.tenant_branding_enabled ?? false,
         branding,
         domains,
         features,
@@ -558,6 +563,8 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
               tenantId={tenantId}
               branding={organisation.branding}
               organisationName={organisation.name}
+              brandingEnabled={organisation.brandingEnabled}
+              isSystemAdmin={isSystemAdmin}
               onRefresh={loadOrganisation}
             />
             <OrganisationLocaleSection

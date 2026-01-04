@@ -9,6 +9,7 @@ import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import { resetAuth } from '@/lib/supabase/resetAuth'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
+import type { SystemDesignConfig } from '@/types/design'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -16,13 +17,14 @@ import { useRbac } from '@/features/admin/shared/hooks/useRbac'
 
 interface AdminShellV2Props {
   children: ReactNode
+  systemDesign?: SystemDesignConfig
 }
 
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
 
-export function AdminShellV2({ children }: AdminShellV2Props) {
+export function AdminShellV2({ children, systemDesign }: AdminShellV2Props) {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [loadingTimedOut, setLoadingTimedOut] = useState(false)
@@ -156,6 +158,7 @@ export function AdminShellV2({ children }: AdminShellV2Props) {
         <AdminSidebarV2
           collapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          systemDesign={systemDesign}
         />
 
         {/* Mobile sidebar */}
@@ -163,6 +166,7 @@ export function AdminShellV2({ children }: AdminShellV2Props) {
           variant="mobile"
           open={isMobileNavOpen}
           onClose={() => setIsMobileNavOpen(false)}
+          systemDesign={systemDesign}
         />
 
         {/* Main content area */}

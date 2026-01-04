@@ -4,6 +4,7 @@ import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import { AdminShellV2 } from '@/components/admin/AdminShellV2'
 import { ToastProvider } from '@/components/ui'
+import { getSystemDesign } from '@/lib/design'
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const authContext = await getServerAuthContext('/admin')
@@ -22,6 +23,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     redirect('/app')
   }
 
+  // Fetch system design for branding
+  const systemDesign = await getSystemDesign()
+
   return (
     <TenantProvider
       userId={authContext.user.id}
@@ -31,7 +35,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       isSystemAdmin={isSystemAdmin}
     >
       <ToastProvider>
-        <AdminShellV2>{children}</AdminShellV2>
+        <AdminShellV2 systemDesign={systemDesign}>{children}</AdminShellV2>
       </ToastProvider>
     </TenantProvider>
   )

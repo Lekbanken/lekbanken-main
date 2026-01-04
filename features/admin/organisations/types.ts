@@ -254,6 +254,9 @@ export type OrganisationDetail = {
 
   // Trial
   trialEndsAt: string | null;
+  
+  // Branding feature toggle (system admin controlled)
+  brandingEnabled: boolean;
 
   // Related data (loaded separately or joined)
   branding: TenantBranding | null;

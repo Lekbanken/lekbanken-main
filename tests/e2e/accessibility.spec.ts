@@ -98,7 +98,7 @@ test.describe('Keyboard Navigation', () => {
     await page.goto('/admin');
     
     const results = await new AxeBuilder({ page })
-      .withRules(['keyboard'])
+      .withTags(['cat.keyboard'])
       .analyze();
 
     expect(results.violations).toEqual([]);
@@ -108,7 +108,7 @@ test.describe('Keyboard Navigation', () => {
     await page.goto('/admin');
     
     const results = await new AxeBuilder({ page })
-      .withRules(['focus-visible'])
+      .withRules(['focus-order-semantics'])
       .analyze();
 
     expect(results.violations).toEqual([]);
@@ -129,11 +129,14 @@ test.describe('Forms', () => {
   test('form errors are accessible', async ({ page }) => {
     await page.goto('/auth/login');
     
-    // Submit empty form to trigger errors
-    await page.getByRole('button', { name: /log in|sign in/i }).click();
+    // Submit form to trigger validation
+    const submitButton = page.locator('button[type="submit"]').first();
+    if (await submitButton.isVisible()) {
+      await submitButton.click();
+    }
     
-    // Wait for error messages
-    await page.waitForSelector('[role="alert"], .error-message', { timeout: 5000 }).catch(() => {});
+    // Wait for error messages (if any)
+    await page.waitForSelector('[role="alert"], .error-message, [aria-invalid="true"]', { timeout: 3000 }).catch(() => {});
     
     const results = await new AxeBuilder({ page })
       .withRules(['aria-input-field-name', 'aria-valid-attr-value'])

@@ -27,16 +27,15 @@ export const adminNavGroups: AdminNavGroup[] = [
     items: [
       { href: '/admin/organisations', label: 'Organisationer', icon: navIcons.organisations },
       { href: '/admin/users', label: 'Användare', icon: navIcons.users },
-      { href: '/admin/licenses', label: 'Licenser', icon: navIcons.licenses },
     ],
   },
   {
-    id: 'content',
-    title: 'Innehåll',
+    id: 'products-content',
+    title: 'Produkter & Innehåll',
     items: [
-      { href: '/admin/games', label: 'Spel', icon: navIcons.games },
-      { href: '/admin/planner', label: 'Planer', icon: navIcons.content },
-      { href: '/admin/purposes', label: 'Syften', icon: navIcons.content },
+      { href: '/admin/products', label: 'Produkter', icon: navIcons.products },
+      { href: '/admin/games', label: 'Lekhanteraren', icon: navIcons.games },
+      { href: '/admin/planner', label: 'Planläggaren', icon: navIcons.content },
     ],
   },
   {
@@ -57,11 +56,13 @@ export const adminNavGroups: AdminNavGroup[] = [
   },
   {
     id: 'gamification',
-    title: 'Gamification',
+    title: 'Gamification hub',
     items: [
-      { href: '/admin/leaderboard', label: 'Leaderboard', icon: navIcons.leaderboard },
-      { href: '/admin/gamification/levels', label: 'Levels', icon: navIcons.settings },
-      { href: '/admin/marketplace', label: 'Butik', icon: navIcons.marketplace },
+      { href: '/admin/gamification', label: 'Översikt', icon: navIcons.leaderboard },
+      { href: '/admin/gamification/dicecoin-xp', label: 'DiceCoin & XP', icon: navIcons.leaderboard },
+      { href: '/admin/gamification/achievements', label: 'Achievements', icon: navIcons.achievements },
+      { href: '/admin/gamification/shop-rewards', label: 'Shop & Rewards', icon: navIcons.marketplace },
+      { href: '/admin/gamification/library-exports', label: 'Library Exports', icon: navIcons.content },
     ],
   },
   {

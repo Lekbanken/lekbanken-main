@@ -1,6 +1,6 @@
 'use client';
 
-import type { FormEvent} from "react";
+import type { FormEvent } from "react";
 import { useState } from "react";
 import {
   Button,
@@ -14,44 +14,63 @@ import {
   Select,
 } from "@/components/ui";
 import { BuildingOffice2Icon } from "@heroicons/react/24/outline";
-import type { OrganisationAdminItem, OrganisationStatus} from "../types";
-import { statusLabels } from "../types";
+import type { OrganisationCreatePayload, OrganisationListStatus } from "../types";
+import { tenantStatusLabels } from "../types";
 
 type OrganisationCreateDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreate: (organisation: Omit<OrganisationAdminItem, "id">) => void;
+  onCreate: (organisation: OrganisationCreatePayload) => Promise<void>;
 };
 
-export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: OrganisationCreateDialogProps) {
+const statusOptions: { value: OrganisationListStatus; label: string }[] = [
+  { value: "active", label: tenantStatusLabels.active },
+  { value: "trial", label: tenantStatusLabels.trial },
+  { value: "demo", label: tenantStatusLabels.demo },
+  { value: "inactive", label: tenantStatusLabels.inactive },
+];
+
+export function OrganisationCreateDialog({
+  open,
+  onOpenChange,
+  onCreate,
+}: OrganisationCreateDialogProps) {
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
-  const [status, setStatus] = useState<OrganisationStatus>("active");
+  const [status, setStatus] = useState<OrganisationListStatus>("active");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!name || !contactEmail) return;
-    onCreate({
-      name: name.trim(),
-      slug: slug.trim() || null,
-      contactName: contactName.trim() || null,
-      contactEmail: contactEmail.trim(),
-      contactPhone: contactPhone.trim() || null,
-      status,
-      membersCount: 0,
-      subscriptionPlan: null,
-      createdAt: new Date().toISOString(),
-      updatedAt: null,
-    });
+  const resetForm = () => {
     setName("");
     setSlug("");
     setContactName("");
     setContactEmail("");
     setContactPhone("");
     setStatus("active");
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!name.trim() || !contactEmail.trim()) return;
+
+    setIsSaving(true);
+    try {
+      await onCreate({
+        name: name.trim(),
+        slug: slug.trim() || null,
+        contactName: contactName.trim() || null,
+        contactEmail: contactEmail.trim(),
+        contactPhone: contactPhone.trim() || null,
+        status,
+      });
+      resetForm();
+      onOpenChange(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -61,14 +80,16 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <BuildingOffice2Icon className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle>Create organisation</DialogTitle>
-          <DialogDescription>Add a new organisation and set its primary contact.</DialogDescription>
+          <DialogTitle>Skapa organisation</DialogTitle>
+          <DialogDescription>
+            Lägg till en ny organisation och ange kontaktuppgifter.
+          </DialogDescription>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground" htmlFor="create-org-name">
-              Organisation name <span className="text-destructive">*</span>
+              Organisationsnamn <span className="text-destructive">*</span>
             </label>
             <Input
               id="create-org-name"
@@ -79,21 +100,34 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
             />
           </div>
 
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground" htmlFor="create-slug">
+              Slug <span className="text-muted-foreground font-normal">(valfritt)</span>
+            </label>
+            <Input
+              id="create-slug"
+              value={slug}
+              onChange={(event) => setSlug(event.target.value)}
+              placeholder="organisation-ab"
+            />
+            <p className="text-xs text-muted-foreground">Lämna tomt för auto-slug.</p>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-name">
-                Contact person
+                Kontaktperson
               </label>
               <Input
                 id="create-contact-name"
                 value={contactName}
                 onChange={(event) => setContactName(event.target.value)}
-                placeholder="Name"
+                placeholder="Namn"
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-email">
-                Contact email <span className="text-destructive">*</span>
+                Kontaktmail <span className="text-destructive">*</span>
               </label>
               <Input
                 id="create-contact-email"
@@ -109,7 +143,7 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-phone">
-                Phone <span className="text-muted-foreground font-normal">(optional)</span>
+                Telefon <span className="text-muted-foreground font-normal">(valfritt)</span>
               </label>
               <Input
                 id="create-contact-phone"
@@ -121,37 +155,32 @@ export function OrganisationCreateDialog({ open, onOpenChange, onCreate }: Organ
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-status">
                 Status
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground" htmlFor="create-slug">
-                  Slug <span className="text-muted-foreground font-normal">(valfritt)</span>
-                </label>
-                <Input
-                  id="create-slug"
-                  value={slug}
-                  onChange={(event) => setSlug(event.target.value)}
-                  placeholder="organisation-ab"
-                />
-                <p className="text-xs text-muted-foreground">Lämna tomt för auto-slug.</p>
-              </div>
               </label>
               <Select
                 id="create-status"
                 value={status}
-                onChange={(event) => setStatus(event.target.value as OrganisationStatus)}
-                options={[
-                  { value: "active", label: statusLabels.active },
-                  { value: "inactive", label: statusLabels.inactive },
-                ]}
-                placeholder="Status"
+                onChange={(event) => setStatus(event.target.value as OrganisationListStatus)}
+                options={statusOptions}
+                placeholder="Välj status"
               />
             </div>
           </div>
 
           <DialogFooter className="pt-4">
-            <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-              Cancel
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => {
+                resetForm();
+                onOpenChange(false);
+              }}
+              disabled={isSaving}
+            >
+              Avbryt
             </Button>
-            <Button type="submit">Create organisation</Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? "Skapar..." : "Skapa organisation"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

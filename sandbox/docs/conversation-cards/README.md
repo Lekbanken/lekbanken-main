@@ -16,6 +16,18 @@ This sandbox explores how the cards should feel in use: as physical cards, not a
 
 ## UI variants
 
+### Content fields considered
+Collection fields:
+- Title, status, language, target group
+- Description
+- Main purpose + sub purposes
+
+Card fields:
+- Sorting (order)
+- Optional title
+- Primary prompt + follow-up prompts
+- Optional leader tip
+
 ### Variant A - Deck Drawer Minimal
 Summary: A stacked deck preview with a bottom drawer that reveals the full card.
 Pros:

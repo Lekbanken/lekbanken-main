@@ -213,16 +213,15 @@ export const adminNavConfig: AdminNavConfig = [
         permission: 'admin.tenants.list',
       },
       { id: 'users', href: '/admin/users', label: 'Användare', icon: navIcons.users, permission: 'admin.users.list' },
-      { id: 'licenses', href: '/admin/licenses', label: 'Licenser', icon: navIcons.licenses, permission: 'admin.billing.view' },
     ],
   },
   {
-    id: 'content',
-    title: 'Innehåll',
+    id: 'products-content',
+    title: 'Produkter & Innehåll',
     items: [
-      { id: 'games', href: '/admin/games', label: 'Spel', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
-      { id: 'planner', href: '/admin/planner', label: 'Planer', icon: navIcons.content, permission: 'admin.planner.list' },
-      { id: 'purposes', href: '/admin/purposes', label: 'Syften', icon: navIcons.content, permission: 'admin.products.list', systemAdminOnly: true },
+      { id: 'products', href: '/admin/products', label: 'Produkter', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
+      { id: 'games', href: '/admin/games', label: 'Lekhanteraren', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
+      { id: 'planner', href: '/admin/planner', label: 'Planläggaren', icon: navIcons.content, permission: 'admin.planner.list' },
     ],
   },
   {
@@ -255,11 +254,13 @@ export const adminNavConfig: AdminNavConfig = [
   },
   {
     id: 'gamification',
-    title: 'Gamification',
+    title: 'Gamification hub',
     items: [
-      { id: 'leaderboard', href: '/admin/leaderboard', label: 'Leaderboard', icon: navIcons.leaderboard },
-      { id: 'gamification-levels', href: '/admin/gamification/levels', label: 'Levels', icon: navIcons.settings },
-      { id: 'marketplace', href: '/admin/marketplace', label: 'Butik', icon: navIcons.marketplace },
+      { id: 'gamification-hub', href: '/admin/gamification', label: 'Översikt', icon: navIcons.leaderboard },
+      { id: 'dicecoin-xp', href: '/admin/gamification/dicecoin-xp', label: 'DiceCoin & XP', icon: navIcons.leaderboard },
+      { id: 'achievements', href: '/admin/gamification/achievements', label: 'Achievements', icon: navIcons.achievements },
+      { id: 'shop-rewards', href: '/admin/gamification/shop-rewards', label: 'Shop & Rewards', icon: navIcons.marketplace },
+      { id: 'library-exports', href: '/admin/gamification/library-exports', label: 'Library Exports', icon: navIcons.content },
     ],
   },
   {

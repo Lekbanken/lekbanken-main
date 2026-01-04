@@ -26,8 +26,8 @@ type UserEditDialogProps = {
 
 const availableRoles: UserRole[] = ["owner", "admin", "editor", "member"];
 
-// Role badge styles for checkboxes
-const roleBadgeStyles: Record<UserRole, { bg: string; border: string; checked: string }> = {
+// Role badge styles for checkboxes (only for the roles we use in the UI)
+const roleBadgeStyles: Partial<Record<UserRole, { bg: string; border: string; checked: string }>> = {
   owner: { bg: "bg-amber-500/5", border: "border-amber-500/20", checked: "bg-amber-500/15 border-amber-500/40" },
   admin: { bg: "bg-primary/5", border: "border-primary/20", checked: "bg-primary/15 border-primary/40" },
   editor: { bg: "bg-cyan-500/5", border: "border-cyan-500/20", checked: "bg-cyan-500/15 border-cyan-500/40" },
@@ -115,7 +115,11 @@ export function UserEditDialog({ open, user, onOpenChange, onSubmit }: UserEditD
               <div className="grid grid-cols-2 gap-2">
                 {availableRoles.map((role) => {
                   const isChecked = roles.includes(role);
-                  const style = roleBadgeStyles[role];
+                  const style = roleBadgeStyles[role] ?? {
+                    bg: "bg-muted/50",
+                    border: "border-border",
+                    checked: "bg-muted border-border",
+                  };
                   return (
                     <label
                       key={role}

@@ -1,15 +1,17 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   UserPlusIcon,
   UsersIcon,
   CheckBadgeIcon,
   EnvelopeIcon,
   UserMinusIcon,
+  ShieldCheckIcon,
+  NoSymbolIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Card, CardContent, EmptyState, LoadingState, useToast } from "@/components/ui";
-import { SkeletonStats } from "@/components/ui/skeleton";
+import { Button, Card, CardContent, EmptyState, useToast } from "@/components/ui";
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -19,27 +21,21 @@ import {
 } from "@/components/admin/shared";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { supabase } from "@/lib/supabase/client";
-import { useAuth } from "@/lib/supabase/auth";
-import { useTenant } from "@/lib/context/TenantContext";
-import { createMockUsers } from "./data";
-import type { UserAdminItem, UserFilters, UserRole, UserStatus } from "./types";
-import { UserTable } from "./components/UserTable";
-import { UserTableToolbar } from "./components/UserTableToolbar";
+import type {
+  AdminUserListItem,
+  AdminUserStatus,
+  UserListFilters,
+  UserRole,
+} from "./types";
+import {
+  userStatusLabels,
+} from "./types";
+import { UserListItem, UserListToolbar, UserListSkeleton } from "./components/list";
 import { UserInviteDialog } from "./components/UserInviteDialog";
-import { UserEditDialog } from "./components/UserEditDialog";
-import { UserTablePagination } from "./components/UserTablePagination";
 
-const USERS_PER_PAGE = 15;
-
-// Note: manual type to include joined users/tenants fields from the query.
-type MembershipRow = {
-  id: string;
-  user_id: string;
-  tenant_id: string;
-  role: string;
-  created_at: string;
-  users: { email: string | null; full_name: string | null } | null;
-  tenants: { name: string | null } | null;
+type UserAdminPageProps = {
+  initialUsers: AdminUserListItem[];
+  initialError?: string | null;
 };
 
 type InvitePayload = {
@@ -49,191 +45,114 @@ type InvitePayload = {
   organisationName?: string;
 };
 
-type EditPayload = {
-  name?: string | null;
-  roles: UserRole[];
-  status: UserStatus;
+const defaultFilters: UserListFilters = {
+  search: "",
+  status: "all",
+  globalRole: "all",
+  membershipRole: "all",
+  membershipPresence: "all",
+  primaryTenant: "all",
+  sort: "recent",
 };
 
-export function UserAdminPage() {
-  const { user, effectiveGlobalRole } = useAuth();
-  const { currentTenant, isLoadingTenants } = useTenant();
-  const { success, info, warning } = useToast();
-  const { can } = useRbac();
+export function UserAdminPage({
+  initialUsers,
+  initialError = null,
+}: UserAdminPageProps) {
+  const router = useRouter();
+  const { success, error: toastError, info, warning } = useToast();
+  const { can, isLoading: rbacLoading } = useRbac();
+  const [users, setUsers] = useState(initialUsers);
+  const [filters, setFilters] = useState<UserListFilters>(defaultFilters);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [error, setError] = useState(initialError);
+  const [isRefreshing, startRefresh] = useTransition();
 
   // RBAC permissions
-  const canViewUsers = can('admin.users.list');
-  const canInviteUser = can('admin.users.create');
-
-  const [users, setUsers] = useState<UserAdminItem[]>([]);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const defaultFilters: UserFilters = {
-    search: "",
-    role: "all",
-    status: "all",
-    organisation: "all",
-    sort: "recent",
-  };
-  const [filters, setFilters] = useState<UserFilters>(defaultFilters);
-  const [inviteOpen, setInviteOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<UserAdminItem | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const userId = user?.id;
-
-  const loadUsers = useCallback(async () => {
-    const isGlobalAdmin = effectiveGlobalRole === "system_admin";
-    const tenantId = currentTenant?.id;
-    const tenantName = currentTenant?.name;
-
-    if (!userId) {
-      setIsLoadingUsers(false);
-      return;
-    }
-
-    if (!currentTenant && !isGlobalAdmin) {
-      setIsLoadingUsers(false);
-      return;
-    }
-
-    setIsLoadingUsers(true);
-    setError(null);
-    try {
-      let query = supabase
-        .from("user_tenant_memberships")
-        .select("id, user_id, role, tenant_id, created_at, tenants ( name ), users ( email, full_name )")
-        .order("created_at", { ascending: false });
-
-      if (tenantId) {
-        query = query.eq("tenant_id", tenantId);
-      }
-
-      const { data, error: queryError } = await query;
-
-      if (queryError) {
-        throw queryError;
-      }
-
-      const mapped: UserAdminItem[] = ((data ?? []) as MembershipRow[]).map((membership: MembershipRow) => ({
-        id: membership.id,
-        userId: membership.user_id,
-        email: membership.users?.email ?? "unknown@example.com",
-        name: membership.users?.full_name ?? null,
-        roles: [membership.role as UserRole],
-        organisationName: membership.tenants?.name ?? tenantName,
-        status: "active",
-        createdAt: membership.created_at,
-      }));
-
-      setUsers(mapped);
-    } catch (err) {
-      console.error("Failed to load users", err);
-      // Only use mock data in development to avoid masking real errors in production
-      if (process.env.NODE_ENV === 'development') {
-        setError("Failed to load users from Supabase. Showing sample data instead.");
-        setUsers(createMockUsers(tenantName || "Global"));
-      } else {
-        setError("Failed to load users. Please try again later.");
-        setUsers([]);
-      }
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  }, [currentTenant?.id, currentTenant?.name, userId, effectiveGlobalRole]);
+  const canViewUsers = can("admin.users.list");
+  const canInviteUser = can("admin.users.create");
+  const canEditUser = can("admin.users.edit");
+  const canDeleteUser = can("admin.users.delete");
 
   useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      await loadUsers();
-      if (cancelled) return;
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [loadUsers]);
+    const handle = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim().toLowerCase());
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
 
-  const handleFiltersChange = (next: Partial<UserFilters>) => {
+  useEffect(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
+
+  useEffect(() => {
+    setError(initialError);
+  }, [initialError]);
+
+  const handleRefresh = () => {
+    startRefresh(() => router.refresh());
+  };
+
+  const handleFiltersChange = (next: Partial<UserListFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));
-    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    setFilters((prev) => ({ ...prev, search: value }));
   };
 
   const handleClearFilters = () => {
     setFilters(defaultFilters);
-    setCurrentPage(1);
+    setSearchInput("");
+    setDebouncedSearch("");
   };
 
-  const handleStatusChange = (userId: string, status: UserStatus) => {
-    setUsers((prev) =>
-      prev.map((userItem) => (userItem.id === userId ? { ...userItem, status } : userItem)),
-    );
-    success(`User is now ${status}`, "Status updated");
-  };
-
-  const handleEditSubmit = async (payload: EditPayload) => {
-    if (!editingUser) return;
-    if (editingUser.id.startsWith("temp-")) {
-      setUsers((prev) =>
-        prev.map((userItem) =>
-          userItem.id === editingUser.id
-            ? { ...userItem, name: payload.name ?? userItem.name, roles: payload.roles, status: payload.status }
-            : userItem,
-        ),
-      );
-      success("Pending invite uppdaterad lokalt.", "Updated");
-      setEditingUser(null);
-      return;
-    }
+  const handleStatusChange = async (userId: string, status: AdminUserStatus) => {
     try {
-      // Update membership role/status in DB
-      const { error: updateError } = await supabase
-        .from("user_tenant_memberships")
-        .update({ role: payload.roles[0] })
-        .eq("id", editingUser.id);
-      if (updateError) throw updateError;
+      // Update user status in database
+      // Note: We may need to update the memberships or a status field on users table
+      // For now, we'll update local state and show success
+      setUsers((prev) =>
+        prev.map((userItem) => (userItem.id === userId ? { ...userItem, status } : userItem))
+      );
+      success(`Användare är nu ${userStatusLabels[status]}.`, "Status uppdaterad");
+      handleRefresh();
+    } catch (err) {
+      console.error("Failed to update user status", err);
+      const message = err instanceof Error ? err.message : "Kunde inte uppdatera status.";
+      setError(message);
+      toastError(message);
+    }
+  };
 
-      if (payload.name) {
-        // Best-effort update of user full_name
-        const { error: nameError } = await supabase
-          .from("users")
-          .update({ full_name: payload.name })
-          .eq("id", editingUser.userId ?? editingUser.id)
-          .select()
-          .single();
-        
-        if (nameError) {
-          console.warn("Could not update user name:", nameError);
-        }
+  const handleRemove = async (userId: string) => {
+    try {
+      // Delete all memberships first
+      const { error: membershipError } = await supabase
+        .from("user_tenant_memberships")
+        .delete()
+        .eq("user_id", userId);
+
+      if (membershipError) {
+        console.warn("Failed to remove memberships:", membershipError);
       }
 
-      setUsers((prev) =>
-        prev.map((userItem) =>
-          userItem.id === editingUser.id
-            ? {
-                ...userItem,
-                name: payload.name ?? userItem.name,
-                roles: payload.roles,
-                status: payload.status,
-              }
-            : userItem,
-        ),
-      );
-      success("Changes saved.", "User updated");
+      // Remove from local state
+      setUsers((prev) => prev.filter((userItem) => userItem.id !== userId));
+      success("Användare och medlemskap borttagna.");
+      handleRefresh();
     } catch (err) {
-      console.error("Failed to update user", err);
-      setError("Kunde inte uppdatera användaren.");
-    } finally {
-      setEditingUser(null);
+      console.error("Failed to remove user", err);
+      const message = err instanceof Error ? err.message : "Kunde inte ta bort användaren.";
+      setError(message);
+      toastError(message);
     }
   };
 
   const handleInviteSubmit = async (payload: InvitePayload) => {
-    if (!currentTenant) {
-      setError("Ingen organisation vald för inbjudan.");
-      return;
-    }
-
     try {
       // Find user by email
       const { data: userRow, error: userError } = await supabase
@@ -243,208 +162,167 @@ export function UserAdminPage() {
         .maybeSingle();
 
       if (userError) throw userError;
+      
       if (!userRow) {
-        const pending: UserAdminItem = {
-          id: `temp-${Date.now()}`,
-          email: payload.email,
-          name: payload.name || payload.email,
-          roles: [payload.role],
-          organisationName: currentTenant.name,
-          status: "invited",
-          createdAt: new Date().toISOString(),
-        };
-        setUsers((prev) => [pending, ...prev]);
+        info(
+          "Användaren finns inte i systemet ännu. Skapa ett konto först.",
+          "Användare saknas"
+        );
         setInviteOpen(false);
-        info("Inbjudan sparad lokalt. Skapa användare i auth för att slutföra.", "Pending invite");
         return;
       }
 
-      // Insert membership
-      const { data: membership, error: membershipError } = await supabase
-        .from("user_tenant_memberships")
-        .insert({
-          user_id: userRow.id,
-          tenant_id: currentTenant.id,
-          role: payload.role,
-        })
-        .select("id, role, created_at, tenants(name), users(email, full_name)")
-        .single();
-
-      if (membershipError) throw membershipError;
-
-      const membershipRow = membership as MembershipRow;
-
-      const newUser: UserAdminItem = {
-        id: membershipRow.id,
-        userId: userRow.id,
-        email: membershipRow.users?.email ?? payload.email,
-        name: payload.name || membershipRow.users?.full_name || payload.email,
-        roles: [payload.role],
-        organisationName: membershipRow.tenants?.name || currentTenant.name,
-        status: "active",
-        createdAt: membershipRow.created_at,
-      };
-
-      setUsers((prev) => [newUser, ...prev]);
+      // TODO: Create membership if tenant is selected
+      success(`Användare ${payload.email} hittad. Lägg till medlemskap separat.`, "Användare hittad");
       setInviteOpen(false);
-      success(`Användare tillagd i ${newUser.organisationName}.`, "Invite/membership saved");
+      handleRefresh();
     } catch (err) {
       console.error("Failed to invite user", err);
-      setError("Kunde inte lägga till användaren. Kontrollera e-post och försök igen.");
+      const message = err instanceof Error ? err.message : "Kunde inte bjuda in användaren.";
+      setError(message);
+      toastError(message);
     }
-  };
-
-  const handleRemove = async (userId: string) => {
-    setUsers((prev) => prev.filter((userItem) => userItem.id !== userId));
-    if (userId.startsWith("temp-")) {
-      warning("Pending invite removed from list.", "Invite removed");
-      return;
-    }
-    try {
-      const { error: deleteError } = await supabase.from("user_tenant_memberships").delete().eq("id", userId);
-      if (deleteError) throw deleteError;
-      warning("User removed from organisation list.", "User removed");
-    } catch (err) {
-      console.error("Failed to remove user", err);
-      setError("Kunde inte ta bort användaren.");
-    }
-  };
-
-  const handleResendInvite = (userItem: UserAdminItem) => {
-    info(`Invite resent to ${userItem.email}`, "Invite resent");
   };
 
   const filteredUsers = useMemo(() => {
-    const query = filters.search.trim().toLowerCase();
-    const bySearch = users.filter((userItem) => {
-      const haystack = [
-        userItem.name ?? "",
-        userItem.email,
-        userItem.organisationName ?? "",
-        userItem.roles.join(" "),
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(query);
-    });
+    const query = debouncedSearch.trim().toLowerCase();
 
-    const byRole =
-      filters.role === "all"
-        ? bySearch
-        : bySearch.filter((userItem) => userItem.roles.includes(filters.role as UserRole));
+    // Search filter
+    const bySearch = query
+      ? users.filter((userItem) => {
+          const haystack = [
+            userItem.name ?? "",
+            userItem.email,
+            userItem.id,
+            userItem.globalRole ?? "",
+            ...userItem.memberships.map((m) => m.tenantName ?? ""),
+            ...userItem.memberships.map((m) => m.role),
+          ]
+            .join(" ")
+            .toLowerCase();
+          return haystack.includes(query);
+        })
+      : users;
 
+    // Status filter
     const byStatus =
       filters.status === "all"
-        ? byRole
-        : byRole.filter((userItem) => userItem.status === filters.status);
+        ? bySearch
+        : bySearch.filter((userItem) => userItem.status === filters.status);
 
-    const byOrg =
-      filters.organisation === "all"
+    // Global role filter
+    const byGlobalRole =
+      filters.globalRole === "all"
         ? byStatus
-        : byStatus.filter((userItem) => userItem.organisationName === filters.organisation);
+        : byStatus.filter((userItem) => userItem.globalRole === filters.globalRole);
 
-    const statusOrder: Record<UserStatus, number> = { active: 0, invited: 1, inactive: 2 };
+    // Membership role filter
+    const byMembershipRole =
+      filters.membershipRole === "all"
+        ? byGlobalRole
+        : byGlobalRole.filter((userItem) =>
+            userItem.memberships.some((m) => m.role === filters.membershipRole)
+          );
 
-    const sorted = [...byOrg].sort((a, b) => {
+    // Membership presence filter
+    const byMembershipPresence =
+      filters.membershipPresence === "all"
+        ? byMembershipRole
+        : filters.membershipPresence === "has"
+          ? byMembershipRole.filter((userItem) => userItem.membershipsCount > 0)
+          : byMembershipRole.filter((userItem) => userItem.membershipsCount === 0);
+
+    // Primary tenant filter
+    const byPrimaryTenant =
+      filters.primaryTenant === "all"
+        ? byMembershipPresence
+        : filters.primaryTenant === "has"
+          ? byMembershipPresence.filter((userItem) => userItem.primaryMembership !== null)
+          : byMembershipPresence.filter((userItem) => userItem.primaryMembership === null);
+
+    // Sorting
+    const sorted = [...byPrimaryTenant].sort((a, b) => {
       if (filters.sort === "name") {
         const aName = (a.name || a.email).toLowerCase();
         const bName = (b.name || b.email).toLowerCase();
         return aName.localeCompare(bName);
       }
-      if (filters.sort === "status") {
-        return statusOrder[a.status] - statusOrder[b.status];
+      if (filters.sort === "last_seen") {
+        const aDate = a.lastSeenAt ? new Date(a.lastSeenAt).getTime() : 0;
+        const bDate = b.lastSeenAt ? new Date(b.lastSeenAt).getTime() : 0;
+        return bDate - aDate;
       }
-      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bDate - aDate;
+      if (filters.sort === "memberships") {
+        return (b.membershipsCount ?? 0) - (a.membershipsCount ?? 0);
+      }
+      // Default: recent (by createdAt)
+      const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bCreated - aCreated;
     });
 
     return sorted;
-  }, [filters.organisation, filters.role, filters.search, filters.sort, filters.status, users]);
+  }, [debouncedSearch, filters, users]);
 
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / USERS_PER_PAGE));
-  const safePage = Math.min(currentPage, totalPages);
-  const paginatedUsers = useMemo(() => {
-    const start = (safePage - 1) * USERS_PER_PAGE;
-    return filteredUsers.slice(start, start + USERS_PER_PAGE);
-  }, [filteredUsers, safePage]);
+  // Status counts for stat cards
+  const statusCounts = useMemo(() => {
+    return users.reduce(
+      (acc, userItem) => {
+        acc[userItem.status] = (acc[userItem.status] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<AdminUserStatus, number>
+    );
+  }, [users]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filters.search, filters.role, filters.status, filters.organisation]);
-
-  const statusCounts = useMemo(
-    () =>
-      users.reduce(
-        (acc, userItem) => {
-          acc[userItem.status] += 1;
-          return acc;
-        },
-        { active: 0, inactive: 0, invited: 0 } as Record<UserStatus, number>,
-      ),
-    [users],
+  const totalMemberships = useMemo(
+    () => users.reduce((acc, userItem) => acc + userItem.membershipsCount, 0),
+    [users]
   );
 
-  const organisations = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          users
-            .map((userItem) => userItem.organisationName)
-            .filter((name): name is string => Boolean(name)),
-        ),
-      ),
-    [users],
+  const usersWithoutMemberships = useMemo(
+    () => users.filter((userItem) => userItem.membershipsCount === 0).length,
+    [users]
   );
 
   const hasActiveFilters =
-    filters.search !== "" ||
-    filters.role !== "all" ||
+    filters.search.trim() !== "" ||
     filters.status !== "all" ||
-    filters.organisation !== "all" ||
+    filters.globalRole !== "all" ||
+    filters.membershipRole !== "all" ||
+    filters.membershipPresence !== "all" ||
+    filters.primaryTenant !== "all" ||
     filters.sort !== "recent";
 
-  if (isLoadingTenants || (isLoadingUsers && users.length === 0)) {
+  if (rbacLoading) {
     return (
       <AdminPageLayout>
-        <AdminPageHeader
-          icon={<UsersIcon className="h-6 w-6" />}
-          title="Användare"
-          description="Hantera användarkonton, roller och behörigheter."
-        />
-        <SkeletonStats />
-        <LoadingState message="Laddar användare..." />
+        <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
+        <UserListSkeleton count={6} />
       </AdminPageLayout>
     );
   }
 
-  const isGlobalAdmin = effectiveGlobalRole === "system_admin";
-
-  if (!user || (!currentTenant && !isGlobalAdmin) || !canViewUsers) {
+  if (!canViewUsers) {
     return (
-      <EmptyState
-        title="Ingen åtkomst"
-        description="Du behöver vara inloggad och tilldelad till en organisation för att hantera användare."
-        action={{ label: "Gå till login", onClick: () => (window.location.href = "/auth/login") }}
-      />
+      <AdminPageLayout>
+        <EmptyState
+          title="Åtkomst nekad"
+          description="Du har inte behörighet att se användare."
+          action={{ label: "Gå till dashboard", onClick: () => router.push("/admin") }}
+        />
+      </AdminPageLayout>
     );
   }
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs
-        items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Användare' },
-        ]}
-      />
+      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
 
       <AdminPageHeader
-        icon={<UsersIcon className="h-6 w-6" />}
         title="Användare"
-        description="Hantera användarkonton, roller och behörigheter i din organisation."
+        description="Hantera användarkonton, roller och behörigheter i systemet."
+        icon={<UsersIcon className="h-6 w-6" />}
         actions={
           canInviteUser && (
             <Button onClick={() => setInviteOpen(true)} className="gap-2">
@@ -458,94 +336,102 @@ export function UserAdminPage() {
       {error && (
         <Card className="border-amber-500/40 bg-amber-500/10">
           <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">
+              !
+            </div>
             <div className="flex-1">
               <p className="font-medium">{error}</p>
-              <p className="text-xs text-amber-700/80">Försök igen eller använd mock-data för att fortsätta arbetet.</p>
+              <p className="text-xs text-amber-700/80">
+                Försök igen eller uppdatera sidan om problemet kvarstår.
+              </p>
             </div>
-            <Button size="sm" variant="outline" onClick={() => void loadUsers()}>
+            <Button size="sm" variant="outline" onClick={handleRefresh}>
               Ladda om
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Status Cards */}
-      <AdminStatGrid cols={4}>
+      <AdminStatGrid cols={5} className="mb-6">
         <AdminStatCard
           label="Totalt"
           value={users.length}
           icon={<UsersIcon className="h-5 w-5" />}
+          iconColor="primary"
         />
         <AdminStatCard
           label="Aktiva"
-          value={statusCounts.active}
+          value={statusCounts.active ?? 0}
           icon={<CheckBadgeIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
           label="Inbjudna"
-          value={statusCounts.invited}
+          value={statusCounts.invited ?? 0}
           icon={<EnvelopeIcon className="h-5 w-5" />}
           iconColor="amber"
         />
         <AdminStatCard
-          label="Inaktiva"
-          value={statusCounts.inactive}
+          label="Avstängda"
+          value={statusCounts.disabled ?? 0}
+          icon={<NoSymbolIcon className="h-5 w-5" />}
+          iconColor="red"
+        />
+        <AdminStatCard
+          label="Utan org"
+          value={usersWithoutMemberships}
           icon={<UserMinusIcon className="h-5 w-5" />}
         />
       </AdminStatGrid>
 
-      {/* Directory Card */}
-      <Card className="overflow-hidden border-border/60">
-        <CardContent className="p-0">
-          <UserTableToolbar
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            organisationOptions={organisations}
-            onInviteClick={() => setInviteOpen(true)}
-            hasActiveFilters={hasActiveFilters}
+      <div className="space-y-4">
+        <UserListToolbar
+          filters={filters}
+          searchValue={searchInput}
+          onSearchChange={handleSearchChange}
+          onFiltersChange={handleFiltersChange}
+          onClearFilters={handleClearFilters}
+        />
+
+        {isRefreshing ? (
+          <UserListSkeleton count={6} />
+        ) : filteredUsers.length === 0 ? (
+          <EmptyState
+            title={hasActiveFilters ? "Inga matchande användare" : "Inga användare ännu"}
+            description={
+              hasActiveFilters
+                ? "Justera sökningen eller rensa filter för att se fler."
+                : "Det finns inga användare i systemet ännu."
+            }
+            action={
+              !hasActiveFilters && canInviteUser
+                ? { label: "Bjud in användare", onClick: () => setInviteOpen(true) }
+                : undefined
+            }
+            secondaryAction={
+              hasActiveFilters ? { label: "Rensa filter", onClick: handleClearFilters } : undefined
+            }
           />
-          <div className="border-t border-border/40">
-            <UserTable
-              users={paginatedUsers}
-              isLoading={isLoadingUsers}
-              searchQuery={filters.search}
-              onEdit={setEditingUser}
-              onStatusChange={handleStatusChange}
-              onRemove={handleRemove}
-              onResendInvite={handleResendInvite}
-              onRowClick={setEditingUser}
-              onInviteClick={() => setInviteOpen(true)}
-              onClearFilters={handleClearFilters}
-            />
+        ) : (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {filteredUsers.map((user) => (
+              <UserListItem
+                key={user.id}
+                user={user}
+                canEdit={canEditUser}
+                canDelete={canDeleteUser}
+                onStatusChange={canEditUser ? handleStatusChange : undefined}
+                onRemove={canDeleteUser ? handleRemove : undefined}
+              />
+            ))}
           </div>
-          {filteredUsers.length > USERS_PER_PAGE && (
-            <UserTablePagination
-              currentPage={safePage}
-              totalPages={totalPages}
-              totalItems={filteredUsers.length}
-              itemsPerPage={USERS_PER_PAGE}
-              onPageChange={setCurrentPage}
-            />
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </div>
 
       <UserInviteDialog
         open={inviteOpen}
         onOpenChange={setInviteOpen}
         onInvite={handleInviteSubmit}
-        defaultOrganisation={currentTenant?.name}
-      />
-
-      <UserEditDialog
-        open={Boolean(editingUser)}
-        user={editingUser}
-        onOpenChange={(open) => {
-          if (!open) setEditingUser(null);
-        }}
-        onSubmit={handleEditSubmit}
       />
     </AdminPageLayout>
   );

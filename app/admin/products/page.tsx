@@ -1,7 +1,7 @@
-import { redirect } from 'next/navigation'
-import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
+import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
+import { ProductHubPage } from '@/features/admin/products/ProductHubPage';
 
-export default async function ProductsRedirect() {
-  await requireSystemAdmin('/admin')
-  redirect('/admin/billing')
+export default async function ProductsPage() {
+  await requireSystemAdmin('/admin');
+  return <ProductHubPage />;
 }

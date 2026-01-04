@@ -18,29 +18,52 @@ import {
 
 type CardSample = {
   id: string;
-  title: string;
+  order: number;
+  title?: string;
   prompt: string;
   followups: string[];
+  leaderTip?: string;
   category: string;
   audience: string;
 };
 
+const DEFAULT_CARD_TITLE = "Utan titel";
+
+function getCardTitle(card: CardSample) {
+  return card.title?.trim() ? card.title : DEFAULT_CARD_TITLE;
+}
+
 const SAMPLE_COLLECTION = {
-  title: "Trygga samtal",
-  count: 12,
+  title: "Tema & stämning",
+  status: "Draft",
+  language: "SV",
+  audience: "10–12 år",
+  description:
+    "Samtalskort som skapar glädje, gemenskap och positiv stämning i grupper.",
+  mainPurpose: "Tema & stämning",
+  subPurposes: [
+    "Social gemenskap",
+    "Humor och glädje",
+    "Inkluderande firanden",
+    "Teamwork i firande",
+  ],
+  count: 24,
 };
 
 const SAMPLE_CARDS: CardSample[] = [
   {
     id: "1",
+    order: 13,
     title: "Starta mjukt",
     prompt: "Vad är en liten sak som gjorde din dag lite bättre?",
     followups: ["Vad gjorde det meningsfullt?", "Hur kan du ge det vidare?"],
+    leaderTip: "Ge alla 10 sekunder att tänka innan någon svarar.",
     category: "Check-in",
     audience: "11+",
   },
   {
     id: "2",
+    order: 14,
     title: "Ögonblicket",
     prompt: "Beskriv ett ögonblick där du kände dig helt närvarande.",
     followups: ["Vad hjälpte dig att vara där?", "Vad vill du ta med dig?"],
@@ -49,6 +72,7 @@ const SAMPLE_CARDS: CardSample[] = [
   },
   {
     id: "3",
+    order: 15,
     title: "Perspektiv",
     prompt: "Vad tror du att andra i gruppen behövde idag?",
     followups: ["Vilka tecken lade du märke till?", "Hur kan vi möta det?"],
@@ -57,9 +81,11 @@ const SAMPLE_CARDS: CardSample[] = [
   },
   {
     id: "4",
+    order: 16,
     title: "Avsluta",
     prompt: "Vad vill du tacka dig själv för just nu?",
     followups: ["Hur vill du avsluta samtalet?", "Vad tar du med dig?"],
+    leaderTip: "Summera två ord du hör ofta och tacka gruppen.",
     category: "Avslut",
     audience: "11+",
   },
@@ -90,13 +116,23 @@ function CardPreview({
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {card.category}
           </p>
-          <h3 className="text-base font-semibold text-foreground">{card.title}</h3>
+          <h3 className="text-base font-semibold text-foreground">
+            {getCardTitle(card)}
+          </h3>
         </div>
-        <Badge variant="outline" size="sm">
-          {index + 1} / {SAMPLE_COLLECTION.count}
-        </Badge>
+        <div className="flex flex-col items-end gap-2">
+          <Badge variant="outline" size="sm">
+            {index + 1} / {SAMPLE_COLLECTION.count}
+          </Badge>
+          <span className="text-xs text-muted-foreground">
+            Sortering {card.order}
+          </span>
+        </div>
       </div>
       <p className="mt-3 text-sm text-muted-foreground">{card.prompt}</p>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Syfte: {SAMPLE_COLLECTION.mainPurpose}
+      </p>
       <div className="mt-4 flex items-center justify-between text-xs text-muted-foreground">
         <span>{SAMPLE_COLLECTION.title}</span>
         <span>{card.audience}</span>
@@ -160,11 +196,18 @@ function DrawerCard({ card }: { card: CardSample }) {
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
             {card.category}
           </p>
-          <h3 className="text-xl font-semibold text-foreground">{card.title}</h3>
+          <h3 className="text-xl font-semibold text-foreground">
+            {getCardTitle(card)}
+          </h3>
         </div>
-        <Badge variant="outline" size="sm">
-          {card.audience}
-        </Badge>
+        <div className="flex flex-col items-end gap-2">
+          <Badge variant="outline" size="sm">
+            {card.audience}
+          </Badge>
+          <span className="text-xs text-muted-foreground">
+            Sortering {card.order}
+          </span>
+        </div>
       </div>
       <p className="mt-6 text-lg text-foreground">{card.prompt}</p>
       <div className="mt-6 space-y-2 text-sm text-muted-foreground">
@@ -175,6 +218,45 @@ function DrawerCard({ card }: { card: CardSample }) {
           </div>
         ))}
       </div>
+      {card.leaderTip ? (
+        <div className="mt-6 rounded-2xl border border-border bg-muted/30 p-4">
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            Ledartips
+          </p>
+          <p className="mt-2 text-sm text-foreground">{card.leaderTip}</p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function CollectionMetaRow() {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+      <Badge variant="outline" size="sm">
+        Målgrupp: {SAMPLE_COLLECTION.audience}
+      </Badge>
+      <Badge variant="outline" size="sm">
+        Språk: {SAMPLE_COLLECTION.language}
+      </Badge>
+      <Badge variant="outline" size="sm">
+        Status: {SAMPLE_COLLECTION.status}
+      </Badge>
+      <Badge variant="outline" size="sm">
+        Huvudsyfte: {SAMPLE_COLLECTION.mainPurpose}
+      </Badge>
+    </div>
+  );
+}
+
+function CollectionPurposeRow() {
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+      {SAMPLE_COLLECTION.subPurposes.map((purpose) => (
+        <Badge key={purpose} variant="outline" size="sm">
+          {purpose}
+        </Badge>
+      ))}
     </div>
   );
 }
@@ -190,6 +272,7 @@ function RoleSplitHint() {
           <li>- Byter kort och styr tempo</li>
           <li>- Ser index och samlingsöversikt</li>
           <li>- Kan slumpa eller hoppa</li>
+          <li>- Ser ledartips och syften</li>
         </ul>
       </div>
       <div className="rounded-2xl border border-border bg-muted/20 p-4">
@@ -200,6 +283,7 @@ function RoleSplitHint() {
           <li>- Fokus på läsning och svar</li>
           <li>- Mindre kontroller</li>
           <li>- Trygg, stilla layout</li>
+          <li>- Ser inte extra metadata</li>
         </ul>
       </div>
     </div>
@@ -238,6 +322,13 @@ function VariantDeckDrawer() {
                   <SheetTitle className="text-2xl font-semibold text-foreground">
                     Samtalskort
                   </SheetTitle>
+                  <div className="mt-2 space-y-2">
+                    <CollectionMetaRow />
+                    <p className="text-sm text-muted-foreground">
+                      {SAMPLE_COLLECTION.description}
+                    </p>
+                    <CollectionPurposeRow />
+                  </div>
                 </SheetHeader>
                 <SheetClose asChild>
                   <Button variant="outline" size="sm">
@@ -305,6 +396,10 @@ function VariantSideDrawer() {
                   <SheetTitle className="text-xl font-semibold text-foreground">
                     Bibliotek
                   </SheetTitle>
+                  <div className="mt-2 space-y-2">
+                    <CollectionMetaRow />
+                    <CollectionPurposeRow />
+                  </div>
                 </SheetHeader>
                 <SheetClose asChild>
                   <Button variant="outline" size="sm">
@@ -370,6 +465,10 @@ function VariantFocusDrawer() {
                   <SheetTitle className="text-2xl font-semibold text-foreground">
                     Samtalskort
                   </SheetTitle>
+                  <div className="mt-2 space-y-2">
+                    <CollectionMetaRow />
+                    <CollectionPurposeRow />
+                  </div>
                 </SheetHeader>
                 <SheetClose asChild>
                   <Button variant="outline" size="sm">
@@ -394,7 +493,9 @@ function VariantFocusDrawer() {
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
               Reflektion
             </p>
-            <h4 className="text-lg font-semibold text-foreground">{card.title}</h4>
+            <h4 className="text-lg font-semibold text-foreground">
+              {getCardTitle(card)}
+            </h4>
           </div>
           <Badge variant="outline" size="sm">
             {SAMPLE_COLLECTION.count} kort

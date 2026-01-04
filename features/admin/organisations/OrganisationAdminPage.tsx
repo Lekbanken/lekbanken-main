@@ -1,36 +1,59 @@
 'use client';
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   BuildingOffice2Icon,
-  PlusIcon,
   CheckBadgeIcon,
   PauseCircleIcon,
+  PlusIcon,
+  CreditCardIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
-import { Button, Card, CardContent, EmptyState, LoadingState, useToast } from "@/components/ui";
-import { SkeletonStats } from "@/components/ui/skeleton";
-import { 
-  AdminPageHeader, 
-  AdminPageLayout, 
-  AdminStatCard, 
-  AdminStatGrid,
+import {
   AdminBreadcrumbs,
+  AdminPageHeader,
+  AdminPageLayout,
+  AdminStatCard,
+  AdminStatGrid,
 } from "@/components/admin/shared";
+import { Button, Card, CardContent, EmptyState, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
-import { useAuth } from "@/lib/supabase/auth";
 import { supabase } from "@/lib/supabase/client";
-import type { Database } from "@/types/supabase";
-import { mockOrganisations, createMockOrganisation } from "./data";
-import type { OrganisationAdminItem, OrganisationFilters, OrganisationStatus } from "./types";
-import { OrganisationTable } from "./components/OrganisationTable";
-import { OrganisationTableToolbar } from "./components/OrganisationTableToolbar";
-import { OrganisationEditDialog } from "./components/OrganisationEditDialog";
+import type {
+  AdminOrganisationListItem,
+  OrganisationCreatePayload,
+  OrganisationListFilters,
+  OrganisationListStatus,
+} from "./types";
+import { tenantStatusLabels } from "./types";
+import { OrganisationListToolbar } from "./components/list/OrganisationListToolbar";
+import { OrganisationListItem } from "./components/list/OrganisationListItem";
+import { OrganisationListSkeleton } from "./components/list/OrganisationListSkeleton";
 import { OrganisationCreateDialog } from "./components/OrganisationCreateDialog";
-import { OrganisationTablePagination } from "./components/OrganisationTablePagination";
 
-type TenantWithMembershipCount = Database["public"]["Tables"]["tenants"]["Row"] & {
-  user_tenant_memberships?: { count: number | null }[];
+type OrganisationAdminPageProps = {
+  initialOrganisations: AdminOrganisationListItem[];
+  initialError?: string | null;
 };
+
+const defaultFilters: OrganisationListFilters = {
+  search: "",
+  status: "all",
+  billing: "all",
+  language: "all",
+  domain: "all",
+  sort: "recent",
+};
+
+const statusOrder: OrganisationListStatus[] = [
+  "active",
+  "trial",
+  "demo",
+  "inactive",
+  "suspended",
+  "archived",
+];
 
 function slugify(value: string) {
   return value
@@ -42,95 +65,62 @@ function slugify(value: string) {
     .replace(/^-|-$/g, "");
 }
 
-const ORGS_PER_PAGE = 15;
-
-export function OrganisationAdminPage() {
-  const { user } = useAuth();
+export function OrganisationAdminPage({
+  initialOrganisations,
+  initialError = null,
+}: OrganisationAdminPageProps) {
+  const router = useRouter();
+  const { success, error: toastError } = useToast();
   const { can, isLoading: rbacLoading } = useRbac();
-  const { success, info, warning } = useToast();
-
-  const [organisations, setOrganisations] = useState<OrganisationAdminItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const defaultFilters: OrganisationFilters = {
-    search: "",
-    status: "all",
-    sort: "recent",
-  };
-  const [filters, setFilters] = useState<OrganisationFilters>(defaultFilters);
-  const [editingOrg, setEditingOrg] = useState<OrganisationAdminItem | null>(null);
+  const [organisations, setOrganisations] = useState(initialOrganisations);
+  const [filters, setFilters] = useState<OrganisationListFilters>(defaultFilters);
+  const [searchInput, setSearchInput] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const userId = user?.id;
-
-  const loadOrganisations = useCallback(async () => {
-    if (!userId) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { data, error: queryError } = await supabase
-        .from("tenants")
-        .select(
-          "id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at, user_tenant_memberships(count)"
-        )
-        .order("created_at", { ascending: false });
-
-      if (queryError) {
-        throw queryError;
-      }
-
-      const mapped: OrganisationAdminItem[] = (data || [] as TenantWithMembershipCount[]).map((tenant) => ({
-        id: tenant.id,
-        name: tenant.name,
-        slug: tenant.slug,
-        contactEmail: tenant.contact_email,
-        contactName: tenant.contact_name,
-        contactPhone: tenant.contact_phone,
-        status: (tenant.status as OrganisationStatus) || "active",
-        membersCount: tenant.user_tenant_memberships?.[0]?.count ?? null,
-        subscriptionPlan: null,
-        createdAt: tenant.created_at,
-        updatedAt: tenant.updated_at,
-      }));
-
-      setOrganisations(mapped);
-    } catch (err) {
-      console.error("Failed to load organisations", err);
-      setError("Failed to load organisations from Supabase. Showing sample data instead.");
-      setOrganisations(mockOrganisations);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [userId]);
+  const [error, setError] = useState(initialError);
+  const [isRefreshing, startRefresh] = useTransition();
 
   useEffect(() => {
-    let cancelled = false;
-    const run = async () => {
-      await loadOrganisations();
-      if (cancelled) return;
-    };
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [loadOrganisations]);
+    const handle = setTimeout(() => {
+      setDebouncedSearch(searchInput.trim().toLowerCase());
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [searchInput]);
 
-  const handleFiltersChange = (next: Partial<OrganisationFilters>) => {
+  useEffect(() => {
+    setOrganisations(initialOrganisations);
+  }, [initialOrganisations]);
+
+  useEffect(() => {
+    setError(initialError);
+  }, [initialError]);
+
+  const canViewTenants = can("admin.tenants.list");
+  const canCreateTenant = can("admin.tenants.create");
+  const canEditTenant = can("admin.tenants.edit");
+  const canDeleteTenant = can("admin.tenants.delete");
+  const canManageBilling = can("admin.billing.manage");
+
+  const handleRefresh = () => {
+    startRefresh(() => router.refresh());
+  };
+
+  const handleFiltersChange = (next: Partial<OrganisationListFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));
-    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    setFilters((prev) => ({ ...prev, search: value }));
   };
 
   const handleClearFilters = () => {
     setFilters(defaultFilters);
-    setCurrentPage(1);
+    setSearchInput("");
+    setDebouncedSearch("");
   };
 
-  const handleCreate = async (payload: Omit<OrganisationAdminItem, "id">) => {
+  const handleCreate = async (payload: OrganisationCreatePayload) => {
     try {
       const slug = payload.slug?.trim() || slugify(payload.name);
       const { data, error: insertError } = await supabase
@@ -139,247 +129,250 @@ export function OrganisationAdminPage() {
           name: payload.name,
           status: payload.status,
           type: "organisation",
-          main_language: "NO",
           slug: slug || null,
           contact_name: payload.contactName,
           contact_email: payload.contactEmail,
           contact_phone: payload.contactPhone,
         })
-        .select("id, name, status, slug, contact_name, contact_email, contact_phone, created_at, updated_at")
+        .select(
+          "id, name, slug, status, contact_name, contact_email, contact_phone, created_at, updated_at, default_language, main_language, logo_url"
+        )
         .single();
 
       if (insertError) {
         throw insertError;
       }
+
       if (!data) {
         throw new Error("Supabase returned no data for tenant insert");
       }
 
-      const newOrg: OrganisationAdminItem = {
-        ...payload,
+      const newItem: AdminOrganisationListItem = {
         id: data.id,
-        status: (data.status as OrganisationStatus) || payload.status,
+        name: data.name,
+        slug: data.slug,
+        status: payload.status,
         contactName: data.contact_name,
         contactEmail: data.contact_email,
         contactPhone: data.contact_phone,
+        membersCount: 0,
         createdAt: data.created_at,
         updatedAt: data.updated_at,
-        membersCount: 0,
+        language: data.default_language ?? data.main_language ?? null,
+        branding: {
+          logoUrl: data.logo_url,
+        },
+        billing: {
+          status: null,
+          plan: null,
+          connected: false,
+          customerId: null,
+          subscriptionId: null,
+        },
+        domain: null,
       };
 
-      setOrganisations((prev) => [newOrg, ...prev]);
-      // Try to add creator as owner membership (best-effort)
+      setOrganisations((prev) => [newItem, ...prev]);
       void supabase.rpc("add_initial_tenant_owner", { target_tenant: data.id });
-      setCreateOpen(false);
-      success("Organisation skapad.", "Saved to Supabase");
+      success("Organisation skapad.");
+      handleRefresh();
     } catch (err) {
       console.error("Failed to create organisation", err);
       const message = err instanceof Error ? err.message : "Kunde inte skapa organisation.";
-      setError(message || "Kunde inte skapa organisation.");
-      // fallback: keep local mock
-      const local = createMockOrganisation(payload.name, payload.contactEmail || "contact@example.com");
-      setOrganisations((prev) => [local, ...prev]);
-      info("Sparat lokalt som fallback.");
-    }
-  };
-
-  const handleEditSubmit = async (payload: OrganisationAdminItem) => {
-    const updatedAt = new Date().toISOString();
-    const slug = payload.slug?.trim() || slugify(payload.name);
-    
-    try {
-      const { error: updateError } = await supabase
-        .from("tenants")
-        .update({
-          name: payload.name,
-          status: payload.status,
-          slug: slug || null,
-          contact_name: payload.contactName,
-          contact_email: payload.contactEmail,
-          contact_phone: payload.contactPhone,
-          updated_at: updatedAt,
-        })
-        .eq("id", payload.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Only update local state after successful save
-      setOrganisations((prev) => prev.map((org) => (org.id === payload.id ? { ...payload, slug, updatedAt } : org)));
-      setEditingOrg(null);
-      success("Ändringar sparade.", "Organisation uppdaterad");
-    } catch (err) {
-      console.error("Failed to update organisation", err);
-      const message = err instanceof Error ? err.message : "Kunde inte spara ändringar.";
       setError(message);
-      // Keep dialog open so user can retry
+      toastError(message);
     }
   };
 
-  const handleStatusChange = async (orgId: string, status: OrganisationStatus) => {
-    const updatedAt = new Date().toISOString();
-    
+  const handleStatusChange = async (orgId: string, status: OrganisationListStatus) => {
     try {
       const { error: updateError } = await supabase
         .from("tenants")
-        .update({ status, updated_at: updatedAt })
-        .eq("id", orgId)
-        .select()
-        .single();
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq("id", orgId);
 
       if (updateError) {
         throw updateError;
       }
 
       setOrganisations((prev) =>
-        prev.map((org) => (org.id === orgId ? { ...org, status, updatedAt } : org)),
+        prev.map((org) => (org.id === orgId ? { ...org, status } : org))
       );
-      success(`Organisation är nu ${status === 'active' ? 'aktiv' : 'inaktiv'}.`, "Status uppdaterad");
+      success(`Organisation uppdaterad till ${tenantStatusLabels[status]}.`);
+      handleRefresh();
     } catch (err) {
-      console.error("Failed to update status", err);
+      console.error("Failed to update organisation status", err);
       const message = err instanceof Error ? err.message : "Kunde inte uppdatera status.";
       setError(message);
+      toastError(message);
     }
   };
 
   const handleRemove = async (orgId: string) => {
     try {
-      const { error: deleteError } = await supabase
-        .from("tenants")
-        .delete()
-        .eq("id", orgId);
+      const { error: deleteError } = await supabase.from("tenants").delete().eq("id", orgId);
 
       if (deleteError) {
         throw deleteError;
       }
 
       setOrganisations((prev) => prev.filter((org) => org.id !== orgId));
-      warning("Organisation borttagen.");
+      success("Organisation borttagen.");
+      handleRefresh();
     } catch (err) {
       console.error("Failed to delete organisation", err);
       const message = err instanceof Error ? err.message : "Kunde inte ta bort organisation.";
       setError(message);
+      toastError(message);
     }
   };
 
+  const statusOptions = useMemo(() => {
+    return [
+      { value: "all" as const, label: "Alla statusar" },
+      ...statusOrder.map((status) => ({
+        value: status,
+        label: tenantStatusLabels[status],
+      })),
+    ];
+  }, []);
+
+  const languageOptions = useMemo(() => {
+    const languages = Array.from(
+      new Set(
+        organisations
+          .map((org) => org.language)
+          .filter((language): language is string => Boolean(language))
+      )
+    ).sort((a, b) => a.localeCompare(b));
+
+    return [
+      { value: "all", label: "Alla språk" },
+      ...languages.map((language) => ({
+        value: language ?? "unknown",
+        label: language?.toUpperCase() ?? "Okänt",
+      })),
+    ];
+  }, [organisations]);
+
   const filteredOrganisations = useMemo(() => {
-    const query = filters.search.trim().toLowerCase();
-    const bySearch = organisations.filter((org) => {
-      const haystack = [
-        org.name,
-        org.contactName ?? "",
-        org.contactEmail ?? "",
-        org.subscriptionPlan ?? "",
-      ]
-        .join(" ")
-        .toLowerCase();
-      return haystack.includes(query);
-    });
+    const query = debouncedSearch.trim().toLowerCase();
+
+    const bySearch = query
+      ? organisations.filter((org) => {
+          const haystack = [
+            org.name,
+            org.slug ?? "",
+            org.id,
+            org.contactName ?? "",
+            org.contactEmail ?? "",
+            org.contactPhone ?? "",
+            org.domain?.hostname ?? "",
+          ]
+            .join(" ")
+            .toLowerCase();
+          return haystack.includes(query);
+        })
+      : organisations;
 
     const byStatus =
       filters.status === "all" ? bySearch : bySearch.filter((org) => org.status === filters.status);
 
-    const sorted = [...byStatus].sort((a, b) => {
+    const byBilling =
+      filters.billing === "all"
+        ? byStatus
+        : byStatus.filter((org) =>
+            filters.billing === "connected" ? org.billing.connected : !org.billing.connected
+          );
+
+    const byLanguage =
+      filters.language === "all"
+        ? byBilling
+        : byBilling.filter(
+            (org) =>
+              (org.language ?? "").toLowerCase() === filters.language.toLowerCase()
+          );
+
+    const byDomain =
+      filters.domain === "all"
+        ? byLanguage
+        : byLanguage.filter((org) =>
+            filters.domain === "yes" ? Boolean(org.domain) : !org.domain
+          );
+
+    const sorted = [...byDomain].sort((a, b) => {
       if (filters.sort === "name") {
         return a.name.localeCompare(b.name);
       }
       if (filters.sort === "members") {
-        const aMembers = a.membersCount ?? 0;
-        const bMembers = b.membersCount ?? 0;
-        return bMembers - aMembers;
+        return (b.membersCount ?? 0) - (a.membersCount ?? 0);
       }
-      const aDate = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const bDate = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return bDate - aDate;
+      if (filters.sort === "updated") {
+        const aUpdated = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+        const bUpdated = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+        return bUpdated - aUpdated;
+      }
+      const aCreated = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bCreated - aCreated;
     });
 
     return sorted;
-  }, [filters.search, filters.sort, filters.status, organisations]);
+  }, [debouncedSearch, filters, organisations]);
 
-  // Pagination
-  const totalPages = Math.max(1, Math.ceil(filteredOrganisations.length / ORGS_PER_PAGE));
-  const safePage = Math.min(currentPage, totalPages);
-  const paginatedOrganisations = filteredOrganisations.slice(
-    (safePage - 1) * ORGS_PER_PAGE,
-    safePage * ORGS_PER_PAGE,
-  );
+  const statusCounts = useMemo(() => {
+    return organisations.reduce(
+      (acc, org) => {
+        acc[org.status] = (acc[org.status] ?? 0) + 1;
+        return acc;
+      },
+      {} as Record<OrganisationListStatus, number>
+    );
+  }, [organisations]);
 
-  const statusCounts = useMemo(
-    () =>
-      organisations.reduce(
-        (acc, org) => {
-          acc[org.status] += 1;
-          return acc;
-        },
-        { active: 0, inactive: 0 } as Record<OrganisationStatus, number>,
-      ),
-    [organisations],
-  );
+  const trialOrDemoCount = (statusCounts.trial ?? 0) + (statusCounts.demo ?? 0);
+  const inactiveCount =
+    (statusCounts.inactive ?? 0) +
+    (statusCounts.archived ?? 0) +
+    (statusCounts.suspended ?? 0);
+  const connectedBillingCount = organisations.filter((org) => org.billing.connected).length;
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filters.search, filters.status]);
+  const hasActiveFilters =
+    filters.search.trim() !== "" ||
+    filters.status !== "all" ||
+    filters.billing !== "all" ||
+    filters.language !== "all" ||
+    filters.domain !== "all" ||
+    filters.sort !== "recent";
 
-  // RBAC check
-  const canViewTenants = can('admin.tenants.list');
-  const canCreateTenant = can('admin.tenants.create');
-  const canEditTenant = can('admin.tenants.edit');
-  // const canDeleteTenant = can('admin.tenants.delete');
-
-  if (rbacLoading || (isLoading && organisations.length === 0)) {
+  if (rbacLoading) {
     return (
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Organisationer' },
-        ]} />
-        <AdminPageHeader
-          title="Organisationer"
-          description="Hantera organisationer, kontakter och prenumerationsstatus."
-          icon={<BuildingOffice2Icon className="h-6 w-6" />}
-        />
-        <SkeletonStats />
-        <LoadingState message="Laddar organisationer..." />
+        <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Organisationer" }]} />
+        <OrganisationListSkeleton rows={4} />
       </AdminPageLayout>
     );
   }
 
-  // Only show access denied if we have NO loaded data AND user lacks permission
-  // This prevents flashing "access denied" during re-auth when data is already loaded
-  if ((!userId || !canViewTenants) && organisations.length === 0) {
+  if (!canViewTenants) {
     return (
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Organisationer' },
-        ]} />
         <EmptyState
           title="Åtkomst nekad"
           description="Du har inte behörighet att se organisationer."
-          action={{ label: "Gå till dashboard", onClick: () => (window.location.href = "/admin") }}
+          action={{ label: "Gå till dashboard", onClick: () => router.push("/admin") }}
         />
       </AdminPageLayout>
     );
   }
 
-  const hasActiveFilters = filters.search !== "" || filters.status !== "all" || filters.sort !== "recent";
-
   return (
     <AdminPageLayout>
-      {/* Breadcrumbs */}
-      <AdminBreadcrumbs items={[
-        { label: 'Admin', href: '/admin' },
-        { label: 'Organisationer' },
-      ]} />
+      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Organisationer" }]} />
 
-      {/* Page Header */}
       <AdminPageHeader
         title="Organisationer"
-        description="Hantera organisationer, kontakter och prenumerationsstatus."
+        description="Hantera organisationer, kontaktinfo och prenumerationsstatus."
         icon={<BuildingOffice2Icon className="h-6 w-6" />}
         actions={
           canCreateTenant && (
@@ -397,87 +390,102 @@ export function OrganisationAdminPage() {
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">!</div>
             <div className="flex-1">
               <p className="font-medium">{error}</p>
-              <p className="text-xs text-amber-700/80">Försök igen eller arbeta vidare med mock-data.</p>
+              <p className="text-xs text-amber-700/80">
+                Försök igen eller uppdatera sidan om problemet kvarstår.
+              </p>
             </div>
-            <Button size="sm" variant="outline" onClick={() => void loadOrganisations()}>
+            <Button size="sm" variant="outline" onClick={handleRefresh}>
               Ladda om
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Summary Cards */}
-      <AdminStatGrid cols={3} className="mb-6">
+      <AdminStatGrid cols={5} className="mb-6">
         <AdminStatCard
-          label="Totalt organisationer"
+          label="Totalt"
           value={organisations.length}
           icon={<BuildingOffice2Icon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
           label="Aktiva"
-          value={statusCounts.active}
+          value={statusCounts.active ?? 0}
           icon={<CheckBadgeIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
           label="Inaktiva"
-          value={statusCounts.inactive}
+          value={inactiveCount}
           icon={<PauseCircleIcon className="h-5 w-5" />}
           iconColor="amber"
         />
+        <AdminStatCard
+          label="Trial/Demo"
+          value={trialOrDemoCount}
+          icon={<ClockIcon className="h-5 w-5" />}
+          iconColor="purple"
+        />
+        <AdminStatCard
+          label="Billing kopplad"
+          value={connectedBillingCount}
+          icon={<CreditCardIcon className="h-5 w-5" />}
+          iconColor="blue"
+        />
       </AdminStatGrid>
 
-      {/* Directory Card */}
-      {/* Directory Card */}
-      <Card className="overflow-hidden border-border/60">
-        <CardContent className="p-0">
-          <OrganisationTableToolbar
-            filters={filters}
-            onFiltersChange={handleFiltersChange}
-            onCreateClick={() => setCreateOpen(true)}
-            hasActiveFilters={hasActiveFilters}
+      <div className="space-y-4">
+        <OrganisationListToolbar
+          filters={filters}
+          searchValue={searchInput}
+          statusOptions={statusOptions}
+          languageOptions={languageOptions}
+          onSearchChange={handleSearchChange}
+          onFiltersChange={handleFiltersChange}
+          onClearFilters={handleClearFilters}
+        />
+
+        {isRefreshing ? (
+          <OrganisationListSkeleton rows={4} />
+        ) : filteredOrganisations.length === 0 ? (
+          <EmptyState
+            title={hasActiveFilters ? "Inga matchande organisationer" : "Inga organisationer ännu"}
+            description={
+              hasActiveFilters
+                ? "Justera sökningen eller rensa filter för att se fler."
+                : "Skapa din första organisation för att börja hantera tenants."
+            }
+            action={
+              !hasActiveFilters && canCreateTenant
+                ? { label: "Skapa organisation", onClick: () => setCreateOpen(true) }
+                : undefined
+            }
+            secondaryAction={
+              hasActiveFilters ? { label: "Rensa filter", onClick: handleClearFilters } : undefined
+            }
           />
-          <div className="border-t border-border/40">
-            <OrganisationTable
-              organisations={paginatedOrganisations}
-              isLoading={isLoading}
-              searchQuery={filters.search}
-              onEdit={setEditingOrg}
-              onStatusChange={handleStatusChange}
-              onRemove={handleRemove}
-              onCreateClick={() => setCreateOpen(true)}
-              onClearFilters={handleClearFilters}
-            />
+        ) : (
+          <div className="space-y-4">
+            {filteredOrganisations.map((organisation) => (
+              <OrganisationListItem
+                key={organisation.id}
+                organisation={organisation}
+                canEdit={canEditTenant}
+                canDelete={canDeleteTenant}
+                canManageBilling={canManageBilling}
+                onStatusChange={canEditTenant ? handleStatusChange : undefined}
+                onRemove={canDeleteTenant ? handleRemove : undefined}
+              />
+            ))}
           </div>
-          {filteredOrganisations.length > ORGS_PER_PAGE && (
-            <OrganisationTablePagination
-              currentPage={safePage}
-              totalPages={totalPages}
-              totalItems={filteredOrganisations.length}
-              itemsPerPage={ORGS_PER_PAGE}
-              onPageChange={setCurrentPage}
-            />
-          )}
-        </CardContent>
-      </Card>
+        )}
+      </div>
 
       <OrganisationCreateDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreate={handleCreate}
       />
-
-      {canEditTenant && (
-        <OrganisationEditDialog
-          open={Boolean(editingOrg)}
-          organisation={editingOrg}
-          onOpenChange={(open) => {
-            if (!open) setEditingOrg(null);
-          }}
-          onSubmit={handleEditSubmit}
-        />
-      )}
     </AdminPageLayout>
   );
 }

@@ -20,8 +20,8 @@ type UserTableProps = {
   onClearFilters?: () => void;
 };
 
-// Role badge variants with semantic colors
-const roleBadgeStyles: Record<UserRole, { bg: string; text: string; border: string }> = {
+// Role badge variants with semantic colors (only for the roles we display)
+const roleBadgeStyles: Partial<Record<UserRole, { bg: string; text: string; border: string }>> = {
   owner: { bg: "bg-amber-500/15", text: "text-amber-700", border: "border-amber-500/30" },
   admin: { bg: "bg-primary/15", text: "text-primary", border: "border-primary/25" },
   editor: { bg: "bg-cyan-500/15", text: "text-cyan-700", border: "border-cyan-500/25" },
@@ -131,7 +131,11 @@ export function UserTable({
                 <td className="whitespace-nowrap px-4 py-3">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {user.roles.map((role) => {
-                      const style = roleBadgeStyles[role as UserRole] || roleBadgeStyles.member;
+                      const style = roleBadgeStyles[role as UserRole] ?? {
+                        bg: "bg-muted",
+                        text: "text-muted-foreground",
+                        border: "border-border",
+                      };
                       return (
                         <span
                           key={`${user.id}-${role}`}

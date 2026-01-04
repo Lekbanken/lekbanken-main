@@ -1,0 +1,797 @@
+'use client';
+
+import { useState, useEffect, useCallback } from "react";
+import {
+  UsersIcon,
+  MagnifyingGlassIcon,
+  ShieldCheckIcon,
+  UserIcon,
+  EllipsisVerticalIcon,
+  EnvelopeIcon,
+  ArrowPathIcon,
+  PlusIcon,
+  UserPlusIcon,
+  XMarkIcon,
+  CheckCircleIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button, Input } from "@/components/ui";
+import { Select } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/toast";
+import { supabase } from "@/lib/supabase/client";
+import type { MemberSummary } from "../../types";
+
+type TenantRole = 'owner' | 'admin' | 'member';
+
+type Member = {
+  id: string;
+  userId: string;
+  email: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  role: TenantRole;
+  status: string | null;
+  isPrimary: boolean;
+  createdAt: string;
+};
+
+type OrganisationMembersListProps = {
+  tenantId: string;
+  summary: MemberSummary;
+  onRefresh: () => void;
+};
+
+const roleLabels: Record<TenantRole, string> = {
+  owner: 'Ägare',
+  admin: 'Admin',
+  member: 'Medlem',
+};
+
+const roleColors: Record<TenantRole, string> = {
+  owner: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400',
+  admin: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  member: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400',
+};
+
+const roleIcons: Record<TenantRole, typeof ShieldCheckIcon> = {
+  owner: ShieldCheckIcon,
+  admin: ShieldCheckIcon,
+  member: UserIcon,
+};
+
+// User search result type
+type UserSearchResult = {
+  id: string;
+  email: string;
+  fullName: string | null;
+  avatarUrl: string | null;
+  alreadyMember: boolean;
+};
+
+// Format date for display
+function formatDate(dateString: string): string {
+  return new Date(dateString).toLocaleDateString('sv-SE', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}
+
+// Avatar component for search results
+function UserAvatar({ user }: { user: UserSearchResult }) {
+  if (user.avatarUrl) {
+    return (
+      <img
+        src={user.avatarUrl}
+        alt={user.fullName || user.email}
+        className="h-10 w-10 rounded-full object-cover"
+      />
+    );
+  }
+  
+  const initials = user.fullName
+    ? user.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : user.email.slice(0, 2).toUpperCase();
+  
+  return (
+    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+      <span className="text-sm font-medium text-primary">{initials}</span>
+    </div>
+  );
+}
+
+// Avatar component
+function MemberAvatar({ member }: { member: Member }) {
+  if (member.avatarUrl) {
+    return (
+      <img
+        src={member.avatarUrl}
+        alt={member.fullName || member.email}
+        className="h-9 w-9 rounded-full object-cover"
+      />
+    );
+  }
+  
+  const initials = member.fullName
+    ? member.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : member.email.slice(0, 2).toUpperCase();
+  
+  return (
+    <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center">
+      <span className="text-sm font-medium text-primary">{initials}</span>
+    </div>
+  );
+}
+
+// Add Member Dialog Component
+type AddMemberDialogProps = {
+  tenantId: string;
+  existingMemberIds: string[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onMemberAdded: () => void;
+};
+
+function AddMemberDialog({
+  tenantId,
+  existingMemberIds,
+  open,
+  onOpenChange,
+  onMemberAdded,
+}: AddMemberDialogProps) {
+  const { success, error: toastError } = useToast();
+  
+  const [searchEmail, setSearchEmail] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<UserSearchResult[]>([]);
+  const [selectedUser, setSelectedUser] = useState<UserSearchResult | null>(null);
+  const [selectedRole, setSelectedRole] = useState<TenantRole>('member');
+  const [isAdding, setIsAdding] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSearchEmail('');
+      setSearchResults([]);
+      setSelectedUser(null);
+      setSelectedRole('member');
+      setSearchError(null);
+    }
+  }, [open]);
+  
+  // Search for users by email
+  const handleSearch = async () => {
+    if (!searchEmail.trim()) return;
+    
+    setIsSearching(true);
+    setSearchError(null);
+    setSearchResults([]);
+    setSelectedUser(null);
+    
+    try {
+      // Search for users by email (partial match)
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, email, full_name, avatar_url')
+        .ilike('email', `%${searchEmail.trim()}%`)
+        .limit(10);
+      
+      if (error) throw error;
+      
+      if (!data || data.length === 0) {
+        setSearchError('Ingen användare hittades med den e-postadressen');
+        return;
+      }
+      
+      // Mark users that are already members
+      const results: UserSearchResult[] = data.map((user) => ({
+        id: user.id,
+        email: user.email,
+        fullName: user.full_name,
+        avatarUrl: user.avatar_url,
+        alreadyMember: existingMemberIds.includes(user.id),
+      }));
+      
+      setSearchResults(results);
+    } catch (err) {
+      console.error('User search failed:', err);
+      setSearchError('Kunde inte söka efter användare');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+  
+  // Handle key press in search input
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+  
+  // Add selected user as member
+  const handleAddMember = async () => {
+    if (!selectedUser) return;
+    
+    setIsAdding(true);
+    try {
+      // Insert membership
+      const { error } = await supabase
+        .from('user_tenant_memberships')
+        .insert({
+          tenant_id: tenantId,
+          user_id: selectedUser.id,
+          role: selectedRole,
+          is_primary: false,
+        });
+      
+      if (error) {
+        if (error.code === '23505') {
+          toastError('Användaren är redan medlem i organisationen');
+        } else {
+          throw error;
+        }
+        return;
+      }
+      
+      // Log audit event
+      await supabase.from('tenant_audit_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'member_added',
+        payload: {
+          userId: selectedUser.id,
+          email: selectedUser.email,
+          fullName: selectedUser.fullName,
+          role: selectedRole,
+          addedDirectly: true,
+        },
+      });
+      
+      success(`${selectedUser.fullName || selectedUser.email} tillagd som ${roleLabels[selectedRole].toLowerCase()}`);
+      onOpenChange(false);
+      onMemberAdded();
+    } catch (err) {
+      console.error('Failed to add member:', err);
+      toastError('Kunde inte lägga till medlem');
+    } finally {
+      setIsAdding(false);
+    }
+  };
+  
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserPlusIcon className="h-5 w-5" />
+            Lägg till medlem
+          </DialogTitle>
+          <DialogDescription>
+            Sök efter en befintlig användare via e-post och lägg till dem direkt i organisationen.
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div className="space-y-4 py-4">
+          {/* Search input */}
+          <div className="space-y-2">
+            <Label>Sök användare via e-post</Label>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  value={searchEmail}
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  onKeyPress={handleSearchKeyPress}
+                  placeholder="namn@exempel.se"
+                  className="pl-9"
+                />
+              </div>
+              <Button
+                onClick={handleSearch}
+                disabled={isSearching || !searchEmail.trim()}
+              >
+                {isSearching ? 'Söker...' : 'Sök'}
+              </Button>
+            </div>
+          </div>
+          
+          {/* Search error */}
+          {searchError && (
+            <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-800 dark:text-amber-300 text-sm">
+              <ExclamationTriangleIcon className="h-4 w-4 shrink-0" />
+              {searchError}
+            </div>
+          )}
+          
+          {/* Search results */}
+          {searchResults.length > 0 && !selectedUser && (
+            <div className="space-y-2">
+              <Label>Sökresultat</Label>
+              <div className="border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
+                {searchResults.map((user) => (
+                  <button
+                    key={user.id}
+                    onClick={() => !user.alreadyMember && setSelectedUser(user)}
+                    disabled={user.alreadyMember}
+                    className={`w-full flex items-center gap-3 p-3 text-left transition-colors ${
+                      user.alreadyMember 
+                        ? 'opacity-50 cursor-not-allowed' 
+                        : 'hover:bg-muted/50'
+                    }`}
+                  >
+                    <UserAvatar user={user} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">
+                        {user.fullName || user.email}
+                      </div>
+                      {user.fullName && (
+                        <div className="text-xs text-muted-foreground truncate">
+                          {user.email}
+                        </div>
+                      )}
+                    </div>
+                    {user.alreadyMember ? (
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                        Redan medlem
+                      </span>
+                    ) : (
+                      <CheckCircleIcon className="h-5 w-5 text-muted-foreground/30" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Selected user */}
+          {selectedUser && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <UserAvatar user={selectedUser} />
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">
+                    {selectedUser.fullName || selectedUser.email}
+                  </div>
+                  {selectedUser.fullName && (
+                    <div className="text-xs text-muted-foreground">
+                      {selectedUser.email}
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setSelectedUser(null)}
+                  className="h-8 w-8 p-0"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Role selection */}
+              <div className="space-y-2">
+                <Label>Roll</Label>
+                <Select
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value as TenantRole)}
+                  options={[
+                    { value: 'member', label: 'Medlem' },
+                    { value: 'admin', label: 'Admin' },
+                    { value: 'owner', label: 'Ägare' },
+                  ]}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Avbryt
+          </Button>
+          <Button
+            onClick={handleAddMember}
+            disabled={!selectedUser || isAdding}
+          >
+            {isAdding ? 'Lägger till...' : 'Lägg till medlem'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+export function OrganisationMembersList({
+  tenantId,
+  summary,
+  onRefresh,
+}: OrganisationMembersListProps) {
+  const { success, error: toastError } = useToast();
+  
+  const [members, setMembers] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<TenantRole | 'all'>('all');
+  const [isUpdatingRole, setIsUpdatingRole] = useState<string | null>(null);
+  const [showAddMemberDialog, setShowAddMemberDialog] = useState(false);
+  
+  // Load members
+  const loadMembers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('user_tenant_memberships')
+        .select(`
+          id,
+          user_id,
+          role,
+          status,
+          is_primary,
+          created_at,
+          users:user_id (
+            email,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: true });
+      
+      if (error) throw error;
+      
+      const mappedMembers: Member[] = (data || []).map((m) => {
+        const user = m.users as unknown as { email: string; full_name: string | null; avatar_url: string | null } | null;
+        return {
+          id: m.id,
+          userId: m.user_id,
+          email: user?.email || 'Okänd',
+          fullName: user?.full_name || null,
+          avatarUrl: user?.avatar_url || null,
+          role: m.role as TenantRole,
+          status: m.status,
+          isPrimary: m.is_primary,
+          createdAt: m.created_at,
+        };
+      });
+      
+      setMembers(mappedMembers);
+    } catch (err) {
+      console.error('Failed to load members:', err);
+      toastError('Kunde inte ladda medlemmar');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tenantId, toastError]);
+  
+  useEffect(() => {
+    loadMembers();
+  }, [loadMembers]);
+  
+  // Filter members
+  const filteredMembers = members.filter((member) => {
+    // Search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = 
+        member.email.toLowerCase().includes(query) ||
+        (member.fullName?.toLowerCase().includes(query) ?? false);
+      if (!matchesSearch) return false;
+    }
+    
+    // Role filter
+    if (roleFilter !== 'all' && member.role !== roleFilter) {
+      return false;
+    }
+    
+    return true;
+  });
+  
+  // Handle role change
+  const handleRoleChange = async (memberId: string, newRole: TenantRole) => {
+    setIsUpdatingRole(memberId);
+    try {
+      const { error } = await supabase
+        .from('user_tenant_memberships')
+        .update({ role: newRole, updated_at: new Date().toISOString() })
+        .eq('id', memberId);
+      
+      if (error) throw error;
+      
+      // Log audit event
+      const member = members.find(m => m.id === memberId);
+      await supabase.from('tenant_audit_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'member_role_changed',
+        payload: { 
+          memberId,
+          userId: member?.userId,
+          email: member?.email,
+          from: member?.role,
+          to: newRole,
+        },
+      });
+      
+      success(`Roll ändrad till ${roleLabels[newRole]}`);
+      loadMembers();
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to change role:', err);
+      toastError('Kunde inte ändra roll');
+    } finally {
+      setIsUpdatingRole(null);
+    }
+  };
+  
+  // Handle remove member
+  const handleRemoveMember = async (memberId: string) => {
+    const member = members.find(m => m.id === memberId);
+    if (!member) return;
+    
+    // Prevent removing owner
+    if (member.role === 'owner' && members.filter(m => m.role === 'owner').length <= 1) {
+      toastError('Kan inte ta bort den enda ägaren');
+      return;
+    }
+    
+    if (!confirm(`Är du säker på att du vill ta bort ${member.fullName || member.email} från organisationen?`)) {
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('user_tenant_memberships')
+        .delete()
+        .eq('id', memberId);
+      
+      if (error) throw error;
+      
+      // Log audit event
+      await supabase.from('tenant_audit_logs').insert({
+        tenant_id: tenantId,
+        event_type: 'member_removed',
+        payload: { 
+          memberId,
+          userId: member.userId,
+          email: member.email,
+          role: member.role,
+        },
+      });
+      
+      success('Medlem borttagen');
+      loadMembers();
+      onRefresh();
+    } catch (err) {
+      console.error('Failed to remove member:', err);
+      toastError('Kunde inte ta bort medlem');
+    }
+  };
+  
+  // Stats cards
+  const stats = [
+    { label: 'Totalt', value: summary.total, icon: UsersIcon },
+    { label: 'Ägare', value: summary.owners, icon: ShieldCheckIcon },
+    { label: 'Admins', value: summary.admins, icon: ShieldCheckIcon },
+    { label: 'Väntande', value: summary.pendingInvites, icon: EnvelopeIcon },
+  ];
+  
+  return (
+    <div className="space-y-6">
+      {/* Stats row */}
+      <div className="grid grid-cols-4 gap-4">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={stat.label}>
+              <CardContent className="pt-4 pb-3 px-4">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-muted/50 flex items-center justify-center">
+                    <Icon className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{stat.value}</div>
+                    <div className="text-xs text-muted-foreground">{stat.label}</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      
+      {/* Members table */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle className="text-base font-medium flex items-center gap-2">
+            <UsersIcon className="h-4 w-4" />
+            Medlemmar ({filteredMembers.length})
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={loadMembers}
+              disabled={isLoading}
+            >
+              <ArrowPathIcon className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button size="sm" onClick={() => setShowAddMemberDialog(true)}>
+              <UserPlusIcon className="h-4 w-4 mr-1" />
+              Lägg till medlem
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Filters */}
+          <div className="flex items-center gap-3">
+            <div className="relative flex-1 max-w-xs">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Sök på namn eller e-post..."
+                className="pl-9 h-9"
+              />
+            </div>
+            <Select
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value as TenantRole | 'all')}
+              options={[
+                { value: 'all', label: 'Alla roller' },
+                { value: 'owner', label: 'Ägare' },
+                { value: 'admin', label: 'Admin' },
+                { value: 'member', label: 'Medlem' },
+              ]}
+            />
+          </div>
+          
+          {/* Table */}
+          {isLoading ? (
+            <div className="py-8 text-center text-muted-foreground">
+              Laddar medlemmar...
+            </div>
+          ) : filteredMembers.length === 0 ? (
+            <div className="py-8 text-center text-muted-foreground">
+              {searchQuery || roleFilter !== 'all' 
+                ? 'Inga medlemmar matchar filtren'
+                : 'Inga medlemmar i organisationen'
+              }
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
+                      Användare
+                    </th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
+                      Roll
+                    </th>
+                    <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
+                      Medlem sedan
+                    </th>
+                    <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">
+                      Åtgärder
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {filteredMembers.map((member) => {
+                    const RoleIcon = roleIcons[member.role];
+                    return (
+                      <tr key={member.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <MemberAvatar member={member} />
+                            <div>
+                              <div className="font-medium text-sm">
+                                {member.fullName || member.email}
+                              </div>
+                              {member.fullName && (
+                                <div className="text-xs text-muted-foreground">
+                                  {member.email}
+                                </div>
+                              )}
+                            </div>
+                            {member.isPrimary && (
+                              <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                                Primär
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[member.role]}`}>
+                            <RoleIcon className="h-3.5 w-3.5" />
+                            {roleLabels[member.role]}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-muted-foreground">
+                          {formatDate(member.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                disabled={isUpdatingRole === member.id}
+                              >
+                                <EllipsisVerticalIcon className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                disabled={member.role === 'owner'}
+                                onClick={() => handleRoleChange(member.id, 'owner')}
+                              >
+                                <ShieldCheckIcon className="h-4 w-4 mr-2 text-emerald-600" />
+                                Gör till ägare
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled={member.role === 'admin'}
+                                onClick={() => handleRoleChange(member.id, 'admin')}
+                              >
+                                <ShieldCheckIcon className="h-4 w-4 mr-2 text-blue-600" />
+                                Gör till admin
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled={member.role === 'member'}
+                                onClick={() => handleRoleChange(member.id, 'member')}
+                              >
+                                <UserIcon className="h-4 w-4 mr-2" />
+                                Gör till medlem
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive focus:text-destructive"
+                                onClick={() => handleRemoveMember(member.id)}
+                              >
+                                Ta bort från organisation
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      
+      {/* Add Member Dialog */}
+      <AddMemberDialog
+        tenantId={tenantId}
+        existingMemberIds={members.map(m => m.userId)}
+        open={showAddMemberDialog}
+        onOpenChange={setShowAddMemberDialog}
+        onMemberAdded={() => {
+          loadMembers();
+          onRefresh();
+        }}
+      />
+    </div>
+  );
+}

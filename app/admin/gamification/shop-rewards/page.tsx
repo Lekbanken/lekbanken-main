@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   ShoppingBagIcon,
   PlusIcon,
@@ -129,7 +129,7 @@ const mockItems: ShopItem[] = [
 
 export default function ShopRewardsPage() {
   useAuth();
-  const { currentTenant } = useTenant();
+  const { currentTenant: _currentTenant } = useTenant();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<ItemCategory | "all">("all");

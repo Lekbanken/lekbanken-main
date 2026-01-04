@@ -211,6 +211,7 @@ export function useRbac() {
   const isLoading = authLoading || isLoadingTenants;
 
   // Memoize admin role computation
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const adminRole = useMemo(() => getAdminRole(), [isSystemAdmin, isTenantAdmin, isTenantEditor]);
 
   // Memoize the entire return object to prevent unnecessary re-renders

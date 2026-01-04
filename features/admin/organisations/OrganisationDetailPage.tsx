@@ -18,7 +18,6 @@ import {
   AdminErrorState,
 } from "@/components/admin/shared";
 import { Button, Tabs, TabPanel } from "@/components/ui";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -132,6 +131,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
     if (requestedTab && validTabs.includes(requestedTab as typeof validTabs[number])) {
       setActiveTab(requestedTab as typeof validTabs[number]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedTab]);
 
   // Load organisation details

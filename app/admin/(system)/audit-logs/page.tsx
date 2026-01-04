@@ -46,11 +46,15 @@ export default function AuditLogsPage() {
   const [actionFilter, setActionFilter] = useState<ActionType>('all')
   const [resourceFilter, setResourceFilter] = useState<ResourceType>('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-      .toISOString()
-      .split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+  const [dateRange, setDateRange] = useState(() => {
+    // Initialize in a function to avoid impure Date.now() during render
+    const now = Date.now()
+    return {
+      startDate: new Date(now - 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0],
+      endDate: new Date(now).toISOString().split('T')[0],
+    }
   })
 
   useEffect(() => {

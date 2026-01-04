@@ -8,7 +8,6 @@ import {
   CheckBadgeIcon,
   EnvelopeIcon,
   UserMinusIcon,
-  ShieldCheckIcon,
   NoSymbolIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, EmptyState, useToast } from "@/components/ui";
@@ -60,7 +59,7 @@ export function UserAdminPage({
   initialError = null,
 }: UserAdminPageProps) {
   const router = useRouter();
-  const { success, error: toastError, info, warning } = useToast();
+  const { success, error: toastError, info, warning: _warning } = useToast();
   const { can, isLoading: rbacLoading } = useRbac();
   const [users, setUsers] = useState(initialUsers);
   const [filters, setFilters] = useState<UserListFilters>(defaultFilters);
@@ -275,7 +274,7 @@ export function UserAdminPage({
     );
   }, [users]);
 
-  const totalMemberships = useMemo(
+  const _totalMemberships = useMemo(
     () => users.reduce((acc, userItem) => acc + userItem.membershipsCount, 0),
     [users]
   );

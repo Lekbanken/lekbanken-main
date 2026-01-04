@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
-  CurrencyDollarIcon,
   SparklesIcon,
   ChartBarIcon,
   TrophyIcon,
@@ -17,10 +16,8 @@ import {
   AdminStatCard,
   AdminStatGrid,
   AdminBreadcrumbs,
-  AdminDataTable,
-  AdminTableToolbar,
 } from "@/components/admin/shared";
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Tabs, TabPanel, EmptyState, Input } from "@/components/ui";
+import { Button, Card, CardContent, Badge, Tabs, TabPanel, Input } from "@/components/ui";
 import { useTenant } from "@/lib/context/TenantContext";
 import { useAuth } from "@/lib/supabase/auth";
 
@@ -238,7 +235,7 @@ function XPRulesTab({ rules }: { rules: XPRule[] }) {
 }
 
 // Levels Tab
-function LevelsTab({ levels, tenantId }: { levels: Level[]; tenantId?: string }) {
+function LevelsTab({ levels, tenantId: _tenantId }: { levels: Level[]; tenantId?: string }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">

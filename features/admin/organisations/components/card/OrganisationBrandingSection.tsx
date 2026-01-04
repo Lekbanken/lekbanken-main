@@ -280,6 +280,7 @@ export function OrganisationBrandingSection({
             {/* Logo preview */}
             <div className="h-20 w-20 rounded-xl border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted/30 overflow-hidden">
               {branding?.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img 
                   src={branding.logoUrl} 
                   alt="Logo" 

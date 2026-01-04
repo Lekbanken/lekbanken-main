@@ -73,7 +73,7 @@ function getDaysUntilTrialEnds(trialEndsAt: string): number {
 }
 
 export function OrganisationBillingSection({
-  tenantId,
+  tenantId: _tenantId,
   subscription,
   billingAccount,
   trialEndsAt,

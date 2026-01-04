@@ -53,7 +53,7 @@ const membershipPresenceOptions = [
   { value: "none", label: "Inga medlemskap" },
 ];
 
-const primaryTenantOptions = [
+const _primaryTenantOptions = [
   { value: "all", label: "Alla primära" },
   { value: "has", label: "Har primär org" },
   { value: "none", label: "Ingen primär org" },
@@ -93,7 +93,7 @@ export function UserListToolbar({
     onFiltersChange({ membershipPresence: event.target.value as UserListFilters["membershipPresence"] });
   };
 
-  const handlePrimaryTenantChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const _handlePrimaryTenantChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onFiltersChange({ primaryTenant: event.target.value as UserListFilters["primaryTenant"] });
   };
 

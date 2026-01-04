@@ -9,7 +9,6 @@ import {
   EllipsisVerticalIcon,
   EnvelopeIcon,
   ArrowPathIcon,
-  PlusIcon,
   UserPlusIcon,
   XMarkIcon,
   CheckCircleIcon,
@@ -98,6 +97,7 @@ function formatDate(dateString: string): string {
 function UserAvatar({ user }: { user: UserSearchResult }) {
   if (user.avatarUrl) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={user.avatarUrl}
         alt={user.fullName || user.email}
@@ -121,6 +121,7 @@ function UserAvatar({ user }: { user: UserSearchResult }) {
 function MemberAvatar({ member }: { member: Member }) {
   if (member.avatarUrl) {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         src={member.avatarUrl}
         alt={member.fullName || member.email}

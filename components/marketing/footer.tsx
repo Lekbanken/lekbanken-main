@@ -79,7 +79,7 @@ export function Footer() {
               />
               <span className="text-xl font-semibold text-background">Lekbanken</span>
             </div>
-            <p className="max-w-xs text-sm leading-relaxed text-background/60">
+            <p className="max-w-xs text-sm leading-relaxed text-background/70">
               Gör planeringen lekfull, snabb och delbar. Perfekt för träningar, lektioner och
               teambuilding.
             </p>
@@ -88,7 +88,7 @@ export function Footer() {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-background/5 text-background/50 transition-all hover:bg-background/10 hover:text-background hover:scale-110"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg bg-background/5 text-background/70 transition-all hover:bg-background/10 hover:text-background hover:scale-110"
                 >
                   <span className="sr-only">{item.name}</span>
                   <item.icon className="h-5 w-5" aria-hidden="true" />
@@ -106,7 +106,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 transition-colors hover:text-background"
+                        className="text-sm text-background/70 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -121,7 +121,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 transition-colors hover:text-background"
+                        className="text-sm text-background/70 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -138,7 +138,7 @@ export function Footer() {
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className="text-sm text-background/60 transition-colors hover:text-background"
+                        className="text-sm text-background/70 transition-colors hover:text-background"
                       >
                         {item.name}
                       </Link>
@@ -151,7 +151,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 border-t border-background/10 pt-8 md:flex md:items-center md:justify-between">
-          <p className="text-xs text-background/50">
+          <p className="text-xs text-background/70">
             &copy; {new Date().getFullYear()} Lekbanken AB. Alla rättigheter förbehållna.
           </p>
           <div className="mt-4 flex gap-3 md:mt-0">

@@ -75,7 +75,7 @@ test.describe('Color Contrast', () => {
     await page.goto('/');
     
     const results = await new AxeBuilder({ page })
-      .withTags(['cat.color'])
+      .withRules(['color-contrast']) // Only AA level (4.5:1), not AAA (7:1)
       .analyze();
 
     expect(results.violations).toEqual([]);

@@ -96,9 +96,9 @@ export function StepsSpotlight() {
               <dl className="space-y-5 text-sm text-muted-foreground">
                 {features.map(({ name, description, Icon }) => (
                   <div key={name} className="group relative rounded-lg pl-12 pr-4 py-3 transition-colors hover:bg-muted/50">
-                    <div className="absolute left-3 top-3.5 flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 transition-colors group-hover:bg-primary/20">
-                      <Icon className="h-4 w-4 text-primary" aria-hidden />
-                    </div>
+                    <span className="absolute left-3 top-3.5 flex h-6 w-6 items-center justify-center rounded-md bg-primary/10 transition-colors group-hover:bg-primary/20" aria-hidden="true">
+                      <Icon className="h-4 w-4 text-primary" />
+                    </span>
                     <dt className="font-semibold text-foreground">{name}</dt>
                     <dd className="mt-0.5">{description}</dd>
                   </div>

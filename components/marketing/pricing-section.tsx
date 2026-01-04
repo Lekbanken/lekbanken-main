@@ -156,11 +156,11 @@ export function PricingSection() {
                   </div>
                 )}
                 <h3 className="text-lg font-semibold text-foreground">{tier.name}</h3>
-                <p className="mt-3 text-sm text-muted-foreground">{tier.description}</p>
+                <p className="mt-3 text-sm text-foreground/70">{tier.description}</p>
                 <p className="mt-6 flex items-baseline gap-1 text-4xl font-semibold text-foreground">
                   {price}
                   {typeof tier.price !== "string" && (
-                    <span className="text-sm font-semibold text-muted-foreground">
+                    <span className="text-sm font-semibold text-foreground/70">
                       {frequencies.find((f) => f.value === frequency)?.priceSuffix}
                     </span>
                   )}
@@ -174,7 +174,7 @@ export function PricingSection() {
                   {tier.cta}
                 </Button>
 
-                <ul className="mt-8 space-y-3 text-sm text-muted-foreground xl:mt-10">
+                <ul className="mt-8 space-y-3 text-sm text-foreground/70 xl:mt-10">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex gap-3">
                       <CheckIcon

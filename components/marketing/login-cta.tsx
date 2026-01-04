@@ -22,7 +22,7 @@ export function LoginCta() {
         >
           Redo att effektivisera planeringen?
         </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-lg text-primary-foreground/80">
+        <p className="mx-auto mt-4 max-w-2xl text-lg text-primary-foreground">
           Kom igång gratis, logga in när du vill fortsätta och bjud enkelt in kollegor. Ingen
           bindningstid.
         </p>
@@ -59,8 +59,8 @@ export function LoginCta() {
           </Button>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-primary-foreground/75">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary-foreground/10 px-3 py-1.5 text-primary-foreground">
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-primary-foreground">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/30 px-3 py-1.5 text-primary-foreground">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
             </svg>

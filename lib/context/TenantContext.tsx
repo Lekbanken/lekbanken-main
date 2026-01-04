@@ -28,6 +28,7 @@ interface TenantContextType {
   tenantRole: TenantRole | null
   isLoadingTenants: boolean
   hasTenants: boolean
+  isSystemAdmin: boolean
   selectTenant: (tenantId: string) => void
   createTenant: (name: string, type: string) => Promise<Tenant>
   reloadTenants: () => Promise<void>
@@ -39,6 +40,7 @@ type TenantProviderProps = {
   initialTenant?: TenantWithMembership | null
   initialRole?: TenantRole | null
   initialMemberships?: TenantMembership[]
+  isSystemAdmin?: boolean
 }
 
 function mapMembershipsToTenants(memberships: TenantMembership[]): TenantWithMembership[] {
@@ -63,6 +65,7 @@ export function TenantProvider({
   initialTenant,
   initialRole,
   initialMemberships,
+  isSystemAdmin = false,
 }: TenantProviderProps) {
   const hasInitial = initialTenant !== undefined || initialMemberships !== undefined
 
@@ -189,6 +192,7 @@ export function TenantProvider({
     tenantRole,
     isLoadingTenants,
     hasTenants,
+    isSystemAdmin,
     selectTenant,
     createTenant,
     reloadTenants,

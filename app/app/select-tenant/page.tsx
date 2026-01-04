@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import { getServerAuthContext } from '@/lib/auth/server-context'
-import { selectTenant } from '@/app/actions/tenant'
+import { selectTenant, clearTenantSelection } from '@/app/actions/tenant'
 
 async function handleSelectTenant(formData: FormData) {
   'use server'
@@ -12,6 +12,12 @@ async function handleSelectTenant(formData: FormData) {
   redirect('/app')
 }
 
+async function handleContinueWithoutTenant() {
+  'use server'
+  await clearTenantSelection()
+  redirect('/app')
+}
+
 export default async function SelectTenantPage() {
   const authContext = await getServerAuthContext('/app/select-tenant')
 
@@ -20,12 +26,15 @@ export default async function SelectTenantPage() {
   }
 
   const memberships = authContext.memberships || []
+  const isSystemAdmin = authContext.effectiveGlobalRole === 'system_admin'
 
-  if (memberships.length === 0) {
+  // System admins with no memberships can continue without tenant
+  if (memberships.length === 0 && !isSystemAdmin) {
     redirect('/app/no-access')
   }
 
-  if (memberships.length === 1 && memberships[0]?.tenant_id) {
+  // Auto-select if user has exactly one tenant and is not a system admin
+  if (memberships.length === 1 && memberships[0]?.tenant_id && !isSystemAdmin) {
     await selectTenant(memberships[0].tenant_id!)
     redirect('/app')
   }
@@ -60,6 +69,24 @@ export default async function SelectTenantPage() {
           </button>
         ))}
       </form>
+
+      {/* System admins can continue without selecting a tenant */}
+      {isSystemAdmin && (
+        <form action={handleContinueWithoutTenant}>
+          <button
+            type="submit"
+            className="flex w-full items-center justify-between rounded-lg border border-dashed border-muted-foreground/30 px-4 py-3 text-left transition hover:border-primary/40 hover:bg-muted/50"
+          >
+            <div>
+              <p className="font-medium text-muted-foreground">Fortsätt utan organisation</p>
+              <p className="text-xs text-muted-foreground">
+                Arbeta som systemadministratör
+              </p>
+            </div>
+            <span className="text-sm text-muted-foreground">→</span>
+          </button>
+        </form>
+      )}
     </div>
   )
 }

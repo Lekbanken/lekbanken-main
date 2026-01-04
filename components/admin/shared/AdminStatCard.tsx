@@ -15,7 +15,7 @@ interface AdminStatCardProps {
   /** Icon to display */
   icon?: ReactNode;
   /** Color theme for the icon background */
-  iconColor?: 'primary' | 'blue' | 'green' | 'amber' | 'purple' | 'red';
+  iconColor?: 'primary' | 'blue' | 'green' | 'amber' | 'purple' | 'red' | 'slate';
   /** Loading state */
   isLoading?: boolean;
   /** Optional subtitle or secondary info */
@@ -31,6 +31,7 @@ const iconColorClasses: Record<string, string> = {
   amber: 'from-amber-500/20 to-amber-500/5 text-amber-600 ring-amber-500/10',
   purple: 'from-purple-500/20 to-purple-500/5 text-purple-600 ring-purple-500/10',
   red: 'from-red-500/20 to-red-500/5 text-red-600 ring-red-500/10',
+  slate: 'from-slate-500/20 to-slate-500/5 text-slate-600 ring-slate-500/10',
 };
 
 const trendConfig = {

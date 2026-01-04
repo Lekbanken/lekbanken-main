@@ -102,3 +102,12 @@ export async function selectTenant(tenantId: string) {
     role: membership.role as TenantRole,
   }
 }
+
+/**
+ * Clear tenant selection - allows system admins to work without a tenant context
+ */
+export async function clearTenantSelection() {
+  const cookieStore = await cookies()
+  clearTenantCookie(cookieStore)
+  return { tenant: null, role: null }
+}

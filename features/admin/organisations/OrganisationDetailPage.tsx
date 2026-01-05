@@ -27,17 +27,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/toast";
 import { supabase } from "@/lib/supabase/client";
-import type { Database } from "@/types/supabase";
+import { getOrganisationDetail } from "./organisationDetail.server";
 
 import type {
   OrganisationDetail,
   TenantStatus,
-  TenantBranding,
-  TenantDomain,
-  TenantFeature,
-  TenantSubscription,
-  AuditEvent,
-  MemberSummary,
 } from "./types";
 import { tenantStatusLabels, tenantStatusColors, tenantTypeLabels } from "./types";
 
@@ -138,165 +132,19 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedTab]);
 
-  // Load organisation details
+  // Load organisation details using server action
   const loadOrganisation = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     
     try {
-      // Main tenant query
-      // Note: Using explicit typing due to complex joins
-      const { data: tenant, error: tenantError } = await supabase
-        .from("tenants")
-        .select(`
-          *,
-          tenant_domains(*),
-          tenant_features(*),
-          tenant_subscriptions(
-            *,
-            billing_product:billing_products(name)
-          )
-        `)
-        .eq("id", tenantId)
-        .single();
+      const { organisation: detail, error: fetchError } = await getOrganisationDetail(tenantId);
       
-      if (tenantError) throw tenantError;
-      if (!tenant) throw new Error("Organisation hittades inte");
-
-      // Fetch branding separately (1:1 relationship)
-      const { data: brandingData } = await supabase
-        .from("tenant_branding")
-        .select("*")
-        .eq("tenant_id", tenantId)
-        .maybeSingle();
-
-      // Get member counts
-      const { count: totalMembers } = await supabase
-        .from("user_tenant_memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenantId);
-
-      const { count: ownerCount } = await supabase
-        .from("user_tenant_memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenantId)
-        .eq("role", "owner");
-
-      const { count: adminCount } = await supabase
-        .from("user_tenant_memberships")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenantId)
-        .eq("role", "admin");
-
-      const { count: pendingInvites } = await supabase
-        .from("tenant_invitations")
-        .select("*", { count: "exact", head: true })
-        .eq("tenant_id", tenantId)
-        .eq("status", "pending");
-
-      // Get recent audit events
-      const { data: auditEvents } = await supabase
-        .from("tenant_audit_logs")
-        .select(`
-          id,
-          event_type,
-          payload,
-          created_at,
-          actor_user_id
-        `)
-        .eq("tenant_id", tenantId)
-        .order("created_at", { ascending: false })
-        .limit(5);
-
-      // Map to OrganisationDetail
-      const branding: TenantBranding | null = brandingData ? {
-        id: brandingData.id,
-        logoMediaId: brandingData.logo_media_id,
-        brandNameOverride: brandingData.brand_name_override,
-        primaryColor: brandingData.primary_color,
-        secondaryColor: brandingData.secondary_color,
-        accentColor: brandingData.accent_color,
-        theme: brandingData.theme as TenantBranding['theme'],
-      } : null;
-
-      const domains: TenantDomain[] = (tenant.tenant_domains || []).map((d: Database["public"]["Tables"]["tenant_domains"]["Row"]) => ({
-        id: d.id,
-        hostname: d.hostname,
-        kind: d.kind as TenantDomain['kind'],
-        status: d.status as TenantDomain['status'],
-        verifiedAt: d.verified_at,
-        createdAt: d.created_at,
-      }));
-
-      const features: TenantFeature[] = (tenant.tenant_features || []).map((f: Database["public"]["Tables"]["tenant_features"]["Row"]) => ({
-        id: f.id,
-        featureKey: f.feature_key,
-        enabled: f.enabled,
-        value: f.value as Record<string, unknown> | null,
-      }));
-
-      const subscriptionRow = tenant.tenant_subscriptions?.[0];
-      const subscription: TenantSubscription | null = subscriptionRow ? {
-        id: subscriptionRow.id,
-        status: subscriptionRow.status as TenantSubscription['status'],
-        seatsPurchased: subscriptionRow.seats_purchased,
-        startDate: subscriptionRow.start_date,
-        renewalDate: subscriptionRow.renewal_date,
-        cancelledAt: subscriptionRow.cancelled_at,
-        stripeSubscriptionId: subscriptionRow.stripe_subscription_id,
-        product: subscriptionRow.billing_product ? {
-          name: (subscriptionRow.billing_product as unknown as { name: string }).name,
-          description: null, // billing_products doesn't have description column
-        } : null,
-      } : null;
-
-      const memberSummary: MemberSummary = {
-        total: totalMembers ?? 0,
-        owners: ownerCount ?? 0,
-        admins: adminCount ?? 0,
-        members: (totalMembers ?? 0) - (ownerCount ?? 0) - (adminCount ?? 0),
-        pendingInvites: pendingInvites ?? 0,
-      };
-
-      const recentAuditEvents: AuditEvent[] = (auditEvents || []).map((e) => ({
-        id: e.id,
-        eventType: e.event_type,
-        payload: e.payload as Record<string, unknown> | null,
-        createdAt: e.created_at,
-        actor: null, // Would need to join users table
-      }));
-
-      const metadata = tenant.metadata as Record<string, unknown> | null;
-
-      const detail: OrganisationDetail = {
-        id: tenant.id,
-        name: tenant.name,
-        slug: tenant.slug,
-        status: tenant.status as TenantStatus,
-        type: tenant.type as OrganisationDetail['type'],
-        description: tenant.description,
-        createdAt: tenant.created_at,
-        createdBy: null, // Would need to join users
-        updatedAt: tenant.updated_at,
-        updatedBy: null, // Would need to join users
-        contactName: tenant.contact_name,
-        contactEmail: tenant.contact_email,
-        contactPhone: tenant.contact_phone,
-        adminNotes: metadata?.admin_notes as string | null ?? null,
-        defaultLanguage: tenant.default_language,
-        mainLanguage: tenant.main_language,
-        defaultTheme: tenant.default_theme,
-        trialEndsAt: tenant.trial_ends_at,
-        brandingEnabled: tenant.tenant_branding_enabled ?? false,
-        branding,
-        domains,
-        features,
-        subscription,
-        billingAccount: null, // Loaded separately if needed
-        memberSummary,
-        recentAuditEvents,
-      };
-
+      if (fetchError) {
+        setError(fetchError);
+        return;
+      }
+      
       setOrganisation(detail);
     } catch (err) {
       console.error("Failed to load organisation:", err);

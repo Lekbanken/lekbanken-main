@@ -8,6 +8,11 @@
 -- Rollback: DROP VIEW ... CREATE VIEW without security_invoker option
 -- Requires: PostgreSQL 15+ (Supabase uses 15+)
 -- ============================================================================
+-- NOTE: We use DROP/CREATE instead of ALTER VIEW because:
+--   - PostgreSQL 15 does not support ALTER VIEW ... SET (security_invoker = on)
+--   - The security_invoker option can only be set at CREATE time
+--   - We use CASCADE to handle dependencies, then re-grant permissions
+-- ============================================================================
 
 -- ===========================================
 -- 1. session_artifact_state view

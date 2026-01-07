@@ -1,0 +1,42 @@
+-- Migration 024: Add missing foreign key index
+-- =============================================================================
+-- Adds index on session_artifact_variants.media_ref for faster JOIN/DELETE
+-- =============================================================================
+
+CREATE INDEX IF NOT EXISTS idx_session_artifact_variants_media_ref 
+  ON public.session_artifact_variants(media_ref);
+
+-- =============================================================================
+-- PERFORMANCE ADVISOR ANALYSIS (2026-01-08)
+-- =============================================================================
+-- 
+-- After migrations 010-023, the following warnings remain:
+--
+-- | Category                          | Count | Action        |
+-- |-----------------------------------|-------|---------------|
+-- | auth.uid() utan wrapper           | 0     | ✅ Resolved   |
+-- | Functions utan search_path        | 0     | ✅ Resolved   |
+-- | Tables med >1 permissive policy   | 19    | ⚪ Intentional|
+-- | Unused indexes (<50 scans)        | 740   | ⚪ Expected   |
+-- | Missing FK indexes                | 1     | ✅ Fixed here |
+--
+-- MULTIPLE POLICIES (Intentional):
+-- These tables have 2 policies by design (authenticated + anon, or user + admin):
+-- - billing_products, games, participant_sessions, participants (auth + anon)
+-- - learning_* tables (user + system_admin)
+-- - session_* tables (host + admin)
+-- - user_profiles, users (owner + admin)
+--
+-- UNUSED INDEXES:
+-- The 740 unused indexes are expected in a development environment:
+-- 1. Many are PRIMARY KEY indexes (cannot be dropped)
+-- 2. Many are UNIQUE constraint indexes (cannot be dropped)
+-- 3. Many are for features not yet in active use
+-- 4. These should be reviewed after 90 days in production
+--
+-- RECOMMENDATION:
+-- Monitor index usage in production using:
+--   SELECT indexrelname, idx_scan FROM pg_stat_user_indexes 
+--   WHERE schemaname = 'public' ORDER BY idx_scan;
+--
+-- =============================================================================

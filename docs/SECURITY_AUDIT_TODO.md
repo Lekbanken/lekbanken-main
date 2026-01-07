@@ -1,7 +1,7 @@
 # 🔐 Security Audit - TODO Tracker
 
-> **Senast uppdaterad:** 2026-01-07 (uppdaterad efter Migration 014)  
-> **Status:** Migration 014 KLAR ✅ - Phase 2 KOMPLETT!
+> **Senast uppdaterad:** 2026-01-07 (uppdaterad efter Migration 015)  
+> **Status:** Migration 015 KLAR ✅ - Phase 2 KOMPLETT!
 
 ---
 
@@ -20,11 +20,30 @@
 | Migration 012 | Enable RLS on moderation tables | ✅ KLAR |
 | Migration 013 | auth.uid() initplan - core tables | ✅ KLAR |
 | Migration 014 | auth.uid() initplan - session tables | ✅ KLAR |
+| Migration 015 | Consolidate permissive policies | ✅ KLAR |
 | Verifiering | Kör Supabase Advisor igen | 🔲 TODO |
 
 ---
 
 ## ✅ KLARA MIGRATIONER (Phase 2)
+
+### Migration 015 - Consolidate Permissive Policies ✅
+**Commit:** `8445df8`
+
+Konsoliderar flera permissive policies till en per tabell/operation:
+
+| Tabell | Före | Efter |
+|--------|------|-------|
+| `billing_accounts` | 2 SELECT | 1 SELECT |
+| `tenants` | 3 SELECT | 1 SELECT |
+| `games` | 3 SELECT | 1 SELECT + 1 anon |
+| `user_tenant_memberships` | 3 SELECT | 1 SELECT |
+| `content_preferences` | 2 SELECT | 1 (FOR ALL covers) |
+| `participant_sessions` | 3 SELECT | 1 SELECT + 1 anon |
+| `session_events` | 4 SELECT | 1 SELECT |
+| `session_roles` | 2 SELECT | 1 SELECT |
+
+---
 
 ### Migration 014 - auth.uid() Initplan Sessions ✅
 **Commit:** `b641928`

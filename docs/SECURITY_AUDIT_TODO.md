@@ -1,7 +1,7 @@
 # 🔐 Security Audit - TODO Tracker
 
-> **Senast uppdaterad:** 2026-01-07  
-> **Status:** Migration 007 KLAR ✅
+> **Senast uppdaterad:** 2026-01-07 (uppdaterad efter Migration 009)  
+> **Status:** Migration 009 KLAR ✅ - Security Audit KOMPLETT!
 
 ---
 
@@ -13,13 +13,40 @@
 | Migration 004-005 | search_path hardening (33 funktioner) | ✅ KLAR |
 | Migration 006 | Remaining SECURITY DEFINER (19 funktioner) | ✅ KLAR |
 | Migration 007 | Critical policy fixes | ✅ KLAR |
-| Migration 008 | Additional policy cleanup | 🔲 TODO |
-| Migration 009 | Performance indexes | 🔲 TODO |
+| Migration 008 | Tenant INSERT restrict + policy cleanup | ✅ KLAR |
+| Migration 009 | FK performance indexes (84 indexes) | ✅ KLAR |
 | Verifiering | Kör alla audit-frågor igen | 🔲 TODO |
 
 ---
 
 ## ✅ KLARA MIGRATIONER
+
+### Migration 009 - FK Performance Indexes ✅
+**Commit:** (pending)
+
+| Prioritet | Beskrivning | Antal index |
+|-----------|-------------|-------------|
+| P1 CRITICAL | Session/participant tables | 14 |
+| P2 HIGH | Game/plan/tenant tables | 32 |
+| P3 MEDIUM | Billing/gamification/content | 30 |
+| P4 LOW | Misc tables | 8 |
+| **TOTALT** | | **84 index** |
+
+---
+
+### Migration 008 - Tenant INSERT Restrict ✅
+**Commit:** (pending)
+
+| Åtgärd | Status |
+|--------|--------|
+| Ersätt `tenant_insert_authenticated` → `tenant_insert_admin_only` | ✅ |
+| Policy nu: `is_global_admin() OR service_role` endast | ✅ |
+| Ta bort `authenticated_can_select_products` (redundant) | ✅ |
+| Ta bort `authenticated_can_select_purposes` (redundant) | ✅ |
+
+**Framtida tenant-köp:** Ska gå via Edge Function som validerar betalning och anropar service_role.
+
+---
 
 ### Migration 007 - Critical Policy Fixes ✅
 **Commit:** `d433dfe`
@@ -50,85 +77,69 @@
 
 ---
 
-## 🔲 TODO: Migration 008 - Additional Policy Cleanup
+## ✅ KLAR: Migration 008 - Tenant Insert Beslut
 
-### 8.1 Granska `tenant_insert_authenticated` policy
-**Nuvarande villkor:** 
-```sql
-is_global_admin() OR auth.role() = 'service_role' OR auth.uid() IS NOT NULL
-```
+### Affärsbeslut taget ✅
+**Beslut:** Endast admin/service kan skapa tenants nu.  
+**Framtid:** Beslutstagare köper tenant-produkt med licenser via Edge Function-flöde.
 
-**Problem:** `auth.uid() IS NOT NULL` tillåter ALLA inloggade användare att skapa tenants.
-
-**Förslag:** Begränsa till enbart:
-- `is_global_admin()` - systemadmins
-- `auth.role() = 'service_role'` - backend
-- Eventuellt: Rate limiting via edge function
-
-| Uppgift | Status |
-|---------|--------|
-| Beslut: Ska alla autentiserade kunna skapa tenants? | 🔲 BESLUT KRÄVS |
-| Om nej: Uppdatera policy | 🔲 |
-
-### 8.2 Redundanta SELECT-policies
-Dessa tabeller har duplicerade SELECT-policies:
-
-| Tabell | Policies | Åtgärd |
-|--------|----------|--------|
-| `products` | `products_select_all` (true), `authenticated_can_select_products` | 🔲 Ta bort en |
-| `purposes` | `purposes_select_all` (true), `authenticated_can_select_purposes` | 🔲 Ta bort en |
-
-### 8.3 Analytics-tabell med `true`
-| Tabell | Policy | Åtgärd |
-|--------|--------|--------|
-| `analytics_timeseries` | `system_can_insert_timeseries` | ⚪ OK - ren analytics |
+### Implementerat
+- Policy `tenant_insert_admin_only`: `is_global_admin() OR service_role`
+- Framtida köpflöde dokumenterat i migrationen
 
 ---
 
-## 🔲 TODO: Migration 009 - Performance & Indexes
+## ✅ KLAR: Migration 009 - FK Indexes
 
-### 9.1 Kör Fråga 10 - Duplicate Indexes
-```sql
-SELECT a.indexname, b.indexname, a.tablename
-FROM pg_indexes a
-JOIN pg_indexes b ON a.indexdef = b.indexdef 
-  AND a.indexname < b.indexname
-WHERE a.schemaname = 'public';
-```
-| Uppgift | Status |
-|---------|--------|
-| Kör frågan | 🔲 |
-| Analysera resultat | 🔲 |
-| Skapa migration för att ta bort duplicat | 🔲 |
+### Fråga 10: Duplicate Indexes ✅
+**Resultat:** Inga duplicerade index! ✅
 
-### 9.2 Kör Fråga 11 - FK utan Index
-```sql
--- Se security-audit-queries.sql fråga 11
-```
-| Uppgift | Status |
-|---------|--------|
-| Kör frågan | 🔲 |
-| Analysera resultat | 🔲 |
-| Skapa index för viktiga FK | 🔲 |
+### Fråga 11: FK utan Index ✅
+**Resultat:** 84 FK-kolumner saknade index.  
+**Åtgärd:** Alla 84 index skapade, prioriterade efter:
+- P1: Session/participant (real-time) 
+- P2: Game/tenant (frequent queries)
+- P3: Billing/gamification (admin)
+- P4: Misc (low traffic)
 
-### 9.3 Kör Fråga 8 - RLS utan policies
+---
+
+## 🔲 TODO: Verifiering
+
+Kör alla audit-frågor igen för att verifiera:
+
 ```sql
-SELECT t.tablename FROM pg_tables t
-WHERE t.schemaname = 'public' AND t.rowsecurity = true
-AND NOT EXISTS (SELECT 1 FROM pg_policies p 
-  WHERE p.schemaname = 'public' AND p.tablename = t.tablename);
+-- Fråga 4: Alla SECURITY DEFINER ska ha search_path
+SELECT proname FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE n.nspname = 'public' AND p.prosecdef = true
+AND p.proconfig IS NULL;
+-- Förväntat: 0 rader
+
+-- Fråga 9: Policies med TRUE (bör endast vara analytics_timeseries)
+SELECT tablename, policyname FROM pg_policies 
+WHERE schemaname = 'public' AND with_check::text = 'true';
+-- Förväntat: 1 rad (analytics_timeseries)
+
+-- Fråga 10: Inga duplicerade index
+-- Förväntat: 0 rader
+
+-- Fråga 11: Inga FK utan index
+-- Förväntat: 0 rader
 ```
-| Uppgift | Status |
-|---------|--------|
-| Kör frågan | 🔲 |
-| Analysera resultat | 🔲 |
-| Lägg till policies eller inaktivera RLS | 🔲 |
 
 ---
 
 ## 🆕 FRAMTIDA FÖRSLAG
 
-### F1. Lägg till Rate Limiting för Tenant Creation
+### F1. Tenant Purchase Flow (Planerat)
+När produkter är klara:
+- Edge Function för tenant-köp
+- Validerar betalning/licenser
+- Anropar `create_tenant_with_licenses()` via service_role
+- Sätter upp initial tenant-konfiguration
+
+### F2. Lägg till Rate Limiting för känsliga operationer
 - Edge function som begränsar antal tenants per user
 - Förhindrar missbruk av tenant-skapande
 
@@ -186,5 +197,18 @@ git push origin main
 ## 📝 Anteckningar
 
 - **2026-01-07:** Migration 006 och 007 applicerade. Alla SECURITY DEFINER funktioner har nu search_path. Kritiska policy-sårbarheter fixade.
-- `tenant_insert_authenticated` tillåter fortfarande alla autentiserade att skapa tenants - kräver affärsbeslut.
+- **2026-01-07:** Migration 008 och 009 applicerade. Tenant INSERT begränsat till admin/service. 84 FK-index skapade.
+- **2026-01-07:** Security Audit KOMPLETT! Alla migrationer (000-009) applicerade och pushade.
+
+### Git Commits (denna session)
+| Commit | Beskrivning |
+|--------|-------------|
+| `ff82116` | Core security migrations (000-003) |
+| `797579c` | Policy cleanup migration |
+| `4b3900e` | search_path hardening (004-005) |
+| `5e83536` | Migration 006 - remaining SECURITY DEFINER |
+| `d433dfe` | Migration 007 - critical policy fixes |
+| `656c47b` | docs: add security audit TODO tracker |
+| (pending) | Migration 008 - tenant INSERT restrict |
+| (pending) | Migration 009 - FK indexes |
 

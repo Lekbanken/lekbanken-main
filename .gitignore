@@ -48,3 +48,8 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# Ignore Supabase inspect reports (regenerate with: npx supabase inspect report)
+2026-*/
+scripts/*-output.txt
+scripts/supabase-inspect-report.json
+scripts/roles-dump.sql

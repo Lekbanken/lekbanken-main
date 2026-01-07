@@ -13,6 +13,8 @@ import {
   ClockIcon,
   EllipsisVerticalIcon,
   WrenchScrewdriverIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
 } from '@heroicons/react/24/outline';
 import {
   AdminBreadcrumbs,
@@ -38,6 +40,11 @@ import {
   DropdownMenuItem,
 } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
+
+// Legacy components for Import/Export/Info
+import { GameImportDialog } from '../components/GameImportDialog';
+import { GameExportDialog } from '../components/GameExportDialog';
+import { GameInfoDialog } from '../components/GameInfoDialog';
 
 // V2 Components
 import { GameCardDrawer } from './components/GameCardDrawer';
@@ -293,6 +300,8 @@ export function GameAdminPageV2() {
   // UI state
   const [selectedGame, setSelectedGame] = useState<GameAdminRow | null>(null);
   const [cardOpen, setCardOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   // Selection
   const selection = useBulkSelection(games);
@@ -490,6 +499,15 @@ export function GameAdminPageV2() {
         icon={<PuzzlePieceIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
+            <GameInfoDialog />
+            <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
+              <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
+              CSV Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
+              <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
+              Importera
+            </Button>
             {canEdit && (
               <Button
                 variant="default"
@@ -666,6 +684,23 @@ export function GameAdminPageV2() {
         game={selectedGame}
         open={cardOpen}
         onOpenChange={setCardOpen}
+      />
+
+      {/* Import Dialog */}
+      <GameImportDialog
+        open={importOpen}
+        onOpenChange={setImportOpen}
+        onImport={async () => {
+          await loadGames();
+        }}
+      />
+
+      {/* Export Dialog */}
+      <GameExportDialog
+        open={exportOpen}
+        onOpenChange={setExportOpen}
+        selectedIds={[]}
+        totalCount={games.length}
       />
     </AdminPageLayout>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowTopRightOnSquareIcon,
@@ -30,7 +30,6 @@ import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs';
 import type {
   GameAdminRow,
   GameCardTab,
-  GameContentSummary,
   ValidationState,
   PlayMode,
 } from '../types';
@@ -513,14 +512,14 @@ const TABS: Array<{ id: GameCardTab; label: string }> = [
 
 export function GameCardDrawer({ game, open, onOpenChange }: GameCardDrawerProps) {
   const router = useRouter();
-  const { activeTab, setActiveTab } = useTabs<GameCardTab>('overview');
+  const { activeTab, setActiveTab } = useTabs('overview');
 
   // Reset tab when game changes
   useEffect(() => {
     if (game) {
       setActiveTab('overview');
     }
-  }, [game?.id, setActiveTab]);
+  }, [game, setActiveTab]);
 
   const handleOpenBuilder = useCallback(() => {
     if (game) {

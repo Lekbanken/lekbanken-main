@@ -3,21 +3,24 @@
 import { useState, useCallback, useMemo } from 'react';
 import {
   CheckCircleIcon,
-  XCircleIcon,
-  TagIcon,
   ArrowDownTrayIcon,
   ArrowPathIcon,
   TrashIcon,
   ArchiveBoxIcon,
-  EyeIcon,
   EyeSlashIcon,
-  BuildingOfficeIcon,
-  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui';
 import { AdminConfirmDialog } from '@/components/admin/shared/AdminConfirmDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import type { GameAdminRow, BulkOperationType, BulkOperationResult } from '../types';
 
 // ============================================================================
@@ -153,15 +156,6 @@ export function GameBulkActionsBar({
 
   const selectedCount = selectedGames.length;
 
-  const handleAction = useCallback(async (action: BulkActionConfig) => {
-    if (action.requiresConfirmation) {
-      setConfirmAction(action);
-      return;
-    }
-
-    await executeAction(action);
-  }, []);
-
   const executeAction = useCallback(async (action: BulkActionConfig) => {
     setIsProcessing(true);
     
@@ -177,13 +171,22 @@ export function GameBulkActionsBar({
       }
 
       onActionComplete(result);
-    } catch (err) {
+    } catch {
       showError('Ett fel uppstod vid utförande av åtgärden');
     } finally {
       setIsProcessing(false);
       setConfirmAction(null);
     }
   }, [selectedGames, success, warning, showError, onClearSelection, onActionComplete]);
+
+  const handleAction = useCallback(async (action: BulkActionConfig) => {
+    if (action.requiresConfirmation) {
+      setConfirmAction(action);
+      return;
+    }
+
+    await executeAction(action);
+  }, [executeAction]);
 
   const confirmDescription = useMemo(() => {
     if (!confirmAction) return '';
@@ -252,8 +255,8 @@ export function GameBulkActionsBar({
         title={confirmAction?.confirmTitle || ''}
         description={confirmDescription}
         confirmLabel={confirmAction?.confirmLabel || 'Bekräfta'}
-        variant={confirmAction?.variant === 'destructive' ? 'danger' : 'default'}
-        onConfirm={() => confirmAction && executeAction(confirmAction)}
+        variant={confirmAction?.variant === 'destructive' ? 'danger' : undefined}
+        onConfirm={() => { if (confirmAction) void executeAction(confirmAction); }}
       />
     </>
   );
@@ -291,59 +294,69 @@ export function GameExportDialog({
   };
 
   return (
-    <AdminConfirmDialog
-      open={open}
-      onOpenChange={onOpenChange}
-      title="Exportera spel"
-      description={`Exportera ${selectedGames.length} valda spel.`}
-      confirmLabel={isExporting ? 'Exporterar...' : 'Exportera'}
-      variant="default"
-      onConfirm={handleExport}
-    >
-      <div className="space-y-4 py-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Format</label>
-          <div className="flex gap-2">
-            <Button
-              variant={format === 'csv' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFormat('csv')}
-            >
-              CSV
-            </Button>
-            <Button
-              variant={format === 'json' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFormat('json')}
-            >
-              JSON
-            </Button>
-          </div>
-        </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Exportera spel</DialogTitle>
+          <DialogDescription>
+            Exportera {selectedGames.length} valda spel.
+          </DialogDescription>
+        </DialogHeader>
         
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="includeRelations"
-            checked={includeRelations}
-            onChange={(e) => setIncludeRelations(e.target.checked)}
-            className="rounded"
-          />
-          <label htmlFor="includeRelations" className="text-sm">
-            Inkludera relationer (steg, faser, roller)
-          </label>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Format</label>
+            <div className="flex gap-2">
+              <Button
+                variant={format === 'csv' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFormat('csv')}
+              >
+                CSV
+              </Button>
+              <Button
+                variant={format === 'json' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFormat('json')}
+              >
+                JSON
+              </Button>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="includeRelations"
+              checked={includeRelations}
+              onChange={(e) => setIncludeRelations(e.target.checked)}
+              className="rounded"
+            />
+            <label htmlFor="includeRelations" className="text-sm">
+              Inkludera relationer (steg, faser, roller)
+            </label>
+          </div>
+
+          {format === 'json' && (
+            <div className="rounded-lg border border-border bg-muted/50 p-3">
+              <p className="text-xs text-muted-foreground">
+                JSON-export inkluderar fullständig data och är kompatibel med 
+                Legendary-import för återställning.
+              </p>
+            </div>
+          )}
         </div>
 
-        {format === 'json' && (
-          <div className="rounded-lg border border-border bg-muted/50 p-3">
-            <p className="text-xs text-muted-foreground">
-              JSON-export inkluderar fullständig data och är kompatibel med 
-              Legendary-import för återställning.
-            </p>
-          </div>
-        )}
-      </div>
-    </AdminConfirmDialog>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Avbryt
+          </Button>
+          <Button onClick={handleExport} disabled={isExporting}>
+            {isExporting ? 'Exporterar...' : 'Exportera'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

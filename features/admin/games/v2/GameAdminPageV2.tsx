@@ -5,20 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import {
   PuzzlePieceIcon,
   PlusIcon,
-  ArrowUpTrayIcon,
-  ArrowDownTrayIcon,
   Cog6ToothIcon,
-  TableCellsIcon,
-  Squares2X2Icon,
   InformationCircleIcon,
   CheckCircleIcon,
   XCircleIcon,
   ExclamationTriangleIcon,
   ClockIcon,
-  UserGroupIcon,
-  BoltIcon,
   EllipsisVerticalIcon,
-  PencilSquareIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/24/outline';
 import {
@@ -59,7 +52,7 @@ import type {
   PlayMode,
   BulkOperationResult,
 } from './types';
-import { PLAY_MODE_META, DEFAULT_COLUMNS } from './types';
+import { PLAY_MODE_META } from './types';
 
 // ============================================================================
 // CONSTANTS
@@ -80,7 +73,7 @@ function ValidationBadge({ state }: { state: ValidationState }) {
     outdated: { icon: InformationCircleIcon, variant: 'outline' as const, label: '~' },
   };
 
-  const { icon: Icon, variant, label } = config[state] || config.pending;
+  const { icon: Icon, variant } = config[state] || config.pending;
 
   return (
     <Badge variant={variant} className="h-6 w-6 p-0 justify-center" title={state}>
@@ -154,8 +147,6 @@ function GameRow({
   onPublishToggle,
   canEdit,
 }: GameRowProps) {
-  const playMode = game.play_mode || 'basic';
-  const meta = PLAY_MODE_META[playMode];
 
   return (
     <tr
@@ -275,9 +266,9 @@ function GameRow({
 
 export function GameAdminPageV2() {
   const { can } = useRbac();
-  const { success, warning, info } = useToast();
+  const { warning, info } = useToast();
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const _searchParams = useSearchParams();
 
   // State
   const [games, setGames] = useState<GameAdminRow[]>([]);
@@ -452,7 +443,7 @@ export function GameAdminPageV2() {
         prev.map((g) => (g.id === game.id ? { ...g, status: newStatus } : g))
       );
       info(newStatus === 'published' ? 'Publicerad' : 'Avpublicerad');
-    } catch (err) {
+    } catch {
       warning('Åtgärden misslyckades');
     }
   }, [info, warning]);

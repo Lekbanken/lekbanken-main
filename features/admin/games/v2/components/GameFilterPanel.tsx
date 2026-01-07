@@ -276,7 +276,7 @@ export function GameFilterPanel({
   onChange,
   purposes,
   tenants,
-  products,
+  products: _products,
   presets = [],
   onSavePreset,
   onLoadPreset,

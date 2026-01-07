@@ -1,0 +1,53 @@
+-- Migration 022: Unused Index Review Documentation
+-- =============================================================================
+-- This migration documents the review of unused indexes reported by Supabase
+-- Performance Advisor (lint 0005). No indexes are dropped.
+-- =============================================================================
+
+-- =============================================================================
+-- UNUSED INDEXES ANALYSIS (as of 2026-01-08)
+-- =============================================================================
+-- 
+-- The following indexes were reported as having 0 or low scan counts:
+--
+-- | Table         | Index                     | Scans | Decision    | Reason                          |
+-- |---------------|---------------------------|-------|-------------|----------------------------------|
+-- | games         | games_popularity_score_idx| 0     | KEEP        | Planned for browse/search feature|
+-- | games         | idx_games_energy_level    | 0     | KEEP        | Planned filter in game browser   |
+-- | games         | idx_games_location_type   | 0     | KEEP        | Planned filter in game browser   |
+-- | games         | idx_games_category        | 0     | KEEP        | Planned filter in game browser   |
+-- | games         | idx_games_time_estimate   | 0     | KEEP        | Planned filter in game browser   |
+-- | games         | idx_games_age_range       | 0     | KEEP        | Planned filter in game browser   |
+-- | games         | games_owner_tenant_idx    | 13    | KEEP        | Active for tenant queries        |
+-- | games         | games_rating_idx          | 16    | KEEP        | Active for sorting               |
+-- | games         | games_product_idx         | 20    | KEEP        | Active for product queries       |
+-- | user_devices  | idx_user_devices_last_seen| 36    | KEEP        | Active for device tracking       |
+--
+-- =============================================================================
+-- RECOMMENDATION
+-- =============================================================================
+-- 
+-- 1. The "0 scans" indexes on games table are for PLANNED FEATURES:
+--    - Game filtering by energy level, location type, category, time, age
+--    - These filters will be implemented in the browse/search UI
+--    - DO NOT DROP - they will be needed when features are activated
+--
+-- 2. Low-scan indexes (13-36 scans) are ACTIVELY USED:
+--    - games_owner_tenant_idx: Tenant isolation queries
+--    - games_rating_idx: Rating-based sorting
+--    - games_product_idx: Product association queries
+--    - idx_user_devices_last_seen: Device activity tracking
+--
+-- 3. MONITORING PLAN:
+--    - Review index usage monthly using:
+--      SELECT * FROM extensions.index_advisor();
+--    - Consider dropping indexes with 0 scans after 90 days in production
+--    - Document any new indexes and their intended use cases
+--
+-- =============================================================================
+-- NO SCHEMA CHANGES IN THIS MIGRATION
+-- This is a documentation-only migration to record the decision.
+-- =============================================================================
+
+-- Placeholder statement to make migration valid
+SELECT 'Unused index review completed - no indexes dropped' AS status;

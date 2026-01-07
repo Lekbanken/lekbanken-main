@@ -52,6 +52,10 @@ Fält:
 | NOTIFICATIONS_DOMAIN.md | A | active | 2025-12-17 | - |
 | API_INTEGRATION_DOMAIN.md | A | active | 2025-12-17 | - |
 | AI_DOMAIN.md | A | active | 2025-12-18 | - |
+| DATABASE_SECURITY_DOMAIN.md | A | active | 2026-01-08 | - |
+| DATABASE_SECURITY_AUDIT.md | C | active | 2026-01-08 | - |
+| SECURITY_AUDIT_TODO.md | D | ✅ done | 2026-01-08 | - |
+| PERFORMANCE_ADVISOR_PROMPT.md | E | active | 2026-01-08 | - |
 | PARTICIPANTS_DOMAIN_ARCHITECTURE.md | B | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_IMPLEMENTATION_REPORT.md | C | archived | 2025-12-17 | - |
 | PARTICIPANTS_DOMAIN_MVP.md | B | archived | 2025-12-17 | - |
@@ -69,6 +73,8 @@ Fält:
 - auth/: se auth/README.md
 - ops/: se ops/README.md
 - admin/: se admin/README.md
+- sandbox/: se sandbox/SANDBOX_ARTIFACTS_IMPLEMENTATION.md
+- security/: DATABASE_SECURITY_DOMAIN.md + SECURITY_AUDIT_TODO.md + DATABASE_SECURITY_AUDIT.md
 - templates/: se templates/*
 - validation/: se validation/* (start: `validation/REALITY_CHECK_2025-12-17.md`)
 - reports/: se reports/README.md
@@ -76,7 +82,8 @@ Fält:
 
 ## Nästa validering (rekommenderad ordning)
 
-1) Auth/RBAC (docs/auth/*)
+1) ~~Auth/RBAC (docs/auth/*)~~ ✅ Done
 2) DB/migrations + typegen (MIGRATIONS.md)
-3) Game Builder + CSV import/export (CSV_IMPORT_FIELD_REFERENCE.md + GAME_* docs)
-4) Ops/runbooks (docs/ops)
+3) ~~Security hardening (DATABASE_SECURITY_DOMAIN.md)~~ ✅ Done (2026-01-08)
+4) Game Builder + CSV import/export (CSV_IMPORT_FIELD_REFERENCE.md + GAME_* docs)
+5) Ops/runbooks (docs/ops)

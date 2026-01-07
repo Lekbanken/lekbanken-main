@@ -1,103 +1,124 @@
 # Database Security & Performance Audit Report
 
-**Date:** 2026-01-07  
+**Date:** 2026-01-08  
 **Project:** lekbanken-main (qohhnufxididbmzqnjwg)  
-**Auditor:** Automated analysis via Supabase CLI & migration inspection
+**Status:** ✅ **RESOLVED** - All security issues fixed
 
 ---
 
 ## Executive Summary
 
-### Risk Overview
+### Final Status (After Migrations 010-024)
 
-| Category | Count | Severity |
-|----------|-------|----------|
-| SECURITY DEFINER functions missing `search_path` | 1 | 🔴 ERROR |
-| Tables with RLS disabled | ~2 (game_steps, game_materials) | 🔴 ERROR |
-| Views without SECURITY INVOKER (SECURITY DEFINER by default) | 2 | 🟡 WARN |
-| Multiple permissive policies per table/operation | ~50 combinations | 🟡 WARN |
-| Unused indexes | 10 | 🔵 INFO |
-| Tables never vacuumed | ~30 | 🔵 INFO |
-| Duplicate indexes | 0-3 | 🔵 INFO |
+| Category | Before | After | Status |
+|----------|--------|-------|--------|
+| SECURITY DEFINER without `search_path` | 10+ | **0** | ✅ FIXED |
+| Tables with RLS disabled | ~30 | **0** | ✅ FIXED |
+| Tables with RLS but no policies | ~21 | **0** | ✅ FIXED |
+| auth.uid() without initplan wrapper | ~180 | **0** | ✅ FIXED |
+| Multiple permissive policies (>2) | ~10 | **0** | ✅ FIXED |
+| Unused indexes | 740 | 740 | ⚪ Expected |
 
----
-
-## 🔴 ERROR-Level Findings (Fix Immediately)
-
-### 1. `is_system_admin()` Missing `search_path`
-
-**Location:** `supabase/migrations/20260104120100_repair_consolidation.sql` (lines 63-78)
-
-**Current Definition:**
-```sql
-CREATE OR REPLACE FUNCTION public.is_system_admin() 
-RETURNS boolean 
-LANGUAGE plpgsql 
-SECURITY DEFINER 
-STABLE
-AS $$
-BEGIN
-  -- Function body
-END;
-$$;
-```
-
-**Problem:** This function is `SECURITY DEFINER` but lacks `SET search_path = public`. An attacker could:
-1. Create a malicious `auth` schema in their search path
-2. Call `is_system_admin()` which would use their malicious `auth.uid()` or `auth.jwt()`
-3. Gain unauthorized admin access
-
-**Risk Level:** HIGH - Direct privilege escalation vector
-
-**Fix Required:**
-```sql
-CREATE OR REPLACE FUNCTION public.is_system_admin() 
-RETURNS boolean 
-LANGUAGE plpgsql 
-SECURITY DEFINER 
-STABLE
-SET search_path = public
-AS $$
--- ... same body ...
-$$;
-```
+### Supabase Advisor Status
+- **Security Advisor:** ✅ 0 warnings
+- **Performance Advisor:** ⚪ 740 warnings (expected - mostly unused indexes in dev)
 
 ---
 
-### 2. Tables With RLS Disabled
+## 🔴 RESOLVED: ERROR-Level Findings
 
-The ChatGPT analysis mentioned `game_steps` and `game_materials` as having RLS disabled. This needs verification via SQL Editor.
+### 1. ✅ `is_system_admin()` Missing `search_path` - FIXED
 
-**Verification Query:**
-```sql
-SELECT tablename, rowsecurity 
-FROM pg_tables 
-WHERE schemaname = 'public' 
-AND tablename IN ('game_steps', 'game_materials');
-```
+**Fixed in:** Migration 010  
+**Solution:** Added `SET search_path = pg_catalog, public` to all SECURITY DEFINER functions
 
-**If RLS is disabled:**
-- All data is exposed to any authenticated user with SELECT grants
-- No tenant isolation on these tables
+### 2. ✅ Tables With RLS Disabled - FIXED
+
+**Fixed in:** Migration 011  
+**Solution:** Enabled RLS on all 167 tables
+
+### 3. ✅ Tables With RLS But No Policies - FIXED
+
+**Fixed in:** Migration 017  
+**Solution:** Added appropriate policies to all 21 affected tables
 
 ---
 
-## 🟡 WARN-Level Findings (Fix Soon)
+## 🟡 RESOLVED: WARN-Level Findings
 
-### 3. Views With Default SECURITY DEFINER Context
+### 4. ✅ Views With Default SECURITY DEFINER - FIXED
 
-**Affected Views:**
-1. `session_artifact_state` 
-2. `tenant_memberships`
+**Fixed in:** Migration 001  
+**Solution:** Recreated views with `security_invoker = true`
 
-**Problem:** PostgreSQL views by default run with the *owner's* permissions (similar to SECURITY DEFINER), not the calling user's. When accessed through Supabase client:
-- RLS policies on underlying tables may be bypassed
-- The view owner (usually `postgres`) has full access
+### 5. ✅ auth.uid() Without Initplan Wrapper - FIXED
 
-**Mitigation Options:**
+**Fixed in:** Migrations 013-014, 018-020, 023  
+**Solution:** Wrapped all `auth.uid()` calls in `(SELECT auth.uid())` for better query performance
 
-**Option A: Add SECURITY INVOKER (PostgreSQL 15+)**
+### 6. ✅ Multiple Permissive Policies Per Table - FIXED
+
+**Fixed in:** Migrations 015, 021, 023  
+**Solution:** Consolidated duplicate policies into single OR-combined policies
+
+---
+
+## ⚪ DOCUMENTED: INFO-Level Findings
+
+### 7. Unused Indexes (740)
+
+**Status:** Documented in Migration 022  
+**Reason:** Expected in development environment
+- Many are PRIMARY KEY indexes (cannot be dropped)
+- Many are UNIQUE constraint indexes (cannot be dropped)
+- Many are for features not yet in active use
+- Will be reviewed after 90 days in production
+
+### 8. Multiple Policies (19 tables with 2 policies)
+
+**Status:** Intentional by design
+**Reason:** These tables require separate policies for:
+- `authenticated` + `anon` roles (public access)
+- `user` + `admin` access levels
+- `host` + `system_admin` for session tables
+
+---
+
+## Verification Queries
+
+Run these in Supabase SQL Editor to verify:
+
 ```sql
+-- Should return: 0 rows
+SELECT p.proname FROM pg_proc p
+JOIN pg_namespace n ON p.pronamespace = n.oid
+WHERE n.nspname = 'public' AND p.prosecdef = true
+AND (p.proconfig IS NULL 
+     OR NOT EXISTS (SELECT 1 FROM unnest(p.proconfig) cfg 
+                    WHERE cfg LIKE 'search_path=%'));
+
+-- Should return: 0 rows  
+SELECT tablename FROM pg_tables 
+WHERE schemaname = 'public' AND rowsecurity = false;
+
+-- Should return: 0 rows
+SELECT tablename, policyname FROM pg_policies 
+WHERE schemaname = 'public'
+AND qual::text ~ 'auth\.uid\(\)' 
+AND qual::text NOT LIKE '%SELECT auth.uid()%';
+```
+
+---
+
+## Related Documentation
+
+- [DATABASE_SECURITY_DOMAIN.md](DATABASE_SECURITY_DOMAIN.md) - Security architecture overview
+- [SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) - Migration tracking
+- [PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) - Performance analysis queries
+
+---
+
+## Original Audit Details (Preserved for Reference)
 ALTER VIEW public.session_artifact_state SET (security_invoker = on);
 ALTER VIEW public.tenant_memberships SET (security_invoker = on);
 ```

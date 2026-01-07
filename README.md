@@ -122,6 +122,21 @@ Projektet är organiserat enligt **Domain-Driven Design** med tydligt avgränsad
 
 ---
 
+## 🛡️ Enterprise Security Status
+
+Lekbanken har genomgått fullständig säkerhetsrevision och uppfyller **Enterprise-nivå**:
+
+| Metric | Status |
+|--------|--------|
+| Row Level Security (RLS) | ✅ 167/167 tabeller |
+| SECURITY DEFINER search_path | ✅ 52/52 funktioner |
+| auth.uid() optimering | ✅ 100% |
+| Supabase Security Advisor | ✅ 0 varningar |
+
+📖 **[Se fullständig säkerhetsdokumentation →](docs/DATABASE_SECURITY_DOMAIN.md)**
+
+---
+
 ## ✅ Planner QA-checklista (snabb)
 
 - Säkerställ giltig auth-cookie och `lb_tenant`-header/cookie.

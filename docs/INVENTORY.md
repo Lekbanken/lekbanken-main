@@ -56,6 +56,8 @@ Fält:
 | [docs/CONTENT_MANAGEMENT_DOMAIN.md](CONTENT_MANAGEMENT_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
 | [docs/CSV_IMPORT_FIELD_REFERENCE.md](CSV_IMPORT_FIELD_REFERENCE.md) | A | active | 2025-12-17 | - | Contract/reference |
 | [docs/DATA_MODEL_DOMAIN.md](DATA_MODEL_DOMAIN.md) | A | active | 2025-12-18 | - | Domain doc (repo-anchored) |
+| [docs/DATABASE_SECURITY_DOMAIN.md](DATABASE_SECURITY_DOMAIN.md) | A | active | 2026-01-08 | - | Security domain doc (Enterprise) |
+| [docs/DATABASE_SECURITY_AUDIT.md](DATABASE_SECURITY_AUDIT.md) | C | active | 2026-01-08 | - | Security audit report (resolved) |
 | [docs/DESIGN_CONSISTENCY_TODO.md](DESIGN_CONSISTENCY_TODO.md) | D | draft | - | - | Backlog |
 | [docs/DESIGN_IMPLEMENTATION_TODO.md](DESIGN_IMPLEMENTATION_TODO.md) | D | draft | - | - | Backlog |
 | [docs/DOCS_INDEX.md](DOCS_INDEX.md) | A | draft | 2025-12-18 | - | Curated index |
@@ -111,10 +113,13 @@ Fält:
 | [docs/JOURNEY_DOMAIN.md](JOURNEY_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/API_INTEGRATION_DOMAIN.md](API_INTEGRATION_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (API surface + conventions) |
 | [docs/PLAY_SESSIONS_UI_SPEC.md](PLAY_SESSIONS_UI_SPEC.md) | B | draft | - | - | Spec |
+| [docs/PERFORMANCE_ADVISOR_PROMPT.md](PERFORMANCE_ADVISOR_PROMPT.md) | E | active | 2026-01-08 | - | Prompt for Supabase Performance Advisor |
 | [docs/PROJECT_EXECUTION_PLAN.md](PROJECT_EXECUTION_PLAN.md) | B | draft | - | - | Plan |
 | [docs/prompts/PROMPT_FOR_NEW_AI.md](prompts/PROMPT_FOR_NEW_AI.md) | E | draft | - | - | Prompt/template |
 | [docs/README.md](README.md) | A | draft | 2025-12-17 | - | Docs start |
 | [docs/SESSION_COMPLETION_REPORT.md](SESSION_COMPLETION_REPORT.md) | C | draft | - | - | Report |
+| [docs/SECURITY_AUDIT_TODO.md](SECURITY_AUDIT_TODO.md) | D | ✅ done | 2026-01-08 | - | Security backlog (completed) |
+| [docs/SECURITY_AUDIT_PROMPT_V2.md](SECURITY_AUDIT_PROMPT_V2.md) | E | active | 2026-01-08 | - | Verification queries for security audit |
 | [docs/STRIPE.md](STRIPE.md) | A | active | 2025-12-17 | - | Billing reference |
 | [docs/SUPPORT_DOMAIN.md](SUPPORT_DOMAIN.md) | A | active | 2025-12-17 | - | Domain doc (repo-anchored) |
 | [docs/TAILWIND_PLUS_COMPONENTS.md](TAILWIND_PLUS_COMPONENTS.md) | A | draft | - | - | UI reference |

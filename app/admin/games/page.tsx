@@ -1,7 +1,7 @@
 import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
-import { GameAdminPage } from '@/features/admin/games/GameAdminPage';
+import { GameAdminPageV2 } from '@/features/admin/games/v2';
 
 export default async function GamesAdminPage() {
   await requireSystemAdmin('/admin');
-  return <GameAdminPage />;
+  return <GameAdminPageV2 />;
 }

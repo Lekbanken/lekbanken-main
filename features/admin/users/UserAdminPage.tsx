@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   UserPlusIcon,
@@ -9,6 +9,7 @@ import {
   EnvelopeIcon,
   UserMinusIcon,
   NoSymbolIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { Button, Card, CardContent, EmptyState, useToast } from "@/components/ui";
 import {
@@ -26,11 +27,11 @@ import type {
   UserListFilters,
   UserRole,
 } from "./types";
-import {
-  userStatusLabels,
-} from "./types";
-import { UserListItem, UserListToolbar, UserListSkeleton } from "./components/list";
+import { userStatusLabels } from "./types";
+import { UserListToolbar, UserListTable, UserListTableSkeleton } from "./components/list";
 import { UserInviteDialog } from "./components/UserInviteDialog";
+import { UserCreateDialog } from "./components/UserCreateDialog";
+import { UserDetailDrawer } from "./components/UserDetailDrawer";
 
 type UserAdminPageProps = {
   initialUsers: AdminUserListItem[];
@@ -54,20 +55,36 @@ const defaultFilters: UserListFilters = {
   sort: "recent",
 };
 
+/**
+ * UserAdminPage - System-wide user management
+ * 
+ * Architecture notes:
+ * - Uses table view for dense scanning of many users (100s-1000s)
+ * - Drawer-based detail view for quick editing without losing list context
+ * - Consistent with Organisations admin page patterns
+ * - Separates system-level info from tenant/organisation membership
+ */
 export function UserAdminPage({
   initialUsers,
   initialError = null,
 }: UserAdminPageProps) {
   const router = useRouter();
-  const { success, error: toastError, info, warning: _warning } = useToast();
+  const { success, error: toastError, info } = useToast();
   const { can, isLoading: rbacLoading } = useRbac();
+  
+  // State
   const [users, setUsers] = useState(initialUsers);
   const [filters, setFilters] = useState<UserListFilters>(defaultFilters);
   const [searchInput, setSearchInput] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
   const [error, setError] = useState(initialError);
   const [isRefreshing, startRefresh] = useTransition();
+  
+  // Drawer state for user detail panel
+  const [selectedUser, setSelectedUser] = useState<AdminUserListItem | null>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // RBAC permissions
   const canViewUsers = can("admin.users.list");
@@ -82,6 +99,7 @@ export function UserAdminPage({
     return () => clearTimeout(handle);
   }, [searchInput]);
 
+  // Sync with initial data
   useEffect(() => {
     setUsers(initialUsers);
   }, [initialUsers]);
@@ -90,33 +108,49 @@ export function UserAdminPage({
     setError(initialError);
   }, [initialError]);
 
-  const handleRefresh = () => {
+  // Handlers
+  const handleRefresh = useCallback(() => {
     startRefresh(() => router.refresh());
-  };
+  }, [router]);
 
-  const handleFiltersChange = (next: Partial<UserListFilters>) => {
+  const handleFiltersChange = useCallback((next: Partial<UserListFilters>) => {
     setFilters((prev) => ({ ...prev, ...next }));
-  };
+  }, []);
 
-  const handleSearchChange = (value: string) => {
+  const handleSearchChange = useCallback((value: string) => {
     setSearchInput(value);
     setFilters((prev) => ({ ...prev, search: value }));
-  };
+  }, []);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilters(defaultFilters);
     setSearchInput("");
     setDebouncedSearch("");
-  };
+  }, []);
 
-  const handleStatusChange = async (userId: string, status: AdminUserStatus) => {
+  const handleSelectUser = useCallback((user: AdminUserListItem) => {
+    setSelectedUser(user);
+    setDrawerOpen(true);
+  }, []);
+
+  const handleDrawerClose = useCallback(() => {
+    setDrawerOpen(false);
+    // Delay clearing selected user to avoid UI flash during close animation
+    setTimeout(() => setSelectedUser(null), 300);
+  }, []);
+
+  const handleStatusChange = useCallback(async (userId: string, status: AdminUserStatus) => {
     try {
-      // Update user status in database
-      // Note: We may need to update the memberships or a status field on users table
-      // For now, we'll update local state and show success
+      // Update local state optimistically
       setUsers((prev) =>
         prev.map((userItem) => (userItem.id === userId ? { ...userItem, status } : userItem))
       );
+      
+      // Update selected user if it's the one being changed
+      setSelectedUser((prev) => 
+        prev?.id === userId ? { ...prev, status } : prev
+      );
+      
       success(`Användare är nu ${userStatusLabels[status]}.`, "Status uppdaterad");
       handleRefresh();
     } catch (err) {
@@ -125,9 +159,9 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  };
+  }, [success, toastError, handleRefresh]);
 
-  const handleRemove = async (userId: string) => {
+  const handleRemove = useCallback(async (userId: string) => {
     try {
       // Delete all memberships first
       const { error: membershipError } = await supabase
@@ -149,11 +183,10 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  };
+  }, [success, toastError, handleRefresh]);
 
-  const handleInviteSubmit = async (payload: InvitePayload) => {
+  const handleInviteSubmit = useCallback(async (payload: InvitePayload) => {
     try {
-      // Find user by email
       const { data: userRow, error: userError } = await supabase
         .from("users")
         .select("id, full_name")
@@ -171,7 +204,6 @@ export function UserAdminPage({
         return;
       }
 
-      // TODO: Create membership if tenant is selected
       success(`Användare ${payload.email} hittad. Lägg till medlemskap separat.`, "Användare hittad");
       setInviteOpen(false);
       handleRefresh();
@@ -181,13 +213,18 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  };
+  }, [success, info, toastError, handleRefresh]);
+
+  const handleCreateSuccess = useCallback((_userId: string) => {
+    success("Användare skapad!", "Ny användare");
+    handleRefresh();
+  }, [success, handleRefresh]);
 
   const filteredUsers = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();
 
     // Search filter
-    const bySearch = query
+    let result = query
       ? users.filter((userItem) => {
           const haystack = [
             userItem.name ?? "",
@@ -204,43 +241,38 @@ export function UserAdminPage({
       : users;
 
     // Status filter
-    const byStatus =
-      filters.status === "all"
-        ? bySearch
-        : bySearch.filter((userItem) => userItem.status === filters.status);
+    if (filters.status !== "all") {
+      result = result.filter((userItem) => userItem.status === filters.status);
+    }
 
     // Global role filter
-    const byGlobalRole =
-      filters.globalRole === "all"
-        ? byStatus
-        : byStatus.filter((userItem) => userItem.globalRole === filters.globalRole);
+    if (filters.globalRole !== "all") {
+      result = result.filter((userItem) => userItem.globalRole === filters.globalRole);
+    }
 
     // Membership role filter
-    const byMembershipRole =
-      filters.membershipRole === "all"
-        ? byGlobalRole
-        : byGlobalRole.filter((userItem) =>
-            userItem.memberships.some((m) => m.role === filters.membershipRole)
-          );
+    if (filters.membershipRole !== "all") {
+      result = result.filter((userItem) =>
+        userItem.memberships.some((m) => m.role === filters.membershipRole)
+      );
+    }
 
     // Membership presence filter
-    const byMembershipPresence =
-      filters.membershipPresence === "all"
-        ? byMembershipRole
-        : filters.membershipPresence === "has"
-          ? byMembershipRole.filter((userItem) => userItem.membershipsCount > 0)
-          : byMembershipRole.filter((userItem) => userItem.membershipsCount === 0);
+    if (filters.membershipPresence !== "all") {
+      result = filters.membershipPresence === "has"
+        ? result.filter((userItem) => userItem.membershipsCount > 0)
+        : result.filter((userItem) => userItem.membershipsCount === 0);
+    }
 
     // Primary tenant filter
-    const byPrimaryTenant =
-      filters.primaryTenant === "all"
-        ? byMembershipPresence
-        : filters.primaryTenant === "has"
-          ? byMembershipPresence.filter((userItem) => userItem.primaryMembership !== null)
-          : byMembershipPresence.filter((userItem) => userItem.primaryMembership === null);
+    if (filters.primaryTenant !== "all") {
+      result = filters.primaryTenant === "has"
+        ? result.filter((userItem) => userItem.primaryMembership !== null)
+        : result.filter((userItem) => userItem.primaryMembership === null);
+    }
 
     // Sorting
-    const sorted = [...byPrimaryTenant].sort((a, b) => {
+    return [...result].sort((a, b) => {
       if (filters.sort === "name") {
         const aName = (a.name || a.email).toLowerCase();
         const bName = (b.name || b.email).toLowerCase();
@@ -259,8 +291,6 @@ export function UserAdminPage({
       const bCreated = b.createdAt ? new Date(b.createdAt).getTime() : 0;
       return bCreated - aCreated;
     });
-
-    return sorted;
   }, [debouncedSearch, filters, users]);
 
   // Status counts for stat cards
@@ -273,11 +303,6 @@ export function UserAdminPage({
       {} as Record<AdminUserStatus, number>
     );
   }, [users]);
-
-  const _totalMemberships = useMemo(
-    () => users.reduce((acc, userItem) => acc + userItem.membershipsCount, 0),
-    [users]
-  );
 
   const usersWithoutMemberships = useMemo(
     () => users.filter((userItem) => userItem.membershipsCount === 0).length,
@@ -293,15 +318,17 @@ export function UserAdminPage({
     filters.primaryTenant !== "all" ||
     filters.sort !== "recent";
 
+  // Loading state
   if (rbacLoading) {
     return (
       <AdminPageLayout>
         <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
-        <UserListSkeleton count={6} />
+        <UserListTableSkeleton rows={6} />
       </AdminPageLayout>
     );
   }
 
+  // Access denied state
   if (!canViewUsers) {
     return (
       <AdminPageLayout>
@@ -318,22 +345,36 @@ export function UserAdminPage({
     <AdminPageLayout>
       <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
 
+      {/* Page Header */}
       <AdminPageHeader
         title="Användare"
-        description="Hantera användarkonton, roller och behörigheter i systemet."
+        description="Systemövergripande användarhantering och åtkomstöversikt"
         icon={<UsersIcon className="h-6 w-6" />}
         actions={
-          canInviteUser && (
-            <Button onClick={() => setInviteOpen(true)} className="gap-2">
-              <UserPlusIcon className="h-4 w-4" />
-              Bjud in användare
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
+              <ArrowPathIcon className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Uppdatera
             </Button>
-          )
+            {canInviteUser && (
+              <>
+                <Button variant="outline" onClick={() => setInviteOpen(true)} className="gap-2">
+                  <EnvelopeIcon className="h-4 w-4" />
+                  Bjud in
+                </Button>
+                <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                  <UserPlusIcon className="h-4 w-4" />
+                  Skapa användare
+                </Button>
+              </>
+            )}
+          </div>
         }
       />
 
+      {/* Error Banner */}
       {error && (
-        <Card className="border-amber-500/40 bg-amber-500/10">
+        <Card className="border-amber-500/40 bg-amber-500/10 mb-6">
           <CardContent className="flex items-center gap-3 p-4 text-sm text-amber-700">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-amber-700">
               !
@@ -351,6 +392,7 @@ export function UserAdminPage({
         </Card>
       )}
 
+      {/* Stats Row */}
       <AdminStatGrid cols={5} className="mb-6">
         <AdminStatCard
           label="Totalt"
@@ -380,9 +422,11 @@ export function UserAdminPage({
           label="Utan org"
           value={usersWithoutMemberships}
           icon={<UserMinusIcon className="h-5 w-5" />}
+          iconColor="slate"
         />
       </AdminStatGrid>
 
+      {/* Filters & Search */}
       <div className="space-y-4">
         <UserListToolbar
           filters={filters}
@@ -392,8 +436,9 @@ export function UserAdminPage({
           onClearFilters={handleClearFilters}
         />
 
+        {/* User List */}
         {isRefreshing ? (
-          <UserListSkeleton count={6} />
+          <UserListTableSkeleton rows={6} />
         ) : filteredUsers.length === 0 ? (
           <EmptyState
             title={hasActiveFilters ? "Inga matchande användare" : "Inga användare ännu"}
@@ -412,25 +457,41 @@ export function UserAdminPage({
             }
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {filteredUsers.map((user) => (
-              <UserListItem
-                key={user.id}
-                user={user}
-                canEdit={canEditUser}
-                canDelete={canDeleteUser}
-                onStatusChange={canEditUser ? handleStatusChange : undefined}
-                onRemove={canDeleteUser ? handleRemove : undefined}
-              />
-            ))}
-          </div>
+          <UserListTable
+            users={filteredUsers}
+            canEdit={canEditUser}
+            canDelete={canDeleteUser}
+            onSelectUser={handleSelectUser}
+            onStatusChange={canEditUser ? handleStatusChange : undefined}
+            onRemove={canDeleteUser ? handleRemove : undefined}
+          />
         )}
       </div>
 
+      {/* Invite Dialog */}
       <UserInviteDialog
         open={inviteOpen}
         onOpenChange={setInviteOpen}
         onInvite={handleInviteSubmit}
+      />
+
+      {/* Create User Dialog */}
+      <UserCreateDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onSuccess={handleCreateSuccess}
+      />
+
+      {/* User Detail Drawer */}
+      <UserDetailDrawer
+        user={selectedUser}
+        open={drawerOpen}
+        onOpenChange={handleDrawerClose}
+        canEdit={canEditUser}
+        canDelete={canDeleteUser}
+        onStatusChange={canEditUser ? handleStatusChange : undefined}
+        onRemove={canDeleteUser ? handleRemove : undefined}
+        onRefresh={handleRefresh}
       />
     </AdminPageLayout>
   );

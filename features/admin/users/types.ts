@@ -142,12 +142,35 @@ export const globalRoleLabels: Record<AdminUserGlobalRole, string> = {
   system_admin: "Systemadmin",
   superadmin: "Superadmin",
   admin: "Admin",
-  member: "Medlem",
+  member: "Standard",
   private_user: "Privat",
   demo_private_user: "Demo",
-  user: "Användare",
+  user: "Standard",
   none: "Ingen",
 };
+
+/**
+ * Helper to check if a global role is a "system admin" level role.
+ * Only system_admin, superadmin, and legacy admin are considered system-level.
+ */
+export function isSystemAdminRole(role: string | null | undefined): boolean {
+  if (!role) return false;
+  return role === 'system_admin' || role === 'superadmin' || role === 'admin';
+}
+
+/**
+ * Helper to get a display label for global role, with context.
+ * For system admins: shows "Systemadmin"
+ * For regular users: returns null (don't show a badge)
+ */
+export function getSystemRoleBadgeLabel(role: string | null | undefined): string | null {
+  if (!role) return null;
+  if (role === 'system_admin') return 'Systemadmin';
+  if (role === 'superadmin') return 'Superadmin';
+  if (role === 'admin') return 'Admin';
+  // Regular user types - don't show as a badge
+  return null;
+}
 
 export const membershipRoleLabels: Record<AdminUserMembershipRole, string> = {
   owner: "Ägare",

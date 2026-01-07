@@ -1,7 +1,7 @@
 # 🔐 Security Audit - TODO Tracker
 
-> **Senast uppdaterad:** 2026-01-07 (uppdaterad efter Migration 009)  
-> **Status:** Migration 009 KLAR ✅ - Security Audit KOMPLETT!
+> **Senast uppdaterad:** 2026-01-07 (uppdaterad efter Migration 014)  
+> **Status:** Migration 014 KLAR ✅ - Phase 2 KOMPLETT!
 
 ---
 
@@ -15,49 +15,89 @@
 | Migration 007 | Critical policy fixes | ✅ KLAR |
 | Migration 008 | Tenant INSERT restrict + policy cleanup | ✅ KLAR |
 | Migration 009 | FK performance indexes (84 indexes) | ✅ KLAR |
-| Verifiering | Kör alla audit-frågor igen | 🔲 TODO |
+| Migration 010 | search_path ALL functions + analytics fix | ✅ KLAR |
+| Migration 011 | Remove duplicate indexes | ✅ KLAR |
+| Migration 012 | Enable RLS on moderation tables | ✅ KLAR |
+| Migration 013 | auth.uid() initplan - core tables | ✅ KLAR |
+| Migration 014 | auth.uid() initplan - session tables | ✅ KLAR |
+| Verifiering | Kör Supabase Advisor igen | 🔲 TODO |
 
 ---
 
-## ✅ KLARA MIGRATIONER
+## ✅ KLARA MIGRATIONER (Phase 2)
+
+### Migration 014 - auth.uid() Initplan Sessions ✅
+**Commit:** `b641928`
+
+Optimerar session/play-tabeller:
+- `participant_sessions` - host management
+- `session_artifacts`, `session_events`, `session_triggers`
+- `session_time_bank`, `session_time_bank_ledger`
+- `game_scores`, `participants`
+
+---
+
+### Migration 013 - auth.uid() Initplan Core ✅
+**Commit:** `b641928`
+
+Optimerar kärnpolicies med `(SELECT auth.uid())`:
+- `users` SELECT/UPDATE
+- `user_profiles` SELECT/UPDATE/INSERT
+- `user_tenant_memberships` SELECT
+- Gamification: coins, transactions, streaks, progress, achievements
+- Shop: purchases, cosmetics, powerups
+- Moderation: reports, restrictions
+
+---
+
+### Migration 012 - Enable Moderation RLS ✅
+**Commit:** `b641928`
+
+**KRITISK FIX:** 6 moderation-tabeller hade policies men RLS var aldrig aktiverat!
+- `content_reports` ✅
+- `content_filter_rules` ✅
+- `moderation_actions` ✅
+- `user_restrictions` ✅
+- `moderation_queue` ✅
+- `moderation_analytics` ✅
+
+---
+
+### Migration 011 - Remove Duplicate Indexes ✅
+**Commit:** `b641928`
+
+| Index borttaget | Anledning |
+|-----------------|-----------|
+| `idx_session_events_session` | Duplicerar `idx_session_events_session_id` |
+| `idx_session_events_created` | Duplicerar `idx_session_events_session_created` |
+| `tenant_domains_hostname_key` | Duplicerar `tenant_domains_hostname_unique_idx` |
+
+---
+
+### Migration 010 - search_path + Analytics Fix ✅
+**Commit:** `b641928`
+
+**Funktioner med search_path:**
+1. `trigger_set_updated_at()`
+2. `update_learning_updated_at()`
+3. `touch_updated_at()`
+4. `update_participant_count()`
+5. `update_updated_at_column()`
+6. `update_tenant_domains_updated_at()`
+7. `to_text_array_safe(text)`
+8. `get_latest_game_snapshot(uuid)`
+9. `attempt_keypad_unlock(...)`
+10. `time_bank_apply_delta(...)`
+
+**Policy fix:**
+- `analytics_timeseries`: Ändrat från `WITH CHECK (true)` till service_role only
+
+---
+
+## ✅ KLARA MIGRATIONER (Phase 1)
 
 ### Migration 009 - FK Performance Indexes ✅
-**Commit:** (pending)
-
-| Prioritet | Beskrivning | Antal index |
-|-----------|-------------|-------------|
-| P1 CRITICAL | Session/participant tables | 14 |
-| P2 HIGH | Game/plan/tenant tables | 32 |
-| P3 MEDIUM | Billing/gamification/content | 30 |
-| P4 LOW | Misc tables | 8 |
-| **TOTALT** | | **84 index** |
-
----
-
-### Migration 008 - Tenant INSERT Restrict ✅
-**Commit:** (pending)
-
-| Åtgärd | Status |
-|--------|--------|
-| Ersätt `tenant_insert_authenticated` → `tenant_insert_admin_only` | ✅ |
-| Policy nu: `is_global_admin() OR service_role` endast | ✅ |
-| Ta bort `authenticated_can_select_products` (redundant) | ✅ |
-| Ta bort `authenticated_can_select_purposes` (redundant) | ✅ |
-
-**Framtida tenant-köp:** Ska gå via Edge Function som validerar betalning och anropar service_role.
-
----
-
-### Migration 007 - Critical Policy Fixes ✅
-**Commit:** `d433dfe`
-
-| Åtgärd | Status |
-|--------|--------|
-| Ta bort `authenticated_can_insert_tenants` (WITH CHECK true) | ✅ |
-| Fix `billing_history` → service_role | ✅ |
-| Fix `friends` → service_role | ✅ |
-| Fix `notification_log` → service_role | ✅ |
-| Fix `notifications` → service_role | ✅ |
+**Commit:** `1c747d1`
 | Fix `participants` → service_role | ✅ |
 | Fix `participant_activity_log` → service_role | ✅ |
 | Fix `social_leaderboards` INSERT → service_role | ✅ |

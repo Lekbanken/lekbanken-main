@@ -400,11 +400,13 @@ function PricingTab({ product, onRefresh }: { product: ProductDetail; onRefresh:
           product_id: product.id,
           stripe_price_id: p.stripe_price_id ?? null,
           amount: p.amount,
-          currency: p.currency,
-          interval: p.interval,
+          currency: p.currency as 'SEK' | 'NOK' | 'EUR',
+          interval: p.interval as 'month' | 'year' | 'one_time',
           interval_count: p.interval_count ?? 1,
           tax_behavior: p.tax_behavior ?? 'inclusive',
           billing_model: p.billing_model ?? 'standard',
+          lookup_key: p.lookup_key ?? null,
+          trial_period_days: p.trial_period_days ?? 0,
           nickname: p.nickname ?? null,
           is_default: p.is_default ?? false,
           active: p.active,
@@ -652,7 +654,7 @@ function LifecycleTab({ product, onRefresh }: { product: ProductDetail; onRefres
           
           {/* Status Actions */}
           <div className="pt-3 mt-3 border-t border-border flex flex-wrap gap-2">
-            {product.status === 'inactive' && lifecycle?.can_activate && (
+            {product.status === 'draft' && lifecycle?.can_activate && (
               <Button
                 size="sm"
                 onClick={() => handleStatusChange('active')}

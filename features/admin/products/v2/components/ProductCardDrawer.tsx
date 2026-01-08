@@ -43,7 +43,7 @@ import type {
   ProductPrice,
   ProductEntitlement,
   TenantAssignment,
-  AuditEvent,
+  ProductAuditEvent,
 } from '../types';
 import {
   PRODUCT_STATUS_META,
@@ -824,7 +824,7 @@ function AuditTab({ product }: { product: ProductDetail }) {
   );
 }
 
-function AuditEventRow({ event }: { event: AuditEvent }) {
+function AuditEventRow({ event }: { event: ProductAuditEvent }) {
   const eventMeta = AUDIT_EVENT_META[event.event_type as keyof typeof AUDIT_EVENT_META] || {
     label: event.event_type,
     color: '#6b7280',
@@ -844,11 +844,11 @@ function AuditEventRow({ event }: { event: AuditEvent }) {
             {eventMeta.label}
           </p>
           <span className="text-xs text-muted-foreground flex-shrink-0">
-            {formatDateTime(event.created_at || event.timestamp || '')}
+            {formatDateTime(event.created_at)}
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          {event.actor_name || event.actor_email || 'System'}
+          {event.actor_email || 'System'}
         </p>
       </div>
     </div>

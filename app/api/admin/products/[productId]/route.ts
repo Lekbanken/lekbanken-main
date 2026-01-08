@@ -21,6 +21,9 @@ import type {
   ProductAvailability,
   LifecycleState,
   PublishChecklist,
+  UnitLabel,
+  PriceInterval,
+  TaxBehavior,
 } from '@/features/admin/products/v2/types';
 
 type RouteParams = {
@@ -140,18 +143,39 @@ export async function GET(request: Request, { params }: RouteParams) {
     tags: [],
     status,
     // Critical Stripe fields (Step 1)
-    unit_label: row.unit_label ?? 'seat',
+    unit_label: (row.unit_label ?? 'seat') as UnitLabel,
     statement_descriptor: row.statement_descriptor ?? null,
     stripe_product_id: row.stripe_product_id ?? null,
     // Step 2: Product image
     image_url: row.image_url ?? null,
     // Step 3: Strategic fields
-    target_audience: row.target_audience ?? 'all',
-    feature_tier: row.feature_tier ?? 'standard',
+    target_audience: (row.target_audience ?? 'all') as 'all' | 'schools' | 'kindergartens' | 'fritids' | 'enterprise',
+    feature_tier: (row.feature_tier ?? 'standard') as 'free' | 'standard' | 'premium' | 'enterprise',
     min_seats: row.min_seats ?? 1,
     max_seats: row.max_seats ?? 100,
     stripe_linkage: stripeLinkage,
-    primary_price: activePrices.find(p => p.is_default) ?? activePrices[0] ?? null,
+    primary_price: (() => {
+      const found = activePrices.find(p => p.is_default) ?? activePrices[0];
+      if (!found) return null;
+      return {
+        id: found.id,
+        product_id: productId,
+        stripe_price_id: found.stripe_price_id,
+        amount: found.amount,
+        currency: found.currency,
+        interval: found.interval as PriceInterval,
+        interval_count: found.interval_count ?? 1,
+        tax_behavior: (found.tax_behavior ?? 'exclusive') as TaxBehavior,
+        billing_model: found.billing_model ?? 'per_seat',
+        lookup_key: found.lookup_key ?? null,
+        trial_period_days: found.trial_period_days ?? 0,
+        nickname: found.nickname,
+        is_default: found.is_default ?? false,
+        active: found.active ?? true,
+        created_at: found.created_at ?? new Date().toISOString(),
+        updated_at: found.updated_at ?? new Date().toISOString(),
+      };
+    })(),
     prices_count: activePrices.length,
     availability_scope: 'global' as AvailabilityScope,
     assigned_tenants_count: 0,
@@ -167,17 +191,17 @@ export async function GET(request: Request, { params }: RouteParams) {
       stripe_price_id: p.stripe_price_id,
       amount: p.amount,
       currency: p.currency,
-      interval: p.interval,
+      interval: p.interval as PriceInterval,
       interval_count: p.interval_count ?? 1,
-      tax_behavior: p.tax_behavior ?? 'exclusive',
+      tax_behavior: (p.tax_behavior ?? 'exclusive') as TaxBehavior,
       billing_model: p.billing_model ?? 'per_seat',
       lookup_key: p.lookup_key ?? null,
       trial_period_days: p.trial_period_days ?? 0,
       nickname: p.nickname,
       is_default: p.is_default ?? false,
       active: p.active ?? true,
-      created_at: p.created_at,
-      updated_at: p.updated_at,
+      created_at: p.created_at ?? new Date().toISOString(),
+      updated_at: p.updated_at ?? new Date().toISOString(),
     })),
     entitlements: [],
     dependencies: [],
@@ -226,7 +250,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   // Helper to track changes
   const trackChange = (field: string, newValue: unknown) => {
-    const oldValue = currentProduct[field];
+    const oldValue = (currentProduct as Record<string, unknown>)[field];
     if (oldValue !== newValue) {
       updatePayload[field] = newValue;
       changes[field] = { old: oldValue, new: newValue };

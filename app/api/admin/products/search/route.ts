@@ -10,7 +10,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { isSystemAdmin } from '@/lib/utils/tenantAuth';
-import type { ProductFilters, ProductAdminRow, ProductListResponse, HealthStatus, ProductType, ProductStatus, AvailabilityScope, ProductPrice, StripeLinkage } from '@/features/admin/products/v2/types';
+import type { ProductFilters, ProductAdminRow, ProductListResponse, HealthStatus, ProductType, ProductStatus, AvailabilityScope, ProductPrice, StripeLinkage, UnitLabel } from '@/features/admin/products/v2/types';
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient();
@@ -118,6 +118,17 @@ export async function POST(request: Request) {
       category: row.category || 'general',
       tags: [],
       status: status,
+      // Critical Stripe fields
+      unit_label: 'seat' as UnitLabel,
+      statement_descriptor: null,
+      stripe_product_id: null,
+      // Product image
+      image_url: null,
+      // Strategic fields
+      target_audience: 'all' as const,
+      feature_tier: 'standard' as const,
+      min_seats: 1,
+      max_seats: 100,
       stripe_linkage: stripeLinkage,
       primary_price: primaryPrice,
       prices_count: 0,

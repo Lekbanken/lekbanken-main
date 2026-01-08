@@ -9,7 +9,7 @@
 // CORE ENUMS
 // ============================================================================
 
-export type ProductStatus = 'draft' | 'active' | 'archived';
+export type ProductStatus = 'draft' | 'active' | 'inactive' | 'archived';
 
 export type ProductType =
   | 'license' // Base access license
@@ -29,7 +29,7 @@ export type LicenseModel = 'per_tenant' | 'per_seat' | 'per_user';
 
 export type UnitLabel = 'seat' | 'license' | 'user';
 
-export type StripeLinkageStatus = 'connected' | 'missing' | 'drift';
+export type StripeLinkageStatus = 'connected' | 'missing' | 'drift' | 'error';
 
 export type HealthStatus = 'ok' | 'missing_fields' | 'stripe_drift' | 'availability_misconfig' | 'no_price';
 
@@ -253,7 +253,7 @@ export type ProductDetail = ProductAdminRow & {
   publish_checklist: PublishChecklist;
 
   // Audit (recent events)
-  recent_audit_events: AuditEvent[];
+  recent_audit_events: ProductAuditEvent[];
 };
 
 // ============================================================================
@@ -327,7 +327,8 @@ export type ProductCardTab =
   | 'settings'
   | 'entitlements'
   | 'availability'
-  | 'lifecycle';
+  | 'lifecycle'
+  | 'audit';
 
 // ============================================================================
 // CONSTANTS
@@ -336,6 +337,7 @@ export type ProductCardTab =
 export const PRODUCT_STATUS_META: Record<ProductStatus, { label: string; color: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' }> = {
   draft: { label: 'Utkast', color: '#6b7280', variant: 'outline' },
   active: { label: 'Aktiv', color: '#10b981', variant: 'default' },
+  inactive: { label: 'Inaktiv', color: '#6b7280', variant: 'secondary' },
   archived: { label: 'Arkiverad', color: '#ef4444', variant: 'destructive' },
 };
 
@@ -352,6 +354,7 @@ export const STRIPE_LINKAGE_META: Record<StripeLinkageStatus, { label: string; c
   connected: { label: 'Kopplad', color: '#10b981', variant: 'default' },
   missing: { label: 'Saknas', color: '#f59e0b', variant: 'warning' },
   drift: { label: 'Avvikelse', color: '#ef4444', variant: 'destructive' },
+  error: { label: 'Fel', color: '#ef4444', variant: 'destructive' },
 };
 
 export const HEALTH_STATUS_META: Record<HealthStatus, { label: string; color: string; icon: string }> = {

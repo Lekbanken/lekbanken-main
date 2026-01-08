@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { adminSearchSchema, buildSortClause, computeValidationState } from './helpers';
-import type { GameAdminRow, GameListResponse } from '@/features/admin/games/v2/types';
+import type { GameAdminRow, GameListResponse, PlayMode } from '@/features/admin/games/v2/types';
 
 /**
  * POST /api/admin/games/search
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
         short_description: row.short_description,
         description: row.description,
         status: row.status,
-        play_mode: row.play_mode,
+        play_mode: row.play_mode as PlayMode | null,
         category: row.category,
         energy_level: row.energy_level,
         location_type: row.location_type,

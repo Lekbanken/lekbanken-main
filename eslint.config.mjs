@@ -25,7 +25,27 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unused-vars": ["warn", { 
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_" 
+      }],
+      // Prevent importing deprecated sandbox builder into admin paths
+      "no-restricted-imports": ["error", {
+        "patterns": [
+          {
+            "group": ["@/components/achievements/*", "@/components/achievements"],
+            "message": "The sandbox badge builder is deprecated. Use features/admin/achievements/* instead."
+          },
+          {
+            "group": ["@/types/achievements-builder", "@/types/achievements-builder/*"],
+            "message": "Legacy achievement types are deprecated. Use features/admin/achievements/types instead."
+          }
+        ]
       }]
+    }
+  },
+  // Allow sandbox imports only in sandbox paths
+  {
+    files: ["app/sandbox/**/*.tsx", "app/sandbox/**/*.ts", "components/achievements/**/*.tsx", "components/achievements/**/*.ts"],
+    rules: {
+      "no-restricted-imports": "off"
     }
   }
 ]);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import type { WizardStep } from './components/WizardStepIndicator';
 import { WizardStepIndicator } from './components/WizardStepIndicator';
 import { LayerDropdownSelector } from './components/LayerDropdownSelector';
@@ -14,6 +14,7 @@ import { getAssetsByType, getAssetById, resolveAssetUrl } from '../assets';
 import type { AchievementItem, AchievementIconConfig, AchievementTheme } from '../types';
 import { themes } from '../data';
 import { useBadgeHistory } from './hooks/useBadgeHistory';
+import { validateForPublish, validateForDraft, type ValidationResult } from '../validation';
 
 import {
   ArrowLeftIcon,
@@ -25,6 +26,7 @@ import {
   DocumentTextIcon,
   CloudArrowUpIcon,
   CheckIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
 
 type AchievementEditorWizardProps = {
@@ -92,6 +94,15 @@ export function AchievementEditorWizard({
     onDraftChange(newDraft);
   });
 
+  // Validation
+  const publishValidation = useMemo(() => validateForPublish(draft), [draft]);
+  const draftValidation = useMemo(() => validateForDraft(draft), [draft]);
+  
+  // Determine if save is allowed based on status
+  const canSave = draft.status === 'published' 
+    ? publishValidation.valid 
+    : draftValidation.valid;
+
   // Navigation
   const goNext = () => setCurrentStep((s) => Math.min(s + 1, WIZARD_STEPS.length - 1));
   const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
@@ -133,6 +144,7 @@ export function AchievementEditorWizard({
           <PublishStep
             draft={draft}
             updateDraft={updateDraft}
+            validation={publishValidation}
           />
         );
       default:
@@ -255,7 +267,8 @@ export function AchievementEditorWizard({
             <button
               type="button"
               onClick={() => onSave()}
-              disabled={isSaving || (draft.status === 'published' && !draft.title)}
+              disabled={isSaving || !canSave}
+              title={!canSave ? 'Åtgärda valideringsfel för att spara' : undefined}
               className={`
                 flex items-center gap-2 px-6 py-2 text-sm font-medium rounded-xl disabled:opacity-50 transition-all
                 ${draft.status === 'published' 
@@ -643,9 +656,10 @@ function MetadataStep({ draft, updateDraft }: MetadataStepProps) {
 type PublishStepProps = {
   draft: AchievementItem;
   updateDraft: (updates: Partial<AchievementItem>) => void;
+  validation: ValidationResult;
 };
 
-function PublishStep({ draft, updateDraft }: PublishStepProps) {
+function PublishStep({ draft, updateDraft, validation }: PublishStepProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -657,6 +671,21 @@ function PublishStep({ draft, updateDraft }: PublishStepProps) {
         <p className="text-sm text-muted-foreground">Granska och publicera din badge</p>
       </div>
 
+      {/* Validation errors - only show when status is published */}
+      {draft.status === 'published' && !validation.valid && (
+        <div className="rounded-xl border-2 border-red-300 bg-red-50 p-4 space-y-2">
+          <h3 className="font-medium text-red-800 flex items-center gap-2">
+            <ExclamationTriangleIcon className="h-5 w-5" />
+            Kan inte publicera
+          </h3>
+          <ul className="text-sm text-red-700 space-y-1 list-disc list-inside">
+            {validation.errors.map((error, i) => (
+              <li key={i}>{error.message}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Summary */}
       <div className="rounded-2xl border border-border bg-muted/30 p-4 space-y-3">
         <h3 className="font-medium text-foreground">Sammanfattning</h3>
@@ -664,7 +693,9 @@ function PublishStep({ draft, updateDraft }: PublishStepProps) {
         <div className="grid gap-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Namn:</span>
-            <span className="font-medium">{draft.title || '(inget namn)'}</span>
+            <span className={`font-medium ${!draft.title ? 'text-red-500' : ''}`}>
+              {draft.title || '(inget namn)'}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Belöning:</span>
@@ -672,7 +703,7 @@ function PublishStep({ draft, updateDraft }: PublishStepProps) {
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Lager:</span>
-            <span className="font-medium">
+            <span className={`font-medium ${!draft.icon.base && !draft.icon.symbol ? 'text-red-500' : ''}`}>
               {[
                 draft.icon.base && '1 bas',
                 draft.icon.backgrounds?.length && `${draft.icon.backgrounds.length} bg`,
@@ -680,7 +711,7 @@ function PublishStep({ draft, updateDraft }: PublishStepProps) {
                 draft.icon.symbol && '1 symbol',
               ]
                 .filter(Boolean)
-                .join(', ') || 'Inga'}
+                .join(', ') || 'Inga (kräver minst bas eller symbol)'}
             </span>
           </div>
         </div>

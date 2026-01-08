@@ -4,6 +4,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
 import { awardBuilderExportSchemaV1 } from '@/lib/validation/awardBuilderExportSchemaV1'
+import { 
+  validateBadgeForPublish, 
+  shouldValidateForPublish, 
+  extractBadgeFromExport 
+} from '@/lib/validation/badgeValidation'
 import type { Database, Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -82,6 +87,58 @@ const exportSchema = z.object({
   exportedByTool: z.string().min(1).max(64).optional(),
   export: z.unknown(),
 })
+
+/**
+ * Update export JSON with server-generated ID
+ * Replaces client-side export_id and badge item id with the real server ID
+ */
+function updateExportWithServerId(
+  canonical: z.infer<typeof awardBuilderExportSchemaV1>,
+  serverId: string
+): z.infer<typeof awardBuilderExportSchemaV1> {
+  // Update the achievement_key in achievements array to match server ID
+  const updated = {
+    ...canonical,
+    achievements: canonical.achievements.map(achievement => {
+      // Update achievement_key and the embedded badge ID in builder params
+      const params = achievement.unlock?.unlock_criteria?.params
+      let updatedParams = params
+      
+      if (params && typeof params === 'object' && 'builder' in params) {
+        const builder = (params as Record<string, unknown>).builder
+        if (builder && typeof builder === 'object' && 'badge' in builder) {
+          const badge = (builder as Record<string, unknown>).badge
+          if (badge && typeof badge === 'object') {
+            updatedParams = {
+              ...params,
+              builder: {
+                ...builder,
+                badge: {
+                  ...badge,
+                  id: serverId,
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      return {
+        ...achievement,
+        achievement_key: serverId,
+        unlock: {
+          ...achievement.unlock,
+          unlock_criteria: {
+            ...achievement.unlock.unlock_criteria,
+            params: updatedParams,
+          }
+        }
+      }
+    })
+  }
+
+  return updated
+}
 
 async function requireAuth() {
   const supabase = await createServerRlsClient()
@@ -173,6 +230,23 @@ export async function POST(req: NextRequest) {
   }
 
   const canonical = exportParsed.data
+
+  // Server-side validation for published badges
+  if (shouldValidateForPublish(canonical)) {
+    const badge = extractBadgeFromExport(canonical)
+    const validationResult = validateBadgeForPublish(badge)
+    if (!validationResult.valid) {
+      return NextResponse.json(
+        { 
+          error: 'Validation failed', 
+          details: { 
+            badge: validationResult.errors.map(e => e.message) 
+          } 
+        },
+        { status: 400 },
+      )
+    }
+  }
 
   // Prevent split-brain between request metadata and canonical export JSON.
   if (schemaVersion !== canonical.schema_version) {
@@ -267,5 +341,27 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to save export', details: error.message ?? 'Unknown error' }, { status: 500 })
   }
 
-  return NextResponse.json({ id: (data?.id as string | undefined) ?? null }, { status: 200 })
+  const serverId = data?.id as string | undefined
+  if (!serverId) {
+    return NextResponse.json({ error: 'Failed to save export (no id returned)' }, { status: 500 })
+  }
+
+  // Update the export JSON to use the server-side ID as the canonical export_id and badge ID.
+  // This eliminates the need for a follow-up PUT to fix the ID mismatch.
+  const updatedExport = updateExportWithServerId(canonical, serverId)
+  
+  const { error: updateError } = await admin
+    .from('award_builder_exports')
+    .update({ export: updatedExport as unknown as Json, updated_at: new Date().toISOString() })
+    .eq('id', serverId)
+
+  if (updateError) {
+    // Log but don't fail - the record was created, just with client ID in the export JSON
+    console.error('Failed to update export with server ID:', updateError)
+  }
+
+  return NextResponse.json({ 
+    id: serverId, 
+    export: updatedExport 
+  }, { status: 200 })
 }

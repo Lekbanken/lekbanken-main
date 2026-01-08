@@ -4,6 +4,11 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { assertTenantAdminOrSystem, isSystemAdmin } from '@/lib/utils/tenantAuth'
 import { awardBuilderExportSchemaV1 } from '@/lib/validation/awardBuilderExportSchemaV1'
+import { 
+  validateBadgeForPublish, 
+  shouldValidateForPublish, 
+  extractBadgeFromExport 
+} from '@/lib/validation/badgeValidation'
 import type { Database, Json } from '@/types/supabase'
 
 export const dynamic = 'force-dynamic'
@@ -158,6 +163,23 @@ export async function PUT(req: NextRequest, context: { params: Promise<{ exportI
     }
 
     const canonical = exportParsed.data
+
+    // Server-side validation for published badges
+    if (shouldValidateForPublish(canonical)) {
+      const badge = extractBadgeFromExport(canonical)
+      const validationResult = validateBadgeForPublish(badge)
+      if (!validationResult.valid) {
+        return NextResponse.json(
+          { 
+            error: 'Validation failed', 
+            details: { 
+              badge: validationResult.errors.map(e => e.message) 
+            } 
+          },
+          { status: 400 },
+        )
+      }
+    }
 
     if (canonical.exported_by.user_id !== user.id) {
       return NextResponse.json(

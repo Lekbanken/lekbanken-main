@@ -1,5 +1,13 @@
 ﻿'use client'
 
+/**
+ * @deprecated This component is part of the sandbox/prototype builder.
+ * For production use, see: features/admin/achievements/editor/AchievementEditorWizard.tsx
+ * 
+ * This file will be removed in a future cleanup sprint.
+ * Do NOT import this into any production admin paths.
+ */
+
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'

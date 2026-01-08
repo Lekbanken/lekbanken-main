@@ -17,11 +17,11 @@ import {
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
-import { awardBuilderExportSchemaV1, type AwardBuilderExportV1 } from '@/lib/validation/awardBuilderExportSchemaV1';
 
 import { themes } from '@/features/admin/achievements/data';
 import type { AchievementFilters, AchievementItem, AchievementTheme } from '@/features/admin/achievements/types';
 import { normalizeIconConfig } from '@/features/admin/achievements/icon-utils';
+import { extractBadgeItem, buildExportJson } from '@/features/admin/achievements/export-utils';
 import { AchievementLibraryGrid } from '@/features/admin/achievements/components/AchievementLibraryGrid';
 import { AchievementEditor } from '@/features/admin/achievements/editor/AchievementEditor';
 
@@ -50,125 +50,6 @@ type AwardBuilderExportRow = {
   created_at: string;
   updated_at: string;
 };
-
-type BuilderPayloadV1 = {
-  /**
-   * Builder/editor payload stored inside canonical schema:
-   * `achievements[0].unlock.unlock_criteria.params.builder.badge`
-   */
-  badge: Partial<AchievementItem>;
-};
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
-}
-
-function parseCanonicalExportOrThrow(exportJson: unknown): AwardBuilderExportV1 {
-  const parsed = awardBuilderExportSchemaV1.safeParse(exportJson);
-  if (!parsed.success) {
-    const details = parsed.error.flatten();
-    throw new Error(`Export JSON does not match AWARD_BUILDER_EXPORT_SCHEMA_V1: ${JSON.stringify(details)}`);
-  }
-  return parsed.data;
-}
-
-function readBuilderPayloadOrThrow(exportV1: AwardBuilderExportV1): BuilderPayloadV1 {
-  const p = exportV1.achievements[0]?.unlock?.unlock_criteria?.params;
-  if (!isRecord(p)) {
-    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params');
-  }
-
-  const builder = (p as Record<string, unknown>).builder;
-  if (!isRecord(builder)) {
-    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params.builder');
-  }
-
-  const badge = builder.badge;
-  if (!isRecord(badge)) {
-    throw new Error('Export JSON is missing achievements[0].unlock.unlock_criteria.params.builder.badge');
-  }
-
-  return { badge: badge as unknown as Partial<AchievementItem> };
-}
-
-function extractBadgeItem(exportId: string, exportJson: unknown): AchievementItem {
-  const exportV1 = parseCanonicalExportOrThrow(exportJson);
-  const payload = readBuilderPayloadOrThrow(exportV1);
-
-  // Ensure the editor always uses exportId as the stable identifier.
-  const badge = payload.badge;
-  const icon = normalizeIconConfig(badge.icon);
-
-  return {
-    ...badge,
-    id: exportId,
-    title: typeof badge.title === 'string' ? badge.title : exportV1.achievements[0]?.name ?? '',
-    description: typeof badge.description === 'string' ? badge.description : exportV1.achievements[0]?.description ?? undefined,
-    icon,
-    status: badge.status ?? 'draft',
-    version: typeof badge.version === 'number' ? badge.version : 1,
-  } as AchievementItem;
-}
-
-function buildExportJson(args: {
-  scope: { type: 'tenant'; tenantId: string } | { type: 'global' };
-  actorUserId: string;
-  tool: string;
-  nowIso: string;
-  exportId: string;
-  badge: AchievementItem;
-}): AwardBuilderExportV1 {
-  const publish_scope =
-    args.scope.type === 'global'
-      ? ({ type: 'global', tenant_id: null } as const)
-      : ({ type: 'tenant', tenant_id: args.scope.tenantId } as const);
-
-  const name = args.badge.title ?? '';
-  const description = args.badge.description ?? args.badge.subtitle ?? '';
-
-  const exportV1: AwardBuilderExportV1 = {
-    schema_version: '1.0',
-    exported_at: args.nowIso,
-    exported_by: {
-      user_id: args.actorUserId,
-      tool: args.tool,
-    },
-    publish_scope,
-    achievements: [
-      {
-        achievement_key: args.exportId,
-        name,
-        description,
-        icon: {
-          icon_media_id: null,
-          icon_url_legacy: null,
-        },
-        badge: {
-          badge_color: null,
-        },
-        visibility: {
-          is_easter_egg: false,
-          hint_text: null,
-        },
-        unlock: {
-          condition_type: 'manual',
-          condition_value: null,
-          unlock_criteria: {
-            type: 'manual',
-            params: {
-              builder: {
-                badge: args.badge,
-              } satisfies BuilderPayloadV1,
-            },
-          },
-        },
-      },
-    ],
-  };
-
-  // Hard guarantee: do not emit non-canonical JSON.
-  return parseCanonicalExportOrThrow(exportV1);
-}
 
 export function LibraryBadgesPage() {
   const router = useRouter();
@@ -388,8 +269,10 @@ export function LibraryBadgesPage() {
         ? ({ type: 'global' } as const)
         : ({ type: 'tenant', tenantId: resolvedTenantId as string } as const);
 
+    // Use a temporary ID that will be replaced server-side
+    const tempId = `temp-${Date.now()}`;
     const draft: AchievementItem = {
-      id: `temp-${Date.now()}`,
+      id: tempId,
       title: '',
       subtitle: '',
       rewardCoins: 0,
@@ -421,7 +304,7 @@ export function LibraryBadgesPage() {
           actorUserId: user.id,
           tool: 'admin-library-badges',
           nowIso: new Date().toISOString(),
-          exportId: draft.id,
+          exportId: tempId,
           badge: draft,
         }),
       }),
@@ -436,33 +319,9 @@ export function LibraryBadgesPage() {
     const id = String(json?.id ?? '');
     if (!id) throw new Error('Failed to create badge (missing id)');
 
-    // Immediately rewrite the export using the real exportId to ensure canonical identity.
+    // Server now returns the updated export with correct ID - use it directly
+    const serverExport = json?.export;
     const created: AchievementItem = { ...draft, id };
-    const canonical = buildExportJson({
-      scope,
-      actorUserId: user.id,
-      tool: 'admin-library-badges',
-      nowIso: new Date().toISOString(),
-      exportId: id,
-      badge: created,
-    });
-
-    const put = await fetch(`/api/admin/award-builder/exports/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        schemaVersion: '1.0',
-        exportedAt: new Date().toISOString(),
-        exportedByTool: 'admin-library-badges',
-        export: canonical,
-      }),
-    });
-
-    if (!put.ok) {
-      const putJson = await put.json().catch(() => ({}))
-      const msg = typeof putJson?.error === 'string' ? putJson.error : 'Failed to finalize badge export'
-      throw new Error(msg)
-    }
 
     setBadges((prev) => [created, ...prev]);
     setRows((prev) => [{
@@ -473,7 +332,14 @@ export function LibraryBadgesPage() {
       exported_at: new Date().toISOString(),
       exported_by_user_id: user.id,
       exported_by_tool: 'admin-library-badges',
-      export: canonical,
+      export: serverExport ?? buildExportJson({
+        scope,
+        actorUserId: user.id,
+        tool: 'admin-library-badges',
+        nowIso: new Date().toISOString(),
+        exportId: id,
+        badge: created,
+      }),
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }, ...prev]);

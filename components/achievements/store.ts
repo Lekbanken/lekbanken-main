@@ -1,5 +1,14 @@
 'use client'
 
+/**
+ * @deprecated This store is part of the sandbox/prototype builder.
+ * For production use, the admin builder uses prop drilling + useBadgeHistory hook.
+ * See: features/admin/achievements/editor/hooks/useBadgeHistory.ts
+ * 
+ * This file will be removed in a future cleanup sprint.
+ * Do NOT import this into any production admin paths.
+ */
+
 import { create } from 'zustand'
 import type {
   AchievementExport,

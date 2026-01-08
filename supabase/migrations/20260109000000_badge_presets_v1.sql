@@ -76,16 +76,16 @@ CREATE POLICY "badge_presets_insert_policy" ON public.badge_presets
     (
       -- Global presets: system admin only
       tenant_id IS NULL
-      AND public.is_system_admin((SELECT auth.uid()))
+      AND public.is_system_admin()
     )
     OR
     (
       -- Tenant presets: tenant admin or system admin
       tenant_id IS NOT NULL
       AND (
-        public.is_system_admin((SELECT auth.uid()))
+        public.is_system_admin()
         OR
-        public.has_tenant_role(tenant_id, (SELECT auth.uid()), ARRAY['admin'])
+        public.has_tenant_role(tenant_id, ARRAY['admin']::public.tenant_role_enum[])
       )
     )
   );
@@ -95,7 +95,7 @@ CREATE POLICY "badge_presets_update_policy" ON public.badge_presets
   FOR UPDATE TO authenticated
   USING (
     -- System admin can update anything
-    public.is_system_admin((SELECT auth.uid()))
+    public.is_system_admin()
     OR
     -- Creator can update their own
     created_by_user_id = (SELECT auth.uid())
@@ -103,16 +103,16 @@ CREATE POLICY "badge_presets_update_policy" ON public.badge_presets
     -- Tenant admin can update tenant presets
     (
       tenant_id IS NOT NULL
-      AND public.has_tenant_role(tenant_id, (SELECT auth.uid()), ARRAY['admin'])
+      AND public.has_tenant_role(tenant_id, ARRAY['admin']::public.tenant_role_enum[])
     )
   )
   WITH CHECK (
     -- Same conditions for the new row
-    public.is_system_admin((SELECT auth.uid()))
+    public.is_system_admin()
     OR created_by_user_id = (SELECT auth.uid())
     OR (
       tenant_id IS NOT NULL
-      AND public.has_tenant_role(tenant_id, (SELECT auth.uid()), ARRAY['admin'])
+      AND public.has_tenant_role(tenant_id, ARRAY['admin']::public.tenant_role_enum[])
     )
   );
 
@@ -121,7 +121,7 @@ CREATE POLICY "badge_presets_delete_policy" ON public.badge_presets
   FOR DELETE TO authenticated
   USING (
     -- System admin can delete anything
-    public.is_system_admin((SELECT auth.uid()))
+    public.is_system_admin()
     OR
     -- Creator can delete their own
     created_by_user_id = (SELECT auth.uid())
@@ -129,7 +129,7 @@ CREATE POLICY "badge_presets_delete_policy" ON public.badge_presets
     -- Tenant admin can delete tenant presets
     (
       tenant_id IS NOT NULL
-      AND public.has_tenant_role(tenant_id, (SELECT auth.uid()), ARRAY['admin'])
+      AND public.has_tenant_role(tenant_id, ARRAY['admin']::public.tenant_role_enum[])
     )
   );
 

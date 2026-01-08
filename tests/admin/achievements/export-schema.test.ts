@@ -124,7 +124,7 @@ describe('awardBuilderExportSchemaV1', () => {
     });
 
     it('should reject missing schema version', () => {
-      const { schema_version, ...noVersion } = validExport;
+      const { schema_version: _schema_version, ...noVersion } = validExport;
       
       const result = awardBuilderExportSchemaV1.safeParse(noVersion);
       
@@ -145,7 +145,7 @@ describe('awardBuilderExportSchemaV1', () => {
     });
 
     it('should reject missing exported_at', () => {
-      const { exported_at, ...noDate } = validExport;
+      const { exported_at: _exported_at, ...noDate } = validExport;
       
       const result = awardBuilderExportSchemaV1.safeParse(noDate);
       

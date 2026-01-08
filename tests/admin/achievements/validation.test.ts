@@ -11,6 +11,7 @@ import {
   REWARD_COINS_MIN,
   REWARD_COINS_MAX,
   TITLE_MAX_LENGTH,
+  type ValidationError,
 } from '@/features/admin/achievements/validation';
 import type { AchievementItem } from '@/features/admin/achievements/types';
 
@@ -105,7 +106,7 @@ describe('validateForPublish', () => {
     it('passes when title is valid', () => {
       const badge = createTestBadge({ title: 'Valid Title' });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'title')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'title')).toHaveLength(0);
     });
   });
 
@@ -126,7 +127,7 @@ describe('validateForPublish', () => {
         icon: { themeId: 'purple', base: { id: 'shield', color: '#FFF' }, symbol: null, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'icon')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);
     });
 
     it('passes when symbol is present', () => {
@@ -134,7 +135,7 @@ describe('validateForPublish', () => {
         icon: { themeId: 'purple', base: null, symbol: { id: 'star', color: '#FFF' }, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'icon')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);
     });
   });
 
@@ -160,19 +161,19 @@ describe('validateForPublish', () => {
     it('passes when rewardCoins is 0', () => {
       const badge = createTestBadge({ rewardCoins: 0 });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'rewardCoins')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'rewardCoins')).toHaveLength(0);
     });
 
     it('passes when rewardCoins is at max', () => {
       const badge = createTestBadge({ rewardCoins: REWARD_COINS_MAX });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'rewardCoins')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'rewardCoins')).toHaveLength(0);
     });
 
     it('treats undefined rewardCoins as 0', () => {
       const badge = createTestBadge({ rewardCoins: undefined });
       const result = validateForPublish(badge);
-      expect(result.errors.filter(e => e.field === 'rewardCoins')).toHaveLength(0);
+      expect(result.errors.filter((e: ValidationError) => e.field === 'rewardCoins')).toHaveLength(0);
     });
   });
 
@@ -218,7 +219,7 @@ describe('validateForDraft', () => {
   it('allows empty title for drafts', () => {
     const badge = createTestBadge({ title: '' });
     const result = validateForDraft(badge);
-    expect(result.errors.filter(e => e.field === 'title')).toHaveLength(0);
+    expect(result.errors.filter((e: ValidationError) => e.field === 'title')).toHaveLength(0);
   });
 
   it('allows no visual anchor for drafts', () => {
@@ -226,7 +227,7 @@ describe('validateForDraft', () => {
       icon: { themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
     });
     const result = validateForDraft(badge);
-    expect(result.errors.filter(e => e.field === 'icon')).toHaveLength(0);
+    expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);
   });
 
   it('still validates rewardCoins bounds for drafts', () => {

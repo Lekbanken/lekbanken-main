@@ -275,7 +275,7 @@ describe('ensureLayerOrder', () => {
     
     const result = ensureLayerOrder(items);
     
-    expect(result.map(i => i.id)).toEqual(['layer_a', 'layer_b', 'layer_c']);
+    expect(result.map((i: AchievementLayerStackItem) => i.id)).toEqual(['layer_a', 'layer_b', 'layer_c']);
   });
 
   it('should treat undefined order as 0', () => {
@@ -286,7 +286,7 @@ describe('ensureLayerOrder', () => {
     
     const result = ensureLayerOrder(items);
     
-    expect(result.map(i => i.id)).toEqual(['layer_a', 'layer_b']);
+    expect(result.map((i: AchievementLayerStackItem) => i.id)).toEqual(['layer_a', 'layer_b']);
   });
 
   it('should not mutate original array', () => {

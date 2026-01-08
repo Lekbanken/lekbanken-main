@@ -131,7 +131,7 @@ describe('BadgeHistory core logic', () => {
     it('should support function updater', () => {
       const initial = createInitialHistory(baseBadge);
       
-      const result = applySetState(initial, (prev) => ({
+      const result = applySetState(initial, (prev: AchievementItem) => ({
         ...prev,
         title: prev.title + ' - Modified'
       }));

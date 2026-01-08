@@ -109,12 +109,13 @@ describe('Softcap - Diminishing Returns Formula', () => {
     return Math.ceil(reward * factor);
   }
 
-  it('should apply 1.0x factor when under 50% of daily cap', () => {
+  it('should apply ~0.87x factor at 40% of daily cap', () => {
     const factor = calculateSoftcapFactor(200, 500); // 40%
-    expect(factor).toBe(1.0);
+    // 1.0 - 0.8 * (0.4)^2 = 1.0 - 0.8 * 0.16 = 1.0 - 0.128 = 0.872
+    expect(factor).toBeCloseTo(0.872, 2);
 
     const adjusted = applySoftcap(100, 200, 500);
-    expect(adjusted).toBe(100);
+    expect(adjusted).toBe(88); // ceil(87.2)
   });
 
   it('should apply ~0.95x factor at 50% of daily cap', () => {

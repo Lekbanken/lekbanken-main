@@ -2,7 +2,10 @@
 
 **Project:** Lekbanken  
 **Date:** January 8, 2026  
-**Status:** ✅ Core Implementation Complete
+**Status:** ✅ Core Implementation Complete  
+**Classification:** 🔒 Economy-Critical System (v2 Frozen)
+
+> ⚠️ **Governance:** See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md) for operational rules, change procedures, and KPI monitoring.
 
 ---
 
@@ -361,6 +364,8 @@ interface EvaluateRewardResult {
 
 ### Hardcoded Default Rules
 
+> 🔒 **v2 Event Contracts: FROZEN** - These event types are locked. Never change semantics on existing types. Only add new event types. See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md#event-contract-freeze).
+
 | Event Type | Source | Coins | XP | Cooldown |
 |------------|--------|-------|-----|----------|
 | `session_started` | play | 1 | 10 | none |
@@ -443,6 +448,8 @@ All multipliers stack multiplicatively but are **capped at 2.0x** to prevent inf
 
 Example: Streak (1.5) × Weekend (1.25) × Level 7 (1.3) = 2.4375 → **capped to 2.0**
 
+> 📝 **Design Note:** At high levels, the level bonus is often absorbed by the cap. This is intentional - level bonus becomes psychological/prestige value rather than economic. See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md#level-multiplier-design-note) for details.
+
 ---
 
 ## Softcap System
@@ -459,6 +466,9 @@ adjusted_reward = base_reward × multiplier × factor
 ```
 
 ### Default Configuration
+
+> ⏳ **Initial defaults** - Expected to be reviewed and adjusted after 30-60 days of production data. See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md) for review schedule.
+
 - **Daily coin threshold:** 100 coins
 - **Daily XP threshold:** 500 XP
 - **Diminishing factor:** 0.8 (aggressive curve)
@@ -521,17 +531,29 @@ Located in `docs/gamification/`:
 
 | Document | Purpose |
 |----------|---------|
-| `SOFTCAP_DESIGN.md` | Softcap algorithm specification |
-| `LEADERBOARD_DESIGN.md` | Leaderboard feature design |
-| `BURN_FOUNDATION_DESIGN.md` | Shop/sink system architecture |
 | `ADMIN_DASHBOARD_DESIGN.md` | Admin UI wireframes |
+| `BURN_FOUNDATION_DESIGN.md` | Shop/sink system architecture |
+| `ECONOMY_GOVERNANCE.md` | **Operational rules, KPIs, change procedures** |
+| `GAMIFICATION_COMPLETE_REPORT.md` | This file |
 | `GAMIFICATION_TEST_PLAN.md` | Test strategy |
 | `GAMIFICATION_TRIGGER_REPORT.md` | Event → reward mappings |
 | `GAMIFICATION_V2_MIGRATION_SUMMARY.md` | Migration changelog |
+| `LEADERBOARD_DESIGN.md` | Leaderboard feature design |
+| `SOFTCAP_DESIGN.md` | Softcap algorithm specification |
 
 ---
 
 ## Security Considerations
+
+### System Classification
+
+This subsystem is classified as **Economy-Critical**. All changes require:
+- Proper test coverage
+- Code review
+- Idempotency verification
+- Post-deploy monitoring
+
+See [ECONOMY_GOVERNANCE.md](ECONOMY_GOVERNANCE.md) for full operational procedures.
 
 ### Row Level Security (RLS)
 - All gamification tables have RLS enabled
@@ -566,6 +588,12 @@ Located in `docs/gamification/`:
 - [x] Softcap
 - [x] Leaderboards
 - [x] Burn foundation
+- [x] Economy governance documentation
+
+### Phase 1.5 (Recommended before "v2 live")
+- [ ] Economy mode toggle (`normal` / `tight` / `generous`)
+- [ ] Global economy KPI dashboard (mint/burn ratio monitoring)
+- [ ] Baseline data collection for softcap tuning
 
 ### Phase 2 (Planned)
 - [ ] Shop UI (frontend)
@@ -578,6 +606,7 @@ Located in `docs/gamification/`:
 - [ ] Achievement builder (admin UI)
 - [ ] Reward path visualization
 - [ ] Gamification analytics dashboard
+- [ ] Achievement-gated sink unlocks
 
 ---
 

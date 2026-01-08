@@ -10,6 +10,7 @@ import {
   SparklesIcon,
   ChartBarIcon,
   UserGroupIcon,
+  PresentationChartLineIcon,
 } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
@@ -40,6 +41,19 @@ const statusConfig: Record<ModuleStatus, { label: string; variant: "default" | "
 };
 
 const modules: GamificationModule[] = [
+  {
+    id: "dashboard",
+    title: "Economy Dashboard",
+    description: "Övervaka mint/burn-rates, topptjänare och misstänkt aktivitet i realtid.",
+    href: "/admin/gamification/dashboard",
+    icon: <PresentationChartLineIcon className="h-8 w-8" />,
+    status: "implemented",
+    features: ["Mint Rate", "Burn Rate", "Top Earners", "Rule Toggles", "Abuse Detection"],
+    stats: [
+      { label: "Aktiva idag", value: "89" },
+      { label: "Netto 24h", value: "+778" },
+    ],
+  },
   {
     id: "dicecoin-xp",
     title: "DiceCoin & XP",

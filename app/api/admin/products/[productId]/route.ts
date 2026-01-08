@@ -9,8 +9,9 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { logFieldUpdates, getRecentAuditEvents } from '@/lib/services/productAudit.server';
 import type {
   ProductDetail,
   ProductStatus,
@@ -52,14 +53,30 @@ export async function GET(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Product not found' }, { status: 404 });
   }
 
-  // Build Stripe linkage (mock - no stripe_product_id column yet)
+  // Fetch prices from product_prices table using service role client
+  const adminClient = createServiceRoleClient();
+  const { data: pricesData, error: pricesError } = await adminClient
+    .from('product_prices')
+    .select('*')
+    .eq('product_id', productId)
+    .order('currency', { ascending: true })
+    .order('interval', { ascending: true });
+
+  if (pricesError) {
+    console.error('[api/admin/products/[productId]] Prices fetch error:', pricesError);
+  }
+
+  const prices = pricesData ?? [];
+  const activePrices = prices.filter(p => p.active);
+
+  // Build Stripe linkage with actual data
   const stripeLinkage: StripeLinkage = {
-    status: 'missing',
-    stripe_product_id: null,
-    stripe_product_name: null,
-    last_synced_at: null,
+    status: row.stripe_product_id ? 'connected' : 'missing',
+    stripe_product_id: row.stripe_product_id ?? null,
+    stripe_product_name: row.stripe_product_id ? row.name : null,
+    last_synced_at: row.stripe_last_synced_at ?? null,
     drift_details: null,
-    active_prices_count: 0,
+    active_prices_count: activePrices.length,
   };
 
   // Build availability (placeholder)
@@ -84,14 +101,16 @@ export async function GET(request: Request, { params }: RouteParams) {
   };
 
   // Build publish checklist
-  const hasEntitlements = Array.isArray(row.capabilities) && (row.capabilities as unknown[]).length > 0;
+  // Note: Entitlements check disabled until feature is implemented
+  const hasValidPrice = activePrices.length > 0;
+  const stripeLinkageOk = !!row.stripe_product_id;
   const publishChecklist: PublishChecklist = {
-    has_valid_price: false, // No stripe integration yet
-    has_entitlements: hasEntitlements,
+    has_valid_price: hasValidPrice,
+    has_entitlements: true, // Disabled - always passes until entitlements UI is implemented
     availability_rules_valid: true,
-    stripe_linkage_ok: false, // No stripe integration yet
-    all_passed: false,
-    waived_items: [],
+    stripe_linkage_ok: stripeLinkageOk,
+    all_passed: hasValidPrice && stripeLinkageOk,
+    waived_items: ['entitlements'], // Mark as waived
   };
 
   // Compute health
@@ -102,8 +121,8 @@ export async function GET(request: Request, { params }: RouteParams) {
     healthStatus = 'missing_fields';
     healthIssues.push('Namn saknas');
   }
-  if (!row.description) {
-    healthIssues.push('Beskrivning saknas');
+  if (!row.customer_description) {
+    healthIssues.push('Kundbeskrivning saknas');
   }
   // Note: Would check stripe linkage here once column exists
 
@@ -115,14 +134,25 @@ export async function GET(request: Request, { params }: RouteParams) {
     product_key: row.product_key,
     name: row.name,
     internal_description: row.description,
-    customer_description: null,
+    customer_description: row.customer_description ?? null,
     product_type: productType,
     category: row.category || 'general',
     tags: [],
     status,
+    // Critical Stripe fields (Step 1)
+    unit_label: row.unit_label ?? 'seat',
+    statement_descriptor: row.statement_descriptor ?? null,
+    stripe_product_id: row.stripe_product_id ?? null,
+    // Step 2: Product image
+    image_url: row.image_url ?? null,
+    // Step 3: Strategic fields
+    target_audience: row.target_audience ?? 'all',
+    feature_tier: row.feature_tier ?? 'standard',
+    min_seats: row.min_seats ?? 1,
+    max_seats: row.max_seats ?? 100,
     stripe_linkage: stripeLinkage,
-    primary_price: null,
-    prices_count: 0,
+    primary_price: activePrices.find(p => p.is_default) ?? activePrices[0] ?? null,
+    prices_count: activePrices.length,
     availability_scope: 'global' as AvailabilityScope,
     assigned_tenants_count: 0,
     health_status: healthStatus,
@@ -131,13 +161,30 @@ export async function GET(request: Request, { params }: RouteParams) {
     created_at: row.created_at,
     updated_at: row.updated_at,
     created_by: null,
-    prices: [],
+    prices: prices.map(p => ({
+      id: p.id,
+      product_id: productId,
+      stripe_price_id: p.stripe_price_id,
+      amount: p.amount,
+      currency: p.currency,
+      interval: p.interval,
+      interval_count: p.interval_count ?? 1,
+      tax_behavior: p.tax_behavior ?? 'exclusive',
+      billing_model: p.billing_model ?? 'per_seat',
+      lookup_key: p.lookup_key ?? null,
+      trial_period_days: p.trial_period_days ?? 0,
+      nickname: p.nickname,
+      is_default: p.is_default ?? false,
+      active: p.active ?? true,
+      created_at: p.created_at,
+      updated_at: p.updated_at,
+    })),
     entitlements: [],
     dependencies: [],
     availability,
     lifecycle,
     publish_checklist: publishChecklist,
-    recent_audit_events: [],
+    recent_audit_events: await getRecentAuditEvents(productId, 10),
   };
 
   return NextResponse.json({ product });
@@ -158,18 +205,124 @@ export async function PATCH(request: Request, { params }: RouteParams) {
 
   const body = await request.json().catch(() => ({}));
 
-  // Build update payload - only update columns that exist in current schema
-  const updatePayload: Record<string, unknown> = {};
+  // Use service role client to bypass RLS for admin operations
+  const adminClient = createServiceRoleClient();
 
-  if (body.name !== undefined) updatePayload.name = body.name;
-  if (body.description !== undefined) updatePayload.description = body.description;
-  if (body.category !== undefined) updatePayload.category = body.category;
-  if (body.product_key !== undefined) updatePayload.product_key = body.product_key;
-  // Note: status and product_type columns don't exist yet in schema
+  // Fetch current product state for change tracking
+  const { data: currentProduct, error: fetchError } = await adminClient
+    .from('products')
+    .select('*')
+    .eq('id', productId)
+    .single();
+
+  if (fetchError || !currentProduct) {
+    console.error('[api/admin/products/[productId]] Product not found:', fetchError);
+    return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+  }
+
+  // Build update payload - include both original and new fields
+  const updatePayload: Record<string, unknown> = {};
+  const changes: Record<string, { old: unknown; new: unknown }> = {};
+
+  // Helper to track changes
+  const trackChange = (field: string, newValue: unknown) => {
+    const oldValue = currentProduct[field];
+    if (oldValue !== newValue) {
+      updatePayload[field] = newValue;
+      changes[field] = { old: oldValue, new: newValue };
+    }
+  };
+
+  // Original fields
+  if (body.name !== undefined) trackChange('name', body.name);
+  if (body.description !== undefined) trackChange('description', body.description);
+  if (body.category !== undefined) trackChange('category', body.category);
+  if (body.product_key !== undefined) trackChange('product_key', body.product_key);
+  
+  // Customer-facing description (syncs to Stripe)
+  if (body.customer_description !== undefined) {
+    trackChange('customer_description', body.customer_description);
+  }
+  
+  // Track if any Stripe-synced field is being changed
+  const stripeFieldsChanged = 
+    body.customer_description !== undefined ||
+    body.unit_label !== undefined ||
+    body.statement_descriptor !== undefined ||
+    body.image_url !== undefined ||
+    body.name !== undefined ||
+    body.target_audience !== undefined ||
+    body.feature_tier !== undefined ||
+    body.min_seats !== undefined ||
+    body.max_seats !== undefined;
+  
+  // Critical Stripe fields (Step 1)
+  if (body.unit_label !== undefined) {
+    const validLabels = ['seat', 'license', 'user'];
+    if (!validLabels.includes(body.unit_label)) {
+      return NextResponse.json({ error: 'Invalid unit_label. Must be seat, license, or user.' }, { status: 400 });
+    }
+    trackChange('unit_label', body.unit_label);
+  }
+  if (body.statement_descriptor !== undefined) {
+    if (body.statement_descriptor && body.statement_descriptor.length > 22) {
+      return NextResponse.json({ error: 'statement_descriptor max 22 characters' }, { status: 400 });
+    }
+    trackChange('statement_descriptor', body.statement_descriptor || null);
+  }
+  
+  // Step 2: Product image
+  if (body.image_url !== undefined) {
+    if (body.image_url && !body.image_url.startsWith('https://')) {
+      return NextResponse.json({ error: 'image_url must start with https://' }, { status: 400 });
+    }
+    trackChange('image_url', body.image_url || null);
+  }
+  
+  // Step 3: Strategic fields
+  if (body.target_audience !== undefined) {
+    const validAudiences = ['all', 'schools', 'kindergartens', 'fritids', 'enterprise'];
+    if (!validAudiences.includes(body.target_audience)) {
+      return NextResponse.json({ error: 'Invalid target_audience' }, { status: 400 });
+    }
+    trackChange('target_audience', body.target_audience);
+  }
+  if (body.feature_tier !== undefined) {
+    const validTiers = ['free', 'standard', 'premium', 'enterprise'];
+    if (!validTiers.includes(body.feature_tier)) {
+      return NextResponse.json({ error: 'Invalid feature_tier' }, { status: 400 });
+    }
+    trackChange('feature_tier', body.feature_tier);
+  }
+  if (body.min_seats !== undefined) {
+    const minSeats = parseInt(body.min_seats, 10);
+    if (isNaN(minSeats) || minSeats < 1) {
+      return NextResponse.json({ error: 'min_seats must be >= 1' }, { status: 400 });
+    }
+    trackChange('min_seats', minSeats);
+  }
+  if (body.max_seats !== undefined) {
+    const maxSeats = parseInt(body.max_seats, 10);
+    if (isNaN(maxSeats) || maxSeats < 1) {
+      return NextResponse.json({ error: 'max_seats must be >= 1' }, { status: 400 });
+    }
+    trackChange('max_seats', maxSeats);
+  }
+
+  // Only update if there are actual changes
+  if (Object.keys(updatePayload).length === 0) {
+    return NextResponse.json({ product: currentProduct, message: 'No changes' });
+  }
 
   updatePayload.updated_at = new Date().toISOString();
-
-  const { data, error } = await supabase
+  
+  // Mark as needing sync if any Stripe-related field changed
+  // Use 'unsynced' since that's the valid value per CHECK constraint
+  if (stripeFieldsChanged) {
+    updatePayload.stripe_sync_status = 'unsynced';
+  }
+  
+  const { data, error } = await adminClient
     .from('products')
     .update(updatePayload)
     .eq('id', productId)
@@ -179,6 +332,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   if (error) {
     console.error('[api/admin/products/[productId]] Update error:', error);
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
+  }
+
+  // Log audit event for field changes
+  if (Object.keys(changes).length > 0) {
+    await logFieldUpdates(productId, changes, user.id);
   }
 
   return NextResponse.json({ product: data });

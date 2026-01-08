@@ -3,7 +3,7 @@ import type { HTMLAttributes, ReactNode } from "react";
 export type BadgeVariant = "default" | "primary" | "accent" | "warning" | "success" | "destructive" | "outline" | "secondary" | "error";
 type BadgeSize = "sm" | "md" | "lg";
 
-type BadgeProps = {
+export type BadgeProps = {
   children: ReactNode;
   variant?: BadgeVariant;
   size?: BadgeSize;

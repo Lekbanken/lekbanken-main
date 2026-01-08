@@ -27,6 +27,8 @@ export type AvailabilityScope = 'global' | 'allowlist' | 'blocklist' | 'internal
 
 export type LicenseModel = 'per_tenant' | 'per_seat' | 'per_user';
 
+export type UnitLabel = 'seat' | 'license' | 'user';
+
 export type StripeLinkageStatus = 'connected' | 'missing' | 'drift';
 
 export type HealthStatus = 'ok' | 'missing_fields' | 'stripe_drift' | 'availability_misconfig' | 'no_price';
@@ -44,6 +46,9 @@ export type ProductPrice = {
   interval: PriceInterval;
   interval_count: number;
   tax_behavior: TaxBehavior;
+  billing_model: string;
+  lookup_key: string | null;
+  trial_period_days: number;
   active: boolean;
   is_default: boolean;
   nickname: string | null;
@@ -152,13 +157,13 @@ export type AuditEvent = {
   id: string;
   product_id: string;
   event_type: AuditEventType;
-  actor_id: string;
-  actor_name: string;
-  actor_email: string;
-  timestamp: string;
-  before_snapshot: Record<string, unknown> | null;
-  after_snapshot: Record<string, unknown> | null;
-  metadata: Record<string, unknown> | null;
+  event_data?: Record<string, unknown>;
+  actor_id: string | null;
+  actor_email: string | null;
+  created_at: string;
+  // Legacy fields for backwards compatibility
+  timestamp?: string; // Alias for created_at
+  actor_name?: string; // Not used in new audit log
 };
 
 export type AuditEventType =
@@ -195,6 +200,20 @@ export type ProductAdminRow = {
   category: string;
   tags: string[];
   status: ProductStatus;
+  
+  // Critical Stripe fields (Step 1)
+  unit_label: UnitLabel;
+  statement_descriptor: string | null;
+  stripe_product_id: string | null;
+  
+  // Step 2: Product image
+  image_url: string | null;
+  
+  // Step 3: Strategic fields
+  target_audience: 'all' | 'schools' | 'kindergartens' | 'fritids' | 'enterprise';
+  feature_tier: 'free' | 'standard' | 'premium' | 'enterprise';
+  min_seats: number;
+  max_seats: number;
 
   // Stripe linkage (computed)
   stripe_linkage: StripeLinkage;
@@ -304,10 +323,11 @@ export type SelectOption = {
 export type ProductCardTab =
   | 'overview'
   | 'pricing'
+  | 'stripe'
+  | 'settings'
   | 'entitlements'
   | 'availability'
-  | 'lifecycle'
-  | 'audit';
+  | 'lifecycle';
 
 // ============================================================================
 // CONSTANTS
@@ -354,4 +374,55 @@ export const PRICE_INTERVAL_META: Record<PriceInterval, { label: string; shortLa
   year: { label: 'Per år', shortLabel: '/år' },
   one_time: { label: 'Engångsbetalning', shortLabel: '' },
   usage: { label: 'Per användning', shortLabel: '/användning' },
+};
+
+// ============================================================================
+// AUDIT LOG TYPES
+// ============================================================================
+
+export type ProductAuditEventType =
+  | 'created'
+  | 'status_changed'
+  | 'field_updated'
+  | 'price_created'
+  | 'price_updated'
+  | 'price_deleted'
+  | 'default_price_changed'
+  | 'stripe_synced'
+  | 'stripe_sync_failed'
+  | 'archived'
+  | 'restored';
+
+export type ProductAuditEvent = {
+  id: string;
+  product_id: string;
+  tenant_id?: string; // Optional - products are global
+  event_type: ProductAuditEventType;
+  event_data: {
+    field?: string;
+    old_value?: unknown;
+    new_value?: unknown;
+    price_id?: string;
+    error?: string;
+    stripe_product_id?: string;
+    changes?: Record<string, { old: unknown; new: unknown }>;
+    [key: string]: unknown;
+  };
+  actor_id: string | null;
+  actor_email: string | null;
+  created_at: string;
+};
+
+export const AUDIT_EVENT_META: Record<ProductAuditEventType, { label: string; icon: string; color: string }> = {
+  created: { label: 'Skapad', icon: 'PlusCircle', color: '#10b981' },
+  status_changed: { label: 'Status ändrad', icon: 'ArrowPath', color: '#3b82f6' },
+  field_updated: { label: 'Fält uppdaterat', icon: 'PencilSquare', color: '#6b7280' },
+  price_created: { label: 'Pris skapat', icon: 'CurrencyDollar', color: '#10b981' },
+  price_updated: { label: 'Pris uppdaterat', icon: 'CurrencyDollar', color: '#f59e0b' },
+  price_deleted: { label: 'Pris borttaget', icon: 'Trash', color: '#ef4444' },
+  default_price_changed: { label: 'Standardpris ändrat', icon: 'Star', color: '#8b5cf6' },
+  stripe_synced: { label: 'Synkad till Stripe', icon: 'CloudArrowUp', color: '#10b981' },
+  stripe_sync_failed: { label: 'Synkfel', icon: 'ExclamationCircle', color: '#ef4444' },
+  archived: { label: 'Arkiverad', icon: 'Archive', color: '#6b7280' },
+  restored: { label: 'Återställd', icon: 'ArrowUturnLeft', color: '#10b981' },
 };

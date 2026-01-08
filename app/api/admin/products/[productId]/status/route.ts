@@ -7,6 +7,7 @@
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { logStatusChange } from '@/lib/services/productAudit.server';
 
 type RouteParams = {
   params: Promise<{ productId: string }>;
@@ -95,7 +96,8 @@ export async function PATCH(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
 
-  // TODO: Log audit event
+  // Log audit event for status change
+  await logStatusChange(productId, currentStatus, newStatus, user.id);
 
   return NextResponse.json({ product: data, previousStatus: currentStatus });
 }

@@ -13,7 +13,6 @@ import {
   ArrowDownTrayIcon,
   ArrowUpTrayIcon,
   ArchiveBoxIcon,
-  PencilSquareIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
   BuildingOfficeIcon,
@@ -44,10 +43,8 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
-import { ProductCardDrawer } from './components/ProductCardDrawer';
 import type {
   ProductAdminRow,
-  ProductDetail,
   ProductFilters,
   ProductListResponse,
   ProductStatus,
@@ -338,7 +335,6 @@ type ProductRowProps = {
   isSelected: boolean;
   onToggleSelect: () => void;
   onOpenCard: () => void;
-  onEdit: () => void;
   canEdit: boolean;
 };
 
@@ -347,7 +343,6 @@ function ProductRow({
   isSelected,
   onToggleSelect,
   onOpenCard,
-  onEdit,
   canEdit,
 }: ProductRowProps) {
   const typeMeta = PRODUCT_TYPE_META[product.product_type];
@@ -456,14 +451,10 @@ function ProductRow({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onOpenCard}>
               <CubeIcon className="h-4 w-4 mr-2" />
-              Visa detaljer
+              Visa produkt
             </DropdownMenuItem>
             {canEdit && (
               <>
-                <DropdownMenuItem onClick={onEdit}>
-                  <PencilSquareIcon className="h-4 w-4 mr-2" />
-                  Redigera
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <ArrowPathIcon className="h-4 w-4 mr-2" />
@@ -550,11 +541,6 @@ export function ProductAdminPageV2() {
     sortOrder: 'desc',
   });
 
-  // Drawer state
-  const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [_loadingDetail, setLoadingDetail] = useState(false);
-
   // Selection
   const selection = useBulkSelection(products);
 
@@ -603,36 +589,14 @@ export function ProductAdminPageV2() {
     }
   }, [canView, filters]);
 
-  // Load product detail
-  const loadProductDetail = useCallback(async (productId: string) => {
-    setLoadingDetail(true);
-    try {
-      const response = await fetch(`/api/admin/products/${productId}`);
-      if (!response.ok) throw new Error('Failed to load product details');
-
-      const data = await response.json();
-      setSelectedProduct(data.product);
-      setDrawerOpen(true);
-    } catch (err) {
-      console.error('[ProductAdminPageV2] Detail error:', err);
-      warning('Kunde inte ladda produktdetaljer');
-    } finally {
-      setLoadingDetail(false);
-    }
-  }, [warning]);
-
   // Initial load
   useEffect(() => {
     void loadProducts();
   }, [loadProducts]);
 
-  // Handlers
+  // Handlers - navigate directly to product detail page instead of using drawer
   const handleOpenCard = useCallback((product: ProductAdminRow) => {
-    void loadProductDetail(product.id);
-  }, [loadProductDetail]);
-
-  const handleEdit = useCallback((product: ProductAdminRow) => {
-    router.push(`/admin/products/${product.id}/edit`);
+    router.push(`/admin/products/${product.id}`);
   }, [router]);
 
   const handleFilterChange = useCallback((newFilters: ProductFilters) => {
@@ -653,10 +617,7 @@ export function ProductAdminPageV2() {
 
   const handleRefresh = useCallback(() => {
     void loadProducts();
-    if (selectedProduct) {
-      void loadProductDetail(selectedProduct.id);
-    }
-  }, [loadProducts, loadProductDetail, selectedProduct]);
+  }, [loadProducts]);
 
   // Permission check
   if (!canView) {
@@ -819,7 +780,6 @@ export function ProductAdminPageV2() {
                       isSelected={selection.isSelected(product)}
                       onToggleSelect={() => selection.toggle(product)}
                       onOpenCard={() => handleOpenCard(product)}
-                      onEdit={() => handleEdit(product)}
                       canEdit={canEdit}
                     />
                   ))}
@@ -842,14 +802,6 @@ export function ProductAdminPageV2() {
           )}
         </CardContent>
       </Card>
-
-      {/* Product Card Drawer */}
-      <ProductCardDrawer
-        product={selectedProduct}
-        open={drawerOpen}
-        onOpenChange={setDrawerOpen}
-        onRefresh={handleRefresh}
-      />
     </AdminPageLayout>
   );
 }

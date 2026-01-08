@@ -3,13 +3,15 @@
  *
  * Admin-only endpoint to sync product with Stripe.
  * 
- * Note: This is a placeholder implementation. Full Stripe sync requires
- * additional schema columns (stripe_product_id, etc.) and Stripe API integration.
+ * Uses pushProductToStripe() to create/update product and prices in Stripe.
+ * Supports force option to re-sync even if already synced.
  */
 
 import { NextResponse } from 'next/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { isSystemAdmin } from '@/lib/utils/tenantAuth';
+import { pushProductToStripe } from '@/lib/stripe/product-sync';
+import { logStripeSync } from '@/lib/services/productAudit.server';
 
 type RouteParams = {
   params: Promise<{ productId: string }>;
@@ -28,44 +30,54 @@ export async function POST(request: Request, { params }: RouteParams) {
     return NextResponse.json({ error: 'Forbidden - system_admin required' }, { status: 403 });
   }
 
-  // Fetch current product
-  const { data: product, error: fetchError } = await supabase
-    .from('products')
-    .select('*')
-    .eq('id', productId)
-    .single();
-
-  if (fetchError || !product) {
-    return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+  // Parse options from request body (optional)
+  let options: { force?: boolean; dryRun?: boolean } = {};
+  try {
+    const body = await request.json();
+    options = {
+      force: body?.force ?? true, // Default to force sync from UI
+      dryRun: body?.dryRun ?? false,
+    };
+  } catch {
+    // No body or invalid JSON - use defaults (force: true)
+    options = { force: true };
   }
 
-  // TODO: Implement actual Stripe sync
-  // This would:
-  // 1. Fetch product from Stripe using stripe_product_id
-  // 2. Compare fields (name, description, etc.)
-  // 3. Fetch prices from Stripe
-  // 4. Update local database with any changes
-  // 5. Detect and report drift
+  // Sync product to Stripe using the real sync function
+  const result = await pushProductToStripe(productId, options);
 
-  // For now, return a placeholder response
-  // Note: stripe_product_id column doesn't exist yet in schema
-  const syncResult = {
-    synced: false,
-    stripe_product_id: null,
-    drift_detected: false,
-    drift_details: [],
-    prices_synced: 0,
-    timestamp: new Date().toISOString(),
-    message: 'Stripe sync not yet implemented - schema migration required',
-  };
+  if (!result.success) {
+    // Log failed sync attempt
+    await logStripeSync(
+      productId, 
+      result.stripeProductId || '', 
+      false, 
+      result.error || 'Unknown error', 
+      user.id
+    );
+    
+    return NextResponse.json(
+      { 
+        error: result.error || 'Sync failed',
+        details: result,
+      }, 
+      { status: 500 }
+    );
+  }
 
-  // Update last_synced timestamp
-  await supabase
-    .from('products')
-    .update({ updated_at: new Date().toISOString() })
-    .eq('id', productId);
+  // Log successful sync
+  if (result.operation !== 'skipped') {
+    await logStripeSync(productId, result.stripeProductId || '', true, undefined, user.id);
+  }
 
-  // TODO: Log audit event
-
-  return NextResponse.json(syncResult);
+  // Return sync result
+  return NextResponse.json({
+    synced: true,
+    stripe_product_id: result.stripeProductId,
+    operation: result.operation,
+    timestamp: result.timestamp,
+    message: result.operation === 'skipped' 
+      ? 'Product already synced (use force: true to re-sync)'
+      : `Product ${result.operation} successfully`,
+  });
 }

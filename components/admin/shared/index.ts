@@ -28,3 +28,30 @@ export {
   AdminConfirmDialog, 
   useConfirmDialog,
 } from './AdminConfirmDialog';
+
+// Status badges
+export {
+  ProductStatusBadge,
+  StripeSyncStatusBadge,
+  HealthStatusBadge,
+  StripeLinkageBadge,
+  type ProductStatus,
+  type StripeSyncStatus,
+  type HealthStatus,
+  type StripeLinkageStatus,
+} from './StatusBadges';
+
+// Field components
+export {
+  FieldLabel,
+  ReadOnlyField,
+  FieldGroup,
+  InfoBox,
+} from './FieldComponents';
+
+// Diff view
+export {
+  DiffView,
+  DiffRow,
+  type DiffItem,
+} from './DiffView';

@@ -52,6 +52,7 @@ import {
   HEALTH_STATUS_META,
   AVAILABILITY_SCOPE_META,
   PRICE_INTERVAL_META,
+  AUDIT_EVENT_META,
 } from '../types';
 
 // ============================================================================
@@ -736,10 +737,11 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
             label="Har giltigt pris (om betald)"
             passed={checklist?.has_valid_price ?? false}
           />
-          <ChecklistItem
+          {/* Entitlements check disabled until feature is implemented */}
+          {/* <ChecklistItem
             label="Har entitlements-mappning"
             passed={checklist?.has_entitlements ?? false}
-          />
+          /> */}
           <ChecklistItem
             label="Tillgänglighetsregler giltiga"
             passed={checklist?.availability_rules_valid ?? false}
@@ -823,40 +825,30 @@ function AuditTab({ product }: { product: ProductDetail }) {
 }
 
 function AuditEventRow({ event }: { event: AuditEvent }) {
-  const eventLabels: Record<string, string> = {
-    created: 'Skapad',
-    updated: 'Uppdaterad',
-    status_changed: 'Status ändrad',
-    price_added: 'Pris tillagt',
-    price_updated: 'Pris uppdaterat',
-    price_removed: 'Pris borttaget',
-    entitlement_added: 'Entitlement tillagt',
-    entitlement_updated: 'Entitlement uppdaterat',
-    entitlement_removed: 'Entitlement borttaget',
-    availability_changed: 'Tillgänglighet ändrad',
-    tenant_assigned: 'Organisation tilldelad',
-    tenant_unassigned: 'Organisation borttagen',
-    stripe_synced: 'Synkad med Stripe',
-    archived: 'Arkiverad',
-    restored: 'Återställd',
+  const eventMeta = AUDIT_EVENT_META[event.event_type as keyof typeof AUDIT_EVENT_META] || {
+    label: event.event_type,
+    color: '#6b7280',
   };
 
   return (
     <div className="flex items-start gap-3 py-2 border-b border-border last:border-0">
       <div className="flex-shrink-0 mt-1">
-        <div className="h-2 w-2 rounded-full bg-primary" />
+        <div 
+          className="h-2 w-2 rounded-full"
+          style={{ backgroundColor: eventMeta.color }}
+        />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <p className="text-sm font-medium">
-            {eventLabels[event.event_type] || event.event_type}
+            {eventMeta.label}
           </p>
           <span className="text-xs text-muted-foreground flex-shrink-0">
-            {formatDateTime(event.timestamp)}
+            {formatDateTime(event.created_at || event.timestamp || '')}
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          {event.actor_name || event.actor_email}
+          {event.actor_name || event.actor_email || 'System'}
         </p>
       </div>
     </div>

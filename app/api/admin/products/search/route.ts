@@ -95,8 +95,8 @@ export async function POST(request: Request) {
       healthStatus = 'missing_fields';
       healthIssues.push('Namn saknas');
     }
-    if (!row.description) {
-      healthIssues.push('Beskrivning saknas');
+    if (!row.customer_description) {
+      healthIssues.push('Kundbeskrivning saknas');
     }
 
     // Primary price - mock as null until pricing table is implemented

@@ -151,14 +151,21 @@ export async function burnCoins(input: BurnInput): Promise<BurnResult> {
     }
   }
 
-  const { data, error } = await admin.rpc('burn_coins_v1', {
-    p_user_id: input.userId,
-    p_tenant_id: input.tenantId,
-    p_sink_id: input.sinkId,
-    p_amount: amount,
-    p_idempotency_key: input.idempotencyKey,
-    p_metadata: input.metadata ?? null,
-  })
+  // Type assertion: RPC allows nullable tenant_id and sink_id
+  const { data, error } = await (admin.rpc as unknown as (
+    fn: string,
+    params: Record<string, unknown>
+  ) => Promise<{ data: { success: boolean; burn_log_id: string | null; coin_transaction_id: string | null; new_balance: number | null; error_message: string | null }[] | null; error: Error | null }>)(
+    'burn_coins_v1',
+    {
+      p_user_id: input.userId,
+      p_tenant_id: input.tenantId,
+      p_sink_id: input.sinkId,
+      p_amount: amount,
+      p_idempotency_key: input.idempotencyKey,
+      p_metadata: input.metadata ?? null,
+    }
+  )
 
   if (error) {
     console.error('[burn] RPC failed', error)
@@ -263,18 +270,34 @@ export async function refundBurn(input: RefundInput): Promise<RefundResult> {
     }
   }
 
-  // 2. Create refund transaction
-  const { data: txResult, error: txError } = await admin.rpc('apply_coin_transaction_v1', {
-    p_user_id: burnLog.user_id,
-    p_tenant_id: burnLog.tenant_id,
-    p_type: 'earn',
-    p_amount: burnLog.amount_spent,
-    p_reason_code: 'refund',
-    p_idempotency_key: `refund:${input.burnLogId}`,
-    p_description: `Refund: ${input.reason ?? 'Admin refund'}`,
-    p_source: 'admin',
-    p_metadata: { originalBurnLogId: input.burnLogId },
-  })
+  // Ensure user_id exists (should always be present in burn_log)
+  if (!burnLog.user_id) {
+    return {
+      success: false,
+      refundTransactionId: null,
+      newBalance: null,
+      errorMessage: 'Invalid burn log: missing user_id',
+    }
+  }
+
+  // 2. Create refund transaction - Type assertion for nullable tenant_id
+  const { data: txResult, error: txError } = await (admin.rpc as unknown as (
+    fn: string,
+    params: Record<string, unknown>
+  ) => Promise<{ data: { transaction_id: string; balance: number }[] | null; error: Error | null }>)(
+    'apply_coin_transaction_v1',
+    {
+      p_user_id: burnLog.user_id,
+      p_tenant_id: burnLog.tenant_id,
+      p_type: 'earn',
+      p_amount: burnLog.amount_spent,
+      p_reason_code: 'refund',
+      p_idempotency_key: `refund:${input.burnLogId}`,
+      p_description: `Refund: ${input.reason ?? 'Admin refund'}`,
+      p_source: 'admin',
+      p_metadata: { originalBurnLogId: input.burnLogId },
+    }
+  )
 
   if (txError) {
     console.error('[burn] refund transaction failed', txError)
@@ -316,8 +339,8 @@ export async function refundBurn(input: RefundInput): Promise<RefundResult> {
 
   return {
     success: true,
-    refundTransactionId: refundTxId,
-    newBalance,
+    refundTransactionId: refundTxId ?? null,
+    newBalance: newBalance ?? null,
     errorMessage: null,
   }
 }

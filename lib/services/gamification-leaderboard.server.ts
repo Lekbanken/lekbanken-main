@@ -155,12 +155,13 @@ async function getLeaderboardAllTime(
     return emptyResult(tenantId, type, 'all_time')
   }
 
-  // Get user profiles for display names
-  const userIds = entries?.map((e: LeaderboardViewRow) => e.user_id) ?? []
+  // Get user profiles for display names - filter out entries with null user_id
+  const validEntries = (entries ?? []).filter((e): e is LeaderboardViewRow & { user_id: string } => e.user_id !== null)
+  const userIds = validEntries.map((e) => e.user_id)
   const profiles = await getUserProfiles(userIds)
 
   // Transform entries
-  const leaderboardEntries: LeaderboardEntry[] = (entries ?? []).map((entry: LeaderboardViewRow, index: number) => ({
+  const leaderboardEntries: LeaderboardEntry[] = validEntries.map((entry, index: number) => ({
     rank: index + 1,
     userId: entry.user_id,
     displayName: profiles.get(entry.user_id)?.displayName ?? maskEmail(entry.email),

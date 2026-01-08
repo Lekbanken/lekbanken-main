@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vitest/globals"]
+  },
+  "include": [
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": ["node_modules", "catalyst-ui-kit", "tests/e2e/**"]
+}

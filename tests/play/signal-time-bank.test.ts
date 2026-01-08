@@ -85,7 +85,7 @@ describe('time_bank_apply_delta (DB)', () => {
     expect(sessionId).not.toBeNull();
 
     const { data, error } = await supabase!.rpc('time_bank_apply_delta', {
-      p_session_id: sessionId,
+      p_session_id: sessionId!,
       p_delta_seconds: 60,
       p_reason: 'test-positive',
     });
@@ -103,7 +103,7 @@ describe('time_bank_apply_delta (DB)', () => {
 
     // Try removing more than current balance
     const { data, error } = await supabase!.rpc('time_bank_apply_delta', {
-      p_session_id: sessionId,
+      p_session_id: sessionId!,
       p_delta_seconds: -9999,
       p_reason: 'test-clamp-neg',
       p_min_balance: 0,
@@ -121,15 +121,17 @@ describe('time_bank_apply_delta (DB)', () => {
     expect(sessionId).not.toBeNull();
 
     const { data, error } = await supabase!.rpc('time_bank_apply_delta', {
-      p_session_id: sessionId,
+      p_session_id: sessionId!,
       p_delta_seconds: 5000,
       p_reason: 'test-clamp-max',
       p_max_balance: 100,
     });
 
     expect(error).toBeNull();
-    expect(data.status).toBe('clamped');
-    expect(data.new_balance).toBeLessThanOrEqual(100);
+    expect(data).not.toBeNull();
+    const result = data as { status: string; new_balance: number };
+    expect(result.status).toBe('clamped');
+    expect(result.new_balance).toBeLessThanOrEqual(100);
   });
 });
 

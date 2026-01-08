@@ -8,6 +8,9 @@ export default defineConfig({
     include: ['tests/**/*.test.ts'],
     exclude: ['tests/e2e/**', 'node_modules'],
     testTimeout: 30000,
+    typecheck: {
+      tsconfig: './tsconfig.test.json',
+    },
   },
   resolve: {
     alias: {

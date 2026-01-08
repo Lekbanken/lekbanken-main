@@ -13,7 +13,17 @@ import {
   TITLE_MAX_LENGTH,
   type ValidationError,
 } from '@/features/admin/achievements/validation';
-import type { AchievementItem } from '@/features/admin/achievements/types';
+import type { AchievementItem, AchievementIconConfig } from '@/features/admin/achievements/types';
+
+// Default icon for tests
+const testIcon: AchievementIconConfig = {
+  mode: 'theme',
+  themeId: 'purple',
+  base: { id: 'shield-solid', color: '#FF0000' },
+  symbol: null,
+  backgrounds: [],
+  foregrounds: [],
+};
 
 // Factory for creating test badges
 function createTestBadge(overrides: Partial<AchievementItem> = {}): AchievementItem {
@@ -24,30 +34,25 @@ function createTestBadge(overrides: Partial<AchievementItem> = {}): AchievementI
     status: 'draft',
     version: 1,
     rewardCoins: 100,
-    icon: {
-      themeId: 'purple',
-      base: { id: 'shield-solid', color: '#FF0000' },
-      symbol: null,
-      backgrounds: [],
-      foregrounds: [],
-    },
+    icon: testIcon,
     ...overrides,
   };
 }
 
 describe('hasVisualAnchor', () => {
   it('returns true when base is present', () => {
-    const icon = { themeId: 'purple', base: { id: 'shield', color: '#FFF' }, symbol: null, backgrounds: [], foregrounds: [] };
+    const icon: AchievementIconConfig = { mode: 'theme', themeId: 'purple', base: { id: 'shield', color: '#FFF' }, symbol: null, backgrounds: [], foregrounds: [] };
     expect(hasVisualAnchor(icon)).toBe(true);
   });
 
   it('returns true when symbol is present', () => {
-    const icon = { themeId: 'purple', base: null, symbol: { id: 'star', color: '#FFF' }, backgrounds: [], foregrounds: [] };
+    const icon: AchievementIconConfig = { mode: 'theme', themeId: 'purple', base: null, symbol: { id: 'star', color: '#FFF' }, backgrounds: [], foregrounds: [] };
     expect(hasVisualAnchor(icon)).toBe(true);
   });
 
   it('returns true when both base and symbol are present', () => {
-    const icon = { 
+    const icon: AchievementIconConfig = { 
+      mode: 'theme',
       themeId: 'purple', 
       base: { id: 'shield', color: '#FFF' }, 
       symbol: { id: 'star', color: '#000' }, 
@@ -58,12 +63,13 @@ describe('hasVisualAnchor', () => {
   });
 
   it('returns false when neither base nor symbol is present', () => {
-    const icon = { themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] };
+    const icon: AchievementIconConfig = { mode: 'theme', themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] };
     expect(hasVisualAnchor(icon)).toBe(false);
   });
 
   it('returns false when base and symbol have empty ids', () => {
-    const icon = { 
+    const icon: AchievementIconConfig = { 
+      mode: 'theme',
       themeId: 'purple', 
       base: { id: '', color: '#FFF' }, 
       symbol: { id: '', color: '#FFF' }, 
@@ -113,7 +119,7 @@ describe('validateForPublish', () => {
   describe('visual anchor validation', () => {
     it('returns error when no visual anchor', () => {
       const badge = createTestBadge({
-        icon: { themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
+        icon: { mode: 'theme', themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
       expect(result.valid).toBe(false);
@@ -124,7 +130,7 @@ describe('validateForPublish', () => {
 
     it('passes when base is present', () => {
       const badge = createTestBadge({
-        icon: { themeId: 'purple', base: { id: 'shield', color: '#FFF' }, symbol: null, backgrounds: [], foregrounds: [] }
+        icon: { mode: 'theme', themeId: 'purple', base: { id: 'shield', color: '#FFF' }, symbol: null, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
       expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);
@@ -132,7 +138,7 @@ describe('validateForPublish', () => {
 
     it('passes when symbol is present', () => {
       const badge = createTestBadge({
-        icon: { themeId: 'purple', base: null, symbol: { id: 'star', color: '#FFF' }, backgrounds: [], foregrounds: [] }
+        icon: { mode: 'theme', themeId: 'purple', base: null, symbol: { id: 'star', color: '#FFF' }, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
       expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);
@@ -182,7 +188,7 @@ describe('validateForPublish', () => {
       const badge = createTestBadge({
         title: '',
         rewardCoins: -100,
-        icon: { themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
+        icon: { mode: 'theme', themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
       });
       const result = validateForPublish(badge);
       expect(result.valid).toBe(false);
@@ -224,7 +230,7 @@ describe('validateForDraft', () => {
 
   it('allows no visual anchor for drafts', () => {
     const badge = createTestBadge({
-      icon: { themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
+      icon: { mode: 'theme', themeId: 'purple', base: null, symbol: null, backgrounds: [], foregrounds: [] }
     });
     const result = validateForDraft(badge);
     expect(result.errors.filter((e: ValidationError) => e.field === 'icon')).toHaveLength(0);

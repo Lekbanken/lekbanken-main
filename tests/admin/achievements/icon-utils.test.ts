@@ -98,8 +98,8 @@ describe('normalizeIconConfig', () => {
       const result = normalizeIconConfig(icon);
       
       expect(result.backgrounds).toHaveLength(2);
-      expect(result.backgrounds[0]).toEqual({ id: 'bg_wings_1', order: 0 });
-      expect(result.backgrounds[1]).toEqual({ id: 'bg_spikes_2', order: 1 });
+      expect(result.backgrounds![0]).toEqual({ id: 'bg_wings_1', order: 0 });
+      expect(result.backgrounds![1]).toEqual({ id: 'bg_spikes_2', order: 1 });
     });
 
     it('should preserve layer colors and opacity', () => {

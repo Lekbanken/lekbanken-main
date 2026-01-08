@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { DocumentTextIcon } from "@heroicons/react/24/outline";
+import { DocumentTextIcon, ArchiveBoxIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -15,6 +15,14 @@ import {
 import { Badge, Button, LoadingState, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useTenant } from "@/lib/context/TenantContext";
+import { StatusBadge } from "@/features/planner/components/StatusBadge";
+import {
+  VISIBILITY_LABELS,
+  VISIBILITY_BADGE_VARIANTS,
+  formatDate,
+  formatDuration,
+  canPerformAction,
+} from "@/lib/planner";
 import type {
   PlannerPlan,
   PlannerBlock,
@@ -34,48 +42,6 @@ type PlanCapabilities = {
 };
 
 type PlanWithCapabilities = PlannerPlan & { _capabilities?: PlanCapabilities };
-
-const STATUS_LABELS: Record<PlannerStatus, string> = {
-  draft: "Utkast",
-  published: "Publicerad",
-  modified: "Andrad",
-  archived: "Arkiverad",
-};
-
-const STATUS_VARIANTS: Record<
-  PlannerStatus,
-  "secondary" | "success" | "warning" | "outline"
-> = {
-  draft: "secondary",
-  published: "success",
-  modified: "warning",
-  archived: "outline",
-};
-
-const VISIBILITY_LABELS: Record<PlannerVisibility, string> = {
-  private: "Privat",
-  tenant: "Organisation",
-  public: "Publik",
-};
-
-const VISIBILITY_VARIANTS: Record<
-  PlannerVisibility,
-  "outline" | "accent" | "primary"
-> = {
-  private: "outline",
-  tenant: "accent",
-  public: "primary",
-};
-
-function formatDate(value?: string | null) {
-  if (!value) return "-";
-  return new Date(value).toLocaleDateString("sv-SE");
-}
-
-function formatDuration(totalMinutes?: number | null) {
-  if (!totalMinutes || totalMinutes <= 0) return "0 min";
-  return `${totalMinutes} min`;
-}
 
 function canSetVisibility(plan: PlanWithCapabilities, visibility: PlannerVisibility) {
   const caps = plan._capabilities ?? {};
@@ -230,6 +196,58 @@ export default function AdminPlannerDetailPage() {
     }
   };
 
+  const handleArchive = async () => {
+    if (!plan || !plan._capabilities?.canUpdate) return;
+    if (!canPerformAction(plan.status, 'archive')) return;
+    setPendingPlanId(plan.id);
+    try {
+      const res = await fetch(`/api/plans/${plan.id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "archived" }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to archive plan");
+      }
+      const payload = (await res.json()) as { plan: PlannerPlan };
+      setPlan((prev) =>
+        prev ? { ...prev, ...payload.plan, _capabilities: prev._capabilities } : prev
+      );
+      success("Plan arkiverad.");
+    } catch (err) {
+      console.error("[admin/planner] archive error", err);
+      warning("Kunde inte arkivera plan.");
+    } finally {
+      setPendingPlanId(null);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (!plan || !plan._capabilities?.canUpdate) return;
+    if (!canPerformAction(plan.status, 'restore')) return;
+    setPendingPlanId(plan.id);
+    try {
+      const res = await fetch(`/api/plans/${plan.id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "draft" }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to restore plan");
+      }
+      const payload = (await res.json()) as { plan: PlannerPlan };
+      setPlan((prev) =>
+        prev ? { ...prev, ...payload.plan, _capabilities: prev._capabilities } : prev
+      );
+      success("Plan återställd.");
+    } catch (err) {
+      console.error("[admin/planner] restore error", err);
+      warning("Kunde inte återställa plan.");
+    } finally {
+      setPendingPlanId(null);
+    }
+  };
+
   if (!isRbacLoading && !canView) {
     return (
       <AdminPageLayout>
@@ -289,9 +307,31 @@ export default function AdminPlannerDetailPage() {
         ]}
         actions={
           <div className="flex flex-wrap gap-2">
-            {plan._capabilities?.canPublish && (
+            {plan._capabilities?.canPublish && plan.status !== 'archived' && (
               <Button size="sm" onClick={() => void handlePublish()} disabled={isPending}>
                 Publicera
+              </Button>
+            )}
+            {plan._capabilities?.canUpdate && plan.status !== 'archived' && canPerformAction(plan.status, 'archive') && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleArchive()}
+                disabled={isPending}
+              >
+                <ArchiveBoxIcon className="mr-1 h-4 w-4" />
+                Arkivera
+              </Button>
+            )}
+            {plan._capabilities?.canUpdate && plan.status === 'archived' && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => void handleRestore()}
+                disabled={isPending}
+              >
+                <ArrowPathIcon className="mr-1 h-4 w-4" />
+                Återställ
               </Button>
             )}
             {plan._capabilities?.canDelete && (
@@ -311,11 +351,16 @@ export default function AdminPlannerDetailPage() {
       <AdminSection title="Status och synlighet">
         <AdminCard>
           <div className="flex flex-wrap items-center gap-3">
-            <Badge variant={STATUS_VARIANTS[plan.status]}>{STATUS_LABELS[plan.status]}</Badge>
-            <Badge variant={VISIBILITY_VARIANTS[plan.visibility]}>
+            <StatusBadge status={plan.status} />
+            <Badge variant={VISIBILITY_BADGE_VARIANTS[plan.visibility]}>
               {VISIBILITY_LABELS[plan.visibility]}
             </Badge>
-            {plan._capabilities?.canUpdate && (
+            {plan.status === 'modified' && (
+              <span className="text-xs text-amber-600 font-medium">
+                ⚠ Opublicerade ändringar
+              </span>
+            )}
+            {plan._capabilities?.canUpdate && plan.status !== 'archived' && (
               <select
                 value={plan.visibility}
                 onChange={(event) =>
@@ -331,7 +376,7 @@ export default function AdminPlannerDetailPage() {
                 ))}
               </select>
             )}
-            {plan._capabilities?.canStartRun && (
+            {plan._capabilities?.canStartRun && plan.status !== 'archived' && (
               <Button size="sm" variant="outline" href={`/app/play/${plan.id}/start`}>
                 Starta run
               </Button>

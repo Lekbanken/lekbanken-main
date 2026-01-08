@@ -67,6 +67,7 @@ type PlannerUICapabilities = PlanCapabilities & {
   canShare: boolean;
   canExport: boolean;
   canRun: boolean;
+  canCopy: boolean;
 };
 
 export function PlannerPage() {
@@ -156,6 +157,7 @@ export function PlannerPage() {
         canShare: false,
         canExport: false,
         canRun: false,
+        canCopy: false,
       };
     }
 
@@ -188,6 +190,7 @@ export function PlannerPage() {
       canShare: base.canRead,
       canExport: base.canRead,
       canRun: base.canStartRun,
+      canCopy: base.canRead, // Anyone who can read can copy
     };
   }, [activePlan, user, effectiveGlobalRole, userTenants]);
 
@@ -471,6 +474,41 @@ export function PlannerPage() {
     URL.revokeObjectURL(url);
   };
 
+  const handleCopy = async () => {
+    if (!activePlan) return;
+    await withFeedback(
+      `copy-${activePlan.id}`,
+      async () => {
+        const response = await fetch(`/api/plans/${activePlan.id}/copy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            visibility: "private",
+            owner_tenant_id: currentTenant?.id ?? null,
+          }),
+        });
+        
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error?.message ?? "Kunde inte kopiera plan");
+        }
+        
+        const data = await response.json();
+        const copiedPlan = data.plan as PlannerPlan;
+        
+        // Add to plans list and select it
+        setPlans((prev) => [copiedPlan, ...prev]);
+        setActivePlanId(copiedPlan.id);
+        
+        return copiedPlan;
+      },
+      { 
+        successMessage: "Plan kopierad!",
+        errorMessage: "Kunde inte kopiera plan"
+      }
+    );
+  };
+
   const handleAddBlockType = (type: PlannerBlock["blockType"]) => {
     if (type === "game") {
       setShowGamePicker(true);
@@ -612,8 +650,10 @@ export function PlannerPage() {
                       onShare={handleShare}
                       onExport={handleExport}
                       onDelete={() => void handleDelete()}
+                      onCopy={() => void handleCopy()}
                       isPublishing={isPending(`publish-${activePlan.id}`)}
                       isSaving={isSaving}
+                      isCopying={isPending(`copy-${activePlan.id}`)}
                     />
 
                     <div className="space-y-4">

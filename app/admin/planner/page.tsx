@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DocumentTextIcon } from "@heroicons/react/24/outline";
+import { DocumentTextIcon, PlusIcon } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -15,6 +15,17 @@ import {
 import { Badge, Button, Input, LoadingState, useToast } from "@/components/ui";
 import { useRbac } from "@/features/admin/shared/hooks/useRbac";
 import { useTenant } from "@/lib/context/TenantContext";
+import { StatusBadge } from "@/features/planner/components/StatusBadge";
+import {
+  VISIBILITY_LABELS,
+  VISIBILITY_BADGE_VARIANTS,
+  STATUS_FILTER_OPTIONS,
+  VISIBILITY_FILTER_OPTIONS,
+  SORT_OPTIONS,
+  formatDate,
+  formatDuration,
+  type PlanSortOption,
+} from "@/lib/planner";
 import type { PlannerPlan, PlannerStatus, PlannerVisibility } from "@/types/planner";
 
 type PlanCapabilities = {
@@ -41,83 +52,6 @@ type PlanSearchResult = {
 
 type Scope = "tenant" | "global";
 
-type SortOption =
-  | "updated-desc"
-  | "updated-asc"
-  | "name-asc"
-  | "name-desc"
-  | "duration-desc"
-  | "duration-asc";
-
-const STATUS_LABELS: Record<PlannerStatus, string> = {
-  draft: "Utkast",
-  published: "Publicerad",
-  modified: "Andrad",
-  archived: "Arkiverad",
-};
-
-const STATUS_VARIANTS: Record<
-  PlannerStatus,
-  "secondary" | "success" | "warning" | "outline"
-> = {
-  draft: "secondary",
-  published: "success",
-  modified: "warning",
-  archived: "outline",
-};
-
-const VISIBILITY_LABELS: Record<PlannerVisibility, string> = {
-  private: "Privat",
-  tenant: "Organisation",
-  public: "Publik",
-};
-
-const VISIBILITY_VARIANTS: Record<
-  PlannerVisibility,
-  "outline" | "accent" | "primary"
-> = {
-  private: "outline",
-  tenant: "accent",
-  public: "primary",
-};
-
-const STATUS_OPTIONS: Array<{ value: PlannerStatus | "all"; label: string }> = [
-  { value: "all", label: "Alla statusar" },
-  { value: "draft", label: STATUS_LABELS.draft },
-  { value: "published", label: STATUS_LABELS.published },
-  { value: "modified", label: STATUS_LABELS.modified },
-  { value: "archived", label: STATUS_LABELS.archived },
-];
-
-const VISIBILITY_OPTIONS: Array<{
-  value: PlannerVisibility | "all";
-  label: string;
-}> = [
-  { value: "all", label: "Alla visningar" },
-  { value: "private", label: VISIBILITY_LABELS.private },
-  { value: "tenant", label: VISIBILITY_LABELS.tenant },
-  { value: "public", label: VISIBILITY_LABELS.public },
-];
-
-const SORT_OPTIONS: Array<{ value: SortOption; label: string }> = [
-  { value: "updated-desc", label: "Senast uppdaterad" },
-  { value: "updated-asc", label: "Aldst uppdaterad" },
-  { value: "name-asc", label: "Namn A-Z" },
-  { value: "name-desc", label: "Namn Z-A" },
-  { value: "duration-desc", label: "Langst tid" },
-  { value: "duration-asc", label: "Kortast tid" },
-];
-
-function formatDate(value?: string | null) {
-  if (!value) return "-";
-  return new Date(value).toLocaleDateString("sv-SE");
-}
-
-function formatDuration(totalMinutes?: number | null) {
-  if (!totalMinutes || totalMinutes <= 0) return "0 min";
-  return `${totalMinutes} min`;
-}
-
 function canSetVisibility(plan: PlanWithCapabilities, visibility: PlannerVisibility) {
   const caps = plan._capabilities ?? {};
   if (!caps.canUpdate) return false;
@@ -136,7 +70,7 @@ export default function AdminPlannerPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<PlannerStatus | "all">("all");
   const [visibilityFilter, setVisibilityFilter] = useState<PlannerVisibility | "all">("all");
-  const [sort, setSort] = useState<SortOption>("updated-desc");
+  const [sort, setSort] = useState<PlanSortOption>("updated-desc");
 
   const [plans, setPlans] = useState<PlanWithCapabilities[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -384,6 +318,36 @@ export default function AdminPlannerPage() {
     }
   };
 
+  const [isCreating, setIsCreating] = useState(false);
+
+  const handleCreate = async () => {
+    if (isCreating) return;
+    setIsCreating(true);
+    try {
+      const res = await fetch("/api/plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Ny plan",
+          description: "",
+          visibility: "private",
+          owner_tenant_id: scope === "tenant" ? currentTenant?.id : null,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to create plan");
+      }
+      const payload = (await res.json()) as { plan: PlannerPlan };
+      success("Plan skapad!");
+      router.push(`/admin/planner/${payload.plan.id}`);
+    } catch (err) {
+      console.error("[admin/planner] create error", err);
+      warning("Kunde inte skapa plan.");
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const resolveOwnerLabel = (plan: PlanWithCapabilities) => {
     if (!plan.ownerTenantId) {
       return "Global";
@@ -425,6 +389,12 @@ export default function AdminPlannerPage() {
         description="Administrera planbibliotek, publicering och synlighet."
         icon={<DocumentTextIcon className="h-6 w-6" />}
         breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Planner" }]}
+        actions={
+          <Button onClick={() => void handleCreate()} disabled={isCreating}>
+            <PlusIcon className="mr-1.5 h-4 w-4" />
+            {isCreating ? "Skapar..." : "Skapa plan"}
+          </Button>
+        }
       />
 
       <AdminSection
@@ -459,7 +429,7 @@ export default function AdminPlannerPage() {
       <AdminSection title="Filter">
         <div className="flex flex-wrap gap-3">
           <Input
-            placeholder="Sok planer..."
+            placeholder="Sök planer..."
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             className="w-full md:w-72"
@@ -471,7 +441,7 @@ export default function AdminPlannerPage() {
             }
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
-            {STATUS_OPTIONS.map((option) => (
+            {STATUS_FILTER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -484,7 +454,7 @@ export default function AdminPlannerPage() {
             }
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
-            {VISIBILITY_OPTIONS.map((option) => (
+            {VISIBILITY_FILTER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -492,7 +462,7 @@ export default function AdminPlannerPage() {
           </select>
           <select
             value={sort}
-            onChange={(event) => setSort(event.target.value as SortOption)}
+            onChange={(event) => setSort(event.target.value as PlanSortOption)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
           >
             {SORT_OPTIONS.map((option) => (
@@ -537,14 +507,9 @@ export default function AdminPlannerPage() {
                         >
                           {plan.name}
                         </button>
+                        <StatusBadge status={plan.status} size="sm" />
                         <Badge
-                          variant={STATUS_VARIANTS[plan.status]}
-                          size="sm"
-                        >
-                          {STATUS_LABELS[plan.status]}
-                        </Badge>
-                        <Badge
-                          variant={VISIBILITY_VARIANTS[plan.visibility]}
+                          variant={VISIBILITY_BADGE_VARIANTS[plan.visibility]}
                           size="sm"
                         >
                           {VISIBILITY_LABELS[plan.visibility]}

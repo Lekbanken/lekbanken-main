@@ -21,6 +21,8 @@ type SearchBody = {
   search?: string
   tenantId?: string | null
   visibility?: 'private' | 'tenant' | 'public'
+  status?: 'draft' | 'published' | 'modified' | 'archived'
+  statuses?: Array<'draft' | 'published' | 'modified' | 'archived'>
   page?: number
   pageSize?: number
 }
@@ -39,6 +41,8 @@ export async function POST(request: Request) {
     search,
     tenantId = null,
     visibility,
+    status,
+    statuses,
     page = 1,
     pageSize = 20,
   } = (await request.json().catch(() => ({}))) as SearchBody
@@ -73,6 +77,13 @@ export async function POST(request: Request) {
     query = query.eq('visibility', visibility)
   } else if (tenantId) {
     query = query.or(`owner_tenant_id.eq.${tenantId},visibility.eq.public`)
+  }
+
+  // Status filter - support both single status and array of statuses
+  if (statuses && statuses.length > 0) {
+    query = query.in('status', statuses)
+  } else if (status) {
+    query = query.eq('status', status)
   }
 
   query = query.range(offset, offset + safePageSize - 1)

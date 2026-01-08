@@ -1,0 +1,176 @@
+{
+  "sv": {
+    "planner": {
+      "status": {
+        "draft": "Utkast",
+        "published": "Publicerad",
+        "modified": "Ändrad",
+        "archived": "Arkiverad"
+      },
+      "visibility": {
+        "private": "Privat",
+        "tenant": "Organisation",
+        "public": "Publik"
+      },
+      "actions": {
+        "create": "Skapa plan",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "archive": "Arkivera",
+        "restore": "Återställ",
+        "publish": "Publicera",
+        "copy": "Kopiera",
+        "export": "Exportera",
+        "share": "Dela",
+        "preview": "Förhandsgranska"
+      },
+      "blocks": {
+        "title": "Block i planen",
+        "empty": "Inga block i denna plan ännu.",
+        "description": "Dra, byt ordning och justera tidsåtgång.",
+        "types": {
+          "game": "Lek",
+          "pause": "Paus",
+          "preparation": "Förberedelse",
+          "reflection": "Reflektion",
+          "transition": "Övergång"
+        }
+      },
+      "form": {
+        "name": "Titel",
+        "namePlaceholder": "Skriv planens titel",
+        "description": "Beskrivning",
+        "descriptionPlaceholder": "Kort beskrivning av planen"
+      },
+      "versions": {
+        "title": "Versionshistorik",
+        "current": "Aktuell",
+        "empty": "Inga publicerade versioner ännu",
+        "emptyHint": "Publicera planen för att skapa en version"
+      },
+      "warnings": {
+        "unpublishedChanges": "Opublicerade ändringar",
+        "archivedPlan": "Denna plan är arkiverad"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda planer",
+        "saveFailed": "Kunde inte spara",
+        "deleteFailed": "Kunde inte ta bort",
+        "publishFailed": "Kunde inte publicera",
+        "copyFailed": "Kunde inte kopiera plan"
+      },
+      "success": {
+        "saved": "Sparad",
+        "published": "Publicerad!",
+        "deleted": "Plan borttagen",
+        "copied": "Plan kopierad!",
+        "archived": "Plan arkiverad",
+        "restored": "Plan återställd"
+      },
+      "filter": {
+        "search": "Sök planer...",
+        "status": "Status",
+        "visibility": "Synlighet",
+        "sortBy": "Sortera efter",
+        "all": "Alla",
+        "clear": "Rensa filter"
+      },
+      "sort": {
+        "updatedAt": "Senast ändrad",
+        "createdAt": "Skapad",
+        "name": "Namn"
+      },
+      "time": {
+        "minutes": "min",
+        "hours": "h"
+      }
+    }
+  },
+  "en": {
+    "planner": {
+      "status": {
+        "draft": "Draft",
+        "published": "Published",
+        "modified": "Modified",
+        "archived": "Archived"
+      },
+      "visibility": {
+        "private": "Private",
+        "tenant": "Organization",
+        "public": "Public"
+      },
+      "actions": {
+        "create": "Create plan",
+        "edit": "Edit",
+        "delete": "Delete",
+        "archive": "Archive",
+        "restore": "Restore",
+        "publish": "Publish",
+        "copy": "Copy",
+        "export": "Export",
+        "share": "Share",
+        "preview": "Preview"
+      },
+      "blocks": {
+        "title": "Blocks in plan",
+        "empty": "No blocks in this plan yet.",
+        "description": "Drag, reorder and adjust duration.",
+        "types": {
+          "game": "Game",
+          "pause": "Break",
+          "preparation": "Preparation",
+          "reflection": "Reflection",
+          "transition": "Transition"
+        }
+      },
+      "form": {
+        "name": "Title",
+        "namePlaceholder": "Enter plan title",
+        "description": "Description",
+        "descriptionPlaceholder": "Brief description of the plan"
+      },
+      "versions": {
+        "title": "Version History",
+        "current": "Current",
+        "empty": "No published versions yet",
+        "emptyHint": "Publish the plan to create a version"
+      },
+      "warnings": {
+        "unpublishedChanges": "Unpublished changes",
+        "archivedPlan": "This plan is archived"
+      },
+      "errors": {
+        "loadFailed": "Could not load plans",
+        "saveFailed": "Could not save",
+        "deleteFailed": "Could not delete",
+        "publishFailed": "Could not publish",
+        "copyFailed": "Could not copy plan"
+      },
+      "success": {
+        "saved": "Saved",
+        "published": "Published!",
+        "deleted": "Plan deleted",
+        "copied": "Plan copied!",
+        "archived": "Plan archived",
+        "restored": "Plan restored"
+      },
+      "filter": {
+        "search": "Search plans...",
+        "status": "Status",
+        "visibility": "Visibility",
+        "sortBy": "Sort by",
+        "all": "All",
+        "clear": "Clear filters"
+      },
+      "sort": {
+        "updatedAt": "Last modified",
+        "createdAt": "Created",
+        "name": "Name"
+      },
+      "time": {
+        "minutes": "min",
+        "hours": "h"
+      }
+    }
+  }
+}

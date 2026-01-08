@@ -46,7 +46,10 @@ const Share2Icon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
 );
 const DownloadIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+);
+const CopyIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
 );
 const ChevronDownIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
@@ -59,6 +62,7 @@ interface ExtendedCapabilities {
   canViewHistory: boolean;
   canShare: boolean;
   canExport: boolean;
+  canCopy: boolean;
 }
 
 interface PlanHeaderBarProps {
@@ -75,8 +79,10 @@ interface PlanHeaderBarProps {
   onShare: () => void;
   onExport: () => void;
   onDelete: () => void;
+  onCopy: () => void;
   isPublishing?: boolean;
   isSaving?: boolean;
+  isCopying?: boolean;
 }
 
 const VISIBILITY_OPTIONS = [
@@ -112,8 +118,10 @@ export function PlanHeaderBar({
   onShare,
   onExport,
   onDelete,
+  onCopy,
   isPublishing = false,
   isSaving = false,
+  isCopying = false,
 }: PlanHeaderBarProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const showPublishButton =
@@ -123,6 +131,21 @@ export function PlanHeaderBar({
     <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div className="flex flex-wrap items-center gap-2">
         <StatusBadge status={plan.status} size="sm" />
+        
+        {/* Version indicator */}
+        {plan.currentVersion && (
+          <span className="text-xs text-muted-foreground font-medium">
+            v{plan.currentVersion.versionNumber}
+          </span>
+        )}
+        
+        {/* Modified warning */}
+        {plan.status === "modified" && (
+          <span className="flex items-center gap-1 text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+            Opublicerade ändringar
+          </span>
+        )}
 
         {capabilities.canSetVisibility ? (
           <DropdownMenu>
@@ -182,6 +205,21 @@ export function PlanHeaderBar({
           <Button variant="outline" size="sm" onClick={onExport} disabled={!hasBlocks}>
             <DownloadIcon />
             <span className="ml-1.5">Exportera</span>
+          </Button>
+        )}
+        {capabilities.canCopy && (
+          <Button variant="outline" size="sm" onClick={onCopy} disabled={isCopying}>
+            {isCopying ? (
+              <>
+                <LoaderIcon />
+                <span className="ml-1.5">Kopierar...</span>
+              </>
+            ) : (
+              <>
+                <CopyIcon />
+                <span className="ml-1.5">Kopiera</span>
+              </>
+            )}
           </Button>
         )}
         {showPublishButton && (
@@ -248,6 +286,12 @@ export function PlanHeaderBar({
               <DropdownMenuItem onClick={onExport} disabled={!hasBlocks}>
                 <DownloadIcon />
                 Exportera
+              </DropdownMenuItem>
+            )}
+            {capabilities.canCopy && (
+              <DropdownMenuItem onClick={onCopy} disabled={isCopying}>
+                <CopyIcon />
+                Kopiera plan
               </DropdownMenuItem>
             )}
             {capabilities.canDelete && (

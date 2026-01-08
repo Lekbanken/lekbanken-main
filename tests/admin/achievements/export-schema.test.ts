@@ -197,8 +197,11 @@ describe('awardBuilderExportSchemaV1', () => {
       
       expect(result.success).toBe(false);
       if (!result.success) {
-        const flatErrors = result.error.flatten();
-        expect(flatErrors.formErrors.length).toBeGreaterThan(0);
+        // Error is in fieldErrors under publish_scope.tenant_id path
+        const hasError = result.error.issues.some(issue => 
+          issue.path.includes('publish_scope') || issue.message.includes('tenant_id')
+        );
+        expect(hasError).toBe(true);
       }
     });
 

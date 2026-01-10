@@ -73,6 +73,7 @@ export interface AtlasComponent {
   id: string;
   name: string;
   fileRef?: string;
+  notes?: string;
 }
 
 export interface AtlasTable {
@@ -80,6 +81,8 @@ export interface AtlasTable {
   name: string;
   schema?: string;
   description?: string;
+  fileRef?: string;
+  notes?: string;
 }
 
 export interface AtlasEndpoint {
@@ -88,6 +91,7 @@ export interface AtlasEndpoint {
   path: string;
   description?: string;
   fileRef?: string;
+  notes?: string;
 }
 
 export interface AtlasEdge {

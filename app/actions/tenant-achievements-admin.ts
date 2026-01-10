@@ -13,6 +13,7 @@ import { revalidatePath } from 'next/cache';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { assertTenantAdminOrSystem } from '@/lib/utils/tenantAuth';
 import { z } from 'zod';
+import type { Json } from '@/types/supabase';
 
 // ============================================
 // TYPES
@@ -25,7 +26,7 @@ export interface TenantAchievementRow {
   description: string | null;
   icon_url: string | null;
   badge_color: string | null;
-  icon_config: Record<string, unknown> | null;
+  icon_config: Json | null;
   condition_type: string;
   condition_value: number | null;
   scope: 'global' | 'tenant' | 'private';
@@ -80,7 +81,7 @@ const tenantAchievementCreateSchema = z.object({
   achievement_key: z.string().max(50).optional().nullable(),
   icon_url: z.string().url().optional().nullable(),
   badge_color: z.string().max(20).optional().nullable(),
-  icon_config: z.record(z.unknown()).optional().nullable(),
+  icon_config: z.any().optional().nullable(), // Json type
   condition_type: z.string().min(1, 'Villkorstyp krävs').default('manual'),
   condition_value: z.number().int().optional().nullable(),
   status: z.enum(['draft', 'active', 'archived']).default('draft'),
@@ -482,8 +483,8 @@ export async function awardTenantAchievement(
     p_tenant_id: tenantId,
     p_achievement_id: achievementId,
     p_user_ids: parsed.data.userIds,
-    p_message: parsed.data.message || null,
-    p_idempotency_key: parsed.data.idempotencyKey || null,
+    p_message: parsed.data.message ?? undefined,
+    p_idempotency_key: parsed.data.idempotencyKey ?? undefined,
   });
 
   if (error) {

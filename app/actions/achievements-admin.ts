@@ -16,6 +16,8 @@ import { z } from 'zod';
 // TYPES
 // ============================================
 
+import type { Json } from '@/types/supabase';
+
 export interface AchievementRow {
   id: string;
   achievement_key: string | null;
@@ -23,7 +25,7 @@ export interface AchievementRow {
   description: string | null;
   icon_url: string | null;
   badge_color: string | null;
-  icon_config: Record<string, unknown> | null;
+  icon_config: Json | null;
   condition_type: string;
   condition_value: number | null;
   scope: 'global' | 'tenant' | 'private';
@@ -64,7 +66,7 @@ const achievementCreateSchema = z.object({
   achievement_key: z.string().max(50).optional().nullable(),
   icon_url: z.string().url().optional().nullable(),
   badge_color: z.string().max(20).optional().nullable(),
-  icon_config: z.record(z.unknown()).optional().nullable(),
+  icon_config: z.any().optional().nullable(), // Json type
   condition_type: z.string().min(1, 'Condition type is required'),
   condition_value: z.number().int().optional().nullable(),
   scope: z.enum(['global', 'tenant', 'private']).default('global'),
@@ -433,8 +435,8 @@ export async function awardAchievement(
   const { data, error } = await supabase.rpc('admin_award_achievement_v1', {
     p_achievement_id: achievementId,
     p_user_ids: userIds,
-    p_message: message || null,
-    p_tenant_id: tenantId || null,
+    p_message: message ?? undefined,
+    p_tenant_id: tenantId ?? undefined,
     p_idempotency_key: finalKey,
   });
 
@@ -508,7 +510,7 @@ export async function getTenantUserIds(
 export interface TenantOption {
   id: string;
   name: string;
-  slug: string;
+  slug: string | null;
 }
 
 export async function listTenantsForSelector(): Promise<{ tenants: TenantOption[] }> {
@@ -539,7 +541,7 @@ export async function listTenantsForSelector(): Promise<{ tenants: TenantOption[
 export interface UserSearchResult {
   id: string;
   email: string;
-  display_name: string | null;
+  full_name: string | null;
   avatar_url: string | null;
 }
 
@@ -561,8 +563,8 @@ export async function searchUsersForAward(
 
   let dbQuery = supabase
     .from('users')
-    .select('id, email, display_name, avatar_url')
-    .or(`email.ilike.%${query}%,display_name.ilike.%${query}%`)
+    .select('id, email, full_name, avatar_url')
+    .or(`email.ilike.%${query}%,full_name.ilike.%${query}%`)
     .limit(limit);
 
   // If tenant specified, filter to tenant members

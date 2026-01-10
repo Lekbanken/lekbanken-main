@@ -252,11 +252,11 @@ export function AwardAchievementModal({
                       className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-muted/50"
                     >
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
-                        {user.display_name?.charAt(0) || user.email?.charAt(0) || '?'}
+                        {user.full_name?.charAt(0) || user.email?.charAt(0) || '?'}
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
-                          {user.display_name || 'Ingen namn'}
+                          {user.full_name || 'Ingen namn'}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
                           {user.email}
@@ -285,7 +285,7 @@ export function AwardAchievementModal({
                         key={user.id}
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary"
                       >
-                        {user.display_name || user.email}
+                        {user.full_name || user.email}
                         <button
                           type="button"
                           onClick={() => handleRemoveUser(user.id)}

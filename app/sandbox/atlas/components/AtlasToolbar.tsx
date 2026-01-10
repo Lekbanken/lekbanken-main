@@ -16,7 +16,7 @@ interface AtlasToolbarProps {
   lastSystemSyncAt: string | null;
   helpOpen: boolean;
   onHelpOpenChange: (open: boolean) => void;
-  searchInputRef: RefObject<HTMLInputElement>;
+  searchInputRef: RefObject<HTMLInputElement | null>;
 }
 
 const modeOptions: { id: AtlasMode; label: string; description: string }[] = [

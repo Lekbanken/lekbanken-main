@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useCallback } from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -146,10 +146,8 @@ export function PathEditorDrawer({
       setSelectedCourseId('');
       setSelectedEdgeFrom('');
       setSelectedEdgeTo('');
-      
-      // Load courses for selector
-      loadCourses();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, path, currentTenantId, tenants]);
 
   // Auto-generate slug from title
@@ -159,7 +157,7 @@ export function PathEditorDrawer({
     }
   }, [title, slugManuallyEdited]);
 
-  const loadCourses = async () => {
+  const loadCourses = useCallback(async () => {
     try {
       const result = await listCoursesForPathEditor({
         scope: scope === 'global' ? 'global' : 'all',
@@ -169,7 +167,7 @@ export function PathEditorDrawer({
     } catch (err) {
       console.error('Failed to load courses:', err);
     }
-  };
+  }, [scope, tenantId]);
 
   const loadNodesAndEdges = async (pathId: string) => {
     setNodesLoading(true);
@@ -187,12 +185,12 @@ export function PathEditorDrawer({
     }
   };
 
-  // Reload courses when scope/tenant changes
+  // Load courses on open and when scope/tenant changes
   useEffect(() => {
     if (open) {
       loadCourses();
     }
-  }, [scope, tenantId, open]);
+  }, [open, loadCourses]);
 
   const handleSlugChange = (value: string) => {
     setSlugManuallyEdited(true);

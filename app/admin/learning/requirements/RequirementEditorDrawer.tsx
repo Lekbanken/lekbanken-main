@@ -75,6 +75,7 @@ export function RequirementEditorDrawer({
   const [tenantId, setTenantId] = useState<string>('');
 
   // Reset form when drawer opens
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (open) {
       if (requirement) {
@@ -102,6 +103,7 @@ export function RequirementEditorDrawer({
       setError(null);
     }
   }, [open, requirement, isSystemAdmin, currentTenantId, tenants]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Load courses when drawer opens or tenant changes
   useEffect(() => {

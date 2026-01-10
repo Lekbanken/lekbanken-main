@@ -1163,7 +1163,7 @@ export async function deleteRequirementAdmin(
 // ============================================
 
 export async function listTenantsForLearningAdmin(): Promise<{ tenants: TenantOption[] }> {
-  const { user, isSystem, error: authError } = await getCurrentAdminUser();
+  const { user, isSystem, error: _authError } = await getCurrentAdminUser();
   
   if (!user) {
     return { tenants: [] };
@@ -1212,7 +1212,7 @@ export async function listTenantsForLearningAdmin(): Promise<{ tenants: TenantOp
 export async function listCoursesForSelector(
   tenantId?: string | null
 ): Promise<{ courses: Array<{ id: string; title: string; slug: string; tenant_id: string | null }> }> {
-  const { user, isSystem, error: authError } = await getCurrentAdminUser();
+  const { user, isSystem, error: _authError } = await getCurrentAdminUser();
   
   if (!user) {
     return { courses: [] };
@@ -1992,8 +1992,8 @@ export async function getLearningReports(params: {
 
   // Calculate stats
   const uniqueUsers = new Set(progressData?.filter(p => p.status === 'in_progress' || p.status === 'completed').map(p => p.user_id));
-  const completed = progressData?.filter(p => p.status === 'completed') || [];
-  const scores = completed.map(p => p.last_score).filter((s): s is number => s !== null);
+  const completed = progressData?.filter(prog => prog.status === 'completed') || [];
+  const scores = completed.map(prog => prog.last_score).filter((s): s is number => s !== null);
   const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
 
   // Get top courses by completions
@@ -2140,7 +2140,7 @@ export async function listCoursesForPathEditor(params: {
   tenantId?: string;
 } = {}): Promise<{ courses: Array<{ id: string; title: string; slug: string; tenant_id: string | null }> }> {
   const { scope = 'all', tenantId } = params;
-  const { user, isSystem, error: authError } = await getCurrentAdminUser();
+  const { user, isSystem, error: _authError } = await getCurrentAdminUser();
 
   if (!user) {
     return { courses: [] };

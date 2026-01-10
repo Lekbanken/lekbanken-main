@@ -155,6 +155,7 @@ export function CourseEditorDrawer({
   };
 
   // Reset form when course changes or drawer opens
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (open) {
       if (course) {
@@ -216,8 +217,10 @@ export function CourseEditorDrawer({
       setActiveTab('basic');
     }
   }, [open, course, isSystemAdmin, currentTenantId, tenants]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Sync blocks to JSON when switching to advanced mode
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (advancedMode) {
       setContentJson(sectionsToJson(sections));
@@ -225,6 +228,7 @@ export function CourseEditorDrawer({
       setRewardsJson(rewardsToJson(rewards));
     }
   }, [advancedMode, sections, questions, rewards]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Sync JSON to blocks when switching back from advanced mode
   const handleAdvancedModeToggle = (checked: boolean) => {
@@ -238,11 +242,13 @@ export function CourseEditorDrawer({
   };
 
   // Auto-generate slug from title
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!slugManuallyEdited && title) {
       setSlug(slugify(title));
     }
   }, [title, slugManuallyEdited]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSlugChange = (value: string) => {
     setSlugManuallyEdited(true);

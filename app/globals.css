@@ -142,9 +142,54 @@ body {
   animation: shake 0.5s ease-in-out;
 }
 
+/* Achievement notification animations */
+@keyframes bounce-in {
+  0% { transform: scale(0.3) translateY(-50px); opacity: 0; }
+  50% { transform: scale(1.05) translateY(0); opacity: 1; }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes confetti {
+  0% { transform: translateY(-10px) rotate(0deg) scale(0); opacity: 1; }
+  50% { transform: translateY(200px) rotate(var(--rotation, 180deg)) scale(1); opacity: 1; }
+  100% { transform: translateY(400px) rotate(calc(var(--rotation, 180deg) * 2)) scale(0.5); opacity: 0; }
+}
+
+@keyframes scale-pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fade-in-delayed {
+  0% { opacity: 0; transform: translateX(-10px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.animate-confetti {
+  animation: confetti 2s ease-out forwards;
+}
+
+.animate-scale-pop {
+  animation: scale-pop 0.5s ease-out 0.2s;
+}
+
+.animate-fade-in-delayed {
+  animation: fade-in-delayed 0.3s ease-out 0.4s both;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  .animate-shake {
+  .animate-shake,
+  .animate-bounce-in,
+  .animate-confetti,
+  .animate-scale-pop,
+  .animate-fade-in-delayed {
     animation: none;
   }
 }

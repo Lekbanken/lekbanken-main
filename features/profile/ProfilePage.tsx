@@ -14,6 +14,7 @@ import { useAuth } from "@/lib/supabase/auth";
 import { cn } from "@/lib/utils";
 import { avatarPresets } from "./avatarPresets";
 import { LogoutButton } from "./components/LogoutButton";
+import { ProfileAchievementsShowcase } from "./components/ProfileAchievementsShowcase";
 
 type ThemePreference = "light" | "dark" | "system";
 
@@ -332,6 +333,9 @@ export function ProfilePage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Achievements Showcase */}
+      {user?.id && <ProfileAchievementsShowcase userId={user.id} maxDisplay={6} showLocked />}
 
       <Card>
         <CardHeader>

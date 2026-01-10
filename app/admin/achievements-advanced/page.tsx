@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// Legacy route: redirect to the consolidated Achievements admin
+// Legacy route: redirect to the canonical achievements admin
 export default function AchievementsAdvancedRedirect() {
-  redirect("/admin/achievements");
+  redirect("/admin/gamification/achievements");
 }

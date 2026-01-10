@@ -176,11 +176,33 @@ export async function GET() {
 
   const userId = user.id;
 
-  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes, progressRes] = await Promise.all([
-    supabase
-      .from("achievements")
-      .select("id,name,description,icon_url,condition_type,condition_value,is_easter_egg,hint_text")
-      .order("created_at", { ascending: true }),
+  // First get progress to know tenant context
+  const progressRes = await supabase
+    .from("user_progress")
+    .select("level,current_xp,next_level_xp,tenant_id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+
+  const tenantId = (progressRes.data as { tenant_id?: string | null } | null)?.tenant_id ?? null;
+
+  // Build achievements query: global (tenant_id IS NULL) + tenant-specific active achievements
+  let achievementsQuery = supabase
+    .from("achievements")
+    .select("id,name,description,icon_url,condition_type,condition_value,is_easter_egg,hint_text,tenant_id")
+    .eq("status", "active")
+    .order("created_at", { ascending: true });
+
+  if (tenantId) {
+    // Include global achievements OR this tenant's achievements
+    achievementsQuery = achievementsQuery.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`);
+  } else {
+    // Only global achievements
+    achievementsQuery = achievementsQuery.is("tenant_id", null);
+  }
+
+  const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes] = await Promise.all([
+    achievementsQuery,
     supabase.from("user_achievements").select("achievement_id").eq("user_id", userId),
     supabase
       .from("user_coins")
@@ -201,12 +223,6 @@ export async function GET() {
       .eq("user_id", userId)
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from("user_progress")
-      .select("level,current_xp,next_level_xp,tenant_id")
-      .eq("user_id", userId)
-      .limit(1)
-      .maybeSingle(),
   ]);
 
   const achievements = mapAchievements(achievementsRes.data ?? [], userAchievementsRes.data ?? []);
@@ -214,7 +230,6 @@ export async function GET() {
   const streak = mapStreak(streakRes.data ?? null);
   const baseProgress = mapProgress(progressRes.data ?? null, achievements);
 
-  const tenantId = (progressRes.data as { tenant_id?: string | null } | null)?.tenant_id ?? null;
   let levelDefs: LevelDefinitionRow[] | null = null;
   try {
     const res = await supabase.rpc('get_gamification_level_definitions_v1', { p_tenant_id: tenantId ?? undefined })

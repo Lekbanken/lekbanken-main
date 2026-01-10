@@ -489,3 +489,165 @@ export async function getAchievementLeaderboard(
     return [];
   }
 }
+
+// ============================================
+// TENANT-AWARE ACHIEVEMENTS (Phase 3)
+// ============================================
+
+/**
+ * Get achievements visible to a user within a specific tenant context.
+ * Returns:
+ * - Global achievements (scope = 'global', tenant_id IS NULL)
+ * - Tenant achievements (scope = 'tenant', tenant_id = tenantId, status = 'active')
+ */
+export async function getAchievementsForTenant(tenantId: string | null): Promise<Achievement[]> {
+  try {
+    // Build query for global + tenant achievements
+    let query = supabase
+      .from('achievements')
+      .select('*')
+      .eq('status', 'active');
+
+    if (tenantId) {
+      // Get global OR this tenant's achievements
+      query = query.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`);
+    } else {
+      // Only global achievements
+      query = query.is('tenant_id', null);
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching tenant achievements:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.error('Error in getAchievementsForTenant:', err);
+    return [];
+  }
+}
+
+/**
+ * Get user's achievement progress within a tenant context.
+ * Shows global achievements plus tenant-specific ones.
+ */
+export async function getUserAchievementProgressForTenant(
+  userId: string,
+  tenantId: string | null
+): Promise<AchievementProgress[]> {
+  try {
+    const achievements = await getAchievementsForTenant(tenantId);
+    const userAchievements = await getUserAchievements(userId);
+
+    // Get user stats from game_sessions
+    const { data: sessions } = await supabase
+      .from('game_sessions')
+      .select('score')
+      .eq('user_id', userId)
+      .eq('status', 'completed');
+
+    const totalGames = sessions?.length || 0;
+    const totalScore = sessions?.reduce((sum, s) => sum + (s.score || 0), 0) || 0;
+    const bestScore = sessions ? Math.max(0, ...sessions.map((s) => s.score || 0)) : 0;
+
+    return achievements.map((achievement) => {
+      const isUnlocked = userAchievements.some((ua) => ua.achievement_id === achievement.id);
+      const unlockedItem = userAchievements.find((ua) => ua.achievement_id === achievement.id);
+
+      let progress = 0;
+      let percentComplete = 0;
+
+      switch (achievement.condition_type) {
+        case 'session_count':
+        case 'games_played':
+          progress = totalGames;
+          percentComplete = achievement.condition_value
+            ? Math.min(100, (totalGames / achievement.condition_value) * 100)
+            : 0;
+          break;
+
+        case 'total_score':
+        case 'score_reached':
+          progress = totalScore;
+          percentComplete = achievement.condition_value
+            ? Math.min(100, (totalScore / achievement.condition_value) * 100)
+            : 0;
+          break;
+
+        case 'best_score':
+        case 'score_milestone':
+          progress = bestScore;
+          percentComplete = achievement.condition_value
+            ? Math.min(100, (bestScore / achievement.condition_value) * 100)
+            : 0;
+          break;
+
+        case 'first_game':
+          percentComplete = totalGames > 0 ? 100 : 0;
+          break;
+
+        case 'perfect_score':
+        case 'manual':
+        default:
+          // Manual or unknown - no progress
+          percentComplete = isUnlocked ? 100 : 0;
+          break;
+      }
+
+      return {
+        achievement,
+        progress,
+        isUnlocked,
+        unlockedAt: unlockedItem?.unlocked_at || null,
+        percentComplete: isUnlocked ? 100 : percentComplete,
+      };
+    });
+  } catch (err) {
+    console.error('Error in getUserAchievementProgressForTenant:', err);
+    return [];
+  }
+}
+
+/**
+ * Get user's achievement stats within a tenant context.
+ */
+export async function getUserAchievementStatsForTenant(
+  userId: string,
+  tenantId: string | null
+): Promise<{
+  unlockedCount: number;
+  totalCount: number;
+  completionPercentage: number;
+  recentlyUnlocked: UserAchievement[];
+}> {
+  try {
+    const achievements = await getAchievementsForTenant(tenantId);
+    const userAchievements = await getUserAchievements(userId);
+
+    // Filter user achievements to only those in the tenant context
+    const achievementIds = new Set(achievements.map((a) => a.id));
+    const relevantUserAchievements = userAchievements.filter((ua) =>
+      achievementIds.has(ua.achievement_id)
+    );
+
+    return {
+      unlockedCount: relevantUserAchievements.length,
+      totalCount: achievements.length,
+      completionPercentage: Math.round(
+        (relevantUserAchievements.length / Math.max(1, achievements.length)) * 100
+      ),
+      recentlyUnlocked: relevantUserAchievements.slice(0, 3),
+    };
+  } catch (err) {
+    console.error('Error in getUserAchievementStatsForTenant:', err);
+    return {
+      unlockedCount: 0,
+      totalCount: 0,
+      completionPercentage: 0,
+      recentlyUnlocked: [],
+    };
+  }
+}

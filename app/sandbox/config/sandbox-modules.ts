@@ -79,6 +79,15 @@ export const sandboxCategories: SandboxCategory[] = [
         routes: ['/sandbox/docs/wiki', '/sandbox/docs/wiki/*'],
       },
       {
+        id: 'atlas',
+        label: 'Atlas',
+        href: '/sandbox/atlas',
+        description: 'System map for routes, data, and components',
+        status: 'implemented',
+        components: ['@/app/sandbox/atlas/*'],
+        routes: ['/sandbox/atlas'],
+      },
+      {
         id: 'conversation-cards',
         label: 'Samtalskort',
         href: '/sandbox/docs/conversation-cards',
@@ -751,6 +760,7 @@ export const moduleGroups = sandboxCategories.map((category) => ({
     description: m.description,
   })),
 }));
+
 
 
 

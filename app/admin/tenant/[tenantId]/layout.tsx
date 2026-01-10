@@ -32,14 +32,18 @@ export default async function TenantAdminLayout({
   const tenantRole = membership?.role as string | null;
   const hasTenantAccess = tenantRole === 'owner' || tenantRole === 'admin' || tenantRole === 'editor';
 
-  // Redirect unauthorized users
+  // Redirect unauthorized users directly to /app (avoid redirect chain through /admin)
   if (!isSystemAdmin && !hasTenantAccess) {
-    // If user has other tenant memberships, redirect to their tenant or admin home
-    const firstTenantId = authContext.memberships?.[0]?.tenant_id;
-    if (firstTenantId && firstTenantId !== tenantId) {
-      redirect(`/admin/tenant/${firstTenantId}`);
+    // If user has another tenant they can admin, redirect there
+    const adminRoles = new Set(['owner', 'admin', 'editor']);
+    const firstAdminMembership = authContext.memberships?.find(m => 
+      m.tenant_id !== tenantId && adminRoles.has(m.role as string)
+    );
+    if (firstAdminMembership?.tenant_id) {
+      redirect(`/admin/tenant/${firstAdminMembership.tenant_id}`);
     }
-    redirect('/admin');
+    // No admin access anywhere - redirect to app
+    redirect('/app');
   }
 
   return (

@@ -28,6 +28,9 @@ interface SandboxShellProps {
   controls?: React.ReactNode;
   title?: string;
   description?: string;
+  contentWidth?: 'default' | 'full';
+  contextContent?: React.ReactNode;
+  contextTitle?: string;
 }
 
 export function SandboxShell({
@@ -36,9 +39,13 @@ export function SandboxShell({
   controls,
   title,
   description,
+  contentWidth = 'default',
+  contextContent,
+  contextTitle,
 }: SandboxShellProps) {
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
+  const contentWidthClass = contentWidth === 'full' ? 'max-w-none w-full' : 'max-w-5xl';
 
   return (
     <SandboxThemeProvider>
@@ -112,14 +119,19 @@ export function SandboxShell({
         {/* Main scrollable content */}
         <main className="flex-1 overflow-y-auto p-6">
           <ViewportFrame>
-            <div className="mx-auto max-w-5xl">{children}</div>
+            <div className={cn('mx-auto', contentWidthClass)}>{children}</div>
           </ViewportFrame>
         </main>
       </div>
 
       {/* Right context panel - Desktop */}
       <div className="hidden w-80 shrink-0 lg:block">
-        <ContextPanel moduleId={moduleId} controls={controls} />
+        <ContextPanel
+          moduleId={moduleId}
+          controls={controls}
+          customContent={contextContent}
+          customTitle={contextTitle}
+        />
       </div>
 
       {/* Right context panel - Mobile (slide-in) */}
@@ -136,7 +148,12 @@ export function SandboxShell({
         >
           <XMarkIcon className="h-5 w-5" />
         </button>
-        <ContextPanel moduleId={moduleId} controls={controls} />
+        <ContextPanel
+          moduleId={moduleId}
+          controls={controls}
+          customContent={contextContent}
+          customTitle={contextTitle}
+        />
       </div>
     </div>
     </SandboxThemeProvider>

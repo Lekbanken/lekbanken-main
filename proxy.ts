@@ -215,7 +215,9 @@ export default async function proxy(request: NextRequest) {
   }
 
   const effectiveRole = deriveEffectiveGlobalRoleFromClaims(user)
-  if (user && pathname.startsWith('/admin') && effectiveRole !== 'system_admin') {
+  // Gate: /admin/* requires system_admin, EXCEPT /admin/tenant/* which allows
+  // any authenticated user through (tenant membership validated by layout guard)
+  if (user && pathname.startsWith('/admin') && !pathname.startsWith('/admin/tenant/') && effectiveRole !== 'system_admin') {
     const redirectResponse = NextResponse.redirect(new URL('/app', request.url))
     redirectResponse.headers.set('x-request-id', requestId)
     return redirectResponse

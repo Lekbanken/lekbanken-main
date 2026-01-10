@@ -190,6 +190,14 @@ const organisationAdminCategories: AdminNavCategory[] = [
     ],
   },
   {
+    id: 'org-gamification',
+    label: 'Gamification',
+    icon: 'achievements',
+    items: [
+      { id: 'org-achievements', label: 'Utmärkelser', href: '/admin/tenant/[tenantId]/gamification/achievements', icon: 'achievements' },
+    ],
+  },
+  {
     id: 'org-billing',
     label: 'Konto',
     icon: 'billing',

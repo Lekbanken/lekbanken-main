@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------------
 // Module Notes & Changelog - Documentation per module
 // -----------------------------------------------------------------------------
 
@@ -11,8 +11,8 @@ export interface ModuleNotes {
 export const moduleNotes: Record<string, ModuleNotes> = {
   'repo-docs': {
     notes: `
-- Renderar Markdown-filer från **docs/** (top-level) direkt i Sandbox UI
-- Syfte: onboarding/utforskning med samma shell/nav som övriga sandboxen
+- Renderar Markdown-filer frÃ¥n **docs/** (top-level) direkt i Sandbox UI
+- Syfte: onboarding/utforskning med samma shell/nav som Ã¶vriga sandboxen
 - Dev-only: visas inte i production
     `.trim(),
     changelog: [{ date: '2025-12-18', note: 'Added repo docs viewer (docs/*.md rendered in UI)' }],
@@ -25,8 +25,8 @@ docs/*.md
   },
   wiki: {
     notes: `
-- Renderar Markdown-filer från **sandbox/wiki** direkt i Sandbox UI
-- Syfte: onboarding/utbildning (läsbarhet + navigering), inte "source of truth"
+- Renderar Markdown-filer frÃ¥n **sandbox/wiki** direkt i Sandbox UI
+- Syfte: onboarding/utbildning (lÃ¤sbarhet + navigering), inte "source of truth"
 - Dev-only: visas inte i production
     `.trim(),
     changelog: [{ date: '2025-12-18', note: 'Added sandbox wiki viewer (markdown rendering in UI)' }],
@@ -36,6 +36,20 @@ sandbox/wiki/*.md
 // UI routes:
 /sandbox/docs/wiki
 /sandbox/docs/wiki/[slug]`,
+  },
+  atlas: {
+    notes: `
+- Enterprise atlas for frames, data, and endpoints.
+- Manual layer: review flags + notes.
+- Auto layer: sync timestamp (stub for MVP).
+    `.trim(),
+    changelog: [{ date: '2026-01-10', note: 'Added sandbox atlas registry and graph UI' }],
+    codeSnippet: `// UI route:
+/sandbox/atlas
+
+// Registry + types:
+app/sandbox/atlas/registry.ts
+app/sandbox/atlas/types.ts`,
   },
   typography: {
     notes: `
@@ -57,13 +71,13 @@ sandbox/wiki/*.md
 
   icons: {
     notes: `
-- Fyra ikon-URL:er kan testas parallellt (ljust/mörkt original + ljust/mörkt test)
-- Logo lockup stöder fyra layouts: icon-left, icon-top, icon-only, text-only
+- Fyra ikon-URL:er kan testas parallellt (ljust/mÃ¶rkt original + ljust/mÃ¶rkt test)
+- Logo lockup stÃ¶der fyra layouts: icon-left, icon-top, icon-only, text-only
 - Storlekar: sm (24px), md (32px), lg (48px), xl (64px)
-- Justerbar letter spacing och case för wordmark
+- Justerbar letter spacing och case fÃ¶r wordmark
     `.trim(),
     changelog: [
-      { date: '2025-12-12', note: 'La till ikon-URL-fält och flyttade logolayout hit från /logo' },
+      { date: '2025-12-12', note: 'La till ikon-URL-fÃ¤lt och flyttade logolayout hit frÃ¥n /logo' },
       { date: '2025-12-09', note: 'Added logo layout controls' },
     ],
     codeSnippet: `import { LogoLockup } from '@/app/sandbox/components/previews';
@@ -210,8 +224,8 @@ const scale = generateSpacingScale(4);
     codeSnippet: `import { HeroSection } from '@/components/marketing/hero';
 
 <HeroSection 
-  title="Lär genom lek"
-  subtitle="Sveriges roligaste lärplattform"
+  title="LÃ¤r genom lek"
+  subtitle="Sveriges roligaste lÃ¤rplattform"
 />`,
   },
 
@@ -395,3 +409,4 @@ export function getModuleNotes(moduleId: string): ModuleNotes {
     codeSnippet: '// No code snippet available',
   };
 }
+

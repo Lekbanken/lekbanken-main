@@ -12,6 +12,8 @@ interface ContextPanelProps {
   moduleId: string;
   controls?: React.ReactNode;
   className?: string;
+  customContent?: React.ReactNode;
+  customTitle?: string;
 }
 
 type TabId = 'controls' | 'notes' | 'code';
@@ -107,7 +109,13 @@ function WhereUsedSection({ moduleId }: { moduleId: string }) {
   );
 }
 
-export function ContextPanel({ moduleId, controls, className }: ContextPanelProps) {
+export function ContextPanel({
+  moduleId,
+  controls,
+  className,
+  customContent,
+  customTitle,
+}: ContextPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('controls');
   const notes = getModuleNotes(moduleId);
 
@@ -116,6 +124,19 @@ export function ContextPanel({ moduleId, controls, className }: ContextPanelProp
     { id: 'notes', label: 'Notes' },
     { id: 'code', label: 'Code' },
   ];
+
+  if (customContent) {
+    return (
+      <aside className={cn('flex h-full flex-col border-l border-border bg-card', className)}>
+        {customTitle && (
+          <div className="flex h-14 shrink-0 items-center border-b border-border px-4">
+            <h2 className="text-sm font-semibold text-foreground">{customTitle}</h2>
+          </div>
+        )}
+        <div className="flex-1 overflow-y-auto p-4">{customContent}</div>
+      </aside>
+    );
+  }
 
   return (
     <aside className={cn('flex h-full flex-col border-l border-border bg-card', className)}>

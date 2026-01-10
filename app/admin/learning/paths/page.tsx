@@ -1,75 +1,162 @@
 'use client';
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from 'react';
 import {
   MapIcon,
+  GlobeAltIcon,
+  BuildingOffice2Icon,
+  InformationCircleIcon,
+  MagnifyingGlassIcon,
   PlusIcon,
-  PencilIcon,
+  PencilSquareIcon,
   TrashIcon,
-  EyeIcon,
-  ChevronRightIcon,
-  CheckCircleIcon,
-  ClockIcon,
-} from "@heroicons/react/24/outline";
+} from '@heroicons/react/24/outline';
 import {
   AdminPageHeader,
   AdminPageLayout,
   AdminBreadcrumbs,
-} from "@/components/admin/shared";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-// TODO: Remove mock data when database is connected
-const mockPaths = [
-  {
-    id: "1",
-    name: "Lekledarutbildning Grundnivå",
-    slug: "grundniva",
-    description: "Komplett grundutbildning för nya lekledare.",
-    status: "published",
-    is_onboarding_default: true,
-    courses: [
-      { id: "1", title: "Introduktion till Lekbanken", order: 1 },
-      { id: "2", title: "Säkerhet och Trygghet", order: 2 },
-    ],
-    _count: {
-      enrollments: 45,
-      completions: 38,
-    },
-  },
-  {
-    id: "2",
-    name: "Fördjupad Pedagogik",
-    slug: "fordjupad-pedagogik",
-    description: "Avancerad utbildning för erfarna lekledare.",
-    status: "draft",
-    is_onboarding_default: false,
-    courses: [
-      { id: "3", title: "Avancerade Lektekniker", order: 1 },
-    ],
-    _count: {
-      enrollments: 0,
-      completions: 0,
-    },
-  },
-];
+} from '@/components/admin/shared';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  listPaths,
+  listTenantsForLearningAdmin,
+  checkIsSystemAdmin,
+  deletePath,
+  type LearningPathRow,
+  type LearningPathListResult,
+  type TenantOption,
+} from '@/app/actions/learning-admin';
+import { PathEditorDrawer } from './PathEditorDrawer';
 
 const statusConfig = {
-  draft: { label: "Utkast", variant: "outline" as const },
-  published: { label: "Publicerad", variant: "default" as const },
-  archived: { label: "Arkiverad", variant: "secondary" as const },
+  draft: { label: 'Utkast', variant: 'outline' as const },
+  active: { label: 'Aktiv', variant: 'default' as const },
+  archived: { label: 'Arkiverad', variant: 'secondary' as const },
+};
+
+const kindLabels: Record<string, string> = {
+  onboarding: 'Onboarding',
+  role: 'Rollbaserad',
+  theme: 'Tema',
+  compliance: 'Compliance',
 };
 
 export default function AdminPathsPage() {
-  const [paths] = useState(mockPaths);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<LearningPathListResult | null>(null);
+  const [tenants, setTenants] = useState<TenantOption[]>([]);
+  const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+
+  // Editor drawer state
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingPath, setEditingPath] = useState<LearningPathRow | null>(null);
+
+  // Filters
+  const [search, setSearch] = useState('');
+  const [searchDebounced, setSearchDebounced] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'draft' | 'active' | 'archived'>('all');
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'global' | 'tenant'>('all');
+  const [tenantFilter, setTenantFilter] = useState<string>('');
+  const [page, setPage] = useState(1);
+  const pageSize = 20;
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchDebounced(search);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
+
+  // Load initial data
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [isAdmin, tenantData] = await Promise.all([
+          checkIsSystemAdmin(),
+          listTenantsForLearningAdmin(),
+        ]);
+        setIsSystemAdmin(isAdmin);
+        setTenants(tenantData.tenants);
+      } catch (err) {
+        console.error('Failed to load initial data:', err);
+      }
+    };
+    loadInitialData();
+  }, []);
+
+  // Load paths
+  const loadPaths = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await listPaths({
+        page,
+        pageSize,
+        search: searchDebounced || undefined,
+        status: statusFilter,
+        scope: isSystemAdmin ? scopeFilter : 'all',
+        tenantId: tenantFilter || undefined,
+      });
+      setResult(data);
+    } catch (err) {
+      console.error('Failed to load paths:', err);
+      setError(err instanceof Error ? err.message : 'Kunde inte hämta lärstigar');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, pageSize, searchDebounced, statusFilter, scopeFilter, tenantFilter, isSystemAdmin]);
+
+  useEffect(() => {
+    loadPaths();
+  }, [loadPaths]);
+
+  const handleCreateClick = () => {
+    setEditingPath(null);
+    setDrawerOpen(true);
+  };
+
+  const handleEditClick = (path: LearningPathRow) => {
+    setEditingPath(path);
+    setDrawerOpen(true);
+  };
+
+  const handleDeleteClick = async (path: LearningPathRow) => {
+    if (!confirm(`Vill du verkligen ta bort "${path.title}"?`)) return;
+    
+    const result = await deletePath(path.id);
+    if (result.success) {
+      loadPaths();
+    } else {
+      setError(result.error || 'Kunde inte ta bort lärvägen');
+    }
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+    setEditingPath(null);
+  };
+
+  const handleDrawerSave = () => {
+    setDrawerOpen(false);
+    setEditingPath(null);
+    loadPaths();
+  };
+
+  const paths = result?.data ?? [];
+  const totalPages = result?.totalPages ?? 1;
 
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: "Utbildning", href: "/admin/learning" },
-          { label: "Lärstigar", href: "/admin/learning/paths" },
+          { label: 'Utbildning', href: '/admin/learning' },
+          { label: 'Lärstigar', href: '/admin/learning/paths' },
         ]}
       />
 
@@ -78,134 +165,258 @@ export default function AdminPathsPage() {
         description="Bygg utbildningsvägar med ordnade kurser"
         icon={<MapIcon className="h-8 w-8" />}
         actions={
-          <Button>
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Ny lärstig
-          </Button>
+          isSystemAdmin ? (
+            <Button onClick={handleCreateClick}>
+              <PlusIcon className="mr-2 h-4 w-4" />
+              Skapa lärstig
+            </Button>
+          ) : (
+            <Badge variant="secondary" className="gap-1">
+              <InformationCircleIcon className="h-4 w-4" />
+              Endast visning
+            </Badge>
+          )
         }
       />
+
+      {/* Info for non-system admins */}
+      {!isSystemAdmin && (
+        <Card className="mt-6 border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+          <CardContent className="p-4">
+            <div className="flex gap-3">
+              <InformationCircleIcon className="h-5 w-5 shrink-0 text-amber-500" />
+              <div className="text-sm">
+                <p className="font-medium text-foreground">Endast system-admin kan skapa lärstigar</p>
+                <p className="mt-1 text-muted-foreground">
+                  Du kan se befintliga lärstigar men behöver system admin-rättigheter för att skapa eller redigera dem.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <Card>
           <CardContent className="p-4">
-            <p className="text-2xl font-bold">{paths.length}</p>
+            <p className="text-2xl font-bold">{result?.totalCount ?? '—'}</p>
             <p className="text-sm text-muted-foreground">Lärstigar</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-2xl font-bold">
-              {paths.reduce((sum, p) => sum + p._count.enrollments, 0)}
+            <p className="text-2xl font-bold text-green-600">
+              {paths.filter(p => p.status === 'active').length}
             </p>
-            <p className="text-sm text-muted-foreground">Aktiva deltagare</p>
+            <p className="text-sm text-muted-foreground">Aktiva</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
-            <p className="text-2xl font-bold">
-              {paths.reduce((sum, p) => sum + p._count.completions, 0)}
+            <p className="text-2xl font-bold text-muted-foreground">
+              {paths.filter(p => p.status === 'draft').length}
             </p>
-            <p className="text-sm text-muted-foreground">Avklarade</p>
+            <p className="text-sm text-muted-foreground">Utkast</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Filters */}
+      <div className="mt-6 flex flex-wrap gap-3">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Sök lärstigar..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+
+        <select
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value as typeof statusFilter);
+            setPage(1);
+          }}
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+        >
+          <option value="all">Alla statusar</option>
+          <option value="draft">Utkast</option>
+          <option value="active">Aktiv</option>
+          <option value="archived">Arkiverad</option>
+        </select>
+
+        {isSystemAdmin && (
+          <>
+            <select
+              value={scopeFilter}
+              onChange={(e) => {
+                setScopeFilter(e.target.value as typeof scopeFilter);
+                setPage(1);
+              }}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <option value="all">Alla scope</option>
+              <option value="global">Globala</option>
+              <option value="tenant">Organisation</option>
+            </select>
+
+            {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
+              <select
+                value={tenantFilter}
+                onChange={(e) => {
+                  setTenantFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <option value="">Alla organisationer</option>
+                {tenants.map((tenant) => (
+                  <option key={tenant.id} value={tenant.id}>
+                    {tenant.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Error state */}
+      {error && (
+        <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
+          {error}
+        </div>
+      )}
+
+      {/* Loading state */}
+      {isLoading && !result && (
+        <div className="mt-6 flex items-center justify-center py-12">
+          <div className="text-muted-foreground">Laddar lärstigar...</div>
+        </div>
+      )}
 
       {/* Path Cards */}
-      <div className="mt-6 space-y-4">
-        {paths.map((path) => {
-          const statusInfo = statusConfig[path.status as keyof typeof statusConfig];
-          return (
-            <Card key={path.id}>
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
-                      <MapIcon className="h-5 w-5 text-blue-500" />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <CardTitle className="text-lg">{path.name}</CardTitle>
-                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
-                        {path.is_onboarding_default && (
-                          <Badge variant="secondary">Onboarding</Badge>
-                        )}
-                      </div>
-                      <p className="mt-1 text-sm text-muted-foreground">{path.description}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-1">
-                    <Button variant="ghost" size="sm" href={`/admin/learning/paths/${path.id}`}>
-                      <EyeIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <PencilIcon className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <TrashIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Course flow */}
-                <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 p-3">
-                  {path.courses.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Inga kurser tillagda</p>
-                  ) : (
-                    path.courses.map((course, idx) => (
-                      <div key={course.id} className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 rounded-lg bg-background px-3 py-1.5 shadow-sm">
-                          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
-                            {idx + 1}
-                          </span>
-                          <span className="text-sm font-medium">{course.title}</span>
-                        </div>
-                        {idx < path.courses.length - 1 && (
-                          <ChevronRightIcon className="h-4 w-4 text-muted-foreground" />
-                        )}
-                      </div>
-                    ))
-                  )}
-                </div>
-
-                {/* Stats */}
-                <div className="mt-4 flex gap-6 text-sm">
-                  <div className="flex items-center gap-2">
-                    <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">
-                      {path._count.enrollments} deltagare pågår
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircleIcon className="h-4 w-4 text-green-500" />
-                    <span className="text-muted-foreground">
-                      {path._count.completions} har slutfört
-                    </span>
-                  </div>
-                </div>
+      {result && (
+        <div className="mt-6 space-y-4">
+          {paths.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-12 text-center">
+                <MapIcon className="h-12 w-12 text-muted-foreground/50" />
+                <h3 className="mt-4 font-semibold">Inga lärstigar ännu</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {searchDebounced || statusFilter !== 'all' 
+                    ? 'Inga lärstigar matchar filtren' 
+                    : 'Lärstigar kan skapas i en framtida version.'}
+                </p>
               </CardContent>
             </Card>
-          );
-        })}
-      </div>
+          ) : (
+            paths.map((path) => {
+              const statusInfo = statusConfig[path.status];
+              const isGlobal = path.tenant_id === null;
 
-      {/* Empty state hint */}
-      {paths.length === 0 && (
-        <Card className="mt-6">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <MapIcon className="h-12 w-12 text-muted-foreground/50" />
-            <h3 className="mt-4 font-semibold">Inga lärstigar ännu</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Skapa din första lärstig för att organisera kurser i en sekvens.
-            </p>
-            <Button className="mt-4">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              Skapa lärstig
-            </Button>
-          </CardContent>
-        </Card>
+              return (
+                <Card key={path.id}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10">
+                          <MapIcon className="h-5 w-5 text-blue-500" />
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <CardTitle className="text-lg">{path.title}</CardTitle>
+                            <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                            {isGlobal ? (
+                              <Badge variant="secondary" className="gap-1">
+                                <GlobeAltIcon className="h-3 w-3" />
+                                Global
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline" className="gap-1">
+                                <BuildingOffice2Icon className="h-3 w-3" />
+                                {path.tenant_name || 'Organisation'}
+                              </Badge>
+                            )}
+                            <Badge variant="outline">
+                              {kindLabels[path.kind] || path.kind}
+                            </Badge>
+                          </div>
+                          <p className="mt-1 text-sm text-muted-foreground">{path.description || '—'}</p>
+                        </div>
+                      </div>
+                      {isSystemAdmin && (
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditClick(path)}
+                          >
+                            <PencilSquareIcon className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteClick(path)}
+                          >
+                            <TrashIcon className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap items-center gap-4 rounded-lg border border-dashed border-border bg-muted/30 p-3">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <span className="font-medium">{path.node_count || 0}</span> kurser i denna stig
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
+          )}
+        </div>
       )}
+
+      {/* Pagination */}
+      {result && totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Visar {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, result.totalCount)} av {result.totalCount}
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Föregående
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Nästa
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Path Editor Drawer */}
+      <PathEditorDrawer
+        open={drawerOpen}
+        path={editingPath}
+        tenants={tenants}
+        onClose={handleDrawerClose}
+        onSave={handleDrawerSave}
+      />
     </AdminPageLayout>
   );
 }

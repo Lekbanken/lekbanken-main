@@ -115,6 +115,7 @@ const systemAdminCategories: AdminNavCategory[] = [
       { id: 'courses', label: 'Kurser', href: '/admin/learning/courses', icon: 'learning' },
       { id: 'paths', label: 'Lärstigar', href: '/admin/learning/paths', icon: 'learning' },
       { id: 'requirements', label: 'Krav & Grind', href: '/admin/learning/requirements', icon: 'learning' },
+      { id: 'reports', label: 'Rapporter', href: '/admin/learning/reports', icon: 'learning' },
     ],
   },
   {

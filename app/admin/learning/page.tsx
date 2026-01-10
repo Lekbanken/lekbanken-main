@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   AcademicCapIcon,
@@ -16,6 +17,13 @@ import {
   AdminBreadcrumbs,
 } from "@/components/admin/shared";
 import { Card, CardContent, Badge } from "@/components/ui";
+import {
+  getLearningHubStats,
+  listTenantsForLearningAdmin,
+  checkIsSystemAdmin,
+  type LearningHubStats,
+  type TenantOption,
+} from "@/app/actions/learning-admin";
 
 type ModuleStatus = "implemented" | "partial" | "planned";
 
@@ -42,8 +50,8 @@ const modules: LearningModule[] = [
     description: "Skapa och hantera utbildningskurser med text, quiz och belöningar.",
     href: "/admin/learning/courses",
     icon: <BookOpenIcon className="h-8 w-8" />,
-    status: "partial",
-    features: ["Kursinnehåll", "Quiz-builder", "Belöningar", "Versionshantering"],
+    status: "implemented",
+    features: ["Kursinnehåll", "Quiz-builder", "Belöningar", "Scope-hantering"],
   },
   {
     id: "paths",
@@ -51,8 +59,8 @@ const modules: LearningModule[] = [
     description: "Bygg lärstigar med förutsättningar och progression.",
     href: "/admin/learning/paths",
     icon: <MapIcon className="h-8 w-8" />,
-    status: "planned",
-    features: ["Graf-editor", "Förutsättningar", "Onboarding", "Rollbaserade"],
+    status: "partial",
+    features: ["Endast visning (Fas 1)", "Graf-editor (planerad)", "Förutsättningar", "Rollbaserade"],
   },
   {
     id: "requirements",
@@ -60,8 +68,8 @@ const modules: LearningModule[] = [
     description: "Konfigurera vilka kurser som krävs för aktiviteter och roller.",
     href: "/admin/learning/requirements",
     icon: <ShieldCheckIcon className="h-8 w-8" />,
-    status: "planned",
-    features: ["Aktivitetskrav", "Rollkrav", "Spelkrav", "Globala regler"],
+    status: "implemented",
+    features: ["Aktivitetskrav", "Rollkrav", "Spelkrav", "Toggle aktiv/inaktiv"],
   },
   {
     id: "reports",
@@ -69,12 +77,53 @@ const modules: LearningModule[] = [
     description: "Översikt av gruppens framsteg och kursstatistik.",
     href: "/admin/learning/reports",
     icon: <ChartBarIcon className="h-8 w-8" />,
-    status: "planned",
+    status: "partial",
     features: ["Framstegsöversikt", "Kursstatistik", "Användarrapporter", "Export"],
   },
 ];
 
 export default function LearningHubPage() {
+  const [stats, setStats] = useState<LearningHubStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tenants, setTenants] = useState<TenantOption[]>([]);
+  const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+  const [scopeFilter, setScopeFilter] = useState<'all' | 'global' | 'tenant'>('all');
+  const [tenantFilter, setTenantFilter] = useState<string>('');
+
+  useEffect(() => {
+    const loadInitialData = async () => {
+      try {
+        const [isAdmin, tenantData] = await Promise.all([
+          checkIsSystemAdmin(),
+          listTenantsForLearningAdmin(),
+        ]);
+        setIsSystemAdmin(isAdmin);
+        setTenants(tenantData.tenants);
+      } catch (err) {
+        console.error('Failed to load initial data:', err);
+      }
+    };
+    loadInitialData();
+  }, []);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      setIsLoading(true);
+      try {
+        const data = await getLearningHubStats({
+          scope: isSystemAdmin ? scopeFilter : 'all',
+          tenantId: tenantFilter || undefined,
+        });
+        setStats(data);
+      } catch (err) {
+        console.error('Failed to load stats:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadStats();
+  }, [scopeFilter, tenantFilter, isSystemAdmin]);
+
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
@@ -89,6 +138,36 @@ export default function LearningHubPage() {
         icon={<AcademicCapIcon className="h-8 w-8" />}
       />
 
+      {/* Scope Filters (System Admin Only) */}
+      {isSystemAdmin && (
+        <div className="mt-6 flex flex-wrap gap-3">
+          <select
+            value={scopeFilter}
+            onChange={(e) => setScopeFilter(e.target.value as typeof scopeFilter)}
+            className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+          >
+            <option value="all">Alla</option>
+            <option value="global">Globala</option>
+            <option value="tenant">Organisation</option>
+          </select>
+
+          {scopeFilter === 'tenant' && (
+            <select
+              value={tenantFilter}
+              onChange={(e) => setTenantFilter(e.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            >
+              <option value="">Välj organisation</option>
+              {tenants.map((tenant) => (
+                <option key={tenant.id} value={tenant.id}>
+                  {tenant.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
+
       {/* Quick Stats */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border border-border bg-card p-4">
@@ -97,7 +176,9 @@ export default function LearningHubPage() {
               <BookOpenIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">3</p>
+              <p className="text-2xl font-bold text-foreground">
+                {isLoading ? '...' : stats?.courses.active ?? 0}
+              </p>
               <p className="text-sm text-muted-foreground">Aktiva kurser</p>
             </div>
           </div>
@@ -108,7 +189,9 @@ export default function LearningHubPage() {
               <MapIcon className="h-5 w-5 text-blue-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">1</p>
+              <p className="text-2xl font-bold text-foreground">
+                {isLoading ? '...' : stats?.paths.total ?? 0}
+              </p>
               <p className="text-sm text-muted-foreground">Lärstigar</p>
             </div>
           </div>
@@ -116,11 +199,13 @@ export default function LearningHubPage() {
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/10">
-              <UserGroupIcon className="h-5 w-5 text-green-500" />
+              <ShieldCheckIcon className="h-5 w-5 text-green-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">24</p>
-              <p className="text-sm text-muted-foreground">Aktiva deltagare</p>
+              <p className="text-2xl font-bold text-foreground">
+                {isLoading ? '...' : stats?.requirements.active ?? 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Aktiva krav</p>
             </div>
           </div>
         </div>
@@ -130,8 +215,10 @@ export default function LearningHubPage() {
               <AcademicCapIcon className="h-5 w-5 text-amber-500" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-foreground">87%</p>
-              <p className="text-sm text-muted-foreground">Snitt godkänt</p>
+              <p className="text-2xl font-bold text-foreground">
+                {isLoading ? '...' : stats?.courses.total ?? 0}
+              </p>
+              <p className="text-sm text-muted-foreground">Totalt kurser</p>
             </div>
           </div>
         </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Textarea, Select } from '@/components/ui'
 import {
   QuestionMarkCircleIcon,
@@ -30,46 +31,17 @@ interface Ticket {
   updated_at: string
 }
 
-// Fallback FAQ data (shown if DB fetch fails)
-const fallbackFAQs = [
-  {
-    question: 'Hur ändrar jag mitt lösenord?',
-    answer_markdown: 'Gå till Inställningar > Profil > Ändra lösenord. Där kan du ange ditt nya lösenord.',
-  },
-  {
-    question: 'Hur kontaktar jag supporten?',
-    answer_markdown: 'Du kan skicka ett supportärende via denna sida eller maila oss på support@lekbanken.se.',
-  },
-  {
-    question: 'Kan jag dela mitt konto?',
-    answer_markdown: 'Nej, varje användare ska ha sitt eget konto. Med Team-planen kan du ha flera användare.',
-  },
-  {
-    question: 'Hur avbryter jag min prenumeration?',
-    answer_markdown: 'Gå till Prenumeration > Avbryt prenumeration. Din tillgång fortsätter till periodens slut.',
-  },
-]
-
-const CATEGORIES = [
-  { value: 'general', label: 'Allmänt' },
-  { value: 'technical', label: 'Tekniskt problem' },
-  { value: 'billing', label: 'Fakturering' },
-  { value: 'feature', label: 'Funktionsförslag' },
-  { value: 'bug', label: 'Buggrapport' },
-]
+// Category/type/priority values (labels come from translations)
+const CATEGORIES = ['general', 'technical', 'billing', 'feature', 'bug'] as const
 
 const FEEDBACK_TYPES = [
-  { value: 'bug', label: 'Bugg', icon: BugAntIcon },
-  { value: 'feature', label: 'Förslag', icon: LightBulbIcon },
-  { value: 'general', label: 'Fråga', icon: QuestionMarkCircleIcon },
-  { value: 'other', label: 'Övrigt', icon: ChatBubbleLeftRightIcon },
-]
+  { value: 'bug', icon: BugAntIcon },
+  { value: 'feature', icon: LightBulbIcon },
+  { value: 'general', icon: QuestionMarkCircleIcon },
+  { value: 'other', icon: ChatBubbleLeftRightIcon },
+] as const
 
-const PRIORITY_OPTIONS = [
-  { value: 'low', label: 'Låg' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'high', label: 'Hög' },
-]
+const PRIORITY_OPTIONS = ['low', 'medium', 'high'] as const
 
 function getStatusVariant(status: string) {
   switch (status) {
@@ -86,22 +58,8 @@ function getStatusVariant(status: string) {
   }
 }
 
-function getStatusLabel(status: string) {
-  switch (status) {
-    case 'open':
-      return 'Öppen'
-    case 'in_progress':
-      return 'Pågår'
-    case 'resolved':
-      return 'Löst'
-    case 'closed':
-      return 'Stängd'
-    default:
-      return status
-  }
-}
-
 export default function SupportPage() {
+  const t = useTranslations('app.support')
   const [activeTab, setActiveTab] = useState<'contact' | 'tickets' | 'faq'>('contact')
   const [feedbackType, setFeedbackType] = useState('general')
   const [priority, setPriority] = useState('medium')
@@ -115,7 +73,7 @@ export default function SupportPage() {
   const [submitted, setSubmitted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [faqs, setFaqs] = useState<Array<{ id?: string; question: string; answer_markdown: string }>>(fallbackFAQs)
+  const [faqs, setFaqs] = useState<Array<{ id?: string; question: string; answer_markdown: string }>>([])
   const [faqsLoading, setFaqsLoading] = useState(false)
 
   // Load tickets function
@@ -127,7 +85,7 @@ export default function SupportPage() {
       // Cast to handle status type compatibility
       setTickets(result.data as unknown as Ticket[])
     } else {
-      setTicketsError(result.error || 'Kunde inte hämta ärenden')
+      setTicketsError(result.error || t('errors.loadTickets'))
     }
     setTicketsLoading(false)
   }
@@ -189,7 +147,7 @@ export default function SupportPage() {
         loadTickets()
       }, 3000)
     } else {
-      setSubmitError(result.error || 'Något gick fel. Försök igen.')
+      setSubmitError(result.error || t('errors.submitFailed'))
     }
   }
 
@@ -199,8 +157,8 @@ export default function SupportPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Support</h1>
-        <p className="text-muted-foreground mt-1">Hur kan vi hjälpa dig idag?</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Quick Links */}
@@ -214,8 +172,8 @@ export default function SupportPage() {
               <EnvelopeIcon className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <div className="font-medium text-foreground">Kontakta oss</div>
-              <div className="text-sm text-muted-foreground">Skicka ett ärende</div>
+              <div className="font-medium text-foreground">{t('quickLinks.contact')}</div>
+              <div className="text-sm text-muted-foreground">{t('quickLinks.contactSub')}</div>
             </div>
           </CardContent>
         </Card>
@@ -228,8 +186,8 @@ export default function SupportPage() {
               <ClockIcon className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <div className="font-medium text-foreground">Mina ärenden</div>
-              <div className="text-sm text-muted-foreground">{activeTicketCount} aktiva</div>
+              <div className="font-medium text-foreground">{t('quickLinks.tickets')}</div>
+              <div className="text-sm text-muted-foreground">{t('quickLinks.ticketsSub', { count: activeTicketCount })}</div>
             </div>
           </CardContent>
         </Card>
@@ -242,8 +200,8 @@ export default function SupportPage() {
               <BookOpenIcon className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <div className="font-medium text-foreground">Vanliga frågor</div>
-              <div className="text-sm text-muted-foreground">Snabba svar</div>
+              <div className="font-medium text-foreground">{t('quickLinks.faq')}</div>
+              <div className="text-sm text-muted-foreground">{t('quickLinks.faqSub')}</div>
             </div>
           </CardContent>
         </Card>
@@ -256,21 +214,21 @@ export default function SupportPage() {
           size="sm"
           onClick={() => setActiveTab('contact')}
         >
-          Kontakta oss
+          {t('tabs.contact')}
         </Button>
         <Button
           variant={activeTab === 'tickets' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setActiveTab('tickets')}
         >
-          Mina ärenden
+          {t('tabs.tickets')}
         </Button>
         <Button
           variant={activeTab === 'faq' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setActiveTab('faq')}
         >
-          Vanliga frågor
+          {t('tabs.faq')}
         </Button>
       </div>
 
@@ -279,15 +237,15 @@ export default function SupportPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <CardTitle>Skicka ett ärende</CardTitle>
+              <CardTitle>{t('form.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {submitted ? (
                 <div className="text-center py-8">
                   <CheckCircleIcon className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                  <h3 className="font-semibold text-foreground mb-2">Tack för ditt meddelande!</h3>
+                  <h3 className="font-semibold text-foreground mb-2">{t('form.success')}</h3>
                   <p className="text-muted-foreground text-sm">
-                    Vi återkommer så snart vi kan.
+                    {t('form.successSub')}
                   </p>
                 </div>
               ) : (
@@ -311,7 +269,7 @@ export default function SupportPage() {
                               feedbackType === type.value ? 'text-primary' : 'text-muted-foreground'
                             }`}
                           />
-                          <span className="text-xs">{type.label}</span>
+                          <span className="text-xs">{t(`feedbackTypes.${type.value}` as 'feedbackTypes.bug')}</span>
                         </button>
                       )
                     })}
@@ -319,32 +277,32 @@ export default function SupportPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Kategori
+                      {t('tabs.contact')}
                     </label>
                     <Select
                       value={feedbackType}
                       onChange={(e) => setFeedbackType(e.target.value)}
-                      options={CATEGORIES}
+                      options={CATEGORIES.map(cat => ({ value: cat, label: t(`categories.${cat}` as 'categories.general') }))}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Prioritet
+                      {t('priority.medium')}
                     </label>
                     <Select
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
-                      options={PRIORITY_OPTIONS}
+                      options={PRIORITY_OPTIONS.map(p => ({ value: p, label: t(`priority.${p}` as 'priority.low') }))}
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Titel
+                      {t('form.title')}
                     </label>
                     <Input
-                      placeholder="Kort beskrivning av ärendet"
+                      placeholder={t('form.titlePlaceholder')}
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
                     />
@@ -352,10 +310,10 @@ export default function SupportPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      Beskrivning
+                      {t('form.descriptionPlaceholder')}
                     </label>
                     <Textarea
-                      placeholder="Beskriv ditt ärende i detalj..."
+                      placeholder={t('form.descriptionPlaceholder')}
                       rows={4}
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
@@ -365,7 +323,7 @@ export default function SupportPage() {
                   {/* Rating */}
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-2">
-                      Hur nöjd är du med Lekbanken? (valfritt)
+                      {t('form.ratingLabel')}
                     </label>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
@@ -395,12 +353,12 @@ export default function SupportPage() {
                     {isSubmitting ? (
                       <>
                         <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
-                        Skickar...
+                        {t('form.submitting')}
                       </>
                     ) : (
                       <>
                         <PaperAirplaneIcon className="h-4 w-4 mr-1" />
-                        Skicka ärende
+                        {t('form.submit')}
                       </>
                     )}
                   </Button>
@@ -412,31 +370,22 @@ export default function SupportPage() {
           {/* Contact Info */}
           <Card>
             <CardHeader>
-              <CardTitle>Kontaktuppgifter</CardTitle>
+              <CardTitle>{t('tabs.contact')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="p-4 bg-muted rounded-lg">
                 <div className="font-medium text-foreground mb-1">E-post</div>
                 <div className="text-primary">support@lekbanken.se</div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Svarstid: 1-2 arbetsdagar
-                </div>
               </div>
               <div className="p-4 bg-muted rounded-lg">
-                <div className="font-medium text-foreground mb-1">Telefon</div>
+                <div className="font-medium text-foreground mb-1">{t('contactInfo.hours')}</div>
                 <div className="text-primary">08-123 456 78</div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  Mån-Fre 9:00-17:00
-                </div>
               </div>
               <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                 <div className="font-medium text-foreground mb-1">Pro-support</div>
                 <div className="text-sm text-muted-foreground">
-                  Som Pro-användare har du prioriterad support med svarstid under 24 timmar.
+                  {t('contactInfo.proSupport')}
                 </div>
-                <Badge variant="primary" className="mt-2">
-                  Aktiverad
-                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -447,11 +396,11 @@ export default function SupportPage() {
       {activeTab === 'tickets' && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Dina supportärenden</CardTitle>
+            <CardTitle>{t('tickets.title')}</CardTitle>
             <Link href="/app/support/contact">
               <Button size="sm">
                 <EnvelopeIcon className="h-4 w-4 mr-1" />
-                Nytt ärende
+                {t('tickets.new')}
               </Button>
             </Link>
           </CardHeader>
@@ -459,15 +408,15 @@ export default function SupportPage() {
             {ticketsLoading ? (
               <div className="text-center py-8">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
-                <p className="text-muted-foreground">Laddar ärenden...</p>
+                <p className="text-muted-foreground">{t('tickets.loading')}</p>
               </div>
             ) : ticketsError ? (
               <div className="text-center py-8">
                 <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Kunde inte hämta ärenden</h3>
+                <h3 className="font-semibold text-foreground mb-2">{t('tickets.errorTitle')}</h3>
                 <p className="text-muted-foreground text-sm mb-4">{ticketsError}</p>
                 <Button onClick={loadTickets} variant="outline" size="sm">
-                  Försök igen
+                  {t('tickets.retry')}
                 </Button>
               </div>
             ) : tickets.length > 0 ? (
@@ -491,13 +440,13 @@ export default function SupportPage() {
                       <div>
                         <div className="font-medium text-foreground">{ticket.title}</div>
                         <div className="text-sm text-muted-foreground">
-                          Skapad {new Date(ticket.created_at).toLocaleDateString('sv-SE')}
+                          {new Date(ticket.created_at).toLocaleDateString()}
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge variant={getStatusVariant(ticket.status) as 'primary' | 'warning' | 'success' | 'default'}>
-                        {getStatusLabel(ticket.status)}
+                        {t(`status.${ticket.status}` as 'status.open')}
                       </Badge>
                       <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -507,14 +456,14 @@ export default function SupportPage() {
             ) : (
               <div className="text-center py-8">
                 <ChatBubbleLeftRightIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Inga ärenden</h3>
+                <h3 className="font-semibold text-foreground mb-2">{t('tickets.emptyTitle')}</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Du har inga aktiva supportärenden.
+                  {t('tickets.emptySub')}
                 </p>
                 <Link href="/app/support/contact">
                   <Button>
                     <EnvelopeIcon className="h-4 w-4 mr-1" />
-                    Skapa ett ärende
+                    {t('tickets.create')}
                   </Button>
                 </Link>
               </div>
@@ -527,13 +476,13 @@ export default function SupportPage() {
       {activeTab === 'faq' && (
         <Card>
           <CardHeader>
-            <CardTitle>Vanliga frågor</CardTitle>
+            <CardTitle>{t('faq.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {faqsLoading ? (
               <div className="text-center py-8">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
-                <p className="text-muted-foreground">Laddar frågor...</p>
+                <p className="text-muted-foreground">{t('faq.loading')}</p>
               </div>
             ) : (
               faqs.map((faq, index) => (

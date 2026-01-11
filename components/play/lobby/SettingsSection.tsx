@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { SessionSettings } from '@/types/lobby';
 import {
@@ -23,22 +24,22 @@ export interface SettingsSectionProps extends Omit<HTMLAttributes<HTMLDivElement
 
 interface ToggleSetting {
   key: keyof SessionSettings;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: React.ElementType;
   type: 'toggle';
 }
 
 interface NumberSetting {
   key: keyof SessionSettings;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   icon: React.ElementType;
   type: 'number';
   min: number;
   max: number;
   step: number;
-  suffix?: string;
+  suffixKey?: string;
 }
 
 type SettingConfig = ToggleSetting | NumberSetting;
@@ -46,53 +47,53 @@ type SettingConfig = ToggleSetting | NumberSetting;
 const SETTINGS_CONFIG: SettingConfig[] = [
   {
     key: 'showParticipantNames',
-    label: 'Visa deltagarnamn',
-    description: 'Deltagare kan se varandras namn',
+    labelKey: 'showParticipantNames.label',
+    descriptionKey: 'showParticipantNames.description',
     icon: EyeIcon,
     type: 'toggle',
   },
   {
     key: 'allowChat',
-    label: 'Tillåt chatt',
-    description: 'Deltagare kan chatta med varandra',
+    labelKey: 'allowChat.label',
+    descriptionKey: 'allowChat.description',
     icon: ChatBubbleLeftRightIcon,
     type: 'toggle',
   },
   {
     key: 'autoAdvance',
-    label: 'Auto-fortsätt',
-    description: 'Gå vidare automatiskt när alla är redo',
+    labelKey: 'autoAdvance.label',
+    descriptionKey: 'autoAdvance.description',
     icon: PlayIcon,
     type: 'toggle',
   },
   {
     key: 'requireRoles',
-    label: 'Kräv roller',
-    description: 'Alla deltagare måste ha en roll innan start',
+    labelKey: 'requireRoles.label',
+    descriptionKey: 'requireRoles.description',
     icon: ShieldCheckIcon,
     type: 'toggle',
   },
   {
     key: 'maxParticipants',
-    label: 'Max deltagare',
-    description: 'Maximalt antal deltagare i sessionen',
+    labelKey: 'maxParticipants.label',
+    descriptionKey: 'maxParticipants.description',
     icon: UserGroupIcon,
     type: 'number',
     min: 2,
     max: 100,
     step: 1,
-    suffix: 'st',
+    suffixKey: 'maxParticipants.suffix',
   },
   {
     key: 'durationLimit',
-    label: 'Tidsgräns',
-    description: 'Max tid för sessionen (0 = ingen gräns)',
+    labelKey: 'durationLimit.label',
+    descriptionKey: 'durationLimit.description',
     icon: ClockIcon,
     type: 'number',
     min: 0,
     max: 480,
     step: 5,
-    suffix: 'min',
+    suffixKey: 'durationLimit.suffix',
   },
 ];
 
@@ -128,6 +129,8 @@ export const SettingsSection = forwardRef<HTMLDivElement, SettingsSectionProps>(
       });
     };
 
+    const t = useTranslations('play.settingsSection');
+
     return (
       <div
         ref={ref}
@@ -136,9 +139,9 @@ export const SettingsSection = forwardRef<HTMLDivElement, SettingsSectionProps>(
       >
         {/* Header */}
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Inställningar</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('title')}</h3>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Konfigurera sessionen
+            {t('subtitle')}
           </p>
         </div>
 
@@ -160,9 +163,9 @@ export const SettingsSection = forwardRef<HTMLDivElement, SettingsSectionProps>(
 
                 {/* Label and Description */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground">{config.label}</p>
+                  <p className="font-medium text-foreground">{t(config.labelKey as 'title')}</p>
                   <p className="text-sm text-muted-foreground mt-0.5">
-                    {config.description}
+                    {t(config.descriptionKey as 'title')}
                   </p>
                 </div>
 
@@ -204,9 +207,9 @@ export const SettingsSection = forwardRef<HTMLDivElement, SettingsSectionProps>(
                         !canEdit && 'opacity-50 cursor-not-allowed'
                       )}
                     />
-                    {config.suffix && (
+                    {config.suffixKey && (
                       <span className="text-sm text-muted-foreground">
-                        {config.suffix}
+                        {t(config.suffixKey as 'title')}
                       </span>
                     )}
                   </div>
@@ -218,7 +221,7 @@ export const SettingsSection = forwardRef<HTMLDivElement, SettingsSectionProps>(
 
         {/* Footer Note */}
         <p className="text-xs text-muted-foreground text-center">
-          Dessa inställningar kan ändras under sessionen
+          {t('footerNote')}
         </p>
       </div>
     );

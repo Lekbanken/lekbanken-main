@@ -451,6 +451,204 @@
       "themeDark": "Dark",
       "themeSystem": "System",
       "notifications": "Notifications"
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "How can we help you today?",
+      "tabs": {
+        "contact": "Contact us",
+        "tickets": "My tickets",
+        "faq": "FAQ"
+      },
+      "quickLinks": {
+        "contact": "Contact us",
+        "contactSub": "Submit a ticket",
+        "tickets": "My tickets",
+        "ticketsSub": "{count} active",
+        "faq": "FAQ",
+        "faqSub": "Quick answers"
+      },
+      "form": {
+        "title": "Submit a ticket",
+        "success": "Thank you for your message!",
+        "successSub": "We'll get back to you as soon as possible.",
+        "titlePlaceholder": "Brief description of the issue",
+        "descriptionPlaceholder": "Describe your issue in detail...",
+        "ratingLabel": "How satisfied are you with Lekbanken? (optional)",
+        "submit": "Submit ticket",
+        "submitting": "Submitting..."
+      },
+      "categories": {
+        "general": "General",
+        "technical": "Technical issue",
+        "billing": "Billing",
+        "feature": "Feature request",
+        "bug": "Bug report"
+      },
+      "feedbackTypes": {
+        "bug": "Bug",
+        "feature": "Suggestion",
+        "general": "Question",
+        "other": "Other"
+      },
+      "priority": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      },
+      "status": {
+        "open": "Open",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "closed": "Closed",
+        "waiting_for_user": "Waiting for response"
+      },
+      "contactInfo": {
+        "hours": "Mon-Fri 9:00-17:00",
+        "proSupport": "As a Pro user, you have priority support with response times under 24 hours."
+      },
+      "tickets": {
+        "title": "Your support tickets",
+        "new": "New ticket",
+        "loading": "Loading tickets...",
+        "errorTitle": "Could not load tickets",
+        "retry": "Try again",
+        "emptyTitle": "No tickets",
+        "emptySub": "You have no active support tickets.",
+        "create": "Create a ticket"
+      },
+      "faq": {
+        "title": "Frequently Asked Questions",
+        "loading": "Loading questions..."
+      },
+      "errors": {
+        "loadTickets": "Could not load tickets",
+        "submitFailed": "Something went wrong. Please try again."
+      }
+    },
+    "preferences": {
+      "title": "Settings",
+      "subtitle": "Customize your experience",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "saved": "Saved!",
+      "savedBanner": "Your settings have been saved!",
+      "profile": {
+        "title": "Profile",
+        "displayName": "Display name",
+        "visibility": "Profile visibility",
+        "visibilityHint": "Choose who can see your profile and activity"
+      },
+      "appearance": {
+        "title": "Appearance",
+        "language": "Language",
+        "theme": "Theme"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "email": "Email notifications",
+        "emailDesc": "Receive updates via email",
+        "emailFrequency": "Email frequency",
+        "push": "Push notifications",
+        "pushDesc": "Receive notifications on your device",
+        "sound": "Sound",
+        "soundDesc": "Play sound on notifications"
+      },
+      "content": {
+        "title": "Content & Privacy",
+        "maturity": "Content level",
+        "maturityHint": "Filter content based on age group",
+        "recommendations": "Recommendations",
+        "recommendationsDesc": "Receive personalized suggestions",
+        "cookies": "Manage cookie settings"
+      },
+      "quick": {
+        "title": "Quick settings",
+        "changeLanguage": "Change language",
+        "changeTheme": "Change theme",
+        "muteNotifications": "Mute notifications",
+        "advanced": "Advanced"
+      },
+      "languages": {
+        "sv": "Svenska",
+        "en": "English",
+        "no": "Norsk",
+        "da": "Dansk"
+      },
+      "themes": {
+        "light": "Light",
+        "dark": "Dark",
+        "system": "System"
+      },
+      "emailFrequencies": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "never": "Never"
+      },
+      "visibility": {
+        "public": "Public",
+        "friends": "Friends only",
+        "private": "Private"
+      },
+      "maturity": {
+        "all": "All content",
+        "family": "Family friendly",
+        "kids": "Kids only"
+      }
+    },
+    "shop": {
+      "title": "Shop",
+      "subtitle": "Exchange points for rewards and power-ups",
+      "activeBoost": "Active boost: {label}",
+      "boostRemaining": "{hours}h {minutes}m remaining",
+      "coins": "Coins",
+      "gems": "Gems",
+      "featured": "Featured",
+      "levelLocked": "Locked: level {level}",
+      "buyNow": "Buy now",
+      "buy": "Buy",
+      "owned": "Owned",
+      "use": "Use",
+      "searchPlaceholder": "Search the shop...",
+      "categories": {
+        "all": "All",
+        "cosmetic": "Cosmetics",
+        "powerup": "Power-ups",
+        "bundle": "Bundles",
+        "season_pass": "Season pass"
+      },
+      "rarity": {
+        "legendary": "Legendary",
+        "epic": "Epic",
+        "rare": "Rare",
+        "common": "Common"
+      },
+      "empty": {
+        "title": "No items found",
+        "description": "Try changing your search or filtering by a different category."
+      },
+      "toasts": {
+        "insufficientBalance": "You don't have enough coins.",
+        "insufficientBalanceTitle": "Insufficient balance",
+        "notLoggedIn": "You need to log in to make a purchase.",
+        "notLoggedInTitle": "Not logged in",
+        "levelLocked": "You need to reach level {level} to buy this.",
+        "levelLockedTitle": "Locked",
+        "accessDenied": "You don't have access to this tenant.",
+        "accessDeniedTitle": "Access denied",
+        "purchaseFailed": "Please try again in a moment.",
+        "purchaseFailedTitle": "Purchase failed",
+        "purchaseSuccess": "Purchase completed.",
+        "purchaseSuccessTitle": "Purchased",
+        "noPowerups": "You have none left to use.",
+        "noPowerupsTitle": "No powerups left",
+        "consumeFailed": "Please try again in a moment.",
+        "consumeFailedTitle": "Could not use",
+        "consumeSuccess": "Powerup used.",
+        "consumeSuccessTitle": "Used"
+      },
+      "new": "New!"
     }
   },
   "auth": {
@@ -1953,6 +2151,50 @@
       "yourTurn": "Your turn",
       "submitAnswer": "Submit answer",
       "skipQuestion": "Skip"
+    },
+    "settingsSection": {
+      "title": "Settings",
+      "subtitle": "Configure the session",
+      "footerNote": "These settings can be changed during the session",
+      "showParticipantNames": {
+        "label": "Show participant names",
+        "description": "Participants can see each other's names"
+      },
+      "allowChat": {
+        "label": "Allow chat",
+        "description": "Participants can chat with each other"
+      },
+      "autoAdvance": {
+        "label": "Auto-advance",
+        "description": "Proceed automatically when everyone is ready"
+      },
+      "requireRoles": {
+        "label": "Require roles",
+        "description": "All participants must have a role before starting"
+      },
+      "maxParticipants": {
+        "label": "Max participants",
+        "description": "Maximum number of participants in the session",
+        "suffix": "pcs"
+      },
+      "durationLimit": {
+        "label": "Time limit",
+        "description": "Max time for the session (0 = no limit)",
+        "suffix": "min"
+      }
+    },
+    "rolesSection": {
+      "title": "Roles",
+      "summary": "{roleCount} roles • {unassignedCount} unassigned",
+      "randomize": "Randomize",
+      "newRole": "New role",
+      "host": "Host",
+      "removeFromRole": "Remove {name} from role",
+      "empty": {
+        "title": "No roles created",
+        "description": "Add roles to assign participants",
+        "createFirst": "Create first role"
+      }
     },
     "participantView": {
       "header": {

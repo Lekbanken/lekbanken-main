@@ -451,6 +451,204 @@
       "themeDark": "Mörkt",
       "themeSystem": "System",
       "notifications": "Notifikationer"
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "Hur kan vi hjälpa dig idag?",
+      "tabs": {
+        "contact": "Kontakta oss",
+        "tickets": "Mina ärenden",
+        "faq": "Vanliga frågor"
+      },
+      "quickLinks": {
+        "contact": "Kontakta oss",
+        "contactSub": "Skicka ett ärende",
+        "tickets": "Mina ärenden",
+        "ticketsSub": "{count} aktiva",
+        "faq": "Vanliga frågor",
+        "faqSub": "Snabba svar"
+      },
+      "form": {
+        "title": "Skicka ett ärende",
+        "success": "Tack för ditt meddelande!",
+        "successSub": "Vi återkommer så snart vi kan.",
+        "titlePlaceholder": "Kort beskrivning av ärendet",
+        "descriptionPlaceholder": "Beskriv ditt ärende i detalj...",
+        "ratingLabel": "Hur nöjd är du med Lekbanken? (valfritt)",
+        "submit": "Skicka ärende",
+        "submitting": "Skickar..."
+      },
+      "categories": {
+        "general": "Allmänt",
+        "technical": "Tekniskt problem",
+        "billing": "Fakturering",
+        "feature": "Funktionsförslag",
+        "bug": "Buggrapport"
+      },
+      "feedbackTypes": {
+        "bug": "Bugg",
+        "feature": "Förslag",
+        "general": "Fråga",
+        "other": "Övrigt"
+      },
+      "priority": {
+        "low": "Låg",
+        "medium": "Medium",
+        "high": "Hög"
+      },
+      "status": {
+        "open": "Öppen",
+        "in_progress": "Pågår",
+        "resolved": "Löst",
+        "closed": "Stängd",
+        "waiting_for_user": "Väntar på svar"
+      },
+      "contactInfo": {
+        "hours": "Mån-Fre 9:00-17:00",
+        "proSupport": "Som Pro-användare har du prioriterad support med svarstid under 24 timmar."
+      },
+      "tickets": {
+        "title": "Dina supportärenden",
+        "new": "Nytt ärende",
+        "loading": "Laddar ärenden...",
+        "errorTitle": "Kunde inte hämta ärenden",
+        "retry": "Försök igen",
+        "emptyTitle": "Inga ärenden",
+        "emptySub": "Du har inga aktiva supportärenden.",
+        "create": "Skapa ett ärende"
+      },
+      "faq": {
+        "title": "Vanliga frågor",
+        "loading": "Laddar frågor..."
+      },
+      "errors": {
+        "loadTickets": "Kunde inte hämta ärenden",
+        "submitFailed": "Något gick fel. Försök igen."
+      }
+    },
+    "preferences": {
+      "title": "Inställningar",
+      "subtitle": "Anpassa din upplevelse",
+      "save": "Spara ändringar",
+      "saving": "Sparar...",
+      "saved": "Sparat!",
+      "savedBanner": "Dina inställningar har sparats!",
+      "profile": {
+        "title": "Profil",
+        "displayName": "Visningsnamn",
+        "visibility": "Profilsynlighet",
+        "visibilityHint": "Välj vem som kan se din profil och aktivitet"
+      },
+      "appearance": {
+        "title": "Utseende",
+        "language": "Språk",
+        "theme": "Tema"
+      },
+      "notifications": {
+        "title": "Notiser",
+        "email": "E-postnotiser",
+        "emailDesc": "Få uppdateringar via e-post",
+        "emailFrequency": "E-postfrekvens",
+        "push": "Push-notiser",
+        "pushDesc": "Få notiser på din enhet",
+        "sound": "Ljud",
+        "soundDesc": "Spela upp ljud vid notiser"
+      },
+      "content": {
+        "title": "Innehåll & Integritet",
+        "maturity": "Innehållsnivå",
+        "maturityHint": "Filtrera innehåll baserat på åldersgrupp",
+        "recommendations": "Rekommendationer",
+        "recommendationsDesc": "Få personliga förslag",
+        "cookies": "Hantera cookie-inställningar"
+      },
+      "quick": {
+        "title": "Snabbinställningar",
+        "changeLanguage": "Byt språk",
+        "changeTheme": "Byt tema",
+        "muteNotifications": "Tysta notiser",
+        "advanced": "Avancerat"
+      },
+      "languages": {
+        "sv": "Svenska",
+        "en": "English",
+        "no": "Norsk",
+        "da": "Dansk"
+      },
+      "themes": {
+        "light": "Ljust",
+        "dark": "Mörkt",
+        "system": "Systemval"
+      },
+      "emailFrequencies": {
+        "daily": "Dagligen",
+        "weekly": "Veckovis",
+        "monthly": "Månatligen",
+        "never": "Aldrig"
+      },
+      "visibility": {
+        "public": "Publik",
+        "friends": "Endast vänner",
+        "private": "Privat"
+      },
+      "maturity": {
+        "all": "Allt innehåll",
+        "family": "Familjevänligt",
+        "kids": "Endast barn"
+      }
+    },
+    "shop": {
+      "title": "Butik",
+      "subtitle": "Byt poäng mot belöningar och power-ups",
+      "activeBoost": "Aktiv boost: {label}",
+      "boostRemaining": "{hours}h {minutes}m kvar",
+      "coins": "Mynt",
+      "gems": "Gems",
+      "featured": "Utvalt",
+      "levelLocked": "Låst: nivå {level}",
+      "buyNow": "Köp nu",
+      "buy": "Köp",
+      "owned": "Ägs",
+      "use": "Använd",
+      "searchPlaceholder": "Sök i butiken...",
+      "categories": {
+        "all": "Alla",
+        "cosmetic": "Utseende",
+        "powerup": "Power-ups",
+        "bundle": "Bundles",
+        "season_pass": "Säsongspass"
+      },
+      "rarity": {
+        "legendary": "Legendarisk",
+        "epic": "Episk",
+        "rare": "Sällsynt",
+        "common": "Vanlig"
+      },
+      "empty": {
+        "title": "Inga artiklar hittades",
+        "description": "Prova att ändra din sökning eller filtrera efter en annan kategori."
+      },
+      "toasts": {
+        "insufficientBalance": "Du har inte tillräckligt med mynt.",
+        "insufficientBalanceTitle": "Otillräckligt saldo",
+        "notLoggedIn": "Du behöver logga in för att köpa.",
+        "notLoggedInTitle": "Inte inloggad",
+        "levelLocked": "Du behöver nå nivå {level} för att köpa detta.",
+        "levelLockedTitle": "Låst",
+        "accessDenied": "Du saknar behörighet i denna tenant.",
+        "accessDeniedTitle": "Åtkomst nekad",
+        "purchaseFailed": "Försök igen om en stund.",
+        "purchaseFailedTitle": "Köp misslyckades",
+        "purchaseSuccess": "Köpet är genomfört.",
+        "purchaseSuccessTitle": "Köpt",
+        "noPowerups": "Du har inga kvar att använda.",
+        "noPowerupsTitle": "Inga powerups kvar",
+        "consumeFailed": "Försök igen om en stund.",
+        "consumeFailedTitle": "Kunde inte använda",
+        "consumeSuccess": "Powerup använd.",
+        "consumeSuccessTitle": "Använd"
+      },
+      "new": "Ny!"
     }
   },
   "auth": {
@@ -1949,6 +2147,50 @@
       "yourTurn": "Din tur",
       "submitAnswer": "Skicka svar",
       "skipQuestion": "Hoppa över"
+    },
+    "settingsSection": {
+      "title": "Inställningar",
+      "subtitle": "Konfigurera sessionen",
+      "footerNote": "Dessa inställningar kan ändras under sessionen",
+      "showParticipantNames": {
+        "label": "Visa deltagarnamn",
+        "description": "Deltagare kan se varandras namn"
+      },
+      "allowChat": {
+        "label": "Tillåt chatt",
+        "description": "Deltagare kan chatta med varandra"
+      },
+      "autoAdvance": {
+        "label": "Auto-fortsätt",
+        "description": "Gå vidare automatiskt när alla är redo"
+      },
+      "requireRoles": {
+        "label": "Kräv roller",
+        "description": "Alla deltagare måste ha en roll innan start"
+      },
+      "maxParticipants": {
+        "label": "Max deltagare",
+        "description": "Maximalt antal deltagare i sessionen",
+        "suffix": "st"
+      },
+      "durationLimit": {
+        "label": "Tidsgräns",
+        "description": "Max tid för sessionen (0 = ingen gräns)",
+        "suffix": "min"
+      }
+    },
+    "rolesSection": {
+      "title": "Roller",
+      "summary": "{roleCount} roller • {unassignedCount} utan roll",
+      "randomize": "Slumpa",
+      "newRole": "Ny roll",
+      "host": "Värd",
+      "removeFromRole": "Ta bort {name} från roll",
+      "empty": {
+        "title": "Inga roller skapade",
+        "description": "Lägg till roller för att tilldela deltagare",
+        "createFirst": "Skapa första rollen"
+      }
     },
     "participantView": {
       "header": {

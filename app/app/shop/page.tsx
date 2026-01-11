@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, Badge, Input, useToast } from '@/components/ui'
 import {
   ShoppingBagIcon,
@@ -54,13 +55,15 @@ type ShopOverviewPayload = {
   items: ShopItem[]
 }
 
-const CATEGORIES = [
-  { id: 'all', name: 'Alla', icon: Squares2X2Icon },
-  { id: 'cosmetic', name: 'Utseende', icon: SparklesIcon },
-  { id: 'powerup', name: 'Power-ups', icon: BoltIcon },
-  { id: 'bundle', name: 'Bundles', icon: GiftIcon },
-  { id: 'season_pass', name: 'Säsongspass', icon: StarIcon },
-]
+// Category IDs - labels come from translations
+const CATEGORY_IDS = ['all', 'cosmetic', 'powerup', 'bundle', 'season_pass'] as const
+const CATEGORY_ICONS = {
+  all: Squares2X2Icon,
+  cosmetic: SparklesIcon,
+  powerup: BoltIcon,
+  bundle: GiftIcon,
+  season_pass: StarIcon,
+}
 
 function getRarityColor(rarity: string) {
   switch (rarity) {
@@ -75,20 +78,8 @@ function getRarityColor(rarity: string) {
   }
 }
 
-function getRarityLabel(rarity: string) {
-  switch (rarity) {
-    case 'legendary':
-      return 'Legendarisk'
-    case 'epic':
-      return 'Episk'
-    case 'rare':
-      return 'Sällsynt'
-    default:
-      return 'Vanlig'
-  }
-}
-
 export default function ShopPage() {
+  const t = useTranslations('app.shop')
   const toast = useToast()
   const { currentTenant } = useTenant()
   const tenantId = currentTenant?.id ?? null
@@ -170,10 +161,7 @@ export default function ShopPage() {
     const hours = Math.floor(totalMinutes / 60)
     const minutes = totalMinutes % 60
 
-    const parts: string[] = []
-    if (hours > 0) parts.push(`${hours}h`)
-    parts.push(`${minutes}m`)
-    return `${activeBoost.multiplier}x (${parts.join(' ')} kvar)`
+    return `${activeBoost.multiplier}x (${hours}h ${minutes}m)`
   }, [activeBoost, nowMs])
 
   const featuredItem = useMemo(() => items.find((item) => item.isFeatured), [items])
@@ -249,21 +237,21 @@ export default function ShopPage() {
 
       if (!res.ok) {
         if (res.status === 409) {
-          toast.warning('Du har inte tillräckligt med mynt.', 'Otillräckligt saldo')
+          toast.warning(t('toasts.insufficientBalance'), t('toasts.insufficientBalanceTitle'))
         } else if (res.status === 401) {
-          toast.error('Du behöver logga in för att köpa.', 'Inte inloggad')
+          toast.error(t('toasts.notLoggedIn'), t('toasts.notLoggedInTitle'))
         } else if (res.status === 403) {
           const json = (await res.json().catch(() => null)) as
             | { code?: string; requiredLevel?: number | null }
             | null
           if (json?.code === 'LEVEL_LOCKED') {
             const required = typeof json.requiredLevel === 'number' ? json.requiredLevel : item.requiredLevel
-            toast.warning(`Du behöver nå nivå ${required ?? '?'} för att köpa detta.`, 'Låst')
+            toast.warning(t('toasts.levelLocked', { level: required ?? '?' }), t('toasts.levelLockedTitle'))
           } else {
-            toast.error('Du saknar behörighet i denna tenant.', 'Åtkomst nekad')
+            toast.error(t('toasts.accessDenied'), t('toasts.accessDeniedTitle'))
           }
         } else {
-          toast.error('Försök igen om en stund.', 'Köp misslyckades')
+          toast.error(t('toasts.purchaseFailed'), t('toasts.purchaseFailedTitle'))
         }
         return
       }
@@ -278,7 +266,7 @@ export default function ShopPage() {
       }
       if (typeof payload.balance === 'number') setCoinBalance(payload.balance)
 
-      toast.success('Köpet är genomfört.', 'Köpt')
+      toast.success(t('toasts.purchaseSuccess'), t('toasts.purchaseSuccessTitle'))
     } finally {
       setIsBuyingId(null)
     }
@@ -305,9 +293,9 @@ export default function ShopPage() {
 
       if (!res.ok) {
         if (res.status === 409) {
-          toast.warning('Du har inga kvar att använda.', 'Inga powerups kvar')
+          toast.warning(t('toasts.noPowerups'), t('toasts.noPowerupsTitle'))
         } else {
-          toast.error('Försök igen om en stund.', 'Kunde inte använda')
+          toast.error(t('toasts.consumeFailed'), t('toasts.consumeFailedTitle'))
         }
         return
       }
@@ -315,7 +303,7 @@ export default function ShopPage() {
       const payload = (await res.json()) as { remainingQuantity?: number | null }
       const remaining = typeof payload.remainingQuantity === 'number' ? payload.remainingQuantity : 0
       setOwnedQuantitiesByItemId((prev) => ({ ...prev, [item.id]: Math.max(0, remaining) }))
-      toast.success('Powerup använd.', 'Använd')
+      toast.success(t('toasts.consumeSuccess'), t('toasts.consumeSuccessTitle'))
     } finally {
       setIsConsumingId(null)
     }
@@ -326,11 +314,11 @@ export default function ShopPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Butik</h1>
-          <p className="text-muted-foreground mt-1">Byt poäng mot belöningar och power-ups</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
           {activeBoostLabel && (
             <div className="mt-2">
-              <Badge variant="accent">Aktiv boost: {activeBoostLabel}</Badge>
+              <Badge variant="accent">{t('activeBoost', { label: activeBoostLabel })}</Badge>
             </div>
           )}
         </div>
@@ -344,7 +332,7 @@ export default function ShopPage() {
               <CurrencyDollarIcon className="h-5 w-5 text-yellow-600" />
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Mynt</div>
+              <div className="text-sm text-muted-foreground">{t('coins')}</div>
               <div className="text-xl font-bold text-foreground">{coinBalance.toLocaleString()}</div>
             </div>
           </CardContent>
@@ -385,15 +373,15 @@ export default function ShopPage() {
                   <div className="flex items-center gap-2 mb-2">
                     <Badge variant="warning" className="flex items-center gap-1">
                       <StarSolidIcon className="h-3 w-3" />
-                      Utvalt
+                      {t('featured')}
                     </Badge>
                     {isLevelLocked(featuredItem) && (
                       <Badge variant="default">
-                        Låst: nivå {featuredItem.requiredLevel ?? '?'}
+                        {t('levelLocked', { level: featuredItem.requiredLevel ?? '?' })}
                       </Badge>
                     )}
                     <Badge variant={getRarityColor(featuredItem.rarity) as 'warning' | 'primary' | 'accent' | 'default'}>
-                      {getRarityLabel(featuredItem.rarity)}
+                      {t(`rarity.${featuredItem.rarity}` as 'rarity.common')}
                     </Badge>
                     {featuredItem.discount && (
                       <Badge variant="destructive">-{featuredItem.discount}%</Badge>
@@ -422,7 +410,7 @@ export default function ShopPage() {
                     onClick={() => buyItem(featuredItem)}
                   >
                     <ShoppingBagIcon className="h-4 w-4 mr-1" />
-                    {isOwned(featuredItem) ? 'Ägs' : 'Köp nu'}
+                    {isOwned(featuredItem) ? t('owned') : t('buyNow')}
                   </Button>
                 </div>
               </div>
@@ -436,7 +424,7 @@ export default function ShopPage() {
         <div className="relative flex-1">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
-            placeholder="Sök i butiken..."
+            placeholder={t('searchPlaceholder')}
             className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -462,19 +450,19 @@ export default function ShopPage() {
 
       {/* Categories */}
       <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-        {CATEGORIES.map((category) => {
-          const Icon = category.icon
+        {CATEGORY_IDS.map((categoryId) => {
+          const Icon = CATEGORY_ICONS[categoryId]
           return (
             <Button
-              key={category.id}
-              variant={selectedCategory === category.id ? 'default' : 'outline'}
+              key={categoryId}
+              variant={selectedCategory === categoryId ? 'default' : 'outline'}
               size="sm"
-              onClick={() => setSelectedCategory(category.id)}
-              disabled={isLoading || isCategoryLocked(category.id)}
+              onClick={() => setSelectedCategory(categoryId)}
+              disabled={isLoading || isCategoryLocked(categoryId)}
               className="flex-shrink-0"
             >
               <Icon className="h-4 w-4 mr-1" />
-              {category.name}
+              {t(`categories.${categoryId}` as 'categories.all')}
             </Button>
           )
         })}
@@ -516,10 +504,10 @@ export default function ShopPage() {
               <div className={viewMode === 'list' ? 'flex-1' : ''}>
                 {/* Badges */}
                 <div className="flex gap-1 mb-1 flex-wrap">
-                  {item.isNew && <Badge variant="accent" size="sm">Ny!</Badge>}
+                  {item.isNew && <Badge variant="accent" size="sm">{t('new')}</Badge>}
                   {isLevelLocked(item) && (
                     <Badge variant="default" size="sm">
-                      Låst: nivå {item.requiredLevel ?? '?'}
+                      {t('levelLocked', { level: item.requiredLevel ?? '?' })}
                     </Badge>
                   )}
                   {baseCategory(item.category) === 'powerup' && getPowerupQuantity(item) > 0 && (
@@ -531,7 +519,7 @@ export default function ShopPage() {
                     variant={getRarityColor(item.rarity) as 'warning' | 'primary' | 'accent' | 'default'}
                     size="sm"
                   >
-                    {getRarityLabel(item.rarity)}
+                    {t(`rarity.${item.rarity}` as 'rarity.common')}
                   </Badge>
                 </div>
 
@@ -561,7 +549,7 @@ export default function ShopPage() {
                       loading={isConsumingId === item.id}
                       onClick={() => consumePowerup(item)}
                     >
-                      Använd
+                      {t('use')}
                     </Button>
                   )}
                   <Button
@@ -571,7 +559,7 @@ export default function ShopPage() {
                     loading={isBuyingId === item.id}
                     onClick={() => buyItem(item)}
                   >
-                    {isOwned(item) ? 'Ägs' : 'Köp'}
+                    {isOwned(item) ? t('owned') : t('buy')}
                   </Button>
                 </div>
               </div>
@@ -585,9 +573,9 @@ export default function ShopPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <ShoppingBagIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold text-foreground mb-2">Inga artiklar hittades</h3>
+            <h3 className="font-semibold text-foreground mb-2">{t('empty.title')}</h3>
             <p className="text-muted-foreground text-sm">
-              Prova att ändra din sökning eller filtrera efter en annan kategori.
+              {t('empty.description')}
             </p>
           </CardContent>
         </Card>

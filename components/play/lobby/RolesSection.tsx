@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useState, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Role, Participant } from '@/types/lobby';
 import { Button } from '@/components/ui/button';
@@ -81,6 +82,8 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
       return roleColors[color] ?? roleColors.muted;
     };
 
+    const t = useTranslations('play.rolesSection');
+
     return (
       <div
         ref={ref}
@@ -90,9 +93,9 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Roller</h3>
+            <h3 className="text-lg font-semibold text-foreground">{t('title')}</h3>
             <p className="text-sm text-muted-foreground mt-0.5">
-              {roles.length} roller • {unassignedParticipants.length} utan roll
+              {t('summary', { roleCount: roles.length, unassignedCount: unassignedParticipants.length })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -104,7 +107,7 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                 className="gap-1.5"
               >
                 <SparklesIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">Slumpa</span>
+                <span className="hidden sm:inline">{t('randomize')}</span>
               </Button>
             )}
             {canEdit && onAddRole && (
@@ -115,7 +118,7 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                 className="gap-1.5"
               >
                 <PlusIcon className="h-4 w-4" />
-                <span className="hidden sm:inline">Ny roll</span>
+                <span className="hidden sm:inline">{t('newRole')}</span>
               </Button>
             )}
           </div>
@@ -127,9 +130,9 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
             <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <UserIcon className="h-8 w-8 text-muted-foreground" />
             </div>
-            <p className="text-foreground font-medium">Inga roller skapade</p>
+            <p className="text-foreground font-medium">{t('empty.title')}</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Lägg till roller för att tilldela deltagare
+              {t('empty.description')}
             </p>
             {canEdit && onAddRole && (
               <Button
@@ -138,7 +141,7 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                 className="mt-4 gap-1.5"
               >
                 <PlusIcon className="h-4 w-4" />
-                Skapa första rollen
+                {t('empty.createFirst')}
               </Button>
             )}
           </div>
@@ -173,7 +176,7 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                           {role.name}
                           {role.isHost && (
                             <span className="ml-2 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
-                              Värd
+                              {t('host')}
                             </span>
                           )}
                         </span>
@@ -246,7 +249,7 @@ export const RolesSection = forwardRef<HTMLDivElement, RolesSectionProps>(
                                 type="button"
                                 onClick={() => onAssignRole(participant.id, undefined)}
                                 className="text-muted-foreground hover:text-foreground transition-colors"
-                                aria-label={`Ta bort ${participant.name} från roll`}
+                                aria-label={t('removeFromRole', { name: participant.name })}
                               >
                                 ×
                               </button>

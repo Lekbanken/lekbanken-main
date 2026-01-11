@@ -451,6 +451,204 @@
       "themeDark": "Mørkt",
       "themeSystem": "System",
       "notifications": "Varsler"
+    },
+    "support": {
+      "title": "Support",
+      "subtitle": "Hvordan kan vi hjelpe deg i dag?",
+      "tabs": {
+        "contact": "Kontakt oss",
+        "tickets": "Mine saker",
+        "faq": "Vanlige spørsmål"
+      },
+      "quickLinks": {
+        "contact": "Kontakt oss",
+        "contactSub": "Send en sak",
+        "tickets": "Mine saker",
+        "ticketsSub": "{count} aktive",
+        "faq": "Vanlige spørsmål",
+        "faqSub": "Raske svar"
+      },
+      "form": {
+        "title": "Send en sak",
+        "success": "Takk for meldingen din!",
+        "successSub": "Vi kommer tilbake til deg så snart vi kan.",
+        "titlePlaceholder": "Kort beskrivelse av saken",
+        "descriptionPlaceholder": "Beskriv saken din i detalj...",
+        "ratingLabel": "Hvor fornøyd er du med Lekbanken? (valgfritt)",
+        "submit": "Send sak",
+        "submitting": "Sender..."
+      },
+      "categories": {
+        "general": "Generelt",
+        "technical": "Teknisk problem",
+        "billing": "Fakturering",
+        "feature": "Funksjonsforslag",
+        "bug": "Feilrapport"
+      },
+      "feedbackTypes": {
+        "bug": "Feil",
+        "feature": "Forslag",
+        "general": "Spørsmål",
+        "other": "Annet"
+      },
+      "priority": {
+        "low": "Lav",
+        "medium": "Medium",
+        "high": "Høy"
+      },
+      "status": {
+        "open": "Åpen",
+        "in_progress": "Pågår",
+        "resolved": "Løst",
+        "closed": "Lukket",
+        "waiting_for_user": "Venter på svar"
+      },
+      "contactInfo": {
+        "hours": "Man-Fre 9:00-17:00",
+        "proSupport": "Som Pro-bruker har du prioritert support med svartid under 24 timer."
+      },
+      "tickets": {
+        "title": "Dine supportsaker",
+        "new": "Ny sak",
+        "loading": "Laster saker...",
+        "errorTitle": "Kunne ikke hente saker",
+        "retry": "Prøv igjen",
+        "emptyTitle": "Ingen saker",
+        "emptySub": "Du har ingen aktive supportsaker.",
+        "create": "Opprett en sak"
+      },
+      "faq": {
+        "title": "Vanlige spørsmål",
+        "loading": "Laster spørsmål..."
+      },
+      "errors": {
+        "loadTickets": "Kunne ikke hente saker",
+        "submitFailed": "Noe gikk galt. Prøv igjen."
+      }
+    },
+    "preferences": {
+      "title": "Innstillinger",
+      "subtitle": "Tilpass opplevelsen din",
+      "save": "Lagre endringer",
+      "saving": "Lagrer...",
+      "saved": "Lagret!",
+      "savedBanner": "Innstillingene dine er lagret!",
+      "profile": {
+        "title": "Profil",
+        "displayName": "Visningsnavn",
+        "visibility": "Profilsynlighet",
+        "visibilityHint": "Velg hvem som kan se profilen og aktiviteten din"
+      },
+      "appearance": {
+        "title": "Utseende",
+        "language": "Språk",
+        "theme": "Tema"
+      },
+      "notifications": {
+        "title": "Varsler",
+        "email": "E-postvarsler",
+        "emailDesc": "Få oppdateringer via e-post",
+        "emailFrequency": "E-postfrekvens",
+        "push": "Push-varsler",
+        "pushDesc": "Få varsler på enheten din",
+        "sound": "Lyd",
+        "soundDesc": "Spill av lyd ved varsler"
+      },
+      "content": {
+        "title": "Innhold & Personvern",
+        "maturity": "Innholdsnivå",
+        "maturityHint": "Filtrer innhold basert på aldersgruppe",
+        "recommendations": "Anbefalinger",
+        "recommendationsDesc": "Få personlige forslag",
+        "cookies": "Administrer cookie-innstillinger"
+      },
+      "quick": {
+        "title": "Hurtiginnstillinger",
+        "changeLanguage": "Bytt språk",
+        "changeTheme": "Bytt tema",
+        "muteNotifications": "Demp varsler",
+        "advanced": "Avansert"
+      },
+      "languages": {
+        "sv": "Svenska",
+        "en": "English",
+        "no": "Norsk",
+        "da": "Dansk"
+      },
+      "themes": {
+        "light": "Lyst",
+        "dark": "Mørkt",
+        "system": "System"
+      },
+      "emailFrequencies": {
+        "daily": "Daglig",
+        "weekly": "Ukentlig",
+        "monthly": "Månedlig",
+        "never": "Aldri"
+      },
+      "visibility": {
+        "public": "Offentlig",
+        "friends": "Kun venner",
+        "private": "Privat"
+      },
+      "maturity": {
+        "all": "Alt innhold",
+        "family": "Familievennlig",
+        "kids": "Kun barn"
+      }
+    },
+    "shop": {
+      "title": "Butikk",
+      "subtitle": "Bytt poeng mot belønninger og power-ups",
+      "activeBoost": "Aktiv boost: {label}",
+      "boostRemaining": "{hours}t {minutes}m igjen",
+      "coins": "Mynter",
+      "gems": "Gems",
+      "featured": "Utvalgt",
+      "levelLocked": "Låst: nivå {level}",
+      "buyNow": "Kjøp nå",
+      "buy": "Kjøp",
+      "owned": "Eies",
+      "use": "Bruk",
+      "searchPlaceholder": "Søk i butikken...",
+      "categories": {
+        "all": "Alle",
+        "cosmetic": "Utseende",
+        "powerup": "Power-ups",
+        "bundle": "Bundles",
+        "season_pass": "Sesongpass"
+      },
+      "rarity": {
+        "legendary": "Legendarisk",
+        "epic": "Episk",
+        "rare": "Sjelden",
+        "common": "Vanlig"
+      },
+      "empty": {
+        "title": "Ingen artikler funnet",
+        "description": "Prøv å endre søket eller filtrer etter en annen kategori."
+      },
+      "toasts": {
+        "insufficientBalance": "Du har ikke nok mynter.",
+        "insufficientBalanceTitle": "Utilstrekkelig saldo",
+        "notLoggedIn": "Du må logge inn for å kjøpe.",
+        "notLoggedInTitle": "Ikke innlogget",
+        "levelLocked": "Du må nå nivå {level} for å kjøpe dette.",
+        "levelLockedTitle": "Låst",
+        "accessDenied": "Du har ikke tilgang til denne tenant.",
+        "accessDeniedTitle": "Tilgang nektet",
+        "purchaseFailed": "Prøv igjen om litt.",
+        "purchaseFailedTitle": "Kjøp mislyktes",
+        "purchaseSuccess": "Kjøpet er gjennomført.",
+        "purchaseSuccessTitle": "Kjøpt",
+        "noPowerups": "Du har ingen igjen å bruke.",
+        "noPowerupsTitle": "Ingen powerups igjen",
+        "consumeFailed": "Prøv igjen om litt.",
+        "consumeFailedTitle": "Kunne ikke bruke",
+        "consumeSuccess": "Powerup brukt.",
+        "consumeSuccessTitle": "Brukt"
+      },
+      "new": "Ny!"
     }
   },
   "auth": {
@@ -1953,6 +2151,50 @@
       "yourTurn": "Din tur",
       "submitAnswer": "Send svar",
       "skipQuestion": "Hopp over"
+    },
+    "settingsSection": {
+      "title": "Innstillinger",
+      "subtitle": "Konfigurer sesjonen",
+      "footerNote": "Disse innstillingene kan endres under sesjonen",
+      "showParticipantNames": {
+        "label": "Vis deltakernavn",
+        "description": "Deltakere kan se hverandres navn"
+      },
+      "allowChat": {
+        "label": "Tillat chat",
+        "description": "Deltakere kan chatte med hverandre"
+      },
+      "autoAdvance": {
+        "label": "Auto-fortsett",
+        "description": "Gå videre automatisk når alle er klare"
+      },
+      "requireRoles": {
+        "label": "Krev roller",
+        "description": "Alle deltakere må ha en rolle før start"
+      },
+      "maxParticipants": {
+        "label": "Maks deltakere",
+        "description": "Maksimalt antall deltakere i sesjonen",
+        "suffix": "stk"
+      },
+      "durationLimit": {
+        "label": "Tidsbegrensning",
+        "description": "Maks tid for sesjonen (0 = ingen grense)",
+        "suffix": "min"
+      }
+    },
+    "rolesSection": {
+      "title": "Roller",
+      "summary": "{roleCount} roller • {unassignedCount} uten rolle",
+      "randomize": "Tilfeldig",
+      "newRole": "Ny rolle",
+      "host": "Vert",
+      "removeFromRole": "Fjern {name} fra rolle",
+      "empty": {
+        "title": "Ingen roller opprettet",
+        "description": "Legg til roller for å tildele deltakere",
+        "createFirst": "Opprett første rolle"
+      }
     },
     "participantView": {
       "header": {

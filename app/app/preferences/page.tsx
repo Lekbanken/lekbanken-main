@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Select } from '@/components/ui'
 import {
   Cog6ToothIcon,
@@ -28,37 +29,12 @@ interface Preferences {
   displayName: string
 }
 
-const LANGUAGES = [
-  { value: 'sv', label: 'Svenska' },
-  { value: 'en', label: 'English' },
-  { value: 'no', label: 'Norsk' },
-  { value: 'da', label: 'Dansk' },
-]
-
-const THEMES = [
-  { value: 'light', label: 'Ljust' },
-  { value: 'dark', label: 'Mörkt' },
-  { value: 'system', label: 'Systemval' },
-]
-
-const EMAIL_FREQUENCIES = [
-  { value: 'daily', label: 'Dagligen' },
-  { value: 'weekly', label: 'Veckovis' },
-  { value: 'monthly', label: 'Månatligen' },
-  { value: 'never', label: 'Aldrig' },
-]
-
-const VISIBILITY_OPTIONS = [
-  { value: 'public', label: 'Publik' },
-  { value: 'friends', label: 'Endast vänner' },
-  { value: 'private', label: 'Privat' },
-]
-
-const MATURITY_LEVELS = [
-  { value: 'all', label: 'Allt innehåll' },
-  { value: 'family', label: 'Familjevänligt' },
-  { value: 'kids', label: 'Endast barn' },
-]
+// Values only - labels come from translations
+const LANGUAGES = ['sv', 'en', 'no', 'da'] as const
+const THEMES = ['light', 'dark', 'system'] as const
+const EMAIL_FREQUENCIES = ['daily', 'weekly', 'monthly', 'never'] as const
+const VISIBILITY_OPTIONS = ['public', 'friends', 'private'] as const
+const MATURITY_LEVELS = ['all', 'family', 'kids'] as const
 
 function Toggle({
   checked,
@@ -88,6 +64,7 @@ function Toggle({
 }
 
 export default function PreferencesPage() {
+  const t = useTranslations('app.preferences')
   const [preferences, setPreferences] = useState<Preferences>({
     language: 'sv',
     theme: 'light',
@@ -122,26 +99,26 @@ export default function PreferencesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Inställningar</h1>
-          <p className="text-muted-foreground mt-1">Anpassa din upplevelse</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
         <Button onClick={handleSave} disabled={saving}>
           {saving ? (
-            'Sparar...'
+            t('saving')
           ) : saved ? (
             <>
               <CheckIcon className="h-4 w-4 mr-1" />
-              Sparat!
+              {t('saved')}
             </>
           ) : (
-            'Spara ändringar'
+            t('save')
           )}
         </Button>
       </div>
 
       {saved && (
         <Badge variant="success" className="w-full justify-center py-2">
-          Dina inställningar har sparats!
+          {t('savedBanner')}
         </Badge>
       )}
 
@@ -151,13 +128,13 @@ export default function PreferencesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <UserCircleIcon className="h-5 w-5 text-primary" />
-              Profil
+              {t('profile.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Visningsnamn
+                {t('profile.displayName')}
               </label>
               <Input
                 value={preferences.displayName}
@@ -166,15 +143,15 @@ export default function PreferencesPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Profilsynlighet
+                {t('profile.visibility')}
               </label>
               <Select
                 value={preferences.profileVisibility}
                 onChange={(e) => updatePreference('profileVisibility', e.target.value)}
-                options={VISIBILITY_OPTIONS}
+                options={VISIBILITY_OPTIONS.map(v => ({ value: v, label: t(`visibility.${v}` as 'visibility.public') }))}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Välj vem som kan se din profil och aktivitet
+                {t('profile.visibilityHint')}
               </p>
             </div>
           </CardContent>
@@ -185,28 +162,28 @@ export default function PreferencesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <PaintBrushIcon className="h-5 w-5 text-accent" />
-              Utseende
+              {t('appearance.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Språk
+                {t('appearance.language')}
               </label>
               <Select
                 value={preferences.language}
                 onChange={(e) => updatePreference('language', e.target.value)}
-                options={LANGUAGES}
+                options={LANGUAGES.map(l => ({ value: l, label: t(`languages.${l}` as 'languages.sv') }))}
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Tema
+                {t('appearance.theme')}
               </label>
               <Select
                 value={preferences.theme}
                 onChange={(e) => updatePreference('theme', e.target.value)}
-                options={THEMES}
+                options={THEMES.map(th => ({ value: th, label: t(`themes.${th}` as 'themes.light') }))}
               />
             </div>
           </CardContent>
@@ -217,53 +194,53 @@ export default function PreferencesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BellIcon className="h-5 w-5 text-yellow-500" />
-              Notiser
+              {t('notifications.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-foreground">E-postnotiser</div>
-                <div className="text-sm text-muted-foreground">Få uppdateringar via e-post</div>
+                <div className="font-medium text-foreground">{t('notifications.email')}</div>
+                <div className="text-sm text-muted-foreground">{t('notifications.emailDesc')}</div>
               </div>
               <Toggle
                 checked={preferences.notificationsEnabled}
                 onChange={(val) => updatePreference('notificationsEnabled', val)}
-                label="E-postnotiser"
+                label={t('notifications.email')}
               />
             </div>
             {preferences.notificationsEnabled && (
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">
-                  E-postfrekvens
+                  {t('notifications.emailFrequency')}
                 </label>
                 <Select
                   value={preferences.emailFrequency}
                   onChange={(e) => updatePreference('emailFrequency', e.target.value)}
-                  options={EMAIL_FREQUENCIES}
+                  options={EMAIL_FREQUENCIES.map(f => ({ value: f, label: t(`emailFrequencies.${f}` as 'emailFrequencies.daily') }))}
                 />
               </div>
             )}
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-foreground">Push-notiser</div>
-                <div className="text-sm text-muted-foreground">Få notiser på din enhet</div>
+                <div className="font-medium text-foreground">{t('notifications.push')}</div>
+                <div className="text-sm text-muted-foreground">{t('notifications.pushDesc')}</div>
               </div>
               <Toggle
                 checked={preferences.pushNotifications}
                 onChange={(val) => updatePreference('pushNotifications', val)}
-                label="Push-notiser"
+                label={t('notifications.push')}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-foreground">Ljud</div>
-                <div className="text-sm text-muted-foreground">Spela upp ljud vid notiser</div>
+                <div className="font-medium text-foreground">{t('notifications.sound')}</div>
+                <div className="text-sm text-muted-foreground">{t('notifications.soundDesc')}</div>
               </div>
               <Toggle
                 checked={preferences.soundEnabled}
                 onChange={(val) => updatePreference('soundEnabled', val)}
-                label="Ljud"
+                label={t('notifications.sound')}
               />
             </div>
           </CardContent>
@@ -274,32 +251,32 @@ export default function PreferencesPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheckIcon className="h-5 w-5 text-green-500" />
-              Innehåll & Integritet
+              {t('content.title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Innehållsnivå
+                {t('content.maturity')}
               </label>
               <Select
                 value={preferences.contentMaturity}
                 onChange={(e) => updatePreference('contentMaturity', e.target.value)}
-                options={MATURITY_LEVELS}
+                options={MATURITY_LEVELS.map(m => ({ value: m, label: t(`maturity.${m}` as 'maturity.all') }))}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Filtrera innehåll baserat på åldersgrupp
+                {t('content.maturityHint')}
               </p>
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <div className="font-medium text-foreground">Rekommendationer</div>
-                <div className="text-sm text-muted-foreground">Få personliga förslag</div>
+                <div className="font-medium text-foreground">{t('content.recommendations')}</div>
+                <div className="text-sm text-muted-foreground">{t('content.recommendationsDesc')}</div>
               </div>
               <Toggle
                 checked={preferences.enableRecommendations}
                 onChange={(val) => updatePreference('enableRecommendations', val)}
-                label="Rekommendationer"
+                label={t('content.recommendations')}
               />
             </div>
             <div className="pt-2">
@@ -307,7 +284,7 @@ export default function PreferencesPage() {
                 href="/app/preferences/cookies"
                 className="inline-flex items-center text-sm text-primary hover:underline"
               >
-                Hantera cookie-inställningar
+                {t('content.cookies')}
               </Link>
             </div>
             <div className="pt-2">
@@ -327,26 +304,26 @@ export default function PreferencesPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SparklesIcon className="h-5 w-5 text-purple-500" />
-            Snabbinställningar
+            {t('quick.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Button variant="outline" className="justify-start">
               <GlobeAltIcon className="h-4 w-4 mr-2" />
-              Byt språk
+              {t('quick.changeLanguage')}
             </Button>
             <Button variant="outline" className="justify-start">
               <PaintBrushIcon className="h-4 w-4 mr-2" />
-              Byt tema
+              {t('quick.changeTheme')}
             </Button>
             <Button variant="outline" className="justify-start">
               <BellIcon className="h-4 w-4 mr-2" />
-              Tysta notiser
+              {t('quick.muteNotifications')}
             </Button>
             <Button variant="outline" className="justify-start">
               <Cog6ToothIcon className="h-4 w-4 mr-2" />
-              Avancerat
+              {t('quick.advanced')}
             </Button>
           </div>
         </CardContent>

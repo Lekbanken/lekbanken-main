@@ -1,0 +1,1083 @@
+{
+  "common": {
+    "actions": {
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "delete": "Ta bort",
+      "edit": "Redigera",
+      "create": "Skapa",
+      "add": "Lägg till",
+      "remove": "Ta bort",
+      "close": "Stäng",
+      "confirm": "Bekräfta",
+      "back": "Tillbaka",
+      "next": "Nästa",
+      "previous": "Föregående",
+      "search": "Sök",
+      "filter": "Filtrera",
+      "sort": "Sortera",
+      "export": "Exportera",
+      "import": "Importera",
+      "download": "Ladda ner",
+      "upload": "Ladda upp",
+      "refresh": "Uppdatera",
+      "retry": "Försök igen",
+      "submit": "Skicka",
+      "apply": "Tillämpa",
+      "reset": "Återställ",
+      "clear": "Rensa",
+      "select": "Välj",
+      "selectAll": "Välj alla",
+      "deselectAll": "Avmarkera alla",
+      "copy": "Kopiera",
+      "paste": "Klistra in",
+      "duplicate": "Duplicera",
+      "archive": "Arkivera",
+      "restore": "Återställ",
+      "publish": "Publicera",
+      "unpublish": "Avpublicera",
+      "preview": "Förhandsgranska",
+      "view": "Visa",
+      "hide": "Dölj",
+      "show": "Visa",
+      "expand": "Expandera",
+      "collapse": "Komprimera",
+      "more": "Mer",
+      "less": "Mindre",
+      "loading": "Laddar...",
+      "saving": "Sparar...",
+      "deleting": "Tar bort...",
+      "updating": "Uppdaterar..."
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "pending": "Väntande",
+      "approved": "Godkänd",
+      "rejected": "Avvisad",
+      "draft": "Utkast",
+      "published": "Publicerad",
+      "archived": "Arkiverad",
+      "enabled": "Aktiverad",
+      "disabled": "Inaktiverad"
+    },
+    "labels": {
+      "name": "Namn",
+      "title": "Titel",
+      "description": "Beskrivning",
+      "email": "E-post",
+      "phone": "Telefon",
+      "address": "Adress",
+      "date": "Datum",
+      "time": "Tid",
+      "datetime": "Datum och tid",
+      "created": "Skapad",
+      "updated": "Uppdaterad",
+      "createdAt": "Skapad",
+      "updatedAt": "Uppdaterad",
+      "createdBy": "Skapad av",
+      "updatedBy": "Uppdaterad av",
+      "status": "Status",
+      "type": "Typ",
+      "category": "Kategori",
+      "tags": "Taggar",
+      "notes": "Anteckningar",
+      "comments": "Kommentarer",
+      "attachments": "Bilagor",
+      "settings": "Inställningar",
+      "options": "Alternativ",
+      "actions": "Åtgärder",
+      "details": "Detaljer",
+      "summary": "Sammanfattning",
+      "total": "Totalt",
+      "count": "Antal",
+      "amount": "Belopp",
+      "price": "Pris",
+      "quantity": "Kvantitet",
+      "percent": "Procent",
+      "language": "Språk",
+      "country": "Land",
+      "currency": "Valuta",
+      "timezone": "Tidszon"
+    },
+    "messages": {
+      "success": "Åtgärden lyckades",
+      "error": "Ett fel uppstod",
+      "warning": "Varning",
+      "info": "Information",
+      "saved": "Sparad",
+      "deleted": "Borttagen",
+      "updated": "Uppdaterad",
+      "created": "Skapad",
+      "copied": "Kopierad",
+      "noResults": "Inga resultat hittades",
+      "noData": "Ingen data tillgänglig",
+      "emptyState": "Det finns inget här ännu",
+      "confirmDelete": "Är du säker på att du vill ta bort detta?",
+      "confirmAction": "Är du säker på att du vill fortsätta?",
+      "unsavedChanges": "Du har osparade ändringar. Vill du lämna sidan?",
+      "loadingError": "Kunde inte ladda data",
+      "saveError": "Kunde inte spara",
+      "deleteError": "Kunde inte ta bort",
+      "networkError": "Nätverksfel. Kontrollera din anslutning.",
+      "unauthorized": "Du har inte behörighet att utföra denna åtgärd",
+      "notFound": "Sidan kunde inte hittas",
+      "serverError": "Serverfel. Försök igen senare."
+    },
+    "time": {
+      "today": "Idag",
+      "yesterday": "Igår",
+      "tomorrow": "Imorgon",
+      "now": "Nu",
+      "ago": "sedan",
+      "in": "om",
+      "seconds": "sekunder",
+      "minutes": "minuter",
+      "hours": "timmar",
+      "days": "dagar",
+      "weeks": "veckor",
+      "months": "månader",
+      "years": "år"
+    },
+    "pagination": {
+      "page": "Sida",
+      "of": "av",
+      "showing": "Visar",
+      "to": "till",
+      "results": "resultat",
+      "first": "Första",
+      "last": "Sista",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "perPage": "per sida"
+    },
+    "form": {
+      "required": "Obligatoriskt fält",
+      "optional": "Valfritt",
+      "invalid": "Ogiltigt värde",
+      "tooShort": "För kort",
+      "tooLong": "För långt",
+      "invalidEmail": "Ogiltig e-postadress",
+      "invalidPhone": "Ogiltigt telefonnummer",
+      "invalidUrl": "Ogiltig URL",
+      "passwordMismatch": "Lösenorden matchar inte",
+      "minLength": "Minst {min} tecken",
+      "maxLength": "Max {max} tecken"
+    }
+  },
+  "admin": {
+    "nav": {
+      "dashboard": "Översikt",
+      "overview": "Översikt",
+      "organizations": "Organisationer",
+      "allOrganizations": "Alla organisationer",
+      "users": "Användare",
+      "allUsers": "Alla användare",
+      "licenses": "Licenser & Planer",
+      "games": "Spel",
+      "gameManager": "Lekhanteraren",
+      "planner": "Planer",
+      "plannerTool": "Planläggaren",
+      "products": "Produkter",
+      "allProducts": "Alla produkter",
+      "purposes": "Syften",
+      "badges": "Badges",
+      "coachDiagrams": "Coach Diagrams",
+      "library": "Bibliotek",
+      "mediaFiles": "Mediefiler",
+      "tools": "Verktyg",
+      "conversationCards": "Samtalskort",
+      "leaderboard": "Leaderboard",
+      "levels": "Levels",
+      "shop": "Butik",
+      "sessions": "Sessioner",
+      "participants": "Deltagare",
+      "allParticipants": "Alla deltagare",
+      "moderation": "Moderering",
+      "tickets": "Ärenden",
+      "analytics": "Analys",
+      "statistics": "Statistik",
+      "billing": "Fakturering",
+      "notifications": "Notifikationer",
+      "systemHealth": "System Health",
+      "auditLog": "Granskningslogg",
+      "featureFlags": "Feature Flags",
+      "apiKeys": "API-nycklar",
+      "webhooks": "Webhooks",
+      "incidents": "Incidenter",
+      "releaseNotes": "Release Notes",
+      "settings": "Inställningar",
+      "translations": "Översättningar",
+      "gamification": "Gamification",
+      "dicecoinXp": "DiceCoin & XP",
+      "achievements": "Achievements",
+      "awards": "Utmärkelser",
+      "shopRewards": "Shop & Rewards",
+      "learning": "Utbildning",
+      "courses": "Kurser",
+      "learningPaths": "Lärstigar",
+      "requirements": "Krav & Grind",
+      "reports": "Rapporter",
+      "support": "Support",
+      "knowledgeBase": "Kunskapsbas",
+      "automation": "Automation",
+      "bugReports": "Buggrapporter",
+      "feedback": "Feedback",
+      "operations": "Drift",
+      "system": "System",
+      "design": "Design",
+      "members": "Medlemmar",
+      "allMembers": "Alla medlemmar",
+      "rolesPermissions": "Roller & Behörigheter",
+      "invitations": "Inbjudningar",
+      "content": "Innehåll",
+      "plans": "Planer",
+      "account": "Konto",
+      "subscription": "Prenumeration",
+      "invoices": "Fakturor",
+      "general": "Allmänt",
+      "branding": "Varumärke",
+      "domains": "Domäner"
+    },
+    "navGroups": {
+      "overview": "Översikt",
+      "organizations": "Organisationer",
+      "users": "Användare",
+      "products": "Produkter",
+      "library": "Bibliotek",
+      "gamification": "Gamification",
+      "learning": "Utbildning",
+      "support": "Support",
+      "operations": "Drift",
+      "system": "System",
+      "members": "Medlemmar",
+      "content": "Innehåll",
+      "participants": "Deltagare",
+      "account": "Konto",
+      "settings": "Inställningar"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Välkommen till Lekbanken Admin",
+      "quickStats": "Snabbstatistik",
+      "recentActivity": "Senaste aktivitet",
+      "activeUsers": "Aktiva användare",
+      "totalOrganizations": "Totalt organisationer",
+      "activeSessions": "Aktiva sessioner",
+      "pendingTickets": "Väntande ärenden"
+    },
+    "users": {
+      "title": "Användare",
+      "createUser": "Skapa användare",
+      "editUser": "Redigera användare",
+      "deleteUser": "Ta bort användare",
+      "userDetails": "Användardetaljer",
+      "searchUsers": "Sök användare...",
+      "noUsers": "Inga användare hittades",
+      "role": "Roll",
+      "roles": {
+        "systemAdmin": "Systemadministratör",
+        "tenantAdmin": "Organisationsadministratör",
+        "staff": "Personal",
+        "member": "Medlem",
+        "user": "Användare"
+      },
+      "lastLogin": "Senaste inloggning",
+      "createdAt": "Skapad",
+      "status": "Status",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "invited": "Inbjuden",
+      "blocked": "Blockerad",
+      "inviteUser": "Bjud in användare",
+      "resendInvite": "Skicka inbjudan igen",
+      "resetPassword": "Återställ lösenord",
+      "blockUser": "Blockera användare",
+      "unblockUser": "Avblockera användare",
+      "confirmDelete": "Är du säker på att du vill ta bort denna användare?"
+    },
+    "organizations": {
+      "title": "Organisationer",
+      "createOrganization": "Skapa organisation",
+      "editOrganization": "Redigera organisation",
+      "deleteOrganization": "Ta bort organisation",
+      "organizationDetails": "Organisationsdetaljer",
+      "searchOrganizations": "Sök organisationer...",
+      "noOrganizations": "Inga organisationer hittades",
+      "members": "Medlemmar",
+      "memberCount": "{count} medlemmar",
+      "plan": "Plan",
+      "subscription": "Prenumeration",
+      "settings": "Inställningar",
+      "billing": "Fakturering",
+      "mainLanguage": "Huvudspråk",
+      "confirmDelete": "Är du säker på att du vill ta bort denna organisation?"
+    },
+    "settings": {
+      "title": "Inställningar",
+      "general": "Allmänt",
+      "appearance": "Utseende",
+      "language": "Språk",
+      "notifications": "Notifikationer",
+      "security": "Säkerhet",
+      "integrations": "Integrationer",
+      "advanced": "Avancerat"
+    },
+    "translations": {
+      "title": "Översättningar",
+      "audit": {
+        "title": "Översättningshistorik",
+        "description": "Alla ändringar av översättningar spåras här",
+        "totalChanges": "Totala ändringar",
+        "changeLog": "Ändringslogg",
+        "showingRecent": "Visar de senaste {count} ändringarna",
+        "noChangesYet": "Inga ändringar ännu",
+        "changesWillAppear": "Ändringar i översättningar kommer att visas här.",
+        "changedFields": "Ändrade fält"
+      },
+      "missing": {
+        "title": "Saknade nycklar",
+        "noMissingKeys": "Inga saknade nycklar!",
+        "allKeysFound": "Alla översättningsnycklar som efterfrågats vid körning har hittats.",
+        "selected": "{count} valda",
+        "deselect": "Avmarkera",
+        "markResolved": "Markera som lösta",
+        "key": "Nyckel",
+        "locale": "Locale",
+        "namespace": "Namespace",
+        "occurrences": "Förekomster",
+        "lastSeen": "Senast sedd",
+        "actions": "Åtgärder",
+        "copyKey": "Kopiera nyckel",
+        "resolve": "Åtgärda"
+      },
+      "content": {
+        "title": "Innehållsöversättningar",
+        "description": "Hantera översättningar för dynamiskt innehåll som kurser, prestationer och butiksartiklar",
+        "totalContent": "Totalt innehåll",
+        "translations": "Översättningar",
+        "ofPossible": "av {count} möjliga",
+        "coverageRate": "Täckningsgrad",
+        "needsWork": "Behöver arbete",
+        "domainsBelow50": "Domäner under 50%",
+        "noItemsInDomain": "Inga objekt hittades i denna domän.",
+        "translate": "Översätt",
+        "manageTranslations": "Hantera översättningar för alla",
+        "hasTranslation": "Översättning finns",
+        "missingTranslation": "Saknar översättning",
+        "backToUiTranslations": "Tillbaka till UI-översättningar",
+        "systemStringsMessages": "Systemsträngar och meddelanden",
+        "translateAchievements": "Översätt prestationer",
+        "namesDescriptionsTips": "Namn, beskrivningar och tips",
+        "translateCourses": "Översätt kurser",
+        "courseContentMetadata": "Kursinnehåll och metadata",
+        "learningPathsComingSoon": "Lärandevägar-översättningar kommer snart.",
+        "ready": "Klar",
+        "missing": "Saknas",
+        "contentDomains": "Innehållsdomäner"
+      },
+      "editor": {
+        "translateTitle": "Översätt: {name}",
+        "editTranslationsDescription": "Redigera översättningar för alla språk sida vid sida",
+        "original": "Original (Svenska)",
+        "translation": "Översättning",
+        "empty": "Tom",
+        "deleteTranslation": "Ta bort översättning",
+        "saved": "Sparat",
+        "couldNotSave": "Kunde inte spara",
+        "saveTranslation": "Spara översättning",
+        "saving": "Sparar..."
+      },
+      "actions": {
+        "created": "Skapad",
+        "updated": "Uppdaterad",
+        "deleted": "Borttagen"
+      },
+      "domains": {
+        "learningCourses": "Kurser",
+        "learningPaths": "Lärandevägar",
+        "achievements": "Prestationer",
+        "shopItems": "Butiksartiklar",
+        "notificationTemplates": "Notismallar"
+      },
+      "tables": {
+        "learningCourseTranslations": "Kurs",
+        "learningPathTranslations": "Lärandeväg",
+        "achievementTranslations": "Prestation",
+        "shopItemTranslations": "Butiksartikel",
+        "notificationTemplateTranslations": "Notismall",
+        "tenantTranslationOverrides": "Tenant-anpassning"
+      }
+    }
+  },
+  "app": {
+    "nav": {
+      "home": "Hem",
+      "dashboard": "Dashboard",
+      "games": "Spel",
+      "planner": "Planering",
+      "library": "Bibliotek",
+      "profile": "Profil",
+      "settings": "Inställningar",
+      "help": "Hjälp",
+      "logout": "Logga ut",
+      "goToDashboard": "Gå till dashboard",
+      "logoAlt": "Lekbanken ikon"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "welcome": "Välkommen tillbaka",
+      "recentGames": "Senaste spel",
+      "recentPlans": "Senaste planer",
+      "quickActions": "Snabbåtgärder",
+      "startSession": "Starta session",
+      "createPlan": "Skapa plan",
+      "browseGames": "Bläddra spel"
+    },
+    "profile": {
+      "title": "Profil",
+      "editProfile": "Redigera profil",
+      "personalInfo": "Personlig information",
+      "preferences": "Preferenser",
+      "security": "Säkerhet",
+      "notifications": "Notifikationer"
+    },
+    "settings": {
+      "title": "Inställningar",
+      "language": "Språk",
+      "theme": "Tema",
+      "themeLight": "Ljust",
+      "themeDark": "Mörkt",
+      "themeSystem": "System",
+      "notifications": "Notifikationer"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Logga in i Lekbanken",
+      "description": "Fortsätt där du slutade.",
+      "email": "E-postadress",
+      "password": "Lösenord",
+      "submit": "Logga in",
+      "google": "Logga in med Google",
+      "forgotPassword": "Glömt lösenord?",
+      "noAccount": "Har du inget konto?",
+      "signUp": "Skapa konto"
+    },
+    "signup": {
+      "title": "Skapa konto",
+      "description": "Kom igång med Lekbanken.",
+      "name": "Namn",
+      "email": "E-postadress",
+      "password": "Lösenord",
+      "confirmPassword": "Bekräfta lösenord",
+      "submit": "Skapa konto",
+      "google": "Registrera med Google",
+      "hasAccount": "Har du redan ett konto?",
+      "signIn": "Logga in"
+    },
+    "passwordReset": {
+      "title": "Återställ lösenord",
+      "description": "Ange din e-post så skickar vi en länk.",
+      "email": "E-postadress",
+      "submit": "Skicka länk",
+      "backToLogin": "Tillbaka till inloggning",
+      "sent": "Länk skickad! Kolla din e-post."
+    },
+    "errors": {
+      "invalidCredentials": "Ogiltiga inloggningsuppgifter",
+      "userNotFound": "Användaren hittades inte",
+      "emailInUse": "E-postadressen används redan",
+      "weakPassword": "Lösenordet är för svagt",
+      "tooManyAttempts": "För många försök. Försök igen senare.",
+      "networkError": "Nätverksfel. Kontrollera din anslutning."
+    }
+  },
+  "errors": {
+    "general": {
+      "title": "Ett fel uppstod",
+      "description": "Något gick fel. Försök igen senare.",
+      "retry": "Försök igen",
+      "goHome": "Gå till startsidan"
+    },
+    "notFound": {
+      "title": "Sidan hittades inte",
+      "description": "Sidan du letar efter finns inte eller har flyttats.",
+      "goBack": "Gå tillbaka",
+      "goHome": "Gå till startsidan"
+    },
+    "unauthorized": {
+      "title": "Åtkomst nekad",
+      "description": "Du har inte behörighet att se denna sida.",
+      "login": "Logga in",
+      "goHome": "Gå till startsidan"
+    },
+    "serverError": {
+      "title": "Serverfel",
+      "description": "Ett oväntat fel inträffade på servern.",
+      "retry": "Försök igen",
+      "contact": "Kontakta support"
+    },
+    "networkError": {
+      "title": "Nätverksfel",
+      "description": "Kunde inte ansluta till servern. Kontrollera din internetanslutning.",
+      "retry": "Försök igen"
+    },
+    "validation": {
+      "required": "Detta fält är obligatoriskt",
+      "email": "Ange en giltig e-postadress",
+      "minLength": "Måste vara minst {min} tecken",
+      "maxLength": "Får vara max {max} tecken",
+      "pattern": "Ogiltigt format"
+    }
+  },
+  "marketing": {
+    "nav": {
+      "features": "Funktioner",
+      "howItWorks": "Så funkar det",
+      "pricing": "Priser",
+      "customers": "Kunder"
+    },
+    "actions": {
+      "login": "Logga in",
+      "signup": "Prova gratis",
+      "goToApp": "Gå till appen",
+      "goToAdmin": "Gå till admin",
+      "goToMarketing": "Gå till startsidan"
+    }
+  },
+  "legal": {
+    "common": {
+      "backToHome": "← Tillbaka till startsidan",
+      "lastUpdated": "Senast uppdaterad: {date}"
+    },
+    "privacy": {
+      "metadata": {
+        "title": "Integritetspolicy - Lekbanken",
+        "description": "Hur Lekbanken hanterar och skyddar dina personuppgifter"
+      },
+      "title": "Integritetspolicy",
+      "sections": {
+        "introduction": {
+          "title": "1. Introduktion",
+          "content": "På Lekbanken värnar vi om din integritet. Denna integritetspolicy förklarar hur vi samlar in, använder, lagrar och skyddar dina personuppgifter när du använder våra tjänster.",
+          "gdpr": "Vi följer Dataskyddsförordningen (GDPR) och norsk dataskyddslagstiftning."
+        },
+        "dataCollection": {
+          "title": "2. Personuppgifter vi samlar in",
+          "provided": {
+            "title": "2.1 Information du tillhandahåller",
+            "account": "Kontoinformation: Namn, e-postadress, lösenord (krypterat)",
+            "profile": "Profilinformation: Profilbild, biografi, preferenser",
+            "organization": "Organisationsinformation: Organisationsnamn, kontaktuppgifter",
+            "payment": "Betalningsinformation: Faktureringsadress (betalningsuppgifter hanteras av Stripe)"
+          },
+          "automatic": {
+            "title": "2.2 Information vi samlar in automatiskt",
+            "usage": "Användningsdata: Sidvisningar, funktionsanvändning, sessionstid",
+            "device": "Enhetsinformation: Enhetstyp, webbläsare, operativsystem",
+            "logs": "Loggdata: IP-adress, datum och tid för åtkomst, felloggar",
+            "cookies": "Cookies: Se vår cookiepolicy nedan"
+          }
+        },
+        "dataUsage": {
+          "title": "3. Hur vi använder dina uppgifter",
+          "intro": "Vi använder dina personuppgifter för att:",
+          "purposes": {
+            "service": "Tillhandahålla och förbättra våra tjänster",
+            "account": "Hantera ditt konto och autentisering",
+            "payments": "Bearbeta betalningar och fakturor",
+            "messages": "Skicka tjänstemeddelanden och uppdateringar",
+            "support": "Ge kundsupport",
+            "analytics": "Analysera användning och optimera användarupplevelsen",
+            "security": "Upptäcka och förhindra bedrägerier eller säkerhetsincidenter",
+            "legal": "Följa juridiska krav"
+          }
+        },
+        "legalBasis": {
+          "title": "4. Rättslig grund för behandling",
+          "intro": "Vi behandlar dina personuppgifter baserat på:",
+          "contract": "Avtal: För att fullgöra vårt avtal med dig (tjänsteleverans)",
+          "consent": "Samtycke: När du har gett explicit samtycke (t.ex. marknadsföring)",
+          "interest": "Berättigat intresse: För att förbättra tjänsten och förhindra missbruk",
+          "obligation": "Juridisk skyldighet: För att följa lagar och förordningar"
+        },
+        "sharing": {
+          "title": "5. Delning av personuppgifter",
+          "intro": "Vi delar dina uppgifter endast med:",
+          "providers": {
+            "title": "5.1 Tjänsteleverantörer",
+            "supabase": "Supabase: Databashosting och autentisering",
+            "vercel": "Vercel: Webbhosting och CDN",
+            "stripe": "Stripe: Betalningshantering"
+          },
+          "legal": {
+            "title": "5.2 Juridiska krav",
+            "content": "Vi kan dela uppgifter om det krävs enligt lag, domstolsbeslut eller myndighetsbegäran."
+          },
+          "transfers": {
+            "title": "5.3 Företagsöverlåtelser",
+            "content": "Vid fusion, förvärv eller försäljning kan dina uppgifter överföras till den nya ägaren."
+          }
+        },
+        "storage": {
+          "title": "6. Lagring och säkerhet",
+          "location": {
+            "title": "6.1 Var lagras data?",
+            "content": "Dina personuppgifter lagras i Europa (via Supabase EU-region) för att följa GDPR-krav."
+          },
+          "duration": {
+            "title": "6.2 Hur länge lagras data?",
+            "active": "Aktiva konton: Så länge ditt konto är aktivt",
+            "closed": "Avslutade konton: 30 dagar efter avslutning (backup-syfte)",
+            "logs": "Loggar: 90 dagar",
+            "invoices": "Fakturor: 7 år (bokföringskrav)"
+          },
+          "security": {
+            "title": "6.3 Säkerhetsåtgärder",
+            "https": "HTTPS-kryptering för all datatransmission",
+            "passwords": "Krypterade lösenord (bcrypt)",
+            "rls": "Row-Level Security (RLS) i databasen",
+            "updates": "Regelbundna säkerhetsupdateringar",
+            "access": "Åtkomstkontroll och auditloggar"
+          }
+        },
+        "rights": {
+          "title": "7. Dina rättigheter",
+          "intro": "Enligt GDPR har du rätt att:",
+          "access": "Tillgång: Få en kopia av dina personuppgifter",
+          "rectification": "Rättelse: Korrigera felaktiga uppgifter",
+          "erasure": "Radering: Begära att vi raderar dina uppgifter (\"rätten att bli glömd\")",
+          "portability": "Dataportabilitet: Få dina uppgifter i strukturerat format",
+          "objection": "Invändning: Motsätta dig viss behandling",
+          "restriction": "Begränsa behandling: Begära begränsad behandling",
+          "withdraw": "Återkalla samtycke: Dra tillbaka samtycke när som helst",
+          "contact": "För att utöva dessa rättigheter, kontakta oss på"
+        },
+        "cookies": {
+          "title": "8. Cookies",
+          "intro": "Vi använder cookies för att:",
+          "necessary": "Nödvändiga cookies: Autentisering, sessionhantering",
+          "functional": "Funktionella cookies: Språkval, preferenser",
+          "analytics": "Analytiska cookies: Användningsstatistik (anonymiserad)",
+          "manage": "Du kan hantera cookies i dina webbläsarinställningar. Observera att vissa funktioner kanske inte fungerar korrekt om du blockerar cookies."
+        },
+        "children": {
+          "title": "9. Barn",
+          "content": "Lekbanken är inte avsett för barn under 13 år. Vi samlar inte medvetet in personuppgifter från barn. Om du är vårdnadshavare och upptäcker att ditt barn har lämnat personuppgifter, kontakta oss så raderar vi informationen."
+        },
+        "changes": {
+          "title": "10. Ändringar av integritetspolicyn",
+          "content": "Vi kan uppdatera denna policy från tid till annan. Vi kommer att meddela dig om väsentliga ändringar via e-post eller genom ett meddelande i tjänsten."
+        },
+        "contact": {
+          "title": "11. Kontaktinformation",
+          "intro": "Om du har frågor om denna integritetspolicy eller hur vi hanterar dina personuppgifter:",
+          "email": "E-post: privacy@lekbanken.no",
+          "address": "Adress: Lekbanken AS, Oslo, Norge",
+          "dpo": "Dataskyddsombud: dpo@lekbanken.no"
+        },
+        "complaints": {
+          "title": "12. Klagomål",
+          "intro": "Om du är missnöjd med hur vi hanterar dina personuppgifter har du rätt att lämna in ett klagomål till Datatilsynet (Norges dataskyddsmyndighet):",
+          "website": "Webbplats:",
+          "email": "E-post: postkasse@datatilsynet.no"
+        }
+      },
+      "footer": "Genom att använda Lekbanken godkänner du denna integritetspolicy och våra"
+    },
+    "terms": {
+      "metadata": {
+        "title": "Användarvillkor - Lekbanken",
+        "description": "Användarvillkor och regler för användning av Lekbanken"
+      },
+      "title": "Användarvillkor",
+      "sections": {
+        "introduction": {
+          "title": "1. Introduktion",
+          "content": "Välkommen till Lekbanken! Dessa användarvillkor (\"Villkoren\") reglerar din användning av Lekbanken-plattformen och våra tjänster. Genom att använda våra tjänster godkänner du dessa villkor."
+        },
+        "usage": {
+          "title": "2. Användning av tjänsten",
+          "eligibility": {
+            "title": "2.1 Behörighet",
+            "content": "För att använda Lekbanken måste du vara minst 18 år gammal eller ha tillstånd från vårdnadshavare. Om du använder tjänsten på uppdrag av en organisation, garanterar du att du har behörighet att ingå detta avtal för organisationens räkning."
+          },
+          "security": {
+            "title": "2.2 Kontosäkerhet",
+            "content": "Du är ansvarig för att hålla dina inloggningsuppgifter säkra och för all aktivitet som sker under ditt konto. Du måste omedelbart meddela oss om du upptäcker obehörig användning av ditt konto."
+          },
+          "acceptable": {
+            "title": "2.3 Accepterad användning",
+            "intro": "Du samtycker till att inte:",
+            "illegal": "Använda tjänsten för olagliga ändamål",
+            "unauthorized": "Försöka få obehörig åtkomst till systemet",
+            "malware": "Ladda upp skadligt innehåll eller virus",
+            "harassment": "Trakassera, hota eller förolämpa andra användare",
+            "spam": "Överföra spam eller oönskad kommunikation",
+            "ip": "Bryta mot andras immateriella rättigheter"
+          }
+        },
+        "content": {
+          "title": "3. Innehåll och immateriella rättigheter",
+          "yourContent": {
+            "title": "3.1 Ditt innehåll",
+            "content": "Du behåller äganderätten till allt innehåll du laddar upp till Lekbanken. Genom att ladda upp innehåll ger du oss en icke-exklusiv licens att använda, visa och distribuera ditt innehåll för att tillhandahålla tjänsten."
+          },
+          "ourContent": {
+            "title": "3.2 Vårt innehåll",
+            "content": "All programvara, design, text, grafik och annat material som tillhandahålls av Lekbanken skyddas av upphovsrätt och andra immateriella rättigheter. Du får inte kopiera, modifiera eller distribuera vårt innehåll utan skriftligt tillstånd."
+          }
+        },
+        "payment": {
+          "title": "4. Betalning och prenumerationer",
+          "fees": {
+            "title": "4.1 Avgifter",
+            "content": "Vissa funktioner i Lekbanken kräver en betald prenumeration. Alla priser anges på vår prissättningssida och inkluderar tillämplig moms."
+          },
+          "billing": {
+            "title": "4.2 Fakturering",
+            "content": "Prenumerationsavgifter debiteras automatiskt vid början av varje faktureringsperiod. Du är ansvarig för att tillhandahålla giltiga betalningsuppgifter."
+          },
+          "refunds": {
+            "title": "4.3 Återbetalning",
+            "content": "Återbetalningar hanteras i enlighet med vår återbetalningspolicy. Kontakta vår support för att diskutera återbetalning inom 14 dagar från köpdatum."
+          }
+        },
+        "termination": {
+          "title": "5. Uppsägning",
+          "content": "Du kan när som helst avsluta ditt konto genom att kontakta vår support. Vi förbehåller oss rätten att stänga av eller avsluta konton som bryter mot dessa villkor."
+        },
+        "liability": {
+          "title": "6. Ansvarsbegränsning",
+          "content": "Lekbanken tillhandahålls \"i befintligt skick\" utan garantier av något slag. Vi ansvarar inte för indirekta skador, förlorad vinst eller dataförlust som uppstår från användningen av våra tjänster."
+        },
+        "changes": {
+          "title": "7. Ändringar av villkoren",
+          "content": "Vi kan uppdatera dessa villkor från tid till annan. Vi kommer att meddela dig om väsentliga ändringar via e-post eller genom ett meddelande i tjänsten. Din fortsatta användning av tjänsten efter ändringar utgör ditt godkännande av de nya villkoren."
+        },
+        "law": {
+          "title": "8. Tillämplig lag",
+          "content": "Dessa villkor regleras av norsk lag. Eventuella tvister ska lösas i norska domstolar."
+        },
+        "contact": {
+          "title": "9. Kontaktinformation",
+          "intro": "Om du har frågor om dessa användarvillkor, vänligen kontakta oss:",
+          "email": "E-post: legal@lekbanken.no",
+          "address": "Adress: Lekbanken AS, Oslo, Norge"
+        }
+      },
+      "footer": "Genom att använda Lekbanken godkänner du dessa användarvillkor och vår"
+    },
+    "links": {
+      "terms": "användarvillkor",
+      "privacy": "integritetspolicy"
+    }
+  },
+  "play": {
+    "common": {
+      "cancel": "Avbryt",
+      "confirm": "Bekräfta",
+      "loading": "Laddar...",
+      "triggers": "triggers",
+      "activeTriggers": "aktiva triggers",
+      "ofTotal": "{count} av {total}"
+    },
+    "killSwitch": {
+      "emergencyStopActive": "Nödstopp aktivt",
+      "triggersActive": "Triggers aktiva",
+      "emergencyStop": "Nödstopp",
+      "reactivate": "Återaktivera",
+      "reactivateTriggers": "Återaktivera triggers",
+      "tooltips": {
+        "emergencyStopActive": "Nödstopp aktivt - triggers inaktiverade",
+        "activeTriggersCount": "{count} aktiva triggers",
+        "noActiveTriggers": "Inga aktiva triggers",
+        "disableAllTriggers": "Inaktivera alla {count} aktiva triggers"
+      },
+      "status": {
+        "disabled": "{disabled} av {total} inaktiverade",
+        "ready": "{armed} av {total} redo",
+        "disabledOfTotal": "{disabled} av {total} inaktiverade",
+        "readyOfTotal": "{armed} av {total} redo"
+      },
+      "dialogs": {
+        "activateEmergencyStop": {
+          "title": "Aktivera nödstopp?",
+          "description": "Detta kommer att omedelbart inaktivera alla {count} aktiva triggers. Inga automatiska händelser kommer att köras förrän du återaktiverar dem.",
+          "descriptionShort": "Detta kommer att omedelbart inaktivera alla {count} aktiva triggers.",
+          "confirm": "Ja, aktivera nödstopp"
+        },
+        "reactivateAll": {
+          "title": "Återaktivera alla triggers?",
+          "descriptionFromEmergency": "Detta kommer att återaktivera alla {count} inaktiverade triggers som var aktiverade innan nödstoppet.",
+          "description": "Detta kommer att återaktivera alla {count} inaktiverade triggers. Automatiska händelser kommer att börja köras igen.",
+          "descriptionShort": "Detta kommer att återaktivera alla {count} inaktiverade triggers.",
+          "confirm": "Ja, återaktivera"
+        }
+      },
+      "warning": "Alla automatiska händelser är inaktiverade. Spelet kan behöva manuell styrning tills triggers återaktiveras."
+    },
+    "session": {
+      "paused": "Sessionen är pausad",
+      "locked": "Sessionen är låst",
+      "ended": "Sessionen är avslutad",
+      "starting": "Sessionen startar...",
+      "waitingForHost": "Väntar på spelledare...",
+      "connecting": "Ansluter...",
+      "reconnecting": "Återansluter...",
+      "sessionCode": "Sessionskod",
+      "noGameLinked": "Inget spel är kopplat till sessionen."
+    },
+    "hostSession": {
+      "tabs": {
+        "participants": "Deltagare",
+        "roles": "Roller",
+        "signals": "Signaler",
+        "timebank": "Tidsbank",
+        "settings": "Inställningar"
+      },
+      "errors": {
+        "somethingWentWrong": "Något gick fel"
+      },
+      "participants": {
+        "title": "Deltagare",
+        "count": "Deltagare ({count})"
+      },
+      "share": {
+        "title": "Dela session",
+        "participantsGoTo": "Deltagare går till",
+        "copied": "Kopierad!",
+        "share": "Dela",
+        "qrCode": "QR-kod"
+      },
+      "roles": {
+        "title": "Roller",
+        "description": "Tilldela roller i lobbyn innan ni går in i aktiv session.",
+        "copyFromGame": "Kopiera roller från spel"
+      },
+      "secrets": {
+        "title": "Hemliga instruktioner",
+        "description": "Lås upp när alla har fått en roll. Du kan bara låsa igen om ingen har hunnit visa sina hemligheter.",
+        "lock": "Lås igen",
+        "unlock": "Lås upp",
+        "statusUnlocked": "Upplåst",
+        "statusLocked": "Låst",
+        "participantsLabel": "Deltagare",
+        "assignedLabel": "Tilldelade",
+        "revealedLabel": "Visade",
+        "tip": "Tips: Du kan låsa upp när alla har en roll."
+      },
+      "controls": {
+        "title": "Sessionskontroller"
+      },
+      "admin": {
+        "title": "Admin-inställningar (endast denna session)",
+        "description": "Justera steg, säkerhet, faser och roller utan att ändra spelets originaldata.",
+        "resetOverrides": "Återställ overrides",
+        "saveChanges": "Spara sessionens ändringar",
+        "steps": {
+          "title": "Steg-för-steg",
+          "subtitle": "Titel, beskrivning, tid, ordning",
+          "orderLabel": "Ordning",
+          "timeLabel": "Tid (min)"
+        },
+        "safety": {
+          "title": "Säkerhet & Inkludering",
+          "subtitle": "Säkerhet, tillgänglighet, utrymme, ledartips",
+          "safetyNotes": "Säkerhetsnoteringar",
+          "accessibilityNotes": "Tillgänglighetsnoteringar",
+          "spaceRequirements": "Utrymmeskrav",
+          "leaderTips": "Ledartips"
+        },
+        "phases": {
+          "title": "Faser & Rundor",
+          "subtitle": "Namn, beskrivning, tid, ordning",
+          "orderLabel": "Ordning",
+          "timeLabel": "Tid (min)"
+        },
+        "roleSettings": {
+          "title": "Roller i session",
+          "subtitle": "Min/max antal, beskrivning",
+          "minLabel": "Min",
+          "maxLabel": "Max",
+          "iconLabel": "Ikon",
+          "colorLabel": "Färg",
+          "saveRoles": "Spara roller",
+          "noRoles": "Inga snapshotade roller ännu."
+        }
+      }
+    },
+    "facilitator": {
+      "dashboard": "Instrumentpanel",
+      "participants": "Deltagare",
+      "timeline": "Tidslinje",
+      "controls": "Kontroller",
+      "startSession": "Starta session",
+      "pauseSession": "Pausa session",
+      "resumeSession": "Återuppta session",
+      "endSession": "Avsluta session",
+      "nextStep": "Nästa steg",
+      "previousStep": "Föregående steg"
+    },
+    "participant": {
+      "ready": "Redo",
+      "notReady": "Inte redo",
+      "waiting": "Väntar...",
+      "yourTurn": "Din tur",
+      "submitAnswer": "Skicka svar",
+      "skipQuestion": "Hoppa över"
+    },
+    "participantView": {
+      "header": {
+        "play": "Spela",
+        "playingAs": "Du spelar som {name}",
+        "artifacts": "Artefakter",
+        "decisions": "Beslut"
+      },
+      "timer": {
+        "paused": "Timer pausad",
+        "timeUp": "Tiden är slut!",
+        "timeRemaining": "Tid kvar"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "ended": "Avslutad",
+        "cancelled": "Avbruten",
+        "live": "Live",
+        "offline": "Offline"
+      },
+      "errors": {
+        "couldNotLoadArtifacts": "Kunde inte ladda artefakter",
+        "couldNotLoadDecisions": "Kunde inte ladda beslut",
+        "serverError": "Serverfel",
+        "couldNotShowInstructions": "Kunde inte visa instruktionerna",
+        "couldNotRequestHint": "Kunde inte be om ledtråd",
+        "couldNotVote": "Kunde inte rösta",
+        "selectOptionFirst": "Välj ett alternativ först."
+      },
+      "keypad": {
+        "unlocked": "Upplåst",
+        "locked": "Låst",
+        "lock": "Lås"
+      },
+      "session": {
+        "paused": "Sessionen är pausad",
+        "waitingForLeader": "Vänta på att ledaren startar igen",
+        "waitingForHost": "Väntar på lekledaren...",
+        "waitingDescription": "Lekledaren har inte startat spelet ännu. Häng kvar så börjar vi snart!",
+        "ended": "Sessionen är avslutad",
+        "thanksForParticipating": "Tack för att du deltog!"
+      },
+      "secrets": {
+        "title": "Hemliga instruktioner",
+        "clickToShow": "Klicka för att visa dina hemliga instruktioner.",
+        "unlockedAt": "Upplåst {time}",
+        "showing": "Visar…",
+        "show": "Visa"
+      },
+      "artifactsDrawer": {
+        "title": "Mina artefakter",
+        "noArtifacts": "Inga artefakter just nu."
+      },
+      "decisionsDrawer": {
+        "title": "Beslut",
+        "noDecisions": "Inga beslut just nu.",
+        "noOptions": "Inga alternativ tillgängliga för detta beslut än.",
+        "results": "Resultat:",
+        "resultsShown": "Resultaten är visade."
+      },
+      "voting": {
+        "vote": "Rösta",
+        "voting": "Röstar...",
+        "submitVote": "Skicka röst",
+        "hostNeedsToAddOptions": "Lekledaren behöver lägga till alternativ innan du kan rösta.",
+        "voteReceived": "Röst mottagen!"
+      },
+      "hints": {
+        "needHintWithStep": "Jag behöver en ledtråd. Steg: {step}.",
+        "needHint": "Jag behöver en ledtråd."
+      },
+      "turnIndicator": {
+        "youStartNext": "Du börjar nästa!"
+      },
+      "phases": {
+        "phaseOf": "Fas {current} av {total}"
+      },
+      "keypadArtifact": {
+        "codeCorrect": "Koden är korrekt!",
+        "keypadLocked": "Keypaden är låst.",
+        "attemptsRemaining": "{count} försök kvar"
+      },
+      "safety": {
+        "title": "Säkerhet"
+      },
+      "secretsLocked": {
+        "message": "Hemliga instruktioner är låsta tills lekledaren låser upp dem."
+      }
+    },
+    "artifacts": {
+      "title": "Artefakter",
+      "noArtifacts": "Inga artefakter",
+      "showArtifact": "Visa artefakt",
+      "hideArtifact": "Dölj artefakt"
+    },
+    "decisions": {
+      "title": "Beslut",
+      "makeDecision": "Fatta beslut",
+      "pendingDecisions": "Väntande beslut",
+      "noDecisions": "Inga beslut"
+    },
+    "triggers": {
+      "title": "Triggers",
+      "armed": "Aktiverad",
+      "disabled": "Inaktiverad",
+      "fired": "Avfyrad",
+      "pending": "Väntande"
+    },
+    "timer": {
+      "timeRemaining": "Tid kvar",
+      "timeElapsed": "Förfluten tid",
+      "pause": "Pausa",
+      "resume": "Återuppta",
+      "reset": "Återställ"
+    },
+    "signals": {
+      "title": "Signaler",
+      "sendSignal": "Skicka signal",
+      "signalSent": "Signal skickad"
+    },
+    "roles": {
+      "title": "Roller",
+      "assignRole": "Tilldela roll",
+      "unassigned": "Ej tilldelad"
+    },
+    "puzzles": {
+      "title": "Pussel",
+      "progress": "Framsteg",
+      "solved": "Löst",
+      "unsolved": "Olöst",
+      "hints": "Ledtrådar"
+    },
+    "timeBank": {
+      "title": "Tidsbank",
+      "remaining": "Kvarvarande",
+      "used": "Använt",
+      "addTime": "Lägg till tid",
+      "removeTime": "Ta bort tid"
+    },
+    "analytics": {
+      "title": "Analys",
+      "overview": "Översikt",
+      "engagement": "Engagemang",
+      "performance": "Prestation"
+    },
+    "steps": {
+      "currentStep": "Aktuellt steg",
+      "totalSteps": "Totalt {count} steg",
+      "stepOf": "Steg {current} av {total}",
+      "goToStep": "Gå till steg"
+    }
+  }
+}

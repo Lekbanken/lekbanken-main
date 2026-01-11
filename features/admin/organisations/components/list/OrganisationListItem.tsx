@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { formatDate } from '@/lib/i18n/format-utils';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -65,13 +66,6 @@ const subscriptionStatusLabels: Record<string, string> = {
   canceled: "Avslutad",
   paused: "Pausad",
 };
-
-function formatDate(value: string | null) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("sv-SE");
-}
 
 function getInitials(name: string) {
   const parts = name.trim().split(" ").filter(Boolean);

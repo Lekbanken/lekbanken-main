@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
@@ -61,6 +62,8 @@ export function TriggerKillSwitch({
   variant = 'button',
   className,
 }: TriggerKillSwitchProps) {
+  const t = useTranslations('play.killSwitch');
+  const tc = useTranslations('play.common');
   const [isLoading, setIsLoading] = useState(false);
   const [showConfirmDisable, setShowConfirmDisable] = useState(false);
   const [showConfirmRearm, setShowConfirmRearm] = useState(false);
@@ -99,7 +102,7 @@ export function TriggerKillSwitch({
       <div className={`flex items-center gap-2 ${className}`}>
         {isActive ? (
           <>
-            <Tooltip content="Nödstopp aktivt - triggers inaktiverade">
+            <Tooltip content={t('tooltips.emergencyStopActive')}>
               <div className="flex items-center gap-1 text-destructive">
                 <ShieldExclamationIcon className="h-4 w-4" />
                 <span className="text-xs font-medium">
@@ -117,13 +120,13 @@ export function TriggerKillSwitch({
               {isLoading ? (
                 <ArrowPathIcon className="h-3 w-3 animate-spin" />
               ) : (
-                'Återaktivera'
+                t('reactivate')
               )}
             </Button>
           </>
         ) : (
           <>
-            <Tooltip content={`${armedCount} aktiva triggers`}>
+            <Tooltip content={t('tooltips.activeTriggersCount', { count: armedCount })}>
               <div className="flex items-center gap-1 text-green-500">
                 <ShieldCheckIcon className="h-4 w-4" />
                 <span className="text-xs font-medium">
@@ -153,15 +156,14 @@ export function TriggerKillSwitch({
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
-                Aktivera nödstopp?
+                {t('dialogs.activateEmergencyStop.title')}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Detta kommer att omedelbart inaktivera alla {armedCount} aktiva triggers.
-                Inga automatiska händelser kommer att köras förrän du återaktiverar dem.
+                {t('dialogs.activateEmergencyStop.description', { count: armedCount })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel disabled={isLoading}>{tc('cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDisableAll}
                 disabled={isLoading}
@@ -172,7 +174,7 @@ export function TriggerKillSwitch({
                 ) : (
                   <ShieldExclamationIcon className="h-4 w-4 mr-2" />
                 )}
-                Ja, aktivera nödstopp
+                {t('dialogs.activateEmergencyStop.confirm')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -183,15 +185,14 @@ export function TriggerKillSwitch({
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
                 <ShieldCheckIcon className="h-5 w-5 text-green-500" />
-                Återaktivera alla triggers?
+                {t('dialogs.reactivateAll.title')}
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Detta kommer att återaktivera alla {disabledCount} inaktiverade triggers
-                som var aktiverade innan nödstoppet.
+                {t('dialogs.reactivateAll.descriptionFromEmergency', { count: disabledCount })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isLoading}>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel disabled={isLoading}>{tc('cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleRearmAll}
                 disabled={isLoading}
@@ -201,7 +202,7 @@ export function TriggerKillSwitch({
                 ) : (
                   <ShieldCheckIcon className="h-4 w-4 mr-2" />
                 )}
-                Ja, återaktivera
+                {t('dialogs.reactivateAll.confirm')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -228,7 +229,7 @@ export function TriggerKillSwitch({
                 ) : (
                   <ShieldCheckIcon className="h-4 w-4" />
                 )}
-                Återaktivera triggers
+                {t('reactivateTriggers')}
                 <Badge variant="default" className="ml-1">
                   {disabledCount}
                 </Badge>
@@ -238,17 +239,16 @@ export function TriggerKillSwitch({
               <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2">
                   <ShieldCheckIcon className="h-5 w-5 text-green-500" />
-                  Återaktivera alla triggers?
+                  {t('dialogs.reactivateAll.title')}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Detta kommer att återaktivera alla {disabledCount} inaktiverade triggers.
-                  Automatiska händelser kommer att börja köras igen.
+                  {t('dialogs.reactivateAll.description', { count: disabledCount })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
                 <AlertDialogAction onClick={handleRearmAll}>
-                  Ja, återaktivera
+                  {t('dialogs.reactivateAll.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -256,8 +256,8 @@ export function TriggerKillSwitch({
         ) : (
           <Tooltip
             content={armedCount === 0
-              ? 'Inga aktiva triggers'
-              : `Inaktivera alla ${armedCount} aktiva triggers`}
+              ? t('tooltips.noActiveTriggers')
+              : t('tooltips.disableAllTriggers', { count: armedCount })}
           >
             <span>
               <AlertDialog>
@@ -273,27 +273,26 @@ export function TriggerKillSwitch({
                     ) : (
                       <ShieldExclamationIcon className="h-4 w-4" />
                     )}
-                    Nödstopp
+                    {t('emergencyStop')}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <AlertDialogTitle className="flex items-center gap-2">
                       <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
-                      Aktivera nödstopp?
+                      {t('dialogs.activateEmergencyStop.title')}
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Detta kommer att omedelbart inaktivera alla {armedCount} aktiva triggers.
-                      Inga automatiska händelser kommer att köras förrän du återaktiverar dem.
+                      {t('dialogs.activateEmergencyStop.description', { count: armedCount })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                    <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={handleDisableAll}
                       className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                     >
-                      Ja, aktivera nödstopp
+                      {t('dialogs.activateEmergencyStop.confirm')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
@@ -323,12 +322,12 @@ export function TriggerKillSwitch({
           )}
           <div>
             <div className="font-medium">
-              {isActive ? 'Nödstopp aktivt' : 'Triggers aktiva'}
+              {isActive ? t('emergencyStopActive') : t('triggersActive')}
             </div>
             <div className="text-sm text-muted-foreground">
               {isActive
-                ? `${disabledCount} av ${totalCount} inaktiverade`
-                : `${armedCount} av ${totalCount} redo`}
+                ? t('status.disabledOfTotal', { disabled: disabledCount, total: totalCount })
+                : t('status.readyOfTotal', { armed: armedCount, total: totalCount })}
             </div>
           </div>
         </div>
@@ -342,20 +341,20 @@ export function TriggerKillSwitch({
                 ) : (
                   <ShieldCheckIcon className="h-4 w-4 mr-2" />
                 )}
-                Återaktivera
+                {t('reactivate')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Återaktivera alla triggers?</AlertDialogTitle>
+                <AlertDialogTitle>{t('dialogs.reactivateAll.title')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Detta kommer att återaktivera alla {disabledCount} inaktiverade triggers.
+                  {t('dialogs.reactivateAll.descriptionShort', { count: disabledCount })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
                 <AlertDialogAction onClick={handleRearmAll}>
-                  Ja, återaktivera
+                  {t('dialogs.reactivateAll.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -372,26 +371,26 @@ export function TriggerKillSwitch({
                 ) : (
                   <ShieldExclamationIcon className="h-4 w-4 mr-2" />
                 )}
-                Nödstopp
+                {t('emergencyStop')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle className="flex items-center gap-2">
                   <ExclamationTriangleIcon className="h-5 w-5 text-destructive" />
-                  Aktivera nödstopp?
+                  {t('dialogs.activateEmergencyStop.title')}
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Detta kommer att omedelbart inaktivera alla {armedCount} aktiva triggers.
+                  {t('dialogs.activateEmergencyStop.descriptionShort', { count: armedCount })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                <AlertDialogCancel>{tc('cancel')}</AlertDialogCancel>
                 <AlertDialogAction
                   onClick={handleDisableAll}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  Ja, aktivera nödstopp
+                  {t('dialogs.activateEmergencyStop.confirm')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -404,8 +403,7 @@ export function TriggerKillSwitch({
         <div className="mt-3 flex items-start gap-2 p-2 rounded bg-destructive/20 text-destructive text-sm">
           <ExclamationTriangleIcon className="h-4 w-4 mt-0.5 flex-shrink-0" />
           <span>
-            Alla automatiska händelser är inaktiverade. Spelet kan behöva manuell
-            styrning tills triggers återaktiveras.
+            {t('warning')}
           </span>
         </div>
       )}

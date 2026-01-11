@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "@/components/navigation/LanguageSwitcher";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
@@ -12,6 +13,7 @@ import { useAuth } from "@/lib/supabase/auth";
 export function AppTopbar() {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("app.nav");
   const { effectiveGlobalRole } = useAuth();
   const [mounted, setMounted] = useState(false);
 
@@ -49,11 +51,11 @@ export function AppTopbar() {
           type="button"
           onClick={() => router.push("/app")}
           className="flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-          aria-label="Gå till dashboard"
+          aria-label={t("goToDashboard")}
         >
           <Image
             src="/lekbanken-icon.png"
-            alt="Lekbanken ikon"
+            alt={t("logoAlt")}
             width={36}
             height={36}
             className={`rounded-xl ${isDashboard ? "h-10 w-10" : "h-8 w-8"} sm:h-9 sm:w-9`}

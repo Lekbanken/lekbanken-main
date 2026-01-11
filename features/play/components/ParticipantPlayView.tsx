@@ -8,6 +8,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ClockIcon,
   PauseCircleIcon,
@@ -125,9 +126,14 @@ function getThemeAccentClasses(theme?: BoardTheme) {
 
 interface TimerDisplayProps {
   timerState: TimerState | null;
+  translations: {
+    paused: string;
+    timeUp: string;
+    timeRemaining: string;
+  };
 }
 
-function TimerDisplay({ timerState }: TimerDisplayProps) {
+function TimerDisplay({ timerState, translations }: TimerDisplayProps) {
   const display = useLiveTimer({ timerState });
   
   if (!timerState) {
@@ -154,7 +160,7 @@ function TimerDisplay({ timerState }: TimerDisplayProps) {
         <div className="flex items-center gap-2">
           <ClockIcon className="h-5 w-5" />
           <span className="text-sm font-medium">
-            {display.isPaused ? 'Timer pausad' : display.isFinished ? 'Tiden är slut!' : 'Tid kvar'}
+            {display.isPaused ? translations.paused : display.isFinished ? translations.timeUp : translations.timeRemaining}
           </span>
         </div>
         <span className="font-mono text-2xl font-bold tabular-nums">
@@ -176,14 +182,22 @@ function TimerDisplay({ timerState }: TimerDisplayProps) {
 interface StatusIndicatorProps {
   status: SessionRuntimeState['status'];
   connected: boolean;
+  translations: {
+    active: string;
+    paused: string;
+    ended: string;
+    cancelled: string;
+    live: string;
+    offline: string;
+  };
 }
 
-function StatusIndicator({ status, connected }: StatusIndicatorProps) {
+function StatusIndicator({ status, connected, translations }: StatusIndicatorProps) {
   const statusConfig = {
-    active: { icon: SignalIcon, text: 'Aktiv', color: 'text-green-500' },
-    paused: { icon: PauseCircleIcon, text: 'Pausad', color: 'text-yellow-500' },
-    ended: { icon: CheckCircleIcon, text: 'Avslutad', color: 'text-gray-500' },
-    cancelled: { icon: ExclamationTriangleIcon, text: 'Avbruten', color: 'text-red-500' },
+    active: { icon: SignalIcon, text: translations.active, color: 'text-green-500' },
+    paused: { icon: PauseCircleIcon, text: translations.paused, color: 'text-yellow-500' },
+    ended: { icon: CheckCircleIcon, text: translations.ended, color: 'text-gray-500' },
+    cancelled: { icon: ExclamationTriangleIcon, text: translations.cancelled, color: 'text-red-500' },
   };
   
   const config = statusConfig[status];
@@ -197,7 +211,7 @@ function StatusIndicator({ status, connected }: StatusIndicatorProps) {
         ) : (
           <SignalSlashIcon className="h-3 w-3" />
         )}
-        {connected ? 'Live' : 'Offline'}
+        {connected ? translations.live : translations.offline}
       </Badge>
       
       <div className={`flex items-center gap-1 ${config.color}`}>
@@ -247,6 +261,11 @@ export function ParticipantPlayView({
   boardTheme,
 }: ParticipantPlayViewProps) {
   // --------------------------------------------------------------------------
+  // i18n
+  // --------------------------------------------------------------------------
+  const t = useTranslations('play.participantView');
+
+  // --------------------------------------------------------------------------
   // Primitives (participant): Artifacts + Decisions
   // --------------------------------------------------------------------------
 
@@ -293,7 +312,7 @@ export function ParticipantPlayView({
       setArtifactVariants(data.variants);
       setArtifactsError(null);
     } catch (err) {
-      setArtifactsError(err instanceof Error ? err.message : 'Kunde inte ladda artefakter');
+      setArtifactsError(err instanceof Error ? err.message : t('errors.couldNotLoadArtifacts'));
     }
   }, [sessionId, participantToken]);
 
@@ -324,7 +343,7 @@ export function ParticipantPlayView({
         });
       }
     } catch (err) {
-      setDecisionsError(err instanceof Error ? err.message : 'Kunde inte ladda beslut');
+      setDecisionsError(err instanceof Error ? err.message : t('errors.couldNotLoadDecisions'));
     }
   }, [sessionId, participantToken]);
 
@@ -355,7 +374,7 @@ export function ParticipantPlayView({
     } catch (err) {
       setKeypadMessages((prev) => ({ 
         ...prev, 
-        [artifactId]: { type: 'error', text: err instanceof Error ? err.message : 'Serverfel' }
+        [artifactId]: { type: 'error', text: err instanceof Error ? err.message : t('errors.serverError') }
       }));
     } finally {
       setKeypadSubmitting((prev) => ({ ...prev, [artifactId]: false }));
@@ -508,13 +527,13 @@ export function ParticipantPlayView({
 
       const data = (await res.json().catch(() => ({}))) as { secretRevealedAt?: string; error?: string };
       if (!res.ok) {
-        throw new Error(data.error ?? 'Kunde inte visa instruktionerna');
+        throw new Error(data.error ?? t('errors.couldNotShowInstructions'));
       }
 
       setSecretRevealedAt(data.secretRevealedAt ?? new Date().toISOString());
       setSecretRevealError(null);
     } catch (err) {
-      setSecretRevealError(err instanceof Error ? err.message : 'Kunde inte visa instruktionerna');
+      setSecretRevealError(err instanceof Error ? err.message : t('errors.couldNotShowInstructions'));
     } finally {
       setSecretRevealLoading(false);
     }
@@ -529,8 +548,8 @@ export function ParticipantPlayView({
     try {
       const stepTitle = steps[currentStepIndex]?.title;
       const msg = stepTitle
-        ? `Jag behöver en ledtråd. Steg: ${stepTitle}.`
-        : 'Jag behöver en ledtråd.';
+        ? t('hints.needHintWithStep', { step: stepTitle })
+        : t('hints.needHint');
 
       await sendSessionChatMessage(
         sessionId,
@@ -542,7 +561,7 @@ export function ParticipantPlayView({
         { participantToken }
       );
     } catch (err) {
-      setHintRequestError(err instanceof Error ? err.message : 'Kunde inte be om ledtråd');
+      setHintRequestError(err instanceof Error ? err.message : t('errors.couldNotRequestHint'));
     } finally {
       setHintRequestSending(false);
     }
@@ -630,7 +649,7 @@ export function ParticipantPlayView({
     if (!participantToken) return;
     const optionKey = selectedOptionByDecisionId[decisionId];
     if (!optionKey) {
-      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: 'Välj ett alternativ först.' }));
+      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: t('errors.selectOptionFirst') }));
       return;
     }
 
@@ -638,14 +657,14 @@ export function ParticipantPlayView({
     setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: null }));
     try {
       await castParticipantVote(sessionId, decisionId, { optionKey }, { participantToken });
-      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: 'Röst mottagen!' }));
+      setVoteMessageByDecisionId((prev) => ({ ...prev, [decisionId]: t('voting.voteReceived') }));
       setSubmittedVoteByDecisionId((prev) => ({ ...prev, [decisionId]: true }));
       // Refresh decisions (e.g. host might close/reveal)
       void loadDecisions();
     } catch (err) {
       setVoteMessageByDecisionId((prev) => ({
         ...prev,
-        [decisionId]: err instanceof Error ? err.message : 'Kunde inte rösta',
+        [decisionId]: err instanceof Error ? err.message : t('errors.couldNotVote'),
       }));
     } finally {
       setVoteSendingByDecisionId((prev) => ({ ...prev, [decisionId]: false }));
@@ -670,11 +689,22 @@ export function ParticipantPlayView({
       <header className="space-y-3">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className={`text-xs font-bold uppercase tracking-widest ${themeAccent.label}`}>Spela</p>
+            <p className={`text-xs font-bold uppercase tracking-widest ${themeAccent.label}`}>{t('header.play')}</p>
             <h1 className="text-xl font-bold text-foreground sm:text-2xl">{gameTitle}</h1>
           </div>
           <div className="flex flex-col items-end gap-1">
-            <StatusIndicator status={status} connected={connected} />
+            <StatusIndicator
+              status={status}
+              connected={connected}
+              translations={{
+                active: t('status.active'),
+                paused: t('status.paused'),
+                ended: t('status.ended'),
+                cancelled: t('status.cancelled'),
+                live: t('status.live'),
+                offline: t('status.offline'),
+              }}
+            />
             {isFeatureEnabled('timeBank') && <ParticipantTimeBankDisplay sessionId={sessionId} />}
           </div>
         </div>
@@ -683,7 +713,7 @@ export function ParticipantPlayView({
         <div className="flex items-center justify-between gap-2 flex-wrap">
           {participantName && (
             <p className="text-sm text-muted-foreground">
-              Du spelar som <span className="font-medium text-foreground">{participantName}</span>
+              {t('header.playingAs', { name: participantName })}
             </p>
           )}
           
@@ -697,7 +727,7 @@ export function ParticipantPlayView({
                 onClick={() => setShowArtifactsDrawer(!showArtifactsDrawer)}
                 className="gap-1 h-7 text-xs"
               >
-                📦 Artefakter
+                📦 {t('header.artifacts')}
                 {artifacts.length > 0 && (
                   <span className="rounded-full bg-primary/10 px-1.5 text-primary">
                     {artifacts.length}
@@ -711,7 +741,7 @@ export function ParticipantPlayView({
                 onClick={() => setShowDecisionsDrawer(!showDecisionsDrawer)}
                 className="gap-1 h-7 text-xs"
               >
-                🗳️ Beslut
+                🗳️ {t('header.decisions')}
                 {decisions.filter(d => d.status === 'open').length > 0 && (
                   <span className="rounded-full bg-destructive/10 px-1.5 text-destructive">
                     {decisions.filter(d => d.status === 'open').length}
@@ -742,7 +772,7 @@ export function ParticipantPlayView({
       {/* Turn Indicator */}
       {isNextStarter && !isEnded && (
         <Card className="border-2 border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm font-medium text-foreground">Du börjar nästa!</p>
+          <p className="text-sm font-medium text-foreground">{t('turnIndicator.youStartNext')}</p>
         </Card>
       )}
 
@@ -750,7 +780,7 @@ export function ParticipantPlayView({
       {currentPhase && !isEnded && (
         <Card className="p-4 border-2 border-secondary/20 bg-secondary/5">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-bold uppercase tracking-widest text-secondary">Fas {currentPhaseIndex + 1} av {totalPhases}</p>
+            <p className="text-xs font-bold uppercase tracking-widest text-secondary">{t('phases.phaseOf', { current: currentPhaseIndex + 1, total: totalPhases })}</p>
           </div>
           <h3 className="text-lg font-semibold text-foreground">{currentPhase.name}</h3>
           {currentPhase.description && (
@@ -763,7 +793,7 @@ export function ParticipantPlayView({
       {showArtifactsDrawer && !isEnded && participantToken && (
         <Card className="p-4 space-y-3 animate-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Mina artefakter</p>
+            <p className="text-sm font-semibold text-foreground">{t('artifactsDrawer.title')}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="ghost" onClick={() => void loadArtifacts()}>
                 ↻
@@ -777,7 +807,7 @@ export function ParticipantPlayView({
           {artifactsError && <p className="text-sm text-destructive">{artifactsError}</p>}
 
           {artifacts.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Inga artefakter just nu.</p>
+            <p className="text-sm text-muted-foreground">{t('artifactsDrawer.noArtifacts')}</p>
           ) : (
             <div className="space-y-3">
               {artifacts
@@ -805,8 +835,8 @@ export function ParticipantPlayView({
                     const keypadState = meta.keypadState ?? { isUnlocked: false, isLockedOut: false, attemptCount: 0 };
                     const codeLength = meta.codeLength ?? 4;
                     const maxAttempts = meta.maxAttempts;
-                    const successMessage = meta.successMessage || 'Koden är korrekt!';
-                    const lockedMessage = meta.lockedMessage || 'Keypaden är låst.';
+                    const successMessage = meta.successMessage || t('keypadArtifact.codeCorrect');
+                    const lockedMessage = meta.lockedMessage || t('keypadArtifact.keypadLocked');
 
                     const isUnlocked = keypadState.isUnlocked;
                     const isLockedOut = keypadState.isLockedOut;
@@ -824,7 +854,7 @@ export function ParticipantPlayView({
                             <p className="text-sm font-medium text-foreground">{a.title ?? 'Keypad'}</p>
                           </div>
                           <Badge variant={isUnlocked ? 'default' : isLockedOut ? 'destructive' : 'secondary'}>
-                            {isUnlocked ? 'Upplåst' : isLockedOut ? 'Låst' : 'Lås'}
+                            {isUnlocked ? t('keypad.unlocked') : isLockedOut ? t('keypad.locked') : t('keypad.lock')}
                           </Badge>
                         </div>
                         {a.description && <p className="text-xs text-muted-foreground">{a.description}</p>}
@@ -836,7 +866,7 @@ export function ParticipantPlayView({
                               <div className="mt-2 space-y-1 text-left">
                                 {vars.map((v) => (
                                   <div key={v.id} className="rounded bg-muted/30 p-2">
-                                    <p className="text-sm font-medium">{v.title || 'Upplåst'}</p>
+                                    <p className="text-sm font-medium">{v.title || t('keypad.unlocked')}</p>
                                     {v.body && <p className="text-xs text-muted-foreground">{v.body}</p>}
                                   </div>
                                 ))}
@@ -885,7 +915,7 @@ export function ParticipantPlayView({
                               </Button>
                             </div>
                             {attemptsRemaining !== null && (
-                              <p className="text-xs text-muted-foreground text-center">{attemptsRemaining} försök kvar</p>
+                              <p className="text-xs text-muted-foreground text-center">{t('keypadArtifact.attemptsRemaining', { count: attemptsRemaining })}</p>
                             )}
                             {message && (
                               <p className={`text-xs text-center ${message.type === 'success' ? 'text-green-600' : 'text-destructive'}`}>
@@ -966,7 +996,7 @@ export function ParticipantPlayView({
       {showDecisionsDrawer && !isEnded && participantToken && (
         <Card className="p-4 space-y-3 animate-in slide-in-from-top-2">
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-foreground">Beslut</p>
+            <p className="text-sm font-semibold text-foreground">{t('decisionsDrawer.title')}</p>
             <div className="flex gap-2">
               <Button type="button" size="sm" variant="ghost" onClick={() => void loadDecisions()}>
                 ↻
@@ -980,7 +1010,7 @@ export function ParticipantPlayView({
           {decisionsError && <p className="text-sm text-destructive">{decisionsError}</p>}
 
           {decisions.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Inga beslut just nu.</p>
+            <p className="text-sm text-muted-foreground">{t('decisionsDrawer.noDecisions')}</p>
           ) : (
             <div className="space-y-3">
               {decisions.map((d) => {
@@ -1028,7 +1058,7 @@ export function ParticipantPlayView({
                             onClick={() => void handleVote(d.id)}
                             disabled={sending}
                           >
-                            Rösta
+                            {t('voting.vote')}
                           </Button>
                           {msg && (
                             <p className={`text-sm ${msg.includes('!') ? 'text-green-600' : 'text-muted-foreground'}`}>
@@ -1041,7 +1071,7 @@ export function ParticipantPlayView({
 
                     {isRevealed && (
                       <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Resultat:</p>
+                        <p className="text-sm text-muted-foreground">{t('decisionsDrawer.results')}</p>
                         {results ? (
                           <div className="space-y-1">
                             {results.map((r) => (
@@ -1052,7 +1082,7 @@ export function ParticipantPlayView({
                             ))}
                           </div>
                         ) : (
-                          <p className="text-sm text-muted-foreground">Resultaten är visade.</p>
+                          <p className="text-sm text-muted-foreground">{t('decisionsDrawer.resultsShown')}</p>
                         )}
                       </div>
                     )}
@@ -1069,10 +1099,10 @@ export function ParticipantPlayView({
         <Card className="border-2 border-yellow-200 bg-yellow-50 p-6 text-center dark:bg-yellow-900/20">
           <PauseCircleIcon className="mx-auto h-12 w-12 text-yellow-500" />
           <h2 className="mt-3 text-lg font-semibold text-yellow-700 dark:text-yellow-400">
-            Sessionen är pausad
+            {t('session.paused')}
           </h2>
           <p className="mt-1 text-sm text-yellow-600 dark:text-yellow-500">
-            Vänta på att ledaren startar igen
+            {t('session.waitingForLeader')}
           </p>
         </Card>
       )}
@@ -1084,10 +1114,10 @@ export function ParticipantPlayView({
             <ClockIcon className="h-6 w-6 text-primary" />
           </div>
           <h2 className="mt-4 text-lg font-semibold text-foreground">
-            Väntar på lekledaren...
+            {t('session.waitingForHost')}
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Lekledaren har inte startat spelet ännu. Häng kvar så börjar vi snart!
+            {t('session.waitingDescription')}
           </p>
         </Card>
       )}
@@ -1097,17 +1127,24 @@ export function ParticipantPlayView({
         <Card className="border-2 border-gray-200 bg-gray-50 p-6 text-center dark:bg-gray-800/50">
           <CheckCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
           <h2 className="mt-3 text-lg font-semibold text-gray-700 dark:text-gray-300">
-            Sessionen är avslutad
+            {t('session.ended')}
           </h2>
           <p className="mt-1 text-sm text-gray-500">
-            Tack för att du deltog!
+            {t('session.thanksForParticipating')}
           </p>
         </Card>
       )}
       
       {/* Timer */}
       {!isEnded && (
-        <TimerDisplay timerState={timerState} />
+        <TimerDisplay
+          timerState={timerState}
+          translations={{
+            paused: t('timer.paused'),
+            timeUp: t('timer.timeUp'),
+            timeRemaining: t('timer.timeRemaining'),
+          }}
+        />
       )}
       
       {/* Current Step */}
@@ -1181,7 +1218,7 @@ export function ParticipantPlayView({
                   <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 shrink-0 text-red-500" />
                   <div>
                     <p className="text-xs font-bold uppercase tracking-wider text-red-700 dark:text-red-400">
-                      Säkerhet
+                      {t('safety.title')}
                     </p>
                     <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                       {currentStep.safety}
@@ -1233,7 +1270,7 @@ export function ParticipantPlayView({
                 {!secretsUnlocked && (
                   <Card className="p-4">
                     <p className="text-sm text-muted-foreground">
-                      Hemliga instruktioner är låsta tills lekledaren låser upp dem.
+                      {t('secretsLocked.message')}
                     </p>
                   </Card>
                 )}
@@ -1242,13 +1279,13 @@ export function ParticipantPlayView({
                   <Card className="p-4">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <div>
-                        <p className="text-sm font-medium text-foreground">Hemliga instruktioner</p>
+                        <p className="text-sm font-medium text-foreground">{t('secrets.title')}</p>
                         <p className="text-sm text-muted-foreground">
-                          Klicka för att visa dina hemliga instruktioner.
+                          {t('secrets.clickToShow')}
                         </p>
                         {secretUnlockedBy && (
                           <p className="mt-1 text-xs text-muted-foreground">
-                            Upplåst {secretUnlockedAt ? new Date(secretUnlockedAt).toLocaleTimeString() : ''}
+                            {t('secrets.unlockedAt', { time: secretUnlockedAt ? new Date(secretUnlockedAt).toLocaleTimeString() : '' })}
                           </p>
                         )}
                       </div>
@@ -1256,7 +1293,7 @@ export function ParticipantPlayView({
                         onClick={() => void handleRevealSecretInstructions()}
                         disabled={secretRevealLoading || !participantToken || !sessionCode}
                       >
-                        {secretRevealLoading ? 'Visar…' : 'Visa'}
+                        {secretRevealLoading ? t('secrets.showing') : t('secrets.show')}
                       </Button>
                     </div>
                     {secretRevealError && (
@@ -1300,7 +1337,7 @@ export function ParticipantPlayView({
               <div className="flex items-center gap-2">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xl">🗳️</div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary">Beslut</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-primary">{t('decisionsDrawer.title')}</p>
                   <p className="text-lg font-semibold text-foreground">{openDecision.title}</p>
                 </div>
               </div>
@@ -1312,7 +1349,7 @@ export function ParticipantPlayView({
               <div className="mt-4 space-y-3">
                 {options.length === 0 && (
                   <div className="rounded-lg border border-border/60 bg-muted/40 p-3 text-sm text-muted-foreground">
-                    Inga alternativ tillgängliga för detta beslut än.
+                    {t('decisionsDrawer.noOptions')}
                   </div>
                 )}
 
@@ -1359,11 +1396,11 @@ export function ParticipantPlayView({
                   className="w-full"
                   size="lg"
                 >
-                  {sending ? 'Röstar...' : 'Skicka röst'}
+                  {sending ? t('voting.voting') : t('voting.submitVote')}
                 </Button>
                 {options.length === 0 && (
                   <p className="mt-2 text-xs text-muted-foreground">
-                    Lekledaren behöver lägga till alternativ innan du kan rösta.
+                    {t('voting.hostNeedsToAddOptions')}
                   </p>
                 )}
               </div>

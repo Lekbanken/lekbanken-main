@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
+import { formatDate, formatDateTimeLong } from '@/lib/i18n/format-utils';
 import { useRouter } from 'next/navigation';
 import {
   ArrowTopRightOnSquareIcon,
@@ -431,22 +432,10 @@ function HistoryTab({ game }: { game: GameAdminRow }) {
         </CardHeader>
         <CardContent className="pt-0">
           <InfoRow label="Skapad">
-            {new Date(game.created_at).toLocaleDateString('sv-SE', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {formatDateTimeLong(game.created_at)}
           </InfoRow>
           <InfoRow label="Senast uppdaterad">
-            {new Date(game.updated_at).toLocaleDateString('sv-SE', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            {formatDateTimeLong(game.updated_at)}
           </InfoRow>
         </CardContent>
       </Card>
@@ -464,7 +453,7 @@ function HistoryTab({ game }: { game: GameAdminRow }) {
               </Badge>
             </InfoRow>
             <InfoRow label="Importerad">
-              {new Date(game.import_source.importedAt).toLocaleDateString('sv-SE')}
+              {formatDate(game.import_source.importedAt)}
             </InfoRow>
             {game.import_source.schemaVersion && (
               <InfoRow label="Schema">

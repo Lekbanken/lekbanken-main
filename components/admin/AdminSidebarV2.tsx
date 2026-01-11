@@ -14,8 +14,8 @@ import {
   ADMIN_NAV,
   resolveNavHref,
   getExpandedCategoriesFromRoute,
-  type AdminNavCategory,
 } from '@/lib/admin/nav'
+import { useAdminNav, type TranslatedAdminNavCategory } from '@/lib/admin/useAdminNav'
 import { navIcons } from '@/app/admin/components/admin-nav-config'
 import {
   ChevronDownIcon,
@@ -80,7 +80,7 @@ function NavCategory({
   checkPermission,
   isSystemAdmin,
 }: {
-  category: AdminNavCategory
+  category: TranslatedAdminNavCategory
   isExpanded: boolean
   onToggle: () => void
   currentPath: string
@@ -228,14 +228,20 @@ function SidebarContent({
   const pathname = usePathname()
   const { isSystemAdmin, currentTenantId, can } = useRbac()
   const { mode, setMode, canSwitchMode, isHydrated } = useAdminMode({ isSystemAdmin })
+  
+  // Get translated navigation
+  const translatedNav = useAdminNav()
 
-  // Get categories based on current mode
-  const categories = mode === 'system' ? ADMIN_NAV.system : ADMIN_NAV.organisation
+  // Get categories based on current mode (translated)
+  const categories = mode === 'system' ? translatedNav.system : translatedNav.organisation
+  
+  // Get untranslated categories for route matching (stable reference)
+  const rawCategories = mode === 'system' ? ADMIN_NAV.system : ADMIN_NAV.organisation
 
   // Expanded categories state with localStorage persistence
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(() => {
     // Initialize with active category expanded
-    return getExpandedCategoriesFromRoute(categories, pathname, currentTenantId)
+    return getExpandedCategoriesFromRoute(rawCategories, pathname, currentTenantId)
   })
 
   // Persist expanded state
@@ -248,8 +254,8 @@ function SidebarContent({
   // When route changes, ensure the active category is expanded
   // Use useMemo to calculate which categories should be expanded instead of setState in effect
   const activeCategories = useMemo(() => {
-    return getExpandedCategoriesFromRoute(categories, pathname, currentTenantId)
-  }, [pathname, categories, currentTenantId])
+    return getExpandedCategoriesFromRoute(rawCategories, pathname, currentTenantId)
+  }, [pathname, rawCategories, currentTenantId])
 
   // Merge active categories with stored state on mount and route change
   useEffect(() => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { formatDate } from '@/lib/i18n/format-utils';
 import {
   GlobeAltIcon,
   PlusIcon,
@@ -199,7 +200,7 @@ export function OrganisationDomainsSection({
                       <p className="text-sm font-medium">{domain.hostname}</p>
                       <p className="text-xs text-muted-foreground">
                         {domain.kind === 'custom' ? 'Egen domän' : 'Subdomän'}
-                        {domain.verifiedAt && ` • Verifierad ${new Date(domain.verifiedAt).toLocaleDateString('sv-SE')}`}
+                        {domain.verifiedAt && ` • Verifierad ${formatDate(domain.verifiedAt)}`}
                       </p>
                     </div>
                   </div>

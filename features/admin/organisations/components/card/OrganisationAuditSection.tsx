@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { formatDate } from '@/lib/i18n/format-utils';
 import {
   ClockIcon,
   ArrowRightIcon,
@@ -50,7 +51,7 @@ function formatRelativeTime(dateString: string): string {
   if (diffHours < 24) return `${diffHours}h sedan`;
   if (diffDays < 7) return `${diffDays}d sedan`;
   if (diffWeeks < 4) return `${diffWeeks}v sedan`;
-  return date.toLocaleDateString('sv-SE');
+  return formatDate(date);
 }
 
 function formatEventPayload(eventType: string, payload: Record<string, unknown> | null): string {

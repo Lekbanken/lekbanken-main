@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { useAuth } from '@/lib/supabase/auth'
 import type { Database } from '@/types/supabase'
 import { TenantContext } from './TenantContext'
+import { LOCALE_COOKIE, getLocaleFromLanguageCode } from '@/lib/i18n/config'
 
 type ThemePreference = 'light' | 'dark' | 'system'
 type ResolvedTheme = 'light' | 'dark'
@@ -123,12 +124,15 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
     }
   }, [theme])
 
-  // Apply and persist language
+  // Apply and persist language (and sync to next-intl cookie)
   useEffect(() => {
     if (!initializedRef.current) return
     applyLanguage(language)
     if (typeof window !== 'undefined') {
       localStorage.setItem(LANGUAGE_KEY, language)
+      // Sync to next-intl locale cookie
+      const locale = getLocaleFromLanguageCode(language) ?? 'sv'
+      document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`
     }
   }, [language])
 

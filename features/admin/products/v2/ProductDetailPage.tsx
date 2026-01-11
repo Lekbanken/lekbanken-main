@@ -1,6 +1,11 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import {
+  formatCurrencyWithDecimals as formatCurrency,
+  formatDateLong as formatDate,
+  formatDateTimeLong as formatDateTime,
+} from '@/lib/i18n/format-utils';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeftIcon,
@@ -120,33 +125,6 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: number |
       </div>
     </div>
   );
-}
-
-function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('sv-SE', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amount / 100);
-}
-
-function formatDate(value: string | null | undefined): string {
-  if (!value) return '—';
-  return new Date(value).toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function formatDateTime(value: string | null | undefined): string {
-  if (!value) return '—';
-  return new Date(value).toLocaleString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 // ============================================================================

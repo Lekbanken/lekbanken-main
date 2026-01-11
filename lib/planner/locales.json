@@ -172,5 +172,92 @@
         "hours": "h"
       }
     }
+  },
+  "no": {
+    "planner": {
+      "status": {
+        "draft": "Utkast",
+        "published": "Publisert",
+        "modified": "Endret",
+        "archived": "Arkivert"
+      },
+      "visibility": {
+        "private": "Privat",
+        "tenant": "Organisasjon",
+        "public": "Offentlig"
+      },
+      "actions": {
+        "create": "Opprett plan",
+        "edit": "Rediger",
+        "delete": "Slett",
+        "archive": "Arkiver",
+        "restore": "Gjenopprett",
+        "publish": "Publiser",
+        "copy": "Kopier",
+        "export": "Eksporter",
+        "share": "Del",
+        "preview": "Forhåndsvis"
+      },
+      "blocks": {
+        "title": "Blokker i planen",
+        "empty": "Ingen blokker i denne planen ennå.",
+        "description": "Dra, endre rekkefølge og juster varighet.",
+        "types": {
+          "game": "Lek",
+          "pause": "Pause",
+          "preparation": "Forberedelse",
+          "reflection": "Refleksjon",
+          "transition": "Overgang"
+        }
+      },
+      "form": {
+        "name": "Tittel",
+        "namePlaceholder": "Skriv inn planens tittel",
+        "description": "Beskrivelse",
+        "descriptionPlaceholder": "Kort beskrivelse av planen"
+      },
+      "versions": {
+        "title": "Versjonshistorikk",
+        "current": "Gjeldende",
+        "empty": "Ingen publiserte versjoner ennå",
+        "emptyHint": "Publiser planen for å opprette en versjon"
+      },
+      "warnings": {
+        "unpublishedChanges": "Upubliserte endringer",
+        "archivedPlan": "Denne planen er arkivert"
+      },
+      "errors": {
+        "loadFailed": "Kunne ikke laste planer",
+        "saveFailed": "Kunne ikke lagre",
+        "deleteFailed": "Kunne ikke slette",
+        "publishFailed": "Kunne ikke publisere",
+        "copyFailed": "Kunne ikke kopiere plan"
+      },
+      "success": {
+        "saved": "Lagret",
+        "published": "Publisert!",
+        "deleted": "Plan slettet",
+        "copied": "Plan kopiert!",
+        "archived": "Plan arkivert",
+        "restored": "Plan gjenopprettet"
+      },
+      "filter": {
+        "search": "Søk planer...",
+        "status": "Status",
+        "visibility": "Synlighet",
+        "sortBy": "Sorter etter",
+        "all": "Alle",
+        "clear": "Fjern filtre"
+      },
+      "sort": {
+        "updatedAt": "Sist endret",
+        "createdAt": "Opprettet",
+        "name": "Navn"
+      },
+      "time": {
+        "minutes": "min",
+        "hours": "t"
+      }
+    }
   }
 }

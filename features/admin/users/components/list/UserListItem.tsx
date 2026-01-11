@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { formatDate, formatRelativeTime } from '@/lib/i18n/format-utils';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -57,29 +58,6 @@ type UserListItemProps = {
   onStatusChange?: (userId: string, status: AdminUserStatus) => Promise<void>;
   onRemove?: (userId: string) => Promise<void>;
 };
-
-function formatDate(value: string | null) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("sv-SE");
-}
-
-function formatRelativeTime(value: string | null) {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffDays === 0) return "Idag";
-  if (diffDays === 1) return "Igår";
-  if (diffDays < 7) return `${diffDays} dagar sedan`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} veckor sedan`;
-  return formatDate(value);
-}
 
 function getInitials(name: string | null, email: string) {
   const displayName = name || email;

@@ -6,6 +6,7 @@
  */
 
 import type { PlannerPlan, PlannerBlock, PlannerStatus, PlannerVisibility } from '@/types/planner'
+import { defaultLocale, formatNumber, formatPercent, formatDuration } from '@/lib/i18n'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Metric Types
@@ -269,18 +270,22 @@ export function generateInsights(stats: PlanAggregateStats): PlanInsight[] {
 
 /**
  * Format analytics for display
+ * @param value - The numeric value to format
+ * @param type - The type of formatting to apply
+ * @param locale - Optional locale code (defaults to system default)
  */
-export function formatAnalyticsValue(value: number, type: 'count' | 'percent' | 'duration'): string {
+export function formatAnalyticsValue(
+  value: number,
+  type: 'count' | 'percent' | 'duration',
+  locale: string = defaultLocale
+): string {
   switch (type) {
     case 'count':
-      return value.toLocaleString('sv-SE')
+      return formatNumber(value, locale)
     case 'percent':
-      return `${Math.round(value * 100)}%`
+      return formatPercent(value, locale)
     case 'duration':
-      if (value < 60) return `${value} min`
-      const hours = Math.floor(value / 60)
-      const mins = value % 60
-      return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+      return formatDuration(value, locale)
     default:
       return String(value)
   }

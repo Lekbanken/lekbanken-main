@@ -1,6 +1,11 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import {
+  formatDateLong as formatDate,
+  formatDateTimeLong as formatDateTime,
+  formatRelativeTime,
+} from '@/lib/i18n/format-utils';
 import Image from 'next/image';
 import {
   XMarkIcon,
@@ -75,50 +80,6 @@ type TabId = 'overview' | 'organisations' | 'security' | 'activity';
 // =============================================================================
 // Helper Functions
 // =============================================================================
-
-function formatDate(value: string | null) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
-}
-
-function formatDateTime(value: string | null) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  return date.toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-function formatRelativeTime(value: string | null) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffMins < 1) return 'Just nu';
-  if (diffMins < 60) return `${diffMins} min sedan`;
-  if (diffHours < 24) return `${diffHours} tim sedan`;
-  if (diffDays === 1) return 'Igår';
-  if (diffDays < 7) return `${diffDays} dagar sedan`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} veckor sedan`;
-  return formatDate(value);
-}
 
 function getInitials(name: string | null, email: string) {
   const displayName = name || email;

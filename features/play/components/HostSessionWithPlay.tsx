@@ -9,6 +9,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { 
   getHostSession, 
   getParticipants, 
@@ -68,6 +69,8 @@ type ParticipantWithExtras = Participant & {
 export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProps) {
   const router = useRouter();
   const toast = useToast();
+  const t = useTranslations('play.hostSession');
+  const ts = useTranslations('play.session');
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participants, setParticipants] = useState<ParticipantWithExtras[]>([]);
   const [loading, setLoading] = useState(true);
@@ -563,7 +566,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         onOpenChat={() => setChatOpen(true)}
       >
         <div className="mb-3 flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">Sessionskod</div>
+          <div className="text-sm text-muted-foreground">{ts('sessionCode')}</div>
           <div className="font-mono text-base font-bold text-primary">{session.sessionCode}</div>
         </div>
 
@@ -589,11 +592,11 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
   // Regular lobby view
   const lobbyTabs = [
-    { id: 'participants', label: 'Deltagare', icon: <UsersIcon className="h-4 w-4" />, badge: participants.length },
-    { id: 'roles', label: 'Roller', icon: <UserGroupIcon className="h-4 w-4" /> },
-    ...(isFeatureEnabled('signals') ? [{ id: 'signals', label: 'Signals', icon: <SignalIcon className="h-4 w-4" /> }] : []),
-    ...(isFeatureEnabled('timeBank') ? [{ id: 'timebank', label: 'Tidsbank', icon: <ClockIcon className="h-4 w-4" /> }] : []),
-    { id: 'settings', label: 'Inställningar', icon: <Cog6ToothIcon className="h-4 w-4" /> },
+    { id: 'participants', label: t('tabs.participants'), icon: <UsersIcon className="h-4 w-4" />, badge: participants.length },
+    { id: 'roles', label: t('tabs.roles'), icon: <UserGroupIcon className="h-4 w-4" /> },
+    ...(isFeatureEnabled('signals') ? [{ id: 'signals', label: t('tabs.signals'), icon: <SignalIcon className="h-4 w-4" /> }] : []),
+    ...(isFeatureEnabled('timeBank') ? [{ id: 'timebank', label: t('tabs.timebank'), icon: <ClockIcon className="h-4 w-4" /> }] : []),
+    { id: 'settings', label: t('tabs.settings'), icon: <Cog6ToothIcon className="h-4 w-4" /> },
   ];
 
   return (
@@ -611,7 +614,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       {error && (
         <SessionStatusMessage
           type="error"
-          title="Något gick fel"
+          title={t('errors.somethingWentWrong')}
           message={error}
           onDismiss={() => setError(null)}
           autoDismiss
@@ -664,7 +667,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       <TabPanel id="participants" activeTab={lobbyTab} className="space-y-6">
         <Card variant="elevated" className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">
-            Deltagare ({participants.length})
+            {t('participants.count', { count: participants.length })}
           </h2>
           <ParticipantList
             participants={participants.map((p) => ({
@@ -688,17 +691,17 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         {isLive && (
           <Card variant="elevated" className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Dela session
+              {t('share.title')}
             </h2>
             <div className="flex flex-col sm:flex-row gap-4 items-center">
               {/* Large code display */}
               <div className="flex-1 text-center sm:text-left">
-                <p className="text-sm text-muted-foreground mb-1">Sessionskod</p>
+                <p className="text-sm text-muted-foreground mb-1">{ts('sessionCode')}</p>
                 <p className="text-4xl font-mono font-bold text-primary tracking-widest">
                   {session.sessionCode}
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Deltagare går till <span className="font-medium">lekbanken.se/play</span>
+                  {t('share.participantsGoTo')} <span className="font-medium">lekbanken.se/play</span>
                 </p>
               </div>
 
@@ -706,11 +709,11 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
               <div className="flex gap-2">
                 <Button variant="outline" onClick={handleShare}>
                   <ShareIcon className="h-4 w-4" />
-                  {copied ? 'Kopierad!' : 'Dela'}
+                  {copied ? t('share.copied') : t('share.share')}
                 </Button>
                 <Button variant="outline" disabled>
                   <QrCodeIcon className="h-4 w-4" />
-                  QR-kod
+                  {t('share.qrCode')}
                 </Button>
               </div>
             </div>
@@ -723,14 +726,14 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           <Card variant="elevated" className="p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-lg font-semibold text-foreground">Roller</h2>
+                <h2 className="text-lg font-semibold text-foreground">{t('roles.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Tilldela roller i lobbyn innan ni går in i aktiv session.
+                  {t('roles.description')}
                 </p>
               </div>
               {sessionRoles.length === 0 && (
                 <Button variant="outline" onClick={handleSnapshotRoles} disabled={rolesLoading}>
-                  Kopiera roller från spel
+                  {t('roles.copyFromGame')}
                 </Button>
               )}
             </div>
@@ -754,9 +757,9 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
             <div className="mt-6 border-t border-border pt-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="text-base font-semibold text-foreground">Hemliga instruktioner</h3>
+                  <h3 className="text-base font-semibold text-foreground">{t('secrets.title')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Lås upp när alla har fått en roll. Du kan bara låsa igen om ingen har hunnit visa sina hemligheter.
+                    {t('secrets.description')}
                   </p>
                 </div>
                 <div className="flex gap-2">
@@ -769,7 +772,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                       (secretsStatus.revealedCount ?? 0) > 0
                     }
                   >
-                    Lås igen
+                    {t('secrets.lock')}
                   </Button>
                   <Button
                     onClick={() => void handleSecretsAction('unlock')}
@@ -780,7 +783,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                         (secretsStatus?.assignedCount ?? 0) < (secretsStatus?.participantCount ?? 0)
                     }
                   >
-                    Lås upp
+                    {t('secrets.unlock')}
                   </Button>
                 </div>
               </div>
@@ -791,13 +794,13 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
               {secretsStatus && (
                 <div className="mt-3 text-sm text-muted-foreground">
-                  Status: {secretsStatus.unlockedAt ? 'Upplåst' : 'Låst'} · Deltagare: {secretsStatus.participantCount} · Tilldelade: {secretsStatus.assignedCount} · Visade: {secretsStatus.revealedCount}
+                  Status: {secretsStatus.unlockedAt ? t('secrets.statusUnlocked') : t('secrets.statusLocked')} · {t('secrets.participantsLabel')}: {secretsStatus.participantCount} · {t('secrets.assignedLabel')}: {secretsStatus.assignedCount} · {t('secrets.revealedLabel')}: {secretsStatus.revealedCount}
                 </div>
               )}
 
               {secretsStatus && !secretsStatus.unlockedAt && secretsStatus.participantCount > 0 && secretsStatus.assignedCount < secretsStatus.participantCount && (
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Tips: Du kan låsa upp när alla har en roll.
+                  {t('secrets.tip')}
                 </div>
               )}
             </div>
@@ -805,7 +808,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         ) : (
           <Card variant="elevated" className="p-6">
             <p className="text-muted-foreground">
-              {isEnded ? 'Sessionen är avslutad.' : 'Inget spel är kopplat till sessionen.'}
+              {isEnded ? ts('ended') : ts('noGameLinked')}
             </p>
           </Card>
         )}
@@ -826,7 +829,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       <TabPanel id="settings" activeTab={lobbyTab} className="space-y-6">
         <Card variant="elevated" className="p-6">
           <h2 className="text-lg font-semibold text-foreground mb-4">
-            Sessionskontroller
+            {t('controls.title')}
           </h2>
           <SessionControls
             status={session.status}
@@ -843,15 +846,15 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         <Card variant="elevated" className="p-6 space-y-4">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">Admin-inställningar (endast denna session)</h2>
-              <p className="text-sm text-muted-foreground">Justera steg, säkerhet, faser och roller utan att ändra spelets originaldata.</p>
+              <h2 className="text-lg font-semibold text-foreground">{t('admin.title')}</h2>
+              <p className="text-sm text-muted-foreground">{t('admin.description')}</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => void handleResetOverrides()} disabled={overridesLoading}>
-                Återställ overrides
+                {t('admin.resetOverrides')}
               </Button>
               <Button size="sm" onClick={() => void handleSaveOverrides()} disabled={overridesLoading}>
-                Spara sessionens ändringar
+                {t('admin.saveChanges')}
               </Button>
             </div>
           </div>
@@ -859,8 +862,8 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           {/* Steps */}
           <div className="border border-border/70 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">Steg-för-steg</h3>
-              <span className="text-xs text-muted-foreground">Titel, beskrivning, tid, ordning</span>
+              <h3 className="font-semibold text-foreground">{t('admin.steps.title')}</h3>
+              <span className="text-xs text-muted-foreground">{t('admin.steps.subtitle')}</span>
             </div>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
               {gameSteps.map((step, idx) => {
@@ -871,7 +874,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                       <span className="text-sm font-semibold">{idx + 1}. {step.title}</span>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <label className="flex items-center gap-1">
-                          Ordning
+                          {t('admin.steps.orderLabel')}
                           <input
                             type="number"
                             className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -886,7 +889,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                           />
                         </label>
                         <label className="flex items-center gap-1">
-                          Tid (min)
+                          {t('admin.steps.timeLabel')}
                           <input
                             type="number"
                             className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -926,12 +929,12 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           {/* Safety & Inclusion */}
           <div className="border border-border/70 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">Säkerhet & Inkludering</h3>
-              <span className="text-xs text-muted-foreground">Säkerhet, tillgänglighet, utrymme, ledartips</span>
+              <h3 className="font-semibold text-foreground">{t('admin.safety.title')}</h3>
+              <span className="text-xs text-muted-foreground">{t('admin.safety.subtitle')}</span>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Säkerhetsnoteringar</label>
+                <label className="text-xs text-muted-foreground">{t('admin.safety.safetyNotes')}</label>
                 <textarea
                   className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
                   rows={3}
@@ -941,7 +944,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Tillgänglighetsnoteringar</label>
+                <label className="text-xs text-muted-foreground">{t('admin.safety.accessibilityNotes')}</label>
                 <textarea
                   className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
                   rows={3}
@@ -951,7 +954,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Utrymmeskrav</label>
+                <label className="text-xs text-muted-foreground">{t('admin.safety.spaceRequirements')}</label>
                 <textarea
                   className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
                   rows={3}
@@ -961,7 +964,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-xs text-muted-foreground">Ledartips</label>
+                <label className="text-xs text-muted-foreground">{t('admin.safety.leaderTips')}</label>
                 <textarea
                   className="w-full rounded border border-input bg-background px-3 py-2 text-sm"
                   rows={3}
@@ -976,8 +979,8 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           {/* Phases */}
           <div className="border border-border/70 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">Faser & Rundor</h3>
-              <span className="text-xs text-muted-foreground">Namn, beskrivning, tid, ordning</span>
+              <h3 className="font-semibold text-foreground">{t('admin.phases.title')}</h3>
+              <span className="text-xs text-muted-foreground">{t('admin.phases.subtitle')}</span>
             </div>
             <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
               {gamePhases.map((phase, idx) => {
@@ -988,7 +991,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                       <span className="text-sm font-semibold">{idx + 1}. {phase.name}</span>
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <label className="flex items-center gap-1">
-                          Ordning
+                          {t('admin.phases.orderLabel')}
                           <input
                             type="number"
                             className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1003,7 +1006,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                           />
                         </label>
                         <label className="flex items-center gap-1">
-                          Tid (sek)
+                          {t('admin.phases.timeLabel')}
                           <input
                             type="number"
                             className="w-20 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1043,8 +1046,8 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           {/* Roles */}
           <div className="border border-border/70 rounded-lg p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">Roller (sessionens kopia)</h3>
-              <span className="text-xs text-muted-foreground">Namn, beskrivning, min/max, instruktioner, ikon/färg</span>
+              <h3 className="font-semibold text-foreground">{t('admin.roleSettings.title')}</h3>
+              <span className="text-xs text-muted-foreground">{t('admin.roleSettings.subtitle')}</span>
             </div>
             <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
               {sessionRoles.map((role) => {
@@ -1061,7 +1064,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                       />
                       <div className="flex gap-2 text-xs text-muted-foreground">
                         <label className="flex items-center gap-1">
-                          Min
+                          {t('admin.roleSettings.minLabel')}
                           <input
                             type="number"
                             className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1074,7 +1077,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                           />
                         </label>
                         <label className="flex items-center gap-1">
-                          Max
+                          {t('admin.roleSettings.maxLabel')}
                           <input
                             type="number"
                             className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1087,7 +1090,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                           />
                         </label>
                         <label className="flex items-center gap-1">
-                          Ikon
+                          {t('admin.roleSettings.iconLabel')}
                           <input
                             type="text"
                             className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1097,7 +1100,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
                           />
                         </label>
                         <label className="flex items-center gap-1">
-                          Färg
+                          {t('admin.roleSettings.colorLabel')}
                           <input
                             type="text"
                             className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1129,7 +1132,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
             <div className="flex justify-end">
               <Button onClick={() => void handleSaveRoleEdits()} disabled={rolesLoading}>
-                Spara roller
+                {t('admin.roleSettings.saveRoles')}
               </Button>
             </div>
           </div>

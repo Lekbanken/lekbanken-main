@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { formatCurrency, formatDate } from '@/lib/i18n/format-utils';
 import { useRouter } from 'next/navigation';
 import {
   CubeIcon,
@@ -99,14 +100,6 @@ function HealthBadge({ status }: { status: HealthStatus }) {
       <Icon className="h-3 w-3" />
     </Badge>
   );
-}
-
-function formatCurrency(amount: number, currency: string): string {
-  return new Intl.NumberFormat('sv-SE', {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-    minimumFractionDigits: 0,
-  }).format(amount / 100);
 }
 
 // ============================================================================
@@ -436,7 +429,7 @@ function ProductRow({
       {/* Updated */}
       <td className="px-3 py-3 hidden lg:table-cell">
         <span className="text-xs text-muted-foreground">
-          {new Date(product.updated_at).toLocaleDateString('sv-SE')}
+          {formatDate(product.updated_at)}
         </span>
       </td>
 

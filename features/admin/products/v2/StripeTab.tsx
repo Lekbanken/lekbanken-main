@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { formatDateTime } from '@/lib/i18n/format-utils';
 import {
   ArrowPathIcon,
   LinkIcon,
@@ -304,7 +305,7 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
               />
               <ReadOnlyField
                 label="Senast synkad"
-                value={lastSynced ? new Date(lastSynced).toLocaleString('sv-SE') : null}
+                value={lastSynced ? formatDateTime(lastSynced) : null}
                 placeholder="Aldrig synkad"
               />
             </div>
@@ -432,7 +433,7 @@ function SyncStatusBanner({
 
         {lastSynced && (
           <span className="text-xs text-muted-foreground">
-            Senast: {new Date(lastSynced).toLocaleString('sv-SE')}
+            Senast: {formatDateTime(lastSynced)}
           </span>
         )}
 

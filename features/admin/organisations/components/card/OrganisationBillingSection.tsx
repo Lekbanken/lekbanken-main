@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { formatDateLong } from '@/lib/i18n/format-utils';
 import {
   CreditCardIcon,
   ArrowTopRightOnSquareIcon,
@@ -57,11 +58,7 @@ const subscriptionStatusConfig: Record<SubscriptionStatus, {
 // Format date for display
 function formatDate(dateString: string | null): string {
   if (!dateString) return '–';
-  return new Date(dateString).toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  return formatDateLong(dateString);
 }
 
 // Calculate days until trial ends

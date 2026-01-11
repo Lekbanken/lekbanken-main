@@ -4,7 +4,11 @@
  * Centralized navigation structure for the admin panel.
  * Supports collapsible categories with proper context separation.
  * 
+ * Labels use i18n keys from messages/{locale}.json under "admin.nav" namespace.
+ * Use the getTranslatedNav() helper or translate keys in components.
+ * 
  * @see docs/admin/appshell.md for architecture documentation
+ * @see docs/I18N_GUIDE.md for internationalization
  */
 
 // ---------------------------------------------------------------------------
@@ -13,7 +17,8 @@
 
 export interface AdminNavItem {
   id: string
-  label: string
+  /** i18n key under admin.nav namespace, e.g., "dashboard" → t("admin.nav.dashboard") */
+  labelKey: string
   href: string
   icon?: string // Icon key from navIcons
   badge?: string | number
@@ -28,7 +33,8 @@ export interface AdminNavItem {
 
 export interface AdminNavCategory {
   id: string
-  label: string
+  /** i18n key under admin.navGroups namespace */
+  labelKey: string
   icon: string // Icon key from navIcons
   items: AdminNavItem[]
   /** Only visible to system admins */
@@ -49,112 +55,113 @@ export interface AdminNavConfig {
 const systemAdminCategories: AdminNavCategory[] = [
   {
     id: 'overview',
-    label: 'Översikt',
+    labelKey: 'overview',
     icon: 'dashboard',
     items: [
-      { id: 'dashboard', label: 'Dashboard', href: '/admin', icon: 'dashboard' },
-      { id: 'analytics', label: 'Analys', href: '/admin/analytics', icon: 'analytics' },
+      { id: 'dashboard', labelKey: 'dashboard', href: '/admin', icon: 'dashboard' },
+      { id: 'analytics', labelKey: 'analytics', href: '/admin/analytics', icon: 'analytics' },
     ],
   },
   {
     id: 'organisations',
-    label: 'Organisationer',
+    labelKey: 'organizations',
     icon: 'organisations',
     items: [
-      { id: 'org-list', label: 'Alla organisationer', href: '/admin/organisations', icon: 'organisations', permission: 'admin.tenants.list' },
-      { id: 'licenses', label: 'Licenser & Planer', href: '/admin/licenses', icon: 'licenses', permission: 'admin.licenses.list' },
-      { id: 'billing', label: 'Fakturering', href: '/admin/billing', icon: 'billing', permission: 'admin.billing.view' },
+      { id: 'org-list', labelKey: 'allOrganizations', href: '/admin/organisations', icon: 'organisations', permission: 'admin.tenants.list' },
+      { id: 'licenses', labelKey: 'licenses', href: '/admin/licenses', icon: 'licenses', permission: 'admin.licenses.list' },
+      { id: 'billing', labelKey: 'billing', href: '/admin/billing', icon: 'billing', permission: 'admin.billing.view' },
     ],
   },
   {
     id: 'users',
-    label: 'Användare',
+    labelKey: 'users',
     icon: 'users',
     items: [
-      { id: 'user-list', label: 'Alla användare', href: '/admin/users', icon: 'users', permission: 'admin.users.list' },
-      { id: 'participants', label: 'Deltagare', href: '/admin/participants', icon: 'participants', permission: 'admin.participants.list' },
+      { id: 'user-list', labelKey: 'allUsers', href: '/admin/users', icon: 'users', permission: 'admin.users.list' },
+      { id: 'participants', labelKey: 'participants', href: '/admin/participants', icon: 'participants', permission: 'admin.participants.list' },
     ],
   },
   {
     id: 'products',
-    label: 'Produkter',
+    labelKey: 'products',
     icon: 'products',
     items: [
-      { id: 'product-list', label: 'Alla produkter', href: '/admin/products', icon: 'products', permission: 'admin.products.list' },
-      { id: 'games', label: 'Lekhanteraren', href: '/admin/games', icon: 'games', permission: 'admin.games.list' },
-      { id: 'planner', label: 'Planläggaren', href: '/admin/planner', icon: 'content', permission: 'admin.planner.list' },
+      { id: 'product-list', labelKey: 'allProducts', href: '/admin/products', icon: 'products', permission: 'admin.products.list' },
+      { id: 'games', labelKey: 'gameManager', href: '/admin/games', icon: 'games', permission: 'admin.games.list' },
+      { id: 'planner', labelKey: 'plannerTool', href: '/admin/planner', icon: 'content', permission: 'admin.planner.list' },
     ],
   },
   {
     id: 'library',
-    label: 'Bibliotek',
+    labelKey: 'library',
     icon: 'achievements',
     items: [
-      { id: 'badges', label: 'Badges', href: '/admin/library/badges', icon: 'achievements', permission: 'admin.achievements.list' },
-      { id: 'coach-diagrams', label: 'Coach Diagrams', href: '/admin/library/coach-diagrams', icon: 'content', permission: 'admin.content.list' },
-      { id: 'media', label: 'Mediefiler', href: '/admin/media', icon: 'content', permission: 'admin.media.list' },
+      { id: 'badges', labelKey: 'badges', href: '/admin/library/badges', icon: 'achievements', permission: 'admin.achievements.list' },
+      { id: 'coach-diagrams', labelKey: 'coachDiagrams', href: '/admin/library/coach-diagrams', icon: 'content', permission: 'admin.content.list' },
+      { id: 'media', labelKey: 'mediaFiles', href: '/admin/media', icon: 'content', permission: 'admin.media.list' },
     ],
   },
   {
     id: 'gamification',
-    label: 'Gamification',
+    labelKey: 'gamification',
     icon: 'leaderboard',
     items: [
-      { id: 'gamification-hub', label: 'Översikt', href: '/admin/gamification', icon: 'leaderboard' },
-      { id: 'dicecoin-xp', label: 'DiceCoin & XP', href: '/admin/gamification/dicecoin-xp', icon: 'leaderboard' },
-      { id: 'achievements', label: 'Achievements', href: '/admin/gamification/achievements', icon: 'achievements' },
-      { id: 'shop-rewards', label: 'Shop & Rewards', href: '/admin/gamification/shop-rewards', icon: 'marketplace' },
+      { id: 'gamification-hub', labelKey: 'overview', href: '/admin/gamification', icon: 'leaderboard' },
+      { id: 'dicecoin-xp', labelKey: 'dicecoinXp', href: '/admin/gamification/dicecoin-xp', icon: 'leaderboard' },
+      { id: 'achievements', labelKey: 'achievements', href: '/admin/gamification/achievements', icon: 'achievements' },
+      { id: 'shop-rewards', labelKey: 'shopRewards', href: '/admin/gamification/shop-rewards', icon: 'marketplace' },
     ],
   },
   {
     id: 'learning',
-    label: 'Utbildning',
+    labelKey: 'learning',
     icon: 'learning',
     items: [
-      { id: 'learning-hub', label: 'Översikt', href: '/admin/learning', icon: 'learning' },
-      { id: 'courses', label: 'Kurser', href: '/admin/learning/courses', icon: 'learning' },
-      { id: 'paths', label: 'Lärstigar', href: '/admin/learning/paths', icon: 'learning' },
-      { id: 'requirements', label: 'Krav & Grind', href: '/admin/learning/requirements', icon: 'learning' },
-      { id: 'reports', label: 'Rapporter', href: '/admin/learning/reports', icon: 'learning' },
+      { id: 'learning-hub', labelKey: 'overview', href: '/admin/learning', icon: 'learning' },
+      { id: 'courses', labelKey: 'courses', href: '/admin/learning/courses', icon: 'learning' },
+      { id: 'paths', labelKey: 'learningPaths', href: '/admin/learning/paths', icon: 'learning' },
+      { id: 'requirements', labelKey: 'requirements', href: '/admin/learning/requirements', icon: 'learning' },
+      { id: 'reports', labelKey: 'reports', href: '/admin/learning/reports', icon: 'learning' },
     ],
   },
   {
     id: 'support',
-    label: 'Support',
+    labelKey: 'support',
     icon: 'tickets',
     items: [
-      { id: 'support-hub', label: 'Översikt', href: '/admin/support', icon: 'tickets' },
-      { id: 'tickets', label: 'Ärenden', href: '/admin/tickets', icon: 'tickets', permission: 'admin.tickets.view' },
-      { id: 'kb', label: 'Kunskapsbas', href: '/admin/support/kb', icon: 'learning' },
-      { id: 'automation', label: 'Automation', href: '/admin/support/automation', icon: 'settings', systemAdminOnly: true },
-      { id: 'bugs', label: 'Buggrapporter', href: '/admin/support/bugs', icon: 'incident' },
-      { id: 'feedback', label: 'Feedback', href: '/admin/support/feedback', icon: 'notifications' },
+      { id: 'support-hub', labelKey: 'overview', href: '/admin/support', icon: 'tickets' },
+      { id: 'tickets', labelKey: 'tickets', href: '/admin/tickets', icon: 'tickets', permission: 'admin.tickets.view' },
+      { id: 'kb', labelKey: 'knowledgeBase', href: '/admin/support/kb', icon: 'learning' },
+      { id: 'automation', labelKey: 'automation', href: '/admin/support/automation', icon: 'settings', systemAdminOnly: true },
+      { id: 'bugs', labelKey: 'bugReports', href: '/admin/support/bugs', icon: 'incident' },
+      { id: 'feedback', labelKey: 'feedback', href: '/admin/support/feedback', icon: 'notifications' },
     ],
   },
   {
     id: 'operations',
-    label: 'Drift',
+    labelKey: 'operations',
     icon: 'sessions',
     items: [
-      { id: 'sessions', label: 'Sessioner', href: '/admin/sessions', icon: 'sessions', permission: 'admin.sessions.list' },
-      { id: 'moderation', label: 'Moderering', href: '/admin/moderation', icon: 'moderation', permission: 'admin.moderation.view' },
-      { id: 'incidents', label: 'Incidenter', href: '/admin/incidents', icon: 'incident', permission: 'admin.system.view' },
+      { id: 'sessions', labelKey: 'sessions', href: '/admin/sessions', icon: 'sessions', permission: 'admin.sessions.list' },
+      { id: 'moderation', labelKey: 'moderation', href: '/admin/moderation', icon: 'moderation', permission: 'admin.moderation.view' },
+      { id: 'incidents', labelKey: 'incidents', href: '/admin/incidents', icon: 'incident', permission: 'admin.system.view' },
     ],
   },
   {
     id: 'system',
-    label: 'System',
+    labelKey: 'system',
     icon: 'settings',
     items: [
-      { id: 'design', label: 'Design', href: '/admin/design', icon: 'swatch', permission: 'admin.system.view', systemAdminOnly: true },
-      { id: 'notifications', label: 'Notifikationer', href: '/admin/notifications', icon: 'notifications', permission: 'admin.notifications.send' },
-      { id: 'feature-flags', label: 'Feature Flags', href: '/admin/feature-flags', icon: 'flag', permission: 'admin.system.view' },
-      { id: 'api-keys', label: 'API-nycklar', href: '/admin/api-keys', icon: 'key', permission: 'admin.system.view' },
-      { id: 'webhooks', label: 'Webhooks', href: '/admin/webhooks', icon: 'rss', permission: 'admin.system.view' },
-      { id: 'system-health', label: 'System Health', href: '/admin/system-health', icon: 'systemHealth', permission: 'admin.system.view' },
-      { id: 'audit-logs', label: 'Granskningslogg', href: '/admin/audit-logs', icon: 'audit', permission: 'admin.audit.view' },
-      { id: 'release-notes', label: 'Release Notes', href: '/admin/release-notes', icon: 'megaphone', permission: 'admin.system.view' },
-      { id: 'settings', label: 'Inställningar', href: '/admin/settings', icon: 'settings', permission: 'admin.settings.view' },
+      { id: 'design', labelKey: 'design', href: '/admin/design', icon: 'swatch', permission: 'admin.system.view', systemAdminOnly: true },
+      { id: 'translations', labelKey: 'translations', href: '/admin/translations', icon: 'language', permission: 'admin.system.view', systemAdminOnly: true },
+      { id: 'notifications', labelKey: 'notifications', href: '/admin/notifications', icon: 'notifications', permission: 'admin.notifications.send' },
+      { id: 'feature-flags', labelKey: 'featureFlags', href: '/admin/feature-flags', icon: 'flag', permission: 'admin.system.view' },
+      { id: 'api-keys', labelKey: 'apiKeys', href: '/admin/api-keys', icon: 'key', permission: 'admin.system.view' },
+      { id: 'webhooks', labelKey: 'webhooks', href: '/admin/webhooks', icon: 'rss', permission: 'admin.system.view' },
+      { id: 'system-health', labelKey: 'systemHealth', href: '/admin/system-health', icon: 'systemHealth', permission: 'admin.system.view' },
+      { id: 'audit-logs', labelKey: 'auditLog', href: '/admin/audit-logs', icon: 'audit', permission: 'admin.audit.view' },
+      { id: 'release-notes', labelKey: 'releaseNotes', href: '/admin/release-notes', icon: 'megaphone', permission: 'admin.system.view' },
+      { id: 'settings', labelKey: 'settings', href: '/admin/settings', icon: 'settings', permission: 'admin.settings.view' },
     ],
   },
 ]
@@ -166,67 +173,67 @@ const systemAdminCategories: AdminNavCategory[] = [
 const organisationAdminCategories: AdminNavCategory[] = [
   {
     id: 'org-overview',
-    label: 'Översikt',
+    labelKey: 'overview',
     icon: 'dashboard',
     items: [
-      { id: 'org-dashboard', label: 'Dashboard', href: '/admin/tenant/[tenantId]', icon: 'dashboard' },
-      { id: 'org-analytics', label: 'Statistik', href: '/admin/tenant/[tenantId]/analytics', icon: 'analytics' },
+      { id: 'org-dashboard', labelKey: 'dashboard', href: '/admin/tenant/[tenantId]', icon: 'dashboard' },
+      { id: 'org-analytics', labelKey: 'statistics', href: '/admin/tenant/[tenantId]/analytics', icon: 'analytics' },
     ],
   },
   {
     id: 'org-members',
-    label: 'Medlemmar',
+    labelKey: 'members',
     icon: 'users',
     items: [
-      { id: 'members-list', label: 'Alla medlemmar', href: '/admin/tenant/[tenantId]/members', icon: 'users' },
-      { id: 'roles', label: 'Roller & Behörigheter', href: '/admin/tenant/[tenantId]/roles', icon: 'moderation' },
-      { id: 'invites', label: 'Inbjudningar', href: '/admin/tenant/[tenantId]/invites', icon: 'notifications' },
+      { id: 'members-list', labelKey: 'allMembers', href: '/admin/tenant/[tenantId]/members', icon: 'users' },
+      { id: 'roles', labelKey: 'rolesPermissions', href: '/admin/tenant/[tenantId]/roles', icon: 'moderation' },
+      { id: 'invites', labelKey: 'invitations', href: '/admin/tenant/[tenantId]/invites', icon: 'notifications' },
     ],
   },
   {
     id: 'org-content',
-    label: 'Innehåll',
+    labelKey: 'content',
     icon: 'content',
     items: [
-      { id: 'org-games', label: 'Spel', href: '/admin/tenant/[tenantId]/games', icon: 'games' },
-      { id: 'org-planner', label: 'Planer', href: '/admin/tenant/[tenantId]/planner', icon: 'content' },
-      { id: 'org-media', label: 'Mediefiler', href: '/admin/tenant/[tenantId]/media', icon: 'content' },
+      { id: 'org-games', labelKey: 'games', href: '/admin/tenant/[tenantId]/games', icon: 'games' },
+      { id: 'org-planner', labelKey: 'plans', href: '/admin/tenant/[tenantId]/planner', icon: 'content' },
+      { id: 'org-media', labelKey: 'mediaFiles', href: '/admin/tenant/[tenantId]/media', icon: 'content' },
     ],
   },
   {
     id: 'org-participants',
-    label: 'Deltagare',
+    labelKey: 'participants',
     icon: 'participants',
     items: [
-      { id: 'org-participants-list', label: 'Alla deltagare', href: '/admin/tenant/[tenantId]/participants', icon: 'participants' },
-      { id: 'org-sessions', label: 'Sessioner', href: '/admin/tenant/[tenantId]/sessions', icon: 'sessions' },
+      { id: 'org-participants-list', labelKey: 'allParticipants', href: '/admin/tenant/[tenantId]/participants', icon: 'participants' },
+      { id: 'org-sessions', labelKey: 'sessions', href: '/admin/tenant/[tenantId]/sessions', icon: 'sessions' },
     ],
   },
   {
     id: 'org-gamification',
-    label: 'Gamification',
+    labelKey: 'gamification',
     icon: 'achievements',
     items: [
-      { id: 'org-achievements', label: 'Utmärkelser', href: '/admin/tenant/[tenantId]/gamification/achievements', icon: 'achievements' },
+      { id: 'org-achievements', labelKey: 'awards', href: '/admin/tenant/[tenantId]/gamification/achievements', icon: 'achievements' },
     ],
   },
   {
     id: 'org-billing',
-    label: 'Konto',
+    labelKey: 'account',
     icon: 'billing',
     items: [
-      { id: 'org-subscription', label: 'Prenumeration', href: '/admin/tenant/[tenantId]/subscription', icon: 'billing' },
-      { id: 'org-invoices', label: 'Fakturor', href: '/admin/tenant/[tenantId]/invoices', icon: 'billing' },
+      { id: 'org-subscription', labelKey: 'subscription', href: '/admin/tenant/[tenantId]/subscription', icon: 'billing' },
+      { id: 'org-invoices', labelKey: 'invoices', href: '/admin/tenant/[tenantId]/invoices', icon: 'billing' },
     ],
   },
   {
     id: 'org-settings',
-    label: 'Inställningar',
+    labelKey: 'settings',
     icon: 'settings',
     items: [
-      { id: 'org-general', label: 'Allmänt', href: '/admin/tenant/[tenantId]/settings', icon: 'settings' },
-      { id: 'org-branding', label: 'Varumärke', href: '/admin/tenant/[tenantId]/branding', icon: 'personalization' },
-      { id: 'org-domains', label: 'Domäner', href: '/admin/tenant/[tenantId]/domains', icon: 'rss' },
+      { id: 'org-general', labelKey: 'general', href: '/admin/tenant/[tenantId]/settings', icon: 'settings' },
+      { id: 'org-branding', labelKey: 'branding', href: '/admin/tenant/[tenantId]/branding', icon: 'personalization' },
+      { id: 'org-domains', labelKey: 'domains', href: '/admin/tenant/[tenantId]/domains', icon: 'rss' },
     ],
   },
 ]

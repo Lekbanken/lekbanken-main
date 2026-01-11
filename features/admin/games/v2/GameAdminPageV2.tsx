@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { formatDate } from '@/lib/i18n/format-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   PuzzlePieceIcon,
@@ -222,7 +223,7 @@ function GameRow({
       {/* Updated */}
       <td className="px-3 py-3 hidden lg:table-cell">
         <span className="text-xs text-muted-foreground">
-          {new Date(game.updated_at).toLocaleDateString('sv-SE')}
+          {formatDate(game.updated_at)}
         </span>
       </td>
 

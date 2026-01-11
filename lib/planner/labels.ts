@@ -4,6 +4,7 @@
  */
 
 import type { PlannerStatus, PlannerVisibility } from '@/types/planner'
+import { defaultLocale } from '@/lib/i18n/config'
 
 // =============================================================================
 // STATUS LABELS & COLORS
@@ -173,19 +174,23 @@ export function formatDuration(totalMinutes?: number | null): string {
 }
 
 /**
- * Format a date to Swedish locale
+ * Format a date to locale-aware format
+ * @param value - Date string or null
+ * @param locale - Locale code (defaults to system default)
  */
-export function formatDate(value?: string | null): string {
+export function formatDate(value?: string | null, locale: string = defaultLocale): string {
   if (!value) return '-'
-  return new Date(value).toLocaleDateString('sv-SE')
+  return new Date(value).toLocaleDateString(locale)
 }
 
 /**
- * Format a date with time to Swedish locale
+ * Format a date with time to locale-aware format
+ * @param value - Date string or null  
+ * @param locale - Locale code (defaults to system default)
  */
-export function formatDateTime(value?: string | null): string {
+export function formatDateTime(value?: string | null, locale: string = defaultLocale): string {
   if (!value) return '-'
-  return new Date(value).toLocaleString('sv-SE', {
+  return new Date(value).toLocaleString(locale, {
     dateStyle: 'short',
     timeStyle: 'short',
   })

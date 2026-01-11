@@ -4,6 +4,7 @@ import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
 import { deriveEffectiveGlobalRoleFromClaims, resolveTenantForMiddlewareRequest } from '@/lib/auth/middleware-helpers'
 import { setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
+import { locales, defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
 
 const guestOnlyPaths = new Set(['/auth/login', '/auth/signup'])
 
@@ -13,6 +14,43 @@ const PLATFORM_PRIMARY_HOST = 'app.lekbanken.no'
 
 function generateRequestId(): string {
   return `req_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+}
+
+/**
+ * Resolve the locale for a request.
+ * Priority: Cookie → Accept-Language → Default
+ */
+function resolveLocale(request: NextRequest): Locale {
+  // 1. Check cookie
+  const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value
+  if (cookieLocale && isValidLocale(cookieLocale)) {
+    return cookieLocale
+  }
+
+  // 2. Check Accept-Language header
+  const acceptLanguage = request.headers.get('accept-language')
+  if (acceptLanguage) {
+    // Parse Accept-Language header (e.g., "sv-SE,sv;q=0.9,en;q=0.8")
+    const languages = acceptLanguage
+      .split(',')
+      .map((lang) => {
+        const [code, q = 'q=1'] = lang.trim().split(';')
+        return {
+          code: code.split('-')[0].toLowerCase(), // Extract primary language code
+          quality: parseFloat(q.replace('q=', '')) || 1,
+        }
+      })
+      .sort((a, b) => b.quality - a.quality)
+
+    for (const { code } of languages) {
+      if (isValidLocale(code)) {
+        return code
+      }
+    }
+  }
+
+  // 3. Default fallback
+  return defaultLocale
 }
 
 function isProtectedPath(pathname: string) {
@@ -142,6 +180,23 @@ export default async function proxy(request: NextRequest) {
 
   const response = NextResponse.next()
   response.headers.set('x-request-id', requestId)
+
+  // ============================================
+  // LOCALE RESOLUTION
+  // Resolve and set locale cookie for i18n
+  // ============================================
+  const locale = resolveLocale(request)
+  const existingLocale = request.cookies.get(LOCALE_COOKIE)?.value
+  
+  // Set/update locale cookie if not already set or different
+  if (!existingLocale || existingLocale !== locale) {
+    response.cookies.set(LOCALE_COOKIE, locale, {
+      path: '/',
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 365, // 1 year
+    })
+  }
 
   const supabase = createServerClient<Database>(env.supabase.url, env.supabase.anonKey, {
     cookies: {

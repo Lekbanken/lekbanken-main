@@ -1,6 +1,11 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import { createRequire } from 'module';
+
+// Import custom rules using CommonJS require (needed for .cjs files in ESM context)
+const require = createRequire(import.meta.url);
+const lekbankenRules = require('./eslint-rules/index.cjs');
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -15,6 +20,12 @@ const eslintConfig = defineConfig([
     "catalyst-ui-kit/**",
     "types/supabase.ts",
   ]),
+  // Register custom Lekbanken rules
+  {
+    plugins: {
+      lekbanken: lekbankenRules,
+    },
+  },
   {
     rules: {
       // Prevent 'as any' usage - force proper typing
@@ -40,6 +51,32 @@ const eslintConfig = defineConfig([
         ]
       }]
     }
+  },
+  // i18n: ERROR for critical user-facing areas (legal, play, app)
+  {
+    files: [
+      "app/legal/**/*.tsx",
+      "app/app/**/*.tsx", 
+      "features/play/**/*.tsx",
+      "components/play/**/*.tsx"
+    ],
+    rules: {
+      "lekbanken/no-hardcoded-strings": "error",
+    },
+  },
+  // i18n: Warn about hardcoded Nordic strings in other components (migration phase)
+  {
+    files: ["components/**/*.tsx", "app/**/*.tsx", "features/**/*.tsx"],
+    ignores: [
+      "app/legal/**/*.tsx",
+      "app/app/**/*.tsx",
+      "features/play/**/*.tsx", 
+      "components/play/**/*.tsx",
+      "app/sandbox/**/*.tsx" // Dev tools - lower priority
+    ],
+    rules: {
+      "lekbanken/no-hardcoded-strings": "warn",
+    },
   },
   // Allow sandbox imports only in sandbox paths
   {

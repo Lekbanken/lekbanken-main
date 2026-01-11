@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
+import { formatDateLong } from '@/lib/i18n/format-utils';
 import {
   UsersIcon,
   MagnifyingGlassIcon,
@@ -86,11 +87,7 @@ type UserSearchResult = {
 
 // Format date for display
 function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+  return formatDateLong(dateString);
 }
 
 // Avatar component for search results

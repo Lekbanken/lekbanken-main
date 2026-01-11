@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
+import { formatDateTimeLong } from '@/lib/i18n/format-utils';
 import {
   ClockIcon,
   ArrowPathIcon,
@@ -125,13 +126,7 @@ function formatTimestamp(dateString: string): string {
   if (diffHours < 24) return `${diffHours}h sedan`;
   if (diffDays < 7) return `${diffDays}d sedan`;
   
-  return date.toLocaleDateString('sv-SE', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  return formatDateTimeLong(date);
 }
 
 // Format payload details

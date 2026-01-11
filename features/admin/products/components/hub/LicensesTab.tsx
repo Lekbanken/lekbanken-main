@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from "react";
+import { formatDate } from '@/lib/i18n/format-utils';
 import { useRouter } from "next/navigation";
 import {
   KeyIcon,
@@ -275,7 +276,7 @@ export function LicensesTab() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Utgår</span>
-                      <span className="font-medium">{new Date(license.endDate).toLocaleDateString("sv-SE")}</span>
+                      <span className="font-medium">{formatDate(license.endDate)}</span>
                     </div>
                   </div>
 

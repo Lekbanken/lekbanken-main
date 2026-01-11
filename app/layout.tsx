@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ServerProviders from "./server-providers";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 
 const themeInitScript = `(() => {
   try {
@@ -44,14 +46,17 @@ export const metadata: Metadata = {
     "Separata UI-världar för Marketing, App och Admin i Next.js App Router med delade providers och komponenter.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
     <html
-      lang="sv"
+      lang={locale}
       className="bg-background text-foreground"
       data-theme="light"
       style={{ colorScheme: "light" }}
@@ -59,9 +64,11 @@ export default function RootLayout({
     >
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-        <ServerProviders>
-          {children}
-        </ServerProviders>
+        <NextIntlClientProvider messages={messages}>
+          <ServerProviders>
+            {children}
+          </ServerProviders>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@/components/ui'
 import {
   CheckIcon,
@@ -17,10 +18,10 @@ import { CheckCircleIcon } from '@heroicons/react/24/solid'
 // Types
 interface Plan {
   id: string
-  name: string
+  nameKey: string
   price: number
   interval: 'month' | 'year'
-  features: string[]
+  featureKeys: string[]
   popular?: boolean
 }
 
@@ -32,47 +33,47 @@ interface Invoice {
   description: string
 }
 
-// Mock data
+// Mock data - use translation keys for labels
 const mockPlans: Plan[] = [
   {
     id: 'free',
-    name: 'Gratis',
+    nameKey: 'plans.free',
     price: 0,
     interval: 'month',
-    features: [
-      'Upp till 10 aktiviteter',
-      'Grundläggande statistik',
-      'Begränsade kategorier',
-      'E-postsupport',
+    featureKeys: [
+      'planFeatures.upTo10Activities',
+      'planFeatures.basicStats',
+      'planFeatures.limitedCategories',
+      'planFeatures.emailSupport',
     ],
   },
   {
     id: 'pro',
-    name: 'Pro',
+    nameKey: 'plans.pro',
     price: 99,
     interval: 'month',
-    features: [
-      'Obegränsade aktiviteter',
-      'Avancerad statistik',
-      'Alla kategorier',
-      'Prioriterad support',
-      'Anpassade teman',
-      'Exportera data',
+    featureKeys: [
+      'planFeatures.unlimitedActivities',
+      'planFeatures.advancedStats',
+      'planFeatures.allCategories',
+      'planFeatures.prioritySupport',
+      'planFeatures.customThemes',
+      'planFeatures.exportData',
     ],
     popular: true,
   },
   {
     id: 'team',
-    name: 'Team',
+    nameKey: 'plans.team',
     price: 299,
     interval: 'month',
-    features: [
-      'Allt i Pro',
-      'Upp till 10 användare',
-      'Admin-panel',
-      'Team-statistik',
-      'API-åtkomst',
-      'Dedikerad support',
+    featureKeys: [
+      'planFeatures.everythingInPro',
+      'planFeatures.upTo10Users',
+      'planFeatures.adminPanel',
+      'planFeatures.teamStats',
+      'planFeatures.apiAccess',
+      'planFeatures.dedicatedSupport',
     ],
   },
 ]
@@ -102,6 +103,7 @@ const mockInvoices: Invoice[] = [
 ]
 
 export default function SubscriptionPage() {
+  const t = useTranslations('app.subscription')
   const [selectedTab, setSelectedTab] = useState<'overview' | 'invoices' | 'plans'>('overview')
   const currentPlan = mockPlans[1] // Pro plan
 
@@ -109,8 +111,8 @@ export default function SubscriptionPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Prenumeration</h1>
-        <p className="text-muted-foreground mt-1">Hantera din prenumeration och fakturor</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -120,21 +122,21 @@ export default function SubscriptionPage() {
           size="sm"
           onClick={() => setSelectedTab('overview')}
         >
-          Översikt
+          {t('tabs.overview')}
         </Button>
         <Button
           variant={selectedTab === 'plans' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setSelectedTab('plans')}
         >
-          Planer
+          {t('tabs.plans')}
         </Button>
         <Button
           variant={selectedTab === 'invoices' ? 'default' : 'ghost'}
           size="sm"
           onClick={() => setSelectedTab('invoices')}
         >
-          Fakturor
+          {t('tabs.invoices')}
         </Button>
       </div>
 
@@ -147,17 +149,17 @@ export default function SubscriptionPage() {
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Badge variant="primary">Aktiv</Badge>
-                    <Badge variant="accent">Pro</Badge>
+                    <Badge variant="primary">{t('status.active')}</Badge>
+                    <Badge variant="accent">{t('plans.pro')}</Badge>
                   </div>
-                  <h2 className="text-2xl font-bold text-foreground">Pro-plan</h2>
+                  <h2 className="text-2xl font-bold text-foreground">{t('currentPlan.proPlan')}</h2>
                   <p className="text-muted-foreground mt-1">
-                    Obegränsad tillgång till alla funktioner
+                    {t('currentPlan.unlimited')}
                   </p>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-primary">99 kr</div>
-                  <div className="text-sm text-muted-foreground">per månad</div>
+                  <div className="text-sm text-muted-foreground">{t('currentPlan.perMonth')}</div>
                 </div>
               </div>
 
@@ -165,7 +167,7 @@ export default function SubscriptionPage() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <CalendarDaysIcon className="h-4 w-4" />
-                    <span>Förnyas: 1 februari 2025</span>
+                    <span>{t('currentPlan.renews', { date: '1 februari 2025' })}</span>
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <CreditCardIcon className="h-4 w-4" />
@@ -177,10 +179,10 @@ export default function SubscriptionPage() {
               <div className="mt-6 flex gap-3">
                 <Button variant="outline">
                   <ArrowPathIcon className="h-4 w-4 mr-1" />
-                  Byt plan
+                  {t('currentPlan.changePlan')}
                 </Button>
                 <Button variant="ghost" className="text-red-500 hover:text-red-600">
-                  Avbryt prenumeration
+                  {t('currentPlan.cancel')}
                 </Button>
               </div>
             </CardContent>
@@ -191,15 +193,15 @@ export default function SubscriptionPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <SparklesIcon className="h-5 w-5 text-primary" />
-                Dina funktioner
+                {t('features.title')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ul className="grid gap-2 sm:grid-cols-2">
-                {currentPlan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-foreground">
+                {currentPlan.featureKeys.map((featureKey) => (
+                  <li key={featureKey} className="flex items-center gap-2 text-foreground">
                     <CheckCircleIcon className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    {feature}
+                    {t(featureKey as 'planFeatures.unlimitedActivities')}
                   </li>
                 ))}
               </ul>
@@ -211,19 +213,19 @@ export default function SubscriptionPage() {
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-primary">∞</div>
-                <div className="text-sm text-muted-foreground">Aktiviteter</div>
+                <div className="text-sm text-muted-foreground">{t('stats.activities')}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-accent">247</div>
-                <div className="text-sm text-muted-foreground">Använda idag</div>
+                <div className="text-sm text-muted-foreground">{t('stats.usedToday')}</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-yellow-500">12</div>
-                <div className="text-sm text-muted-foreground">Månader medlem</div>
+                <div className="text-sm text-muted-foreground">{t('stats.monthsMember')}</div>
               </CardContent>
             </Card>
           </div>
@@ -245,7 +247,7 @@ export default function SubscriptionPage() {
               >
                 {plan.popular && (
                   <div className="absolute top-0 right-0 bg-primary text-white text-xs px-3 py-1 rounded-bl-lg">
-                    Populärast
+                    {t('plans.popular')}
                   </div>
                 )}
                 <CardContent className="p-6">
@@ -253,19 +255,19 @@ export default function SubscriptionPage() {
                     {plan.id === 'free' && <StarIcon className="h-6 w-6 text-muted-foreground" />}
                     {plan.id === 'pro' && <SparklesIcon className="h-6 w-6 text-primary" />}
                     {plan.id === 'team' && <RocketLaunchIcon className="h-6 w-6 text-accent" />}
-                    <h3 className="text-lg font-bold">{plan.name}</h3>
+                    <h3 className="text-lg font-bold">{t(plan.nameKey as 'plans.free')}</h3>
                   </div>
 
                   <div className="mb-4">
                     <span className="text-3xl font-bold">{plan.price} kr</span>
-                    <span className="text-muted-foreground">/månad</span>
+                    <span className="text-muted-foreground">{t('plans.perMonth')}</span>
                   </div>
 
                   <ul className="space-y-2 mb-6">
-                    {plan.features.map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {plan.featureKeys.map((featureKey) => (
+                      <li key={featureKey} className="flex items-center gap-2 text-sm text-muted-foreground">
                         <CheckIcon className="h-4 w-4 text-green-500" />
-                        {feature}
+                        {t(featureKey as 'planFeatures.unlimitedActivities')}
                       </li>
                     ))}
                   </ul>
@@ -275,7 +277,7 @@ export default function SubscriptionPage() {
                     className="w-full"
                     disabled={isCurrent}
                   >
-                    {isCurrent ? 'Nuvarande plan' : 'Välj plan'}
+                    {isCurrent ? t('plans.current') : t('plans.select')}
                   </Button>
                 </CardContent>
               </Card>
@@ -290,7 +292,7 @@ export default function SubscriptionPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <DocumentTextIcon className="h-5 w-5 text-muted-foreground" />
-              Faktureringshistorik
+              {t('invoices.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -307,7 +309,7 @@ export default function SubscriptionPage() {
                     <div>
                       <div className="font-medium text-foreground">{invoice.description}</div>
                       <div className="text-sm text-muted-foreground">
-                        {new Date(invoice.date).toLocaleDateString('sv-SE')}
+                        {new Date(invoice.date).toLocaleDateString()}
                       </div>
                     </div>
                   </div>
@@ -321,15 +323,11 @@ export default function SubscriptionPage() {
                           : 'destructive'
                       }
                     >
-                      {invoice.status === 'paid'
-                        ? 'Betald'
-                        : invoice.status === 'pending'
-                        ? 'Väntande'
-                        : 'Misslyckad'}
+                      {t(`invoices.${invoice.status}` as 'invoices.paid')}
                     </Badge>
                     <span className="font-medium">{invoice.amount} kr</span>
                     <Button size="sm" variant="ghost">
-                      Ladda ner
+                      {t('invoices.download')}
                     </Button>
                   </div>
                 </div>

@@ -649,6 +649,90 @@
         "consumeSuccessTitle": "Used"
       },
       "new": "New!"
+    },
+    "subscription": {
+      "title": "Subscription",
+      "subtitle": "Manage your subscription and invoices",
+      "tabs": {
+        "overview": "Overview",
+        "plans": "Plans",
+        "invoices": "Invoices"
+      },
+      "status": {
+        "active": "Active"
+      },
+      "currentPlan": {
+        "proPlan": "Pro plan",
+        "unlimited": "Unlimited access to all features",
+        "perMonth": "per month",
+        "renews": "Renews: {date}",
+        "changePlan": "Change plan",
+        "cancel": "Cancel subscription"
+      },
+      "features": {
+        "title": "Your features"
+      },
+      "stats": {
+        "activities": "Activities",
+        "usedToday": "Used today",
+        "monthsMember": "Months member"
+      },
+      "plans": {
+        "free": "Free",
+        "pro": "Pro",
+        "team": "Team",
+        "popular": "Most popular",
+        "perMonth": "/month",
+        "current": "Current plan",
+        "select": "Select plan"
+      },
+      "planFeatures": {
+        "upTo10Activities": "Up to 10 activities",
+        "basicStats": "Basic statistics",
+        "limitedCategories": "Limited categories",
+        "emailSupport": "Email support",
+        "unlimitedActivities": "Unlimited activities",
+        "advancedStats": "Advanced statistics",
+        "allCategories": "All categories",
+        "prioritySupport": "Priority support",
+        "customThemes": "Custom themes",
+        "exportData": "Export data",
+        "everythingInPro": "Everything in Pro",
+        "upTo10Users": "Up to 10 users",
+        "adminPanel": "Admin panel",
+        "teamStats": "Team statistics",
+        "apiAccess": "API access",
+        "dedicatedSupport": "Dedicated support"
+      },
+      "invoices": {
+        "title": "Billing history",
+        "paid": "Paid",
+        "pending": "Pending",
+        "failed": "Failed",
+        "download": "Download"
+      }
+    },
+    "learning": {
+      "title": "My Education",
+      "subtitle": "Track your progress and complete courses",
+      "progress": {
+        "coursesComplete": "Courses completed",
+        "paths": "Learning paths",
+        "xpEarned": "XP earned",
+        "achievements": "Achievements",
+        "courses": "courses",
+        "progressLabel": "Progress"
+      },
+      "courses": "Courses",
+      "status": {
+        "completed": "Completed",
+        "inProgress": "In progress",
+        "locked": "Locked",
+        "available": "Available"
+      },
+      "percentComplete": "{percent}% complete",
+      "passedWith": "Passed with {score}%",
+      "coins": "coins"
     }
   },
   "auth": {

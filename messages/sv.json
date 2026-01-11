@@ -649,6 +649,90 @@
         "consumeSuccessTitle": "Använd"
       },
       "new": "Ny!"
+    },
+    "subscription": {
+      "title": "Prenumeration",
+      "subtitle": "Hantera din prenumeration och fakturor",
+      "tabs": {
+        "overview": "Översikt",
+        "plans": "Planer",
+        "invoices": "Fakturor"
+      },
+      "status": {
+        "active": "Aktiv"
+      },
+      "currentPlan": {
+        "proPlan": "Pro-plan",
+        "unlimited": "Obegränsad tillgång till alla funktioner",
+        "perMonth": "per månad",
+        "renews": "Förnyas: {date}",
+        "changePlan": "Byt plan",
+        "cancel": "Avbryt prenumeration"
+      },
+      "features": {
+        "title": "Dina funktioner"
+      },
+      "stats": {
+        "activities": "Aktiviteter",
+        "usedToday": "Använda idag",
+        "monthsMember": "Månader medlem"
+      },
+      "plans": {
+        "free": "Gratis",
+        "pro": "Pro",
+        "team": "Team",
+        "popular": "Populärast",
+        "perMonth": "/månad",
+        "current": "Nuvarande plan",
+        "select": "Välj plan"
+      },
+      "planFeatures": {
+        "upTo10Activities": "Upp till 10 aktiviteter",
+        "basicStats": "Grundläggande statistik",
+        "limitedCategories": "Begränsade kategorier",
+        "emailSupport": "E-postsupport",
+        "unlimitedActivities": "Obegränsade aktiviteter",
+        "advancedStats": "Avancerad statistik",
+        "allCategories": "Alla kategorier",
+        "prioritySupport": "Prioriterad support",
+        "customThemes": "Anpassade teman",
+        "exportData": "Exportera data",
+        "everythingInPro": "Allt i Pro",
+        "upTo10Users": "Upp till 10 användare",
+        "adminPanel": "Admin-panel",
+        "teamStats": "Team-statistik",
+        "apiAccess": "API-åtkomst",
+        "dedicatedSupport": "Dedikerad support"
+      },
+      "invoices": {
+        "title": "Faktureringshistorik",
+        "paid": "Betald",
+        "pending": "Väntande",
+        "failed": "Misslyckad",
+        "download": "Ladda ner"
+      }
+    },
+    "learning": {
+      "title": "Min Utbildning",
+      "subtitle": "Följ din framsteg och slutför kurser",
+      "progress": {
+        "coursesComplete": "Kurser klara",
+        "paths": "Lärstigar",
+        "xpEarned": "XP intjänade",
+        "achievements": "Prestationer",
+        "courses": "kurser",
+        "progressLabel": "Framsteg"
+      },
+      "courses": "Kurser",
+      "status": {
+        "completed": "Avklarad",
+        "inProgress": "Pågår",
+        "locked": "Låst",
+        "available": "Tillgänglig"
+      },
+      "percentComplete": "{percent}% klart",
+      "passedWith": "Godkänd med {score}%",
+      "coins": "mynt"
     }
   },
   "auth": {

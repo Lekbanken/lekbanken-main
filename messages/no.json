@@ -649,6 +649,90 @@
         "consumeSuccessTitle": "Brukt"
       },
       "new": "Ny!"
+    },
+    "subscription": {
+      "title": "Abonnement",
+      "subtitle": "Administrer abonnementet og fakturaene dine",
+      "tabs": {
+        "overview": "Oversikt",
+        "plans": "Planer",
+        "invoices": "Fakturaer"
+      },
+      "status": {
+        "active": "Aktiv"
+      },
+      "currentPlan": {
+        "proPlan": "Pro-plan",
+        "unlimited": "Ubegrenset tilgang til alle funksjoner",
+        "perMonth": "per måned",
+        "renews": "Fornyes: {date}",
+        "changePlan": "Bytt plan",
+        "cancel": "Avbryt abonnement"
+      },
+      "features": {
+        "title": "Dine funksjoner"
+      },
+      "stats": {
+        "activities": "Aktiviteter",
+        "usedToday": "Brukt i dag",
+        "monthsMember": "Måneder medlem"
+      },
+      "plans": {
+        "free": "Gratis",
+        "pro": "Pro",
+        "team": "Team",
+        "popular": "Mest populær",
+        "perMonth": "/måned",
+        "current": "Nåværende plan",
+        "select": "Velg plan"
+      },
+      "planFeatures": {
+        "upTo10Activities": "Opptil 10 aktiviteter",
+        "basicStats": "Grunnleggende statistikk",
+        "limitedCategories": "Begrensede kategorier",
+        "emailSupport": "E-poststøtte",
+        "unlimitedActivities": "Ubegrensede aktiviteter",
+        "advancedStats": "Avansert statistikk",
+        "allCategories": "Alle kategorier",
+        "prioritySupport": "Prioritert støtte",
+        "customThemes": "Egendefinerte temaer",
+        "exportData": "Eksporter data",
+        "everythingInPro": "Alt i Pro",
+        "upTo10Users": "Opptil 10 brukere",
+        "adminPanel": "Admin-panel",
+        "teamStats": "Team-statistikk",
+        "apiAccess": "API-tilgang",
+        "dedicatedSupport": "Dedikert støtte"
+      },
+      "invoices": {
+        "title": "Faktureringshistorikk",
+        "paid": "Betalt",
+        "pending": "Venter",
+        "failed": "Mislykket",
+        "download": "Last ned"
+      }
+    },
+    "learning": {
+      "title": "Min Utdanning",
+      "subtitle": "Følg fremgangen din og fullfør kurs",
+      "progress": {
+        "coursesComplete": "Kurs fullført",
+        "paths": "Læringsstier",
+        "xpEarned": "XP opptjent",
+        "achievements": "Prestasjoner",
+        "courses": "kurs",
+        "progressLabel": "Fremgang"
+      },
+      "courses": "Kurs",
+      "status": {
+        "completed": "Fullført",
+        "inProgress": "Pågår",
+        "locked": "Låst",
+        "available": "Tilgjengelig"
+      },
+      "percentComplete": "{percent}% fullført",
+      "passedWith": "Bestått med {score}%",
+      "coins": "mynter"
     }
   },
   "auth": {

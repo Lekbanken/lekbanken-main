@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import { useTranslations } from 'next-intl'
 import {
   AcademicCapIcon,
   BookOpenIcon,
@@ -72,25 +73,25 @@ const mockPath = {
 
 const statusConfig = {
   completed: { 
-    label: "Avklarad", 
+    labelKey: "status.completed", 
     variant: "default" as const, 
     bgColor: "bg-green-500/10",
     textColor: "text-green-600",
   },
   "in-progress": { 
-    label: "Pågår", 
+    labelKey: "status.inProgress", 
     variant: "secondary" as const,
     bgColor: "bg-blue-500/10",
     textColor: "text-blue-600",
   },
   locked: { 
-    label: "Låst", 
+    labelKey: "status.locked", 
     variant: "outline" as const,
     bgColor: "bg-muted",
     textColor: "text-muted-foreground",
   },
   available: { 
-    label: "Tillgänglig", 
+    labelKey: "status.available", 
     variant: "outline" as const,
     bgColor: "bg-primary/10",
     textColor: "text-primary",
@@ -98,6 +99,8 @@ const statusConfig = {
 };
 
 export default function LearningDashboardPage() {
+  const t = useTranslations('app.learning')
+  
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
@@ -107,8 +110,8 @@ export default function LearningDashboardPage() {
             <AcademicCapIcon className="h-6 w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Min Utbildning</h1>
-            <p className="text-muted-foreground">Följ din framsteg och slutför kurser</p>
+            <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('subtitle')}</p>
           </div>
         </div>
       </div>
@@ -124,7 +127,7 @@ export default function LearningDashboardPage() {
               <p className="text-xl font-bold">
                 {mockUserProgress.coursesCompleted}/{mockUserProgress.totalCourses}
               </p>
-              <p className="text-xs text-muted-foreground">Kurser klara</p>
+              <p className="text-xs text-muted-foreground">{t('progress.coursesComplete')}</p>
             </div>
           </CardContent>
         </Card>
@@ -137,7 +140,7 @@ export default function LearningDashboardPage() {
               <p className="text-xl font-bold">
                 {mockUserProgress.pathsCompleted}/{mockUserProgress.totalPaths}
               </p>
-              <p className="text-xs text-muted-foreground">Lärstigar</p>
+              <p className="text-xs text-muted-foreground">{t('progress.paths')}</p>
             </div>
           </CardContent>
         </Card>
@@ -148,7 +151,7 @@ export default function LearningDashboardPage() {
             </div>
             <div>
               <p className="text-xl font-bold">{mockUserProgress.xpEarned}</p>
-              <p className="text-xs text-muted-foreground">XP intjänade</p>
+              <p className="text-xs text-muted-foreground">{t('progress.xpEarned')}</p>
             </div>
           </CardContent>
         </Card>
@@ -159,7 +162,7 @@ export default function LearningDashboardPage() {
             </div>
             <div>
               <p className="text-xl font-bold">{mockUserProgress.achievementsUnlocked}</p>
-              <p className="text-xs text-muted-foreground">Prestationer</p>
+              <p className="text-xs text-muted-foreground">{t('progress.achievements')}</p>
             </div>
           </CardContent>
         </Card>
@@ -179,14 +182,14 @@ export default function LearningDashboardPage() {
               </div>
             </div>
             <Badge variant="secondary">
-              {mockPath.coursesCompleted}/{mockPath.totalCourses} kurser
+              {mockPath.coursesCompleted}/{mockPath.totalCourses} {t('progress.courses')}
             </Badge>
           </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Framsteg</span>
+              <span className="text-muted-foreground">{t('progress.progressLabel')}</span>
               <span className="font-medium">{mockPath.progress}%</span>
             </div>
             <Progress value={mockPath.progress} className="h-2" />
@@ -198,7 +201,7 @@ export default function LearningDashboardPage() {
       <div className="space-y-4">
         <h2 className="flex items-center gap-2 text-lg font-semibold">
           <BookOpenIcon className="h-5 w-5" />
-          Kurser
+          {t('courses')}
         </h2>
 
         {mockCourses.map((course) => {
@@ -232,7 +235,7 @@ export default function LearningDashboardPage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-foreground">{course.title}</h3>
-                        <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                        <Badge variant={statusInfo.variant}>{t(statusInfo.labelKey as 'status.completed')}</Badge>
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground">{course.description}</p>
                       
@@ -240,7 +243,7 @@ export default function LearningDashboardPage() {
                       {course.status === "in-progress" && course.progress !== undefined && (
                         <div className="mt-3">
                           <Progress value={course.progress} className="h-1.5" />
-                          <p className="mt-1 text-xs text-muted-foreground">{course.progress}% klart</p>
+                          <p className="mt-1 text-xs text-muted-foreground">{t('percentComplete', { percent: course.progress })}</p>
                         </div>
                       )}
 
@@ -252,7 +255,7 @@ export default function LearningDashboardPage() {
                       {/* Completed score */}
                       {course.status === "completed" && course.score !== undefined && (
                         <p className="mt-2 text-sm text-green-600">
-                          ✓ Godkänd med {course.score}%
+                          ✓ {t('passedWith', { score: course.score })}
                         </p>
                       )}
 
@@ -267,7 +270,7 @@ export default function LearningDashboardPage() {
                           +{course.rewards.xp} XP
                         </span>
                         <span className="flex items-center gap-1">
-                          🪙 +{course.rewards.coins} mynt
+                          🪙 +{course.rewards.coins} {t('coins')}
                         </span>
                       </div>
                     </div>

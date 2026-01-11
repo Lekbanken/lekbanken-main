@@ -535,27 +535,19 @@ export async function trackFAQHelpful(params: {
     // Increment the appropriate counter
     const column = params.helpful ? 'helpful_count' : 'not_helpful_count'
     
-    const { error: updateError } = await supabase.rpc('increment_faq_counter', {
-      faq_id: params.id,
-      counter_name: column,
-    })
+    // Get current value and increment
+    const { data: current } = await supabase
+      .from('support_faq_entries')
+      .select(column)
+      .eq('id', params.id)
+      .single()
     
-    // If RPC doesn't exist, fall back to direct update
-    if (updateError) {
-      // Get current value and increment
-      const { data: current } = await supabase
+    if (current) {
+      const newValue = ((current as Record<string, number>)[column] ?? 0) + 1
+      await supabase
         .from('support_faq_entries')
-        .select(column)
+        .update({ [column]: newValue })
         .eq('id', params.id)
-        .single()
-      
-      if (current) {
-        const newValue = ((current as Record<string, number>)[column] ?? 0) + 1
-        await supabase
-          .from('support_faq_entries')
-          .update({ [column]: newValue })
-          .eq('id', params.id)
-      }
     }
     
     return { success: true }

@@ -6,16 +6,17 @@
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import { checkIsSystemAdmin } from '@/app/actions/tickets-admin';
 import { 
   listRoutingRules, 
   listNotificationTemplates,
   runSlaEscalation,
 } from '@/app/actions/support-automation';
-import { Heading, Subheading, Text } from '@/catalyst-ui-kit/typescript/heading';
+import { Heading, Subheading } from '@/catalyst-ui-kit/typescript/heading';
+import { Text } from '@/catalyst-ui-kit/typescript/text';
 import { Badge } from '@/catalyst-ui-kit/typescript/badge';
-import { Button } from '@/catalyst-ui-kit/typescript/button';
+import { Button } from '@/components/ui';
 import { 
   Table, 
   TableHead, 
@@ -54,7 +55,7 @@ function EscalationButton() {
 
   return (
     <form action={handleEscalation}>
-      <Button type="submit" color="amber" className="gap-2">
+      <Button type="submit" variant="primary" className="gap-2">
         <PlayIcon className="h-4 w-4" />
         Kör SLA-eskalering nu
       </Button>
@@ -77,7 +78,7 @@ async function RoutingRulesSection() {
           <CogIcon className="h-6 w-6 text-zinc-500" />
           <Subheading>Routingregler</Subheading>
         </div>
-        <Button href="/admin/support/automation/rules/new" color="dark" className="gap-2">
+        <Button href="/admin/support/automation/rules/new" variant="default" className="gap-2">
           <PlusIcon className="h-4 w-4" />
           Ny regel
         </Button>
@@ -94,7 +95,7 @@ async function RoutingRulesSection() {
           <Text className="mt-2">Inga routingregler har skapats än.</Text>
           <Button 
             href="/admin/support/automation/rules/new" 
-            color="dark" 
+            variant="default" 
             className="mt-4 gap-2"
           >
             <PlusIcon className="h-4 w-4" />
@@ -172,7 +173,7 @@ async function NotificationTemplatesSection() {
           <BellIcon className="h-6 w-6 text-zinc-500" />
           <Subheading>Notifikationsmallar</Subheading>
         </div>
-        <Button href="/admin/support/automation/templates/new" color="dark" className="gap-2">
+        <Button href="/admin/support/automation/templates/new" variant="default" className="gap-2">
           <PlusIcon className="h-4 w-4" />
           Ny mall
         </Button>
@@ -330,7 +331,7 @@ export default async function SupportAutomationPage() {
             Konfigurera automatiska regler, mallar och SLA-inställningar för ärendehantering.
           </Text>
         </div>
-        <Button href="/admin/support" outline className="gap-2">
+        <Button href="/admin/support" variant="outline" className="gap-2">
           <ArrowPathIcon className="h-4 w-4" />
           Tillbaka till Support
         </Button>

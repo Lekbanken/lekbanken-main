@@ -732,7 +732,6 @@ export async function addTicketMessage(input: AddMessageInput): Promise<{
         ticketTitle: ticket.title,
         eventType: 'admin_reply',
         messageId: msgData.id, // For idempotency - prevents duplicate notifications
-        eventType: 'admin_reply',
       });
     }
 

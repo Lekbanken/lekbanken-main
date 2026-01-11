@@ -152,7 +152,6 @@ export default function SupportPage() {
     if (activeTab === 'tickets') {
       loadTickets()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
   // Load FAQs when the faq tab is activated
@@ -160,7 +159,6 @@ export default function SupportPage() {
     if (activeTab === 'faq') {
       loadFAQs()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
   const handleSubmit = async () => {

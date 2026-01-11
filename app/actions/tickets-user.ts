@@ -345,7 +345,7 @@ export async function addUserTicketMessage(input: AddUserMessageInput): Promise<
     }
 
     // Update ticket's updated_at and potentially status
-    const updateData: { updated_at: string; status?: string } = {
+    const updateData: { updated_at: string; status?: 'open' | 'in_progress' | 'waiting_for_user' | 'resolved' | 'closed' } = {
       updated_at: new Date().toISOString(),
     };
     

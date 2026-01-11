@@ -183,7 +183,6 @@ export default function SupportHubPage() {
   // Initial access check
   useEffect(() => {
     checkAccess()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Load data when access is confirmed or tenant changes
@@ -191,7 +190,6 @@ export default function SupportHubPage() {
     if (hasAccess) {
       loadData()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasAccess, selectedTenantId])
 
   if (error) {

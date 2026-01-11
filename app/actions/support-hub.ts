@@ -601,7 +601,7 @@ export async function listTenantsForSupportHub(): Promise<{
 
 export interface NotificationHistoryItem {
   id: string
-  user_id: string
+  user_id: string | null
   user_email?: string | null
   tenant_id: string
   tenant_name?: string | null
@@ -609,10 +609,10 @@ export interface NotificationHistoryItem {
   message: string
   type: string
   category: string | null
-  is_read: boolean
+  is_read: boolean | null
   action_url: string | null
   event_key: string | null
-  created_at: string
+  created_at: string | null
 }
 
 export async function listRecentNotifications(params: {

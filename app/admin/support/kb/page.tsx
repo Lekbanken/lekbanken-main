@@ -1,16 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import Link from 'next/link'
-import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Textarea, Select } from '@/components/ui'
+import { useState, useEffect, useCallback } from 'react'
+import { Button, Card, CardContent, Badge, Input, Textarea, Select } from '@/components/ui'
 import {
   BookOpenIcon,
   PlusIcon,
   PencilIcon,
-  TrashIcon,
   MagnifyingGlassIcon,
-  XMarkIcon,
-  CheckIcon,
   EyeIcon,
   EyeSlashIcon,
   ChevronLeftIcon,
@@ -56,17 +52,7 @@ export default function KnowledgeBaseAdminPage() {
   const [formIsPublished, setFormIsPublished] = useState(false)
   const [formTenantId, setFormTenantId] = useState<string | null>(null)
 
-  useEffect(() => {
-    checkAccess()
-  }, [])
-
-  useEffect(() => {
-    if (hasAccess) {
-      loadData()
-    }
-  }, [hasAccess, selectedTenantId, searchQuery, categoryFilter, showUnpublished])
-
-  async function checkAccess() {
+  const checkAccessFn = useCallback(async () => {
     const result = await checkSupportHubAccess()
     if (!result.hasAccess) {
       setError(result.error || 'Ingen åtkomst')
@@ -84,9 +70,9 @@ export default function KnowledgeBaseAdminPage() {
     } else if (result.tenantIds.length > 0) {
       setSelectedTenantId(result.tenantIds[0])
     }
-  }
+  }, [])
 
-  async function loadData() {
+  const loadData = useCallback(async () => {
     setLoading(true)
     
     const [entriesResult, categoriesResult] = await Promise.all([
@@ -108,7 +94,17 @@ export default function KnowledgeBaseAdminPage() {
     }
     
     setLoading(false)
-  }
+  }, [selectedTenantId, showUnpublished, categoryFilter, searchQuery])
+
+  useEffect(() => {
+    checkAccessFn()
+  }, [checkAccessFn])
+
+  useEffect(() => {
+    if (hasAccess) {
+      loadData()
+    }
+  }, [hasAccess, loadData])
 
   function openCreateForm() {
     setFormQuestion('')
@@ -211,7 +207,7 @@ export default function KnowledgeBaseAdminPage() {
       <AdminPageLayout>
         <AdminErrorState
           title="Ingen åtkomst"
-          message={error}
+          description={error}
           onRetry={() => window.location.reload()}
         />
       </AdminPageLayout>
@@ -431,12 +427,11 @@ export default function KnowledgeBaseAdminPage() {
           icon={<BookOpenIcon className="h-12 w-12" />}
           title="Inga FAQ ännu"
           description="Skapa din första FAQ för att hjälpa användare hitta svar."
-          action={
-            <Button onClick={openCreateForm}>
-              <PlusIcon className="h-4 w-4 mr-1" />
-              Skapa FAQ
-            </Button>
-          }
+          action={{
+            label: 'Skapa FAQ',
+            onClick: openCreateForm,
+            icon: <PlusIcon className="h-4 w-4" />
+          }}
         />
       ) : (
         <div className="space-y-3">

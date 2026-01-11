@@ -251,12 +251,12 @@ export default function NotificationHistoryPage() {
                       
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground">
                         <span>
-                          Till: {notification.user_email || notification.user_id.slice(0, 8)}
+                          Till: {notification.user_email || notification.user_id?.slice(0, 8) || 'Okänd'}
                         </span>
                         {isSystemAdmin && notification.tenant_name && (
                           <span>Org: {notification.tenant_name}</span>
                         )}
-                        <span>{formatDate(notification.created_at)}</span>
+                        <span>{notification.created_at ? formatDate(notification.created_at) : ''}</span>
                         {notification.event_key && (
                           <span className="font-mono text-xs opacity-60" title={notification.event_key}>
                             {notification.event_key.length > 30 

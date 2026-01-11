@@ -20,10 +20,9 @@ export default function FeedbackAdminPage() {
   const [isSystemAdmin, setIsSystemAdmin] = useState(false);
   const [stats, setStats] = useState<{
     total: number;
-    suggestions: number;
-    compliments: number;
-    complaints: number;
-    questions: number;
+    feature_request: number;
+    bug: number;
+    improvement: number;
     other: number;
     averageRating: number | null;
   } | null>(null);
@@ -168,26 +167,22 @@ export default function FeedbackAdminPage() {
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">{stats.total}</div>
             <div className="text-sm text-gray-500 dark:text-gray-400">Total</div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-blue-600">{stats.suggestions}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Suggestions</div>
+            <div className="text-2xl font-bold text-blue-600">{stats.feature_request}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Feature Requests</div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-green-600">{stats.compliments}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Compliments</div>
+            <div className="text-2xl font-bold text-red-600">{stats.bug}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Bugs</div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-red-600">{stats.complaints}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Complaints</div>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-            <div className="text-2xl font-bold text-purple-600">{stats.questions}</div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">Questions</div>
+            <div className="text-2xl font-bold text-green-600">{stats.improvement}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Improvements</div>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
             <div className="text-2xl font-bold text-gray-600 dark:text-gray-300">{stats.other}</div>

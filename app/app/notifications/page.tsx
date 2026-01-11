@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Button, Card, CardContent, Badge } from '@/components/ui'
+import { Button, Card, CardContent } from '@/components/ui'
 import {
   BellIcon,
   CheckIcon,
@@ -17,7 +17,6 @@ import {
   TicketIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
-import { BellIcon as BellSolidIcon } from '@heroicons/react/24/solid'
 import {
   getUserNotifications,
   markNotificationAsRead,
@@ -103,11 +102,7 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
   const [isMarkingAll, setIsMarkingAll] = useState(false)
 
-  useEffect(() => {
-    loadNotifications()
-  }, [])
-
-  async function loadNotifications() {
+  const loadNotifications = useCallback(async () => {
     setLoading(true)
     setError(null)
     
@@ -120,7 +115,11 @@ export default function NotificationsPage() {
     }
     
     setLoading(false)
-  }
+  }, [])
+
+  useEffect(() => {
+    loadNotifications()
+  }, [loadNotifications])
 
   const filteredNotifications = notifications.filter((n) => {
     if (filter === 'unread') return !n.is_read

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Textarea } from '@/components/ui'
@@ -8,7 +8,6 @@ import {
   ArrowLeftIcon,
   PaperAirplaneIcon,
   ChatBubbleLeftRightIcon,
-  ClockIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
@@ -17,20 +16,21 @@ import { getUserTicket, listUserTicketMessages, addUserTicketMessage } from '@/a
 interface Ticket {
   id: string
   title: string
-  description: string
+  description: string | null
   status: 'open' | 'in_progress' | 'resolved' | 'closed'
   priority: 'low' | 'medium' | 'high'
-  category: string
+  category: string | null
   created_at: string
   updated_at: string
+  user_id: string
 }
 
 interface Message {
   id: string
-  content: string
+  message: string
   created_at: string
-  is_from_support: boolean
-  sender_email?: string
+  user_id: string
+  is_internal: boolean
 }
 
 function getStatusVariant(status: string) {
@@ -105,11 +105,7 @@ export default function TicketDetailPage() {
   const [sending, setSending] = useState(false)
   const [sendError, setSendError] = useState<string | null>(null)
 
-  useEffect(() => {
-    loadTicketData()
-  }, [ticketId])
-
-  async function loadTicketData() {
+  const loadTicketData = useCallback(async () => {
     setLoading(true)
     setError(null)
     
@@ -124,14 +120,18 @@ export default function TicketDetailPage() {
       return
     }
     
-    setTicket(ticketResult.data)
+    setTicket(ticketResult.data as Ticket)
     
     if (messagesResult.success && messagesResult.data) {
-      setMessages(messagesResult.data)
+      setMessages(messagesResult.data as Message[])
     }
     
     setLoading(false)
-  }
+  }, [ticketId])
+
+  useEffect(() => {
+    loadTicketData()
+  }, [loadTicketData])
 
   async function handleSendMessage() {
     if (!newMessage.trim()) return
@@ -141,7 +141,7 @@ export default function TicketDetailPage() {
     
     const result = await addUserTicketMessage({
       ticketId,
-      content: newMessage.trim(),
+      message: newMessage.trim(),
     })
     
     setSending(false)
@@ -151,7 +151,7 @@ export default function TicketDetailPage() {
       // Reload messages
       const messagesResult = await listUserTicketMessages(ticketId)
       if (messagesResult.success && messagesResult.data) {
-        setMessages(messagesResult.data)
+        setMessages(messagesResult.data as Message[])
       }
     } else {
       setSendError(result.error || 'Kunde inte skicka meddelandet')
@@ -250,7 +250,7 @@ export default function TicketDetailPage() {
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div>
               <p className="text-muted-foreground">Kategori</p>
-              <p className="font-medium text-foreground">{getCategoryLabel(ticket.category)}</p>
+              <p className="font-medium text-foreground">{getCategoryLabel(ticket.category || 'general')}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Prioritet</p>
@@ -291,33 +291,37 @@ export default function TicketDetailPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.is_from_support ? 'justify-start' : 'justify-end'}`}
-                >
+              {messages.map((message) => {
+                // Support messages are from users other than the ticket owner
+                const isFromSupport = message.user_id !== ticket.user_id
+                return (
                   <div
-                    className={`max-w-[80%] rounded-lg p-4 ${
-                      message.is_from_support
-                        ? 'bg-muted text-foreground'
-                        : 'bg-primary text-primary-foreground'
-                    }`}
+                    key={message.id}
+                    className={`flex ${isFromSupport ? 'justify-start' : 'justify-end'}`}
                   >
-                    {message.is_from_support && (
-                      <p className="text-xs font-medium mb-1 opacity-80">
-                        Support
+                    <div
+                      className={`max-w-[80%] rounded-lg p-4 ${
+                        isFromSupport
+                          ? 'bg-muted text-foreground'
+                          : 'bg-primary text-primary-foreground'
+                      }`}
+                    >
+                      {isFromSupport && (
+                        <p className="text-xs font-medium mb-1 opacity-80">
+                          Support
+                        </p>
+                      )}
+                      <p className="whitespace-pre-wrap">{message.message}</p>
+                      <p className={`text-xs mt-2 ${isFromSupport ? 'text-muted-foreground' : 'opacity-80'}`}>
+                        {new Date(message.created_at).toLocaleString('sv-SE', {
+                          dateStyle: 'short',
+                          timeStyle: 'short',
+                        })}
                       </p>
-                    )}
-                    <p className="whitespace-pre-wrap">{message.content}</p>
-                    <p className={`text-xs mt-2 ${message.is_from_support ? 'text-muted-foreground' : 'opacity-80'}`}>
-                      {new Date(message.created_at).toLocaleString('sv-SE', {
-                        dateStyle: 'short',
-                        timeStyle: 'short',
-                      })}
-                    </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
 

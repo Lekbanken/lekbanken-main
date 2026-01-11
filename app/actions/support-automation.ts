@@ -16,6 +16,8 @@ import { isSystemAdmin } from '@/lib/utils/tenantAuth';
 
 import type { Database } from '@/types/supabase';
 
+type TicketPriorityEnum = Database['public']['Enums']['ticket_priority_enum'];
+
 // ============================================
 // TYPES
 // ============================================
@@ -27,10 +29,10 @@ export interface RoutingRule {
   name: string;
   description: string | null;
   match_category: string | null;
-  match_priority: string | null;
+  match_priority: TicketPriorityEnum | null;
   match_tenant_id: string | null;
   assign_to_user_id: string | null;
-  set_priority: string | null;
+  set_priority: TicketPriorityEnum | null;
   set_sla_hours: number | null;
   add_tags: string[];
   is_active: boolean;
@@ -47,10 +49,10 @@ export interface CreateRoutingRuleInput {
   name: string;
   description?: string | null;
   matchCategory?: string | null;
-  matchPriority?: string | null;
+  matchPriority?: TicketPriorityEnum | null;
   matchTenantId?: string | null;
   assignToUserId?: string | null;
-  setPriority?: string | null;
+  setPriority?: TicketPriorityEnum | null;
   setSlaHours?: number | null;
   priorityOrder?: number;
 }
@@ -218,23 +220,25 @@ export async function createRoutingRule(input: CreateRoutingRuleInput): Promise<
   }
 
   try {
-    const supabase = await createServiceRoleClient();
+    const supabase = createServiceRoleClient();
+
+    const insertData = {
+      tenant_id: input.tenantId || null,
+      name: input.name,
+      description: input.description || null,
+      match_category: input.matchCategory || null,
+      match_priority: input.matchPriority || null,
+      match_tenant_id: input.matchTenantId || null,
+      assign_to_user_id: input.assignToUserId || null,
+      set_priority: input.setPriority || null,
+      set_sla_hours: input.setSlaHours || null,
+      priority_order: input.priorityOrder ?? 0,
+      created_by: user.id,
+    };
 
     const { data, error } = await supabase
       .from('ticket_routing_rules')
-      .insert({
-        tenant_id: input.tenantId || null,
-        name: input.name,
-        description: input.description || null,
-        match_category: input.matchCategory || null,
-        match_priority: input.matchPriority || null,
-        match_tenant_id: input.matchTenantId || null,
-        assign_to_user_id: input.assignToUserId || null,
-        set_priority: input.setPriority || null,
-        set_sla_hours: input.setSlaHours || null,
-        priority_order: input.priorityOrder ?? 0,
-        created_by: user.id,
-      })
+      .insert(insertData)
       .select()
       .single();
 
@@ -390,7 +394,7 @@ export async function applyRoutingRulesToTicket(ticketId: string): Promise<{
   appliedRules?: Array<{ ruleId: string; ruleName: string; action: string }>;
   error?: string;
 }> {
-  const { user, isSystem, error: authError } = await getCurrentAdminUser();
+  const { user, isSystem: _isSystem, error: authError } = await getCurrentAdminUser();
   
   if (!user) {
     return { success: false, error: authError || 'Inte autentiserad' };
@@ -491,7 +495,7 @@ export async function getNotificationTemplate(templateKey: string, tenantId?: st
     const supabase = await createServerRlsClient();
 
     // First try tenant-specific, then fall back to global
-    let query = supabase
+    const query = supabase
       .from('notification_templates')
       .select('*')
       .eq('template_key', templateKey)

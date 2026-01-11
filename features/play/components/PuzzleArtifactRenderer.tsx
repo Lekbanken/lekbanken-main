@@ -813,9 +813,9 @@ export function PuzzleArtifactRenderer({
   if (artifactType === 'prop_confirmation') {
     const propConfig: PropConfirmationConfig = {
       propId: (meta.propId as string) || artifact.id,
-      propDescription: (meta.propName as string) || (meta.instruction as string) || 'Föremål',
+      propDescription: (meta.propName as string) || (meta.instruction as string) || t('prop.defaultDescription'),
       propImageUrl: meta.propImageUrl as string | undefined,
-      instructions: (meta.instructions as string) || (meta.instruction as string) || 'Visa upp föremålet för spelledaren.',
+      instructions: (meta.instructions as string) || (meta.instruction as string) || t('prop.defaultInstruction'),
       requirePhoto: meta.requirePhoto === true,
     };
 

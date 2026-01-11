@@ -1040,6 +1040,30 @@
         "attempts": "Forsøk",
         "ofSolved": "{solved} av {total} løst",
         "hints": "{count} hint",
+        "progress": "Fremgang",
+        "stepOfTotal": "Steg {current} av {total}",
+        "totalTime": "Total tid",
+        "totalLogged": "Totalt logget",
+        "engagement": "Engasjement",
+        "avgTimePerStep": "Snitt tid/steg",
+        "medianTimePerStep": "Median tid/steg",
+        "triggersFired": "Triggers avfyrt",
+        "triggerErrors": "Trigger-feil",
+        "signals": "Signaler",
+        "totalProgression": "Total progresjon",
+        "step": "Steg",
+        "time": "Tid",
+        "errors": "Feil",
+        "triggers": "Triggers",
+        "status": "Status",
+        "stepNumber": "Steg {number}",
+        "completed": "Ferdig",
+        "timePerStep": "Tid per steg",
+        "name": "Navn",
+        "puzzle": "Gåte",
+        "type": "Type",
+        "triggersCount": "{count} triggers",
+        "triggerErrorsCount": "{count} trigger-feil",
         "tabs": {
           "overview": "Oversikt"
         }
@@ -1764,7 +1788,9 @@
       "prop": {
         "confirmed": "Bekreftet",
         "waiting": "Venter...",
-        "notConfirmed": "Ikke bekreftet"
+        "notConfirmed": "Ikke bekreftet",
+        "defaultDescription": "Gjenstand",
+        "defaultInstruction": "Vis gjenstanden til spillederen."
       },
       "location": {
         "title": "Stedsverifisering"

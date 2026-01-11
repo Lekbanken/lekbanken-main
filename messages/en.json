@@ -1040,6 +1040,30 @@
         "attempts": "Attempts",
         "ofSolved": "{solved} of {total} solved",
         "hints": "{count} hints",
+        "progress": "Progress",
+        "stepOfTotal": "Step {current} of {total}",
+        "totalTime": "Total time",
+        "totalLogged": "Total logged",
+        "engagement": "Engagement",
+        "avgTimePerStep": "Avg time/step",
+        "medianTimePerStep": "Median time/step",
+        "triggersFired": "Triggers fired",
+        "triggerErrors": "Trigger errors",
+        "signals": "Signals",
+        "totalProgression": "Total progression",
+        "step": "Step",
+        "time": "Time",
+        "errors": "Errors",
+        "triggers": "Triggers",
+        "status": "Status",
+        "stepNumber": "Step {number}",
+        "completed": "Complete",
+        "timePerStep": "Time per step",
+        "name": "Name",
+        "puzzle": "Puzzle",
+        "type": "Type",
+        "triggersCount": "{count} triggers",
+        "triggerErrorsCount": "{count} trigger errors",
         "tabs": {
           "overview": "Overview"
         }
@@ -1764,7 +1788,9 @@
       "prop": {
         "confirmed": "Confirmed",
         "waiting": "Waiting...",
-        "notConfirmed": "Not confirmed"
+        "notConfirmed": "Not confirmed",
+        "defaultDescription": "Item",
+        "defaultInstruction": "Show the item to the game master."
       },
       "location": {
         "title": "Location verification"

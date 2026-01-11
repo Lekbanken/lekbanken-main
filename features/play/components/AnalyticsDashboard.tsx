@@ -150,14 +150,14 @@ function OverviewTab({ analytics }: OverviewTabProps) {
       {/* Key Metrics Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard
-          title="Framsteg"
+          title={t('progress')}
           value={`${Math.round(analytics.progressPercent)}%`}
           icon={<CheckCircleIcon className="h-4 w-4" />}
-          description={`Steg ${analytics.currentStep + 1} av ${analytics.totalSteps}`}
+          description={t('stepOfTotal', { current: analytics.currentStep + 1, total: analytics.totalSteps })}
           variant={analytics.progressPercent >= 80 ? 'success' : 'default'}
         />
         <MetricCard
-          title="Total tid"
+          title={t('totalTime')}
           value={formatDuration(analytics.totalDuration)}
           icon={<ClockIcon className="h-4 w-4" />}
           description={analytics.status}
@@ -173,7 +173,7 @@ function OverviewTab({ analytics }: OverviewTabProps) {
           title={t('events')}
           value={analytics.eventCount}
           icon={<SignalIcon className="h-4 w-4" />}
-          description="Totalt loggade"
+          description={t('totalLogged')}
         />
       </div>
 
@@ -182,17 +182,17 @@ function OverviewTab({ analytics }: OverviewTabProps) {
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <ArrowTrendingUpIcon className="h-4 w-4" />
-            Engagemang
+            {t('engagement')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-sm text-muted-foreground">Snitt tid/steg</div>
+              <div className="text-sm text-muted-foreground">{t('avgTimePerStep')}</div>
               <div className="font-semibold">{formatDuration(analytics.engagement.avgTimePerStep)}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Median tid/steg</div>
+              <div className="text-sm text-muted-foreground">{t('medianTimePerStep')}</div>
               <div className="font-semibold">{formatDuration(analytics.engagement.medianTimePerStep)}</div>
             </div>
             <div>
@@ -200,17 +200,17 @@ function OverviewTab({ analytics }: OverviewTabProps) {
               <div className="font-semibold">{analytics.engagement.totalHintsUsed}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Triggers avfyrade</div>
+              <div className="text-sm text-muted-foreground">{t('triggersFired')}</div>
               <div className="font-semibold">{analytics.engagement.totalTriggerFires}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Trigger-fel</div>
+              <div className="text-sm text-muted-foreground">{t('triggerErrors')}</div>
               <div className={`font-semibold ${analytics.engagement.triggerErrors > 0 ? 'text-red-500' : ''}`}>
                 {analytics.engagement.triggerErrors}
               </div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Signaler</div>
+              <div className="text-sm text-muted-foreground">{t('signals')}</div>
               <div className="font-semibold">{analytics.engagement.signalsSent}</div>
             </div>
           </div>
@@ -227,7 +227,7 @@ function OverviewTab({ analytics }: OverviewTabProps) {
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span>Total progression</span>
+            <span>{t('totalProgression')}</span>
             <span className={getCompletionColor(analytics.engagement.overallCompletionRate)}>
               {formatPercent(analytics.engagement.overallCompletionRate)}
             </span>
@@ -259,19 +259,19 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Steg</TableHead>
-            <TableHead>Tid</TableHead>
+            <TableHead>{t('step')}</TableHead>
+            <TableHead>{t('time')}</TableHead>
             <TableHead className="text-center">{t('solved')}</TableHead>
-            <TableHead className="text-center">Fel</TableHead>
-            <TableHead className="text-center">Triggers</TableHead>
-            <TableHead className="text-right">Status</TableHead>
+            <TableHead className="text-center">{t('errors')}</TableHead>
+            <TableHead className="text-center">{t('triggers')}</TableHead>
+            <TableHead className="text-right">{t('status')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {stepMetrics.map((step) => (
             <TableRow key={step.stepIndex}>
               <TableCell>
-                <div className="font-medium">Steg {step.stepIndex + 1}</div>
+                <div className="font-medium">{t('stepNumber', { number: step.stepIndex + 1 })}</div>
                 <div className="text-xs text-muted-foreground truncate max-w-[120px]">
                   {step.stepName}
                 </div>
@@ -290,7 +290,7 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
                 {step.completed ? (
                   <Badge variant="default" className="bg-green-500">
                     <CheckCircleIcon className="h-3 w-3 mr-1" />
-                    Klar
+                    {t('completed')}
                   </Badge>
                 ) : (
                   <Badge variant="outline">{t('inProgress')}</Badge>
@@ -304,7 +304,7 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
       {/* Step Duration Chart (simple bar) */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm">Tid per steg</CardTitle>
+          <CardTitle className="text-sm">{t('timePerStep')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -314,7 +314,7 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
               
               return (
                 <div key={step.stepIndex} className="flex items-center gap-2">
-                  <span className="text-xs w-12">Steg {step.stepIndex + 1}</span>
+                  <span className="text-xs w-12">{t('stepNumber', { number: step.stepIndex + 1 })}</span>
                   <div className="flex-1 h-4 bg-muted rounded overflow-hidden">
                     <div
                       className="h-full bg-primary transition-all"
@@ -358,7 +358,7 @@ function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
   });
 
   const sortOptions = [
-    { value: 'name', label: 'Namn' },
+    { value: 'name', label: t('name') },
     { value: 'time', label: t('solutionTime') },
     { value: 'attempts', label: t('attempts') },
   ];
@@ -381,12 +381,12 @@ function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Pussel</TableHead>
-              <TableHead>Typ</TableHead>
-              <TableHead>Steg</TableHead>
+              <TableHead>{t('puzzle')}</TableHead>
+              <TableHead>{t('type')}</TableHead>
+              <TableHead>{t('step')}</TableHead>
               <TableHead className="text-center">{t('attempts')}</TableHead>
               <TableHead className="text-right">{t('solutionTime')}</TableHead>
-              <TableHead className="text-right">Status</TableHead>
+              <TableHead className="text-right">{t('status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -398,7 +398,7 @@ function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
                     {puzzle.type}
                   </Badge>
                 </TableCell>
-                <TableCell>Steg {puzzle.stepIndex + 1}</TableCell>
+                <TableCell>{t('stepNumber', { number: puzzle.stepIndex + 1 })}</TableCell>
                 <TableCell className="text-center">{puzzle.attempts}</TableCell>
                 <TableCell className="text-right">
                   {puzzle.solveTime ? formatDuration(puzzle.solveTime) : '–'}
@@ -543,12 +543,13 @@ export function AnalyticsSummaryCard({
   analytics,
   className,
 }: AnalyticsSummaryCardProps) {
+  const t = useTranslations('play.cockpit.analytics');
   return (
     <div className={`space-y-3 ${className}`}>
       {/* Progress bar */}
       <div className="space-y-1">
         <div className="flex items-center justify-between text-sm">
-          <span>Framsteg</span>
+          <span>{t('progress')}</span>
           <span className="font-medium">{Math.round(analytics.progressPercent)}%</span>
         </div>
         <Progress value={analytics.progressPercent} />
@@ -568,7 +569,7 @@ export function AnalyticsSummaryCard({
         </div>
         <div className="flex items-center gap-2">
           <BoltIcon className="h-4 w-4 text-muted-foreground" />
-          <span>{analytics.engagement.totalTriggerFires} triggers</span>
+          <span>{t('triggersCount', { count: analytics.engagement.totalTriggerFires })}</span>
         </div>
         <div className="flex items-center gap-2">
           <LightBulbIcon className="h-4 w-4 text-muted-foreground" />
@@ -580,7 +581,7 @@ export function AnalyticsSummaryCard({
       {analytics.engagement.triggerErrors > 0 && (
         <div className="flex items-center gap-2 text-sm text-red-500">
           <ExclamationCircleIcon className="h-4 w-4" />
-          <span>{analytics.engagement.triggerErrors} trigger-fel</span>
+          <span>{t('triggerErrorsCount', { count: analytics.engagement.triggerErrors })}</span>
         </div>
       )}
     </div>

@@ -1036,6 +1036,30 @@
         "attempts": "Försök",
         "ofSolved": "{solved} av {total} lösta",
         "hints": "{count} ledtrådar",
+        "progress": "Framsteg",
+        "stepOfTotal": "Steg {current} av {total}",
+        "totalTime": "Total tid",
+        "totalLogged": "Totalt loggade",
+        "engagement": "Engagemang",
+        "avgTimePerStep": "Snitt tid/steg",
+        "medianTimePerStep": "Median tid/steg",
+        "triggersFired": "Triggers avfyrade",
+        "triggerErrors": "Trigger-fel",
+        "signals": "Signaler",
+        "totalProgression": "Total progression",
+        "step": "Steg",
+        "time": "Tid",
+        "errors": "Fel",
+        "triggers": "Triggers",
+        "status": "Status",
+        "stepNumber": "Steg {number}",
+        "completed": "Klar",
+        "timePerStep": "Tid per steg",
+        "name": "Namn",
+        "puzzle": "Pussel",
+        "type": "Typ",
+        "triggersCount": "{count} triggers",
+        "triggerErrorsCount": "{count} trigger-fel",
         "tabs": {
           "overview": "Översikt"
         }
@@ -1760,7 +1784,9 @@
       "prop": {
         "confirmed": "Bekräftad",
         "waiting": "Väntar...",
-        "notConfirmed": "Ej bekräftad"
+        "notConfirmed": "Ej bekräftad",
+        "defaultDescription": "Föremål",
+        "defaultInstruction": "Visa upp föremålet för spelledaren."
       },
       "location": {
         "title": "Platsverifiering"

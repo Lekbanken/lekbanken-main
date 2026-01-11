@@ -6,6 +6,7 @@
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 import { checkIsSystemAdmin } from '@/app/actions/tickets-admin';
 import { 
@@ -13,18 +14,16 @@ import {
   listNotificationTemplates,
   runSlaEscalation,
 } from '@/app/actions/support-automation';
-import { Heading, Subheading } from '@/catalyst-ui-kit/typescript/heading';
-import { Text } from '@/catalyst-ui-kit/typescript/text';
-import { Badge } from '@/catalyst-ui-kit/typescript/badge';
-import { Button } from '@/components/ui';
 import { 
+  Badge, 
+  Button, 
   Table, 
-  TableHead, 
+  TableHeader,
   TableRow, 
-  TableHeader, 
+  TableHead, 
   TableBody, 
   TableCell 
-} from '@/catalyst-ui-kit/typescript/table';
+} from '@/components/ui';
 import { 
   CogIcon, 
   BellIcon, 
@@ -33,6 +32,19 @@ import {
   PlayIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
+
+// Simple heading components to avoid @headlessui/react dependency
+function Heading({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <h1 className={`text-2xl font-semibold text-zinc-950 dark:text-white ${className}`}>{children}</h1>;
+}
+
+function Subheading({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <h2 className={`text-base font-semibold text-zinc-950 dark:text-white ${className}`}>{children}</h2>;
+}
+
+function Text({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+  return <p className={`text-base text-zinc-500 dark:text-zinc-400 ${className}`}>{children}</p>;
+}
 
 export const metadata: Metadata = {
   title: 'Automation | Support Admin',
@@ -104,48 +116,52 @@ async function RoutingRulesSection() {
         </div>
       ) : (
         <Table className="mt-4">
-          <TableHead>
+          <TableHeader>
             <TableRow>
-              <TableHeader>Namn</TableHeader>
-              <TableHeader>Matchning</TableHeader>
-              <TableHeader>Åtgärd</TableHeader>
-              <TableHeader>Prioritet</TableHeader>
-              <TableHeader>Status</TableHeader>
+              <TableHead>Namn</TableHead>
+              <TableHead>Matchning</TableHead>
+              <TableHead>Åtgärd</TableHead>
+              <TableHead>Prioritet</TableHead>
+              <TableHead>Status</TableHead>
             </TableRow>
-          </TableHead>
+          </TableHeader>
           <TableBody>
             {rules.map((rule) => (
-              <TableRow key={rule.id} href={`/admin/support/automation/rules/${rule.id}`}>
-                <TableCell className="font-medium">{rule.name}</TableCell>
+              <TableRow key={rule.id}>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/support/automation/rules/${rule.id}`} className="hover:underline">
+                    {rule.name}
+                  </Link>
+                </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {rule.match_category && (
-                      <Badge color="blue">Kategori: {rule.match_category}</Badge>
+                      <Badge variant="primary">Kategori: {rule.match_category}</Badge>
                     )}
                     {rule.match_priority && (
-                      <Badge color="amber">Prioritet: {rule.match_priority}</Badge>
+                      <Badge variant="warning">Prioritet: {rule.match_priority}</Badge>
                     )}
                     {!rule.match_category && !rule.match_priority && (
-                      <Badge color="zinc">Alla ärenden</Badge>
+                      <Badge variant="default">Alla ärenden</Badge>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {rule.assign_to_user_email && (
-                      <Badge color="green">→ {rule.assign_to_user_email}</Badge>
+                      <Badge variant="success">→ {rule.assign_to_user_email}</Badge>
                     )}
                     {rule.set_priority && (
-                      <Badge color="amber">Prioritet: {rule.set_priority}</Badge>
+                      <Badge variant="warning">Prioritet: {rule.set_priority}</Badge>
                     )}
                     {rule.set_sla_hours && (
-                      <Badge color="purple">SLA: {rule.set_sla_hours}h</Badge>
+                      <Badge variant="accent">SLA: {rule.set_sla_hours}h</Badge>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>{rule.priority_order}</TableCell>
                 <TableCell>
-                  <Badge color={rule.is_active ? 'green' : 'zinc'}>
+                  <Badge variant={rule.is_active ? 'success' : 'default'}>
                     {rule.is_active ? 'Aktiv' : 'Inaktiv'}
                   </Badge>
                 </TableCell>
@@ -185,25 +201,28 @@ async function NotificationTemplatesSection() {
       </Text>
 
       <Table className="mt-4">
-        <TableHead>
+        <TableHeader>
           <TableRow>
-            <TableHeader>Namn</TableHeader>
-            <TableHeader>Nyckel</TableHeader>
-            <TableHeader>Kategori</TableHeader>
-            <TableHeader>Typ</TableHeader>
-            <TableHeader>Status</TableHeader>
+            <TableHead>Namn</TableHead>
+            <TableHead>Nyckel</TableHead>
+            <TableHead>Kategori</TableHead>
+            <TableHead>Typ</TableHead>
+            <TableHead>Status</TableHead>
           </TableRow>
-        </TableHead>
+        </TableHeader>
         <TableBody>
           {templates.map((template) => (
-            <TableRow 
-              key={template.id} 
-              href={template.is_system ? undefined : `/admin/support/automation/templates/${template.id}`}
-            >
+            <TableRow key={template.id}>
               <TableCell className="font-medium">
-                {template.name}
-                {template.is_system && (
-                  <Badge color="blue" className="ml-2">System</Badge>
+                {template.is_system ? (
+                  <>
+                    {template.name}
+                    <Badge variant="primary" className="ml-2">System</Badge>
+                  </>
+                ) : (
+                  <Link href={`/admin/support/automation/templates/${template.id}`} className="hover:underline">
+                    {template.name}
+                  </Link>
                 )}
               </TableCell>
               <TableCell>
@@ -212,22 +231,22 @@ async function NotificationTemplatesSection() {
                 </code>
               </TableCell>
               <TableCell>
-                <Badge color="zinc">{template.category}</Badge>
+                <Badge variant="default">{template.category}</Badge>
               </TableCell>
               <TableCell>
                 <Badge 
-                  color={
-                    template.type === 'error' ? 'red' :
-                    template.type === 'warning' ? 'amber' :
-                    template.type === 'success' ? 'green' :
-                    'blue'
+                  variant={
+                    template.type === 'error' ? 'destructive' :
+                    template.type === 'warning' ? 'warning' :
+                    template.type === 'success' ? 'success' :
+                    'primary'
                   }
                 >
                   {template.type}
                 </Badge>
               </TableCell>
               <TableCell>
-                <Badge color={template.is_active ? 'green' : 'zinc'}>
+                <Badge variant={template.is_active ? 'success' : 'default'}>
                   {template.is_active ? 'Aktiv' : 'Inaktiv'}
                 </Badge>
               </TableCell>
@@ -276,7 +295,7 @@ async function SlaSettingsSection() {
           </div>
           <div>
             <Text className="text-sm text-zinc-500">Status</Text>
-            <Badge color="green">Aktiv</Badge>
+            <Badge variant="success">Aktiv</Badge>
           </div>
         </div>
 

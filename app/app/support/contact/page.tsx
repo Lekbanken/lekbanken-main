@@ -54,7 +54,7 @@ export default function ContactSupportPage() {
     setIsSubmitting(false);
     
     if (result.success && result.data) {
-      setTicketId(result.data.id);
+      setTicketId(result.data.ticket.id);
       setSubmitted(true);
     } else {
       setError(result.error || 'Något gick fel. Försök igen.');

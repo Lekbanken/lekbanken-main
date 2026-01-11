@@ -341,9 +341,9 @@ export function PlayPage({ gameId }: { gameId?: string }) {
         title={game.title}
         summary={game.summary}
         meta={[
-          { label: t('meta.environment'), value: game.environment ?? "" },
-          { label: t('meta.group'), value: game.groupSize ? `${game.groupSize} ${t('meta.participants')}` : "" },
-          { label: t('meta.age'), value: game.ageRange ? `${game.ageRange} ${t('meta.years')}` : "" },
+          { key: 'environment', label: t('meta.environment'), value: game.environment ?? "" },
+          { key: 'group', label: t('meta.group'), value: game.groupSize ? `${game.groupSize} ${t('meta.participants')}` : "" },
+          { key: 'age', label: t('meta.age'), value: game.ageRange ? `${game.ageRange} ${t('meta.years')}` : "" },
         ].filter((m) => m.value)}
       />
 

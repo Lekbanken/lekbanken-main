@@ -105,20 +105,20 @@ function buildPreflightItems(
   // 1. Participants check
   items.push({
     id: 'participants',
-    label: 'Deltagare',
+    label: 'Participants',
     status: state.participantCount > 0 ? 'ready' : 'warning',
     detail: state.participantCount > 0
-      ? `${state.participantCount} deltagare anslutna`
-      : 'Inga deltagare ännu – sessionen kan startas ändå',
+      ? `${state.participantCount} participants connected`
+      : 'No participants yet – session can still be started',
   });
 
   // 2. Game linked check
   if (!state.hasGame) {
     items.push({
       id: 'game',
-      label: 'Spel kopplat',
+      label: 'Game linked',
       status: 'error',
-      detail: 'Sessionen har inget spel kopplat',
+      detail: 'Session has no game linked',
     });
     return items; // Early return - can't continue without game
   }
@@ -127,19 +127,19 @@ function buildPreflightItems(
   if (!state.rolesSnapshotted) {
     items.push({
       id: 'roles-snapshot',
-      label: 'Roller kopierade',
+      label: 'Roles copied',
       status: 'error',
-      detail: 'Kopiera roller från spelet innan du kan tilldela dem',
+      detail: 'Copy roles from game before assigning them',
       action: actions.onSnapshotRoles
-        ? { label: 'Kopiera roller', onClick: actions.onSnapshotRoles }
+        ? { label: 'Copy roles', onClick: actions.onSnapshotRoles }
         : undefined,
     });
   } else {
     items.push({
       id: 'roles-snapshot',
-      label: 'Roller kopierade',
+      label: 'Roles copied',
       status: 'ready',
-      detail: `${state.totalRoles} roller kopierade från spelet`,
+      detail: `${state.totalRoles} roles copied from game`,
     });
 
     // 4. Roles assignment check (only if snapshotted)
@@ -148,17 +148,17 @@ function buildPreflightItems(
 
     items.push({
       id: 'roles-assigned',
-      label: 'Roller tilldelade',
+      label: 'Roles assigned',
       status: minCountsMet ? 'ready' : someAssigned ? 'warning' : 'pending',
       detail: minCountsMet
-        ? 'Alla minimikrav uppfyllda'
+        ? 'All minimum requirements met'
         : state.roleMinCountsStatus
             .filter((r) => !r.met)
             .map((r) => `${r.name}: ${r.assigned}/${r.min}`)
             .join(', '),
       action:
         !minCountsMet && actions.onOpenRoleAssigner
-          ? { label: 'Tilldela roller', onClick: actions.onOpenRoleAssigner }
+          ? { label: 'Assign roles', onClick: actions.onOpenRoleAssigner }
           : undefined,
     });
   }
@@ -169,20 +169,20 @@ function buildPreflightItems(
     
     items.push({
       id: 'secrets',
-      label: 'Hemliga instruktioner',
+      label: 'Secret instructions',
       status: state.secretsUnlocked
         ? 'ready'
         : allRolesAssigned
           ? 'warning'
           : 'pending',
       detail: state.secretsUnlocked
-        ? `Upplåsta (${state.secretsRevealedCount}/${state.participantCount} har visat)`
+        ? `Unlocked (${state.secretsRevealedCount}/${state.participantCount} revealed)`
         : allRolesAssigned
-          ? 'Redo att låsas upp'
-          : 'Tilldela roller först',
+          ? 'Ready to unlock'
+          : 'Assign roles first',
       action:
         !state.secretsUnlocked && allRolesAssigned && actions.onUnlockSecrets
-          ? { label: 'Lås upp', onClick: actions.onUnlockSecrets }
+          ? { label: 'Unlock', onClick: actions.onUnlockSecrets }
           : undefined,
     });
   }
@@ -194,8 +194,8 @@ function buildPreflightItems(
       label: 'Triggers',
       status: state.triggersSnapshotted ? 'ready' : 'pending',
       detail: state.triggersSnapshotted
-        ? `${state.armedTriggersCount} triggers redo`
-        : 'Triggers laddas automatiskt vid start',
+        ? `${state.armedTriggersCount} triggers ready`
+        : 'Triggers load automatically at start',
     });
   }
 
@@ -203,22 +203,22 @@ function buildPreflightItems(
   if (state.artifactsSnapshotted !== undefined) {
     items.push({
       id: 'artifacts',
-      label: 'Artefakter',
+      label: 'Artifacts',
       status: state.artifactsSnapshotted ? 'ready' : 'pending',
       detail: state.artifactsSnapshotted
-        ? 'Artefakter redo för sessionen'
-        : 'Artefakter laddas automatiskt vid start',
+        ? 'Artifacts ready for session'
+        : 'Artifacts load automatically at start',
     });
   }
 
   // 8. Signal capabilities check
   items.push({
     id: 'signals',
-    label: 'Signaler',
+    label: 'Signals',
     status: state.signalCapabilitiesTested ? 'ready' : 'pending',
     detail: state.signalCapabilitiesTested
-      ? 'Signalkällor testade'
-      : 'Testa signalkällor i lobbyn',
+      ? 'Signal sources tested'
+      : 'Test signal sources in lobby',
   });
 
   return items;
@@ -1210,16 +1210,16 @@ function formatCondition(condition: Record<string, unknown>): string {
   switch (type) {
     case 'step_started':
     case 'step_completed':
-      return `Steg ${condition.stepId ? '...' : 'any'}`;
+      return `Step ${condition.stepId ? '...' : 'any'}`;
     case 'phase_started':
     case 'phase_completed':
-      return `Fas ${condition.phaseId ? '...' : 'any'}`;
+      return `Phase ${condition.phaseId ? '...' : 'any'}`;
     case 'keypad_correct':
-      return 'Keypad rätt';
+      return 'Keypad correct';
     case 'keypad_failed':
-      return 'Keypad fel';
+      return 'Keypad failed';
     case 'manual':
-      return 'Manuell';
+      return 'Manual';
     case 'signal_received':
       return `Signal: ${condition.channel ?? 'any'}`;
     default:
@@ -1235,15 +1235,15 @@ function formatActions(actions: Record<string, unknown>[]): string {
       const type = a.type as string;
       switch (type) {
         case 'reveal_artifact':
-          return 'Visa artefakt';
+          return 'Reveal artifact';
         case 'hide_artifact':
-          return 'Dölj artefakt';
+          return 'Hide artifact';
         case 'send_message':
-          return 'Skicka meddelande';
+          return 'Send message';
         case 'advance_step':
-          return 'Nästa steg';
+          return 'Next step';
         case 'time_bank_apply_delta':
-          return `Tid ${(a.deltaSeconds as number) > 0 ? '+' : ''}${a.deltaSeconds}s`;
+          return `Time ${(a.deltaSeconds as number) > 0 ? '+' : ''}${a.deltaSeconds}s`;
         default:
           return type;
       }

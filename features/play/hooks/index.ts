@@ -60,7 +60,7 @@ export type {
 } from './useDirectorShortcuts';
 
 // Session readiness (confidence indicator)
-export { useSessionReadiness, READINESS_CATEGORY_LABELS } from './useSessionReadiness';
+export { useSessionReadiness, READINESS_CATEGORY_LABELS, READINESS_CATEGORY_KEYS } from './useSessionReadiness';
 export type {
   ReadinessCheck,
   ReadinessCategory,

@@ -25,8 +25,8 @@ export type SignalCapabilityStatus =
 export interface SignalCapability {
   type: 'torch' | 'audio' | 'vibration' | 'screen_flash' | 'notification';
   status: SignalCapabilityStatus;
-  /** Human-readable label */
-  label: string;
+  /** Translation key for the label (e.g., 'torch', 'audio') */
+  labelKey: string;
   /** Why it's unavailable (if applicable) */
   reason?: string;
   /** Last tested timestamp */
@@ -88,19 +88,19 @@ export interface UseSignalCapabilitiesReturn {
 
 const createDefaultCapability = (
   type: SignalCapability['type'],
-  label: string
+  labelKey: string
 ): SignalCapability => ({
   type,
-  label,
+  labelKey,
   status: 'unknown',
 });
 
 const DEFAULT_CAPABILITIES: SignalCapabilities = {
-  torch: createDefaultCapability('torch', 'Ficklampa'),
-  audio: createDefaultCapability('audio', 'Ljud'),
-  vibration: createDefaultCapability('vibration', 'Vibration'),
-  screenFlash: createDefaultCapability('screen_flash', 'Skärmblänk'),
-  notification: createDefaultCapability('notification', 'Notifikation'),
+  torch: createDefaultCapability('torch', 'torch'),
+  audio: createDefaultCapability('audio', 'audio'),
+  vibration: createDefaultCapability('vibration', 'vibration'),
+  screenFlash: createDefaultCapability('screen_flash', 'screenFlash'),
+  notification: createDefaultCapability('notification', 'notification'),
 };
 
 // =============================================================================

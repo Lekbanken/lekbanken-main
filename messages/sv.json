@@ -1218,7 +1218,12 @@
       },
       "meta": {
         "duration": "Längd",
-        "minutes": "min"
+        "minutes": "min",
+        "blocks": "Moment",
+        "block": "block"
+      },
+      "sessionHeader": {
+        "plannedSession": "Planerat pass"
       },
       "tips": {
         "title": "Tips för passet",

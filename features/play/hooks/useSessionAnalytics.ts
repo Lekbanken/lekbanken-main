@@ -336,7 +336,7 @@ export function useSessionAnalytics({
           if (participantId) {
             participantData.set(participantId, {
               participantId: participantId,
-              displayName: displayName ?? 'Okänd',
+              displayName: displayName ?? 'Unknown',
               puzzlesSolved: 0,
               contributions: 0,
               activeTime: 0,

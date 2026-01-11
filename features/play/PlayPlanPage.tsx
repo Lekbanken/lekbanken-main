@@ -395,15 +395,15 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   }
 
   const meta = [
-    { label: "Moment", value: `${run.blockCount} block` },
-    run.totalDurationMinutes ? { label: t('meta.duration'), value: `${run.totalDurationMinutes} ${t('meta.minutes')}` } : null,
-  ].filter((m): m is { label: string; value: string } => Boolean(m?.value));
+    { key: 'blocks', label: t('meta.blocks'), value: `${run.blockCount} ${t('meta.block')}` },
+    run.totalDurationMinutes ? { key: 'duration', label: t('meta.duration'), value: `${run.totalDurationMinutes} ${t('meta.minutes')}` } : null,
+  ].filter((m): m is { key: string; label: string; value: string } => Boolean(m?.value));
 
   return (
     <div className="space-y-4 pb-44">
       <SessionHeader
         title={run.name}
-        summary="Planerat pass"
+        summary={t('sessionHeader.plannedSession')}
         meta={meta}
       />
 

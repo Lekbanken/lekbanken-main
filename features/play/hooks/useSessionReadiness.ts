@@ -18,8 +18,10 @@ import { useMemo } from 'react';
 export interface ReadinessCheck {
   /** Unique identifier */
   id: string;
-  /** Display name */
+  /** @deprecated Use nameKey with translations instead */
   name: string;
+  /** Translation key for name (e.g., 'checks.min_participants.name') */
+  nameKey: string;
   /** Check category */
   category: ReadinessCategory;
   /** Current status */
@@ -30,8 +32,12 @@ export interface ReadinessCheck {
   current: number;
   /** Target value (for pass) */
   target: number;
-  /** Optional details */
+  /** @deprecated Use detailsKey with translations instead */
   details?: string;
+  /** Translation key for details (e.g., 'checks.min_participants.pass') */
+  detailsKey?: string;
+  /** Parameters for details interpolation */
+  detailsParams?: Record<string, string | number>;
   /** Whether this check is critical (blocks start) */
   critical?: boolean;
 }
@@ -78,8 +84,10 @@ export interface SessionReadinessInput {
 export interface UseSessionReadinessReturn {
   /** Overall readiness percentage (0-100) */
   readinessPercent: number;
-  /** Readiness label */
+  /** @deprecated Use readinessLabelKey with translations instead */
   readinessLabel: string;
+  /** Translation key for readiness label */
+  readinessLabelKey: string;
   /** Readiness color */
   readinessColor: 'red' | 'yellow' | 'green';
   /** All checks */
@@ -92,14 +100,19 @@ export interface UseSessionReadinessReturn {
   warnings: ReadinessCheck[];
   /** Whether session can be started */
   canStart: boolean;
-  /** Summary text */
+  /** @deprecated Use summaryKey with translations instead */
   summary: string;
+  /** Translation key for summary */
+  summaryKey: string;
+  /** Parameters for summary interpolation */
+  summaryParams: Record<string, string | number>;
 }
 
 // =============================================================================
 // Constants
 // =============================================================================
 
+/** @deprecated Use READINESS_CATEGORY_KEYS with translations instead */
 const CATEGORY_LABELS: Record<ReadinessCategory, string> = {
   participants: 'Deltagare',
   content: 'Innehåll',
@@ -107,6 +120,16 @@ const CATEGORY_LABELS: Record<ReadinessCategory, string> = {
   artifacts: 'Artefakter',
   signals: 'Signaler',
   configuration: 'Konfiguration',
+};
+
+/** Translation keys for readiness categories */
+const CATEGORY_KEYS: Record<ReadinessCategory, string> = {
+  participants: 'participants',
+  content: 'content',
+  triggers: 'triggers',
+  artifacts: 'artifacts',
+  signals: 'signals',
+  configuration: 'configuration',
 };
 
 // =============================================================================
@@ -123,17 +146,21 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     
     // Minimum participants
     const minParticipants = input.minParticipants ?? 1;
+    const minPartPass = input.participantCount >= minParticipants;
     result.push({
       id: 'min_participants',
-      name: 'Minsta antal deltagare',
+      name: 'Minimum participants',
+      nameKey: 'checks.minParticipants.name',
       category: 'participants',
-      status: input.participantCount >= minParticipants ? 'pass' : 'fail',
+      status: minPartPass ? 'pass' : 'fail',
       weight: 30,
       current: input.participantCount,
       target: minParticipants,
-      details: input.participantCount >= minParticipants
-        ? `${input.participantCount} deltagare anslutna`
-        : `Behöver minst ${minParticipants} deltagare`,
+      details: minPartPass
+        ? `${input.participantCount} participants connected`
+        : `Need at least ${minParticipants} participants`,
+      detailsKey: minPartPass ? 'checks.minParticipants.pass' : 'checks.minParticipants.fail',
+      detailsParams: { count: input.participantCount, min: minParticipants },
       critical: true,
     });
     
@@ -143,15 +170,18 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
       const allAssigned = rolesAssigned >= input.totalRoles;
       result.push({
         id: 'roles_assigned',
-        name: 'Roller tilldelade',
+        name: 'Roles assigned',
+        nameKey: 'checks.rolesAssigned.name',
         category: 'participants',
         status: allAssigned ? 'pass' : rolesAssigned > 0 ? 'warning' : 'fail',
         weight: 20,
         current: rolesAssigned,
         target: input.totalRoles,
         details: allAssigned
-          ? 'Alla roller tilldelade'
-          : `${rolesAssigned}/${input.totalRoles} roller tilldelade`,
+          ? 'All roles assigned'
+          : `${rolesAssigned}/${input.totalRoles} roles assigned`,
+        detailsKey: allAssigned ? 'checks.rolesAssigned.pass' : 'checks.rolesAssigned.partial',
+        detailsParams: { assigned: rolesAssigned, total: input.totalRoles },
         critical: false,
       });
     }
@@ -161,17 +191,21 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     // =======================================================================
     
     // Has steps
+    const hasStepsPass = input.hasSteps;
     result.push({
       id: 'has_steps',
-      name: 'Steg definierade',
+      name: 'Steps defined',
+      nameKey: 'checks.hasSteps.name',
       category: 'content',
-      status: input.hasSteps ? 'pass' : 'fail',
+      status: hasStepsPass ? 'pass' : 'fail',
       weight: 25,
-      current: input.hasSteps ? 1 : 0,
+      current: hasStepsPass ? 1 : 0,
       target: 1,
-      details: input.hasSteps
-        ? `${input.stepCount ?? 1} steg definierade`
-        : 'Inga steg i spelet',
+      details: hasStepsPass
+        ? `${input.stepCount ?? 1} steps defined`
+        : 'No steps in game',
+      detailsKey: hasStepsPass ? 'checks.hasSteps.pass' : 'checks.hasSteps.fail',
+      detailsParams: { count: input.stepCount ?? 1 },
       critical: true,
     });
     
@@ -179,15 +213,17 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     if (input.hasLeaderScript !== undefined) {
       result.push({
         id: 'leader_script',
-        name: 'Ledarscript',
+        name: 'Leader script',
+        nameKey: 'checks.leaderScript.name',
         category: 'content',
         status: input.hasLeaderScript ? 'pass' : 'skip',
         weight: 5,
         current: input.hasLeaderScript ? 1 : 0,
         target: 1,
         details: input.hasLeaderScript
-          ? 'Ledarscript tillgängligt'
-          : 'Inget ledarscript (valfritt)',
+          ? 'Leader script available'
+          : 'No leader script (optional)',
+        detailsKey: input.hasLeaderScript ? 'checks.leaderScript.pass' : 'checks.leaderScript.skip',
         critical: false,
       });
     }
@@ -198,19 +234,23 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     
     if (input.triggerCount > 0) {
       // Armed triggers
+      const triggersStatus = input.armedTriggerCount === input.triggerCount
+        ? 'pass' as const
+        : input.armedTriggerCount > 0
+          ? 'warning' as const
+          : 'fail' as const;
       result.push({
         id: 'triggers_armed',
-        name: 'Triggers aktiverade',
+        name: 'Triggers armed',
+        nameKey: 'checks.triggersArmed.name',
         category: 'triggers',
-        status: input.armedTriggerCount === input.triggerCount
-          ? 'pass'
-          : input.armedTriggerCount > 0
-            ? 'warning'
-            : 'fail',
+        status: triggersStatus,
         weight: 10,
         current: input.armedTriggerCount,
         target: input.triggerCount,
-        details: `${input.armedTriggerCount}/${input.triggerCount} triggers redo`,
+        details: `${input.armedTriggerCount}/${input.triggerCount} triggers ready`,
+        detailsKey: 'checks.triggersArmed.status',
+        detailsParams: { armed: input.armedTriggerCount, total: input.triggerCount },
         critical: false,
       });
       
@@ -218,13 +258,16 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
       if (input.errorTriggerCount > 0) {
         result.push({
           id: 'triggers_errors',
-          name: 'Trigger-fel',
+          name: 'Trigger errors',
+          nameKey: 'checks.triggersErrors.name',
           category: 'triggers',
           status: 'warning',
           weight: 15,
           current: input.errorTriggerCount,
           target: 0,
-          details: `${input.errorTriggerCount} trigger(s) har fel`,
+          details: `${input.errorTriggerCount} trigger(s) have errors`,
+          detailsKey: 'checks.triggersErrors.warning',
+          detailsParams: { count: input.errorTriggerCount },
           critical: false,
         });
       }
@@ -236,19 +279,23 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     
     if (input.artifactCount > 0) {
       const configuredPercent = (input.configuredArtifactCount / input.artifactCount) * 100;
+      const artifactsStatus = configuredPercent === 100
+        ? 'pass' as const
+        : configuredPercent >= 50
+          ? 'warning' as const
+          : 'fail' as const;
       result.push({
         id: 'artifacts_configured',
-        name: 'Artefakter konfigurerade',
+        name: 'Artifacts configured',
+        nameKey: 'checks.artifactsConfigured.name',
         category: 'artifacts',
-        status: configuredPercent === 100
-          ? 'pass'
-          : configuredPercent >= 50
-            ? 'warning'
-            : 'fail',
+        status: artifactsStatus,
         weight: 15,
         current: input.configuredArtifactCount,
         target: input.artifactCount,
-        details: `${input.configuredArtifactCount}/${input.artifactCount} artefakter klara`,
+        details: `${input.configuredArtifactCount}/${input.artifactCount} artifacts ready`,
+        detailsKey: 'checks.artifactsConfigured.status',
+        detailsParams: { configured: input.configuredArtifactCount, total: input.artifactCount },
         critical: false,
       });
     }
@@ -258,17 +305,21 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     // =======================================================================
     
     if (input.signalPresetsCount !== undefined) {
+      const signalPass = input.signalPresetsCount > 0;
       result.push({
         id: 'signal_presets',
-        name: 'Signalpresets',
+        name: 'Signal presets',
+        nameKey: 'checks.signalPresets.name',
         category: 'signals',
-        status: input.signalPresetsCount > 0 ? 'pass' : 'skip',
+        status: signalPass ? 'pass' : 'skip',
         weight: 5,
         current: input.signalPresetsCount,
         target: 1,
-        details: input.signalPresetsCount > 0
-          ? `${input.signalPresetsCount} presets konfigurerade`
-          : 'Inga signalpresets (valfritt)',
+        details: signalPass
+          ? `${input.signalPresetsCount} presets configured`
+          : 'No signal presets (optional)',
+        detailsKey: signalPass ? 'checks.signalPresets.pass' : 'checks.signalPresets.skip',
+        detailsParams: { count: input.signalPresetsCount },
         critical: false,
       });
     }
@@ -276,15 +327,17 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     if (input.hasTimeBankConfig !== undefined) {
       result.push({
         id: 'timebank_config',
-        name: 'Tidsbank',
+        name: 'Time bank',
+        nameKey: 'checks.timebankConfig.name',
         category: 'signals',
         status: input.hasTimeBankConfig ? 'pass' : 'skip',
         weight: 5,
         current: input.hasTimeBankConfig ? 1 : 0,
         target: 1,
         details: input.hasTimeBankConfig
-          ? 'Tidsbank konfigurerad'
-          : 'Ingen tidsbank (valfritt)',
+          ? 'Time bank configured'
+          : 'No time bank (optional)',
+        detailsKey: input.hasTimeBankConfig ? 'checks.timebankConfig.pass' : 'checks.timebankConfig.skip',
         critical: false,
       });
     }
@@ -295,28 +348,34 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     
     result.push({
       id: 'join_code',
-      name: 'Anslutningskod',
+      name: 'Join code',
+      nameKey: 'checks.joinCode.name',
       category: 'configuration',
       status: input.hasJoinCode ? 'pass' : 'fail',
       weight: 20,
       current: input.hasJoinCode ? 1 : 0,
       target: 1,
       details: input.hasJoinCode
-        ? 'Anslutningskod genererad'
-        : 'Ingen anslutningskod',
+        ? 'Join code generated'
+        : 'No join code',
+      detailsKey: input.hasJoinCode ? 'checks.joinCode.pass' : 'checks.joinCode.fail',
       critical: true,
     });
     
     if (input.sessionName !== undefined) {
+      const hasName = input.sessionName && input.sessionName.trim().length > 0;
       result.push({
         id: 'session_name',
-        name: 'Sessionsnamn',
+        name: 'Session name',
+        nameKey: 'checks.sessionName.name',
         category: 'configuration',
-        status: input.sessionName && input.sessionName.trim().length > 0 ? 'pass' : 'skip',
+        status: hasName ? 'pass' : 'skip',
         weight: 2,
-        current: input.sessionName ? 1 : 0,
+        current: hasName ? 1 : 0,
         target: 1,
-        details: input.sessionName || 'Inget namn (valfritt)',
+        details: input.sessionName || 'No name (optional)',
+        detailsKey: hasName ? 'checks.sessionName.pass' : 'checks.sessionName.skip',
+        detailsParams: { name: input.sessionName || '' },
         critical: false,
       });
     }
@@ -325,11 +384,11 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
   }, [input]);
   
   // Calculate overall readiness
-  const { readinessPercent, readinessLabel, readinessColor } = useMemo(() => {
+  const { readinessPercent, readinessLabel, readinessLabelKey, readinessColor } = useMemo(() => {
     // Only count non-skip checks
     const activeChecks = checks.filter((c) => c.status !== 'skip');
     if (activeChecks.length === 0) {
-      return { readinessPercent: 100, readinessLabel: 'Redo', readinessColor: 'green' as const };
+      return { readinessPercent: 100, readinessLabel: 'Ready', readinessLabelKey: 'labels.ready', readinessColor: 'green' as const };
     }
     
     const totalWeight = activeChecks.reduce((sum, c) => sum + c.weight, 0);
@@ -342,23 +401,28 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     const percent = Math.round((earnedWeight / totalWeight) * 100);
     
     let label: string;
+    let labelKey: string;
     let color: 'red' | 'yellow' | 'green';
     
     if (percent >= 90) {
-      label = 'Redo att starta';
+      label = 'Ready to start';
+      labelKey = 'labels.readyToStart';
       color = 'green';
     } else if (percent >= 70) {
-      label = 'Nästan redo';
+      label = 'Almost ready';
+      labelKey = 'labels.almostReady';
       color = 'yellow';
     } else if (percent >= 50) {
-      label = 'Förberedelser pågår';
+      label = 'Preparing';
+      labelKey = 'labels.preparing';
       color = 'yellow';
     } else {
-      label = 'Inte redo';
+      label = 'Not ready';
+      labelKey = 'labels.notReady';
       color = 'red';
     }
     
-    return { readinessPercent: percent, readinessLabel: label, readinessColor: color };
+    return { readinessPercent: percent, readinessLabel: label, readinessLabelKey: labelKey, readinessColor: color };
   }, [checks]);
   
   // Group by category
@@ -394,19 +458,32 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
   const canStart = criticalIssues.length === 0;
   
   // Summary
-  const summary = useMemo(() => {
+  const { summary, summaryKey, summaryParams } = useMemo(() => {
     if (canStart && readinessPercent >= 90) {
-      return 'Sessionen är redo att starta!';
+      return { 
+        summary: 'Session is ready to start!', 
+        summaryKey: 'summary.ready',
+        summaryParams: {} 
+      };
     } else if (canStart) {
-      return `${warnings.length} sak(er) att förbättra, men du kan starta.`;
+      return { 
+        summary: `${warnings.length} thing(s) to improve, but you can start.`, 
+        summaryKey: 'summary.canStart',
+        summaryParams: { count: warnings.length } 
+      };
     } else {
-      return `${criticalIssues.length} kritiska problem måste lösas innan start.`;
+      return { 
+        summary: `${criticalIssues.length} critical issue(s) must be resolved before start.`, 
+        summaryKey: 'summary.blocked',
+        summaryParams: { count: criticalIssues.length } 
+      };
     }
   }, [canStart, readinessPercent, warnings.length, criticalIssues.length]);
   
   return {
     readinessPercent,
     readinessLabel,
+    readinessLabelKey,
     readinessColor,
     checks,
     checksByCategory,
@@ -414,7 +491,10 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
     warnings,
     canStart,
     summary,
+    summaryKey,
+    summaryParams,
   };
 }
 
 export { CATEGORY_LABELS as READINESS_CATEGORY_LABELS };
+export { CATEGORY_KEYS as READINESS_CATEGORY_KEYS };

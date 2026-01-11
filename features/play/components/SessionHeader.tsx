@@ -1,18 +1,29 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { HomeIcon, SunIcon, UsersIcon, AcademicCapIcon } from "@heroicons/react/24/outline";
+import { HomeIcon, SunIcon, UsersIcon, AcademicCapIcon, ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+
+type MetaItem = {
+  /** Key used for icon lookup (e.g., 'environment', 'group', 'age') */
+  key: string;
+  /** Translated label to display */
+  label: string;
+  /** Value to display */
+  value: string;
+};
 
 type SessionHeaderProps = {
   title: string;
   summary: string;
-  meta?: Array<{ label: string; value: string }>;
+  meta?: MetaItem[];
 };
 
 const metaIcons: Record<string, typeof HomeIcon> = {
-  "Miljö": SunIcon,
-  "Grupp": UsersIcon,
-  "Ålder": AcademicCapIcon,
+  environment: SunIcon,
+  group: UsersIcon,
+  age: AcademicCapIcon,
+  duration: ClockIcon,
+  blocks: Squares2X2Icon,
 };
 
 export function SessionHeader({ title, summary, meta = [] }: SessionHeaderProps) {
@@ -27,7 +38,7 @@ export function SessionHeader({ title, summary, meta = [] }: SessionHeaderProps)
       {meta.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {meta.map((item) => {
-            const Icon = metaIcons[item.label] || HomeIcon;
+            const Icon = metaIcons[item.key] || HomeIcon;
             return (
               <span
                 key={item.label}

@@ -1222,7 +1222,12 @@
       },
       "meta": {
         "duration": "Duration",
-        "minutes": "min"
+        "minutes": "min",
+        "blocks": "Blocks",
+        "block": "block"
+      },
+      "sessionHeader": {
+        "plannedSession": "Planned session"
       },
       "tips": {
         "title": "Session tips",

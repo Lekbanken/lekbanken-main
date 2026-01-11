@@ -1222,7 +1222,12 @@
       },
       "meta": {
         "duration": "Varighet",
-        "minutes": "min"
+        "minutes": "min",
+        "blocks": "Momenter",
+        "block": "blokk"
+      },
+      "sessionHeader": {
+        "plannedSession": "Planlagt økt"
       },
       "tips": {
         "title": "Økttips",

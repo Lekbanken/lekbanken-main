@@ -142,33 +142,38 @@ function getEventSeverity(type: SessionEventType): TimelineMarker['severity'] {
   }
 }
 
+/** 
+ * @deprecated Use event.eventType as translation key instead
+ * Translation keys are in play.sessionTimeline.eventTypes.[eventType]
+ */
 function getEventLabel(event: SessionEvent): string {
+  // Return English labels as fallback - components should use eventType as translation key
   const labels: Partial<Record<SessionEventType, string>> = {
-    session_started: 'Session startad',
-    session_paused: 'Session pausad',
-    session_resumed: 'Session återupptagen',
-    session_ended: 'Session avslutad',
-    step_started: 'Steg startat',
-    step_completed: 'Steg klart',
-    phase_started: 'Fas startad',
-    phase_completed: 'Fas klar',
-    artifact_revealed: 'Artefakt visad',
-    artifact_hidden: 'Artefakt dold',
-    artifact_state_changed: 'Artefakt uppdaterad',
-    artifact_solved: 'Pussel löst',
-    artifact_failed: 'Fel svar',
-    trigger_armed: 'Trigger aktiverad',
-    trigger_disabled: 'Trigger avaktiverad',
-    trigger_fired: 'Trigger avfyrad',
-    trigger_error: 'Trigger-fel',
-    signal_sent: 'Signal skickad',
-    timebank_started: 'TimeBank startad',
-    timebank_paused: 'TimeBank pausad',
-    timebank_expired: 'TimeBank utgången',
-    participant_joined: 'Deltagare anslöt',
-    participant_left: 'Deltagare lämnade',
-    participant_role_assigned: 'Roll tilldelad',
-    host_action: 'Spelledare-åtgärd',
+    session_started: 'Session started',
+    session_paused: 'Session paused',
+    session_resumed: 'Session resumed',
+    session_ended: 'Session ended',
+    step_started: 'Step started',
+    step_completed: 'Step completed',
+    phase_started: 'Phase started',
+    phase_completed: 'Phase completed',
+    artifact_revealed: 'Artifact revealed',
+    artifact_hidden: 'Artifact hidden',
+    artifact_state_changed: 'Artifact updated',
+    artifact_solved: 'Puzzle solved',
+    artifact_failed: 'Wrong answer',
+    trigger_armed: 'Trigger armed',
+    trigger_disabled: 'Trigger disabled',
+    trigger_fired: 'Trigger fired',
+    trigger_error: 'Trigger error',
+    signal_sent: 'Signal sent',
+    timebank_started: 'TimeBank started',
+    timebank_paused: 'TimeBank paused',
+    timebank_expired: 'TimeBank expired',
+    participant_joined: 'Participant joined',
+    participant_left: 'Participant left',
+    participant_role_assigned: 'Role assigned',
+    host_action: 'Host action',
   };
   return labels[event.eventType] ?? (event.payload as { label?: string })?.label ?? event.eventType;
 }

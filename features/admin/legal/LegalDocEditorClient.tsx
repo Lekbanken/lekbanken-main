@@ -59,9 +59,9 @@ function buildInitialForms(
 }
 
 function formatDate(value?: string | null) {
-  if (!value) return '—'
+  if (!value) return 'N/A'
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? '—' : date.toLocaleString()
+  return Number.isNaN(date.getTime()) ? 'N/A' : date.toLocaleString()
 }
 
 export function LegalDocEditorClient({
@@ -101,6 +101,11 @@ export function LegalDocEditorClient({
   const currentPublished = activeDocs[locale]
   const currentForm = forms[locale]
   const publicRoute = LEGAL_DOC_PUBLIC_ROUTES[docType]
+  const canPublish = Boolean(
+    currentForm.title.trim() &&
+    currentForm.contentMarkdown.trim() &&
+    currentForm.changeSummary.trim()
+  )
 
   const isDirty = useMemo(() => {
     const base = currentDraft ?? currentPublished
@@ -330,7 +335,7 @@ export function LegalDocEditorClient({
               <Button
                 variant="outline"
                 onClick={() => setConfirmOpen(true)}
-                disabled={isPublishing}
+                disabled={isPublishing || !canPublish}
               >
                 {isPublishing ? 'Publishing...' : 'Publish'}
               </Button>
@@ -356,7 +361,7 @@ export function LegalDocEditorClient({
               <div className="flex items-center justify-between">
                 <span>Version</span>
                 <span className="font-medium text-foreground">
-                  {currentPublished ? `v${currentPublished.version_int}` : '—'}
+                  {currentPublished ? `v${currentPublished.version_int}` : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -368,7 +373,7 @@ export function LegalDocEditorClient({
               <div className="flex items-center justify-between">
                 <span>Requires acceptance</span>
                 <span className="font-medium text-foreground">
-                  {currentPublished ? (currentPublished.requires_acceptance ? 'Yes' : 'No') : '—'}
+                  {currentPublished ? (currentPublished.requires_acceptance ? 'Yes' : 'No') : 'N/A'}
                 </span>
               </div>
               {publicRoute && scope === 'global' && (

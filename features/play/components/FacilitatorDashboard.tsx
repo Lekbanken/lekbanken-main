@@ -13,6 +13,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   PlayIcon,
   PauseIcon,
@@ -88,6 +89,8 @@ export function FacilitatorDashboard({
   onEndSession,
   participantCount = 0,
 }: FacilitatorDashboardProps) {
+  const t = useTranslations('play.facilitatorDashboard');
+
   // Local state (mirrors server state)
   // Use -1 as default to indicate "not started yet"
   const [currentStepIndex, setCurrentStepIndex] = useState(initialState?.current_step_index ?? -1);
@@ -418,7 +421,7 @@ export function FacilitatorDashboard({
   }, [updateAndBroadcast, broadcastStateChange]);
   
   const handleEndSession = useCallback(async () => {
-    if (!confirm('Är du säker på att du vill avsluta sessionen?')) return;
+    if (!confirm(t('confirmEndSession'))) return;
     setStatus('ended');
     await updateAndBroadcast(
       { status: 'ended' },
@@ -445,7 +448,7 @@ export function FacilitatorDashboard({
         }
       } catch (err) {
         if (!cancelled) {
-          setChatError(err instanceof Error ? err.message : 'Kunde inte ladda chatten');
+          setChatError(err instanceof Error ? err.message : t('chat.loadError'));
         }
       }
     };
@@ -500,7 +503,7 @@ export function FacilitatorDashboard({
         });
       }
     } catch (err) {
-      setChatError(err instanceof Error ? err.message : 'Kunde inte skicka meddelandet');
+      setChatError(err instanceof Error ? err.message : t('chat.sendError'));
     } finally {
       setChatSending(false);
     }
@@ -512,7 +515,7 @@ export function FacilitatorDashboard({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-primary">
-            Facilitator
+            {t('header.facilitator')}
           </p>
           <h1 className="text-2xl font-bold text-foreground">{gameTitle}</h1>
         </div>
@@ -525,13 +528,13 @@ export function FacilitatorDashboard({
             ) : (
               <SignalSlashIcon className="h-3 w-3" />
             )}
-            {connected ? 'Ansluten' : 'Ej ansluten'}
+            {connected ? t('connection.connected') : t('connection.disconnected')}
           </Badge>
           
           {/* Participant count */}
           <Badge variant="secondary" className="gap-1.5">
             <UserGroupIcon className="h-3 w-3" />
-            {participantCount} deltagare
+            {t('participants.count', { count: participantCount })}
           </Badge>
           
           {/* Settings toggle */}
@@ -556,9 +559,9 @@ export function FacilitatorDashboard({
               'bg-gray-500'
             }`} />
             <span className="text-sm font-medium">
-              {status === 'active' ? 'Aktiv' :
-               status === 'paused' ? 'Pausad' :
-               status === 'ended' ? 'Avslutad' : status}
+              {status === 'active' ? t('status.active') :
+               status === 'paused' ? t('status.paused') :
+               status === 'ended' ? t('status.ended') : status}
             </span>
           </div>
           
@@ -572,7 +575,7 @@ export function FacilitatorDashboard({
                 className="gap-1.5"
               >
                 <PauseIcon className="h-4 w-4" />
-                Pausa
+                {t('session.pause')}
               </Button>
             ) : status === 'paused' ? (
               <Button
@@ -582,7 +585,7 @@ export function FacilitatorDashboard({
                 className="gap-1.5"
               >
                 <PlayIcon className="h-4 w-4" />
-                Återuppta
+                {t('session.resume')}
               </Button>
             ) : null}
             
@@ -595,7 +598,7 @@ export function FacilitatorDashboard({
                 className="gap-1.5"
               >
                 <StopIcon className="h-4 w-4" />
-                Avsluta
+                {t('session.end')}
               </Button>
             )}
 
@@ -604,10 +607,10 @@ export function FacilitatorDashboard({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => void broadcastCountdown('show', 5, 'Nästa moment startar om')}
+                onClick={() => void broadcastCountdown('show', 5, t('session.countdownMessage'))}
                 disabled={isSaving}
                 className="gap-1.5"
-                title="Visa nedräkning för deltagare"
+                title={t('session.countdownTooltip')}
               >
                 <ClockIcon className="h-4 w-4" />
                 5s
@@ -641,7 +644,7 @@ export function FacilitatorDashboard({
           {/* Timer Control */}
           <Card className="p-4">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Timer
+              {t('timer.title')}
             </h3>
             <TimerControl
               timerState={timerState}
@@ -659,13 +662,13 @@ export function FacilitatorDashboard({
           <Card className="p-4">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               <ChatBubbleBottomCenterTextIcon className="mr-2 inline h-4 w-4" />
-              Meddelande till tavlan
+              {t('board.title')}
             </h3>
             <div className="space-y-3">
               <Input
                 value={boardMessage}
                 onChange={(e) => setBoardMessage(e.target.value)}
-                placeholder="Skriv ett meddelande som visas på tavlan..."
+                placeholder={t('board.placeholder')}
                 disabled={isSaving || status === 'ended'}
               />
               <div className="flex gap-2">
@@ -674,7 +677,7 @@ export function FacilitatorDashboard({
                   onClick={handleBoardMessageSubmit}
                   disabled={isSaving || status === 'ended' || !boardMessage.trim()}
                 >
-                  Visa på tavlan
+                  {t('board.showOnBoard')}
                 </Button>
                 <Button
                   variant="outline"
@@ -682,7 +685,7 @@ export function FacilitatorDashboard({
                   onClick={handleClearBoardMessage}
                   disabled={isSaving || status === 'ended'}
                 >
-                  Rensa
+                  {t('board.clear')}
                 </Button>
               </div>
             </div>
@@ -693,10 +696,10 @@ export function FacilitatorDashboard({
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
                 <SignalIcon className="mr-2 inline h-4 w-4" />
-                Signals
+                {t('signals.title')}
               </h3>
               <Badge variant={liveConnected ? 'success' : 'secondary'} size="sm">
-                {liveConnected ? 'Live' : 'Offline'}
+                {liveConnected ? t('signals.live') : t('signals.offline')}
               </Badge>
             </div>
 
@@ -707,13 +710,13 @@ export function FacilitatorDashboard({
                 <Input
                   value={signalChannel}
                   onChange={(e) => setSignalChannel(e.target.value)}
-                  placeholder="Kanal (t.ex. READY)"
+                  placeholder={t('signals.channelPlaceholder')}
                   disabled={signalSending || status === 'ended'}
                 />
                 <Input
                   value={signalMessage}
                   onChange={(e) => setSignalMessage(e.target.value)}
-                  placeholder="Meddelande"
+                  placeholder={t('signals.messagePlaceholder')}
                   disabled={signalSending || status === 'ended'}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -732,7 +735,7 @@ export function FacilitatorDashboard({
                     !signalMessage.trim()
                   }
                 >
-                  Skicka
+                  {t('signals.send')}
                 </Button>
               </div>
 
@@ -755,7 +758,7 @@ export function FacilitatorDashboard({
 
               <div className="max-h-48 overflow-auto rounded-md border border-border p-3 space-y-2">
                 {recentSignals.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Inga signals ännu.</p>
+                  <p className="text-sm text-muted-foreground">{t('signals.noSignals')}</p>
                 ) : (
                   recentSignals.map((s) => (
                     <div key={s.id} className="text-sm">
@@ -779,19 +782,19 @@ export function FacilitatorDashboard({
           <Card className="p-4">
             <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
               <ChatBubbleBottomCenterTextIcon className="mr-2 inline h-4 w-4" />
-              Chatt
+              {t('chat.title')}
             </h3>
 
             <div className="space-y-3">
               <div className="max-h-72 overflow-auto rounded-md border border-border p-3 space-y-2">
                 {chatMessages.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Inga meddelanden ännu.</p>
+                  <p className="text-sm text-muted-foreground">{t('chat.noMessages')}</p>
                 ) : (
                   chatMessages.map((m) => (
                     <div key={m.id} className="text-sm">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-foreground">{m.senderLabel}</span>
-                        {m.visibility === 'host' && <Badge variant="secondary">Privat</Badge>}
+                        {m.visibility === 'host' && <Badge variant="secondary">{t('chat.private')}</Badge>}
                       </div>
                       <p className="text-muted-foreground">{m.message}</p>
                     </div>
@@ -805,7 +808,7 @@ export function FacilitatorDashboard({
                 <Input
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
-                  placeholder="Skriv till alla…"
+                  placeholder={t('chat.placeholder')}
                   disabled={chatSending || status === 'ended'}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
@@ -819,7 +822,7 @@ export function FacilitatorDashboard({
                   onClick={() => void handleSendChat()}
                   disabled={chatSending || status === 'ended'}
                 >
-                  Skicka
+                  {t('chat.send')}
                 </Button>
               </div>
             </div>
@@ -839,7 +842,7 @@ export function FacilitatorDashboard({
       {/* Saving indicator */}
       {isSaving && (
         <div className="fixed bottom-4 right-4 rounded-lg bg-primary px-4 py-2 text-sm text-primary-foreground shadow-lg">
-          Sparar...
+          {t('saving')}
         </div>
       )}
     </div>

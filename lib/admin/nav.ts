@@ -154,6 +154,7 @@ const systemAdminCategories: AdminNavCategory[] = [
     items: [
       { id: 'design', labelKey: 'design', href: '/admin/design', icon: 'swatch', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'translations', labelKey: 'translations', href: '/admin/translations', icon: 'language', permission: 'admin.system.view', systemAdminOnly: true },
+      { id: 'legal', labelKey: 'legal', href: '/admin/legal', icon: 'audit', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'notifications', labelKey: 'notifications', href: '/admin/notifications', icon: 'notifications', permission: 'admin.notifications.send' },
       { id: 'feature-flags', labelKey: 'featureFlags', href: '/admin/feature-flags', icon: 'flag', permission: 'admin.system.view' },
       { id: 'api-keys', labelKey: 'apiKeys', href: '/admin/api-keys', icon: 'key', permission: 'admin.system.view' },
@@ -234,6 +235,7 @@ const organisationAdminCategories: AdminNavCategory[] = [
       { id: 'org-general', labelKey: 'general', href: '/admin/tenant/[tenantId]/settings', icon: 'settings' },
       { id: 'org-branding', labelKey: 'branding', href: '/admin/tenant/[tenantId]/branding', icon: 'personalization' },
       { id: 'org-domains', labelKey: 'domains', href: '/admin/tenant/[tenantId]/domains', icon: 'rss' },
+      { id: 'org-legal', labelKey: 'legal', href: '/admin/tenant/[tenantId]/legal', icon: 'audit' },
     ],
   },
 ]

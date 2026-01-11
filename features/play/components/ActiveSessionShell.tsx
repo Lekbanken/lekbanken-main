@@ -9,6 +9,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -58,6 +59,7 @@ export function ActiveSessionShell({
   onOpenChat,
   children,
 }: ActiveSessionShellProps) {
+  const t = useTranslations('play.activeSessionShell');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [hostBusy, setHostBusy] = useState(false);
 
@@ -83,8 +85,8 @@ export function ActiveSessionShell({
 
   const topTitle = useMemo(() => {
     if (title) return title;
-    return role === 'host' ? 'Aktiv session' : 'Aktiv session';
-  }, [role, title]);
+    return t('defaultTitle');
+  }, [role, title, t]);
 
   if (!open) return null;
 
@@ -93,11 +95,11 @@ export function ActiveSessionShell({
   const participantConfirm = (
     <Card variant="elevated" className="w-full max-w-md p-6">
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-foreground">Tillbaka till Lobbyn</h2>
-        <p className="text-sm text-muted-foreground">Du är påväg att lämna sessionen. Stämmer det?</p>
+        <h2 className="text-lg font-semibold text-foreground">{t('participant.confirmTitle')}</h2>
+        <p className="text-sm text-muted-foreground">{t('participant.confirmDescription')}</p>
         <div className="grid grid-cols-2 gap-3 pt-2">
           <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-            Nej
+            {t('participant.no')}
           </Button>
           <Button
             variant="primary"
@@ -106,7 +108,7 @@ export function ActiveSessionShell({
               onRequestClose();
             }}
           >
-            Ja
+            {t('participant.yes')}
           </Button>
         </div>
       </div>
@@ -116,9 +118,9 @@ export function ActiveSessionShell({
   const hostConfirm = (
     <Card variant="elevated" className="w-full max-w-lg p-6">
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-foreground">Lämna aktiv session</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t('host.confirmTitle')}</h2>
         <p className="text-sm text-muted-foreground">
-          Du är på väg att lämna sessionen. Vad vill du göra med sessionen?
+          {t('host.confirmDescription')}
         </p>
         <div className="grid gap-2 pt-2">
           <Button
@@ -128,7 +130,7 @@ export function ActiveSessionShell({
               setConfirmOpen(false);
             }}
           >
-            Avbryt
+            {t('host.cancel')}
           </Button>
           <Button
             variant="default"
@@ -144,7 +146,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Lämna – sessionen fortsätter som AKTIV
+            {t('host.continueActive')}
           </Button>
           <Button
             variant="outline"
@@ -160,7 +162,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Lämna – sessionen PAUSAS
+            {t('host.pauseSession')}
           </Button>
           <Button
             variant="destructive"
@@ -176,7 +178,7 @@ export function ActiveSessionShell({
               }
             }}
           >
-            Lämna – sessionen AVSLUTAS
+            {t('host.endSession')}
           </Button>
         </div>
       </div>

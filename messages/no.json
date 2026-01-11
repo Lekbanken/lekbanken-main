@@ -208,6 +208,7 @@
       "releaseNotes": "Utgivelsesnotater",
       "settings": "Innstillinger",
       "translations": "Oversettelser",
+      "legal": "Juridikk",
       "gamification": "Gamification",
       "dicecoinXp": "DiceCoin & XP",
       "achievements": "Achievements",
@@ -1181,6 +1182,23 @@
         "rejected": "Avslått"
       }
     },
+    "activeSessionShell": {
+      "defaultTitle": "Aktiv sesjon",
+      "participant": {
+        "confirmTitle": "Tilbake til lobbyen",
+        "confirmDescription": "Du er i ferd med å forlate sesjonen. Stemmer det?",
+        "no": "Nei",
+        "yes": "Ja"
+      },
+      "host": {
+        "confirmTitle": "Forlat aktiv sesjon",
+        "confirmDescription": "Du er i ferd med å forlate sesjonen. Hva vil du gjøre med sesjonen?",
+        "cancel": "Avbryt",
+        "continueActive": "Forlat – sesjonen fortsetter som AKTIV",
+        "pauseSession": "Forlat – sesjonen PAUSES",
+        "endSession": "Forlat – sesjonen AVSLUTTES"
+      }
+    },
     "participant": {
       "ready": "Klar",
       "notReady": "Ikke klar",
@@ -1394,6 +1412,90 @@
       "totalSteps": "Totalt {count} steg",
       "stepOf": "Steg {current} av {total}",
       "goToStep": "Gå til steg"
+    },
+    "facilitatorDashboard": {
+      "header": {
+        "facilitator": "Fasilitator"
+      },
+      "connection": {
+        "connected": "Tilkoblet",
+        "disconnected": "Ikke tilkoblet"
+      },
+      "participants": {
+        "count": "{count} deltakere"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pauset",
+        "ended": "Avsluttet"
+      },
+      "session": {
+        "pause": "Pause",
+        "resume": "Gjenoppta",
+        "end": "Avslutt",
+        "countdownMessage": "Neste moment starter om",
+        "countdownTooltip": "Vis nedtelling for deltakere"
+      },
+      "timer": {
+        "title": "Timer"
+      },
+      "board": {
+        "title": "Melding til tavlen",
+        "placeholder": "Skriv en melding som vises på tavlen...",
+        "showOnBoard": "Vis på tavlen",
+        "clear": "Tøm"
+      },
+      "signals": {
+        "title": "Signals",
+        "live": "Live",
+        "offline": "Offline",
+        "channelPlaceholder": "Kanal (f.eks. READY)",
+        "messagePlaceholder": "Melding",
+        "send": "Send",
+        "noSignals": "Ingen signals enda."
+      },
+      "chat": {
+        "title": "Chat",
+        "noMessages": "Ingen meldinger enda.",
+        "private": "Privat",
+        "placeholder": "Skriv til alle…",
+        "send": "Send",
+        "sendError": "Kunne ikke sende melding",
+        "loadError": "Kunne ikke laste chat"
+      },
+      "saving": "Lagrer...",
+      "confirmEndSession": "Er du sikker på at du vil avslutte sesjonen?"
+    },
+    "outcomePanel": {
+      "loading": "Laster utfall…",
+      "title": "Utfall",
+      "description": "Skriv et utfall og vis det på tavlen.",
+      "errors": {
+        "loadFailed": "Kunne ikke laste utfall",
+        "titleRequired": "Tittel er påkrevd",
+        "createFailed": "Kunne ikke opprette utfall",
+        "updateFailed": "Kunne ikke oppdatere utfall"
+      },
+      "form": {
+        "titleLabel": "Tittel",
+        "titlePlaceholder": "F.eks.: Dommen faller",
+        "textLabel": "Tekst",
+        "textPlaceholder": "Valgfri beskrivelse…",
+        "createOutcome": "Opprett utfall"
+      },
+      "empty": {
+        "title": "Ingen utfall registrert",
+        "description": "Bruk skjemaet ovenfor for å dokumentere hva som skjedde under sesjonen.",
+        "hint": "Utfall kan vises for deltakere som en oppsummering/debrief på slutten av sesjonen."
+      },
+      "status": {
+        "revealed": "vist",
+        "hidden": "skjult"
+      },
+      "actions": {
+        "hide": "Skjul",
+        "reveal": "Vis"
+      }
     }
   }
 }

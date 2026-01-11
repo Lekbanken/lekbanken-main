@@ -88,9 +88,10 @@ async function logLegalEvent(params: {
   documentId?: string | null
   eventType: string
   payload?: Record<string, unknown>
+  actorUserId?: string | null
 }) {
   const supabase = await getLegalClient()
-  const { scope, tenantId, documentId, eventType, payload } = params
+  const { scope, tenantId, documentId, eventType, payload, actorUserId } = params
 
   await supabase
     .from('legal_audit_log')
@@ -100,6 +101,7 @@ async function logLegalEvent(params: {
       document_id: documentId ?? null,
       event_type: eventType,
       payload: payload ?? {},
+      actor_user_id: actorUserId ?? null,
     })
 }
 
@@ -182,8 +184,8 @@ export async function getLegalEditorSnapshot(params: {
     listLegalDrafts({ scope: params.scope, tenantId: params.tenantId ?? null, type: params.type }),
   ])
 
-  if (!activeDocs.success) return activeDocs
-  if (!drafts.success) return drafts
+  if (!activeDocs.success) return { success: false, error: activeDocs.error }
+  if (!drafts.success) return { success: false, error: drafts.error }
 
   return { success: true, data: { activeDocs: activeDocs.data, drafts: drafts.data } }
 }
@@ -227,6 +229,7 @@ export async function saveLegalDraft(input: LegalDraftInput): Promise<ActionResu
     documentId: null,
     eventType: 'draft_saved',
     payload: { type: input.type, locale: input.locale },
+    actorUserId: access.user.id,
   })
 
   return { success: true, data }
@@ -242,13 +245,18 @@ export async function deleteLegalDraft(params: {
   if (!access.ok) return { success: false, error: access.error }
 
   const supabase = await getLegalClient()
-  const { error } = await supabase
+  let query = supabase
     .from('legal_document_drafts')
     .delete()
     .eq('scope', params.scope)
     .eq('type', params.type)
     .eq('locale', params.locale)
-    .eq('tenant_id', params.scope === 'tenant' ? params.tenantId ?? null : null)
+
+  query = params.scope === 'tenant'
+    ? query.eq('tenant_id', params.tenantId ?? null)
+    : query.is('tenant_id', null)
+
+  const { error } = await query
 
   if (error) {
     console.error('[legal] deleteLegalDraft failed', error)
@@ -261,6 +269,7 @@ export async function deleteLegalDraft(params: {
     documentId: null,
     eventType: 'draft_deleted',
     payload: { type: params.type, locale: params.locale },
+    actorUserId: access.user.id,
   })
 
   return { success: true, data: null }
@@ -297,13 +306,18 @@ export async function publishLegalDocument(input: PublishInput): Promise<ActionR
     return { success: false, error: 'Failed to publish document' }
   }
 
-  await supabase
+  let draftDeleteQuery = supabase
     .from('legal_document_drafts')
     .delete()
     .eq('scope', input.scope)
     .eq('type', input.type)
     .eq('locale', input.locale)
-    .eq('tenant_id', input.scope === 'tenant' ? input.tenantId ?? null : null)
+
+  draftDeleteQuery = input.scope === 'tenant'
+    ? draftDeleteQuery.eq('tenant_id', input.tenantId ?? null)
+    : draftDeleteQuery.is('tenant_id', null)
+
+  await draftDeleteQuery
 
   const { data: doc, error: docError } = await supabase
     .from('legal_documents')
@@ -461,6 +475,7 @@ export async function recordOrgLegalAcceptance(params: {
     documentId: params.documentId,
     eventType: 'org_accepted',
     payload: { documentId: params.documentId },
+    actorUserId: access.user.id,
   })
 
   return { success: true, data }

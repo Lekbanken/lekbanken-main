@@ -208,6 +208,7 @@
       "releaseNotes": "Release Notes",
       "settings": "Settings",
       "translations": "Translations",
+      "legal": "Legal",
       "gamification": "Gamification",
       "dicecoinXp": "DiceCoin & XP",
       "achievements": "Achievements",
@@ -1181,6 +1182,23 @@
         "rejected": "Rejected"
       }
     },
+    "activeSessionShell": {
+      "defaultTitle": "Active session",
+      "participant": {
+        "confirmTitle": "Back to Lobby",
+        "confirmDescription": "You are about to leave the session. Are you sure?",
+        "no": "No",
+        "yes": "Yes"
+      },
+      "host": {
+        "confirmTitle": "Leave active session",
+        "confirmDescription": "You are about to leave the session. What would you like to do with the session?",
+        "cancel": "Cancel",
+        "continueActive": "Leave – session remains ACTIVE",
+        "pauseSession": "Leave – session is PAUSED",
+        "endSession": "Leave – session is ENDED"
+      }
+    },
     "participant": {
       "ready": "Ready",
       "notReady": "Not ready",
@@ -1394,6 +1412,90 @@
       "totalSteps": "Total {count} steps",
       "stepOf": "Step {current} of {total}",
       "goToStep": "Go to step"
+    },
+    "facilitatorDashboard": {
+      "header": {
+        "facilitator": "Facilitator"
+      },
+      "connection": {
+        "connected": "Connected",
+        "disconnected": "Disconnected"
+      },
+      "participants": {
+        "count": "{count} participants"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "ended": "Ended"
+      },
+      "session": {
+        "pause": "Pause",
+        "resume": "Resume",
+        "end": "End",
+        "countdownMessage": "Next segment starts in",
+        "countdownTooltip": "Show countdown for participants"
+      },
+      "timer": {
+        "title": "Timer"
+      },
+      "board": {
+        "title": "Board message",
+        "placeholder": "Write a message to display on the board...",
+        "showOnBoard": "Show on board",
+        "clear": "Clear"
+      },
+      "signals": {
+        "title": "Signals",
+        "live": "Live",
+        "offline": "Offline",
+        "channelPlaceholder": "Channel (e.g. READY)",
+        "messagePlaceholder": "Message",
+        "send": "Send",
+        "noSignals": "No signals yet."
+      },
+      "chat": {
+        "title": "Chat",
+        "noMessages": "No messages yet.",
+        "private": "Private",
+        "placeholder": "Write to everyone…",
+        "send": "Send",
+        "sendError": "Could not send message",
+        "loadError": "Could not load chat"
+      },
+      "saving": "Saving...",
+      "confirmEndSession": "Are you sure you want to end the session?"
+    },
+    "outcomePanel": {
+      "loading": "Loading outcomes\u2026",
+      "title": "Outcomes",
+      "description": "Write an outcome and reveal it on the board.",
+      "errors": {
+        "loadFailed": "Could not load outcomes",
+        "titleRequired": "Title is required",
+        "createFailed": "Could not create outcome",
+        "updateFailed": "Could not update outcome"
+      },
+      "form": {
+        "titleLabel": "Title",
+        "titlePlaceholder": "E.g.: The verdict is in",
+        "textLabel": "Text",
+        "textPlaceholder": "Optional description\u2026",
+        "createOutcome": "Create outcome"
+      },
+      "empty": {
+        "title": "No outcomes recorded",
+        "description": "Use the form above to document what happened during the session.",
+        "hint": "Outcomes can be shown to participants as a summary/debrief at the end of the session."
+      },
+      "status": {
+        "revealed": "revealed",
+        "hidden": "hidden"
+      },
+      "actions": {
+        "hide": "Hide",
+        "reveal": "Reveal"
+      }
     }
   }
 }

@@ -208,6 +208,7 @@
       "releaseNotes": "Release Notes",
       "settings": "Inställningar",
       "translations": "Översättningar",
+      "legal": "Juridik",
       "gamification": "Gamification",
       "dicecoinXp": "DiceCoin & XP",
       "achievements": "Achievements",
@@ -1177,6 +1178,23 @@
         "rejected": "Avslagen"
       }
     },
+    "activeSessionShell": {
+      "defaultTitle": "Aktiv session",
+      "participant": {
+        "confirmTitle": "Tillbaka till Lobbyn",
+        "confirmDescription": "Du är påväg att lämna sessionen. Stämmer det?",
+        "no": "Nej",
+        "yes": "Ja"
+      },
+      "host": {
+        "confirmTitle": "Lämna aktiv session",
+        "confirmDescription": "Du är på väg att lämna sessionen. Vad vill du göra med sessionen?",
+        "cancel": "Avbryt",
+        "continueActive": "Lämna – sessionen fortsätter som AKTIV",
+        "pauseSession": "Lämna – sessionen PAUSAS",
+        "endSession": "Lämna – sessionen AVSLUTAS"
+      }
+    },
     "participant": {
       "ready": "Redo",
       "notReady": "Inte redo",
@@ -1390,6 +1408,90 @@
       "totalSteps": "Totalt {count} steg",
       "stepOf": "Steg {current} av {total}",
       "goToStep": "Gå till steg"
+    },
+    "facilitatorDashboard": {
+      "header": {
+        "facilitator": "Facilitator"
+      },
+      "connection": {
+        "connected": "Ansluten",
+        "disconnected": "Ej ansluten"
+      },
+      "participants": {
+        "count": "{count} deltagare"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "ended": "Avslutad"
+      },
+      "session": {
+        "pause": "Pausa",
+        "resume": "Återuppta",
+        "end": "Avsluta",
+        "countdownMessage": "Nästa moment startar om",
+        "countdownTooltip": "Visa nedräkning för deltagare"
+      },
+      "timer": {
+        "title": "Timer"
+      },
+      "board": {
+        "title": "Meddelande till tavlan",
+        "placeholder": "Skriv ett meddelande som visas på tavlan...",
+        "showOnBoard": "Visa på tavlan",
+        "clear": "Rensa"
+      },
+      "signals": {
+        "title": "Signals",
+        "live": "Live",
+        "offline": "Offline",
+        "channelPlaceholder": "Kanal (t.ex. READY)",
+        "messagePlaceholder": "Meddelande",
+        "send": "Skicka",
+        "noSignals": "Inga signals ännu."
+      },
+      "chat": {
+        "title": "Chatt",
+        "noMessages": "Inga meddelanden ännu.",
+        "private": "Privat",
+        "placeholder": "Skriv till alla…",
+        "send": "Skicka",
+        "sendError": "Kunde inte skicka meddelandet",
+        "loadError": "Kunde inte ladda chatten"
+      },
+      "saving": "Sparar...",
+      "confirmEndSession": "Är du säker på att du vill avsluta sessionen?"
+    },
+    "outcomePanel": {
+      "loading": "Laddar utfall…",
+      "title": "Utfall",
+      "description": "Skriv ett utfall och reveal på tavlan.",
+      "errors": {
+        "loadFailed": "Kunde inte ladda utfall",
+        "titleRequired": "Titel krävs",
+        "createFailed": "Kunde inte skapa utfall",
+        "updateFailed": "Kunde inte uppdatera utfall"
+      },
+      "form": {
+        "titleLabel": "Titel",
+        "titlePlaceholder": "Ex: Domen faller",
+        "textLabel": "Text",
+        "textPlaceholder": "Valfri beskrivning…",
+        "createOutcome": "Skapa utfall"
+      },
+      "empty": {
+        "title": "Inga utfall registrerade",
+        "description": "Använd formuläret ovan för att dokumentera vad som hände under sessionen.",
+        "hint": "Utfall kan visas för deltagare som en sammanfattning/debrief i slutet av sessionen."
+      },
+      "status": {
+        "revealed": "revealed",
+        "hidden": "hidden"
+      },
+      "actions": {
+        "hide": "Dölj",
+        "reveal": "Reveal"
+      }
     }
   }
 }

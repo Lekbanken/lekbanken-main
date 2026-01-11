@@ -551,6 +551,21 @@
       "backToHome": "← Tillbaka till startsidan",
       "lastUpdated": "Senast uppdaterad: {date}"
     },
+    "accept": {
+      "title": "Granska och godkänn villkor",
+      "description": "Du måste godkänna för att fortsätta.",
+      "intro": "Läs igenom dokumenten nedan och bekräfta ditt godkännande.",
+      "versionLabel": "Version {version}",
+      "acceptCheckbox": "Jag har läst och godkänner {title}.",
+      "acceptButton": "Godkänn och fortsätt"
+    },
+    "cookieBanner": {
+      "title": "Vi använder cookies",
+      "description": "Vi använder cookies för att hålla Lekbanken igång och förbättra upplevelsen.",
+      "acceptAll": "Godkänn alla",
+      "acceptNecessary": "Endast nödvändiga",
+      "gpcNotice": "Global Privacy Control/Do Not Track är aktiverat. Vi använder bara nödvändiga cookies."
+    },
     "privacy": {
       "metadata": {
         "title": "Integritetspolicy - Lekbanken",
@@ -908,6 +923,59 @@
         }
       }
     },
+    "cockpit": {
+      "header": {
+        "participants": "deltagare",
+        "openChat": "Öppna chatt"
+      },
+      "preflight": {
+        "title": "Förberedelsekontroll",
+        "readyToStart": "Redo att starta",
+        "preparingSession": "Förbereda session",
+        "allChecksOk": "Alla kontroller godkända",
+        "pendingLabel": "väntande",
+        "warningsLabel": "varningar",
+        "errorsLabel": "fel"
+      },
+      "roles": {
+        "noRolesCopied": "Inga roller kopierade ännu",
+        "copyRolesDescription": "Kopiera roller från spelet för att kunna tilldela dem till deltagare.",
+        "roleDistribution": "Rollfördelning"
+      },
+      "participants": {
+        "noParticipantsYet": "Inga deltagare har anslutit ännu.",
+        "shareCodeToInvite": "Dela sessionskoden för att bjuda in deltagare.",
+        "noParticipantsConnected": "Inga deltagare har anslutit än",
+        "participantsConnected": "{count} deltagare anslutna"
+      },
+      "steps": {
+        "unnamedStep": "Namnlöst steg"
+      },
+      "tabs": {
+        "overview": "Översikt",
+        "events": "Händelser",
+        "settings": "Inställningar"
+      },
+      "story": {
+        "title": "Berättelsen"
+      },
+      "analytics": {
+        "puzzlesSolved": "Pussel lösta",
+        "events": "Händelser",
+        "hintsUsed": "Ledtrådar använda",
+        "completionRate": "Slutförandegrad",
+        "puzzlesOfTotal": "{solved} av {total} pussel lösta",
+        "solved": "Lösta",
+        "inProgress": "Pågår",
+        "solutionTime": "Lösningstid",
+        "attempts": "Försök",
+        "ofSolved": "{solved} av {total} lösta",
+        "hints": "{count} ledtrådar",
+        "tabs": {
+          "overview": "Översikt"
+        }
+      }
+    },
     "facilitator": {
       "dashboard": "Instrumentpanel",
       "participants": "Deltagare",
@@ -970,6 +1038,35 @@
         "ended": "Sessionen är avslutad",
         "thanksForParticipating": "Tack för att du deltog!"
       },
+      "lobby": {
+        "couldNotGetSession": "Kunde inte hämta session",
+        "sessionNotFound": "Session hittades inte",
+        "checkCodeAndRetry": "Kontrollera att sessionskoden är korrekt och försök igen.",
+        "backToStart": "Tillbaka till start",
+        "sessionEnded": "Sessionen har avslutats",
+        "thanksForParticipating": "Tack för ditt deltagande!",
+        "joinNewSession": "Gå med i en ny session",
+        "participatingAs": "Du deltar som",
+        "rolePlayer": "Spelare",
+        "roleObserver": "Observatör",
+        "roleTeamLead": "Lagledare",
+        "roleFacilitator": "Facilitator",
+        "sessionPaused": "Sessionen är pausad",
+        "awaitInstructions": "Invänta instruktioner från värden.",
+        "sessionLocked": "Sessionen är låst",
+        "noNewParticipants": "Inga nya deltagare kan gå med just nu.",
+        "participants": "{count} deltagare",
+        "started": "Startad",
+        "waitingForActivity": "Väntar på aktivitet...",
+        "gameContentWillShow": "Spelinnehåll visas här när värden startar.",
+        "contentWillShow": "Innehåll kommer att visas här när sessionen startar.",
+        "joinSession": "Delta i sessionen",
+        "sessionIsActive": "Sessionen är aktiv. Startar om",
+        "joinNow": "Gå med nu",
+        "notYet": "Inte ännu",
+        "leaveSession": "Lämna session",
+        "activeSession": "Aktiv session"
+      },
       "secrets": {
         "title": "Hemliga instruktioner",
         "clickToShow": "Klicka för att visa dina hemliga instruktioner.",
@@ -1015,6 +1112,32 @@
       },
       "secretsLocked": {
         "message": "Hemliga instruktioner är låsta tills lekledaren låser upp dem."
+      }
+    },
+    "puzzleProgress": {
+      "title": "Puzzle-framsteg",
+      "loading": "Laddar puzzle-framsteg...",
+      "tryAgain": "Försök igen",
+      "updatedAt": "Uppdaterad {time}",
+      "unknown": "Okänd",
+      "noPuzzlesStarted": "Inga puzzle-artefakter har startats ännu",
+      "attempts": "{count} försök",
+      "errors": {
+        "couldNotLoad": "Kunde inte ladda puzzle-framsteg",
+        "loadError": "Fel vid laddning"
+      },
+      "stats": {
+        "solved": "Lösta",
+        "inProgress": "Pågår",
+        "pending": "Väntar",
+        "remaining": "Kvar"
+      },
+      "status": {
+        "solved": "Löst",
+        "inProgress": "Pågår",
+        "pending": "Väntar",
+        "locked": "Låst",
+        "notStarted": "Ej påbörjad"
       }
     },
     "artifacts": {

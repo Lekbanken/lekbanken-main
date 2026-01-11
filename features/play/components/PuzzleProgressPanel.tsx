@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -53,6 +54,7 @@ export function PuzzleProgressPanel({
   sessionId,
   refreshInterval = 5000,
 }: PuzzleProgressPanelProps) {
+  const t = useTranslations('play.puzzleProgress');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [puzzleStatuses, setPuzzleStatuses] = useState<PuzzleStatus[]>([]);
@@ -66,7 +68,7 @@ export function PuzzleProgressPanel({
       });
       
       if (!res.ok) {
-        throw new Error('Kunde inte ladda puzzle-framsteg');
+        throw new Error(t('errors.couldNotLoad'));
       }
       
       const data = await res.json();
@@ -74,11 +76,11 @@ export function PuzzleProgressPanel({
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fel vid laddning');
+      setError(err instanceof Error ? err.message : t('errors.loadError'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   // Initial load and polling
   useEffect(() => {
@@ -94,7 +96,7 @@ export function PuzzleProgressPanel({
   // Group puzzles by team/participant
   const groupedPuzzles = puzzleStatuses.reduce((acc, puzzle) => {
     const key = puzzle.teamId || puzzle.participantId || 'unknown';
-    const name = puzzle.teamName || puzzle.participantName || 'Okänd';
+    const name = puzzle.teamName || puzzle.participantName || t('unknown');
     
     if (!acc[key]) {
       acc[key] = { name, puzzles: [] };
@@ -120,33 +122,33 @@ export function PuzzleProgressPanel({
         return (
           <Badge className="bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
             <CheckCircleIcon className="h-3 w-3 mr-1" />
-            Löst
+            {t('status.solved')}
           </Badge>
         );
       case 'in_progress':
         return (
           <Badge className="bg-blue-500/20 text-blue-700 dark:text-blue-400 border-blue-500/30">
             <ClockIcon className="h-3 w-3 mr-1" />
-            Pågår
+            {t('status.inProgress')}
           </Badge>
         );
       case 'pending_approval':
         return (
           <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-500/30">
             <ExclamationCircleIcon className="h-3 w-3 mr-1" />
-            Väntar
+            {t('status.pending')}
           </Badge>
         );
       case 'locked':
         return (
           <Badge variant="destructive">
-            Låst
+            {t('status.locked')}
           </Badge>
         );
       default:
         return (
           <Badge variant="outline">
-            Ej påbörjad
+            {t('status.notStarted')}
           </Badge>
         );
     }
@@ -177,7 +179,7 @@ export function PuzzleProgressPanel({
       <Card className="p-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <ArrowPathIcon className="h-5 w-5 animate-spin" />
-          <span>Laddar puzzle-framsteg...</span>
+          <span>{t('loading')}</span>
         </div>
       </Card>
     );
@@ -190,7 +192,7 @@ export function PuzzleProgressPanel({
           <p className="text-sm text-destructive">{error}</p>
           <Button variant="outline" size="sm" onClick={loadProgress}>
             <ArrowPathIcon className="h-4 w-4 mr-1" />
-            Försök igen
+            {t('tryAgain')}
           </Button>
         </div>
       </Card>
@@ -204,12 +206,12 @@ export function PuzzleProgressPanel({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <PuzzlePieceIcon className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Puzzle-framsteg</h3>
+            <h3 className="font-semibold">{t('title')}</h3>
           </div>
           <div className="flex items-center gap-2">
             {lastUpdated && (
               <span className="text-xs text-muted-foreground">
-                Uppdaterad {lastUpdated.toLocaleTimeString('sv-SE')}
+                {t('updatedAt', { time: lastUpdated.toLocaleTimeString('sv-SE') })}
               </span>
             )}
             <Button variant="ghost" size="sm" onClick={loadProgress}>
@@ -222,19 +224,19 @@ export function PuzzleProgressPanel({
         <div className="grid grid-cols-4 gap-3 text-sm">
           <div className="text-center p-2 rounded bg-muted/50">
             <div className="text-2xl font-bold text-green-600">{stats.solved}</div>
-            <div className="text-xs text-muted-foreground">Lösta</div>
+            <div className="text-xs text-muted-foreground">{t('stats.solved')}</div>
           </div>
           <div className="text-center p-2 rounded bg-muted/50">
             <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
-            <div className="text-xs text-muted-foreground">Pågår</div>
+            <div className="text-xs text-muted-foreground">{t('stats.inProgress')}</div>
           </div>
           <div className="text-center p-2 rounded bg-muted/50">
             <div className="text-2xl font-bold text-amber-600">{stats.pendingApproval}</div>
-            <div className="text-xs text-muted-foreground">Väntar</div>
+            <div className="text-xs text-muted-foreground">{t('stats.pending')}</div>
           </div>
           <div className="text-center p-2 rounded bg-muted/50">
             <div className="text-2xl font-bold text-muted-foreground">{stats.total - stats.solved}</div>
-            <div className="text-xs text-muted-foreground">Kvar</div>
+            <div className="text-xs text-muted-foreground">{t('stats.remaining')}</div>
           </div>
         </div>
       </Card>
@@ -243,7 +245,7 @@ export function PuzzleProgressPanel({
       {Object.entries(groupedPuzzles).length === 0 ? (
         <Card className="p-4">
           <p className="text-sm text-muted-foreground text-center">
-            Inga puzzle-artefakter har startats ännu
+            {t('noPuzzlesStarted')}
           </p>
         </Card>
       ) : (
@@ -269,7 +271,7 @@ export function PuzzleProgressPanel({
                       <p className="text-sm font-medium">{puzzle.artifactTitle}</p>
                       {puzzle.attempts !== undefined && puzzle.attempts > 0 && (
                         <p className="text-xs text-muted-foreground">
-                          {puzzle.attempts} försök
+                          {t('attempts', { count: puzzle.attempts })}
                         </p>
                       )}
                     </div>

@@ -551,6 +551,21 @@
       "backToHome": "← Back to homepage",
       "lastUpdated": "Last updated: {date}"
     },
+    "accept": {
+      "title": "Review and accept legal terms",
+      "description": "Legal acceptance required to continue.",
+      "intro": "Please review the documents below and confirm acceptance.",
+      "versionLabel": "Version {version}",
+      "acceptCheckbox": "I have read and accept {title}.",
+      "acceptButton": "Accept and continue"
+    },
+    "cookieBanner": {
+      "title": "We use cookies",
+      "description": "We use cookies to keep Lekbanken running and to improve the experience.",
+      "acceptAll": "Accept all",
+      "acceptNecessary": "Essential only",
+      "gpcNotice": "Global Privacy Control/Do Not Track is enabled. We will only use essential cookies."
+    },
     "privacy": {
       "metadata": {
         "title": "Privacy Policy - Lekbanken",
@@ -908,6 +923,59 @@
         }
       }
     },
+    "cockpit": {
+      "header": {
+        "participants": "participants",
+        "openChat": "Open chat"
+      },
+      "preflight": {
+        "title": "Preflight Check",
+        "readyToStart": "Ready to start",
+        "preparingSession": "Preparing session",
+        "allChecksOk": "All checks passed",
+        "pendingLabel": "pending",
+        "warningsLabel": "warnings",
+        "errorsLabel": "errors"
+      },
+      "roles": {
+        "noRolesCopied": "No roles copied yet",
+        "copyRolesDescription": "Copy roles from the game to assign them to participants.",
+        "roleDistribution": "Role distribution"
+      },
+      "participants": {
+        "noParticipantsYet": "No participants have connected yet.",
+        "shareCodeToInvite": "Share the session code to invite participants.",
+        "noParticipantsConnected": "No participants have connected yet",
+        "participantsConnected": "{count} participants connected"
+      },
+      "steps": {
+        "unnamedStep": "Unnamed step"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "events": "Events",
+        "settings": "Settings"
+      },
+      "story": {
+        "title": "The Story"
+      },
+      "analytics": {
+        "puzzlesSolved": "Puzzles solved",
+        "events": "Events",
+        "hintsUsed": "Hints used",
+        "completionRate": "Completion rate",
+        "puzzlesOfTotal": "{solved} of {total} puzzles solved",
+        "solved": "Solved",
+        "inProgress": "In progress",
+        "solutionTime": "Solution time",
+        "attempts": "Attempts",
+        "ofSolved": "{solved} of {total} solved",
+        "hints": "{count} hints",
+        "tabs": {
+          "overview": "Overview"
+        }
+      }
+    },
     "facilitator": {
       "dashboard": "Dashboard",
       "participants": "Participants",
@@ -970,6 +1038,35 @@
         "ended": "Session has ended",
         "thanksForParticipating": "Thanks for participating!"
       },
+      "lobby": {
+        "couldNotGetSession": "Could not fetch session",
+        "sessionNotFound": "Session not found",
+        "checkCodeAndRetry": "Check that the session code is correct and try again.",
+        "backToStart": "Back to start",
+        "sessionEnded": "Session has ended",
+        "thanksForParticipating": "Thanks for participating!",
+        "joinNewSession": "Join a new session",
+        "participatingAs": "You are participating as",
+        "rolePlayer": "Player",
+        "roleObserver": "Observer",
+        "roleTeamLead": "Team Lead",
+        "roleFacilitator": "Facilitator",
+        "sessionPaused": "Session is paused",
+        "awaitInstructions": "Await instructions from the host.",
+        "sessionLocked": "Session is locked",
+        "noNewParticipants": "No new participants can join right now.",
+        "participants": "{count} participants",
+        "started": "Started",
+        "waitingForActivity": "Waiting for activity...",
+        "gameContentWillShow": "Game content will appear here when the host starts.",
+        "contentWillShow": "Content will appear here when the session starts.",
+        "joinSession": "Join session",
+        "sessionIsActive": "Session is active. Starting in",
+        "joinNow": "Join now",
+        "notYet": "Not yet",
+        "leaveSession": "Leave session",
+        "activeSession": "Active session"
+      },
       "secrets": {
         "title": "Secret instructions",
         "clickToShow": "Click to show your secret instructions.",
@@ -1015,6 +1112,32 @@
       },
       "secretsLocked": {
         "message": "Secret instructions are locked until the host unlocks them."
+      }
+    },
+    "puzzleProgress": {
+      "title": "Puzzle Progress",
+      "loading": "Loading puzzle progress...",
+      "tryAgain": "Try again",
+      "updatedAt": "Updated {time}",
+      "unknown": "Unknown",
+      "noPuzzlesStarted": "No puzzle artifacts have been started yet",
+      "attempts": "{count} attempts",
+      "errors": {
+        "couldNotLoad": "Could not load puzzle progress",
+        "loadError": "Error loading"
+      },
+      "stats": {
+        "solved": "Solved",
+        "inProgress": "In Progress",
+        "pending": "Pending",
+        "remaining": "Remaining"
+      },
+      "status": {
+        "solved": "Solved",
+        "inProgress": "In Progress",
+        "pending": "Pending",
+        "locked": "Locked",
+        "notStarted": "Not Started"
       }
     },
     "artifacts": {

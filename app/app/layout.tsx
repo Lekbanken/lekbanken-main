@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
+import { getPendingLegalDocuments } from '@/lib/legal/acceptance'
 import AppShellContent from './layout-client'
 
 type Props = {
@@ -13,6 +15,12 @@ export default async function AppShell({ children }: Props) {
 
   if (!authContext.user) {
     redirect('/auth/login?redirect=/app')
+  }
+
+  const locale = await getLocale()
+  const pendingLegal = await getPendingLegalDocuments(authContext.user.id, locale)
+  if (pendingLegal.length > 0) {
+    redirect('/legal/accept?redirect=/app')
   }
 
   const memberships = authContext.memberships || []

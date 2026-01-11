@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
 import { redirect } from 'next/navigation'
+import { getLocale } from 'next-intl/server'
 import { TenantProvider } from '@/lib/context/TenantContext'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import { AdminShellV2 } from '@/components/admin/AdminShellV2'
 import { ToastProvider } from '@/components/ui'
 import { getSystemDesign } from '@/lib/design'
+import { getPendingLegalDocuments } from '@/lib/legal/acceptance'
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const authContext = await getServerAuthContext('/admin')
@@ -21,6 +23,12 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   if (!isSystemAdmin && !hasTenantAdminAccess) {
     redirect('/app')
+  }
+
+  const locale = await getLocale()
+  const pendingLegal = await getPendingLegalDocuments(authContext.user.id, locale)
+  if (pendingLegal.length > 0) {
+    redirect('/legal/accept?redirect=/admin')
   }
 
   // Fetch system design for branding

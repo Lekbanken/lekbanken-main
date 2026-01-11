@@ -9,6 +9,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { 
   getPublicSession, 
   getParticipantMe, 
@@ -47,6 +48,7 @@ type ParticipantSessionWithPlayProps = {
 
 export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWithPlayProps) {
   const router = useRouter();
+  const t = useTranslations('play.participantView.lobby');
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         setIsReconnecting(true);
         setReconnectAttempts((prev) => prev + 1);
       } else {
-        setError(err instanceof Error ? err.message : 'Kunde inte hämta session');
+        setError(err instanceof Error ? err.message : t('couldNotGetSession'));
       }
     } finally {
       setLoading(false);
@@ -249,14 +251,14 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             <ExclamationCircleIcon className="h-6 w-6 text-destructive" />
           </div>
           <h1 className="text-xl font-semibold text-foreground">
-            Session hittades inte
+            {t('sessionNotFound')}
           </h1>
           <p className="text-muted-foreground">
-            Kontrollera att sessionskoden är korrekt och försök igen.
+            {t('checkCodeAndRetry')}
           </p>
           <Button variant="primary" onClick={() => router.push('/play')}>
             <ArrowLeftIcon className="h-4 w-4" />
-            Tillbaka till start
+            {t('backToStart')}
           </Button>
         </Card>
       </div>
@@ -270,14 +272,14 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         <Card variant="elevated" className="w-full max-w-md p-8 text-center space-y-4">
           <SessionStatusBadge status={session.status} size="lg" showIcon />
           <h1 className="text-xl font-semibold text-foreground">
-            Sessionen har avslutats
+            {t('sessionEnded')}
           </h1>
           <p className="text-muted-foreground">
-            Tack för ditt deltagande!
+            {t('thanksForParticipating')}
           </p>
           <Button variant="primary" onClick={() => router.push('/play')}>
             <ArrowLeftIcon className="h-4 w-4" />
-            Gå med i en ny session
+            {t('joinNewSession')}
           </Button>
         </Card>
       </div>
@@ -312,15 +314,15 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       {participant && (
         <Card variant="elevated" className="max-w-lg mx-auto w-full p-6 mb-6">
           <div className="text-center">
-            <p className="text-sm text-muted-foreground mb-1">Du deltar som</p>
+            <p className="text-sm text-muted-foreground mb-1">{t('participatingAs')}</p>
             <p className="text-xl font-semibold text-foreground">
               {participant.displayName}
             </p>
             <p className="text-sm text-muted-foreground capitalize">
-              {participant.role === 'player' && 'Spelare'}
-              {participant.role === 'observer' && 'Observatör'}
-              {participant.role === 'team_lead' && 'Lagledare'}
-              {participant.role === 'facilitator' && 'Facilitator'}
+              {participant.role === 'player' && t('rolePlayer')}
+              {participant.role === 'observer' && t('roleObserver')}
+              {participant.role === 'team_lead' && t('roleTeamLead')}
+              {participant.role === 'facilitator' && t('roleFacilitator')}
             </p>
           </div>
         </Card>
@@ -330,8 +332,8 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       {session?.status === 'paused' && (
         <SessionStatusMessage
           type="warning"
-          title="Sessionen är pausad"
-          message="Invänta instruktioner från värden."
+          title={t('sessionPaused')}
+          message={t('awaitInstructions')}
           className="max-w-lg mx-auto w-full mb-6"
         />
       )}
@@ -339,8 +341,8 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       {session?.status === 'locked' && (
         <SessionStatusMessage
           type="info"
-          title="Sessionen är låst"
-          message="Inga nya deltagare kan gå med just nu."
+          title={t('sessionLocked')}
+          message={t('noNewParticipants')}
           className="max-w-lg mx-auto w-full mb-6"
         />
       )}
@@ -349,12 +351,12 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       <div className="flex items-center justify-center gap-6 text-muted-foreground mb-8">
         <div className="flex items-center gap-2">
           <UserGroupIcon className="h-5 w-5" />
-          <span>{session?.participantCount ?? 0} deltagare</span>
+          <span>{t('participants', { count: session?.participantCount ?? 0 })}</span>
         </div>
         {session?.createdAt && (
           <div className="flex items-center gap-2">
             <ClockIcon className="h-5 w-5" />
-            <span>Startad</span>
+            <span>{t('started')}</span>
           </div>
         )}
       </div>
@@ -362,11 +364,11 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       {/* Main content area - waiting message */}
       <Card variant="default" className="max-w-2xl mx-auto w-full flex-1 p-8 flex items-center justify-center">
         <div className="text-center text-muted-foreground">
-          <p className="text-lg">Väntar på aktivitet...</p>
+          <p className="text-lg">{t('waitingForActivity')}</p>
           <p className="text-sm mt-2">
             {hasGame 
-              ? 'Spelinnehåll visas här när värden startar.'
-              : 'Innehåll kommer att visas här när sessionen startar.'}
+              ? t('gameContentWillShow')
+              : t('contentWillShow')}
           </p>
 
           {canEnterActiveSession && !activeSessionOpen && getJoinPreference() === 'later' && (
@@ -375,14 +377,14 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
                 setJoinPreference('join');
                 setActiveSessionOpen(true);
               }}>
-                Delta i sessionen
+                {t('joinSession')}
               </Button>
             </div>
           )}
 
           {canEnterActiveSession && !activeSessionOpen && joinGateSecondsLeft !== null && (
             <div className="mt-6 space-y-3">
-              <div className="text-sm text-muted-foreground">Sessionen är aktiv. Startar om</div>
+              <div className="text-sm text-muted-foreground">{t('sessionIsActive')}</div>
               <div className="text-2xl font-semibold text-foreground">{joinGateSecondsLeft}s</div>
               <div className="grid grid-cols-2 gap-3">
                 <Button
@@ -393,7 +395,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
                     setActiveSessionOpen(true);
                   }}
                 >
-                  Gå med nu
+                  {t('joinNow')}
                 </Button>
                 <Button
                   variant="outline"
@@ -403,7 +405,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
                     setActiveSessionOpen(false);
                   }}
                 >
-                  Inte ännu
+                  {t('notYet')}
                 </Button>
               </div>
             </div>
@@ -414,7 +416,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
       {/* Leave button */}
       <div className="mt-8 text-center">
         <Button variant="ghost" size="sm" onClick={handleLeave}>
-          Lämna session
+          {t('leaveSession')}
         </Button>
       </div>
 
@@ -422,7 +424,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
         <ActiveSessionShell
           role="participant"
           open
-          title={session?.displayName ?? 'Aktiv session'}
+          title={session?.displayName ?? t('activeSession')}
           onRequestClose={() => setActiveSessionOpen(false)}
           chatUnreadCount={chat.unreadCount}
           onOpenChat={() => setChatOpen(true)}

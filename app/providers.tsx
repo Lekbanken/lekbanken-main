@@ -6,6 +6,7 @@ import type { UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 import { PreferencesProvider } from '@/lib/context/PreferencesContext'
 import { AuthProvider } from '@/lib/supabase/auth'
+import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
 
 type ProvidersProps = {
   children: ReactNode
@@ -26,7 +27,10 @@ export function Providers({
       initialProfile={initialProfile}
       initialMemberships={initialMemberships}
     >
-      <PreferencesProvider>{children}</PreferencesProvider>
+      <PreferencesProvider>
+        {children}
+        <CookieConsentBanner />
+      </PreferencesProvider>
     </AuthProvider>
   )
 }

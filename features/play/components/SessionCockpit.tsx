@@ -9,6 +9,7 @@
 'use client';
 
 import { createContext, useContext, useMemo, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -129,6 +130,7 @@ function SessionHeader({
   onOpenChat?: () => void;
   chatUnreadCount?: number;
 }) {
+  const t = useTranslations('play.cockpit.header');
   if (!session) return null;
 
   return (
@@ -142,7 +144,7 @@ function SessionHeader({
           <span>•</span>
           <span className="flex items-center gap-1">
             <UserGroupIcon className="h-4 w-4" />
-            {participantCount} deltagare
+            {participantCount} {t('participants')}
           </span>
           {status === 'active' && (
             <Badge variant="success" size="sm">
@@ -166,7 +168,7 @@ function SessionHeader({
             className="relative"
           >
             <ChatBubbleLeftRightIcon className="h-4 w-4" />
-            <span className="sr-only">Öppna chatt</span>
+            <span className="sr-only">{t('openChat')}</span>
             {chatUnreadCount && chatUnreadCount > 0 && (
               <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                 {chatUnreadCount}
@@ -217,6 +219,7 @@ function ReadinessIndicator({
   preflight: PreflightState;
   onShowChecklist: () => void;
 }) {
+  const t = useTranslations('play.cockpit.preflight');
   const { ready, items } = preflight;
   const pendingCount = items.filter((i: ChecklistItem) => i.status === 'pending').length;
   const errorCount = items.filter((i: ChecklistItem) => i.status === 'error').length;
@@ -243,12 +246,12 @@ function ReadinessIndicator({
           )}
           <div>
             <div className="font-medium text-foreground">
-              {ready ? 'Redo att starta' : 'Förbereda session'}
+              {ready ? t('readyToStart') : t('preparingSession')}
             </div>
             <div className="text-sm text-muted-foreground">
               {ready 
-                ? 'Alla kontroller godkända'
-                : `${pendingCount} väntande${warningCount > 0 ? `, ${warningCount} varningar` : ''}${errorCount > 0 ? `, ${errorCount} fel` : ''}`
+                ? t('allChecksOk')
+                : `${pendingCount} ${t('pendingLabel')}${warningCount > 0 ? `, ${warningCount} ${t('warningsLabel')}` : ''}${errorCount > 0 ? `, ${errorCount} ${t('errorsLabel')}` : ''}`
               }
             </div>
           </div>
@@ -375,6 +378,9 @@ function ParticipantsTab({
   isReadOnly: boolean;
   isLoading: boolean;
 }) {
+  const t = useTranslations('play.cockpit.roles');
+  const tParticipants = useTranslations('play.cockpit.participants');
+  const tHostSession = useTranslations('play.hostSession.roles');
   const connectedCount = participants.filter((p) => p.status === 'active' || p.status === 'joined').length;
   const assignedCount = participants.filter((p) => p.assignedRoleId).length;
   
@@ -402,16 +408,16 @@ function ParticipantsTab({
     <div className="space-y-6">
       {roles.length === 0 && (
         <Card className="p-6 text-center space-y-3">
-          <h3 className="text-base font-semibold text-foreground">Inga roller kopierade ännu</h3>
+          <h3 className="text-base font-semibold text-foreground">{t('noRolesCopied')}</h3>
           <p className="text-sm text-muted-foreground">
-            Kopiera roller från spelet för att kunna tilldela dem till deltagare.
+            {t('copyRolesDescription')}
           </p>
           <Button
             size="sm"
             onClick={onSnapshotRoles}
             disabled={!onSnapshotRoles || isReadOnly || isLoading}
           >
-            Kopiera roller
+            {tHostSession('copyFromGame')}
           </Button>
         </Card>
       )}
@@ -419,7 +425,7 @@ function ParticipantsTab({
       {roles.length > 0 && (
         <Card className="p-4 border-l-4 border-l-primary">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-foreground">Rollfördelning</h4>
+            <h4 className="font-medium text-foreground">{t('roleDistribution')}</h4>
             {allMinsSatisfied ? (
               <Badge variant="success" size="sm">✓ Alla minimikrav uppfyllda</Badge>
             ) : (
@@ -465,9 +471,9 @@ function ParticipantsTab({
         {participants.length === 0 ? (
           <Card className="p-8 text-center text-muted-foreground">
             <UserGroupIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>Inga deltagare har anslutit ännu.</p>
+            <p>{tParticipants('noParticipantsYet')}</p>
             <p className="text-sm mt-2">
-              Dela sessionskoden för att bjuda in deltagare.
+              {tParticipants('shareCodeToInvite')}
             </p>
           </Card>
         ) : (
@@ -557,6 +563,8 @@ export function SessionCockpit({
   children,
   className,
 }: SessionCockpitProps) {
+  const t = useTranslations('play.cockpit');
+  const tTabs = useTranslations('play.hostSession.tabs');
   const sessionState = useSessionState({ sessionId });
   const {
     // State
@@ -901,11 +909,11 @@ export function SessionCockpit({
     const participantsChecks: LobbyCheckInput[] = [
       {
         id: 'participants',
-        label: 'Deltagare',
+        label: tTabs('participants'),
         status: participants.length > 0 ? 'ready' : 'warning',
         detail: participants.length > 0
-          ? `${participants.length} deltagare anslutna`
-          : 'Inga deltagare har anslutit än',
+          ? t('participants.participantsConnected', { count: participants.length })
+          : t('participants.noParticipantsConnected'),
       },
     ];
 
@@ -963,7 +971,7 @@ export function SessionCockpit({
 
       phaseMap.get(targetPhaseId)!.steps.push({
         id: step.id,
-        title: step.title || 'Namnlöst steg',
+        title: step.title || t('steps.unnamedStep'),
         type: 'activity',
         isReady: !missingTitle && !missingDescription,
         issues: [
@@ -1038,15 +1046,15 @@ export function SessionCockpit({
 
   // Tabs configuration
   const tabs = [
-    { id: 'overview', label: 'Översikt' },
+    { id: 'overview', label: t('tabs.overview') },
     { id: 'story', label: 'Berattelse' },
-    { id: 'participants', label: 'Deltagare', badge: participants.length },
+    { id: 'participants', label: tTabs('participants'), badge: participants.length },
     { id: 'artifacts', label: 'Artefakter', badge: artifacts.length },
-    { id: 'triggers', label: 'Triggers', badge: triggers.filter((t) => t.status === 'armed').length || undefined },
-    showSignals ? { id: 'signals', label: 'Signaler' } : null,
-    showTimeBank ? { id: 'timebank', label: 'Tidsbank' } : null,
-    showEvents ? { id: 'events', label: 'Händelser', badge: sessionEvents.length || undefined } : null,
-    { id: 'settings', label: 'Inställningar' },
+    { id: 'triggers', label: 'Triggers', badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
+    showSignals ? { id: 'signals', label: tTabs('signals') } : null,
+    showTimeBank ? { id: 'timebank', label: tTabs('timebank') } : null,
+    showEvents ? { id: 'events', label: t('tabs.events'), badge: sessionEvents.length || undefined } : null,
+    { id: 'settings', label: t('tabs.settings') },
   ].filter(Boolean) as Array<{ id: CockpitTab; label: string; badge?: number }>;
 
   // Map status for drawer
@@ -1375,7 +1383,7 @@ export function SessionCockpit({
           onClose={() => setStoryOpen(false)}
           steps={steps}
           currentStepIndex={currentStepIndex}
-          title={displayName ?? 'Berättelsen'}
+          title={displayName ?? t('story.title')}
           onNavigateToStep={(index) => void goToStep(index)}
         />
         
@@ -1384,7 +1392,7 @@ export function SessionCockpit({
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <Card className="w-full max-w-lg max-h-[80vh] overflow-y-auto">
               <div className="p-4 border-b flex items-center justify-between">
-                <h2 className="font-semibold">Förberedelsekontroll</h2>
+                <h2 className="font-semibold">{t('preflight.title')}</h2>
                 <Button variant="ghost" size="sm" onClick={() => setShowChecklist(false)}>
                   ×
                 </Button>

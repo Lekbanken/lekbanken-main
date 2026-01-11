@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -143,6 +144,7 @@ interface OverviewTabProps {
 }
 
 function OverviewTab({ analytics }: OverviewTabProps) {
+  const t = useTranslations('play.cockpit.analytics');
   return (
     <div className="space-y-4">
       {/* Key Metrics Grid */}
@@ -161,14 +163,14 @@ function OverviewTab({ analytics }: OverviewTabProps) {
           description={analytics.status}
         />
         <MetricCard
-          title="Pussel lösta"
+          title={t('puzzlesSolved')}
           value={`${analytics.engagement.puzzlesSolved}/${analytics.engagement.totalPuzzles}`}
           icon={<PuzzlePieceIcon className="h-4 w-4" />}
           description={formatPercent(analytics.engagement.overallCompletionRate)}
           variant={analytics.engagement.overallCompletionRate >= 0.8 ? 'success' : 'default'}
         />
         <MetricCard
-          title="Händelser"
+          title={t('events')}
           value={analytics.eventCount}
           icon={<SignalIcon className="h-4 w-4" />}
           description="Totalt loggade"
@@ -194,7 +196,7 @@ function OverviewTab({ analytics }: OverviewTabProps) {
               <div className="font-semibold">{formatDuration(analytics.engagement.medianTimePerStep)}</div>
             </div>
             <div>
-              <div className="text-sm text-muted-foreground">Ledtrådar använda</div>
+              <div className="text-sm text-muted-foreground">{t('hintsUsed')}</div>
               <div className="font-semibold">{analytics.engagement.totalHintsUsed}</div>
             </div>
             <div>
@@ -220,7 +222,7 @@ function OverviewTab({ analytics }: OverviewTabProps) {
         <CardHeader className="pb-2">
           <CardTitle className="text-base flex items-center gap-2">
             <CheckCircleIcon className="h-4 w-4" />
-            Slutförandegrad
+            {t('completionRate')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
@@ -234,7 +236,7 @@ function OverviewTab({ analytics }: OverviewTabProps) {
             value={analytics.engagement.overallCompletionRate * 100} 
           />
           <div className="text-xs text-muted-foreground">
-            {analytics.engagement.puzzlesSolved} av {analytics.engagement.totalPuzzles} pussel lösta
+            {t('puzzlesOfTotal', { solved: analytics.engagement.puzzlesSolved, total: analytics.engagement.totalPuzzles })}
           </div>
         </CardContent>
       </Card>
@@ -251,6 +253,7 @@ interface StepsTabProps {
 }
 
 function StepsTab({ stepMetrics }: StepsTabProps) {
+  const t = useTranslations('play.cockpit.analytics');
   return (
     <div className="space-y-4">
       <Table>
@@ -258,7 +261,7 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
           <TableRow>
             <TableHead>Steg</TableHead>
             <TableHead>Tid</TableHead>
-            <TableHead className="text-center">Lösta</TableHead>
+            <TableHead className="text-center">{t('solved')}</TableHead>
             <TableHead className="text-center">Fel</TableHead>
             <TableHead className="text-center">Triggers</TableHead>
             <TableHead className="text-right">Status</TableHead>
@@ -290,7 +293,7 @@ function StepsTab({ stepMetrics }: StepsTabProps) {
                     Klar
                   </Badge>
                 ) : (
-                  <Badge variant="outline">Pågår</Badge>
+                  <Badge variant="outline">{t('inProgress')}</Badge>
                 )}
               </TableCell>
             </TableRow>
@@ -340,6 +343,7 @@ interface PuzzlesTabProps {
 }
 
 function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
+  const t = useTranslations('play.cockpit.analytics');
   const [sortBy, setSortBy] = useState<'name' | 'time' | 'attempts'>('name');
 
   const sortedPuzzles = [...puzzleMetrics].sort((a, b) => {
@@ -355,15 +359,15 @@ function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
 
   const sortOptions = [
     { value: 'name', label: 'Namn' },
-    { value: 'time', label: 'Lösningstid' },
-    { value: 'attempts', label: 'Försök' },
+    { value: 'time', label: t('solutionTime') },
+    { value: 'attempts', label: t('attempts') },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          {puzzleMetrics.filter((p) => p.solved).length} av {puzzleMetrics.length} lösta
+          {t('ofSolved', { solved: puzzleMetrics.filter((p) => p.solved).length, total: puzzleMetrics.length })}
         </div>
         <Select 
           value={sortBy} 
@@ -380,8 +384,8 @@ function PuzzlesTab({ puzzleMetrics }: PuzzlesTabProps) {
               <TableHead>Pussel</TableHead>
               <TableHead>Typ</TableHead>
               <TableHead>Steg</TableHead>
-              <TableHead className="text-center">Försök</TableHead>
-              <TableHead className="text-right">Lösningstid</TableHead>
+              <TableHead className="text-center">{t('attempts')}</TableHead>
+              <TableHead className="text-right">{t('solutionTime')}</TableHead>
               <TableHead className="text-right">Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -449,6 +453,7 @@ export function AnalyticsDashboard({
   compact = false,
   showExport = true,
 }: AnalyticsDashboardProps) {
+  const t = useTranslations('play.cockpit.analytics');
   const { analytics, exportJSON, exportCSV } = analyticsHook;
   const [activeTab, setActiveTab] = useState('overview');
 
@@ -475,7 +480,7 @@ export function AnalyticsDashboard({
   };
 
   const tabs = [
-    { id: 'overview', label: 'Översikt' },
+    { id: 'overview', label: t('tabs.overview') },
     { id: 'steps', label: 'Steg' },
     { id: 'puzzles', label: 'Pussel' },
   ];
@@ -567,7 +572,7 @@ export function AnalyticsSummaryCard({
         </div>
         <div className="flex items-center gap-2">
           <LightBulbIcon className="h-4 w-4 text-muted-foreground" />
-          <span>{analytics.engagement.totalHintsUsed} ledtrådar</span>
+          <span>{t('hints', { count: analytics.engagement.totalHintsUsed })}</span>
         </div>
       </div>
 

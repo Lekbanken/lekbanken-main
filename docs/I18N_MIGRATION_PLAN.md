@@ -1,6 +1,6 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-11 (eftermiddag)
+> **Senast uppdaterad:** 2026-01-12 (morgon)
 > **Status:** 🟡 Pågående - Fas 1.2 (Play features) aktivt under arbete
 
 ## Executive Summary
@@ -10,9 +10,9 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~12 (1.1%) |
-| **Migrerade strängar** | ~170 (6%) |
-| **Uppskattad återstående arbetsinsats** | ~35-50 timmar |
+| Filer som använder i18n | ~20 (2%) |
+| **Migrerade strängar** | ~280 (10%) |
+| **Uppskattad återstående arbetsinsats** | ~30-45 timmar |
 
 ## Prioriteringsmodell
 
@@ -217,7 +217,11 @@ export function PlayButton() {
 - [x] **TriggerKillSwitch.tsx** ✅ ~24 strängar migrerade
 - [x] **HostSessionWithPlay.tsx** ✅ ~40 strängar migrerade  
 - [x] **ParticipantPlayView.tsx** ✅ ~50 strängar migrerade
-- [ ] Fortsätt features/play (Fas 1.2) - ~200 strängar kvar
+- [x] **PuzzleProgressPanel.tsx** ✅ ~12 strängar migrerade
+- [x] **ParticipantSessionWithPlay.tsx** ✅ ~25 strängar migrerade
+- [x] **SessionCockpit.tsx** ✅ ~17 strängar migrerade
+- [x] **AnalyticsDashboard.tsx** ✅ ~18 strängar migrerade
+- [ ] Fortsätt features/play (Fas 1.2) - ~150 strängar kvar
 - [ ] Implementera app pages (Fas 1.3) - 154 strängar kvar
 - [ ] Implementera components/play (Fas 1.4) - 112 strängar kvar
 
@@ -229,7 +233,11 @@ export function PlayButton() {
 | 2026-01-11 | features/play/TriggerKillSwitch.tsx | 1 | ~24 | ✅ Klart |
 | 2026-01-11 | features/play/HostSessionWithPlay.tsx | 1 | ~40 | ✅ Klart |
 | 2026-01-11 | features/play/ParticipantPlayView.tsx | 1 | ~50 | ✅ Klart |
-| - | features/play (övriga) | ~44 | ~200 | 🔄 Pågår |
+| 2026-01-12 | features/play/PuzzleProgressPanel.tsx | 1 | ~12 | ✅ Klart |
+| 2026-01-12 | features/play/ParticipantSessionWithPlay.tsx | 1 | ~25 | ✅ Klart |
+| 2026-01-12 | features/play/SessionCockpit.tsx | 1 | ~17 | ✅ Klart |
+| 2026-01-12 | features/play/AnalyticsDashboard.tsx | 1 | ~18 | ✅ Klart |
+| - | features/play (övriga) | ~40 | ~150 | 🔄 Pågår |
 | - | app/app | ~20 | 154 | ⏳ Väntar |
 | - | components/play | ~15 | 112 | ⏳ Väntar |
 

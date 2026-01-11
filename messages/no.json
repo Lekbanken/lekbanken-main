@@ -551,6 +551,21 @@
       "backToHome": "← Tilbake til forsiden",
       "lastUpdated": "Sist oppdatert: {date}"
     },
+    "accept": {
+      "title": "Gjennomgå og godkjenn vilkår",
+      "description": "Du må godkjenne for å fortsette.",
+      "intro": "Les dokumentene nedenfor og bekreft ditt samtykke.",
+      "versionLabel": "Versjon {version}",
+      "acceptCheckbox": "Jeg har lest og godtar {title}.",
+      "acceptButton": "Godta og fortsett"
+    },
+    "cookieBanner": {
+      "title": "Vi bruker informasjonskapsler",
+      "description": "Vi bruker informasjonskapsler for å holde Lekbanken i gang og forbedre opplevelsen.",
+      "acceptAll": "Godta alle",
+      "acceptNecessary": "Kun nødvendige",
+      "gpcNotice": "Global Privacy Control/Do Not Track er aktivert. Vi bruker kun nødvendige informasjonskapsler."
+    },
     "privacy": {
       "metadata": {
         "title": "Personvernerklæring - Lekbanken",
@@ -908,6 +923,59 @@
         }
       }
     },
+    "cockpit": {
+      "header": {
+        "participants": "deltakere",
+        "openChat": "Åpne chat"
+      },
+      "preflight": {
+        "title": "Forberedelseskontroll",
+        "readyToStart": "Klar til å starte",
+        "preparingSession": "Forbereder økt",
+        "allChecksOk": "Alle kontroller godkjent",
+        "pendingLabel": "ventende",
+        "warningsLabel": "advarsler",
+        "errorsLabel": "feil"
+      },
+      "roles": {
+        "noRolesCopied": "Ingen roller kopiert ennå",
+        "copyRolesDescription": "Kopier roller fra spillet for å tildele dem til deltakere.",
+        "roleDistribution": "Rollefordeling"
+      },
+      "participants": {
+        "noParticipantsYet": "Ingen deltakere har koblet til ennå.",
+        "shareCodeToInvite": "Del øktkoden for å invitere deltakere.",
+        "noParticipantsConnected": "Ingen deltakere har koblet til ennå",
+        "participantsConnected": "{count} deltakere tilkoblet"
+      },
+      "steps": {
+        "unnamedStep": "Navnløst steg"
+      },
+      "tabs": {
+        "overview": "Oversikt",
+        "events": "Hendelser",
+        "settings": "Innstillinger"
+      },
+      "story": {
+        "title": "Historien"
+      },
+      "analytics": {
+        "puzzlesSolved": "Gåter løst",
+        "events": "Hendelser",
+        "hintsUsed": "Hint brukt",
+        "completionRate": "Fullføringsgrad",
+        "puzzlesOfTotal": "{solved} av {total} gåter løst",
+        "solved": "Løst",
+        "inProgress": "Pågår",
+        "solutionTime": "Løsningstid",
+        "attempts": "Forsøk",
+        "ofSolved": "{solved} av {total} løst",
+        "hints": "{count} hint",
+        "tabs": {
+          "overview": "Oversikt"
+        }
+      }
+    },
     "facilitator": {
       "dashboard": "Kontrollpanel",
       "participants": "Deltakere",
@@ -970,6 +1038,35 @@
         "ended": "Økten er avsluttet",
         "thanksForParticipating": "Takk for at du deltok!"
       },
+      "lobby": {
+        "couldNotGetSession": "Kunne ikke hente økt",
+        "sessionNotFound": "Økt ikke funnet",
+        "checkCodeAndRetry": "Sjekk at øktkoden er riktig og prøv igjen.",
+        "backToStart": "Tilbake til start",
+        "sessionEnded": "Økten er avsluttet",
+        "thanksForParticipating": "Takk for at du deltok!",
+        "joinNewSession": "Bli med i en ny økt",
+        "participatingAs": "Du deltar som",
+        "rolePlayer": "Spiller",
+        "roleObserver": "Observatør",
+        "roleTeamLead": "Lagleder",
+        "roleFacilitator": "Fasilitator",
+        "sessionPaused": "Økten er pauset",
+        "awaitInstructions": "Vent på instruksjoner fra verten.",
+        "sessionLocked": "Økten er låst",
+        "noNewParticipants": "Ingen nye deltakere kan bli med akkurat nå.",
+        "participants": "{count} deltakere",
+        "started": "Startet",
+        "waitingForActivity": "Venter på aktivitet...",
+        "gameContentWillShow": "Spillinnhold vises her når verten starter.",
+        "contentWillShow": "Innhold vises her når økten starter.",
+        "joinSession": "Bli med i økten",
+        "sessionIsActive": "Økten er aktiv. Starter om",
+        "joinNow": "Bli med nå",
+        "notYet": "Ikke ennå",
+        "leaveSession": "Forlat økt",
+        "activeSession": "Aktiv økt"
+      },
       "secrets": {
         "title": "Hemmelige instruksjoner",
         "clickToShow": "Klikk for å vise dine hemmelige instruksjoner.",
@@ -1015,6 +1112,32 @@
       },
       "secretsLocked": {
         "message": "Hemmelige instruksjoner er låst til spillederen låser dem opp."
+      }
+    },
+    "puzzleProgress": {
+      "title": "Pusleframgang",
+      "loading": "Laster pusleframgang...",
+      "tryAgain": "Prøv igjen",
+      "updatedAt": "Oppdatert {time}",
+      "unknown": "Ukjent",
+      "noPuzzlesStarted": "Ingen puslespillartefakter har blitt startet ennå",
+      "attempts": "{count} forsøk",
+      "errors": {
+        "couldNotLoad": "Kunne ikke laste pusleframgang",
+        "loadError": "Feil ved lasting"
+      },
+      "stats": {
+        "solved": "Løst",
+        "inProgress": "Pågår",
+        "pending": "Venter",
+        "remaining": "Gjenstår"
+      },
+      "status": {
+        "solved": "Løst",
+        "inProgress": "Pågår",
+        "pending": "Venter",
+        "locked": "Låst",
+        "notStarted": "Ikke startet"
       }
     },
     "artifacts": {

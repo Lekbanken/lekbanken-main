@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   PuzzlePieceIcon,
   PlusIcon,
@@ -76,6 +77,7 @@ export function GameAdminPage() {
   const { can } = useRbac();
   const { success, warning, info } = useToast();
   const router = useRouter();
+  const t = useTranslations('admin.games');
 
   const [games, setGames] = useState<GameWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -123,7 +125,7 @@ export function GameAdminPage() {
 
       if (!gamesRes.ok) {
         const json = await gamesRes.json().catch(() => ({}));
-        throw new Error(json.error || 'Kunde inte hämta spel');
+        throw new Error(json.error || t('errors.fetchFailed'));
       }
 
       const gamesJson = (await gamesRes.json()) as { games?: GameWithRelations[] };
@@ -138,13 +140,13 @@ export function GameAdminPage() {
         : { products: [] };
 
       setGames(gamesJson.games || []);
-      setTenants((tenantsJson.tenants || []).map((t) => ({ value: t.id, label: t.name || 'Namnlös organisation' })));
-      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })));
-      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || 'Okänd produkt' })));
+      setTenants((tenantsJson.tenants || []).map((tenant) => ({ value: tenant.id, label: tenant.name || t('labels.unnamedOrganisation') })));
+      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || t('labels.unknownPurpose') })));
+      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || t('labels.unknownProduct') })));
     } catch (err) {
       console.error('[admin/games] load error', err);
       setGames([]);
-      setError('Kunde inte ladda spel just nu.');
+      setError(t('errors.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -201,7 +203,7 @@ export function GameAdminPage() {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        warning(json.error || 'Publicering misslyckades');
+        warning(json.error || t('errors.publishFailed'));
         return;
       }
     } else {
@@ -212,31 +214,31 @@ export function GameAdminPage() {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        warning(json.error || 'Kunde inte återställa till utkast');
+        warning(json.error || t('errors.draftFailed'));
         return;
       }
     }
     setGames((prev) => prev.map((g) => (g.id === game.id ? { ...g, status: next } : g)));
-    info(next === 'published' ? 'Publicerad' : 'Återställd till utkast');
+    info(next === 'published' ? t('messages.published') : t('messages.restoredToDraft'));
   };
 
   const handleDelete = async (id: string) => {
     const res = await fetch(`/api/games/${id}`, { method: 'DELETE' });
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      warning(json.error || 'Kunde inte ta bort leken');
+      warning(json.error || t('errors.deleteFailed'));
       return;
     }
     setGames((prev) => prev.filter((g) => g.id !== id));
     selection.clearSelection();
-    warning('Leken togs bort.');
+    warning(t('messages.gameDeleted'));
   };
 
   const handleImport = async (items: ImportableGame[]) => {
     // If items is empty, the import was done via CSV API - just reload the list
     if (items.length === 0) {
       await loadGames();
-      success('Import klar! Spellistta uppdaterad.');
+      success(t('messages.importComplete'));
       return;
     }
 
@@ -268,7 +270,7 @@ export function GameAdminPage() {
 
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        failures.push(json.error || 'Okänt fel');
+        failures.push(json.error || t('errors.unknownError'));
         continue;
       }
 
@@ -286,10 +288,10 @@ export function GameAdminPage() {
 
     if (created.length) {
       setGames((prev) => [...created, ...prev]);
-      success(`Importerade ${created.length} spel.`);
+      success(t('messages.importedGames', { count: created.length }));
     }
     if (failures.length) {
-      warning(`Misslyckades för ${failures.length} spel.`);
+      warning(t('messages.importFailed', { count: failures.length }));
     }
   };
 
@@ -298,8 +300,8 @@ export function GameAdminPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<PuzzlePieceIcon className="h-6 w-6" />}
-          title="Ingen åtkomst"
-          description="Du behöver administratörsbehörighet för att hantera spel."
+          title={t('noAccess.title')}
+          description={t('noAccess.description')}
         />
       </AdminPageLayout>
     );
@@ -307,11 +309,11 @@ export function GameAdminPage() {
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Spel' }]} />
+      <AdminBreadcrumbs items={[{ label: t('breadcrumbs.home'), href: '/admin' }, { label: t('breadcrumbs.games') }]} />
 
       <AdminPageHeader
-        title="Spel (globalt)"
-        description="Navet för att skapa, uppdatera, publicera och exportera hela spelkatalogen."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<PuzzlePieceIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
@@ -338,7 +340,7 @@ export function GameAdminPage() {
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda spel"
+          title={t('errors.loadTitle')}
           description={error}
           onRetry={() => {
             setError(null);
@@ -348,10 +350,10 @@ export function GameAdminPage() {
       )}
 
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Totalt" value={stats.total} />
-        <AdminStatCard label="Publicerade" value={stats.published} />
-        <AdminStatCard label="Utkast" value={stats.drafts} />
-        <AdminStatCard label="Tenant-ägda" value={stats.tenantGames} />
+        <AdminStatCard label={t('stats.total')} value={stats.total} />
+        <AdminStatCard label={t('stats.published')} value={stats.published} />
+        <AdminStatCard label={t('stats.drafts')} value={stats.drafts} />
+        <AdminStatCard label={t('stats.tenantOwned')} value={stats.tenantGames} />
       </AdminStatGrid>
 
       {selection.selectedCount > 0 && (
@@ -384,7 +386,7 @@ export function GameAdminPage() {
 
       <Card className="mb-4 border border-border">
         <CardHeader className="border-b border-border bg-muted/30 px-6 py-4">
-          <CardTitle>Spelöversikt</CardTitle>
+          <CardTitle>{t('cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <AdminTableToolbar
@@ -393,7 +395,7 @@ export function GameAdminPage() {
               setFilters((prev) => ({ ...prev, search: val }));
               setCurrentPage(1);
             }}
-            searchPlaceholder="Sök på namn, syfte eller kategori"
+            searchPlaceholder={t('searchPlaceholder')}
             filters={
               <div className="flex flex-wrap gap-2">
                 <Select
@@ -403,11 +405,11 @@ export function GameAdminPage() {
                     setCurrentPage(1);
                   }}
                   options={[
-                    { value: 'all', label: 'Alla statusar' },
-                    { value: 'published', label: 'Publicerade' },
-                    { value: 'draft', label: 'Utkast' },
+                    { value: 'all', label: t('filters.allStatuses') },
+                    { value: 'published', label: t('filters.published') },
+                    { value: 'draft', label: t('filters.draft') },
                   ]}
-                  placeholder="Status"
+                  placeholder={t('filters.status')}
                 />
                 <Select
                   value={filters.energy}
@@ -416,12 +418,12 @@ export function GameAdminPage() {
                     setCurrentPage(1);
                   }}
                   options={[
-                    { value: 'all', label: 'Alla energinivåer' },
-                    { value: 'low', label: 'Låg' },
-                    { value: 'medium', label: 'Medel' },
-                    { value: 'high', label: 'Hög' },
+                    { value: 'all', label: t('filters.allEnergyLevels') },
+                    { value: 'low', label: t('filters.low') },
+                    { value: 'medium', label: t('filters.medium') },
+                    { value: 'high', label: t('filters.high') },
                   ]}
-                  placeholder="Energi"
+                  placeholder={t('filters.energy')}
                 />
                 <Select
                   value={filters.playMode}
@@ -430,12 +432,12 @@ export function GameAdminPage() {
                     setCurrentPage(1);
                   }}
                   options={[
-                    { value: 'all', label: 'Alla spellägen' },
-                    { value: 'basic', label: 'Enkel lek' },
-                    { value: 'facilitated', label: 'Ledd aktivitet' },
-                    { value: 'participants', label: 'Deltagarlek' },
+                    { value: 'all', label: t('filters.allPlayModes') },
+                    { value: 'basic', label: t('filters.basicPlay') },
+                    { value: 'facilitated', label: t('filters.facilitatedActivity') },
+                    { value: 'participants', label: t('filters.participantPlay') },
                   ]}
-                  placeholder="Spelläge"
+                  placeholder={t('filters.playMode')}
                 />
                 <Select
                   value={filters.tenant}
@@ -444,11 +446,11 @@ export function GameAdminPage() {
                     setCurrentPage(1);
                   }}
                   options={[
-                    { value: 'all', label: 'Alla ägare' },
-                    { value: 'global', label: 'Global' },
+                    { value: 'all', label: t('filters.allOwners') },
+                    { value: 'global', label: t('filters.global') },
                     ...tenants,
                   ]}
-                  placeholder="Ägare"
+                  placeholder={t('filters.owner')}
                 />
               </div>
             }
@@ -462,8 +464,8 @@ export function GameAdminPage() {
           ) : pageSlice.length === 0 ? (
             <AdminEmptyState
               icon={<PuzzlePieceIcon className="h-6 w-6" />}
-              title="Inga spel matchar filtren"
-              description="Justera filter eller lägg till ett nytt spel."
+              title={t('noGames.title')}
+              description={t('noGames.description')}
             />
           ) : (
             <ul role="list" className="divide-y divide-border">
@@ -479,7 +481,7 @@ export function GameAdminPage() {
                       type="checkbox"
                       checked={selection.isSelected(game)}
                       onChange={() => selection.toggle(game)}
-                      aria-label={`Välj ${game.name}`}
+                      aria-label={t('list.selectGame', { name: game.name })}
                       className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                     />
                     
@@ -491,7 +493,7 @@ export function GameAdminPage() {
                           variant={game.status === 'published' ? 'success' : 'secondary'}
                           className="mt-0.5"
                         >
-                          {game.status === 'published' ? 'Publicerad' : 'Utkast'}
+                          {game.status === 'published' ? t('filters.published') : t('filters.draft')}
                         </Badge>
                         <Badge variant="outline" className="mt-0.5">
                           {playModeMeta(game.play_mode).label}
@@ -503,7 +505,7 @@ export function GameAdminPage() {
                         )}
                       </div>
                       <p className="mt-1 text-sm text-muted-foreground line-clamp-1">
-                        {game.short_description || game.description || 'Ingen beskrivning'}
+                        {game.short_description || game.description || t('labels.noDescription')}
                       </p>
                       <div className="mt-2 flex items-center gap-x-4 text-xs text-muted-foreground">
                         {game.min_players && (
@@ -547,7 +549,7 @@ export function GameAdminPage() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button className="-m-2.5 block p-2.5 text-muted-foreground hover:text-foreground">
-                          <span className="sr-only">Öppna meny</span>
+                          <span className="sr-only">{t('list.openMenu')}</span>
                           <EllipsisVerticalIcon aria-hidden="true" className="h-5 w-5" />
                         </button>
                       </DropdownMenuTrigger>
@@ -555,7 +557,7 @@ export function GameAdminPage() {
                         {canEdit && (
                           <DropdownMenuItem onClick={() => router.push(`/admin/games/${game.id}/edit`)}>
                             <PencilSquareIcon className="h-4 w-4" />
-                            Redigera
+                            {t('actions.edit')}
                           </DropdownMenuItem>
                         )}
                         {canEdit && (
@@ -573,12 +575,12 @@ export function GameAdminPage() {
                           {game.status === 'published' ? (
                             <>
                               <XCircleIcon className="h-4 w-4" />
-                              Gör till utkast
+                              {t('actions.makeDraft')}
                             </>
                           ) : (
                             <>
                               <CheckCircleIcon className="h-4 w-4" />
-                              Publicera
+                              {t('actions.publish')}
                             </>
                           )}
                         </DropdownMenuItem>
@@ -588,7 +590,7 @@ export function GameAdminPage() {
                             onClick={() => setDeleteTarget(game)}
                           >
                             <TrashIcon className="h-4 w-4" />
-                            Ta bort
+                            {t('actions.delete')}
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -621,9 +623,9 @@ export function GameAdminPage() {
       <AdminConfirmDialog
         open={Boolean(deleteTarget)}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
-        title="Ta bort lek?"
-        description="Denna åtgärd kan inte ångras. Leken tas bort permanent."
-        confirmLabel="Ta bort"
+        title={t('deleteDialog.title')}
+        description={t('deleteDialog.description')}
+        confirmLabel={t('actions.delete')}
         variant="danger"
         onConfirm={() => (deleteTarget ? handleDelete(deleteTarget.id) : Promise.resolve())}
       />
@@ -632,6 +634,7 @@ export function GameAdminPage() {
 }
 
 // Map play modes to consistent label and color for markers and badges
+// Note: Labels moved to translations, but this helper still returns them statically for now
 function playModeMeta(mode: GameWithRelations['play_mode']): { label: string; color: string } {
   switch (mode) {
     case 'facilitated':
@@ -645,9 +648,10 @@ function playModeMeta(mode: GameWithRelations['play_mode']): { label: string; co
 }
 
 function GameInfoDialog() {
+  const t = useTranslations('admin.games');
   const { activeTab, setActiveTab } = useTabs('overview');
 
-  const infoTabs = getInfoTabs();
+  const infoTabs = getInfoTabs(t);
 
   const handleCopy = async (text: string) => {
     try {
@@ -700,13 +704,13 @@ function CodeBlock({ children }: { children: string }) {
   );
 }
 
-function CopyHeaderRow({ label, value, copy }: { label: string; value: string; copy: (text: string) => void }) {
+function CopyHeaderRow({ label, value, copy, copyLabel }: { label: string; value: string; copy: (text: string) => void; copyLabel: string }) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <p className="font-semibold">{label}</p>
         <Button variant="ghost" size="sm" onClick={() => copy(value)}>
-          Kopiera
+          {copyLabel}
         </Button>
       </div>
       <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3 text-xs font-mono break-all">
@@ -785,7 +789,7 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
   );
 }
 
-function getInfoTabs(): InfoTab[] {
+function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): InfoTab[] {
   const minimalJsonExample = `[
   {
     "game_key": "mysteriet-001",

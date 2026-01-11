@@ -775,6 +775,7 @@
         "loading": "Loading...",
         "loadingGameData": "Fetching game data.",
         "gameNotFound": "Game not found",
+        "gameMissing": "Game is missing",
         "checkLinkOrGoBack": "Check the link or go back to the list.",
         "backToGames": "Back to games",
         "makeDraft": "Make draft",
@@ -791,6 +792,86 @@
         "time": "Time",
         "age": "Age",
         "notSet": "Not set"
+      },
+      "pageDescription": "The hub for creating, updating, publishing and exporting the entire game catalog.",
+      "cardTitle": "Game Overview",
+      "searchPlaceholder": "Search by name, purpose or category",
+      "breadcrumbs": {
+        "home": "Home",
+        "games": "Games"
+      },
+      "stats": {
+        "total": "Total",
+        "published": "Published",
+        "drafts": "Drafts",
+        "tenantOwned": "Tenant-owned"
+      },
+      "filters": {
+        "allStatuses": "All statuses",
+        "published": "Published",
+        "draft": "Draft",
+        "allEnergyLevels": "All energy levels",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "energy": "Energy",
+        "allPlayModes": "All play modes",
+        "basicPlay": "Simple play",
+        "facilitatedActivity": "Facilitated activity",
+        "participantPlay": "Participant play",
+        "playMode": "Play mode",
+        "allOwners": "All owners",
+        "global": "Global",
+        "owner": "Owner",
+        "status": "Status"
+      },
+      "noGames": {
+        "title": "No games match the filters",
+        "description": "Adjust filters or add a new game."
+      },
+      "noAccess": {
+        "title": "No access",
+        "description": "You need administrator permissions to manage games."
+      },
+      "labels": {
+        "unnamedOrganisation": "Unnamed organisation",
+        "unknownPurpose": "Unknown purpose",
+        "unknownProduct": "Unknown product",
+        "nameMissing": "Name missing",
+        "noDescription": "No description"
+      },
+      "errors": {
+        "fetchFailed": "Could not fetch games",
+        "loadFailed": "Could not load games right now.",
+        "loadTitle": "Could not load games",
+        "publishFailed": "Publishing failed",
+        "draftFailed": "Could not restore to draft",
+        "deleteFailed": "Could not delete the game",
+        "updateFailed": "Failed to update the game",
+        "unknownError": "Unknown error"
+      },
+      "messages": {
+        "published": "Published",
+        "restoredToDraft": "Restored to draft",
+        "gameDeleted": "The game was deleted.",
+        "importComplete": "Import complete! Game list updated.",
+        "importedGames": "Imported {count} games.",
+        "importFailed": "Failed for {count} games.",
+        "changesSaved": "Changes saved."
+      },
+      "actions": {
+        "edit": "Edit",
+        "makeDraft": "Make draft",
+        "publish": "Publish",
+        "delete": "Delete"
+      },
+      "list": {
+        "selectGame": "Select {name}",
+        "openMenu": "Open menu"
+      },
+      "deleteDialog": {
+        "title": "Delete game?",
+        "description": "This action cannot be undone. The game will be permanently deleted."
       }
     }
   },

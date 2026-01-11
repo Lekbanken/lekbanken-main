@@ -775,6 +775,7 @@
         "loading": "Laster...",
         "loadingGameData": "Henter spilldata.",
         "gameNotFound": "Spillet ble ikke funnet",
+        "gameMissing": "Spillet mangler",
         "checkLinkOrGoBack": "Sjekk lenken eller gå tilbake til listen.",
         "backToGames": "Tilbake til spill",
         "makeDraft": "Gjør til utkast",
@@ -791,6 +792,86 @@
         "time": "Tid",
         "age": "Alder",
         "notSet": "Ikke satt"
+      },
+      "pageDescription": "Navet for å opprette, oppdatere, publisere og eksportere hele spillkatalogen.",
+      "cardTitle": "Spilloversikt",
+      "searchPlaceholder": "Søk etter navn, formål eller kategori",
+      "breadcrumbs": {
+        "home": "Startside",
+        "games": "Spill"
+      },
+      "stats": {
+        "total": "Totalt",
+        "published": "Publiserte",
+        "drafts": "Utkast",
+        "tenantOwned": "Tenant-eide"
+      },
+      "filters": {
+        "allStatuses": "Alle statuser",
+        "published": "Publiserte",
+        "draft": "Utkast",
+        "allEnergyLevels": "Alle energinivåer",
+        "low": "Lav",
+        "medium": "Medium",
+        "high": "Høy",
+        "energy": "Energi",
+        "allPlayModes": "Alle spillmoduser",
+        "basicPlay": "Enkel lek",
+        "facilitatedActivity": "Ledet aktivitet",
+        "participantPlay": "Deltakerlek",
+        "playMode": "Spillmodus",
+        "allOwners": "Alle eiere",
+        "global": "Global",
+        "owner": "Eier",
+        "status": "Status"
+      },
+      "noGames": {
+        "title": "Ingen spill matcher filtrene",
+        "description": "Juster filtre eller legg til et nytt spill."
+      },
+      "noAccess": {
+        "title": "Ingen tilgang",
+        "description": "Du trenger administratorrettigheter for å administrere spill."
+      },
+      "labels": {
+        "unnamedOrganisation": "Navnløs organisasjon",
+        "unknownPurpose": "Ukjent formål",
+        "unknownProduct": "Ukjent produkt",
+        "nameMissing": "Navn mangler",
+        "noDescription": "Ingen beskrivelse"
+      },
+      "errors": {
+        "fetchFailed": "Kunne ikke hente spill",
+        "loadFailed": "Kunne ikke laste spill akkurat nå.",
+        "loadTitle": "Kunne ikke laste spill",
+        "publishFailed": "Publisering mislyktes",
+        "draftFailed": "Kunne ikke gjenopprette til utkast",
+        "deleteFailed": "Kunne ikke slette spillet",
+        "updateFailed": "Kunne ikke oppdatere spillet",
+        "unknownError": "Ukjent feil"
+      },
+      "messages": {
+        "published": "Publisert",
+        "restoredToDraft": "Gjenopprettet til utkast",
+        "gameDeleted": "Spillet ble slettet.",
+        "importComplete": "Import fullført! Spillisten oppdatert.",
+        "importedGames": "Importerte {count} spill.",
+        "importFailed": "Mislyktes for {count} spill.",
+        "changesSaved": "Endringer lagret."
+      },
+      "actions": {
+        "edit": "Rediger",
+        "makeDraft": "Gjør til utkast",
+        "publish": "Publiser",
+        "delete": "Slett"
+      },
+      "list": {
+        "selectGame": "Velg {name}",
+        "openMenu": "Åpne meny"
+      },
+      "deleteDialog": {
+        "title": "Slette spill?",
+        "description": "Denne handlingen kan ikke angres. Spillet vil bli permanent slettet."
       }
     }
   },

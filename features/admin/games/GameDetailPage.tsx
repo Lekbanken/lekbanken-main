@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -53,6 +54,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   const { can } = useRbac();
   const { success, warning, info } = useToast();
   const router = useRouter();
+  const t = useTranslations('admin.games');
 
   const [game, setGame] = useState<GameWithRelations | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,13 +82,13 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
 
       if (!gameRes.ok) {
         const json = await gameRes.json().catch(() => ({}));
-        setError(json.error || 'Kunde inte hämta spelet');
+        setError(json.error || t('errors.fetchFailed'));
         return;
       }
 
       const { game: gameData } = (await gameRes.json()) as { game: GameWithRelations };
       if (!gameData) {
-        setError('Spelet saknas');
+        setError(t('detail.gameMissing'));
         return;
       }
 
@@ -101,13 +103,13 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
         : { products: [] };
 
       setGame(gameData);
-      setTenants((tenantsJson.tenants || []).map((t) => ({ value: t.id, label: t.name || 'Namn saknas' })));
-      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })));
-      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || 'Okänd produkt' })));
+      setTenants((tenantsJson.tenants || []).map((tenant) => ({ value: tenant.id, label: tenant.name || t('labels.nameMissing') })));
+      setPurposes((purposesJson.purposes || []).map((p) => ({ value: p.id, label: p.name || t('labels.unknownPurpose') })));
+      setProducts((productsJson.products || []).map((p) => ({ value: p.id, label: p.name || t('labels.unknownProduct') })));
     } catch (err) {
       console.error('[admin/games/:id] load error', err);
       setGame(null);
-      setError('Kunde inte ladda spelet just nu.');
+      setError(t('errors.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -126,7 +128,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
     });
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      throw new Error(json.error || 'Misslyckades att uppdatera spelet');
+      throw new Error(json.error || t('errors.updateFailed'));
     }
     const { game: updated } = (await res.json()) as { game: GameWithRelations };
     const owner = tenants.find((t) => t.value === updated.owner_tenant_id);
@@ -138,7 +140,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       main_purpose: purpose ? { id: purpose.value, name: purpose.label } : null,
       product: product ? { id: product.value, name: product.label } : null,
     });
-    success('Ändringar sparade.');
+    success(t('messages.changesSaved'));
   };
 
   const handlePublishToggle = async (next: Database['public']['Enums']['game_status_enum']) => {
@@ -151,7 +153,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        warning(json.error || 'Publicering misslyckades');
+        warning(json.error || t('errors.publishFailed'));
         return;
       }
     } else {
@@ -162,12 +164,12 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       });
       if (!res.ok) {
         const json = await res.json().catch(() => ({}));
-        warning(json.error || 'Kunde inte återställa till utkast');
+        warning(json.error || t('errors.draftFailed'));
         return;
       }
     }
     setGame((prev) => (prev ? { ...prev, status: next } : prev));
-    info(next === 'published' ? 'Publicerad' : 'Återställd till utkast');
+    info(next === 'published' ? t('messages.published') : t('messages.restoredToDraft'));
   };
 
   const handleDelete = async () => {
@@ -175,10 +177,10 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
     const res = await fetch(`/api/games/${game.id}`, { method: 'DELETE' });
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      warning(json.error || 'Kunde inte ta bort spelet');
+      warning(json.error || t('errors.deleteFailed'));
       return;
     }
-    warning('Spelet togs bort.');
+    warning(t('messages.gameDeleted'));
     router.push('/admin/games');
   };
 

@@ -775,6 +775,7 @@
         "loading": "Laddar...",
         "loadingGameData": "Hämtar speldata.",
         "gameNotFound": "Spelet hittades inte",
+        "gameMissing": "Spelet saknas",
         "checkLinkOrGoBack": "Kontrollera länken eller gå tillbaka till listan.",
         "backToGames": "Tillbaka till spel",
         "makeDraft": "Gör till utkast",
@@ -791,6 +792,86 @@
         "time": "Tid",
         "age": "Ålder",
         "notSet": "Inte satt"
+      },
+      "pageDescription": "Navet för att skapa, uppdatera, publicera och exportera hela spelkatalogen.",
+      "cardTitle": "Spelöversikt",
+      "searchPlaceholder": "Sök på namn, syfte eller kategori",
+      "breadcrumbs": {
+        "home": "Startsida",
+        "games": "Spel"
+      },
+      "stats": {
+        "total": "Totalt",
+        "published": "Publicerade",
+        "drafts": "Utkast",
+        "tenantOwned": "Tenant-ägda"
+      },
+      "filters": {
+        "allStatuses": "Alla statusar",
+        "published": "Publicerade",
+        "draft": "Utkast",
+        "allEnergyLevels": "Alla energinivåer",
+        "low": "Låg",
+        "medium": "Medel",
+        "high": "Hög",
+        "energy": "Energi",
+        "allPlayModes": "Alla spellägen",
+        "basicPlay": "Enkel lek",
+        "facilitatedActivity": "Ledd aktivitet",
+        "participantPlay": "Deltagarlek",
+        "playMode": "Spelläge",
+        "allOwners": "Alla ägare",
+        "global": "Global",
+        "owner": "Ägare",
+        "status": "Status"
+      },
+      "noGames": {
+        "title": "Inga spel matchar filtren",
+        "description": "Justera filter eller lägg till ett nytt spel."
+      },
+      "noAccess": {
+        "title": "Ingen åtkomst",
+        "description": "Du behöver administratörsbehörighet för att hantera spel."
+      },
+      "labels": {
+        "unnamedOrganisation": "Namnlös organisation",
+        "unknownPurpose": "Okänt syfte",
+        "unknownProduct": "Okänd produkt",
+        "nameMissing": "Namn saknas",
+        "noDescription": "Ingen beskrivning"
+      },
+      "errors": {
+        "fetchFailed": "Kunde inte hämta spel",
+        "loadFailed": "Kunde inte ladda spel just nu.",
+        "loadTitle": "Kunde inte ladda spel",
+        "publishFailed": "Publicering misslyckades",
+        "draftFailed": "Kunde inte återställa till utkast",
+        "deleteFailed": "Kunde inte ta bort leken",
+        "updateFailed": "Misslyckades att uppdatera spelet",
+        "unknownError": "Okänt fel"
+      },
+      "messages": {
+        "published": "Publicerad",
+        "restoredToDraft": "Återställd till utkast",
+        "gameDeleted": "Leken togs bort.",
+        "importComplete": "Import klar! Spellistan uppdaterad.",
+        "importedGames": "Importerade {count} spel.",
+        "importFailed": "Misslyckades för {count} spel.",
+        "changesSaved": "Ändringar sparade."
+      },
+      "actions": {
+        "edit": "Redigera",
+        "makeDraft": "Gör till utkast",
+        "publish": "Publicera",
+        "delete": "Ta bort"
+      },
+      "list": {
+        "selectGame": "Välj {name}",
+        "openMenu": "Öppna meny"
+      },
+      "deleteDialog": {
+        "title": "Ta bort lek?",
+        "description": "Denna åtgärd kan inte ångras. Leken tas bort permanent."
       }
     }
   },

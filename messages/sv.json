@@ -1605,7 +1605,36 @@
     "shortcutHelpPanel": {
       "title": "Kortkommandon",
       "description": "Snabbåtkomst till Director Mode-funktioner",
-      "pressToShow": "Tryck ? för att visa denna hjälp"
+      "pressToShow": "Tryck ? för att visa denna hjälp",
+      "categories": {
+        "navigation": "Navigation",
+        "playback": "Uppspelning",
+        "triggers": "Triggers",
+        "signals": "Signaler",
+        "artifacts": "Artefakter",
+        "view": "Vy",
+        "system": "System"
+      },
+      "actions": {
+        "next_step": "Gå till nästa steg",
+        "prev_step": "Gå till föregående steg",
+        "next_phase": "Gå till nästa fas",
+        "prev_phase": "Gå till föregående fas",
+        "toggle_pause": "Pausa/återuppta session",
+        "start_session": "Starta session",
+        "end_session": "Avsluta session",
+        "trigger_kill_switch": "Aktivera nödstopp (alla triggers)",
+        "trigger_rearm_all": "Återaktivera alla triggers",
+        "signal_attention": "Skicka uppmärksamhetssignal",
+        "signal_success": "Skicka framgångssignal",
+        "signal_warning": "Skicka varningssignal",
+        "toggle_director": "Öppna/stäng Director Mode",
+        "toggle_story_view": "Visa/dölj deltagarvy",
+        "toggle_event_feed": "Visa/dölj händelseflöde",
+        "toggle_chat": "Visa/dölj chatt",
+        "show_shortcuts": "Visa alla kortkommandon",
+        "quick_search": "Snabbsök"
+      }
     },
     "stepViewer": {
       "stepOf": "Steg {current} av {total}",

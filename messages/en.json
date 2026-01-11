@@ -1609,7 +1609,36 @@
     "shortcutHelpPanel": {
       "title": "Keyboard Shortcuts",
       "description": "Quick access to Director Mode features",
-      "pressToShow": "Press ? to show this help"
+      "pressToShow": "Press ? to show this help",
+      "categories": {
+        "navigation": "Navigation",
+        "playback": "Playback",
+        "triggers": "Triggers",
+        "signals": "Signals",
+        "artifacts": "Artifacts",
+        "view": "View",
+        "system": "System"
+      },
+      "actions": {
+        "next_step": "Go to next step",
+        "prev_step": "Go to previous step",
+        "next_phase": "Go to next phase",
+        "prev_phase": "Go to previous phase",
+        "toggle_pause": "Pause/resume session",
+        "start_session": "Start session",
+        "end_session": "End session",
+        "trigger_kill_switch": "Activate emergency stop (all triggers)",
+        "trigger_rearm_all": "Rearm all triggers",
+        "signal_attention": "Send attention signal",
+        "signal_success": "Send success signal",
+        "signal_warning": "Send warning signal",
+        "toggle_director": "Open/close Director Mode",
+        "toggle_story_view": "Show/hide participant view",
+        "toggle_event_feed": "Show/hide event feed",
+        "toggle_chat": "Show/hide chat",
+        "show_shortcuts": "Show all keyboard shortcuts",
+        "quick_search": "Quick search"
+      }
     },
     "stepViewer": {
       "stepOf": "Step {current} of {total}",

@@ -144,12 +144,13 @@ function formatKey(shortcut: DirectorShortcut): React.ReactNode {
 
 interface ShortcutRowProps {
   shortcut: DirectorShortcut;
+  t: ReturnType<typeof useTranslations<'play.shortcutHelpPanel'>>;
 }
 
-function ShortcutRow({ shortcut }: ShortcutRowProps) {
+function ShortcutRow({ shortcut, t }: ShortcutRowProps) {
   return (
     <div className="flex items-center justify-between py-2 px-2 hover:bg-muted/50 rounded">
-      <span className="text-sm">{shortcut.description}</span>
+      <span className="text-sm">{t(`actions.${shortcut.descriptionKey}` as Parameters<typeof t>[0])}</span>
       {formatKey(shortcut)}
     </div>
   );
@@ -162,23 +163,24 @@ function ShortcutRow({ shortcut }: ShortcutRowProps) {
 interface CategorySectionProps {
   category: ShortcutCategory;
   shortcuts: DirectorShortcut[];
+  t: ReturnType<typeof useTranslations<'play.shortcutHelpPanel'>>;
 }
 
-function CategorySection({ category, shortcuts }: CategorySectionProps) {
+function CategorySection({ category, shortcuts, t }: CategorySectionProps) {
   if (shortcuts.length === 0) return null;
   
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
         {CATEGORY_ICONS[category]}
-        {SHORTCUT_CATEGORY_LABELS[category]}
+        {t(`categories.${SHORTCUT_CATEGORY_LABELS[category]}` as Parameters<typeof t>[0])}
         <Badge variant="default" className="text-xs">
           {shortcuts.length}
         </Badge>
       </div>
       <div className="border rounded-lg divide-y">
         {shortcuts.map((shortcut) => (
-          <ShortcutRow key={shortcut.action} shortcut={shortcut} />
+          <ShortcutRow key={shortcut.action} shortcut={shortcut} t={t} />
         ))}
       </div>
     </div>
@@ -226,6 +228,7 @@ export function ShortcutHelpPanel({
                 key={category}
                 category={category}
                 shortcuts={groupedShortcuts[category]}
+                t={t}
               />
             ))}
           </div>

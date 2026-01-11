@@ -291,43 +291,36 @@ export function useBatchArtifacts({
 
 export const PRESET_FILTERS: Array<{
   id: string;
-  label: string;
   icon: string;
   filter: ArtifactFilter;
 }> = [
   {
     id: 'all-hidden',
-    label: 'Alla dolda',
     icon: 'eye-off',
     filter: { type: 'visibility', value: 'hidden' },
   },
   {
     id: 'all-visible',
-    label: 'Alla synliga',
     icon: 'eye',
     filter: { type: 'visibility', value: 'visible' },
   },
   {
     id: 'all-locked',
-    label: 'Alla låsta',
     icon: 'lock',
     filter: { type: 'state', value: 'locked' },
   },
   {
     id: 'all-solved',
-    label: 'Alla lösta',
     icon: 'check-circle',
     filter: { type: 'state', value: 'solved' },
   },
   {
     id: 'all-unsolved',
-    label: 'Alla olösta',
     icon: 'circle',
     filter: { type: 'state', value: 'unsolved' },
   },
   {
     id: 'puzzles',
-    label: 'Alla pussel',
     icon: 'puzzle',
     filter: {
       predicate: (a) =>
@@ -336,7 +329,6 @@ export const PRESET_FILTERS: Array<{
   },
   {
     id: 'content',
-    label: 'Allt innehåll',
     icon: 'file-text',
     filter: {
       predicate: (a) =>
@@ -346,17 +338,20 @@ export const PRESET_FILTERS: Array<{
 ];
 
 // =============================================================================
-// Operation Labels
+// Operation Keys (for translation lookup under play.batchArtifactPanel.operations)
 // =============================================================================
 
-export const OPERATION_LABELS: Record<BatchOperation, string> = {
-  reveal: 'Visa',
-  hide: 'Dölj',
-  reset: 'Återställ',
-  lock: 'Lås',
-  unlock: 'Lås upp',
-  solve: 'Markera som löst',
+export const OPERATION_KEYS: Record<BatchOperation, string> = {
+  reveal: 'reveal',
+  hide: 'hide',
+  reset: 'reset',
+  lock: 'lock',
+  unlock: 'unlock',
+  solve: 'solve',
 };
+
+/** @deprecated Use OPERATION_KEYS with translations instead */
+export const OPERATION_LABELS = OPERATION_KEYS;
 
 export const OPERATION_ICONS: Record<BatchOperation, string> = {
   reveal: 'eye',

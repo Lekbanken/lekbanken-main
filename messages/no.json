@@ -1609,7 +1609,36 @@
     "shortcutHelpPanel": {
       "title": "Hurtigtaster",
       "description": "Rask tilgang til Director Mode-funksjoner",
-      "pressToShow": "Trykk ? for å vise denne hjelpen"
+      "pressToShow": "Trykk ? for å vise denne hjelpen",
+      "categories": {
+        "navigation": "Navigasjon",
+        "playback": "Avspilling",
+        "triggers": "Triggers",
+        "signals": "Signaler",
+        "artifacts": "Artefakter",
+        "view": "Visning",
+        "system": "System"
+      },
+      "actions": {
+        "next_step": "Gå til neste steg",
+        "prev_step": "Gå til forrige steg",
+        "next_phase": "Gå til neste fase",
+        "prev_phase": "Gå til forrige fase",
+        "toggle_pause": "Pause/fortsett sesjon",
+        "start_session": "Start sesjon",
+        "end_session": "Avslutt sesjon",
+        "trigger_kill_switch": "Aktiver nødstopp (alle triggers)",
+        "trigger_rearm_all": "Reaktiver alle triggers",
+        "signal_attention": "Send oppmerksomhetssignal",
+        "signal_success": "Send suksesssignal",
+        "signal_warning": "Send varselsignal",
+        "toggle_director": "Åpne/lukk Director Mode",
+        "toggle_story_view": "Vis/skjul deltakervisning",
+        "toggle_event_feed": "Vis/skjul hendelsesstrøm",
+        "toggle_chat": "Vis/skjul chat",
+        "show_shortcuts": "Vis alle hurtigtaster",
+        "quick_search": "Hurtigsøk"
+      }
     },
     "stepViewer": {
       "stepOf": "Steg {current} av {total}",

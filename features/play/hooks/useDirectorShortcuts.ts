@@ -29,8 +29,8 @@ export interface DirectorShortcut {
   };
   /** Action identifier */
   action: DirectorAction;
-  /** Human-readable description */
-  description: string;
+  /** Translation key for description (under play.directorShortcuts.actions) */
+  descriptionKey: string;
   /** Category for grouping */
   category: ShortcutCategory;
   /** Whether shortcut is enabled */
@@ -115,7 +115,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'ArrowRight',
     modifiers: { ctrl: true },
     action: 'next_step',
-    description: 'Gå till nästa steg',
+    descriptionKey: 'next_step',
     category: 'navigation',
   },
   {
@@ -123,7 +123,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'ArrowLeft',
     modifiers: { ctrl: true },
     action: 'prev_step',
-    description: 'Gå till föregående steg',
+    descriptionKey: 'prev_step',
     category: 'navigation',
   },
   {
@@ -131,7 +131,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'ArrowDown',
     modifiers: { ctrl: true },
     action: 'next_phase',
-    description: 'Gå till nästa fas',
+    descriptionKey: 'next_phase',
     category: 'navigation',
   },
   {
@@ -139,7 +139,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'ArrowUp',
     modifiers: { ctrl: true },
     action: 'prev_phase',
-    description: 'Gå till föregående fas',
+    descriptionKey: 'prev_phase',
     category: 'navigation',
   },
   // Playback
@@ -148,7 +148,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Space',
     modifiers: { ctrl: true },
     action: 'toggle_pause',
-    description: 'Pausa/återuppta session',
+    descriptionKey: 'toggle_pause',
     category: 'playback',
   },
   {
@@ -156,7 +156,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Enter',
     modifiers: { ctrl: true, shift: true },
     action: 'start_session',
-    description: 'Starta session',
+    descriptionKey: 'start_session',
     category: 'playback',
   },
   {
@@ -164,7 +164,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Escape',
     modifiers: { ctrl: true, shift: true },
     action: 'end_session',
-    description: 'Avsluta session',
+    descriptionKey: 'end_session',
     category: 'playback',
   },
   // Triggers
@@ -173,7 +173,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyK',
     modifiers: { ctrl: true, shift: true },
     action: 'trigger_kill_switch',
-    description: 'Aktivera nödstopp (alla triggers)',
+    descriptionKey: 'trigger_kill_switch',
     category: 'triggers',
   },
   {
@@ -181,7 +181,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyR',
     modifiers: { ctrl: true, shift: true },
     action: 'trigger_rearm_all',
-    description: 'Återaktivera alla triggers',
+    descriptionKey: 'trigger_rearm_all',
     category: 'triggers',
   },
   // Signals
@@ -190,7 +190,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Digit1',
     modifiers: { alt: true },
     action: 'signal_attention',
-    description: 'Skicka uppmärksamhetssignal',
+    descriptionKey: 'signal_attention',
     category: 'signals',
   },
   {
@@ -198,7 +198,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Digit2',
     modifiers: { alt: true },
     action: 'signal_success',
-    description: 'Skicka framgångssignal',
+    descriptionKey: 'signal_success',
     category: 'signals',
   },
   {
@@ -206,7 +206,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Digit3',
     modifiers: { alt: true },
     action: 'signal_warning',
-    description: 'Skicka varningssignal',
+    descriptionKey: 'signal_warning',
     category: 'signals',
   },
   // View
@@ -215,7 +215,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyD',
     modifiers: { ctrl: true },
     action: 'toggle_director',
-    description: 'Öppna/stäng Director Mode',
+    descriptionKey: 'toggle_director',
     category: 'view',
   },
   {
@@ -223,7 +223,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyS',
     modifiers: { ctrl: true, shift: true },
     action: 'toggle_story_view',
-    description: 'Visa/dölj deltagarvy',
+    descriptionKey: 'toggle_story_view',
     category: 'view',
   },
   {
@@ -231,7 +231,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyE',
     modifiers: { ctrl: true },
     action: 'toggle_event_feed',
-    description: 'Visa/dölj händelseflöde',
+    descriptionKey: 'toggle_event_feed',
     category: 'view',
   },
   {
@@ -239,7 +239,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyM',
     modifiers: { ctrl: true },
     action: 'toggle_chat',
-    description: 'Visa/dölj chatt',
+    descriptionKey: 'toggle_chat',
     category: 'view',
   },
   // System
@@ -248,7 +248,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'Slash',
     modifiers: { shift: true },
     action: 'show_shortcuts',
-    description: 'Visa alla kortkommandon',
+    descriptionKey: 'show_shortcuts',
     category: 'system',
   },
   {
@@ -256,7 +256,7 @@ const DEFAULT_SHORTCUTS: DirectorShortcut[] = [
     code: 'KeyP',
     modifiers: { ctrl: true },
     action: 'quick_search',
-    description: 'Snabbsök',
+    descriptionKey: 'quick_search',
     category: 'system',
   },
 ];
@@ -440,15 +440,18 @@ export function useDirectorShortcuts({
 }
 
 // =============================================================================
-// Category Labels
+// Category Keys (for translation lookup under play.directorShortcuts.categories)
 // =============================================================================
 
-export const SHORTCUT_CATEGORY_LABELS: Record<ShortcutCategory, string> = {
-  navigation: 'Navigation',
-  playback: 'Uppspelning',
-  triggers: 'Triggers',
-  signals: 'Signaler',
-  artifacts: 'Artefakter',
-  view: 'Vy',
-  system: 'System',
+export const SHORTCUT_CATEGORY_KEYS: Record<ShortcutCategory, string> = {
+  navigation: 'navigation',
+  playback: 'playback',
+  triggers: 'triggers',
+  signals: 'signals',
+  artifacts: 'artifacts',
+  view: 'view',
+  system: 'system',
 };
+
+/** @deprecated Use SHORTCUT_CATEGORY_KEYS with translations instead */
+export const SHORTCUT_CATEGORY_LABELS = SHORTCUT_CATEGORY_KEYS;

@@ -1492,6 +1492,52 @@
         "cyan": "Cyan"
       }
     },
+    "triggerTemplateLibrary": {
+      "dialog": {
+        "title": "Trigger-malbibliotek",
+        "description": "Velg en ferdig mal for å raskt legge til en trigger"
+      },
+      "tabs": {
+        "browse": "Bla gjennom",
+        "search": "Søk"
+      },
+      "categories": {
+        "all": "Alle kategorier"
+      },
+      "complexity": {
+        "beginner": "Enkel",
+        "intermediate": "Middels",
+        "advanced": "Avansert"
+      },
+      "empty": {
+        "noTemplates": "Ingen maler funnet"
+      },
+      "search": {
+        "placeholder": "Søk maler...",
+        "enterKeyword": "Skriv inn søkeord for å finne maler",
+        "noMatches": "Ingen maler matchet søket"
+      },
+      "stats": {
+        "templatesCount": "{count} maler",
+        "simple": "{count} enkle",
+        "medium": "{count} middels",
+        "advanced": "{count} avanserte"
+      },
+      "variableInput": {
+        "selectStep": "Velg steg",
+        "selectPhase": "Velg fase",
+        "selectArtifact": "Velg artefakt",
+        "selectChannel": "Velg kanal"
+      },
+      "configDialog": {
+        "noConfiguration": "Denne malen trenger ingen konfigurasjon.",
+        "examples": "Eksempler"
+      },
+      "buttons": {
+        "cancel": "Avbryt",
+        "addTrigger": "Legg til trigger"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Noe gikk galt",
@@ -1948,8 +1994,14 @@
       "noContent": "Intet innhold i denne fasen"
     },
     "participantSignalMicroUI": {
-      "queueCount": "{count} i k\u00f8",
-      "autoSendHint": "Sendes automatisk n\u00e5r du er online."
+      "title": "Signaler",
+      "queueCount": "{count} i kø",
+      "autoSendHint": "Sendes automatisk når du er online.",
+      "buttons": {
+        "ready": "KLAR",
+        "sos": "SOS",
+        "found": "FUNNET"
+      }
     },
     "batchArtifactPanel": {
       "title": "Masseoperasjoner",

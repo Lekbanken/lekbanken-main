@@ -1492,6 +1492,52 @@
         "cyan": "Cyan"
       }
     },
+    "triggerTemplateLibrary": {
+      "dialog": {
+        "title": "Trigger Template Library",
+        "description": "Select a template to quickly add a trigger"
+      },
+      "tabs": {
+        "browse": "Browse",
+        "search": "Search"
+      },
+      "categories": {
+        "all": "All categories"
+      },
+      "complexity": {
+        "beginner": "Simple",
+        "intermediate": "Medium",
+        "advanced": "Advanced"
+      },
+      "empty": {
+        "noTemplates": "No templates found"
+      },
+      "search": {
+        "placeholder": "Search templates...",
+        "enterKeyword": "Enter a keyword to find templates",
+        "noMatches": "No templates matched the search"
+      },
+      "stats": {
+        "templatesCount": "{count} templates",
+        "simple": "{count} simple",
+        "medium": "{count} medium",
+        "advanced": "{count} advanced"
+      },
+      "variableInput": {
+        "selectStep": "Select step",
+        "selectPhase": "Select phase",
+        "selectArtifact": "Select artifact",
+        "selectChannel": "Select channel"
+      },
+      "configDialog": {
+        "noConfiguration": "This template does not require configuration.",
+        "examples": "Examples"
+      },
+      "buttons": {
+        "cancel": "Cancel",
+        "addTrigger": "Add trigger"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Something went wrong",
@@ -1948,8 +1994,14 @@
       "noContent": "No content in this phase"
     },
     "participantSignalMicroUI": {
+      "title": "Signals",
       "queueCount": "{count} queued",
-      "autoSendHint": "Will be sent automatically when you are online."
+      "autoSendHint": "Will be sent automatically when you are online.",
+      "buttons": {
+        "ready": "READY",
+        "sos": "SOS",
+        "found": "FOUND"
+      }
     },
     "batchArtifactPanel": {
       "title": "Batch operations",

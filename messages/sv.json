@@ -1488,6 +1488,52 @@
         "cyan": "Cyan"
       }
     },
+    "triggerTemplateLibrary": {
+      "dialog": {
+        "title": "Trigger-mallbibliotek",
+        "description": "Välj en färdig mall för att snabbt lägga till en trigger"
+      },
+      "tabs": {
+        "browse": "Bläddra",
+        "search": "Sök"
+      },
+      "categories": {
+        "all": "Alla kategorier"
+      },
+      "complexity": {
+        "beginner": "Enkel",
+        "intermediate": "Medel",
+        "advanced": "Avancerad"
+      },
+      "empty": {
+        "noTemplates": "Inga mallar hittades"
+      },
+      "search": {
+        "placeholder": "Sök mallar...",
+        "enterKeyword": "Ange sökord för att hitta mallar",
+        "noMatches": "Inga mallar matchade sökningen"
+      },
+      "stats": {
+        "templatesCount": "{count} mallar",
+        "simple": "{count} enkla",
+        "medium": "{count} medel",
+        "advanced": "{count} avancerade"
+      },
+      "variableInput": {
+        "selectStep": "Välj steg",
+        "selectPhase": "Välj fas",
+        "selectArtifact": "Välj artefakt",
+        "selectChannel": "Välj kanal"
+      },
+      "configDialog": {
+        "noConfiguration": "Denna mall behöver ingen konfiguration.",
+        "examples": "Exempel"
+      },
+      "buttons": {
+        "cancel": "Avbryt",
+        "addTrigger": "Lägg till trigger"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Något gick fel",
@@ -1944,8 +1990,14 @@
       "noContent": "Inget innehåll i denna fas"
     },
     "participantSignalMicroUI": {
+      "title": "Signaler",
       "queueCount": "{count} i kö",
-      "autoSendHint": "Skickas automatiskt när du är online."
+      "autoSendHint": "Skickas automatiskt när du är online.",
+      "buttons": {
+        "ready": "REDO",
+        "sos": "SOS",
+        "found": "HITTAD"
+      }
     },
     "batchArtifactPanel": {
       "title": "Massoperationer",

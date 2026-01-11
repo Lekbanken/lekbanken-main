@@ -177,9 +177,9 @@ export function ParticipantSignalMicroUI({
 
   const buttons = useMemo(
     () => [
-      { channel: 'READY', label: 'READY' },
-      { channel: 'SOS', label: 'SOS' },
-      { channel: 'FOUND', label: 'FOUND' },
+      { channel: 'READY', labelKey: 'ready' as const },
+      { channel: 'SOS', labelKey: 'sos' as const },
+      { channel: 'FOUND', labelKey: 'found' as const },
     ],
     []
   );
@@ -187,7 +187,7 @@ export function ParticipantSignalMicroUI({
   return (
     <Card className="p-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Signals</div>
+        <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t('title')}</div>
         {queue.length > 0 && (
           <Badge variant="secondary" size="sm">{t('queueCount', { count: queue.length })}</Badge>
         )}
@@ -203,7 +203,7 @@ export function ParticipantSignalMicroUI({
             onClick={() => void handleTap(b.channel)}
             disabled={disabled || sending}
           >
-            {b.label}
+            {t(`buttons.${b.labelKey}` as Parameters<typeof t>[0])}
           </Button>
         ))}
       </div>

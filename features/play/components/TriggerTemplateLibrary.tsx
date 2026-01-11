@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -88,10 +89,10 @@ export interface TriggerTemplateLibraryProps {
 // =============================================================================
 
 const COMPLEXITY_LABELS = {
-  beginner: 'Enkel',
-  intermediate: 'Medel',
-  advanced: 'Avancerad',
-};
+  beginner: 'beginner',
+  intermediate: 'intermediate',
+  advanced: 'advanced',
+} as const;
 
 const COMPLEXITY_COLORS = {
   beginner: 'bg-green-500/10 text-green-600 border-green-500/20',
@@ -115,9 +116,10 @@ const CATEGORY_ORDER: TriggerTemplateCategory[] = [
 interface TemplateCardProps {
   template: TriggerTemplate;
   onSelect: () => void;
+  t: ReturnType<typeof useTranslations<'play.triggerTemplateLibrary'>>;
 }
 
-function TemplateCard({ template, onSelect }: TemplateCardProps) {
+function TemplateCard({ template, onSelect, t }: TemplateCardProps) {
   return (
     <Card
       className="cursor-pointer hover:border-primary/50 transition-colors"
@@ -137,7 +139,7 @@ function TemplateCard({ template, onSelect }: TemplateCardProps) {
             variant="outline"
             className={COMPLEXITY_COLORS[template.complexity]}
           >
-            {COMPLEXITY_LABELS[template.complexity]}
+            {t(`complexity.${COMPLEXITY_LABELS[template.complexity]}` as Parameters<typeof t>[0])}
           </Badge>
         </div>
       </CardHeader>
@@ -176,6 +178,7 @@ interface VariableInputProps {
   phases?: Array<{ id: string; name: string }>;
   artifacts?: Array<{ id: string; name: string; type: string }>;
   channels?: string[];
+  t: ReturnType<typeof useTranslations<'play.triggerTemplateLibrary'>>;
 }
 
 function VariableInput({
@@ -186,6 +189,7 @@ function VariableInput({
   phases = [],
   artifacts = [],
   channels = [],
+  t,
 }: VariableInputProps) {
   switch (variable.type) {
     case 'step':
@@ -194,7 +198,7 @@ function VariableInput({
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
           options={[
-            { value: '', label: 'Välj steg' },
+            { value: '', label: t('variableInput.selectStep') },
             ...steps.map((step) => ({ value: step.id, label: step.name })),
           ]}
         />
@@ -206,7 +210,7 @@ function VariableInput({
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
           options={[
-            { value: '', label: 'Välj fas' },
+            { value: '', label: t('variableInput.selectPhase') },
             ...phases.map((phase) => ({ value: phase.id, label: phase.name })),
           ]}
         />
@@ -218,7 +222,7 @@ function VariableInput({
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
           options={[
-            { value: '', label: 'Välj artefakt' },
+            { value: '', label: t('variableInput.selectArtifact') },
             ...artifacts.map((artifact) => ({
               value: artifact.id,
               label: `${artifact.name} (${artifact.type})`,
@@ -233,7 +237,7 @@ function VariableInput({
           value={value as string}
           onChange={(e) => onChange(e.target.value)}
           options={[
-            { value: '', label: 'Välj kanal' },
+            { value: '', label: t('variableInput.selectChannel') },
             ...channels.map((channel) => ({ value: channel, label: channel })),
             { value: 'success', label: 'success' },
             { value: 'warning', label: 'warning' },
@@ -279,6 +283,7 @@ interface ConfigureTemplateDialogProps {
   phases?: Array<{ id: string; name: string }>;
   artifacts?: Array<{ id: string; name: string; type: string }>;
   channels?: string[];
+  t: ReturnType<typeof useTranslations<'play.triggerTemplateLibrary'>>;
 }
 
 function ConfigureTemplateDialog({
@@ -290,6 +295,7 @@ function ConfigureTemplateDialog({
   phases,
   artifacts,
   channels,
+  t,
 }: ConfigureTemplateDialogProps) {
   const [values, setValues] = useState<Record<string, unknown>>({});
 
@@ -332,7 +338,7 @@ function ConfigureTemplateDialog({
         <div className="space-y-4 py-4">
           {template.variables.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
-              Denna mall behöver ingen konfiguration.
+              {t('configDialog.noConfiguration')}
             </p>
           ) : (
             template.variables.map((variable) => (
@@ -356,6 +362,7 @@ function ConfigureTemplateDialog({
                   phases={phases}
                   artifacts={artifacts}
                   channels={channels}
+                  t={t}
                 />
               </div>
             ))
@@ -363,7 +370,7 @@ function ConfigureTemplateDialog({
 
           {template.examples && template.examples.length > 0 && (
             <div className="pt-4 border-t">
-              <p className="text-sm font-medium mb-2">Exempel:</p>
+              <p className="text-sm font-medium mb-2">{t('configDialog.examples')}:</p>
               <ul className="text-sm text-muted-foreground space-y-1">
                 {template.examples.map((example, i) => (
                   <li key={i} className="flex items-start gap-2">
@@ -378,11 +385,11 @@ function ConfigureTemplateDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Avbryt
+            {t('buttons.cancel')}
           </Button>
           <Button onClick={() => onConfirm(values)} disabled={!canConfirm}>
             <PlusIcon className="h-4 w-4 mr-2" />
-            Lägg till trigger
+            {t('buttons.addTrigger')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -405,6 +412,7 @@ export function TriggerTemplateLibrary({
   onOpenChange,
   className,
 }: TriggerTemplateLibraryProps) {
+  const t = useTranslations('play.triggerTemplateLibrary');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<TriggerTemplateCategory | 'all'>('all');
   const [activeTab, setActiveTab] = useState('browse');
@@ -453,8 +461,8 @@ export function TriggerTemplateLibrary({
 
   // Tab configuration
   const tabs = [
-    { id: 'browse', label: 'Bläddra' },
-    { id: 'search', label: 'Sök' },
+    { id: 'browse', label: t('tabs.browse') },
+    { id: 'search', label: t('tabs.search') },
   ];
 
   const content = (
@@ -469,7 +477,7 @@ export function TriggerTemplateLibrary({
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value as TriggerTemplateCategory | 'all')}
             options={[
-              { value: 'all', label: 'Alla kategorier' },
+              { value: 'all', label: t('categories.all') },
               ...CATEGORY_ORDER.map((cat) => ({
                 value: cat,
                 label: `${TEMPLATE_CATEGORY_ICONS[cat]} ${TEMPLATE_CATEGORY_LABELS[cat]}`,
@@ -483,7 +491,7 @@ export function TriggerTemplateLibrary({
           {filteredTemplates.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <BookOpenIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Inga mallar hittades</p>
+              <p>{t('empty.noTemplates')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 pr-4">
@@ -492,6 +500,7 @@ export function TriggerTemplateLibrary({
                   key={template.id}
                   template={template}
                   onSelect={() => handleSelectTemplate(template)}
+                  t={t}
                 />
               ))}
             </div>
@@ -506,7 +515,7 @@ export function TriggerTemplateLibrary({
           <Input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Sök mallar..."
+            placeholder={t('search.placeholder')}
             className="pl-9"
           />
         </div>
@@ -516,12 +525,12 @@ export function TriggerTemplateLibrary({
           {searchQuery.trim() === '' ? (
             <div className="text-center py-8 text-muted-foreground">
               <MagnifyingGlassIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Ange sökord för att hitta mallar</p>
+              <p>{t('search.enterKeyword')}</p>
             </div>
           ) : filteredTemplates.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <BookOpenIcon className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>Inga mallar matchade sökningen</p>
+              <p>{t('search.noMatches')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3 pr-4">
@@ -530,6 +539,7 @@ export function TriggerTemplateLibrary({
                   key={template.id}
                   template={template}
                   onSelect={() => handleSelectTemplate(template)}
+                  t={t}
                 />
               ))}
             </div>
@@ -539,16 +549,16 @@ export function TriggerTemplateLibrary({
 
       {/* Stats */}
       <div className="flex items-center justify-between text-sm text-muted-foreground pt-2 border-t">
-        <span>{filteredTemplates.length} mallar</span>
+        <span>{t('stats.templatesCount', { count: filteredTemplates.length })}</span>
         <div className="flex items-center gap-3">
           <span className={COMPLEXITY_COLORS.beginner}>
-            {TRIGGER_TEMPLATES.filter((t) => t.complexity === 'beginner').length} enkla
+            {t('stats.simple', { count: TRIGGER_TEMPLATES.filter((tpl) => tpl.complexity === 'beginner').length })}
           </span>
           <span className={COMPLEXITY_COLORS.intermediate}>
-            {TRIGGER_TEMPLATES.filter((t) => t.complexity === 'intermediate').length} medel
+            {t('stats.medium', { count: TRIGGER_TEMPLATES.filter((tpl) => tpl.complexity === 'intermediate').length })}
           </span>
           <span className={COMPLEXITY_COLORS.advanced}>
-            {TRIGGER_TEMPLATES.filter((t) => t.complexity === 'advanced').length} avancerade
+            {t('stats.advanced', { count: TRIGGER_TEMPLATES.filter((tpl) => tpl.complexity === 'advanced').length })}
           </span>
         </div>
       </div>
@@ -563,6 +573,7 @@ export function TriggerTemplateLibrary({
         phases={phases}
         artifacts={artifacts}
         channels={channels}
+        t={t}
       />
     </div>
   );
@@ -574,10 +585,10 @@ export function TriggerTemplateLibrary({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <BoltIcon className="h-5 w-5" />
-              Trigger-mallbibliotek
+              {t('dialog.title')}
             </DialogTitle>
             <DialogDescription>
-              Välj en färdig mall för att snabbt lägga till en trigger
+              {t('dialog.description')}
             </DialogDescription>
           </DialogHeader>
           {content}

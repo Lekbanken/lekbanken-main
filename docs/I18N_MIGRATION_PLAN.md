@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
 > **Senast uppdaterad:** 2026-01-13
-> **Status:** 🟡 Pågående - Fas 1.2 (Play features) aktivt under arbete
+> **Status:** 🟡 Pågående - Fas 1.2 (Play features) nästan klart (~85%)
 
 ## Executive Summary
 
@@ -11,7 +11,7 @@
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
 | Filer som använder i18n | ~35 (3%) |
-| **Migrerade strängar** | ~400 (14%) |
+| **Migrerade strängar** | ~630 (22%) |
 | **Uppskattad återstående arbetsinsats** | ~25-40 timmar |
 
 ## Prioriteringsmodell
@@ -229,7 +229,13 @@ export function PlayButton() {
 - [x] **EventFeedPanel.tsx** ✅ ~25 strängar migrerade (commit 6277a5f)
 - [x] **ArtifactsPanel.tsx** ✅ 4 error strängar (commit 6277a5f)
 - [x] **ConversationCardsCollectionArtifact.tsx** ✅ 12 strängar (commit 6277a5f)
-- [ ] Fortsätt features/play (Fas 1.2) - ~100 strängar kvar
+- [x] **HostPlayMode.tsx** ✅ ~25 strängar migrerade (commit 4bc66db)
+- [x] **TimeBankPanel.tsx** ✅ ~12 strängar migrerade (commit 4bc66db)
+- [x] **TriggerDryRunPanel.tsx** ✅ ~60 strängar migrerade (commit 4bc66db)
+- [x] **SignalPresetEditor.tsx** ✅ ~80 strängar migrerade (commit 4bc66db)
+- [x] **TriggerTemplateLibrary.tsx** ✅ ~50 strängar migrerade
+- [x] **ParticipantSignalMicroUI.tsx** ✅ Fix partial migration (title, buttons)
+- [ ] Fortsätt features/play (Fas 1.2) - ~50 strängar kvar
 - [ ] Implementera app pages (Fas 1.3) - 154 strängar kvar
 - [ ] Implementera components/play (Fas 1.4) - 112 strängar kvar
 
@@ -247,7 +253,8 @@ export function PlayButton() {
 | 2026-01-12 | features/play/AnalyticsDashboard.tsx | 1 | ~18 | ✅ Klart |
 | 2026-01-12 | features/play (batch 2) | 5 | ~35 | ✅ Klart |
 | 2026-01-13 | features/play (batch 3) | 5 | ~85 | ✅ Klart |
-| - | features/play (övriga) | ~30 | ~100 | 🔄 Pågår |
+| 2026-01-13 | features/play (batch 4) | 6 | ~230 | ✅ Klart |
+| - | features/play (övriga) | ~25 | ~50 | 🔄 Pågår |
 | - | app/app | ~20 | 154 | ⏳ Väntar |
 | - | components/play | ~15 | 112 | ⏳ Väntar |
 

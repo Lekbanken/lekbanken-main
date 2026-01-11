@@ -791,6 +791,7 @@
     }
   },
   "play": {
+    "play": "Play",
     "common": {
       "cancel": "Cancel",
       "confirm": "Confirm",
@@ -1562,6 +1563,131 @@
     "participantSignalMicroUI": {
       "queueCount": "{count} queued",
       "autoSendHint": "Will be sent automatically when you are online."
+    },
+    "batchArtifactPanel": {
+      "title": "Batch operations",
+      "description": "Select artifacts and perform operations on multiple at once",
+      "processing": "Performing operation...",
+      "progressCount": "{done} of {total}",
+      "resultSuccess": "{operation}: {count} succeeded",
+      "resultWithErrors": "{operation}: {count} succeeded, {failed} failed",
+      "confirmTitle": "Confirm operation",
+      "confirmDescription": "Are you sure you want to {operation} {count} artifact{plural}?",
+      "confirmReset": "This will reset all selected puzzles to their original state.",
+      "confirmSolve": "This will mark all selected as solved without players solving them.",
+      "cancel": "Cancel",
+      "confirm": "Yes, continue"
+    },
+    "readinessIndicator": {
+      "criticalIssues": "Must be fixed before starting:",
+      "warnings": "Recommended to fix:",
+      "readyToStart": "Ready to start session",
+      "cannotStart": "Cannot start - fix critical issues"
+    },
+    "sessionTimeline": {
+      "title": "Session Timeline",
+      "description": "{count} events · {steps} steps",
+      "listButton": "List",
+      "stepLabel": "Step {number}",
+      "showingRecent": "Showing last {maxItems} of {total} events",
+      "solved": "{count} solved",
+      "triggers": "{count} triggers",
+      "errors": "{count} errors",
+      "updatingLive": "Updating live",
+      "recentEvents": "Recent events",
+      "noEvents": "No events yet",
+      "stats": {
+        "totalTime": "Total time",
+        "avgPerStep": "Avg/step",
+        "mostActiveStep": "Most active step",
+        "errors": "Errors"
+      },
+      "timeAxis": {
+        "start": "Start",
+        "now": "Now"
+      },
+      "filters": {
+        "all": "All events",
+        "triggers": "Triggers",
+        "artifacts": "Artifacts",
+        "navigation": "Navigation",
+        "timebank": "TimeBank",
+        "signals": "Signals",
+        "participants": "Participants",
+        "host": "Host"
+      }
+    },
+    "signalCapabilityTest": {
+      "title": "Signal Test",
+      "description": "Test which signals your device supports",
+      "signalsLabel": "Signals",
+      "availableCount": "{count}/5 available",
+      "testAll": "Test all",
+      "testing": "Testing...",
+      "status": {
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "denied": "Permission denied",
+        "error": "Error",
+        "unknown": "Not tested"
+      },
+      "capabilities": {
+        "torch": {
+          "label": "Flashlight",
+          "description": "Use the phone's flashlight as a signal",
+          "testButton": "Flash",
+          "fallback": "Requires camera access and a device with flashlight (most smartphones)"
+        },
+        "audio": {
+          "label": "Sound",
+          "description": "Play sound as a signal",
+          "testButton": "Beep",
+          "fallback": "Works in most browsers. On iOS you may need to tap the screen first."
+        },
+        "vibration": {
+          "label": "Vibration",
+          "description": "Vibrate the device as a signal",
+          "testButton": "Vibrate",
+          "fallback": "Works on most smartphones. Desktop computers do not support vibration."
+        },
+        "screenFlash": {
+          "label": "Screen flash",
+          "description": "Flash the screen in different colors",
+          "testButton": "Flash",
+          "fallback": "Works in all browsers. Best effect in a dark room."
+        },
+        "notification": {
+          "label": "Notification",
+          "description": "Show push notifications",
+          "testButton": "Test",
+          "fallback": "Requires you to allow notifications. Works best on mobile devices."
+        }
+      },
+      "tooltips": {
+        "unavailable": "This feature is not supported on your device",
+        "denied": "You need to grant permission for this feature",
+        "test": "Test {capability}"
+      },
+      "iosWarning": {
+        "title": "iOS users:",
+        "message": "Tap the \"Beep\" button above to activate audio. This only needs to be done once per session."
+      },
+      "summary": {
+        "excellent": "Excellent! Your device supports most signals.",
+        "basic": "Your device supports basic signals.",
+        "limited": "Limited signal support on this device.",
+        "count": "{count} of 5 signal types available"
+      },
+      "notificationTest": {
+        "title": "Signal Test",
+        "body": "Notifications are working!"
+      }
+    },
+    "sessionHeader": {
+      "sessionFor": "Session for",
+      "copyCode": "Copy code",
+      "copiedCode": "Copied!",
+      "joinUrl": "Join link"
     }
   }
 }

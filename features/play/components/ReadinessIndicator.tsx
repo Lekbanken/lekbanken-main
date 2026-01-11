@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -258,6 +259,7 @@ function CompactIndicator({ readiness, className }: ReadinessIndicatorProps) {
 // =============================================================================
 
 function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
+  const t = useTranslations('play.readinessIndicator');
   const colors = COLOR_CLASSES[readiness.readinessColor];
   
   return (
@@ -286,7 +288,7 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
         {readiness.criticalIssues.length > 0 && (
           <div className={`p-3 rounded-lg ${COLOR_CLASSES.red.light}`}>
             <p className="text-sm font-medium text-red-600 mb-2">
-              Måste åtgärdas innan start:
+              {t('criticalIssues')}
             </p>
             <div className="space-y-1">
               {readiness.criticalIssues.map((issue) => (
@@ -303,7 +305,7 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
         {readiness.warnings.length > 0 && (
           <div className={`p-3 rounded-lg ${COLOR_CLASSES.yellow.light}`}>
             <p className="text-sm font-medium text-yellow-600 mb-2">
-              Rekommenderas att åtgärda:
+              {t('warnings')}
             </p>
             <div className="space-y-1">
               {readiness.warnings.map((warning) => (
@@ -332,12 +334,12 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
           {readiness.canStart ? (
             <div className="flex items-center gap-2 text-green-600">
               <CheckCircleIcon className="h-5 w-5" />
-              <span className="font-medium">Redo att starta session</span>
+              <span className="font-medium">{t('readyToStart')}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2 text-red-600">
               <XCircleIcon className="h-5 w-5" />
-              <span className="font-medium">Kan inte starta - åtgärda kritiska problem</span>
+              <span className="font-medium">{t('cannotStart')}</span>
             </div>
           )}
         </div>

@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ClockIcon,
   MagnifyingGlassPlusIcon,
@@ -77,13 +78,13 @@ const SEVERITY_ICONS: Record<TimelineMarker['severity'], React.ReactNode> = {
 
 // Event type groups for filtering - using valid SessionEventType values
 const EVENT_TYPE_GROUPS: Record<string, SessionEventType[]> = {
-  'Triggers': ['trigger_armed', 'trigger_fired', 'trigger_disabled', 'trigger_error'],
-  'Artefakter': ['artifact_revealed', 'artifact_hidden', 'artifact_solved', 'artifact_failed', 'artifact_state_changed'],
-  'Navigation': ['step_started', 'step_completed', 'phase_started', 'phase_completed'],
-  'TimeBank': ['timebank_started', 'timebank_paused', 'timebank_expired', 'timebank_delta_applied'],
-  'Signaler': ['signal_sent', 'signal_received'],
-  'Deltagare': ['participant_joined', 'participant_left', 'participant_action'],
-  'Spelledare': ['host_action', 'host_hint_sent', 'host_message_sent'],
+  'triggers': ['trigger_armed', 'trigger_fired', 'trigger_disabled', 'trigger_error'],
+  'artifacts': ['artifact_revealed', 'artifact_hidden', 'artifact_solved', 'artifact_failed', 'artifact_state_changed'],
+  'navigation': ['step_started', 'step_completed', 'phase_started', 'phase_completed'],
+  'timebank': ['timebank_started', 'timebank_paused', 'timebank_expired', 'timebank_delta_applied'],
+  'signals': ['signal_sent', 'signal_received'],
+  'participants': ['participant_joined', 'participant_left', 'participant_action'],
+  'host': ['host_action', 'host_hint_sent', 'host_message_sent'],
 };
 
 // =============================================================================
@@ -163,6 +164,7 @@ function SegmentBar({
   onClick,
   onMarkerClick,
 }: SegmentBarProps) {
+  const t = useTranslations('play.sessionTimeline');
   const widthPercent = (segment.duration / totalDuration) * 100 * zoom;
   
   // Distribute markers across segment width
@@ -192,7 +194,7 @@ function SegmentBar({
       >
         {/* Segment label */}
         <div className="absolute inset-x-1 top-1 text-xs font-medium truncate">
-          Steg {segment.stepIndex + 1}
+          {t('stepLabel', { number: segment.stepIndex + 1 })}
         </div>
         
         {/* Duration */}
@@ -230,11 +232,12 @@ interface FilterPanelProps {
 }
 
 function FilterPanel({ selectedGroup, onGroupChange }: FilterPanelProps) {
+  const t = useTranslations('play.sessionTimeline');
   const options = [
-    { value: 'all', label: 'Alla händelser' },
+    { value: 'all', label: t('filters.all') },
     ...Object.keys(EVENT_TYPE_GROUPS).map((group) => ({
       value: group,
-      label: group,
+      label: t(`filters.${group}` as 'filters.all'),
     })),
   ];
 
@@ -318,24 +321,25 @@ interface StatsPanelProps {
 }
 
 function StatsPanel({ stats }: StatsPanelProps) {
+  const t = useTranslations('play.sessionTimeline');
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-3 bg-muted/30 rounded-lg">
       <div className="space-y-1">
-        <div className="text-xs text-muted-foreground">Total tid</div>
+        <div className="text-xs text-muted-foreground">{t('stats.totalTime')}</div>
         <div className="font-semibold">{formatDuration(stats.totalDuration)}</div>
       </div>
       <div className="space-y-1">
-        <div className="text-xs text-muted-foreground">Snitt/steg</div>
+        <div className="text-xs text-muted-foreground">{t('stats.avgPerStep')}</div>
         <div className="font-semibold">{formatDuration(stats.avgStepDuration)}</div>
       </div>
       <div className="space-y-1">
-        <div className="text-xs text-muted-foreground">Mest aktivt steg</div>
-        <div className="font-semibold">Steg {stats.mostActiveStep + 1}</div>
+        <div className="text-xs text-muted-foreground">{t('stats.mostActiveStep')}</div>
+        <div className="font-semibold">{t('stepLabel', { number: stats.mostActiveStep + 1 })}</div>
       </div>
       <div className="space-y-1">
         <div className="text-xs text-muted-foreground flex items-center gap-1">
           <ExclamationCircleIcon className="h-3 w-3 text-red-500" />
-          Fel
+          {t('stats.errors')}
         </div>
         <div className={`font-semibold ${stats.errorCount > 0 ? 'text-red-500' : ''}`}>
           {stats.errorCount}
@@ -356,6 +360,7 @@ interface MarkerListProps {
 }
 
 function MarkerList({ markers, onMarkerClick, maxItems = 50 }: MarkerListProps) {
+  const t = useTranslations('play.sessionTimeline');
   const displayMarkers = markers.slice(-maxItems);
 
   return (
@@ -375,13 +380,13 @@ function MarkerList({ markers, onMarkerClick, maxItems = 50 }: MarkerListProps) 
             {formatTime(marker.timestamp)}
           </span>
           <Badge variant="outline" className="text-xs">
-            Steg {marker.stepIndex + 1}
+            {t('stepLabel', { number: marker.stepIndex + 1 })}
           </Badge>
         </button>
       ))}
       {markers.length > maxItems && (
         <div className="text-xs text-muted-foreground text-center py-1">
-          Visar senaste {maxItems} av {markers.length} händelser
+          {t('showingRecent', { maxItems, total: markers.length })}
         </div>
       )}
     </div>
@@ -401,6 +406,7 @@ export function SessionTimeline({
   onSegmentClick,
   showStats = true,
 }: SessionTimelineProps) {
+  const t = useTranslations('play.sessionTimeline');
   const containerRef = useRef<HTMLDivElement>(null);
   const [filterGroup, setFilterGroup] = useState('all');
   const [showList, setShowList] = useState(false);
@@ -419,11 +425,11 @@ export function SessionTimeline({
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <SignalIcon className="h-5 w-5" />
-              Session Timeline
+              {t('title')}
             </CardTitle>
             {!compact && (
               <CardDescription>
-                {timeline.markers.length} händelser · {timeline.segments.length} steg
+                {t('description', { count: timeline.markers.length, steps: timeline.segments.length })}
               </CardDescription>
             )}
           </div>
@@ -435,7 +441,7 @@ export function SessionTimeline({
               size="sm"
               onClick={() => setShowList(!showList)}
             >
-              Lista
+              {t('listButton')}
             </Button>
           </div>
         </div>
@@ -453,11 +459,11 @@ export function SessionTimeline({
         >
           {/* Time axis labels */}
           <div className="absolute top-0 left-0 right-0 h-5 flex items-center px-2 text-[10px] text-muted-foreground border-b">
-            <span>Start</span>
+            <span>{t('timeAxis.start')}</span>
             <span className="flex-1 text-center">
               {formatDuration(timeline.stats.totalDuration)}
             </span>
-            <span>Nu</span>
+            <span>{t('timeAxis.now')}</span>
           </div>
 
           {/* Segments container */}
@@ -500,20 +506,20 @@ export function SessionTimeline({
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-green-500" />
-              {timeline.stats.eventCounts.get('artifact_solved') ?? 0} lösta
+              {t('solved', { count: timeline.stats.eventCounts.get('artifact_solved') ?? 0 })}
             </span>
             <span className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-yellow-500" />
-              {timeline.stats.eventCounts.get('trigger_fired') ?? 0} triggers
+              {t('triggers', { count: timeline.stats.eventCounts.get('trigger_fired') ?? 0 })}
             </span>
             <span className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-red-500" />
-              {timeline.stats.errorCount} fel
+              {t('errors', { count: timeline.stats.errorCount })}
             </span>
           </div>
           <div className="flex items-center gap-1">
             <ClockIcon className="h-3 w-3" />
-            Uppdateras live
+            {t('updatingLive')}
           </div>
         </div>
       </CardContent>
@@ -536,6 +542,7 @@ export function CompactTimeline({
   onMarkerClick,
   className,
 }: CompactTimelineProps) {
+  const t = useTranslations('play.sessionTimeline');
   const recentMarkers = timeline.markers.slice(-10).reverse();
 
   return (
@@ -543,7 +550,7 @@ export function CompactTimeline({
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium flex items-center gap-1">
           <SignalIcon className="h-4 w-4" />
-          Senaste händelser
+          {t('recentEvents')}
         </span>
         <Badge variant="outline" className="text-xs">
           {timeline.markers.length}
@@ -568,7 +575,7 @@ export function CompactTimeline({
 
       {timeline.markers.length === 0 && (
         <div className="text-xs text-muted-foreground text-center py-2">
-          Inga händelser än
+          {t('noEvents')}
         </div>
       )}
     </div>

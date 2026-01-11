@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -55,51 +56,20 @@ export interface SignalCapabilityTestProps {
 // Constants
 // =============================================================================
 
-const CAPABILITY_CONFIG: Record<
-  SignalCapability['type'],
-  {
-    icon: React.ReactNode;
-    label: string;
-    description: string;
-    testButtonLabel: string;
-    fallbackInfo: string;
-  }
-> = {
-  torch: {
-    icon: <LightBulbIcon className="h-5 w-5" />,
-    label: 'Ficklampa',
-    description: 'Använd telefonens ficklampa som signal',
-    testButtonLabel: 'Blinka',
-    fallbackInfo: 'Kräver kamera-tillgång och en enhet med ficklampa (de flesta smartphones)',
-  },
-  audio: {
-    icon: <SpeakerWaveIcon className="h-5 w-5" />,
-    label: 'Ljud',
-    description: 'Spela upp ljud som signal',
-    testButtonLabel: 'Pip',
-    fallbackInfo: 'Fungerar i de flesta webbläsare. På iOS kan du behöva trycka på skärmen först.',
-  },
-  vibration: {
-    icon: <DevicePhoneMobileIcon className="h-5 w-5" />,
-    label: 'Vibration',
-    description: 'Vibrera enheten som signal',
-    testButtonLabel: 'Vibrera',
-    fallbackInfo: 'Fungerar på de flesta smartphones. Desktop-datorer stödjer inte vibration.',
-  },
-  screen_flash: {
-    icon: <ComputerDesktopIcon className="h-5 w-5" />,
-    label: 'Skärmblänk',
-    description: 'Blinka skärmen i olika färger',
-    testButtonLabel: 'Blinka',
-    fallbackInfo: 'Fungerar i alla webbläsare. Bäst effekt i ett mörkt rum.',
-  },
-  notification: {
-    icon: <BellIcon className="h-5 w-5" />,
-    label: 'Notifikation',
-    description: 'Visa push-notifikationer',
-    testButtonLabel: 'Testa',
-    fallbackInfo: 'Kräver att du tillåter notifikationer. Fungerar bäst på mobila enheter.',
-  },
+const CAPABILITY_ICONS: Record<SignalCapability['type'], React.ReactNode> = {
+  torch: <LightBulbIcon className="h-5 w-5" />,
+  audio: <SpeakerWaveIcon className="h-5 w-5" />,
+  vibration: <DevicePhoneMobileIcon className="h-5 w-5" />,
+  screen_flash: <ComputerDesktopIcon className="h-5 w-5" />,
+  notification: <BellIcon className="h-5 w-5" />,
+};
+
+const CAPABILITY_TRANSLATION_KEYS: Record<SignalCapability['type'], string> = {
+  torch: 'torch',
+  audio: 'audio',
+  vibration: 'vibration',
+  screen_flash: 'screenFlash',
+  notification: 'notification',
 };
 
 // =============================================================================
@@ -127,36 +97,37 @@ function StatusIcon({ status }: { status: SignalCapabilityStatus }) {
 // =============================================================================
 
 function StatusBadge({ status }: { status: SignalCapabilityStatus }) {
+  const t = useTranslations('play.signalCapabilityTest');
   switch (status) {
     case 'available':
       return (
         <Badge variant="default" className="bg-green-500/10 text-green-600 border-green-500/20">
-          Tillgänglig
+          {t('status.available')}
         </Badge>
       );
     case 'unavailable':
       return (
         <Badge variant="outline">
-          Ej tillgänglig
+          {t('status.unavailable')}
         </Badge>
       );
     case 'denied':
       return (
         <Badge variant="outline" className="border-yellow-500/50 text-yellow-600">
-          Behörighet nekad
+          {t('status.denied')}
         </Badge>
       );
     case 'error':
       return (
         <Badge variant="destructive">
-          Fel
+          {t('status.error')}
         </Badge>
       );
     case 'unknown':
     default:
       return (
         <Badge variant="outline">
-          Ej testad
+          {t('status.unknown')}
         </Badge>
       );
   }
@@ -178,7 +149,7 @@ function Spinner({ className }: { className?: string }) {
 
 interface CapabilityRowProps {
   capability: SignalCapability;
-  config: typeof CAPABILITY_CONFIG['torch'];
+  capabilityType: SignalCapability['type'];
   onTest: () => Promise<void>;
   isTesting: boolean;
   compact?: boolean;
@@ -186,17 +157,25 @@ interface CapabilityRowProps {
 
 function CapabilityRow({
   capability,
-  config,
+  capabilityType,
   onTest,
   isTesting,
   compact,
 }: CapabilityRowProps) {
+  const t = useTranslations('play.signalCapabilityTest');
+  const translationKey = CAPABILITY_TRANSLATION_KEYS[capabilityType];
+  const icon = CAPABILITY_ICONS[capabilityType];
+  const label = t(`capabilities.${translationKey}.label` as 'capabilities.torch.label');
+  const description = t(`capabilities.${translationKey}.description` as 'capabilities.torch.description');
+  const testButton = t(`capabilities.${translationKey}.testButton` as 'capabilities.torch.testButton');
+  const fallback = t(`capabilities.${translationKey}.fallback` as 'capabilities.torch.fallback');
+
   if (compact) {
     return (
       <div className="flex items-center justify-between py-2">
         <div className="flex items-center gap-2">
           <StatusIcon status={capability.status} />
-          <span className="text-sm">{config.label}</span>
+          <span className="text-sm">{label}</span>
         </div>
         <Button
           variant="ghost"
@@ -208,7 +187,7 @@ function CapabilityRow({
           {isTesting ? (
             <Spinner className="h-3 w-3" />
           ) : (
-            config.testButtonLabel
+            testButton
           )}
         </Button>
       </div>
@@ -216,10 +195,10 @@ function CapabilityRow({
   }
   
   const tooltipContent = capability.status === 'unavailable'
-    ? 'Denna funktion stöds inte på din enhet'
+    ? t('tooltips.unavailable')
     : capability.status === 'denied'
-    ? 'Du behöver ge behörighet för denna funktion'
-    : `Testa ${config.label.toLowerCase()}`;
+    ? t('tooltips.denied')
+    : t('tooltips.test', { capability: label.toLowerCase() });
   
   return (
     <div className="flex items-start gap-4 p-4 border rounded-lg bg-card">
@@ -231,23 +210,23 @@ function CapabilityRow({
         ${capability.status === 'error' ? 'bg-red-500/10 text-red-600' : ''}
         ${capability.status === 'unknown' ? 'bg-muted text-muted-foreground' : ''}
       `}>
-        {config.icon}
+        {icon}
       </div>
       
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h4 className="font-medium">{config.label}</h4>
+          <h4 className="font-medium">{label}</h4>
           <StatusBadge status={capability.status} />
         </div>
         <p className="text-sm text-muted-foreground mt-1">
-          {config.description}
+          {description}
         </p>
         
         {/* Show fallback info if unavailable or denied */}
         {(capability.status === 'unavailable' || capability.status === 'denied') && (
           <div className="mt-2 text-xs text-muted-foreground flex items-start gap-1">
             <QuestionMarkCircleIcon className="h-3 w-3 mt-0.5 flex-shrink-0" />
-            <span>{config.fallbackInfo}</span>
+            <span>{fallback}</span>
           </div>
         )}
       </div>
@@ -263,10 +242,10 @@ function CapabilityRow({
           {isTesting ? (
             <>
               <Spinner className="h-4 w-4 mr-1" />
-              Testar...
+              {t('testing')}
             </>
           ) : (
-            config.testButtonLabel
+            testButton
           )}
         </Button>
       </Tooltip>
@@ -283,6 +262,7 @@ export function SignalCapabilityTest({
   compact = false,
   className,
 }: SignalCapabilityTestProps) {
+  const t = useTranslations('play.signalCapabilityTest');
   const {
     capabilities,
     allTested,
@@ -323,7 +303,7 @@ export function SignalCapabilityTest({
           await flashScreen('#ffffff', 200);
           break;
         case 'notification':
-          await sendNotification('Signaltest', 'Notifikationer fungerar!');
+          await sendNotification(t('notificationTest.title'), t('notificationTest.body'));
           break;
       }
       
@@ -341,6 +321,7 @@ export function SignalCapabilityTest({
     activateAudioGate,
     audioGateActive,
     testCapability,
+    t,
   ]);
   
   // Handle test all
@@ -364,7 +345,7 @@ export function SignalCapabilityTest({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
             <DevicePhoneMobileIcon className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm font-medium">Signaler</span>
+            <span className="text-sm font-medium">{t('signalsLabel')}</span>
           </div>
           <Badge variant={availableCount >= 3 ? 'default' : 'outline'}>
             {availableCount}/5
@@ -376,7 +357,7 @@ export function SignalCapabilityTest({
             <CapabilityRow
               key={type}
               capability={capability}
-              config={CAPABILITY_CONFIG[type]}
+              capabilityType={type}
               onTest={() => handleTest(type)}
               isTesting={testingCapability === type}
               compact
@@ -394,10 +375,10 @@ export function SignalCapabilityTest({
           <div>
             <CardTitle className="flex items-center gap-2">
               <DevicePhoneMobileIcon className="h-5 w-5" />
-              Signaltest
+              {t('title')}
             </CardTitle>
             <CardDescription className="mt-1">
-              Testa vilka signaler din enhet stödjer
+              {t('description')}
             </CardDescription>
           </div>
           
@@ -406,7 +387,7 @@ export function SignalCapabilityTest({
               variant={availableCount >= 3 ? 'default' : 'outline'}
               className="text-base"
             >
-              {availableCount}/5 tillgängliga
+              {t('availableCount', { count: availableCount })}
             </Badge>
             
             <Button
@@ -418,12 +399,12 @@ export function SignalCapabilityTest({
               {isTestingAll ? (
                 <>
                   <Spinner className="h-4 w-4 mr-1" />
-                  Testar...
+                  {t('testing')}
                 </>
               ) : (
                 <>
                   <ArrowPathIcon className="h-4 w-4 mr-1" />
-                  Testa alla
+                  {t('testAll')}
                 </>
               )}
             </Button>
@@ -436,7 +417,7 @@ export function SignalCapabilityTest({
           <CapabilityRow
             key={type}
             capability={capability}
-            config={CAPABILITY_CONFIG[type]}
+            capabilityType={type}
             onTest={() => handleTest(type)}
             isTesting={testingCapability === type}
           />
@@ -447,8 +428,7 @@ export function SignalCapabilityTest({
           <div className="flex items-start gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-600">
             <ExclamationTriangleIcon className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <div className="text-sm">
-              <strong>iOS-användare:</strong> Tryck på &quot;Pip&quot;-knappen ovan för att 
-              aktivera ljud. Detta behöver bara göras en gång per session.
+              <strong>{t('iosWarning.title')}</strong> {t('iosWarning.message')}
             </div>
           </div>
         )}
@@ -464,23 +444,23 @@ export function SignalCapabilityTest({
             {availableCount >= 4 && (
               <>
                 <CheckIcon className="h-6 w-6 mx-auto mb-2" />
-                <p className="font-medium">Utmärkt! Din enhet stödjer de flesta signaler.</p>
+                <p className="font-medium">{t('summary.excellent')}</p>
               </>
             )}
             {availableCount >= 2 && availableCount < 4 && (
               <>
                 <ExclamationTriangleIcon className="h-6 w-6 mx-auto mb-2" />
-                <p className="font-medium">Din enhet stödjer grundläggande signaler.</p>
+                <p className="font-medium">{t('summary.basic')}</p>
               </>
             )}
             {availableCount < 2 && (
               <>
                 <XMarkIcon className="h-6 w-6 mx-auto mb-2" />
-                <p className="font-medium">Begränsat signalstöd på denna enhet.</p>
+                <p className="font-medium">{t('summary.limited')}</p>
               </>
             )}
             <p className="text-sm mt-1 opacity-80">
-              {availableCount} av 5 signaltyper tillgängliga
+              {t('summary.count', { count: availableCount })}
             </p>
           </div>
         )}

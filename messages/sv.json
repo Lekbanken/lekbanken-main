@@ -791,6 +791,7 @@
     }
   },
   "play": {
+    "play": "Spela",
     "common": {
       "cancel": "Avbryt",
       "confirm": "Bekräfta",
@@ -1558,6 +1559,131 @@
     "participantSignalMicroUI": {
       "queueCount": "{count} i kö",
       "autoSendHint": "Skickas automatiskt när du är online."
+    },
+    "batchArtifactPanel": {
+      "title": "Massoperationer",
+      "description": "Välj artefakter och utför operationer på flera samtidigt",
+      "processing": "Utför operation...",
+      "progressCount": "{done} av {total}",
+      "resultSuccess": "{operation}: {count} lyckades",
+      "resultWithErrors": "{operation}: {count} lyckades, {failed} misslyckades",
+      "confirmTitle": "Bekräfta operation",
+      "confirmDescription": "Är du säker på att du vill {operation} {count} artefakt{plural}?",
+      "confirmReset": "Detta återställer alla valda pussel till ursprungsläget.",
+      "confirmSolve": "Detta markerar alla valda som lösta utan att spelarna löst dem.",
+      "cancel": "Avbryt",
+      "confirm": "Ja, fortsätt"
+    },
+    "readinessIndicator": {
+      "criticalIssues": "Måste åtgärdas innan start:",
+      "warnings": "Rekommenderas att åtgärda:",
+      "readyToStart": "Redo att starta session",
+      "cannotStart": "Kan inte starta - åtgärda kritiska problem"
+    },
+    "sessionTimeline": {
+      "title": "Session Timeline",
+      "description": "{count} händelser · {steps} steg",
+      "listButton": "Lista",
+      "stepLabel": "Steg {number}",
+      "showingRecent": "Visar senaste {maxItems} av {total} händelser",
+      "solved": "{count} lösta",
+      "triggers": "{count} triggers",
+      "errors": "{count} fel",
+      "updatingLive": "Uppdateras live",
+      "recentEvents": "Senaste händelser",
+      "noEvents": "Inga händelser än",
+      "stats": {
+        "totalTime": "Total tid",
+        "avgPerStep": "Snitt/steg",
+        "mostActiveStep": "Mest aktivt steg",
+        "errors": "Fel"
+      },
+      "timeAxis": {
+        "start": "Start",
+        "now": "Nu"
+      },
+      "filters": {
+        "all": "Alla händelser",
+        "triggers": "Triggers",
+        "artifacts": "Artefakter",
+        "navigation": "Navigation",
+        "timebank": "TimeBank",
+        "signals": "Signaler",
+        "participants": "Deltagare",
+        "host": "Spelledare"
+      }
+    },
+    "signalCapabilityTest": {
+      "title": "Signaltest",
+      "description": "Testa vilka signaler din enhet stödjer",
+      "signalsLabel": "Signaler",
+      "availableCount": "{count}/5 tillgängliga",
+      "testAll": "Testa alla",
+      "testing": "Testar...",
+      "status": {
+        "available": "Tillgänglig",
+        "unavailable": "Ej tillgänglig",
+        "denied": "Behörighet nekad",
+        "error": "Fel",
+        "unknown": "Ej testad"
+      },
+      "capabilities": {
+        "torch": {
+          "label": "Ficklampa",
+          "description": "Använd telefonens ficklampa som signal",
+          "testButton": "Blinka",
+          "fallback": "Kräver kamera-tillgång och en enhet med ficklampa (de flesta smartphones)"
+        },
+        "audio": {
+          "label": "Ljud",
+          "description": "Spela upp ljud som signal",
+          "testButton": "Pip",
+          "fallback": "Fungerar i de flesta webbläsare. På iOS kan du behöva trycka på skärmen först."
+        },
+        "vibration": {
+          "label": "Vibration",
+          "description": "Vibrera enheten som signal",
+          "testButton": "Vibrera",
+          "fallback": "Fungerar på de flesta smartphones. Desktop-datorer stödjer inte vibration."
+        },
+        "screenFlash": {
+          "label": "Skärmblänk",
+          "description": "Blinka skärmen i olika färger",
+          "testButton": "Blinka",
+          "fallback": "Fungerar i alla webbläsare. Bäst effekt i ett mörkt rum."
+        },
+        "notification": {
+          "label": "Notifikation",
+          "description": "Visa push-notifikationer",
+          "testButton": "Testa",
+          "fallback": "Kräver att du tillåter notifikationer. Fungerar bäst på mobila enheter."
+        }
+      },
+      "tooltips": {
+        "unavailable": "Denna funktion stöds inte på din enhet",
+        "denied": "Du behöver ge behörighet för denna funktion",
+        "test": "Testa {capability}"
+      },
+      "iosWarning": {
+        "title": "iOS-användare:",
+        "message": "Tryck på \"Pip\"-knappen ovan för att aktivera ljud. Detta behöver bara göras en gång per session."
+      },
+      "summary": {
+        "excellent": "Utmärkt! Din enhet stödjer de flesta signaler.",
+        "basic": "Din enhet stödjer grundläggande signaler.",
+        "limited": "Begränsat signalstöd på denna enhet.",
+        "count": "{count} av 5 signaltyper tillgängliga"
+      },
+      "notificationTest": {
+        "title": "Signaltest",
+        "body": "Notifikationer fungerar!"
+      }
+    },
+    "sessionHeader": {
+      "sessionFor": "Session för",
+      "copyCode": "Kopiera kod",
+      "copiedCode": "Kopierat!",
+      "joinUrl": "Anslutningslänk"
     }
   }
 }

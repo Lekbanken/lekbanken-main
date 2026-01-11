@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -275,6 +276,7 @@ interface ProgressOverlayProps {
 }
 
 function ProgressOverlay({ isProcessing, progress, selectedCount }: ProgressOverlayProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   if (!isProcessing) return null;
 
   return (
@@ -282,9 +284,9 @@ function ProgressOverlay({ isProcessing, progress, selectedCount }: ProgressOver
       <div className="text-center space-y-3">
         <ArrowPathIcon className="h-8 w-8 animate-spin mx-auto text-primary" />
         <div className="space-y-1">
-          <p className="text-sm font-medium">Utför operation...</p>
+          <p className="text-sm font-medium">{t('processing')}</p>
           <p className="text-xs text-muted-foreground">
-            {Math.round((progress / 100) * selectedCount)} av {selectedCount}
+            {t('progressCount', { done: Math.round((progress / 100) * selectedCount), total: selectedCount })}
           </p>
         </div>
         <Progress value={progress} className="w-48" />
@@ -302,6 +304,7 @@ interface ResultSummaryProps {
 }
 
 function ResultSummary({ result }: ResultSummaryProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   if (!result) return null;
 
   const hasErrors = result.failed.length > 0;
@@ -320,8 +323,9 @@ function ResultSummary({ result }: ResultSummaryProps) {
           <CheckCircleIcon className="h-4 w-4" />
         )}
         <span>
-          {OPERATION_LABELS[result.operation]}: {result.successful.length} lyckades
-          {hasErrors && `, ${result.failed.length} misslyckades`}
+          {hasErrors
+            ? t('resultWithErrors', { operation: OPERATION_LABELS[result.operation], count: result.successful.length, failed: result.failed.length })
+            : t('resultSuccess', { operation: OPERATION_LABELS[result.operation], count: result.successful.length })}
         </span>
       </div>
     </div>
@@ -338,6 +342,7 @@ export function BatchArtifactPanel({
   className,
   compact = false,
 }: BatchArtifactPanelProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   const [confirmOperation, setConfirmOperation] = useState<BatchOperation | null>(null);
 
   const handleOperation = (operation: BatchOperation) => {
@@ -367,11 +372,11 @@ export function BatchArtifactPanel({
       <CardHeader className={compact ? 'pb-2' : 'pb-3'}>
         <CardTitle className="flex items-center gap-2 text-base">
           <RectangleStackIcon className="h-5 w-5" />
-          Massoperationer
+          {t('title')}
         </CardTitle>
         {!compact && (
           <CardDescription>
-            Välj artefakter och utför operationer på flera samtidigt
+            {t('description')}
           </CardDescription>
         )}
       </CardHeader>
@@ -404,27 +409,29 @@ export function BatchArtifactPanel({
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bekräfta operation</AlertDialogTitle>
+            <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Är du säker på att du vill{' '}
-              <strong>{confirmOperation && OPERATION_LABELS[confirmOperation].toLowerCase()}</strong>{' '}
-              {batch.selectedCount} artefakt{batch.selectedCount !== 1 ? 'er' : ''}?
+              {t('confirmDescription', {
+                operation: confirmOperation && OPERATION_LABELS[confirmOperation].toLowerCase(),
+                count: batch.selectedCount,
+                plural: batch.selectedCount !== 1 ? 'er' : ''
+              })}
               {confirmOperation === 'reset' && (
                 <span className="block mt-2 text-yellow-600">
-                  Detta återställer alla valda pussel till ursprungsläget.
+                  {t('confirmReset')}
                 </span>
               )}
               {confirmOperation === 'solve' && (
                 <span className="block mt-2 text-yellow-600">
-                  Detta markerar alla valda som lösta utan att spelarna löst dem.
+                  {t('confirmSolve')}
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirm}>
-              Ja, fortsätt
+              {t('confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

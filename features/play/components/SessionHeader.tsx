@@ -1,3 +1,6 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
 import { HomeIcon, SunIcon, UsersIcon, AcademicCapIcon } from "@heroicons/react/24/outline";
 
 type SessionHeaderProps = {
@@ -13,10 +16,11 @@ const metaIcons: Record<string, typeof HomeIcon> = {
 };
 
 export function SessionHeader({ title, summary, meta = [] }: SessionHeaderProps) {
+  const t = useTranslations('play');
   return (
     <header className="space-y-3">
       <div className="space-y-0.5">
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">Spela</p>
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary">{t('play')}</p>
         <h1 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">{title}</h1>
       </div>
       <p className="text-sm leading-relaxed text-muted-foreground line-clamp-2">{summary}</p>

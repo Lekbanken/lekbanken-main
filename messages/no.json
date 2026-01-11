@@ -791,6 +791,7 @@
     }
   },
   "play": {
+    "play": "Spill",
     "common": {
       "cancel": "Avbryt",
       "confirm": "Bekreft",
@@ -1562,6 +1563,131 @@
     "participantSignalMicroUI": {
       "queueCount": "{count} i k\u00f8",
       "autoSendHint": "Sendes automatisk n\u00e5r du er online."
+    },
+    "batchArtifactPanel": {
+      "title": "Masseoperasjoner",
+      "description": "Velg artefakter og utf\u00f8r operasjoner p\u00e5 flere samtidig",
+      "processing": "Utf\u00f8rer operasjon...",
+      "progressCount": "{done} av {total}",
+      "resultSuccess": "{operation}: {count} lyktes",
+      "resultWithErrors": "{operation}: {count} lyktes, {failed} feilet",
+      "confirmTitle": "Bekreft operasjon",
+      "confirmDescription": "Er du sikker på at du vil {operation} {count} artefakt{plural}?",
+      "confirmReset": "Dette tilbakestiller alle valgte puslespill til opprinnelig tilstand.",
+      "confirmSolve": "Dette markerer alle valgte som løst uten at spillerne har løst dem.",
+      "cancel": "Avbryt",
+      "confirm": "Ja, fortsett"
+    },
+    "readinessIndicator": {
+      "criticalIssues": "Må fikses før start:",
+      "warnings": "Anbefales å fikse:",
+      "readyToStart": "Klar til å starte sesjon",
+      "cannotStart": "Kan ikke starte - fiks kritiske problemer"
+    },
+    "sessionTimeline": {
+      "title": "Sesjonstidslinje",
+      "description": "{count} hendelser · {steps} steg",
+      "listButton": "Liste",
+      "stepLabel": "Steg {number}",
+      "showingRecent": "Viser siste {maxItems} av {total} hendelser",
+      "solved": "{count} løst",
+      "triggers": "{count} utløsere",
+      "errors": "{count} feil",
+      "updatingLive": "Oppdateres live",
+      "recentEvents": "Nylige hendelser",
+      "noEvents": "Ingen hendelser ennå",
+      "stats": {
+        "totalTime": "Total tid",
+        "avgPerStep": "Snitt/steg",
+        "mostActiveStep": "Mest aktivt steg",
+        "errors": "Feil"
+      },
+      "timeAxis": {
+        "start": "Start",
+        "now": "Nå"
+      },
+      "filters": {
+        "all": "Alle hendelser",
+        "triggers": "Utløsere",
+        "artifacts": "Artefakter",
+        "navigation": "Navigasjon",
+        "timebank": "Tidsbank",
+        "signals": "Signaler",
+        "participants": "Deltakere",
+        "host": "Spillvert"
+      }
+    },
+    "signalCapabilityTest": {
+      "title": "Signaltest",
+      "description": "Test hvilke signaler enheten din støtter",
+      "signalsLabel": "Signaler",
+      "availableCount": "{count}/5 tilgjengelige",
+      "testAll": "Test alle",
+      "testing": "Tester...",
+      "status": {
+        "available": "Tilgjengelig",
+        "unavailable": "Ikke tilgjengelig",
+        "denied": "Tillatelse nektet",
+        "error": "Feil",
+        "unknown": "Ikke testet"
+      },
+      "capabilities": {
+        "torch": {
+          "label": "Lommelykt",
+          "description": "Bruk telefonens lommelykt som signal",
+          "testButton": "Blink",
+          "fallback": "Krever kameratilgang og en enhet med lommelykt (de fleste smarttelefoner)"
+        },
+        "audio": {
+          "label": "Lyd",
+          "description": "Spill av lyd som signal",
+          "testButton": "Pip",
+          "fallback": "Fungerer i de fleste nettlesere. På iOS må du kanskje trykke på skjermen først."
+        },
+        "vibration": {
+          "label": "Vibrasjon",
+          "description": "Vibrer enheten som signal",
+          "testButton": "Vibrer",
+          "fallback": "Fungerer på de fleste smarttelefoner. Stasjonære datamaskiner støtter ikke vibrasjon."
+        },
+        "screenFlash": {
+          "label": "Skjermblink",
+          "description": "Blink skjermen i forskjellige farger",
+          "testButton": "Blink",
+          "fallback": "Fungerer i alle nettlesere. Best effekt i et mørkt rom."
+        },
+        "notification": {
+          "label": "Varsling",
+          "description": "Vis push-varsler",
+          "testButton": "Test",
+          "fallback": "Krever at du tillater varsler. Fungerer best på mobile enheter."
+        }
+      },
+      "tooltips": {
+        "unavailable": "Denne funksjonen støttes ikke på enheten din",
+        "denied": "Du må gi tillatelse for denne funksjonen",
+        "test": "Test {capability}"
+      },
+      "iosWarning": {
+        "title": "iOS-brukere:",
+        "message": "Trykk på \"Pip\"-knappen ovenfor for å aktivere lyd. Dette trenger bare å gjøres én gang per sesjon."
+      },
+      "summary": {
+        "excellent": "Utmerket! Enheten din støtter de fleste signaler.",
+        "basic": "Enheten din støtter grunnleggende signaler.",
+        "limited": "Begrenset signalstøtte på denne enheten.",
+        "count": "{count} av 5 signaltyper tilgjengelige"
+      },
+      "notificationTest": {
+        "title": "Signaltest",
+        "body": "Varsler fungerer!"
+      }
+    },
+    "sessionHeader": {
+      "sessionFor": "Sesjon for",
+      "copyCode": "Kopier kode",
+      "copiedCode": "Kopiert!",
+      "joinUrl": "Bli med-lenke"
     }
   }
 }

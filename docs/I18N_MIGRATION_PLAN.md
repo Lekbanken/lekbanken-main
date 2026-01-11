@@ -235,7 +235,8 @@ export function PlayButton() {
 - [x] **SignalPresetEditor.tsx** ✅ ~80 strängar migrerade (commit 4bc66db)
 - [x] **TriggerTemplateLibrary.tsx** ✅ ~50 strängar migrerade
 - [x] **ParticipantSignalMicroUI.tsx** ✅ Fix partial migration (title, buttons)
-- [ ] Fortsätt features/play (Fas 1.2) - ~50 strängar kvar
+- [x] **features/play hooks** ✅ All hooks migrated to English fallback + translation keys
+- [x] **features/play komponenter** ✅ KOMPLETT - Inga svenska strängar kvar i .tsx filer
 - [ ] Implementera app pages (Fas 1.3) - 154 strängar kvar
 - [ ] Implementera components/play (Fas 1.4) - 112 strängar kvar
 
@@ -254,7 +255,7 @@ export function PlayButton() {
 | 2026-01-12 | features/play (batch 2) | 5 | ~35 | ✅ Klart |
 | 2026-01-13 | features/play (batch 3) | 5 | ~85 | ✅ Klart |
 | 2026-01-13 | features/play (batch 4) | 6 | ~230 | ✅ Klart |
-| - | features/play (övriga) | ~25 | ~50 | 🔄 Pågår |
+| 2026-01-14 | features/play (hooks + final) | 12 | ~150 | ✅ Klart |
 | - | app/app | ~20 | 154 | ⏳ Väntar |
 | - | components/play | ~15 | 112 | ⏳ Väntar |
 

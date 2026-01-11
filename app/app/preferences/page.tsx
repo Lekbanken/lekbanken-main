@@ -310,6 +310,14 @@ export default function PreferencesPage() {
                 Hantera cookie-inställningar
               </Link>
             </div>
+            <div className="pt-2">
+              <Link
+                href="/app/preferences/legal"
+                className="inline-flex items-center text-sm text-primary hover:underline"
+              >
+                View legal acceptance receipt
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -36,6 +37,7 @@ export function SessionChatDrawer({
   sending,
   onSend,
 }: SessionChatDrawerProps) {
+  const t = useTranslations('play.sessionChatDrawer');
   const [tab, setTab] = useState<'public' | 'host'>('public');
   const [input, setInput] = useState('');
   const [anonymous, setAnonymous] = useState(false);
@@ -64,12 +66,12 @@ export function SessionChatDrawer({
         )}
         role="dialog"
         aria-modal="true"
-        aria-label="Chatt"
+        aria-label={t('title')}
       >
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
-          <div className="text-sm font-semibold text-foreground">Chatt</div>
+          <div className="text-sm font-semibold text-foreground">{t('title')}</div>
           <Button variant="ghost" size="sm" onClick={handleClose}>
-            Stäng
+            {t('close')}
           </Button>
         </div>
 
@@ -80,7 +82,7 @@ export function SessionChatDrawer({
             variant={tab === 'public' ? 'primary' : 'outline'}
             onClick={() => setTab('public')}
           >
-            Vägg
+            {t('tabs.wall')}
           </Button>
           <Button
             type="button"
@@ -88,26 +90,26 @@ export function SessionChatDrawer({
             variant={tab === 'host' ? 'primary' : 'outline'}
             onClick={() => setTab('host')}
           >
-            Privat
+            {t('tabs.private')}
           </Button>
           <div className="ml-auto text-xs text-muted-foreground">
-            {tab === 'public' ? 'Till alla' : role === 'host' ? 'Till lekledare' : 'Till lekledare'}
+            {tab === 'public' ? t('toAll') : t('toHost')}
           </div>
         </div>
 
         <div className="flex min-h-0 flex-col">
           <div className="min-h-0 flex-1 overflow-auto px-4 py-3">
             {visibleMessages.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Inga meddelanden ännu.</p>
+              <p className="text-sm text-muted-foreground">{t('noMessages')}</p>
             ) : (
               <div className="space-y-3">
                 {visibleMessages.map((m) => (
                   <div key={m.id} className={cn('text-sm', m.isMine ? 'text-right' : 'text-left')}>
                     <div className={cn('flex items-center gap-2', m.isMine ? 'justify-end' : 'justify-start')}>
                       {!m.isMine && <span className="font-medium text-foreground">{m.senderLabel}</span>}
-                      {m.visibility === 'host' && <Badge variant="secondary">Privat</Badge>}
+                      {m.visibility === 'host' && <Badge variant="secondary">{t('tabs.private')}</Badge>}
                       <span className="text-xs text-muted-foreground">{formatTimeShort(m.createdAt)}</span>
-                      {m.isMine && <span className="font-medium text-foreground">Du</span>}
+                      {m.isMine && <span className="font-medium text-foreground">{t('you')}</span>}
                     </div>
                     <p className="text-muted-foreground whitespace-pre-wrap">{m.message}</p>
                   </div>
@@ -128,14 +130,14 @@ export function SessionChatDrawer({
                   checked={anonymous}
                   onChange={(e) => setAnonymous(e.target.checked)}
                 />
-                Skicka anonymt
+                {t('sendAnonymously')}
               </label>
             )}
 
             {role === 'host' && tab === 'host' && (
               <Card className="mb-3 p-3">
                 <p className="text-sm text-muted-foreground">
-                  Privat-chatten är till för deltagare → lekledare. Du kan svara på väggen.
+                  {t('hostPrivateChatNotice')}
                 </p>
               </Card>
             )}
@@ -144,7 +146,7 @@ export function SessionChatDrawer({
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={tab === 'public' ? 'Skriv till alla…' : 'Skriv privat till lekledaren…'}
+                placeholder={tab === 'public' ? t('placeholders.public') : t('placeholders.private')}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -164,7 +166,7 @@ export function SessionChatDrawer({
                 }}
                 disabled={sending || (role === 'host' && tab === 'host')}
               >
-                Skicka
+                {t('send')}
               </Button>
             </div>
           </div>

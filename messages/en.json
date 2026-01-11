@@ -1538,6 +1538,74 @@
         "addTrigger": "Add trigger"
       }
     },
+    "participantTimeBankDisplay": {
+      "label": "Time Bank:",
+      "error": "Error",
+      "errors": {
+        "loadFailed": "Could not load time bank"
+      }
+    },
+    "roleCard": {
+      "showHints": "Show hints (if you're stuck)",
+      "requestHint": "Request a hint from the host"
+    },
+    "roleAssigner": {
+      "errors": {
+        "randomAssignFailed": "An error occurred during random assignment"
+      },
+      "minRequirements": {
+        "notSatisfied": "Minimum requirements not met",
+        "needMore": "{roleName}: {count} more needed"
+      },
+      "needs": "Needs {count}",
+      "noAssignedYet": "No one assigned yet",
+      "selectRoleFor": "Select role for",
+      "noRolesAvailable": "No roles available (all full or conflict)",
+      "cancel": "Cancel"
+    },
+    "sessionChatDrawer": {
+      "title": "Chat",
+      "close": "Close",
+      "tabs": {
+        "wall": "Wall",
+        "private": "Private"
+      },
+      "toAll": "To everyone",
+      "toHost": "To host",
+      "noMessages": "No messages yet.",
+      "you": "You",
+      "sendAnonymously": "Send anonymously",
+      "hostPrivateChatNotice": "Private chat is for participants → host. You can reply on the wall.",
+      "placeholders": {
+        "public": "Write to everyone…",
+        "private": "Write privately to host…"
+      },
+      "send": "Send"
+    },
+    "shortcutHelpPanel": {
+      "title": "Keyboard Shortcuts",
+      "description": "Quick access to Director Mode features",
+      "pressToShow": "Press ? to show this help"
+    },
+    "stepViewer": {
+      "stepOf": "Step {current} of {total}",
+      "timerRunning": "Time running",
+      "timerPaused": "Time paused",
+      "materials": "Materials",
+      "note": "Note",
+      "safety": "Safety"
+    },
+    "timerControl": {
+      "status": {
+        "paused": "Paused",
+        "finished": "Done!",
+        "running": "Running"
+      },
+      "startTimer": "Start timer",
+      "resume": "Resume",
+      "pause": "Pause",
+      "reset": "Reset"
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Something went wrong",

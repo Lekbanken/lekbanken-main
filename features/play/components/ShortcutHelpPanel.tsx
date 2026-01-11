@@ -10,6 +10,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslations } from 'next-intl';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
@@ -194,6 +195,8 @@ export function ShortcutHelpPanel({
   shortcuts,
   className,
 }: ShortcutHelpPanelProps) {
+  const t = useTranslations('play.shortcutHelpPanel');
+  
   // Group shortcuts by category
   const groupedShortcuts = CATEGORY_ORDER.reduce(
     (acc, category) => {
@@ -209,10 +212,10 @@ export function ShortcutHelpPanel({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CommandLineIcon className="h-5 w-5" />
-            Kortkommandon
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Snabbåtkomst till Director Mode-funktioner
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -230,7 +233,7 @@ export function ShortcutHelpPanel({
 
         <div className="flex items-center justify-center pt-4 border-t">
           <p className="text-sm text-muted-foreground">
-            Tryck <kbd className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">?</kbd> för att visa denna hjälp
+            {t('pressToShow')}
           </p>
         </div>
       </DialogContent>

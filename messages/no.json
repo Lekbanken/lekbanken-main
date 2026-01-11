@@ -1538,6 +1538,74 @@
         "addTrigger": "Legg til trigger"
       }
     },
+    "participantTimeBankDisplay": {
+      "label": "Tidsbank:",
+      "error": "Feil",
+      "errors": {
+        "loadFailed": "Kunne ikke laste tidsbank"
+      }
+    },
+    "roleCard": {
+      "showHints": "Vis tips (hvis du sitter fast)",
+      "requestHint": "Be om et hint fra verten"
+    },
+    "roleAssigner": {
+      "errors": {
+        "randomAssignFailed": "En feil oppstod under tilfeldig tildeling"
+      },
+      "minRequirements": {
+        "notSatisfied": "Minimumskrav ikke oppfylt",
+        "needMore": "{roleName}: {count} flere trengs"
+      },
+      "needs": "Trenger {count}",
+      "noAssignedYet": "Ingen tildelt ennå",
+      "selectRoleFor": "Velg rolle for",
+      "noRolesAvailable": "Ingen roller tilgjengelige (alle fulle eller konflikt)",
+      "cancel": "Avbryt"
+    },
+    "sessionChatDrawer": {
+      "title": "Chat",
+      "close": "Lukk",
+      "tabs": {
+        "wall": "Vegg",
+        "private": "Privat"
+      },
+      "toAll": "Til alle",
+      "toHost": "Til vert",
+      "noMessages": "Ingen meldinger ennå.",
+      "you": "Du",
+      "sendAnonymously": "Send anonymt",
+      "hostPrivateChatNotice": "Privat-chat er for deltakere → vert. Du kan svare på veggen.",
+      "placeholders": {
+        "public": "Skriv til alle…",
+        "private": "Skriv privat til verten…"
+      },
+      "send": "Send"
+    },
+    "shortcutHelpPanel": {
+      "title": "Hurtigtaster",
+      "description": "Rask tilgang til Director Mode-funksjoner",
+      "pressToShow": "Trykk ? for å vise denne hjelpen"
+    },
+    "stepViewer": {
+      "stepOf": "Steg {current} av {total}",
+      "timerRunning": "Tid pågår",
+      "timerPaused": "Tid pauset",
+      "materials": "Materialer",
+      "note": "Notat",
+      "safety": "Sikkerhet"
+    },
+    "timerControl": {
+      "status": {
+        "paused": "Pauset",
+        "finished": "Ferdig!",
+        "running": "Pågår"
+      },
+      "startTimer": "Start timer",
+      "resume": "Fortsett",
+      "pause": "Pause",
+      "reset": "Tilbakestill"
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Noe gikk galt",

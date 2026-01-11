@@ -1534,6 +1534,74 @@
         "addTrigger": "Lägg till trigger"
       }
     },
+    "participantTimeBankDisplay": {
+      "label": "Tidsbank:",
+      "error": "Fel",
+      "errors": {
+        "loadFailed": "Kunde inte ladda tidsbank"
+      }
+    },
+    "roleCard": {
+      "showHints": "Visa tips (om du kör fast)",
+      "requestHint": "Be om ledtråd av lekledaren"
+    },
+    "roleAssigner": {
+      "errors": {
+        "randomAssignFailed": "Ett fel uppstod vid slumpmässig tilldelning"
+      },
+      "minRequirements": {
+        "notSatisfied": "Minimikrav ej uppfyllt",
+        "needMore": "{roleName}: {count} fler behövs"
+      },
+      "needs": "Behöver {count}",
+      "noAssignedYet": "Ingen tilldelad ännu",
+      "selectRoleFor": "Välj roll för",
+      "noRolesAvailable": "Inga roller tillgängliga (alla fulla eller konflikt)",
+      "cancel": "Avbryt"
+    },
+    "sessionChatDrawer": {
+      "title": "Chatt",
+      "close": "Stäng",
+      "tabs": {
+        "wall": "Vägg",
+        "private": "Privat"
+      },
+      "toAll": "Till alla",
+      "toHost": "Till lekledare",
+      "noMessages": "Inga meddelanden ännu.",
+      "you": "Du",
+      "sendAnonymously": "Skicka anonymt",
+      "hostPrivateChatNotice": "Privat-chatten är till för deltagare → lekledare. Du kan svara på väggen.",
+      "placeholders": {
+        "public": "Skriv till alla…",
+        "private": "Skriv privat till lekledaren…"
+      },
+      "send": "Skicka"
+    },
+    "shortcutHelpPanel": {
+      "title": "Kortkommandon",
+      "description": "Snabbåtkomst till Director Mode-funktioner",
+      "pressToShow": "Tryck ? för att visa denna hjälp"
+    },
+    "stepViewer": {
+      "stepOf": "Steg {current} av {total}",
+      "timerRunning": "Tid pågår",
+      "timerPaused": "Tid pausad",
+      "materials": "Material",
+      "note": "Anteckning",
+      "safety": "Säkerhet"
+    },
+    "timerControl": {
+      "status": {
+        "paused": "Pausad",
+        "finished": "Klar!",
+        "running": "Pågår"
+      },
+      "startTimer": "Starta timer",
+      "resume": "Fortsätt",
+      "pause": "Pausa",
+      "reset": "Återställ"
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Något gick fel",

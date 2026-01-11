@@ -2,15 +2,22 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
-import { createServerRlsClient } from '@/lib/supabase/server'
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import {
   COOKIE_CONSENT_SCHEMA_VERSION,
   DEFAULT_COOKIE_CONSENT,
 } from '@/lib/legal/constants'
 import type { CookieConsentState } from '@/lib/legal/consent-types'
-import type { LegalDatabase, LegalDocumentRow } from '@/lib/legal/types'
-import type { CookieCatalogRow, CookieConsentRow } from '@/lib/legal/types'
+import type {
+  CookieCatalogRow,
+  CookieConsentRow,
+  LegalDatabase,
+  LegalDocScope,
+  LegalDocType,
+  LegalDocumentRow,
+  LegalLocale,
+} from '@/lib/legal/types'
 
 type AcceptResult = {
   success: boolean
@@ -162,6 +169,38 @@ type CookieConsentReceiptResult = {
   error?: string
 }
 
+export type LegalDocumentSummary = {
+  id: string
+  type: LegalDocType
+  locale: LegalLocale
+  version: number
+  title: string
+  scope: LegalDocScope
+  tenantId: string | null
+  publishedAt: string | null
+  isActive: boolean
+}
+
+export type LegalAcceptanceReceiptEntry = {
+  documentId: string
+  acceptedAt: string
+  acceptedLocale: LegalLocale
+  tenantIdSnapshot: string | null
+  document: LegalDocumentSummary | null
+}
+
+export type LegalAcceptanceReceipt = {
+  updatedAt: string | null
+  entries: LegalAcceptanceReceiptEntry[]
+  missingDocuments: string[]
+}
+
+type LegalAcceptanceReceiptResult = {
+  success: boolean
+  data?: LegalAcceptanceReceipt
+  error?: string
+}
+
 export async function getCookieCatalog(): Promise<CookieCatalogResult> {
   const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
   const { data, error } = await supabase
@@ -296,4 +335,76 @@ export async function deleteCookieConsentHistory(): Promise<{ success: boolean; 
   }
 
   return { success: true }
+}
+
+export async function getLegalAcceptanceReceipt(): Promise<LegalAcceptanceReceiptResult> {
+  const authContext = await getServerAuthContext()
+  const user = authContext.user
+
+  if (!user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
+  const { data: acceptances, error } = await supabase
+    .from('user_legal_acceptances')
+    .select('document_id, accepted_at, accepted_locale, tenant_id_snapshot')
+    .eq('user_id', user.id)
+    .order('accepted_at', { ascending: false })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  const rows = acceptances ?? []
+  const documentIds = Array.from(new Set(rows.map((row) => row.document_id)))
+
+  if (!documentIds.length) {
+    return { success: true, data: { updatedAt: null, entries: [], missingDocuments: [] } }
+  }
+
+  const adminClient = createServiceRoleClient() as SupabaseClient<LegalDatabase>
+  const { data: docs, error: docsError } = await adminClient
+    .from('legal_documents')
+    .select('id, type, locale, version_int, title, scope, tenant_id, published_at, is_active')
+    .in('id', documentIds)
+
+  if (docsError) {
+    return { success: false, error: docsError.message }
+  }
+
+  const docMap = new Map((docs ?? []).map((doc) => [doc.id, doc]))
+  const missingDocuments = documentIds.filter((id) => !docMap.has(id))
+
+  const entries: LegalAcceptanceReceiptEntry[] = rows.map((row) => {
+    const doc = docMap.get(row.document_id)
+    return {
+      documentId: row.document_id,
+      acceptedAt: row.accepted_at,
+      acceptedLocale: row.accepted_locale as LegalLocale,
+      tenantIdSnapshot: row.tenant_id_snapshot,
+      document: doc
+        ? {
+            id: doc.id,
+            type: doc.type as LegalDocType,
+            locale: doc.locale as LegalLocale,
+            version: doc.version_int,
+            title: doc.title,
+            scope: doc.scope as LegalDocScope,
+            tenantId: doc.tenant_id,
+            publishedAt: doc.published_at,
+            isActive: doc.is_active,
+          }
+        : null,
+    }
+  })
+
+  return {
+    success: true,
+    data: {
+      updatedAt: entries[0]?.acceptedAt ?? null,
+      entries,
+      missingDocuments,
+    },
+  }
 }

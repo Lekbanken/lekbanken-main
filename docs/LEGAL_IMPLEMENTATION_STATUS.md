@@ -61,6 +61,10 @@ Remaining work is Phase 3+ (advanced consent tooling, observability, and tests).
 - Consent reset action to clear stored preferences.
 - Retention policy surfaced in UI (constant-based).
 
+### Legal acceptance receipts
+- Legal acceptance receipt page: `/app/preferences/legal`.
+- Receipt download (JSON) with accepted document metadata (type, locale, version).
+
 ### Observability + translation hub touchpoints
 - Cookie consent overview cards in `/admin/legal` (opt-in counts).
 - Translation hub quick action linking to `/admin/legal`.
@@ -72,7 +76,6 @@ Remaining work is Phase 3+ (advanced consent tooling, observability, and tests).
 - Admin UI for cookie catalog and consent reporting.
 
 ### Phase 3+ (planned)
-- Consent receipts export beyond cookie consents (legal acceptance receipts).
 - Integration with Translation Hub beyond linking (single editor for locale diffs).
 - Advanced observability dashboards (acceptance rates per tenant, consent opt-ins trends).
 - E2E tests for acceptance gating, publish flow, and consent changes.

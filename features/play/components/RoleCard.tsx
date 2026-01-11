@@ -8,6 +8,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -96,6 +97,7 @@ export function RoleCard({
   interactive = true,
   className = '',
 }: RoleCardProps) {
+  const t = useTranslations('play.roleCard');
   const [showInstructions, setShowInstructions] = useState(true);
   const [localHintsRevealed, setLocalHintsRevealed] = useState(hintsRevealed);
   
@@ -243,7 +245,7 @@ export function RoleCard({
                 className="w-full gap-2"
               >
                 <LightBulbIcon className="h-4 w-4" />
-                Visa tips (om du kör fast)
+                {t('showHints')}
               </Button>
 
               {onRequestHint && (
@@ -254,7 +256,7 @@ export function RoleCard({
                   disabled={!interactive}
                   className="w-full"
                 >
-                  Be om ledtråd av lekledaren
+                  {t('requestHint')}
                 </Button>
               )}
             </div>

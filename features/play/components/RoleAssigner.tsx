@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   UserCircleIcon,
   SparklesIcon,
@@ -92,6 +93,7 @@ export function RoleAssigner({
   disabled = false,
   compact = false,
 }: RoleAssignerProps) {
+  const t = useTranslations('play.roleAssigner');
   const [isAssigning, setIsAssigning] = useState(false);
   const [lastResult, setLastResult] = useState<AssignmentResult | null>(null);
   const [selectedParticipant, setSelectedParticipant] = useState<string | null>(null);
@@ -175,7 +177,7 @@ export function RoleAssigner({
       setLastResult({
         success: false,
         assignments: [],
-        errors: ['Ett fel uppstod vid slumpmässig tilldelning'],
+        errors: [t('errors.randomAssignFailed')],
         warnings: [],
       });
     } finally {
@@ -315,10 +317,10 @@ export function RoleAssigner({
           <div className="flex items-start gap-2">
             <ExclamationTriangleIcon className="h-5 w-5 shrink-0" />
             <div className="text-sm">
-              <p className="font-medium">Minimikrav ej uppfyllt</p>
+              <p className="font-medium">{t('minRequirements.notSatisfied')}</p>
               {minCheck.unsatisfied.map(({ role, needed }) => (
                 <p key={role.id}>
-                  {role.name}: {needed} fler behövs
+                  {t('minRequirements.needMore', { roleName: role.name, count: needed })}
                 </p>
               ))}
             </div>
@@ -356,7 +358,7 @@ export function RoleAssigner({
                   
                   {needsMore && (
                     <Badge variant="destructive" className="text-xs">
-                      Behöver {role.min_count - assignedParticipants.length}
+                      {t('needs', { count: role.min_count - assignedParticipants.length })}
                     </Badge>
                   )}
                   {isFull && (
@@ -371,7 +373,7 @@ export function RoleAssigner({
               <div className="p-3 space-y-2">
                 {assignedParticipants.length === 0 ? (
                   <p className="text-sm text-muted-foreground italic">
-                    Ingen tilldelad ännu
+                    {t('noAssignedYet')}
                   </p>
                 ) : (
                   assignedParticipants.map((p) => (
@@ -436,14 +438,14 @@ export function RoleAssigner({
           {selectedParticipant && (
             <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 p-4">
               <p className="mb-3 text-sm font-medium">
-                Välj roll för{' '}
+                {t('selectRoleFor')}{' '}
                 <span className="text-primary">
                   {participants.find((p) => p.id === selectedParticipant)?.display_name}
                 </span>
               </p>
               {availableRoles.length === 0 ? (
                 <p className="text-sm text-muted-foreground italic">
-                  Inga roller tillgängliga (alla fulla eller konflikt)
+                  {t('noRolesAvailable')}
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2">
@@ -469,7 +471,7 @@ export function RoleAssigner({
                 onClick={() => setSelectedParticipant(null)}
                 className="mt-3"
               >
-                Avbryt
+                {t('cancel')}
               </Button>
             </div>
           )}

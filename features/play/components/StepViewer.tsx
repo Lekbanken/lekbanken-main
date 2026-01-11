@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { ClockIcon, CubeIcon, DocumentTextIcon, ShieldExclamationIcon } from "@heroicons/react/24/outline";
 import type { Step } from "../types";
 
@@ -12,6 +13,7 @@ type StepViewerProps = {
 };
 
 export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds, timerRunning, formatTime }: StepViewerProps) {
+  const t = useTranslations('play.stepViewer');
   const totalSeconds = typeof timerTotalSeconds === "number" ? timerTotalSeconds : 0;
   const remainingSeconds = typeof timerSeconds === "number" ? timerSeconds : totalSeconds;
   const timerProgress = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : null;
@@ -26,7 +28,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
               {index + 1}
             </span>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
-              Steg {index + 1} av {total}
+              {t('stepOf', { current: index + 1, total })}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -51,7 +53,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
       {timerProgress !== null && (
         <div className="space-y-2 rounded-2xl bg-muted/40 p-4">
           <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-            <span>{timerRunning ? "Tid pågår" : "Tid pausad"}</span>
+            <span>{timerRunning ? t('timerRunning') : t('timerPaused')}</span>
             <span className="text-sm font-semibold text-foreground">{timerLabel}</span>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
@@ -68,7 +70,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
         <div className="space-y-2.5 rounded-2xl bg-muted/40 p-4">
           <div className="flex items-center gap-2">
             <CubeIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Material</p>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">{t('materials')}</p>
           </div>
           <ul className="space-y-1.5 pl-6 text-sm text-foreground">
             {step.materials.map((item) => (
@@ -85,7 +87,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
         <div className="space-y-2.5 rounded-2xl bg-muted/40 p-4">
           <div className="flex items-center gap-2">
             <DocumentTextIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">Anteckning</p>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground">{t('note')}</p>
           </div>
           <p className="text-sm leading-relaxed text-foreground">{step.note}</p>
         </div>
@@ -95,7 +97,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
         <div className="space-y-2.5 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
           <div className="flex items-center gap-2">
             <ShieldExclamationIcon className="h-4 w-4 text-amber-600 dark:text-amber-400" aria-hidden />
-            <p className="text-xs font-bold uppercase tracking-[0.15em] text-amber-700 dark:text-amber-300">Säkerhet</p>
+            <p className="text-xs font-bold uppercase tracking-[0.15em] text-amber-700 dark:text-amber-300">{t('safety')}</p>
           </div>
           <p className="text-sm leading-relaxed text-amber-900 dark:text-amber-100">{step.safety}</p>
         </div>

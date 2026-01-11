@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ClockIcon } from '@heroicons/react/24/outline';
 import { Badge } from '@/components/ui/badge';
 import { getSessionTimeBank } from '@/features/play/api/time-bank-api';
@@ -28,6 +29,7 @@ export function ParticipantTimeBankDisplay({
   sessionId,
   enabled = true,
 }: ParticipantTimeBankDisplayProps) {
+  const t = useTranslations('play.participantTimeBankDisplay');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [balanceSeconds, setBalanceSeconds] = useState<number | null>(null);
@@ -39,11 +41,11 @@ export function ParticipantTimeBankDisplay({
       const res = await getSessionTimeBank(sessionId);
       setBalanceSeconds(res.timeBank.balanceSeconds ?? 0);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte ladda tidsbank');
+      setError(err instanceof Error ? err.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -69,12 +71,12 @@ export function ParticipantTimeBankDisplay({
   return (
     <div className="flex items-center gap-2 text-sm">
       <ClockIcon className="h-4 w-4 text-muted-foreground" />
-      <span className="text-muted-foreground">Tidsbank:</span>
+      <span className="text-muted-foreground">{t('label')}</span>
       {loading && balanceSeconds === null ? (
         <span className="text-muted-foreground">…</span>
       ) : error ? (
         <Badge variant="destructive" size="sm">
-          Fel
+          {t('error')}
         </Badge>
       ) : (
         <Badge variant="secondary" size="sm">

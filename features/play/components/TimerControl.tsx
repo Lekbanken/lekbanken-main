@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   PlayIcon, 
   PauseIcon, 
@@ -57,6 +58,7 @@ export function TimerControl({
   disabled = false,
   size = 'md',
 }: TimerControlProps) {
+  const t = useTranslations('play.timerControl');
   // Input for setting timer duration
   const [inputMinutes, setInputMinutes] = useState(Math.floor(defaultDuration / 60));
   const [inputSeconds, setInputSeconds] = useState(defaultDuration % 60);
@@ -109,7 +111,7 @@ export function TimerControl({
             </div>
             <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
               <ClockIcon className="h-4 w-4" />
-              {timerDisplay.isPaused ? 'Pausad' : timerDisplay.isFinished ? 'Klar!' : 'Pågår'}
+              {timerDisplay.isPaused ? t('status.paused') : timerDisplay.isFinished ? t('status.finished') : t('status.running')}
             </div>
             
             {/* Progress bar */}
@@ -179,7 +181,7 @@ export function TimerControl({
             className="gap-2"
           >
             <PlayIcon className="h-5 w-5" />
-            Starta timer
+            {t('startTimer')}
           </Button>
         ) : (
           <>
@@ -192,7 +194,7 @@ export function TimerControl({
                 className="gap-2"
               >
                 <PlayIcon className="h-5 w-5" />
-                Fortsätt
+                {t('resume')}
               </Button>
             ) : (
               <Button
@@ -203,7 +205,7 @@ export function TimerControl({
                 className="gap-2"
               >
                 <PauseIcon className="h-5 w-5" />
-                Pausa
+                {t('pause')}
               </Button>
             )}
             
@@ -216,7 +218,7 @@ export function TimerControl({
               className="gap-2"
             >
               <ArrowPathIcon className="h-5 w-5" />
-              Återställ
+              {t('reset')}
             </Button>
           </>
         )}

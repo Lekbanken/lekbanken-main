@@ -442,9 +442,6 @@ function PresetCard({
                 options={AUDIO_OPTIONS.map(o => ({ value: o.value, label: t(`audioTypes.${o.labelKey}` as Parameters<typeof t>[0]) }))}
               />
             </div>
-                options={AUDIO_OPTIONS.map(o => ({ value: o.value, label: t(`audioTypes.${o.labelKey}` as Parameters<typeof t>[0]) }))}
-              />
-            </div>
             
             <div className="space-y-2">
               <Label>{t('labels.volume', { percent: Math.round((preset.volume || 0.5) * 100) })}</Label>

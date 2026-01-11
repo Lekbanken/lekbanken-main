@@ -908,7 +908,7 @@ function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): Info
             </ul>
           </div>
 
-          <CopyHeaderRow label="Canonical CSV-header (kopiera exakt)" value={CANONICAL_CSV_HEADER} copy={copy} />
+          <CopyHeaderRow label="Canonical CSV-header (kopiera exakt)" value={CANONICAL_CSV_HEADER} copy={copy} copyLabel={t('import.copy')} />
 
           <div className="space-y-1">
             <p className="font-semibold">JSON-kolumner som stöds i CSV</p>

@@ -473,9 +473,6 @@ function SignalQuickPanel({
             </div>
           </div>
         )}
-            </div>
-          </div>
-        )}
       </div>
       
       {/* Recent signals */}

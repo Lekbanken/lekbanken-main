@@ -75,11 +75,11 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/artifacts`, { cache: 'no-store' });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ladda artefakter');
+      if (!res.ok) throw new Error(data.error || t('errors.loadFailed'));
       setArtifacts(data.artifacts || []);
       setVariants(data.variants || []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Kunde inte ladda artefakter');
+      setError(e instanceof Error ? e.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -108,7 +108,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError(data.error || 'Kunde inte snapshotta artefakter');
+      setError(data.error || t('errors.snapshotFailed'));
       return;
     }
     await load();
@@ -124,7 +124,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || 'Kunde inte uppdatera artefakt');
+        setError(data.error || t('errors.updateFailed'));
         return;
       }
       await load();
@@ -158,7 +158,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
         const data: KeypadAttemptResponse = await res.json();
 
         if (!res.ok) {
-          setKeypadMessages((prev) => new Map(prev).set(artifactId, { type: 'error', text: 'Serverfel' }));
+          setKeypadMessages((prev) => new Map(prev).set(artifactId, { type: 'error', text: t('errors.serverError') }));
           return;
         }
 

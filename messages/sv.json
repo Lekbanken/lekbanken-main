@@ -858,6 +858,13 @@
         "somethingWentWrong": "Något gick fel",
         "couldNotFetchSession": "Kunde inte hämta session",
         "couldNotLoadRoles": "Kunde inte ladda roller",
+        "couldNotLoadSecretsStatus": "Kunde inte ladda hemlighetsstatus",
+        "couldNotCopyRoles": "Kunde inte kopiera roller",
+        "couldNotUpdate": "Kunde inte uppdatera",
+        "couldNotUpdateStatus": "Kunde inte uppdatera status",
+        "couldNotRemoveParticipant": "Kunde inte ta bort deltagare",
+        "couldNotBlockParticipant": "Kunde inte blockera deltagare",
+        "couldNotSaveRoles": "Kunde inte spara roller",
         "assignRolesFirst": "Tilldela roller först (tilldelade {assigned} av {total}).",
         "cannotLockAgain": "Kan inte låsa igen: minst en deltagare har redan visat sina hemligheter.",
         "couldNotSetNextStarter": "Kunde inte sätta nästa startare",
@@ -865,6 +872,9 @@
         "couldNotStartPlayMode": "Kunde inte starta spelläge",
         "couldNotSaveSettings": "Kunde inte spara inställningar",
         "couldNotResetOverrides": "Kunde inte återställa overrides"
+      },
+      "success": {
+        "rolesCopied": "{count} roller kopierade till sessionen"
       },
       "toast": {
         "settingsSaved": "Sessionens inställningar sparades",
@@ -1031,6 +1041,111 @@
         }
       }
     },
+    "directorDrawer": {
+      "tabs": {
+        "play": "Spela",
+        "triggers": "Triggers",
+        "signals": "Signaler",
+        "events": "Händelser"
+      },
+      "header": {
+        "participants": "{count} deltagare",
+        "statusLive": "LIVE",
+        "statusPaused": "PAUSAD",
+        "statusEnded": "AVSLUTAD",
+        "pause": "Pausa",
+        "resume": "Fortsätt"
+      },
+      "steps": {
+        "noSteps": "Inga steg tillgängliga ännu",
+        "stepOf": "Steg {current} av {total}",
+        "notStarted": "Ej startat"
+      },
+      "triggers": {
+        "disableAll": "Inaktivera alla",
+        "noTriggers": "Inga triggers i denna session"
+      },
+      "signals": {
+        "deviceSignals": "Enhetssignaler",
+        "quickMessages": "Snabbmeddelanden",
+        "customSignal": "Anpassad signal",
+        "channelPlaceholder": "Kanal (t.ex. 'team-red')",
+        "messagePlaceholder": "Meddelande",
+        "send": "Skicka",
+        "recentSignals": "Senaste signaler",
+        "clickToResend": "Klicka för att skicka igen",
+        "presets": {
+          "pause": "Paus",
+          "pauseMessage": "Paus!",
+          "hint": "Hint",
+          "hintMessage": "Ledtråd tillgänglig",
+          "attention": "Uppmärksamhet",
+          "attentionMessage": "Titta hit!",
+          "flash": "Blinka",
+          "flashMessage": "Flash!"
+        }
+      },
+      "events": {
+        "noEvents": "Inga händelser ännu"
+      },
+      "timeBank": {
+        "title": "Tidsbank",
+        "paused": "PAUSAD",
+        "manualAdjustment": "Manuell justering"
+      },
+      "quickActions": {
+        "title": "Snabbåtgärder",
+        "story": "Berättelse",
+        "giveHint": "Ge ledtråd",
+        "reset": "Reset",
+        "message": "Meddelande"
+      },
+      "footer": {
+        "backToLobby": "Tillbaka till Lobby"
+      }
+    },
+    "eventFeed": {
+      "title": "Händelseflöde",
+      "eventCount": "{count} händelser",
+      "errors": "{count} fel",
+      "warnings": "{count} varningar",
+      "allEvents": "Alla händelser",
+      "filters": {
+        "searchPlaceholder": "Sök i händelser...",
+        "category": "Kategori",
+        "allCategories": "Alla kategorier",
+        "severity": "Allvarlighet",
+        "allSeverities": "Alla nivåer",
+        "groupByTime": "Gruppera efter tid",
+        "clear": "Rensa"
+      },
+      "categories": {
+        "trigger": "Trigger",
+        "artifact": "Artefakt",
+        "lifecycle": "Session",
+        "signal": "Signal",
+        "timebank": "Tidsbank",
+        "navigation": "Navigation",
+        "participant": "Deltagare",
+        "host": "Ledare"
+      },
+      "severity": {
+        "error": "Fel",
+        "warning": "Varningar",
+        "info": "Info",
+        "debug": "Debug"
+      },
+      "timeGroups": {
+        "lastMinute": "Senaste minuten",
+        "last5Minutes": "Senaste 5 minuterna",
+        "last15Minutes": "Senaste 15 minuterna",
+        "older": "Tidigare"
+      },
+      "empty": {
+        "noEvents": "Inga händelser än",
+        "noMatchingEvents": "Inga händelser matchar filtret"
+      }
+    },
     "playPage": {
       "errors": {
         "noGameSelected": "Ingen lek vald",
@@ -1163,7 +1278,11 @@
     },
     "artifactsPanel": {
       "errors": {
-        "somethingWentWrong": "Något gick fel"
+        "somethingWentWrong": "Något gick fel",
+        "loadFailed": "Kunde inte ladda artefakter",
+        "snapshotFailed": "Kunde inte snapshotta artefakter",
+        "updateFailed": "Kunde inte uppdatera artefakt",
+        "serverError": "Serverfel"
       },
       "empty": {
         "title": "Inga artefakter ännu",
@@ -1195,6 +1314,20 @@
         "locked": "Låst",
         "attemptsRemaining": "{count} försök kvar",
         "unlockedContent": "Upplåst innehåll"
+      }
+    },
+    "conversationCards": {
+      "title": "Samtalskort",
+      "badge": "Samtalskort",
+      "loading": "Laddar samtalskort…",
+      "noCards": "Inga kort i leken.",
+      "card": "Kort",
+      "leaderTip": "Ledartips",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "errors": {
+        "missingCollection": "Samtalskort saknar kopplad lek (conversation_card_collection_id).",
+        "loadFailed": "Kunde inte ladda samtalskort"
       }
     },
     "propConfirmation": {

@@ -9,6 +9,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -114,16 +115,18 @@ function StepNavigation({
   currentIndex,
   onNext,
   onPrevious,
+  t,
 }: {
   steps: CockpitStep[];
   currentIndex: number;
   onNext: () => void;
   onPrevious: () => void;
+  t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
   if (steps.length === 0) {
     return (
       <div className="text-sm text-muted-foreground text-center py-6">
-        Inga steg tillgängliga ännu
+        {t('steps.noSteps')}
       </div>
     );
   }
@@ -146,10 +149,10 @@ function StepNavigation({
         
         <div className="text-center flex-1 px-4">
           <div className="text-xs text-muted-foreground">
-            Steg {currentIndex + 1} av {steps.length}
+            {t('steps.stepOf', { current: currentIndex + 1, total: steps.length })}
           </div>
           <div className="font-medium text-foreground truncate">
-            {currentStep?.title ?? 'Ej startat'}
+            {currentStep?.title ?? t('steps.notStarted')}
           </div>
         </div>
         
@@ -198,10 +201,12 @@ function TriggerPanel({
   triggers,
   onFire,
   onDisableAll,
+  t,
 }: {
   triggers: CockpitTrigger[];
   onFire: (id: string) => void;
   onDisableAll: () => void;
+  t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
   const armedTriggers = triggers.filter((t) => t.status === 'armed');
   const firedTriggers = triggers.filter((t) => t.status === 'fired');
@@ -219,7 +224,7 @@ function TriggerPanel({
             onClick={onDisableAll}
           >
             <StopIcon className="h-4 w-4 mr-1" />
-            Inaktivera alla
+            {t('triggers.disableAll')}
           </Button>
         </div>
       )}
@@ -289,7 +294,7 @@ function TriggerPanel({
       
       {triggers.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-8">
-          Inga triggers i denna session
+          {t('triggers.noTriggers')}
         </div>
       )}
     </div>
@@ -301,6 +306,7 @@ function SignalQuickPanel({
   presets = [],
   onSend,
   onExecuteSignal,
+  t,
 }: {
   recentSignals: Signal[];
   presets?: Array<{
@@ -313,6 +319,7 @@ function SignalQuickPanel({
   }>;
   onSend: (channel: string, payload: unknown) => void;
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
+  t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
   const [channel, setChannel] = useState('');
   const [message, setMessage] = useState('');
@@ -338,10 +345,10 @@ function SignalQuickPanel({
 
   // Quick presets - built-in
   const builtInPresets = [
-    { id: 'pause', channel: 'pause', label: '⏸ Paus', message: 'Paus!', icon: '⏸' },
-    { id: 'hint', channel: 'hint', label: '💡 Hint', message: 'Ledtråd tillgänglig', icon: '💡' },
-    { id: 'attention', channel: 'attention', label: '⚡ Uppmärksamhet', message: 'Titta hit!', icon: '⚡' },
-    { id: 'flash', channel: 'flash', label: '💥 Blinka', message: 'Flash!', icon: '💥' },
+    { id: 'pause', channel: 'pause', label: `⏸ ${t('signals.presets.pause')}`, message: t('signals.presets.pauseMessage'), icon: '⏸' },
+    { id: 'hint', channel: 'hint', label: `💡 ${t('signals.presets.hint')}`, message: t('signals.presets.hintMessage'), icon: '💡' },
+    { id: 'attention', channel: 'attention', label: `⚡ ${t('signals.presets.attention')}`, message: t('signals.presets.attentionMessage'), icon: '⚡' },
+    { id: 'flash', channel: 'flash', label: `💥 ${t('signals.presets.flash')}`, message: t('signals.presets.flashMessage'), icon: '💥' },
   ];
 
   // Signal type icons
@@ -365,7 +372,7 @@ function SignalQuickPanel({
       {presets.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Enhetssignaler
+            {t('signals.deviceSignals')}
           </div>
           <div className="flex flex-wrap gap-2">
             {presets.map((p) => (
@@ -414,7 +421,7 @@ function SignalQuickPanel({
       {/* Message presets */}
       <div className="space-y-2">
         <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-          Snabbmeddelanden
+          {t('signals.quickMessages')}
         </div>
         <div className="flex flex-wrap gap-2">
           {builtInPresets.map((p) => (
@@ -438,7 +445,7 @@ function SignalQuickPanel({
           onClick={() => setShowCustom(!showCustom)}
           className="w-full justify-between"
         >
-          <span>Anpassad signal</span>
+          <span>{t('signals.customSignal')}</span>
           <span className="text-muted-foreground">{showCustom ? '−' : '+'}</span>
         </Button>
         
@@ -446,7 +453,7 @@ function SignalQuickPanel({
           <div className="mt-2 space-y-2">
             <input
               type="text"
-              placeholder="Kanal (t.ex. 'team-red')"
+              placeholder={t('signals.channelPlaceholder')}
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
               className="w-full px-3 py-2 text-sm border rounded-lg bg-background"
@@ -454,15 +461,18 @@ function SignalQuickPanel({
             <div className="flex gap-2">
               <input
                 type="text"
-                placeholder="Meddelande"
+                placeholder={t('signals.messagePlaceholder')}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 className="flex-1 px-3 py-2 text-sm border rounded-lg bg-background"
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               />
               <Button size="sm" onClick={handleSend} disabled={!channel || !message}>
-                Skicka
+                {t('signals.send')}
               </Button>
+            </div>
+          </div>
+        )}
             </div>
           </div>
         )}
@@ -472,7 +482,7 @@ function SignalQuickPanel({
       {recentSignals.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Senaste signaler
+            {t('signals.recentSignals')}
           </div>
           <div className="space-y-1 max-h-[120px] overflow-y-auto">
             {recentSignals.slice(0, 8).map((s) => (
@@ -493,7 +503,7 @@ function SignalQuickPanel({
             ))}
           </div>
           <p className="text-[10px] text-muted-foreground text-center">
-            Klicka för att skicka igen
+            {t('signals.clickToResend')}
           </p>
         </div>
       )}
@@ -501,11 +511,11 @@ function SignalQuickPanel({
   );
 }
 
-function EventFeed({ events }: { events: SessionEvent[] }) {
+function EventFeed({ events, t }: { events: SessionEvent[]; t: ReturnType<typeof useTranslations<'play.directorDrawer'>> }) {
   if (events.length === 0) {
     return (
       <div className="text-sm text-muted-foreground text-center py-8">
-        Inga händelser ännu
+        {t('events.noEvents')}
       </div>
     );
   }
@@ -551,10 +561,12 @@ function TimeBankQuickPanel({
   balance,
   paused,
   onDelta,
+  t,
 }: {
   balance: number;
   paused: boolean;
   onDelta: (delta: number, reason: string) => void;
+  t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
   const minutes = Math.floor(balance / 60);
   const seconds = balance % 60;
@@ -567,7 +579,7 @@ function TimeBankQuickPanel({
         </div>
         {paused && (
           <Badge variant="warning" size="sm" className="mt-1">
-            PAUSAD
+            {t('timeBank.paused')}
           </Badge>
         )}
       </div>
@@ -576,28 +588,28 @@ function TimeBankQuickPanel({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelta(-60, 'Manuell justering')}
+          onClick={() => onDelta(-60, t('timeBank.manualAdjustment'))}
         >
           −1 min
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelta(-30, 'Manuell justering')}
+          onClick={() => onDelta(-30, t('timeBank.manualAdjustment'))}
         >
           −30s
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelta(30, 'Manuell justering')}
+          onClick={() => onDelta(30, t('timeBank.manualAdjustment'))}
         >
           +30s
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onDelta(60, 'Manuell justering')}
+          onClick={() => onDelta(60, t('timeBank.manualAdjustment'))}
         >
           +1 min
         </Button>
@@ -638,6 +650,7 @@ export function DirectorModeDrawer({
   onTimeBankDelta,
   className,
 }: DirectorModeDrawerProps) {
+  const t = useTranslations('play.directorDrawer');
   const [activeTab, setActiveTab] = useState<DirectorTab>('play');
   const [actionPending, setActionPending] = useState(false);
   const [showStoryView, setShowStoryView] = useState(false);
@@ -681,10 +694,10 @@ export function DirectorModeDrawer({
   };
 
   const tabs = [
-    { id: 'play' as const, label: 'Spela', icon: PlayIcon },
-    { id: 'triggers' as const, label: 'Triggers', icon: BoltIcon, badge: triggers.filter((t) => t.status === 'armed').length },
-    { id: 'signals' as const, label: 'Signals', icon: SignalIcon },
-    { id: 'events' as const, label: 'Händelser', icon: ClockIcon, badge: events.length },
+    { id: 'play' as const, label: t('tabs.play'), icon: PlayIcon },
+    { id: 'triggers' as const, label: t('tabs.triggers'), icon: BoltIcon, badge: triggers.filter((tr) => tr.status === 'armed').length },
+    { id: 'signals' as const, label: t('tabs.signals'), icon: SignalIcon },
+    { id: 'events' as const, label: t('tabs.events'), icon: ClockIcon, badge: events.length },
   ];
 
   return (
@@ -717,7 +730,7 @@ export function DirectorModeDrawer({
                   <div className="text-xs text-muted-foreground">
                     <span className="font-mono">{sessionCode}</span>
                     <span className="mx-2">•</span>
-                    <span>{participantCount} deltagare</span>
+                    <span>{t('header.participants', { count: participantCount })}</span>
                   </div>
                 </div>
               </div>
@@ -726,7 +739,7 @@ export function DirectorModeDrawer({
                 <Badge
                   variant={status === 'active' ? 'success' : status === 'paused' ? 'warning' : 'default'}
                 >
-                  {status === 'active' ? '● LIVE' : status === 'paused' ? '⏸ PAUSAD' : 'AVSLUTAD'}
+                  {status === 'active' ? `● ${t('header.statusLive')}` : status === 'paused' ? `⏸ ${t('header.statusPaused')}` : t('header.statusEnded')}
                 </Badge>
                 
                 {status !== 'ended' && (
@@ -739,12 +752,12 @@ export function DirectorModeDrawer({
                     {status === 'active' ? (
                       <>
                         <PauseIcon className="h-4 w-4 mr-1" />
-                        Pausa
+                        {t('header.pause')}
                       </>
                     ) : (
                       <>
                         <PlayIcon className="h-4 w-4 mr-1" />
-                        Fortsätt
+                        {t('header.resume')}
                       </>
                     )}
                   </Button>
@@ -786,6 +799,7 @@ export function DirectorModeDrawer({
                     currentIndex={currentStepIndex}
                     onNext={onNextStep}
                     onPrevious={onPreviousStep}
+                    t={t}
                   />
                   
                   {/* Leader Script */}
@@ -795,19 +809,20 @@ export function DirectorModeDrawer({
                   <Card className="p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <ClockIcon className="h-5 w-5 text-primary" />
-                      <span className="font-medium">Tidsbank</span>
+                      <span className="font-medium">{t('timeBank.title')}</span>
                     </div>
                     <TimeBankQuickPanel
                       balance={timeBankBalance}
                       paused={timeBankPaused}
                       onDelta={onTimeBankDelta}
+                      t={t}
                     />
                   </Card>
                   
                   {/* Quick Actions */}
                   {currentStep && (
                     <Card className="p-4">
-                      <div className="text-sm font-medium mb-3">Snabbåtgärder</div>
+                      <div className="text-sm font-medium mb-3">{t('quickActions.title')}</div>
                       <div className="flex flex-wrap gap-2">
                         <Button 
                           variant="outline" 
@@ -815,16 +830,16 @@ export function DirectorModeDrawer({
                           onClick={() => setShowStoryView(true)}
                         >
                           <BookOpenIcon className="h-4 w-4 mr-1" />
-                          Berättelse
+                          {t('quickActions.story')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          💡 Ge ledtråd
+                          💡 {t('quickActions.giveHint')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          🔄 Reset
+                          🔄 {t('quickActions.reset')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          📣 Meddelande
+                          📣 {t('quickActions.message')}
                         </Button>
                       </div>
                     </Card>
@@ -837,6 +852,7 @@ export function DirectorModeDrawer({
                   triggers={triggers}
                   onFire={onFireTrigger}
                   onDisableAll={onDisableAllTriggers}
+                  t={t}
                 />
               )}
               
@@ -846,11 +862,12 @@ export function DirectorModeDrawer({
                   presets={signalPresets}
                   onSend={onSendSignal}
                   onExecuteSignal={onExecuteSignal}
+                  t={t}
                 />
               )}
               
               {activeTab === 'events' && (
-                <EventFeed events={events} />
+                <EventFeed events={events} t={t} />
               )}
             </div>
             
@@ -862,7 +879,7 @@ export function DirectorModeDrawer({
                 onClick={onClose}
               >
                 <ArrowLeftIcon className="h-4 w-4 mr-2" />
-                Tillbaka till Lobby
+                {t('footer.backToLobby')}
               </Button>
             </div>
           </div>

@@ -858,6 +858,13 @@
         "somethingWentWrong": "Something went wrong",
         "couldNotFetchSession": "Could not fetch session",
         "couldNotLoadRoles": "Could not load roles",
+        "couldNotLoadSecretsStatus": "Could not load secrets status",
+        "couldNotCopyRoles": "Could not copy roles",
+        "couldNotUpdate": "Could not update",
+        "couldNotUpdateStatus": "Could not update status",
+        "couldNotRemoveParticipant": "Could not remove participant",
+        "couldNotBlockParticipant": "Could not block participant",
+        "couldNotSaveRoles": "Could not save roles",
         "assignRolesFirst": "Assign roles first (assigned {assigned} of {total}).",
         "cannotLockAgain": "Cannot lock again: at least one participant has already revealed their secrets.",
         "couldNotSetNextStarter": "Could not set next starter",
@@ -865,6 +872,9 @@
         "couldNotStartPlayMode": "Could not start play mode",
         "couldNotSaveSettings": "Could not save settings",
         "couldNotResetOverrides": "Could not reset overrides"
+      },
+      "success": {
+        "rolesCopied": "{count} roles copied to session"
       },
       "toast": {
         "settingsSaved": "Session settings saved",
@@ -1035,6 +1045,111 @@
         }
       }
     },
+    "directorDrawer": {
+      "tabs": {
+        "play": "Play",
+        "triggers": "Triggers",
+        "signals": "Signals",
+        "events": "Events"
+      },
+      "header": {
+        "participants": "{count} participants",
+        "statusLive": "LIVE",
+        "statusPaused": "PAUSED",
+        "statusEnded": "ENDED",
+        "pause": "Pause",
+        "resume": "Resume"
+      },
+      "steps": {
+        "noSteps": "No steps available yet",
+        "stepOf": "Step {current} of {total}",
+        "notStarted": "Not started"
+      },
+      "triggers": {
+        "disableAll": "Disable all",
+        "noTriggers": "No triggers in this session"
+      },
+      "signals": {
+        "deviceSignals": "Device signals",
+        "quickMessages": "Quick messages",
+        "customSignal": "Custom signal",
+        "channelPlaceholder": "Channel (e.g. 'team-red')",
+        "messagePlaceholder": "Message",
+        "send": "Send",
+        "recentSignals": "Recent signals",
+        "clickToResend": "Click to resend",
+        "presets": {
+          "pause": "Pause",
+          "pauseMessage": "Pause!",
+          "hint": "Hint",
+          "hintMessage": "Hint available",
+          "attention": "Attention",
+          "attentionMessage": "Look here!",
+          "flash": "Flash",
+          "flashMessage": "Flash!"
+        }
+      },
+      "events": {
+        "noEvents": "No events yet"
+      },
+      "timeBank": {
+        "title": "Time Bank",
+        "paused": "PAUSED",
+        "manualAdjustment": "Manual adjustment"
+      },
+      "quickActions": {
+        "title": "Quick actions",
+        "story": "Story",
+        "giveHint": "Give hint",
+        "reset": "Reset",
+        "message": "Message"
+      },
+      "footer": {
+        "backToLobby": "Back to Lobby"
+      }
+    },
+    "eventFeed": {
+      "title": "Event Feed",
+      "eventCount": "{count} events",
+      "errors": "{count} errors",
+      "warnings": "{count} warnings",
+      "allEvents": "All events",
+      "filters": {
+        "searchPlaceholder": "Search events...",
+        "category": "Category",
+        "allCategories": "All categories",
+        "severity": "Severity",
+        "allSeverities": "All levels",
+        "groupByTime": "Group by time",
+        "clear": "Clear"
+      },
+      "categories": {
+        "trigger": "Trigger",
+        "artifact": "Artifact",
+        "lifecycle": "Session",
+        "signal": "Signal",
+        "timebank": "Time Bank",
+        "navigation": "Navigation",
+        "participant": "Participant",
+        "host": "Host"
+      },
+      "severity": {
+        "error": "Error",
+        "warning": "Warnings",
+        "info": "Info",
+        "debug": "Debug"
+      },
+      "timeGroups": {
+        "lastMinute": "Last minute",
+        "last5Minutes": "Last 5 minutes",
+        "last15Minutes": "Last 15 minutes",
+        "older": "Older"
+      },
+      "empty": {
+        "noEvents": "No events yet",
+        "noMatchingEvents": "No events match the filter"
+      }
+    },
     "playPage": {
       "errors": {
         "noGameSelected": "No game selected",
@@ -1167,7 +1282,11 @@
     },
     "artifactsPanel": {
       "errors": {
-        "somethingWentWrong": "Something went wrong"
+        "somethingWentWrong": "Something went wrong",
+        "loadFailed": "Could not load artifacts",
+        "snapshotFailed": "Could not snapshot artifacts",
+        "updateFailed": "Could not update artifact",
+        "serverError": "Server error"
       },
       "empty": {
         "title": "No artifacts yet",
@@ -1199,6 +1318,20 @@
         "locked": "Locked",
         "attemptsRemaining": "{count} attempts remaining",
         "unlockedContent": "Unlocked content"
+      }
+    },
+    "conversationCards": {
+      "title": "Conversation Cards",
+      "badge": "Conversation Cards",
+      "loading": "Loading conversation cards…",
+      "noCards": "No cards in this game.",
+      "card": "Card",
+      "leaderTip": "Leader Tip",
+      "previous": "Previous",
+      "next": "Next",
+      "errors": {
+        "missingCollection": "Conversation cards missing linked collection (conversation_card_collection_id).",
+        "loadFailed": "Could not load conversation cards"
       }
     },
     "propConfirmation": {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +38,7 @@ export function ConversationCardsCollectionArtifact(props: {
   artifactDescription?: string | null;
   metadata?: Record<string, unknown> | null;
 }) {
+  const t = useTranslations('play.conversationCards');
   const { sessionId, participantToken, artifactTitle, artifactDescription, metadata } = props;
 
   const collectionId = useMemo(() => readCollectionId(metadata), [metadata]);
@@ -61,7 +63,7 @@ export function ConversationCardsCollectionArtifact(props: {
       setDeckDescription(null);
 
       if (!collectionId) {
-        setError('Samtalskort saknar kopplad lek (conversation_card_collection_id).');
+        setError(t('errors.missingCollection'));
         return;
       }
 
@@ -75,7 +77,7 @@ export function ConversationCardsCollectionArtifact(props: {
 
         const data = (await res.json().catch(() => ({}))) as DeckResponse & { error?: string };
         if (!res.ok) {
-          throw new Error(typeof data?.error === 'string' ? data.error : `Kunde inte ladda samtalskort (${res.status})`);
+          throw new Error(typeof data?.error === 'string' ? data.error : t('errors.loadFailed'));
         }
 
         if (cancelled) return;
@@ -84,7 +86,7 @@ export function ConversationCardsCollectionArtifact(props: {
         setCards(Array.isArray(data.cards) ? data.cards : []);
       } catch (e) {
         if (cancelled) return;
-        setError(e instanceof Error ? e.message : 'Kunde inte ladda samtalskort');
+        setError(e instanceof Error ? e.message : t('errors.loadFailed'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -99,8 +101,8 @@ export function ConversationCardsCollectionArtifact(props: {
   return (
     <div className="rounded-md border border-border p-3 space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm font-medium text-foreground">{artifactTitle ?? 'Samtalskort'}</p>
-        <Badge variant="secondary">Samtalskort</Badge>
+        <p className="text-sm font-medium text-foreground">{artifactTitle ?? t('title')}</p>
+        <Badge variant="secondary">{t('badge')}</Badge>
       </div>
 
       {artifactDescription && <p className="text-xs text-muted-foreground">{artifactDescription}</p>}
@@ -112,17 +114,17 @@ export function ConversationCardsCollectionArtifact(props: {
         </Card>
       )}
 
-      {loading && <p className="text-sm text-muted-foreground">Laddar samtalskort…</p>}
+      {loading && <p className="text-sm text-muted-foreground">{t('loading')}</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {!loading && !error && cards.length === 0 && (
-        <p className="text-sm text-muted-foreground">Inga kort i leken.</p>
+        <p className="text-sm text-muted-foreground">{t('noCards')}</p>
       )}
 
       {!loading && !error && current && (
         <Card className="p-3 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm font-semibold text-foreground">{current.card_title ?? 'Kort'}</p>
+            <p className="text-sm font-semibold text-foreground">{current.card_title ?? t('card')}</p>
             <p className="text-xs text-muted-foreground">
               {index + 1} / {cards.length}
             </p>
@@ -140,13 +142,13 @@ export function ConversationCardsCollectionArtifact(props: {
 
           {current.leader_tip && (
             <div className="rounded border border-border bg-muted/30 p-2">
-              <p className="text-xs text-muted-foreground">Ledartips: {current.leader_tip}</p>
+              <p className="text-xs text-muted-foreground">{t('leaderTip')}: {current.leader_tip}</p>
             </div>
           )}
 
           <div className="flex gap-2">
             <Button type="button" size="sm" variant="outline" onClick={() => setIndex((i) => Math.max(0, i - 1))} disabled={index <= 0}>
-              Föregående
+              {t('previous')}
             </Button>
             <Button
               type="button"
@@ -154,7 +156,7 @@ export function ConversationCardsCollectionArtifact(props: {
               onClick={() => setIndex((i) => Math.min(cards.length - 1, i + 1))}
               disabled={index >= cards.length - 1}
             >
-              Nästa
+              {t('next')}
             </Button>
           </div>
         </Card>

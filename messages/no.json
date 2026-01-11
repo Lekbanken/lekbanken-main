@@ -858,6 +858,13 @@
         "somethingWentWrong": "Noe gikk galt",
         "couldNotFetchSession": "Kunne ikke hente sesjon",
         "couldNotLoadRoles": "Kunne ikke laste roller",
+        "couldNotLoadSecretsStatus": "Kunne ikke laste hemmelighetsstatus",
+        "couldNotCopyRoles": "Kunne ikke kopiere roller",
+        "couldNotUpdate": "Kunne ikke oppdatere",
+        "couldNotUpdateStatus": "Kunne ikke oppdatere status",
+        "couldNotRemoveParticipant": "Kunne ikke fjerne deltaker",
+        "couldNotBlockParticipant": "Kunne ikke blokkere deltaker",
+        "couldNotSaveRoles": "Kunne ikke lagre roller",
         "assignRolesFirst": "Tildel roller først (tildelt {assigned} av {total}).",
         "cannotLockAgain": "Kan ikke låse igjen: minst én deltaker har allerede vist sine hemmeligheter.",
         "couldNotSetNextStarter": "Kunne ikke sette neste starter",
@@ -865,6 +872,9 @@
         "couldNotStartPlayMode": "Kunne ikke starte spillmodus",
         "couldNotSaveSettings": "Kunne ikke lagre innstillinger",
         "couldNotResetOverrides": "Kunne ikke tilbakestille overrides"
+      },
+      "success": {
+        "rolesCopied": "{count} roller kopiert til sesjonen"
       },
       "toast": {
         "settingsSaved": "Sesjonens innstillinger lagret",
@@ -1035,6 +1045,111 @@
         }
       }
     },
+    "directorDrawer": {
+      "tabs": {
+        "play": "Spill",
+        "triggers": "Triggers",
+        "signals": "Signaler",
+        "events": "Hendelser"
+      },
+      "header": {
+        "participants": "{count} deltakere",
+        "statusLive": "LIVE",
+        "statusPaused": "PAUSET",
+        "statusEnded": "AVSLUTTET",
+        "pause": "Pause",
+        "resume": "Fortsett"
+      },
+      "steps": {
+        "noSteps": "Ingen trinn tilgjengelig ennå",
+        "stepOf": "Trinn {current} av {total}",
+        "notStarted": "Ikke startet"
+      },
+      "triggers": {
+        "disableAll": "Deaktiver alle",
+        "noTriggers": "Ingen triggers i denne sesjonen"
+      },
+      "signals": {
+        "deviceSignals": "Enhetssignaler",
+        "quickMessages": "Hurtigmeldinger",
+        "customSignal": "Egendefinert signal",
+        "channelPlaceholder": "Kanal (f.eks. 'team-red')",
+        "messagePlaceholder": "Melding",
+        "send": "Send",
+        "recentSignals": "Nylige signaler",
+        "clickToResend": "Klikk for å sende på nytt",
+        "presets": {
+          "pause": "Pause",
+          "pauseMessage": "Pause!",
+          "hint": "Hint",
+          "hintMessage": "Hint tilgjengelig",
+          "attention": "Oppmerksomhet",
+          "attentionMessage": "Se hit!",
+          "flash": "Blink",
+          "flashMessage": "Flash!"
+        }
+      },
+      "events": {
+        "noEvents": "Ingen hendelser ennå"
+      },
+      "timeBank": {
+        "title": "Tidsbank",
+        "paused": "PAUSET",
+        "manualAdjustment": "Manuell justering"
+      },
+      "quickActions": {
+        "title": "Hurtighandlinger",
+        "story": "Historie",
+        "giveHint": "Gi hint",
+        "reset": "Nullstill",
+        "message": "Melding"
+      },
+      "footer": {
+        "backToLobby": "Tilbake til Lobby"
+      }
+    },
+    "eventFeed": {
+      "title": "Hendelsesflyt",
+      "eventCount": "{count} hendelser",
+      "errors": "{count} feil",
+      "warnings": "{count} advarsler",
+      "allEvents": "Alle hendelser",
+      "filters": {
+        "searchPlaceholder": "Søk i hendelser...",
+        "category": "Kategori",
+        "allCategories": "Alle kategorier",
+        "severity": "Alvorlighet",
+        "allSeverities": "Alle nivåer",
+        "groupByTime": "Grupper etter tid",
+        "clear": "Tøm"
+      },
+      "categories": {
+        "trigger": "Trigger",
+        "artifact": "Artefakt",
+        "lifecycle": "Sesjon",
+        "signal": "Signal",
+        "timebank": "Tidsbank",
+        "navigation": "Navigasjon",
+        "participant": "Deltaker",
+        "host": "Leder"
+      },
+      "severity": {
+        "error": "Feil",
+        "warning": "Advarsler",
+        "info": "Info",
+        "debug": "Debug"
+      },
+      "timeGroups": {
+        "lastMinute": "Siste minutt",
+        "last5Minutes": "Siste 5 minutter",
+        "last15Minutes": "Siste 15 minutter",
+        "older": "Eldre"
+      },
+      "empty": {
+        "noEvents": "Ingen hendelser ennå",
+        "noMatchingEvents": "Ingen hendelser matcher filteret"
+      }
+    },
     "playPage": {
       "errors": {
         "noGameSelected": "Ingen lek valgt",
@@ -1167,7 +1282,11 @@
     },
     "artifactsPanel": {
       "errors": {
-        "somethingWentWrong": "Noe gikk galt"
+        "somethingWentWrong": "Noe gikk galt",
+        "loadFailed": "Kunne ikke laste artefakter",
+        "snapshotFailed": "Kunne ikke ta snapshot av artefakter",
+        "updateFailed": "Kunne ikke oppdatere artefakt",
+        "serverError": "Serverfeil"
       },
       "empty": {
         "title": "Ingen artefakter ennå",
@@ -1199,6 +1318,20 @@
         "locked": "Låst",
         "attemptsRemaining": "{count} forsøk igjen",
         "unlockedContent": "Opplåst innhold"
+      }
+    },
+    "conversationCards": {
+      "title": "Samtalekort",
+      "badge": "Samtalekort",
+      "loading": "Laster samtalekort…",
+      "noCards": "Ingen kort i spillet.",
+      "card": "Kort",
+      "leaderTip": "Ledertips",
+      "previous": "Forrige",
+      "next": "Neste",
+      "errors": {
+        "missingCollection": "Samtalekort mangler tilknyttet samling (conversation_card_collection_id).",
+        "loadFailed": "Kunne ikke laste samtalekort"
       }
     },
     "propConfirmation": {

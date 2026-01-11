@@ -155,7 +155,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/roles`, { cache: 'no-store' });
       if (!res.ok) {
-        throw new Error('Kunde inte ladda roller');
+        throw new Error(t('errors.couldNotLoadRoles'));
       }
       const data = (await res.json()) as { roles?: SessionRole[] };
       setSessionRoles(data.roles ?? []);
@@ -175,7 +175,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       setRoleDrafts(drafts);
       setRolesError(null);
     } catch (err) {
-      setRolesError(err instanceof Error ? err.message : 'Kunde inte ladda roller');
+      setRolesError(err instanceof Error ? err.message : t('errors.couldNotLoadRoles'));
     } finally {
       setRolesLoading(false);
     }
@@ -186,7 +186,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/secrets`, { cache: 'no-store' });
       if (!res.ok) {
-        throw new Error('Kunde inte ladda hemlighetsstatus');
+        throw new Error(t('errors.couldNotLoadSecretsStatus'));
       }
       const data = (await res.json()) as {
         session?: { secret_instructions_unlocked_at?: string | null };
@@ -200,7 +200,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       });
       setSecretsError(null);
     } catch (err) {
-      setSecretsError(err instanceof Error ? err.message : 'Kunde inte ladda hemlighetsstatus');
+      setSecretsError(err instanceof Error ? err.message : t('errors.couldNotLoadSecretsStatus'));
     } finally {
       setSecretsLoading(false);
     }
@@ -276,15 +276,15 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        const errMsg = (data as { error?: string }).error ?? 'Kunde inte kopiera roller';
+        const errMsg = (data as { error?: string }).error ?? t('errors.couldNotCopyRoles');
         throw new Error(errMsg);
       }
 
       const count = (data as { count?: number }).count ?? 0;
-      toast.success(`${count} roller kopierade till sessionen`);
+      toast.success(t('success.rolesCopied', { count }));
       await loadRoles();
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : 'Kunde inte kopiera roller';
+      const errMsg = err instanceof Error ? err.message : t('errors.couldNotCopyRoles');
       setRolesError(errMsg);
       toast.error(errMsg);
     } finally {
@@ -318,7 +318,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
           throw new Error(t('errors.cannotLockAgain'));
         }
 
-        throw new Error(err.error ?? 'Kunde inte uppdatera');
+        throw new Error(err.error ?? t('errors.couldNotUpdate'));
       }
 
       const ok = data as {
@@ -338,7 +338,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         await loadSecrets();
       }
     } catch (err) {
-      setSecretsError(err instanceof Error ? err.message : 'Kunde inte uppdatera');
+      setSecretsError(err instanceof Error ? err.message : t('errors.couldNotUpdate'));
     } finally {
       setSecretsLoading(false);
     }
@@ -351,7 +351,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await updateSessionStatus(sessionId, action);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte uppdatera status');
+      setError(err instanceof Error ? err.message : t('errors.couldNotUpdateStatus'));
     } finally {
       setActionPending(false);
       setLoadingAction(undefined);
@@ -387,7 +387,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await kickParticipant(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte ta bort deltagare');
+      setError(err instanceof Error ? err.message : t('errors.couldNotRemoveParticipant'));
     }
   };
 
@@ -396,7 +396,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await blockParticipant(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte blockera deltagare');
+      setError(err instanceof Error ? err.message : t('errors.couldNotBlockParticipant'));
     }
   };
 
@@ -511,7 +511,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       toast.success(t('toast.rolesSaved'));
       await loadRoles();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Kunde inte spara roller');
+      toast.error(err instanceof Error ? err.message : t('errors.couldNotSaveRoles'));
     } finally {
       setRolesLoading(false);
     }

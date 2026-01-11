@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -116,14 +117,14 @@ const SEVERITY_ICONS: Record<EventSeverity, React.ReactNode> = {
 };
 
 const CATEGORY_LABELS: Record<EventCategory, string> = {
-  trigger: 'Trigger',
-  artifact: 'Artefakt',
-  lifecycle: 'Session',
-  signal: 'Signal',
-  timebank: 'Tidsbank',
-  navigation: 'Navigation',
-  participant: 'Deltagare',
-  host: 'Ledare',
+  trigger: 'categories.trigger',
+  artifact: 'categories.artifact',
+  lifecycle: 'categories.lifecycle',
+  signal: 'categories.signal',
+  timebank: 'categories.timebank',
+  navigation: 'categories.navigation',
+  participant: 'categories.participant',
+  host: 'categories.host',
 };
 
 // =============================================================================
@@ -157,7 +158,7 @@ interface EventGroup {
   events: SessionEvent[];
 }
 
-function groupEventsByTime(events: SessionEvent[]): EventGroup[] {
+function groupEventsByTime(events: SessionEvent[], t: ReturnType<typeof useTranslations<'play.eventFeed'>>): EventGroup[] {
   const now = new Date();
   const groups: EventGroup[] = [];
   
@@ -182,16 +183,16 @@ function groupEventsByTime(events: SessionEvent[]): EventGroup[] {
   }
   
   if (thisMinute.length > 0) {
-    groups.push({ label: 'Senaste minuten', events: thisMinute });
+    groups.push({ label: t('timeGroups.lastMinute'), events: thisMinute });
   }
   if (last5Min.length > 0) {
-    groups.push({ label: 'Senaste 5 minuterna', events: last5Min });
+    groups.push({ label: t('timeGroups.last5Minutes'), events: last5Min });
   }
   if (last15Min.length > 0) {
-    groups.push({ label: 'Senaste 15 minuterna', events: last15Min });
+    groups.push({ label: t('timeGroups.last15Minutes'), events: last15Min });
   }
   if (older.length > 0) {
-    groups.push({ label: 'Tidigare', events: older });
+    groups.push({ label: t('timeGroups.older'), events: older });
   }
   
   return groups;
@@ -204,9 +205,10 @@ function groupEventsByTime(events: SessionEvent[]): EventGroup[] {
 interface EventRowProps {
   event: SessionEvent;
   compact?: boolean;
+  t: ReturnType<typeof useTranslations<'play.eventFeed'>>;
 }
 
-function EventRow({ event, compact }: EventRowProps) {
+function EventRow({ event, compact, t }: EventRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasPayload = Object.keys(event.payload).length > 0;
   
@@ -237,7 +239,7 @@ function EventRow({ event, compact }: EventRowProps) {
               `}
             >
               {CATEGORY_ICONS[event.eventCategory]}
-              {!compact && CATEGORY_LABELS[event.eventCategory]}
+              {!compact && t(CATEGORY_LABELS[event.eventCategory] as 'categories.trigger')}
             </span>
             
             {/* Event type */}
@@ -305,9 +307,10 @@ function EventRow({ event, compact }: EventRowProps) {
 interface EventGroupSectionProps {
   group: EventGroup;
   compact?: boolean;
+  t: ReturnType<typeof useTranslations<'play.eventFeed'>>;
 }
 
-function EventGroupSection({ group, compact }: EventGroupSectionProps) {
+function EventGroupSection({ group, compact, t }: EventGroupSectionProps) {
   const [isOpen, setIsOpen] = useState(true);
   
   return (
@@ -328,7 +331,7 @@ function EventGroupSection({ group, compact }: EventGroupSectionProps) {
       <CollapsibleContent>
         <div className="space-y-1 ml-2">
           {group.events.map((event) => (
-            <EventRow key={event.id} event={event} compact={compact} />
+            <EventRow key={event.id} event={event} compact={compact} t={t} />
           ))}
         </div>
       </CollapsibleContent>
@@ -351,6 +354,7 @@ export function EventFeedPanel({
   compact = false,
   className,
 }: EventFeedPanelProps) {
+  const t = useTranslations('play.eventFeed');
   // Filters
   const [categoryFilter, setCategoryFilter] = useState<EventCategory | 'all'>('all');
   const [severityFilter, setSeverityFilter] = useState<EventSeverity | 'all'>('all');
@@ -386,10 +390,10 @@ export function EventFeedPanel({
   // Group events
   const groupedEvents = useMemo(() => {
     if (!groupByTime) {
-      return [{ label: 'Alla händelser', events: filteredEvents }];
+      return [{ label: t('allEvents'), events: filteredEvents }];
     }
-    return groupEventsByTime(filteredEvents);
-  }, [filteredEvents, groupByTime]);
+    return groupEventsByTime(filteredEvents, t);
+  }, [filteredEvents, groupByTime, t]);
 
   // Count by severity
   const errorCount = events.filter((e) => e.severity === 'error').length;
@@ -402,21 +406,21 @@ export function EventFeedPanel({
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <ChartBarIcon className="h-5 w-5" />
-              Händelseflöde
+              {t('title')}
               {isLoading && (
                 <ArrowPathIcon className="h-4 w-4 animate-spin text-muted-foreground" />
               )}
             </CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
-              {events.length} händelser
+              {t('eventCount', { count: events.length })}
               {errorCount > 0 && (
                 <Badge variant="destructive" className="text-xs">
-                  {errorCount} fel
+                  {t('errors', { count: errorCount })}
                 </Badge>
               )}
               {warningCount > 0 && (
                 <Badge variant="outline" className="text-xs text-yellow-600">
-                  {warningCount} varningar
+                  {t('warnings', { count: warningCount })}
                 </Badge>
               )}
             </CardDescription>
@@ -455,7 +459,7 @@ export function EventFeedPanel({
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Sök i händelser..."
+                  placeholder={t('filters.searchPlaceholder')}
                   className="pl-8"
                 />
                 {searchQuery && (
@@ -471,31 +475,31 @@ export function EventFeedPanel({
             
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <Label className="text-xs">Kategori</Label>
+                <Label className="text-xs">{t('filters.category')}</Label>
                 <Select
                   value={categoryFilter}
                   onChange={(e) => setCategoryFilter(e.target.value as EventCategory | 'all')}
                   options={[
-                    { value: 'all', label: 'Alla kategorier' },
-                    ...Object.entries(CATEGORY_LABELS).map(([key, label]) => ({
+                    { value: 'all', label: t('filters.allCategories') },
+                    ...Object.entries(CATEGORY_LABELS).map(([key, labelKey]) => ({
                       value: key,
-                      label,
+                      label: t(labelKey as 'categories.trigger'),
                     })),
                   ]}
                 />
               </div>
               
               <div className="space-y-1">
-                <Label className="text-xs">Allvarlighet</Label>
+                <Label className="text-xs">{t('filters.severity')}</Label>
                 <Select
                   value={severityFilter}
                   onChange={(e) => setSeverityFilter(e.target.value as EventSeverity | 'all')}
                   options={[
-                    { value: 'all', label: 'Alla nivåer' },
-                    { value: 'error', label: 'Fel' },
-                    { value: 'warning', label: 'Varningar' },
-                    { value: 'info', label: 'Info' },
-                    { value: 'debug', label: 'Debug' },
+                    { value: 'all', label: t('filters.allSeverities') },
+                    { value: 'error', label: t('severity.error') },
+                    { value: 'warning', label: t('severity.warning') },
+                    { value: 'info', label: t('severity.info') },
+                    { value: 'debug', label: t('severity.debug') },
                   ]}
                 />
               </div>
@@ -509,7 +513,7 @@ export function EventFeedPanel({
                   onCheckedChange={setGroupByTime}
                 />
                 <Label htmlFor="group-time" className="text-xs">
-                  Gruppera efter tid
+                  {t('filters.groupByTime')}
                 </Label>
               </div>
               
@@ -520,7 +524,7 @@ export function EventFeedPanel({
                   onClick={onClear}
                   className="text-xs h-7"
                 >
-                  Rensa
+                  {t('filters.clear')}
                 </Button>
               )}
             </div>
@@ -540,8 +544,8 @@ export function EventFeedPanel({
           {filteredEvents.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               {events.length === 0
-                ? 'Inga händelser än'
-                : 'Inga händelser matchar filtret'}
+                ? t('empty.noEvents')
+                : t('empty.noMatchingEvents')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -550,6 +554,7 @@ export function EventFeedPanel({
                   key={group.label}
                   group={group}
                   compact={compact}
+                  t={t}
                 />
               ))}
             </div>

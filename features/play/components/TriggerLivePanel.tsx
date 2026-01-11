@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -82,7 +83,7 @@ export interface TriggerLivePanelProps {
 
 interface TriggerGroup {
   status: TriggerStatus;
-  label: string;
+  labelKey: 'armed' | 'error' | 'fired' | 'disabled';
   icon: React.ReactNode;
   triggers: Trigger[];
   variant: 'default' | 'outline' | 'destructive';
@@ -97,28 +98,28 @@ const groupTriggers = (triggers: Trigger[]): TriggerGroup[] => {
   const groups: TriggerGroup[] = [
     {
       status: 'armed' as TriggerStatus,
-      label: 'Redo',
+      labelKey: 'armed',
       icon: <BoltIcon className="h-4 w-4 text-green-500" />,
       triggers: armed,
       variant: 'default',
     },
     {
       status: 'error' as TriggerStatus,
-      label: 'Fel',
+      labelKey: 'error',
       icon: <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />,
       triggers: error,
       variant: 'destructive',
     },
     {
       status: 'fired' as TriggerStatus,
-      label: 'Aktiverade',
+      labelKey: 'fired',
       icon: <CheckCircleIcon className="h-4 w-4 text-blue-500" />,
       triggers: fired,
       variant: 'outline',
     },
     {
       status: 'disabled' as TriggerStatus,
-      label: 'Inaktiverade',
+      labelKey: 'disabled',
       icon: <XCircleIcon className="h-4 w-4 text-muted-foreground" />,
       triggers: disabled,
       variant: 'outline',
@@ -132,36 +133,36 @@ const groupTriggers = (triggers: Trigger[]): TriggerGroup[] => {
 // Helper: Get condition description
 // =============================================================================
 
-const getConditionLabel = (condition: TriggerCondition): string => {
+const getConditionKey = (condition: TriggerCondition): string => {
   switch (condition.type) {
     case 'step_started':
-      return 'Steg startat';
+      return 'conditions.stepStarted';
     case 'step_completed':
-      return 'Steg klart';
+      return 'conditions.stepCompleted';
     case 'phase_started':
-      return 'Fas startad';
+      return 'conditions.phaseStarted';
     case 'phase_completed':
-      return 'Fas klar';
+      return 'conditions.phaseCompleted';
     case 'keypad_correct':
-      return 'Rätt kod';
+      return 'conditions.keypadCorrect';
     case 'keypad_failed':
-      return 'Fel kod';
+      return 'conditions.keypadFailed';
     case 'artifact_unlocked':
-      return 'Artefakt upplåst';
+      return 'conditions.artifactUnlocked';
     case 'timer_ended':
-      return 'Timer slut';
+      return 'conditions.timerEnded';
     case 'manual':
-      return 'Manuell';
+      return 'conditions.manual';
     case 'signal_received':
-      return 'Signal mottagen';
+      return 'conditions.signalReceived';
     case 'counter_reached':
-      return 'Räknare nådd';
+      return 'conditions.counterReached';
     case 'riddle_correct':
-      return 'Gåta löst';
+      return 'conditions.riddleCorrect';
     case 'time_bank_expired':
-      return 'Tidsbank slut';
+      return 'conditions.timeBankExpired';
     case 'signal_generator_triggered':
-      return 'Signalgenerator';
+      return 'conditions.signalGenerator';
     default:
       return condition.type;
   }
@@ -177,6 +178,7 @@ interface TriggerRowProps {
   onDisable: () => Promise<void>;
   onRearm: () => Promise<void>;
   isLoading: boolean;
+  t: ReturnType<typeof useTranslations<'play.triggerLivePanel'>>;
 }
 
 function TriggerRow({
@@ -185,6 +187,7 @@ function TriggerRow({
   onDisable,
   onRearm,
   isLoading,
+  t,
 }: TriggerRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -221,7 +224,7 @@ function TriggerRow({
           <div className="flex items-center gap-2">
             <span className="font-medium truncate">{trigger.name}</span>
             <Badge variant="outline" className="text-xs">
-              {getConditionLabel(trigger.when)}
+              {t(getConditionKey(trigger.when) as Parameters<typeof t>[0])}
             </Badge>
             {trigger.executeOnce && (
               <Badge variant="outline" className="text-xs">
@@ -240,7 +243,7 @@ function TriggerRow({
           {/* Fired info */}
           {trigger.firedCount > 0 && (
             <div className="text-xs text-muted-foreground mt-1">
-              Aktiverad {trigger.firedCount}×
+              {t('firedCount', { count: trigger.firedCount })}
               {trigger.firedAt && (
                 <> • {new Date(trigger.firedAt).toLocaleTimeString('sv-SE')}</>
               )}
@@ -252,7 +255,7 @@ function TriggerRow({
         <div className="flex items-center gap-1">
           {trigger.status === 'armed' && (
             <>
-              <Tooltip content="Aktivera nu">
+              <Tooltip content={t('tooltips.fireNow')}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -264,7 +267,7 @@ function TriggerRow({
                 </Button>
               </Tooltip>
 
-              <Tooltip content="Inaktivera">
+              <Tooltip content={t('tooltips.disable')}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -279,7 +282,7 @@ function TriggerRow({
           )}
 
           {(trigger.status === 'disabled' || trigger.status === 'error') && (
-            <Tooltip content={trigger.status === 'error' ? 'Rensa fel & återaktivera' : 'Återaktivera'}>
+            <Tooltip content={trigger.status === 'error' ? t('tooltips.clearErrorRearm') : t('tooltips.rearm')}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -293,7 +296,7 @@ function TriggerRow({
           )}
 
           {trigger.status === 'fired' && trigger.executeOnce && (
-            <Tooltip content="Återställ (kan aktiveras igen)">
+            <Tooltip content={t('tooltips.resetCanFire')}>
               <Button
                 variant="ghost"
                 size="sm"
@@ -313,22 +316,22 @@ function TriggerRow({
         <div className="mt-3 pt-3 border-t text-sm">
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
-              <span className="text-muted-foreground">Villkor:</span>{' '}
+              <span className="text-muted-foreground">{t('details.condition')}:</span>{' '}
               <code className="bg-muted px-1 rounded">{trigger.when.type}</code>
             </div>
             <div>
-              <span className="text-muted-foreground">Åtgärder:</span>{' '}
-              {trigger.then.length} st
+              <span className="text-muted-foreground">{t('details.actions')}:</span>{' '}
+              {t('details.actionsCount', { count: trigger.then.length })}
             </div>
             {trigger.delaySeconds && trigger.delaySeconds > 0 && (
               <div>
-                <span className="text-muted-foreground">Fördröjning:</span>{' '}
+                <span className="text-muted-foreground">{t('details.delay')}:</span>{' '}
                 {trigger.delaySeconds}s
               </div>
             )}
             {trigger.errorCount > 0 && (
               <div>
-                <span className="text-muted-foreground">Fel totalt:</span>{' '}
+                <span className="text-muted-foreground">{t('details.totalErrors')}:</span>{' '}
                 {trigger.errorCount}
               </div>
             )}
@@ -336,7 +339,7 @@ function TriggerRow({
 
           {/* Actions list */}
           <div className="mt-2">
-            <div className="text-xs text-muted-foreground mb-1">Åtgärder:</div>
+            <div className="text-xs text-muted-foreground mb-1">{t('details.actions')}:</div>
             <div className="space-y-1">
               {trigger.then.map((action, i) => (
                 <div
@@ -364,6 +367,7 @@ interface TriggerGroupSectionProps {
   onDisableTrigger: (id: string) => Promise<void>;
   onRearmTrigger: (id: string) => Promise<void>;
   loadingTriggerId: string | null;
+  t: ReturnType<typeof useTranslations<'play.triggerLivePanel'>>;
 }
 
 function TriggerGroupSection({
@@ -372,6 +376,7 @@ function TriggerGroupSection({
   onDisableTrigger,
   onRearmTrigger,
   loadingTriggerId,
+  t,
 }: TriggerGroupSectionProps) {
   const [isOpen, setIsOpen] = useState(
     group.status === 'armed' || group.status === 'error'
@@ -390,7 +395,7 @@ function TriggerGroupSection({
             <ChevronRightIcon className="h-4 w-4" />
           )}
           {group.icon}
-          <span className="font-medium">{group.label}</span>
+          <span className="font-medium">{t(`groups.${group.labelKey}` as Parameters<typeof t>[0])}</span>
           <Badge variant={group.variant} className="ml-auto">
             {group.triggers.length}
           </Badge>
@@ -406,6 +411,7 @@ function TriggerGroupSection({
             onDisable={() => onDisableTrigger(trigger.id)}
             onRearm={() => onRearmTrigger(trigger.id)}
             isLoading={loadingTriggerId === trigger.id}
+            t={t}
           />
         ))}
       </CollapsibleContent>
@@ -428,13 +434,14 @@ export function TriggerLivePanel({
   compact = false,
   className,
 }: TriggerLivePanelProps) {
+  const t = useTranslations('play.triggerLivePanel');
   const [loadingTriggerId, setLoadingTriggerId] = useState<string | null>(null);
   const [isKillSwitchLoading, setIsKillSwitchLoading] = useState(false);
 
   const groups = useMemo(() => groupTriggers(triggers), [triggers]);
 
-  const armedCount = triggers.filter((t) => t.status === 'armed').length;
-  const errorCount = triggers.filter((t) => t.status === 'error').length;
+  const armedCount = triggers.filter((tr) => tr.status === 'armed').length;
+  const errorCount = triggers.filter((tr) => tr.status === 'error').length;
 
   const handleFireTrigger = useCallback(
     async (id: string) => {
@@ -499,11 +506,11 @@ export function TriggerLivePanel({
         <BoltIcon className="h-4 w-4" />
         <span className="text-sm font-medium">Triggers</span>
         <Badge variant={armedCount > 0 ? 'default' : 'outline'}>
-          {armedCount} redo
+          {t('readyCount', { count: armedCount })}
         </Badge>
         {errorCount > 0 && (
           <Badge variant="destructive">
-            {errorCount} fel
+            {t('errorCount', { count: errorCount })}
           </Badge>
         )}
       </div>
@@ -522,17 +529,17 @@ export function TriggerLivePanel({
           <div className="flex items-center gap-2">
             {/* Stats badges */}
             <Badge variant={armedCount > 0 ? 'default' : 'outline'}>
-              {armedCount} redo
+              {t('readyCount', { count: armedCount })}
             </Badge>
             {errorCount > 0 && (
               <Badge variant="destructive">
-                {errorCount} fel
+                {t('errorCount', { count: errorCount })}
               </Badge>
             )}
           </div>
         </div>
         <CardDescription>
-          {triggers.length} triggers • Automatiserade händelser
+          {t('description', { count: triggers.length })}
         </CardDescription>
       </CardHeader>
 
@@ -550,29 +557,27 @@ export function TriggerLivePanel({
                     className="gap-1"
                   >
                     <ShieldExclamationIcon className="h-4 w-4" />
-                    Nödstopp
+                    {t('emergencyStop')}
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Inaktivera alla triggers?</AlertDialogTitle>
+                    <AlertDialogTitle>{t('dialog.title')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Detta kommer att inaktivera alla {armedCount} aktiva triggers.
-                      Inga automatiska händelser kommer att köras.
-                      Du kan återaktivera dem manuellt efteråt.
+                      {t('dialog.description', { count: armedCount })}
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
-                    <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                    <AlertDialogCancel>{t('dialog.cancel')}</AlertDialogCancel>
                     <AlertDialogAction onClick={handleDisableAll}>
-                      Ja, inaktivera alla
+                      {t('dialog.confirm')}
                     </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
             )}
 
-            {onRearmAll && armedCount < triggers.filter((t) => t.enabled).length && (
+            {onRearmAll && armedCount < triggers.filter((tr) => tr.enabled).length && (
               <Button
                 variant="outline"
                 size="sm"
@@ -581,14 +586,14 @@ export function TriggerLivePanel({
                 className="gap-1"
               >
                 <ShieldCheckIcon className="h-4 w-4" />
-                Återaktivera alla
+                {t('rearmAll')}
               </Button>
             )}
 
             {killSwitchActive && (
               <div className="flex items-center gap-1 text-sm text-destructive ml-auto">
                 <ExclamationTriangleIcon className="h-4 w-4" />
-                Nödstopp aktivt
+                {t('emergencyStopActive')}
               </div>
             )}
           </div>
@@ -598,7 +603,7 @@ export function TriggerLivePanel({
         {groups.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <BoltIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p>Inga triggers i denna session</p>
+            <p>{t('noTriggersInSession')}</p>
           </div>
         ) : (
           <div className="space-y-2">
@@ -610,6 +615,7 @@ export function TriggerLivePanel({
                 onDisableTrigger={handleDisableTrigger}
                 onRearmTrigger={handleRearmTrigger}
                 loadingTriggerId={loadingTriggerId}
+                t={t}
               />
             ))}
           </div>

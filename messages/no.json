@@ -1606,6 +1606,187 @@
       "pause": "Pause",
       "reset": "Tilbakestill"
     },
+    "stepPhaseNavigation": {
+      "steps": {
+        "title": "Steg",
+        "label": "Steg",
+        "notStartedMessage": "Stegene har ikke startet ennå. Klikk på knappen nedenfor for å starte første steg.",
+        "startFirst": "Start første steg",
+        "first": "Første steg",
+        "last": "Siste steg",
+        "goTo": "Gå til steg {number}",
+        "stepN": "Steg {number}"
+      },
+      "phases": {
+        "title": "Fase",
+        "label": "Fase",
+        "notStartedMessage": "Fasene har ikke startet ennå. Klikk på knappen nedenfor for å starte første fase.",
+        "startFirst": "Start første fase",
+        "startPhase": "Start fase",
+        "goTo": "Gå til fase {number}",
+        "phaseN": "Fase {number}"
+      },
+      "notStarted": "Ikke startet",
+      "ofTotal": "{current} av {total}",
+      "previous": "Forrige",
+      "next": "Neste",
+      "startGame": "Start spill",
+      "description": "Beskrivelse",
+      "leaderScript": "Ledermanus"
+    },
+    "timeBankLivePanel": {
+      "paused": "Pauset",
+      "pause": "Pause",
+      "resume": "Fortsett",
+      "resetToStart": "Tilbakestill til start",
+      "status": {
+        "critical": "Kritisk tidsnivå!",
+        "warning": "Tiden er snart ute",
+        "good": "God tidsmargin"
+      },
+      "noAdjustmentsYet": "Ingen justeringer ennå",
+      "manualAdjustment": "Manuell justering",
+      "quickAdjustment": "Hurtigjustering",
+      "customAdjustment": "Tilpasset justering",
+      "history": "Historikk",
+      "recentTrend": "Nylig trend: {time} (siste 5 hendelser)",
+      "tooltips": {
+        "plus30seconds": "+30 sekunder",
+        "minus30seconds": "-30 sekunder",
+        "addSeconds": "Legg til {count} sekunder",
+        "subtractSeconds": "Trekk fra {count} sekunder"
+      },
+      "placeholders": {
+        "seconds": "Sekunder (+/-)",
+        "reason": "Årsak (valgfritt)"
+      }
+    },
+    "triggerLivePanel": {
+      "readyCount": "{count} klar",
+      "errorCount": "{count} feil",
+      "description": "{count} triggere • Automatiserte hendelser",
+      "emergencyStop": "Nødstopp",
+      "emergencyStopActive": "Nødstopp aktiv",
+      "rearmAll": "Reaktiver alle",
+      "noTriggersInSession": "Ingen triggere i denne økten",
+      "firedCount": "Aktivert {count}×",
+      "groups": {
+        "armed": "Klar",
+        "error": "Feil",
+        "fired": "Aktiverte",
+        "disabled": "Deaktiverte"
+      },
+      "conditions": {
+        "stepStarted": "Steg startet",
+        "stepCompleted": "Steg fullført",
+        "phaseStarted": "Fase startet",
+        "phaseCompleted": "Fase fullført",
+        "keypadCorrect": "Riktig kode",
+        "keypadFailed": "Feil kode",
+        "artifactUnlocked": "Artefakt låst opp",
+        "timerEnded": "Timer slutt",
+        "manual": "Manuell",
+        "signalReceived": "Signal mottatt",
+        "counterReached": "Teller nådd",
+        "riddleCorrect": "Gåte løst",
+        "timeBankExpired": "Tidsbank utløpt",
+        "signalGenerator": "Signalgenerator"
+      },
+      "tooltips": {
+        "fireNow": "Aktiver nå",
+        "disable": "Deaktiver",
+        "clearErrorRearm": "Fjern feil & reaktiver",
+        "rearm": "Reaktiver",
+        "resetCanFire": "Tilbakestill (kan aktiveres igjen)"
+      },
+      "details": {
+        "condition": "Vilkår",
+        "actions": "Handlinger",
+        "actionsCount": "{count} stk",
+        "delay": "Forsinkelse",
+        "totalErrors": "Feil totalt"
+      },
+      "dialog": {
+        "title": "Deaktiver alle triggere?",
+        "description": "Dette vil deaktivere alle {count} aktive triggere. Ingen automatiserte hendelser vil kjøre. Du kan reaktivere dem manuelt etterpå.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, deaktiver alle"
+      }
+    },
+    "puzzleArtifactRenderer": {
+      "errors": {
+        "puzzleLocked": "Puslespillet er låst av spillederen"
+      },
+      "status": {
+        "solved": "Løst",
+        "locked": "Låst",
+        "unsolved": "Uløst",
+        "done": "Ferdig!",
+        "verified": "Verifisert",
+        "verifiedExclaim": "Verifisert!",
+        "solvedExclaim": "Løst!"
+      },
+      "riddle": {
+        "title": "Gåte",
+        "correctAnswer": "Riktig svar!",
+        "lockedTooManyAttempts": "Låst - for mange forsøk"
+      },
+      "counter": {
+        "title": "Teller"
+      },
+      "audio": {
+        "title": "Lydklipp",
+        "notConfigured": "Lydklipp ikke konfigurert",
+        "listened": "Lyttet"
+      },
+      "qr": {
+        "title": "Skann QR-kode",
+        "promptText": "Skann QR-koden",
+        "verified": "QR-kode verifisert!"
+      },
+      "hint": {
+        "title": "Tips",
+        "count": "{revealed}/{total} tips"
+      },
+      "hotspot": {
+        "title": "Finn i bilde",
+        "notConfigured": "Hotspot-bilde ikke konfigurert"
+      },
+      "tilePuzzle": {
+        "title": "Puslespill"
+      },
+      "logicGrid": {
+        "title": "Logikkpuslespill",
+        "grid": "Logikkrutenett",
+        "rows": "Rader",
+        "columns": "Kolonner"
+      },
+      "prop": {
+        "confirmed": "Bekreftet",
+        "waiting": "Venter...",
+        "notConfirmed": "Ikke bekreftet"
+      },
+      "location": {
+        "title": "Stedsverifisering"
+      },
+      "sound": {
+        "title": "Lydaktivering",
+        "defaultInstruction": "Lag en lyd!"
+      },
+      "signal": {
+        "defaultLabel": "Signal",
+        "sources": "{count} signalkilder",
+        "badge": "Signal"
+      },
+      "timeBank": {
+        "title": "Tid igjen",
+        "paused": "Pauset",
+        "expired": "Tiden er ute!"
+      },
+      "empty": {
+        "contentComingSoon": "Innhold kommer snart..."
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Noe gikk galt",

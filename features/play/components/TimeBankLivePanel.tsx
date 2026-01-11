@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -116,9 +117,10 @@ interface BalanceDisplayProps {
   maxBalance: number;
   paused: boolean;
   compact?: boolean;
+  t: ReturnType<typeof useTranslations<'play.timeBankLivePanel'>>;
 }
 
-function BalanceDisplay({ balance, maxBalance, paused, compact }: BalanceDisplayProps) {
+function BalanceDisplay({ balance, maxBalance, paused, compact, t }: BalanceDisplayProps) {
   const status = getBalanceStatus(balance, maxBalance);
   const percentage = Math.min(100, Math.max(0, (balance / maxBalance) * 100));
   
@@ -146,7 +148,7 @@ function BalanceDisplay({ balance, maxBalance, paused, compact }: BalanceDisplay
         {paused && (
           <Badge variant="outline" className="text-xs">
             <PauseIcon className="h-3 w-3 mr-1" />
-            Pausad
+            {t('paused')}
           </Badge>
         )}
       </div>
@@ -168,7 +170,7 @@ function BalanceDisplay({ balance, maxBalance, paused, compact }: BalanceDisplay
         {paused && (
           <Badge variant="outline" className="h-8">
             <PauseIcon className="h-4 w-4 mr-1" />
-            Pausad
+            {t('paused')}
           </Badge>
         )}
       </div>
@@ -186,19 +188,19 @@ function BalanceDisplay({ balance, maxBalance, paused, compact }: BalanceDisplay
         {status === 'critical' && (
           <>
             <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
-            <span className="text-red-500 font-medium">Kritisk tidsnivå!</span>
+            <span className="text-red-500 font-medium">{t('status.critical')}</span>
           </>
         )}
         {status === 'warning' && (
           <>
             <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />
-            <span className="text-yellow-500">Tiden är snart slut</span>
+            <span className="text-yellow-500">{t('status.warning')}</span>
           </>
         )}
         {status === 'good' && (
           <span className="text-green-500">
             <ArrowTrendingUpIcon className="h-4 w-4 inline mr-1" />
-            Bra tidsmarginal
+            {t('status.good')}
           </span>
         )}
       </div>
@@ -213,13 +215,14 @@ function BalanceDisplay({ balance, maxBalance, paused, compact }: BalanceDisplay
 interface LedgerHistoryProps {
   ledger: TimeBankEntry[];
   maxItems?: number;
+  t: ReturnType<typeof useTranslations<'play.timeBankLivePanel'>>;
 }
 
-function LedgerHistory({ ledger, maxItems = 5 }: LedgerHistoryProps) {
+function LedgerHistory({ ledger, maxItems = 5, t }: LedgerHistoryProps) {
   if (ledger.length === 0) {
     return (
       <div className="text-xs text-muted-foreground text-center py-2">
-        Inga justeringar ännu
+        {t('noAdjustmentsYet')}
       </div>
     );
   }
@@ -241,7 +244,7 @@ function LedgerHistory({ ledger, maxItems = 5 }: LedgerHistoryProps) {
               <ArrowTrendingDownIcon className="h-3 w-3 text-red-500 flex-shrink-0" />
             )}
             <span className="truncate text-muted-foreground">
-              {entry.reason || 'Manuell justering'}
+              {entry.reason || t('manualAdjustment')}
             </span>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -273,22 +276,23 @@ export function TimeBankLivePanel({
   compact = false,
   className,
 }: TimeBankLivePanelProps) {
+  const t = useTranslations('play.timeBankLivePanel');
   const [customDelta, setCustomDelta] = useState<string>('');
   const [customReason, setCustomReason] = useState<string>('');
   const [showHistory, setShowHistory] = useState(false);
   
   const handleQuickAdjust = useCallback((delta: number) => {
-    onApplyDelta(delta, `Snabbjustering: ${formatTime(delta, true)}`);
-  }, [onApplyDelta]);
+    onApplyDelta(delta, `${t('quickAdjustment')}: ${formatTime(delta, true)}`);
+  }, [onApplyDelta, t]);
   
   const handleCustomAdjust = useCallback(() => {
     const delta = parseInt(customDelta);
     if (isNaN(delta) || delta === 0) return;
     
-    onApplyDelta(delta, customReason || 'Manuell justering');
+    onApplyDelta(delta, customReason || t('manualAdjustment'));
     setCustomDelta('');
     setCustomReason('');
-  }, [customDelta, customReason, onApplyDelta]);
+  }, [customDelta, customReason, onApplyDelta, t]);
   
   // Calculate recent trend
   const recentTrend = useMemo(() => {
@@ -306,10 +310,11 @@ export function TimeBankLivePanel({
           maxBalance={state.rules.maxBalance ?? 600}
           paused={state.paused}
           compact
+          t={t}
         />
         
         <div className="flex items-center gap-1">
-          <Tooltip content="+30 sekunder">
+          <Tooltip content={t('tooltips.plus30seconds')}>
             <Button
               variant="ghost"
               size="sm"
@@ -320,7 +325,7 @@ export function TimeBankLivePanel({
             </Button>
           </Tooltip>
           
-          <Tooltip content="-30 sekunder">
+          <Tooltip content={t('tooltips.minus30seconds')}>
             <Button
               variant="ghost"
               size="sm"
@@ -331,7 +336,7 @@ export function TimeBankLivePanel({
             </Button>
           </Tooltip>
           
-          <Tooltip content={state.paused ? 'Återuppta' : 'Pausa'}>
+          <Tooltip content={state.paused ? t('resume') : t('pause')}>
             <Button
               variant="ghost"
               size="sm"
@@ -370,18 +375,18 @@ export function TimeBankLivePanel({
               {state.paused ? (
                 <>
                   <PlayIcon className="h-4 w-4 mr-1" />
-                  Återuppta
+                  {t('resume')}
                 </>
               ) : (
                 <>
                   <PauseIcon className="h-4 w-4 mr-1" />
-                  Pausa
+                  {t('pause')}
                 </>
               )}
             </Button>
             
             {onReset && (
-              <Tooltip content="Återställ till start">
+              <Tooltip content={t('resetToStart')}>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -402,12 +407,13 @@ export function TimeBankLivePanel({
           balance={state.balance}
           maxBalance={state.rules.maxBalance ?? 600}
           paused={state.paused}
+          t={t}
         />
         
         {/* Quick adjustments */}
         <div className="grid grid-cols-6 gap-2">
           {QUICK_ADJUSTMENTS.map((adj) => (
-            <Tooltip key={adj.delta} content={`${adj.delta > 0 ? 'Lägg till' : 'Dra av'} ${Math.abs(adj.delta)} sekunder`}>
+            <Tooltip key={adj.delta} content={adj.delta > 0 ? t('tooltips.addSeconds', { count: Math.abs(adj.delta) }) : t('tooltips.subtractSeconds', { count: Math.abs(adj.delta) })}>
               <Button
                 variant="outline"
                 size="sm"
@@ -427,20 +433,20 @@ export function TimeBankLivePanel({
         {/* Custom adjustment */}
         <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
           <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Anpassad justering
+            {t('customAdjustment')}
           </div>
           <div className="flex gap-2">
             <Input
               type="number"
               value={customDelta}
               onChange={(e) => setCustomDelta(e.target.value)}
-              placeholder="Sekunder (+/-)"
+              placeholder={t('placeholders.seconds')}
               className="w-24"
             />
             <Input
               value={customReason}
               onChange={(e) => setCustomReason(e.target.value)}
-              placeholder="Anledning (valfri)"
+              placeholder={t('placeholders.reason')}
               className="flex-1"
             />
             <Button
@@ -463,7 +469,7 @@ export function TimeBankLivePanel({
           >
             <span className="flex items-center gap-2">
               <ClipboardDocumentListIcon className="h-4 w-4" />
-              Historik
+              {t('history')}
               <Badge variant="outline" className="text-xs">
                 {state.ledger.length}
               </Badge>
@@ -473,7 +479,7 @@ export function TimeBankLivePanel({
           
           {showHistory && (
             <div className="pt-2">
-              <LedgerHistory ledger={state.ledger} maxItems={8} />
+              <LedgerHistory ledger={state.ledger} maxItems={8} t={t} />
             </div>
           )}
         </div>
@@ -490,7 +496,7 @@ export function TimeBankLivePanel({
               <ArrowTrendingDownIcon className="h-3 w-3" />
             )}
             <span>
-              Senaste trend: {formatTime(recentTrend, true)} (senaste 5 händelser)
+              {t('recentTrend', { time: formatTime(recentTrend, true) })}
             </span>
           </div>
         )}

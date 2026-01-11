@@ -1602,6 +1602,187 @@
       "pause": "Pausa",
       "reset": "Återställ"
     },
+    "stepPhaseNavigation": {
+      "steps": {
+        "title": "Steg",
+        "label": "Steg",
+        "notStartedMessage": "Stegen har inte startats ännu. Klicka på knappen nedan för att starta första steget.",
+        "startFirst": "Starta första steget",
+        "first": "Första steget",
+        "last": "Sista steget",
+        "goTo": "Gå till steg {number}",
+        "stepN": "Steg {number}"
+      },
+      "phases": {
+        "title": "Fas",
+        "label": "Fas",
+        "notStartedMessage": "Faserna har inte startats ännu. Klicka på knappen nedan för att starta första fasen.",
+        "startFirst": "Starta första fasen",
+        "startPhase": "Starta fas",
+        "goTo": "Gå till fas {number}",
+        "phaseN": "Fas {number}"
+      },
+      "notStarted": "Ej startat",
+      "ofTotal": "{current} av {total}",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "startGame": "Starta spelet",
+      "description": "Beskrivning",
+      "leaderScript": "Ledarskript"
+    },
+    "timeBankLivePanel": {
+      "paused": "Pausad",
+      "pause": "Pausa",
+      "resume": "Återuppta",
+      "resetToStart": "Återställ till start",
+      "status": {
+        "critical": "Kritisk tidsnivå!",
+        "warning": "Tiden är snart slut",
+        "good": "Bra tidsmarginal"
+      },
+      "noAdjustmentsYet": "Inga justeringar ännu",
+      "manualAdjustment": "Manuell justering",
+      "quickAdjustment": "Snabbjustering",
+      "customAdjustment": "Anpassad justering",
+      "history": "Historik",
+      "recentTrend": "Senaste trend: {time} (senaste 5 händelser)",
+      "tooltips": {
+        "plus30seconds": "+30 sekunder",
+        "minus30seconds": "-30 sekunder",
+        "addSeconds": "Lägg till {count} sekunder",
+        "subtractSeconds": "Dra av {count} sekunder"
+      },
+      "placeholders": {
+        "seconds": "Sekunder (+/-)",
+        "reason": "Anledning (valfri)"
+      }
+    },
+    "triggerLivePanel": {
+      "readyCount": "{count} redo",
+      "errorCount": "{count} fel",
+      "description": "{count} triggers • Automatiserade händelser",
+      "emergencyStop": "Nödstopp",
+      "emergencyStopActive": "Nödstopp aktivt",
+      "rearmAll": "Återaktivera alla",
+      "noTriggersInSession": "Inga triggers i denna session",
+      "firedCount": "Aktiverad {count}×",
+      "groups": {
+        "armed": "Redo",
+        "error": "Fel",
+        "fired": "Aktiverade",
+        "disabled": "Inaktiverade"
+      },
+      "conditions": {
+        "stepStarted": "Steg startat",
+        "stepCompleted": "Steg klart",
+        "phaseStarted": "Fas startad",
+        "phaseCompleted": "Fas klar",
+        "keypadCorrect": "Rätt kod",
+        "keypadFailed": "Fel kod",
+        "artifactUnlocked": "Artefakt upplåst",
+        "timerEnded": "Timer slut",
+        "manual": "Manuell",
+        "signalReceived": "Signal mottagen",
+        "counterReached": "Räknare nådd",
+        "riddleCorrect": "Gåta löst",
+        "timeBankExpired": "Tidsbank slut",
+        "signalGenerator": "Signalgenerator"
+      },
+      "tooltips": {
+        "fireNow": "Aktivera nu",
+        "disable": "Inaktivera",
+        "clearErrorRearm": "Rensa fel & återaktivera",
+        "rearm": "Återaktivera",
+        "resetCanFire": "Återställ (kan aktiveras igen)"
+      },
+      "details": {
+        "condition": "Villkor",
+        "actions": "Åtgärder",
+        "actionsCount": "{count} st",
+        "delay": "Fördröjning",
+        "totalErrors": "Fel totalt"
+      },
+      "dialog": {
+        "title": "Inaktivera alla triggers?",
+        "description": "Detta kommer att inaktivera alla {count} aktiva triggers. Inga automatiska händelser kommer att köras. Du kan återaktivera dem manuellt efteråt.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, inaktivera alla"
+      }
+    },
+    "puzzleArtifactRenderer": {
+      "errors": {
+        "puzzleLocked": "Pusslet är låst av spelledaren"
+      },
+      "status": {
+        "solved": "Löst",
+        "locked": "Låst",
+        "unsolved": "Olöst",
+        "done": "Klart!",
+        "verified": "Verifierad",
+        "verifiedExclaim": "Verifierad!",
+        "solvedExclaim": "Löst!"
+      },
+      "riddle": {
+        "title": "Gåta",
+        "correctAnswer": "Rätt svar!",
+        "lockedTooManyAttempts": "Låst - för många försök"
+      },
+      "counter": {
+        "title": "Räknare"
+      },
+      "audio": {
+        "title": "Ljudklipp",
+        "notConfigured": "Ljudklipp ej konfigurerat",
+        "listened": "Lyssnat"
+      },
+      "qr": {
+        "title": "Skanna QR-kod",
+        "promptText": "Skanna QR-koden",
+        "verified": "QR-kod verifierad!"
+      },
+      "hint": {
+        "title": "Tips",
+        "count": "{revealed}/{total} tips"
+      },
+      "hotspot": {
+        "title": "Hitta i bilden",
+        "notConfigured": "Hotspot-bild ej konfigurerad"
+      },
+      "tilePuzzle": {
+        "title": "Pusselspel"
+      },
+      "logicGrid": {
+        "title": "Logikpussel",
+        "grid": "Logikrutnät",
+        "rows": "Rader",
+        "columns": "Kolumner"
+      },
+      "prop": {
+        "confirmed": "Bekräftad",
+        "waiting": "Väntar...",
+        "notConfirmed": "Ej bekräftad"
+      },
+      "location": {
+        "title": "Platsverifiering"
+      },
+      "sound": {
+        "title": "Ljudaktivering",
+        "defaultInstruction": "Gör ljud!"
+      },
+      "signal": {
+        "defaultLabel": "Signal",
+        "sources": "{count} signalkällor",
+        "badge": "Signal"
+      },
+      "timeBank": {
+        "title": "Tid kvar",
+        "paused": "Pausad",
+        "expired": "Tiden är ute!"
+      },
+      "empty": {
+        "contentComingSoon": "Innehåll kommer snart..."
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Något gick fel",

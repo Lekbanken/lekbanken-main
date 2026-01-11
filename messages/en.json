@@ -1606,6 +1606,187 @@
       "pause": "Pause",
       "reset": "Reset"
     },
+    "stepPhaseNavigation": {
+      "steps": {
+        "title": "Steps",
+        "label": "Step",
+        "notStartedMessage": "Steps have not started yet. Click the button below to start the first step.",
+        "startFirst": "Start first step",
+        "first": "First step",
+        "last": "Last step",
+        "goTo": "Go to step {number}",
+        "stepN": "Step {number}"
+      },
+      "phases": {
+        "title": "Phase",
+        "label": "Phase",
+        "notStartedMessage": "Phases have not started yet. Click the button below to start the first phase.",
+        "startFirst": "Start first phase",
+        "startPhase": "Start phase",
+        "goTo": "Go to phase {number}",
+        "phaseN": "Phase {number}"
+      },
+      "notStarted": "Not started",
+      "ofTotal": "{current} of {total}",
+      "previous": "Previous",
+      "next": "Next",
+      "startGame": "Start game",
+      "description": "Description",
+      "leaderScript": "Leader script"
+    },
+    "timeBankLivePanel": {
+      "paused": "Paused",
+      "pause": "Pause",
+      "resume": "Resume",
+      "resetToStart": "Reset to start",
+      "status": {
+        "critical": "Critical time level!",
+        "warning": "Time is almost up",
+        "good": "Good time margin"
+      },
+      "noAdjustmentsYet": "No adjustments yet",
+      "manualAdjustment": "Manual adjustment",
+      "quickAdjustment": "Quick adjustment",
+      "customAdjustment": "Custom adjustment",
+      "history": "History",
+      "recentTrend": "Recent trend: {time} (last 5 events)",
+      "tooltips": {
+        "plus30seconds": "+30 seconds",
+        "minus30seconds": "-30 seconds",
+        "addSeconds": "Add {count} seconds",
+        "subtractSeconds": "Subtract {count} seconds"
+      },
+      "placeholders": {
+        "seconds": "Seconds (+/-)",
+        "reason": "Reason (optional)"
+      }
+    },
+    "triggerLivePanel": {
+      "readyCount": "{count} ready",
+      "errorCount": "{count} error",
+      "description": "{count} triggers • Automated events",
+      "emergencyStop": "Emergency stop",
+      "emergencyStopActive": "Emergency stop active",
+      "rearmAll": "Rearm all",
+      "noTriggersInSession": "No triggers in this session",
+      "firedCount": "Fired {count}×",
+      "groups": {
+        "armed": "Ready",
+        "error": "Error",
+        "fired": "Fired",
+        "disabled": "Disabled"
+      },
+      "conditions": {
+        "stepStarted": "Step started",
+        "stepCompleted": "Step completed",
+        "phaseStarted": "Phase started",
+        "phaseCompleted": "Phase completed",
+        "keypadCorrect": "Correct code",
+        "keypadFailed": "Wrong code",
+        "artifactUnlocked": "Artifact unlocked",
+        "timerEnded": "Timer ended",
+        "manual": "Manual",
+        "signalReceived": "Signal received",
+        "counterReached": "Counter reached",
+        "riddleCorrect": "Riddle solved",
+        "timeBankExpired": "Time bank expired",
+        "signalGenerator": "Signal generator"
+      },
+      "tooltips": {
+        "fireNow": "Fire now",
+        "disable": "Disable",
+        "clearErrorRearm": "Clear error & rearm",
+        "rearm": "Rearm",
+        "resetCanFire": "Reset (can fire again)"
+      },
+      "details": {
+        "condition": "Condition",
+        "actions": "Actions",
+        "actionsCount": "{count} pcs",
+        "delay": "Delay",
+        "totalErrors": "Total errors"
+      },
+      "dialog": {
+        "title": "Disable all triggers?",
+        "description": "This will disable all {count} active triggers. No automated events will run. You can rearm them manually afterwards.",
+        "cancel": "Cancel",
+        "confirm": "Yes, disable all"
+      }
+    },
+    "puzzleArtifactRenderer": {
+      "errors": {
+        "puzzleLocked": "Puzzle is locked by the game master"
+      },
+      "status": {
+        "solved": "Solved",
+        "locked": "Locked",
+        "unsolved": "Unsolved",
+        "done": "Done!",
+        "verified": "Verified",
+        "verifiedExclaim": "Verified!",
+        "solvedExclaim": "Solved!"
+      },
+      "riddle": {
+        "title": "Riddle",
+        "correctAnswer": "Correct answer!",
+        "lockedTooManyAttempts": "Locked - too many attempts"
+      },
+      "counter": {
+        "title": "Counter"
+      },
+      "audio": {
+        "title": "Audio clip",
+        "notConfigured": "Audio clip not configured",
+        "listened": "Listened"
+      },
+      "qr": {
+        "title": "Scan QR code",
+        "promptText": "Scan the QR code",
+        "verified": "QR code verified!"
+      },
+      "hint": {
+        "title": "Hints",
+        "count": "{revealed}/{total} hints"
+      },
+      "hotspot": {
+        "title": "Find in image",
+        "notConfigured": "Hotspot image not configured"
+      },
+      "tilePuzzle": {
+        "title": "Tile puzzle"
+      },
+      "logicGrid": {
+        "title": "Logic puzzle",
+        "grid": "Logic grid",
+        "rows": "Rows",
+        "columns": "Columns"
+      },
+      "prop": {
+        "confirmed": "Confirmed",
+        "waiting": "Waiting...",
+        "notConfirmed": "Not confirmed"
+      },
+      "location": {
+        "title": "Location verification"
+      },
+      "sound": {
+        "title": "Sound activation",
+        "defaultInstruction": "Make a sound!"
+      },
+      "signal": {
+        "defaultLabel": "Signal",
+        "sources": "{count} signal sources",
+        "badge": "Signal"
+      },
+      "timeBank": {
+        "title": "Time remaining",
+        "paused": "Paused",
+        "expired": "Time is up!"
+      },
+      "empty": {
+        "contentComingSoon": "Content coming soon..."
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Something went wrong",

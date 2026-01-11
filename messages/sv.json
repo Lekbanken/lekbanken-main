@@ -853,18 +853,29 @@
         "settings": "Inställningar"
       },
       "errors": {
-        "somethingWentWrong": "Något gick fel"
+        "somethingWentWrong": "Något gick fel",
+        "couldNotFetchSession": "Kunde inte hämta session",
+        "couldNotLoadRoles": "Kunde inte ladda roller",
+        "assignRolesFirst": "Tilldela roller först (tilldelade {assigned} av {total}).",
+        "cannotLockAgain": "Kan inte låsa igen: minst en deltagare har redan visat sina hemligheter.",
+        "couldNotSetNextStarter": "Kunde inte sätta nästa startare",
+        "couldNotSetPosition": "Kunde inte sätta position",
+        "couldNotStartPlayMode": "Kunde inte starta spelläge",
+        "couldNotSaveSettings": "Kunde inte spara inställningar",
+        "couldNotResetOverrides": "Kunde inte återställa overrides"
       },
-      "participants": {
-        "title": "Deltagare",
-        "count": "Deltagare ({count})"
+      "toast": {
+        "settingsSaved": "Sessionens inställningar sparades",
+        "overridesReset": "Overrides återställda",
+        "rolesSaved": "Roller sparade för sessionen"
       },
       "share": {
         "title": "Dela session",
         "participantsGoTo": "Deltagare går till",
         "copied": "Kopierad!",
         "share": "Dela",
-        "qrCode": "QR-kod"
+        "qrCode": "QR-kod",
+        "joinSessionText": "Gå med i sessionen! Kod: {code}"
       },
       "roles": {
         "title": "Roller",
@@ -976,6 +987,107 @@
         }
       }
     },
+    "playPage": {
+      "errors": {
+        "noGameSelected": "Ingen lek vald",
+        "selectGame": "Välj en lek att spela.",
+        "cannotPlay": "Denna lek kan inte spelas just nu",
+        "notPublished": "Spelet är antingen inte publicerat eller så saknas behörighet.",
+        "couldNotLoad": "Kunde inte ladda passet",
+        "checkConnection": "Kontrollera uppkoppling eller försök igen."
+      },
+      "timer": {
+        "pause": "Pausa tid",
+        "continue": "Fortsätt",
+        "start": "Starta tid"
+      },
+      "meta": {
+        "environment": "Miljö",
+        "group": "Grupp",
+        "age": "Ålder",
+        "participants": "deltagare",
+        "years": "år"
+      },
+      "tips": {
+        "title": "Tips för sessionen",
+        "hideUI": "Skjut undan UI-krom när du läser upp instruktioner.",
+        "planReserve": "Planera 1-2 reservlekar i Planner och byt med ett tryck.",
+        "keepBright": "Behåll skärmen ljus och textstorlek stor utomhus."
+      },
+      "actions": {
+        "switchGame": "Byt lek",
+        "reset": "Nollställ"
+      }
+    },
+    "playPlanPage": {
+      "errors": {
+        "noPlanSelected": "Ingen plan vald",
+        "selectPlan": "Välj en plan att spela.",
+        "cannotPlay": "Denna plan kan inte spelas just nu",
+        "notPublished": "Planen saknas eller så har du inte behörighet.",
+        "couldNotLoad": "Kunde inte ladda passet",
+        "checkConnection": "Kontrollera uppkoppling eller försök igen."
+      },
+      "timer": {
+        "pause": "Pausa tid",
+        "continue": "Fortsätt",
+        "start": "Starta tid"
+      },
+      "meta": {
+        "duration": "Längd",
+        "minutes": "min"
+      },
+      "tips": {
+        "title": "Tips för passet",
+        "reviewSteps": "Gå igenom varje steg innan du startar timern.",
+        "adjustPlan": "Justera planen på plats: hoppa över block eller korta steg vid behov.",
+        "trackMaterials": "Håll koll på materialtaggar i första steget per lek."
+      },
+      "actions": {
+        "reset": "Nollställ"
+      },
+      "defaults": {
+        "continueWhenReady": "Fortsätt när gruppen är redo."
+      }
+    },
+    "decisionsPanel": {
+      "loading": "Laddar beslut…",
+      "title": "Beslut",
+      "description": "Skapa ett beslut och öppna röstning (single-choice).",
+      "errors": {
+        "titleRequired": "Titel krävs",
+        "minOptionsRequired": "Minst två alternativ krävs",
+        "couldNotLoad": "Kunde inte ladda beslut",
+        "couldNotCreate": "Kunde inte skapa beslut",
+        "couldNotUpdate": "Kunde inte uppdatera beslut"
+      },
+      "labels": {
+        "title": "Titel",
+        "prompt": "Prompt",
+        "options": "Alternativ"
+      },
+      "placeholders": {
+        "title": "Ex: Vad gör ni nu?",
+        "prompt": "Valfri kontext…"
+      },
+      "actions": {
+        "addOption": "Lägg till",
+        "createDecision": "Skapa beslut",
+        "openVoting": "Öppna röstning",
+        "close": "Stäng",
+        "reopenVoting": "Öppna igen",
+        "revealResults": "Reveal resultat",
+        "updateResults": "Uppdatera resultat"
+      },
+      "empty": {
+        "title": "Inga beslut skapade",
+        "description": "Skapa ett beslut ovan för att låta deltagarna rösta under sessionen.",
+        "flowHint": "Beslut går genom: Utkast → Öppen röstning → Stängd → Resultat visas"
+      },
+      "results": {
+        "title": "Resultat"
+      }
+    },
     "facilitator": {
       "dashboard": "Instrumentpanel",
       "participants": "Deltagare",
@@ -987,6 +1099,59 @@
       "endSession": "Avsluta session",
       "nextStep": "Nästa steg",
       "previousStep": "Föregående steg"
+    },
+    "navigationControls": {
+      "stepOf": "Steg {current} av {total}",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "finish": "Avsluta"
+    },
+    "participantPlayMode": {
+      "errors": {
+        "couldNotLoadPlayData": "Kunde inte ladda speldata",
+        "somethingWentWrong": "Ett fel uppstod"
+      },
+      "noData": "Ingen speldata tillgänglig.",
+      "waiting": {
+        "title": "Väntar på aktivitet",
+        "description": "Spelinnehåll visas här när värden startar."
+      }
+    },
+    "artifactsPanel": {
+      "errors": {
+        "somethingWentWrong": "Något gick fel"
+      },
+      "empty": {
+        "title": "Inga artefakter ännu",
+        "description": "Hämta artefakter från spelet"
+      },
+      "actions": {
+        "snapshotFromGame": "Snapshotta från spel",
+        "unlock": "Lås upp",
+        "checking": "Kontrollerar...",
+        "reveal": "Reveal",
+        "hide": "Dölj",
+        "update": "Uppdatera",
+        "highlight": "Highlight",
+        "unhighlight": "Avmarkera"
+      },
+      "loading": "Laddar artefakter…",
+      "title": "Artefakter",
+      "description": "Snapshot, reveal och highlight av artefakter.",
+      "noArtifactsHint": "Spelet kan ha dokument, bilder eller andra resurser kopplade till sig.",
+      "noArtifactsButton": "Om knappen inte fungerar har spelet inga artefakter definierade.",
+      "variants": "{count} varianter",
+      "variant": "Variant",
+      "rolePrivate": "(roll)",
+      "keypad": {
+        "successMessage": "Koden är korrekt!",
+        "lockedMessage": "Keypaden är låst.",
+        "unlocked": "Upplåst",
+        "lockedOut": "Låst ut",
+        "locked": "Låst",
+        "attemptsRemaining": "{count} försök kvar",
+        "unlockedContent": "Upplåst innehåll"
+      }
     },
     "participant": {
       "ready": "Redo",

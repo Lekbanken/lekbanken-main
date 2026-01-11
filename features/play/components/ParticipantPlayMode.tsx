@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { ParticipantPlayView } from './ParticipantPlayView';
 import { getParticipantPlaySession, type ParticipantPlayData } from '../api';
 import { Card } from '@/components/ui/card';
@@ -36,6 +37,7 @@ export function ParticipantPlayMode({
   participantToken,
   showRole = true,
 }: ParticipantPlayModeProps) {
+  const t = useTranslations('play.participantPlayMode');
   // Data state
   const [playData, setPlayData] = useState<ParticipantPlayData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -49,10 +51,10 @@ export function ParticipantPlayMode({
         setPlayData(data);
         setError(null);
       } else {
-        setError('Kunde inte ladda speldata');
+        setError(t('errors.couldNotLoadPlayData'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.somethingWentWrong'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ export function ParticipantPlayMode({
   if (!playData) {
     return (
       <Card className="max-w-md mx-auto p-6 text-center">
-        <p className="text-muted-foreground">Ingen speldata tillgänglig.</p>
+        <p className="text-muted-foreground">{t('noData')}</p>
       </Card>
     );
   }
@@ -104,9 +106,9 @@ export function ParticipantPlayMode({
             <ClockIcon className="h-6 w-6 text-primary" />
           </div>
         </div>
-        <h2 className="text-lg font-semibold mb-2">Väntar på aktivitet</h2>
+        <h2 className="text-lg font-semibold mb-2">{t('waiting.title')}</h2>
         <p className="text-muted-foreground">
-          Spelinnehåll visas här när värden startar.
+          {t('waiting.description')}
         </p>
       </Card>
     );

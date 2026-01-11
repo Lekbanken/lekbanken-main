@@ -1,4 +1,5 @@
 import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 type NavigationControlsProps = {
@@ -11,6 +12,7 @@ type NavigationControlsProps = {
 };
 
 export function NavigationControls({ current, total, onPrev, onNext, onEnd, progress }: NavigationControlsProps) {
+  const t = useTranslations('play.navigationControls');
   const isFirst = current === 0;
   const isLast = current === total - 1;
 
@@ -41,7 +43,7 @@ export function NavigationControls({ current, total, onPrev, onNext, onEnd, prog
             </div>
           </div>
           <span className="text-xs font-medium text-muted-foreground">
-            Steg {current + 1} av {total}
+            {t('stepOf', { current: current + 1, total })}
           </span>
         </div>
 
@@ -66,7 +68,7 @@ export function NavigationControls({ current, total, onPrev, onNext, onEnd, prog
             className="h-12 flex-1 gap-2 text-sm font-medium transition-all active:scale-95 disabled:opacity-40"
           >
             <ChevronLeftIcon className="h-4 w-4" aria-hidden />
-            Föregående
+            {t('previous')}
           </Button>
           {!isLast ? (
             <Button 
@@ -74,7 +76,7 @@ export function NavigationControls({ current, total, onPrev, onNext, onEnd, prog
               onClick={onNext}
               className="h-12 flex-1 gap-2 text-sm font-medium shadow-lg shadow-primary/20 transition-all active:scale-95"
             >
-              Nästa
+              {t('next')}
               <ChevronRightIcon className="h-4 w-4" aria-hidden />
             </Button>
           ) : (
@@ -84,7 +86,7 @@ export function NavigationControls({ current, total, onPrev, onNext, onEnd, prog
               className="h-12 flex-1 gap-2 bg-green-600 text-sm font-medium shadow-lg shadow-green-600/20 transition-all hover:bg-green-700 active:scale-95"
             >
               <CheckIcon className="h-4 w-4" aria-hidden />
-              Avsluta
+              {t('finish')}
             </Button>
           )}
         </div>

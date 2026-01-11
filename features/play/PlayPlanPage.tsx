@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,6 +46,7 @@ function getStepDurationSeconds(step?: Step | null) {
 
 export function PlayPlanPage({ planId }: { planId?: string }) {
   const router = useRouter();
+  const t = useTranslations('play.playPlanPage');
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<ErrorCode>(null);
@@ -165,7 +167,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
           blockId: block.id,
           blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
           title: tag,
-          description: block.notes || "Fortsätt när gruppen är redo.",
+          description: block.notes || "",
           durationMinutes: baseDuration,
           tag,
           gameSnapshot: null,
@@ -327,16 +329,16 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   };
 
   const timerLabel = (() => {
-    if (isTimerRunning) return "Pausa tid";
-    if (timerRemaining > 0 && timerRemaining < timerTotal) return "Fortsätt";
-    return "Starta tid";
+    if (isTimerRunning) return t('timer.pause');
+    if (timerRemaining > 0 && timerRemaining < timerTotal) return t('timer.continue');
+    return t('timer.start');
   })();
 
   if (!planId) {
     return (
       <ErrorState
-        title="Ingen plan vald"
-        description="Välj en plan att spela."
+        title={t('errors.noPlanSelected')}
+        description={t('errors.selectPlan')}
         onGoBack={handleBack}
       />
     );
@@ -345,8 +347,8 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   if (errorCode === "not-found") {
     return (
       <ErrorState
-        title="Planen kan inte spelas just nu"
-        description="Planen saknas eller så har du inte behörighet."
+        title={t('errors.cannotPlay')}
+        description={t('errors.notPublished')}
         onGoBack={handleBack}
       />
     );
@@ -355,8 +357,8 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
   if (errorCode === "network") {
     return (
       <ErrorState
-        title="Kunde inte ladda planen"
-        description="Kontrollera uppkoppling eller försök igen."
+        title={t('errors.couldNotLoad')}
+        description={t('errors.checkConnection')}
         onRetry={loadRun}
         onGoBack={handleBack}
       />
@@ -394,7 +396,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
 
   const meta = [
     { label: "Moment", value: `${run.blockCount} block` },
-    run.totalDurationMinutes ? { label: "Längd", value: `${run.totalDurationMinutes} min` } : null,
+    run.totalDurationMinutes ? { label: t('meta.duration'), value: `${run.totalDurationMinutes} ${t('meta.minutes')}` } : null,
   ].filter((m): m is { label: string; value: string } => Boolean(m?.value));
 
   return (
@@ -427,20 +429,20 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
           <svg className="h-4 w-4 text-primary transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          Tips för passet
+          {t('tips.title')}
         </summary>
         <ul className="space-y-1.5 px-4 pb-4 pl-10 text-muted-foreground">
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Gå igenom varje steg innan du startar timern.</span>
+            <span>{t('tips.reviewSteps')}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Justera planen på plats: hoppa över block eller korta steg vid behov.</span>
+            <span>{t('tips.adjustPlan')}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Håll koll på materialtaggar i första steget per lek.</span>
+            <span>{t('tips.trackMaterials')}</span>
           </li>
         </ul>
       </details>
@@ -477,7 +479,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
           <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
           </svg>
-          Nollställ
+          {t('actions.reset')}
         </Button>
       </div>
 

@@ -57,6 +57,50 @@ export interface LegalDocumentUpdate {
   published_at?: string | null
 }
 
+export interface LegalDocumentDraftRow {
+  id: string
+  scope: LegalDocScope
+  tenant_id: string | null
+  type: LegalDocType
+  locale: LegalLocale
+  title: string
+  content_markdown: string
+  requires_acceptance: boolean
+  change_summary: string
+  created_at: string
+  updated_at: string
+  updated_by: string | null
+}
+
+export interface LegalDocumentDraftInsert {
+  id?: string
+  scope: LegalDocScope
+  tenant_id?: string | null
+  type: LegalDocType
+  locale: LegalLocale
+  title: string
+  content_markdown: string
+  requires_acceptance?: boolean
+  change_summary?: string
+  created_at?: string
+  updated_at?: string
+  updated_by?: string | null
+}
+
+export interface LegalDocumentDraftUpdate {
+  scope?: LegalDocScope
+  tenant_id?: string | null
+  type?: LegalDocType
+  locale?: LegalLocale
+  title?: string
+  content_markdown?: string
+  requires_acceptance?: boolean
+  change_summary?: string
+  created_at?: string
+  updated_at?: string
+  updated_by?: string | null
+}
+
 export interface UserLegalAcceptanceRow {
   id: string
   user_id: string
@@ -87,6 +131,61 @@ export interface UserLegalAcceptanceUpdate {
   accepted_at?: string
   ip_hash?: string | null
   user_agent?: string | null
+}
+
+export interface OrgLegalAcceptanceRow {
+  id: string
+  tenant_id: string
+  document_id: string
+  accepted_by: string
+  accepted_at: string
+}
+
+export interface OrgLegalAcceptanceInsert {
+  id?: string
+  tenant_id: string
+  document_id: string
+  accepted_by: string
+  accepted_at?: string
+}
+
+export interface OrgLegalAcceptanceUpdate {
+  tenant_id?: string
+  document_id?: string
+  accepted_by?: string
+  accepted_at?: string
+}
+
+export interface LegalAuditLogRow {
+  id: string
+  scope: LegalDocScope
+  tenant_id: string | null
+  document_id: string | null
+  actor_user_id: string | null
+  event_type: string
+  payload: Record<string, unknown>
+  created_at: string
+}
+
+export interface LegalAuditLogInsert {
+  id?: string
+  scope: LegalDocScope
+  tenant_id?: string | null
+  document_id?: string | null
+  actor_user_id?: string | null
+  event_type: string
+  payload?: Record<string, unknown>
+  created_at?: string
+}
+
+export interface LegalAuditLogUpdate {
+  scope?: LegalDocScope
+  tenant_id?: string | null
+  document_id?: string | null
+  actor_user_id?: string | null
+  event_type?: string
+  payload?: Record<string, unknown>
+  created_at?: string
 }
 
 export interface CookieCatalogRow {
@@ -177,6 +276,24 @@ export type LegalDatabase = BaseDatabase & {
         Row: CookieConsentRow
         Insert: CookieConsentInsert
         Update: CookieConsentUpdate
+        Relationships: []
+      }
+      legal_document_drafts: {
+        Row: LegalDocumentDraftRow
+        Insert: LegalDocumentDraftInsert
+        Update: LegalDocumentDraftUpdate
+        Relationships: []
+      }
+      org_legal_acceptances: {
+        Row: OrgLegalAcceptanceRow
+        Insert: OrgLegalAcceptanceInsert
+        Update: OrgLegalAcceptanceUpdate
+        Relationships: []
+      }
+      legal_audit_log: {
+        Row: LegalAuditLogRow
+        Insert: LegalAuditLogInsert
+        Update: LegalAuditLogUpdate
         Relationships: []
       }
     }

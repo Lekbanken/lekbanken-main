@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -57,6 +58,7 @@ type KeypadAttemptResponse = {
 };
 
 export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
+  const t = useTranslations('play.artifactsPanel');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [artifacts, setArtifacts] = useState<SessionArtifact[]>([]);
@@ -179,7 +181,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       } catch (e) {
         setKeypadMessages((prev) => new Map(prev).set(artifactId, { 
           type: 'error', 
-          text: e instanceof Error ? e.message : 'Något gick fel' 
+          text: e instanceof Error ? e.message : t('errors.somethingWentWrong') 
         }));
       } finally {
         setKeypadSubmitting((prev) => {
@@ -195,7 +197,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
   if (loading) {
     return (
       <Card className="p-6">
-        <p className="text-sm text-muted-foreground">Laddar artefakter…</p>
+        <p className="text-sm text-muted-foreground">{t('loading')}</p>
       </Card>
     );
   }
@@ -205,15 +207,15 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       <Card className="p-6">
         <div className="flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold">Artefakter</h2>
-            <p className="text-sm text-muted-foreground">Snapshot, reveal och highlight av artefakter.</p>
+            <h2 className="text-lg font-semibold">{t('title')}</h2>
+            <p className="text-sm text-muted-foreground">{t('description')}</p>
           </div>
           <div className="flex items-center gap-2">
             <Button size="sm" variant="outline" onClick={load}>
-              Uppdatera
+              {t('actions.update')}
             </Button>
             <Button size="sm" onClick={snapshot}>
-              Snapshotta från spel
+              {t('actions.snapshotFromGame')}
             </Button>
           </div>
         </div>
@@ -228,15 +230,15 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-foreground">Inga artefakter ännu</h3>
+          <h3 className="text-base font-semibold text-foreground">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Spelet kan ha dokument, bilder eller andra resurser kopplade till sig.
+            {t('noArtifactsHint')}
           </p>
           <Button size="sm" onClick={snapshot}>
-            Hämta artefakter från spelet
+            {t('empty.description')}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Om knappen inte fungerar har spelet inga artefakter definierade.
+            {t('noArtifactsButton')}
           </p>
         </Card>
       ) : (
@@ -261,8 +263,8 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
             const meta = (a.metadata || {}) as KeypadMetadata;
             const codeLength = meta.codeLength || 4;
             const maxAttempts = meta.maxAttempts;
-            const successMessage = meta.successMessage || 'Koden är korrekt!';
-            const lockedMessage = meta.lockedMessage || 'Keypaden är låst.';
+            const successMessage = meta.successMessage || t('keypad.successMessage');
+            const lockedMessage = meta.lockedMessage || t('keypad.lockedMessage');
             
             // Server-provided state
             const keypadState = meta.keypadState || { isUnlocked: false, isLockedOut: false, attemptCount: 0 };
@@ -287,11 +289,11 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                   </div>
                   <div className="flex flex-col items-end gap-1">
                     <Badge variant={isUnlocked ? 'default' : isLockedOut ? 'destructive' : 'secondary'}>
-                      {isUnlocked ? 'Upplåst' : isLockedOut ? 'Låst ut' : 'Låst'}
+                      {isUnlocked ? t('keypad.unlocked') : isLockedOut ? t('keypad.lockedOut') : t('keypad.locked')}
                     </Badge>
                     {attemptsRemaining !== null && !isUnlocked && !isLockedOut && (
                       <span className="text-xs text-muted-foreground">
-                        {attemptsRemaining} försök kvar
+                        {t('keypad.attemptsRemaining', { count: attemptsRemaining })}
                       </span>
                     )}
                   </div>
@@ -306,7 +308,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                       <div className="mt-3 space-y-2 text-left">
                         {vs.map((v) => (
                           <div key={v.id} className="rounded border border-border p-2 text-sm">
-                            <p className="font-medium">{v.title || 'Upplåst innehåll'}</p>
+                            <p className="font-medium">{v.title || t('keypad.unlockedContent')}</p>
                             {v.body && <p className="text-muted-foreground">{v.body}</p>}
                           </div>
                         ))}
@@ -356,7 +358,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                         onClick={() => submitKeypadCode(a.id, enteredCode)}
                         disabled={enteredCode.length !== codeLength || isSubmitting}
                       >
-                        {isSubmitting ? 'Kontrollerar...' : 'Lås upp'}
+                        {isSubmitting ? t('actions.checking') : t('actions.unlock')}
                       </Button>
                     </div>
 
@@ -392,7 +394,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                   <h3 className="font-medium">{a.title}</h3>
                   {a.description && <p className="text-sm text-muted-foreground">{a.description}</p>}
                 </div>
-                <Badge variant="secondary">{vs.length} varianter</Badge>
+                <Badge variant="secondary">{t('variants', { count: vs.length })}</Badge>
               </div>
 
               <div className="space-y-2">
@@ -405,11 +407,11 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <div className="min-w-0">
                           <p className="text-sm font-medium truncate">
-                            {v.title || 'Variant'}
+                            {v.title || t('variant')}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {v.visibility}
-                            {v.visibility === 'role_private' && v.visible_to_session_role_id ? ' (roll)' : ''}
+                            {v.visibility === 'role_private' && v.visible_to_session_role_id ? ` ${t('rolePrivate')}` : ''}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -421,7 +423,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                                 updateVariant({ action: 'reveal_variant', variantId: v.id, revealed: !revealed })
                               }
                             >
-                              {revealed ? 'Dölj' : 'Reveal'}
+                              {revealed ? t('actions.hide') : t('actions.reveal')}
                             </Button>
                           )}
                           <Button
@@ -431,7 +433,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                               updateVariant({ action: 'highlight_variant', variantId: v.id, highlighted: !highlighted })
                             }
                           >
-                            {highlighted ? 'Avmarkera' : 'Highlight'}
+                            {highlighted ? t('actions.unhighlight') : t('actions.highlight')}
                           </Button>
                         </div>
                       </div>

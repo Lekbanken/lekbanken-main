@@ -853,7 +853,21 @@
         "settings": "Settings"
       },
       "errors": {
-        "somethingWentWrong": "Something went wrong"
+        "somethingWentWrong": "Something went wrong",
+        "couldNotFetchSession": "Could not fetch session",
+        "couldNotLoadRoles": "Could not load roles",
+        "assignRolesFirst": "Assign roles first (assigned {assigned} of {total}).",
+        "cannotLockAgain": "Cannot lock again: at least one participant has already revealed their secrets.",
+        "couldNotSetNextStarter": "Could not set next starter",
+        "couldNotSetPosition": "Could not set position",
+        "couldNotStartPlayMode": "Could not start play mode",
+        "couldNotSaveSettings": "Could not save settings",
+        "couldNotResetOverrides": "Could not reset overrides"
+      },
+      "toast": {
+        "settingsSaved": "Session settings saved",
+        "overridesReset": "Overrides reset",
+        "rolesSaved": "Roles saved for session"
       },
       "participants": {
         "title": "Participants",
@@ -864,7 +878,8 @@
         "participantsGoTo": "Participants go to",
         "copied": "Copied!",
         "share": "Share",
-        "qrCode": "QR code"
+        "qrCode": "QR code",
+        "joinSessionText": "Join the session! Code: {code}"
       },
       "roles": {
         "title": "Roles",
@@ -976,6 +991,107 @@
         }
       }
     },
+    "playPage": {
+      "errors": {
+        "noGameSelected": "No game selected",
+        "selectGame": "Select a game to play.",
+        "cannotPlay": "This game cannot be played right now",
+        "notPublished": "The game is either not published or you lack permission.",
+        "couldNotLoad": "Could not load session",
+        "checkConnection": "Check your connection and try again."
+      },
+      "timer": {
+        "pause": "Pause timer",
+        "continue": "Continue",
+        "start": "Start timer"
+      },
+      "meta": {
+        "environment": "Environment",
+        "group": "Group",
+        "age": "Age",
+        "participants": "participants",
+        "years": "years"
+      },
+      "tips": {
+        "title": "Session tips",
+        "hideUI": "Hide UI chrome when reading instructions aloud.",
+        "planReserve": "Plan 1-2 backup games in Planner and switch with one tap.",
+        "keepBright": "Keep the screen bright and text size large outdoors."
+      },
+      "actions": {
+        "switchGame": "Switch game",
+        "reset": "Reset"
+      }
+    },
+    "playPlanPage": {
+      "errors": {
+        "noPlanSelected": "No plan selected",
+        "selectPlan": "Select a plan to play.",
+        "cannotPlay": "This plan cannot be played right now",
+        "notPublished": "The plan is missing or you lack permission.",
+        "couldNotLoad": "Could not load session",
+        "checkConnection": "Check your connection and try again."
+      },
+      "timer": {
+        "pause": "Pause timer",
+        "continue": "Continue",
+        "start": "Start timer"
+      },
+      "meta": {
+        "duration": "Duration",
+        "minutes": "min"
+      },
+      "tips": {
+        "title": "Session tips",
+        "reviewSteps": "Review each step before starting the timer.",
+        "adjustPlan": "Adjust the plan on the fly: skip blocks or shorten steps as needed.",
+        "trackMaterials": "Keep track of material tags in the first step of each game."
+      },
+      "actions": {
+        "reset": "Reset"
+      },
+      "defaults": {
+        "continueWhenReady": "Continue when the group is ready."
+      }
+    },
+    "decisionsPanel": {
+      "loading": "Loading decisions…",
+      "title": "Decisions",
+      "description": "Create a decision and open voting (single-choice).",
+      "errors": {
+        "titleRequired": "Title is required",
+        "minOptionsRequired": "At least two options are required",
+        "couldNotLoad": "Could not load decisions",
+        "couldNotCreate": "Could not create decision",
+        "couldNotUpdate": "Could not update decision"
+      },
+      "labels": {
+        "title": "Title",
+        "prompt": "Prompt",
+        "options": "Options"
+      },
+      "placeholders": {
+        "title": "E.g.: What are you doing now?",
+        "prompt": "Optional context…"
+      },
+      "actions": {
+        "addOption": "Add",
+        "createDecision": "Create decision",
+        "openVoting": "Open voting",
+        "close": "Close",
+        "reopenVoting": "Reopen",
+        "revealResults": "Reveal results",
+        "updateResults": "Update results"
+      },
+      "empty": {
+        "title": "No decisions created",
+        "description": "Create a decision above to let participants vote during the session.",
+        "flowHint": "Decisions flow: Draft → Open voting → Closed → Results revealed"
+      },
+      "results": {
+        "title": "Results"
+      }
+    },
     "facilitator": {
       "dashboard": "Dashboard",
       "participants": "Participants",
@@ -987,6 +1103,59 @@
       "endSession": "End session",
       "nextStep": "Next step",
       "previousStep": "Previous step"
+    },
+    "navigationControls": {
+      "stepOf": "Step {current} of {total}",
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish"
+    },
+    "participantPlayMode": {
+      "errors": {
+        "couldNotLoadPlayData": "Could not load play data",
+        "somethingWentWrong": "Something went wrong"
+      },
+      "noData": "No play data available.",
+      "waiting": {
+        "title": "Waiting for activity",
+        "description": "Game content will appear here when the host starts."
+      }
+    },
+    "artifactsPanel": {
+      "errors": {
+        "somethingWentWrong": "Something went wrong"
+      },
+      "empty": {
+        "title": "No artifacts yet",
+        "description": "Fetch artifacts from the game"
+      },
+      "actions": {
+        "snapshotFromGame": "Snapshot from game",
+        "unlock": "Unlock",
+        "checking": "Checking...",
+        "reveal": "Reveal",
+        "hide": "Hide",
+        "update": "Update",
+        "highlight": "Highlight",
+        "unhighlight": "Unhighlight"
+      },
+      "loading": "Loading artifacts…",
+      "title": "Artifacts",
+      "description": "Snapshot, reveal and highlight artifacts.",
+      "noArtifactsHint": "The game may have documents, images or other resources linked to it.",
+      "noArtifactsButton": "If the button doesn't work, the game has no artifacts defined.",
+      "variants": "{count} variants",
+      "variant": "Variant",
+      "rolePrivate": "(role)",
+      "keypad": {
+        "successMessage": "The code is correct!",
+        "lockedMessage": "The keypad is locked.",
+        "unlocked": "Unlocked",
+        "lockedOut": "Locked out",
+        "locked": "Locked",
+        "attemptsRemaining": "{count} attempts remaining",
+        "unlockedContent": "Unlocked content"
+      }
     },
     "participant": {
       "ready": "Ready",

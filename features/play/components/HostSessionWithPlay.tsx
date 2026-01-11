@@ -143,7 +143,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       setParticipants(participantsRes.participants);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte hämta session');
+      setError(err instanceof Error ? err.message : t('errors.couldNotFetchSession'));
     } finally {
       setLoading(false);
     }
@@ -309,12 +309,12 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
 
         if (res.status === 409 && action === 'unlock' && err.stats) {
           throw new Error(
-            `Tilldela roller först (tilldelade ${err.stats.assigned_count ?? 0} av ${err.stats.participant_count ?? 0}).`
+            t('errors.assignRolesFirst', { assigned: err.stats.assigned_count ?? 0, total: err.stats.participant_count ?? 0 })
           );
         }
 
         if (res.status === 409 && action === 'relock' && typeof err.revealed_count === 'number') {
-          throw new Error('Kan inte låsa igen: minst en deltagare har redan visat sina hemligheter.');
+          throw new Error(t('errors.cannotLockAgain'));
         }
 
         throw new Error(err.error ?? 'Kunde inte uppdatera');
@@ -361,7 +361,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     if (!session) return;
     
     const shareUrl = `${window.location.origin}/play`;
-    const shareText = `Gå med i sessionen! Kod: ${session.sessionCode}`;
+    const shareText = t('share.joinSessionText', { code: session.sessionCode });
 
     if (navigator.share) {
       try {
@@ -404,7 +404,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await setNextStarter(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte sätta nästa startare');
+      setError(err instanceof Error ? err.message : t('errors.couldNotSetNextStarter'));
     }
   };
 
@@ -413,7 +413,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await setParticipantPosition(sessionId, participantId, position);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte sätta position');
+      setError(err instanceof Error ? err.message : t('errors.couldNotSetPosition'));
     }
   };
 
@@ -432,7 +432,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       await loadData();
       setIsPlayMode(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte starta spelläge');
+      setError(err instanceof Error ? err.message : t('errors.couldNotStartPlayMode'));
     } finally {
       setActionPending(false);
       setLoadingAction(undefined);
@@ -477,11 +477,11 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
       };
 
       const ok = await updateSessionOverrides(sessionId, payload);
-      if (!ok) throw new Error('Kunde inte spara sessionens overrides');
-      toast.success('Sessionens inställningar sparades');
+      if (!ok) throw new Error(t('errors.couldNotSaveSettings'));
+      toast.success(t('toast.settingsSaved'));
       await loadGameStructure();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Kunde inte spara inställningar');
+      toast.error(err instanceof Error ? err.message : t('errors.couldNotSaveSettings'));
     } finally {
       setOverridesLoading(false);
     }
@@ -491,11 +491,11 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     setOverridesLoading(true);
     try {
       const ok = await updateSessionOverrides(sessionId, {});
-      if (!ok) throw new Error('Kunde inte återställa overrides');
-      toast.success('Overrides återställda');
+      if (!ok) throw new Error(t('errors.couldNotResetOverrides'));
+      toast.success(t('toast.overridesReset'));
       await loadGameStructure();
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Kunde inte återställa');
+      toast.error(err instanceof Error ? err.message : t('errors.couldNotResetOverrides'));
     } finally {
       setOverridesLoading(false);
     }
@@ -506,8 +506,8 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     try {
       const updates = Object.values(roleDrafts);
       const ok = await updateSessionRoles(sessionId, updates);
-      if (!ok) throw new Error('Kunde inte spara roller');
-      toast.success('Roller sparade för sessionen');
+      if (!ok) throw new Error(t('errors.couldNotSaveSettings'));
+      toast.success(t('toast.rolesSaved'));
       await loadRoles();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Kunde inte spara roller');

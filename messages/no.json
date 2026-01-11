@@ -853,7 +853,21 @@
         "settings": "Innstillinger"
       },
       "errors": {
-        "somethingWentWrong": "Noe gikk galt"
+        "somethingWentWrong": "Noe gikk galt",
+        "couldNotFetchSession": "Kunne ikke hente sesjon",
+        "couldNotLoadRoles": "Kunne ikke laste roller",
+        "assignRolesFirst": "Tildel roller først (tildelt {assigned} av {total}).",
+        "cannotLockAgain": "Kan ikke låse igjen: minst én deltaker har allerede vist sine hemmeligheter.",
+        "couldNotSetNextStarter": "Kunne ikke sette neste starter",
+        "couldNotSetPosition": "Kunne ikke sette posisjon",
+        "couldNotStartPlayMode": "Kunne ikke starte spillmodus",
+        "couldNotSaveSettings": "Kunne ikke lagre innstillinger",
+        "couldNotResetOverrides": "Kunne ikke tilbakestille overrides"
+      },
+      "toast": {
+        "settingsSaved": "Sesjonens innstillinger lagret",
+        "overridesReset": "Overrides tilbakestilt",
+        "rolesSaved": "Roller lagret for sesjonen"
       },
       "participants": {
         "title": "Deltakere",
@@ -864,7 +878,8 @@
         "participantsGoTo": "Deltakere går til",
         "copied": "Kopiert!",
         "share": "Del",
-        "qrCode": "QR-kode"
+        "qrCode": "QR-kode",
+        "joinSessionText": "Bli med i sesjonen! Kode: {code}"
       },
       "roles": {
         "title": "Roller",
@@ -976,6 +991,107 @@
         }
       }
     },
+    "playPage": {
+      "errors": {
+        "noGameSelected": "Ingen lek valgt",
+        "selectGame": "Velg en lek å spille.",
+        "cannotPlay": "Denne leken kan ikke spilles akkurat nå",
+        "notPublished": "Spillet er enten ikke publisert eller du mangler tilgang.",
+        "couldNotLoad": "Kunne ikke laste økten",
+        "checkConnection": "Sjekk tilkoblingen og prøv igjen."
+      },
+      "timer": {
+        "pause": "Pause tid",
+        "continue": "Fortsett",
+        "start": "Start tid"
+      },
+      "meta": {
+        "environment": "Miljø",
+        "group": "Gruppe",
+        "age": "Alder",
+        "participants": "deltakere",
+        "years": "år"
+      },
+      "tips": {
+        "title": "Økttips",
+        "hideUI": "Skjul UI-elementer når du leser instruksjoner høyt.",
+        "planReserve": "Planlegg 1-2 reserveleker i Planner og bytt med ett trykk.",
+        "keepBright": "Hold skjermen lys og tekststørrelsen stor utendørs."
+      },
+      "actions": {
+        "switchGame": "Bytt lek",
+        "reset": "Nullstill"
+      }
+    },
+    "playPlanPage": {
+      "errors": {
+        "noPlanSelected": "Ingen plan valgt",
+        "selectPlan": "Velg en plan å spille.",
+        "cannotPlay": "Denne planen kan ikke spilles akkurat nå",
+        "notPublished": "Planen mangler eller du har ikke tilgang.",
+        "couldNotLoad": "Kunne ikke laste økten",
+        "checkConnection": "Sjekk tilkoblingen og prøv igjen."
+      },
+      "timer": {
+        "pause": "Pause tid",
+        "continue": "Fortsett",
+        "start": "Start tid"
+      },
+      "meta": {
+        "duration": "Varighet",
+        "minutes": "min"
+      },
+      "tips": {
+        "title": "Økttips",
+        "reviewSteps": "Gå gjennom hvert steg før du starter timeren.",
+        "adjustPlan": "Juster planen på stedet: hopp over blokker eller forkort steg ved behov.",
+        "trackMaterials": "Hold styr på materialtagger i det første steget for hver lek."
+      },
+      "actions": {
+        "reset": "Nullstill"
+      },
+      "defaults": {
+        "continueWhenReady": "Fortsett når gruppen er klar."
+      }
+    },
+    "decisionsPanel": {
+      "loading": "Laster beslutninger…",
+      "title": "Beslutninger",
+      "description": "Opprett en beslutning og åpne avstemning (enkelvalg).",
+      "errors": {
+        "titleRequired": "Tittel kreves",
+        "minOptionsRequired": "Minst to alternativer kreves",
+        "couldNotLoad": "Kunne ikke laste beslutninger",
+        "couldNotCreate": "Kunne ikke opprette beslutning",
+        "couldNotUpdate": "Kunne ikke oppdatere beslutning"
+      },
+      "labels": {
+        "title": "Tittel",
+        "prompt": "Prompt",
+        "options": "Alternativer"
+      },
+      "placeholders": {
+        "title": "F.eks.: Hva gjør dere nå?",
+        "prompt": "Valgfri kontekst…"
+      },
+      "actions": {
+        "addOption": "Legg til",
+        "createDecision": "Opprett beslutning",
+        "openVoting": "Åpne avstemning",
+        "close": "Lukk",
+        "reopenVoting": "Åpne igjen",
+        "revealResults": "Vis resultater",
+        "updateResults": "Oppdater resultater"
+      },
+      "empty": {
+        "title": "Ingen beslutninger opprettet",
+        "description": "Opprett en beslutning ovenfor for å la deltakerne stemme under økten.",
+        "flowHint": "Beslutninger går gjennom: Utkast → Åpen avstemning → Lukket → Resultater vises"
+      },
+      "results": {
+        "title": "Resultater"
+      }
+    },
     "facilitator": {
       "dashboard": "Kontrollpanel",
       "participants": "Deltakere",
@@ -987,6 +1103,59 @@
       "endSession": "Avslutt sesjon",
       "nextStep": "Neste steg",
       "previousStep": "Forrige steg"
+    },
+    "navigationControls": {
+      "stepOf": "Steg {current} av {total}",
+      "previous": "Forrige",
+      "next": "Neste",
+      "finish": "Avslutt"
+    },
+    "participantPlayMode": {
+      "errors": {
+        "couldNotLoadPlayData": "Kunne ikke laste spilldata",
+        "somethingWentWrong": "Noe gikk galt"
+      },
+      "noData": "Ingen spilldata tilgjengelig.",
+      "waiting": {
+        "title": "Venter på aktivitet",
+        "description": "Spillinnhold vises her når verten starter."
+      }
+    },
+    "artifactsPanel": {
+      "errors": {
+        "somethingWentWrong": "Noe gikk galt"
+      },
+      "empty": {
+        "title": "Ingen artefakter ennå",
+        "description": "Hent artefakter fra spillet"
+      },
+      "actions": {
+        "snapshotFromGame": "Ta snapshot fra spill",
+        "unlock": "Lås opp",
+        "checking": "Sjekker...",
+        "reveal": "Vis",
+        "hide": "Skjul",
+        "update": "Oppdater",
+        "highlight": "Fremhev",
+        "unhighlight": "Fjern fremheving"
+      },
+      "loading": "Laster artefakter…",
+      "title": "Artefakter",
+      "description": "Snapshot, vis og fremhev artefakter.",
+      "noArtifactsHint": "Spillet kan ha dokumenter, bilder eller andre ressurser knyttet til seg.",
+      "noArtifactsButton": "Hvis knappen ikke fungerer, har spillet ingen artefakter definert.",
+      "variants": "{count} varianter",
+      "variant": "Variant",
+      "rolePrivate": "(rolle)",
+      "keypad": {
+        "successMessage": "Koden er riktig!",
+        "lockedMessage": "Tastaturet er låst.",
+        "unlocked": "Opplåst",
+        "lockedOut": "Låst ute",
+        "locked": "Låst",
+        "attemptsRemaining": "{count} forsøk igjen",
+        "unlockedContent": "Opplåst innhold"
+      }
     },
     "participant": {
       "ready": "Klar",

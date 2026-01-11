@@ -12,3 +12,5 @@ export const DEFAULT_COOKIE_CONSENT: Record<CookieCategory, boolean> = {
 }
 
 export const REQUIRED_LEGAL_TYPES = ['terms', 'privacy'] as const
+export const GLOBAL_LEGAL_TYPES = ['terms', 'privacy', 'cookie_policy'] as const
+export const TENANT_LEGAL_TYPES = ['org_terms', 'dpa'] as const

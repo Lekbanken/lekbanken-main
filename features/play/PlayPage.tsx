@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -74,8 +75,8 @@ function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "n
   }
 
   const groupSize =
-    game.min_players && game.max_players ? `${game.min_players}-${game.max_players} deltagare` : undefined;
-  const ageRange = game.age_min && game.age_max ? `${game.age_min}-${game.age_max} år` : undefined;
+    game.min_players && game.max_players ? `${game.min_players}-${game.max_players}` : undefined;
+  const ageRange = game.age_min && game.age_max ? `${game.age_min}-${game.age_max}` : undefined;
 
   return {
     id: game.id,
@@ -104,6 +105,7 @@ function getStepDurationSeconds(step?: Step | null) {
 
 export function PlayPage({ gameId }: { gameId?: string }) {
   const router = useRouter();
+  const t = useTranslations('play.playPage');
   const [currentStep, setCurrentStep] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [errorCode, setErrorCode] = useState<ErrorCode>(null);
@@ -268,16 +270,16 @@ export function PlayPage({ gameId }: { gameId?: string }) {
   };
 
   const timerLabel = (() => {
-    if (isTimerRunning) return "Pausa tid";
-    if (timerRemaining > 0 && timerRemaining < timerTotal) return "Fortsätt";
-    return "Starta tid";
+    if (isTimerRunning) return t('timer.pause');
+    if (timerRemaining > 0 && timerRemaining < timerTotal) return t('timer.continue');
+    return t('timer.start');
   })();
 
   if (!gameId) {
     return (
       <ErrorState
-        title="Ingen lek vald"
-        description="Välj en lek att spela."
+        title={t('errors.noGameSelected')}
+        description={t('errors.selectGame')}
         onGoBack={handleBackToGames}
       />
     );
@@ -286,8 +288,8 @@ export function PlayPage({ gameId }: { gameId?: string }) {
   if (errorCode === "not-found") {
     return (
       <ErrorState
-        title="Denna lek kan inte spelas just nu"
-        description="Spelet är antingen inte publicerat eller så saknas behörighet."
+        title={t('errors.cannotPlay')}
+        description={t('errors.notPublished')}
         onGoBack={handleBackToGames}
       />
     );
@@ -296,8 +298,8 @@ export function PlayPage({ gameId }: { gameId?: string }) {
   if (errorCode === "network") {
     return (
       <ErrorState
-        title="Kunde inte ladda passet"
-        description="Kontrollera uppkoppling eller försök igen."
+        title={t('errors.couldNotLoad')}
+        description={t('errors.checkConnection')}
         onRetry={loadGame}
         onGoBack={handleBackToGames}
       />
@@ -339,9 +341,9 @@ export function PlayPage({ gameId }: { gameId?: string }) {
         title={game.title}
         summary={game.summary}
         meta={[
-          { label: "Miljö", value: game.environment ?? "" },
-          { label: "Grupp", value: game.groupSize ?? "" },
-          { label: "Ålder", value: game.ageRange ?? "" },
+          { label: t('meta.environment'), value: game.environment ?? "" },
+          { label: t('meta.group'), value: game.groupSize ? `${game.groupSize} ${t('meta.participants')}` : "" },
+          { label: t('meta.age'), value: game.ageRange ? `${game.ageRange} ${t('meta.years')}` : "" },
         ].filter((m) => m.value)}
       />
 
@@ -360,20 +362,20 @@ export function PlayPage({ gameId }: { gameId?: string }) {
           <svg className="h-4 w-4 text-primary transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
-          Tips för sessionen
+          {t('tips.title')}
         </summary>
         <ul className="space-y-1.5 px-4 pb-4 pl-10 text-muted-foreground">
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Skjut undan UI-krom när du läser upp instruktioner.</span>
+            <span>{t('tips.hideUI')}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Planera 1-2 reservlekar i Planner och byt med ett tryck.</span>
+            <span>{t('tips.planReserve')}</span>
           </li>
           <li className="flex items-start gap-2">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50" />
-            <span>Behåll skärmen ljus och textstorlek stor utomhus.</span>
+            <span>{t('tips.keepBright')}</span>
           </li>
         </ul>
       </details>
@@ -388,7 +390,7 @@ export function PlayPage({ gameId }: { gameId?: string }) {
           <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
           </svg>
-          Byt lek
+          {t('actions.switchGame')}
         </Button>
         <Button
           variant="ghost"
@@ -410,7 +412,7 @@ export function PlayPage({ gameId }: { gameId?: string }) {
           <svg className="mr-1.5 h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l3 3" />
           </svg>
-          Nollställ
+          {t('actions.reset')}
         </Button>
       </div>
 

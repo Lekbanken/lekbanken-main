@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,7 @@ type Decision = {
 type DecisionResult = { key: string; label: string; count: number };
 
 export function DecisionsPanel({ sessionId }: { sessionId: string }) {
+  const t = useTranslations('play.decisionsPanel');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [decisions, setDecisions] = useState<Decision[]>([]);
@@ -40,10 +42,10 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     try {
       const res = await fetch(`/api/play/sessions/${sessionId}/decisions`, { cache: 'no-store' });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ladda beslut');
+      if (!res.ok) throw new Error(data.error || t('errors.couldNotLoad'));
       setDecisions(data.decisions || []);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Kunde inte ladda beslut');
+      setError(e instanceof Error ? e.message : t('errors.couldNotLoad'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     setError(null);
     const title = newTitle.trim();
     if (!title) {
-      setError('Titel krävs');
+      setError(t('errors.titleRequired'));
       return;
     }
 
@@ -66,7 +68,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
       .filter((o) => o.key && o.label);
 
     if (options.length < 2) {
-      setError('Minst två alternativ krävs');
+      setError(t('errors.minOptionsRequired'));
       return;
     }
 
@@ -83,7 +85,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      setError(data.error || 'Kunde inte skapa beslut');
+      setError(data.error || t('errors.couldNotCreate'));
       return;
     }
 
@@ -107,7 +109,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || 'Kunde inte uppdatera beslut');
+        setError(data.error || t('errors.couldNotUpdate'));
         return;
       }
       await load();
@@ -143,7 +145,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
   if (loading) {
     return (
       <Card className="p-6">
-        <p className="text-sm text-muted-foreground">Laddar beslut…</p>
+        <p className="text-sm text-muted-foreground">{t('loading')}</p>
       </Card>
     );
   }
@@ -152,25 +154,25 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     <div className="space-y-4">
       <Card className="p-6 space-y-4">
         <div>
-          <h2 className="text-lg font-semibold">Beslut</h2>
-          <p className="text-sm text-muted-foreground">Skapa ett beslut och öppna röstning (single-choice).</p>
+          <h2 className="text-lg font-semibold">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 
         <div className="grid gap-3">
           <div>
-            <label className="text-sm font-medium">Titel</label>
-            <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Ex: Vad gör ni nu?" />
+            <label className="text-sm font-medium">{t('labels.title')}</label>
+            <Input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder={t('placeholders.title')} />
           </div>
           <div>
-            <label className="text-sm font-medium">Prompt</label>
-            <Textarea value={newPrompt} onChange={(e) => setNewPrompt(e.target.value)} rows={3} placeholder="Valfri kontext…" />
+            <label className="text-sm font-medium">{t('labels.prompt')}</label>
+            <Textarea value={newPrompt} onChange={(e) => setNewPrompt(e.target.value)} rows={3} placeholder={t('placeholders.prompt')} />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Alternativ</label>
+              <label className="text-sm font-medium">{t('labels.options')}</label>
               <Button
                 size="sm"
                 variant="outline"
@@ -184,7 +186,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
                   ])
                 }
               >
-                Lägg till
+                {t('actions.addOption')}
               </Button>
             </div>
             {newOptions.map((o, idx) => (
@@ -210,7 +212,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={createDecision}>Skapa beslut</Button>
+            <Button onClick={createDecision}>{t('actions.createDecision')}</Button>
           </div>
         </div>
       </Card>
@@ -222,12 +224,12 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
             </svg>
           </div>
-          <h3 className="text-base font-semibold text-foreground">Inga beslut skapade</h3>
+          <h3 className="text-base font-semibold text-foreground">{t('empty.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Skapa ett beslut ovan för att låta deltagarna rösta under sessionen.
+            {t('empty.description')}
           </p>
           <p className="text-xs text-muted-foreground">
-            Beslut går genom: Utkast → Öppen röstning → Stängd → Resultat visas
+            {t('empty.flowHint')}
           </p>
         </Card>
       ) : (
@@ -252,34 +254,34 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
             <div className="flex flex-wrap items-center gap-2">
               {d.status === 'draft' && (
                 <Button size="sm" onClick={() => action(d.id, 'open')}>
-                  Öppna röstning
+                  {t('actions.openVoting')}
                 </Button>
               )}
               {d.status === 'open' && (
                 <Button size="sm" variant="outline" onClick={() => action(d.id, 'close')}>
-                  Stäng
+                  {t('actions.close')}
                 </Button>
               )}
               {d.status === 'closed' && (
                 <>
                   <Button size="sm" variant="outline" onClick={() => action(d.id, 'open')}>
-                    Öppna igen
+                    {t('actions.reopenVoting')}
                   </Button>
                   <Button size="sm" onClick={() => action(d.id, 'reveal')}>
-                    Reveal resultat
+                    {t('actions.revealResults')}
                   </Button>
                 </>
               )}
               {d.status === 'revealed' && (
                 <Button size="sm" variant="outline" onClick={() => loadResults(d.id)}>
-                  Uppdatera resultat
+                  {t('actions.updateResults')}
                 </Button>
               )}
             </div>
 
             {d.status === 'revealed' && resultsByDecisionId[d.id] && (
               <div className="pt-2 border-t border-border">
-                <p className="text-sm font-medium mb-2">Resultat</p>
+                <p className="text-sm font-medium mb-2">{t('results.title')}</p>
                 <div className="space-y-1">
                   {resultsByDecisionId[d.id].map((r) => (
                     <div key={r.key} className="flex items-center justify-between text-sm">

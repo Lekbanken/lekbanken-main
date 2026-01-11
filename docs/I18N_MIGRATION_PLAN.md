@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
 > **Senast uppdaterad:** 2026-01-14
-> **Status:** 🟢 Fas 1 nästan komplett (~95%) - app/app och features/play klara
+> **Status:** 🟢 Fas 1 KOMPLETT (100%) - app/app, features/play och components/play klara
 
 ## Executive Summary
 
@@ -10,9 +10,9 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~80 (7%) |
-| **Migrerade strängar** | ~1,100 (39%) |
-| **Uppskattad återstående arbetsinsats** | ~20-30 timmar |
+| Filer som använder i18n | ~150 (14%) |
+| **Migrerade strängar** | ~1,400 (49%) |
+| **Uppskattad återstående arbetsinsats** | ~15-25 timmar |
 
 ## Prioriteringsmodell
 
@@ -249,9 +249,16 @@ export function PlayButton() {
   - [x] app/app/challenges/page.tsx ✅
   - [x] app/app/no-access/page.tsx ✅
   - [x] app/app/select-tenant/page.tsx ✅
-- [x] Implementera components/play (Fas 1.4) ✅ ~40 strängar migrerade
+- [x] Implementera components/play (Fas 1.4) ✅ ~150 strängar migrerade
   - [x] components/play/lobby/SettingsSection.tsx ✅
   - [x] components/play/lobby/RolesSection.tsx ✅
+  - [x] components/play/PropConfirmation.tsx ✅
+  - [x] components/play/LocationCheck.tsx ✅
+  - [x] components/play/HintPanel.tsx ✅
+  - [x] components/play/SessionControls.tsx ✅
+  - [x] components/play/CipherDecoder.tsx ✅
+  - [x] components/play/AudioPlayer.tsx ✅
+  - [x] components/play/*.tsx ✅ (alla kvarvarande filer migrerade)
 - [ ] Implementera features/admin (Fas 2) - ~489 strängar kvar
 - [ ] Implementera app/admin (Fas 2) - ~752 strängar kvar
 
@@ -276,6 +283,7 @@ export function PlayButton() {
 | 2026-01-14 | app/app (learning) | 1 | ~14 | ✅ Klart |
 | 2026-01-14 | app/app (leaderboard, events, notifications, challenges) | 4 | ~45 | ✅ Klart |
 | 2026-01-14 | app/app (no-access, select-tenant) | 2 | ~10 | ✅ Klart |
+| 2026-01-14 | components/play (alla) | 20 | ~150 | ✅ Klart |
 | - | features/admin | ~68 | 489 | ⏳ Nästa |
 | - | app/admin | ~91 | 752 | ⏳ Väntar |
 

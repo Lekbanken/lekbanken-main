@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useKeypad } from './hooks/useKeypad';
 import { LockClosedIcon, CheckCircleIcon } from '@heroicons/react/24/solid';
@@ -63,6 +64,7 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
     ref
   ) => {
     // Normalize correctCode to uppercase
+    const t = useTranslations('play.alphaKeypad');
     const normalizedCode = correctCode.toUpperCase();
     const codeLength = codeLengthProp ?? normalizedCode.length;
 
@@ -143,9 +145,9 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
           {...props}
         >
           <LockClosedIcon className="h-16 w-16 text-destructive mb-4" />
-          <p className="text-lg font-medium text-foreground">Utelåst</p>
+          <p className="text-lg font-medium text-foreground">{t('lockedOut')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Maximalt antal försök uppnått
+            {t('maxAttemptsReached')}
           </p>
         </div>
       );
@@ -163,9 +165,9 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
           {...props}
         >
           <CheckCircleIcon className="h-16 w-16 text-success mb-4" />
-          <p className="text-lg font-medium text-foreground">Rätt!</p>
+          <p className="text-lg font-medium text-foreground">{t('correct')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Ordet var korrekt
+            {t('wordCorrect')}
           </p>
         </div>
       );
@@ -200,7 +202,7 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
             isShaking && 'animate-shake',
           )}
           aria-live="polite"
-          aria-label={`Inmatning: ${currentInput || 'Tom'}`}
+          aria-label={currentInput ? t('inputLabel', { input: currentInput }) : t('inputEmpty')}
         >
           {showLetters ? (
             // Show typed letters with placeholders
@@ -240,14 +242,14 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
         {/* Attempts remaining */}
         {showAttempts && attemptsRemaining !== undefined && (
           <p className="text-sm text-muted-foreground mb-4">
-            {attemptsRemaining} försök kvar
+            {t('attemptsRemaining', { count: attemptsRemaining })}
           </p>
         )}
 
         {/* Cooldown message */}
         {isInCooldown && (
           <p className="text-sm text-warning mb-4">
-            Vänta {cooldownRemaining}s...
+            {t('waitCooldown', { seconds: cooldownRemaining })}
           </p>
         )}
 
@@ -255,7 +257,7 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
         <div
           className={cn('flex flex-col items-center', gridGaps[size])}
           role="group"
-          aria-label="Bokstavsknappar"
+          aria-label={t('letterButtons')}
         >
           {letterRows.map((row, rowIndex) => (
             <div key={rowIndex} className={cn('flex', gridGaps[size])}>
@@ -298,7 +300,7 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
                 'bg-muted text-foreground hover:bg-muted/80',
                 (isLocked || currentInput.length === 0) && 'opacity-50 cursor-not-allowed'
               )}
-              aria-label="Ta bort"
+              aria-label={t('delete')}
             >
               ⌫
             </button>
@@ -316,7 +318,7 @@ export const AlphaKeypad = forwardRef<HTMLDivElement, AlphaKeypadProps>(
                 'bg-primary text-primary-foreground hover:bg-primary/90',
                 (isLocked || currentInput.length === 0) && 'opacity-50 cursor-not-allowed'
               )}
-              aria-label="Bekräfta"
+              aria-label={t('confirm')}
             >
               ✓
             </button>

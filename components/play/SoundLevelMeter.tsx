@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   MicrophoneIcon,
   SpeakerWaveIcon,
@@ -29,6 +30,7 @@ export function SoundLevelMeter({
   onTriggered,
   className = '',
 }: SoundLevelMeterProps) {
+  const t = useTranslations('play.soundLevelMeter');
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -82,7 +84,7 @@ export function SoundLevelMeter({
       analyze();
     } catch (err) {
       console.error('Microphone access failed:', err);
-      setError('Kunde inte få åtkomst till mikrofonen');
+      setError(t('microphoneAccessError'));
       setHasPermission(false);
     }
   };
@@ -146,7 +148,7 @@ export function SoundLevelMeter({
         <div className="flex flex-col items-center gap-4 p-6 rounded-lg bg-green-50 dark:bg-green-900/20">
           <CheckCircleIcon className="h-16 w-16 text-green-500" />
           <p className="font-medium text-green-700 dark:text-green-300">
-            Mål uppnått!
+            {t('goalAchieved')}
           </p>
         </div>
       ) : (
@@ -177,7 +179,7 @@ export function SoundLevelMeter({
               
               <div className="flex justify-between w-full text-xs text-zinc-500">
                 <span>0</span>
-                <span className="text-red-500">Mål: {config.thresholdLevel}</span>
+                <span className="text-red-500">{t('goal')}: {config.thresholdLevel}</span>
                 <span>100</span>
               </div>
             </div>
@@ -187,7 +189,7 @@ export function SoundLevelMeter({
           {config.showProgress && config.triggerMode === 'sustained' && (
             <div className="flex flex-col gap-1">
               <div className="flex justify-between text-sm">
-                <span>Håll ljudnivån</span>
+                <span>{t('holdSoundLevel')}</span>
                 <span>{state.sustainedSeconds.toFixed(1)}s / {config.sustainDuration}s</span>
               </div>
               <div className="w-full h-2 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
@@ -202,7 +204,7 @@ export function SoundLevelMeter({
           {/* Peak level display */}
           {config.triggerMode === 'peak' && (
             <div className="text-center">
-              <span className="text-sm text-zinc-500">Högsta nivå: </span>
+              <span className="text-sm text-zinc-500">{t('peakLevel')}: </span>
               <span className="text-2xl font-bold">{state.peakLevel}</span>
             </div>
           )}
@@ -212,12 +214,12 @@ export function SoundLevelMeter({
             {!isListening ? (
               <Button onClick={startListening} disabled={hasPermission === false}>
                 <MicrophoneIcon className="h-5 w-5 mr-2" />
-                Starta mikrofon
+                {t('startMicrophone')}
               </Button>
             ) : (
               <Button onClick={stopListening} variant="outline">
                 <SpeakerWaveIcon className="h-5 w-5 mr-2 animate-pulse" />
-                Stoppa
+                {t('stop')}
               </Button>
             )}
           </div>
@@ -226,7 +228,7 @@ export function SoundLevelMeter({
           {isListening && (
             <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              Lyssnar...
+              {t('listening')}
             </div>
           )}
         </>

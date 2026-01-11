@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useKeypad } from './hooks/useKeypad';
 import { KeypadDisplay } from './KeypadDisplay';
@@ -60,6 +61,7 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
     },
     ref
   ) => {
+    const t = useTranslations('play.keypad');
     const codeLength = codeLengthProp ?? correctCode.length;
 
     const {
@@ -134,9 +136,9 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
           {...props}
         >
           <LockClosedIcon className="h-16 w-16 text-destructive mb-4" />
-          <p className="text-lg font-medium text-foreground">Utelåst</p>
+          <p className="text-lg font-medium text-foreground">{t('lockedOut')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Maximalt antal försök uppnått
+            {t('maxAttemptsReached')}
           </p>
         </div>
       );
@@ -154,9 +156,9 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
           {...props}
         >
           <CheckCircleIcon className="h-16 w-16 text-success mb-4" />
-          <p className="text-lg font-medium text-foreground">Upplåst!</p>
+          <p className="text-lg font-medium text-foreground">{t('unlocked')}</p>
           <p className="text-sm text-muted-foreground mt-1">
-            Korrekt kod
+            {t('correctCode')}
           </p>
         </div>
       );
@@ -189,14 +191,14 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
         {/* Attempts remaining */}
         {showAttempts && attemptsRemaining !== undefined && (
           <p className="text-sm text-muted-foreground mb-4">
-            {attemptsRemaining} försök kvar
+            {t('attemptsRemaining', { count: attemptsRemaining })}
           </p>
         )}
 
         {/* Cooldown message */}
         {isInCooldown && (
           <p className="text-sm text-warning mb-4">
-            Vänta {cooldownRemaining}s...
+            {t('waitCooldown', { seconds: cooldownRemaining })}
           </p>
         )}
 
@@ -207,7 +209,7 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
             gridGaps[size]
           )}
           role="group"
-          aria-label="Knappsats"
+          aria-label={t('keypadLabel')}
         >
           {NUMERIC_BUTTONS.map((button) => {
             const isAction = button === '⌫' || button === '✓';
@@ -233,8 +235,8 @@ export const Keypad = forwardRef<HTMLDivElement, KeypadProps>(
                   isDisabled && 'opacity-50 cursor-not-allowed'
                 )}
                 aria-label={
-                  button === '⌫' ? 'Ta bort' :
-                  button === '✓' ? 'Bekräfta' :
+                  button === '⌫' ? t('delete') :
+                  button === '✓' ? t('confirm') :
                   button
                 }
               >

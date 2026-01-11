@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   LightBulbIcon,
@@ -38,6 +39,7 @@ export function LogicGrid({
   onSolved: _onSolved,
   className = '',
 }: LogicGridProps) {
+  const t = useTranslations('play.logicGrid');
   const [selectedSection, setSelectedSection] = useState<{
     rowCat: string;
     colCat: string;
@@ -105,7 +107,7 @@ export function LogicGrid({
       <div>
         <h3 className="text-xl font-bold">{config.title}</h3>
         <p className="text-sm text-zinc-500 mt-1">
-          Klicka på celler för att markera: ✓ (ja), ✗ (nej), eller ? (okänt)
+          {t('instructions')}
         </p>
       </div>
 
@@ -113,7 +115,7 @@ export function LogicGrid({
       <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
         <div className="flex items-center gap-2 mb-3">
           <LightBulbIcon className="h-5 w-5 text-amber-500" />
-          <h4 className="font-semibold">Ledtrådar</h4>
+          <h4 className="font-semibold">{t('clues')}</h4>
         </div>
         <ol className="list-decimal list-inside space-y-1 text-sm">
           {visibleClues.map((clue) => (
@@ -134,7 +136,7 @@ export function LogicGrid({
               if (nextClue) onRevealClue?.(nextClue.id);
             }}
           >
-            Visa nästa ledtråd ({hiddenClueCount} kvar)
+            {t('showNextClue', { count: hiddenClueCount })}
           </Button>
         )}
       </div>
@@ -166,11 +168,11 @@ export function LogicGrid({
 
       {/* Status */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-zinc-500">Drag: {state.moveCount}</span>
+        <span className="text-sm text-zinc-500">{t('moves')}: {state.moveCount}</span>
         {state.isSolved && (
           <div className="flex items-center gap-2 text-green-600">
             <CheckCircleIcon className="h-5 w-5" />
-            <span className="font-medium">Löst!</span>
+            <span className="font-medium">{t('solved')}</span>
           </div>
         )}
       </div>

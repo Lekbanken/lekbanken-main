@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   BookmarkIcon,
   StarIcon,
@@ -43,6 +44,7 @@ export function ReplayTimeline({
   onDeleteMarker,
   className = '',
 }: ReplayTimelineProps) {
+  const t = useTranslations('play.replayMarker');
   const [isAddingMarker, setIsAddingMarker] = useState(false);
   const [newMarkerType, setNewMarkerType] = useState<ReplayMarkerType>('highlight');
   const [newMarkerLabel, setNewMarkerLabel] = useState('');
@@ -117,11 +119,11 @@ export function ReplayTimeline({
       <div className="flex flex-col gap-2">
         <h4 className="text-sm font-medium flex items-center gap-2">
           <BookmarkIcon className="h-4 w-4" />
-          Markörer ({state.markers.length})
+          {t('markers')} ({state.markers.length})
         </h4>
         
         {state.markers.length === 0 ? (
-          <p className="text-sm text-zinc-500">Inga markörer ännu</p>
+          <p className="text-sm text-zinc-500">{t('noMarkers')}</p>
         ) : (
           <div className="space-y-1 max-h-48 overflow-y-auto">
             {state.markers
@@ -177,19 +179,19 @@ export function ReplayTimeline({
               <Input
                 value={newMarkerLabel}
                 onChange={e => setNewMarkerLabel(e.target.value)}
-                placeholder="Markörens namn..."
+                placeholder={t('markerNamePlaceholder')}
                 onKeyDown={e => e.key === 'Enter' && handleAddMarker()}
               />
               <div className="flex gap-2">
                 <Button onClick={handleAddMarker} size="sm" disabled={!newMarkerLabel.trim()}>
-                  Lägg till
+                  {t('add')}
                 </Button>
                 <Button
                   onClick={() => setIsAddingMarker(false)}
                   variant="outline"
                   size="sm"
                 >
-                  Avbryt
+                  {t('cancel')}
                 </Button>
               </div>
             </div>
@@ -200,7 +202,7 @@ export function ReplayTimeline({
               size="sm"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
-              Lägg till markör vid {formatTime(currentTimeSeconds)}
+              {t('addMarkerAt', { time: formatTime(currentTimeSeconds) })}
             </Button>
           )}
         </div>

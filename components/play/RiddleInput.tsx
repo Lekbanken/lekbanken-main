@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -55,6 +56,7 @@ export function RiddleInput({
   size = 'md',
   className,
 }: RiddleInputProps) {
+  const t = useTranslations('play.riddleInput');
   // Internal state (used if not controlled)
   const [internalState, setInternalState] = useState<RiddleState>({
     isCorrect: false,
@@ -142,7 +144,7 @@ export function RiddleInput({
       <div className={cn('flex flex-col items-center gap-4 p-6', className)}>
         <LockClosedIcon className="h-12 w-12 text-destructive" />
         <p className="text-sm text-muted-foreground text-center">
-          Inga fler försök tillåtna
+          {t('noMoreAttempts')}
         </p>
       </div>
     );

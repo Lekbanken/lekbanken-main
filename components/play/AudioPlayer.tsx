@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,6 +65,7 @@ export function AudioPlayer({
   className,
   ...props
 }: AudioPlayerProps) {
+  const t = useTranslations('play.audioPlayer');
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // Internal state
@@ -86,7 +88,7 @@ export function AudioPlayer({
   // Destructure config with defaults
   const {
     requireAck = false,
-    ackButtonText = 'Jag har lyssnat',
+    ackButtonText = t('iHaveListened'),
     showTranscript: showTranscriptToggle = false,
     transcriptText,
     autoPlay = false,
@@ -178,7 +180,7 @@ export function AudioPlayer({
     return (
       <div className={cn('flex flex-col items-center gap-3 p-4', className)} {...props}>
         <CheckCircleIcon className="h-12 w-12 text-green-500" />
-        <p className="text-sm text-muted-foreground">Bekräftat</p>
+        <p className="text-sm text-muted-foreground">{t('acknowledged')}</p>
       </div>
     );
   }
@@ -193,8 +195,8 @@ export function AudioPlayer({
         onEnded={handleEnded}
         onTimeUpdate={handleTimeUpdate}
         onError={() => {
-          setError('Kunde inte ladda ljudfilen');
-          onError?.('Kunde inte ladda ljudfilen');
+          setError(t('loadError'));
+          onError?.(t('loadError'));
         }}
       />
 
@@ -203,7 +205,7 @@ export function AudioPlayer({
         <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-sm">
           <SpeakerWaveIcon className="h-5 w-5 text-amber-500 flex-shrink-0" />
           <span className="text-amber-700 dark:text-amber-300">
-            Hörlurar rekommenderas för bästa upplevelse
+            {t('headphonesRecommended')}
           </span>
         </div>
       )}
@@ -268,7 +270,7 @@ export function AudioPlayer({
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mx-auto"
           >
             <DocumentTextIcon className="h-4 w-4" />
-            {showTranscript ? 'Dölj transkript' : 'Visa transkript'}
+            {showTranscript ? t('hideTranscript') : t('showTranscript')}
           </button>
           
           {showTranscript && (

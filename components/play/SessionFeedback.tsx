@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { WifiIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState, useMemo } from 'react';
 
@@ -19,6 +20,7 @@ export function ReconnectingBanner({
   onRetry,
   className = '',
 }: ReconnectingBannerProps) {
+  const t = useTranslations('play.sessionFeedback');
   const [dotCount, setDotCount] = useState(0);
 
   // Animate dots
@@ -64,11 +66,11 @@ export function ReconnectingBanner({
       {/* Message */}
       <div className="text-sm">
         <span className="font-medium">
-          Återansluter{dots}
+          {t('reconnecting')}{dots}
         </span>
         {attemptCount > 0 && (
           <span className="text-amber-700 dark:text-amber-300 ml-2">
-            (försök {attemptCount}/{maxAttempts})
+            ({t('attempt', { current: attemptCount, max: maxAttempts })})
           </span>
         )}
       </div>
@@ -84,7 +86,7 @@ export function ReconnectingBanner({
             'transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500'
           )}
         >
-          Försök igen
+          {t('tryAgain')}
         </button>
       )}
     </div>
@@ -194,7 +196,7 @@ export function SessionStatusMessage({
               setTimeout(onDismiss, 300);
             }}
             className="p-1 rounded hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-            aria-label="Stäng meddelande"
+            aria-label={t('closeMessage')}
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -2463,6 +2463,109 @@
         "encoded": "Encoded"
       }
     },
+    "keypad": {
+      "lockedOut": "Locked out",
+      "maxAttemptsReached": "Maximum attempts reached",
+      "unlocked": "Unlocked!",
+      "correctCode": "Correct code",
+      "attemptsRemaining": "{count} attempts remaining",
+      "waitCooldown": "Wait {seconds}s...",
+      "keypadLabel": "Keypad",
+      "delete": "Delete",
+      "confirm": "Confirm"
+    },
+    "alphaKeypad": {
+      "lockedOut": "Locked out",
+      "maxAttemptsReached": "Maximum attempts reached",
+      "correct": "Correct!",
+      "wordCorrect": "The word was correct",
+      "inputLabel": "Input: {input}",
+      "inputEmpty": "Input: Empty",
+      "attemptsRemaining": "{count} attempts remaining",
+      "waitCooldown": "Wait {seconds}s...",
+      "letterButtons": "Letter buttons",
+      "delete": "Delete",
+      "confirm": "Confirm"
+    },
+    "qrScanner": {
+      "cameraError": "Could not start camera",
+      "invalidCode": "Invalid code",
+      "qrNotValid": "QR code is not valid for this task",
+      "close": "Close",
+      "scanQrCode": "Scan QR code",
+      "readNfc": "Read NFC tag",
+      "nfcNotSupported": "NFC is not supported in this browser",
+      "enterManually": "Enter code manually",
+      "enterCodePlaceholder": "Enter code...",
+      "verify": "Verify",
+      "backToScanning": "Back to scanning",
+      "failedAttempts": "{count} failed attempts"
+    },
+    "multiAnswerForm": {
+      "allChecksPassed": "All checks passed!",
+      "passedCount": "{passed}/{total} passed",
+      "progress": "Progress",
+      "typeAnswer": "Type answer...",
+      "check": "Check",
+      "enterCode": "Enter code...",
+      "verify": "Verify",
+      "select": "Select...",
+      "confirm": "Confirm"
+    },
+    "soundLevelMeter": {
+      "microphoneAccessError": "Could not access microphone",
+      "goalAchieved": "Goal achieved!",
+      "goal": "Goal",
+      "holdSoundLevel": "Hold sound level",
+      "peakLevel": "Peak level",
+      "startMicrophone": "Start microphone",
+      "stop": "Stop",
+      "listening": "Listening..."
+    },
+    "replayMarker": {
+      "markers": "Markers",
+      "noMarkers": "No markers yet",
+      "markerNamePlaceholder": "Marker name...",
+      "add": "Add",
+      "cancel": "Cancel",
+      "addMarkerAt": "Add marker at {time}"
+    },
+    "participantRow": {
+      "winner": "Winner",
+      "secondPlace": "2nd place",
+      "thirdPlace": "3rd place",
+      "nthPlace": "{position}th place",
+      "you": "you",
+      "startsNext": "Starts next time",
+      "participantActions": "Participant actions",
+      "setPosition": "Set position",
+      "remove": "Remove",
+      "block": "Block"
+    },
+    "sessionFeedback": {
+      "reconnecting": "Reconnecting",
+      "attempt": "attempt {current}/{max}",
+      "tryAgain": "Try again",
+      "closeMessage": "Close message"
+    },
+    "logicGrid": {
+      "instructions": "Click cells to mark: ✓ (yes), ✗ (no), or ? (unknown)",
+      "clues": "Clues",
+      "showNextClue": "Show next clue ({count} remaining)",
+      "moves": "Moves",
+      "solved": "Solved!"
+    },
+    "audioPlayer": {
+      "iHaveListened": "I have listened",
+      "acknowledged": "Acknowledged",
+      "loadError": "Could not load audio file",
+      "headphonesRecommended": "Headphones recommended for best experience",
+      "hideTranscript": "Hide transcript",
+      "showTranscript": "Show transcript"
+    },
+    "riddleInput": {
+      "noMoreAttempts": "No more attempts allowed"
+    },
     "activeSessionShell": {
       "defaultTitle": "Active session",
       "participant": {

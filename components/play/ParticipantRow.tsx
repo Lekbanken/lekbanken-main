@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Database } from '@/types/supabase';
 import { cn } from '@/lib/utils';
 import { ParticipantStatusBadge, ParticipantStatusDot } from './ParticipantStatusBadge';
@@ -52,6 +53,7 @@ export function ParticipantRow({
   onSetPosition,
   className = '',
 }: ParticipantRowProps) {
+  const t = useTranslations('play.participantRow');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleKick = () => {
@@ -76,10 +78,10 @@ export function ParticipantRow({
 
   // Generate position labels based on participant count
   const getPositionLabel = (pos: number) => {
-    if (pos === 1) return '🥇 Vinnare';
-    if (pos === 2) return '🥈 2:a plats';
-    if (pos === 3) return '🥉 3:e plats';
-    return `${pos}:e plats`;
+    if (pos === 1) return `🥇 ${t('winner')}`;
+    if (pos === 2) return `🥈 ${t('secondPlace')}`;
+    if (pos === 3) return `🥉 ${t('thirdPlace')}`;
+    return t('nthPlace', { position: pos });
   };
 
   const hasAnyAction = onKick || onBlock || onSetNextStarter || (isSessionEnded && onSetPosition);
@@ -101,12 +103,12 @@ export function ParticipantRow({
           <span className={cn('font-medium text-foreground', compact && 'text-sm')}>
             {participant.displayName}
             {isCurrentUser && (
-              <span className="ml-1 text-muted-foreground">(du)</span>
+              <span className="ml-1 text-muted-foreground">({t('you')})</span>
             )}
           </span>
           {participant.isNextStarter && (
             <span className="text-xs text-amber-600 dark:text-amber-400">
-              Börjar nästa gång
+              {t('startsNext')}
             </span>
           )}
           {participant.position && (
@@ -144,7 +146,7 @@ export function ParticipantRow({
               variant="ghost"
               size="sm"
               className="h-8 w-8 p-0"
-              aria-label="Deltagaråtgärder"
+              aria-label={t('participantActions')}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               <EllipsisVerticalIcon className="h-4 w-4" />
@@ -167,7 +169,7 @@ export function ParticipantRow({
                       className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-muted"
                     >
                       <HandRaisedIcon className="h-4 w-4 text-amber-500" />
-                      Börjar nästa gång
+                      {t('startsNext')}
                     </button>
                   )}
 
@@ -175,7 +177,7 @@ export function ParticipantRow({
                   {isSessionEnded && onSetPosition && participantCount > 0 && (
                     <>
                       <div className="px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                        Sätt placering
+                        {t('setPosition')}
                       </div>
                       {Array.from({ length: Math.min(participantCount, 10) }, (_, i) => i + 1).map((pos) => (
                         <button
@@ -201,7 +203,7 @@ export function ParticipantRow({
                       className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-muted"
                     >
                       <XMarkIcon className="h-4 w-4" />
-                      Ta bort
+                      {t('remove')}
                     </button>
                   )}
 
@@ -212,7 +214,7 @@ export function ParticipantRow({
                       className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm text-destructive hover:bg-muted"
                     >
                       <NoSymbolIcon className="h-4 w-4" />
-                      Blockera
+                      {t('block')}
                     </button>
                   )}
                 </div>

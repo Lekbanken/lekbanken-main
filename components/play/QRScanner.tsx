@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,6 +52,7 @@ export function QRScanner({
   size = 'md',
   className,
 }: QRScannerProps) {
+  const t = useTranslations('play.qrScanner');
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -135,7 +137,7 @@ export function QRScanner({
       
       setShowCamera(true);
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Kunde inte starta kameran';
+      const errorMsg = err instanceof Error ? err.message : t('cameraError');
       setCameraError(errorMsg);
       onScanFail?.(errorMsg);
       
@@ -162,7 +164,7 @@ export function QRScanner({
     if (isValid) {
       handleSuccess(fallbackCode.trim().toUpperCase(), true);
     } else {
-      setError('Ogiltig kod');
+      setError(t('invalidCode'));
       updateState({ scanAttempts: state.scanAttempts + 1 });
     }
   }, [fallbackCode, validateValue, handleSuccess, updateState, state.scanAttempts]);
@@ -175,7 +177,7 @@ export function QRScanner({
     if (isValid) {
       handleSuccess(simulatedValue, false);
     } else {
-      setError('QR-koden är inte giltig för denna uppgift');
+      setError(t('qrNotValid'));
       updateState({ scanAttempts: state.scanAttempts + 1 });
       onScanFail?.('Invalid QR code');
     }
@@ -236,7 +238,7 @@ export function QRScanner({
             onClick={stopCamera}
             className="absolute top-2 right-2"
           >
-            Stäng
+            {t('close')}
           </Button>
         </div>
       )}
@@ -259,7 +261,7 @@ export function QRScanner({
               className={cn('w-full gap-2', styles.button)}
             >
               <CameraIcon className="h-5 w-5" />
-              Skanna QR-kod
+              {t('scanQrCode')}
             </Button>
           )}
           
@@ -267,13 +269,13 @@ export function QRScanner({
             <Button
               onClick={() => {
                 // NFC API would go here
-                setError('NFC stöds inte i denna webbläsare');
+                setError(t('nfcNotSupported'));
               }}
               disabled={disabled}
               className={cn('w-full gap-2', styles.button)}
             >
               <QrCodeIcon className="h-5 w-5" />
-              Läs NFC-tagg
+              {t('readNfc')}
             </Button>
           )}
           
@@ -285,7 +287,7 @@ export function QRScanner({
               className={cn('w-full gap-2', styles.button)}
             >
               <KeyIcon className="h-5 w-5" />
-              Ange kod manuellt
+              {t('enterManually')}
             </Button>
           )}
         </div>
@@ -302,7 +304,7 @@ export function QRScanner({
                 setFallbackCode(e.target.value.toUpperCase());
                 setError(null);
               }}
-              placeholder="Ange kod..."
+              placeholder={t('enterCodePlaceholder')}
               disabled={disabled}
               className="flex-1 font-mono tracking-widest"
               autoComplete="off"
@@ -312,7 +314,7 @@ export function QRScanner({
               onClick={handleFallbackSubmit}
               disabled={disabled || !fallbackCode.trim()}
             >
-              Verifiera
+              {t('verify')}
             </Button>
           </div>
           
@@ -326,7 +328,7 @@ export function QRScanner({
             }}
             className="w-full"
           >
-            Tillbaka till skanning
+            {t('backToScanning')}
           </Button>
         </div>
       )}
@@ -339,7 +341,7 @@ export function QRScanner({
       {/* Attempts counter */}
       {state.scanAttempts > 0 && (
         <p className="text-xs text-muted-foreground text-center">
-          {state.scanAttempts} misslyckade försök
+          {t('failedAttempts', { count: state.scanAttempts })}
         </p>
       )}
 

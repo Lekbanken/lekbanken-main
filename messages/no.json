@@ -2463,6 +2463,109 @@
         "encoded": "Kodet"
       }
     },
+    "keypad": {
+      "lockedOut": "Utestengt",
+      "maxAttemptsReached": "Maksimalt antall forsøk nådd",
+      "unlocked": "Låst opp!",
+      "correctCode": "Riktig kode",
+      "attemptsRemaining": "{count} forsøk igjen",
+      "waitCooldown": "Vent {seconds}s...",
+      "keypadLabel": "Tastatur",
+      "delete": "Slett",
+      "confirm": "Bekreft"
+    },
+    "alphaKeypad": {
+      "lockedOut": "Utestengt",
+      "maxAttemptsReached": "Maksimalt antall forsøk nådd",
+      "correct": "Riktig!",
+      "wordCorrect": "Ordet var riktig",
+      "inputLabel": "Inndata: {input}",
+      "inputEmpty": "Inndata: Tom",
+      "attemptsRemaining": "{count} forsøk igjen",
+      "waitCooldown": "Vent {seconds}s...",
+      "letterButtons": "Bokstavknapper",
+      "delete": "Slett",
+      "confirm": "Bekreft"
+    },
+    "qrScanner": {
+      "cameraError": "Kunne ikke starte kameraet",
+      "invalidCode": "Ugyldig kode",
+      "qrNotValid": "QR-koden er ikke gyldig for denne oppgaven",
+      "close": "Lukk",
+      "scanQrCode": "Skann QR-kode",
+      "readNfc": "Les NFC-brikke",
+      "nfcNotSupported": "NFC støttes ikke i denne nettleseren",
+      "enterManually": "Skriv inn kode manuelt",
+      "enterCodePlaceholder": "Skriv inn kode...",
+      "verify": "Verifiser",
+      "backToScanning": "Tilbake til skanning",
+      "failedAttempts": "{count} mislykkede forsøk"
+    },
+    "multiAnswerForm": {
+      "allChecksPassed": "Alle kontroller godkjent!",
+      "passedCount": "{passed}/{total} bestått",
+      "progress": "Fremdrift",
+      "typeAnswer": "Skriv svar...",
+      "check": "Kontroller",
+      "enterCode": "Skriv inn kode...",
+      "verify": "Verifiser",
+      "select": "Velg...",
+      "confirm": "Bekreft"
+    },
+    "soundLevelMeter": {
+      "microphoneAccessError": "Kunne ikke få tilgang til mikrofonen",
+      "goalAchieved": "Mål oppnådd!",
+      "goal": "Mål",
+      "holdSoundLevel": "Hold lydnivået",
+      "peakLevel": "Høyeste nivå",
+      "startMicrophone": "Start mikrofon",
+      "stop": "Stopp",
+      "listening": "Lytter..."
+    },
+    "replayMarker": {
+      "markers": "Markører",
+      "noMarkers": "Ingen markører ennå",
+      "markerNamePlaceholder": "Markørens navn...",
+      "add": "Legg til",
+      "cancel": "Avbryt",
+      "addMarkerAt": "Legg til markør ved {time}"
+    },
+    "participantRow": {
+      "winner": "Vinner",
+      "secondPlace": "2. plass",
+      "thirdPlace": "3. plass",
+      "nthPlace": "{position}. plass",
+      "you": "deg",
+      "startsNext": "Starter neste gang",
+      "participantActions": "Deltakerhandlinger",
+      "setPosition": "Sett plassering",
+      "remove": "Fjern",
+      "block": "Blokker"
+    },
+    "sessionFeedback": {
+      "reconnecting": "Kobler til på nytt",
+      "attempt": "forsøk {current}/{max}",
+      "tryAgain": "Prøv igjen",
+      "closeMessage": "Lukk melding"
+    },
+    "logicGrid": {
+      "instructions": "Klikk på celler for å markere: ✓ (ja), ✗ (nei), eller ? (ukjent)",
+      "clues": "Ledetråder",
+      "showNextClue": "Vis neste ledetråd ({count} igjen)",
+      "moves": "Trekk",
+      "solved": "Løst!"
+    },
+    "audioPlayer": {
+      "iHaveListened": "Jeg har lyttet",
+      "acknowledged": "Bekreftet",
+      "loadError": "Kunne ikke laste lydfilen",
+      "headphonesRecommended": "Hodetelefoner anbefales for best opplevelse",
+      "hideTranscript": "Skjul transkripsjon",
+      "showTranscript": "Vis transkripsjon"
+    },
+    "riddleInput": {
+      "noMoreAttempts": "Ingen flere forsøk tillatt"
+    },
     "activeSessionShell": {
       "defaultTitle": "Aktiv sesjon",
       "participant": {

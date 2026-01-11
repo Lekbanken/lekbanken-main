@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,6 +55,7 @@ export function MultiAnswerForm({
   size = 'md',
   className,
 }: MultiAnswerFormProps) {
+  const t = useTranslations('play.multiAnswerForm');
   // Internal state
   const [internalState, setInternalState] = useState<MultiAnswerState>({
     results: [],
@@ -143,9 +145,9 @@ export function MultiAnswerForm({
     return (
       <div className={cn('flex flex-col items-center gap-4 p-6', className)}>
         <CheckCircleIcon className="h-12 w-12 text-green-500" />
-        <p className="text-lg font-medium text-green-500">Alla kontroller godkända!</p>
+        <p className="text-lg font-medium text-green-500">{t('allChecksPassed')}</p>
         <p className="text-sm text-muted-foreground">
-          {state.passedCount}/{state.totalCount} klarade
+          {t('passedCount', { passed: state.passedCount, total: state.totalCount })}
         </p>
       </div>
     );
@@ -156,7 +158,7 @@ export function MultiAnswerForm({
       {/* Progress indicator */}
       {config.showProgress !== false && (
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Framsteg</span>
+          <span className="text-muted-foreground">{t('progress')}</span>
           <span className="font-medium">
             {state.passedCount}/{state.totalCount}
           </span>
@@ -181,6 +183,7 @@ export function MultiAnswerForm({
             isFailed={isFailed}
             disabled={disabled || isPassed}
             size={size}
+            t={t}
           />
         );
       })}
@@ -201,6 +204,7 @@ interface CheckItemInputProps {
   isFailed: boolean;
   disabled: boolean;
   size: 'sm' | 'md' | 'lg';
+  t: (key: string) => string;
 }
 
 function CheckItemInput({
@@ -212,6 +216,7 @@ function CheckItemInput({
   isFailed,
   disabled,
   size,
+  t,
 }: CheckItemInputProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -255,7 +260,7 @@ function CheckItemInput({
               type="text"
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Skriv svar..."
+              placeholder={t('typeAnswer')}
               disabled={disabled}
               className={cn(styles.input, 'flex-1')}
               autoComplete="off"
@@ -265,7 +270,7 @@ function CheckItemInput({
               disabled={disabled || !value.trim()}
               className={styles.button}
             >
-              Kontrollera
+              {t('check')}
             </Button>
           </div>
         )}
@@ -276,7 +281,7 @@ function CheckItemInput({
               type="text"
               value={value}
               onChange={(e) => onChange(e.target.value.toUpperCase())}
-              placeholder="Ange kod..."
+              placeholder={t('enterCode')}
               disabled={disabled}
               className={cn(styles.input, 'flex-1 font-mono tracking-widest')}
               autoComplete="off"
@@ -287,7 +292,7 @@ function CheckItemInput({
               disabled={disabled || !value.trim()}
               className={styles.button}
             >
-              Verifiera
+              {t('verify')}
             </Button>
           </div>
         )}
@@ -299,20 +304,20 @@ function CheckItemInput({
               onChange={(e) => onChange(e.target.value)}
               disabled={disabled}
               options={[
-                { value: '', label: 'Välj...' },
+                { value: '', label: t('select') },
                 ...check.options.map((opt) => ({
                   value: opt.value,
                   label: opt.label,
                 })),
               ]}
-              placeholder="Välj..."
+              placeholder={t('select')}
             />
             <Button
               type="submit"
               disabled={disabled || !value}
               className={styles.button}
             >
-              Bekräfta
+              {t('confirm')}
             </Button>
           </div>
         )}
@@ -320,7 +325,7 @@ function CheckItemInput({
         {check.type === 'toggle' && (
           <div className="flex items-center justify-between">
             <span className="text-sm text-muted-foreground">
-              {check.hint ?? 'Bekräfta'}
+              {check.hint ?? t('confirm')}
             </span>
             <Switch
               checked={value === 'true'}

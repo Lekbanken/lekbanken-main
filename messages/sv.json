@@ -2459,6 +2459,109 @@
         "encoded": "Kodat"
       }
     },
+    "keypad": {
+      "lockedOut": "Utelåst",
+      "maxAttemptsReached": "Maximalt antal försök uppnått",
+      "unlocked": "Upplåst!",
+      "correctCode": "Korrekt kod",
+      "attemptsRemaining": "{count} försök kvar",
+      "waitCooldown": "Vänta {seconds}s...",
+      "keypadLabel": "Knappsats",
+      "delete": "Ta bort",
+      "confirm": "Bekräfta"
+    },
+    "alphaKeypad": {
+      "lockedOut": "Utelåst",
+      "maxAttemptsReached": "Maximalt antal försök uppnått",
+      "correct": "Rätt!",
+      "wordCorrect": "Ordet var korrekt",
+      "inputLabel": "Inmatning: {input}",
+      "inputEmpty": "Inmatning: Tom",
+      "attemptsRemaining": "{count} försök kvar",
+      "waitCooldown": "Vänta {seconds}s...",
+      "letterButtons": "Bokstavsknappar",
+      "delete": "Ta bort",
+      "confirm": "Bekräfta"
+    },
+    "qrScanner": {
+      "cameraError": "Kunde inte starta kameran",
+      "invalidCode": "Ogiltig kod",
+      "qrNotValid": "QR-koden är inte giltig för denna uppgift",
+      "close": "Stäng",
+      "scanQrCode": "Skanna QR-kod",
+      "readNfc": "Läs NFC-tagg",
+      "nfcNotSupported": "NFC stöds inte i denna webbläsare",
+      "enterManually": "Ange kod manuellt",
+      "enterCodePlaceholder": "Ange kod...",
+      "verify": "Verifiera",
+      "backToScanning": "Tillbaka till skanning",
+      "failedAttempts": "{count} misslyckade försök"
+    },
+    "multiAnswerForm": {
+      "allChecksPassed": "Alla kontroller godkända!",
+      "passedCount": "{passed}/{total} klarade",
+      "progress": "Framsteg",
+      "typeAnswer": "Skriv svar...",
+      "check": "Kontrollera",
+      "enterCode": "Ange kod...",
+      "verify": "Verifiera",
+      "select": "Välj...",
+      "confirm": "Bekräfta"
+    },
+    "soundLevelMeter": {
+      "microphoneAccessError": "Kunde inte få åtkomst till mikrofonen",
+      "goalAchieved": "Mål uppnått!",
+      "goal": "Mål",
+      "holdSoundLevel": "Håll ljudnivån",
+      "peakLevel": "Högsta nivå",
+      "startMicrophone": "Starta mikrofon",
+      "stop": "Stoppa",
+      "listening": "Lyssnar..."
+    },
+    "replayMarker": {
+      "markers": "Markörer",
+      "noMarkers": "Inga markörer ännu",
+      "markerNamePlaceholder": "Markörens namn...",
+      "add": "Lägg till",
+      "cancel": "Avbryt",
+      "addMarkerAt": "Lägg till markör vid {time}"
+    },
+    "participantRow": {
+      "winner": "Vinnare",
+      "secondPlace": "2:a plats",
+      "thirdPlace": "3:e plats",
+      "nthPlace": "{position}:e plats",
+      "you": "du",
+      "startsNext": "Börjar nästa gång",
+      "participantActions": "Deltagaråtgärder",
+      "setPosition": "Sätt placering",
+      "remove": "Ta bort",
+      "block": "Blockera"
+    },
+    "sessionFeedback": {
+      "reconnecting": "Återansluter",
+      "attempt": "försök {current}/{max}",
+      "tryAgain": "Försök igen",
+      "closeMessage": "Stäng meddelande"
+    },
+    "logicGrid": {
+      "instructions": "Klicka på celler för att markera: ✓ (ja), ✗ (nej), eller ? (okänt)",
+      "clues": "Ledtrådar",
+      "showNextClue": "Visa nästa ledtråd ({count} kvar)",
+      "moves": "Drag",
+      "solved": "Löst!"
+    },
+    "audioPlayer": {
+      "iHaveListened": "Jag har lyssnat",
+      "acknowledged": "Bekräftat",
+      "loadError": "Kunde inte ladda ljudfilen",
+      "headphonesRecommended": "Hörlurar rekommenderas för bästa upplevelse",
+      "hideTranscript": "Dölj transkript",
+      "showTranscript": "Visa transkript"
+    },
+    "riddleInput": {
+      "noMoreAttempts": "Inga fler försök tillåtna"
+    },
     "activeSessionShell": {
       "defaultTitle": "Aktiv session",
       "participant": {

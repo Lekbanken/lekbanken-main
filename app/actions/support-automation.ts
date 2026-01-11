@@ -828,7 +828,7 @@ export async function setTicketSlaDeadline(
 // HELPER: Render template with variables
 // ============================================
 
-export function renderTemplate(
+function renderTemplate(
   template: string,
   variables: Record<string, string | number | null | undefined>
 ): string {

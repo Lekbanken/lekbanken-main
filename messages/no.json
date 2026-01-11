@@ -1496,6 +1496,72 @@
         "hide": "Skjul",
         "reveal": "Vis"
       }
+    },
+    "preflightChecklist": {
+      "title": "Klar til \u00e5 starte?",
+      "description": "Kontroller at alt er p\u00e5 plass f\u00f8r du starter spillmodus.",
+      "itemsReady": "{ready} / {total} klare",
+      "errorMessage": "Fiks feilene ovenfor for \u00e5 starte.",
+      "warningMessage": "Sjekk advarslene f\u00f8r du starter.",
+      "successMessage": "\u2713 Alt ser bra ut! Du kan starte sesjonen.",
+      "starting": "Starter...",
+      "startPlayMode": "Start spillmodus",
+      "items": {
+        "participants": {
+          "label": "Deltakere",
+          "joined": "{count} deltakere har blitt med",
+          "noneJoined": "Ingen deltakere har blitt med enda"
+        },
+        "game": {
+          "label": "Spill koblet",
+          "noGame": "Sesjonen har ikke noe spill koblet"
+        },
+        "rolesSnapshot": {
+          "label": "Roller kopiert",
+          "notCopied": "Kopier roller fra spillet f\u00f8r du kan tildele dem",
+          "copied": "{count} roller kopiert fra spillet",
+          "copyAction": "Kopier roller"
+        },
+        "rolesAssigned": {
+          "label": "Roller tildelt",
+          "allMinMet": "Alle minimumskrav oppfylt",
+          "allAssigned": "Alle deltakere har f\u00e5tt roller",
+          "someAssigned": "{assigned} av {total} deltakere har roller",
+          "noneAssigned": "Ingen deltaker har blitt tildelt rolle enda",
+          "assignAction": "Tildel roller"
+        },
+        "secrets": {
+          "label": "Hemmelige instruksjoner",
+          "unlocked": "L\u00e5st opp ({revealed}/{total} har vist)",
+          "readyToUnlock": "Klar til \u00e5 l\u00e5ses opp",
+          "assignRolesFirst": "Tildel roller f\u00f8rst",
+          "unlockAction": "L\u00e5s opp"
+        },
+        "artifacts": {
+          "label": "Artefakter",
+          "ready": "Artefakter klare for sesjonen",
+          "loading": "Artefakter lastes automatisk ved start"
+        },
+        "triggers": {
+          "label": "Triggere",
+          "ready": "{count} triggere klare",
+          "loading": "Triggere lastes automatisk ved start"
+        },
+        "signals": {
+          "label": "Signaler",
+          "tested": "Signalkilder testet",
+          "notTested": "Test signalkilder (valgfritt)",
+          "testAction": "Test"
+        }
+      }
+    },
+    "leaderScriptPanel": {
+      "translationLabel": "Oversettelse ({language})",
+      "noContent": "Intet innhold i denne fasen"
+    },
+    "participantSignalMicroUI": {
+      "queueCount": "{count} i k\u00f8",
+      "autoSendHint": "Sendes automatisk n\u00e5r du er online."
     }
   }
 }

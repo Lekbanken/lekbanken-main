@@ -71,6 +71,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
   const toast = useToast();
   const t = useTranslations('play.hostSession');
   const ts = useTranslations('play.session');
+  const tp = useTranslations('play.preflightChecklist');
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participants, setParticipants] = useState<ParticipantWithExtras[]>([]);
   const [loading, setLoading] = useState(true);
@@ -639,7 +640,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
         
         const items = buildPreflightItems(checklistState, {
           onSnapshotRoles: handleSnapshotRoles,
-        });
+        }, tp);
         
         // Can start if no errors (warnings are allowed)
         const canStart = !items.some((i) => i.status === 'error');

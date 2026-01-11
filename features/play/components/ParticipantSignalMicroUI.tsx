@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -62,6 +63,7 @@ export function ParticipantSignalMicroUI({
   participantToken,
   disabled = false,
 }: ParticipantSignalMicroUIProps) {
+  const t = useTranslations('play.participantSignalMicroUI');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
@@ -187,7 +189,7 @@ export function ParticipantSignalMicroUI({
       <div className="flex items-center justify-between">
         <div className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Signals</div>
         {queue.length > 0 && (
-          <Badge variant="secondary" size="sm">{queue.length} i kö</Badge>
+          <Badge variant="secondary" size="sm">{t('queueCount', { count: queue.length })}</Badge>
         )}
       </div>
 
@@ -208,7 +210,7 @@ export function ParticipantSignalMicroUI({
 
       {queue.length > 0 && (
         <p className="mt-2 text-xs text-muted-foreground">
-          Skickas automatiskt när du är online.
+          {t('autoSendHint')}
         </p>
       )}
     </Card>

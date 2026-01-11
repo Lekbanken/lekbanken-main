@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -231,6 +232,7 @@ interface TranslationStatusBarProps {
 }
 
 function TranslationStatusBar({ completion, language }: TranslationStatusBarProps) {
+  const t = useTranslations('play.leaderScriptPanel');
   const langInfo = getLanguageInfo(language);
   const isComplete = completion === 1;
 
@@ -238,13 +240,22 @@ function TranslationStatusBar({ completion, language }: TranslationStatusBarProp
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
         <span className="text-muted-foreground">
-          Översättning ({langInfo?.nativeName})
+          {t('translationLabel', { language: langInfo?.nativeName ?? language })}
         </span>
         <span className={isComplete ? 'text-green-500' : 'text-yellow-500'}>
           {Math.round(completion * 100)}%
         </span>
       </div>
       <Progress value={completion * 100} className="h-1" />
+    </div>
+  );
+}
+
+function NoContentPlaceholder() {
+  const t = useTranslations('play.leaderScriptPanel');
+  return (
+    <div className="text-center text-muted-foreground py-8">
+      {t('noContent')}
     </div>
   );
 }
@@ -362,9 +373,7 @@ export function LeaderScriptPanel({
                     />
                   ))
                 ) : (
-                  <div className="text-center text-muted-foreground py-8">
-                    Inget innehåll i denna fas
-                  </div>
+                  <NoContentPlaceholder />
                 )}
               </div>
             </ScrollArea>

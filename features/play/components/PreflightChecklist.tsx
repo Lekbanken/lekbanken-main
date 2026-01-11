@@ -12,6 +12,7 @@ import {
   ExclamationTriangleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/solid';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -110,6 +111,7 @@ export function PreflightChecklist({
   isStarting = false,
   className,
 }: PreflightChecklistProps) {
+  const t = useTranslations('play.preflightChecklist');
   const readyCount = items.filter((i) => i.status === 'ready').length;
   const hasErrors = items.some((i) => i.status === 'error');
   const hasWarnings = items.some((i) => i.status === 'warning');
@@ -125,17 +127,17 @@ export function PreflightChecklist({
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-foreground">
-            Redo att starta?
+            {t('title')}
           </h2>
           <p className="text-sm text-muted-foreground">
-            Kontrollera att allt är på plats innan du startar spelläget.
+            {t('description')}
           </p>
         </div>
         <Badge
           variant={hasErrors ? 'error' : hasWarnings ? 'warning' : 'success'}
           size="lg"
         >
-          {readyCount} / {items.length} klara
+          {t('itemsReady', { ready: readyCount, total: items.length })}
         </Badge>
       </div>
 
@@ -149,13 +151,13 @@ export function PreflightChecklist({
         {!canStart && (
           <p className="text-sm text-muted-foreground">
             {hasErrors
-              ? 'Åtgärda felen ovan för att kunna starta.'
-              : 'Kontrollera varningarna innan du startar.'}
+              ? t('errorMessage')
+              : t('warningMessage')}
           </p>
         )}
         {canStart && (
           <p className="text-sm text-green-700">
-            ✓ Allt ser bra ut! Du kan starta sessionen.
+            {t('successMessage')}
           </p>
         )}
 
@@ -166,7 +168,7 @@ export function PreflightChecklist({
           disabled={!canStart || isStarting}
           className="shrink-0"
         >
-          {isStarting ? 'Startar...' : 'Starta spelläge'}
+          {isStarting ? t('starting') : t('startPlayMode')}
         </Button>
       </div>
     </Card>
@@ -195,6 +197,9 @@ export interface SessionChecklistState {
   roleMinCountsStatus?: Array<{ roleId: string; name: string; min: number; assigned: number; met: boolean }>;
 }
 
+// Type for the translate function
+type TranslateFunction = (key: string, values?: Record<string, string | number>) => string;
+
 export function buildPreflightItems(
   state: SessionChecklistState,
   actions: {
@@ -202,28 +207,29 @@ export function buildPreflightItems(
     onAssignRoles?: () => void;
     onUnlockSecrets?: () => void;
     onTestSignals?: () => void;
-  }
+  },
+  t: TranslateFunction
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
 
   // 1. Participants check
   items.push({
     id: 'participants',
-    label: 'Deltagare',
+    label: t('items.participants.label'),
     status: state.participantCount > 0 ? 'ready' : 'warning',
     detail:
       state.participantCount > 0
-        ? `${state.participantCount} deltagare har gått med`
-        : 'Inga deltagare har gått med ännu',
+        ? t('items.participants.joined', { count: state.participantCount })
+        : t('items.participants.noneJoined'),
   });
 
   // 2. Game check
   if (!state.hasGame) {
     items.push({
       id: 'game',
-      label: 'Spel kopplat',
+      label: t('items.game.label'),
       status: 'error',
-      detail: 'Sessionen har inget spel kopplat',
+      detail: t('items.game.noGame'),
     });
     return items; // Early return - can't continue without game
   }
@@ -232,19 +238,19 @@ export function buildPreflightItems(
   if (!state.rolesSnapshotted) {
     items.push({
       id: 'roles-snapshot',
-      label: 'Roller kopierade',
+      label: t('items.rolesSnapshot.label'),
       status: 'error',
-      detail: 'Kopiera roller från spelet innan du kan tilldela dem',
+      detail: t('items.rolesSnapshot.notCopied'),
       action: actions.onSnapshotRoles
-        ? { label: 'Kopiera roller', onClick: actions.onSnapshotRoles }
+        ? { label: t('items.rolesSnapshot.copyAction'), onClick: actions.onSnapshotRoles }
         : undefined,
     });
   } else {
     items.push({
       id: 'roles-snapshot',
-      label: 'Roller kopierade',
+      label: t('items.rolesSnapshot.label'),
       status: 'ready',
-      detail: `${state.totalRoles} roller kopierade från spelet`,
+      detail: t('items.rolesSnapshot.copied', { count: state.totalRoles }),
     });
 
     // 4. Roles assignment check
@@ -254,17 +260,17 @@ export function buildPreflightItems(
 
       items.push({
         id: 'roles-assigned',
-        label: 'Roller tilldelade',
+        label: t('items.rolesAssigned.label'),
         status: minCountsMet ? 'ready' : someAssigned ? 'warning' : 'pending',
         detail: minCountsMet
-          ? 'Alla minimikrav uppfyllda'
+          ? t('items.rolesAssigned.allMinMet')
           : state.roleMinCountsStatus
               .filter((r) => !r.met)
               .map((r) => `${r.name}: ${r.assigned}/${r.min}`)
               .join(', '),
         action:
           !minCountsMet && actions.onAssignRoles
-            ? { label: 'Tilldela roller', onClick: actions.onAssignRoles }
+            ? { label: t('items.rolesAssigned.assignAction'), onClick: actions.onAssignRoles }
             : undefined,
       });
     } else {
@@ -276,16 +282,16 @@ export function buildPreflightItems(
 
       items.push({
         id: 'roles-assigned',
-        label: 'Roller tilldelade',
+        label: t('items.rolesAssigned.label'),
         status: allAssigned ? 'ready' : someAssigned ? 'warning' : 'pending',
         detail: allAssigned
-          ? 'Alla deltagare har fått roller'
+          ? t('items.rolesAssigned.allAssigned')
           : someAssigned
-            ? `${state.rolesAssignedCount} av ${state.participantCount} deltagare har roller`
-            : 'Ingen deltagare har tilldelats roll än',
+            ? t('items.rolesAssigned.someAssigned', { assigned: state.rolesAssignedCount, total: state.participantCount })
+            : t('items.rolesAssigned.noneAssigned'),
         action:
           !allAssigned && actions.onAssignRoles
-            ? { label: 'Tilldela roller', onClick: actions.onAssignRoles }
+            ? { label: t('items.rolesAssigned.assignAction'), onClick: actions.onAssignRoles }
             : undefined,
       });
     }
@@ -298,20 +304,20 @@ export function buildPreflightItems(
 
     items.push({
       id: 'secrets',
-      label: 'Hemliga instruktioner',
+      label: t('items.secrets.label'),
       status: state.secretsUnlocked
         ? 'ready'
         : allRolesAssigned
           ? 'warning'
           : 'pending',
       detail: state.secretsUnlocked
-        ? `Upplåsta (${secretsRevealedCount}/${state.participantCount} har visat)`
+        ? t('items.secrets.unlocked', { revealed: secretsRevealedCount, total: state.participantCount })
         : allRolesAssigned
-          ? 'Redo att låsas upp'
-          : 'Tilldela roller först',
+          ? t('items.secrets.readyToUnlock')
+          : t('items.secrets.assignRolesFirst'),
       action:
         !state.secretsUnlocked && allRolesAssigned && actions.onUnlockSecrets
-          ? { label: 'Lås upp', onClick: actions.onUnlockSecrets }
+          ? { label: t('items.secrets.unlockAction'), onClick: actions.onUnlockSecrets }
           : undefined,
     });
   }
@@ -320,11 +326,11 @@ export function buildPreflightItems(
   if (state.artifactsSnapshotted !== undefined) {
     items.push({
       id: 'artifacts',
-      label: 'Artefakter',
+      label: t('items.artifacts.label'),
       status: state.artifactsSnapshotted ? 'ready' : 'pending',
       detail: state.artifactsSnapshotted
-        ? 'Artefakter redo för sessionen'
-        : 'Artefakter laddas automatiskt vid start',
+        ? t('items.artifacts.ready')
+        : t('items.artifacts.loading'),
     });
   }
 
@@ -332,11 +338,11 @@ export function buildPreflightItems(
   if (state.hasTriggers) {
     items.push({
       id: 'triggers',
-      label: 'Triggers',
+      label: t('items.triggers.label'),
       status: state.triggersSnapshotted ? 'ready' : 'pending',
       detail: state.triggersSnapshotted
-        ? `${state.armedTriggersCount ?? 0} triggers redo`
-        : 'Triggers laddas automatiskt vid start',
+        ? t('items.triggers.ready', { count: state.armedTriggersCount ?? 0 })
+        : t('items.triggers.loading'),
     });
   }
 
@@ -344,14 +350,14 @@ export function buildPreflightItems(
   if (state.signalCapabilitiesTested !== undefined) {
     items.push({
       id: 'signals',
-      label: 'Signaler',
+      label: t('items.signals.label'),
       status: state.signalCapabilitiesTested ? 'ready' : 'pending',
       detail: state.signalCapabilitiesTested
-        ? 'Signalkällor testade'
-        : 'Testa signalkällor (valfritt)',
+        ? t('items.signals.tested')
+        : t('items.signals.notTested'),
       action:
         !state.signalCapabilitiesTested && actions.onTestSignals
-          ? { label: 'Testa', onClick: actions.onTestSignals }
+          ? { label: t('items.signals.testAction'), onClick: actions.onTestSignals }
           : undefined,
     });
   }

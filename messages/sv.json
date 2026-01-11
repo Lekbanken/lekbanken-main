@@ -1492,6 +1492,72 @@
         "hide": "Dölj",
         "reveal": "Reveal"
       }
+    },
+    "preflightChecklist": {
+      "title": "Redo att starta?",
+      "description": "Kontrollera att allt är på plats innan du startar spelläget.",
+      "itemsReady": "{ready} / {total} klara",
+      "errorMessage": "Åtgärda felen ovan för att kunna starta.",
+      "warningMessage": "Kontrollera varningarna innan du startar.",
+      "successMessage": "✓ Allt ser bra ut! Du kan starta sessionen.",
+      "starting": "Startar...",
+      "startPlayMode": "Starta spelläge",
+      "items": {
+        "participants": {
+          "label": "Deltagare",
+          "joined": "{count} deltagare har gått med",
+          "noneJoined": "Inga deltagare har gått med ännu"
+        },
+        "game": {
+          "label": "Spel kopplat",
+          "noGame": "Sessionen har inget spel kopplat"
+        },
+        "rolesSnapshot": {
+          "label": "Roller kopierade",
+          "notCopied": "Kopiera roller från spelet innan du kan tilldela dem",
+          "copied": "{count} roller kopierade från spelet",
+          "copyAction": "Kopiera roller"
+        },
+        "rolesAssigned": {
+          "label": "Roller tilldelade",
+          "allMinMet": "Alla minimikrav uppfyllda",
+          "allAssigned": "Alla deltagare har fått roller",
+          "someAssigned": "{assigned} av {total} deltagare har roller",
+          "noneAssigned": "Ingen deltagare har tilldelats roll än",
+          "assignAction": "Tilldela roller"
+        },
+        "secrets": {
+          "label": "Hemliga instruktioner",
+          "unlocked": "Upplåsta ({revealed}/{total} har visat)",
+          "readyToUnlock": "Redo att låsas upp",
+          "assignRolesFirst": "Tilldela roller först",
+          "unlockAction": "Lås upp"
+        },
+        "artifacts": {
+          "label": "Artefakter",
+          "ready": "Artefakter redo för sessionen",
+          "loading": "Artefakter laddas automatiskt vid start"
+        },
+        "triggers": {
+          "label": "Triggers",
+          "ready": "{count} triggers redo",
+          "loading": "Triggers laddas automatiskt vid start"
+        },
+        "signals": {
+          "label": "Signaler",
+          "tested": "Signalkällor testade",
+          "notTested": "Testa signalkällor (valfritt)",
+          "testAction": "Testa"
+        }
+      }
+    },
+    "leaderScriptPanel": {
+      "translationLabel": "Översättning ({language})",
+      "noContent": "Inget innehåll i denna fas"
+    },
+    "participantSignalMicroUI": {
+      "queueCount": "{count} i kö",
+      "autoSendHint": "Skickas automatiskt när du är online."
     }
   }
 }

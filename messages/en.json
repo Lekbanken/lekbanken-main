@@ -1496,6 +1496,72 @@
         "hide": "Hide",
         "reveal": "Reveal"
       }
+    },
+    "preflightChecklist": {
+      "title": "Ready to start?",
+      "description": "Make sure everything is in place before starting play mode.",
+      "itemsReady": "{ready} / {total} ready",
+      "errorMessage": "Fix the errors above to start.",
+      "warningMessage": "Check the warnings before starting.",
+      "successMessage": "\u2713 Everything looks good! You can start the session.",
+      "starting": "Starting...",
+      "startPlayMode": "Start play mode",
+      "items": {
+        "participants": {
+          "label": "Participants",
+          "joined": "{count} participants have joined",
+          "noneJoined": "No participants have joined yet"
+        },
+        "game": {
+          "label": "Game linked",
+          "noGame": "Session has no game linked"
+        },
+        "rolesSnapshot": {
+          "label": "Roles copied",
+          "notCopied": "Copy roles from the game before assigning them",
+          "copied": "{count} roles copied from game",
+          "copyAction": "Copy roles"
+        },
+        "rolesAssigned": {
+          "label": "Roles assigned",
+          "allMinMet": "All minimum requirements met",
+          "allAssigned": "All participants have been assigned roles",
+          "someAssigned": "{assigned} of {total} participants have roles",
+          "noneAssigned": "No participant has been assigned a role yet",
+          "assignAction": "Assign roles"
+        },
+        "secrets": {
+          "label": "Secret instructions",
+          "unlocked": "Unlocked ({revealed}/{total} have viewed)",
+          "readyToUnlock": "Ready to unlock",
+          "assignRolesFirst": "Assign roles first",
+          "unlockAction": "Unlock"
+        },
+        "artifacts": {
+          "label": "Artifacts",
+          "ready": "Artifacts ready for session",
+          "loading": "Artifacts load automatically at start"
+        },
+        "triggers": {
+          "label": "Triggers",
+          "ready": "{count} triggers ready",
+          "loading": "Triggers load automatically at start"
+        },
+        "signals": {
+          "label": "Signals",
+          "tested": "Signal sources tested",
+          "notTested": "Test signal sources (optional)",
+          "testAction": "Test"
+        }
+      }
+    },
+    "leaderScriptPanel": {
+      "translationLabel": "Translation ({language})",
+      "noContent": "No content in this phase"
+    },
+    "participantSignalMicroUI": {
+      "queueCount": "{count} queued",
+      "autoSendHint": "Will be sent automatically when you are online."
     }
   }
 }

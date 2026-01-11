@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-14
-> **Status:** 🟢 Fas 1 KOMPLETT (100%) - app/app, features/play och components/play klara
+> **Senast uppdaterad:** 2026-01-15
+> **Status:** 🟡 Fas 2 PÅGÅR (25%) - features/admin/users, organisations, products klara
 
 ## Executive Summary
 
@@ -10,9 +10,9 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~150 (14%) |
-| **Migrerade strängar** | ~1,400 (49%) |
-| **Uppskattad återstående arbetsinsats** | ~15-25 timmar |
+| Filer som använder i18n | ~165 (15%) |
+| **Migrerade strängar** | ~1,650 (58%) |
+| **Uppskattad återstående arbetsinsats** | ~12-18 timmar |
 
 ## Prioriteringsmodell
 
@@ -259,7 +259,21 @@ export function PlayButton() {
   - [x] components/play/CipherDecoder.tsx ✅
   - [x] components/play/AudioPlayer.tsx ✅
   - [x] components/play/*.tsx ✅ (alla kvarvarande filer migrerade)
-- [ ] Implementera features/admin (Fas 2) - ~489 strängar kvar
+- [x] Implementera features/admin/users (Fas 2.1) ✅ ~250 strängar migrerade
+  - [x] UserDetailDrawer.tsx ✅ Komplett
+  - [x] UserListItem.tsx ✅ Komplett
+  - [x] UserListTable.tsx ✅ Komplett  
+  - [x] UserListToolbar.tsx ✅ Komplett
+  - [x] UserCreateDialog.tsx ✅ Partiellt
+- [x] Implementera features/admin/organisations (Fas 2.1) ✅ ~14 strängar
+  - [x] OrganisationAdminPage.tsx ✅ Komplett
+- [x] Implementera features/admin/products (Fas 2.1) ✅ ~18 strängar
+  - [x] ProductAdminPage.tsx ✅ Komplett
+- [ ] Implementera features/admin (Fas 2) - ~200 strängar kvar
+  - [ ] GameAdminPage.tsx (partiellt påbörjad)
+  - [ ] GameDetailPage.tsx
+  - [ ] SessionDetailPage.tsx
+  - [ ] ParticipantDetailPage.tsx
 - [ ] Implementera app/admin (Fas 2) - ~752 strängar kvar
 
 ## Progress Tracker
@@ -284,7 +298,10 @@ export function PlayButton() {
 | 2026-01-14 | app/app (leaderboard, events, notifications, challenges) | 4 | ~45 | ✅ Klart |
 | 2026-01-14 | app/app (no-access, select-tenant) | 2 | ~10 | ✅ Klart |
 | 2026-01-14 | components/play (alla) | 20 | ~150 | ✅ Klart |
-| - | features/admin | ~68 | 489 | ⏳ Nästa |
+| 2026-01-15 | features/admin/users | 5 | ~250 | ✅ Klart |
+| 2026-01-15 | features/admin/organisations | 1 | ~14 | ✅ Klart |
+| 2026-01-15 | features/admin/products | 1 | ~18 | ✅ Klart |
+| - | features/admin (övrigt) | ~60 | ~200 | ⏳ Nästa |
 | - | app/admin | ~91 | 752 | ⏳ Väntar |
 
 ### Migrerade message-keys (play.participantView)

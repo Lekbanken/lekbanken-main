@@ -153,7 +153,7 @@ function SessionHeader({
           )}
           {status === 'paused' && (
             <Badge variant="warning" size="sm">
-              ⏸ PAUSAD
+              ⏸ {t('status.paused')}
             </Badge>
           )}
         </div>
@@ -190,7 +190,7 @@ function SessionHeader({
             size="lg"
           >
             <PlayIcon className="h-5 w-5 mr-2" />
-            Starta session
+            {t('startSession')}
           </Button>
         )}
         {(status === 'active' || status === 'paused') && (
@@ -279,6 +279,7 @@ function ParticipantWithRoleRow({
   onMarkNext: (participantId: string) => void;
   isDisabled: boolean;
 }) {
+  const t = useTranslations('play.cockpit.participants');
   const currentRole = roles.find((r) => r.id === participant.assignedRoleId);
 
   // Map status to connection state
@@ -292,18 +293,18 @@ function ParticipantWithRoleRow({
         </div>
         <div className="min-w-0">
           <div className="font-medium text-foreground truncate">
-            {participant.displayName ?? 'Anonym deltagare'}
+            {participant.displayName ?? t('anonymous')}
           </div>
           {participant.isNextStarter && (
             <Badge variant="outline" className="mt-1 w-fit text-[10px]">
-              Nasta tur
+              {t('nextTurn')}
             </Badge>
           )}
           <div className="text-xs text-muted-foreground flex items-center gap-1">
             {isConnected ? (
-              <span className="text-green-600">● Online</span>
+              <span className="text-green-600">● {t('online')}</span>
             ) : (
-              <span className="text-muted-foreground">○ Offline</span>
+              <span className="text-muted-foreground">○ {t('offline')}</span>
             )}
           </div>
         </div>
@@ -326,7 +327,7 @@ function ParticipantWithRoleRow({
             onChange={(e) => e.target.value && onAssignRole(participant.id, e.target.value)}
             disabled={isDisabled}
           >
-            <option value="">Tilldela roll...</option>
+            <option value="">{t('assignRole')}</option>
             {roles.map((role) => (
               <option key={role.id} value={role.id}>
                 {role.name}
@@ -427,9 +428,9 @@ function ParticipantsTab({
           <div className="flex items-center justify-between mb-3">
             <h4 className="font-medium text-foreground">{t('roleDistribution')}</h4>
             {allMinsSatisfied ? (
-              <Badge variant="success" size="sm">✓ Alla minimikrav uppfyllda</Badge>
+              <Badge variant="success" size="sm">✓ {t('allMinsSatisfied')}</Badge>
             ) : (
-              <Badge variant="warning" size="sm">⚠ Minimikrav ej uppfyllda</Badge>
+              <Badge variant="warning" size="sm">⚠ {t('minsNotSatisfied')}</Badge>
             )}
           </div>
           <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
@@ -453,7 +454,7 @@ function ParticipantsTab({
           </div>
           {unassignedParticipants.length > 0 && (
             <div className="mt-3 text-sm text-muted-foreground">
-              {unassignedParticipants.length} deltagare saknar roll
+              {t('participantsMissingRole', { count: unassignedParticipants.length })}
             </div>
           )}
         </Card>
@@ -461,9 +462,9 @@ function ParticipantsTab({
 
       {/* Summary stats */}
       <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>{connectedCount} av {participants.length} online</span>
+        <span>{t('onlineCount', { online: connectedCount, total: participants.length })}</span>
         <span>•</span>
-        <span>{assignedCount} av {participants.length} har roller</span>
+        <span>{t('rolesCount', { assigned: assignedCount, total: participants.length })}</span>
       </div>
       
       {/* Participant list */}
@@ -500,13 +501,14 @@ function TriggersTab({
 }: {
   triggers: SessionCockpitState['triggers'];
 }) {
+  const t = useTranslations('play.cockpit.triggers');
   if (triggers.length === 0) {
     return (
       <Card className="p-8 text-center text-muted-foreground">
         <BoltIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>Inga triggers i denna session.</p>
+        <p>{t('noTriggers')}</p>
         <p className="text-sm mt-2">
-          Triggers konfigureras via Spel-byggaren.
+          {t('configuredViaBuilder')}
         </p>
       </Card>
     );
@@ -633,16 +635,16 @@ export function SessionCockpit({
     }> = [];
 
     if (capabilities.screenFlash.status === 'available') {
-      presets.push({ id: 'screen_flash', name: 'Skarmblink', type: 'screen_flash', color: '#ffffff' });
+      presets.push({ id: 'screen_flash', name: t('signalPresets.screenFlash'), type: 'screen_flash', color: '#ffffff' });
     }
     if (capabilities.vibration.status === 'available') {
-      presets.push({ id: 'vibration', name: 'Vibration', type: 'vibration' });
+      presets.push({ id: 'vibration', name: t('signalPresets.vibration'), type: 'vibration' });
     }
     if (capabilities.torch.status === 'available') {
-      presets.push({ id: 'torch', name: 'Ficklampa', type: 'torch' });
+      presets.push({ id: 'torch', name: t('signalPresets.torch'), type: 'torch' });
     }
     if (capabilities.audio.status === 'available') {
-      presets.push({ id: 'audio', name: 'Ljudsignal', type: 'audio' });
+      presets.push({ id: 'audio', name: t('signalPresets.audio'), type: 'audio' });
     }
     const notificationStatus = capabilities.notification.status;
     const notificationDisabled = notificationStatus !== 'available';
@@ -668,7 +670,7 @@ export function SessionCockpit({
     }
     presets.push({
       id: 'notification',
-      name: 'Notis',
+      name: t('signalPresets.notification'),
       type: 'notification',
       disabled: notificationDisabled,
       disabledReason: notificationReason,
@@ -830,7 +832,7 @@ export function SessionCockpit({
 
   const handleKickParticipant = useCallback(async (participantId: string, displayName?: string) => {
     if (typeof window !== 'undefined') {
-      const label = displayName ? `Ta bort ${displayName} fran sessionen?` : 'Ta bort deltagaren fran sessionen?';
+      const label = displayName ? t('confirmKick', { name: displayName }) : t('confirmKickAnonymous');
       if (!window.confirm(label)) return;
     }
     try {
@@ -924,11 +926,11 @@ export function SessionCockpit({
     const contentChecks: LobbyCheckInput[] = [
       {
         id: 'steps',
-        label: 'Steg & faser',
+        label: t('content.stepsAndPhases'),
         status: steps.length > 0 ? 'ready' : 'error',
         detail: steps.length > 0
-          ? `${steps.length} steg definierade`
-          : 'Inga steg definierade',
+          ? t('content.stepsDefined', { count: steps.length })
+          : t('content.noStepsDefined'),
       },
       ...preflightItems.filter((item) => item.id === 'artifacts'),
     ];
@@ -938,9 +940,9 @@ export function SessionCockpit({
     const settingsChecks: LobbyCheckInput[] = [
       {
         id: 'session-code',
-        label: 'Sessionskod',
+        label: t('settings.sessionCode'),
         status: sessionCode ? 'ready' : 'error',
-        detail: sessionCode ? 'Kod genererad' : 'Ingen kod genererad',
+        detail: sessionCode ? t('settings.codeGenerated') : t('settings.noCodeGenerated'),
       },
     ];
 
@@ -975,8 +977,8 @@ export function SessionCockpit({
         type: 'activity',
         isReady: !missingTitle && !missingDescription,
         issues: [
-          ...(missingTitle ? ['Saknar rubrik'] : []),
-          ...(missingDescription ? ['Saknar beskrivning'] : []),
+          ...(missingTitle ? [t('steps.missingTitle')] : []),
+          ...(missingDescription ? [t('steps.missingDescription')] : []),
         ],
       });
     });
@@ -989,7 +991,7 @@ export function SessionCockpit({
       sessionStatus: status === 'ended' ? 'completed' : status === 'active' || status === 'paused' ? 'active' : 'lobby',
       participants: participants.map((participant) => ({
         id: participant.id,
-        name: participant.displayName || 'Anonym deltagare',
+        name: participant.displayName || t('participants.anonymous'),
         roleId: participant.assignedRoleId,
         isConnected: participant.status === 'active' || participant.status === 'joined',
         joinedAt: new Date(participant.joinedAt),
@@ -1047,10 +1049,10 @@ export function SessionCockpit({
   // Tabs configuration
   const tabs = [
     { id: 'overview', label: t('tabs.overview') },
-    { id: 'story', label: 'Berattelse' },
+    { id: 'story', label: t('tabs.story') },
     { id: 'participants', label: tTabs('participants'), badge: participants.length },
-    { id: 'artifacts', label: 'Artefakter', badge: artifacts.length },
-    { id: 'triggers', label: 'Triggers', badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
+    { id: 'artifacts', label: t('tabs.artifacts'), badge: artifacts.length },
+    { id: 'triggers', label: t('tabs.triggers'), badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
     showSignals ? { id: 'signals', label: tTabs('signals') } : null,
     showTimeBank ? { id: 'timebank', label: tTabs('timebank') } : null,
     showEvents ? { id: 'events', label: t('tabs.events'), badge: sessionEvents.length || undefined } : null,

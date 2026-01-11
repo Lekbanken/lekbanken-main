@@ -945,6 +945,19 @@
         "participants": "deltakere",
         "openChat": "Åpne chat"
       },
+      "status": {
+        "paused": "PAUSET"
+      },
+      "startSession": "Start økt",
+      "confirmKick": "Fjerne {name} fra økten?",
+      "confirmKickAnonymous": "Fjerne denne deltakeren fra økten?",
+      "signalPresets": {
+        "screenFlash": "Skjermblink",
+        "vibration": "Vibrasjon",
+        "torch": "Lommelykt",
+        "audio": "Lydsignal",
+        "notification": "Varsling"
+      },
       "preflight": {
         "title": "Forberedelseskontroll",
         "readyToStart": "Klar til å starte",
@@ -957,19 +970,48 @@
       "roles": {
         "noRolesCopied": "Ingen roller kopiert ennå",
         "copyRolesDescription": "Kopier roller fra spillet for å tildele dem til deltakere.",
-        "roleDistribution": "Rollefordeling"
+        "roleDistribution": "Rollefordeling",
+        "allMinsSatisfied": "Alle minimumskrav oppfylt",
+        "minsNotSatisfied": "Minimumskrav ikke oppfylt"
       },
       "participants": {
         "noParticipantsYet": "Ingen deltakere har koblet til ennå.",
         "shareCodeToInvite": "Del øktkoden for å invitere deltakere.",
         "noParticipantsConnected": "Ingen deltakere har koblet til ennå",
-        "participantsConnected": "{count} deltakere tilkoblet"
+        "participantsConnected": "{count} deltakere tilkoblet",
+        "anonymous": "Anonym deltaker",
+        "nextTurn": "Neste tur",
+        "online": "Online",
+        "offline": "Offline",
+        "assignRole": "Tildel rolle...",
+        "participantsMissingRole": "{count} deltakere mangler rolle",
+        "onlineCount": "{online} av {total} online",
+        "rolesCount": "{assigned} av {total} har roller"
+      },
+      "triggers": {
+        "noTriggers": "Ingen utløsere i denne økten.",
+        "configuredViaBuilder": "Utløsere konfigureres via Spillbyggeren."
+      },
+      "content": {
+        "stepsAndPhases": "Steg og faser",
+        "stepsDefined": "{count} steg definert",
+        "noStepsDefined": "Ingen steg definert"
+      },
+      "settings": {
+        "sessionCode": "Øktkode",
+        "codeGenerated": "Kode generert",
+        "noCodeGenerated": "Ingen kode generert"
       },
       "steps": {
-        "unnamedStep": "Navnløst steg"
+        "unnamedStep": "Navnløst steg",
+        "missingTitle": "Mangler tittel",
+        "missingDescription": "Mangler beskrivelse"
       },
       "tabs": {
         "overview": "Oversikt",
+        "story": "Historie",
+        "artifacts": "Artefakter",
+        "triggers": "Utløsere",
         "events": "Hendelser",
         "settings": "Innstillinger"
       },
@@ -1688,6 +1730,117 @@
       "copyCode": "Kopier kode",
       "copiedCode": "Kopiert!",
       "joinUrl": "Bli med-lenke"
+    },
+    "signalPanel": {
+      "title": "Signaler",
+      "description": "Send raske hendelser med forhåndsdefinerte knapper eller egendefinert kanal.",
+      "quickButtons": "Hurtigknapper",
+      "channelPlaceholder": "Kanal (f.eks. READY)",
+      "messagePlaceholder": "Melding",
+      "send": "Send",
+      "recent": "Nylige",
+      "refresh": "Oppdater",
+      "loading": "Laster…",
+      "noSignals": "Ingen signaler ennå.",
+      "presets": {
+        "ready": "Klar",
+        "hint": "Hint",
+        "hintAvailable": "Hint tilgjengelig",
+        "attention": "Oppmerksomhet",
+        "gatherAttention": "Samle oppmerksomhet",
+        "pause": "Pause",
+        "pauseNow": "Pause nå",
+        "found": "Funnet",
+        "findConfirmed": "Funn bekreftet",
+        "sos": "SOS",
+        "needHelp": "Trenger hjelp"
+      },
+      "errors": {
+        "loadFailed": "Kunne ikke laste signaler",
+        "sendFailed": "Kunne ikke sende signal"
+      }
+    },
+    "roleAssigner": {
+      "noRolesCopied": "Ingen roller kopiert ennå",
+      "copyRolesHint": "Klikk på \"Kopier roller fra spill\" ovenfor for å hente rollene fra spillmalen.",
+      "afterCopyHint": "Etter kopiering kan du tildele roller til deltakere manuelt eller tilfeldig.",
+      "errors": {
+        "loadFailed": "Kunne ikke laste data",
+        "assignFailed": "Kunne ikke tildele roller",
+        "unassignFailed": "Kunne ikke fjerne rolletildeling"
+      }
+    },
+    "storyView": {
+      "title": "Historien",
+      "unnamedStep": "Uten navn",
+      "now": "Nå",
+      "sayToGroup": "SI TIL GRUPPEN",
+      "goToStep": "Gå til dette steget",
+      "stepsCount": "{count} steg",
+      "totalDuration": "~{minutes} min totalt",
+      "scriptsCount": "{count} scripts",
+      "noStepsYet": "Ingen steg i dette spillet ennå.",
+      "close": "Lukk"
+    },
+    "timeBankEditor": {
+      "description": "Konfigurer tidsbank og belønningsregler",
+      "initialTime": "Starttid (sek)",
+      "minimum": "Minimum",
+      "maximum": "Maksimum",
+      "allowDebt": "Tillat gjeld",
+      "noDebt": "Ingen gjeld",
+      "onZero": "Ved tid = 0",
+      "triggerToActivate": "Trigger å aktivere",
+      "selectTrigger": "Velg trigger",
+      "showToParticipants": "Vis for deltakere",
+      "showToParticipantsDescription": "Vis tidsbanken i deltakernes grensesnitt",
+      "rewardRules": "Belønningsregler",
+      "activeCount": "{count} aktive",
+      "noRules": "Ingen regler definert",
+      "noRulesHint": "Legg til regler for å automatisk justere tidsbanken",
+      "addRule": "Legg til regel",
+      "newRule": "Ny regel",
+      "copyName": "{name} (kopi)",
+      "editRule": "Rediger regel",
+      "name": "Navn",
+      "ruleNamePlaceholder": "Regelnavn",
+      "descriptionOptional": "Beskrivelse (valgfri)",
+      "descriptionPlaceholder": "Beskriv når denne regelen aktiveres",
+      "when": "Når",
+      "target": "Mål",
+      "afterSeconds": "Etter (sekunder)",
+      "operation": "Operasjon",
+      "factor": "Faktor",
+      "seconds": "Sekunder",
+      "maxFires": "Maks antall ganger (0 = ubegrenset)",
+      "conditionOptional": "Vilkår (valgfritt)",
+      "done": "Ferdig",
+      "all": "Alle",
+      "triggers": {
+        "artifact_solved": "Artefakt løst",
+        "step_completed": "Steg fullført",
+        "phase_completed": "Fase fullført",
+        "trigger_fired": "Trigger aktivert",
+        "time_elapsed": "Tid passert",
+        "manual": "Manuell justering"
+      },
+      "operators": {
+        "add": "Legg til (+)",
+        "subtract": "Trekk fra (-)",
+        "set": "Sett til (=)",
+        "multiply": "Multipliser (×)"
+      },
+      "zeroActions": {
+        "pause": "Pause spillet",
+        "end_game": "Avslutt spillet",
+        "continue": "Fortsett (negativ tid)",
+        "trigger": "Aktiver trigger"
+      },
+      "conditions": {
+        "none": "Ingen vilkår",
+        "balance_below": "Hvis tid under",
+        "balance_above": "Hvis tid over"
+      }
     }
   }
 }

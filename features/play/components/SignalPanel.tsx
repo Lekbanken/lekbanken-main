@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -48,6 +49,7 @@ function toRow(p: SignalReceivedBroadcast['payload']): SessionSignalRow {
 }
 
 export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
+  const t = useTranslations('play.signalPanel');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,12 +60,12 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
   const [sending, setSending] = useState(false);
 
   const presets: SignalPreset[] = [
-    { id: 'ready', label: 'Redo', channel: 'READY', message: 'Redo' },
-    { id: 'hint', label: 'Ledtråd', channel: 'HINT', message: 'Ledtråd tillgänglig' },
-    { id: 'attention', label: 'Fokus', channel: 'ATTENTION', message: 'Samla uppmärksamhet' },
-    { id: 'pause', label: 'Paus', channel: 'PAUSE', message: 'Pausa nu' },
-    { id: 'found', label: 'Hittat', channel: 'FOUND', message: 'Fynd bekräftat' },
-    { id: 'sos', label: 'SOS', channel: 'SOS', message: 'Behöver hjälp' },
+    { id: 'ready', label: t('presets.ready'), channel: 'READY', message: t('presets.ready') },
+    { id: 'hint', label: t('presets.hint'), channel: 'HINT', message: t('presets.hintAvailable') },
+    { id: 'attention', label: t('presets.attention'), channel: 'ATTENTION', message: t('presets.gatherAttention') },
+    { id: 'pause', label: t('presets.pause'), channel: 'PAUSE', message: t('presets.pauseNow') },
+    { id: 'found', label: t('presets.found'), channel: 'FOUND', message: t('presets.findConfirmed') },
+    { id: 'sos', label: t('presets.sos'), channel: 'SOS', message: t('presets.needHelp') },
   ];
 
   const load = useCallback(async () => {
@@ -76,7 +78,7 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
         setChannel(res.signals[0]!.channel);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte ladda signals');
+      setError(err instanceof Error ? err.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
@@ -128,11 +130,11 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
       // Rely on realtime, but keep it responsive even if connection is flaky
       void load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte skicka signal');
+      setError(err instanceof Error ? err.message : t('errors.sendFailed'));
     } finally {
       setSending(false);
     }
-  }, [sessionId, channel, message, load]);
+  }, [sessionId, channel, message, load, t]);
 
   const handlePresetSend = useCallback(async (preset: SignalPreset) => {
     if (disabled || sending) return;
@@ -147,18 +149,18 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
       setMessage('');
       void load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte skicka signal');
+      setError(err instanceof Error ? err.message : t('errors.sendFailed'));
     } finally {
       setSending(false);
     }
-  }, [disabled, sending, sessionId, load]);
+  }, [disabled, sending, sessionId, load, t]);
 
   return (
     <Card variant="elevated" className="p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Signals</h2>
-          <p className="text-sm text-muted-foreground">Skicka snabba events med färdiga knappar eller egen kanal.</p>
+          <h2 className="text-lg font-semibold text-foreground">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
         <Badge variant={connected ? 'success' : 'secondary'} size="sm">
           {connected ? 'Live' : 'Offline'}
@@ -169,7 +171,7 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
 
       <div className="mt-4 space-y-3">
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Snabbknappar</h3>
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{t('quickButtons')}</h3>
           <div className="flex flex-wrap gap-2">
             {presets.map((preset) => (
               <Button
@@ -190,13 +192,13 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
           <Input
             value={channel}
             onChange={(e) => setChannel(e.target.value)}
-            placeholder="Kanal (t.ex. READY)"
+            placeholder={t('channelPlaceholder')}
             disabled={disabled || sending}
           />
           <Input
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Meddelande"
+            placeholder={t('messagePlaceholder')}
             disabled={disabled || sending}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -210,7 +212,7 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
             onClick={() => void handleSend()}
             disabled={disabled || sending || !channel.trim() || !message.trim()}
           >
-            Skicka
+            {t('send')}
           </Button>
         </div>
 
@@ -232,17 +234,17 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
         )}
 
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Senaste</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t('recent')}</h3>
           <Button type="button" variant="ghost" size="sm" onClick={() => void load()} disabled={loading}>
-            Uppdatera
+            {t('refresh')}
           </Button>
         </div>
 
         <div className="max-h-64 overflow-auto rounded-md border border-border p-3 space-y-2">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Laddar…</p>
+            <p className="text-sm text-muted-foreground">{t('loading')}</p>
           ) : signals.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Inga signals ännu.</p>
+            <p className="text-sm text-muted-foreground">{t('noSignals')}</p>
           ) : (
             signals.map((s) => (
               <div key={s.id} className="text-sm">

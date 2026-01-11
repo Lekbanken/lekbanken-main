@@ -945,6 +945,19 @@
         "participants": "participants",
         "openChat": "Open chat"
       },
+      "status": {
+        "paused": "PAUSED"
+      },
+      "startSession": "Start session",
+      "confirmKick": "Remove {name} from the session?",
+      "confirmKickAnonymous": "Remove this participant from the session?",
+      "signalPresets": {
+        "screenFlash": "Screen flash",
+        "vibration": "Vibration",
+        "torch": "Flashlight",
+        "audio": "Audio signal",
+        "notification": "Notification"
+      },
       "preflight": {
         "title": "Preflight Check",
         "readyToStart": "Ready to start",
@@ -957,19 +970,48 @@
       "roles": {
         "noRolesCopied": "No roles copied yet",
         "copyRolesDescription": "Copy roles from the game to assign them to participants.",
-        "roleDistribution": "Role distribution"
+        "roleDistribution": "Role distribution",
+        "allMinsSatisfied": "All minimum requirements met",
+        "minsNotSatisfied": "Minimum requirements not met"
       },
       "participants": {
         "noParticipantsYet": "No participants have connected yet.",
         "shareCodeToInvite": "Share the session code to invite participants.",
         "noParticipantsConnected": "No participants have connected yet",
-        "participantsConnected": "{count} participants connected"
+        "participantsConnected": "{count} participants connected",
+        "anonymous": "Anonymous participant",
+        "nextTurn": "Next turn",
+        "online": "Online",
+        "offline": "Offline",
+        "assignRole": "Assign role...",
+        "participantsMissingRole": "{count} participants missing role",
+        "onlineCount": "{online} of {total} online",
+        "rolesCount": "{assigned} of {total} have roles"
+      },
+      "triggers": {
+        "noTriggers": "No triggers in this session.",
+        "configuredViaBuilder": "Triggers are configured via the Game Builder."
+      },
+      "content": {
+        "stepsAndPhases": "Steps & Phases",
+        "stepsDefined": "{count} steps defined",
+        "noStepsDefined": "No steps defined"
+      },
+      "settings": {
+        "sessionCode": "Session code",
+        "codeGenerated": "Code generated",
+        "noCodeGenerated": "No code generated"
       },
       "steps": {
-        "unnamedStep": "Unnamed step"
+        "unnamedStep": "Unnamed step",
+        "missingTitle": "Missing title",
+        "missingDescription": "Missing description"
       },
       "tabs": {
         "overview": "Overview",
+        "story": "Story",
+        "artifacts": "Artifacts",
+        "triggers": "Triggers",
         "events": "Events",
         "settings": "Settings"
       },
@@ -1688,6 +1730,117 @@
       "copyCode": "Copy code",
       "copiedCode": "Copied!",
       "joinUrl": "Join link"
+    },
+    "signalPanel": {
+      "title": "Signals",
+      "description": "Send quick events with preset buttons or custom channel.",
+      "quickButtons": "Quick buttons",
+      "channelPlaceholder": "Channel (e.g. READY)",
+      "messagePlaceholder": "Message",
+      "send": "Send",
+      "recent": "Recent",
+      "refresh": "Refresh",
+      "loading": "Loading…",
+      "noSignals": "No signals yet.",
+      "presets": {
+        "ready": "Ready",
+        "hint": "Hint",
+        "hintAvailable": "Hint available",
+        "attention": "Attention",
+        "gatherAttention": "Gather attention",
+        "pause": "Pause",
+        "pauseNow": "Pause now",
+        "found": "Found",
+        "findConfirmed": "Find confirmed",
+        "sos": "SOS",
+        "needHelp": "Need help"
+      },
+      "errors": {
+        "loadFailed": "Could not load signals",
+        "sendFailed": "Could not send signal"
+      }
+    },
+    "roleAssigner": {
+      "noRolesCopied": "No roles copied yet",
+      "copyRolesHint": "Click \"Copy roles from game\" above to fetch roles from the game template.",
+      "afterCopyHint": "After copying, you can assign roles to participants manually or randomly.",
+      "errors": {
+        "loadFailed": "Could not load data",
+        "assignFailed": "Could not assign roles",
+        "unassignFailed": "Could not remove role assignment"
+      }
+    },
+    "storyView": {
+      "title": "The Story",
+      "unnamedStep": "Unnamed step",
+      "now": "Now",
+      "sayToGroup": "SAY TO THE GROUP",
+      "goToStep": "Go to this step",
+      "stepsCount": "{count} steps",
+      "totalDuration": "~{minutes} min total",
+      "scriptsCount": "{count} scripts",
+      "noStepsYet": "No steps in this game yet.",
+      "close": "Close"
+    },
+    "timeBankEditor": {
+      "description": "Configure time bank and reward rules",
+      "initialTime": "Initial time (sec)",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "allowDebt": "Allow debt",
+      "noDebt": "No debt",
+      "onZero": "When time = 0",
+      "triggerToActivate": "Trigger to activate",
+      "selectTrigger": "Select trigger",
+      "showToParticipants": "Show to participants",
+      "showToParticipantsDescription": "Display the time bank in participants' interface",
+      "rewardRules": "Reward rules",
+      "activeCount": "{count} active",
+      "noRules": "No rules defined",
+      "noRulesHint": "Add rules to automatically adjust the time bank",
+      "addRule": "Add rule",
+      "newRule": "New rule",
+      "copyName": "{name} (copy)",
+      "editRule": "Edit rule",
+      "name": "Name",
+      "ruleNamePlaceholder": "Rule name",
+      "descriptionOptional": "Description (optional)",
+      "descriptionPlaceholder": "Describe when this rule activates",
+      "when": "When",
+      "target": "Target",
+      "afterSeconds": "After (seconds)",
+      "operation": "Operation",
+      "factor": "Factor",
+      "seconds": "Seconds",
+      "maxFires": "Max times (0 = unlimited)",
+      "conditionOptional": "Condition (optional)",
+      "done": "Done",
+      "all": "All",
+      "triggers": {
+        "artifact_solved": "Artifact solved",
+        "step_completed": "Step completed",
+        "phase_completed": "Phase completed",
+        "trigger_fired": "Trigger fired",
+        "time_elapsed": "Time elapsed",
+        "manual": "Manual adjustment"
+      },
+      "operators": {
+        "add": "Add (+)",
+        "subtract": "Subtract (-)",
+        "set": "Set to (=)",
+        "multiply": "Multiply (×)"
+      },
+      "zeroActions": {
+        "pause": "Pause game",
+        "end_game": "End game",
+        "continue": "Continue (negative time)",
+        "trigger": "Activate trigger"
+      },
+      "conditions": {
+        "none": "No condition",
+        "balance_below": "If time below",
+        "balance_above": "If time above"
+      }
     }
   }
 }

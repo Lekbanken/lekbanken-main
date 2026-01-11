@@ -9,7 +9,8 @@
 
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -102,37 +103,23 @@ export interface TimeBankRuleEditorProps {
 }
 
 // =============================================================================
-// Constants
+// Constants - Option keys for translation
 // =============================================================================
 
-const TRIGGER_OPTIONS = [
-  { value: 'artifact_solved', label: 'Artefakt löst' },
-  { value: 'step_completed', label: 'Steg klart' },
-  { value: 'phase_completed', label: 'Fas klar' },
-  { value: 'trigger_fired', label: 'Trigger aktiverad' },
-  { value: 'time_elapsed', label: 'Tid passerat' },
-  { value: 'manual', label: 'Manuell justering' },
-];
+const TRIGGER_KEYS = [
+  'artifact_solved',
+  'step_completed',
+  'phase_completed',
+  'trigger_fired',
+  'time_elapsed',
+  'manual',
+] as const;
 
-const OPERATOR_OPTIONS = [
-  { value: 'add', label: 'Lägg till (+)' },
-  { value: 'subtract', label: 'Dra av (-)' },
-  { value: 'set', label: 'Sätt till (=)' },
-  { value: 'multiply', label: 'Multiplicera (×)' },
-];
+const OPERATOR_KEYS = ['add', 'subtract', 'set', 'multiply'] as const;
 
-const ZERO_ACTION_OPTIONS = [
-  { value: 'pause', label: 'Pausa spelet' },
-  { value: 'end_game', label: 'Avsluta spelet' },
-  { value: 'continue', label: 'Fortsätt (negativ tid)' },
-  { value: 'trigger', label: 'Aktivera trigger' },
-];
+const ZERO_ACTION_KEYS = ['pause', 'end_game', 'continue', 'trigger'] as const;
 
-const CONDITION_OPTIONS = [
-  { value: 'none', label: 'Inget villkor' },
-  { value: 'balance_below', label: 'Om tid under' },
-  { value: 'balance_above', label: 'Om tid över' },
-];
+const CONDITION_KEYS = ['none', 'balance_below', 'balance_above'] as const;
 
 // =============================================================================
 // Helper: Generate ID
@@ -155,9 +142,9 @@ const formatTime = (seconds: number): string => {
 // Helper: Create Default Rule
 // =============================================================================
 
-const createDefaultRule = (): TimeBankRule => ({
+const createDefaultRule = (t: ReturnType<typeof useTranslations>): TimeBankRule => ({
   id: generateId(),
-  name: 'Ny regel',
+  name: t('newRule'),
   trigger: 'artifact_solved',
   targetId: '*',
   operator: 'add',
@@ -193,6 +180,9 @@ interface RuleCardProps {
   artifacts?: Array<{ id: string; name: string }>;
   steps?: Array<{ id: string; name: string }>;
   triggers?: Array<{ id: string; name: string }>;
+  triggerOptions: Array<{ value: string; label: string }>;
+  operatorOptions: Array<{ value: string; label: string }>;
+  conditionOptions: Array<{ value: string; label: string }>;
 }
 
 function RuleCard({
@@ -205,12 +195,16 @@ function RuleCard({
   artifacts = [],
   steps = [],
   triggers = [],
+  triggerOptions,
+  operatorOptions,
+  conditionOptions,
 }: RuleCardProps) {
-  const triggerOption = TRIGGER_OPTIONS.find((o) => o.value === rule.trigger);
+  const t = useTranslations('play.timeBankEditor');
+  const triggerOption = triggerOptions.find((o) => o.value === rule.trigger);
   
   // Get target name
   const getTargetName = () => {
-    if (rule.targetId === '*') return 'alla';
+    if (rule.targetId === '*') return t('all');
     
     switch (rule.trigger) {
       case 'artifact_solved':
@@ -240,7 +234,7 @@ function RuleCard({
   
   // Get target options for select
   const getTargetOptions = () => {
-    const options = [{ value: '*', label: 'Alla' }];
+    const options = [{ value: '*', label: t('all') }];
     
     switch (rule.trigger) {
       case 'artifact_solved':
@@ -329,7 +323,7 @@ function RuleCard({
     <Card className="border-primary">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Redigera regel</CardTitle>
+          <CardTitle className="text-base">{t('editRule')}</CardTitle>
           <div className="flex items-center gap-2">
             <Switch
               checked={rule.enabled}
@@ -350,30 +344,30 @@ function RuleCard({
       <CardContent className="space-y-4">
         {/* Name */}
         <div className="space-y-2">
-          <Label htmlFor={`rule-name-${rule.id}`}>Namn</Label>
+          <Label htmlFor={`rule-name-${rule.id}`}>{t('name')}</Label>
           <Input
             id={`rule-name-${rule.id}`}
             value={rule.name}
             onChange={(e) => onUpdate({ ...rule, name: e.target.value })}
-            placeholder="Regelnamn"
+            placeholder={t('ruleNamePlaceholder')}
           />
         </div>
         
         {/* Description */}
         <div className="space-y-2">
-          <Label htmlFor={`rule-desc-${rule.id}`}>Beskrivning (valfri)</Label>
+          <Label htmlFor={`rule-desc-${rule.id}`}>{t('descriptionOptional')}</Label>
           <Input
             id={`rule-desc-${rule.id}`}
             value={rule.description || ''}
             onChange={(e) => onUpdate({ ...rule, description: e.target.value })}
-            placeholder="Beskriv när denna regel aktiveras"
+            placeholder={t('descriptionPlaceholder')}
           />
         </div>
         
         {/* Trigger */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>När</Label>
+            <Label>{t('when')}</Label>
             <Select
               value={rule.trigger}
               onChange={(e) => onUpdate({
@@ -381,7 +375,7 @@ function RuleCard({
                 trigger: e.target.value as TimeBankRuleTrigger,
                 targetId: '*',
               })}
-              options={TRIGGER_OPTIONS}
+              options={triggerOptions}
             />
           </div>
           
@@ -390,7 +384,7 @@ function RuleCard({
             rule.trigger === 'step_completed' || 
             rule.trigger === 'trigger_fired') && (
             <div className="space-y-2">
-              <Label>Mål</Label>
+              <Label>{t('target')}</Label>
               <Select
                 value={rule.targetId || '*'}
                 onChange={(e) => onUpdate({ ...rule, targetId: e.target.value })}
@@ -401,7 +395,7 @@ function RuleCard({
           
           {rule.trigger === 'time_elapsed' && (
             <div className="space-y-2">
-              <Label htmlFor={`rule-elapsed-${rule.id}`}>Efter (sekunder)</Label>
+              <Label htmlFor={`rule-elapsed-${rule.id}`}>{t('afterSeconds')}</Label>
               <Input
                 id={`rule-elapsed-${rule.id}`}
                 type="number"
@@ -417,20 +411,20 @@ function RuleCard({
         {/* Operator and value */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Operation</Label>
+            <Label>{t('operation')}</Label>
             <Select
               value={rule.operator}
               onChange={(e) => onUpdate({
                 ...rule,
                 operator: e.target.value as TimeBankOperator,
               })}
-              options={OPERATOR_OPTIONS}
+              options={operatorOptions}
             />
           </div>
           
           <div className="space-y-2">
             <Label htmlFor={`rule-value-${rule.id}`}>
-              {rule.operator === 'multiply' ? 'Faktor' : 'Sekunder'}
+              {rule.operator === 'multiply' ? t('factor') : t('seconds')}
             </Label>
             <Input
               id={`rule-value-${rule.id}`}
@@ -445,7 +439,7 @@ function RuleCard({
         
         {/* Max fires */}
         <div className="space-y-2">
-          <Label htmlFor={`rule-max-${rule.id}`}>Max antal gånger (0 = obegränsat)</Label>
+          <Label htmlFor={`rule-max-${rule.id}`}>{t('maxFires')}</Label>
           <Input
             id={`rule-max-${rule.id}`}
             type="number"
@@ -457,7 +451,7 @@ function RuleCard({
         
         {/* Condition */}
         <div className="space-y-2 p-3 border rounded-lg bg-muted/30">
-          <Label className="text-sm font-medium">Villkor (valfritt)</Label>
+          <Label className="text-sm font-medium">{t('conditionOptional')}</Label>
           <div className="grid grid-cols-2 gap-2">
             <Select
               value={rule.condition?.type || 'none'}
@@ -475,7 +469,7 @@ function RuleCard({
                   });
                 }
               }}
-              options={CONDITION_OPTIONS}
+              options={conditionOptions}
             />
             
             {rule.condition && (
@@ -490,7 +484,7 @@ function RuleCard({
                   },
                 })}
                 min={0}
-                placeholder="Sekunder"
+                placeholder={t('seconds')}
               />
             )}
           </div>
@@ -499,7 +493,7 @@ function RuleCard({
         {/* Done button */}
         <div className="pt-2">
           <Button variant="outline" onClick={onEdit} className="w-full">
-            Klar
+            {t('done')}
           </Button>
         </div>
       </CardContent>
@@ -519,17 +513,28 @@ export function TimeBankRuleEditor({
   triggers = [],
   className,
 }: TimeBankRuleEditorProps) {
+  const t = useTranslations('play.timeBankEditor');
   const [editingId, setEditingId] = useState<string | null>(null);
+  
+  // Build translated options
+  const triggerOptions = useMemo(() => 
+    TRIGGER_KEYS.map(key => ({ value: key, label: t(`triggers.${key}`) })), [t]);
+  const operatorOptions = useMemo(() => 
+    OPERATOR_KEYS.map(key => ({ value: key, label: t(`operators.${key}`) })), [t]);
+  const zeroActionOptions = useMemo(() => 
+    ZERO_ACTION_KEYS.map(key => ({ value: key, label: t(`zeroActions.${key}`) })), [t]);
+  const conditionOptions = useMemo(() => 
+    CONDITION_KEYS.map(key => ({ value: key, label: t(`conditions.${key}`) })), [t]);
   
   const updateConfig = useCallback((updates: Partial<TimeBankConfig>) => {
     onChange({ ...config, ...updates });
   }, [config, onChange]);
   
   const addRule = useCallback(() => {
-    const newRule = createDefaultRule();
+    const newRule = createDefaultRule(t);
     updateConfig({ rules: [...config.rules, newRule] });
     setEditingId(newRule.id);
-  }, [config.rules, updateConfig]);
+  }, [config.rules, updateConfig, t]);
   
   const updateRule = useCallback((rule: TimeBankRule) => {
     updateConfig({
@@ -550,11 +555,11 @@ export function TimeBankRuleEditor({
     const newRule: TimeBankRule = {
       ...rule,
       id: generateId(),
-      name: `${rule.name} (kopia)`,
+      name: t('copyName', { name: rule.name }),
     };
     updateConfig({ rules: [...config.rules, newRule] });
     setEditingId(newRule.id);
-  }, [config.rules, updateConfig]);
+  }, [config.rules, updateConfig, t]);
   
   // Build trigger options for zero action
   const triggerSelectOptions = triggers.map(t => ({ value: t.id, label: t.name }));
@@ -568,7 +573,7 @@ export function TimeBankRuleEditor({
             TimeBank
           </CardTitle>
           <CardDescription>
-            Konfigurera tidsbank och belöningsregler
+            {t('description')}
           </CardDescription>
         </CardHeader>
         
@@ -576,7 +581,7 @@ export function TimeBankRuleEditor({
           {/* Basic settings */}
           <div className="grid grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="tb-initial">Starttid (sek)</Label>
+              <Label htmlFor="tb-initial">{t('initialTime')}</Label>
               <Input
                 id="tb-initial"
                 type="number"
@@ -593,7 +598,7 @@ export function TimeBankRuleEditor({
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="tb-min">Minimum</Label>
+              <Label htmlFor="tb-min">{t('minimum')}</Label>
               <Input
                 id="tb-min"
                 type="number"
@@ -604,12 +609,12 @@ export function TimeBankRuleEditor({
                 step={30}
               />
               <div className="text-xs text-muted-foreground">
-                {config.minBalance < 0 ? 'Tillåt skuld' : 'Ingen skuld'}
+                {config.minBalance < 0 ? t('allowDebt') : t('noDebt')}
               </div>
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="tb-max">Maximum</Label>
+              <Label htmlFor="tb-max">{t('maximum')}</Label>
               <Input
                 id="tb-max"
                 type="number"
@@ -629,26 +634,26 @@ export function TimeBankRuleEditor({
           {/* On zero action */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Vid tid = 0</Label>
+              <Label>{t('onZero')}</Label>
               <Select
                 value={config.onZeroAction}
                 onChange={(e) => updateConfig({
                   onZeroAction: e.target.value as TimeBankConfig['onZeroAction'],
                 })}
-                options={ZERO_ACTION_OPTIONS}
+                options={zeroActionOptions}
               />
             </div>
             
             {config.onZeroAction === 'trigger' && (
               <div className="space-y-2">
-                <Label>Trigger att aktivera</Label>
+                <Label>{t('triggerToActivate')}</Label>
                 <Select
                   value={config.onZeroTriggerId || ''}
                   onChange={(e) => updateConfig({
                     onZeroTriggerId: e.target.value,
                   })}
                   options={triggerSelectOptions}
-                  placeholder="Välj trigger"
+                  placeholder={t('selectTrigger')}
                 />
               </div>
             )}
@@ -657,9 +662,9 @@ export function TimeBankRuleEditor({
           {/* Show to participants */}
           <div className="flex items-center justify-between p-3 border rounded-lg">
             <div>
-              <Label className="font-medium">Visa för deltagare</Label>
+              <Label className="font-medium">{t('showToParticipants')}</Label>
               <p className="text-xs text-muted-foreground mt-1">
-                Visa tidsbanken i deltagarnas gränssnitt
+                {t('showToParticipantsDescription')}
               </p>
             </div>
             <Switch
@@ -673,18 +678,18 @@ export function TimeBankRuleEditor({
           {/* Rules section */}
           <div className="space-y-3 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <Label className="text-base font-medium">Belöningsregler</Label>
+              <Label className="text-base font-medium">{t('rewardRules')}</Label>
               <Badge variant="outline">
-                {config.rules.filter((r) => r.enabled).length} aktiva
+                {t('activeCount', { count: config.rules.filter((r) => r.enabled).length })}
               </Badge>
             </div>
             
             {config.rules.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground border rounded-lg bg-muted/30">
                 <ClockIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>Inga regler definierade</p>
+                <p>{t('noRules')}</p>
                 <p className="text-sm">
-                  Lägg till regler för att automatiskt justera tidbanken
+                  {t('noRulesHint')}
                 </p>
               </div>
             ) : (
@@ -701,6 +706,9 @@ export function TimeBankRuleEditor({
                     artifacts={artifacts}
                     steps={steps}
                     triggers={triggers}
+                    triggerOptions={triggerOptions}
+                    operatorOptions={operatorOptions}
+                    conditionOptions={conditionOptions}
                   />
                 ))}
               </div>
@@ -712,7 +720,7 @@ export function TimeBankRuleEditor({
               className="w-full"
             >
               <PlusIcon className="h-4 w-4 mr-2" />
-              Lägg till regel
+              {t('addRule')}
             </Button>
           </div>
         </CardContent>
@@ -725,4 +733,4 @@ export function TimeBankRuleEditor({
 // Exports
 // =============================================================================
 
-export { TRIGGER_OPTIONS, OPERATOR_OPTIONS, ZERO_ACTION_OPTIONS };
+export { TRIGGER_KEYS, OPERATOR_KEYS, ZERO_ACTION_KEYS };

@@ -941,6 +941,19 @@
         "participants": "deltagare",
         "openChat": "Öppna chatt"
       },
+      "status": {
+        "paused": "PAUSAD"
+      },
+      "startSession": "Starta session",
+      "confirmKick": "Ta bort {name} från sessionen?",
+      "confirmKickAnonymous": "Ta bort deltagaren från sessionen?",
+      "signalPresets": {
+        "screenFlash": "Skärmblink",
+        "vibration": "Vibration",
+        "torch": "Ficklampa",
+        "audio": "Ljudsignal",
+        "notification": "Notis"
+      },
       "preflight": {
         "title": "Förberedelsekontroll",
         "readyToStart": "Redo att starta",
@@ -953,19 +966,48 @@
       "roles": {
         "noRolesCopied": "Inga roller kopierade ännu",
         "copyRolesDescription": "Kopiera roller från spelet för att kunna tilldela dem till deltagare.",
-        "roleDistribution": "Rollfördelning"
+        "roleDistribution": "Rollfördelning",
+        "allMinsSatisfied": "Alla minimikrav uppfyllda",
+        "minsNotSatisfied": "Minimikrav ej uppfyllda"
       },
       "participants": {
         "noParticipantsYet": "Inga deltagare har anslutit ännu.",
         "shareCodeToInvite": "Dela sessionskoden för att bjuda in deltagare.",
         "noParticipantsConnected": "Inga deltagare har anslutit än",
-        "participantsConnected": "{count} deltagare anslutna"
+        "participantsConnected": "{count} deltagare anslutna",
+        "anonymous": "Anonym deltagare",
+        "nextTurn": "Nästa tur",
+        "online": "Online",
+        "offline": "Offline",
+        "assignRole": "Tilldela roll...",
+        "participantsMissingRole": "{count} deltagare saknar roll",
+        "onlineCount": "{online} av {total} online",
+        "rolesCount": "{assigned} av {total} har roller"
+      },
+      "triggers": {
+        "noTriggers": "Inga triggers i denna session.",
+        "configuredViaBuilder": "Triggers konfigureras via Spel-byggaren."
+      },
+      "content": {
+        "stepsAndPhases": "Steg & faser",
+        "stepsDefined": "{count} steg definierade",
+        "noStepsDefined": "Inga steg definierade"
+      },
+      "settings": {
+        "sessionCode": "Sessionskod",
+        "codeGenerated": "Kod genererad",
+        "noCodeGenerated": "Ingen kod genererad"
       },
       "steps": {
-        "unnamedStep": "Namnlöst steg"
+        "unnamedStep": "Namnlöst steg",
+        "missingTitle": "Saknar rubrik",
+        "missingDescription": "Saknar beskrivning"
       },
       "tabs": {
         "overview": "Översikt",
+        "story": "Berättelse",
+        "artifacts": "Artefakter",
+        "triggers": "Triggers",
         "events": "Händelser",
         "settings": "Inställningar"
       },
@@ -1684,6 +1726,117 @@
       "copyCode": "Kopiera kod",
       "copiedCode": "Kopierat!",
       "joinUrl": "Anslutningslänk"
+    },
+    "signalPanel": {
+      "title": "Signals",
+      "description": "Skicka snabba events med färdiga knappar eller egen kanal.",
+      "quickButtons": "Snabbknappar",
+      "channelPlaceholder": "Kanal (t.ex. READY)",
+      "messagePlaceholder": "Meddelande",
+      "send": "Skicka",
+      "recent": "Senaste",
+      "refresh": "Uppdatera",
+      "loading": "Laddar…",
+      "noSignals": "Inga signals ännu.",
+      "presets": {
+        "ready": "Redo",
+        "hint": "Ledtråd",
+        "hintAvailable": "Ledtråd tillgänglig",
+        "attention": "Fokus",
+        "gatherAttention": "Samla uppmärksamhet",
+        "pause": "Paus",
+        "pauseNow": "Pausa nu",
+        "found": "Hittat",
+        "findConfirmed": "Fynd bekräftat",
+        "sos": "SOS",
+        "needHelp": "Behöver hjälp"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda signals",
+        "sendFailed": "Kunde inte skicka signal"
+      }
+    },
+    "roleAssigner": {
+      "noRolesCopied": "Inga roller kopierade ännu",
+      "copyRolesHint": "Klicka på \"Kopiera roller från spel\" ovan för att hämta rollerna från spelets mall.",
+      "afterCopyHint": "Efter kopiering kan du tilldela roller till deltagare manuellt eller slumpmässigt.",
+      "errors": {
+        "loadFailed": "Kunde inte ladda data",
+        "assignFailed": "Kunde inte tilldela roller",
+        "unassignFailed": "Kunde inte ta bort rolltilldelning"
+      }
+    },
+    "storyView": {
+      "title": "Berättelsen",
+      "unnamedStep": "Namnlöst steg",
+      "now": "Nu",
+      "sayToGroup": "SÄGA TILL GRUPPEN",
+      "goToStep": "Gå till detta steg",
+      "stepsCount": "{count} steg",
+      "totalDuration": "~{minutes} min totalt",
+      "scriptsCount": "{count} scripts",
+      "noStepsYet": "Inga steg i detta spel ännu.",
+      "close": "Stäng"
+    },
+    "timeBankEditor": {
+      "description": "Konfigurera tidsbank och belöningsregler",
+      "initialTime": "Starttid (sek)",
+      "minimum": "Minimum",
+      "maximum": "Maximum",
+      "allowDebt": "Tillåt skuld",
+      "noDebt": "Ingen skuld",
+      "onZero": "Vid tid = 0",
+      "triggerToActivate": "Trigger att aktivera",
+      "selectTrigger": "Välj trigger",
+      "showToParticipants": "Visa för deltagare",
+      "showToParticipantsDescription": "Visa tidsbanken i deltagarnas gränssnitt",
+      "rewardRules": "Belöningsregler",
+      "activeCount": "{count} aktiva",
+      "noRules": "Inga regler definierade",
+      "noRulesHint": "Lägg till regler för att automatiskt justera tidbanken",
+      "addRule": "Lägg till regel",
+      "newRule": "Ny regel",
+      "copyName": "{name} (kopia)",
+      "editRule": "Redigera regel",
+      "name": "Namn",
+      "ruleNamePlaceholder": "Regelnamn",
+      "descriptionOptional": "Beskrivning (valfri)",
+      "descriptionPlaceholder": "Beskriv när denna regel aktiveras",
+      "when": "När",
+      "target": "Mål",
+      "afterSeconds": "Efter (sekunder)",
+      "operation": "Operation",
+      "factor": "Faktor",
+      "seconds": "Sekunder",
+      "maxFires": "Max antal gånger (0 = obegränsat)",
+      "conditionOptional": "Villkor (valfritt)",
+      "done": "Klar",
+      "all": "Alla",
+      "triggers": {
+        "artifact_solved": "Artefakt löst",
+        "step_completed": "Steg klart",
+        "phase_completed": "Fas klar",
+        "trigger_fired": "Trigger aktiverad",
+        "time_elapsed": "Tid passerat",
+        "manual": "Manuell justering"
+      },
+      "operators": {
+        "add": "Lägg till (+)",
+        "subtract": "Dra av (-)",
+        "set": "Sätt till (=)",
+        "multiply": "Multiplicera (×)"
+      },
+      "zeroActions": {
+        "pause": "Pausa spelet",
+        "end_game": "Avsluta spelet",
+        "continue": "Fortsätt (negativ tid)",
+        "trigger": "Aktivera trigger"
+      },
+      "conditions": {
+        "none": "Inget villkor",
+        "balance_below": "Om tid under",
+        "balance_above": "Om tid över"
+      }
     }
   }
 }

@@ -10,6 +10,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -60,6 +61,7 @@ function StepCard({
   isPast: boolean;
   onNavigate?: () => void;
 }) {
+  const t = useTranslations('play.storyView');
   const [isExpanded, setIsExpanded] = useState(isCurrent);
   
   const hasLeaderScript = Boolean(step.leaderScript);
@@ -94,10 +96,10 @@ function StepCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h3 className="font-medium text-foreground truncate">
-              {step.title || 'Namnlöst steg'}
+              {step.title || t('unnamedStep')}
             </h3>
             {isCurrent && (
-              <Badge variant="primary" size="sm">Nu</Badge>
+              <Badge variant="primary" size="sm">{t('now')}</Badge>
             )}
           </div>
           <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
@@ -143,7 +145,7 @@ function StepCard({
                 <DocumentTextIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
                 <div>
                   <div className="text-xs font-medium text-amber-700 dark:text-amber-400 mb-1">
-                    SÄGA TILL GRUPPEN
+                    {t('sayToGroup')}
                   </div>
                   <div className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
                     {step.leaderScript}
@@ -161,7 +163,7 @@ function StepCard({
               onClick={onNavigate}
               className="w-full"
             >
-              Gå till detta steg
+              {t('goToStep')}
             </Button>
           )}
         </div>
@@ -179,11 +181,14 @@ export function StoryViewModal({
   onClose,
   steps,
   currentStepIndex = -1,
-  title = 'Berättelsen',
+  title,
   onNavigateToStep,
 }: StoryViewModalProps) {
+  const t = useTranslations('play.storyView');
+  
   if (!open) return null;
   
+  const displayTitle = title ?? t('title');
   const totalDuration = steps.reduce((sum, s) => sum + (s.durationMinutes ?? 0), 0);
   const stepsWithScripts = steps.filter((s) => s.leaderScript).length;
   
@@ -202,13 +207,13 @@ export function StoryViewModal({
           <div className="flex items-center gap-3">
             <BookOpenIcon className="h-6 w-6 text-primary" />
             <div>
-              <h2 className="font-semibold text-foreground text-lg">{title}</h2>
+              <h2 className="font-semibold text-foreground text-lg">{displayTitle}</h2>
               <div className="text-xs text-muted-foreground flex items-center gap-3">
-                <span>{steps.length} steg</span>
-                {totalDuration > 0 && <span>~{totalDuration} min totalt</span>}
+                <span>{t('stepsCount', { count: steps.length })}</span>
+                {totalDuration > 0 && <span>{t('totalDuration', { minutes: totalDuration })}</span>}
                 {stepsWithScripts > 0 && (
                   <span className="text-amber-600">
-                    {stepsWithScripts} scripts
+                    {t('scriptsCount', { count: stepsWithScripts })}
                   </span>
                 )}
               </div>
@@ -228,7 +233,7 @@ export function StoryViewModal({
           {steps.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <BookOpenIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>Inga steg i detta spel ännu.</p>
+              <p>{t('noStepsYet')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -253,7 +258,7 @@ export function StoryViewModal({
         {/* Footer */}
         <div className="border-t px-6 py-4 flex justify-end">
           <Button variant="outline" onClick={onClose}>
-            Stäng
+            {t('close')}
           </Button>
         </div>
       </div>

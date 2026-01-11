@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, Badge } from '@/components/ui'
 import {
   TrophyIcon,
@@ -115,19 +116,6 @@ function getDifficultyVariant(difficulty: string) {
   }
 }
 
-function getDifficultyLabel(difficulty: string) {
-  switch (difficulty) {
-    case 'easy':
-      return 'Lätt'
-    case 'medium':
-      return 'Medel'
-    case 'hard':
-      return 'Svår'
-    default:
-      return difficulty
-  }
-}
-
 function getTypeIcon(type: string) {
   switch (type) {
     case 'daily':
@@ -140,21 +128,6 @@ function getTypeIcon(type: string) {
       return <StarIcon className="h-4 w-4" />
     default:
       return <TrophyIcon className="h-4 w-4" />
-  }
-}
-
-function getTypeLabel(type: string) {
-  switch (type) {
-    case 'daily':
-      return 'Daglig'
-    case 'weekly':
-      return 'Vecka'
-    case 'community':
-      return 'Gemenskap'
-    case 'special':
-      return 'Special'
-    default:
-      return type
   }
 }
 
@@ -175,6 +148,7 @@ export default function ChallengesPage() {
   const [challenges] = useState<Challenge[]>(mockChallenges)
   const [filterType, setFilterType] = useState<string>('all')
   const [filterDifficulty, setFilterDifficulty] = useState<string>('all')
+  const t = useTranslations('app.challenges')
 
   const filteredChallenges = challenges.filter((challenge) => {
     if (filterType !== 'all' && challenge.type !== filterType) return false
@@ -185,12 +159,57 @@ export default function ChallengesPage() {
   const activeChallenges = challenges.filter((c) => c.isJoined && !c.isCompleted)
   const completedToday = challenges.filter((c) => c.isCompleted).length
 
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'all':
+        return t('types.all')
+      case 'daily':
+        return t('types.daily')
+      case 'weekly':
+        return t('types.weekly')
+      case 'community':
+        return t('types.community')
+      case 'special':
+        return t('types.special')
+      default:
+        return type
+    }
+  }
+
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'all':
+        return t('difficulty.all')
+      case 'easy':
+        return t('difficulty.easy')
+      case 'medium':
+        return t('difficulty.medium')
+      case 'hard':
+        return t('difficulty.hard')
+      default:
+        return difficulty
+    }
+  }
+
+  const getRewardLabel = (rewardType: string, amount: number) => {
+    switch (rewardType) {
+      case 'badge':
+        return t('rewards.badge')
+      case 'xp':
+        return t('rewards.xp', { amount })
+      case 'coins':
+        return t('rewards.coins', { amount })
+      default:
+        return `${amount}`
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Utmaningar</h1>
-        <p className="text-muted-foreground mt-1">Ta dig an utmaningar och tjäna belöningar</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+        <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Stats */}
@@ -198,13 +217,13 @@ export default function ChallengesPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-primary">{activeChallenges.length}</div>
-            <div className="text-sm text-muted-foreground">Aktiva</div>
+            <div className="text-sm text-muted-foreground">{t('stats.active')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-500">{completedToday}</div>
-            <div className="text-sm text-muted-foreground">Avklarade</div>
+            <div className="text-sm text-muted-foreground">{t('stats.completed')}</div>
           </CardContent>
         </Card>
         <Card>
@@ -212,7 +231,7 @@ export default function ChallengesPage() {
             <div className="text-2xl font-bold text-yellow-500">
               <FireIcon className="h-6 w-6 mx-auto" />
             </div>
-            <div className="text-sm text-muted-foreground">5 dagar streak</div>
+            <div className="text-sm text-muted-foreground">{t('stats.streak', { days: 5 })}</div>
           </CardContent>
         </Card>
       </div>
@@ -227,7 +246,7 @@ export default function ChallengesPage() {
               size="sm"
               onClick={() => setFilterType(type)}
             >
-              {type === 'all' ? 'Alla' : getTypeLabel(type)}
+              {getTypeLabel(type)}
             </Button>
           ))}
         </div>
@@ -239,7 +258,7 @@ export default function ChallengesPage() {
               size="sm"
               onClick={() => setFilterDifficulty(diff)}
             >
-              {diff === 'all' ? 'Alla' : getDifficultyLabel(diff)}
+              {getDifficultyLabel(diff)}
             </Button>
           ))}
         </div>
@@ -289,7 +308,7 @@ export default function ChallengesPage() {
                         {getDifficultyLabel(challenge.difficulty)}
                       </Badge>
                       {challenge.isCompleted && (
-                        <Badge variant="success">Avklarad!</Badge>
+                        <Badge variant="success">{t('status.completed')}</Badge>
                       )}
                     </div>
 
@@ -329,16 +348,14 @@ export default function ChallengesPage() {
                         {challenge.participants && (
                           <span className="flex items-center gap-1">
                             <UserGroupIcon className="h-4 w-4" />
-                            {challenge.participants} deltagare
+                            {t('participants', { count: challenge.participants })}
                           </span>
                         )}
                       </div>
                       <div className="flex items-center gap-2">
                         {getRewardIcon(challenge.rewardType)}
                         <span className="font-medium">
-                          {challenge.rewardType === 'badge'
-                            ? 'Märke'
-                            : `+${challenge.reward} ${challenge.rewardType === 'xp' ? 'XP' : 'mynt'}`}
+                          {getRewardLabel(challenge.rewardType, challenge.reward)}
                         </span>
                       </div>
                     </div>
@@ -349,16 +366,16 @@ export default function ChallengesPage() {
                     {challenge.isCompleted ? (
                       <Button size="sm" variant="outline" disabled>
                         <CheckCircleIcon className="h-4 w-4 mr-1" />
-                        Klar
+                        {t('status.done')}
                       </Button>
                     ) : challenge.isJoined ? (
                       <Button size="sm" variant="outline">
-                        Visa
+                        {t('status.view')}
                       </Button>
                     ) : (
                       <Button size="sm">
                         <LockClosedIcon className="h-4 w-4 mr-1" />
-                        Delta
+                        {t('status.participate')}
                       </Button>
                     )}
                   </div>
@@ -374,9 +391,9 @@ export default function ChallengesPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <TrophyIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold text-foreground mb-2">Inga utmaningar hittades</h3>
+            <h3 className="font-semibold text-foreground mb-2">{t('empty.title')}</h3>
             <p className="text-muted-foreground text-sm">
-              Prova att ändra dina filter för att se fler utmaningar.
+              {t('empty.message')}
             </p>
           </CardContent>
         </Card>

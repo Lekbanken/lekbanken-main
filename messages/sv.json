@@ -733,6 +733,151 @@
       "percentComplete": "{percent}% klart",
       "passedWith": "Godkänd med {score}%",
       "coins": "mynt"
+    },
+    "leaderboard": {
+      "title": "Topplista",
+      "subtitle": "Se hur du står dig mot andra spelare",
+      "selectGame": "Välj lek",
+      "tabs": {
+        "global": "Global",
+        "friends": "Vänner"
+      },
+      "ranking": {
+        "global": "Global Ranking",
+        "friends": "Vänner Ranking"
+      },
+      "rounds": "omgångar",
+      "empty": {
+        "global": "Inga spelare än",
+        "friends": "Du har inga vänner än"
+      },
+      "stats": {
+        "best": "Bäst",
+        "average": "Snitt",
+        "achievements": "achievements",
+        "totalPlayers": "Totalt spelare",
+        "averageScore": "Snittpoäng",
+        "topScore": "Toppresultat"
+      }
+    },
+    "noAccess": {
+      "title": "Ingen organisation tilldelad",
+      "description": "Du verkar inte vara medlem i någon organisation ännu. Be en administratör bjuda in dig, eller skapa en ny organisation om du har behörighet.",
+      "selectOrg": "Välj organisation",
+      "backToApp": "Tillbaka till appen"
+    },
+    "selectTenant": {
+      "title": "Välj organisation",
+      "description": "Välj vilken organisation du vill arbeta i just nu.",
+      "unknownName": "Okänt namn",
+      "select": "Välj",
+      "continueWithout": "Fortsätt utan organisation",
+      "workAsAdmin": "Arbeta som systemadministratör"
+    },
+    "challenges": {
+      "title": "Utmaningar",
+      "subtitle": "Ta dig an utmaningar och tjäna belöningar",
+      "stats": {
+        "active": "Aktiva",
+        "completed": "Avklarade",
+        "streak": "{days} dagar streak"
+      },
+      "types": {
+        "all": "Alla",
+        "daily": "Daglig",
+        "weekly": "Vecka",
+        "community": "Gemenskap",
+        "special": "Special"
+      },
+      "difficulty": {
+        "all": "Alla",
+        "easy": "Lätt",
+        "medium": "Medel",
+        "hard": "Svår"
+      },
+      "participants": "{count} deltagare",
+      "rewards": {
+        "badge": "Märke",
+        "xp": "+{amount} XP",
+        "coins": "+{amount} mynt"
+      },
+      "status": {
+        "completed": "Avklarad!",
+        "done": "Klar",
+        "view": "Visa",
+        "participate": "Delta"
+      },
+      "empty": {
+        "title": "Inga utmaningar hittades",
+        "message": "Prova att ändra dina filter för att se fler utmaningar."
+      }
+    },
+    "notifications": {
+      "title": "Notifikationer",
+      "subtitle": "Dina meddelanden och uppdateringar",
+      "unreadCount": "{count} olästa",
+      "allRead": "Alla lästa",
+      "markAllAsRead": "Markera alla som lästa",
+      "filters": {
+        "all": "Alla",
+        "unread": "Olästa ({count})",
+        "read": "Lästa"
+      },
+      "empty": {
+        "title": "Inga notifikationer",
+        "titleUnread": "Inga olästa notifikationer",
+        "message": "Du har inga notifikationer ännu.",
+        "messageUnread": "Du har läst alla dina notifikationer."
+      },
+      "actions": {
+        "view": "Visa",
+        "markAsRead": "Markera som läst",
+        "delete": "Ta bort"
+      },
+      "timeAgo": {
+        "minutes": "{minutes} min sedan",
+        "hours": "{hours} tim sedan",
+        "yesterday": "Igår",
+        "days": "{days} dagar sedan"
+      },
+      "error": {
+        "load": "Kunde inte hämta notifikationer",
+        "retry": "Försök igen"
+      }
+    },
+    "events": {
+      "title": "Händelser",
+      "subtitle": "Delta i spännande event och tjäna exklusiva belöningar",
+      "stats": {
+        "activeEvents": "Aktiva event",
+        "total": "Totalt",
+        "participants": "Deltagare",
+        "completed": "Avklarade"
+      },
+      "filters": {
+        "all": "Alla",
+        "active": "Aktiva",
+        "upcoming": "Kommande"
+      },
+      "daysRemaining": "{days} dagar kvar",
+      "participantCount": "{count} deltagare",
+      "yourProgress": "Din progress",
+      "rewards": {
+        "points": "{amount} poäng",
+        "cosmetics": "Exklusiv belöning",
+        "currency": "{amount} mynt",
+        "default": "Belöning"
+      },
+      "actions": {
+        "participate": "Delta",
+        "comingSoon": "Kommer snart"
+      },
+      "empty": {
+        "title": "Inga event hittades",
+        "active": "Det finns inga aktiva event just nu. Kolla tillbaka snart!",
+        "upcoming": "Det finns inga kommande event planerade.",
+        "all": "Det finns inga event att visa."
+      }
     }
   },
   "auth": {

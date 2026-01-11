@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent } from '@/components/ui'
 import {
   BellIcon,
@@ -81,26 +82,27 @@ function getTypeColor(type: string, category: string | null) {
   }
 }
 
-function formatTimeAgo(dateString: string) {
-  const date = new Date(dateString)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMins / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMins < 60) return `${diffMins} min sedan`
-  if (diffHours < 24) return `${diffHours} tim sedan`
-  if (diffDays === 1) return 'Igår'
-  return `${diffDays} dagar sedan`
-}
-
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<UserNotification[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
   const [isMarkingAll, setIsMarkingAll] = useState(false)
+  const t = useTranslations('app.notifications')
+
+  const formatTimeAgo = useCallback((dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMins / 60)
+    const diffDays = Math.floor(diffHours / 24)
+
+    if (diffMins < 60) return t('timeAgo.minutes', { minutes: diffMins })
+    if (diffHours < 24) return t('timeAgo.hours', { hours: diffHours })
+    if (diffDays === 1) return t('timeAgo.yesterday')
+    return t('timeAgo.days', { days: diffDays })
+  }, [t])
 
   const loadNotifications = useCallback(async () => {
     setLoading(true)
@@ -111,11 +113,11 @@ export default function NotificationsPage() {
     if (result.success && result.data) {
       setNotifications(result.data)
     } else {
-      setError(result.error || 'Kunde inte hämta notifikationer')
+      setError(result.error || t('error.load'))
     }
     
     setLoading(false)
-  }, [])
+  }, [t])
 
   useEffect(() => {
     loadNotifications()
@@ -171,8 +173,8 @@ export default function NotificationsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
-          <p className="text-muted-foreground mt-1">Dina meddelanden och uppdateringar</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
         <div className="flex items-center justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
@@ -185,14 +187,14 @@ export default function NotificationsPage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
-          <p className="text-muted-foreground mt-1">Dina meddelanden och uppdateringar</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
+          <p className="text-muted-foreground mt-1">{t('subtitle')}</p>
         </div>
         <Card className="border-red-500/30">
           <CardContent className="p-8 text-center">
             <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={loadNotifications}>Försök igen</Button>
+            <Button onClick={loadNotifications}>{t('error.retry')}</Button>
           </CardContent>
         </Card>
       </div>
@@ -204,9 +206,9 @@ export default function NotificationsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {unreadCount > 0 ? `${unreadCount} olästa` : 'Alla lästa'}
+            {unreadCount > 0 ? t('unreadCount', { count: unreadCount }) : t('allRead')}
           </p>
         </div>
         {unreadCount > 0 && (
@@ -221,7 +223,7 @@ export default function NotificationsPage() {
             ) : (
               <CheckCircleIcon className="h-4 w-4 mr-1" />
             )}
-            Markera alla som lästa
+            {t('markAllAsRead')}
           </Button>
         )}
       </div>
@@ -233,21 +235,21 @@ export default function NotificationsPage() {
           size="sm"
           onClick={() => setFilter('all')}
         >
-          Alla
+          {t('filters.all')}
         </Button>
         <Button
           variant={filter === 'unread' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setFilter('unread')}
         >
-          Olästa ({unreadCount})
+          {t('filters.unread', { count: unreadCount })}
         </Button>
         <Button
           variant={filter === 'read' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setFilter('read')}
         >
-          Lästa
+          {t('filters.read')}
         </Button>
       </div>
 
@@ -259,12 +261,12 @@ export default function NotificationsPage() {
               <BellIcon className="h-8 w-8 text-muted-foreground" />
             </div>
             <h3 className="font-semibold text-foreground mb-2">
-              {filter === 'unread' ? 'Inga olästa notifikationer' : 'Inga notifikationer'}
+              {filter === 'unread' ? t('empty.titleUnread') : t('empty.title')}
             </h3>
             <p className="text-muted-foreground text-sm">
               {filter === 'unread'
-                ? 'Du har läst alla dina notifikationer.'
-                : 'Du har inga notifikationer ännu.'}
+                ? t('empty.messageUnread')
+                : t('empty.message')}
             </p>
           </CardContent>
         </Card>
@@ -305,7 +307,7 @@ export default function NotificationsPage() {
                         {notification.action_url && (
                           <Link href={notification.action_url}>
                             <Button variant="ghost" size="sm">
-                              {notification.action_label || 'Visa'}
+                              {notification.action_label || t('actions.view')}
                             </Button>
                           </Link>
                         )}
@@ -314,7 +316,7 @@ export default function NotificationsPage() {
                             variant="ghost"
                             size="sm"
                             onClick={() => handleMarkAsRead(notification.id)}
-                            title="Markera som läst"
+                            title={t('actions.markAsRead')}
                           >
                             <CheckIcon className="h-4 w-4" />
                           </Button>
@@ -323,7 +325,7 @@ export default function NotificationsPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDelete(notification.id)}
-                          title="Ta bort"
+                          title={t('actions.delete')}
                         >
                           <TrashIcon className="h-4 w-4" />
                         </Button>

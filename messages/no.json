@@ -733,6 +733,151 @@
       "percentComplete": "{percent}% fullført",
       "passedWith": "Bestått med {score}%",
       "coins": "mynter"
+    },
+    "leaderboard": {
+      "title": "Toppliste",
+      "subtitle": "Se hvordan du sammenligner deg med andre spillere",
+      "selectGame": "Velg spill",
+      "tabs": {
+        "global": "Global",
+        "friends": "Venner"
+      },
+      "ranking": {
+        "global": "Global Rangering",
+        "friends": "Venner Rangering"
+      },
+      "rounds": "runder",
+      "empty": {
+        "global": "Ingen spillere ennå",
+        "friends": "Du har ingen venner ennå"
+      },
+      "stats": {
+        "best": "Best",
+        "average": "Snitt",
+        "achievements": "prestasjoner",
+        "totalPlayers": "Totalt spillere",
+        "averageScore": "Gjennomsnittspoeng",
+        "topScore": "Toppresultat"
+      }
+    },
+    "noAccess": {
+      "title": "Ingen organisasjon tildelt",
+      "description": "Du ser ikke ut til å være medlem av noen organisasjon ennå. Be en administrator om å invitere deg, eller opprett en ny organisasjon hvis du har tillatelse.",
+      "selectOrg": "Velg organisasjon",
+      "backToApp": "Tilbake til appen"
+    },
+    "selectTenant": {
+      "title": "Velg organisasjon",
+      "description": "Velg hvilken organisasjon du vil jobbe i akkurat nå.",
+      "unknownName": "Ukjent navn",
+      "select": "Velg",
+      "continueWithout": "Fortsett uten organisasjon",
+      "workAsAdmin": "Arbeid som systemadministrator"
+    },
+    "challenges": {
+      "title": "Utfordringer",
+      "subtitle": "Ta på deg utfordringer og tjen belønninger",
+      "stats": {
+        "active": "Aktive",
+        "completed": "Fullførte",
+        "streak": "{days} dagers streak"
+      },
+      "types": {
+        "all": "Alle",
+        "daily": "Daglig",
+        "weekly": "Ukentlig",
+        "community": "Fellesskap",
+        "special": "Spesial"
+      },
+      "difficulty": {
+        "all": "Alle",
+        "easy": "Lett",
+        "medium": "Middels",
+        "hard": "Vanskelig"
+      },
+      "participants": "{count} deltakere",
+      "rewards": {
+        "badge": "Merke",
+        "xp": "+{amount} XP",
+        "coins": "+{amount} mynter"
+      },
+      "status": {
+        "completed": "Fullført!",
+        "done": "Ferdig",
+        "view": "Vis",
+        "participate": "Delta"
+      },
+      "empty": {
+        "title": "Ingen utfordringer funnet",
+        "message": "Prøv å endre filtrene dine for å se flere utfordringer."
+      }
+    },
+    "notifications": {
+      "title": "Varsler",
+      "subtitle": "Dine meldinger og oppdateringer",
+      "unreadCount": "{count} uleste",
+      "allRead": "Alle lest",
+      "markAllAsRead": "Merk alle som lest",
+      "filters": {
+        "all": "Alle",
+        "unread": "Uleste ({count})",
+        "read": "Leste"
+      },
+      "empty": {
+        "title": "Ingen varsler",
+        "titleUnread": "Ingen uleste varsler",
+        "message": "Du har ingen varsler ennå.",
+        "messageUnread": "Du har lest alle varslene dine."
+      },
+      "actions": {
+        "view": "Vis",
+        "markAsRead": "Merk som lest",
+        "delete": "Slett"
+      },
+      "timeAgo": {
+        "minutes": "{minutes} min siden",
+        "hours": "{hours} t siden",
+        "yesterday": "I går",
+        "days": "{days} dager siden"
+      },
+      "error": {
+        "load": "Kunne ikke hente varsler",
+        "retry": "Prøv igjen"
+      }
+    },
+    "events": {
+      "title": "Hendelser",
+      "subtitle": "Delta i spennende eventer og tjen eksklusive belønninger",
+      "stats": {
+        "activeEvents": "Aktive eventer",
+        "total": "Totalt",
+        "participants": "Deltakere",
+        "completed": "Fullførte"
+      },
+      "filters": {
+        "all": "Alle",
+        "active": "Aktive",
+        "upcoming": "Kommende"
+      },
+      "daysRemaining": "{days} dager igjen",
+      "participantCount": "{count} deltakere",
+      "yourProgress": "Din fremgang",
+      "rewards": {
+        "points": "{amount} poeng",
+        "cosmetics": "Eksklusiv belønning",
+        "currency": "{amount} mynter",
+        "default": "Belønning"
+      },
+      "actions": {
+        "participate": "Delta",
+        "comingSoon": "Kommer snart"
+      },
+      "empty": {
+        "title": "Ingen eventer funnet",
+        "active": "Det finnes ingen aktive eventer akkurat nå. Kom tilbake snart!",
+        "upcoming": "Det finnes ingen kommende eventer planlagt.",
+        "all": "Det finnes ingen eventer å vise."
+      }
     }
   },
   "auth": {

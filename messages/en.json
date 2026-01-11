@@ -733,6 +733,151 @@
       "percentComplete": "{percent}% complete",
       "passedWith": "Passed with {score}%",
       "coins": "coins"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "subtitle": "See how you compare to other players",
+      "selectGame": "Select game",
+      "tabs": {
+        "global": "Global",
+        "friends": "Friends"
+      },
+      "ranking": {
+        "global": "Global Ranking",
+        "friends": "Friends Ranking"
+      },
+      "rounds": "rounds",
+      "empty": {
+        "global": "No players yet",
+        "friends": "You have no friends yet"
+      },
+      "stats": {
+        "best": "Best",
+        "average": "Avg",
+        "achievements": "achievements",
+        "totalPlayers": "Total players",
+        "averageScore": "Average score",
+        "topScore": "Top score"
+      }
+    },
+    "noAccess": {
+      "title": "No organization assigned",
+      "description": "You don't seem to be a member of any organization yet. Ask an administrator to invite you, or create a new organization if you have permission.",
+      "selectOrg": "Select organization",
+      "backToApp": "Back to app"
+    },
+    "selectTenant": {
+      "title": "Select organization",
+      "description": "Choose which organization you want to work in right now.",
+      "unknownName": "Unknown name",
+      "select": "Select",
+      "continueWithout": "Continue without organization",
+      "workAsAdmin": "Work as system administrator"
+    },
+    "challenges": {
+      "title": "Challenges",
+      "subtitle": "Take on challenges and earn rewards",
+      "stats": {
+        "active": "Active",
+        "completed": "Completed",
+        "streak": "{days} day streak"
+      },
+      "types": {
+        "all": "All",
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "community": "Community",
+        "special": "Special"
+      },
+      "difficulty": {
+        "all": "All",
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "participants": "{count} participants",
+      "rewards": {
+        "badge": "Badge",
+        "xp": "+{amount} XP",
+        "coins": "+{amount} coins"
+      },
+      "status": {
+        "completed": "Completed!",
+        "done": "Done",
+        "view": "View",
+        "participate": "Join"
+      },
+      "empty": {
+        "title": "No challenges found",
+        "message": "Try changing your filters to see more challenges."
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Your messages and updates",
+      "unreadCount": "{count} unread",
+      "allRead": "All read",
+      "markAllAsRead": "Mark all as read",
+      "filters": {
+        "all": "All",
+        "unread": "Unread ({count})",
+        "read": "Read"
+      },
+      "empty": {
+        "title": "No notifications",
+        "titleUnread": "No unread notifications",
+        "message": "You have no notifications yet.",
+        "messageUnread": "You have read all your notifications."
+      },
+      "actions": {
+        "view": "View",
+        "markAsRead": "Mark as read",
+        "delete": "Delete"
+      },
+      "timeAgo": {
+        "minutes": "{minutes} min ago",
+        "hours": "{hours} hr ago",
+        "yesterday": "Yesterday",
+        "days": "{days} days ago"
+      },
+      "error": {
+        "load": "Could not load notifications",
+        "retry": "Try again"
+      }
+    },
+    "events": {
+      "title": "Events",
+      "subtitle": "Participate in exciting events and earn exclusive rewards",
+      "stats": {
+        "activeEvents": "Active events",
+        "total": "Total",
+        "participants": "Participants",
+        "completed": "Completed"
+      },
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "upcoming": "Upcoming"
+      },
+      "daysRemaining": "{days} days left",
+      "participantCount": "{count} participants",
+      "yourProgress": "Your progress",
+      "rewards": {
+        "points": "{amount} points",
+        "cosmetics": "Exclusive reward",
+        "currency": "{amount} coins",
+        "default": "Reward"
+      },
+      "actions": {
+        "participate": "Participate",
+        "comingSoon": "Coming soon"
+      },
+      "empty": {
+        "title": "No events found",
+        "active": "There are no active events right now. Check back soon!",
+        "upcoming": "There are no upcoming events planned.",
+        "all": "There are no events to show."
+      }
     }
   },
   "auth": {

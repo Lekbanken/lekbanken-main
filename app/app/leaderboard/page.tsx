@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import type { SocialLeaderboardEntry } from '@/lib/services/socialService';
@@ -23,6 +24,7 @@ interface Game {
 export default function LeaderboardPage() {
   const { user } = useAuth()
   const { currentTenant } = useTenant()
+  const t = useTranslations('app.leaderboard')
 
   const [games, setGames] = useState<Game[]>([])
   const [selectedGameId, setSelectedGameId] = useState<string>('')
@@ -104,9 +106,9 @@ export default function LeaderboardPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Topplista</h1>
+        <h1 className="text-3xl font-bold text-foreground">{t('title')}</h1>
         <p className="mt-1 text-muted-foreground">
-          Se hur du står dig mot andra spelare
+          {t('subtitle')}
         </p>
       </div>
 
@@ -118,7 +120,7 @@ export default function LeaderboardPage() {
             {games.length > 0 && (
               <div className="w-full sm:w-64">
                 <Select
-                  label="Välj lek"
+                  label={t('selectGame')}
                   value={selectedGameId}
                   onChange={(e) => setSelectedGameId(e.target.value)}
                   options={gameOptions}
@@ -134,7 +136,7 @@ export default function LeaderboardPage() {
                 size="sm"
               >
                 <GlobeAltIcon className="h-4 w-4 mr-2" />
-                Global
+                {t('tabs.global')}
               </Button>
               <Button
                 variant={activeTab === 'friends' ? 'default' : 'outline'}
@@ -142,7 +144,7 @@ export default function LeaderboardPage() {
                 size="sm"
               >
                 <UserGroupIcon className="h-4 w-4 mr-2" />
-                Vänner
+                {t('tabs.friends')}
               </Button>
             </div>
           </div>
@@ -160,7 +162,7 @@ export default function LeaderboardPage() {
               </div>
               <p className="font-bold text-foreground">{currentLeaderboard[1].user_id}</p>
               <p className="text-2xl font-bold text-muted-foreground">{currentLeaderboard[1].score.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">{currentLeaderboard[1].total_plays} omgångar</p>
+              <p className="text-xs text-muted-foreground">{currentLeaderboard[1].total_plays} {t('rounds')}</p>
             </CardContent>
           </Card>
 
@@ -172,7 +174,7 @@ export default function LeaderboardPage() {
               </div>
               <p className="font-bold text-white text-lg">{currentLeaderboard[0].user_id}</p>
               <p className="text-3xl font-bold text-white">{currentLeaderboard[0].score.toLocaleString()}</p>
-              <p className="text-sm text-yellow-100">{currentLeaderboard[0].total_plays} omgångar</p>
+              <p className="text-sm text-yellow-100">{currentLeaderboard[0].total_plays} {t('rounds')}</p>
               <Badge className="mt-2 bg-white/20 text-white border-0">
                 <TrophyIcon className="h-3 w-3 mr-1" />
                 Champion
@@ -188,7 +190,7 @@ export default function LeaderboardPage() {
               </div>
               <p className="font-bold text-foreground">{currentLeaderboard[2].user_id}</p>
               <p className="text-2xl font-bold text-muted-foreground">{currentLeaderboard[2].score.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">{currentLeaderboard[2].total_plays} omgångar</p>
+              <p className="text-xs text-muted-foreground">{currentLeaderboard[2].total_plays} {t('rounds')}</p>
             </CardContent>
           </Card>
         </div>
@@ -199,7 +201,7 @@ export default function LeaderboardPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ChartBarIcon className="h-5 w-5 text-primary" />
-            {activeTab === 'global' ? 'Global Ranking' : 'Vänner Ranking'}
+            {activeTab === 'global' ? t('ranking.global') : t('ranking.friends')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -219,7 +221,7 @@ export default function LeaderboardPage() {
             <div className="text-center py-8">
               <UserGroupIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <p className="text-muted-foreground">
-                {activeTab === 'global' ? 'Inga spelare än' : 'Du har inga vänner än'}
+                {activeTab === 'global' ? t('empty.global') : t('empty.friends')}
               </p>
             </div>
           ) : (
@@ -249,9 +251,9 @@ export default function LeaderboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-foreground truncate">{entry.user_id}</p>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                        <span>{entry.total_plays} omgångar</span>
-                        <span>Bäst: {entry.best_score || 0}</span>
-                        <span className="hidden sm:inline">Snitt: {(entry.avg_score || 0).toFixed(1)}</span>
+                        <span>{entry.total_plays} {t('rounds')}</span>
+                        <span>{t('stats.best')}: {entry.best_score || 0}</span>
+                        <span className="hidden sm:inline">{t('stats.average')}: {(entry.avg_score || 0).toFixed(1)}</span>
                       </div>
                     </div>
 
@@ -277,14 +279,14 @@ export default function LeaderboardPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <UserGroupIcon className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Totalt spelare</p>
+              <p className="text-sm text-gray-500">{t('stats.totalPlayers')}</p>
               <p className="text-2xl font-bold text-gray-900">{currentLeaderboard.length}</p>
             </CardContent>
           </Card>
           <Card>
             <CardContent className="p-4 text-center">
               <ChartBarIcon className="h-6 w-6 text-green-500 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Snittpoäng</p>
+              <p className="text-sm text-gray-500">{t('stats.averageScore')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {(currentLeaderboard.reduce((sum, e) => sum + e.score, 0) / currentLeaderboard.length).toFixed(0)}
               </p>
@@ -293,7 +295,7 @@ export default function LeaderboardPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <TrophyIcon className="h-6 w-6 text-purple-500 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Toppresultat</p>
+              <p className="text-sm text-gray-500">{t('stats.topScore')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {currentLeaderboard[0]?.score.toLocaleString() || 0}
               </p>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, Badge } from '@/components/ui'
 import {
   CalendarDaysIcon,
@@ -101,19 +102,6 @@ function getRewardIcon(type: string) {
   }
 }
 
-function getRewardLabel(type: string, amount: number) {
-  switch (type) {
-    case 'points':
-      return `${amount} poäng`
-    case 'cosmetics':
-      return 'Exklusiv belöning'
-    case 'currency':
-      return `${amount} mynt`
-    default:
-      return 'Belöning'
-  }
-}
-
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString('sv-SE', {
     day: 'numeric',
@@ -131,6 +119,7 @@ function getDaysRemaining(endDate: string) {
 export default function EventsPage() {
   const [events] = useState<Event[]>(mockEvents)
   const [filter, setFilter] = useState<'all' | 'active' | 'upcoming'>('all')
+  const t = useTranslations('app.events')
 
   const filteredEvents = events.filter((event) => {
     if (filter === 'active') return event.isActive
@@ -141,13 +130,26 @@ export default function EventsPage() {
   const activeEvents = events.filter((e) => e.isActive)
   const totalParticipants = events.reduce((sum, e) => sum + e.participant_count, 0)
 
+  const getRewardLabel = (type: string, amount: number) => {
+    switch (type) {
+      case 'points':
+        return t('rewards.points', { amount })
+      case 'cosmetics':
+        return t('rewards.cosmetics')
+      case 'currency':
+        return t('rewards.currency', { amount })
+      default:
+        return t('rewards.default')
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Händelser</h1>
+        <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
         <p className="text-muted-foreground mt-1">
-          Delta i spännande event och tjäna exklusiva belöningar
+          {t('subtitle')}
         </p>
       </div>
 
@@ -156,19 +158,19 @@ export default function EventsPage() {
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-primary">{activeEvents.length}</div>
-            <div className="text-sm text-muted-foreground">Aktiva event</div>
+            <div className="text-sm text-muted-foreground">{t('stats.activeEvents')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-accent">{events.length}</div>
-            <div className="text-sm text-muted-foreground">Totalt</div>
+            <div className="text-sm text-muted-foreground">{t('stats.total')}</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-yellow-500">{totalParticipants}</div>
-            <div className="text-sm text-muted-foreground">Deltagare</div>
+            <div className="text-sm text-muted-foreground">{t('stats.participants')}</div>
           </CardContent>
         </Card>
         <Card>
@@ -176,7 +178,7 @@ export default function EventsPage() {
             <div className="text-2xl font-bold text-green-500">
               {events.filter((e) => (e.progress || 0) >= 100).length}
             </div>
-            <div className="text-sm text-muted-foreground">Avklarade</div>
+            <div className="text-sm text-muted-foreground">{t('stats.completed')}</div>
           </CardContent>
         </Card>
       </div>
@@ -188,7 +190,7 @@ export default function EventsPage() {
           size="sm"
           onClick={() => setFilter('all')}
         >
-          Alla
+          {t('filters.all')}
         </Button>
         <Button
           variant={filter === 'active' ? 'default' : 'outline'}
@@ -196,7 +198,7 @@ export default function EventsPage() {
           onClick={() => setFilter('active')}
         >
           <FireIcon className="h-4 w-4 mr-1" />
-          Aktiva
+          {t('filters.active')}
         </Button>
         <Button
           variant={filter === 'upcoming' ? 'default' : 'outline'}
@@ -204,7 +206,7 @@ export default function EventsPage() {
           onClick={() => setFilter('upcoming')}
         >
           <CalendarDaysIcon className="h-4 w-4 mr-1" />
-          Kommande
+          {t('filters.upcoming')}
         </Button>
       </div>
 
@@ -234,7 +236,7 @@ export default function EventsPage() {
                   {event.isActive && isEnding && (
                     <Badge variant="warning" className="flex items-center gap-1">
                       <FireIcon className="h-3 w-3" />
-                      {daysRemaining} dagar kvar
+                      {t('daysRemaining', { days: daysRemaining })}
                     </Badge>
                   )}
                 </div>
@@ -251,7 +253,7 @@ export default function EventsPage() {
                   </span>
                   <span className="flex items-center gap-1">
                     <UserGroupIcon className="h-4 w-4" />
-                    {event.participant_count} deltagare
+                    {t('participantCount', { count: event.participant_count })}
                   </span>
                 </div>
 
@@ -259,7 +261,7 @@ export default function EventsPage() {
                 {event.isActive && event.progress !== undefined && (
                   <div>
                     <div className="flex justify-between text-sm mb-1">
-                      <span className="text-muted-foreground">Din progress</span>
+                      <span className="text-muted-foreground">{t('yourProgress')}</span>
                       <span className="font-medium text-primary">{event.progress}%</span>
                     </div>
                     <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -285,11 +287,11 @@ export default function EventsPage() {
                   {event.isActive ? (
                     <Button size="sm">
                       <ClockIcon className="h-4 w-4 mr-1" />
-                      Delta
+                      {t('actions.participate')}
                     </Button>
                   ) : (
                     <Button size="sm" variant="outline" disabled>
-                      Kommer snart
+                      {t('actions.comingSoon')}
                     </Button>
                   )}
                 </div>
@@ -304,13 +306,13 @@ export default function EventsPage() {
         <Card>
           <CardContent className="p-8 text-center">
             <CalendarDaysIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold text-foreground mb-2">Inga event hittades</h3>
+            <h3 className="font-semibold text-foreground mb-2">{t('empty.title')}</h3>
             <p className="text-muted-foreground text-sm">
               {filter === 'active'
-                ? 'Det finns inga aktiva event just nu. Kolla tillbaka snart!'
+                ? t('empty.active')
                 : filter === 'upcoming'
-                ? 'Det finns inga kommande event planerade.'
-                : 'Det finns inga event att visa.'}
+                ? t('empty.upcoming')
+                : t('empty.all')}
             </p>
           </CardContent>
         </Card>

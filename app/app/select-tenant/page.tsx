@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { getServerAuthContext } from '@/lib/auth/server-context'
 import { selectTenant, clearTenantSelection } from '@/app/actions/tenant'
 
@@ -20,6 +21,7 @@ async function handleContinueWithoutTenant() {
 
 export default async function SelectTenantPage() {
   const authContext = await getServerAuthContext('/app/select-tenant')
+  const t = await getTranslations('app.selectTenant')
 
   if (!authContext.user) {
     redirect('/auth/login?redirect=/app/select-tenant')
@@ -42,9 +44,9 @@ export default async function SelectTenantPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col gap-6 px-4 py-12">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Välj organisation</h1>
+        <h1 className="text-2xl font-semibold text-foreground">{t('title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Välj vilken organisation du vill arbeta i just nu.
+          {t('description')}
         </p>
       </div>
 
@@ -59,13 +61,13 @@ export default async function SelectTenantPage() {
           >
             <div>
               <p className="font-medium text-foreground">
-                {membership.tenant?.name ?? 'Okänt namn'}
+                {membership.tenant?.name ?? t('unknownName')}
               </p>
               <p className="text-xs text-muted-foreground">
                 Roll: {membership.role ?? 'member'}
               </p>
             </div>
-            <span className="text-sm text-primary">Välj</span>
+            <span className="text-sm text-primary">{t('select')}</span>
           </button>
         ))}
       </form>
@@ -78,9 +80,9 @@ export default async function SelectTenantPage() {
             className="flex w-full items-center justify-between rounded-lg border border-dashed border-muted-foreground/30 px-4 py-3 text-left transition hover:border-primary/40 hover:bg-muted/50"
           >
             <div>
-              <p className="font-medium text-muted-foreground">Fortsätt utan organisation</p>
+              <p className="font-medium text-muted-foreground">{t('continueWithout')}</p>
               <p className="text-xs text-muted-foreground">
-                Arbeta som systemadministratör
+                {t('workAsAdmin')}
               </p>
             </div>
             <span className="text-sm text-muted-foreground">→</span>

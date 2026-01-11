@@ -170,6 +170,7 @@ interface SelectionHeaderProps {
 }
 
 function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   const allSelected = batch.selectedCount === totalCount && totalCount > 0;
   const someSelected = batch.selectedCount > 0 && batch.selectedCount < totalCount;
 
@@ -194,7 +195,7 @@ function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
         ) : (
           <StopIcon className="h-4 w-4" />
         )}
-        {allSelected ? 'Avmarkera alla' : 'Markera alla'}
+        {allSelected ? t('deselectAll') : t('selectAll')}
       </button>
 
       <div className="flex-1" />
@@ -202,7 +203,7 @@ function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm">
-            Snabbval
+            {t('quickSelect')}
             <ChevronDownIcon className="h-4 w-4 ml-1" />
           </Button>
         </DropdownMenuTrigger>
@@ -212,7 +213,7 @@ function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
               key={preset.id}
               onClick={() => batch.selectByFilter(preset.filter)}
             >
-              {preset.label}
+              {t(`presets.${preset.id}` as Parameters<typeof t>[0])}
             </DropdownMenuItem>
           ))}
           <DropdownMenuSeparator />
@@ -221,14 +222,14 @@ function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
               key={type}
               onClick={() => batch.selectByFilter({ type: 'type', value: type })}
             >
-              Alla {type}
+              {t('allOfType', { type })}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
 
       <Badge variant="default">
-        {batch.selectedCount} av {totalCount}
+        {t('selectedCount', { selected: batch.selectedCount, total: totalCount })}
       </Badge>
     </div>
   );
@@ -244,6 +245,7 @@ interface OperationButtonsProps {
 }
 
 function OperationButtons({ batch, onOperation }: OperationButtonsProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   const disabled = batch.selectedCount === 0 || batch.isProcessing;
 
   return (
@@ -258,7 +260,7 @@ function OperationButtons({ batch, onOperation }: OperationButtonsProps) {
           className="gap-1"
         >
           {config.icon}
-          {OPERATION_LABELS[config.operation]}
+          {t(`operations.${config.operation}` as Parameters<typeof t>[0])}
         </Button>
       ))}
     </div>

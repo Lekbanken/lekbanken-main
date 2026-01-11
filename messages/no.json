@@ -1785,6 +1785,10 @@
       },
       "empty": {
         "contentComingSoon": "Innhold kommer snart..."
+      },
+      "cipher": {
+        "defaultTitle": "Kryptert melding",
+        "decoded": "Dekryptert!"
       }
     },
     "artifactsPanel": {
@@ -2250,6 +2254,9 @@
         "ready": "KLAR",
         "sos": "SOS",
         "found": "FUNNET"
+      },
+      "errors": {
+        "couldNotSend": "Kunne ikke sende signal"
       }
     },
     "batchArtifactPanel": {
@@ -2264,7 +2271,36 @@
       "confirmReset": "Dette tilbakestiller alle valgte puslespill til opprinnelig tilstand.",
       "confirmSolve": "Dette markerer alle valgte som løst uten at spillerne har løst dem.",
       "cancel": "Avbryt",
-      "confirm": "Ja, fortsett"
+      "confirm": "Ja, fortsett",
+      "selectAll": "Merk alle",
+      "deselectAll": "Fjern merking",
+      "quickSelect": "Hurtigvalg",
+      "allOfType": "Alle {type}",
+      "selectedCount": "{selected} av {total}",
+      "presets": {
+        "all-hidden": "Alle skjulte",
+        "all-visible": "Alle synlige",
+        "all-locked": "Alle låste",
+        "all-solved": "Alle løste",
+        "all-unsolved": "Alle uløste",
+        "puzzles": "Alle puslespill",
+        "content": "Alt innhold"
+      },
+      "operations": {
+        "reveal": "Vis",
+        "hide": "Skjul",
+        "reset": "Tilbakestill",
+        "lock": "Lås",
+        "unlock": "Lås opp",
+        "solve": "Merk som løst"
+      }
+    },
+    "propConfirmationManager": {
+      "time": {
+        "justNow": "Akkurat nå",
+        "minutesAgo": "{minutes} min siden",
+        "hoursMinutesAgo": "{hours}t {minutes}m siden"
+      }
     },
     "readinessIndicator": {
       "criticalIssues": "Må fikses før start:",

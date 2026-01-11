@@ -1781,6 +1781,10 @@
       },
       "empty": {
         "contentComingSoon": "Innehåll kommer snart..."
+      },
+      "cipher": {
+        "defaultTitle": "Krypterat meddelande",
+        "decoded": "Dekrypterat!"
       }
     },
     "artifactsPanel": {
@@ -2246,6 +2250,9 @@
         "ready": "REDO",
         "sos": "SOS",
         "found": "HITTAD"
+      },
+      "errors": {
+        "couldNotSend": "Kunde inte skicka signal"
       }
     },
     "batchArtifactPanel": {
@@ -2260,7 +2267,36 @@
       "confirmReset": "Detta återställer alla valda pussel till ursprungsläget.",
       "confirmSolve": "Detta markerar alla valda som lösta utan att spelarna löst dem.",
       "cancel": "Avbryt",
-      "confirm": "Ja, fortsätt"
+      "confirm": "Ja, fortsätt",
+      "selectAll": "Markera alla",
+      "deselectAll": "Avmarkera alla",
+      "quickSelect": "Snabbval",
+      "allOfType": "Alla {type}",
+      "selectedCount": "{selected} av {total}",
+      "presets": {
+        "all-hidden": "Alla dolda",
+        "all-visible": "Alla synliga",
+        "all-locked": "Alla låsta",
+        "all-solved": "Alla lösta",
+        "all-unsolved": "Alla olösta",
+        "puzzles": "Alla pussel",
+        "content": "Allt innehåll"
+      },
+      "operations": {
+        "reveal": "Visa",
+        "hide": "Dölj",
+        "reset": "Återställ",
+        "lock": "Lås",
+        "unlock": "Lås upp",
+        "solve": "Markera som löst"
+      }
+    },
+    "propConfirmationManager": {
+      "time": {
+        "justNow": "Just nu",
+        "minutesAgo": "{minutes} min sedan",
+        "hoursMinutesAgo": "{hours}h {minutes}m sedan"
+      }
     },
     "readinessIndicator": {
       "criticalIssues": "Måste åtgärdas innan start:",

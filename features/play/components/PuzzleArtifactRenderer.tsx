@@ -720,9 +720,9 @@ export function PuzzleArtifactRenderer({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">🔤</span>
-            <p className="font-medium">{artifact.title || 'Krypterat meddelande'}</p>
+            <p className="font-medium">{artifact.title || t('cipher.defaultTitle')}</p>
           </div>
-          {cipherState.isDecoded && <Badge variant="default">Dekrypterat!</Badge>}
+          {cipherState.isDecoded && <Badge variant="default">{t('cipher.decoded')}</Badge>}
         </div>
 
         <CipherDecoder

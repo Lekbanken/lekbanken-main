@@ -118,12 +118,12 @@ export function ParticipantSignalMicroUI({
       if (isNetworkError(err) || (typeof navigator !== 'undefined' && navigator.onLine === false)) {
         return false;
       }
-      setError(err instanceof Error ? err.message : 'Kunde inte skicka signal');
-      return true; // non-network error: don’t queue infinitely
+      setError(err instanceof Error ? err.message : t('errors.couldNotSend'));
+      return true; // non-network error: don't queue infinitely
     } finally {
       setSending(false);
     }
-  }, [sessionId, participantToken]);
+  }, [sessionId, participantToken, t]);
 
   const handleTap = useCallback(async (channel: string) => {
     if (disabled || sending) return;

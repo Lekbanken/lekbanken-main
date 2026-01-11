@@ -156,10 +156,10 @@ export function PropConfirmationManager({
   const getTimeAgo = (timestamp: string) => {
     const diff = Date.now() - new Date(timestamp).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return 'Just nu';
-    if (minutes < 60) return `${minutes} min sedan`;
+    if (minutes < 1) return t('time.justNow');
+    if (minutes < 60) return t('time.minutesAgo', { minutes });
     const hours = Math.floor(minutes / 60);
-    return `${hours}h ${minutes % 60}m sedan`;
+    return t('time.hoursMinutesAgo', { hours, minutes: minutes % 60 });
   };
 
   if (loading) {

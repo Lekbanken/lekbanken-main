@@ -1785,6 +1785,10 @@
       },
       "empty": {
         "contentComingSoon": "Content coming soon..."
+      },
+      "cipher": {
+        "defaultTitle": "Encrypted message",
+        "decoded": "Decoded!"
       }
     },
     "artifactsPanel": {
@@ -2250,6 +2254,9 @@
         "ready": "READY",
         "sos": "SOS",
         "found": "FOUND"
+      },
+      "errors": {
+        "couldNotSend": "Could not send signal"
       }
     },
     "batchArtifactPanel": {
@@ -2264,7 +2271,36 @@
       "confirmReset": "This will reset all selected puzzles to their original state.",
       "confirmSolve": "This will mark all selected as solved without players solving them.",
       "cancel": "Cancel",
-      "confirm": "Yes, continue"
+      "confirm": "Yes, continue",
+      "selectAll": "Select all",
+      "deselectAll": "Deselect all",
+      "quickSelect": "Quick select",
+      "allOfType": "All {type}",
+      "selectedCount": "{selected} of {total}",
+      "presets": {
+        "all-hidden": "All hidden",
+        "all-visible": "All visible",
+        "all-locked": "All locked",
+        "all-solved": "All solved",
+        "all-unsolved": "All unsolved",
+        "puzzles": "All puzzles",
+        "content": "All content"
+      },
+      "operations": {
+        "reveal": "Show",
+        "hide": "Hide",
+        "reset": "Reset",
+        "lock": "Lock",
+        "unlock": "Unlock",
+        "solve": "Mark as solved"
+      }
+    },
+    "propConfirmationManager": {
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{minutes} min ago",
+        "hoursMinutesAgo": "{hours}h {minutes}m ago"
+      }
     },
     "readinessIndicator": {
       "criticalIssues": "Must be fixed before starting:",

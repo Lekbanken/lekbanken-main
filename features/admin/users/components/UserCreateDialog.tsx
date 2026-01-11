@@ -1,7 +1,8 @@
 'use client';
 
 import type { FormEvent } from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { UserPlusIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import {
   Button,
@@ -30,13 +31,15 @@ type DbTenantRole = 'owner' | 'admin' | 'editor' | 'member';
 // Only include roles that exist in the database tenant_role_enum
 const tenantRoles: DbTenantRole[] = ['owner', 'admin', 'editor', 'member'];
 
-const globalRoleOptions = [
-  { value: 'member', label: 'Standard (member)' },
-  { value: 'private_user', label: 'Privat användare' },
-  { value: 'system_admin', label: 'Systemadmin' },
-];
-
 export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDialogProps) {
+  const t = useTranslations('admin.users');
+
+  const globalRoleOptions = useMemo(() => [
+    { value: 'member', label: t('create.globalRoleOptions.member') },
+    { value: 'private_user', label: t('create.globalRoleOptions.privateUser') },
+    { value: 'system_admin', label: t('create.globalRoleOptions.systemAdmin') },
+  ], [t]);
+
   // Form state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -89,7 +92,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
       });
 
       if (!result.success) {
-        setError(result.error || 'Kunde inte skapa användare');
+        setError(result.error || t('errors.couldNotCreateUser'));
         return;
       }
 

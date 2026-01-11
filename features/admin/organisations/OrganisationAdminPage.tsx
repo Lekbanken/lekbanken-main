@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   BuildingOffice2Icon,
   CheckBadgeIcon,
@@ -69,6 +70,7 @@ export function OrganisationAdminPage({
   initialOrganisations,
   initialError = null,
 }: OrganisationAdminPageProps) {
+  const t = useTranslations('admin.organizations');
   const router = useRouter();
   const { success, error: toastError } = useToast();
   const { can, isLoading: rbacLoading } = useRbac();
@@ -247,10 +249,10 @@ export function OrganisationAdminPage({
     ).sort((a, b) => a.localeCompare(b));
 
     return [
-      { value: "all", label: "Alla språk" },
+      { value: "all", label: t('allLanguages') },
       ...languages.map((language) => ({
         value: language ?? "unknown",
-        label: language?.toUpperCase() ?? "Okänt",
+        label: language?.toUpperCase() ?? t('unknown'),
       })),
     ];
   }, [organisations]);
@@ -358,9 +360,9 @@ export function OrganisationAdminPage({
     return (
       <AdminPageLayout>
         <EmptyState
-          title="Åtkomst nekad"
-          description="Du har inte behörighet att se organisationer."
-          action={{ label: "Gå till dashboard", onClick: () => router.push("/admin") }}
+          title={t('accessDenied')}
+          description={t('noPermissionOrgs')}
+          action={{ label: t('goToDashboard'), onClick: () => router.push("/admin") }}
         />
       </AdminPageLayout>
     );
@@ -391,11 +393,11 @@ export function OrganisationAdminPage({
             <div className="flex-1">
               <p className="font-medium">{error}</p>
               <p className="text-xs text-amber-700/80">
-                Försök igen eller uppdatera sidan om problemet kvarstår.
+                {t('retryOrRefresh')}
               </p>
             </div>
             <Button size="sm" variant="outline" onClick={handleRefresh}>
-              Ladda om
+              {t('reload')}
             </Button>
           </CardContent>
         </Card>
@@ -449,11 +451,11 @@ export function OrganisationAdminPage({
           <OrganisationListSkeleton rows={4} />
         ) : filteredOrganisations.length === 0 ? (
           <EmptyState
-            title={hasActiveFilters ? "Inga matchande organisationer" : "Inga organisationer ännu"}
+            title={hasActiveFilters ? t('noMatchingOrgs') : t('noOrgsYet')}
             description={
               hasActiveFilters
-                ? "Justera sökningen eller rensa filter för att se fler."
-                : "Skapa din första organisation för att börja hantera tenants."
+                ? t('adjustSearchOrClear')
+                : t('createFirstOrg')
             }
             action={
               !hasActiveFilters && canCreateTenant

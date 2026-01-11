@@ -5,6 +5,7 @@ import { formatDate, formatRelativeTime } from '@/lib/i18n/format-utils';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ArrowTopRightOnSquareIcon,
   EllipsisHorizontalIcon,
@@ -68,20 +69,21 @@ function getInitials(name: string | null, email: string) {
 }
 
 function MembershipPreview({ membership }: { membership: AdminUserMembershipPreview }) {
+  const t = useTranslations('admin.users');
   const roleLabel = membershipRoleLabels[membership.role as keyof typeof membershipRoleLabels] ?? membership.role;
   
   return (
     <div className="flex items-center gap-2 text-xs">
       <BuildingOffice2Icon className="h-3.5 w-3.5 text-muted-foreground" />
       <span className="font-medium text-foreground">
-        {membership.tenantName || "Okänd organisation"}
+        {membership.tenantName || t('drawer.unknownOrganisation')}
       </span>
       <Badge variant="outline" size="sm" className="text-[10px]">
         {roleLabel}
       </Badge>
       {membership.isPrimary && (
         <Badge variant="accent" size="sm" className="text-[10px]">
-          Primär
+          {t('drawer.primary')}
         </Badge>
       )}
     </div>
@@ -96,6 +98,7 @@ export function UserListItem({
   onRemove,
 }: UserListItemProps) {
   const router = useRouter();
+  const t = useTranslations('admin.users');
   const { success, error } = useToast();
   const [removeOpen, setRemoveOpen] = useState(false);
   
@@ -109,9 +112,9 @@ export function UserListItem({
   const handleCopyUuid = async () => {
     try {
       await navigator.clipboard.writeText(user.id);
-      success("UUID kopierad");
+      success(t('messages.uuidCopied'));
     } catch (err) {
-      error("Kunde inte kopiera UUID");
+      error(t('errors.couldNotCopyUuid'));
       console.error(err);
     }
   };
@@ -119,9 +122,9 @@ export function UserListItem({
   const handleCopyEmail = async () => {
     try {
       await navigator.clipboard.writeText(user.email);
-      success("E-post kopierad");
+      success(t('messages.emailCopied'));
     } catch (err) {
-      error("Kunde inte kopiera e-post");
+      error(t('errors.couldNotCopyEmail'));
       console.error(err);
     }
   };
@@ -147,7 +150,7 @@ export function UserListItem({
               role="button"
               tabIndex={0}
               onClick={handleRowClick}
-              aria-label={`Öppna ${displayName}`}
+              aria-label={t('listItem.openUser', { name: displayName })}
               onKeyDown={(event) => {
                 if (event.key === "Enter") handleRowClick();
               }}
@@ -193,13 +196,13 @@ export function UserListItem({
                     variant="ghost"
                     size="sm"
                     className="h-5 px-1.5 text-[10px]"
-                    aria-label="Kopiera e-post"
+                    aria-label={t('actions.copyEmail')}
                     onClick={(event) => {
                       event.stopPropagation();
                       void handleCopyEmail();
                     }}
                   >
-                    Kopiera
+                    {t('actions.copy')}
                   </Button>
                   <span className="text-muted-foreground/60">•</span>
                   <span className="font-mono">{shortId}</span>
@@ -207,13 +210,13 @@ export function UserListItem({
                     variant="ghost"
                     size="sm"
                     className="h-5 px-1.5 text-[10px]"
-                    aria-label="Kopiera UUID"
+                    aria-label={t('actions.copy')}
                     onClick={(event) => {
                       event.stopPropagation();
                       void handleCopyUuid();
                     }}
                   >
-                    Kopiera
+                    {t('actions.copy')}
                   </Button>
                 </div>
               </div>
@@ -228,25 +231,25 @@ export function UserListItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Snabbåtgärder</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('actions.quickActions')}</DropdownMenuLabel>
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/users/${user.id}`}>
                       <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                      Visa användare
+                      {t('actions.viewUser')}
                     </Link>
                   </DropdownMenuItem>
                   {canEdit && (
                     <DropdownMenuItem asChild>
                       <Link href={`/admin/users/${user.id}?tab=profile`}>
                         <PencilSquareIcon className="h-4 w-4" />
-                        Redigera profil
+                        {t('actions.editProfile')}
                       </Link>
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/users/${user.id}?tab=memberships`}>
                       <BuildingOffice2Icon className="h-4 w-4" />
-                      Hantera medlemskap
+                      {t('actions.manageMemberships')}
                     </Link>
                   </DropdownMenuItem>
                   {canEdit && (
@@ -256,14 +259,14 @@ export function UserListItem({
                         onSelect={() => void navigator.clipboard.writeText(user.email)}
                       >
                         <EnvelopeIcon className="h-4 w-4" />
-                        Kopiera e-post
+                        {t('actions.copyEmail')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         disabled
                         title="Inte implementerat"
                       >
                         <KeyIcon className="h-4 w-4" />
-                        Skicka lösenordsåterställning
+                        {t('actions.sendPasswordReset')}
                       </DropdownMenuItem>
                     </>
                   )}
@@ -277,12 +280,12 @@ export function UserListItem({
                         {isDisabled ? (
                           <>
                             <UserIcon className="h-4 w-4" />
-                            Återaktivera
+                            {t('actions.reactivate')}
                           </>
                         ) : (
                           <>
                             <NoSymbolIcon className="h-4 w-4" />
-                            Stäng av
+                            {t('actions.disable')}
                           </>
                         )}
                       </DropdownMenuItem>
@@ -296,7 +299,7 @@ export function UserListItem({
                         onSelect={() => setRemoveOpen(true)}
                       >
                         <TrashIcon className="h-4 w-4" />
-                        Ta bort användare
+                        {t('actions.removeUser')}
                       </DropdownMenuItem>
                     </>
                   )}
@@ -313,7 +316,7 @@ export function UserListItem({
               ))}
               {hiddenCount > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  +{hiddenCount} fler {hiddenCount === 1 ? "medlemskap" : "medlemskap"}
+                  {t('listItem.moreMembers', { count: hiddenCount })}
                 </p>
               )}
             </div>
@@ -322,25 +325,25 @@ export function UserListItem({
           {/* Footer info grid */}
           <div className="grid gap-4 text-sm text-muted-foreground md:grid-cols-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Medlemskap</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('listItem.memberships')}</p>
               <p className="mt-1 text-sm text-foreground">
-                {user.membershipsCount} {user.membershipsCount === 1 ? "organisation" : "organisationer"}
+                {user.membershipsCount} {user.membershipsCount === 1 ? t('listItem.organisationCount', { count: 1 }).replace('1 ', '') : t('listItem.organisationCountPlural', { count: user.membershipsCount }).replace(`${user.membershipsCount} `, '')}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Primär org</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('listItem.primaryOrg')}</p>
               <p className="mt-1 text-sm text-foreground">
                 {user.primaryMembership?.tenantName || "—"}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Senast aktiv</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('drawer.lastActive')}</p>
               <p className="mt-1 text-sm text-foreground">
                 {formatRelativeTime(user.lastSeenAt || user.lastLoginAt)}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Registrerad</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('listItem.registered')}</p>
               <p className="mt-1 text-sm text-foreground">
                 {formatDate(user.createdAt)}
               </p>
@@ -354,18 +357,18 @@ export function UserListItem({
         <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
           <AlertDialogContent variant="destructive">
             <AlertDialogHeader>
-              <AlertDialogTitle>Ta bort användare?</AlertDialogTitle>
+              <AlertDialogTitle>{t('dialog.removeTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Detta går inte att ångra. Användarens profil och alla medlemskap kommer tas bort permanent.
+                {t('dialog.removeDescriptionSimple')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
                 onClick={() => onRemove && void onRemove(user.id)}
               >
-                Ta bort
+                {t('actions.remove')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

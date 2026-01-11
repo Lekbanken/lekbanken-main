@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   UserPlusIcon,
   UsersIcon,
@@ -71,6 +72,7 @@ export function UserAdminPage({
   const router = useRouter();
   const { success, error: toastError, info } = useToast();
   const { can, isLoading: rbacLoading } = useRbac();
+  const t = useTranslations('admin.users');
   
   // State
   const [users, setUsers] = useState(initialUsers);
@@ -151,11 +153,11 @@ export function UserAdminPage({
         prev?.id === userId ? { ...prev, status } : prev
       );
       
-      success(`Användare är nu ${userStatusLabels[status]}.`, "Status uppdaterad");
+      success(t('messages.statusUpdated', { status: userStatusLabels[status] }), t('messages.statusUpdatedTitle'));
       handleRefresh();
     } catch (err) {
       console.error("Failed to update user status", err);
-      const message = err instanceof Error ? err.message : "Kunde inte uppdatera status.";
+      const message = err instanceof Error ? err.message : t('errors.statusUpdateFailed');
       setError(message);
       toastError(message);
     }
@@ -175,11 +177,11 @@ export function UserAdminPage({
 
       // Remove from local state
       setUsers((prev) => prev.filter((userItem) => userItem.id !== userId));
-      success("Användare och medlemskap borttagna.");
+      success(t('messages.userRemoved'));
       handleRefresh();
     } catch (err) {
       console.error("Failed to remove user", err);
-      const message = err instanceof Error ? err.message : "Kunde inte ta bort användaren.";
+      const message = err instanceof Error ? err.message : t('errors.removeFailed');
       setError(message);
       toastError(message);
     }
@@ -197,26 +199,26 @@ export function UserAdminPage({
       
       if (!userRow) {
         info(
-          "Användaren finns inte i systemet ännu. Skapa ett konto först.",
-          "Användare saknas"
+          t('messages.userNotFound'),
+          t('messages.userNotFoundTitle')
         );
         setInviteOpen(false);
         return;
       }
 
-      success(`Användare ${payload.email} hittad. Lägg till medlemskap separat.`, "Användare hittad");
+      success(t('messages.userFound', { email: payload.email }), t('messages.userFoundTitle'));
       setInviteOpen(false);
       handleRefresh();
     } catch (err) {
       console.error("Failed to invite user", err);
-      const message = err instanceof Error ? err.message : "Kunde inte bjuda in användaren.";
+      const message = err instanceof Error ? err.message : t('errors.inviteFailed');
       setError(message);
       toastError(message);
     }
   }, [success, info, toastError, handleRefresh]);
 
   const handleCreateSuccess = useCallback((_userId: string) => {
-    success("Användare skapad!", "Ny användare");
+    success(t('messages.userCreated'), t('messages.newUser'));
     handleRefresh();
   }, [success, handleRefresh]);
 
@@ -322,7 +324,7 @@ export function UserAdminPage({
   if (rbacLoading) {
     return (
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
+        <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: t('title') }]} />
         <UserListTableSkeleton rows={6} />
       </AdminPageLayout>
     );
@@ -333,9 +335,9 @@ export function UserAdminPage({
     return (
       <AdminPageLayout>
         <EmptyState
-          title="Åtkomst nekad"
-          description="Du har inte behörighet att se användare."
-          action={{ label: "Gå till dashboard", onClick: () => router.push("/admin") }}
+          title={t('noAccess.title')}
+          description={t('noAccess.description')}
+          action={{ label: t('noAccess.goToDashboard'), onClick: () => router.push("/admin") }}
         />
       </AdminPageLayout>
     );
@@ -343,28 +345,28 @@ export function UserAdminPage({
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Användare" }]} />
+      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: t('title') }]} />
 
       {/* Page Header */}
       <AdminPageHeader
-        title="Användare"
-        description="Systemövergripande användarhantering och åtkomstöversikt"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<UsersIcon className="h-6 w-6" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" onClick={handleRefresh} disabled={isRefreshing}>
               <ArrowPathIcon className={`h-4 w-4 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
-              Uppdatera
+              {t('actions.refresh')}
             </Button>
             {canInviteUser && (
               <>
                 <Button variant="outline" onClick={() => setInviteOpen(true)} className="gap-2">
                   <EnvelopeIcon className="h-4 w-4" />
-                  Bjud in
+                  {t('actions.invite')}
                 </Button>
                 <Button onClick={() => setCreateOpen(true)} className="gap-2">
                   <UserPlusIcon className="h-4 w-4" />
-                  Skapa användare
+                  {t('actions.createUser')}
                 </Button>
               </>
             )}
@@ -382,11 +384,11 @@ export function UserAdminPage({
             <div className="flex-1">
               <p className="font-medium">{error}</p>
               <p className="text-xs text-amber-700/80">
-                Försök igen eller uppdatera sidan om problemet kvarstår.
+                {t('errors.retryHint')}
               </p>
             </div>
             <Button size="sm" variant="outline" onClick={handleRefresh}>
-              Ladda om
+              {t('actions.reload')}
             </Button>
           </CardContent>
         </Card>
@@ -395,31 +397,31 @@ export function UserAdminPage({
       {/* Stats Row */}
       <AdminStatGrid cols={5} className="mb-6">
         <AdminStatCard
-          label="Totalt"
+          label={t('stats.total')}
           value={users.length}
           icon={<UsersIcon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
-          label="Aktiva"
+          label={t('stats.active')}
           value={statusCounts.active ?? 0}
           icon={<CheckBadgeIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Inbjudna"
+          label={t('stats.invited')}
           value={statusCounts.invited ?? 0}
           icon={<EnvelopeIcon className="h-5 w-5" />}
           iconColor="amber"
         />
         <AdminStatCard
-          label="Avstängda"
+          label={t('stats.disabled')}
           value={statusCounts.disabled ?? 0}
           icon={<NoSymbolIcon className="h-5 w-5" />}
           iconColor="red"
         />
         <AdminStatCard
-          label="Utan org"
+          label={t('stats.withoutOrg')}
           value={usersWithoutMemberships}
           icon={<UserMinusIcon className="h-5 w-5" />}
           iconColor="slate"
@@ -441,19 +443,19 @@ export function UserAdminPage({
           <UserListTableSkeleton rows={6} />
         ) : filteredUsers.length === 0 ? (
           <EmptyState
-            title={hasActiveFilters ? "Inga matchande användare" : "Inga användare ännu"}
+            title={hasActiveFilters ? t('noUsers.titleWithFilters') : t('noUsers.title')}
             description={
               hasActiveFilters
-                ? "Justera sökningen eller rensa filter för att se fler."
-                : "Det finns inga användare i systemet ännu."
+                ? t('noUsers.descriptionWithFilters')
+                : t('noUsers.description')
             }
             action={
               !hasActiveFilters && canInviteUser
-                ? { label: "Bjud in användare", onClick: () => setInviteOpen(true) }
+                ? { label: t('actions.inviteUser'), onClick: () => setInviteOpen(true) }
                 : undefined
             }
             secondaryAction={
-              hasActiveFilters ? { label: "Rensa filter", onClick: handleClearFilters } : undefined
+              hasActiveFilters ? { label: t('actions.clearFilters'), onClick: handleClearFilters } : undefined
             }
           />
         ) : (

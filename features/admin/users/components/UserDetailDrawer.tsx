@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   formatDateLong as formatDate,
   formatDateTimeLong as formatDateTime,
@@ -98,16 +99,18 @@ function CopyableField({
   label,
   value,
   mono = false,
+  t,
 }: {
   label: string;
   value: string;
   mono?: boolean;
+  t: ReturnType<typeof useTranslations<'admin.users'>>;
 }) {
   const { success } = useToast();
   
   const handleCopy = async () => {
     await navigator.clipboard.writeText(value);
-    success('Kopierad till urklipp');
+    success(t('messages.copiedToClipboard'));
   };
 
   return (
@@ -120,7 +123,7 @@ function CopyableField({
         <button
           onClick={handleCopy}
           className="text-muted-foreground hover:text-foreground transition-colors"
-          title="Kopiera"
+          title={t('actions.copy')}
         >
           <ClipboardDocumentIcon className="h-3.5 w-3.5" />
         </button>
@@ -150,11 +153,13 @@ function MembershipCard({
   _canEdit,
   _onRemove,
   _onChangeRole,
+  t,
 }: {
   membership: AdminUserMembershipPreview;
   _canEdit: boolean;
   _onRemove?: () => void;
   _onChangeRole?: () => void;
+  t: ReturnType<typeof useTranslations<'admin.users'>>;
 }) {
   const roleLabel = membershipRoleLabels[membership.role as keyof typeof membershipRoleLabels] ?? membership.role;
   const statusLabel = membershipStatusLabels[membership.status as keyof typeof membershipStatusLabels] ?? membership.status;
@@ -171,10 +176,10 @@ function MembershipCard({
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h4 className="font-medium text-foreground">
-                {membership.tenantName || 'Okänd organisation'}
+                {membership.tenantName || t('drawer.unknownOrganisation')}
               </h4>
               {membership.isPrimary && (
-                <Badge variant="accent" size="sm">Primär</Badge>
+                <Badge variant="accent" size="sm">{t('drawer.primary')}</Badge>
               )}
             </div>
             
@@ -189,7 +194,7 @@ function MembershipCard({
             </div>
             
             <p className="mt-2 text-xs text-muted-foreground">
-              Medlem sedan {formatDate(membership.createdAt)}
+              {t('drawer.memberSince', { date: formatDate(membership.createdAt) })}
             </p>
           </div>
           
@@ -244,6 +249,7 @@ export function UserDetailDrawer({
   onRefresh,
 }: UserDetailDrawerProps) {
   const { success, error: toastError } = useToast();
+  const t = useTranslations('admin.users');
   const [activeTab, setActiveTab] = useState<TabId>('overview');
   const [isUpdating, setIsUpdating] = useState(false);
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false);
@@ -268,11 +274,11 @@ export function UserDetailDrawer({
     if (!user) return;
     try {
       await navigator.clipboard.writeText(user.id);
-      success('UUID kopierad');
+      success(t('messages.uuidCopied'));
     } catch {
-      toastError('Kunde inte kopiera UUID');
+      toastError(t('errors.couldNotCopyUuid'));
     }
-  }, [user, success, toastError]);
+  }, [user, success, toastError, t]);
 
   const handleStatusToggle = useCallback(async () => {
     if (!user || !onStatusChange) return;
@@ -306,38 +312,38 @@ export function UserDetailDrawer({
     try {
       const result = await sendPasswordResetEmail(user.email);
       if (result.success) {
-        success('Återställningsmail skickat', `E-post skickad till ${user.email}`);
+        success(t('messages.resetEmailSent'), t('messages.resetEmailSentDesc', { email: user.email }));
       } else {
-        toastError(result.error || 'Kunde inte skicka återställningsmail');
+        toastError(result.error || t('errors.couldNotSendReset'));
       }
     } catch {
-      toastError('Ett oväntat fel uppstod');
+      toastError(t('errors.unexpectedError'));
     } finally {
       setIsSendingReset(false);
     }
-  }, [user?.email, success, toastError]);
+  }, [user?.email, success, toastError, t]);
 
   const handleUpdatePassword = useCallback(async () => {
     if (!user?.id || !newPassword || newPassword.length < 6) {
-      toastError('Lösenord måste vara minst 6 tecken');
+      toastError(t('errors.passwordTooShort'));
       return;
     }
     setIsUpdatingPassword(true);
     try {
       const result = await updateUserPassword(user.id, newPassword);
       if (result.success) {
-        success('Lösenord uppdaterat', 'Användaren kan nu logga in med det nya lösenordet');
+        success(t('messages.passwordUpdated'), t('messages.passwordUpdatedDesc'));
         setNewPassword('');
         setShowPasswordInput(false);
       } else {
-        toastError(result.error || 'Kunde inte uppdatera lösenord');
+        toastError(result.error || t('errors.couldNotUpdatePassword'));
       }
     } catch {
-      toastError('Ett oväntat fel uppstod');
+      toastError(t('errors.unexpectedError'));
     } finally {
       setIsUpdatingPassword(false);
     }
-  }, [user?.id, newPassword, success, toastError]);
+  }, [user?.id, newPassword, success, toastError, t]);
 
   if (!user) return null;
 
@@ -359,10 +365,10 @@ export function UserDetailDrawer({
     : null;
 
   const tabs = [
-    { id: 'overview', label: 'Översikt', icon: <UserIcon className="h-4 w-4" /> },
-    { id: 'organisations', label: 'Organisationer', icon: <BuildingOffice2Icon className="h-4 w-4" />, badge: user.membershipsCount },
-    { id: 'security', label: 'Säkerhet', icon: <ShieldCheckIcon className="h-4 w-4" /> },
-    { id: 'activity', label: 'Aktivitet', icon: <ClockIcon className="h-4 w-4" /> },
+    { id: 'overview', label: t('tabs.overview'), icon: <UserIcon className="h-4 w-4" /> },
+    { id: 'organisations', label: t('tabs.organisations'), icon: <BuildingOffice2Icon className="h-4 w-4" />, badge: user.membershipsCount },
+    { id: 'security', label: t('tabs.security'), icon: <ShieldCheckIcon className="h-4 w-4" /> },
+    { id: 'activity', label: t('tabs.activity'), icon: <ClockIcon className="h-4 w-4" /> },
   ];
 
   return (
@@ -407,7 +413,7 @@ export function UserDetailDrawer({
                   <EnvelopeIcon className="h-3.5 w-3.5" />
                   {user.email}
                   {user.emailVerified && (
-                    <CheckBadgeIcon className="h-4 w-4 text-emerald-500" title="E-post verifierad" />
+                    <CheckBadgeIcon className="h-4 w-4 text-emerald-500" title={t('drawer.emailVerified')} />
                   )}
                 </SheetDescription>
               </div>
@@ -442,12 +448,12 @@ export function UserDetailDrawer({
               <div className="space-y-6">
                 {/* Basic Info */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Grundläggande information</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.basicInfo')}</h3>
                   <div className="space-y-4">
-                    <CopyableField label="E-post" value={user.email} />
-                    <CopyableField label="Användar-UUID" value={user.id} mono />
+                    <CopyableField label={t('drawer.email')} value={user.email} t={t} />
+                    <CopyableField label={t('drawer.userUuid')} value={user.id} mono t={t} />
                     {user.name && (
-                      <InfoRow label="Fullständigt namn" value={user.name} />
+                      <InfoRow label={t('drawer.fullName')} value={user.name} />
                     )}
                   </div>
                 </div>
@@ -456,10 +462,10 @@ export function UserDetailDrawer({
 
                 {/* Account Status */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Kontostatus</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.accountStatus')}</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <InfoRow 
-                      label="Status" 
+                      label={t('status')} 
                       value={
                         <Badge variant={userStatusVariants[user.status]}>
                           {userStatusLabels[user.status]}
@@ -467,11 +473,11 @@ export function UserDetailDrawer({
                       } 
                     />
                     <InfoRow 
-                      label="E-post verifierad" 
-                      value={user.emailVerified ? 'Ja' : 'Nej'} 
+                      label={t('drawer.emailVerified')} 
+                      value={user.emailVerified ? t('drawer.yes') : t('drawer.no')} 
                     />
-                    <InfoRow label="Registrerad" value={formatDate(user.createdAt)} />
-                    <InfoRow label="Senast aktiv" value={formatRelativeTime(user.lastSeenAt || user.lastLoginAt)} />
+                    <InfoRow label={t('drawer.registered')} value={formatDate(user.createdAt)} />
+                    <InfoRow label={t('drawer.lastActive')} value={formatRelativeTime(user.lastSeenAt || user.lastLoginAt)} />
                   </div>
                 </div>
 
@@ -479,12 +485,12 @@ export function UserDetailDrawer({
 
                 {/* Roller */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Roller</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.rolesTitle')}</h3>
                   <div className="space-y-3">
                     {/* System Role */}
                     <div className="flex items-start gap-3">
                       <div className="flex-1">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Systemroll</p>
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t('drawer.systemRole')}</p>
                         <div className="flex items-center gap-2">
                           {systemRoleBadgeLabel ? (
                             <>
@@ -493,11 +499,11 @@ export function UserDetailDrawer({
                                 {systemRoleBadgeLabel}
                               </Badge>
                               <p className="text-xs text-muted-foreground">
-                                Har tillgång till systemadministration
+                                {t('drawer.hasSystemAccess')}
                               </p>
                             </>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Ingen systemadminroll</span>
+                            <span className="text-sm text-muted-foreground">{t('drawer.noSystemRole')}</span>
                           )}
                         </div>
                       </div>
@@ -506,18 +512,18 @@ export function UserDetailDrawer({
                     {/* Highest Tenant Role */}
                     <div className="flex items-start gap-3">
                       <div className="flex-1">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">Högsta tenantroll</p>
+                        <p className="text-xs uppercase tracking-wider text-muted-foreground mb-1">{t('drawer.highestTenantRole')}</p>
                         <div className="flex items-center gap-2">
                           {highestTenantRole ? (
                             <Badge variant="outline">
                               {membershipRoleLabels[highestTenantRole as keyof typeof membershipRoleLabels] ?? highestTenantRole}
                             </Badge>
                           ) : (
-                            <span className="text-sm text-muted-foreground">Ingen organisation</span>
+                            <span className="text-sm text-muted-foreground">{t('drawer.noOrganisation')}</span>
                           )}
                           {user.membershipsCount > 0 && (
                             <p className="text-xs text-muted-foreground">
-                              i {user.membershipsCount} organisation{user.membershipsCount > 1 ? 'er' : ''}
+                              {user.membershipsCount > 1 ? t('drawer.inOrganisationsPlural', { count: user.membershipsCount }) : t('drawer.inOrganisations', { count: user.membershipsCount })}
                             </p>
                           )}
                         </div>
@@ -531,7 +537,7 @@ export function UserDetailDrawer({
                   <>
                     <hr className="border-border" />
                     <div>
-                      <h3 className="text-sm font-medium text-foreground mb-4">Snabbåtgärder</h3>
+                      <h3 className="text-sm font-medium text-foreground mb-4">{t('actions.quickActions')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {canEdit && onStatusChange && (
                           <Button
@@ -544,12 +550,12 @@ export function UserDetailDrawer({
                             {isDisabled ? (
                               <>
                                 <CheckBadgeIcon className="h-4 w-4 mr-1" />
-                                Återaktivera
+                                {t('actions.reactivate')}
                               </>
                             ) : (
                               <>
                                 <NoSymbolIcon className="h-4 w-4 mr-1" />
-                                Stäng av
+                                {t('actions.disable')}
                               </>
                             )}
                           </Button>
@@ -563,7 +569,7 @@ export function UserDetailDrawer({
                             className="text-destructive"
                           >
                             <TrashIcon className="h-4 w-4 mr-1" />
-                            Ta bort
+                            {t('actions.remove')}
                           </Button>
                         )}
                       </div>
@@ -578,19 +584,19 @@ export function UserDetailDrawer({
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-foreground">
-                    Organisationsmedlemskap ({user.membershipsCount})
+                    {t('drawer.organisationMemberships', { count: user.membershipsCount })}
                   </h3>
                   {canEdit && (
                     <Button variant="outline" size="sm" disabled>
-                      Lägg till organisation
+                      {t('actions.addOrganisation')}
                     </Button>
                   )}
                 </div>
 
                 {user.memberships.length === 0 ? (
                   <TabEmptyState
-                    title="Inga organisationer"
-                    description="Användaren är inte medlem i någon organisation."
+                    title={t('drawer.noOrganisations')}
+                    description={t('drawer.notMemberOfAny')}
                   />
                 ) : (
                   <div className="space-y-3">
@@ -599,6 +605,7 @@ export function UserDetailDrawer({
                         key={membership.tenantId}
                         membership={membership}
                         _canEdit={canEdit}
+                        t={t}
                       />
                     ))}
                   </div>
@@ -611,14 +618,14 @@ export function UserDetailDrawer({
               <div className="space-y-6">
                 {/* Auth Providers */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Autentisering</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.authentication')}</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
                       <EnvelopeIcon className="h-5 w-5 text-muted-foreground" />
                       <div className="flex-1">
-                        <p className="text-sm font-medium">E-post & lösenord</p>
+                        <p className="text-sm font-medium">{t('drawer.emailAndPassword')}</p>
                         <p className="text-xs text-muted-foreground">
-                          {user.emailVerified ? 'Verifierad' : 'Ej verifierad'}
+                          {user.emailVerified ? t('drawer.verified') : t('drawer.notVerified')}
                         </p>
                       </div>
                       {user.emailVerified && (
@@ -632,15 +639,15 @@ export function UserDetailDrawer({
 
                 {/* Last Login */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Senaste inloggning</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.lastLogin')}</h3>
                   <div className="grid grid-cols-2 gap-4">
                     <InfoRow 
-                      label="Senaste inloggning" 
+                      label={t('drawer.lastLogin')} 
                       value={formatDateTime(user.lastLoginAt)} 
                       icon={<KeyIcon className="h-4 w-4" />}
                     />
                     <InfoRow 
-                      label="Senast sedd" 
+                      label={t('drawer.lastSeen')} 
                       value={formatRelativeTime(user.lastSeenAt)} 
                       icon={<ClockIcon className="h-4 w-4" />}
                     />
@@ -651,7 +658,7 @@ export function UserDetailDrawer({
 
                 {/* Security Actions */}
                 <div>
-                  <h3 className="text-sm font-medium text-foreground mb-4">Säkerhetsåtgärder</h3>
+                  <h3 className="text-sm font-medium text-foreground mb-4">{t('drawer.securityActions')}</h3>
                   <div className="space-y-4">
                     {/* Password Reset Email */}
                     <div className="flex items-center gap-2">
@@ -662,10 +669,10 @@ export function UserDetailDrawer({
                         disabled={isSendingReset || !canEdit}
                       >
                         <EnvelopeIcon className="h-4 w-4 mr-1" />
-                        {isSendingReset ? 'Skickar...' : 'Skicka lösenordsåterställning'}
+                        {isSendingReset ? t('drawer.sending') : t('actions.sendPasswordReset')}
                       </Button>
                       <span className="text-xs text-muted-foreground">
-                        Skickar e-post till {user.email}
+                        {t('drawer.sendsEmailTo', { email: user.email })}
                       </span>
                     </div>
 
@@ -679,7 +686,7 @@ export function UserDetailDrawer({
                           disabled={!canEdit}
                         >
                           <KeyIcon className="h-4 w-4 mr-1" />
-                          Ändra lösenord manuellt
+                          {t('actions.changePasswordManually')}
                         </Button>
                       ) : (
                         <div className="flex items-center gap-2">
@@ -687,7 +694,7 @@ export function UserDetailDrawer({
                             type="password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            placeholder="Nytt lösenord (minst 6 tecken)"
+                            placeholder={t('drawer.newPasswordPlaceholder')}
                             className="flex-1 px-3 py-1.5 text-sm border border-border rounded-md bg-background"
                             minLength={6}
                           />
@@ -697,14 +704,14 @@ export function UserDetailDrawer({
                             onClick={handleUpdatePassword}
                             disabled={isUpdatingPassword || newPassword.length < 6}
                           >
-                            {isUpdatingPassword ? 'Sparar...' : 'Spara'}
+                            {isUpdatingPassword ? t('drawer.saving') : t('actions.save')}
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="sm" 
                             onClick={() => { setShowPasswordInput(false); setNewPassword(''); }}
                           >
-                            Avbryt
+                            {t('actions.cancel')}
                           </Button>
                         </div>
                       )}
@@ -714,10 +721,10 @@ export function UserDetailDrawer({
                     <div>
                       <Button variant="outline" size="sm" disabled>
                         <ArrowPathIcon className="h-4 w-4 mr-1" />
-                        Tvinga utloggning
+                        {t('actions.forceLogout')}
                       </Button>
                       <span className="ml-2 text-xs text-muted-foreground">
-                        Kommer snart
+                        {t('drawer.comingSoon')}
                       </span>
                     </div>
                   </div>
@@ -729,18 +736,18 @@ export function UserDetailDrawer({
             <TabPanel id="activity" activeTab={activeTab}>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-foreground">Senaste aktivitet</h3>
+                  <h3 className="text-sm font-medium text-foreground">{t('drawer.recentActivity')}</h3>
                   {onRefresh && (
                     <Button variant="ghost" size="sm" onClick={onRefresh}>
                       <ArrowPathIcon className="h-4 w-4 mr-1" />
-                      Uppdatera
+                      {t('actions.update')}
                     </Button>
                   )}
                 </div>
 
                 <TabEmptyState
-                  title="Aktivitetslogg under utveckling"
-                  description="Detaljerad aktivitetshistorik för användare kommer snart."
+                  title={t('drawer.activityLogDev')}
+                  description={t('drawer.activityLogDesc')}
                 />
               </div>
             </TabPanel>
@@ -753,19 +760,19 @@ export function UserDetailDrawer({
         <AlertDialog open={removeDialogOpen} onOpenChange={setRemoveDialogOpen}>
           <AlertDialogContent variant="destructive">
             <AlertDialogHeader>
-              <AlertDialogTitle>Ta bort användare?</AlertDialogTitle>
+              <AlertDialogTitle>{t('dialog.removeTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Detta går inte att ångra. Användarens profil ({user.email}) och alla {user.membershipsCount} medlemskap kommer tas bort permanent.
+                {t('dialog.removeDescription', { email: user.email, count: user.membershipsCount })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isUpdating}>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel disabled={isUpdating}>{t('actions.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
                 onClick={handleRemove}
                 disabled={isUpdating}
               >
-                {isUpdating ? 'Tar bort...' : 'Ta bort'}
+                {isUpdating ? t('dialog.removing') : t('actions.remove')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

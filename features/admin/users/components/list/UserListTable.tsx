@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import {
   EllipsisHorizontalIcon,
   ArrowTopRightOnSquareIcon,
@@ -62,24 +63,26 @@ type UserListTableProps = {
 // Helper Functions
 // =============================================================================
 
-function formatRelativeTime(value: string | null) {
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffMins < 1) return 'Just nu';
-  if (diffMins < 60) return `${diffMins} min`;
-  if (diffHours < 24) return `${diffHours} tim`;
-  if (diffDays === 1) return 'Igår';
-  if (diffDays < 7) return `${diffDays} d`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} v`;
-  return `${Math.floor(diffDays / 30)} mån`;
+function createFormatRelativeTime(t: ReturnType<typeof useTranslations<'admin.users'>>) {
+  return function formatRelativeTime(value: string | null) {
+    if (!value) return '—';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '—';
+    
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffMins < 1) return t('time.justNow');
+    if (diffMins < 60) return `${diffMins} ${t('time.min')}`;
+    if (diffHours < 24) return `${diffHours} ${t('time.hour')}`;
+    if (diffDays === 1) return t('time.yesterday');
+    if (diffDays < 7) return `${diffDays} ${t('time.day')}`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} ${t('time.week')}`;
+    return `${Math.floor(diffDays / 30)} ${t('time.month')}`;
+  };
 }
 
 function getInitials(name: string | null, email: string) {
@@ -120,8 +123,10 @@ function UserListTableRow({
   onStatusChange?: (userId: string, status: AdminUserStatus) => Promise<void>;
   onRemove?: (userId: string) => Promise<void>;
 }) {
+  const t = useTranslations('admin.users');
   const { success } = useToast();
   const [removeOpen, setRemoveOpen] = useState(false);
+  const formatRelativeTime = createFormatRelativeTime(t);
   
   const displayName = user.name || user.email.split('@')[0];
   const _isSystemAdmin = isSystemAdminRole(user.globalRole);
@@ -132,7 +137,7 @@ function UserListTableRow({
   const handleCopyEmail = async (e: React.MouseEvent) => {
     e.stopPropagation();
     await navigator.clipboard.writeText(user.email);
-    success('E-post kopierad');
+    success(t('messages.emailCopied'));
   };
 
   return (
@@ -234,20 +239,20 @@ function UserListTableRow({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Åtgärder</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
               <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSelect(); }}>
                 <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                Visa detaljer
+                {t('actions.viewDetails')}
               </DropdownMenuItem>
               {canEdit && (
                 <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSelect(); }}>
                   <PencilSquareIcon className="h-4 w-4" />
-                  Redigera
+                  {t('actions.edit')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem onClick={handleCopyEmail}>
                 <EnvelopeIcon className="h-4 w-4" />
-                Kopiera e-post
+                {t('actions.copyEmail')}
               </DropdownMenuItem>
               
               {canEdit && onStatusChange && (
@@ -263,12 +268,12 @@ function UserListTableRow({
                     {isDisabled ? (
                       <>
                         <CheckBadgeIcon className="h-4 w-4" />
-                        Återaktivera
+                        {t('actions.reactivate')}
                       </>
                     ) : (
                       <>
                         <NoSymbolIcon className="h-4 w-4" />
-                        Stäng av
+                        {t('actions.disable')}
                       </>
                     )}
                   </DropdownMenuItem>
@@ -286,7 +291,7 @@ function UserListTableRow({
                     }}
                   >
                     <TrashIcon className="h-4 w-4" />
-                    Ta bort
+                    {t('actions.remove')}
                   </DropdownMenuItem>
                 </>
               )}
@@ -300,20 +305,20 @@ function UserListTableRow({
         <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
           <AlertDialogContent variant="destructive">
             <AlertDialogHeader>
-              <AlertDialogTitle>Ta bort användare?</AlertDialogTitle>
+              <AlertDialogTitle>{t('dialog.removeTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Detta går inte att ångra. Användarens profil ({user.email}) och alla medlemskap kommer tas bort permanent.
+                {t('dialog.removeDescription', { email: user.email, count: user.membershipsCount })}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
                 onClick={() => {
                   void onRemove(user.id);
                 }}
               >
-                Ta bort
+                {t('actions.remove')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -342,6 +347,8 @@ export function UserListTable({
   onStatusChange,
   onRemove,
 }: UserListTableProps) {
+  const t = useTranslations('admin.users');
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <div className="overflow-x-auto">
@@ -349,25 +356,25 @@ export function UserListTable({
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Användare
+                {t('table.user')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Systemroll
+                {t('table.systemRole')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Tenantroll
+                {t('table.tenantRole')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Org
+                {t('table.org')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Senast aktiv
+                {t('table.lastActive')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Status
+                {t('table.status')}
               </th>
               <th className="text-right py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground w-16">
-                <span className="sr-only">Åtgärder</span>
+                <span className="sr-only">{t('table.actions')}</span>
               </th>
             </tr>
           </thead>
@@ -391,14 +398,14 @@ export function UserListTable({
       {users.length > 0 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/20">
           <p className="text-sm text-muted-foreground">
-            Visar {users.length} användare
+            {t('table.showingUsers', { count: users.length })}
           </p>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled>
-              Föregående
+              {t('actions.previous')}
             </Button>
             <Button variant="outline" size="sm" disabled>
-              Nästa
+              {t('actions.next')}
             </Button>
           </div>
         </div>
@@ -412,6 +419,8 @@ export function UserListTable({
 // =============================================================================
 
 export function UserListTableSkeleton({ rows = 6 }: { rows?: number }) {
+  const t = useTranslations('admin.users');
+
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <div className="overflow-x-auto">
@@ -419,25 +428,25 @@ export function UserListTableSkeleton({ rows = 6 }: { rows?: number }) {
           <thead>
             <tr className="border-b border-border bg-muted/30">
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Användare
+                {t('table.user')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Systemroll
+                {t('table.systemRole')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Tenantroll
+                {t('table.tenantRole')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Org
+                {t('table.org')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Senast aktiv
+                {t('table.lastActive')}
               </th>
               <th className="text-left py-3 px-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Status
+                {t('table.status')}
               </th>
               <th className="text-right py-3 px-4 w-16">
-                <span className="sr-only">Åtgärder</span>
+                <span className="sr-only">{t('table.actions')}</span>
               </th>
             </tr>
           </thead>

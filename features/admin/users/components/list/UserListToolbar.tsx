@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent } from "react";
+import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button, Select } from "@/components/ui";
 import type {
@@ -19,53 +20,6 @@ type UserListToolbarProps = {
   onClearFilters: () => void;
 };
 
-const statusOptions: Array<{ value: AdminUserStatus | "all"; label: string }> = [
-  { value: "all", label: "Alla statusar" },
-  { value: "active", label: "Aktiv" },
-  { value: "inactive", label: "Inaktiv" },
-  { value: "invited", label: "Inbjuden" },
-  { value: "pending", label: "Väntar" },
-  { value: "disabled", label: "Avstängd" },
-];
-
-const globalRoleOptions: Array<{ value: AdminUserGlobalRole | "all"; label: string }> = [
-  { value: "all", label: "Alla globala roller" },
-  { value: "system_admin", label: "Systemadmin" },
-  { value: "superadmin", label: "Superadmin" },
-  { value: "admin", label: "Admin" },
-  { value: "member", label: "Medlem" },
-  { value: "user", label: "Användare" },
-  { value: "none", label: "Ingen roll" },
-];
-
-const membershipRoleOptions: Array<{ value: AdminUserMembershipRole | "all"; label: string }> = [
-  { value: "all", label: "Alla medlemsroller" },
-  { value: "owner", label: "Ägare" },
-  { value: "admin", label: "Admin" },
-  { value: "editor", label: "Redaktör" },
-  { value: "member", label: "Medlem" },
-  { value: "viewer", label: "Läsare" },
-];
-
-const membershipPresenceOptions = [
-  { value: "all", label: "Alla medlemskap" },
-  { value: "has", label: "Har medlemskap" },
-  { value: "none", label: "Inga medlemskap" },
-];
-
-const _primaryTenantOptions = [
-  { value: "all", label: "Alla primära" },
-  { value: "has", label: "Har primär org" },
-  { value: "none", label: "Ingen primär org" },
-];
-
-const sortOptions: Array<{ value: UserListSort; label: string }> = [
-  { value: "recent", label: "Nyast först" },
-  { value: "name", label: "Namn A–Ö" },
-  { value: "last_seen", label: "Senast aktiv" },
-  { value: "memberships", label: "Flest medlemskap" },
-];
-
 export function UserListToolbar({
   filters,
   searchValue,
@@ -73,6 +27,55 @@ export function UserListToolbar({
   onFiltersChange,
   onClearFilters,
 }: UserListToolbarProps) {
+  const t = useTranslations('admin.users');
+
+  const statusOptions: Array<{ value: AdminUserStatus | "all"; label: string }> = [
+    { value: "all", label: t('filters.status.all') },
+    { value: "active", label: t('filters.status.active') },
+    { value: "inactive", label: t('filters.status.inactive') },
+    { value: "invited", label: t('filters.status.invited') },
+    { value: "pending", label: t('filters.status.pending') },
+    { value: "disabled", label: t('filters.status.disabled') },
+  ];
+
+  const globalRoleOptions: Array<{ value: AdminUserGlobalRole | "all"; label: string }> = [
+    { value: "all", label: t('filters.globalRole.all') },
+    { value: "system_admin", label: t('filters.globalRole.system_admin') },
+    { value: "superadmin", label: t('filters.globalRole.superadmin') },
+    { value: "admin", label: t('filters.globalRole.admin') },
+    { value: "member", label: t('filters.globalRole.member') },
+    { value: "user", label: t('filters.globalRole.user') },
+    { value: "none", label: t('filters.globalRole.none') },
+  ];
+
+  const membershipRoleOptions: Array<{ value: AdminUserMembershipRole | "all"; label: string }> = [
+    { value: "all", label: t('filters.membershipRole.all') },
+    { value: "owner", label: t('filters.membershipRole.owner') },
+    { value: "admin", label: t('filters.membershipRole.admin') },
+    { value: "editor", label: t('filters.membershipRole.editor') },
+    { value: "member", label: t('filters.membershipRole.member') },
+    { value: "viewer", label: t('filters.membershipRole.viewer') },
+  ];
+
+  const membershipPresenceOptions = [
+    { value: "all", label: t('filters.membershipPresence.all') },
+    { value: "has", label: t('filters.membershipPresence.has') },
+    { value: "none", label: t('filters.membershipPresence.none') },
+  ];
+
+  const _primaryTenantOptions = [
+    { value: "all", label: t('filters.primaryTenant.all') },
+    { value: "has", label: t('filters.primaryTenant.has') },
+    { value: "none", label: t('filters.primaryTenant.none') },
+  ];
+
+  const sortOptions: Array<{ value: UserListSort; label: string }> = [
+    { value: "recent", label: t('filters.sort.recent') },
+    { value: "name", label: t('filters.sort.name') },
+    { value: "last_seen", label: t('filters.sort.last_seen') },
+    { value: "memberships", label: t('filters.sort.memberships') },
+  ];
+
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(event.target.value);
   };
@@ -121,9 +124,9 @@ export function UserListToolbar({
               type="search"
               value={searchValue}
               onChange={handleSearchChange}
-              placeholder="Sök användare... (namn, e-post, uuid)"
+              placeholder={t('filters.searchPlaceholder')}
               className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              aria-label="Sök användare"
+              aria-label={t('filters.searchAriaLabel')}
             />
           </div>
 
@@ -182,7 +185,7 @@ export function UserListToolbar({
               className="text-muted-foreground hover:text-foreground"
             >
               <XMarkIcon className="mr-1 h-4 w-4" />
-              Rensa ({activeFilterCount})
+              {t('filters.clear', { count: activeFilterCount })}
             </Button>
           )}
         </div>

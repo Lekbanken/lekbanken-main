@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   CubeIcon,
   PlusIcon,
@@ -39,6 +40,7 @@ const PRODUCTS_PER_PAGE = 10;
 const fallbackStatus: ProductStatus = "active";
 
 export function ProductAdminPage() {
+  const t = useTranslations('admin.products');
   const { user } = useAuth();
   const { success, info, warning } = useToast();
   const { can } = useRbac();
@@ -483,7 +485,7 @@ export function ProductAdminPage() {
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             {categoryStats.length === 0 ? (
-              <AdminEmptyState title="Inga kategorier" description="Skapa minst en produkt för att se kategorier." />
+              <AdminEmptyState title={t('noCategories')} description={t('createProductForCategories')} />
             ) : (
               <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
                 {categoryStats.map((cat) => (
@@ -505,8 +507,8 @@ export function ProductAdminPage() {
           </CardHeader>
           <CardContent className="p-6 space-y-4">
             <AdminEmptyState
-              title="Rabatter ej konfigurerade"
-              description="Lägg till rabattnivåer (min-max antal → rabatt %) i kommande iteration."
+              title={t('discountsNotConfigured')}
+              description={t('discountsDescription')}
             />
           </CardContent>
         </Card>
@@ -520,40 +522,39 @@ export function ProductAdminPage() {
           <CardContent className="p-6 space-y-4">
             <div className="grid gap-4 lg:grid-cols-2">
               <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4">
-                <p className="font-semibold text-foreground">Mappning Produkt × Huvudsyfte</p>
+                <p className="font-semibold text-foreground">{t('productPurposeMapping')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Standardbilder väljs per kombination av produkt och huvudsyfte. Om en lek saknar egen omslagsbild
-                  och har produkt + huvudsyfte satt, används denna mappning.
+                  {t('defaultImagesExplanation')}
                 </p>
                 <ul className="list-disc space-y-1 pl-5 text-sm text-foreground">
-                  <li>Välj produkt och huvudsyfte.</li>
-                  <li>Välj/ersätt standardbild (per tenant om relevant).</li>
-                  <li>Fallback: global standardbild om mappning saknas.</li>
+                  <li>{t('selectProductAndPurpose')}</li>
+                  <li>{t('selectReplaceImage')}</li>
+                  <li>{t('fallbackGlobal')}</li>
                 </ul>
                 <p className="text-xs text-muted-foreground">
-                  API/storagemappning behöver införas: product_purpose_media (product_id, purpose_id, media_id, priority, tenant_id?).
+                  {t('apiStorageMapping')}
                 </p>
               </div>
 
               <div className="space-y-3 rounded-lg border border-dashed border-border p-4">
-                <p className="font-semibold text-foreground">Snabbkonfiguration (kommmer)</p>
+                <p className="font-semibold text-foreground">{t('quickConfigComing')}</p>
                 <p className="text-sm text-muted-foreground">
-                  Detta gränssnitt reserverat för uppladdning/val av media per kombination. Det aktiveras när API:erna finns.
+                  {t('interfaceReserved')}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-foreground">Produkt</label>
-                    <Select value={""} options={[{ value: "", label: "Välj" }]} disabled />
+                    <label className="text-xs font-medium text-foreground">{t('product')}</label>
+                    <Select value={""} options={[{ value: "", label: t('select') }]} disabled />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-foreground">Huvudsyfte</label>
-                    <Select value={""} options={[{ value: "", label: "Välj" }]} disabled />
+                    <label className="text-xs font-medium text-foreground">{t('mainPurpose')}</label>
+                    <Select value={""} options={[{ value: "", label: t('select') }]} disabled />
                   </div>
                 </div>
                 <Button variant="outline" size="sm" disabled>
-                  Välj standardbild (kommer snart)
+                  {t('selectDefaultImage')}
                 </Button>
-                <p className="text-xs text-muted-foreground">När API:et är klart kopplas detta till media-picker och sparar till mappningstabellen.</p>
+                <p className="text-xs text-muted-foreground">{t('apiReadyNote')}</p>
               </div>
             </div>
           </CardContent>

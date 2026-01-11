@@ -2349,7 +2349,114 @@
       "handledRequests": "Hanterade förfrågningar ({count})",
       "status": {
         "confirmed": "Godkänd",
-        "rejected": "Avslagen"
+        "rejected": "Avslagen",
+        "pending": "Väntar på dig",
+        "waiting": "Väntar på bekräftelse",
+        "timeout": "Tidsgräns passerad"
+      },
+      "request": {
+        "takingPhoto": "Tar bild...",
+        "takePhoto": "Ta foto på föremålet",
+        "requestConfirmation": "Begär bekräftelse från spelledare",
+        "waitingForHost": "Väntar på spelledarens bekräftelse...",
+        "propConfirmed": "Föremål bekräftat!",
+        "confirmedBy": "Av: {name}",
+        "notApproved": "Inte godkänt",
+        "tryAgain": "Försök igen"
+      },
+      "control": {
+        "noPendingForProp": "Inga väntande bekräftelser för detta föremål",
+        "requestFrom": "Begäran från: {name}",
+        "photoEvidence": "Foto-bevis:",
+        "expectedProp": "Förväntat föremål:",
+        "notesLabel": "Anteckning (valfritt):",
+        "notesPlaceholder": "Lägg till kommentar...",
+        "approve": "Godkänn",
+        "reject": "Avvisa"
+      }
+    },
+    "locationCheck": {
+      "errors": {
+        "notSupported": "Geolokalisering stöds inte i denna webbläsare",
+        "accessDenied": "Åtkomst till plats nekad",
+        "notAvailable": "Plats inte tillgänglig",
+        "timeout": "Tidsgräns för platshämtning"
+      },
+      "verified": {
+        "title": "Plats verifierad!",
+        "description": "Du har anlänt till {location}"
+      },
+      "gps": {
+        "distanceToTarget": "Avstånd till målet",
+        "startTracking": "Starta platsövervakning",
+        "searching": "Söker din plats..."
+      },
+      "beacon": {
+        "searchFor": "Sök efter beacon:",
+        "getCloser": "Gå närmare platsen för att detektera beacon-signalen"
+      },
+      "qr": {
+        "scanCode": "Skanna QR-koden på platsen",
+        "openScanner": "Öppna QR-skanner"
+      },
+      "manual": {
+        "hostWillVerify": "Spelledaren kommer verifiera din plats"
+      }
+    },
+    "hintPanel": {
+      "noMoreHints": "Inga fler ledtrådar tillgängliga",
+      "title": "Ledtrådar",
+      "hintsUsed": "{used}/{total} använda",
+      "costTime": "Kostar {seconds} sekunder",
+      "costPoints": "Kostar {points} poäng",
+      "waitSeconds": "Vänta {seconds}s",
+      "requestHint": "Be om ledtråd",
+      "penaltyTime": "-{seconds}s tid",
+      "penaltyPoints": "-{points} poäng",
+      "control": {
+        "send": "Skicka",
+        "customHintLabel": "Egen ledtråd",
+        "customHintPlaceholder": "Skriv egen ledtråd...",
+        "totalDeductions": "Totala avdrag:",
+        "timeDeduction": "{seconds}s tid",
+        "pointsDeduction": "{points} poäng"
+      }
+    },
+    "sessionControls": {
+      "pause": "Pausa",
+      "resume": "Fortsätt",
+      "end": "Avsluta",
+      "reset": "Återställ",
+      "lock": "Lås",
+      "unlock": "Lås upp",
+      "delete": "Ta bort",
+      "shareCode": "Dela kod",
+      "addParticipant": "Lägg till deltagare",
+      "pauseSession": "Pausa session",
+      "resumeSession": "Fortsätt session",
+      "lockSession": "Lås session",
+      "unlockSession": "Lås upp session",
+      "endSession": "Avsluta session",
+      "resetSession": "Återställ session",
+      "deletePermanently": "Ta bort permanent"
+    },
+    "cipherDecoder": {
+      "encodedMessage": "Kodat meddelande ({type})",
+      "hideHelper": "Dölj avkodarhjälpen",
+      "showHelper": "Visa avkodarhjälpen",
+      "shiftLabel": "Förskjutning:",
+      "preview": "Förhandsvisning:",
+      "inputLabel": "Skriv det avkodade meddelandet:",
+      "inputPlaceholder": "Skriv din lösning...",
+      "check": "Kontrollera",
+      "clear": "Rensa",
+      "wrongAnswer": "Inte rätt, försök igen! (Försök {attempt})",
+      "correctTitle": "Korrekt avkodat!",
+      "solution": "Lösning: {solution}",
+      "attempts": "Försök: {count}",
+      "caesarWheel": {
+        "original": "Original",
+        "encoded": "Kodat"
       }
     },
     "activeSessionShell": {

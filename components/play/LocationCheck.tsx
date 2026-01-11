@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   MapPinIcon,
   CheckCircleIcon,
@@ -42,6 +43,7 @@ export function LocationCheck({
   onQrScanned,
   className = '',
 }: LocationCheckProps) {
+  const t = useTranslations('play.locationCheck');
   const [error, setError] = useState<string | null>(null);
   const [isTracking, setIsTracking] = useState(false);
   const watchIdRef = useRef<number | null>(null);
@@ -49,7 +51,7 @@ export function LocationCheck({
   // Start GPS tracking
   const startTracking = useCallback(() => {
     if (!navigator.geolocation) {
-      setError('Geolokalisering stöds inte i denna webbläsare');
+      setError(t('errors.notSupported'));
       return;
     }
 
@@ -76,10 +78,10 @@ export function LocationCheck({
       err => {
         setError(
           err.code === 1
-            ? 'Åtkomst till plats nekad'
+            ? t('errors.accessDenied')
             : err.code === 2
-            ? 'Plats inte tillgänglig'
-            : 'Tidsgräns för platshämtning'
+            ? t('errors.notAvailable')
+            : t('errors.timeout')
         );
         setIsTracking(false);
       },
@@ -89,7 +91,7 @@ export function LocationCheck({
         maximumAge: 0,
       }
     );
-  }, [config.targetCoordinates, config.radiusMeters, onLocationUpdate, onVerified]);
+  }, [config.targetCoordinates, config.radiusMeters, onLocationUpdate, onVerified, t]);
 
   // Stop tracking on unmount
   useEffect(() => {
@@ -129,9 +131,9 @@ export function LocationCheck({
         <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
           <CheckCircleIcon className="h-6 w-6" />
           <div>
-            <p className="font-medium">Plats verifierad!</p>
+            <p className="font-medium">{t('verified.title')}</p>
             <p className="text-sm opacity-80">
-              Du har anlänt till {config.locationName}
+              {t('verified.description', { location: config.locationName })}
             </p>
           </div>
         </div>
@@ -148,7 +150,7 @@ export function LocationCheck({
                       ? `${Math.round(distance)} m`
                       : `${(distance / 1000).toFixed(1)} km`}
                   </div>
-                  <p className="text-sm text-zinc-500">Avstånd till målet</p>
+                  <p className="text-sm text-zinc-500">{t('gps.distanceToTarget')}</p>
                 </div>
               )}
 
@@ -181,12 +183,12 @@ export function LocationCheck({
               {!isTracking ? (
                 <Button onClick={startTracking}>
                   <MapPinIcon className="h-5 w-5 mr-2" />
-                  Starta platsövervakning
+                  {t('gps.startTracking')}
                 </Button>
               ) : (
                 <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
                   <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  Söker din plats...
+                  {t('gps.searching')}
                 </div>
               )}
             </div>
@@ -197,10 +199,10 @@ export function LocationCheck({
             <div className="flex flex-col items-center gap-4 p-6">
               <SignalIcon className="h-16 w-16 text-blue-500 animate-pulse" />
               <p className="text-center text-zinc-600 dark:text-zinc-400">
-                Sök efter beacon: <code className="font-mono">{config.beaconId}</code>
+                {t('beacon.searchFor')} <code className="font-mono">{config.beaconId}</code>
               </p>
               <p className="text-sm text-zinc-500">
-                Gå närmare platsen för att detektera beacon-signalen
+                {t('beacon.getCloser')}
               </p>
             </div>
           )}
@@ -210,11 +212,11 @@ export function LocationCheck({
             <div className="flex flex-col items-center gap-4 p-6">
               <QrCodeIcon className="h-16 w-16 text-blue-500" />
               <p className="text-center text-zinc-600 dark:text-zinc-400">
-                Skanna QR-koden på platsen
+                {t('qr.scanCode')}
               </p>
               <Button onClick={() => onQrScanned?.(config.qrCodeValue || '')}>
                 <QrCodeIcon className="h-5 w-5 mr-2" />
-                Öppna QR-skanner
+                {t('qr.openScanner')}
               </Button>
             </div>
           )}
@@ -224,7 +226,7 @@ export function LocationCheck({
             <div className="flex flex-col items-center gap-4 p-6">
               <MapPinIcon className="h-16 w-16 text-zinc-400" />
               <p className="text-center text-zinc-600 dark:text-zinc-400">
-                Spelledaren kommer verifiera din plats
+                {t('manual.hostWillVerify')}
               </p>
             </div>
           )}

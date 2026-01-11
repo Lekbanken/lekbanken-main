@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   LockClosedIcon,
@@ -36,6 +37,7 @@ export function CipherDecoder({
   onDecoded,
   className = '',
 }: CipherDecoderProps) {
+  const t = useTranslations('play.cipherDecoder');
   const [inputValue, setInputValue] = useState(state.currentGuess);
   const [showHelper, setShowHelper] = useState(false);
   const [helperShift, setHelperShift] = useState(config.caesarShift ?? 3);
@@ -87,7 +89,7 @@ export function CipherDecoder({
       <div className="p-6 rounded-lg bg-zinc-100 dark:bg-zinc-800 border-2 border-zinc-300 dark:border-zinc-600">
         <div className="flex items-center gap-2 mb-3 text-sm text-zinc-500 dark:text-zinc-400">
           <LockClosedIcon className="h-4 w-4" />
-          <span>Kodat meddelande ({config.cipherType})</span>
+          <span>{t('encodedMessage', { type: config.cipherType })}</span>
         </div>
         <p className="font-mono text-lg tracking-wider break-all">
           {config.encodedMessage}
@@ -104,12 +106,12 @@ export function CipherDecoder({
             {showHelper ? (
               <>
                 <LockClosedIcon className="h-4 w-4" />
-                Dölj avkodarhjälpen
+                {t('hideHelper')}
               </>
             ) : (
               <>
                 <LockOpenIcon className="h-4 w-4" />
-                Visa avkodarhjälpen
+                {t('showHelper')}
               </>
             )}
           </button>
@@ -118,7 +120,7 @@ export function CipherDecoder({
             <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
               {config.cipherType === 'caesar' && (
                 <div className="flex items-center gap-3 mb-3">
-                  <label className="text-sm font-medium">Förskjutning:</label>
+                  <label className="text-sm font-medium">{t('shiftLabel')}</label>
                   <input
                     type="range"
                     min="1"
@@ -132,7 +134,7 @@ export function CipherDecoder({
               )}
 
               <div className="p-3 rounded bg-white dark:bg-zinc-800 font-mono text-sm">
-                <div className="text-xs text-zinc-500 mb-1">Förhandsvisning:</div>
+                <div className="text-xs text-zinc-500 mb-1">{t('preview')}</div>
                 <p className="tracking-wider break-all">{decodedPreview}</p>
               </div>
 
@@ -149,12 +151,12 @@ export function CipherDecoder({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-sm font-medium mb-2">
-              Skriv det avkodade meddelandet:
+              {t('inputLabel')}
             </label>
             <Input
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
-              placeholder="Skriv din lösning..."
+              placeholder={t('inputPlaceholder')}
               className={`${
                 feedback === 'wrong'
                   ? 'border-red-500 focus:ring-red-500'
@@ -167,7 +169,7 @@ export function CipherDecoder({
 
           <div className="flex gap-3">
             <Button type="submit" disabled={!inputValue.trim()}>
-              Kontrollera
+              {t('check')}
             </Button>
             <Button
               type="button"
@@ -175,13 +177,13 @@ export function CipherDecoder({
               onClick={() => setInputValue('')}
             >
               <ArrowPathIcon className="h-4 w-4 mr-2" />
-              Rensa
+              {t('clear')}
             </Button>
           </div>
 
           {feedback === 'wrong' && (
             <p className="text-sm text-red-600 dark:text-red-400">
-              Inte rätt, försök igen! (Försök {state.attemptsUsed + 1})
+              {t('wrongAnswer', { attempt: state.attemptsUsed + 1 })}
             </p>
           )}
         </form>
@@ -189,9 +191,9 @@ export function CipherDecoder({
         <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
           <CheckCircleIcon className="h-6 w-6 flex-shrink-0" />
           <div>
-            <p className="font-medium">Korrekt avkodat!</p>
+            <p className="font-medium">{t('correctTitle')}</p>
             <p className="text-sm opacity-80">
-              Lösning: {config.expectedPlaintext}
+              {t('solution', { solution: config.expectedPlaintext })}
             </p>
           </div>
         </div>
@@ -199,7 +201,7 @@ export function CipherDecoder({
 
       {/* Attempt counter */}
       <div className="text-xs text-zinc-500 dark:text-zinc-400">
-        Försök: {state.attemptsUsed}
+        {t('attempts', { count: state.attemptsUsed })}
       </div>
     </div>
   );
@@ -214,6 +216,7 @@ interface CaesarWheelProps {
 }
 
 function CaesarWheel({ shift }: CaesarWheelProps) {
+  const t = useTranslations('play.cipherDecoder');
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const shiftedAlphabet = alphabet
     .split('')
@@ -225,7 +228,7 @@ function CaesarWheel({ shift }: CaesarWheelProps) {
       <table className="w-full text-xs font-mono">
         <thead>
           <tr className="border-b border-zinc-200 dark:border-zinc-700">
-            <th className="py-1 text-left text-zinc-500">Original</th>
+            <th className="py-1 text-left text-zinc-500">{t('caesarWheel.original')}</th>
             {alphabet.split('').map(char => (
               <th key={char} className="px-1 py-1 text-center">
                 {char}
@@ -235,7 +238,7 @@ function CaesarWheel({ shift }: CaesarWheelProps) {
         </thead>
         <tbody>
           <tr>
-            <td className="py-1 text-left text-zinc-500">Kodat</td>
+            <td className="py-1 text-left text-zinc-500">{t('caesarWheel.encoded')}</td>
             {shiftedAlphabet.split('').map((char, i) => (
               <td key={i} className="px-1 py-1 text-center text-blue-600 dark:text-blue-400">
                 {char}

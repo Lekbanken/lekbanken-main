@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -52,6 +53,7 @@ export function SessionControls({
   variant = 'full',
   className = '',
 }: SessionControlsProps) {
+  const t = useTranslations('play.sessionControls');
   const isActive = status === 'active';
   const isPaused = status === 'paused';
   const isLocked = status === 'locked';
@@ -76,7 +78,7 @@ export function SessionControls({
             {...getButtonProps('pause')}
           >
             <PauseIcon className="h-4 w-4" />
-            Pausa
+            {t('pause')}
           </Button>
         )}
         {isPaused && onResume && (
@@ -87,7 +89,7 @@ export function SessionControls({
             {...getButtonProps('resume')}
           >
             <PlayIcon className="h-4 w-4" />
-            Fortsätt
+            {t('resume')}
           </Button>
         )}
         {isLive && onEnd && (
@@ -98,7 +100,7 @@ export function SessionControls({
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
-            Avsluta
+            {t('end')}
           </Button>
         )}
         {(isEnded || isArchived) && onReset && (
@@ -109,7 +111,7 @@ export function SessionControls({
             {...getButtonProps('reset')}
           >
             <ArrowPathIcon className="h-4 w-4" />
-            Återställ
+            {t('reset')}
           </Button>
         )}
       </div>
@@ -128,7 +130,7 @@ export function SessionControls({
             {...getButtonProps('pause')}
           >
             <PauseIcon className="h-4 w-4" />
-            Pausa
+            {t('pause')}
           </Button>
         )}
         {isPaused && onResume && (
@@ -138,7 +140,7 @@ export function SessionControls({
             {...getButtonProps('resume')}
           >
             <PlayIcon className="h-4 w-4" />
-            Fortsätt
+            {t('resume')}
           </Button>
         )}
 
@@ -150,7 +152,7 @@ export function SessionControls({
             {...getButtonProps('lock')}
           >
             <LockClosedIcon className="h-4 w-4" />
-            Lås
+            {t('lock')}
           </Button>
         )}
         {isLocked && onUnlock && (
@@ -160,7 +162,7 @@ export function SessionControls({
             {...getButtonProps('unlock')}
           >
             <LockOpenIcon className="h-4 w-4" />
-            Lås upp
+            {t('unlock')}
           </Button>
         )}
 
@@ -172,7 +174,7 @@ export function SessionControls({
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
-            Avsluta
+            {t('end')}
           </Button>
         )}
 
@@ -186,7 +188,7 @@ export function SessionControls({
                 {...getButtonProps('reset')}
               >
                 <ArrowPathIcon className="h-4 w-4" />
-                Återställ
+                {t('reset')}
               </Button>
             )}
             {onDelete && (
@@ -196,7 +198,7 @@ export function SessionControls({
                 {...getButtonProps('delete')}
               >
                 <TrashIcon className="h-4 w-4" />
-                Ta bort
+                {t('delete')}
               </Button>
             )}
           </>
@@ -219,7 +221,7 @@ export function SessionControls({
             {...getButtonProps('pause')}
           >
             <PauseIcon className="h-5 w-5" />
-            Pausa session
+            {t('pauseSession')}
           </Button>
         )}
         {isPaused && onResume && (
@@ -230,7 +232,7 @@ export function SessionControls({
             {...getButtonProps('resume')}
           >
             <PlayIcon className="h-5 w-5" />
-            Fortsätt session
+            {t('resumeSession')}
           </Button>
         )}
 
@@ -243,7 +245,7 @@ export function SessionControls({
             {...getButtonProps('lock')}
           >
             <LockClosedIcon className="h-5 w-5" />
-            Lås session
+            {t('lockSession')}
           </Button>
         )}
         {isLocked && onUnlock && (
@@ -254,7 +256,7 @@ export function SessionControls({
             {...getButtonProps('unlock')}
           >
             <LockOpenIcon className="h-5 w-5" />
-            Lås upp session
+            {t('unlockSession')}
           </Button>
         )}
       </div>
@@ -269,7 +271,7 @@ export function SessionControls({
             {...getButtonProps('share')}
           >
             <ShareIcon className="h-4 w-4" />
-            Dela kod
+            {t('shareCode')}
           </Button>
         )}
 
@@ -281,7 +283,7 @@ export function SessionControls({
             {...getButtonProps('add')}
           >
             <PlusIcon className="h-4 w-4" />
-            Lägg till deltagare
+            {t('addParticipant')}
           </Button>
         )}
 
@@ -298,7 +300,7 @@ export function SessionControls({
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
-            Avsluta session
+            {t('endSession')}
           </Button>
         )}
       </div>
@@ -313,7 +315,7 @@ export function SessionControls({
               {...getButtonProps('reset')}
             >
               <ArrowPathIcon className="h-4 w-4" />
-              Återställ session
+              {t('resetSession')}
             </Button>
           )}
           {onDelete && (
@@ -323,7 +325,7 @@ export function SessionControls({
               {...getButtonProps('delete')}
             >
               <TrashIcon className="h-4 w-4" />
-              Ta bort permanent
+              {t('deletePermanently')}
             </Button>
           )}
         </div>

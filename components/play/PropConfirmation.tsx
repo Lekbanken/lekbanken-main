@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   XCircleIcon,
@@ -34,6 +35,7 @@ export function PropRequest({
   onPhotoCapture,
   className = '',
 }: PropRequestProps) {
+  const t = useTranslations('play.propConfirmation');
   const [isCapturing, setIsCapturing] = useState(false);
 
   const handleCapturePhoto = async () => {
@@ -99,7 +101,7 @@ export function PropRequest({
               variant="outline"
             >
               <CameraIcon className="h-5 w-5 mr-2" />
-              {isCapturing ? 'Tar bild...' : 'Ta foto på föremålet'}
+              {isCapturing ? t('request.takingPhoto') : t('request.takePhoto')}
             </Button>
           )}
           
@@ -114,7 +116,7 @@ export function PropRequest({
 
           <Button onClick={onRequest}>
             <HandRaisedIcon className="h-5 w-5 mr-2" />
-            Begär bekräftelse från spelledare
+            {t('request.requestConfirmation')}
           </Button>
         </div>
       )}
@@ -122,7 +124,7 @@ export function PropRequest({
       {state.status === 'waiting' && (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300">
           <ClockIcon className="h-6 w-6 animate-pulse" />
-          <span>Väntar på spelledarens bekräftelse...</span>
+          <span>{t('request.waitingForHost')}</span>
         </div>
       )}
 
@@ -130,9 +132,9 @@ export function PropRequest({
         <div className="flex items-center gap-3 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
           <CheckCircleIcon className="h-6 w-6" />
           <div>
-            <p className="font-medium">Föremål bekräftat!</p>
+            <p className="font-medium">{t('request.propConfirmed')}</p>
             {state.confirmedBy && (
-              <p className="text-sm opacity-80">Av: {state.confirmedBy}</p>
+              <p className="text-sm opacity-80">{t('request.confirmedBy', { name: state.confirmedBy })}</p>
             )}
           </div>
         </div>
@@ -143,14 +145,14 @@ export function PropRequest({
           <div className="flex items-center gap-3 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300">
             <XCircleIcon className="h-6 w-6" />
             <div>
-              <p className="font-medium">Inte godkänt</p>
+              <p className="font-medium">{t('request.notApproved')}</p>
               {state.notes && (
                 <p className="text-sm opacity-80">{state.notes}</p>
               )}
             </div>
           </div>
           <Button onClick={onRequest} variant="outline">
-            Försök igen
+            {t('request.tryAgain')}
           </Button>
         </div>
       )}
@@ -179,13 +181,14 @@ export function PropConfirmControl({
   onReject,
   className = '',
 }: PropConfirmControlProps) {
+  const t = useTranslations('play.propConfirmation');
   const [notes, setNotes] = useState('');
 
   if (state.status !== 'waiting') {
     return (
       <div className={`p-4 rounded-lg bg-zinc-100 dark:bg-zinc-800 ${className}`}>
         <p className="text-sm text-zinc-500">
-          Inga väntande bekräftelser för detta föremål
+          {t('control.noPendingForProp')}
         </p>
       </div>
     );
@@ -198,7 +201,7 @@ export function PropConfirmControl({
           <h4 className="font-semibold">{config.propDescription}</h4>
           {participantName && (
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-              Begäran från: {participantName}
+              {t('control.requestFrom', { name: participantName })}
             </p>
           )}
         </div>
@@ -208,7 +211,7 @@ export function PropConfirmControl({
       {/* Photo evidence */}
       {state.photoUrl && (
         <div>
-          <p className="text-sm font-medium mb-2">Foto-bevis:</p>
+          <p className="text-sm font-medium mb-2">{t('control.photoEvidence')}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={state.photoUrl}
@@ -221,7 +224,7 @@ export function PropConfirmControl({
       {/* Reference image */}
       {config.propImageUrl && (
         <div>
-          <p className="text-sm font-medium mb-2">Förväntat föremål:</p>
+          <p className="text-sm font-medium mb-2">{t('control.expectedProp')}</p>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={config.propImageUrl}
@@ -234,13 +237,13 @@ export function PropConfirmControl({
       {/* Notes input */}
       <div>
         <label className="block text-sm font-medium mb-1">
-          Anteckning (valfritt):
+          {t('control.notesLabel')}
         </label>
         <input
           type="text"
           value={notes}
           onChange={e => setNotes(e.target.value)}
-          placeholder="Lägg till kommentar..."
+          placeholder={t('control.notesPlaceholder')}
           className="w-full px-3 py-2 rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800"
         />
       </div>
@@ -252,7 +255,7 @@ export function PropConfirmControl({
           className="flex-1 bg-green-600 hover:bg-green-700"
         >
           <CheckCircleIcon className="h-5 w-5 mr-2" />
-          Godkänn
+          {t('control.approve')}
         </Button>
         <Button
           onClick={() => onReject(notes || undefined)}
@@ -260,7 +263,7 @@ export function PropConfirmControl({
           className="flex-1"
         >
           <XCircleIcon className="h-5 w-5 mr-2" />
-          Avvisa
+          {t('control.reject')}
         </Button>
       </div>
     </div>
@@ -276,31 +279,33 @@ interface PropStatusBadgeProps {
 }
 
 function PropStatusBadge({ status }: PropStatusBadgeProps) {
-  const variants: Record<PropConfirmationStatus, { bg: string; text: string; label: string }> = {
+  const t = useTranslations('play.propConfirmation');
+  
+  const variants: Record<PropConfirmationStatus, { bg: string; text: string; labelKey: string }> = {
     pending: {
       bg: 'bg-zinc-100 dark:bg-zinc-800',
       text: 'text-zinc-600 dark:text-zinc-400',
-      label: 'Väntar på dig',
+      labelKey: 'status.pending',
     },
     waiting: {
       bg: 'bg-amber-100 dark:bg-amber-900/30',
       text: 'text-amber-700 dark:text-amber-300',
-      label: 'Väntar på bekräftelse',
+      labelKey: 'status.waiting',
     },
     confirmed: {
       bg: 'bg-green-100 dark:bg-green-900/30',
       text: 'text-green-700 dark:text-green-300',
-      label: 'Bekräftat',
+      labelKey: 'status.confirmed',
     },
     rejected: {
       bg: 'bg-red-100 dark:bg-red-900/30',
       text: 'text-red-700 dark:text-red-300',
-      label: 'Avvisat',
+      labelKey: 'status.rejected',
     },
     timeout: {
       bg: 'bg-zinc-100 dark:bg-zinc-800',
       text: 'text-zinc-500',
-      label: 'Tidsgräns passerad',
+      labelKey: 'status.timeout',
     },
   };
 
@@ -309,7 +314,7 @@ function PropStatusBadge({ status }: PropStatusBadgeProps) {
   return (
     <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${variant.bg} ${variant.text}`}>
       <span className="w-2 h-2 rounded-full bg-current" />
-      {variant.label}
+      {t(variant.labelKey as 'status.pending')}
     </div>
   );
 }

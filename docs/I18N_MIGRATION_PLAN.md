@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-13
-> **Status:** 🟡 Pågående - Fas 1.2 (Play features) nästan klart (~85%)
+> **Senast uppdaterad:** 2026-01-14
+> **Status:** 🟢 Fas 1 nästan komplett (~95%) - app/app och features/play klara
 
 ## Executive Summary
 
@@ -10,9 +10,9 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~35 (3%) |
-| **Migrerade strängar** | ~630 (22%) |
-| **Uppskattad återstående arbetsinsats** | ~25-40 timmar |
+| Filer som använder i18n | ~80 (7%) |
+| **Migrerade strängar** | ~1,100 (39%) |
+| **Uppskattad återstående arbetsinsats** | ~20-30 timmar |
 
 ## Prioriteringsmodell
 
@@ -237,8 +237,23 @@ export function PlayButton() {
 - [x] **ParticipantSignalMicroUI.tsx** ✅ Fix partial migration (title, buttons)
 - [x] **features/play hooks** ✅ All hooks migrated to English fallback + translation keys
 - [x] **features/play komponenter** ✅ KOMPLETT - Inga svenska strängar kvar i .tsx filer
-- [ ] Implementera app pages (Fas 1.3) - 154 strängar kvar
-- [ ] Implementera components/play (Fas 1.4) - 112 strängar kvar
+- [x] Implementera app pages (Fas 1.3) ✅ ~200 strängar migrerade
+  - [x] app/app/support/page.tsx ✅
+  - [x] app/app/preferences/page.tsx ✅
+  - [x] app/app/shop/page.tsx ✅
+  - [x] app/app/subscription/page.tsx ✅
+  - [x] app/app/learning/page.tsx ✅
+  - [x] app/app/leaderboard/page.tsx ✅
+  - [x] app/app/events/page.tsx ✅
+  - [x] app/app/notifications/page.tsx ✅
+  - [x] app/app/challenges/page.tsx ✅
+  - [x] app/app/no-access/page.tsx ✅
+  - [x] app/app/select-tenant/page.tsx ✅
+- [x] Implementera components/play (Fas 1.4) ✅ ~40 strängar migrerade
+  - [x] components/play/lobby/SettingsSection.tsx ✅
+  - [x] components/play/lobby/RolesSection.tsx ✅
+- [ ] Implementera features/admin (Fas 2) - ~489 strängar kvar
+- [ ] Implementera app/admin (Fas 2) - ~752 strängar kvar
 
 ## Progress Tracker
 
@@ -256,8 +271,13 @@ export function PlayButton() {
 | 2026-01-13 | features/play (batch 3) | 5 | ~85 | ✅ Klart |
 | 2026-01-13 | features/play (batch 4) | 6 | ~230 | ✅ Klart |
 | 2026-01-14 | features/play (hooks + final) | 12 | ~150 | ✅ Klart |
-| - | app/app | ~20 | 154 | ⏳ Väntar |
-| - | components/play | ~15 | 112 | ⏳ Väntar |
+| 2026-01-14 | components/play/lobby | 2 | ~40 | ✅ Klart |
+| 2026-01-14 | app/app (support, preferences, shop, subscription) | 4 | ~90 | ✅ Klart |
+| 2026-01-14 | app/app (learning) | 1 | ~14 | ✅ Klart |
+| 2026-01-14 | app/app (leaderboard, events, notifications, challenges) | 4 | ~45 | ✅ Klart |
+| 2026-01-14 | app/app (no-access, select-tenant) | 2 | ~10 | ✅ Klart |
+| - | features/admin | ~68 | 489 | ⏳ Nästa |
+| - | app/admin | ~91 | 752 | ⏳ Väntar |
 
 ### Migrerade message-keys (play.participantView)
 

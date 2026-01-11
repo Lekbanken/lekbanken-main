@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -42,6 +43,7 @@ export function HintPanel({
   disabled = false,
   className,
 }: HintPanelProps) {
+  const t = useTranslations('play.hintPanel');
   // Track local countdown - resets when state.cooldownRemaining changes
   const [localCountdown, setLocalCountdown] = useState(0);
   const [lastExternalCooldown, setLastExternalCooldown] = useState(state.cooldownRemaining);
@@ -96,7 +98,7 @@ export function HintPanel({
       <Card className={cn('p-4', className)}>
         <div className="flex items-center gap-3 text-muted-foreground">
           <LockClosedIcon className="h-5 w-5" />
-          <span className="text-sm">Inga fler ledtrådar tillgängliga</span>
+          <span className="text-sm">{t('noMoreHints')}</span>
         </div>
       </Card>
     );
@@ -108,11 +110,11 @@ export function HintPanel({
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <LightBulbIcon className="h-5 w-5 text-amber-500" />
-          <span className="font-medium">Ledtrådar</span>
+          <span className="font-medium">{t('title')}</span>
         </div>
         {config.showHintCount !== false && (
           <span className="text-sm text-muted-foreground">
-            {hintsUsed}/{config.maxHints ?? config.hints.length} använda
+            {t('hintsUsed', { used: hintsUsed, total: config.maxHints ?? config.hints.length })}
           </span>
         )}
       </div>
@@ -147,12 +149,12 @@ export function HintPanel({
           {/* Cost warning */}
           {nextHint.cost === 'time' && nextHint.timePenalty && (
             <p className="text-xs text-muted-foreground text-center">
-              Kostar {nextHint.timePenalty} sekunder
+              {t('costTime', { seconds: nextHint.timePenalty })}
             </p>
           )}
           {nextHint.cost === 'points' && nextHint.pointsPenalty && (
             <p className="text-xs text-muted-foreground text-center">
-              Kostar {nextHint.pointsPenalty} poäng
+              {t('costPoints', { points: nextHint.pointsPenalty })}
             </p>
           )}
 
@@ -165,12 +167,12 @@ export function HintPanel({
             {cooldownRemaining > 0 ? (
               <>
                 <ClockIcon className="h-4 w-4" />
-                Vänta {cooldownRemaining}s
+                {t('waitSeconds', { seconds: cooldownRemaining })}
               </>
             ) : (
               <>
                 <LightBulbIcon className="h-4 w-4" />
-                Be om ledtråd
+                {t('requestHint')}
               </>
             )}
           </Button>
@@ -181,10 +183,10 @@ export function HintPanel({
       {(state.totalPenaltyTime > 0 || state.totalPenaltyPoints > 0) && (
         <div className="text-xs text-muted-foreground text-center space-x-3">
           {state.totalPenaltyTime > 0 && (
-            <span>-{state.totalPenaltyTime}s tid</span>
+            <span>{t('penaltyTime', { seconds: state.totalPenaltyTime })}</span>
           )}
           {state.totalPenaltyPoints > 0 && (
-            <span>-{state.totalPenaltyPoints} poäng</span>
+            <span>{t('penaltyPoints', { points: state.totalPenaltyPoints })}</span>
           )}
         </div>
       )}
@@ -219,6 +221,7 @@ export function HintControl({
   onSendCustomHint,
   className,
 }: HintControlProps) {
+  const t = useTranslations('play.hintPanel');
   const [customHint, setCustomHint] = useState('');
 
   const handleSendCustom = () => {
@@ -233,7 +236,7 @@ export function HintControl({
       <div className="flex items-center justify-between">
         <h3 className="font-medium flex items-center gap-2">
           <LightBulbIcon className="h-5 w-5 text-amber-500" />
-          Ledtrådar
+          {t('title')}
         </h3>
         <span className="text-sm text-muted-foreground">
           {state.revealedHintIds.length}/{config.hints.length}
@@ -274,7 +277,7 @@ export function HintControl({
                   variant="outline"
                   onClick={() => onSendHint?.(hint.id)}
                 >
-                  Skicka
+                  {t('control.send')}
                 </Button>
               )}
             </div>
@@ -285,13 +288,13 @@ export function HintControl({
       {/* Custom hint */}
       {onSendCustomHint && (
         <div className="space-y-2 pt-2 border-t border-border">
-          <label className="text-sm font-medium">Egen ledtråd</label>
+          <label className="text-sm font-medium">{t('control.customHintLabel')}</label>
           <div className="flex gap-2">
             <input
               type="text"
               value={customHint}
               onChange={(e) => setCustomHint(e.target.value)}
-              placeholder="Skriv egen ledtråd..."
+              placeholder={t('control.customHintPlaceholder')}
               className="flex-1 px-3 py-2 text-sm rounded-md border border-border bg-background"
             />
             <Button
@@ -299,7 +302,7 @@ export function HintControl({
               onClick={handleSendCustom}
               disabled={!customHint.trim()}
             >
-              Skicka
+              {t('control.send')}
             </Button>
           </div>
         </div>
@@ -308,13 +311,13 @@ export function HintControl({
       {/* Stats */}
       {(state.totalPenaltyTime > 0 || state.totalPenaltyPoints > 0) && (
         <div className="text-xs text-muted-foreground pt-2 border-t border-border">
-          <span className="font-medium">Totala avdrag: </span>
+          <span className="font-medium">{t('control.totalDeductions')} </span>
           {state.totalPenaltyTime > 0 && (
-            <span>{state.totalPenaltyTime}s tid</span>
+            <span>{t('control.timeDeduction', { seconds: state.totalPenaltyTime })}</span>
           )}
           {state.totalPenaltyTime > 0 && state.totalPenaltyPoints > 0 && ', '}
           {state.totalPenaltyPoints > 0 && (
-            <span>{state.totalPenaltyPoints} poäng</span>
+            <span>{t('control.pointsDeduction', { points: state.totalPenaltyPoints })}</span>
           )}
         </div>
       )}

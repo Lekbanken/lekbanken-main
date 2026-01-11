@@ -2353,7 +2353,114 @@
       "handledRequests": "Handled requests ({count})",
       "status": {
         "confirmed": "Approved",
-        "rejected": "Rejected"
+        "rejected": "Rejected",
+        "pending": "Waiting for you",
+        "waiting": "Waiting for confirmation",
+        "timeout": "Time limit exceeded"
+      },
+      "request": {
+        "takingPhoto": "Taking photo...",
+        "takePhoto": "Take photo of the item",
+        "requestConfirmation": "Request confirmation from host",
+        "waitingForHost": "Waiting for host confirmation...",
+        "propConfirmed": "Item confirmed!",
+        "confirmedBy": "By: {name}",
+        "notApproved": "Not approved",
+        "tryAgain": "Try again"
+      },
+      "control": {
+        "noPendingForProp": "No pending confirmations for this item",
+        "requestFrom": "Request from: {name}",
+        "photoEvidence": "Photo evidence:",
+        "expectedProp": "Expected item:",
+        "notesLabel": "Note (optional):",
+        "notesPlaceholder": "Add comment...",
+        "approve": "Approve",
+        "reject": "Reject"
+      }
+    },
+    "locationCheck": {
+      "errors": {
+        "notSupported": "Geolocation is not supported in this browser",
+        "accessDenied": "Location access denied",
+        "notAvailable": "Location not available",
+        "timeout": "Location request timed out"
+      },
+      "verified": {
+        "title": "Location verified!",
+        "description": "You have arrived at {location}"
+      },
+      "gps": {
+        "distanceToTarget": "Distance to target",
+        "startTracking": "Start location tracking",
+        "searching": "Searching for your location..."
+      },
+      "beacon": {
+        "searchFor": "Search for beacon:",
+        "getCloser": "Move closer to the location to detect the beacon signal"
+      },
+      "qr": {
+        "scanCode": "Scan the QR code at the location",
+        "openScanner": "Open QR scanner"
+      },
+      "manual": {
+        "hostWillVerify": "The host will verify your location"
+      }
+    },
+    "hintPanel": {
+      "noMoreHints": "No more hints available",
+      "title": "Hints",
+      "hintsUsed": "{used}/{total} used",
+      "costTime": "Costs {seconds} seconds",
+      "costPoints": "Costs {points} points",
+      "waitSeconds": "Wait {seconds}s",
+      "requestHint": "Request hint",
+      "penaltyTime": "-{seconds}s time",
+      "penaltyPoints": "-{points} points",
+      "control": {
+        "send": "Send",
+        "customHintLabel": "Custom hint",
+        "customHintPlaceholder": "Write a custom hint...",
+        "totalDeductions": "Total deductions:",
+        "timeDeduction": "{seconds}s time",
+        "pointsDeduction": "{points} points"
+      }
+    },
+    "sessionControls": {
+      "pause": "Pause",
+      "resume": "Resume",
+      "end": "End",
+      "reset": "Reset",
+      "lock": "Lock",
+      "unlock": "Unlock",
+      "delete": "Delete",
+      "shareCode": "Share code",
+      "addParticipant": "Add participant",
+      "pauseSession": "Pause session",
+      "resumeSession": "Resume session",
+      "lockSession": "Lock session",
+      "unlockSession": "Unlock session",
+      "endSession": "End session",
+      "resetSession": "Reset session",
+      "deletePermanently": "Delete permanently"
+    },
+    "cipherDecoder": {
+      "encodedMessage": "Encoded message ({type})",
+      "hideHelper": "Hide decoder helper",
+      "showHelper": "Show decoder helper",
+      "shiftLabel": "Shift:",
+      "preview": "Preview:",
+      "inputLabel": "Enter the decoded message:",
+      "inputPlaceholder": "Type your solution...",
+      "check": "Check",
+      "clear": "Clear",
+      "wrongAnswer": "Not correct, try again! (Attempt {attempt})",
+      "correctTitle": "Correctly decoded!",
+      "solution": "Solution: {solution}",
+      "attempts": "Attempts: {count}",
+      "caesarWheel": {
+        "original": "Original",
+        "encoded": "Encoded"
       }
     },
     "activeSessionShell": {

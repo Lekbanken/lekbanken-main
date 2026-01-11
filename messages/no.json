@@ -2353,7 +2353,114 @@
       "handledRequests": "Håndterte forespørsler ({count})",
       "status": {
         "confirmed": "Godkjent",
-        "rejected": "Avslått"
+        "rejected": "Avslått",
+        "pending": "Venter på deg",
+        "waiting": "Venter på bekreftelse",
+        "timeout": "Tidsfrist utløpt"
+      },
+      "request": {
+        "takingPhoto": "Tar bilde...",
+        "takePhoto": "Ta bilde av gjenstanden",
+        "requestConfirmation": "Be om bekreftelse fra spilleder",
+        "waitingForHost": "Venter på spillederens bekreftelse...",
+        "propConfirmed": "Gjenstand bekreftet!",
+        "confirmedBy": "Av: {name}",
+        "notApproved": "Ikke godkjent",
+        "tryAgain": "Prøv igjen"
+      },
+      "control": {
+        "noPendingForProp": "Ingen ventende bekreftelser for denne gjenstanden",
+        "requestFrom": "Forespørsel fra: {name}",
+        "photoEvidence": "Fotobevis:",
+        "expectedProp": "Forventet gjenstand:",
+        "notesLabel": "Merknad (valgfritt):",
+        "notesPlaceholder": "Legg til kommentar...",
+        "approve": "Godkjenn",
+        "reject": "Avvis"
+      }
+    },
+    "locationCheck": {
+      "errors": {
+        "notSupported": "Geolokalisering støttes ikke i denne nettleseren",
+        "accessDenied": "Tilgang til posisjon nektet",
+        "notAvailable": "Posisjon ikke tilgjengelig",
+        "timeout": "Tidsavbrudd for posisjonsforespørsel"
+      },
+      "verified": {
+        "title": "Posisjon bekreftet!",
+        "description": "Du har ankommet til {location}"
+      },
+      "gps": {
+        "distanceToTarget": "Avstand til målet",
+        "startTracking": "Start posisjonssporing",
+        "searching": "Søker etter din posisjon..."
+      },
+      "beacon": {
+        "searchFor": "Søk etter beacon:",
+        "getCloser": "Gå nærmere stedet for å oppdage beacon-signalet"
+      },
+      "qr": {
+        "scanCode": "Skann QR-koden på stedet",
+        "openScanner": "Åpne QR-skanner"
+      },
+      "manual": {
+        "hostWillVerify": "Spillederen vil bekrefte din posisjon"
+      }
+    },
+    "hintPanel": {
+      "noMoreHints": "Ingen flere hint tilgjengelige",
+      "title": "Hint",
+      "hintsUsed": "{used}/{total} brukt",
+      "costTime": "Koster {seconds} sekunder",
+      "costPoints": "Koster {points} poeng",
+      "waitSeconds": "Vent {seconds}s",
+      "requestHint": "Be om hint",
+      "penaltyTime": "-{seconds}s tid",
+      "penaltyPoints": "-{points} poeng",
+      "control": {
+        "send": "Send",
+        "customHintLabel": "Egendefinert hint",
+        "customHintPlaceholder": "Skriv et egendefinert hint...",
+        "totalDeductions": "Totale fradrag:",
+        "timeDeduction": "{seconds}s tid",
+        "pointsDeduction": "{points} poeng"
+      }
+    },
+    "sessionControls": {
+      "pause": "Pause",
+      "resume": "Fortsett",
+      "end": "Avslutt",
+      "reset": "Tilbakestill",
+      "lock": "Lås",
+      "unlock": "Lås opp",
+      "delete": "Slett",
+      "shareCode": "Del kode",
+      "addParticipant": "Legg til deltaker",
+      "pauseSession": "Pause sesjon",
+      "resumeSession": "Fortsett sesjon",
+      "lockSession": "Lås sesjon",
+      "unlockSession": "Lås opp sesjon",
+      "endSession": "Avslutt sesjon",
+      "resetSession": "Tilbakestill sesjon",
+      "deletePermanently": "Slett permanent"
+    },
+    "cipherDecoder": {
+      "encodedMessage": "Kodet melding ({type})",
+      "hideHelper": "Skjul dekoderhjelp",
+      "showHelper": "Vis dekoderhjelp",
+      "shiftLabel": "Forskyvning:",
+      "preview": "Forhåndsvisning:",
+      "inputLabel": "Skriv inn den dekodede meldingen:",
+      "inputPlaceholder": "Skriv din løsning...",
+      "check": "Sjekk",
+      "clear": "Tøm",
+      "wrongAnswer": "Ikke riktig, prøv igjen! (Forsøk {attempt})",
+      "correctTitle": "Riktig dekodet!",
+      "solution": "Løsning: {solution}",
+      "attempts": "Forsøk: {count}",
+      "caesarWheel": {
+        "original": "Original",
+        "encoded": "Kodet"
       }
     },
     "activeSessionShell": {

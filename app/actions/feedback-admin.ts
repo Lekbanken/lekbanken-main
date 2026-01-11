@@ -1,7 +1,7 @@
 'use server';
 
-import { createServiceClient } from '@/lib/supabase/service';
-import { isSystemAdmin, isTenantAdmin } from '@/lib/auth/role-utils';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isSystemAdmin } from '@/lib/utils/tenantAuth';
 import { revalidatePath } from 'next/cache';
 
 // --------------------------------------------------
@@ -41,18 +41,49 @@ export interface FeedbackFilter {
 // --------------------------------------------------
 // Auth helpers
 // --------------------------------------------------
+async function getCurrentAdminUser() {
+  const supabase = await createServerRlsClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    return { user: null, isSystem: false, error: 'Inte autentiserad' };
+  }
+  
+  const isSystem = isSystemAdmin(user);
+  return { user, isSystem, error: null };
+}
+
+async function getUserAdminTenantIds(userId: string): Promise<string[]> {
+  const supabase = await createServerRlsClient();
+  const { data } = await supabase
+    .from('user_tenant_memberships')
+    .select('tenant_id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .in('role', ['owner', 'admin', 'editor']);
+  
+  return (data || []).map(m => m.tenant_id).filter((id): id is string => !!id);
+}
+
 async function requireFeedbackAccess(): Promise<{
-  supabase: ReturnType<typeof createServiceClient>;
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>;
   tenantScope: string | null;
+  userId: string;
 }> {
-  const sysAdmin = await isSystemAdmin();
-  if (sysAdmin) {
-    return { supabase: createServiceClient(), tenantScope: null };
+  const { user, isSystem, error } = await getCurrentAdminUser();
+  if (!user || error) {
+    throw new Error('Unauthorized');
   }
-  const tenantCheck = await isTenantAdmin();
-  if (tenantCheck.isAdmin && tenantCheck.tenantId) {
-    return { supabase: createServiceClient(), tenantScope: tenantCheck.tenantId };
+  
+  if (isSystem) {
+    return { supabase: await createServiceRoleClient(), tenantScope: null, userId: user.id };
   }
+  
+  const tenantIds = await getUserAdminTenantIds(user.id);
+  if (tenantIds.length > 0) {
+    return { supabase: await createServiceRoleClient(), tenantScope: tenantIds[0], userId: user.id };
+  }
+  
   throw new Error('Unauthorized');
 }
 
@@ -90,7 +121,7 @@ export async function listFeedback(
 
     // Type filter
     if (type && type !== 'all') {
-      query = query.eq('type', type);
+      query = query.eq('type', type as 'bug' | 'feature_request' | 'improvement' | 'other');
     }
 
     // Status filter
@@ -248,12 +279,12 @@ export async function deleteFeedback(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const sysAdmin = await isSystemAdmin();
-    if (!sysAdmin) {
+    const { isSystem } = await getCurrentAdminUser();
+    if (!isSystem) {
       return { success: false, error: 'Only system admins can delete feedback' };
     }
 
-    const supabase = createServiceClient();
+    const supabase = await createServiceRoleClient();
 
     const { error } = await supabase
       .from('feedback')
@@ -282,10 +313,9 @@ export async function getFeedbackStats(
   success: boolean;
   data?: {
     total: number;
-    suggestions: number;
-    compliments: number;
-    complaints: number;
-    questions: number;
+    feature_request: number;
+    bug: number;
+    improvement: number;
     other: number;
     averageRating: number | null;
   };
@@ -311,14 +341,13 @@ export async function getFeedbackStats(
     }
 
     const ratings = (data ?? []).filter((r) => r.rating != null).map((r) => r.rating as number);
-    const avgRating = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null;
+    const avgRating = ratings.length > 0 ? ratings.reduce((a: number, b: number) => a + b, 0) / ratings.length : null;
 
     const stats = {
       total: data?.length ?? 0,
-      suggestions: data?.filter((r) => r.type === 'suggestion').length ?? 0,
-      compliments: data?.filter((r) => r.type === 'compliment').length ?? 0,
-      complaints: data?.filter((r) => r.type === 'complaint').length ?? 0,
-      questions: data?.filter((r) => r.type === 'question').length ?? 0,
+      feature_request: data?.filter((r) => r.type === 'feature_request').length ?? 0,
+      bug: data?.filter((r) => r.type === 'bug').length ?? 0,
+      improvement: data?.filter((r) => r.type === 'improvement').length ?? 0,
       other: data?.filter((r) => r.type === 'other').length ?? 0,
       averageRating: avgRating,
     };

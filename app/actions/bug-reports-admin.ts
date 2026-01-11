@@ -1,8 +1,7 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
-import { createServiceClient } from '@/lib/supabase/service';
-import { isSystemAdmin, isTenantAdmin } from '@/lib/auth/role-utils';
+import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
+import { isSystemAdmin } from '@/lib/utils/tenantAuth';
 import { revalidatePath } from 'next/cache';
 
 // --------------------------------------------------
@@ -44,18 +43,49 @@ export interface BugReportsFilter {
 // --------------------------------------------------
 // Auth helpers
 // --------------------------------------------------
+async function getCurrentAdminUser() {
+  const supabase = await createServerRlsClient();
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error || !user) {
+    return { user: null, isSystem: false, error: 'Inte autentiserad' };
+  }
+  
+  const isSystem = isSystemAdmin(user);
+  return { user, isSystem, error: null };
+}
+
+async function getUserAdminTenantIds(userId: string): Promise<string[]> {
+  const supabase = await createServerRlsClient();
+  const { data } = await supabase
+    .from('user_tenant_memberships')
+    .select('tenant_id')
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .in('role', ['owner', 'admin', 'editor']);
+  
+  return (data || []).map(m => m.tenant_id).filter((id): id is string => !!id);
+}
+
 async function requireBugReportsAccess(): Promise<{
-  supabase: ReturnType<typeof createServiceClient>;
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>;
   tenantScope: string | null;
+  userId: string;
 }> {
-  const sysAdmin = await isSystemAdmin();
-  if (sysAdmin) {
-    return { supabase: createServiceClient(), tenantScope: null };
+  const { user, isSystem, error } = await getCurrentAdminUser();
+  if (!user || error) {
+    throw new Error('Unauthorized');
   }
-  const tenantCheck = await isTenantAdmin();
-  if (tenantCheck.isAdmin && tenantCheck.tenantId) {
-    return { supabase: createServiceClient(), tenantScope: tenantCheck.tenantId };
+  
+  if (isSystem) {
+    return { supabase: await createServiceRoleClient(), tenantScope: null, userId: user.id };
   }
+  
+  const tenantIds = await getUserAdminTenantIds(user.id);
+  if (tenantIds.length > 0) {
+    return { supabase: await createServiceRoleClient(), tenantScope: tenantIds[0], userId: user.id };
+  }
+  
   throw new Error('Unauthorized');
 }
 
@@ -296,12 +326,12 @@ export async function deleteBugReport(
   id: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    const sysAdmin = await isSystemAdmin();
-    if (!sysAdmin) {
+    const { isSystem } = await getCurrentAdminUser();
+    if (!isSystem) {
       return { success: false, error: 'Only system admins can delete bug reports' };
     }
 
-    const supabase = createServiceClient();
+    const supabase = await createServiceRoleClient();
 
     const { error } = await supabase
       .from('bug_reports')

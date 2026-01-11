@@ -6,8 +6,8 @@ import {
   listFeedback,
   getFeedbackStats,
   updateFeedbackStatus,
-  FeedbackWithUser,
 } from '@/app/actions/feedback-admin';
+import type { FeedbackWithUser } from '@/app/actions/feedback-admin';
 import { listTenantsForSupportHub, checkSupportHubAccess } from '@/app/actions/support-hub';
 
 export default function FeedbackAdminPage() {
@@ -42,7 +42,7 @@ export default function FeedbackAdminPage() {
     try {
       // Check access
       const accessRes = await checkSupportHubAccess();
-      if (!accessRes.success || !accessRes.hasAccess) {
+      if (!accessRes.hasAccess) {
         router.push('/admin');
         return;
       }

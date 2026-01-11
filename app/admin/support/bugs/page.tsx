@@ -7,8 +7,8 @@ import {
   getBugReportStats,
   updateBugReportStatus,
   resolveBugReport,
-  BugReportWithUser,
 } from '@/app/actions/bug-reports-admin';
+import type { BugReportWithUser } from '@/app/actions/bug-reports-admin';
 import { listTenantsForSupportHub } from '@/app/actions/support-hub';
 import { checkSupportHubAccess } from '@/app/actions/support-hub';
 
@@ -40,7 +40,7 @@ export default function BugReportsAdminPage() {
     try {
       // Check access
       const accessRes = await checkSupportHubAccess();
-      if (!accessRes.success || !accessRes.hasAccess) {
+      if (!accessRes.hasAccess) {
         router.push('/admin');
         return;
       }

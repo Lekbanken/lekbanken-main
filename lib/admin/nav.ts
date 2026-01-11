@@ -119,13 +119,25 @@ const systemAdminCategories: AdminNavCategory[] = [
     ],
   },
   {
+    id: 'support',
+    label: 'Support',
+    icon: 'tickets',
+    items: [
+      { id: 'support-hub', label: 'Översikt', href: '/admin/support', icon: 'tickets' },
+      { id: 'tickets', label: 'Ärenden', href: '/admin/tickets', icon: 'tickets', permission: 'admin.tickets.view' },
+      { id: 'kb', label: 'Kunskapsbas', href: '/admin/support/kb', icon: 'learning' },
+      { id: 'automation', label: 'Automation', href: '/admin/support/automation', icon: 'settings', systemAdminOnly: true },
+      { id: 'bugs', label: 'Buggrapporter', href: '/admin/support/bugs', icon: 'incident' },
+      { id: 'feedback', label: 'Feedback', href: '/admin/support/feedback', icon: 'notifications' },
+    ],
+  },
+  {
     id: 'operations',
     label: 'Drift',
     icon: 'sessions',
     items: [
       { id: 'sessions', label: 'Sessioner', href: '/admin/sessions', icon: 'sessions', permission: 'admin.sessions.list' },
       { id: 'moderation', label: 'Moderering', href: '/admin/moderation', icon: 'moderation', permission: 'admin.moderation.view' },
-      { id: 'tickets', label: 'Ärenden', href: '/admin/tickets', icon: 'tickets', permission: 'admin.tickets.view' },
       { id: 'incidents', label: 'Incidenter', href: '/admin/incidents', icon: 'incident', permission: 'admin.system.view' },
     ],
   },

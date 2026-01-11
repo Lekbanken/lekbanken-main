@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { Button, Card, CardContent, Badge } from '@/components/ui'
 import {
   BellIcon,
@@ -13,78 +14,27 @@ import {
   StarIcon,
   MegaphoneIcon,
   CheckCircleIcon,
+  TicketIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
 import { BellIcon as BellSolidIcon } from '@heroicons/react/24/solid'
+import {
+  getUserNotifications,
+  markNotificationAsRead,
+  markAllNotificationsAsRead,
+  deleteNotification,
+  type UserNotification,
+} from '@/app/actions/notifications-user'
 
-// Types
-interface Notification {
-  id: string
-  title: string
-  message: string
-  type: 'achievement' | 'event' | 'social' | 'reward' | 'system' | 'announcement'
-  isRead: boolean
-  createdAt: string
-  actionUrl?: string
-}
-
-// Mock data
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    title: 'Nytt märke låst upp! 🎉',
-    message: 'Grattis! Du har låst upp märket "Första steget" genom att genomföra din första aktivitet.',
-    type: 'achievement',
-    isRead: false,
-    createdAt: '2025-01-27T10:30:00Z',
-  },
-  {
-    id: '2',
-    title: 'Nytt event har startat',
-    message: 'Vinteräventyret har börjat! Delta nu för att vinna exklusiva belöningar.',
-    type: 'event',
-    isRead: false,
-    createdAt: '2025-01-27T09:00:00Z',
-    actionUrl: '/app/events',
-  },
-  {
-    id: '3',
-    title: 'Anna har gått med i ditt team',
-    message: 'Du har en ny teammedlem! Välkomna Anna till gruppen.',
-    type: 'social',
-    isRead: true,
-    createdAt: '2025-01-26T15:45:00Z',
-  },
-  {
-    id: '4',
-    title: 'Daglig belöning klar att hämta',
-    message: 'Din dagliga belöning väntar! Logga in varje dag för att få ännu bättre belöningar.',
-    type: 'reward',
-    isRead: true,
-    createdAt: '2025-01-26T08:00:00Z',
-    actionUrl: '/app/shop',
-  },
-  {
-    id: '5',
-    title: 'Systemuppdatering',
-    message: 'Vi har uppdaterat plattformen med nya funktioner och förbättringar.',
-    type: 'system',
-    isRead: true,
-    createdAt: '2025-01-25T12:00:00Z',
-  },
-  {
-    id: '6',
-    title: 'Ny utmaning tillgänglig',
-    message: 'Veckans utmaning är här! Genomför 10 nya lekar för att vinna 200 XP.',
-    type: 'announcement',
-    isRead: false,
-    createdAt: '2025-01-27T07:00:00Z',
-    actionUrl: '/app/challenges',
-  },
-]
-
-function getTypeIcon(type: string) {
+function getTypeIcon(type: string, category: string | null) {
+  // Support-related notifications
+  if (category === 'support') {
+    return <TicketIcon className="h-5 w-5" />
+  }
+  
   switch (type) {
     case 'achievement':
+    case 'success':
       return <TrophyIcon className="h-5 w-5" />
     case 'event':
       return <CalendarDaysIcon className="h-5 w-5" />
@@ -96,25 +46,37 @@ function getTypeIcon(type: string) {
       return <StarIcon className="h-5 w-5" />
     case 'announcement':
       return <MegaphoneIcon className="h-5 w-5" />
+    case 'warning':
+    case 'error':
+      return <ExclamationTriangleIcon className="h-5 w-5" />
     default:
       return <BellIcon className="h-5 w-5" />
   }
 }
 
-function getTypeColor(type: string) {
+function getTypeColor(type: string, category: string | null) {
+  if (category === 'support') {
+    return 'bg-blue-100 text-blue-600'
+  }
+  
   switch (type) {
     case 'achievement':
-      return 'bg-yellow-100 text-yellow-600'
+    case 'success':
+      return 'bg-green-100 text-green-600'
     case 'event':
       return 'bg-purple-100 text-purple-600'
     case 'social':
       return 'bg-blue-100 text-blue-600'
     case 'reward':
-      return 'bg-green-100 text-green-600'
+      return 'bg-yellow-100 text-yellow-600'
     case 'system':
       return 'bg-muted text-muted-foreground'
     case 'announcement':
       return 'bg-primary/10 text-primary'
+    case 'warning':
+      return 'bg-yellow-100 text-yellow-600'
+    case 'error':
+      return 'bg-red-100 text-red-600'
     default:
       return 'bg-muted text-muted-foreground'
   }
@@ -135,76 +97,137 @@ function formatTimeAgo(dateString: string) {
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications)
+  const [notifications, setNotifications] = useState<UserNotification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | 'unread' | 'read'>('all')
+  const [isMarkingAll, setIsMarkingAll] = useState(false)
+
+  useEffect(() => {
+    loadNotifications()
+  }, [])
+
+  async function loadNotifications() {
+    setLoading(true)
+    setError(null)
+    
+    const result = await getUserNotifications({ limit: 100 })
+    
+    if (result.success && result.data) {
+      setNotifications(result.data)
+    } else {
+      setError(result.error || 'Kunde inte hämta notifikationer')
+    }
+    
+    setLoading(false)
+  }
 
   const filteredNotifications = notifications.filter((n) => {
-    if (filter === 'unread') return !n.isRead
-    if (filter === 'read') return n.isRead
+    if (filter === 'unread') return !n.is_read
+    if (filter === 'read') return n.is_read
     return true
   })
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length
+  const unreadCount = notifications.filter((n) => !n.is_read).length
 
-  const markAsRead = (id: string) => {
-    setNotifications(
-      notifications.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+  async function handleMarkAsRead(id: string) {
+    // Optimistic update
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true, read_at: new Date().toISOString() } : n))
+    )
+    
+    const result = await markNotificationAsRead(id)
+    if (!result.success) {
+      // Revert on error
+      loadNotifications()
+    }
+  }
+
+  async function handleMarkAllAsRead() {
+    setIsMarkingAll(true)
+    
+    const result = await markAllNotificationsAsRead()
+    
+    if (result.success) {
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, is_read: true, read_at: new Date().toISOString() }))
+      )
+    }
+    
+    setIsMarkingAll(false)
+  }
+
+  async function handleDelete(id: string) {
+    // Optimistic update
+    setNotifications((prev) => prev.filter((n) => n.id !== id))
+    
+    const result = await deleteNotification(id)
+    if (!result.success) {
+      // Revert on error
+      loadNotifications()
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
+          <p className="text-muted-foreground mt-1">Dina meddelanden och uppdateringar</p>
+        </div>
+        <div className="flex items-center justify-center py-16">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+        </div>
+      </div>
     )
   }
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, isRead: true })))
-  }
-
-  const deleteNotification = (id: string) => {
-    setNotifications(notifications.filter((n) => n.id !== id))
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
+          <p className="text-muted-foreground mt-1">Dina meddelanden och uppdateringar</p>
+        </div>
+        <Card className="border-red-500/30">
+          <CardContent className="p-8 text-center">
+            <ExclamationTriangleIcon className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={loadNotifications}>Försök igen</Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Notiser</h1>
+          <h1 className="text-2xl font-bold text-foreground">Notifikationer</h1>
           <p className="text-muted-foreground mt-1">
-            {unreadCount > 0
-              ? `Du har ${unreadCount} olästa notiser`
-              : 'Du är uppdaterad!'}
+            {unreadCount > 0 ? `${unreadCount} olästa` : 'Alla lästa'}
           </p>
         </div>
         {unreadCount > 0 && (
-          <Button variant="outline" size="sm" onClick={markAllAsRead}>
-            <CheckCircleIcon className="h-4 w-4 mr-1" />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleMarkAllAsRead}
+            disabled={isMarkingAll}
+          >
+            {isMarkingAll ? (
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent mr-2" />
+            ) : (
+              <CheckCircleIcon className="h-4 w-4 mr-1" />
+            )}
             Markera alla som lästa
           </Button>
         )}
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{notifications.length}</div>
-            <div className="text-sm text-muted-foreground">Totalt</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-accent">{unreadCount}</div>
-            <div className="text-sm text-muted-foreground">Olästa</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-500">
-              {notifications.length - unreadCount}
-            </div>
-            <div className="text-sm text-muted-foreground">Lästa</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Filter Tabs */}
+      {/* Filters */}
       <div className="flex gap-2">
         <Button
           variant={filter === 'all' ? 'default' : 'outline'}
@@ -218,7 +241,6 @@ export default function NotificationsPage() {
           size="sm"
           onClick={() => setFilter('unread')}
         >
-          <BellSolidIcon className="h-4 w-4 mr-1" />
           Olästa ({unreadCount})
         </Button>
         <Button
@@ -231,90 +253,89 @@ export default function NotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <div className="space-y-3">
-        {filteredNotifications.map((notification) => (
-          <Card
-            key={notification.id}
-            className={`overflow-hidden transition-all ${
-              !notification.isRead ? 'border-l-4 border-l-primary bg-primary/5' : ''
-            }`}
-          >
-            <CardContent className="p-4">
-              <div className="flex gap-4">
-                {/* Type Icon */}
-                <div
-                  className={`h-10 w-10 rounded-full flex items-center justify-center flex-shrink-0 ${getTypeColor(
-                    notification.type
-                  )}`}
-                >
-                  {getTypeIcon(notification.type)}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="font-semibold text-foreground">{notification.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
-                    </div>
-                    {!notification.isRead && (
-                      <Badge variant="primary" size="sm">
-                        Ny
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between mt-3">
-                    <span className="text-xs text-muted-foreground">
-                      {formatTimeAgo(notification.createdAt)}
-                    </span>
-                    <div className="flex gap-2">
-                      {!notification.isRead && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => markAsRead(notification.id)}
-                        >
-                          <CheckIcon className="h-4 w-4" />
-                        </Button>
-                      )}
-                      {notification.actionUrl && (
-                        <Button size="sm" variant="outline">
-                          Visa
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => deleteNotification(notification.id)}
-                      >
-                        <TrashIcon className="h-4 w-4 text-muted-foreground hover:text-red-500" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Empty State */}
-      {filteredNotifications.length === 0 && (
+      {filteredNotifications.length === 0 ? (
         <Card>
-          <CardContent className="p-8 text-center">
-            <BellIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="font-semibold text-foreground mb-2">Inga notiser</h3>
+          <CardContent className="p-12 text-center">
+            <div className="h-16 w-16 rounded-full bg-muted flex items-center justify-center mx-auto mb-4">
+              <BellIcon className="h-8 w-8 text-muted-foreground" />
+            </div>
+            <h3 className="font-semibold text-foreground mb-2">
+              {filter === 'unread' ? 'Inga olästa notifikationer' : 'Inga notifikationer'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {filter === 'unread'
-                ? 'Du har inga olästa notiser.'
-                : filter === 'read'
-                ? 'Du har inga lästa notiser.'
-                : 'Du har inga notiser att visa.'}
+                ? 'Du har läst alla dina notifikationer.'
+                : 'Du har inga notifikationer ännu.'}
             </p>
           </CardContent>
         </Card>
+      ) : (
+        <div className="space-y-3">
+          {filteredNotifications.map((notification) => (
+            <Card
+              key={notification.id}
+              className={`transition-colors ${
+                !notification.is_read ? 'border-primary/30 bg-primary/5' : ''
+              }`}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`h-10 w-10 rounded-full flex items-center justify-center ${getTypeColor(
+                      notification.type,
+                      notification.category
+                    )}`}
+                  >
+                    {getTypeIcon(notification.type, notification.category)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h3 className="font-semibold text-foreground">{notification.title}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">{notification.message}</p>
+                      </div>
+                      {!notification.is_read && (
+                        <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between mt-3">
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimeAgo(notification.created_at)}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {notification.action_url && (
+                          <Link href={notification.action_url}>
+                            <Button variant="ghost" size="sm">
+                              {notification.action_label || 'Visa'}
+                            </Button>
+                          </Link>
+                        )}
+                        {!notification.is_read && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleMarkAsRead(notification.id)}
+                            title="Markera som läst"
+                          >
+                            <CheckIcon className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(notification.id)}
+                          title="Ta bort"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   )

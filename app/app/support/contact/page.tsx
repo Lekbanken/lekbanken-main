@@ -2,39 +2,63 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button, Card, CardContent, Input, Textarea, Select } from '@/components/ui';
 import {
   ArrowLeftIcon,
   EnvelopeIcon,
   CheckCircleIcon,
   ChatBubbleLeftRightIcon,
+  ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline';
+import { createUserTicket } from '@/app/actions/tickets-user';
 
 const CONTACT_REASONS = [
   { value: 'general', label: 'Allmän fråga' },
   { value: 'technical', label: 'Tekniskt problem' },
   { value: 'billing', label: 'Fakturering' },
   { value: 'feedback', label: 'Feedback' },
+  { value: 'bug', label: 'Buggrapport' },
   { value: 'other', label: 'Övrigt' },
 ];
 
+const PRIORITY_OPTIONS = [
+  { value: 'low', label: 'Låg' },
+  { value: 'medium', label: 'Medium' },
+  { value: 'high', label: 'Hög' },
+];
+
 export default function ContactSupportPage() {
+  const router = useRouter();
   const [reason, setReason] = useState('general');
-  const [email, setEmail] = useState('');
+  const [priority, setPriority] = useState('medium');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
-    // Simulate submit
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const result = await createUserTicket({
+      title: subject,
+      description: message,
+      category: reason,
+      priority: priority as 'low' | 'medium' | 'high',
+    });
     
     setIsSubmitting(false);
-    setSubmitted(true);
+    
+    if (result.success && result.data) {
+      setTicketId(result.data.id);
+      setSubmitted(true);
+    } else {
+      setError(result.error || 'Något gick fel. Försök igen.');
+    }
   };
 
   if (submitted) {
@@ -52,7 +76,7 @@ export default function ContactSupportPage() {
               Support
             </p>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Kontakta oss
+              Ärende skapat
             </h1>
           </div>
         </header>
@@ -69,9 +93,16 @@ export default function ContactSupportPage() {
               Vi har mottagit ditt ärende och återkommer så snart vi kan,
               vanligtvis inom 24 timmar.
             </p>
-            <Link href="/app/support">
-              <Button>Tillbaka till support</Button>
-            </Link>
+            <div className="flex gap-3 justify-center">
+              {ticketId && (
+                <Link href={`/app/support/tickets/${ticketId}`}>
+                  <Button variant="outline">Visa ärende</Button>
+                </Link>
+              )}
+              <Link href="/app/support">
+                <Button>Tillbaka till support</Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -136,18 +167,16 @@ export default function ContactSupportPage() {
 
             <div>
               <label
-                htmlFor="email"
+                htmlFor="priority"
                 className="block text-sm font-medium text-foreground mb-2"
               >
-                Din e-postadress
+                Prioritet
               </label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="din@email.se"
-                required
+              <Select
+                id="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                options={PRIORITY_OPTIONS}
               />
             </div>
 
@@ -184,12 +213,19 @@ export default function ContactSupportPage() {
                 required
               />
             </div>
+
+            {error && (
+              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/30 flex items-start gap-3">
+                <ExclamationTriangleIcon className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <Button
           type="submit"
-          disabled={isSubmitting || !email || !subject || !message}
+          disabled={isSubmitting || !subject || !message}
           className="w-full"
           size="lg"
         >
@@ -201,7 +237,7 @@ export default function ContactSupportPage() {
           ) : (
             <>
               <EnvelopeIcon className="h-5 w-5 mr-2" />
-              Skicka meddelande
+              Skicka ärende
             </>
           )}
         </Button>

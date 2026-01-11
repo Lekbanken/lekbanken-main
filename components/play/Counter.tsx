@@ -1,6 +1,7 @@
 'use client';
 
 import { type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { CheckCircleIcon, PlusIcon, MinusIcon } from '@heroicons/react/24/solid';
 import type { CounterState } from '@/types/puzzle-modules';
@@ -139,6 +140,7 @@ export function InteractiveCounter({
   className,
   ...props
 }: InteractiveCounterProps) {
+  const t = useTranslations('play.counter');
   const sizeStyles = {
     sm: { button: 'h-8 w-8', icon: 'h-4 w-4' },
     md: { button: 'h-10 w-10', icon: 'h-5 w-5' },
@@ -163,7 +165,7 @@ export function InteractiveCounter({
             'disabled:opacity-50 disabled:cursor-not-allowed',
             styles.button
           )}
-          aria-label="Minska"
+          aria-label={t('decrease')}
         >
           <MinusIcon className={styles.icon} />
         </button>
@@ -189,7 +191,7 @@ export function InteractiveCounter({
           'disabled:opacity-50 disabled:cursor-not-allowed',
           styles.button
         )}
-        aria-label="Öka"
+        aria-label={t('increase')}
       >
         <PlusIcon className={styles.icon} />
       </button>

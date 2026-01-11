@@ -155,7 +155,7 @@ export function RiddleInput({
     return (
       <div className={cn('flex flex-col items-center gap-4 p-6', className)}>
         <CheckCircleIcon className="h-12 w-12 text-green-500" />
-        <p className="text-lg font-medium text-green-500">Rätt svar!</p>
+        <p className="text-lg font-medium text-green-500">{t('correctAnswer')}</p>
         {state.correctAnswer && (
           <p className="text-sm text-muted-foreground">
             {state.correctAnswer}
@@ -186,7 +186,7 @@ export function RiddleInput({
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={config.placeholderText ?? 'Skriv ditt svar...'}
+            placeholder={config.placeholderText ?? t('placeholder')}
             disabled={disabled}
             className={cn(styles.input, 'flex-1')}
             autoComplete="off"
@@ -199,7 +199,7 @@ export function RiddleInput({
             disabled={disabled || !inputValue.trim()}
             className={styles.button}
           >
-            Svara
+            {t('submit')}
           </Button>
         </div>
       </div>
@@ -208,7 +208,7 @@ export function RiddleInput({
       {config.maxAttempts !== undefined && (
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span>
-            Försök: {state.attemptsUsed}/{config.maxAttempts}
+            {t('attempts', { used: state.attemptsUsed, max: config.maxAttempts })}
           </span>
           {state.attemptsUsed > 0 && !state.isCorrect && (
             <XCircleIcon className="h-4 w-4 text-destructive" />

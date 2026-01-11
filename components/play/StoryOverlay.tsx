@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useEffect, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useTypewriter, type TypewriterSpeed } from './hooks/useTypewriter';
 import { Button } from '@/components/ui/button';
@@ -65,6 +66,7 @@ export const StoryOverlay = forwardRef<HTMLDivElement, StoryOverlayProps>(
     },
     ref
   ) => {
+    const t = useTranslations('play.storyOverlay');
     const [isVisible, setIsVisible] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
 
@@ -237,7 +239,7 @@ export const StoryOverlay = forwardRef<HTMLDivElement, StoryOverlayProps>(
               className={cn('gap-2', styles.button)}
             >
               <ForwardIcon className="h-4 w-4" />
-              Hoppa över
+              {t('skip')}
             </Button>
           )}
           
@@ -248,7 +250,7 @@ export const StoryOverlay = forwardRef<HTMLDivElement, StoryOverlayProps>(
               onClick={handleClose}
               className={cn('gap-2', styles.button)}
             >
-              Fortsätt
+              {t('continue')}
             </Button>
           )}
         </div>

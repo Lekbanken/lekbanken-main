@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Database } from '@/types/supabase';
 import { cn } from '@/lib/utils';
 import { ParticipantRow } from './ParticipantRow';
@@ -44,6 +45,7 @@ export function ParticipantList({
   className = '',
 }: ParticipantListProps) {
   const [isExpanded, setIsExpanded] = useState(!collapsible);
+  const t = useTranslations('play.participantList');
 
   // Sort: current user first, then by status (active > idle > disconnected > kicked/blocked)
   const sortedParticipants = useMemo(() => {
@@ -86,7 +88,7 @@ export function ParticipantList({
       {/* Header with stats */}
       <div className="flex items-center justify-between px-1">
         <h3 className="text-sm font-semibold text-foreground">
-          Deltagare ({participants.length})
+          {t('title', { count: participants.length })}
         </h3>
         <div className="flex items-center gap-3 text-xs text-muted-foreground">
           <span className="flex items-center gap-1">
@@ -112,7 +114,7 @@ export function ParticipantList({
       <div className="divide-y divide-border/50 rounded-lg border border-border/60 bg-card">
         {visibleParticipants.length === 0 ? (
           <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-            Inga deltagare ännu
+            {t('noParticipants')}
           </p>
         ) : (
           visibleParticipants.map((participant) => (
@@ -142,12 +144,12 @@ export function ParticipantList({
             {isExpanded ? (
               <>
                 <ChevronUpIcon className="h-4 w-4" />
-                Visa färre
+                {t('showLess')}
               </>
             ) : (
               <>
                 <ChevronDownIcon className="h-4 w-4" />
-                +{hiddenCount} till
+                {t('showMore', { count: hiddenCount })}
               </>
             )}
           </button>

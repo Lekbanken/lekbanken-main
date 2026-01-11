@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,34 +35,6 @@ type SessionCardProps = {
   className?: string;
 };
 
-function formatRelativeTime(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return 'Just nu';
-  if (diffMins < 60) return `${diffMins} min sedan`;
-  if (diffHours < 24) return `${diffHours} tim sedan`;
-  if (diffDays < 7) return `${diffDays} dagar sedan`;
-
-  return date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
-}
-
-function formatDuration(startDateString: string): string {
-  const start = new Date(startDateString);
-  const now = new Date();
-  const diffMs = now.getTime() - start.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const hours = Math.floor(diffMins / 60);
-  const mins = diffMins % 60;
-
-  if (hours > 0) return `${hours} tim ${mins} min`;
-  return `${mins} min`;
-}
-
 export function SessionCard({
   id: _id,
   code,
@@ -79,9 +52,38 @@ export function SessionCard({
   compact = false,
   className = '',
 }: SessionCardProps) {
+  const t = useTranslations('play.sessionCard');
   const isActive = status === 'active';
   const isPaused = status === 'paused';
   const isLive = isActive || isPaused;
+
+  const formatRelativeTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return t('time.justNow');
+    if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
+
+    return date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'short' });
+  };
+
+  const formatDuration = (startDateString: string): string => {
+    const start = new Date(startDateString);
+    const now = new Date();
+    const diffMs = now.getTime() - start.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+
+    if (hours > 0) return t('duration.hoursMinutes', { hours, minutes: mins });
+    return t('duration.minutes', { minutes: mins });
+  };
 
   const cardContent = (
     <>
@@ -152,17 +154,17 @@ export function SessionCard({
             {isActive ? (
               <>
                 <PauseIcon className="h-4 w-4" />
-                {quickActionLabel || 'Pausa'}
+                {quickActionLabel || t('pause')}
               </>
             ) : isPaused ? (
               <>
                 <PlayIcon className="h-4 w-4" />
-                {quickActionLabel || 'Fortsätt'}
+                {quickActionLabel || t('continue')}
               </>
             ) : (
               <>
                 <ArrowRightIcon className="h-4 w-4" />
-                {quickActionLabel || 'Öppna'}
+                {quickActionLabel || t('open')}
               </>
             )}
           </button>

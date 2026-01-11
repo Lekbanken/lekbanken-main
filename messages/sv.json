@@ -2401,7 +2401,9 @@
       },
       "manual": {
         "hostWillVerify": "Spelledaren kommer verifiera din plats"
-      }
+      },
+      "participant": "Deltagare",
+      "verifyLocation": "Verifiera plats"
     },
     "hintPanel": {
       "noMoreHints": "Inga fler ledtrådar tillgängliga",
@@ -2495,7 +2497,10 @@
       "enterCodePlaceholder": "Ange kod...",
       "verify": "Verifiera",
       "backToScanning": "Tillbaka till skanning",
-      "failedAttempts": "{count} misslyckade försök"
+      "failedAttempts": "{count} misslyckade försök",
+      "viaManualCode": "(via manuell kod)",
+      "defaultPrompt": "Skanna QR-koden för att fortsätta",
+      "devSimulateScan": "[DEV] Simulera lyckad skanning"
     },
     "multiAnswerForm": {
       "allChecksPassed": "Alla kontroller godkända!",
@@ -2560,7 +2565,104 @@
       "showTranscript": "Visa transkript"
     },
     "riddleInput": {
-      "noMoreAttempts": "Inga fler försök tillåtna"
+      "noMoreAttempts": "Inga fler försök tillåtna",
+      "correctAnswer": "Rätt svar!",
+      "placeholder": "Skriv ditt svar...",
+      "submit": "Svara",
+      "attempts": "Försök: {used}/{max}"
+    },
+    "countdownOverlay": {
+      "defaultMessage": "Nästa steg startar om",
+      "secondsRemaining": "{seconds} sekunder kvar",
+      "skip": "Hoppa över"
+    },
+    "counter": {
+      "decrease": "Minska",
+      "increase": "Öka"
+    },
+    "hotspotImage": {
+      "found": "{found} / {total} hittade",
+      "imageAlt": "Sök efter gömda objekt",
+      "zoomOut": "Zooma ut",
+      "zoomIn": "Zooma in",
+      "allFound": "Alla objekt hittade!"
+    },
+    "joinSessionForm": {
+      "sessionCodeLabel": "Sessionskod",
+      "charLabel": "Tecken {current} av {total}",
+      "displayNameLabel": "Ditt visningsnamn",
+      "displayNamePlaceholder": "T.ex. Anna",
+      "charCount": "{current}/20 tecken",
+      "connecting": "Ansluter...",
+      "joinNow": "Gå med nu",
+      "errors": {
+        "incompleteCode": "Ange en komplett sessionskod",
+        "invalidName": "Ange ett visningsnamn (minst 2 tecken)"
+      }
+    },
+    "participantList": {
+      "title": "Deltagare ({count})",
+      "noParticipants": "Inga deltagare ännu",
+      "showLess": "Visa färre",
+      "showMore": "+{count} till"
+    },
+    "participantStatusBadge": {
+      "active": "Ansluten",
+      "idle": "Inaktiv",
+      "disconnected": "Frånkopplad",
+      "kicked": "Sparkad",
+      "blocked": "Blockerad"
+    },
+    "sessionCard": {
+      "time": {
+        "justNow": "Just nu",
+        "minutesAgo": "{count} min sedan",
+        "hoursAgo": "{count} tim sedan",
+        "daysAgo": "{count} dagar sedan"
+      },
+      "duration": {
+        "hoursMinutes": "{hours} tim {minutes} min",
+        "minutes": "{minutes} min"
+      },
+      "pause": "Pausa",
+      "continue": "Fortsätt",
+      "open": "Öppna"
+    },
+    "sessionHeader": {
+      "back": "Tillbaka",
+      "settings": "Inställningar",
+      "codeCopied": "Kod kopierad",
+      "copySessionCode": "Kopiera sessionskod",
+      "participants": "deltagare",
+      "ongoing": "Pågått",
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      }
+    },
+    "sessionStatusBadge": {
+      "active": "Aktiv",
+      "paused": "Pausad",
+      "locked": "Låst",
+      "ended": "Avslutad",
+      "archived": "Arkiverad",
+      "cancelled": "Avbruten"
+    },
+    "storyOverlay": {
+      "skip": "Hoppa över",
+      "continue": "Fortsätt"
+    },
+    "tilePuzzle": {
+      "moves": "Drag",
+      "hideSolution": "Dölj facit",
+      "showSolution": "Visa facit",
+      "solutionImageAlt": "Facitbild",
+      "puzzleComplete": "Pusslet är klart! ({moves} drag)"
+    },
+    "typewriterText": {
+      "pause": "Pausa",
+      "continue": "Fortsätt",
+      "skip": "Hoppa över"
     },
     "activeSessionShell": {
       "defaultTitle": "Aktiv session",

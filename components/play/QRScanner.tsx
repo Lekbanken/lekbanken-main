@@ -201,7 +201,7 @@ export function QRScanner({
         </p>
         {state.usedFallback && (
           <p className="text-sm text-muted-foreground">
-            (via manuell kod)
+            {t('viaManualCode')}
           </p>
         )}
       </div>
@@ -212,7 +212,7 @@ export function QRScanner({
     <div className={cn('flex flex-col gap-4', className)}>
       {/* Prompt */}
       <p className="text-center text-muted-foreground">
-        {config.promptText ?? 'Skanna QR-koden för att fortsätta'}
+        {config.promptText ?? t('defaultPrompt')}
       </p>
 
       {/* Camera view */}
@@ -353,7 +353,7 @@ export function QRScanner({
           onClick={() => handleSimulatedScan(config.allowedValues[0] ?? 'TEST')}
           className="mt-2"
         >
-          [DEV] Simulera lyckad skanning
+          {t('devSimulateScan')}
         </Button>
       )}
     </div>

@@ -1,21 +1,22 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { Database } from '@/types/supabase';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 
 type ParticipantStatus = Database['public']['Enums']['participant_status'];
 
 type StatusConfig = {
-  label: string;
+  labelKey: string;
   variant: BadgeVariant;
 };
 
 const statusConfig: Record<ParticipantStatus, StatusConfig> = {
-  active: { label: 'Ansluten', variant: 'success' },
-  idle: { label: 'Inaktiv', variant: 'warning' },
-  disconnected: { label: 'Frånkopplad', variant: 'secondary' },
-  kicked: { label: 'Sparkad', variant: 'destructive' },
-  blocked: { label: 'Blockerad', variant: 'error' },
+  active: { labelKey: 'active', variant: 'success' },
+  idle: { labelKey: 'idle', variant: 'warning' },
+  disconnected: { labelKey: 'disconnected', variant: 'secondary' },
+  kicked: { labelKey: 'kicked', variant: 'destructive' },
+  blocked: { labelKey: 'blocked', variant: 'error' },
 };
 
 type ParticipantStatusBadgeProps = {
@@ -29,11 +30,12 @@ export function ParticipantStatusBadge({
   size = 'sm',
   className = '',
 }: ParticipantStatusBadgeProps) {
+  const t = useTranslations('play.participantStatusBadge');
   const config = statusConfig[status];
 
   return (
     <Badge variant={config.variant} size={size} dot className={className}>
-      {config.label}
+      {t(config.labelKey)}
     </Badge>
   );
 }
@@ -53,7 +55,9 @@ const dotColors: Record<ParticipantStatus, string> = {
 };
 
 export function ParticipantStatusDot({ status, className = '' }: StatusDotProps) {
+  const t = useTranslations('play.participantStatusBadge');
   const isActive = status === 'active';
+  const labelKey = statusConfig[status].labelKey;
 
   return (
     <span
@@ -61,7 +65,7 @@ export function ParticipantStatusDot({ status, className = '' }: StatusDotProps)
         isActive ? 'animate-pulse' : ''
       } ${className}`}
       role="status"
-      aria-label={statusConfig[status].label}
+      aria-label={t(labelKey)}
     />
   );
 }

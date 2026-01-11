@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, type KeyboardEvent, type ClipboardEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,6 +22,7 @@ export function JoinSessionForm({
   error = null,
   className = '',
 }: JoinSessionFormProps) {
+  const t = useTranslations('play.joinSessionForm');
   const [codeChars, setCodeChars] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [displayName, setDisplayName] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
@@ -100,12 +102,12 @@ export function JoinSessionForm({
     setLocalError(null);
 
     if (!isValidCode) {
-      setLocalError('Ange en komplett sessionskod');
+      setLocalError(t('errors.incompleteCode'));
       return;
     }
 
     if (!isValidName) {
-      setLocalError('Ange ett visningsnamn (minst 2 tecken)');
+      setLocalError(t('errors.invalidName'));
       return;
     }
 
@@ -117,7 +119,7 @@ export function JoinSessionForm({
       {/* Session Code Input */}
       <div>
         <label className="mb-2 block text-sm font-medium text-foreground">
-          Sessionskod
+          {t('sessionCodeLabel')}
         </label>
         <div className="flex justify-center gap-2">
           {codeChars.map((char, i) => (
@@ -134,7 +136,7 @@ export function JoinSessionForm({
               onKeyDown={(e) => handleKeyDown(i, e)}
               onPaste={handlePaste}
               disabled={isLoading}
-              aria-label={`Tecken ${i + 1} av ${CODE_LENGTH}`}
+              aria-label={t('charLabel', { current: i + 1, total: CODE_LENGTH })}
               className={cn(
                 'h-14 w-12 text-center text-2xl font-mono font-bold uppercase',
                 'rounded-lg border-2 bg-muted transition-all duration-150',
@@ -153,8 +155,8 @@ export function JoinSessionForm({
 
       {/* Display Name Input */}
       <Input
-        label="Ditt visningsnamn"
-        placeholder="T.ex. Anna"
+        label={t('displayNameLabel')}
+        placeholder={t('displayNamePlaceholder')}
         value={displayName}
         onChange={(e) => {
           setDisplayName(e.target.value);
@@ -164,7 +166,7 @@ export function JoinSessionForm({
         inputSize="lg"
         variant="filled"
         disabled={isLoading}
-        hint={`${displayName.length}/20 tecken`}
+        hint={t('charCount', { current: displayName.length, max: 20 })}
       />
 
       {/* Submit Button */}
@@ -174,10 +176,10 @@ export function JoinSessionForm({
         size="lg"
         className="w-full"
         loading={isLoading}
-        loadingText="Ansluter..."
+        loadingText={t('connecting')}
         disabled={!canSubmit}
       >
-        Gå med nu
+        {t('joinNow')}
         <ArrowRightIcon className="h-5 w-5" />
       </Button>
     </form>

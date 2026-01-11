@@ -2499,7 +2499,10 @@
       "enterCodePlaceholder": "Enter code...",
       "verify": "Verify",
       "backToScanning": "Back to scanning",
-      "failedAttempts": "{count} failed attempts"
+      "failedAttempts": "{count} failed attempts",
+      "viaManualCode": "(via manual code)",
+      "defaultPrompt": "Scan the QR code to continue",
+      "devSimulateScan": "[DEV] Simulate successful scan"
     },
     "multiAnswerForm": {
       "allChecksPassed": "All checks passed!",
@@ -2564,7 +2567,104 @@
       "showTranscript": "Show transcript"
     },
     "riddleInput": {
-      "noMoreAttempts": "No more attempts allowed"
+      "noMoreAttempts": "No more attempts allowed",
+      "correctAnswer": "Correct answer!",
+      "placeholder": "Type your answer...",
+      "submit": "Answer",
+      "attempts": "Attempts: {used}/{max}"
+    },
+    "countdownOverlay": {
+      "defaultMessage": "Next step starts in",
+      "secondsRemaining": "{seconds} seconds remaining",
+      "skip": "Skip"
+    },
+    "counter": {
+      "decrease": "Decrease",
+      "increase": "Increase"
+    },
+    "hotspotImage": {
+      "found": "{found} / {total} found",
+      "imageAlt": "Search for hidden objects",
+      "zoomOut": "Zoom out",
+      "zoomIn": "Zoom in",
+      "allFound": "All objects found!"
+    },
+    "joinSessionForm": {
+      "sessionCodeLabel": "Session code",
+      "charLabel": "Character {current} of {total}",
+      "displayNameLabel": "Your display name",
+      "displayNamePlaceholder": "E.g. Anna",
+      "charCount": "{current}/20 characters",
+      "connecting": "Connecting...",
+      "joinNow": "Join now",
+      "errors": {
+        "incompleteCode": "Enter a complete session code",
+        "invalidName": "Enter a display name (at least 2 characters)"
+      }
+    },
+    "participantList": {
+      "title": "Participants ({count})",
+      "noParticipants": "No participants yet",
+      "showLess": "Show less",
+      "showMore": "+{count} more"
+    },
+    "participantStatusBadge": {
+      "active": "Connected",
+      "idle": "Idle",
+      "disconnected": "Disconnected",
+      "kicked": "Kicked",
+      "blocked": "Blocked"
+    },
+    "sessionCard": {
+      "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{count} min ago",
+        "hoursAgo": "{count} hr ago",
+        "daysAgo": "{count} days ago"
+      },
+      "duration": {
+        "hoursMinutes": "{hours} hr {minutes} min",
+        "minutes": "{minutes} min"
+      },
+      "pause": "Pause",
+      "continue": "Continue",
+      "open": "Open"
+    },
+    "sessionHeader": {
+      "back": "Back",
+      "settings": "Settings",
+      "codeCopied": "Code copied",
+      "copySessionCode": "Copy session code",
+      "participants": "participants",
+      "ongoing": "Ongoing",
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      }
+    },
+    "sessionStatusBadge": {
+      "active": "Active",
+      "paused": "Paused",
+      "locked": "Locked",
+      "ended": "Ended",
+      "archived": "Archived",
+      "cancelled": "Cancelled"
+    },
+    "storyOverlay": {
+      "skip": "Skip",
+      "continue": "Continue"
+    },
+    "tilePuzzle": {
+      "moves": "Moves",
+      "hideSolution": "Hide solution",
+      "showSolution": "Show solution",
+      "solutionImageAlt": "Solution image",
+      "puzzleComplete": "Puzzle complete! ({moves} moves)"
+    },
+    "typewriterText": {
+      "pause": "Pause",
+      "continue": "Continue",
+      "skip": "Skip"
     },
     "activeSessionShell": {
       "defaultTitle": "Active session",

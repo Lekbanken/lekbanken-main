@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, MagnifyingGlassIcon } from '@heroicons/react/24/solid';
 import type { HotspotConfig, HotspotState } from '@/types/puzzle-modules';
 
@@ -23,6 +24,7 @@ export function HotspotImage({
   onComplete,
   className = '',
 }: HotspotImageProps) {
+  const t = useTranslations('play.hotspotImage');
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -167,7 +169,7 @@ export function HotspotImage({
         <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
           <CheckCircleIcon className="h-5 w-5 text-green-500" />
           <span>
-            {state.foundHotspotIds.length} / {requiredCount} hittade
+            {t('found', { found: state.foundHotspotIds.length, total: requiredCount })}
           </span>
         </div>
       )}
@@ -195,7 +197,7 @@ export function HotspotImage({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
-            alt="Sök efter gömda objekt"
+            alt={t('imageAlt')}
             className="w-full h-auto pointer-events-none"
             draggable={false}
           />
@@ -255,7 +257,7 @@ export function HotspotImage({
             className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50"
           >
             <MagnifyingGlassIcon className="h-5 w-5" />
-            <span className="sr-only">Zooma ut</span>
+            <span className="sr-only">{t('zoomOut')}</span>
           </button>
           <button
             onClick={handleZoomReset}
@@ -269,7 +271,7 @@ export function HotspotImage({
             className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 disabled:opacity-50"
           >
             <MagnifyingGlassIcon className="h-5 w-5" />
-            <span className="sr-only">Zooma in</span>
+            <span className="sr-only">{t('zoomIn')}</span>
           </button>
         </div>
       )}
@@ -278,7 +280,7 @@ export function HotspotImage({
       {state.isComplete && (
         <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
           <CheckCircleIcon className="h-6 w-6" />
-          <span className="font-medium">Alla objekt hittade!</span>
+          <span className="font-medium">{t('allFound')}</span>
         </div>
       )}
     </div>

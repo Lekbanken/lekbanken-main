@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   EyeIcon,
@@ -33,6 +34,7 @@ export function TilePuzzle({
   onComplete,
   className = '',
 }: TilePuzzleProps) {
+  const t = useTranslations('play.tilePuzzle');
   const [draggedTile, setDraggedTile] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -102,7 +104,7 @@ export function TilePuzzle({
       {/* Controls */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-zinc-600 dark:text-zinc-400">
-          Drag: {state.moveCount}
+          {t('moves')}: {state.moveCount}
         </div>
         
         {config.showPreview && (
@@ -113,12 +115,12 @@ export function TilePuzzle({
             {showPreview ? (
               <>
                 <EyeSlashIcon className="h-4 w-4" />
-                Dölj facit
+                {t('hideSolution')}
               </>
             ) : (
               <>
                 <EyeIcon className="h-4 w-4" />
-                Visa facit
+                {t('showSolution')}
               </>
             )}
           </button>
@@ -131,7 +133,7 @@ export function TilePuzzle({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={imageSrc}
-            alt="Facitbild"
+            alt={t('solutionImageAlt')}
             className="w-full h-auto opacity-80"
           />
         </div>
@@ -195,7 +197,7 @@ export function TilePuzzle({
         <div className="flex items-center gap-2 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300">
           <CheckCircleIcon className="h-6 w-6" />
           <span className="font-medium">
-            Pusslet är klart! ({state.moveCount} drag)
+            {t('puzzleComplete', { moves: state.moveCount })}
           </span>
         </div>
       )}

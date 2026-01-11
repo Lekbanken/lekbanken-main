@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import type { Database } from '@/types/supabase';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import {
@@ -15,18 +16,18 @@ import type { ComponentType, SVGProps } from 'react';
 type SessionStatus = Database['public']['Enums']['participant_session_status'];
 
 type StatusConfig = {
-  label: string;
+  labelKey: string;
   variant: BadgeVariant;
   Icon: ComponentType<SVGProps<SVGSVGElement>>;
 };
 
 const statusConfig: Record<SessionStatus, StatusConfig> = {
-  active: { label: 'Aktiv', variant: 'success', Icon: PlayCircleIcon },
-  paused: { label: 'Pausad', variant: 'warning', Icon: PauseCircleIcon },
-  locked: { label: 'Låst', variant: 'secondary', Icon: LockClosedIcon },
-  ended: { label: 'Avslutad', variant: 'default', Icon: CheckCircleIcon },
-  archived: { label: 'Arkiverad', variant: 'outline', Icon: ArchiveBoxIcon },
-  cancelled: { label: 'Avbruten', variant: 'destructive', Icon: XCircleIcon },
+  active: { labelKey: 'active', variant: 'success', Icon: PlayCircleIcon },
+  paused: { labelKey: 'paused', variant: 'warning', Icon: PauseCircleIcon },
+  locked: { labelKey: 'locked', variant: 'secondary', Icon: LockClosedIcon },
+  ended: { labelKey: 'ended', variant: 'default', Icon: CheckCircleIcon },
+  archived: { labelKey: 'archived', variant: 'outline', Icon: ArchiveBoxIcon },
+  cancelled: { labelKey: 'cancelled', variant: 'destructive', Icon: XCircleIcon },
 };
 
 type SessionStatusBadgeProps = {
@@ -42,6 +43,7 @@ export function SessionStatusBadge({
   showIcon = true,
   className = '',
 }: SessionStatusBadgeProps) {
+  const t = useTranslations('play.sessionStatusBadge');
   const config = statusConfig[status];
   const { Icon } = config;
 
@@ -54,7 +56,7 @@ export function SessionStatusBadge({
   return (
     <Badge variant={config.variant} size={size} dot={!showIcon} className={className}>
       {showIcon && <Icon className={iconSizes[size]} />}
-      {config.label}
+      {t(config.labelKey)}
     </Badge>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useCountdown } from './hooks/useCountdown';
 import { Button } from '@/components/ui/button';
@@ -33,7 +34,7 @@ export const CountdownOverlay = forwardRef<HTMLDivElement, CountdownOverlayProps
   (
     {
       duration,
-      message = 'Nästa steg startar om',
+      message,
       onComplete,
       allowHostSkip = false,
       onSkip,
@@ -44,6 +45,9 @@ export const CountdownOverlay = forwardRef<HTMLDivElement, CountdownOverlayProps
     },
     ref
   ) => {
+    const t = useTranslations('play.countdownOverlay');
+    const displayMessage = message ?? t('defaultMessage');
+
     // Check for reduced motion preference
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -95,7 +99,7 @@ export const CountdownOverlay = forwardRef<HTMLDivElement, CountdownOverlayProps
       >
         {/* Message */}
         <p className={cn('text-lg md:text-xl font-medium mb-6', styles.message)}>
-          {message}
+          {displayMessage}
         </p>
 
         {/* Countdown Number */}
@@ -122,7 +126,7 @@ export const CountdownOverlay = forwardRef<HTMLDivElement, CountdownOverlayProps
 
         {/* Screen reader announcement */}
         <span className="sr-only" aria-live="assertive">
-          {secondsRemaining} sekunder kvar
+          {t('secondsRemaining', { seconds: secondsRemaining })}
         </span>
 
         {/* Host Skip Button */}
@@ -137,7 +141,7 @@ export const CountdownOverlay = forwardRef<HTMLDivElement, CountdownOverlayProps
             )}
           >
             <ForwardIcon className="h-5 w-5" />
-            Hoppa över
+            {t('skip')}
           </Button>
         )}
       </div>

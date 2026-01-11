@@ -291,7 +291,7 @@ function DistanceRing({ distance, targetRadius }: DistanceRingProps) {
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
         <span className={`text-sm font-medium ${isClose ? 'text-green-600' : 'text-zinc-600'}`}>
-          {isClose ? 'Nära!' : `${Math.round(progress * 100)}%`}
+          {isClose ? '✓' : `${Math.round(progress * 100)}%`}
         </span>
       </div>
     </div>
@@ -315,20 +315,21 @@ export function LocationConfirmControl({
   onVerify,
   className = '',
 }: LocationConfirmControlProps) {
+  const t = useTranslations('play.locationCheck');
   return (
     <div className={`p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 ${className}`}>
       <div className="flex items-center justify-between mb-3">
         <div>
           <h4 className="font-medium">{config.locationName}</h4>
           {participantName && (
-            <p className="text-sm text-zinc-500">Deltagare: {participantName}</p>
+            <p className="text-sm text-zinc-500">{t('participant')}: {participantName}</p>
           )}
         </div>
         <MapPinIcon className="h-5 w-5 text-blue-500" />
       </div>
       <Button onClick={onVerify} className="w-full">
         <CheckCircleIcon className="h-5 w-5 mr-2" />
-        Verifiera plats
+        {t('verifyLocation')}
       </Button>
     </div>
   );

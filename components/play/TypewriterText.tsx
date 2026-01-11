@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useEffect, useRef, type HTMLAttributes } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { useTypewriter, type TypewriterSpeed } from './hooks/useTypewriter';
 import { useSound } from './hooks/useSound';
@@ -62,6 +63,7 @@ export const TypewriterText = forwardRef<HTMLDivElement, TypewriterTextProps>(
     },
     ref
   ) => {
+    const t = useTranslations('play.typewriterText');
     const {
       displayedText,
       progress,
@@ -169,12 +171,12 @@ export const TypewriterText = forwardRef<HTMLDivElement, TypewriterTextProps>(
                 {isAnimating ? (
                   <>
                     <PauseIcon className="h-4 w-4" />
-                    <span className="sr-only md:not-sr-only">Pausa</span>
+                    <span className="sr-only md:not-sr-only">{t('pause')}</span>
                   </>
                 ) : (
                   <>
                     <PlayIcon className="h-4 w-4" />
-                    <span className="sr-only md:not-sr-only">Fortsätt</span>
+                    <span className="sr-only md:not-sr-only">{t('continue')}</span>
                   </>
                 )}
               </Button>
@@ -187,7 +189,7 @@ export const TypewriterText = forwardRef<HTMLDivElement, TypewriterTextProps>(
                 className="gap-1.5"
               >
                 <ForwardIcon className="h-4 w-4" />
-                <span className="sr-only md:not-sr-only">Hoppa över</span>
+                <span className="sr-only md:not-sr-only">{t('skip')}</span>
               </Button>
             )}
           </div>

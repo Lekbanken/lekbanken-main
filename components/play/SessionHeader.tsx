@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { SessionStatusBadge } from './SessionStatusBadge';
 import {
@@ -30,18 +31,6 @@ type SessionHeaderProps = {
   className?: string;
 };
 
-function formatDuration(startDateString: string): string {
-  const start = new Date(startDateString);
-  const now = new Date();
-  const diffMs = now.getTime() - start.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-  const hours = Math.floor(diffMins / 60);
-  const mins = diffMins % 60;
-
-  if (hours > 0) return `${hours}h ${mins}m`;
-  return `${mins}m`;
-}
-
 export function SessionHeader({
   name,
   code,
@@ -55,8 +44,21 @@ export function SessionHeader({
   backHref,
   className = '',
 }: SessionHeaderProps) {
+  const t = useTranslations('play.sessionHeader');
   const [copied, setCopied] = useState(false);
   const isLive = status === 'active' || status === 'paused';
+
+  const formatDuration = (startDateString: string): string => {
+    const start = new Date(startDateString);
+    const now = new Date();
+    const diffMs = now.getTime() - start.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+
+    if (hours > 0) return t('duration.hoursMinutes', { hours, minutes: mins });
+    return t('duration.minutes', { minutes: mins });
+  };
 
   const handleCopyCode = async () => {
     try {
@@ -79,7 +81,7 @@ export function SessionHeader({
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label="Tillbaka"
+                aria-label={t('back')}
                 className="p-2"
                 href={backHref}
               >
@@ -90,7 +92,7 @@ export function SessionHeader({
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                aria-label="Tillbaka"
+                aria-label={t('back')}
                 className="p-2"
               >
                 <ArrowLeftIcon className="h-5 w-5" />
@@ -117,7 +119,7 @@ export function SessionHeader({
                 variant="ghost"
                 size="sm"
                 onClick={onSettings}
-                aria-label="Inställningar"
+                aria-label={t('settings')}
                 className="p-2"
               >
                 <Cog6ToothIcon className="h-5 w-5" />
@@ -138,7 +140,7 @@ export function SessionHeader({
                 'transition-colors hover:bg-primary/20',
                 'focus:outline-none focus:ring-2 focus:ring-primary/30'
               )}
-              aria-label={copied ? 'Kod kopierad' : 'Kopiera sessionskod'}
+              aria-label={copied ? t('codeCopied') : t('copySessionCode')}
             >
               {code}
               {copied ? (
@@ -155,7 +157,7 @@ export function SessionHeader({
             <span>
               {participantCount}
               {maxParticipants && ` / ${maxParticipants}`}
-              {' deltagare'}
+              {' '}{t('participants')}
             </span>
           </div>
 
@@ -163,7 +165,7 @@ export function SessionHeader({
           {startedAt && isLive && (
             <div className="flex items-center gap-1.5 text-muted-foreground">
               <ClockIcon className="h-4 w-4" />
-              <span>Pågått {formatDuration(startedAt)}</span>
+              <span>{t('ongoing')} {formatDuration(startedAt)}</span>
             </div>
           )}
         </div>

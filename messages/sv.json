@@ -1153,6 +1153,30 @@
         "unlockedContent": "Upplåst innehåll"
       }
     },
+    "propConfirmation": {
+      "errors": {
+        "couldNotLoadRequests": "Kunde inte ladda prop-förfrågningar",
+        "loadError": "Fel vid laddning",
+        "couldNotUpdateRequest": "Kunde inte uppdatera förfrågan",
+        "updateError": "Fel vid uppdatering"
+      },
+      "loading": "Laddar prop-förfrågningar...",
+      "title": "Prop-bekräftelser",
+      "pendingCount": "{count} väntande",
+      "noPendingRequests": "Inga väntande prop-förfrågningar",
+      "showPhoto": "Visa foto",
+      "hidePhoto": "Dölj foto",
+      "notesPlaceholder": "T.ex. 'Bra jobbat!' eller 'Ej korrekt föremål'",
+      "actions": {
+        "approve": "Godkänn",
+        "reject": "Avslå"
+      },
+      "handledRequests": "Hanterade förfrågningar ({count})",
+      "status": {
+        "confirmed": "Godkänd",
+        "rejected": "Avslagen"
+      }
+    },
     "participant": {
       "ready": "Redo",
       "notReady": "Inte redo",

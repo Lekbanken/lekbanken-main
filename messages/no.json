@@ -1157,6 +1157,30 @@
         "unlockedContent": "Opplåst innhold"
       }
     },
+    "propConfirmation": {
+      "errors": {
+        "couldNotLoadRequests": "Kunne ikke laste prop-forespørsler",
+        "loadError": "Feil ved lasting",
+        "couldNotUpdateRequest": "Kunne ikke oppdatere forespørsel",
+        "updateError": "Feil ved oppdatering"
+      },
+      "loading": "Laster prop-forespørsler...",
+      "title": "Prop-bekreftelser",
+      "pendingCount": "{count} ventende",
+      "noPendingRequests": "Ingen ventende prop-forespørsler",
+      "showPhoto": "Vis bilde",
+      "hidePhoto": "Skjul bilde",
+      "notesPlaceholder": "F.eks. 'Bra jobbet!' eller 'Feil gjenstand'",
+      "actions": {
+        "approve": "Godkjenn",
+        "reject": "Avslå"
+      },
+      "handledRequests": "Håndterte forespørsler ({count})",
+      "status": {
+        "confirmed": "Godkjent",
+        "rejected": "Avslått"
+      }
+    },
     "participant": {
       "ready": "Klar",
       "notReady": "Ikke klar",

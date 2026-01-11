@@ -8,6 +8,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -60,6 +61,7 @@ export function PropConfirmationManager({
   refreshInterval = 3000,
   onRequestHandled,
 }: PropConfirmationManagerProps) {
+  const t = useTranslations('play.propConfirmation');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [requests, setRequests] = useState<PropRequest[]>([]);
@@ -75,14 +77,14 @@ export function PropConfirmationManager({
       });
       
       if (!res.ok) {
-        throw new Error('Kunde inte ladda prop-förfrågningar');
+        throw new Error(t('errors.couldNotLoadRequests'));
       }
       
       const data = await res.json();
       setRequests(data.requests || []);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fel vid laddning');
+      setError(err instanceof Error ? err.message : t('errors.loadError'));
     } finally {
       setLoading(false);
     }
@@ -117,7 +119,7 @@ export function PropConfirmationManager({
       });
       
       if (!res.ok) {
-        throw new Error('Kunde inte uppdatera förfrågan');
+        throw new Error(t('errors.couldNotUpdateRequest'));
       }
       
       // Update local state
@@ -136,7 +138,7 @@ export function PropConfirmationManager({
       
       onRequestHandled?.(requestId, action);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Fel vid uppdatering');
+      setError(err instanceof Error ? err.message : t('errors.updateError'));
     } finally {
       setActionLoading(prev => {
         const next = new Set(prev);
@@ -165,7 +167,7 @@ export function PropConfirmationManager({
       <Card className="p-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <ArrowPathIcon className="h-5 w-5 animate-spin" />
-          <span>Laddar prop-förfrågningar...</span>
+          <span>{t('loading')}</span>
         </div>
       </Card>
     );
@@ -178,10 +180,10 @@ export function PropConfirmationManager({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CubeIcon className="h-5 w-5 text-primary" />
-            <h3 className="font-semibold">Prop-bekräftelser</h3>
+            <h3 className="font-semibold">{t('title')}</h3>
             {pendingRequests.length > 0 && (
               <Badge variant="destructive" className="animate-pulse">
-                {pendingRequests.length} väntande
+                {t('pendingCount', { count: pendingRequests.length })}
               </Badge>
             )}
           </div>
@@ -205,7 +207,7 @@ export function PropConfirmationManager({
       {pendingRequests.length === 0 ? (
         <Card className="p-6">
           <p className="text-sm text-muted-foreground text-center">
-            Inga väntande prop-förfrågningar
+            {t('noPendingRequests')}
           </p>
         </Card>
       ) : (
@@ -245,7 +247,7 @@ export function PropConfirmationManager({
                   className="flex items-center gap-1 text-xs text-primary hover:underline"
                 >
                   <CameraIcon className="h-3 w-3" />
-                  {expandedPhoto === request.id ? 'Dölj foto' : 'Visa foto'}
+                  {expandedPhoto === request.id ? t('hidePhoto') : t('showPhoto')}
                 </button>
                 {expandedPhoto === request.id && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -265,7 +267,7 @@ export function PropConfirmationManager({
                 <span>Anteckning (valfritt)</span>
               </div>
               <Input
-                placeholder="T.ex. 'Bra jobbat!' eller 'Ej korrekt föremål'"
+                placeholder={t('notesPlaceholder')}
                 value={notes.get(request.id) || ''}
                 onChange={(e) => setNotes(prev => new Map(prev).set(request.id, e.target.value))}
                 className="text-sm"
@@ -285,7 +287,7 @@ export function PropConfirmationManager({
                 ) : (
                   <CheckCircleIcon className="h-4 w-4 mr-1" />
                 )}
-                Godkänn
+                {t('actions.approve')}
               </Button>
               <Button
                 variant="destructive"
@@ -294,7 +296,7 @@ export function PropConfirmationManager({
                 disabled={actionLoading.has(request.id)}
               >
                 <XCircleIcon className="h-4 w-4 mr-1" />
-                Avslå
+                {t('actions.reject')}
               </Button>
             </div>
           </Card>
@@ -306,7 +308,7 @@ export function PropConfirmationManager({
         <Card className="p-4">
           <details>
             <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
-              Hanterade förfrågningar ({handledRequests.length})
+              {t('handledRequests', { count: handledRequests.length })}
             </summary>
             <div className="mt-3 space-y-2">
               {handledRequests.map((request) => (
@@ -328,7 +330,7 @@ export function PropConfirmationManager({
                     <span className="text-muted-foreground">- {request.artifactTitle}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {request.status === 'confirmed' ? 'Godkänd' : 'Avslagen'}
+                    {request.status === 'confirmed' ? t('status.confirmed') : t('status.rejected')}
                   </span>
                 </div>
               ))}

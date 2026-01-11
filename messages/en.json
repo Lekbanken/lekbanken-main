@@ -1157,6 +1157,30 @@
         "unlockedContent": "Unlocked content"
       }
     },
+    "propConfirmation": {
+      "errors": {
+        "couldNotLoadRequests": "Could not load prop requests",
+        "loadError": "Error loading",
+        "couldNotUpdateRequest": "Could not update request",
+        "updateError": "Error updating"
+      },
+      "loading": "Loading prop requests...",
+      "title": "Prop confirmations",
+      "pendingCount": "{count} pending",
+      "noPendingRequests": "No pending prop requests",
+      "showPhoto": "Show photo",
+      "hidePhoto": "Hide photo",
+      "notesPlaceholder": "E.g. 'Great job!' or 'Incorrect item'",
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "handledRequests": "Handled requests ({count})",
+      "status": {
+        "confirmed": "Approved",
+        "rejected": "Rejected"
+      }
+    },
     "participant": {
       "ready": "Ready",
       "notReady": "Not ready",

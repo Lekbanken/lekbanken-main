@@ -11,6 +11,7 @@ import {
   CheckCircleIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
+  DocumentTextIcon,
 } from '@heroicons/react/24/outline';
 import {
   AdminBreadcrumbs,
@@ -149,7 +150,7 @@ async function TranslationsDashboard() {
       {/* Quick Actions */}
       <section>
         <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <QuickActionCard
             href="/admin/translations/missing"
             title="View Missing Keys"
@@ -169,6 +170,12 @@ async function TranslationsDashboard() {
             title="Edit Admin Strings"
             description="Admin panel navigation and UI strings"
             icon={<GlobeAltIcon className="h-6 w-6" />}
+          />
+          <QuickActionCard
+            href="/admin/legal"
+            title="Legal Documents"
+            description="Manage localized legal terms, privacy, and cookie policy"
+            icon={<DocumentTextIcon className="h-6 w-6" />}
           />
         </div>
       </section>

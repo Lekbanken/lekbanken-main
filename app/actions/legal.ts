@@ -10,6 +10,7 @@ import {
 } from '@/lib/legal/constants'
 import type { CookieConsentState } from '@/lib/legal/consent-types'
 import type { LegalDatabase, LegalDocumentRow } from '@/lib/legal/types'
+import type { CookieCatalogRow, CookieConsentRow } from '@/lib/legal/types'
 
 type AcceptResult = {
   success: boolean
@@ -131,4 +132,168 @@ export async function getLegalDocumentById(
   }
 
   return data ?? null
+}
+
+type CookieCatalogResult = {
+  success: boolean
+  data?: CookieCatalogRow[]
+  error?: string
+}
+
+type CookieConsentStateResult = {
+  success: boolean
+  data?: {
+    schemaVersion: number
+    updatedAt: string | null
+    source: 'banner' | 'settings' | null
+    categories: CookieConsentState
+  }
+  error?: string
+}
+
+type CookieConsentReceiptResult = {
+  success: boolean
+  data?: {
+    schemaVersion: number
+    updatedAt: string | null
+    categories: CookieConsentState
+    entries: CookieConsentRow[]
+  }
+  error?: string
+}
+
+export async function getCookieCatalog(): Promise<CookieCatalogResult> {
+  const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
+  const { data, error } = await supabase
+    .from('cookie_catalog')
+    .select('*')
+    .order('key', { ascending: true })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true, data: data ?? [] }
+}
+
+export async function getCookieConsentState(): Promise<CookieConsentStateResult> {
+  const authContext = await getServerAuthContext()
+  const user = authContext.user
+
+  if (!user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
+  const { data, error } = await supabase
+    .from('cookie_consents')
+    .select('cookie_key, consent, given_at, source')
+    .eq('user_id', user.id)
+    .eq('schema_version', COOKIE_CONSENT_SCHEMA_VERSION)
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  const categories: CookieConsentState = {
+    ...DEFAULT_COOKIE_CONSENT,
+  }
+  let updatedAt: string | null = null
+  let source: 'banner' | 'settings' | null = null
+
+  for (const row of data ?? []) {
+    const key = row.cookie_key as keyof CookieConsentState
+    if (key in categories) {
+      categories[key] = Boolean(row.consent)
+    }
+    if (!updatedAt || row.given_at > updatedAt) {
+      updatedAt = row.given_at
+      source = row.source as 'banner' | 'settings'
+    }
+  }
+
+  return {
+    success: true,
+    data: {
+      schemaVersion: COOKIE_CONSENT_SCHEMA_VERSION,
+      updatedAt,
+      source,
+      categories,
+    },
+  }
+}
+
+export async function getCookieConsentReceipt(): Promise<CookieConsentReceiptResult> {
+  const authContext = await getServerAuthContext()
+  const user = authContext.user
+
+  if (!user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
+  const { data, error } = await supabase
+    .from('cookie_consents')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('schema_version', COOKIE_CONSENT_SCHEMA_VERSION)
+    .order('given_at', { ascending: false })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  const categories: CookieConsentState = {
+    ...DEFAULT_COOKIE_CONSENT,
+  }
+  let updatedAt: string | null = null
+
+  for (const row of data ?? []) {
+    const key = row.cookie_key as keyof CookieConsentState
+    if (key in categories) {
+      categories[key] = Boolean(row.consent)
+    }
+    if (!updatedAt || row.given_at > updatedAt) {
+      updatedAt = row.given_at
+    }
+  }
+
+  return {
+    success: true,
+    data: {
+      schemaVersion: COOKIE_CONSENT_SCHEMA_VERSION,
+      updatedAt,
+      categories,
+      entries: (data ?? []) as CookieConsentRow[],
+    },
+  }
+}
+
+export async function deleteCookieConsentHistory(): Promise<{ success: boolean; error?: string }> {
+  const authContext = await getServerAuthContext()
+  const user = authContext.user
+
+  if (!user) {
+    return { success: false, error: 'Not authenticated' }
+  }
+
+  const supabase = (await createServerRlsClient()) as unknown as SupabaseClient<LegalDatabase>
+  const rows = Object.entries(DEFAULT_COOKIE_CONSENT).map(([cookie_key, value]) => ({
+    user_id: user.id,
+    cookie_key,
+    consent: Boolean(value),
+    schema_version: COOKIE_CONSENT_SCHEMA_VERSION,
+    source: 'settings' as const,
+    tenant_id_snapshot: authContext.activeTenant?.id ?? null,
+  }))
+
+  const { error } = await supabase
+    .from('cookie_consents')
+    .upsert(rows, { onConflict: 'user_id,cookie_key,schema_version' })
+
+  if (error) {
+    return { success: false, error: error.message }
+  }
+
+  return { success: true }
 }

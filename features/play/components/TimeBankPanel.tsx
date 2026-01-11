@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,6 +22,8 @@ function formatSeconds(totalSeconds: number): string {
 }
 
 export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProps) {
+  const t = useTranslations('play.timeBankPanel');
+  
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,11 +42,11 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
       setBalanceSeconds(res.timeBank.balanceSeconds ?? 0);
       setLedger(res.ledger ?? []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte ladda tidsbank');
+      setError(err instanceof Error ? err.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void load();
@@ -79,12 +82,12 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
         });
         await load();
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Kunde inte uppdatera tidsbank');
+        setError(err instanceof Error ? err.message : t('errors.updateFailed'));
       } finally {
         setSubmitting(false);
       }
     },
-    [sessionId, load]
+    [sessionId, load, t]
   );
 
   const handleApplyCustom = useCallback(async () => {
@@ -99,17 +102,17 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
     <Card variant="elevated" className="p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">Tidsbank</h2>
-          <p className="text-sm text-muted-foreground">Lägg till eller dra av tid under spelet.</p>
+          <h2 className="text-lg font-semibold text-foreground">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
         <Badge variant={connected ? 'success' : 'secondary'} size="sm">
-          {connected ? 'Live' : 'Offline'}
+          {connected ? t('status.live') : t('status.offline')}
         </Badge>
       </div>
 
       <div className="mt-4 flex items-baseline gap-3">
         <div className="text-3xl font-mono font-bold text-primary">{formatSeconds(balanceSeconds)}</div>
-        <div className="text-sm text-muted-foreground">min:sek</div>
+        <div className="text-sm text-muted-foreground">{t('format.minSec')}</div>
       </div>
 
       {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
@@ -133,13 +136,13 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
         <Input
           value={customDelta}
           onChange={(e) => setCustomDelta(e.target.value)}
-          placeholder="Delta sekunder (t.ex. 120)"
+          placeholder={t('placeholders.deltaSeconds')}
           disabled={disabled || submitting}
         />
         <Input
           value={customReason}
           onChange={(e) => setCustomReason(e.target.value)}
-          placeholder="Orsak (t.ex. hint)"
+          placeholder={t('placeholders.reason')}
           disabled={disabled || submitting}
         />
         <Button
@@ -153,23 +156,23 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
             Number(customDelta) === 0
           }
         >
-          Använd
+          {t('actions.apply')}
         </Button>
       </div>
 
       <div className="mt-6">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Senaste ändringar</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">{t('recentChanges.title')}</h3>
           <Button type="button" variant="ghost" size="sm" onClick={() => void load()} disabled={loading}>
-            Uppdatera
+            {t('actions.refresh')}
           </Button>
         </div>
 
         <div className="max-h-64 overflow-auto rounded-md border border-border p-3 space-y-2">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Laddar…</p>
+            <p className="text-sm text-muted-foreground">{t('recentChanges.loading')}</p>
           ) : ledger.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Inga ändringar ännu.</p>
+            <p className="text-sm text-muted-foreground">{t('recentChanges.empty')}</p>
           ) : (
             ledger.map((row) => (
               <div key={row.id} className="text-sm">

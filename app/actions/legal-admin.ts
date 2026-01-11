@@ -13,6 +13,7 @@ import type {
   LegalLocale,
   OrgLegalAcceptanceRow,
 } from '@/lib/legal/types'
+import { COOKIE_CATEGORIES, COOKIE_CONSENT_SCHEMA_VERSION, type CookieCategory } from '@/lib/legal/constants'
 
 type ActionResult<T> = { success: true; data: T } | { success: false; error: string }
 
@@ -403,6 +404,61 @@ export async function getLegalAcceptanceImpact(documentIds: string[]): Promise<A
   }))
 
   return { success: true, data: { totalUsers: total, documentStats } }
+}
+
+export async function getCookieConsentOverview(): Promise<ActionResult<{
+  totalUsers: number
+  optedIn: Record<CookieCategory, number>
+}>> {
+  const supabase = await createServerRlsClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || !isSystemAdmin(user)) {
+    return { success: false, error: 'System admin access required' }
+  }
+
+  const adminClient = getLegalServiceClient()
+  const { count: totalUsers, error: userError } = await adminClient
+    .from('users')
+    .select('id', { count: 'exact', head: true })
+
+  if (userError) {
+    console.error('[legal] getCookieConsentOverview users failed', userError)
+    return { success: false, error: 'Failed to load user counts' }
+  }
+
+  const optedIn = COOKIE_CATEGORIES.reduce<Record<CookieCategory, number>>((acc, category) => {
+    acc[category] = 0
+    return acc
+  }, {
+    necessary: 0,
+    functional: 0,
+    analytics: 0,
+    marketing: 0,
+  })
+
+  for (const category of COOKIE_CATEGORIES) {
+    const { count, error } = await adminClient
+      .from('cookie_consents')
+      .select('id', { count: 'exact', head: true })
+      .eq('cookie_key', category)
+      .eq('consent', true)
+      .eq('schema_version', COOKIE_CONSENT_SCHEMA_VERSION)
+
+    if (error) {
+      console.error('[legal] getCookieConsentOverview failed', error)
+      continue
+    }
+    optedIn[category] = count ?? 0
+  }
+
+  return {
+    success: true,
+    data: {
+      totalUsers: totalUsers ?? 0,
+      optedIn,
+    },
+  }
 }
 
 export async function getOrgLegalAcceptanceMap(params: {

@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { FacilitatorDashboard } from './FacilitatorDashboard';
 import { RoleAssignerContainer } from './RoleAssignerContainer';
 import { ArtifactsPanel } from './ArtifactsPanel';
@@ -62,6 +63,8 @@ export function HostPlayMode({
   showExitButton = true,
   participantCount = 0,
 }: HostPlayModeProps) {
+  const t = useTranslations('play.hostPlayMode');
+  
   // Data state
   const [playData, setPlayData] = useState<PlaySessionData | null>(null);
   const [triggers, setTriggers] = useState<SessionTrigger[]>([]);
@@ -81,14 +84,14 @@ export function HostPlayMode({
         setPlayData(data);
         setError(null);
       } else {
-        setError('Kunde inte ladda speldata');
+        setError(t('errors.couldNotLoadData'));
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.genericError'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
   // Load triggers (snapshot if needed)
   const loadTriggers = useCallback(async () => {
     try {
@@ -215,10 +218,10 @@ export function HostPlayMode({
   if (error || !playData) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-destructive mb-4">{error || 'Ingen speldata tillgänglig'}</p>
+        <p className="text-destructive mb-4">{error || t('errors.noDataAvailable')}</p>
         <Button variant="outline" onClick={onExitPlayMode}>
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
-          Tillbaka
+          {t('navigation.back')}
         </Button>
       </Card>
     );
@@ -228,13 +231,13 @@ export function HostPlayMode({
   if (!playData.gameId) {
     return (
       <Card className="p-8 text-center">
-        <h2 className="text-lg font-semibold mb-2">Inget spel kopplat</h2>
+        <h2 className="text-lg font-semibold mb-2">{t('noGameLinked.title')}</h2>
         <p className="text-muted-foreground mb-4">
-          Denna session har inget spel kopplat. Spelläget kräver ett spel med steg och instruktioner.
+          {t('noGameLinked.description')}
         </p>
         <Button variant="outline" onClick={onExitPlayMode}>
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
-          Tillbaka till session
+          {t('navigation.backToSession')}
         </Button>
       </Card>
     );
@@ -252,7 +255,7 @@ export function HostPlayMode({
             className="min-w-[80px]"
           >
             <PlayIcon className="h-4 w-4 mr-1.5" />
-            Spela
+            {t('zones.play')}
           </Button>
           <Button
             variant={activeZone === 'content' ? 'primary' : 'ghost'}
@@ -261,7 +264,7 @@ export function HostPlayMode({
             className="min-w-[80px]"
           >
             <CubeIcon className="h-4 w-4 mr-1.5" />
-            Innehåll
+            {t('zones.content')}
           </Button>
           <Button
             variant={activeZone === 'manage' ? 'primary' : 'ghost'}
@@ -270,14 +273,14 @@ export function HostPlayMode({
             className="min-w-[80px]"
           >
             <Cog6ToothIcon className="h-4 w-4 mr-1.5" />
-            Hantera
+            {t('zones.manage')}
           </Button>
         </div>
         
         {showExitButton && (
           <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
             <ArrowLeftIcon className="h-4 w-4 mr-1" />
-            Lobby
+            {t('navigation.lobby')}
           </Button>
         )}
       </div>
@@ -309,7 +312,7 @@ export function HostPlayMode({
               onClick={() => setContentSubTab('artifacts')}
             >
               <CubeIcon className="h-4 w-4 mr-1" />
-              Artefakter
+              {t('contentTabs.artifacts')}
             </Button>
             <Button
               variant={contentSubTab === 'puzzles' ? 'outline' : 'ghost'}
@@ -317,7 +320,7 @@ export function HostPlayMode({
               onClick={() => setContentSubTab('puzzles')}
             >
               <PuzzlePieceIcon className="h-4 w-4 mr-1" />
-              Pussel
+              {t('contentTabs.puzzles')}
             </Button>
             <Button
               variant={contentSubTab === 'decisions' ? 'outline' : 'ghost'}
@@ -325,7 +328,7 @@ export function HostPlayMode({
               onClick={() => setContentSubTab('decisions')}
             >
               <ScaleIcon className="h-4 w-4 mr-1" />
-              Beslut
+              {t('contentTabs.decisions')}
             </Button>
             <Button
               variant={contentSubTab === 'outcome' ? 'outline' : 'ghost'}
@@ -333,7 +336,7 @@ export function HostPlayMode({
               onClick={() => setContentSubTab('outcome')}
             >
               <FlagIcon className="h-4 w-4 mr-1" />
-              Utfall
+              {t('contentTabs.outcome')}
             </Button>
           </div>
 
@@ -360,7 +363,7 @@ export function HostPlayMode({
               onClick={() => setManageSubTab('roles')}
             >
               <UserGroupIcon className="h-4 w-4 mr-1" />
-              Roller
+              {t('manageTabs.roles')}
               {playData.sessionRoles.length > 0 && (
                 <span className="ml-1 text-xs opacity-75">
                   ({playData.sessionRoles.length})
@@ -373,7 +376,7 @@ export function HostPlayMode({
               onClick={() => setManageSubTab('settings')}
             >
               <Cog6ToothIcon className="h-4 w-4 mr-1" />
-              Inställningar
+              {t('manageTabs.settings')}
             </Button>
           </div>
 
@@ -387,15 +390,15 @@ export function HostPlayMode({
 
           {manageSubTab === 'settings' && (
             <Card className="p-6">
-              <h2 className="text-lg font-semibold mb-4">Spelinställningar</h2>
+              <h2 className="text-lg font-semibold mb-4">{t('settings.title')}</h2>
               <p className="text-muted-foreground">
-                Inställningar för spelet kommer här i framtida versioner.
+                {t('settings.comingSoon')}
               </p>
               <ul className="mt-4 text-sm text-muted-foreground list-disc list-inside space-y-1">
-                <li>Timer-inställningar</li>
-                <li>Automatisk stegframsteg</li>
-                <li>Ljudeffekter</li>
-                <li>Deltagarbegränsningar</li>
+                <li>{t('settings.features.timer')}</li>
+                <li>{t('settings.features.autoStep')}</li>
+                <li>{t('settings.features.sounds')}</li>
+                <li>{t('settings.features.participantLimits')}</li>
               </ul>
             </Card>
           )}

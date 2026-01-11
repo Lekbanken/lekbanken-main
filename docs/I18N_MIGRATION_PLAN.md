@@ -1,6 +1,6 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-12 (morgon)
+> **Senast uppdaterad:** 2026-01-13
 > **Status:** 🟡 Pågående - Fas 1.2 (Play features) aktivt under arbete
 
 ## Executive Summary
@@ -10,9 +10,9 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | 413 (39%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~20 (2%) |
-| **Migrerade strängar** | ~280 (10%) |
-| **Uppskattad återstående arbetsinsats** | ~30-45 timmar |
+| Filer som använder i18n | ~35 (3%) |
+| **Migrerade strängar** | ~400 (14%) |
+| **Uppskattad återstående arbetsinsats** | ~25-40 timmar |
 
 ## Prioriteringsmodell
 
@@ -221,7 +221,15 @@ export function PlayButton() {
 - [x] **ParticipantSessionWithPlay.tsx** ✅ ~25 strängar migrerade
 - [x] **SessionCockpit.tsx** ✅ ~17 strängar migrerade
 - [x] **AnalyticsDashboard.tsx** ✅ ~18 strängar migrerade
-- [ ] Fortsätt features/play (Fas 1.2) - ~150 strängar kvar
+- [x] **SignalPanel.tsx** ✅ commit 0248292
+- [x] **RoleAssignerContainer.tsx** ✅ commit 0248292
+- [x] **StoryViewModal.tsx** ✅ commit 0248292
+- [x] **TimeBankRuleEditor.tsx** ✅ commit 0248292
+- [x] **DirectorModeDrawer.tsx** ✅ ~30 strängar migrerade (commit 6277a5f)
+- [x] **EventFeedPanel.tsx** ✅ ~25 strängar migrerade (commit 6277a5f)
+- [x] **ArtifactsPanel.tsx** ✅ 4 error strängar (commit 6277a5f)
+- [x] **ConversationCardsCollectionArtifact.tsx** ✅ 12 strängar (commit 6277a5f)
+- [ ] Fortsätt features/play (Fas 1.2) - ~100 strängar kvar
 - [ ] Implementera app pages (Fas 1.3) - 154 strängar kvar
 - [ ] Implementera components/play (Fas 1.4) - 112 strängar kvar
 
@@ -237,7 +245,9 @@ export function PlayButton() {
 | 2026-01-12 | features/play/ParticipantSessionWithPlay.tsx | 1 | ~25 | ✅ Klart |
 | 2026-01-12 | features/play/SessionCockpit.tsx | 1 | ~17 | ✅ Klart |
 | 2026-01-12 | features/play/AnalyticsDashboard.tsx | 1 | ~18 | ✅ Klart |
-| - | features/play (övriga) | ~40 | ~150 | 🔄 Pågår |
+| 2026-01-12 | features/play (batch 2) | 5 | ~35 | ✅ Klart |
+| 2026-01-13 | features/play (batch 3) | 5 | ~85 | ✅ Klart |
+| - | features/play (övriga) | ~30 | ~100 | 🔄 Pågår |
 | - | app/app | ~20 | 154 | ⏳ Väntar |
 | - | components/play | ~15 | 112 | ⏳ Väntar |
 

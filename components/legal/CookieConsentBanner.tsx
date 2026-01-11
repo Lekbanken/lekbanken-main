@@ -5,38 +5,15 @@ import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import {
-  COOKIE_CONSENT_SCHEMA_VERSION,
-  COOKIE_CONSENT_STORAGE_KEY,
-  DEFAULT_COOKIE_CONSENT,
-} from '@/lib/legal/constants'
+import { COOKIE_CONSENT_SCHEMA_VERSION, DEFAULT_COOKIE_CONSENT } from '@/lib/legal/constants'
 import type { CookieConsentState } from '@/lib/legal/consent-types'
+import {
+  detectPrivacySignals,
+  getDefaultConsent,
+  readStoredConsent,
+  writeStoredConsent,
+} from '@/lib/legal/cookie-consent'
 import { saveCookieConsent } from '@/app/actions/legal'
-
-type StoredConsent = {
-  schemaVersion: number
-  categories: CookieConsentState
-  updatedAt: string
-  source: 'banner' | 'settings'
-}
-
-function readStoredConsent(): StoredConsent | null {
-  if (typeof window === 'undefined') return null
-  const raw = window.localStorage.getItem(COOKIE_CONSENT_STORAGE_KEY)
-  if (!raw) return null
-  try {
-    return JSON.parse(raw) as StoredConsent
-  } catch {
-    return null
-  }
-}
-
-function detectPrivacySignals(): { gpc: boolean; dnt: boolean } {
-  if (typeof window === 'undefined') return { gpc: false, dnt: false }
-  const gpc = Boolean((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl)
-  const dnt = navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes'
-  return { gpc, dnt }
-}
 
 export function CookieConsentBanner() {
   const t = useTranslations('legal.cookieBanner')
@@ -62,21 +39,11 @@ export function CookieConsentBanner() {
   const gpcEnforced = signals.gpc || signals.dnt
 
   const appliedDefault = useMemo<CookieConsentState>(() => {
-    if (gpcEnforced) {
-      return { ...DEFAULT_COOKIE_CONSENT }
-    }
-    return { ...DEFAULT_COOKIE_CONSENT, functional: true, analytics: true, marketing: true }
+    return getDefaultConsent(gpcEnforced)
   }, [gpcEnforced])
 
   const persistConsent = (categories: CookieConsentState, source: 'banner' | 'settings') => {
-    const payload: StoredConsent = {
-      schemaVersion: COOKIE_CONSENT_SCHEMA_VERSION,
-      categories,
-      updatedAt: new Date().toISOString(),
-      source,
-    }
-
-    window.localStorage.setItem(COOKIE_CONSENT_STORAGE_KEY, JSON.stringify(payload))
+    writeStoredConsent(categories, source)
     setIsOpen(false)
 
     if (!user) return

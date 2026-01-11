@@ -1,5 +1,6 @@
 export const COOKIE_CONSENT_SCHEMA_VERSION = 1
 export const COOKIE_CONSENT_STORAGE_KEY = 'lb-cookie-consent'
+export const COOKIE_CONSENT_RETENTION_DAYS = 365
 
 export const COOKIE_CATEGORIES = ['necessary', 'functional', 'analytics', 'marketing'] as const
 export type CookieCategory = (typeof COOKIE_CATEGORIES)[number]

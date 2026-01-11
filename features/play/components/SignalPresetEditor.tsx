@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -98,11 +99,11 @@ export interface SignalPresetEditorProps {
 // =============================================================================
 
 const SIGNAL_TYPE_OPTIONS = [
-  { value: 'torch', label: 'Ficklampa' },
-  { value: 'audio', label: 'Ljud' },
-  { value: 'vibration', label: 'Vibration' },
-  { value: 'screen_flash', label: 'Skärmblänk' },
-  { value: 'notification', label: 'Notifikation' },
+  { value: 'torch', labelKey: 'torch' },
+  { value: 'audio', labelKey: 'audio' },
+  { value: 'vibration', labelKey: 'vibration' },
+  { value: 'screen_flash', labelKey: 'screenFlash' },
+  { value: 'notification', labelKey: 'notification' },
 ];
 
 const SIGNAL_TYPE_ICONS: Record<SignalType, React.ReactNode> = {
@@ -114,21 +115,21 @@ const SIGNAL_TYPE_ICONS: Record<SignalType, React.ReactNode> = {
 };
 
 const PATTERN_OPTIONS = [
-  { value: 'single', label: 'Enkel' },
-  { value: 'double', label: 'Dubbel' },
-  { value: 'triple', label: 'Trippel' },
-  { value: 'sos', label: 'SOS' },
-  { value: 'pulse', label: 'Puls' },
-  { value: 'custom', label: 'Anpassad' },
+  { value: 'single', labelKey: 'single' },
+  { value: 'double', labelKey: 'double' },
+  { value: 'triple', labelKey: 'triple' },
+  { value: 'sos', labelKey: 'sos' },
+  { value: 'pulse', labelKey: 'pulse' },
+  { value: 'custom', labelKey: 'custom' },
 ];
 
 const PATTERN_DESCRIPTIONS: Record<SignalPattern, string> = {
-  single: 'En kort puls',
-  double: 'Två snabba pulser',
-  triple: 'Tre snabba pulser',
-  sos: '... --- ...',
-  pulse: 'Kontinuerlig pulsning',
-  custom: 'Skapa eget mönster',
+  single: 'singleDesc',
+  double: 'doubleDesc',
+  triple: 'tripleDesc',
+  sos: 'sosDesc',
+  pulse: 'pulseDesc',
+  custom: 'customDesc',
 };
 
 const PRESET_PATTERNS: Record<Exclude<SignalPattern, 'custom'>, SignalStep[]> = {
@@ -162,28 +163,28 @@ const PRESET_PATTERNS: Record<Exclude<SignalPattern, 'custom'>, SignalStep[]> = 
 };
 
 const AUDIO_OPTIONS = [
-  { value: 'beep', label: 'Pip (standard)' },
-  { value: 'bell', label: 'Ringklocka' },
-  { value: 'chime', label: 'Klang' },
-  { value: 'alert', label: 'Larm' },
+  { value: 'beep', labelKey: 'beep' },
+  { value: 'bell', labelKey: 'bell' },
+  { value: 'chime', labelKey: 'chime' },
+  { value: 'alert', labelKey: 'alert' },
 ];
 
 const REPEAT_OPTIONS = [
-  { value: '1', label: '1 gång' },
-  { value: '2', label: '2 gånger' },
-  { value: '3', label: '3 gånger' },
-  { value: '5', label: '5 gånger' },
-  { value: '0', label: 'Oändligt' },
+  { value: '1', labelKey: 'once' },
+  { value: '2', labelKey: 'twice' },
+  { value: '3', labelKey: 'thrice' },
+  { value: '5', labelKey: 'fiveTimes' },
+  { value: '0', labelKey: 'infinite' },
 ];
 
 const COLOR_PRESETS = [
-  { value: '#ffffff', label: 'Vit' },
-  { value: '#ff0000', label: 'Röd' },
-  { value: '#00ff00', label: 'Grön' },
-  { value: '#0000ff', label: 'Blå' },
-  { value: '#ffff00', label: 'Gul' },
-  { value: '#ff00ff', label: 'Magenta' },
-  { value: '#00ffff', label: 'Cyan' },
+  { value: '#ffffff', labelKey: 'white' },
+  { value: '#ff0000', labelKey: 'red' },
+  { value: '#00ff00', labelKey: 'green' },
+  { value: '#0000ff', labelKey: 'blue' },
+  { value: '#ffff00', labelKey: 'yellow' },
+  { value: '#ff00ff', labelKey: 'magenta' },
+  { value: '#00ffff', labelKey: 'cyan' },
 ];
 
 // =============================================================================
@@ -223,6 +224,7 @@ interface PresetCardProps {
   onDuplicate: () => void;
   onTest?: () => Promise<void>;
   isTesting: boolean;
+  t: ReturnType<typeof useTranslations<'play.signalPresetEditor'>>;
 }
 
 function PresetCard({
@@ -234,6 +236,7 @@ function PresetCard({
   onDuplicate,
   onTest,
   isTesting,
+  t,
 }: PresetCardProps) {
   const patternOption = PATTERN_OPTIONS.find((o) => o.value === preset.pattern);
   
@@ -249,7 +252,7 @@ function PresetCard({
               <span className="font-medium">{preset.name}</span>
             </div>
             <Badge variant="outline" className="ml-auto">
-              {patternOption?.label || preset.pattern}
+              {patternOption ? t(`patterns.${patternOption.labelKey}` as Parameters<typeof t>[0]) : preset.pattern}
             </Badge>
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               {onTest && (
@@ -304,7 +307,7 @@ function PresetCard({
     <Card className="border-primary">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">Redigera signal</CardTitle>
+          <CardTitle className="text-base">{t('editSignal')}</CardTitle>
           <div className="flex items-center gap-1">
             {onTest && (
               <Button
@@ -316,12 +319,12 @@ function PresetCard({
                 {isTesting ? (
                   <>
                     <PauseIcon className="h-4 w-4 mr-1" />
-                    Spelar...
+                    {t('playing')}
                   </>
                 ) : (
                   <>
                     <PlayIcon className="h-4 w-4 mr-1" />
-                    Testa
+                    {t('test')}
                   </>
                 )}
               </Button>
@@ -344,35 +347,35 @@ function PresetCard({
           </div>
         </div>
         <CardDescription>
-          Konfigurera signalens egenskaper
+          {t('configureProperties')}
         </CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-4">
         {/* Name */}
         <div className="space-y-2">
-          <Label htmlFor={`preset-name-${preset.id}`}>Namn</Label>
+          <Label htmlFor={`preset-name-${preset.id}`}>{t('labels.name')}</Label>
           <Input
             id={`preset-name-${preset.id}`}
             value={preset.name}
             onChange={(e) => onUpdate({ ...preset, name: e.target.value })}
-            placeholder="Signalnamn"
+            placeholder={t('placeholders.signalName')}
           />
         </div>
         
         {/* Type */}
         <div className="space-y-2">
-          <Label>Signaltyp</Label>
+          <Label>{t('labels.signalType')}</Label>
           <Select
             value={preset.type}
             onChange={(e) => onUpdate({ ...preset, type: e.target.value as SignalType })}
-            options={SIGNAL_TYPE_OPTIONS}
+            options={SIGNAL_TYPE_OPTIONS.map(o => ({ value: o.value, label: t(`signalTypes.${o.labelKey}` as Parameters<typeof t>[0]) }))}
           />
         </div>
         
         {/* Pattern */}
         <div className="space-y-2">
-          <Label>Mönster</Label>
+          <Label>{t('labels.pattern')}</Label>
           <Select
             value={preset.pattern}
             onChange={(e) => {
@@ -385,10 +388,10 @@ function PresetCard({
                   : undefined,
               });
             }}
-            options={PATTERN_OPTIONS}
+            options={PATTERN_OPTIONS.map(o => ({ value: o.value, label: t(`patterns.${o.labelKey}` as Parameters<typeof t>[0]) }))}
           />
           <p className="text-xs text-muted-foreground">
-            {PATTERN_DESCRIPTIONS[preset.pattern]}
+            {t(`patternDescriptions.${PATTERN_DESCRIPTIONS[preset.pattern]}` as Parameters<typeof t>[0])}
           </p>
         </div>
         
@@ -397,13 +400,14 @@ function PresetCard({
           <CustomPatternEditor
             steps={preset.customSteps}
             onChange={(steps) => onUpdate({ ...preset, customSteps: steps })}
+            t={t}
           />
         )}
         
         {/* Type-specific options */}
         {preset.type === 'screen_flash' && (
           <div className="space-y-2">
-            <Label>Färg</Label>
+            <Label>{t('labels.color')}</Label>
             <div className="flex flex-wrap gap-2">
               {COLOR_PRESETS.map((color) => (
                 <button
@@ -415,7 +419,7 @@ function PresetCard({
                     ${preset.color === color.value ? 'border-primary scale-110' : 'border-transparent'}
                   `}
                   style={{ backgroundColor: color.value }}
-                  title={color.label}
+                  title={t(`colors.${color.labelKey}` as Parameters<typeof t>[0])}
                 />
               ))}
               <Input
@@ -431,16 +435,19 @@ function PresetCard({
         {preset.type === 'audio' && (
           <>
             <div className="space-y-2">
-              <Label>Ljudkälla</Label>
+              <Label>{t('labels.audioSource')}</Label>
               <Select
                 value={preset.audioUrl || 'beep'}
                 onChange={(e) => onUpdate({ ...preset, audioUrl: e.target.value })}
-                options={AUDIO_OPTIONS}
+                options={AUDIO_OPTIONS.map(o => ({ value: o.value, label: t(`audioTypes.${o.labelKey}` as Parameters<typeof t>[0]) }))}
+              />
+            </div>
+                options={AUDIO_OPTIONS.map(o => ({ value: o.value, label: t(`audioTypes.${o.labelKey}` as Parameters<typeof t>[0]) }))}
               />
             </div>
             
             <div className="space-y-2">
-              <Label>Volym: {Math.round((preset.volume || 0.5) * 100)}%</Label>
+              <Label>{t('labels.volume', { percent: Math.round((preset.volume || 0.5) * 100) })}</Label>
               <Slider
                 value={[(preset.volume || 0.5) * 100]}
                 onValueChange={(values) => onUpdate({ ...preset, volume: values[0] / 100 })}
@@ -455,21 +462,21 @@ function PresetCard({
         {preset.type === 'notification' && (
           <>
             <div className="space-y-2">
-              <Label htmlFor={`preset-notif-title-${preset.id}`}>Rubrik</Label>
+              <Label htmlFor={`preset-notif-title-${preset.id}`}>{t('labels.title')}</Label>
               <Input
                 id={`preset-notif-title-${preset.id}`}
                 value={preset.notificationTitle || ''}
                 onChange={(e) => onUpdate({ ...preset, notificationTitle: e.target.value })}
-                placeholder="Notifikationsrubrik"
+                placeholder={t('placeholders.notificationTitle')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor={`preset-notif-body-${preset.id}`}>Meddelande</Label>
+              <Label htmlFor={`preset-notif-body-${preset.id}`}>{t('labels.message')}</Label>
               <Input
                 id={`preset-notif-body-${preset.id}`}
                 value={preset.notificationBody || ''}
                 onChange={(e) => onUpdate({ ...preset, notificationBody: e.target.value })}
-                placeholder="Valfritt meddelande"
+                placeholder={t('placeholders.optionalMessage')}
               />
             </div>
           </>
@@ -478,16 +485,16 @@ function PresetCard({
         {/* Repeat settings */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor={`preset-repeat-${preset.id}`}>Upprepa</Label>
+            <Label htmlFor={`preset-repeat-${preset.id}`}>{t('labels.repeat')}</Label>
             <Select
               value={preset.repeatCount.toString()}
               onChange={(e) => onUpdate({ ...preset, repeatCount: parseInt(e.target.value) })}
-              options={REPEAT_OPTIONS}
+              options={REPEAT_OPTIONS.map(o => ({ value: o.value, label: t(`repeatOptions.${o.labelKey}` as Parameters<typeof t>[0]) }))}
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor={`preset-delay-${preset.id}`}>Paus (ms)</Label>
+            <Label htmlFor={`preset-delay-${preset.id}`}>{t('labels.pause')}</Label>
             <Input
               id={`preset-delay-${preset.id}`}
               type="number"
@@ -503,7 +510,7 @@ function PresetCard({
         {/* Done button */}
         <div className="pt-2">
           <Button variant="outline" onClick={onEdit} className="w-full">
-            Klar
+            {t('done')}
           </Button>
         </div>
       </CardContent>
@@ -518,9 +525,10 @@ function PresetCard({
 interface CustomPatternEditorProps {
   steps: SignalStep[];
   onChange: (steps: SignalStep[]) => void;
+  t: ReturnType<typeof useTranslations<'play.signalPresetEditor'>>;
 }
 
-function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
+function CustomPatternEditor({ steps, onChange, t }: CustomPatternEditorProps) {
   const addStep = () => {
     onChange([
       ...steps,
@@ -543,10 +551,10 @@ function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
   return (
     <div className="space-y-3 p-3 border rounded-lg bg-muted/30">
       <div className="flex items-center justify-between">
-        <Label className="text-sm font-medium">Steg i mönstret</Label>
+        <Label className="text-sm font-medium">{t('patternSteps')}</Label>
         <Button variant="outline" size="sm" onClick={addStep}>
           <PlusIcon className="h-4 w-4 mr-1" />
-          Lägg till
+          {t('add')}
         </Button>
       </div>
       
@@ -573,7 +581,7 @@ function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
                   max={5000}
                   step={50}
                 />
-                <span className="text-xs text-muted-foreground">på</span>
+                <span className="text-xs text-muted-foreground">{t('on')}</span>
               </div>
               
               <div className="flex items-center gap-1">
@@ -588,7 +596,7 @@ function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
                   max={5000}
                   step={50}
                 />
-                <span className="text-xs text-muted-foreground">av</span>
+                <span className="text-xs text-muted-foreground">{t('off')}</span>
               </div>
             </div>
             
@@ -606,7 +614,7 @@ function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
       </div>
       
       {/* Pattern visualization */}
-      <PatternVisualization steps={steps} />
+      <PatternVisualization steps={steps} t={t} />
     </div>
   );
 }
@@ -617,9 +625,10 @@ function CustomPatternEditor({ steps, onChange }: CustomPatternEditorProps) {
 
 interface PatternVisualizationProps {
   steps: SignalStep[];
+  t: ReturnType<typeof useTranslations<'play.signalPresetEditor'>>;
 }
 
-function PatternVisualization({ steps }: PatternVisualizationProps) {
+function PatternVisualization({ steps, t }: PatternVisualizationProps) {
   const totalDuration = steps.reduce(
     (sum, step) => sum + step.onDuration + step.offDuration,
     0
@@ -629,7 +638,7 @@ function PatternVisualization({ steps }: PatternVisualizationProps) {
   
   return (
     <div className="space-y-1">
-      <Label className="text-xs text-muted-foreground">Förhandsvisning</Label>
+      <Label className="text-xs text-muted-foreground">{t('preview')}</Label>
       <div className="flex h-6 bg-muted rounded overflow-hidden">
         {steps.map((step) => {
           const onWidth = (step.onDuration / totalDuration) * 100;
@@ -640,13 +649,13 @@ function PatternVisualization({ steps }: PatternVisualizationProps) {
               <div
                 className="bg-primary h-full"
                 style={{ width: `${onWidth}%` }}
-                title={`På: ${step.onDuration}ms`}
+                title={t('onDuration', { ms: step.onDuration })}
               />
               {step.offDuration > 0 && (
                 <div
                   className="bg-muted-foreground/20 h-full"
                   style={{ width: `${offWidth}%` }}
-                  title={`Av: ${step.offDuration}ms`}
+                  title={t('offDuration', { ms: step.offDuration })}
                 />
               )}
             </React.Fragment>
@@ -654,7 +663,7 @@ function PatternVisualization({ steps }: PatternVisualizationProps) {
         })}
       </div>
       <div className="text-xs text-muted-foreground text-right">
-        Total: {totalDuration}ms
+        {t('total', { ms: totalDuration })}
       </div>
     </div>
   );
@@ -670,6 +679,8 @@ export function SignalPresetEditor({
   onTestSignal,
   className,
 }: SignalPresetEditorProps) {
+  const t = useTranslations('play.signalPresetEditor');
+  
   const [editingId, setEditingId] = useState<string | null>(null);
   const [testingId, setTestingId] = useState<string | null>(null);
   
@@ -694,11 +705,11 @@ export function SignalPresetEditor({
     const newPreset: SignalPreset = {
       ...preset,
       id: generateId(),
-      name: `${preset.name} (kopia)`,
+      name: t('copySuffix', { name: preset.name }),
     };
     onChange([...presets, newPreset]);
     setEditingId(newPreset.id);
-  }, [presets, onChange]);
+  }, [presets, onChange, t]);
   
   const testPreset = useCallback(async (preset: SignalPreset) => {
     if (!onTestSignal) return;
@@ -725,14 +736,15 @@ export function SignalPresetEditor({
             onDuplicate={() => duplicatePreset(preset)}
             onTest={onTestSignal ? () => testPreset(preset) : undefined}
             isTesting={testingId === preset.id}
+            t={t}
           />
         ))}
         
         {presets.length === 0 && (
           <div className="text-center py-8 text-muted-foreground">
             <SpeakerWaveIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p>Inga signaler definierade</p>
-            <p className="text-sm">Lägg till signaler som kan triggas under spelet</p>
+            <p>{t('noSignalsDefined')}</p>
+            <p className="text-sm">{t('addSignalsHint')}</p>
           </div>
         )}
         
@@ -742,7 +754,7 @@ export function SignalPresetEditor({
           className="w-full"
         >
           <PlusIcon className="h-4 w-4 mr-2" />
-          Lägg till signal
+          {t('addSignal')}
         </Button>
       </div>
     </div>

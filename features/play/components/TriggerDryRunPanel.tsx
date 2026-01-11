@@ -10,6 +10,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -74,26 +75,26 @@ export interface SimulationResult {
 
 const EVENT_TYPES: Array<{
   value: string;
-  label: string;
+  labelKey: string;
   targetType?: 'step' | 'phase' | 'artifact' | 'custom';
   targetField?: string;
 }> = [
-  { value: 'step_started', label: 'Steg startat', targetType: 'step', targetField: 'stepId' },
-  { value: 'step_completed', label: 'Steg klart', targetType: 'step', targetField: 'stepId' },
-  { value: 'phase_started', label: 'Fas startad', targetType: 'phase', targetField: 'phaseId' },
-  { value: 'phase_completed', label: 'Fas klar', targetType: 'phase', targetField: 'phaseId' },
-  { value: 'keypad_correct', label: 'Rätt kod', targetType: 'artifact', targetField: 'keypadId' },
-  { value: 'keypad_failed', label: 'Fel kod', targetType: 'artifact', targetField: 'keypadId' },
-  { value: 'artifact_unlocked', label: 'Artefakt upplåst', targetType: 'artifact', targetField: 'artifactId' },
-  { value: 'timer_ended', label: 'Timer slut', targetType: 'custom', targetField: 'timerId' },
-  { value: 'counter_reached', label: 'Räknare nådd', targetType: 'artifact', targetField: 'counterKey' },
-  { value: 'riddle_correct', label: 'Gåta löst', targetType: 'artifact', targetField: 'riddleId' },
-  { value: 'signal_received', label: 'Signal mottagen', targetType: 'custom', targetField: 'channel' },
-  { value: 'time_bank_expired', label: 'Tidsbank slut', targetType: undefined },
-  { value: 'hotspot_found', label: 'Hotspot hittad', targetType: 'artifact', targetField: 'hotspotHuntId' },
-  { value: 'tile_puzzle_complete', label: 'Pussel löst', targetType: 'artifact', targetField: 'tilePuzzleId' },
-  { value: 'cipher_decoded', label: 'Chiffer avkodat', targetType: 'artifact', targetField: 'cipherId' },
-  { value: 'logic_grid_solved', label: 'Logikrutnät löst', targetType: 'artifact', targetField: 'gridId' },
+  { value: 'step_started', labelKey: 'stepStarted', targetType: 'step', targetField: 'stepId' },
+  { value: 'step_completed', labelKey: 'stepCompleted', targetType: 'step', targetField: 'stepId' },
+  { value: 'phase_started', labelKey: 'phaseStarted', targetType: 'phase', targetField: 'phaseId' },
+  { value: 'phase_completed', labelKey: 'phaseCompleted', targetType: 'phase', targetField: 'phaseId' },
+  { value: 'keypad_correct', labelKey: 'keypadCorrect', targetType: 'artifact', targetField: 'keypadId' },
+  { value: 'keypad_failed', labelKey: 'keypadFailed', targetType: 'artifact', targetField: 'keypadId' },
+  { value: 'artifact_unlocked', labelKey: 'artifactUnlocked', targetType: 'artifact', targetField: 'artifactId' },
+  { value: 'timer_ended', labelKey: 'timerEnded', targetType: 'custom', targetField: 'timerId' },
+  { value: 'counter_reached', labelKey: 'counterReached', targetType: 'artifact', targetField: 'counterKey' },
+  { value: 'riddle_correct', labelKey: 'riddleCorrect', targetType: 'artifact', targetField: 'riddleId' },
+  { value: 'signal_received', labelKey: 'signalReceived', targetType: 'custom', targetField: 'channel' },
+  { value: 'time_bank_expired', labelKey: 'timeBankExpired', targetType: undefined },
+  { value: 'hotspot_found', labelKey: 'hotspotFound', targetType: 'artifact', targetField: 'hotspotHuntId' },
+  { value: 'tile_puzzle_complete', labelKey: 'tilePuzzleComplete', targetType: 'artifact', targetField: 'tilePuzzleId' },
+  { value: 'cipher_decoded', labelKey: 'cipherDecoded', targetType: 'artifact', targetField: 'cipherId' },
+  { value: 'logic_grid_solved', labelKey: 'logicGridSolved', targetType: 'artifact', targetField: 'gridId' },
 ];
 
 // =============================================================================
@@ -165,32 +166,37 @@ function conditionMatches(condition: TriggerCondition, event: SimulationEvent): 
 // Helper: Get action description
 // =============================================================================
 
-function getActionDescription(action: TriggerAction): string {
+function getActionDescription(
+  action: TriggerAction,
+  t: ReturnType<typeof useTranslations<'play.triggerDryRun'>>
+): string {
   switch (action.type) {
     case 'show_countdown':
-      return `Visa nedräkning: ${action.duration}s`;
+      return t('actions.showCountdown', { duration: action.duration });
     case 'reveal_artifact':
-      return `Visa artefakt`;
+      return t('actions.revealArtifact');
     case 'hide_artifact':
-      return `Dölj artefakt`;
+      return t('actions.hideArtifact');
     case 'advance_step':
-      return `Gå till nästa steg`;
+      return t('actions.advanceStep');
     case 'advance_phase':
-      return `Gå till nästa fas`;
+      return t('actions.advancePhase');
     case 'start_timer':
-      return `Starta timer: ${action.name}`;
+      return t('actions.startTimer', { name: action.name ?? '' });
     case 'send_message':
-      return `Skicka meddelande`;
+      return t('actions.sendMessage');
     case 'send_signal':
-      return `Skicka signal: ${action.channel}`;
+      return t('actions.sendSignal', { channel: action.channel ?? '' });
     case 'time_bank_apply_delta':
-      return `Justera tidsbank: ${action.deltaSeconds > 0 ? '+' : ''}${action.deltaSeconds}s`;
+      return t('actions.timeBankDelta', {
+        delta: action.deltaSeconds > 0 ? `+${action.deltaSeconds}` : `${action.deltaSeconds}`,
+      });
     case 'show_leader_script':
-      return `Visa ledarscript`;
+      return t('actions.showLeaderScript');
     case 'trigger_signal':
-      return `Aktivera signalgenerator`;
+      return t('actions.triggerSignal');
     case 'time_bank_pause':
-      return action.pause ? 'Pausa tidsbank' : 'Återuppta tidsbank';
+      return action.pause ? t('actions.pauseTimeBank') : t('actions.resumeTimeBank');
     default:
       return action.type;
   }
@@ -202,11 +208,14 @@ function getActionDescription(action: TriggerAction): string {
 
 interface SimulationResultCardProps {
   result: SimulationResult;
+  t: ReturnType<typeof useTranslations<'play.triggerDryRun'>>;
 }
 
-function SimulationResultCard({ result }: SimulationResultCardProps) {
+function SimulationResultCard({ result, t }: SimulationResultCardProps) {
   const [isExpanded, setIsExpanded] = useState(result.matchingTriggers.length > 0);
   const hasMatches = result.matchingTriggers.length > 0;
+
+  const eventLabel = EVENT_TYPES.find((e) => e.value === result.event.type);
 
   return (
     <Card className={hasMatches ? 'border-green-500/50' : 'border-muted'}>
@@ -226,11 +235,11 @@ function SimulationResultCard({ result }: SimulationResultCardProps) {
                   <InformationCircleIcon className="h-4 w-4 text-muted-foreground" />
                 )}
                 <CardTitle className="text-sm font-medium">
-                  {EVENT_TYPES.find((e) => e.value === result.event.type)?.label || result.event.type}
+                  {eventLabel ? t(`eventTypes.${eventLabel.labelKey}` as Parameters<typeof t>[0]) : result.event.type}
                 </CardTitle>
               </div>
               <Badge variant={hasMatches ? 'default' : 'outline'}>
-                {result.matchingTriggers.length} träffar
+                {t('matches', { count: result.matchingTriggers.length })}
               </Badge>
             </div>
           </CardHeader>
@@ -257,11 +266,11 @@ function SimulationResultCard({ result }: SimulationResultCardProps) {
                       {trigger.delaySeconds && trigger.delaySeconds > 0 && (
                         <span className="inline-flex items-center gap-1 mr-2">
                           <ClockIcon className="h-3 w-3" />
-                          {trigger.delaySeconds}s fördröjning
+                          {t('delay', { seconds: trigger.delaySeconds })}
                         </span>
                       )}
                       <span>
-                        {trigger.then.length} åtgärd{trigger.then.length !== 1 ? 'er' : ''}
+                        {t('actionCount', { count: trigger.then.length })}
                       </span>
                     </div>
                     <div className="mt-2 space-y-1">
@@ -271,7 +280,7 @@ function SimulationResultCard({ result }: SimulationResultCardProps) {
                           className="text-xs bg-background px-2 py-1 rounded flex items-center gap-2"
                         >
                           <CursorArrowRaysIcon className="h-3 w-3 text-muted-foreground" />
-                          {getActionDescription(action)}
+                          {getActionDescription(action, t)}
                         </div>
                       ))}
                     </div>
@@ -280,7 +289,7 @@ function SimulationResultCard({ result }: SimulationResultCardProps) {
               </div>
             ) : (
               <div className="text-sm text-muted-foreground text-center py-4">
-                Ingen trigger matchar denna händelse
+                {t('noMatchingTrigger')}
               </div>
             )}
           </CardContent>
@@ -301,6 +310,8 @@ export function TriggerDryRunPanel({
   phases = [],
   className,
 }: TriggerDryRunPanelProps) {
+  const t = useTranslations('play.triggerDryRun');
+  
   const [selectedEventType, setSelectedEventType] = useState<string>('');
   const [targetId, setTargetId] = useState<string>('');
   const [customValue, setCustomValue] = useState<string>('');
@@ -384,10 +395,10 @@ export function TriggerDryRunPanel({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <BoltIcon className="h-5 w-5" />
-          Trigger Dry-Run
+          {t('title')}
         </CardTitle>
         <CardDescription>
-          Testa vilka triggers som aktiveras av olika händelser ({armedCount} aktiva)
+          {t('description', { count: armedCount })}
         </CardDescription>
       </CardHeader>
 
@@ -395,7 +406,7 @@ export function TriggerDryRunPanel({
         {/* Event selector */}
         <div className="grid gap-3">
           <div className="space-y-2">
-            <Label>Händelsetyp</Label>
+            <Label>{t('labels.eventType')}</Label>
             <Select
               value={selectedEventType}
               onChange={(e) => {
@@ -404,10 +415,10 @@ export function TriggerDryRunPanel({
                 setCustomValue('');
               }}
               options={[
-                { value: '', label: 'Välj händelse att simulera' },
+                { value: '', label: t('placeholders.selectEvent') },
                 ...EVENT_TYPES.map((event) => ({
                   value: event.value,
-                  label: event.label,
+                  label: t(`eventTypes.${event.labelKey}` as Parameters<typeof t>[0]),
                 })),
               ]}
             />
@@ -416,12 +427,12 @@ export function TriggerDryRunPanel({
           {/* Target selector */}
           {selectedEvent?.targetType === 'step' && (
             <div className="space-y-2">
-              <Label>Steg</Label>
+              <Label>{t('labels.step')}</Label>
               <Select
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
                 options={[
-                  { value: '', label: 'Välj steg' },
+                  { value: '', label: t('placeholders.selectStep') },
                   ...targetOptions,
                 ]}
               />
@@ -430,12 +441,12 @@ export function TriggerDryRunPanel({
 
           {selectedEvent?.targetType === 'phase' && (
             <div className="space-y-2">
-              <Label>Fas</Label>
+              <Label>{t('labels.phase')}</Label>
               <Select
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
                 options={[
-                  { value: '', label: 'Välj fas' },
+                  { value: '', label: t('placeholders.selectPhase') },
                   ...targetOptions,
                 ]}
               />
@@ -444,12 +455,12 @@ export function TriggerDryRunPanel({
 
           {selectedEvent?.targetType === 'artifact' && (
             <div className="space-y-2">
-              <Label>Artefakt</Label>
+              <Label>{t('labels.artifact')}</Label>
               <Select
                 value={targetId}
                 onChange={(e) => setTargetId(e.target.value)}
                 options={[
-                  { value: '', label: 'Välj artefakt' },
+                  { value: '', label: t('placeholders.selectArtifact') },
                   ...targetOptions,
                 ]}
               />
@@ -462,7 +473,7 @@ export function TriggerDryRunPanel({
               <Input
                 value={customValue}
                 onChange={(e) => setCustomValue(e.target.value)}
-                placeholder={`Ange ${selectedEvent.targetField}`}
+                placeholder={t('placeholders.enterValue', { field: selectedEvent.targetField ?? '' })}
               />
             </div>
           )}
@@ -479,7 +490,7 @@ export function TriggerDryRunPanel({
             className="w-full"
           >
             <PlayIcon className="h-4 w-4 mr-2" />
-            Simulera händelse
+            {t('buttons.simulate')}
           </Button>
         </div>
 
@@ -487,20 +498,20 @@ export function TriggerDryRunPanel({
         {results.length > 0 && (
           <div className="space-y-3 pt-4 border-t">
             <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Resultat</Label>
+              <Label className="text-sm font-medium">{t('results.title')}</Label>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setResults([])}
                 className="h-7 text-xs"
               >
-                Rensa
+                {t('buttons.clear')}
               </Button>
             </div>
 
             <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {results.map((result, i) => (
-                <SimulationResultCard key={i} result={result} />
+                <SimulationResultCard key={i} result={result} t={t} />
               ))}
             </div>
           </div>
@@ -510,7 +521,7 @@ export function TriggerDryRunPanel({
         {triggers.length === 0 && (
           <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 text-yellow-600 text-sm">
             <ExclamationTriangleIcon className="h-4 w-4" />
-            Inga triggers definierade för detta spel
+            {t('noTriggersDefined')}
           </div>
         )}
       </CardContent>

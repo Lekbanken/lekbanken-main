@@ -1276,6 +1276,218 @@
         "description": "Spelinnehåll visas här när värden startar."
       }
     },
+    "hostPlayMode": {
+      "errors": {
+        "couldNotLoadData": "Kunde inte ladda speldata",
+        "genericError": "Ett fel uppstod",
+        "noDataAvailable": "Ingen speldata tillgänglig"
+      },
+      "navigation": {
+        "back": "Tillbaka",
+        "backToSession": "Tillbaka till session",
+        "lobby": "Lobby"
+      },
+      "noGameLinked": {
+        "title": "Inget spel kopplat",
+        "description": "Denna session har inget spel kopplat. Spelläget kräver ett spel med steg och instruktioner."
+      },
+      "zones": {
+        "play": "Spela",
+        "content": "Innehåll",
+        "manage": "Hantera"
+      },
+      "contentTabs": {
+        "artifacts": "Artefakter",
+        "puzzles": "Pussel",
+        "decisions": "Beslut",
+        "outcome": "Utfall"
+      },
+      "manageTabs": {
+        "roles": "Roller",
+        "settings": "Inställningar"
+      },
+      "settings": {
+        "title": "Spelinställningar",
+        "comingSoon": "Inställningar för spelet kommer här i framtida versioner.",
+        "features": {
+          "timer": "Timer-inställningar",
+          "autoStep": "Automatisk stegframsteg",
+          "sounds": "Ljudeffekter",
+          "participantLimits": "Deltagarbegränsningar"
+        }
+      }
+    },
+    "timeBankPanel": {
+      "title": "Tidsbank",
+      "description": "Lägg till eller dra av tid under spelet.",
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
+      "format": {
+        "minSec": "min:sek"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda tidsbank",
+        "updateFailed": "Kunde inte uppdatera tidsbank"
+      },
+      "placeholders": {
+        "deltaSeconds": "Delta sekunder (t.ex. 120)",
+        "reason": "Orsak (t.ex. hint)"
+      },
+      "actions": {
+        "apply": "Använd",
+        "refresh": "Uppdatera"
+      },
+      "recentChanges": {
+        "title": "Senaste ändringar",
+        "loading": "Laddar…",
+        "empty": "Inga ändringar ännu."
+      }
+    },
+    "triggerDryRun": {
+      "title": "Trigger Dry-Run",
+      "description": "Testa vilka triggers som aktiveras av olika händelser ({count} aktiva)",
+      "labels": {
+        "eventType": "Händelsetyp",
+        "step": "Steg",
+        "phase": "Fas",
+        "artifact": "Artefakt"
+      },
+      "placeholders": {
+        "selectEvent": "Välj händelse att simulera",
+        "selectStep": "Välj steg",
+        "selectPhase": "Välj fas",
+        "selectArtifact": "Välj artefakt",
+        "enterValue": "Ange {field}"
+      },
+      "buttons": {
+        "simulate": "Simulera händelse",
+        "clear": "Rensa"
+      },
+      "results": {
+        "title": "Resultat"
+      },
+      "matches": "{count} träffar",
+      "delay": "{seconds}s fördröjning",
+      "actionCount": "{count, plural, =1 {1 åtgärd} other {# åtgärder}}",
+      "noMatchingTrigger": "Ingen trigger matchar denna händelse",
+      "noTriggersDefined": "Inga triggers definierade för detta spel",
+      "eventTypes": {
+        "stepStarted": "Steg startat",
+        "stepCompleted": "Steg klart",
+        "phaseStarted": "Fas startad",
+        "phaseCompleted": "Fas klar",
+        "keypadCorrect": "Rätt kod",
+        "keypadFailed": "Fel kod",
+        "artifactUnlocked": "Artefakt upplåst",
+        "timerEnded": "Timer slut",
+        "counterReached": "Räknare nådd",
+        "riddleCorrect": "Gåta löst",
+        "signalReceived": "Signal mottagen",
+        "timeBankExpired": "Tidsbank slut",
+        "hotspotFound": "Hotspot hittad",
+        "tilePuzzleComplete": "Pussel löst",
+        "cipherDecoded": "Chiffer avkodat",
+        "logicGridSolved": "Logikrutnät löst"
+      },
+      "actions": {
+        "showCountdown": "Visa nedräkning: {duration}s",
+        "revealArtifact": "Visa artefakt",
+        "hideArtifact": "Dölj artefakt",
+        "advanceStep": "Gå till nästa steg",
+        "advancePhase": "Gå till nästa fas",
+        "startTimer": "Starta timer: {name}",
+        "sendMessage": "Skicka meddelande",
+        "sendSignal": "Skicka signal: {channel}",
+        "timeBankDelta": "Justera tidsbank: {delta}s",
+        "showLeaderScript": "Visa ledarscript",
+        "triggerSignal": "Aktivera signalgenerator",
+        "pauseTimeBank": "Pausa tidsbank",
+        "resumeTimeBank": "Återuppta tidsbank"
+      }
+    },
+    "signalPresetEditor": {
+      "editSignal": "Redigera signal",
+      "configureProperties": "Konfigurera signalens egenskaper",
+      "playing": "Spelar...",
+      "test": "Testa",
+      "done": "Klar",
+      "patternSteps": "Steg i mönstret",
+      "add": "Lägg till",
+      "on": "på",
+      "off": "av",
+      "preview": "Förhandsvisning",
+      "onDuration": "På: {ms}ms",
+      "offDuration": "Av: {ms}ms",
+      "total": "Total: {ms}ms",
+      "noSignalsDefined": "Inga signaler definierade",
+      "addSignalsHint": "Lägg till signaler som kan triggas under spelet",
+      "addSignal": "Lägg till signal",
+      "copySuffix": "{name} (kopia)",
+      "labels": {
+        "name": "Namn",
+        "signalType": "Signaltyp",
+        "pattern": "Mönster",
+        "color": "Färg",
+        "audioSource": "Ljudkälla",
+        "volume": "Volym: {percent}%",
+        "title": "Rubrik",
+        "message": "Meddelande",
+        "repeat": "Upprepa",
+        "pause": "Paus (ms)"
+      },
+      "placeholders": {
+        "signalName": "Signalnamn",
+        "notificationTitle": "Notifikationsrubrik",
+        "optionalMessage": "Valfritt meddelande"
+      },
+      "signalTypes": {
+        "torch": "Ficklampa",
+        "audio": "Ljud",
+        "vibration": "Vibration",
+        "screenFlash": "Skärmblänk",
+        "notification": "Notifikation"
+      },
+      "patterns": {
+        "single": "Enkel",
+        "double": "Dubbel",
+        "triple": "Trippel",
+        "sos": "SOS",
+        "pulse": "Puls",
+        "custom": "Anpassad"
+      },
+      "patternDescriptions": {
+        "singleDesc": "En kort puls",
+        "doubleDesc": "Två snabba pulser",
+        "tripleDesc": "Tre snabba pulser",
+        "sosDesc": "... --- ...",
+        "pulseDesc": "Kontinuerlig pulsning",
+        "customDesc": "Skapa eget mönster"
+      },
+      "audioTypes": {
+        "beep": "Pip (standard)",
+        "bell": "Ringklocka",
+        "chime": "Klang",
+        "alert": "Larm"
+      },
+      "repeatOptions": {
+        "once": "1 gång",
+        "twice": "2 gånger",
+        "thrice": "3 gånger",
+        "fiveTimes": "5 gånger",
+        "infinite": "Oändligt"
+      },
+      "colors": {
+        "white": "Vit",
+        "red": "Röd",
+        "green": "Grön",
+        "blue": "Blå",
+        "yellow": "Gul",
+        "magenta": "Magenta",
+        "cyan": "Cyan"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Något gick fel",

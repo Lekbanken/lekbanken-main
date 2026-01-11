@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Select } from '@/components/ui'
 import {
   Cog6ToothIcon,
@@ -300,6 +301,14 @@ export default function PreferencesPage() {
                 onChange={(val) => updatePreference('enableRecommendations', val)}
                 label="Rekommendationer"
               />
+            </div>
+            <div className="pt-2">
+              <Link
+                href="/app/preferences/cookies"
+                className="inline-flex items-center text-sm text-primary hover:underline"
+              >
+                Hantera cookie-inställningar
+              </Link>
             </div>
           </CardContent>
         </Card>

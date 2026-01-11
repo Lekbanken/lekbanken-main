@@ -1280,6 +1280,218 @@
         "description": "Game content will appear here when the host starts."
       }
     },
+    "hostPlayMode": {
+      "errors": {
+        "couldNotLoadData": "Could not load game data",
+        "genericError": "An error occurred",
+        "noDataAvailable": "No game data available"
+      },
+      "navigation": {
+        "back": "Back",
+        "backToSession": "Back to session",
+        "lobby": "Lobby"
+      },
+      "noGameLinked": {
+        "title": "No game linked",
+        "description": "This session has no game linked. Play mode requires a game with steps and instructions."
+      },
+      "zones": {
+        "play": "Play",
+        "content": "Content",
+        "manage": "Manage"
+      },
+      "contentTabs": {
+        "artifacts": "Artifacts",
+        "puzzles": "Puzzles",
+        "decisions": "Decisions",
+        "outcome": "Outcome"
+      },
+      "manageTabs": {
+        "roles": "Roles",
+        "settings": "Settings"
+      },
+      "settings": {
+        "title": "Game Settings",
+        "comingSoon": "Settings for the game will be available in future versions.",
+        "features": {
+          "timer": "Timer settings",
+          "autoStep": "Automatic step progression",
+          "sounds": "Sound effects",
+          "participantLimits": "Participant limits"
+        }
+      }
+    },
+    "timeBankPanel": {
+      "title": "Time Bank",
+      "description": "Add or deduct time during the game.",
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
+      "format": {
+        "minSec": "min:sec"
+      },
+      "errors": {
+        "loadFailed": "Could not load time bank",
+        "updateFailed": "Could not update time bank"
+      },
+      "placeholders": {
+        "deltaSeconds": "Delta seconds (e.g. 120)",
+        "reason": "Reason (e.g. hint)"
+      },
+      "actions": {
+        "apply": "Apply",
+        "refresh": "Refresh"
+      },
+      "recentChanges": {
+        "title": "Recent changes",
+        "loading": "Loading…",
+        "empty": "No changes yet."
+      }
+    },
+    "triggerDryRun": {
+      "title": "Trigger Dry-Run",
+      "description": "Test which triggers activate for different events ({count} active)",
+      "labels": {
+        "eventType": "Event type",
+        "step": "Step",
+        "phase": "Phase",
+        "artifact": "Artifact"
+      },
+      "placeholders": {
+        "selectEvent": "Select event to simulate",
+        "selectStep": "Select step",
+        "selectPhase": "Select phase",
+        "selectArtifact": "Select artifact",
+        "enterValue": "Enter {field}"
+      },
+      "buttons": {
+        "simulate": "Simulate event",
+        "clear": "Clear"
+      },
+      "results": {
+        "title": "Results"
+      },
+      "matches": "{count} matches",
+      "delay": "{seconds}s delay",
+      "actionCount": "{count, plural, =1 {1 action} other {# actions}}",
+      "noMatchingTrigger": "No trigger matches this event",
+      "noTriggersDefined": "No triggers defined for this game",
+      "eventTypes": {
+        "stepStarted": "Step started",
+        "stepCompleted": "Step completed",
+        "phaseStarted": "Phase started",
+        "phaseCompleted": "Phase completed",
+        "keypadCorrect": "Correct code",
+        "keypadFailed": "Wrong code",
+        "artifactUnlocked": "Artifact unlocked",
+        "timerEnded": "Timer ended",
+        "counterReached": "Counter reached",
+        "riddleCorrect": "Riddle solved",
+        "signalReceived": "Signal received",
+        "timeBankExpired": "Time bank expired",
+        "hotspotFound": "Hotspot found",
+        "tilePuzzleComplete": "Puzzle complete",
+        "cipherDecoded": "Cipher decoded",
+        "logicGridSolved": "Logic grid solved"
+      },
+      "actions": {
+        "showCountdown": "Show countdown: {duration}s",
+        "revealArtifact": "Reveal artifact",
+        "hideArtifact": "Hide artifact",
+        "advanceStep": "Go to next step",
+        "advancePhase": "Go to next phase",
+        "startTimer": "Start timer: {name}",
+        "sendMessage": "Send message",
+        "sendSignal": "Send signal: {channel}",
+        "timeBankDelta": "Adjust time bank: {delta}s",
+        "showLeaderScript": "Show leader script",
+        "triggerSignal": "Activate signal generator",
+        "pauseTimeBank": "Pause time bank",
+        "resumeTimeBank": "Resume time bank"
+      }
+    },
+    "signalPresetEditor": {
+      "editSignal": "Edit signal",
+      "configureProperties": "Configure signal properties",
+      "playing": "Playing...",
+      "test": "Test",
+      "done": "Done",
+      "patternSteps": "Pattern steps",
+      "add": "Add",
+      "on": "on",
+      "off": "off",
+      "preview": "Preview",
+      "onDuration": "On: {ms}ms",
+      "offDuration": "Off: {ms}ms",
+      "total": "Total: {ms}ms",
+      "noSignalsDefined": "No signals defined",
+      "addSignalsHint": "Add signals that can be triggered during the game",
+      "addSignal": "Add signal",
+      "copySuffix": "{name} (copy)",
+      "labels": {
+        "name": "Name",
+        "signalType": "Signal type",
+        "pattern": "Pattern",
+        "color": "Color",
+        "audioSource": "Audio source",
+        "volume": "Volume: {percent}%",
+        "title": "Title",
+        "message": "Message",
+        "repeat": "Repeat",
+        "pause": "Pause (ms)"
+      },
+      "placeholders": {
+        "signalName": "Signal name",
+        "notificationTitle": "Notification title",
+        "optionalMessage": "Optional message"
+      },
+      "signalTypes": {
+        "torch": "Flashlight",
+        "audio": "Audio",
+        "vibration": "Vibration",
+        "screenFlash": "Screen flash",
+        "notification": "Notification"
+      },
+      "patterns": {
+        "single": "Single",
+        "double": "Double",
+        "triple": "Triple",
+        "sos": "SOS",
+        "pulse": "Pulse",
+        "custom": "Custom"
+      },
+      "patternDescriptions": {
+        "singleDesc": "A single short pulse",
+        "doubleDesc": "Two quick pulses",
+        "tripleDesc": "Three quick pulses",
+        "sosDesc": "... --- ...",
+        "pulseDesc": "Continuous pulsing",
+        "customDesc": "Create custom pattern"
+      },
+      "audioTypes": {
+        "beep": "Beep (default)",
+        "bell": "Bell",
+        "chime": "Chime",
+        "alert": "Alert"
+      },
+      "repeatOptions": {
+        "once": "1 time",
+        "twice": "2 times",
+        "thrice": "3 times",
+        "fiveTimes": "5 times",
+        "infinite": "Infinite"
+      },
+      "colors": {
+        "white": "White",
+        "red": "Red",
+        "green": "Green",
+        "blue": "Blue",
+        "yellow": "Yellow",
+        "magenta": "Magenta",
+        "cyan": "Cyan"
+      }
+    },
     "artifactsPanel": {
       "errors": {
         "somethingWentWrong": "Something went wrong",

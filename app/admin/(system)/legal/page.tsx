@@ -4,6 +4,7 @@ import {
   PencilSquareIcon,
   ShieldCheckIcon,
   ClockIcon,
+  ChartBarIcon,
 } from '@heroicons/react/24/outline'
 import {
   AdminBreadcrumbs,
@@ -13,7 +14,7 @@ import {
   AdminStatCard,
   AdminStatGrid,
 } from '@/components/admin/shared'
-import { listLegalAuditEvents, listLegalDocuments, listLegalDrafts, getLegalAcceptanceImpact } from '@/app/actions/legal-admin'
+import { getCookieConsentOverview, getLegalAcceptanceImpact, listLegalAuditEvents, listLegalDocuments, listLegalDrafts } from '@/app/actions/legal-admin'
 import { GLOBAL_LEGAL_TYPES } from '@/lib/legal/constants'
 import type { LegalDocType } from '@/lib/legal/types'
 import { LEGAL_DOC_LABELS, LEGAL_LOCALE_LABELS } from '@/lib/legal/doc-metadata'
@@ -21,10 +22,11 @@ import { LEGAL_DOC_LABELS, LEGAL_LOCALE_LABELS } from '@/lib/legal/doc-metadata'
 export const dynamic = 'force-dynamic'
 
 export default async function LegalAdminHubPage() {
-  const [docsResult, draftsResult, auditResult] = await Promise.all([
+  const [docsResult, draftsResult, auditResult, consentResult] = await Promise.all([
     listLegalDocuments({ scope: 'global', activeOnly: true }),
     listLegalDrafts({ scope: 'global' }),
     listLegalAuditEvents({ scope: 'global', limit: 12 }),
+    getCookieConsentOverview(),
   ])
 
   if (!docsResult.success) {
@@ -50,6 +52,7 @@ export default async function LegalAdminHubPage() {
 
   const impact = impactResult.success ? impactResult.data : { totalUsers: 0, documentStats: {} }
   const totalPending = Object.values(impact.documentStats).reduce((sum, doc) => sum + doc.pendingCount, 0)
+  const consentOverview = consentResult.success ? consentResult.data : null
 
   return (
     <AdminPageLayout>
@@ -92,6 +95,31 @@ export default async function LegalAdminHubPage() {
           iconColor="amber"
         />
       </AdminStatGrid>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Cookie consent overview</h2>
+        {consentOverview ? (
+          <AdminStatGrid cols={4}>
+            {Object.entries(consentOverview.optedIn).map(([category, count]) => {
+              const percent = consentOverview.totalUsers > 0
+                ? Math.round((count / consentOverview.totalUsers) * 100)
+                : 0
+              return (
+                <AdminStatCard
+                  key={category}
+                  label={category}
+                  value={`${count}`}
+                  icon={<ChartBarIcon className="h-5 w-5" />}
+                  subtitle={`${percent}% of users`}
+                  iconColor={percent >= 75 ? 'green' : percent >= 50 ? 'amber' : 'red'}
+                />
+              )
+            })}
+          </AdminStatGrid>
+        ) : (
+          <p className="text-sm text-muted-foreground">Consent stats are not available yet.</p>
+        )}
+      </section>
 
       <section className="space-y-4">
         <h2 className="text-lg font-semibold">Active documents</h2>

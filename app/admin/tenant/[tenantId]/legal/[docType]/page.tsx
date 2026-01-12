@@ -22,7 +22,7 @@ export default async function TenantLegalEditorPage({
   if (!tenantId) {
     notFound()
   }
-  if (!TENANT_LEGAL_TYPES.includes(docType)) {
+  if (!(TENANT_LEGAL_TYPES as readonly string[]).includes(docType)) {
     notFound()
   }
 

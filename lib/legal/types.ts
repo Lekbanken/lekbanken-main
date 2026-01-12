@@ -251,51 +251,16 @@ export interface CookieConsentUpdate {
   tenant_id_snapshot?: string | null
 }
 
-export type LegalDatabase = BaseDatabase & {
-  public: BaseDatabase['public'] & {
-    Tables: BaseDatabase['public']['Tables'] & {
-      legal_documents: {
-        Row: LegalDocumentRow
-        Insert: LegalDocumentInsert
-        Update: LegalDocumentUpdate
-        Relationships: []
-      }
-      user_legal_acceptances: {
-        Row: UserLegalAcceptanceRow
-        Insert: UserLegalAcceptanceInsert
-        Update: UserLegalAcceptanceUpdate
-        Relationships: []
-      }
-      cookie_catalog: {
-        Row: CookieCatalogRow
-        Insert: CookieCatalogInsert
-        Update: CookieCatalogUpdate
-        Relationships: []
-      }
-      cookie_consents: {
-        Row: CookieConsentRow
-        Insert: CookieConsentInsert
-        Update: CookieConsentUpdate
-        Relationships: []
-      }
-      legal_document_drafts: {
-        Row: LegalDocumentDraftRow
-        Insert: LegalDocumentDraftInsert
-        Update: LegalDocumentDraftUpdate
-        Relationships: []
-      }
-      org_legal_acceptances: {
-        Row: OrgLegalAcceptanceRow
-        Insert: OrgLegalAcceptanceInsert
-        Update: OrgLegalAcceptanceUpdate
-        Relationships: []
-      }
-      legal_audit_log: {
-        Row: LegalAuditLogRow
-        Insert: LegalAuditLogInsert
-        Update: LegalAuditLogUpdate
-        Relationships: []
-      }
-    }
-  }
-}
+// Tables we override with stricter enum types
+type LegalTableNames =
+  | 'legal_documents'
+  | 'user_legal_acceptances'
+  | 'cookie_catalog'
+  | 'cookie_consents'
+  | 'legal_document_drafts'
+  | 'org_legal_acceptances'
+  | 'legal_audit_log'
+
+// Use the base Database type directly to avoid intersection conflicts with stricter enum types.
+// Cast query results to our stricter Row types (e.g., LegalDocumentRow) when needed.
+export type LegalDatabase = BaseDatabase

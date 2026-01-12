@@ -138,7 +138,7 @@ export async function getLegalDocumentById(
     return null
   }
 
-  return data ?? null
+  return (data ?? null) as LegalDocumentRow | null
 }
 
 type CookieCatalogResult = {
@@ -212,7 +212,7 @@ export async function getCookieCatalog(): Promise<CookieCatalogResult> {
     return { success: false, error: error.message }
   }
 
-  return { success: true, data: data ?? [] }
+  return { success: true, data: (data ?? []) as CookieCatalogRow[] }
 }
 
 export async function getCookieConsentState(): Promise<CookieConsentStateResult> {

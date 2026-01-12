@@ -6,7 +6,7 @@ import { getActiveLegalDocument } from '@/lib/legal/legal-docs'
 export default async function CookiePolicyPage() {
   const locale = await getLocale()
   const t = await getTranslations('legal')
-  const { doc } = await getActiveLegalDocument({ type: 'cookie_policy', locale })
+  const { doc } = await getActiveLegalDocument({ type: 'cookie_policy', locale: locale as 'sv' | 'no' | 'en' })
 
   const lastUpdated = doc?.published_at
     ? new Date(doc.published_at).toLocaleDateString(locale)

@@ -15,7 +15,7 @@ export default async function LegalDocumentEditorPage({
   params: { docType: string }
 }) {
   const docType = params.docType as LegalDocType
-  if (!GLOBAL_LEGAL_TYPES.includes(docType)) {
+  if (!(GLOBAL_LEGAL_TYPES as readonly string[]).includes(docType)) {
     notFound()
   }
 

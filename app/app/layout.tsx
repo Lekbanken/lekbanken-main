@@ -18,7 +18,7 @@ export default async function AppShell({ children }: Props) {
   }
 
   const locale = await getLocale()
-  const pendingLegal = await getPendingLegalDocuments(authContext.user.id, locale)
+  const pendingLegal = await getPendingLegalDocuments(authContext.user.id, locale as 'sv' | 'no' | 'en')
   if (pendingLegal.length > 0) {
     redirect('/legal/accept?redirect=/app')
   }

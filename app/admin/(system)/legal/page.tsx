@@ -50,8 +50,8 @@ export default async function LegalAdminHubPage() {
     ? await getLegalAcceptanceImpact(activeDocs.map((doc) => doc.id))
     : { success: true, data: { totalUsers: 0, documentStats: {} } }
 
-  const impact = impactResult.success ? impactResult.data : { totalUsers: 0, documentStats: {} }
-  const totalPending = Object.values(impact.documentStats).reduce((sum, doc) => sum + doc.pendingCount, 0)
+  const impact = impactResult.success ? impactResult.data : { totalUsers: 0, documentStats: {} as Record<string, { acceptedCount: number; pendingCount: number }> }
+  const totalPending = Object.values(impact.documentStats).reduce<number>((sum, doc) => sum + (doc as { pendingCount: number }).pendingCount, 0)
   const consentOverview = consentResult.success ? consentResult.data : null
 
   return (
@@ -144,7 +144,7 @@ export default async function LegalAdminHubPage() {
               </thead>
               <tbody className="divide-y divide-border">
                 {activeDocs.map((doc) => {
-                  const docStats = impact.documentStats[doc.id]
+                  const docStats = (impact.documentStats as Record<string, { acceptedCount: number; pendingCount: number }>)[doc.id]
                   const acceptanceLabel = docStats
                     ? `${docStats.acceptedCount}/${impact.totalUsers}`
                     : 'N/A'

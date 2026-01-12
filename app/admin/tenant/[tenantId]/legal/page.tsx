@@ -89,7 +89,7 @@ export default async function TenantLegalHubPage({
       })
     : { success: true, data: {} }
 
-  const acceptanceMap = acceptanceResult.success ? acceptanceResult.data : {}
+  const acceptanceMap = acceptanceResult.success ? acceptanceResult.data : {} as Record<string, { accepted_at: string }>
 
   return (
     <AdminPageLayout>
@@ -155,11 +155,11 @@ export default async function TenantLegalHubPage({
                       <div className="font-medium">{LEGAL_DOC_LABELS[doc.type as LegalDocType]}</div>
                       <div className="text-xs text-muted-foreground">{doc.title}</div>
                     </td>
-                    <td className="px-4 py-3">{LEGAL_LOCALE_LABELS[doc.locale]}</td>
+                    <td className="px-4 py-3">{LEGAL_LOCALE_LABELS[doc.locale as keyof typeof LEGAL_LOCALE_LABELS]}</td>
                     <td className="px-4 py-3">v{doc.version_int}</td>
                     <td className="px-4 py-3">
-                      {acceptanceMap[doc.id]
-                        ? new Date(acceptanceMap[doc.id].accepted_at).toLocaleString()
+                      {(acceptanceMap as Record<string, { accepted_at: string }>)[doc.id]
+                        ? new Date((acceptanceMap as Record<string, { accepted_at: string }>)[doc.id].accepted_at).toLocaleString()
                         : 'Pending'}
                     </td>
                     <td className="px-4 py-3">

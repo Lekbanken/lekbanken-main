@@ -54,13 +54,13 @@ export async function getActiveLegalDocument({
     let query = supabase
       .from('legal_documents')
       .select('*')
-      .eq('type', type)
-      .eq('scope', scope)
+      .eq('type', type as string)
+      .eq('scope', scope as string)
       .eq('is_active', true)
-      .eq('locale', candidate)
+      .eq('locale', candidate as string)
 
     query = scope === 'tenant'
-      ? query.eq('tenant_id', tenantId)
+      ? query.eq('tenant_id', tenantId!)
       : query.is('tenant_id', null)
 
     const { data, error } = await query.maybeSingle()
@@ -69,7 +69,7 @@ export async function getActiveLegalDocument({
       continue
     }
     if (data) {
-      return { doc: data, localeUsed: candidate }
+      return { doc: data as LegalDocumentRow, localeUsed: candidate }
     }
   }
 

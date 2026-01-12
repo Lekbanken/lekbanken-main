@@ -414,7 +414,7 @@ export function BatchArtifactPanel({
             <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('confirmDescription', {
-                operation: confirmOperation && OPERATION_LABELS[confirmOperation].toLowerCase(),
+                operation: confirmOperation ? OPERATION_LABELS[confirmOperation].toLowerCase() : '',
                 count: batch.selectedCount,
                 plural: batch.selectedCount !== 1 ? 'er' : ''
               })}

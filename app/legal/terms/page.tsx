@@ -16,7 +16,7 @@ export default async function TermsPage() {
   const t = await getTranslations('legal')
   const terms = await getTranslations('legal.terms')
   const s = await getTranslations('legal.terms.sections')
-  const { doc } = await getActiveLegalDocument({ type: 'terms', locale })
+  const { doc } = await getActiveLegalDocument({ type: 'terms', locale: locale as 'sv' | 'no' | 'en' })
 
   const lastUpdated = doc?.published_at
     ? new Date(doc.published_at).toLocaleDateString(locale)

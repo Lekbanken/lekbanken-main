@@ -202,9 +202,12 @@ export default function LegalPreferencesPage() {
               <Button onClick={handleDownload} disabled={!receipt || acceptedCount === 0}>
                 Download acceptance receipt
               </Button>
-              <Button variant="outline" asChild>
-                <Link href="/legal/terms">View legal pages</Link>
-              </Button>
+              <Link
+                href="/legal/terms"
+                className="inline-flex h-9 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                View legal pages
+              </Link>
             </CardContent>
           </Card>
         </div>

@@ -16,7 +16,7 @@ export default async function PrivacyPage() {
   const t = await getTranslations('legal')
   const p = await getTranslations('legal.privacy')
   const s = await getTranslations('legal.privacy.sections')
-  const { doc } = await getActiveLegalDocument({ type: 'privacy', locale })
+  const { doc } = await getActiveLegalDocument({ type: 'privacy', locale: locale as 'sv' | 'no' | 'en' })
 
   const lastUpdated = doc?.published_at
     ? new Date(doc.published_at).toLocaleDateString(locale)

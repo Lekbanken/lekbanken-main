@@ -3,6 +3,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { isSystemAdmin, isTenantAdmin } from '@/lib/utils/tenantAuth'
+import type { Json } from '@/types/supabase'
 import type {
   LegalAuditLogRow,
   LegalDatabase,
@@ -55,7 +56,11 @@ function getLegalServiceClient(): SupabaseClient<LegalDatabase> {
   return createServiceRoleClient() as SupabaseClient<LegalDatabase>
 }
 
-async function assertScopeAccess(scope: LegalDocScope, tenantId?: string | null) {
+type ScopeAccessResult =
+  | { ok: false; error: string }
+  | { ok: true; error?: never; user: { id: string }; isSystem: boolean }
+
+async function assertScopeAccess(scope: LegalDocScope, tenantId?: string | null): Promise<ScopeAccessResult> {
   const supabase = await createServerRlsClient()
   const { data: { user }, error } = await supabase.auth.getUser()
 
@@ -97,11 +102,11 @@ async function logLegalEvent(params: {
   await supabase
     .from('legal_audit_log')
     .insert({
-      scope,
+      scope: scope as string,
       tenant_id: scope === 'tenant' ? tenantId ?? null : null,
       document_id: documentId ?? null,
       event_type: eventType,
-      payload: payload ?? {},
+      payload: (payload ?? {}) as Json,
       actor_user_id: actorUserId ?? null,
     })
 }
@@ -116,14 +121,14 @@ export async function listLegalDocuments(
   let query = supabase
     .from('legal_documents')
     .select('*')
-    .eq('scope', params.scope)
+    .eq('scope', params.scope as string)
 
-  if (params.type) query = query.eq('type', params.type)
-  if (params.locale) query = query.eq('locale', params.locale)
+  if (params.type) query = query.eq('type', params.type as string)
+  if (params.locale) query = query.eq('locale', params.locale as string)
   if (params.activeOnly) query = query.eq('is_active', true)
 
   if (params.scope === 'tenant') {
-    query = query.eq('tenant_id', params.tenantId ?? null)
+    query = query.eq('tenant_id', params.tenantId!)
   } else {
     query = query.is('tenant_id', null)
   }
@@ -138,7 +143,7 @@ export async function listLegalDocuments(
     return { success: false, error: 'Failed to load legal documents' }
   }
 
-  return { success: true, data: data ?? [] }
+  return { success: true, data: (data ?? []) as LegalDocumentRow[] }
 }
 
 export async function listLegalDrafts(
@@ -151,13 +156,13 @@ export async function listLegalDrafts(
   let query = supabase
     .from('legal_document_drafts')
     .select('*')
-    .eq('scope', params.scope)
+    .eq('scope', params.scope as string)
 
-  if (params.type) query = query.eq('type', params.type)
-  if (params.locale) query = query.eq('locale', params.locale)
+  if (params.type) query = query.eq('type', params.type as string)
+  if (params.locale) query = query.eq('locale', params.locale as string)
 
   if (params.scope === 'tenant') {
-    query = query.eq('tenant_id', params.tenantId ?? null)
+    query = query.eq('tenant_id', params.tenantId!)
   } else {
     query = query.is('tenant_id', null)
   }
@@ -172,7 +177,7 @@ export async function listLegalDrafts(
     return { success: false, error: 'Failed to load legal drafts' }
   }
 
-  return { success: true, data: data ?? [] }
+  return { success: true, data: (data ?? []) as LegalDocumentDraftRow[] }
 }
 
 export async function getLegalEditorSnapshot(params: {
@@ -214,7 +219,7 @@ export async function saveLegalDraft(input: LegalDraftInput): Promise<ActionResu
       requires_acceptance: input.requiresAcceptance,
       change_summary: input.changeSummary?.trim() ?? '',
       updated_at: new Date().toISOString(),
-      updated_by: access.user.id,
+      updated_by: access.user!.id,
     }, { onConflict: 'type,locale,scope,tenant_id' })
     .select('*')
     .single()
@@ -230,10 +235,10 @@ export async function saveLegalDraft(input: LegalDraftInput): Promise<ActionResu
     documentId: null,
     eventType: 'draft_saved',
     payload: { type: input.type, locale: input.locale },
-    actorUserId: access.user.id,
+    actorUserId: access.user!.id,
   })
 
-  return { success: true, data }
+  return { success: true, data: data as LegalDocumentDraftRow }
 }
 
 export async function deleteLegalDraft(params: {
@@ -249,12 +254,12 @@ export async function deleteLegalDraft(params: {
   let query = supabase
     .from('legal_document_drafts')
     .delete()
-    .eq('scope', params.scope)
-    .eq('type', params.type)
-    .eq('locale', params.locale)
+    .eq('scope', params.scope as string)
+    .eq('type', params.type as string)
+    .eq('locale', params.locale as string)
 
   query = params.scope === 'tenant'
-    ? query.eq('tenant_id', params.tenantId ?? null)
+    ? query.eq('tenant_id', params.tenantId!)
     : query.is('tenant_id', null)
 
   const { error } = await query
@@ -270,7 +275,7 @@ export async function deleteLegalDraft(params: {
     documentId: null,
     eventType: 'draft_deleted',
     payload: { type: params.type, locale: params.locale },
-    actorUserId: access.user.id,
+    actorUserId: access.user!.id,
   })
 
   return { success: true, data: null }
@@ -292,10 +297,10 @@ export async function publishLegalDocument(input: PublishInput): Promise<ActionR
 
   const supabase = await getLegalClient()
   const { data: newDocId, error } = await supabase.rpc('publish_legal_document_v1', {
-    p_scope: input.scope,
-    p_tenant_id: input.scope === 'tenant' ? input.tenantId ?? null : null,
-    p_type: input.type,
-    p_locale: input.locale,
+    p_scope: input.scope as string,
+    p_tenant_id: (input.scope === 'tenant' ? input.tenantId ?? null : null) as string,
+    p_type: input.type as string,
+    p_locale: input.locale as string,
     p_title: title,
     p_content_markdown: content,
     p_requires_acceptance: input.requiresAcceptance,
@@ -310,12 +315,12 @@ export async function publishLegalDocument(input: PublishInput): Promise<ActionR
   let draftDeleteQuery = supabase
     .from('legal_document_drafts')
     .delete()
-    .eq('scope', input.scope)
-    .eq('type', input.type)
-    .eq('locale', input.locale)
+    .eq('scope', input.scope as string)
+    .eq('type', input.type as string)
+    .eq('locale', input.locale as string)
 
   draftDeleteQuery = input.scope === 'tenant'
-    ? draftDeleteQuery.eq('tenant_id', input.tenantId ?? null)
+    ? draftDeleteQuery.eq('tenant_id', input.tenantId!)
     : draftDeleteQuery.is('tenant_id', null)
 
   await draftDeleteQuery
@@ -331,7 +336,7 @@ export async function publishLegalDocument(input: PublishInput): Promise<ActionR
     return { success: false, error: 'Published, but failed to load document' }
   }
 
-  return { success: true, data: doc }
+  return { success: true, data: doc as LegalDocumentRow }
 }
 
 export async function listLegalAuditEvents(params: {
@@ -346,10 +351,10 @@ export async function listLegalAuditEvents(params: {
   let query = supabase
     .from('legal_audit_log')
     .select('*')
-    .eq('scope', params.scope)
+    .eq('scope', params.scope as string)
 
   if (params.scope === 'tenant') {
-    query = query.eq('tenant_id', params.tenantId ?? null)
+    query = query.eq('tenant_id', params.tenantId!)
   } else {
     query = query.is('tenant_id', null)
   }
@@ -363,7 +368,7 @@ export async function listLegalAuditEvents(params: {
     return { success: false, error: 'Failed to load audit log' }
   }
 
-  return { success: true, data: data ?? [] }
+  return { success: true, data: (data ?? []) as LegalAuditLogRow[] }
 }
 
 export async function getLegalAcceptanceImpact(documentIds: string[]): Promise<ActionResult<AcceptanceImpact>> {
@@ -486,7 +491,7 @@ export async function getOrgLegalAcceptanceMap(params: {
 
   const map: Record<string, OrgLegalAcceptanceRow> = {}
   for (const row of data ?? []) {
-    map[row.document_id] = row
+    map[row.document_id] = row as OrgLegalAcceptanceRow
   }
 
   return { success: true, data: map }
@@ -515,7 +520,7 @@ export async function recordOrgLegalAcceptance(params: {
     .upsert({
       tenant_id: params.tenantId,
       document_id: params.documentId,
-      accepted_by: access.user.id,
+      accepted_by: access.user!.id,
     }, { onConflict: 'tenant_id,document_id' })
     .select('*')
     .single()
@@ -531,8 +536,8 @@ export async function recordOrgLegalAcceptance(params: {
     documentId: params.documentId,
     eventType: 'org_accepted',
     payload: { documentId: params.documentId },
-    actorUserId: access.user.id,
+    actorUserId: access.user!.id,
   })
 
-  return { success: true, data }
+  return { success: true, data: data as OrgLegalAcceptanceRow }
 }

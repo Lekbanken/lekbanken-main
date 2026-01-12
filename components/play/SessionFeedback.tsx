@@ -140,6 +140,7 @@ export function SessionStatusMessage({
   autoDismissDelay = 5000,
   className = '',
 }: SessionStatusMessageProps) {
+  const t = useTranslations('play.sessionFeedback');
   const [isVisible, setIsVisible] = useState(true);
   const styles = statusStyles[type];
 

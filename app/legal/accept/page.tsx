@@ -29,7 +29,7 @@ export default async function LegalAcceptPage({ searchParams }: AcceptPageProps)
   }
 
   const locale = await getLocale()
-  const pendingDocs = await getPendingLegalDocuments(authContext.user.id, locale)
+  const pendingDocs = await getPendingLegalDocuments(authContext.user.id, locale as 'sv' | 'no' | 'en')
 
   const redirectParam = searchParams?.redirect ?? ''
   const redirectTo = redirectParam.startsWith('/') ? redirectParam : '/app'

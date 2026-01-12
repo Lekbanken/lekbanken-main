@@ -458,7 +458,7 @@ export function useSessionReadiness(input: SessionReadinessInput): UseSessionRea
   const canStart = criticalIssues.length === 0;
   
   // Summary
-  const { summary, summaryKey, summaryParams } = useMemo(() => {
+  const { summary, summaryKey, summaryParams } = useMemo((): { summary: string; summaryKey: string; summaryParams: Record<string, string | number> } => {
     if (canStart && readinessPercent >= 90) {
       return { 
         summary: 'Session is ready to start!', 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
@@ -18,6 +19,7 @@ interface User {
 export default function NotificationsAdminPage() {
   const { user } = useAuth();
   const { currentTenant } = useTenant();
+  const t = useTranslations('admin.notifications');
 
   const userId = user?.id;
   const tenantId = currentTenant?.id;
@@ -51,7 +53,7 @@ export default function NotificationsAdminPage() {
           .limit(200);
 
         if (queryError) {
-          setError('Kunde inte ladda användare för organisationen.');
+          setError(t('errors.loadUsers'));
           return;
         }
 
@@ -64,7 +66,7 @@ export default function NotificationsAdminPage() {
         setTenantUsers(mapped);
       } catch (err) {
         console.error(err);
-        setError('Kunde inte ladda användare.');
+        setError(t('errors.loadUsersFailed'));
       } finally {
         setLoading(false);
       }
@@ -90,7 +92,7 @@ export default function NotificationsAdminPage() {
       : tenantUsers.map((u) => u.id).filter(Boolean);
 
     if (userIds.length === 0) {
-      setError('Det finns inga anvÇÏndare att skicka till.');
+      setError(t('errors.noUsersToSend'));
       return;
     }
 
@@ -114,7 +116,7 @@ export default function NotificationsAdminPage() {
       setSelectedUserIds([]);
     } catch (err) {
       console.error(err);
-      setError('Kunde inte skicka notifikationer.');
+      setError(t('errors.sendFailed'));
     } finally {
       setIsSending(false);
     }
@@ -125,8 +127,8 @@ export default function NotificationsAdminPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<BellIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj en organisation för att skicka notifikationer."
+          title={t('noTenantTitle')}
+          description={t('noTenantDescription')}
         />
       </AdminPageLayout>
     );
@@ -136,8 +138,8 @@ export default function NotificationsAdminPage() {
     <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
-        title="Notifikationer"
-        description="Skicka meddelanden till organisationens användare."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<BellIcon className="h-8 w-8 text-primary" />}
         actions={
           <Badge variant="outline" className="capitalize">
@@ -148,7 +150,7 @@ export default function NotificationsAdminPage() {
 
       {error && (
         <AdminErrorState
-          title="Ett fel inträffade"
+          title={t('errorTitle')}
           description={error}
           onRetry={() => setError(null)}
         />
@@ -157,21 +159,21 @@ export default function NotificationsAdminPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
-            <CardTitle>Skicka notifikation</CardTitle>
+            <CardTitle>{t('form.sendNotification')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Titel</label>
+                <label className="text-sm font-medium text-foreground">{t('form.title')}</label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationTitle}
                   onChange={(e) => setNotificationTitle(e.target.value)}
-                  placeholder="Uppdatering i appen"
+                  placeholder={t('placeholders.title')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Typ</label>
+                <label className="text-sm font-medium text-foreground">{t('form.type')}</label>
                 <select
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationType}
@@ -187,19 +189,19 @@ export default function NotificationsAdminPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Meddelande</label>
+              <label className="text-sm font-medium text-foreground">{t('form.message')}</label>
               <textarea
                 className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                 value={notificationMessage}
                 onChange={(e) => setNotificationMessage(e.target.value)}
                 rows={4}
-                placeholder="Ditt meddelande..."
+                placeholder={t('placeholders.message')}
               />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Kategori</label>
+                <label className="text-sm font-medium text-foreground">{t('form.category')}</label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationCategory}
@@ -208,25 +210,25 @@ export default function NotificationsAdminPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Målgrupp</label>
+                <label className="text-sm font-medium text-foreground">{t('form.targetAudience')}</label>
                 <select
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={targetType}
                   onChange={(e) => setTargetType(e.target.value as typeof targetType)}
                 >
-                  <option value="all">Alla i organisationen</option>
-                  <option value="specific">Specifika användare</option>
+                  <option value="all">{t('options.allInOrg')}</option>
+                  <option value="specific">{t('options.specificUsers')}</option>
                 </select>
               </div>
             </div>
 
             {targetType === 'specific' && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Välj mottagare</label>
+                <label className="text-sm font-medium text-foreground">{t('form.selectRecipients')}</label>
                 {loading ? (
-                  <p className="text-sm text-muted-foreground">Laddar användare...</p>
+                  <p className="text-sm text-muted-foreground">{t('loading.users')}</p>
                 ) : tenantUsers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">Inga användare att välja.</p>
+                  <p className="text-sm text-muted-foreground">{t('empty.noUsers')}</p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
                     {tenantUsers.map((u) => (
@@ -252,7 +254,7 @@ export default function NotificationsAdminPage() {
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Action URL (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('form.actionUrl')}</label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={actionUrl}
@@ -261,32 +263,32 @@ export default function NotificationsAdminPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Action label (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('form.actionLabel')}</label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={actionLabel}
                   onChange={(e) => setActionLabel(e.target.value)}
-                  placeholder="Öppna"
+                  placeholder={t('placeholders.actionLabel')}
                 />
               </div>
             </div>
 
             <Button onClick={handleSend} disabled={isSending || !canSend}>
-              {isSending ? 'Skickar...' : 'Skicka notifikation'}
+              {isSending ? t('actions.sending') : t('actions.send')}
             </Button>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Mottagare</CardTitle>
+            <CardTitle>{t('recipients.title')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              {tenantUsers.length} användare i organisationen.
+              {t('recipients.count', { count: tenantUsers.length })}
             </p>
             <p className="text-xs text-muted-foreground">
-              Nar du valjer specifika anvandare kan du valja fran listan. Annars skickas till alla.
+              {t('recipients.hint')}
             </p>
           </CardContent>
         </Card>

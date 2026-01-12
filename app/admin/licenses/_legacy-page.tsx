@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import {
@@ -46,14 +47,15 @@ interface LicenseStats {
   usedSeats: number;
 }
 
-const statusConfig: Record<LicenseStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  active: { label: 'Aktiv', variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
-  trial: { label: 'Testperiod', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
-  expired: { label: 'Utgången', variant: 'destructive', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
-  suspended: { label: 'Pausad', variant: 'outline', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
+const statusConfig: Record<LicenseStatus, { labelKey: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+  active: { labelKey: 'status.active', variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
+  trial: { labelKey: 'status.trial', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
+  expired: { labelKey: 'status.expired', variant: 'destructive', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
+  suspended: { labelKey: 'status.suspended', variant: 'outline', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
 };
 
 export default function LicensesPage() {
+  const t = useTranslations('admin.licenses.legacy');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -213,12 +215,12 @@ export default function LicensesPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Laddar licenser...</p>
+        <p className="text-sm text-muted-foreground">{t('loading')}</p>
       ) : filtered.length === 0 ? (
         <AdminEmptyState
           icon={<KeyIcon className="h-6 w-6" />}
-          title="Inga licenser"
-          description="Inga licenser hittades med aktuella filter."
+          title={t('empty.noLicenses')}
+          description={t('empty.noLicensesDescription')}
         />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -232,7 +234,7 @@ export default function LicensesPage() {
                       <p className="text-sm font-semibold text-foreground">{license.organisationName}</p>
                       <p className="text-xs text-muted-foreground">{license.product}</p>
                     </div>
-                    <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
+                    <Badge variant={statusCfg.variant}>{t(statusCfg.labelKey)}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground">
                     Plan: {license.plan} • Seats: {license.usedSeats}/{license.seats}

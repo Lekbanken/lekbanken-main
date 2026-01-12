@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   AdminBreadcrumbs,
   AdminEmptyState,
@@ -60,6 +61,8 @@ type Props = {
 };
 
 export function SessionDetailPage({ sessionId }: Props) {
+  const t = useTranslations('admin.sessions');
+  const tDetail = useTranslations('admin.sessions.detail');
   const { can } = useRbac();
   const { success, warning } = useToast();
   const [session, setSession] = useState<SessionDetail | null>(null);
@@ -85,30 +88,30 @@ export function SessionDetailPage({ sessionId }: Props) {
         if (!active) return;
         setSession(mockSession);
         setLog(mockLog);
-        setError('Visar mockdata tills riktiga kopplingen är klar.');
+        setError(t('showingMockData'));
       }
     };
     void load();
     return () => {
       active = false;
     };
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   const breadcrumbs = useMemo(
     () => [
-      { label: 'Startsida', href: '/admin' },
-      { label: 'Sessioner', href: '/admin/sessions' },
+      { label: t('breadcrumbs.home'), href: '/admin' },
+      { label: t('breadcrumbs.sessions'), href: '/admin/sessions' },
       { label: session?.title || 'Session' },
     ],
-    [session]
+    [session, t]
   );
 
   if (!can('admin.sessions.view')) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
-          title="Ingen åtkomst"
-          description="Du behöver behörighet för att se sessioner."
+          title={tDetail('noAccess')}
+          description={tDetail('noAccessDescription')}
         />
       </AdminPageLayout>
     );
@@ -119,8 +122,8 @@ export function SessionDetailPage({ sessionId }: Props) {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<PlayIcon className="h-6 w-6" />}
-          title="Sessionen hittades inte"
-          description="Kontrollera länken eller gå tillbaka till listan."
+          title={tDetail('notFound')}
+          description={tDetail('notFoundDescription')}
         />
       </AdminPageLayout>
     );
@@ -131,38 +134,38 @@ export function SessionDetailPage({ sessionId }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title={session.title}
-        description="Detaljer och status för vald session."
+        description={tDetail('pageDescription')}
         icon={<PlayIcon className="h-8 w-8 text-primary" />}
       />
 
       {error && <p className="mb-2 text-sm text-amber-600">{error}</p>}
 
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Status" value={session.status} />
-        <AdminStatCard label="Deltagare" value={session.participants} />
-        <AdminStatCard label="Värd" value={session.host} />
+        <AdminStatCard label={tDetail('status')} value={session.status} />
+        <AdminStatCard label={t('columns.participants')} value={session.participants} />
+        <AdminStatCard label={t('columns.host')} value={session.host} />
       </AdminStatGrid>
 
       <Card className="border border-border mb-4">
         <CardHeader className="border-b border-border bg-muted/40">
-          <CardTitle>Metadata</CardTitle>
+          <CardTitle>{tDetail('metadata')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Status:</span>
+            <span className="text-sm font-medium">{tDetail('status')}:</span>
             <Badge variant={statusVariant(session.status)} className="capitalize">
               {session.status}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Organisation: {session.tenantName}</p>
-          <p className="text-sm text-muted-foreground">Start: {new Date(session.startedAt).toLocaleString()}</p>
-          <p className="text-sm text-muted-foreground">Anteckningar: {session.notes || '—'}</p>
+          <p className="text-sm text-muted-foreground">{tDetail('organisation')}: {session.tenantName}</p>
+          <p className="text-sm text-muted-foreground">{tDetail('start')}: {new Date(session.startedAt).toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground">{tDetail('notes')}: {session.notes || tDetail('noNotes')}</p>
         </CardContent>
       </Card>
 
       <Card className="border border-border">
         <CardHeader className="border-b border-border bg-muted/40">
-          <CardTitle>Åtgärder & logg</CardTitle>
+          <CardTitle>{tDetail('actionsAndLog')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
           <div className="flex flex-wrap gap-2">
@@ -178,10 +181,10 @@ export function SessionDetailPage({ sessionId }: Props) {
                 if (json?.logEntry) {
                   setLog((prev) => [json.logEntry, ...prev]);
                 }
-                success('Mute skickad.');
+                success(tDetail('muteSent'));
               }}
             >
-              Mute deltagare
+              {tDetail('muteParticipant')}
             </button>
             <button
               className="rounded border px-3 py-1 text-sm"
@@ -195,10 +198,10 @@ export function SessionDetailPage({ sessionId }: Props) {
                 if (json?.logEntry) {
                   setLog((prev) => [json.logEntry, ...prev]);
                 }
-                warning('Kick skickad.');
+                warning(tDetail('kickSent'));
               }}
             >
-              Kick session
+              {tDetail('kickSession')}
             </button>
             <button
               className="rounded border px-3 py-1 text-sm"
@@ -212,15 +215,15 @@ export function SessionDetailPage({ sessionId }: Props) {
                 if (json?.logEntry) {
                   setLog((prev) => [json.logEntry, ...prev]);
                 }
-                warning('Ban skickad.');
+                warning(tDetail('banSent'));
               }}
             >
-              Ban deltagare
+              {tDetail('banParticipant')}
             </button>
           </div>
           <div className="space-y-2">
             {log.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Ingen logg ännu.</p>
+              <p className="text-sm text-muted-foreground">{tDetail('noLogYet')}</p>
             ) : (
               log.map((entry) => (
                 <div key={entry.id} className="rounded border border-border px-3 py-2">

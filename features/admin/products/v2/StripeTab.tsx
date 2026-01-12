@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatDateTime } from '@/lib/i18n/format-utils';
 import {
   ArrowPathIcon,
@@ -48,6 +49,7 @@ interface StripeTabProps {
  * Lekbanken-specific product fields.
  */
 export function StripeTab({ product, onRefresh }: StripeTabProps) {
+  const t = useTranslations('admin.products.v2.stripeTab');
   const { success, error: toastError, warning } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -76,12 +78,12 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
 
   const handleSaveLocal = useCallback(async () => {
     if (statementDescriptor.length > 22) {
-      toastError('Kontoutdragstext får max vara 22 tecken');
+      toastError(t('messages.statementDescriptorTooLong'));
       return;
     }
 
     if (imageUrl && !imageUrl.startsWith('https://')) {
-      toastError('Bild-URL måste börja med https://');
+      toastError(t('messages.imageUrlMustBeHttps'));
       return;
     }
 
@@ -100,18 +102,18 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || 'Kunde inte spara');
+        throw new Error(data.error || t('messages.couldNotSave'));
       }
 
-      success('Ändringar sparade lokalt');
-      warning('Kom ihåg att synka till Stripe');
+      success(t('messages.savedLocally'));
+      warning(t('messages.rememberToSync'));
       onRefresh();
     } catch (err) {
-      toastError(err instanceof Error ? err.message : 'Kunde inte spara');
+      toastError(err instanceof Error ? err.message : t('messages.couldNotSave'));
     } finally {
       setIsSaving(false);
     }
-  }, [product.id, imageUrl, unitLabel, statementDescriptor, featureTier, success, warning, toastError, onRefresh]);
+  }, [product.id, imageUrl, unitLabel, statementDescriptor, featureTier, success, warning, toastError, onRefresh, t]);
 
   const handleSyncStripe = useCallback(async () => {
     setIsSyncing(true);
@@ -124,17 +126,17 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Synkronisering misslyckades');
+        throw new Error(data.error || t('messages.syncFailed'));
       }
 
-      success('Produkten synkades till Stripe');
+      success(t('messages.syncSuccess'));
       onRefresh();
     } catch (err) {
-      toastError(err instanceof Error ? err.message : 'Kunde inte synka till Stripe');
+      toastError(err instanceof Error ? err.message : t('messages.couldNotSync'));
     } finally {
       setIsSyncing(false);
     }
-  }, [product.id, success, toastError, onRefresh]);
+  }, [product.id, success, toastError, onRefresh, t]);
 
   const handleReset = useCallback(() => {
     setImageUrl(product.image_url || '');
@@ -184,16 +186,16 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <CloudArrowUpIcon className="h-4 w-4" />
-              Stripe-synkade fält
+              {t('title')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-4">
             {/* Product Image */}
             <div>
               <FieldLabel
-                label="Produktbild"
+                label={t('fields.productImage')}
                 fieldName="image_url"
-                description="Visas i Stripe Checkout och på fakturor"
+                description={t('fields.productImageDescription')}
               />
               <div className="flex gap-2 mt-2">
                 <input
@@ -209,7 +211,7 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
-                      alt="Produktbild"
+                      alt={t('fields.productImageAlt')}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
@@ -223,9 +225,9 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
             {/* Unit Label */}
             <div>
               <FieldLabel
-                label="Enhetsetikett"
+                label={t('fields.unitLabel')}
                 fieldName="unit_label"
-                description={`Visas på faktura: "3 ${unitLabel}s × 299 kr"`}
+                description={t('fields.unitLabelDescription', { unit: unitLabel })}
                 required
               />
               <select
@@ -245,21 +247,21 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
             {/* Statement Descriptor */}
             <div>
               <FieldLabel
-                label="Kontoutdragstext"
+                label={t('fields.statementDescriptor')}
                 fieldName="statement_descriptor"
-                description="Text som visas på kundens kontoutdrag (max 22 tecken)"
+                description={t('fields.statementDescriptorDescription')}
               />
               <input
                 type="text"
                 value={statementDescriptor}
                 onChange={(e) => setStatementDescriptor(e.target.value.slice(0, 22).toUpperCase())}
-                placeholder="T.ex. LEKBANKEN BASKET"
+                placeholder={t('fields.statementDescriptorPlaceholder')}
                 className="w-full mt-2 px-3 py-2 border border-input rounded-md bg-background text-sm font-mono"
                 maxLength={22}
                 disabled={isSaving}
               />
               <p className="text-xs text-muted-foreground mt-1 text-right">
-                {statementDescriptor.length}/22 tecken
+                {t('fields.statementDescriptorCount', { count: statementDescriptor.length })}
               </p>
             </div>
           </CardContent>
@@ -270,16 +272,16 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <LinkIcon className="h-4 w-4" />
-              Stripe Metadata
+              {t('metadataTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-4">
             {/* Feature Tier */}
             <div>
               <FieldLabel
-                label="Funktionsnivå"
+                label={t('fields.featureTier')}
                 fieldName="feature_tier"
-                description="Styr vilka funktioner som inkluderas"
+                description={t('fields.featureTierDescription')}
               />
               <select
                 value={featureTier}
@@ -298,15 +300,15 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
             {/* Read-only Stripe Info */}
             <div className="pt-4 border-t border-border space-y-3">
               <ReadOnlyField
-                label="Stripe Product ID"
+                label={t('fields.stripeProductId')}
                 value={product.stripe_product_id}
                 copyable
                 mono
               />
               <ReadOnlyField
-                label="Senast synkad"
+                label={t('fields.lastSynced')}
                 value={lastSynced ? formatDateTime(lastSynced) : null}
-                placeholder="Aldrig synkad"
+                placeholder={t('fields.neverSynced')}
               />
             </div>
           </CardContent>
@@ -318,8 +320,7 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
         <CardContent className="py-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <InfoBox variant="info" className="flex-1">
-              <strong>Spara</strong> sparar ändringar lokalt.{' '}
-              <strong>Synka till Stripe</strong> pushar alla ändringar till Stripe.
+              <span dangerouslySetInnerHTML={{ __html: t.raw('actions.info') }} />
             </InfoBox>
 
             <div className="flex gap-2">
@@ -330,7 +331,7 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                   onClick={handleReset}
                   disabled={isSaving || isSyncing}
                 >
-                  Återställ
+                  {t('actions.reset')}
                 </Button>
               )}
               <Button
@@ -342,10 +343,10 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                 {isSaving ? (
                   <>
                     <ArrowPathIcon className="mr-1 h-4 w-4 animate-spin" />
-                    Sparar...
+                    {t('actions.saving')}
                   </>
                 ) : (
-                  'Spara lokalt'
+                  t('actions.saveLocal')
                 )}
               </Button>
               <Button
@@ -356,12 +357,12 @@ export function StripeTab({ product, onRefresh }: StripeTabProps) {
                 {isSyncing ? (
                   <>
                     <ArrowPathIcon className="mr-1 h-4 w-4 animate-spin" />
-                    Synkar...
+                    {t('actions.syncing')}
                   </>
                 ) : (
                   <>
                     <CloudArrowUpIcon className="mr-1 h-4 w-4" />
-                    Synka till Stripe
+                    {t('actions.syncToStripe')}
                   </>
                 )}
               </Button>
@@ -392,6 +393,7 @@ function SyncStatusBanner({
   onSync,
   isSyncing,
 }: SyncStatusBannerProps) {
+  const t = useTranslations('admin.products.v2.stripeTab');
   const isConnected = syncStatus === 'connected';
   const hasError = syncStatus === 'error' || syncStatus === 'locked';
   const hasDrift = syncStatus === 'drift';
@@ -399,20 +401,20 @@ function SyncStatusBanner({
 
   let bgClass = 'bg-muted/50';
   let Icon = LinkIcon;
-  let statusText = 'Ej kopplad till Stripe';
+  let statusText = t('status.notConnected');
 
   if (isConnected) {
     bgClass = 'bg-green-50 dark:bg-green-950';
     Icon = CheckCircleIcon;
-    statusText = 'Synkad med Stripe';
+    statusText = t('status.synced');
   } else if (hasError) {
     bgClass = 'bg-red-50 dark:bg-red-950';
     Icon = ExclamationTriangleIcon;
-    statusText = syncStatus === 'locked' ? 'Synk låst - kontakta support' : 'Synkfel';
+    statusText = syncStatus === 'locked' ? t('status.syncLocked') : t('status.syncError');
   } else if (hasDrift) {
     bgClass = 'bg-amber-50 dark:bg-amber-950';
     Icon = ExclamationTriangleIcon;
-    statusText = 'Lokala ändringar ej synkade';
+    statusText = t('status.unsyncedChanges');
   }
 
   return (
@@ -433,13 +435,13 @@ function SyncStatusBanner({
 
         {lastSynced && (
           <span className="text-xs text-muted-foreground">
-            Senast: {formatDateTime(lastSynced)}
+            {t('status.lastSynced', { date: formatDateTime(lastSynced) })}
           </span>
         )}
 
         {isUnsynced && (
           <Button size="sm" onClick={onSync} disabled={isSyncing}>
-            {isSyncing ? 'Skapar...' : 'Skapa i Stripe'}
+            {isSyncing ? t('status.creating') : t('status.createInStripe')}
           </Button>
         )}
       </div>

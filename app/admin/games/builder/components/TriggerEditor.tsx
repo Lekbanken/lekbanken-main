@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Select, FeatureExplainer } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -36,10 +37,10 @@ const makeId = () =>
     ? crypto.randomUUID()
     : `id-${Math.random().toString(36).slice(2, 9)}`;
 
-function createTrigger(): TriggerFormData {
+function createTrigger(t: ReturnType<typeof useTranslations>): TriggerFormData {
   return {
     id: makeId(),
-    name: 'Ny trigger',
+    name: t('trigger.newTrigger'),
     description: '',
     enabled: true,
     condition: { type: 'manual' },
@@ -418,6 +419,7 @@ export function TriggerEditor({
   artifacts,
   onChange,
 }: TriggerEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -481,7 +483,7 @@ export function TriggerEditor({
   };
 
   const addTrigger = () => {
-    const newTrigger = createTrigger();
+    const newTrigger = createTrigger(t);
     onChange([...triggers, newTrigger]);
     setExpandedId(newTrigger.id ?? null);
   };
@@ -587,7 +589,7 @@ export function TriggerEditor({
             title="Välj från mallbibliotek"
           >
             <Squares2X2Icon className="h-4 w-4 mr-1" />
-            Mallar
+            {t('trigger.templates')}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
             <SparklesIcon className="h-4 w-4 mr-1" />
@@ -595,7 +597,7 @@ export function TriggerEditor({
           </Button>
           <Button variant="outline" size="sm" onClick={addTrigger}>
             <PlusIcon className="h-4 w-4 mr-1" />
-            Lägg till trigger
+            {t('trigger.addTrigger')}
           </Button>
         </div>
       </div>
@@ -603,23 +605,23 @@ export function TriggerEditor({
       {/* Import error message */}
       {importError && (
         <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-          <strong>Importfel:</strong> {importError}
+          <strong>{t('trigger.import.error')}:</strong> {importError}
         </div>
       )}
 
       {/* Intro explainer for triggers */}
       <FeatureExplainer
-        title="Hur triggers fungerar"
-        description="Triggers automatiserar leken: när ett villkor uppfylls (t.ex. ett steg slutförs eller tid går ut) utförs en eller flera åtgärder automatiskt."
-        example="När 5 minuter återstår → Visa en ledtråd"
+        title={t('trigger.howItWorks.title')}
+        description={t('trigger.howItWorks.description')}
+        example={t('trigger.howItWorks.example')}
       />
 
       {triggers.length === 0 && (
         <Card className="p-6 text-center text-foreground-secondary">
           <BoltIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-          <p className="text-sm">Inga triggers ännu.</p>
+          <p className="text-sm">{t('trigger.noTriggers')}</p>
           <p className="text-xs mt-1">
-            Triggers automatiserar leken: &quot;När X händer, gör Y&quot;
+            {t('trigger.noTriggersHint')}
           </p>
         </Card>
       )}
@@ -637,12 +639,12 @@ export function TriggerEditor({
                 className="flex-1 flex items-center gap-2 text-left"
               >
                 <BoltIcon className={`h-4 w-4 ${trigger.enabled ? 'text-yellow-500' : 'text-foreground-secondary'}`} />
-                <span className="font-medium">{trigger.name || 'Namnlös trigger'}</span>
+                <span className="font-medium">{trigger.name || t('trigger.unnamedTrigger')}</span>
                 {!trigger.enabled && (
-                  <Badge variant="secondary" size="sm">Inaktiv</Badge>
+                  <Badge variant="secondary" size="sm">{t('trigger.inactive')}</Badge>
                 )}
                 {trigger.execute_once && (
-                  <Badge variant="outline" size="sm">En gång</Badge>
+                  <Badge variant="outline" size="sm">{t('trigger.onceLabel')}</Badge>
                 )}
               </button>
               
@@ -697,7 +699,7 @@ export function TriggerEditor({
 
                 {/* Enabled */}
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium w-20">Aktiv</label>
+                  <label className="text-sm font-medium w-20">{t('trigger.activeLabel')}</label>
                   <input
                     type="checkbox"
                     checked={trigger.enabled}
@@ -708,7 +710,7 @@ export function TriggerEditor({
 
                 {/* Execute once */}
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium w-20">En gång</label>
+                  <label className="text-sm font-medium w-20">{t('trigger.onceCheckboxLabel')}</label>
                   <input
                     type="checkbox"
                     checked={trigger.execute_once}
@@ -716,13 +718,13 @@ export function TriggerEditor({
                     className="h-4 w-4"
                   />
                   <span className="text-xs text-foreground-secondary">
-                    Inaktiveras automatiskt efter första körningen
+                    {t('trigger.autoDisable')}
                   </span>
                 </div>
 
                 {/* Delay */}
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium w-20">Fördröjning</label>
+                  <label className="text-sm font-medium w-20">{t('trigger.delayLabel')}</label>
                   <Input
                     type="number"
                     value={trigger.delay_seconds}
@@ -730,7 +732,7 @@ export function TriggerEditor({
                     className="w-20"
                     min={0}
                   />
-                  <span className="text-xs text-foreground-secondary">sekunder</span>
+                  <span className="text-xs text-foreground-secondary">{t('trigger.seconds')}</span>
                 </div>
 
                 {/* Condition */}

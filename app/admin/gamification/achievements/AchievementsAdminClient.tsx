@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback, useTransition, useEffect } from 'react';
+import { useState, useCallback, useTransition, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   TrophyIcon,
   PlusIcon,
@@ -44,20 +45,6 @@ import { AwardAchievementModal } from './AwardAchievementModal';
 // CONSTANTS
 // ============================================
 
-const SCOPE_OPTIONS = [
-  { value: 'all', label: 'Alla scopes' },
-  { value: 'global', label: 'Global' },
-  { value: 'tenant', label: 'Tenant' },
-  { value: 'private', label: 'Privat' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Alla statusar' },
-  { value: 'draft', label: 'Utkast' },
-  { value: 'active', label: 'Aktiv' },
-  { value: 'archived', label: 'Arkiverad' },
-];
-
 const SCOPE_ICONS: Record<string, React.ReactNode> = {
   global: <GlobeAltIcon className="h-4 w-4" />,
   tenant: <BuildingOfficeIcon className="h-4 w-4" />,
@@ -93,6 +80,23 @@ export function AchievementsAdminClient({
   initialData,
   tenants,
 }: AchievementsAdminClientProps) {
+  const t = useTranslations('admin.gamification.achievements');
+  
+  // Translated options
+  const SCOPE_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('scopes.all') },
+    { value: 'global', label: t('scopes.global') },
+    { value: 'tenant', label: t('scopes.tenant') },
+    { value: 'private', label: t('scopes.private') },
+  ], [t]);
+  
+  const STATUS_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('statuses.all') },
+    { value: 'draft', label: t('statuses.draft') },
+    { value: 'active', label: t('statuses.active') },
+    { value: 'archived', label: t('statuses.archived') },
+  ], [t]);
+  
   // State
   const [achievements, setAchievements] = useState(initialData.achievements);
   const [totalCount, setTotalCount] = useState(initialData.totalCount);
@@ -175,9 +179,9 @@ export function AchievementsAdminClient({
       setTotalPages(result.totalPages);
     } catch (error) {
       console.error('Failed to fetch achievements:', error);
-      showNotification('error', 'Kunde inte hämta achievements');
+      showNotification('error', t('notifications.fetchFailed'));
     }
-  }, [page, pageSize, debouncedSearch, scopeFilter, statusFilter, tenantFilter, showNotification]);
+  }, [page, pageSize, debouncedSearch, scopeFilter, statusFilter, tenantFilter, showNotification, t]);
 
   // Refetch on filter changes
   useEffect(() => {
@@ -211,7 +215,7 @@ export function AchievementsAdminClient({
     setEditorOpen(false);
     setEditingAchievement(null);
     fetchData();
-    showNotification('success', 'Achievement sparat');
+    showNotification('success', t('notifications.saved'));
   };
 
   const handleAwardClose = () => {
@@ -235,7 +239,7 @@ export function AchievementsAdminClient({
       fetchData();
       showNotification('success', `Achievement ${STATUS_LABELS[status].toLowerCase()}`);
     } else {
-      showNotification('error', result.error || 'Kunde inte uppdatera status');
+      showNotification('error', result.error || t('notifications.updateStatusFailed'));
     }
   };
 
@@ -245,9 +249,9 @@ export function AchievementsAdminClient({
       const result = await deleteAchievement(achievement.id);
       if (result.success) {
         fetchData();
-        showNotification('success', 'Achievement borttaget');
+        showNotification('success', t('notifications.deleted'));
       } else {
-        showNotification('error', result.error || 'Kunde inte ta bort');
+        showNotification('error', result.error || t('notifications.deleteFailed'));
       }
     });
     setConfirmOpen(true);
@@ -268,9 +272,9 @@ export function AchievementsAdminClient({
     if (result.success) {
       selection.clearSelection();
       fetchData();
-      showNotification('success', `${result.count} achievements arkiverade`);
+      showNotification('success', `${result.count} achievements archived`);
     } else {
-      showNotification('error', result.error || 'Kunde inte arkivera');
+      showNotification('error', result.error || t('notifications.archiveFailed'));
     }
   };
 
@@ -280,9 +284,9 @@ export function AchievementsAdminClient({
     if (result.success) {
       selection.clearSelection();
       fetchData();
-      showNotification('success', `${result.count} achievements aktiverade`);
+      showNotification('success', `${result.count} achievements activated`);
     } else {
-      showNotification('error', result.error || 'Kunde inte aktivera');
+      showNotification('error', result.error || t('notifications.activateFailed'));
     }
   };
 
@@ -357,7 +361,7 @@ export function AchievementsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleEdit(row); }}
-            title="Redigera"
+            title={t('actions.edit')}
           >
             <PencilSquareIcon className="h-4 w-4" />
           </Button>
@@ -365,7 +369,7 @@ export function AchievementsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleAward(row); }}
-            title="Tilldela"
+            title={t('actions.award')}
             disabled={row.status === 'archived'}
           >
             <GiftIcon className="h-4 w-4" />
@@ -375,7 +379,7 @@ export function AchievementsAdminClient({
               variant="ghost"
               size="sm"
               onClick={(e) => { e.stopPropagation(); handleStatusChange(row, 'archived'); }}
-              title="Arkivera"
+              title={t('actions.archive')}
             >
               <ArchiveBoxIcon className="h-4 w-4" />
             </Button>
@@ -384,7 +388,7 @@ export function AchievementsAdminClient({
               variant="ghost"
               size="sm"
               onClick={(e) => { e.stopPropagation(); handleStatusChange(row, 'draft'); }}
-              title="Återställ"
+              title={t('actions.restore')}
             >
               <ArchiveBoxXMarkIcon className="h-4 w-4" />
             </Button>
@@ -393,7 +397,7 @@ export function AchievementsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-            title="Ta bort"
+            title={t('actions.delete')}
             className="text-destructive hover:text-destructive"
           >
             <TrashIcon className="h-4 w-4" />
@@ -407,19 +411,19 @@ export function AchievementsAdminClient({
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Gamification', href: '/admin/gamification' },
-          { label: 'Achievements' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.gamification'), href: '/admin/gamification' },
+          { label: t('breadcrumbs.achievements') },
         ]}
       />
 
       <AdminPageHeader
-        title="Achievements"
-        description="Hantera achievements, tilldela till användare och konfigurera regler."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         actions={
           <Button onClick={handleCreate}>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Skapa achievement
+            {t('createAchievement')}
           </Button>
         }
       />
@@ -446,28 +450,28 @@ export function AchievementsAdminClient({
       <AdminTableToolbar
         searchValue={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Sök achievements..."
+        searchPlaceholder={t('searchPlaceholder')}
         filters={
           <>
             <AdminFilterSelect
               value={scopeFilter}
               onChange={setScopeFilter}
               options={SCOPE_OPTIONS}
-              label="Scope"
+              label={t('filters.scope')}
             />
             <AdminFilterSelect
               value={statusFilter}
               onChange={setStatusFilter}
               options={STATUS_OPTIONS}
-              label="Status"
+              label={t('filters.status')}
             />
             {scopeFilter === 'tenant' && (
               <AdminFilterSelect
                 value={tenantFilter}
                 onChange={setTenantFilter}
                 options={tenantOptions}
-                label="Tenant"
-                placeholder="Välj tenant"
+                label={t('filters.tenant')}
+                placeholder={t('filters.tenant')}
               />
             )}
           </>
@@ -492,13 +496,13 @@ export function AchievementsAdminClient({
       {achievements.length === 0 && !isPending ? (
         <AdminEmptyState
           icon={<TrophyIcon className="h-12 w-12" />}
-          title="Inga achievements"
+          title={t('empty.noAchievements')}
           description={search || scopeFilter !== 'all' || statusFilter !== 'all'
-            ? 'Inga achievements matchar dina filter.'
-            : 'Skapa ditt första achievement för att komma igång.'}
+            ? t('empty.noMatch')
+            : t('empty.getStarted')}
           action={
             !search && scopeFilter === 'all' && statusFilter === 'all'
-              ? { label: 'Skapa achievement', onClick: handleCreate }
+              ? { label: t('empty.createAction'), onClick: handleCreate }
               : undefined
           }
         />
@@ -555,15 +559,15 @@ export function AchievementsAdminClient({
         onOpenChange={setConfirmOpen}
         title={
           confirmData?.type === 'delete'
-            ? 'Ta bort achievement'
-            : 'Bekräfta åtgärd'
+            ? t('confirmDialog.deleteTitle')
+            : t('confirmDialog.confirmAction')
         }
         description={
           confirmData?.type === 'delete'
-            ? `Är du säker på att du vill ta bort "${confirmData.achievement?.name}"? Detta kan inte ångras.`
-            : 'Är du säker?'
+            ? t('confirmDialog.deleteConfirm')
+            : t('confirmDialog.areYouSure')
         }
-        confirmLabel={confirmData?.type === 'delete' ? 'Ta bort' : 'Bekräfta'}
+        confirmLabel={confirmData?.type === 'delete' ? t('confirmDialog.deleteButton') : t('confirmDialog.confirmButton')}
         variant="danger"
         onConfirm={handleConfirmAction}
       />

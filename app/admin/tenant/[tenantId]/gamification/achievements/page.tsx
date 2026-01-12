@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useTransition, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   TrophyIcon,
   PlusIcon,
@@ -44,23 +45,10 @@ import { TenantAwardModal } from './TenantAwardModal';
 // CONSTANTS
 // ============================================
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Alla statusar' },
-  { value: 'draft', label: 'Utkast' },
-  { value: 'active', label: 'Aktiva' },
-  { value: 'archived', label: 'Arkiverade' },
-];
-
 const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'outline' | 'success'> = {
   draft: 'secondary',
   active: 'success',
   archived: 'outline',
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  draft: 'Utkast',
-  active: 'Aktiv',
-  archived: 'Arkiverad',
 };
 
 // ============================================
@@ -70,6 +58,21 @@ const STATUS_LABELS: Record<string, string> = {
 export default function TenantAchievementsPage() {
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id ?? null;
+  const t = useTranslations('admin.tenant.achievements');
+
+  // Translated options
+  const STATUS_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('status.all') },
+    { value: 'draft', label: t('status.draftPlural') },
+    { value: 'active', label: t('status.activePlural') },
+    { value: 'archived', label: t('status.archivedPlural') },
+  ], [t]);
+
+  const STATUS_LABELS: Record<string, string> = useMemo(() => ({
+    draft: t('status.draft'),
+    active: t('status.active'),
+    archived: t('status.archived'),
+  }), [t]);
 
   // State
   const [achievements, setAchievements] = useState<TenantAchievementRow[]>([]);
@@ -147,10 +150,10 @@ export default function TenantAchievementsPage() {
       setIsInitialLoad(false);
     } catch (error) {
       console.error('Failed to fetch achievements:', error);
-      showNotification('error', 'Kunde inte hämta utmärkelser');
+      showNotification('error', t('fetchError'));
       setIsInitialLoad(false);
     }
-  }, [tenantId, page, pageSize, debouncedSearch, statusFilter, showNotification]);
+  }, [tenantId, page, pageSize, debouncedSearch, statusFilter, showNotification, t]);
 
   // Refetch on filter changes
   useEffect(() => {
@@ -172,12 +175,12 @@ export default function TenantAchievementsPage() {
 
   const handleAward = useCallback((achievement: TenantAchievementRow) => {
     if (achievement.status !== 'active') {
-      showNotification('error', 'Endast aktiva utmärkelser kan delas ut');
+      showNotification('error', t('onlyActiveCanBeAwarded'));
       return;
     }
     setAwardingAchievement(achievement);
     setAwardModalOpen(true);
-  }, [showNotification]);
+  }, [showNotification, t]);
 
   const handleEditorClose = useCallback(() => {
     setEditorOpen(false);
@@ -188,8 +191,8 @@ export default function TenantAchievementsPage() {
     setEditorOpen(false);
     setEditingAchievement(null);
     fetchData();
-    showNotification('success', 'Utmärkelse sparad');
-  }, [fetchData, showNotification]);
+    showNotification('success', t('achievementSaved'));
+  }, [fetchData, showNotification, t]);
 
   const handleAwardClose = useCallback(() => {
     setAwardModalOpen(false);
@@ -200,22 +203,25 @@ export default function TenantAchievementsPage() {
     setAwardModalOpen(false);
     setAwardingAchievement(null);
     if (inserted > 0) {
-      showNotification('success', `Tilldelat till ${inserted} användare${duplicates > 0 ? ` (${duplicates} hade redan)` : ''}`);
+      showNotification('success', duplicates > 0 
+        ? t('awardedWithDuplicates', { count: inserted, duplicates })
+        : t('awardedTo', { count: inserted })
+      );
     } else if (duplicates > 0) {
-      showNotification('success', `Alla ${duplicates} användare hade redan denna utmärkelse`);
+      showNotification('success', t('allHadAlready', { count: duplicates }));
     }
-  }, [showNotification]);
+  }, [showNotification, t]);
 
   const handleStatusChange = useCallback(async (achievement: TenantAchievementRow, status: 'draft' | 'active' | 'archived') => {
     if (!tenantId) return;
     const result = await setTenantAchievementStatus(tenantId, achievement.id, status);
     if (result.success) {
       fetchData();
-      showNotification('success', `Status ändrad till ${STATUS_LABELS[status].toLowerCase()}`);
+      showNotification('success', t('statusChangedTo', { status: STATUS_LABELS[status].toLowerCase() }));
     } else {
-      showNotification('error', result.error || 'Kunde inte uppdatera status');
+      showNotification('error', result.error || t('couldNotUpdateStatus'));
     }
-  }, [tenantId, fetchData, showNotification]);
+  }, [tenantId, fetchData, showNotification, t, STATUS_LABELS]);
 
   const handleDelete = useCallback(async (achievement: TenantAchievementRow) => {
     setConfirmData({ type: 'delete', achievement });
@@ -224,13 +230,13 @@ export default function TenantAchievementsPage() {
       const result = await deleteTenantAchievement(tenantId, achievement.id);
       if (result.success) {
         fetchData();
-        showNotification('success', 'Utmärkelse borttagen');
+        showNotification('success', t('achievementDeleted'));
       } else {
-        showNotification('error', result.error || 'Kunde inte ta bort');
+        showNotification('error', result.error || t('couldNotDelete'));
       }
     });
     setConfirmOpen(true);
-  }, [tenantId, fetchData, showNotification]);
+  }, [tenantId, fetchData, showNotification, t]);
 
   const handleBulkStatusChange = useCallback(async (status: 'active' | 'archived') => {
     if (!tenantId) return;
@@ -241,11 +247,11 @@ export default function TenantAchievementsPage() {
     if (result.success) {
       selection.clearSelection();
       fetchData();
-      showNotification('success', `${result.updatedCount} utmärkelser uppdaterade`);
+      showNotification('success', t('achievementsUpdated', { count: result.updatedCount }));
     } else {
-      showNotification('error', result.error || 'Kunde inte uppdatera');
+      showNotification('error', result.error || t('couldNotUpdate'));
     }
-  }, [tenantId, selection, fetchData, showNotification]);
+  }, [tenantId, selection, fetchData, showNotification, t]);
 
   const handleConfirmAction = useCallback(async () => {
     if (pendingConfirmAction) {
@@ -259,7 +265,7 @@ export default function TenantAchievementsPage() {
   // Table columns
   const columns = useMemo(() => [
     {
-      header: 'Namn',
+      header: t('table.name'),
       accessor: 'name' as const,
       cell: (row: TenantAchievementRow) => (
         <div className="flex items-center gap-3">
@@ -276,16 +282,16 @@ export default function TenantAchievementsPage() {
       ),
     },
     {
-      header: 'Beskrivning',
+      header: t('table.description'),
       accessor: 'description' as const,
       cell: (row: TenantAchievementRow) => (
         <span className="text-slate-600 line-clamp-1">
-          {row.description || '–'}
+          {row.description || t('table.noDescription')}
         </span>
       ),
     },
     {
-      header: 'Status',
+      header: t('table.status'),
       accessor: 'status' as const,
       cell: (row: TenantAchievementRow) => (
         <Badge variant={STATUS_VARIANTS[row.status] || 'default'}>
@@ -302,7 +308,7 @@ export default function TenantAchievementsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleEdit(row)}
-            title="Redigera"
+            title={t('actions.edit')}
           >
             <PencilSquareIcon className="h-4 w-4" />
           </Button>
@@ -311,7 +317,7 @@ export default function TenantAchievementsPage() {
               variant="ghost"
               size="sm"
               onClick={() => handleAward(row)}
-              title="Dela ut"
+              title={t('actions.award')}
             >
               <GiftIcon className="h-4 w-4" />
             </Button>
@@ -321,7 +327,7 @@ export default function TenantAchievementsPage() {
               variant="ghost"
               size="sm"
               onClick={() => handleStatusChange(row, 'active')}
-              title="Aktivera"
+              title={t('actions.activate')}
             >
               <CheckCircleIcon className="h-4 w-4" />
             </Button>
@@ -331,7 +337,7 @@ export default function TenantAchievementsPage() {
               variant="ghost"
               size="sm"
               onClick={() => handleStatusChange(row, 'archived')}
-              title="Arkivera"
+              title={t('actions.archive')}
             >
               <ArchiveBoxIcon className="h-4 w-4" />
             </Button>
@@ -340,7 +346,7 @@ export default function TenantAchievementsPage() {
             variant="ghost"
             size="sm"
             onClick={() => handleDelete(row)}
-            title="Ta bort"
+            title={t('actions.delete')}
             className="text-red-600 hover:text-red-700"
           >
             <TrashIcon className="h-4 w-4" />
@@ -348,7 +354,7 @@ export default function TenantAchievementsPage() {
         </div>
       ),
     },
-  ], [handleEdit, handleAward, handleStatusChange, handleDelete]);
+  ], [handleEdit, handleAward, handleStatusChange, handleDelete, t, STATUS_LABELS]);
 
   // Bulk actions
   const bulkActions = useMemo(() => [
@@ -362,8 +368,8 @@ export default function TenantAchievementsPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<TrophyIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj en organisation för att hantera utmärkelser."
+          title={t('noTenant.title')}
+          description={t('noTenant.description')}
         />
       </AdminPageLayout>
     );
@@ -390,12 +396,12 @@ export default function TenantAchievementsPage() {
       )}
 
       <AdminPageHeader
-        title="Utmärkelser"
-        description={`Skapa och hantera utmärkelser för ${currentTenant?.name || 'din organisation'}`}
+        title={t('pageTitle')}
+        description={t('pageDescription', { tenantName: currentTenant?.name || '' })}
         actions={
           <Button onClick={handleCreate}>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Ny utmärkelse
+            {t('newButton')}
           </Button>
         }
       />
@@ -404,19 +410,19 @@ export default function TenantAchievementsPage() {
       <div className="mb-6 grid gap-4 sm:grid-cols-4">
         <div className="rounded-lg border bg-white p-4">
           <div className="text-2xl font-bold text-slate-900">{stats.total}</div>
-          <div className="text-sm text-slate-500">Totalt</div>
+          <div className="text-sm text-slate-500">{t('stats.total')}</div>
         </div>
         <div className="rounded-lg border bg-white p-4">
           <div className="text-2xl font-bold text-green-600">{stats.active}</div>
-          <div className="text-sm text-slate-500">Aktiva</div>
+          <div className="text-sm text-slate-500">{t('stats.active')}</div>
         </div>
         <div className="rounded-lg border bg-white p-4">
           <div className="text-2xl font-bold text-amber-600">{stats.draft}</div>
-          <div className="text-sm text-slate-500">Utkast</div>
+          <div className="text-sm text-slate-500">{t('stats.draft')}</div>
         </div>
         <div className="rounded-lg border bg-white p-4">
           <div className="text-2xl font-bold text-slate-400">{stats.archived}</div>
-          <div className="text-sm text-slate-500">Arkiverade</div>
+          <div className="text-sm text-slate-500">{t('stats.archived')}</div>
         </div>
       </div>
 
@@ -424,13 +430,13 @@ export default function TenantAchievementsPage() {
       <AdminTableToolbar
         searchValue={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Sök utmärkelser..."
+        searchPlaceholder={t('search.placeholder')}
         filters={
           <AdminFilterSelect
             value={statusFilter}
             onChange={setStatusFilter}
             options={STATUS_OPTIONS}
-            label="Status"
+            label={t('table.status')}
           />
         }
       />
@@ -455,15 +461,15 @@ export default function TenantAchievementsPage() {
       ) : achievements.length === 0 ? (
         <AdminEmptyState
           icon={<TrophyIcon className="h-6 w-6" />}
-          title={debouncedSearch || statusFilter !== 'all' ? 'Inga utmärkelser hittades' : 'Inga utmärkelser än'}
+          title={debouncedSearch || statusFilter !== 'all' ? t('empty.title') : t('empty.titleNoAchievements')}
           description={
             debouncedSearch || statusFilter !== 'all'
-              ? 'Justera sökfiltren eller skapa en ny utmärkelse.'
-              : 'Skapa din första utmärkelse för att engagera deltagarna.'
+              ? t('empty.filtered')
+              : t('empty.noAchievements')
           }
           action={
             !(debouncedSearch || statusFilter !== 'all') ? {
-              label: 'Skapa utmärkelse',
+              label: t('empty.createButton'),
               onClick: handleCreate,
               icon: <PlusIcon className="h-4 w-4" />,
             } : undefined
@@ -531,19 +537,19 @@ export default function TenantAchievementsPage() {
         onConfirm={handleConfirmAction}
         title={
           confirmData?.type === 'delete'
-            ? 'Ta bort utmärkelse'
+            ? t('confirm.deleteTitle')
             : confirmData?.type === 'archive'
-            ? 'Arkivera utmärkelse'
-            : 'Aktivera utmärkelse'
+            ? t('confirm.archiveTitle')
+            : t('confirm.activateTitle')
         }
         description={
           confirmData?.type === 'delete'
-            ? `Är du säker på att du vill ta bort "${confirmData.achievement?.name}"? Detta går inte att ångra.`
+            ? t('confirm.deleteDescription', { name: confirmData.achievement?.name || '' })
             : confirmData?.type === 'archive'
-            ? `Vill du arkivera "${confirmData?.achievement?.name}"?`
-            : `Vill du aktivera "${confirmData?.achievement?.name}"?`
+            ? t('confirm.archiveDescription', { name: confirmData?.achievement?.name || '' })
+            : t('confirm.activateDescription', { name: confirmData?.achievement?.name || '' })
         }
-        confirmLabel={confirmData?.type === 'delete' ? 'Ta bort' : 'Bekräfta'}
+        confirmLabel={confirmData?.type === 'delete' ? t('confirm.deleteLabel') : t('confirm.confirmLabel')}
         variant={confirmData?.type === 'delete' ? 'danger' : 'warning'}
       />
     </AdminPageLayout>

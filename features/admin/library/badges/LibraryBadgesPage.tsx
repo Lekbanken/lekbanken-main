@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   SparklesIcon,
   PlusIcon,
@@ -52,6 +53,7 @@ type AwardBuilderExportRow = {
 };
 
 export function LibraryBadgesPage() {
+  const t = useTranslations('admin.library.badges');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -416,16 +418,16 @@ export function LibraryBadgesPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Bibliotek' },
-          { label: 'Badges' },
+          { label: t('breadcrumbs.home'), href: '/admin' },
+          { label: t('breadcrumbs.library') },
+          { label: t('breadcrumbs.badges') },
         ]}
       />
 
       <AdminPageHeader
         icon={<SparklesIcon className="h-6 w-6" />}
-        title="Bibliotek"
-        description="Hantera badges (via builder exports)"
+        title={t('title')}
+        description={t('description')}
         actions={
           <>
             {isSystemAdmin && (
@@ -435,8 +437,8 @@ export function LibraryBadgesPage() {
                   value={scopeType}
                   onChange={(e) => setScope((e.target.value as 'tenant' | 'global') || 'tenant')}
                   options={[
-                    { value: 'tenant', label: 'Tenant' },
-                    { value: 'global', label: 'Global' },
+                    { value: 'tenant', label: t('scopeTenant') },
+                    { value: 'global', label: t('scopeGlobal') },
                   ]}
                 />
               </div>
@@ -451,7 +453,7 @@ export function LibraryBadgesPage() {
                 disabled={(scopeType === 'tenant' && (!tenantId || isLoadingTenants)) || (scopeType === 'global' && !isSystemAdmin)}
               >
                 <PlusIcon className="h-4 w-4" />
-                Skapa Badge
+                {t('createBadge')}
               </Button>
             )}
           </>
@@ -460,7 +462,7 @@ export function LibraryBadgesPage() {
 
       {!canView && (
         <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
-          Du saknar behörighet att visa Bibliotek.
+          {t('noPermission')}
         </div>
       )}
 
@@ -474,7 +476,7 @@ export function LibraryBadgesPage() {
 
           {scopeType === 'tenant' && !tenantId && !isLoadingTenants && (
             <div className="rounded-lg border border-border/60 bg-muted/20 p-4 text-sm text-muted-foreground">
-              Välj en organisation (active tenant) för att visa biblioteket.
+              {t('selectTenant')}
             </div>
           )}
 
@@ -486,18 +488,18 @@ export function LibraryBadgesPage() {
                   <div className="flex items-center gap-3">
                     <Squares2X2Icon className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <CardTitle className="text-base">Badges</CardTitle>
+                      <CardTitle className="text-base">{t('badgesTitle')}</CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {isLoading ? 'Loading…' : `${filtered.length} badge${filtered.length !== 1 ? 's' : ''}`}
+                        {isLoading ? t('loading') : (filtered.length === 1 ? t('badgeCount', { count: filtered.length }) : t('badgeCountPlural', { count: filtered.length }))}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" size="sm">
-                      {publishedCount} published
+                      {publishedCount} {t('published')}
                     </Badge>
                     <Badge variant="outline" size="sm">
-                      {draftCount} drafts
+                      {draftCount} {t('drafts')}
                     </Badge>
                   </div>
                 </div>
@@ -529,10 +531,10 @@ export function LibraryBadgesPage() {
                     </div>
                     <div>
                       <CardTitle className="text-base">
-                        {editing ? 'Edit Badge' : 'Badge Builder'}
+                        {editing ? t('editBadge') : t('badgeBuilder')}
                       </CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {editing ? `Editing: ${editing.title || 'Untitled'}` : 'Select a badge from the library'}
+                        {editing ? t('editing', { title: editing.title || t('untitled') }) : t('selectFromLibrary')}
                       </p>
                     </div>
                   </div>
@@ -543,7 +545,7 @@ export function LibraryBadgesPage() {
                         size="sm"
                         dot
                       >
-                        {editing.status === 'published' ? 'Published' : 'Draft'}
+                        {editing.status === 'published' ? t('published') : t('drafts')}
                       </Badge>
                       {editing.version && (
                         <Badge variant="outline" size="sm">
@@ -567,9 +569,9 @@ export function LibraryBadgesPage() {
                     <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 text-primary">
                       <SparklesIcon className="h-8 w-8" />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground">Select or create a badge</h3>
+                    <h3 className="text-lg font-semibold text-foreground">{t('selectOrCreate')}</h3>
                     <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                      Choose a badge from the library above or create a new one to start building its layers, colors, and metadata.
+                      {t('selectOrCreateDescription')}
                     </p>
                     {canCreate && (
                       <Button
@@ -580,7 +582,7 @@ export function LibraryBadgesPage() {
                         disabled={(scopeType === 'tenant' && !tenantId) || (scopeType === 'global' && !isSystemAdmin)}
                       >
                         <PlusIcon className="h-4 w-4" />
-                        Create Badge
+                        {t('createBadge')}
                       </Button>
                     )}
                   </div>

@@ -17,7 +17,6 @@ import {
   Checkbox,
 } from '@/components/ui';
 import { createUser, getTenantsForUserCreation } from '../userActions.server';
-import { membershipRoleLabels } from '../types';
 
 type UserCreateDialogProps = {
   open: boolean;
@@ -39,6 +38,14 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
     { value: 'private_user', label: t('create.globalRoleOptions.privateUser') },
     { value: 'system_admin', label: t('create.globalRoleOptions.systemAdmin') },
   ], [t]);
+
+  const membershipRoleLabels = useMemo(() => ({
+    owner: t('filters.membershipRole.owner'),
+    admin: t('filters.membershipRole.admin'),
+    editor: t('filters.membershipRole.editor'),
+    member: t('filters.membershipRole.member'),
+    viewer: t('filters.membershipRole.viewer'),
+  }) as Record<string, string>, [t]);
 
   // Form state
   const [email, setEmail] = useState('');
@@ -101,7 +108,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
       onOpenChange(false);
       onSuccess?.(result.userId!);
     } catch {
-      setError('Ett oväntat fel uppstod');
+      setError(t('errors.unexpectedError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -144,10 +151,10 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
               <UserPlusIcon className="h-4 w-4 text-primary" />
             </div>
-            Skapa ny användare
+            {t('create.title')}
           </DialogTitle>
           <DialogDescription>
-            Skapa en ny användare med e-post och lösenord. Användaren kan direkt logga in utan e-postverifiering.
+            {t('create.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -161,7 +168,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
           {/* Email */}
           <div className="space-y-1.5">
             <label htmlFor="create-email" className="text-sm font-medium text-foreground">
-              E-post <span className="text-destructive">*</span>
+              {t('create.emailLabel')} <span className="text-destructive">*</span>
             </label>
             <Input
               id="create-email"
@@ -177,7 +184,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
           {/* Password */}
           <div className="space-y-1.5">
             <label htmlFor="create-password" className="text-sm font-medium text-foreground">
-              Lösenord <span className="text-destructive">*</span>
+              {t('create.passwordLabel')} <span className="text-destructive">*</span>
             </label>
             <div className="flex gap-2">
               <div className="relative flex-1">
@@ -186,7 +193,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Minst 6 tecken"
+                  placeholder={t('create.passwordPlaceholder')}
                   required
                   minLength={6}
                   autoComplete="new-password"
@@ -205,7 +212,7 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
                 </button>
               </div>
               <Button type="button" variant="outline" size="sm" onClick={generatePassword}>
-                Generera
+                {t('actions.generate')}
               </Button>
             </div>
           </div>
@@ -213,13 +220,13 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
           {/* Full Name */}
           <div className="space-y-1.5">
             <label htmlFor="create-name" className="text-sm font-medium text-foreground">
-              Namn <span className="text-muted-foreground">(valfritt)</span>
+              {t('create.nameLabel')} <span className="text-muted-foreground">{t('create.nameOptional')}</span>
             </label>
             <Input
               id="create-name"
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
-              placeholder="Förnamn Efternamn"
+              placeholder={t('create.namePlaceholder')}
             />
           </div>
 
@@ -231,14 +238,14 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
               onChange={(e) => setAutoConfirm(e.target.checked)}
             />
             <label htmlFor="create-autoconfirm" className="text-sm text-foreground cursor-pointer">
-              Hoppa över e-postverifiering (auto-confirm)
+              {t('create.autoConfirmLabel')}
             </label>
           </div>
 
           {/* Global Role */}
           <div className="space-y-1.5">
             <label htmlFor="create-global-role" className="text-sm font-medium text-foreground">
-              Global roll
+              {t('create.globalRoleLabel')}
             </label>
             <Select
               id="create-global-role"
@@ -249,33 +256,33 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
               options={globalRoleOptions}
             />
             <p className="text-xs text-muted-foreground">
-              De flesta användare ska ha &quot;Standard&quot;. Endast superanvändare ska ha &quot;Systemadmin&quot;.
+              {t('create.globalRoleHint')}
             </p>
           </div>
 
           {/* Tenant Assignment */}
           <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-4">
-            <h4 className="text-sm font-medium text-foreground">Organisationstillhörighet (valfritt)</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('create.organisationSection')}</h4>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-1.5">
                 <label htmlFor="create-tenant" className="text-sm font-medium text-foreground">
-                  Organisation
+                  {t('create.organisationLabel')}
                 </label>
                 <Select
                   id="create-tenant"
                   value={selectedTenantId}
                   onChange={(event) => setSelectedTenantId(event.target.value)}
                   options={[
-                    { value: '', label: 'Ingen organisation' },
-                    ...tenants.map((t) => ({ value: t.id, label: t.name })),
+                    { value: '', label: t('create.noOrganisation') },
+                    ...tenants.map((tenant) => ({ value: tenant.id, label: tenant.name })),
                   ]}
                   disabled={isLoadingTenants}
                 />
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="create-tenant-role" className="text-sm font-medium text-foreground">
-                  Roll i organisation
+                  {t('create.roleInOrganisation')}
                 </label>
                 <Select
                   id="create-tenant-role"
@@ -293,11 +300,11 @@ export function UserCreateDialog({ open, onOpenChange, onSuccess }: UserCreateDi
 
           <DialogFooter className="gap-2 pt-4">
             <Button variant="outline" type="button" onClick={() => handleOpenChange(false)}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={!email || !password || isSubmitting} className="gap-2">
               <UserPlusIcon className="h-4 w-4" />
-              {isSubmitting ? 'Skapar...' : 'Skapa användare'}
+              {isSubmitting ? t('create.creating') : t('createUser')}
             </Button>
           </DialogFooter>
         </form>

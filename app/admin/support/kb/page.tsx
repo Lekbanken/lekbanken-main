@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, Badge, Input, Textarea, Select } from '@/components/ui'
 import {
   BookOpenIcon,
@@ -25,6 +26,7 @@ import {
 import { checkSupportHubAccess, listTenantsForSupportHub } from '@/app/actions/support-hub'
 
 export default function KnowledgeBaseAdminPage() {
+  const t = useTranslations('admin.support.kb')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hasAccess, setHasAccess] = useState(false)
@@ -55,7 +57,7 @@ export default function KnowledgeBaseAdminPage() {
   const checkAccessFn = useCallback(async () => {
     const result = await checkSupportHubAccess()
     if (!result.hasAccess) {
-      setError(result.error || 'Ingen åtkomst')
+      setError(result.error || t('noAccess'))
       setLoading(false)
       return
     }
@@ -70,7 +72,7 @@ export default function KnowledgeBaseAdminPage() {
     } else if (result.tenantIds.length > 0) {
       setSelectedTenantId(result.tenantIds[0])
     }
-  }, [])
+  }, [t])
 
   const loadData = useCallback(async () => {
     setLoading(true)
@@ -152,7 +154,7 @@ export default function KnowledgeBaseAdminPage() {
         closeForm()
         loadData()
       } else {
-        setError(result.error || 'Kunde inte skapa FAQ')
+        setError(result.error || t('errors.createFailed'))
       }
     } else if (editingEntry) {
       const result = await updateFAQEntry({
@@ -167,7 +169,7 @@ export default function KnowledgeBaseAdminPage() {
         closeForm()
         loadData()
       } else {
-        setError(result.error || 'Kunde inte uppdatera FAQ')
+        setError(result.error || t('errors.updateFailed'))
       }
     }
     
@@ -185,7 +187,7 @@ export default function KnowledgeBaseAdminPage() {
       closeForm()
       loadData()
     } else {
-      setError(result.error || 'Kunde inte ta bort FAQ')
+      setError(result.error || t('errors.deleteFailed'))
     }
     
     setIsDeleting(false)
@@ -206,7 +208,7 @@ export default function KnowledgeBaseAdminPage() {
     return (
       <AdminPageLayout>
         <AdminErrorState
-          title="Ingen åtkomst"
+          title={t('noAccess')}
           description={error}
           onRetry={() => window.location.reload()}
         />
@@ -215,17 +217,17 @@ export default function KnowledgeBaseAdminPage() {
   }
 
   const tenantOptions = [
-    { value: '', label: 'Alla organisationer' },
+    { value: '', label: t('allOrganizations') },
     ...tenants.map(t => ({ value: t.id, label: t.name })),
   ]
 
   const categoryOptions = [
-    { value: '', label: 'Alla kategorier' },
+    { value: '', label: t('allCategories') },
     ...categories.map(c => ({ value: c, label: c })),
   ]
 
   const formTenantOptions = [
-    { value: '', label: '🌐 Global (synlig för alla)' },
+    { value: '', label: t('globalOption') },
     ...tenants.map(t => ({ value: t.id, label: t.name })),
   ]
 
@@ -237,10 +239,10 @@ export default function KnowledgeBaseAdminPage() {
           <div className="flex items-center gap-4 mb-6">
             <Button variant="ghost" onClick={closeForm}>
               <ChevronLeftIcon className="h-4 w-4 mr-1" />
-              Tillbaka
+              {t('back')}
             </Button>
             <h1 className="text-2xl font-bold text-foreground">
-              {isCreating ? 'Skapa FAQ' : 'Redigera FAQ'}
+              {isCreating ? t('createFaq') : t('editFaq')}
             </h1>
           </div>
 
@@ -249,7 +251,7 @@ export default function KnowledgeBaseAdminPage() {
               {isSystemAdmin && (
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Organisation
+                    {t('form.organization')}
                   </label>
                   <Select
                     value={formTenantId ?? ''}
@@ -258,42 +260,42 @@ export default function KnowledgeBaseAdminPage() {
                     disabled={!isCreating}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Globala FAQ är synliga för alla användare
+                    {t('form.globalHelp')}
                   </p>
                 </div>
               )}
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Fråga *
+                  {t('form.questionLabel')}
                 </label>
                 <Input
                   value={formQuestion}
                   onChange={(e) => setFormQuestion(e.target.value)}
-                  placeholder="Hur gör jag...?"
+                  placeholder={t('form.questionPlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Svar (Markdown) *
+                  {t('form.answerLabel')}
                 </label>
                 <Textarea
                   value={formAnswer}
                   onChange={(e) => setFormAnswer(e.target.value)}
-                  placeholder="Skriv svaret här... (stöder markdown)"
+                  placeholder={t('form.answerPlaceholder')}
                   rows={10}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
-                  Kategori
+                  {t('form.categoryLabel')}
                 </label>
                 <Input
                   value={formCategory}
                   onChange={(e) => setFormCategory(e.target.value)}
-                  placeholder="t.ex. Konto, Fakturering, Funktioner"
+                  placeholder={t('form.categoryPlaceholder')}
                   list="category-suggestions"
                 />
                 <datalist id="category-suggestions">
@@ -318,7 +320,7 @@ export default function KnowledgeBaseAdminPage() {
                   />
                 </button>
                 <span className="text-sm text-foreground">
-                  {formIsPublished ? 'Publicerad' : 'Utkast'}
+                  {formIsPublished ? t('status.published') : t('status.draft')}
                 </span>
               </div>
 
@@ -336,19 +338,19 @@ export default function KnowledgeBaseAdminPage() {
                       onClick={handleDelete}
                       disabled={isDeleting}
                     >
-                      {isDeleting ? 'Tar bort...' : 'Ta bort'}
+                      {isDeleting ? t('actions.deleting') : t('actions.delete')}
                     </Button>
                   )}
                 </div>
                 <div className="flex items-center gap-3">
                   <Button variant="outline" onClick={closeForm}>
-                    Avbryt
+                    {t('actions.cancel')}
                   </Button>
                   <Button
                     onClick={handleSave}
                     disabled={isSaving || !formQuestion.trim() || !formAnswer.trim()}
                   >
-                    {isSaving ? 'Sparar...' : 'Spara'}
+                    {isSaving ? t('actions.saving') : t('actions.save')}
                   </Button>
                 </div>
               </div>
@@ -363,8 +365,8 @@ export default function KnowledgeBaseAdminPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Kunskapsbas"
-        description="Hantera FAQ och hjälpartiklar"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<BookOpenIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-3">
@@ -378,7 +380,7 @@ export default function KnowledgeBaseAdminPage() {
             )}
             <Button onClick={openCreateForm}>
               <PlusIcon className="h-4 w-4 mr-1" />
-              Ny FAQ
+              {t('newFaq')}
             </Button>
           </div>
         }
@@ -394,7 +396,7 @@ export default function KnowledgeBaseAdminPage() {
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Sök i frågor..."
+                  placeholder={t('filters.searchPlaceholder')}
                   className="pl-9"
                 />
               </div>
@@ -412,7 +414,7 @@ export default function KnowledgeBaseAdminPage() {
                 onChange={(e) => setShowUnpublished(e.target.checked)}
                 className="rounded border-muted"
               />
-              Visa utkast
+              {t('filters.showDrafts')}
             </label>
           </div>
         </CardContent>
@@ -425,10 +427,10 @@ export default function KnowledgeBaseAdminPage() {
       ) : entries.length === 0 ? (
         <AdminEmptyState
           icon={<BookOpenIcon className="h-12 w-12" />}
-          title="Inga FAQ ännu"
-          description="Skapa din första FAQ för att hjälpa användare hitta svar."
+          title={t('empty.title')}
+          description={t('empty.description')}
           action={{
-            label: 'Skapa FAQ',
+            label: t('createFaq'),
             onClick: openCreateForm,
             icon: <PlusIcon className="h-4 w-4" />
           }}
@@ -444,7 +446,7 @@ export default function KnowledgeBaseAdminPage() {
                       {entry.tenant_id === null && (
                         <Badge variant="outline" className="text-xs">
                           <GlobeAltIcon className="h-3 w-3 mr-1" />
-                          Global
+                          {t('list.global')}
                         </Badge>
                       )}
                       {entry.category && (
@@ -454,7 +456,7 @@ export default function KnowledgeBaseAdminPage() {
                       )}
                       {!entry.is_published && (
                         <Badge variant="outline" className="text-xs">
-                          Utkast
+                          {t('status.draft')}
                         </Badge>
                       )}
                     </div>
@@ -463,7 +465,7 @@ export default function KnowledgeBaseAdminPage() {
                       {entry.answer_markdown}
                     </p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                      <span>{entry.view_count} visningar</span>
+                      <span>{entry.view_count} {t('list.views')}</span>
                       <span>👍 {entry.helpful_count}</span>
                       <span>👎 {entry.not_helpful_count}</span>
                     </div>
@@ -473,7 +475,7 @@ export default function KnowledgeBaseAdminPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => togglePublished(entry)}
-                      title={entry.is_published ? 'Avpublicera' : 'Publicera'}
+                      title={entry.is_published ? t('actions.unpublish') : t('actions.publish')}
                     >
                       {entry.is_published ? (
                         <EyeIcon className="h-4 w-4" />

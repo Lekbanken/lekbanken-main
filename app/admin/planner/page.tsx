@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { DocumentTextIcon, PlusIcon } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
@@ -64,6 +65,7 @@ export default function AdminPlannerPage() {
   const { success, warning } = useToast();
   const { can, isSystemAdmin, isLoading: isRbacLoading } = useRbac();
   const { currentTenant } = useTenant();
+  const t = useTranslations("admin.planner");
 
   const [scope, setScope] = useState<Scope>("tenant");
   const [searchInput, setSearchInput] = useState("");
@@ -162,7 +164,7 @@ export default function AdminPlannerPage() {
         });
       } catch (err) {
         console.error("[admin/planner] load error", err);
-        setError("Kunde inte ladda planer.");
+        setError(t("errorLoadPlans"));
       } finally {
         setIsLoading(false);
         setIsLoadingMore(false);
@@ -253,10 +255,10 @@ export default function AdminPlannerPage() {
             : item
         )
       );
-      success("Plan publicerad.");
+      success(t("toasts.planPublished"));
     } catch (err) {
       console.error("[admin/planner] publish error", err);
-      warning("Kunde inte publicera plan.");
+      warning(t("toasts.planPublishError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -288,10 +290,10 @@ export default function AdminPlannerPage() {
             : item
         )
       );
-      success("Synlighet uppdaterad.");
+      success(t("toasts.visibilityUpdated"));
     } catch (err) {
       console.error("[admin/planner] visibility error", err);
-      warning("Kunde inte uppdatera synlighet.");
+      warning(t("toasts.visibilityError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -308,10 +310,10 @@ export default function AdminPlannerPage() {
         throw new Error("Failed to delete plan");
       }
       setPlans((prev) => prev.filter((item) => item.id !== deleteTarget.id));
-      success("Plan borttagen.");
+      success(t("toasts.planDeleted"));
     } catch (err) {
       console.error("[admin/planner] delete error", err);
-      warning("Kunde inte ta bort plan.");
+      warning(t("toasts.planDeleteError"));
     } finally {
       setPendingPlanId(null);
       setDeleteTarget(null);
@@ -338,11 +340,11 @@ export default function AdminPlannerPage() {
         throw new Error("Failed to create plan");
       }
       const payload = (await res.json()) as { plan: PlannerPlan };
-      success("Plan skapad!");
+      success(t("toasts.planCreated"));
       router.push(`/admin/planner/${payload.plan.id}`);
     } catch (err) {
       console.error("[admin/planner] create error", err);
-      warning("Kunde inte skapa plan.");
+      warning(t("toasts.planCreateError"));
     } finally {
       setIsCreating(false);
     }
@@ -363,8 +365,8 @@ export default function AdminPlannerPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<DocumentTextIcon className="h-6 w-6" />}
-          title="Ingen behorighet"
-          description="Du saknar behorighet for att visa planner-admin."
+          title={t("noPermission")}
+          description={t("noPermissionDescription")}
         />
       </AdminPageLayout>
     );
@@ -375,8 +377,8 @@ export default function AdminPlannerPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<DocumentTextIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Valj en organisation for att se dess planer."
+          title={t("noOrganizationSelected")}
+          description={t("noOrganizationDescription")}
         />
       </AdminPageLayout>
     );
@@ -385,24 +387,24 @@ export default function AdminPlannerPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Planner"
-        description="Administrera planbibliotek, publicering och synlighet."
+        title={t("pageTitle")}
+        description={t("pageDescription")}
         icon={<DocumentTextIcon className="h-6 w-6" />}
-        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Planner" }]}
+        breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: t("pageTitle") }]}
         actions={
           <Button onClick={() => void handleCreate()} disabled={isCreating}>
             <PlusIcon className="mr-1.5 h-4 w-4" />
-            {isCreating ? "Skapar..." : "Skapa plan"}
+            {isCreating ? t("actions.creating") : t("actions.createPlan")}
           </Button>
         }
       />
 
       <AdminSection
-        title="Scope"
+        title={t("sections.scope")}
         description={
           scope === "tenant"
-            ? `Visar planer for ${currentTenant?.name ?? "vald organisation"}`
-            : "Visar publika planer"
+            ? t("scopeTenantDescription", { name: currentTenant?.name ?? "vald organisation" })
+            : t("scopeGlobalDescription")
         }
       >
         <div className="flex flex-wrap items-center gap-2">
@@ -426,10 +428,10 @@ export default function AdminPlannerPage() {
         </div>
       </AdminSection>
 
-      <AdminSection title="Filter">
+      <AdminSection title={t("sections.filter")}>
         <div className="flex flex-wrap gap-3">
           <Input
-            placeholder="Sök planer..."
+            placeholder={t("searchPlaceholder")}
             value={searchInput}
             onChange={(event) => setSearchInput(event.target.value)}
             className="w-full md:w-72"
@@ -474,21 +476,21 @@ export default function AdminPlannerPage() {
         </div>
       </AdminSection>
 
-      <AdminSection title="Planer">
+      <AdminSection title={t("sections.plans")}>
         <AdminCard>
           {error ? (
             <AdminErrorState
-              title="Kunde inte ladda planer"
+              title={t("errorLoadPlansTitle")}
               description={error}
               onRetry={() => void loadPlans(1, false)}
             />
           ) : isLoading ? (
-            <LoadingState message="Laddar planer..." />
+            <LoadingState message={t("loadingPlans")} />
           ) : filteredPlans.length === 0 ? (
             <AdminEmptyState
               icon={<DocumentTextIcon className="h-6 w-6" />}
-              title="Inga planer"
-              description="Inga planer matchar dina filter."
+              title={t("noPlans")}
+              description={t("noPlansByFilter")}
             />
           ) : (
             <div className="space-y-3">
@@ -518,7 +520,7 @@ export default function AdminPlannerPage() {
                       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                         <span>{formatDuration(plan.totalTimeMinutes)}</span>
                         <span>•</span>
-                        <span>Uppdaterad {formatDate(plan.updatedAt)}</span>
+                        <span>{t("updatedAt", { date: formatDate(plan.updatedAt) })}</span>
                         <span>•</span>
                         <span>{resolveOwnerLabel(plan)}</span>
                       </div>
@@ -530,7 +532,7 @@ export default function AdminPlannerPage() {
                         variant="outline"
                         href={`/admin/planner/${plan.id}`}
                       >
-                        Oppna
+                        {t("actions.open")}
                       </Button>
                       {plan._capabilities?.canPublish && (
                         <Button
@@ -538,7 +540,7 @@ export default function AdminPlannerPage() {
                           onClick={() => void handlePublish(plan)}
                           disabled={isPending}
                         >
-                          Publicera
+                          {t("actions.publish")}
                         </Button>
                       )}
                       {plan._capabilities?.canUpdate && (
@@ -573,7 +575,7 @@ export default function AdminPlannerPage() {
                           onClick={() => setDeleteTarget(plan)}
                           disabled={isPending}
                         >
-                          Ta bort
+                          {t("actions.delete")}
                         </Button>
                       )}
                     </div>
@@ -591,7 +593,7 @@ export default function AdminPlannerPage() {
                 onClick={() => void handleLoadMore()}
                 loading={isLoadingMore}
               >
-                Ladda fler
+                {t("actions.loadMore")}
               </Button>
             </div>
           )}
@@ -605,13 +607,13 @@ export default function AdminPlannerPage() {
             setDeleteTarget(null);
           }
         }}
-        title="Ta bort plan"
+        title={t("dialogs.deletePlanTitle")}
         description={
           deleteTarget
-            ? `Ar du saker pa att du vill ta bort plan \"${deleteTarget.name}\"?`
-            : "Ar du saker pa att du vill ta bort planen?"
+            ? t("dialogs.deletePlanConfirm", { name: deleteTarget.name })
+            : t("dialogs.deletePlanConfirmGeneric")
         }
-        confirmLabel="Ta bort"
+        confirmLabel={t("actions.delete")}
         variant="danger"
         onConfirm={handleDelete}
       />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useTransition, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   ShoppingBagIcon,
   PlusIcon,
@@ -53,43 +54,6 @@ import { ShopItemEditorDrawer } from './ShopItemEditorDrawer';
 // CONSTANTS
 // ============================================
 
-const CATEGORY_OPTIONS = [
-  { value: 'all', label: 'Alla kategorier' },
-  { value: 'cosmetic', label: 'Kosmetisk' },
-  { value: 'powerup', label: 'Power-up' },
-  { value: 'bundle', label: 'Paket' },
-  { value: 'season_pass', label: 'Season Pass' },
-];
-
-const AVAILABILITY_OPTIONS = [
-  { value: 'all', label: 'Alla' },
-  { value: 'available', label: 'Tillgängliga' },
-  { value: 'unavailable', label: 'Ej tillgängliga' },
-];
-
-const FEATURED_OPTIONS = [
-  { value: 'all', label: 'Alla' },
-  { value: 'featured', label: 'Framhävda' },
-  { value: 'not_featured', label: 'Ej framhävda' },
-];
-
-const CATEGORY_LABELS: Record<string, string> = {
-  cosmetic: 'Kosmetisk',
-  'cosmetic:avatar': 'Avatar',
-  'cosmetic:avatar_frame': 'Avatarram',
-  'cosmetic:background': 'Bakgrund',
-  'cosmetic:title': 'Titel',
-  'cosmetic:badge': 'Märke',
-  powerup: 'Power-up',
-  'powerup:hint': 'Ledtråd',
-  'powerup:skip': 'Hoppa över',
-  'powerup:time_extend': 'Förläng tid',
-  'powerup:double_xp': 'Dubblad XP',
-  'powerup:shield': 'Sköld',
-  bundle: 'Paket',
-  season_pass: 'Season Pass',
-};
-
 const CATEGORY_COLORS: Record<string, 'default' | 'secondary' | 'outline'> = {
   cosmetic: 'default',
   powerup: 'secondary',
@@ -120,6 +84,46 @@ export function ShopRewardsAdminClient({
   initialStats,
   currencies,
 }: ShopRewardsAdminClientProps) {
+  const t = useTranslations('admin.gamification.shopRewards');
+
+  // Dynamic options using translations
+  const CATEGORY_OPTIONS = [
+    { value: 'all', label: t('categories.all') },
+    { value: 'cosmetic', label: t('categories.cosmetic') },
+    { value: 'powerup', label: t('categories.powerup') },
+    { value: 'bundle', label: t('categories.bundle') },
+    { value: 'season_pass', label: t('categories.seasonPass') },
+  ];
+
+  const AVAILABILITY_OPTIONS = [
+    { value: 'all', label: t('availability.all') },
+    { value: 'available', label: t('availability.available') },
+    { value: 'unavailable', label: t('availability.unavailable') },
+  ];
+
+  const FEATURED_OPTIONS = [
+    { value: 'all', label: t('featuredFilter.all') },
+    { value: 'featured', label: t('featuredFilter.featured') },
+    { value: 'not_featured', label: t('featuredFilter.notFeatured') },
+  ];
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    cosmetic: t('categories.cosmetic'),
+    'cosmetic:avatar': t('categories.avatar'),
+    'cosmetic:avatar_frame': t('categories.avatarFrame'),
+    'cosmetic:background': t('categories.background'),
+    'cosmetic:title': t('categories.title'),
+    'cosmetic:badge': t('categories.badge'),
+    powerup: t('categories.powerup'),
+    'powerup:hint': t('categories.hint'),
+    'powerup:skip': t('categories.skip'),
+    'powerup:time_extend': t('categories.timeExtend'),
+    'powerup:double_xp': t('categories.doubleXp'),
+    'powerup:shield': t('categories.shield'),
+    bundle: t('categories.bundle'),
+    season_pass: t('categories.seasonPass'),
+  };
+
   // State
   const [items, setItems] = useState(initialData.items);
   const [totalCount, setTotalCount] = useState(initialData.totalCount);
@@ -205,9 +209,9 @@ export function ShopRewardsAdminClient({
       setStats(newStats);
     } catch (error) {
       console.error('Failed to fetch shop items:', error);
-      showNotification('error', 'Kunde inte hämta shop items');
+      showNotification('error', t('notifications.couldNotFetch'));
     }
-  }, [tenantId, page, pageSize, debouncedSearch, categoryFilter, availabilityFilter, featuredFilter, showNotification]);
+  }, [tenantId, page, pageSize, debouncedSearch, categoryFilter, availabilityFilter, featuredFilter, showNotification, t]);
 
   // Refetch on filter changes
   useEffect(() => {
@@ -236,16 +240,16 @@ export function ShopRewardsAdminClient({
     setEditorOpen(false);
     setEditingItem(null);
     fetchData();
-    showNotification('success', 'Shop item sparat');
+    showNotification('success', t('notifications.itemSaved'));
   };
 
   const handleToggleAvailability = async (item: ShopItemRow) => {
     const result = await toggleShopItemAvailability(tenantId, item.id, !item.is_available);
     if (result.success) {
       fetchData();
-      showNotification('success', item.is_available ? 'Dolt från shopen' : 'Synligt i shopen');
+      showNotification('success', item.is_available ? t('notifications.hiddenFromShop') : t('notifications.visibleInShop'));
     } else {
-      showNotification('error', result.error || 'Kunde inte uppdatera');
+      showNotification('error', result.error || t('notifications.couldNotUpdate'));
     }
   };
 
@@ -253,9 +257,9 @@ export function ShopRewardsAdminClient({
     const result = await toggleShopItemFeatured(tenantId, item.id, !item.is_featured);
     if (result.success) {
       fetchData();
-      showNotification('success', item.is_featured ? 'Borttagen från framhävda' : 'Tillagd som framhävd');
+      showNotification('success', item.is_featured ? t('notifications.removedFromFeatured') : t('notifications.addedToFeatured'));
     } else {
-      showNotification('error', result.error || 'Kunde inte uppdatera');
+      showNotification('error', result.error || t('notifications.couldNotUpdate'));
     }
   };
 
@@ -263,9 +267,9 @@ export function ShopRewardsAdminClient({
     const result = await duplicateShopItem(tenantId, item.id);
     if (result.success) {
       fetchData();
-      showNotification('success', `"${item.name}" duplicerat`);
+      showNotification('success', t('notifications.duplicated', { name: item.name }));
     } else {
-      showNotification('error', result.error || 'Kunde inte duplicera');
+      showNotification('error', result.error || t('notifications.couldNotDuplicate'));
     }
   };
 
@@ -275,9 +279,9 @@ export function ShopRewardsAdminClient({
       const result = await deleteShopItem(tenantId, item.id);
       if (result.success) {
         fetchData();
-        showNotification('success', 'Shop item borttaget');
+        showNotification('success', t('notifications.deleted'));
       } else {
-        showNotification('error', result.error || 'Kunde inte ta bort');
+        showNotification('error', result.error || t('notifications.couldNotDelete'));
       }
     });
     setConfirmOpen(true);
@@ -298,9 +302,9 @@ export function ShopRewardsAdminClient({
     if (result.success) {
       selection.clearSelection();
       fetchData();
-      showNotification('success', `${result.updatedCount} items dolda`);
+      showNotification('success', t('bulkActions.itemsHidden', { count: result.updatedCount }));
     } else {
-      showNotification('error', result.error || 'Kunde inte dölja');
+      showNotification('error', result.error || t('notifications.couldNotHide'));
     }
   };
 
@@ -310,9 +314,9 @@ export function ShopRewardsAdminClient({
     if (result.success) {
       selection.clearSelection();
       fetchData();
-      showNotification('success', `${result.updatedCount} items synliga`);
+      showNotification('success', t('bulkActions.itemsVisible', { count: result.updatedCount }));
     } else {
-      showNotification('error', result.error || 'Kunde inte visa');
+      showNotification('error', result.error || t('notifications.couldNotShow'));
     }
   };
 
@@ -320,13 +324,13 @@ export function ShopRewardsAdminClient({
   const bulkActions = [
     {
       id: 'show',
-      label: 'Visa i shop',
+      label: t('actions.showInShop'),
       icon: <EyeIcon className="h-4 w-4" />,
       onAction: handleBulkShow,
     },
     {
       id: 'hide',
-      label: 'Dölj från shop',
+      label: t('actions.hideFromShop'),
       icon: <EyeSlashIcon className="h-4 w-4" />,
       onAction: handleBulkHide,
     },
@@ -344,7 +348,7 @@ export function ShopRewardsAdminClient({
   // Table columns
   const columns = [
     {
-      header: 'Namn',
+      header: t('columns.name'),
       accessor: 'name' as keyof ShopItemRow,
       cell: (row: ShopItemRow) => (
         <div className="flex items-center gap-3">
@@ -360,7 +364,7 @@ export function ShopRewardsAdminClient({
             <div className="flex items-center gap-2">
               <p className="font-medium text-foreground">{row.name}</p>
               {row.is_featured && (
-                <SparklesIcon className="h-4 w-4 text-yellow-500" title="Framhävd" />
+                <SparklesIcon className="h-4 w-4 text-yellow-500" title={t('featured')} />
               )}
             </div>
             {row.description && (
@@ -371,7 +375,7 @@ export function ShopRewardsAdminClient({
       ),
     },
     {
-      header: 'Kategori',
+      header: t('columns.category'),
       accessor: 'category' as keyof ShopItemRow,
       width: 'w-32',
       cell: (row: ShopItemRow) => (
@@ -381,7 +385,7 @@ export function ShopRewardsAdminClient({
       ),
     },
     {
-      header: 'Pris',
+      header: t('columns.price'),
       accessor: 'price' as keyof ShopItemRow,
       width: 'w-28',
       cell: (row: ShopItemRow) => (
@@ -395,7 +399,7 @@ export function ShopRewardsAdminClient({
       ),
     },
     {
-      header: 'Försäljning',
+      header: t('columns.sales'),
       accessor: 'quantity_sold' as keyof ShopItemRow,
       width: 'w-28',
       hideBelow: 'md' as const,
@@ -409,17 +413,17 @@ export function ShopRewardsAdminClient({
       ),
     },
     {
-      header: 'Status',
+      header: t('columns.status'),
       accessor: 'is_available' as keyof ShopItemRow,
       width: 'w-28',
       cell: (row: ShopItemRow) => (
         <Badge variant={row.is_available ? 'success' : 'outline'}>
-          {row.is_available ? 'Tillgänglig' : 'Dold'}
+          {row.is_available ? t('status.available') : t('status.hidden')}
         </Badge>
       ),
     },
     {
-      header: 'Åtgärder',
+      header: t('columns.actions'),
       accessor: 'id' as keyof ShopItemRow,
       width: 'w-44',
       align: 'right' as const,
@@ -429,7 +433,7 @@ export function ShopRewardsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleEdit(row); }}
-            title="Redigera"
+            title={t('actions.edit')}
           >
             <PencilSquareIcon className="h-4 w-4" />
           </Button>
@@ -437,7 +441,7 @@ export function ShopRewardsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleToggleAvailability(row); }}
-            title={row.is_available ? 'Dölj' : 'Visa'}
+            title={row.is_available ? t('actions.hide') : t('actions.show')}
           >
             {row.is_available ? (
               <EyeSlashIcon className="h-4 w-4" />
@@ -449,7 +453,7 @@ export function ShopRewardsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleToggleFeatured(row); }}
-            title={row.is_featured ? 'Ta bort framhävning' : 'Framhäv'}
+            title={row.is_featured ? t('actions.removeFeatured') : t('actions.addFeatured')}
             className={row.is_featured ? 'text-yellow-500' : ''}
           >
             <SparklesIcon className="h-4 w-4" />
@@ -458,7 +462,7 @@ export function ShopRewardsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleDuplicate(row); }}
-            title="Duplicera"
+            title={t('actions.duplicate')}
           >
             <DocumentDuplicateIcon className="h-4 w-4" />
           </Button>
@@ -466,7 +470,7 @@ export function ShopRewardsAdminClient({
             variant="ghost"
             size="sm"
             onClick={(e) => { e.stopPropagation(); handleDelete(row); }}
-            title="Ta bort"
+            title={t('actions.delete')}
             className="text-destructive hover:text-destructive"
           >
             <TrashIcon className="h-4 w-4" />
@@ -480,19 +484,19 @@ export function ShopRewardsAdminClient({
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Gamification', href: '/admin/gamification' },
-          { label: 'Shop & Rewards' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.gamification'), href: '/admin/gamification' },
+          { label: t('breadcrumbs.shopRewards') },
         ]}
       />
 
       <AdminPageHeader
-        title="Shop & Rewards"
-        description={`Hantera butik och belöningar för ${tenantName}.`}
+        title={t('pageTitle')}
+        description={t('pageDescription', { tenantName })}
         actions={
           <Button onClick={handleCreate} disabled={currencies.length === 0}>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Lägg till item
+            {t('addItem')}
           </Button>
         }
       />
@@ -501,9 +505,9 @@ export function ShopRewardsAdminClient({
       {currencies.length === 0 && (
         <div className="mb-4 flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
           <ExclamationCircleIcon className="h-5 w-5" />
-          Du behöver skapa minst en valuta innan du kan lägga till shop items.
+          {t('currencyWarning')}
           <a href="/admin/gamification/currency" className="underline font-medium">
-            Gå till Valuta →
+            {t('goToCurrency')}
           </a>
         </div>
       )}
@@ -511,25 +515,25 @@ export function ShopRewardsAdminClient({
       {/* Stats */}
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Totalt items"
+          label={t('stats.totalItems')}
           value={stats.totalItems}
           icon={<ShoppingBagIcon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
-          label="Tillgängliga"
+          label={t('stats.available')}
           value={stats.availableItems}
           icon={<TagIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Totalt sålt"
+          label={t('stats.totalSold')}
           value={stats.totalSold.toLocaleString()}
           icon={<GiftIcon className="h-5 w-5" />}
           iconColor="blue"
         />
         <AdminStatCard
-          label="Total intäkt"
+          label={t('stats.totalRevenue')}
           value={stats.totalRevenue.toLocaleString()}
           icon={<CurrencyDollarIcon className="h-5 w-5" />}
           iconColor="amber"
@@ -558,26 +562,26 @@ export function ShopRewardsAdminClient({
       <AdminTableToolbar
         searchValue={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Sök shop items..."
+        searchPlaceholder={t('searchPlaceholder')}
         filters={
           <>
             <AdminFilterSelect
               value={categoryFilter}
               onChange={setCategoryFilter}
               options={CATEGORY_OPTIONS}
-              label="Kategori"
+              label={t('filters.category')}
             />
             <AdminFilterSelect
               value={availabilityFilter}
               onChange={setAvailabilityFilter}
               options={AVAILABILITY_OPTIONS}
-              label="Tillgänglighet"
+              label={t('filters.availability')}
             />
             <AdminFilterSelect
               value={featuredFilter}
               onChange={setFeaturedFilter}
               options={FEATURED_OPTIONS}
-              label="Framhävd"
+              label={t('filters.featured')}
             />
           </>
         }
@@ -601,15 +605,15 @@ export function ShopRewardsAdminClient({
       {items.length === 0 && !isPending ? (
         <AdminEmptyState
           icon={<ShoppingBagIcon className="h-12 w-12" />}
-          title="Inga shop items"
+          title={t('empty.title')}
           description={
             search || categoryFilter !== 'all' || availabilityFilter !== 'all' || featuredFilter !== 'all'
-              ? 'Inga shop items matchar dina filter.'
-              : 'Skapa ditt första shop item för att komma igång.'
+              ? t('empty.noMatch')
+              : t('empty.getStarted')
           }
           action={
             !search && categoryFilter === 'all' && availabilityFilter === 'all' && featuredFilter === 'all' && currencies.length > 0
-              ? { label: 'Lägg till item', onClick: handleCreate }
+              ? { label: t('addItem'), onClick: handleCreate }
               : undefined
           }
         />
@@ -654,9 +658,9 @@ export function ShopRewardsAdminClient({
       <AdminConfirmDialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
-        title="Ta bort shop item"
-        description={`Är du säker på att du vill ta bort "${confirmData?.item?.name}"? Detta kan inte ångras om det inte finns köp.`}
-        confirmLabel="Ta bort"
+        title={t('confirmDelete.title')}
+        description={t('confirmDelete.description', { name: confirmData?.item?.name || '' })}
+        confirmLabel={t('confirmDelete.confirm')}
         variant="danger"
         onConfirm={handleConfirmAction}
       />

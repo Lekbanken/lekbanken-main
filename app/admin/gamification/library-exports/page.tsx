@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
   DocumentArrowDownIcon,
   PlusIcon,
@@ -75,6 +76,7 @@ const mockLogs: ExportLogEntry[] = [];
 type LibraryExportsTab = "templates" | "logs";
 
 export default function LibraryExportsPage() {
+  const t = useTranslations('admin.gamification.libraryExports');
   const [activeTab, setActiveTab] = useState<LibraryExportsTab>("templates");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -165,12 +167,13 @@ function TemplatesTab({
   searchQuery: string; 
   setSearchQuery: (q: string) => void;
 }) {
+  const t = useTranslations('admin.gamification.libraryExports');
   const filteredTemplates = useMemo(() => {
     if (!searchQuery) return templates;
     const q = searchQuery.toLowerCase();
-    return templates.filter(t => 
-      t.name.toLowerCase().includes(q) || 
-      t.description.toLowerCase().includes(q)
+    return templates.filter(template => 
+      template.name.toLowerCase().includes(q) || 
+      template.description.toLowerCase().includes(q)
     );
   }, [templates, searchQuery]);
 
@@ -178,9 +181,9 @@ function TemplatesTab({
     return (
       <EmptyState
         icon={<DocumentArrowDownIcon className="h-12 w-12" />}
-        title="Inga exportmallar ännu"
-        description="Skapa din första exportmall för att börja exportera data från biblioteket."
-        action={{ label: "Skapa exportmall", onClick: () => {} }}
+        title={t('empty.title')}
+        description={t('empty.description')}
+        action={{ label: t('empty.createAction'), onClick: () => {} }}
       />
     );
   }

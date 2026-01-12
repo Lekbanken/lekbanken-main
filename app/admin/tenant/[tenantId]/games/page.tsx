@@ -1,6 +1,7 @@
  'use client';
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from 'next-intl';
 import { PuzzlePieceIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminEmptyState, AdminErrorState, AdminCard } from "@/components/admin/shared";
 import { Input } from "@/components/ui";
@@ -8,6 +9,7 @@ import { useTenant } from "@/lib/context/TenantContext";
 import { searchGames, type Game } from "@/lib/services/gameService";
 
 export default function TenantGamesPage() {
+  const t = useTranslations('admin.tenant.games');
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id ?? null;
 
@@ -31,7 +33,7 @@ export default function TenantGamesPage() {
         setGames(data);
       } catch (err) {
         console.error(err);
-        setError("Kunde inte ladda spel för organisationen.");
+        setError(t('errorDescription'));
       } finally {
         setIsLoading(false);
       }
@@ -52,8 +54,8 @@ export default function TenantGamesPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<PuzzlePieceIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj eller byt organisation för att se spel."
+          title={t('noOrganizationTitle')}
+          description={t('noOrganizationDescription')}
         />
       </AdminPageLayout>
     );
@@ -62,14 +64,14 @@ export default function TenantGamesPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Spel"
-        description="Välj vilka spel som ska vara tillgängliga för organisationen."
+        title={t('title')}
+        description={t('description')}
         icon={<PuzzlePieceIcon className="h-8 w-8 text-primary" />}
       />
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda spel"
+          title={t('errorTitle')}
           description={error}
           onRetry={() => {
             setError(null);
@@ -80,7 +82,7 @@ export default function TenantGamesPage() {
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <Input
-          placeholder="Sök på namn eller kategori"
+          placeholder={t('searchPlaceholder')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full sm:w-80"
@@ -88,12 +90,12 @@ export default function TenantGamesPage() {
       </div>
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Laddar spel...</p>
+        <p className="text-sm text-muted-foreground">{t('loading')}</p>
       ) : filtered.length === 0 ? (
         <AdminEmptyState
           icon={<PuzzlePieceIcon className="h-6 w-6" />}
-          title="Inga spel"
-          description="Inga spel hittades för denna organisation."
+          title={t('emptyTitle')}
+          description={t('emptyDescription')}
         />
       ) : (
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -101,11 +103,11 @@ export default function TenantGamesPage() {
             <AdminCard
               key={game.id}
               title={game.name}
-              description={game.description || "Ingen beskrivning"}
+              description={game.description || t('noDescription')}
               icon={<PuzzlePieceIcon className="h-5 w-5 text-primary" />}
             >
               <p className="text-xs text-muted-foreground">
-                {game.category || "Okänd kategori"} • {game.energy_level || "Nivå okänd"}
+                {game.category || t('unknownCategory')} • {game.energy_level || t('unknownLevel')}
               </p>
             </AdminCard>
           ))}

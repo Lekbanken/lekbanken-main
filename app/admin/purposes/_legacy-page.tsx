@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type React from 'react';
+import { useTranslations } from 'next-intl';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
 import {
   AdminBreadcrumbs,
@@ -36,6 +37,7 @@ type Purpose = PurposeRow & { tenant_id?: string | null; is_standard?: boolean }
 type Tenant = { id: string; name: string | null };
 
 export default function PurposesPage() {
+  const t = useTranslations('admin.purposes.legacy');
   const { can } = useRbac();
   const canView = can('admin.products.list');
   const [purposes, setPurposes] = useState<Purpose[]>([]);
@@ -84,13 +86,13 @@ export default function PurposesPage() {
       try {
         const res = await fetch('/api/purposes');
         const json = (await res.json().catch(() => ({}))) as { purposes?: Purpose[]; error?: string };
-        if (!res.ok) throw new Error(json.error || 'Kunde inte ladda syften');
+        if (!res.ok) throw new Error(json.error || t('errors.loadPurposes'));
         if (!cancelled) {
           setPurposes(json.purposes || []);
         }
       } catch (err) {
         console.error('[admin/purposes] load error', err);
-        if (!cancelled) setError('Kunde inte ladda syften just nu.');
+        if (!cancelled) setError(t('errors.loadPurposesNow'));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -116,7 +118,7 @@ export default function PurposesPage() {
 
   const openCreate = () => {
     if (activeTab === 'tenant' && !selectedTenantId) {
-      setError('Välj en tenant innan du skapar tenant-specifikt syfte.');
+      setError(t('errors.selectTenantFirst'));
       return;
     }
     setEditing(null);
@@ -141,7 +143,7 @@ export default function PurposesPage() {
     setError(null);
     const scopeTenantId = activeTab === 'tenant' ? selectedTenantId || null : null;
     if (activeTab === 'tenant' && !scopeTenantId) {
-      setError('Välj en tenant för tenant-specifikt syfte.');
+      setError(t('errors.selectTenantForPurpose'));
       return;
     }
     const payload = {
@@ -168,7 +170,7 @@ export default function PurposesPage() {
       setEditing(null);
     } catch (err) {
       console.error('[admin/purposes] save error', err);
-      setError('Kunde inte spara syftet.');
+      setError(t('errors.savePurpose'));
     }
   };
 
@@ -187,7 +189,7 @@ export default function PurposesPage() {
       setPurposes((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       console.error('[admin/purposes] delete error', err);
-      setError('Kunde inte ta bort syftet.');
+      setError(t('errors.deletePurpose'));
     }
   };
 
@@ -195,14 +197,14 @@ export default function PurposesPage() {
     setError(null);
     const target = purposes.find((p) => p.id === id);
     if (target?.is_standard) {
-      setError('Standardsyften kan inte tas bort.');
+      setError(t('errors.standardCannotDelete'));
       return;
     }
     try {
       const usageRes = await fetch(`/api/purposes/${id}`);
       if (!usageRes.ok) {
         const usageErr = (await usageRes.json().catch(() => ({}))) as { error?: string };
-        setError(usageErr.error || 'Kunde inte läsa användning.');
+        setError(usageErr.error || t('errors.readUsage'));
         return;
       }
       const usageJson = (await usageRes.json().catch(() => ({}))) as {
@@ -219,13 +221,13 @@ export default function PurposesPage() {
         return;
       }
       if (!res.ok) {
-        setError(json.error || 'Misslyckades att koppla loss och ta bort.');
+        setError(json.error || t('errors.detachDeleteFailed'));
         return;
       }
       setPurposes((prev) => prev.filter((p) => p.id !== id));
     } catch (err) {
       console.error('[admin/purposes] detach/delete error', err);
-      setError('Kunde inte koppla loss och ta bort syftet.');
+      setError(t('errors.detachDeletePurpose'));
     }
   };
 
@@ -233,7 +235,7 @@ export default function PurposesPage() {
     return (
       <SystemAdminClientGuard>
         <AdminPageLayout>
-          <AdminEmptyState title="Ingen åtkomst" description="Du behöver behörighet för att se syften." />
+          <AdminEmptyState title={t('empty.noAccess')} description={t('empty.noAccessDescription')} />
         </AdminPageLayout>
       </SystemAdminClientGuard>
     );
@@ -251,26 +253,26 @@ export default function PurposesPage() {
   return (
     <SystemAdminClientGuard>
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Syften' }]} />
+        <AdminBreadcrumbs items={[{ label: t('breadcrumbHome'), href: '/admin' }, { label: t('breadcrumbPurposes') }]} />
         <AdminPageHeader
-          title="Syften & undersyften"
-          description="Hantera huvudsyften och undersyften som används i spel, produkter och filter."
+          title={t('pageTitle')}
+          description={t('pageDescription')}
           icon={<FolderIcon className="h-8 w-8 text-primary" />}
           actions={
             <div className="flex items-center gap-2">
               <Button size="sm" onClick={openCreate} disabled={activeTab === 'standard'}>
-                Nytt syfte
+                {t('newPurpose')}
               </Button>
               <AdminExportButton
                 data={purposes}
                 columns={[
-                  { header: 'ID', accessor: 'id' },
-                  { header: 'Typ', accessor: 'type' },
-                  { header: 'Nyckel', accessor: 'purpose_key' },
-                  { header: 'Namn', accessor: 'name' },
-                  { header: 'Parent ID', accessor: 'parent_id' },
-                  { header: 'Tenant ID', accessor: (row) => (row as Purpose).tenant_id ?? '' },
-                  { header: 'Standard', accessor: (row) => ((row as Purpose).is_standard ? 'ja' : 'nej') },
+                  { header: t('exportColumns.id'), accessor: 'id' },
+                  { header: t('exportColumns.type'), accessor: 'type' },
+                  { header: t('exportColumns.key'), accessor: 'purpose_key' },
+                  { header: t('exportColumns.name'), accessor: 'name' },
+                  { header: t('exportColumns.parentId'), accessor: 'parent_id' },
+                  { header: t('exportColumns.tenantId'), accessor: (row) => (row as Purpose).tenant_id ?? '' },
+                  { header: t('exportColumns.standard'), accessor: (row) => ((row as Purpose).is_standard ? t('exportColumns.yes') : t('exportColumns.no')) },
                 ]}
                 filename="purposes"
               />
@@ -279,17 +281,17 @@ export default function PurposesPage() {
         />
 
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Huvudsyften" value={purposes.filter((p) => p.type === 'main').length} />
-        <AdminStatCard label="Undersyften" value={purposes.filter((p) => p.type === 'sub').length} />
-        <AdminStatCard label="Totalt" value={purposes.length} />
+        <AdminStatCard label={t('stats.mainPurposes')} value={purposes.filter((p) => p.type === 'main').length} />
+        <AdminStatCard label={t('stats.subPurposes')} value={purposes.filter((p) => p.type === 'sub').length} />
+        <AdminStatCard label={t('stats.total')} value={purposes.length} />
       </AdminStatGrid>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div className="flex gap-2 rounded-lg border border-border bg-muted/40 p-1">
           {[
-            { id: 'standard', label: 'Standard (låsta)' },
-            { id: 'global', label: 'Special global' },
-            { id: 'tenant', label: 'Tenant-specifika' },
+            { id: 'standard', label: t('tabs.standard') },
+            { id: 'global', label: t('tabs.global') },
+            { id: 'tenant', label: t('tabs.tenant') },
           ].map((tab) => (
             <Button
               key={tab.id}
@@ -306,7 +308,7 @@ export default function PurposesPage() {
             value={selectedTenantId}
             onChange={(e) => setSelectedTenantId(e.target.value)}
             options={[
-              { value: '', label: 'Välj tenant' },
+              { value: '', label: t('selectTenant') },
               ...tenants.map((t) => ({ value: t.id, label: t.name || 'Tenant' })),
             ]}
           />
@@ -315,16 +317,16 @@ export default function PurposesPage() {
 
       <Card className="border border-border">
         <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
-          <CardTitle>Syftesträd</CardTitle>
+          <CardTitle>{t('purposeTree')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          {error && <AdminErrorState title="Problem" description={error} onRetry={() => window.location.reload()} />}
+          {error && <AdminErrorState title={t('problem')} description={error} onRetry={() => window.location.reload()} />}
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Laddar...</p>
+            <p className="text-sm text-muted-foreground">{t('loading')}</p>
           ) : activeTab === 'tenant' && !selectedTenantId ? (
-            <AdminEmptyState title="Välj tenant" description="Välj en tenant för att se eller hantera syften." />
+            <AdminEmptyState title={t('empty.selectTenant')} description={t('empty.selectTenantDescription')} />
           ) : currentTree.length === 0 ? (
-            <AdminEmptyState title="Inga syften" description="Kör seeden eller lägg till syften via API/UI." />
+            <AdminEmptyState title={t('empty.noPurposes')} description={t('empty.noPurposesDescription')} />
           ) : (
             <div className="space-y-4">
               {currentTree.map(({ main, children }) => (
@@ -333,10 +335,10 @@ export default function PurposesPage() {
                     <div>
                       <p className="text-sm font-semibold text-foreground">{main.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {main.purpose_key} {main.is_standard ? '(standard)' : ''}
+                        {main.purpose_key} {main.is_standard ? t('standardLabel') : ''}
                       </p>
                     </div>
-                    <span className="text-xs text-muted-foreground">{children.length} undersyften</span>
+                    <span className="text-xs text-muted-foreground">{t('subPurposesCount', { count: children.length })}</span>
                   </div>
                   {children.length > 0 && (
                     <ul className="mt-3 space-y-2">
@@ -344,18 +346,18 @@ export default function PurposesPage() {
                         <li key={child.id} className="rounded bg-muted/30 px-3 py-2">
                           <p className="text-sm text-foreground">{child.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {child.purpose_key} {child.is_standard ? '(standard)' : ''}
+                            {child.purpose_key} {child.is_standard ? t('standardLabel') : ''}
                           </p>
                           {!child.is_standard && (
                             <div className="mt-2 flex gap-2">
                               <Button size="sm" variant="outline" onClick={() => openEdit(child)}>
-                                Redigera
+                                {t('actions.edit')}
                               </Button>
                               <Button size="sm" variant="ghost" onClick={() => handleDelete(child.id)}>
-                                Snabb ta bort
+                                {t('actions.quickDelete')}
                               </Button>
                               <Button size="sm" variant="ghost" onClick={() => handleDetachAndDelete(child.id)}>
-                                Koppla loss + ta bort
+                                {t('actions.detachDelete')}
                               </Button>
                             </div>
                           )}
@@ -366,13 +368,13 @@ export default function PurposesPage() {
                   {!main.is_standard && (
                     <div className="mt-3 flex gap-2">
                       <Button size="sm" variant="outline" onClick={() => openEdit(main)}>
-                        Redigera huvudsyfte
+                        {t('actions.editMain')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleDelete(main.id)}>
-                        Snabb ta bort
+                        {t('actions.quickDelete')}
                       </Button>
                       <Button size="sm" variant="ghost" onClick={() => handleDetachAndDelete(main.id)}>
-                        Koppla loss + ta bort
+                        {t('actions.detachDelete')}
                       </Button>
                     </div>
                   )}
@@ -387,22 +389,22 @@ export default function PurposesPage() {
         <DialogContent className="max-w-lg">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>{editing ? 'Redigera syfte' : 'Nytt syfte'}</DialogTitle>
+              <DialogTitle>{editing ? t('dialog.editTitle') : t('dialog.createTitle')}</DialogTitle>
             </DialogHeader>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Namn</label>
+              <label className="text-sm font-medium">{t('dialog.nameLabel')}</label>
               <Input value={form.name} onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))} required />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Nyckel</label>
+              <label className="text-sm font-medium">{t('dialog.keyLabel')}</label>
               <Input value={form.purpose_key} onChange={(e) => setForm((prev) => ({ ...prev, purpose_key: e.target.value }))} required />
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Typ</label>
+                <label className="text-sm font-medium">{t('dialog.typeLabel')}</label>
                 <Select
                   value={form.type}
                   onChange={(e) =>
@@ -413,20 +415,20 @@ export default function PurposesPage() {
                     }))
                   }
                   options={[
-                    { value: 'main', label: 'Huvudsyfte' },
-                    { value: 'sub', label: 'Undersyfte' },
+                    { value: 'main', label: t('dialog.typeMain') },
+                    { value: 'sub', label: t('dialog.typeSub') },
                   ]}
                 />
               </div>
               {form.type === 'sub' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Parent</label>
+                  <label className="text-sm font-medium">{t('dialog.parentLabel')}</label>
                   <Select
                     value={form.parent_id ?? ''}
                     onChange={(e) => setForm((prev) => ({ ...prev, parent_id: e.target.value || null }))}
                     options={[
-                      { value: '', label: 'Välj huvudsyfte' },
-                      ...currentMains.map((p) => ({ value: p.id, label: p.name || p.purpose_key || 'Huvudsyfte' })),
+                      { value: '', label: t('dialog.selectMain') },
+                      ...currentMains.map((p) => ({ value: p.id, label: p.name || p.purpose_key || t('dialog.typeMain') })),
                     ]}
                   />
                 </div>
@@ -435,12 +437,12 @@ export default function PurposesPage() {
 
             {activeTab === 'tenant' && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Tenant</label>
+                <label className="text-sm font-medium">{t('dialog.tenantLabel')}</label>
                 <Select
                   value={selectedTenantId}
                   onChange={(e) => setSelectedTenantId(e.target.value)}
                   options={[
-                    { value: '', label: 'Välj tenant' },
+                    { value: '', label: t('selectTenant') },
                     ...tenants.map((t) => ({ value: t.id, label: t.name || 'Tenant' })),
                   ]}
                   required
@@ -450,10 +452,10 @@ export default function PurposesPage() {
 
             <DialogFooter>
               <Button variant="outline" type="button" onClick={() => setDialogOpen(false)}>
-                Avbryt
+                {t('dialog.cancel')}
               </Button>
               <Button type="submit" disabled={activeTab === 'standard'}>
-                {editing ? 'Spara' : 'Skapa'}
+                {editing ? t('dialog.save') : t('dialog.create')}
               </Button>
             </DialogFooter>
           </form>

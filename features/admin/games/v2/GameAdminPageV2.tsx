@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { formatDate } from '@/lib/i18n/format-utils';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import {
   PuzzlePieceIcon,
   PlusIcon,
@@ -155,6 +156,7 @@ function GameRow({
   onPublishToggle,
   canEdit,
 }: GameRowProps) {
+  const t = useTranslations('admin.games.page');
 
   return (
     <tr
@@ -169,7 +171,7 @@ function GameRow({
           type="checkbox"
           checked={isSelected}
           onChange={onToggleSelect}
-          aria-label={`Välj ${game.name}`}
+          aria-label={t('selectGame', { name: game.name })}
           className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
         />
       </td>
@@ -239,24 +241,24 @@ function GameRow({
             {canEdit && (
               <DropdownMenuItem onClick={onOpenBuilder}>
                 <WrenchScrewdriverIcon className="h-4 w-4 mr-2" />
-                Öppna i Builder
+                {t('openInBuilder')}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={onOpenCard}>
               <InformationCircleIcon className="h-4 w-4 mr-2" />
-              Visa detaljer
+              {t('showDetails')}
             </DropdownMenuItem>
             {canEdit && (
               <DropdownMenuItem onClick={onPublishToggle}>
                 {game.status === 'published' ? (
                   <>
                     <XCircleIcon className="h-4 w-4 mr-2" />
-                    Avpublicera
+                    {t('unpublish')}
                   </>
                 ) : (
                   <>
                     <CheckCircleIcon className="h-4 w-4 mr-2" />
-                    Publicera
+                    {t('publish')}
                   </>
                 )}
               </DropdownMenuItem>
@@ -277,6 +279,7 @@ export function GameAdminPageV2() {
   const { warning, info } = useToast();
   const router = useRouter();
   const _searchParams = useSearchParams();
+  const t = useTranslations('admin.games');
 
   // State
   const [games, setGames] = useState<GameAdminRow[]>([]);
@@ -479,8 +482,8 @@ export function GameAdminPageV2() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<PuzzlePieceIcon className="h-6 w-6" />}
-          title="Ingen åtkomst"
-          description="Du behöver administratörsbehörighet för att hantera spel."
+          title={t('page.noAccess')}
+          description={t('page.noAccessDesc')}
         />
       </AdminPageLayout>
     );
@@ -491,23 +494,23 @@ export function GameAdminPageV2() {
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
-        items={[{ label: 'Startsida', href: '/admin' }, { label: 'Spel' }]}
+        items={[{ label: t('breadcrumbs.home'), href: '/admin' }, { label: t('breadcrumbs.games') }]}
       />
 
       <AdminPageHeader
-        title="Spel (globalt)"
-        description="Hantera spelkatalogen – sök, filtrera, och utför massåtgärder."
+        title={t('page.title')}
+        description={t('page.description')}
         icon={<PuzzlePieceIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
             <GameInfoDialog />
             <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              CSV Export
+              {t('page.csvExport')}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
               <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
-              Importera
+              {t('page.import')}
             </Button>
             {canEdit && (
               <Button
@@ -516,7 +519,7 @@ export function GameAdminPageV2() {
                 onClick={() => router.push('/admin/games/new')}
               >
                 <PlusIcon className="mr-2 h-4 w-4" />
-                Ny i Builder
+                {t('page.newInBuilder')}
               </Button>
             )}
           </div>
@@ -525,7 +528,7 @@ export function GameAdminPageV2() {
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda spel"
+          title={t('page.loadError')}
           description={error}
           onRetry={() => void loadGames()}
         />
@@ -533,10 +536,10 @@ export function GameAdminPageV2() {
 
       {/* Stats */}
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Totalt" value={stats.total} />
-        <AdminStatCard label="Publicerade" value={stats.published} />
-        <AdminStatCard label="Utkast" value={stats.drafts} />
-        <AdminStatCard label="Med fel" value={stats.withErrors} />
+        <AdminStatCard label={t('stats.total')} value={stats.total} />
+        <AdminStatCard label={t('stats.published')} value={stats.published} />
+        <AdminStatCard label={t('stats.drafts')} value={stats.drafts} />
+        <AdminStatCard label={t('stats.withErrors')} value={stats.withErrors} />
       </AdminStatGrid>
 
       {/* Bulk Actions Bar */}
@@ -601,8 +604,8 @@ export function GameAdminPageV2() {
             ) : games.length === 0 ? (
               <AdminEmptyState
                 icon={<PuzzlePieceIcon className="h-6 w-6" />}
-                title="Inga spel matchar filtren"
-                description="Justera filter eller lägg till ett nytt spel."
+                title={t('page.noGamesTitle')}
+                description={t('page.noGamesDesc')}
               />
             ) : (
               <div className="overflow-x-auto">
@@ -623,25 +626,25 @@ export function GameAdminPageV2() {
                       </th>
                       <th className="w-12 px-2 py-3"></th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                        Namn
+                        {t('table.name')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                        Läge
+                        {t('table.mode')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden lg:table-cell">
-                        Syfte
+                        {t('table.purpose')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                        Status
+                        {t('table.status')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden xl:table-cell">
-                        Valid
+                        {t('table.valid')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden md:table-cell">
-                        Ägare
+                        {t('table.owner')}
                       </th>
                       <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden lg:table-cell">
-                        Uppdaterad
+                        {t('table.updated')}
                       </th>
                       <th className="w-10 px-3 py-3"></th>
                     </tr>

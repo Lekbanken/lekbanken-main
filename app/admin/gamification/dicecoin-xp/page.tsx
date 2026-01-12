@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   SparklesIcon,
   ChartBarIcon,
@@ -76,55 +77,41 @@ interface LeaderboardEntry {
 
 // Default levels (from gamification design)
 const defaultLevels: Level[] = [
-  { level: 1, name: "Nybörjare", xpRequired: 0, reward: null },
-  { level: 2, name: "Lärling", xpRequired: 100, reward: "10 DiceCoin" },
-  { level: 3, name: "Utforskare", xpRequired: 300, reward: "25 DiceCoin" },
-  { level: 4, name: "Äventyrare", xpRequired: 600, reward: "50 DiceCoin" },
-  { level: 5, name: "Mästare", xpRequired: 1000, reward: "100 DiceCoin + Level bonus aktiv" },
-  { level: 6, name: "Expert", xpRequired: 1500, reward: "150 DiceCoin" },
-  { level: 7, name: "Veteran", xpRequired: 2500, reward: "200 DiceCoin + 1.3x bonus" },
-  { level: 8, name: "Legend", xpRequired: 4000, reward: "Badge: Legend" },
-  { level: 9, name: "Champion", xpRequired: 6000, reward: "300 DiceCoin" },
-  { level: 10, name: "Grandmaster", xpRequired: 10000, reward: "500 DiceCoin + Special Badge" },
+  { level: 1, name: null, xpRequired: 0, reward: null },
+  { level: 2, name: null, xpRequired: 100, reward: "10 DiceCoin" },
+  { level: 3, name: null, xpRequired: 300, reward: "25 DiceCoin" },
+  { level: 4, name: null, xpRequired: 600, reward: "50 DiceCoin" },
+  { level: 5, name: null, xpRequired: 1000, reward: "100 DiceCoin + Level bonus" },
+  { level: 6, name: null, xpRequired: 1500, reward: "150 DiceCoin" },
+  { level: 7, name: null, xpRequired: 2500, reward: "200 DiceCoin + 1.3x bonus" },
+  { level: 8, name: null, xpRequired: 4000, reward: "Badge: Legend" },
+  { level: 9, name: null, xpRequired: 6000, reward: "300 DiceCoin" },
+  { level: 10, name: null, xpRequired: 10000, reward: "500 DiceCoin + Special Badge" },
 ];
 
-const tabConfig: { id: DiceCoinTab; label: string }[] = [
-  { id: "xp", label: "XP & DiceCoin Triggers" },
-  { id: "levels", label: "Nivåer" },
-  { id: "leaderboards", label: "Leaderboards" },
-];
-
-// Cooldown type display names
-const cooldownLabels: Record<string, string> = {
-  none: "Ingen",
-  daily: "Daglig",
-  weekly: "Veckovis",
-  once: "En gång",
-  once_per_streak: "Per streak",
-};
-
-// Event type categories for grouping
+// Event type categories for grouping (category keys for translation)
 const eventCategories: Record<string, string> = {
-  session_started: "Play",
-  session_completed: "Play",
-  run_completed: "Play",
-  first_session: "Play",
-  perfect_session: "Play",
-  large_group_hosted: "Play",
-  plan_created: "Planner",
-  plan_published: "Planner",
-  first_plan: "Planner",
-  daily_login: "Engagement",
-  streak_3_days: "Engagement",
-  streak_7_days: "Engagement",
-  streak_30_days: "Engagement",
-  game_created: "Content",
-  game_published: "Content",
-  invite_accepted: "Social",
-  tutorial_completed: "Learning",
+  session_started: "play",
+  session_completed: "play",
+  run_completed: "play",
+  first_session: "play",
+  perfect_session: "play",
+  large_group_hosted: "play",
+  plan_created: "planner",
+  plan_published: "planner",
+  first_plan: "planner",
+  daily_login: "engagement",
+  streak_3_days: "engagement",
+  streak_7_days: "engagement",
+  streak_30_days: "engagement",
+  game_created: "content",
+  game_published: "content",
+  invite_accepted: "social",
+  tutorial_completed: "learning",
 };
 
 export default function DiceCoinXPPage() {
+  const t = useTranslations('admin.gamification.dicecoinXp');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
   const router = useRouter();
@@ -134,6 +121,20 @@ export default function DiceCoinXPPage() {
   const [activeTab, setActiveTab] = useState<DiceCoinTab>(
     tabFromUrl && ["xp", "levels", "leaderboards"].includes(tabFromUrl) ? tabFromUrl : "xp"
   );
+
+  const tabConfig = useMemo(() => [
+    { id: "xp" as const, label: t('tabs.xpTriggers') },
+    { id: "levels" as const, label: t('tabs.levels') },
+    { id: "leaderboards" as const, label: t('tabs.leaderboards') },
+  ], [t]);
+
+  const cooldownLabels = useMemo(() => ({
+    none: t('cooldown.none'),
+    daily: t('cooldown.daily'),
+    weekly: t('cooldown.weekly'),
+    once: t('cooldown.once'),
+    once_per_streak: t('cooldown.oncePerStreak'),
+  }), [t]);
 
   // Rules state
   const [rulesData, setRulesData] = useState<RulesResponse | null>(null);
@@ -164,15 +165,15 @@ export default function DiceCoinXPPage() {
         params.set('tenantId', currentTenant.id);
       }
       const res = await fetch(`/api/admin/gamification/seed-rules?${params}`);
-      if (!res.ok) throw new Error('Failed to fetch rules');
+      if (!res.ok) throw new Error(t('errors.fetchFailed'));
       const data = await res.json();
       setRulesData(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setLoading(false);
     }
-  }, [currentTenant?.id]);
+  }, [currentTenant?.id, t]);
 
   // Fetch leaderboard
   const fetchLeaderboard = useCallback(async () => {
@@ -191,7 +192,7 @@ export default function DiceCoinXPPage() {
         const data = await res.json();
         setLeaderboard(data.entries?.map((e: { rank: number; display_name?: string; xp?: number; coins_balance?: number }, i: number) => ({
           rank: e.rank || i + 1,
-          name: e.display_name || 'Anonym',
+          name: e.display_name || t('leaderboardsTab.anonymous'),
           type: 'user' as const,
           score: e.xp || 0,
           coins: e.coins_balance || 0,
@@ -202,7 +203,7 @@ export default function DiceCoinXPPage() {
     } finally {
       setLeaderboardLoading(false);
     }
-  }, [currentTenant?.id]);
+  }, [currentTenant?.id, t]);
 
   useEffect(() => {
     fetchRules();
@@ -234,7 +235,7 @@ export default function DiceCoinXPPage() {
       setSuccessMessage(data.message);
       await fetchRules();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.generic'));
     } finally {
       setSeeding(false);
     }
@@ -251,24 +252,24 @@ export default function DiceCoinXPPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: "Admin", href: "/admin" },
-          { label: "Gamification hub", href: "/admin/gamification" },
-          { label: "DiceCoin & XP" },
+          { label: t('breadcrumbs.admin'), href: "/admin" },
+          { label: t('breadcrumbs.gamificationHub'), href: "/admin/gamification" },
+          { label: t('breadcrumbs.dicecoinXp') },
         ]}
       />
 
       <AdminPageHeader
-        title="DiceCoin & XP"
-        description="Hantera XP-triggers, nivåer och leaderboards. Seeda alla default-triggers till databasen."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" onClick={fetchRules} disabled={loading}>
               <ArrowPathIcon className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              Uppdatera
+              {t('actions.refresh')}
             </Button>
             <Button onClick={() => {}}>
               <Cog6ToothIcon className="mr-2 h-4 w-4" />
-              Inställningar
+              {t('actions.settings')}
             </Button>
           </div>
         }
@@ -277,25 +278,25 @@ export default function DiceCoinXPPage() {
       {/* Stats */}
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Totalt triggers"
+          label={t('stats.totalTriggers')}
           value={stats.total}
           icon={<SparklesIcon className="h-5 w-5" />}
           iconColor="amber"
         />
         <AdminStatCard
-          label="I databasen"
+          label={t('stats.inDatabase')}
           value={stats.inDatabase}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Saknas"
+          label={t('stats.missing')}
           value={stats.missing}
           icon={stats.missing > 0 ? <ExclamationTriangleIcon className="h-5 w-5" /> : <CheckCircleIcon className="h-5 w-5" />}
           iconColor={stats.missing > 0 ? "amber" : "green"}
         />
         <AdminStatCard
-          label="Nivåer"
+          label={t('stats.levels')}
           value={defaultLevels.length}
           icon={<ChartBarIcon className="h-5 w-5" />}
           iconColor="blue"
@@ -335,6 +336,7 @@ export default function DiceCoinXPPage() {
           seeding={seeding}
           onSeed={seedRules}
           missingCount={stats.missing}
+          cooldownLabels={cooldownLabels}
         />
       </TabPanel>
       <TabPanel id="levels" activeTab={activeTab}>
@@ -355,6 +357,7 @@ function XPRulesTab({
   seeding,
   onSeed,
   missingCount,
+  cooldownLabels,
 }: { 
   rules: RuleFromAPI[]
   customRules: RuleFromAPI[]
@@ -362,7 +365,9 @@ function XPRulesTab({
   seeding: boolean
   onSeed: (mode: 'missing' | 'reset') => void
   missingCount: number
+  cooldownLabels: Record<string, string>
 }) {
+  const t = useTranslations('admin.gamification.dicecoinXp');
   const [searchQuery, setSearchQuery] = useState("");
   const [showConfirmReset, setShowConfirmReset] = useState(false);
 
@@ -380,9 +385,9 @@ function XPRulesTab({
   const groupedRules = useMemo(() => {
     const groups: Record<string, RuleFromAPI[]> = {};
     for (const rule of filteredRules) {
-      const category = eventCategories[rule.event_type] || 'Custom';
-      if (!groups[category]) groups[category] = [];
-      groups[category].push(rule);
+      const categoryKey = eventCategories[rule.event_type] || 'custom';
+      if (!groups[categoryKey]) groups[categoryKey] = [];
+      groups[categoryKey].push(rule);
     }
     return groups;
   }, [filteredRules]);
@@ -401,7 +406,7 @@ function XPRulesTab({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <Input
-            placeholder="Sök triggers..."
+            placeholder={t('xpTab.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -414,7 +419,7 @@ function XPRulesTab({
               className="bg-green-600 hover:bg-green-700"
             >
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              {seeding ? 'Seedar...' : `Lägg till ${missingCount} saknade`}
+              {seeding ? t('xpTab.seeding') : t('xpTab.addMissing', { count: missingCount })}
             </Button>
           )}
           <Button 
@@ -423,11 +428,11 @@ function XPRulesTab({
             disabled={seeding}
           >
             <ArrowPathIcon className="mr-2 h-4 w-4" />
-            Återställ alla
+            {t('xpTab.resetAll')}
           </Button>
           <Button>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Skapa custom trigger
+            {t('xpTab.createCustom')}
           </Button>
         </div>
       </div>
@@ -436,8 +441,7 @@ function XPRulesTab({
       {showConfirmReset && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950">
           <p className="mb-3 text-amber-800 dark:text-amber-200">
-            <strong>Varning:</strong> Detta kommer att ta bort alla default-triggers och lägga till dem på nytt med standardvärden. 
-            Custom triggers bevaras.
+            <strong>⚠️</strong> {t('xpTab.resetWarning')}
           </p>
           <div className="flex gap-2">
             <Button 
@@ -445,32 +449,32 @@ function XPRulesTab({
               onClick={() => { onSeed('reset'); setShowConfirmReset(false); }}
               disabled={seeding}
             >
-              Ja, återställ
+              {t('xpTab.confirmReset')}
             </Button>
             <Button variant="outline" onClick={() => setShowConfirmReset(false)}>
-              Avbryt
+              {t('xpTab.cancel')}
             </Button>
           </div>
         </div>
       )}
 
       {/* Rules grouped by category */}
-      {Object.entries(groupedRules).map(([category, categoryRules]) => (
-        <Card key={category}>
+      {Object.entries(groupedRules).map(([categoryKey, categoryRules]) => (
+        <Card key={categoryKey}>
           <div className="border-b bg-muted/30 px-4 py-2">
-            <h3 className="font-semibold text-sm">{category}</h3>
+            <h3 className="font-semibold text-sm">{t(`categories.${categoryKey}`)}</h3>
           </div>
           <CardContent className="p-0">
             <table className="w-full">
               <thead className="border-b bg-muted/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Namn</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Event Type</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Coins</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">XP</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Cooldown</th>
-                  <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">Aktiv</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('xpTab.table.status')}</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('xpTab.table.name')}</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('xpTab.table.eventType')}</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('xpTab.table.coins')}</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('xpTab.table.xp')}</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('xpTab.table.cooldown')}</th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-muted-foreground">{t('xpTab.table.active')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -486,7 +490,7 @@ function XPRulesTab({
                     <td className="px-4 py-3 font-medium">
                       {rule.name}
                       {rule.isCustom && (
-                        <Badge variant="outline" className="ml-2">Custom</Badge>
+                        <Badge variant="outline" className="ml-2">{t('xpTab.custom')}</Badge>
                       )}
                     </td>
                     <td className="px-4 py-3 font-mono text-sm text-muted-foreground">{rule.event_type}</td>
@@ -509,7 +513,7 @@ function XPRulesTab({
                     </td>
                     <td className="px-4 py-3 text-center">
                       <Badge variant={(rule.dbValues?.is_active ?? rule.is_active) ? "default" : "outline"}>
-                        {(rule.dbValues?.is_active ?? rule.is_active) ? "Aktiv" : "Inaktiv"}
+                        {(rule.dbValues?.is_active ?? rule.is_active) ? t('xpTab.table.active') : t('xpTab.table.inactive')}
                       </Badge>
                     </td>
                   </tr>
@@ -522,7 +526,7 @@ function XPRulesTab({
 
       {filteredRules.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
-          Inga triggers hittades
+          {t('xpTab.noTriggers')}
         </div>
       )}
     </div>
@@ -531,11 +535,13 @@ function XPRulesTab({
 
 // Levels Tab
 function LevelsTab({ levels, tenantId: _tenantId }: { levels: Level[]; tenantId?: string }) {
+  const t = useTranslations('admin.gamification.dicecoinXp');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Nivåer baserade på total XP. Level-bonus aktiveras från nivå 5 (1.1x) och ökar med 0.1x per nivå, capped vid 2.0x.
+          {t('levelsTab.description')}
         </p>
       </div>
 
@@ -556,7 +562,7 @@ function LevelsTab({ levels, tenantId: _tenantId }: { levels: Level[]; tenantId?
                     {level.level}
                   </div>
                   <div>
-                    <h4 className="font-semibold">{level.name || `Nivå ${level.level}`}</h4>
+                    <h4 className="font-semibold">{t(`levelsTab.levelNames.${level.level}`)}</h4>
                     <p className="text-sm text-muted-foreground">{level.xpRequired.toLocaleString()} XP</p>
                   </div>
                 </div>
@@ -568,7 +574,7 @@ function LevelsTab({ levels, tenantId: _tenantId }: { levels: Level[]; tenantId?
               </div>
               {level.reward && (
                 <div className="mt-3 rounded-lg bg-muted/50 px-3 py-2">
-                  <p className="text-xs text-muted-foreground">Belöning</p>
+                  <p className="text-xs text-muted-foreground">{t('levelsTab.reward')}</p>
                   <p className="text-sm font-medium">{level.reward}</p>
                 </div>
               )}
@@ -590,15 +596,17 @@ function LeaderboardsTab({
   loading: boolean
   onRefresh: () => void
 }) {
+  const t = useTranslations('admin.gamification.dicecoinXp');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Topplista över användare baserat på total XP. Användare kan välja att dölja sig från leaderboards.
+          {t('leaderboardsTab.description')}
         </p>
         <Button variant="outline" onClick={onRefresh} disabled={loading}>
           <ArrowPathIcon className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Uppdatera
+          {t('leaderboardsTab.refresh')}
         </Button>
       </div>
 
@@ -608,7 +616,7 @@ function LeaderboardsTab({
         </div>
       ) : entries.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          Ingen data ännu. Leaderboard fylls på när användare tjänar XP.
+          {t('leaderboardsTab.emptyState')}
         </div>
       ) : (
         <Card>
@@ -616,10 +624,10 @@ function LeaderboardsTab({
             <table className="w-full">
               <thead className="border-b bg-muted/50">
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Rank</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Namn</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">XP</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">DiceCoin</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('leaderboardsTab.table.rank')}</th>
+                  <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('leaderboardsTab.table.name')}</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('leaderboardsTab.table.xp')}</th>
+                  <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('leaderboardsTab.table.dicecoin')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y">

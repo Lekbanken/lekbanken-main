@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import {
@@ -37,6 +38,7 @@ type ResourceType = 'all' | 'game' | 'product' | 'user' | 'tenant' | 'media' | '
 export default function AuditLogsPage() {
   const { user } = useAuth()
   const { currentTenant } = useTenant()
+  const t = useTranslations('admin.auditLog')
 
   const userId = user?.id
   const tenantId = currentTenant?.id
@@ -163,7 +165,7 @@ export default function AuditLogsPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     )
@@ -178,10 +180,10 @@ export default function AuditLogsPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Audit Logs"
-        description="Granska alla systemaktiviteter och ändringar"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ClipboardDocumentListIcon className="h-6 w-6" />}
-        breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'Audit Logs' }]}
+        breadcrumbs={[{ label: t('breadcrumbs.admin'), href: '/admin' }, { label: t('breadcrumbs.auditLog') }]}
         actions={
           <button
             onClick={exportToCSV}
@@ -189,35 +191,35 @@ export default function AuditLogsPage() {
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <ArrowDownTrayIcon className="h-5 w-5" />
-            Exportera CSV
+            {t('exportCsv')}
           </button>
         }
       />
 
       <AdminStatGrid cols={4} className="mb-8">
         <AdminStatCard
-          label="Totalt händelser"
+          label={t('stats.totalEvents')}
           value={logs.length}
           icon={<ClipboardDocumentListIcon className="h-5 w-5" />}
           iconColor="primary"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Skapade"
+          label={t('stats.created')}
           value={actionCounts.create}
           icon={<ClipboardDocumentListIcon className="h-5 w-5" />}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Uppdaterade"
+          label={t('stats.updated')}
           value={actionCounts.update}
           icon={<ClipboardDocumentListIcon className="h-5 w-5" />}
           iconColor="blue"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Raderade"
+          label={t('stats.deleted')}
           value={actionCounts.delete}
           icon={<ClipboardDocumentListIcon className="h-5 w-5" />}
           iconColor="red"
@@ -230,13 +232,13 @@ export default function AuditLogsPage() {
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center gap-2 text-muted-foreground mb-2">
             <FunnelIcon className="h-5 w-5" />
-            <span className="font-medium">Filter</span>
+            <span className="font-medium">{t('filters.title')}</span>
           </div>
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {/* Date Range */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Från</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t('filters.from')}</label>
               <input
                 type="date"
                 value={dateRange.startDate}
@@ -247,7 +249,7 @@ export default function AuditLogsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Till</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t('filters.to')}</label>
               <input
                 type="date"
                 value={dateRange.endDate}
@@ -260,38 +262,38 @@ export default function AuditLogsPage() {
 
             {/* Action Type */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Åtgärd</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t('filters.action')}</label>
               <select
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value as ActionType)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
               >
-                <option value="all">Alla</option>
-                <option value="create">Skapa</option>
-                <option value="update">Uppdatera</option>
-                <option value="delete">Radera</option>
-                <option value="login">Inloggning</option>
-                <option value="logout">Utloggning</option>
+                <option value="all">{t('filters.actions.all')}</option>
+                <option value="create">{t('filters.actions.create')}</option>
+                <option value="update">{t('filters.actions.update')}</option>
+                <option value="delete">{t('filters.actions.delete')}</option>
+                <option value="login">{t('filters.actions.login')}</option>
+                <option value="logout">{t('filters.actions.logout')}</option>
               </select>
             </div>
 
             {/* Resource Type */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                Resurstyp
+                {t('filters.resourceType')}
               </label>
               <select
                 value={resourceFilter}
                 onChange={(e) => setResourceFilter(e.target.value as ResourceType)}
                 className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
               >
-                <option value="all">Alla</option>
-                <option value="game">Spel</option>
-                <option value="product">Produkt</option>
-                <option value="user">Användare</option>
-                <option value="tenant">Organisation</option>
-                <option value="media">Media</option>
-                <option value="achievement">Prestation</option>
+                <option value="all">{t('filters.resources.all')}</option>
+                <option value="game">{t('filters.resources.game')}</option>
+                <option value="product">{t('filters.resources.product')}</option>
+                <option value="user">{t('filters.resources.user')}</option>
+                <option value="tenant">{t('filters.resources.tenant')}</option>
+                <option value="media">{t('filters.resources.media')}</option>
+                <option value="achievement">{t('filters.resources.achievement')}</option>
               </select>
             </div>
           </div>
@@ -303,13 +305,13 @@ export default function AuditLogsPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Sök i aktiviteter..."
+              placeholder={t('filters.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
             />
           </div>
 
           <p className="text-xs text-muted-foreground text-center">
-            Filter tillämpas automatiskt
+            {t('filters.autoApply')}
           </p>
         </CardContent>
       </Card>
@@ -317,7 +319,7 @@ export default function AuditLogsPage() {
       {/* Logs Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Aktivitetslogg ({logs.length} händelser)</CardTitle>
+          <CardTitle>{t('table.title')} ({logs.length} {t.raw('table.eventsCount').replace('{count}', '')})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
@@ -325,19 +327,19 @@ export default function AuditLogsPage() {
               <thead className="bg-muted border-b border-border">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    Tidpunkt
+                    {t('table.timestamp')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    Åtgärd
+                    {t('table.action')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    Resurs
+                    {t('table.resource')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    Användare
+                    {t('table.user')}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                    Detaljer
+                    {t('table.details')}
                   </th>
                 </tr>
               </thead>
@@ -345,13 +347,13 @@ export default function AuditLogsPage() {
                 {isLoading ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                      Laddar...
+                      {t('loading')}
                     </td>
                   </tr>
                 ) : logs.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                      Inga aktiviteter hittades
+                      {t('noEvents')}
                     </td>
                   </tr>
                 ) : (
@@ -393,13 +395,13 @@ export default function AuditLogsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {log.user_email || 'System'}
+                        {log.user_email || t('table.system')}
                       </td>
                       <td className="px-6 py-4 text-sm text-muted-foreground">
                         {log.metadata && Object.keys(log.metadata).length > 0 ? (
                           <details className="cursor-pointer">
                             <summary className="text-primary hover:underline">
-                              Visa metadata
+                              {t('table.showMetadata')}
                             </summary>
                             <pre className="mt-2 text-xs bg-muted p-2 rounded overflow-x-auto">
                               {JSON.stringify(log.metadata, null, 2)}

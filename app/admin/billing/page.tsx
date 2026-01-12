@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
@@ -39,46 +40,8 @@ interface QuickAction {
   buttonLabel: string;
 }
 
-const quickActions: QuickAction[] = [
-  {
-    id: 'subscriptions',
-    title: 'Prenumerationer',
-    description: 'Hantera kundprenumerationer och abonnemang.',
-    href: '/admin/billing/subscriptions',
-    icon: <CreditCardIcon className="h-5 w-5" />,
-    color: 'from-primary/20 to-primary/5 text-primary',
-    buttonLabel: 'Visa prenumerationer',
-  },
-  {
-    id: 'invoices',
-    title: 'Fakturor',
-    description: 'Visa och hantera kundfakturor och betalningar.',
-    href: '/admin/billing/invoices',
-    icon: <DocumentTextIcon className="h-5 w-5" />,
-    color: 'from-emerald-500/20 to-emerald-500/5 text-emerald-600',
-    buttonLabel: 'Visa fakturor',
-  },
-  {
-    id: 'plans',
-    title: 'Prisplaner',
-    description: 'Konfigurera prenumerationsnivåer och prissättning.',
-    href: '#',
-    icon: <CurrencyDollarIcon className="h-5 w-5" />,
-    color: 'from-purple-500/20 to-purple-500/5 text-purple-600',
-    buttonLabel: 'Hantera planer',
-  },
-  {
-    id: 'settings',
-    title: 'Betalningsinställningar',
-    description: 'Konfigurera betalningsmetoder och integrationer.',
-    href: '#',
-    icon: <CogIcon className="h-5 w-5" />,
-    color: 'from-slate-500/20 to-slate-500/5 text-slate-600',
-    buttonLabel: 'Inställningar',
-  },
-];
-
 export default function BillingAdminPage() {
+  const t = useTranslations('admin.billing.hub');
   const router = useRouter();
   const { user } = useAuth();
   const { currentTenant } = useTenant();
@@ -88,6 +51,45 @@ export default function BillingAdminPage() {
 
   const [stats, setStats] = useState<Stats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const quickActions: QuickAction[] = useMemo(() => [
+    {
+      id: 'subscriptions',
+      title: t('actions.subscriptions.title'),
+      description: t('actions.subscriptions.description'),
+      href: '/admin/billing/subscriptions',
+      icon: <CreditCardIcon className="h-5 w-5" />,
+      color: 'from-primary/20 to-primary/5 text-primary',
+      buttonLabel: t('actions.subscriptions.button'),
+    },
+    {
+      id: 'invoices',
+      title: t('actions.invoices.title'),
+      description: t('actions.invoices.description'),
+      href: '/admin/billing/invoices',
+      icon: <DocumentTextIcon className="h-5 w-5" />,
+      color: 'from-emerald-500/20 to-emerald-500/5 text-emerald-600',
+      buttonLabel: t('actions.invoices.button'),
+    },
+    {
+      id: 'plans',
+      title: t('actions.plans.title'),
+      description: t('actions.plans.description'),
+      href: '#',
+      icon: <CurrencyDollarIcon className="h-5 w-5" />,
+      color: 'from-purple-500/20 to-purple-500/5 text-purple-600',
+      buttonLabel: t('actions.plans.button'),
+    },
+    {
+      id: 'settings',
+      title: t('actions.settings.title'),
+      description: t('actions.settings.description'),
+      href: '#',
+      icon: <CogIcon className="h-5 w-5" />,
+      color: 'from-slate-500/20 to-slate-500/5 text-slate-600',
+      buttonLabel: t('actions.settings.button'),
+    },
+  ], [t]);
 
   useEffect(() => {
     if (!userId || !tenantId) return;
@@ -110,7 +112,7 @@ export default function BillingAdminPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     );
@@ -120,47 +122,47 @@ export default function BillingAdminPage() {
     <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
-        title="Fakturering"
-        description="Hantera prenumerationer, fakturor och betalningar"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<CreditCardIcon className="h-6 w-6" />}
         breadcrumbs={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Fakturering' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.billing') },
         ]}
       />
 
       {/* Stats */}
       <AdminStatGrid cols={5} className="mb-8">
         <AdminStatCard
-          label="Aktiva prenumerationer"
+          label={t('stats.activeSubscriptions')}
           value={stats?.activeSubscriptions ?? 0}
           icon={<CreditCardIcon className="h-5 w-5" />}
           iconColor="primary"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="MRR"
+          label={t('stats.mrr')}
           value={stats ? `$${stats.monthlyRecurringRevenue.toFixed(0)}` : '-'}
           icon={<span className="text-base">📈</span>}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Total intäkt"
+          label={t('stats.totalRevenue')}
           value={stats ? `$${stats.totalRevenue.toFixed(0)}` : '-'}
           icon={<CurrencyDollarIcon className="h-5 w-5" />}
           iconColor="purple"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Betalda fakturor"
+          label={t('stats.paidInvoices')}
           value={stats?.paidInvoices ?? 0}
           icon={<span className="text-base">✅</span>}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Utestående"
+          label={t('stats.outstanding')}
           value={stats?.outstandingInvoices ?? 0}
           icon={<span className="text-base">⏳</span>}
           iconColor="amber"
@@ -200,18 +202,18 @@ export default function BillingAdminPage() {
       {/* Info Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Om fakturering</CardTitle>
+          <CardTitle className="text-base">{t('about.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2 text-sm text-muted-foreground">
             <p>
-              Faktureringsdashboarden ger en översikt över alla prenumerations- och betalningsaktiviteter.
+              {t('about.paragraph1')}
             </p>
             <p>
-              Här kan du hantera kundprenumerationer, visa fakturor, konfigurera prisplaner och övervaka betalningsmetoder.
+              {t('about.paragraph2')}
             </p>
             <p className="text-xs border-l-2 border-amber-500 pl-3 py-1 bg-amber-50 dark:bg-amber-950/30 rounded-r">
-              <strong>OBS:</strong> Stripe-integration kommer att aktiveras i produktion. För tillfället lagras faktureringsdata i Supabase.
+              <strong>{t('about.note').split(':')[0]}:</strong>{t('about.note').split(':').slice(1).join(':')}
             </p>
           </div>
         </CardContent>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Select } from '@/components/ui'
 import {
   TicketIcon,
@@ -51,18 +52,18 @@ function getStatusBadgeVariant(status: string) {
   }
 }
 
-function getStatusLabel(status: string) {
+function getStatusLabel(status: string, t: (key: string) => string) {
   switch (status) {
     case 'open':
-      return 'Öppen'
+      return t('status.open')
     case 'in_progress':
-      return 'Pågår'
+      return t('status.inProgress')
     case 'waiting_for_user':
-      return 'Väntar på svar'
+      return t('status.waitingForUser')
     case 'resolved':
-      return 'Löst'
+      return t('status.resolved')
     case 'closed':
-      return 'Stängd'
+      return t('status.closed')
     default:
       return status
   }
@@ -83,7 +84,7 @@ function getPriorityBadgeVariant(priority: string) {
   }
 }
 
-function formatTimeAgo(dateString: string) {
+function formatTimeAgo(dateString: string, t: (key: string, values?: Record<string, string | number | Date>) => string) {
   const date = new Date(dateString)
   const now = new Date()
   const diffMs = now.getTime() - date.getTime()
@@ -91,13 +92,14 @@ function formatTimeAgo(dateString: string) {
   const diffHours = Math.floor(diffMins / 60)
   const diffDays = Math.floor(diffHours / 24)
 
-  if (diffMins < 60) return `${diffMins}m sedan`
-  if (diffHours < 24) return `${diffHours}h sedan`
-  if (diffDays === 1) return 'Igår'
-  return `${diffDays}d sedan`
+  if (diffMins < 60) return t('timeAgo.minutes', { count: diffMins })
+  if (diffHours < 24) return t('timeAgo.hours', { count: diffHours })
+  if (diffDays === 1) return t('timeAgo.yesterday')
+  return t('timeAgo.days', { count: diffDays })
 }
 
 export default function SupportHubPage() {
+  const t = useTranslations('admin.support.hub')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hasAccess, setHasAccess] = useState(false)
@@ -117,7 +119,7 @@ export default function SupportHubPage() {
   async function checkAccess() {
     const result = await checkSupportHubAccess()
     if (!result.hasAccess) {
-      setError(result.error || 'Ingen åtkomst')
+      setError(result.error || t('noAccess'))
       setLoading(false)
       return
     }
@@ -196,7 +198,7 @@ export default function SupportHubPage() {
     return (
       <AdminPageLayout>
         <AdminErrorState
-          title="Ingen åtkomst"
+          title={t('noAccess')}
           description={error}
           onRetry={() => window.location.reload()}
         />
@@ -205,15 +207,15 @@ export default function SupportHubPage() {
   }
 
   const tenantOptions = [
-    { value: '', label: 'Alla organisationer' },
+    { value: '', label: t('allOrganizations') },
     ...tenants.map(t => ({ value: t.id, label: t.name })),
   ]
 
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Support"
-        description="Översikt över supportärenden, feedback och buggrapporter"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
           isSystemAdmin && tenants.length > 0 ? (
@@ -242,9 +244,9 @@ export default function SupportHubPage() {
                     <TicketIcon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">Ärenden</div>
+                    <div className="font-semibold text-foreground">{t('cards.tickets')}</div>
                     <div className="text-sm text-muted-foreground">
-                      {(stats?.total_open ?? 0) + (stats?.in_progress ?? 0)} aktiva
+                      {t('cards.activeCount', { count: (stats?.total_open ?? 0) + (stats?.in_progress ?? 0) })}
                     </div>
                   </div>
                   <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
@@ -259,8 +261,8 @@ export default function SupportHubPage() {
                     <BookOpenIcon className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">Kunskapsbas</div>
-                    <div className="text-sm text-muted-foreground">FAQ & artiklar</div>
+                    <div className="font-semibold text-foreground">{t('cards.knowledgeBase')}</div>
+                    <div className="text-sm text-muted-foreground">{t('cards.faqAndArticles')}</div>
                   </div>
                   <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
                 </CardContent>
@@ -274,9 +276,9 @@ export default function SupportHubPage() {
                     <BugAntIcon className="h-6 w-6 text-red-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">Buggrapporter</div>
+                    <div className="font-semibold text-foreground">{t('cards.bugReports')}</div>
                     <div className="text-sm text-muted-foreground">
-                      {stats?.open_bugs ?? 0} öppna
+                      {t('cards.openCount', { count: stats?.open_bugs ?? 0 })}
                     </div>
                   </div>
                   <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
@@ -291,9 +293,9 @@ export default function SupportHubPage() {
                     <LightBulbIcon className="h-6 w-6 text-yellow-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">Feedback</div>
+                    <div className="font-semibold text-foreground">{t('cards.feedback')}</div>
                     <div className="text-sm text-muted-foreground">
-                      {stats?.unread_feedback ?? 0} nya
+                      {t('cards.newCount', { count: stats?.unread_feedback ?? 0 })}
                     </div>
                   </div>
                   <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
@@ -308,8 +310,8 @@ export default function SupportHubPage() {
                     <BellIcon className="h-6 w-6 text-purple-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-foreground">Notifikationer</div>
-                    <div className="text-sm text-muted-foreground">Historik & felsökning</div>
+                    <div className="font-semibold text-foreground">{t('cards.notifications')}</div>
+                    <div className="text-sm text-muted-foreground">{t('cards.historyAndTroubleshooting')}</div>
                   </div>
                   <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
                 </CardContent>
@@ -324,8 +326,8 @@ export default function SupportHubPage() {
                       <CogIcon className="h-6 w-6 text-indigo-600" />
                     </div>
                     <div>
-                      <div className="font-semibold text-foreground">Automation</div>
-                      <div className="text-sm text-muted-foreground">Regler, SLA & mallar</div>
+                      <div className="font-semibold text-foreground">{t('cards.automation')}</div>
+                      <div className="text-sm text-muted-foreground">{t('cards.rulesAndSla')}</div>
                     </div>
                     <ArrowRightIcon className="h-5 w-5 text-muted-foreground ml-auto" />
                   </CardContent>
@@ -340,7 +342,7 @@ export default function SupportHubPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">Öppna</div>
+                    <div className="text-sm text-muted-foreground">{t('stats.open')}</div>
                     <ClockIcon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="text-2xl font-bold text-foreground mt-1">{stats.total_open}</div>
@@ -349,7 +351,7 @@ export default function SupportHubPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">Pågående</div>
+                    <div className="text-sm text-muted-foreground">{t('stats.inProgress')}</div>
                     <ChatBubbleLeftRightIcon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="text-2xl font-bold text-foreground mt-1">{stats.in_progress}</div>
@@ -358,7 +360,7 @@ export default function SupportHubPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">Väntar på svar</div>
+                    <div className="text-sm text-muted-foreground">{t('stats.waitingForUser')}</div>
                     <UserIcon className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <div className="text-2xl font-bold text-foreground mt-1">{stats.waiting_for_user}</div>
@@ -367,7 +369,7 @@ export default function SupportHubPage() {
               <Card className={stats.urgent_count > 0 ? 'border-red-500/50' : ''}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">Brådskande</div>
+                    <div className="text-sm text-muted-foreground">{t('stats.urgent')}</div>
                     <ExclamationTriangleIcon className={`h-4 w-4 ${stats.urgent_count > 0 ? 'text-red-500' : 'text-muted-foreground'}`} />
                   </div>
                   <div className={`text-2xl font-bold mt-1 ${stats.urgent_count > 0 ? 'text-red-600' : 'text-foreground'}`}>
@@ -378,7 +380,7 @@ export default function SupportHubPage() {
               <Card>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">Lösta (30d)</div>
+                    <div className="text-sm text-muted-foreground">{t('stats.resolved30d')}</div>
                     <CheckCircleIcon className="h-4 w-4 text-green-500" />
                   </div>
                   <div className="text-2xl font-bold text-foreground mt-1">{stats.resolved_last_30d}</div>
@@ -394,7 +396,7 @@ export default function SupportHubPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-red-600">
                     <ExclamationTriangleIcon className="h-5 w-5" />
-                    Brådskande ärenden
+                    {t('sections.urgentTickets')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -408,10 +410,10 @@ export default function SupportHubPage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-foreground truncate">{ticket.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {ticket.user_email || 'Okänd'} • {formatTimeAgo(ticket.created_at)}
+                            {ticket.user_email || t('unknown')} • {formatTimeAgo(ticket.created_at, t)}
                           </div>
                         </div>
-                        <Badge variant="destructive">Brådskande</Badge>
+                        <Badge variant="destructive">{t('priority.urgent')}</Badge>
                       </Link>
                     ))}
                   </div>
@@ -425,7 +427,7 @@ export default function SupportHubPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2">
                     <UserIcon className="h-5 w-5" />
-                    Mina tilldelade ärenden
+                    {t('sections.myAssignedTickets')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -439,7 +441,7 @@ export default function SupportHubPage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-foreground truncate">{ticket.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {formatTimeAgo(ticket.created_at)}
+                            {formatTimeAgo(ticket.created_at, t)}
                             {isSystemAdmin && ticket.tenant_name && ` • ${ticket.tenant_name}`}
                           </div>
                         </div>
@@ -448,7 +450,7 @@ export default function SupportHubPage() {
                             {ticket.priority}
                           </Badge>
                           <Badge variant={getStatusBadgeVariant(ticket.status) as 'primary' | 'warning' | 'secondary' | 'success' | 'default'}>
-                            {getStatusLabel(ticket.status)}
+                            {getStatusLabel(ticket.status, t)}
                           </Badge>
                         </div>
                       </Link>
@@ -463,11 +465,11 @@ export default function SupportHubPage() {
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <TicketIcon className="h-5 w-5" />
-                  Senaste ärenden
+                  {t('sections.recentTickets')}
                 </CardTitle>
                 <Link href="/admin/tickets">
                   <Button variant="ghost" size="sm">
-                    Visa alla
+                    {t('viewAll')}
                     <ArrowRightIcon className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
@@ -475,7 +477,7 @@ export default function SupportHubPage() {
               <CardContent>
                 {recentTickets.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    Inga aktiva ärenden
+                    {t('empty.noActiveTickets')}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -488,12 +490,12 @@ export default function SupportHubPage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-foreground truncate">{ticket.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {ticket.user_email || 'Okänd'} • {formatTimeAgo(ticket.created_at)}
+                            {ticket.user_email || t('unknown')} • {formatTimeAgo(ticket.created_at, t)}
                             {isSystemAdmin && ticket.tenant_name && ` • ${ticket.tenant_name}`}
                           </div>
                         </div>
                         <Badge variant={getStatusBadgeVariant(ticket.status) as 'primary' | 'warning' | 'secondary' | 'success' | 'default'}>
-                          {getStatusLabel(ticket.status)}
+                          {getStatusLabel(ticket.status, t)}
                         </Badge>
                       </Link>
                     ))}
@@ -507,11 +509,11 @@ export default function SupportHubPage() {
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <LightBulbIcon className="h-5 w-5" />
-                  Ny feedback
+                  {t('sections.newFeedback')}
                 </CardTitle>
                 <Link href="/admin/support/feedback">
                   <Button variant="ghost" size="sm">
-                    Visa alla
+                    {t('viewAll')}
                     <ArrowRightIcon className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
@@ -519,7 +521,7 @@ export default function SupportHubPage() {
               <CardContent>
                 {recentFeedback.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    Ingen ny feedback
+                    {t('empty.noNewFeedback')}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -532,7 +534,7 @@ export default function SupportHubPage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-foreground truncate">{item.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {item.user_email || 'Anonym'} • {formatTimeAgo(item.created_at)}
+                            {item.user_email || t('anonymous')} • {formatTimeAgo(item.created_at, t)}
                           </div>
                         </div>
                         <Badge variant="secondary">{item.type}</Badge>
@@ -548,11 +550,11 @@ export default function SupportHubPage() {
               <CardHeader className="pb-3 flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                   <BugAntIcon className="h-5 w-5" />
-                  Öppna buggrapporter
+                  {t('sections.openBugReports')}
                 </CardTitle>
                 <Link href="/admin/support/bugs">
                   <Button variant="ghost" size="sm">
-                    Visa alla
+                    {t('viewAll')}
                     <ArrowRightIcon className="h-4 w-4 ml-1" />
                   </Button>
                 </Link>
@@ -560,7 +562,7 @@ export default function SupportHubPage() {
               <CardContent>
                 {recentBugs.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    Inga öppna buggrapporter
+                    {t('empty.noOpenBugReports')}
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -573,7 +575,7 @@ export default function SupportHubPage() {
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-foreground truncate">{bug.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {bug.user_email || 'Okänd'} • {formatTimeAgo(bug.created_at)}
+                            {bug.user_email || t('unknown')} • {formatTimeAgo(bug.created_at, t)}
                           </div>
                         </div>
                         <Badge variant="outline">{bug.status}</Badge>

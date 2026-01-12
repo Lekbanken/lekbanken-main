@@ -1,7 +1,8 @@
 'use client';
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   Button,
   Dialog,
@@ -23,18 +24,20 @@ type OrganisationCreateDialogProps = {
   onCreate: (organisation: OrganisationCreatePayload) => Promise<void>;
 };
 
-const statusOptions: { value: OrganisationListStatus; label: string }[] = [
-  { value: "active", label: tenantStatusLabels.active },
-  { value: "trial", label: tenantStatusLabels.trial },
-  { value: "demo", label: tenantStatusLabels.demo },
-  { value: "inactive", label: tenantStatusLabels.inactive },
-];
-
 export function OrganisationCreateDialog({
   open,
   onOpenChange,
   onCreate,
 }: OrganisationCreateDialogProps) {
+  const t = useTranslations('admin.organizations.create');
+
+  const statusOptions: { value: OrganisationListStatus; label: string }[] = useMemo(() => [
+    { value: "active", label: tenantStatusLabels.active },
+    { value: "trial", label: tenantStatusLabels.trial },
+    { value: "demo", label: tenantStatusLabels.demo },
+    { value: "inactive", label: tenantStatusLabels.inactive },
+  ], []);
+
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [contactName, setContactName] = useState("");
@@ -80,61 +83,61 @@ export function OrganisationCreateDialog({
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <BuildingOffice2Icon className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle>Skapa organisation</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Lägg till en ny organisation och ange kontaktuppgifter.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground" htmlFor="create-org-name">
-              Organisationsnamn <span className="text-destructive">*</span>
+              {t('nameLabel')} <span className="text-destructive">{t('required')}</span>
             </label>
             <Input
               id="create-org-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Organisation AB"
+              placeholder={t('namePlaceholder')}
               required
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground" htmlFor="create-slug">
-              Slug <span className="text-muted-foreground font-normal">(valfritt)</span>
+              {t('slugLabel')} <span className="text-muted-foreground font-normal">{t('slugOptional')}</span>
             </label>
             <Input
               id="create-slug"
               value={slug}
               onChange={(event) => setSlug(event.target.value)}
-              placeholder="organisation-ab"
+              placeholder={t('slugPlaceholder')}
             />
-            <p className="text-xs text-muted-foreground">Lämna tomt för auto-slug.</p>
+            <p className="text-xs text-muted-foreground">{t('slugHint')}</p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-name">
-                Kontaktperson
+                {t('contactPerson')}
               </label>
               <Input
                 id="create-contact-name"
                 value={contactName}
                 onChange={(event) => setContactName(event.target.value)}
-                placeholder="Namn"
+                placeholder={t('contactPersonPlaceholder')}
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-email">
-                Kontaktmail <span className="text-destructive">*</span>
+                {t('contactEmail')} <span className="text-destructive">{t('required')}</span>
               </label>
               <Input
                 id="create-contact-email"
                 type="email"
                 value={contactEmail}
                 onChange={(event) => setContactEmail(event.target.value)}
-                placeholder="email@example.com"
+                placeholder={t('contactEmailPlaceholder')}
                 required
               />
             </div>
@@ -143,25 +146,25 @@ export function OrganisationCreateDialog({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-contact-phone">
-                Telefon <span className="text-muted-foreground font-normal">(valfritt)</span>
+                {t('phone')} <span className="text-muted-foreground font-normal">{t('phoneOptional')}</span>
               </label>
               <Input
                 id="create-contact-phone"
                 value={contactPhone}
                 onChange={(event) => setContactPhone(event.target.value)}
-                placeholder="+46 ..."
+                placeholder={t('phonePlaceholder')}
               />
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="create-status">
-                Status
+                {t('status')}
               </label>
               <Select
                 id="create-status"
                 value={status}
                 onChange={(event) => setStatus(event.target.value as OrganisationListStatus)}
                 options={statusOptions}
-                placeholder="Välj status"
+                placeholder={t('statusPlaceholder')}
               />
             </div>
           </div>
@@ -176,10 +179,10 @@ export function OrganisationCreateDialog({
               }}
               disabled={isSaving}
             >
-              Avbryt
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? "Skapar..." : "Skapa organisation"}
+              {isSaving ? t('creating') : t('submit')}
             </Button>
           </DialogFooter>
         </form>

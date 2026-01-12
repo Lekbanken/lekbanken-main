@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Button,
   Dialog,
@@ -25,23 +26,6 @@ type GameFormDialogProps = {
   products: SelectOption[];
   initialGame?: GameWithRelations | null;
 };
-
-const energyOptions: SelectOption[] = [
-  { value: 'low', label: 'Låg' },
-  { value: 'medium', label: 'Medel' },
-  { value: 'high', label: 'Hög' },
-];
-
-const locationOptions: SelectOption[] = [
-  { value: 'indoor', label: 'Inomhus' },
-  { value: 'outdoor', label: 'Utomhus' },
-  { value: 'both', label: 'Både och' },
-];
-
-const statusOptions: SelectOption[] = [
-  { value: 'draft', label: 'Utkast' },
-  { value: 'published', label: 'Publicerad' },
-];
 
 const defaultValues: GameFormValues = {
   name: '',
@@ -70,9 +54,27 @@ export function GameFormDialog({
   products,
   initialGame,
 }: GameFormDialogProps) {
+  const t = useTranslations('admin.games.form');
   const [values, setValues] = useState<GameFormValues>(defaultValues);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const energyOptions: SelectOption[] = useMemo(() => [
+    { value: 'low', label: t('energyLow') },
+    { value: 'medium', label: t('energyMedium') },
+    { value: 'high', label: t('energyHigh') },
+  ], [t]);
+
+  const locationOptions: SelectOption[] = useMemo(() => [
+    { value: 'indoor', label: t('locationIndoor') },
+    { value: 'outdoor', label: t('locationOutdoor') },
+    { value: 'both', label: t('locationBoth') },
+  ], [t]);
+
+  const statusOptions: SelectOption[] = useMemo(() => [
+    { value: 'draft', label: t('statusDraft') },
+    { value: 'published', label: t('statusPublished') },
+  ], [t]);
 
   useEffect(() => {
     if (initialGame) {
@@ -110,7 +112,7 @@ export function GameFormDialog({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!hasRequiredFields) {
-      setError('Namn, kort beskrivning och syfte måste anges.');
+      setError(t('requiredError'));
       return;
     }
     setIsSubmitting(true);
@@ -120,7 +122,7 @@ export function GameFormDialog({
       onOpenChange(false);
     } catch (err) {
       console.error('Game form submit failed', err);
-      setError('Kunde inte spara spelet. Försök igen.');
+      setError(t('saveError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -137,9 +139,9 @@ export function GameFormDialog({
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <PuzzlePieceIcon className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle>{initialGame ? 'Redigera lek' : 'Skapa ny lek'}</DialogTitle>
+          <DialogTitle>{initialGame ? t('editTitle') : t('createTitle')}</DialogTitle>
           <DialogDescription>
-            Hantera grunddata för lekbanken. Minimikrav: namn, kort beskrivning och huvudsyfte.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -147,41 +149,41 @@ export function GameFormDialog({
           <div className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="game-name">
-                Namn <span className="text-destructive">*</span>
+                {t('name')} <span className="text-destructive">*</span>
               </label>
               <Input
                 id="game-name"
                 value={values.name}
                 onChange={(event) => updateField('name', event.target.value)}
-                placeholder="Ex. Samarbetsstafett"
+                placeholder={t('namePlaceholder')}
                 required
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="game-short">
-                Kort beskrivning <span className="text-destructive">*</span>
+                {t('shortDescription')} <span className="text-destructive">*</span>
               </label>
               <Textarea
                 id="game-short"
                 value={values.short_description}
                 onChange={(event) => updateField('short_description', event.target.value)}
                 rows={2}
-                placeholder="1-2 meningar som sammanfattar leken."
+                placeholder={t('shortDescriptionPlaceholder')}
                 required
               />
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground" htmlFor="game-description">
-                Full beskrivning
+                {t('fullDescription')}
               </label>
               <Textarea
                 id="game-description"
                 value={values.description}
                 onChange={(event) => updateField('description', event.target.value)}
                 rows={6}
-                placeholder="Instruktioner, tips och säkerhetsnotiser."
+                placeholder={t('fullDescriptionPlaceholder')}
               />
             </div>
           </div>
@@ -189,21 +191,21 @@ export function GameFormDialog({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Status</label>
+                <label className="text-sm font-medium text-foreground">{t('status')}</label>
                 <Select
                   value={values.status}
                   onChange={(event) => updateField('status', event.target.value as GameFormValues['status'])}
                   options={statusOptions}
-                  placeholder="Välj status"
+                  placeholder={t('statusPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Ägare</label>
+                <label className="text-sm font-medium text-foreground">{t('owner')}</label>
                 <Select
                   value={values.owner_tenant_id ?? 'global'}
                   onChange={(event) => updateField('owner_tenant_id', event.target.value === 'global' ? null : event.target.value)}
-                  options={[{ value: 'global', label: 'Global (Lekbanken)' }, ...tenants]}
-                  placeholder="Välj ägare"
+                  options={[{ value: 'global', label: t('ownerGlobal') }, ...tenants]}
+                  placeholder={t('ownerPlaceholder')}
                 />
               </div>
             </div>
@@ -211,62 +213,62 @@ export function GameFormDialog({
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Syfte <span className="text-destructive">*</span>
+                  {t('purpose')} <span className="text-destructive">*</span>
                 </label>
                 <Select
                   value={values.main_purpose_id}
                   onChange={(event) => updateField('main_purpose_id', event.target.value)}
                   options={purposes}
-                  placeholder="Välj syfte"
+                  placeholder={t('purposePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Produkt</label>
+                <label className="text-sm font-medium text-foreground">{t('product')}</label>
                 <Select
                   value={values.product_id ?? ''}
                   onChange={(event) => updateField('product_id', event.target.value || null)}
-                  options={[{ value: '', label: 'Ingen' }, ...products]}
-                  placeholder="Välj produkt"
+                  options={[{ value: '', label: t('productNone') }, ...products]}
+                  placeholder={t('productPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Kategori</label>
+                <label className="text-sm font-medium text-foreground">{t('category')}</label>
                 <Input
                   value={values.category || ''}
                   onChange={(event) => updateField('category', event.target.value || null)}
-                  placeholder="Ex. Samarbete, Uppvärmning"
+                  placeholder={t('categoryPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Energi</label>
+                <label className="text-sm font-medium text-foreground">{t('energy')}</label>
                 <Select
                   value={values.energy_level ?? ''}
                   onChange={(event) =>
                     updateField('energy_level', (event.target.value || null) as GameFormValues['energy_level'])
                   }
-                  options={[{ value: '', label: 'Ingen' }, ...energyOptions]}
-                  placeholder="Välj energinivå"
+                  options={[{ value: '', label: t('energyNone') }, ...energyOptions]}
+                  placeholder={t('energyPlaceholder')}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Spelplats</label>
+                <label className="text-sm font-medium text-foreground">{t('location')}</label>
                 <Select
                   value={values.location_type ?? ''}
                   onChange={(event) =>
                     updateField('location_type', (event.target.value || null) as GameFormValues['location_type'])
                   }
-                  options={[{ value: '', label: 'Okänt' }, ...locationOptions]}
-                  placeholder="Välj spelplats"
+                  options={[{ value: '', label: t('locationUnknown') }, ...locationOptions]}
+                  placeholder={t('locationPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Beräknad tid (min)</label>
+                <label className="text-sm font-medium text-foreground">{t('timeEstimate')}</label>
                 <Input
                   type="number"
                   min={0}
@@ -274,14 +276,14 @@ export function GameFormDialog({
                   onChange={(event) =>
                     updateField('time_estimate_min', event.target.value ? Number(event.target.value) : null)
                   }
-                  placeholder="Ex. 15"
+                  placeholder={t('timeEstimatePlaceholder')}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Spelare (min-max)</label>
+                <label className="text-sm font-medium text-foreground">{t('players')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     type="number"
@@ -290,7 +292,7 @@ export function GameFormDialog({
                     onChange={(event) =>
                       updateField('min_players', event.target.value ? Number(event.target.value) : null)
                     }
-                    placeholder="Min"
+                    placeholder={t('playersMin')}
                   />
                   <Input
                     type="number"
@@ -299,26 +301,26 @@ export function GameFormDialog({
                     onChange={(event) =>
                       updateField('max_players', event.target.value ? Number(event.target.value) : null)
                     }
-                    placeholder="Max"
+                    placeholder={t('playersMax')}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Ålder (min-max)</label>
+                <label className="text-sm font-medium text-foreground">{t('age')}</label>
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     type="number"
                     min={0}
                     value={values.age_min ?? ''}
                     onChange={(event) => updateField('age_min', event.target.value ? Number(event.target.value) : null)}
-                    placeholder="Min"
+                    placeholder={t('ageMin')}
                   />
                   <Input
                     type="number"
                     min={0}
                     value={values.age_max ?? ''}
                     onChange={(event) => updateField('age_max', event.target.value ? Number(event.target.value) : null)}
-                    placeholder="Max"
+                    placeholder={t('ageMax')}
                   />
                 </div>
               </div>
@@ -330,10 +332,10 @@ export function GameFormDialog({
           <DialogFooter className="col-span-1 sm:col-span-2">
             <div className="flex w-full items-center justify-end gap-2">
               <Button variant="ghost" type="button" onClick={() => onOpenChange(false)}>
-                Avbryt
+                {t('cancel')}
               </Button>
               <Button type="submit" disabled={!hasRequiredFields || isSubmitting}>
-                {isSubmitting ? 'Sparar...' : initialGame ? 'Spara ändringar' : 'Skapa lek'}
+                {isSubmitting ? t('saving') : initialGame ? t('saveChanges') : t('create')}
               </Button>
             </div>
           </DialogFooter>

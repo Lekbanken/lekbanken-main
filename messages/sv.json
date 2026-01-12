@@ -257,6 +257,642 @@
       "account": "Konto",
       "settings": "Inställningar"
     },
+    "notifications": {
+      "pageTitle": "Notifikationer",
+      "pageDescription": "Skicka meddelanden till organisationens användare.",
+      "noTenantTitle": "Ingen organisation vald",
+      "noTenantDescription": "Välj en organisation för att skicka notifikationer.",
+      "errorTitle": "Ett fel inträffade",
+      "form": {
+        "sendNotification": "Skicka notifikation",
+        "title": "Titel",
+        "type": "Typ",
+        "message": "Meddelande",
+        "category": "Kategori",
+        "targetAudience": "Målgrupp",
+        "selectRecipients": "Välj mottagare",
+        "actionUrl": "Action URL (valfritt)",
+        "actionLabel": "Action label (valfritt)"
+      },
+      "placeholders": {
+        "title": "Uppdatering i appen",
+        "message": "Ditt meddelande...",
+        "actionLabel": "Öppna"
+      },
+      "options": {
+        "allInOrg": "Alla i organisationen",
+        "specificUsers": "Specifika användare"
+      },
+      "loading": {
+        "users": "Laddar användare..."
+      },
+      "empty": {
+        "noUsers": "Inga användare att välja."
+      },
+      "recipients": {
+        "title": "Mottagare",
+        "count": "{count} användare i organisationen.",
+        "hint": "När du väljer specifika användare kan du välja från listan. Annars skickas till alla."
+      },
+      "actions": {
+        "sending": "Skickar...",
+        "send": "Skicka notifikation"
+      },
+      "errors": {
+        "loadUsers": "Kunde inte ladda användare för organisationen.",
+        "loadUsersFailed": "Kunde inte ladda användare.",
+        "noUsersToSend": "Det finns inga användare att skicka till.",
+        "sendFailed": "Kunde inte skicka notifikationer."
+      }
+    },
+    "purposes": {
+      "legacy": {
+        "pageTitle": "Syften & undersyften",
+        "pageDescription": "Hantera huvudsyften och undersyften som används i spel, produkter och filter.",
+        "breadcrumbHome": "Startsida",
+        "breadcrumbPurposes": "Syften",
+        "newPurpose": "Nytt syfte",
+        "exportColumns": {
+          "id": "ID",
+          "type": "Typ",
+          "key": "Nyckel",
+          "name": "Namn",
+          "parentId": "Parent ID",
+          "tenantId": "Tenant ID",
+          "standard": "Standard",
+          "yes": "ja",
+          "no": "nej"
+        },
+        "stats": {
+          "mainPurposes": "Huvudsyften",
+          "subPurposes": "Undersyften",
+          "total": "Totalt"
+        },
+        "tabs": {
+          "standard": "Standard (låsta)",
+          "global": "Special global",
+          "tenant": "Tenant-specifika"
+        },
+        "selectTenant": "Välj tenant",
+        "purposeTree": "Syftesträd",
+        "loading": "Laddar...",
+        "subPurposesCount": "{count} undersyften",
+        "standardLabel": "(standard)",
+        "actions": {
+          "edit": "Redigera",
+          "quickDelete": "Snabb ta bort",
+          "detachDelete": "Koppla loss + ta bort",
+          "editMain": "Redigera huvudsyfte"
+        },
+        "errors": {
+          "loadPurposes": "Kunde inte ladda syften",
+          "loadPurposesNow": "Kunde inte ladda syften just nu.",
+          "selectTenantFirst": "Välj en tenant innan du skapar tenant-specifikt syfte.",
+          "selectTenantForPurpose": "Välj en tenant för tenant-specifikt syfte.",
+          "savePurpose": "Kunde inte spara syftet.",
+          "deletePurpose": "Kunde inte ta bort syftet.",
+          "readUsage": "Kunde inte läsa användning.",
+          "detachDeleteFailed": "Misslyckades att koppla loss och ta bort.",
+          "detachDeletePurpose": "Kunde inte koppla loss och ta bort syftet.",
+          "standardCannotDelete": "Standardsyften kan inte tas bort."
+        },
+        "empty": {
+          "noAccess": "Ingen åtkomst",
+          "noAccessDescription": "Du behöver behörighet för att se syften.",
+          "selectTenant": "Välj tenant",
+          "selectTenantDescription": "Välj en tenant för att se eller hantera syften.",
+          "noPurposes": "Inga syften",
+          "noPurposesDescription": "Kör seeden eller lägg till syften via API/UI."
+        },
+        "problem": "Problem",
+        "dialog": {
+          "editTitle": "Redigera syfte",
+          "createTitle": "Nytt syfte",
+          "nameLabel": "Namn",
+          "keyLabel": "Nyckel",
+          "typeLabel": "Typ",
+          "parentLabel": "Parent",
+          "tenantLabel": "Tenant",
+          "typeMain": "Huvudsyfte",
+          "typeSub": "Undersyfte",
+          "selectMain": "Välj huvudsyfte",
+          "cancel": "Avbryt",
+          "save": "Spara",
+          "create": "Skapa"
+        },
+        "confirm": {
+          "usageMessage": "Detta syfte används av:\n- {gamesMain} spel (main)\n- {gamesSecondary} spel (secondary)\n- {products} produkter\n- {media} media\n- {childSubs} undersyften (kommer tas bort)\nDet kommer kopplas loss och tas bort. Vill du fortsätta?"
+        }
+      }
+    },
+    "licenses": {
+      "legacy": {
+        "pageTitle": "Licenser",
+        "pageDescription": "Översikt över kunders licenser, status och användning.",
+        "notLoggedIn": "Du är inte inloggad",
+        "notLoggedInDescription": "Logga in för att se licenser.",
+        "errorTitle": "Ett fel inträffade",
+        "loading": "Laddar licenser...",
+        "searchPlaceholder": "Sök organisation eller produkt",
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktiva",
+          "trial": "Testperiod",
+          "expired": "Utgångna"
+        },
+        "status": {
+          "active": "Aktiv",
+          "trial": "Testperiod",
+          "expired": "Utgången",
+          "suspended": "Pausad"
+        },
+        "filter": {
+          "all": "Alla statusar"
+        },
+        "empty": {
+          "noLicenses": "Inga licenser",
+          "noLicensesDescription": "Inga licenser hittades med aktuella filter."
+        },
+        "unknownOrg": "Okänd org",
+        "plan": "Årsvis",
+        "seatsLabel": "Plan: {plan} • Seats: {used}/{total}",
+        "validLabel": "Gäller: {start} – {end}"
+      }
+    },
+    "leaderboard": {
+      "legacy": {
+        "pageTitle": "Leaderboard",
+        "pageDescription": "Se rankingar för användare och organisationer",
+        "breadcrumbAdmin": "Admin",
+        "breadcrumbLeaderboard": "Leaderboard",
+        "refresh": "Uppdatera",
+        "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
+        "stats": {
+          "users": "Användare",
+          "organisations": "Organisationer",
+          "totalCoins": "Totalt coins",
+          "achievements": "Achievements"
+        },
+        "table": {
+          "rank": "Rank",
+          "name": "Namn",
+          "coins": "Coins",
+          "games": "Spel",
+          "achievements": "Achievements",
+          "score": "Poäng"
+        },
+        "type": {
+          "user": "Användare",
+          "organisation": "Organisation"
+        },
+        "searchPlaceholder": "Sök namn...",
+        "timeframe": {
+          "7d": "Senaste 7 dagarna",
+          "30d": "Senaste 30 dagarna",
+          "90d": "Senaste 90 dagarna",
+          "all": "All tid"
+        },
+        "typeFilter": {
+          "all": "Alla typer",
+          "users": "Endast användare",
+          "organisations": "Endast organisationer"
+        },
+        "metricSort": {
+          "score": "Sortera: Poäng",
+          "coins": "Sortera: Coins",
+          "games": "Sortera: Spel",
+          "achievements": "Sortera: Achievements"
+        },
+        "empty": {
+          "noResults": "Inga resultat",
+          "noResultsForQuery": "Inga resultat för \"{query}\"",
+          "noData": "Det finns ingen data att visa ännu.",
+          "clearSearch": "Rensa sökning"
+        },
+        "mockUserLabel": "Användare {number}"
+      }
+    },
+    "planner": {
+      "pageTitle": "Planner",
+      "pageDescription": "Administrera planbibliotek, publicering och synlighet.",
+      "detailDescription": "Historik över publicerade versioner.",
+      "noPermission": "Ingen behörighet",
+      "noPermissionDescription": "Du saknar behörighet för att visa planner-admin.",
+      "noOrganizationSelected": "Ingen organisation vald",
+      "noOrganizationDescription": "Välj en organisation för att se dess planer.",
+      "planNotFound": "Plan saknas",
+      "planNotFoundDescription": "Planen kunde inte hittas eller saknar åtkomst.",
+      "noDescription": "Ingen beskrivning",
+      "loadingPlans": "Laddar planer...",
+      "loadingPlan": "Laddar plan...",
+      "loadingVersions": "Laddar versioner...",
+      "errorLoadPlans": "Kunde inte ladda planer.",
+      "errorLoadPlansTitle": "Kunde inte ladda planer",
+      "errorLoadPlan": "Kunde inte ladda plan.",
+      "errorLoadPlanTitle": "Kunde inte ladda plan",
+      "errorLoadVersions": "Kunde inte ladda versioner.",
+      "errorLoadVersionsTitle": "Kunde inte ladda versioner",
+      "scopeTenantDescription": "Visar planer för {name}",
+      "scopeGlobalDescription": "Visar publika planer",
+      "searchPlaceholder": "Sök planer...",
+      "noPlans": "Inga planer",
+      "noPlansByFilter": "Inga planer matchar dina filter.",
+      "noBlocks": "Inga block",
+      "noBlocksDescription": "Planen innehåller inga block.",
+      "noVersions": "Inga versioner",
+      "noVersionsDescription": "Planen har inga publicerade versioner.",
+      "updatedAt": "Uppdaterad {date}",
+      "publishedAt": "Publicerad {date}",
+      "actions": {
+        "createPlan": "Skapa plan",
+        "creating": "Skapar...",
+        "open": "Öppna",
+        "publish": "Publicera",
+        "archive": "Arkivera",
+        "restore": "Återställ",
+        "delete": "Ta bort",
+        "loadMore": "Ladda fler",
+        "showAll": "Visa alla",
+        "startRun": "Starta run",
+        "backToPlan": "Tillbaka till plan"
+      },
+      "sections": {
+        "scope": "Scope",
+        "filter": "Filter",
+        "plans": "Planer",
+        "statusVisibility": "Status och synlighet",
+        "metadata": "Metadata",
+        "blocks": "Block",
+        "versions": "Versioner",
+        "versionList": "Versionslista"
+      },
+      "metadata": {
+        "ownerUser": "Ägare användare",
+        "ownerTenant": "Ägare organisation",
+        "totalTime": "Total tid",
+        "lastUpdated": "Senast uppdaterad",
+        "currentVersion": "Aktuell version",
+        "none": "Ingen",
+        "global": "Global"
+      },
+      "unpublishedChanges": "⚠ Opublicerade ändringar",
+      "dialogs": {
+        "deletePlanTitle": "Ta bort plan",
+        "deletePlanConfirm": "Är du säker på att du vill ta bort plan \"{name}\"?",
+        "deletePlanConfirmGeneric": "Är du säker på att du vill ta bort planen?"
+      },
+      "toasts": {
+        "planPublished": "Plan publicerad.",
+        "planPublishError": "Kunde inte publicera plan.",
+        "visibilityUpdated": "Synlighet uppdaterad.",
+        "visibilityError": "Kunde inte uppdatera synlighet.",
+        "planDeleted": "Plan borttagen.",
+        "planDeleteError": "Kunde inte ta bort plan.",
+        "planCreated": "Plan skapad!",
+        "planCreateError": "Kunde inte skapa plan.",
+        "planArchived": "Plan arkiverad.",
+        "planArchiveError": "Kunde inte arkivera plan.",
+        "planRestored": "Plan återställd.",
+        "planRestoreError": "Kunde inte återställa plan."
+      }
+    },
+    "tenant": {
+      "members": {
+        "title": "Medlemmar",
+        "description": "Hantera organisationens medlemmar och roller.",
+        "noOrganizationTitle": "Ingen organisation vald",
+        "noOrganizationDescription": "Välj eller byt organisation för att se medlemmar.",
+        "errorTitle": "Kunde inte ladda medlemmar",
+        "errorDescription": "Kunde inte ladda medlemmar just nu.",
+        "searchPlaceholder": "Sök på namn, e-post eller roll",
+        "loading": "Laddar medlemmar...",
+        "emptyTitle": "Inga medlemmar",
+        "emptyDescription": "Det finns inga medlemmar att visa för denna organisation.",
+        "unknownUser": "Okänd användare",
+        "noEmail": "Ingen e-post",
+        "primaryContact": "Primär kontakt",
+        "member": "Medlem"
+      },
+      "games": {
+        "title": "Spel",
+        "description": "Välj vilka spel som ska vara tillgängliga för organisationen.",
+        "noOrganizationTitle": "Ingen organisation vald",
+        "noOrganizationDescription": "Välj eller byt organisation för att se spel.",
+        "errorTitle": "Kunde inte ladda spel",
+        "errorDescription": "Kunde inte ladda spel för organisationen.",
+        "searchPlaceholder": "Sök på namn eller kategori",
+        "loading": "Laddar spel...",
+        "emptyTitle": "Inga spel",
+        "emptyDescription": "Inga spel hittades för denna organisation.",
+        "noDescription": "Ingen beskrivning",
+        "unknownCategory": "Okänd kategori",
+        "unknownLevel": "Nivå okänd"
+      },
+      "billing": {
+        "title": "Fakturering",
+        "description": "Översikt över prenumeration och fakturor.",
+        "noOrganizationTitle": "Ingen organisation vald",
+        "noOrganizationDescription": "Välj eller byt organisation för att se fakturering.",
+        "loading": "Laddar...",
+        "loadingInvoices": "Laddar fakturor...",
+        "activePlan": "Aktiv plan",
+        "noPlan": "Ingen aktiv plan",
+        "unknownPlan": "Okänd plan",
+        "noStatus": "Ingen status",
+        "mrr": "MRR",
+        "mrrSubtitle": "Beräknat",
+        "totalBilled": "Totalt fakturerat",
+        "totalBilledSubtitle": "Summa",
+        "invoicesTitle": "Fakturor",
+        "noInvoicesTitle": "Inga fakturor ännu",
+        "noInvoicesDescription": "När fakturor finns för denna organisation visas de här.",
+        "invoiceFallbackName": "Faktura"
+      },
+      "analytics": {
+        "pageTitle": "Statistik",
+        "pageDescription": "Nyckeltal för organisationens användning.",
+        "noOrganization": {
+          "title": "Ingen organisation vald",
+          "description": "Välj eller byt organisation för att se statistik."
+        },
+        "error": {
+          "loadFailed": "Kunde inte ladda statistik",
+          "message": "Kunde inte ladda statistik just nu."
+        },
+        "loading": "Laddar statistik...",
+        "stats": {
+          "pageViews": "Sidvisningar",
+          "uniqueViews": "Unika: {count}",
+          "sessions": "Sessioner",
+          "completedSessions": "Avslutade: {count}",
+          "avgTime": "Genomsnittlig tid",
+          "avgVisitTime": "Snitt besökstid: {seconds}s",
+          "avgScore": "Genomsnittlig poäng",
+          "last30Days": "Senaste 30 dagarna"
+        }
+      },
+      "content": {
+        "pageTitle": "Material",
+        "pageDescription": "Hantera organisationens material och bibliotek.",
+        "noOrganization": {
+          "title": "Ingen organisation vald",
+          "description": "Välj eller byt organisation för att se material."
+        },
+        "error": {
+          "loadFailed": "Kunde inte ladda material",
+          "message": "Kunde inte ladda material för organisationen."
+        },
+        "search": {
+          "placeholder": "Sök på titel eller beskrivning"
+        },
+        "filter": {
+          "allTypes": "Alla typer",
+          "game": "Game",
+          "lesson": "Lesson",
+          "resource": "Resource"
+        },
+        "loading": "Laddar material...",
+        "empty": {
+          "title": "Inget material",
+          "description": "Inget material hittades för denna organisation."
+        },
+        "item": {
+          "noDescription": "Ingen beskrivning",
+          "published": "Publicerad",
+          "draft": "Draft"
+        }
+      },
+      "subscription": {
+        "pageTitle": "Prenumeration",
+        "pageDescription": "Prenumerationsplan och användning för organisationen.",
+        "noOrganization": {
+          "title": "Ingen organisation vald",
+          "description": "Välj en organisation för att se prenumeration."
+        },
+        "loading": "Laddar prenumeration...",
+        "loadingShort": "Laddar...",
+        "empty": {
+          "title": "Ingen aktiv prenumeration",
+          "description": "Ingen prenumeration hittades för denna organisation."
+        },
+        "plan": {
+          "title": "Plan",
+          "noActivePlan": "Ingen aktiv plan",
+          "unknownPlan": "Okänd plan",
+          "status": "Status: {status}",
+          "period": "Period: {period}"
+        },
+        "billing": {
+          "title": "Fakturering",
+          "stripeSubscriptionId": "Stripe Subscription ID: {id}",
+          "stripeCustomerId": "Stripe Customer ID: {id}",
+          "usageIncluded": "Användning ingår"
+        }
+      },
+      "settings": {
+        "pageTitle": "Inställningar",
+        "pageDescription": "Hantera organisationens inställningar, branding och gamification.",
+        "comingSoon": {
+          "title": "Inställningar kommer snart",
+          "description": "Här lägger vi till branding, gamification-konfiguration och säkerhetsinställningar."
+        }
+      },
+      "achievements": {
+        "pageTitle": "Utmärkelser",
+        "pageDescription": "Skapa och hantera utmärkelser för {tenantName}",
+        "newButton": "Ny utmärkelse",
+        "noTenant": {
+          "title": "Ingen organisation vald",
+          "description": "Välj en organisation för att hantera utmärkelser."
+        },
+        "fetchError": "Kunde inte hämta utmärkelser",
+        "onlyActiveCanBeAwarded": "Endast aktiva utmärkelser kan delas ut",
+        "achievementSaved": "Utmärkelse sparad",
+        "statusChangedTo": "Status ändrad till {status}",
+        "couldNotUpdateStatus": "Kunde inte uppdatera status",
+        "achievementDeleted": "Utmärkelse borttagen",
+        "couldNotDelete": "Kunde inte ta bort",
+        "achievementsUpdated": "{count} utmärkelser uppdaterade",
+        "couldNotUpdate": "Kunde inte uppdatera",
+        "awardedTo": "Tilldelat till {count} användare",
+        "awardedWithDuplicates": "Tilldelat till {count} användare ({duplicates} hade redan)",
+        "allHadAlready": "Alla {count} användare hade redan denna utmärkelse",
+        "status": {
+          "all": "Alla statusar",
+          "draft": "Utkast",
+          "draftPlural": "Utkast",
+          "active": "Aktiv",
+          "activePlural": "Aktiva",
+          "archived": "Arkiverad",
+          "archivedPlural": "Arkiverade"
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktiva",
+          "draft": "Utkast",
+          "archived": "Arkiverade"
+        },
+        "search": {
+          "placeholder": "Sök utmärkelser..."
+        },
+        "table": {
+          "name": "Namn",
+          "description": "Beskrivning",
+          "status": "Status",
+          "noDescription": "–"
+        },
+        "actions": {
+          "edit": "Redigera",
+          "award": "Dela ut",
+          "activate": "Aktivera",
+          "archive": "Arkivera",
+          "delete": "Ta bort"
+        },
+        "empty": {
+          "title": "Inga utmärkelser hittades",
+          "titleNoAchievements": "Inga utmärkelser än",
+          "filtered": "Justera sökfiltren eller skapa en ny utmärkelse.",
+          "noAchievements": "Skapa din första utmärkelse för att engagera deltagarna.",
+          "createButton": "Skapa utmärkelse"
+        },
+        "confirm": {
+          "deleteTitle": "Ta bort utmärkelse",
+          "archiveTitle": "Arkivera utmärkelse",
+          "activateTitle": "Aktivera utmärkelse",
+          "deleteDescription": "Är du säker på att du vill ta bort \"{name}\"? Detta går inte att ångra.",
+          "archiveDescription": "Vill du arkivera \"{name}\"?",
+          "activateDescription": "Vill du aktivera \"{name}\"?",
+          "deleteLabel": "Ta bort",
+          "confirmLabel": "Bekräfta"
+        }
+      }
+    },
+    "conversationCards": {
+      "breadcrumbHome": "Startsida",
+      "breadcrumbTitle": "Samtalskort",
+      "pageTitle": "Samtalskort",
+      "pageDescription": "Hantera samtalskortssamlingar (Toolbelt) och importera kort via CSV.",
+      "importButton": "Importera",
+      "createCollectionButton": "Skapa samling",
+      "filterTitle": "Filter",
+      "filterScope": "Scope",
+      "filterStatus": "Status",
+      "filterMainPurpose": "Huvudsyfte",
+      "filterSubPurpose": "Undersyfte",
+      "statusAll": "Alla",
+      "loading": "Laddar…",
+      "errorLoadPurposes": "Kunde inte ladda syften",
+      "errorLoadCollections": "Kunde inte ladda samlingar",
+      "errorLoadTitle": "Kunde inte ladda",
+      "noCollections": "Inga samlingar",
+      "noCollectionsDescription": "Skapa en samling eller byt filter.",
+      "cardsCount": "{count} kort",
+      "editButton": "Redigera",
+      "viewButton": "Visa",
+      "new": {
+        "breadcrumbHome": "Startsida",
+        "breadcrumbTitle": "Samtalskort",
+        "breadcrumbNew": "Ny",
+        "breadcrumbCreate": "Skapa samling",
+        "pageTitle": "Skapa samling",
+        "pageDescription": "Skapa en samtalskortssamling (deck).",
+        "noAccessTitle": "Ingen åtkomst",
+        "noAccessDescription": "Du saknar behörighet för Samtalskort.",
+        "noPermission": "Du har inte behörighet att skapa samlingar.",
+        "selectTenantError": "Välj tenant (saknas i din kontext).",
+        "couldNotCreate": "Kunde inte skapa samling",
+        "couldNotSave": "Kunde inte spara",
+        "cancel": "Avbryt",
+        "creating": "Skapar…",
+        "create": "Skapa",
+        "basicInfo": "Grundinfo",
+        "scope": "Scope",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global",
+        "scopeHint": "Tenant styrs av din aktiva tenant i Admin.",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "title": "Titel",
+        "titlePlaceholder": "Titel",
+        "language": "Språk",
+        "languagePlaceholder": "sv",
+        "description": "Beskrivning",
+        "descriptionPlaceholder": "Kort beskrivning (valfri)",
+        "audience": "Målgrupp",
+        "audiencePlaceholder": "t.ex. 10–12 år",
+        "purposes": "Syften",
+        "mainPurpose": "Huvudsyfte",
+        "mainPurposeLoading": "Laddar…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Undersyften",
+        "noSubPurposes": "Inga undersyften att välja."
+      },
+      "edit": {
+        "breadcrumbHome": "Startsida",
+        "breadcrumbCards": "Samtalskort",
+        "breadcrumbLoading": "Laddar…",
+        "breadcrumbCollection": "Samling",
+        "loading": "Laddar…",
+        "loadError": "Kunde inte ladda",
+        "notFoundTitle": "Hittades inte",
+        "notFoundDescription": "Samlingen finns inte eller du saknar åtkomst.",
+        "pageDescription": "Redigera samling och hantera kort.",
+        "importCsv": "Import (CSV)",
+        "delete": "Ta bort",
+        "saving": "Sparar…",
+        "save": "Spara",
+        "errorTitle": "Något gick fel",
+        "basicInfo": "Grundinfo",
+        "viewOnlyNotice": "Du kan visa, men inte redigera, denna samling.",
+        "title": "Titel",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "language": "Språk",
+        "languagePlaceholder": "sv",
+        "audience": "Målgrupp",
+        "audiencePlaceholder": "t.ex. 10–12 år",
+        "description": "Beskrivning",
+        "descriptionPlaceholder": "Kort beskrivning (valfri)",
+        "purposes": "Syften",
+        "mainPurpose": "Huvudsyfte",
+        "mainPurposeLoading": "Laddar…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Undersyften",
+        "noSubPurposes": "Inga undersyften att välja.",
+        "cardsTitle": "Kort",
+        "addCardSection": "Lägg till kort",
+        "sortOrder": "Sortering",
+        "cardTitleOptional": "Titel (valfri)",
+        "cardTitle": "Titel",
+        "primaryPrompt": "Primär fråga / prompt",
+        "followup1": "Följdfråga 1",
+        "followup2": "Följdfråga 2",
+        "followup3": "Följdfråga 3",
+        "leaderTip": "Ledartips (valfri)",
+        "leaderTipLabel": "Ledartips",
+        "addButton": "Lägg till",
+        "setSortToEnd": "Sätt sortering till slutet",
+        "noCardsYet": "Inga kort än.",
+        "cardLabel": "Kort",
+        "close": "Stäng",
+        "edit": "Redigera",
+        "deleteCard": "Ta bort",
+        "saveCard": "Spara kort",
+        "preview": "Förhandsvisning",
+        "noCardsToPreview": "Inga kort att förhandsvisa.",
+        "confirmDeleteCollection": "Ta bort samlingen? Detta tar även bort alla kort i samlingen.",
+        "confirmDeleteCard": "Ta bort kortet?",
+        "couldNotLoadCollection": "Kunde inte ladda samling",
+        "couldNotSaveCollection": "Kunde inte spara samling",
+        "couldNotDeleteCollection": "Kunde inte ta bort",
+        "primaryPromptRequired": "primary_prompt krävs",
+        "couldNotCreateCard": "Kunde inte skapa kort",
+        "couldNotSaveCard": "Kunde inte spara kort",
+        "couldNotDeleteCard": "Kunde inte ta bort kort"
+      }
+    },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Välkommen till Lekbanken Admin",
@@ -294,6 +930,611 @@
         "productAdminDesc": "Produkter, funktioner, tillgänglighet.",
         "achievementsAdmin": "Prestationsadmin",
         "achievementsAdminDesc": "Badge-byggare och belöningar."
+      }
+    },
+    "webhooks": {
+      "pageTitle": "Webhooks",
+      "pageDescription": "Hantera webhook-endpoints och loggar.",
+      "emptyTitle": "Inga webhooks konfigurerade ännu",
+      "emptyDescription": "Här kommer du kunna lägga till endpoints, se leveransstatus och loggar. Backendkoppling saknas ännu."
+    },
+    "apiKeys": {
+      "pageTitle": "API-nycklar",
+      "pageDescription": "Hantera API-nycklar och scopes.",
+      "emptyTitle": "Inga API-nycklar ännu",
+      "emptyDescription": "Här kommer du att skapa, rotera och begränsa nycklar. Backendkoppling saknas ännu."
+    },
+    "featureFlags": {
+      "pageTitle": "Feature Flags",
+      "pageDescription": "Hantera systemflaggor och rollout.",
+      "emptyTitle": "Inga flaggor att visa ännu",
+      "emptyDescription": "Flagg-hanteringen kopplas på när backend-stöd finns. Här ska du kunna toggla, segmentera och versionshantera."
+    },
+    "releaseNotes": {
+      "pageTitle": "Release Notes",
+      "pageDescription": "Se och publicera versionsnyheter.",
+      "emptyTitle": "Inga release notes ännu",
+      "emptyDescription": "Här kommer versionshistorik och redigering/publicering när backendkoppling finns."
+    },
+    "systemHealth": {
+      "pageTitle": "System Health",
+      "pageDescription": "Översikt över systemets hälsa och prestanda",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "systemHealth": "System Health"
+      },
+      "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
+      "autoRefresh": "Auto-refresh (30s)",
+      "refreshNow": "Uppdatera nu",
+      "systemStatus": "Systemstatus",
+      "lastChecked": "Senast kontrollerad: {time}",
+      "version": "Version",
+      "status": {
+        "healthy": "Alla system fungerar",
+        "degraded": "Nedsatt prestanda",
+        "unhealthy": "Systemfel upptäckt"
+      },
+      "checks": {
+        "database": "Database",
+        "storage": "Storage",
+        "api": "API",
+        "ok": "OK",
+        "error": "Error",
+        "latency": "{ms}ms latency",
+        "responding": "Responding"
+      },
+      "metrics": {
+        "errorsLastHour": "Fel senaste timmen",
+        "activeUsersNow": "Aktiva användare (nu)",
+        "apiLatencyP95": "API Latency (P95)",
+        "totalFiles": "Totalt filer"
+      },
+      "cards": {
+        "errorRate": "Felfrekvens",
+        "apiPerformance": "API Performance",
+        "users": "Användare",
+        "storageDatabase": "Storage & Database"
+      },
+      "timeRanges": {
+        "lastHour": "Senaste timmen",
+        "last24h": "Senaste 24h",
+        "last7d": "Senaste 7 dagar"
+      },
+      "latency": {
+        "p50": "P50 (median)",
+        "p95": "P95",
+        "p99": "P99"
+      },
+      "activeUsers": {
+        "now": "Aktiva just nu (5 min)",
+        "last24h": "Senaste 24h"
+      },
+      "storage": {
+        "totalFiles": "Totalt filer",
+        "databaseRecords": "Database records",
+        "connectionPool": "Connection pool"
+      }
+    },
+    "auditLog": {
+      "pageTitle": "Audit Logs",
+      "pageDescription": "Granska alla systemaktiviteter och ändringar",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "auditLog": "Audit Logs"
+      },
+      "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
+      "loading": "Laddar...",
+      "noEvents": "Inga aktiviteter hittades",
+      "exportCsv": "Exportera CSV",
+      "stats": {
+        "totalEvents": "Totalt händelser",
+        "created": "Skapade",
+        "updated": "Uppdaterade",
+        "deleted": "Raderade"
+      },
+      "filters": {
+        "title": "Filter",
+        "from": "Från",
+        "to": "Till",
+        "action": "Åtgärd",
+        "resourceType": "Resurstyp",
+        "searchPlaceholder": "Sök i aktiviteter...",
+        "autoApply": "Filter tillämpas automatiskt",
+        "actions": {
+          "all": "Alla",
+          "create": "Skapa",
+          "update": "Uppdatera",
+          "delete": "Radera",
+          "login": "Inloggning",
+          "logout": "Utloggning"
+        },
+        "resources": {
+          "all": "Alla",
+          "game": "Spel",
+          "product": "Produkt",
+          "user": "Användare",
+          "tenant": "Organisation",
+          "media": "Media",
+          "achievement": "Prestation"
+        }
+      },
+      "table": {
+        "title": "Aktivitetslogg",
+        "eventsCount": "{count} händelser",
+        "timestamp": "Tidpunkt",
+        "action": "Åtgärd",
+        "resource": "Resurs",
+        "user": "Användare",
+        "details": "Detaljer",
+        "showMetadata": "Visa metadata",
+        "system": "System"
+      }
+    },
+    "design": {
+      "mediaDefaults": {
+        "noDefaultProfileImages": "Inga standardprofilbilder uppladdade",
+        "noDefaultCoverImages": "Inga standardomslagsbilder uppladdade"
+      }
+    },
+    "billing": {
+      "hub": {
+        "pageTitle": "Fakturering",
+        "pageDescription": "Hantera prenumerationer, fakturor och betalningar",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering"
+        },
+        "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
+        "stats": {
+          "activeSubscriptions": "Aktiva prenumerationer",
+          "mrr": "MRR",
+          "totalRevenue": "Total intäkt",
+          "paidInvoices": "Betalda fakturor",
+          "outstanding": "Utestående"
+        },
+        "actions": {
+          "subscriptions": {
+            "title": "Prenumerationer",
+            "description": "Hantera kundprenumerationer och abonnemang.",
+            "button": "Visa prenumerationer"
+          },
+          "invoices": {
+            "title": "Fakturor",
+            "description": "Visa och hantera kundfakturor och betalningar.",
+            "button": "Visa fakturor"
+          },
+          "plans": {
+            "title": "Prisplaner",
+            "description": "Konfigurera prenumerationsnivåer och prissättning.",
+            "button": "Hantera planer"
+          },
+          "settings": {
+            "title": "Betalningsinställningar",
+            "description": "Konfigurera betalningsmetoder och integrationer.",
+            "button": "Inställningar"
+          }
+        },
+        "about": {
+          "title": "Om fakturering",
+          "paragraph1": "Faktureringsdashboarden ger en översikt över alla prenumerations- och betalningsaktiviteter.",
+          "paragraph2": "Här kan du hantera kundprenumerationer, visa fakturor, konfigurera prisplaner och övervaka betalningsmetoder.",
+          "note": "OBS: Stripe-integration kommer att aktiveras i produktion. För tillfället lagras faktureringsdata i Supabase."
+        }
+      },
+      "subscriptions": {
+        "title": "Prenumerationer",
+        "description": "Hantera aktiva prenumerationer och abonnemang",
+        "emptyTitle": "Inga prenumerationer",
+        "emptyDescription": "Det finns inga prenumerationer att visa.",
+        "noResultsFor": "Inga resultat för \"{query}\"",
+        "clearSearch": "Rensa sökning",
+        "back": "Tillbaka",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering",
+          "subscriptions": "Prenumerationer"
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktiva",
+          "trial": "Testperiod",
+          "mrr": "MRR"
+        },
+        "search": "Sök organisation...",
+        "filter": {
+          "all": "Alla statusar",
+          "active": "Aktiva",
+          "trial": "Testperiod",
+          "paused": "Pausade",
+          "canceled": "Avslutade"
+        }
+      },
+      "invoices": {
+        "emptyTitle": "Inga fakturor",
+        "emptyDescription": "Det finns inga fakturor att visa.",
+        "noResultsFor": "Inga resultat för \"{query}\"",
+        "clearSearch": "Rensa sökning"
+      }
+    },
+    "gamification": {
+      "hub": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification hub"
+        },
+        "pageTitle": "Gamification hub",
+        "pageDescription": "Centralt nav för alla gamification-funktioner: progression, achievements, belöningar och exports.",
+        "stats": {
+          "activePlayers": "Aktiva spelare",
+          "totalXpAwarded": "Totalt XP utdelat",
+          "achievementsUnlocked": "Achievements låsta upp",
+          "purchasesThisWeek": "Köp denna vecka"
+        },
+        "status": {
+          "implemented": "Implementerad",
+          "partial": "Delvis",
+          "planned": "Planerad"
+        },
+        "modules": {
+          "dashboard": {
+            "title": "Economy Dashboard",
+            "description": "Övervaka mint/burn-rates, topptjänare och misstänkt aktivitet i realtid.",
+            "features": {
+              "mintRate": "Mint Rate",
+              "burnRate": "Burn Rate",
+              "topEarners": "Top Earners",
+              "ruleToggles": "Rule Toggles",
+              "abuseDetection": "Abuse Detection"
+            },
+            "stats": {
+              "activeToday": "Aktiva idag",
+              "net24h": "Netto 24h"
+            }
+          },
+          "dicecoinXp": {
+            "title": "DiceCoin & XP",
+            "description": "Hantera progression, nivåer, XP-regler och leaderboards för att engagera användare.",
+            "features": {
+              "xpRules": "XP-regler",
+              "levels": "Nivåer",
+              "leaderboards": "Leaderboards",
+              "coinTransactions": "Coin-transaktioner"
+            },
+            "stats": {
+              "activePlayers": "Aktiva spelare",
+              "levels": "Nivåer"
+            }
+          },
+          "achievements": {
+            "title": "Achievements",
+            "description": "Administrera achievements, badges, tiers och belöningskriterier.",
+            "features": {
+              "badgeLibrary": "Badge-bibliotek",
+              "tierSystem": "Tier-system",
+              "triggerRules": "Trigger-regler",
+              "rewardConnection": "Reward-koppling"
+            },
+            "stats": {
+              "badges": "Badges",
+              "activeTriggers": "Aktiva triggers"
+            }
+          },
+          "shopRewards": {
+            "title": "Shop & Rewards",
+            "description": "Hantera butik, belöningar, priser och tillgänglighetsregler.",
+            "features": {
+              "shopItems": "Butik-items",
+              "pricing": "Prissättning",
+              "inventory": "Inventory",
+              "purchaseHistory": "Köphistorik"
+            },
+            "stats": {
+              "items": "Items",
+              "purchasesToday": "Köp idag"
+            }
+          },
+          "libraryExports": {
+            "title": "Library Exports",
+            "description": "Exportpaket från biblioteket – CSV, PDF och brandade exports.",
+            "features": {
+              "exportTemplates": "Export-mallar",
+              "formatSelection": "Format-val",
+              "versioning": "Versioning",
+              "exportLog": "Export-logg"
+            },
+            "stats": {
+              "templates": "Mallar",
+              "exports": "Exports"
+            }
+          }
+        }
+      },
+      "dicecoinXp": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification hub",
+          "dicecoinXp": "DiceCoin & XP"
+        },
+        "pageTitle": "DiceCoin & XP",
+        "pageDescription": "Hantera XP-triggers, nivåer och leaderboards. Seeda alla default-triggers till databasen.",
+        "actions": {
+          "refresh": "Uppdatera",
+          "settings": "Inställningar"
+        },
+        "stats": {
+          "totalTriggers": "Totalt triggers",
+          "inDatabase": "I databasen",
+          "missing": "Saknas",
+          "levels": "Nivåer"
+        },
+        "tabs": {
+          "xpTriggers": "XP & DiceCoin Triggers",
+          "levels": "Nivåer",
+          "leaderboards": "Leaderboards"
+        },
+        "cooldown": {
+          "none": "Ingen",
+          "daily": "Daglig",
+          "weekly": "Veckovis",
+          "once": "En gång",
+          "oncePerStreak": "Per streak"
+        },
+        "categories": {
+          "play": "Play",
+          "planner": "Planner",
+          "engagement": "Engagement",
+          "content": "Content",
+          "social": "Social",
+          "learning": "Learning",
+          "custom": "Custom"
+        },
+        "xpTab": {
+          "searchPlaceholder": "Sök triggers...",
+          "addMissing": "Lägg till {count} saknade",
+          "seeding": "Seedar...",
+          "resetAll": "Återställ alla",
+          "createCustom": "Skapa custom trigger",
+          "resetWarning": "Detta kommer att ta bort alla default-triggers och lägga till dem på nytt med standardvärden. Custom triggers bevaras.",
+          "confirmReset": "Ja, återställ",
+          "cancel": "Avbryt",
+          "table": {
+            "status": "Status",
+            "name": "Namn",
+            "eventType": "Event Type",
+            "coins": "Coins",
+            "xp": "XP",
+            "cooldown": "Cooldown",
+            "active": "Aktiv",
+            "inactive": "Inaktiv"
+          },
+          "custom": "Custom",
+          "noTriggers": "Inga triggers hittades"
+        },
+        "levelsTab": {
+          "description": "Nivåer baserade på total XP. Level-bonus aktiveras från nivå 5 (1.1x) och ökar med 0.1x per nivå, capped vid 2.0x.",
+          "levelPrefix": "Nivå",
+          "reward": "Belöning",
+          "levelNames": {
+            "1": "Nybörjare",
+            "2": "Lärling",
+            "3": "Utforskare",
+            "4": "Äventyrare",
+            "5": "Mästare",
+            "6": "Expert",
+            "7": "Veteran",
+            "8": "Legend",
+            "9": "Champion",
+            "10": "Grandmaster"
+          }
+        },
+        "leaderboardsTab": {
+          "description": "Topplista över användare baserat på total XP. Användare kan välja att dölja sig från leaderboards.",
+          "refresh": "Uppdatera",
+          "emptyState": "Ingen data ännu. Leaderboard fylls på när användare tjänar XP.",
+          "table": {
+            "rank": "Rank",
+            "name": "Namn",
+            "xp": "XP",
+            "dicecoin": "DiceCoin"
+          },
+          "anonymous": "Anonym"
+        },
+        "errors": {
+          "generic": "Ett fel uppstod",
+          "fetchFailed": "Kunde inte hämta regler"
+        }
+      },
+      "achievements": {
+        "emptyTitle": "Inga achievements"
+      },
+      "shopRewards": {
+        "pageTitle": "Shop & Rewards",
+        "pageDescription": "Hantera butik och belöningar för {tenantName}.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "shopRewards": "Shop & Rewards"
+        },
+        "addItem": "Lägg till item",
+        "stats": {
+          "totalItems": "Totalt items",
+          "available": "Tillgängliga",
+          "totalSold": "Totalt sålt",
+          "totalRevenue": "Total intäkt"
+        },
+        "currencyWarning": "Du behöver skapa minst en valuta innan du kan lägga till shop items.",
+        "goToCurrency": "Gå till Valuta →",
+        "searchPlaceholder": "Sök shop items...",
+        "filters": {
+          "category": "Kategori",
+          "availability": "Tillgänglighet",
+          "featured": "Framhävd"
+        },
+        "categories": {
+          "all": "Alla kategorier",
+          "cosmetic": "Kosmetisk",
+          "powerup": "Power-up",
+          "bundle": "Paket",
+          "seasonPass": "Season Pass",
+          "avatar": "Avatar",
+          "avatarFrame": "Avatarram",
+          "background": "Bakgrund",
+          "title": "Titel",
+          "badge": "Märke",
+          "hint": "Ledtråd",
+          "skip": "Hoppa över",
+          "timeExtend": "Förläng tid",
+          "doubleXp": "Dubblad XP",
+          "shield": "Sköld"
+        },
+        "availability": {
+          "all": "Alla",
+          "available": "Tillgängliga",
+          "unavailable": "Ej tillgängliga"
+        },
+        "featuredFilter": {
+          "all": "Alla",
+          "featured": "Framhävda",
+          "notFeatured": "Ej framhävda"
+        },
+        "columns": {
+          "name": "Namn",
+          "category": "Kategori",
+          "price": "Pris",
+          "sales": "Försäljning",
+          "status": "Status",
+          "actions": "Åtgärder"
+        },
+        "status": {
+          "available": "Tillgänglig",
+          "hidden": "Dold"
+        },
+        "actions": {
+          "edit": "Redigera",
+          "hide": "Dölj",
+          "show": "Visa",
+          "removeFeatured": "Ta bort framhävning",
+          "addFeatured": "Framhäv",
+          "duplicate": "Duplicera",
+          "delete": "Ta bort",
+          "showInShop": "Visa i shop",
+          "hideFromShop": "Dölj från shop"
+        },
+        "bulkActions": {
+          "itemsHidden": "{count} items dolda",
+          "itemsVisible": "{count} items synliga"
+        },
+        "empty": {
+          "title": "Inga shop items",
+          "noMatch": "Inga shop items matchar dina filter.",
+          "getStarted": "Skapa ditt första shop item för att komma igång."
+        },
+        "notifications": {
+          "itemSaved": "Shop item sparat",
+          "hiddenFromShop": "Dolt från shopen",
+          "visibleInShop": "Synligt i shopen",
+          "removedFromFeatured": "Borttagen från framhävda",
+          "addedToFeatured": "Tillagd som framhävd",
+          "duplicated": "\"{name}\" duplicerat",
+          "deleted": "Shop item borttaget",
+          "couldNotFetch": "Kunde inte hämta shop items",
+          "couldNotUpdate": "Kunde inte uppdatera",
+          "couldNotDuplicate": "Kunde inte duplicera",
+          "couldNotDelete": "Kunde inte ta bort",
+          "couldNotHide": "Kunde inte dölja",
+          "couldNotShow": "Kunde inte visa"
+        },
+        "confirmDelete": {
+          "title": "Ta bort shop item",
+          "description": "Är du säker på att du vill ta bort \"{name}\"? Detta kan inte ångras om det inte finns köp.",
+          "confirm": "Ta bort"
+        },
+        "featured": "Framhävd",
+        "tenantSelector": {
+          "title": "Välj organisation",
+          "description": "Välj en organisation för att hantera butik och belöningar.",
+          "noAccess": "Du har inte tillgång till några organisationer."
+        },
+        "loading": "Laddar shop items...",
+        "unknownTenant": "Okänd organisation"
+      },
+      "libraryExports": {
+        "pageTitle": "Library Exports",
+        "pageDescription": "Exportpaket från biblioteket – CSV, PDF och brandade exports.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification hub",
+          "libraryExports": "Library Exports"
+        },
+        "empty": {
+          "title": "Inga exportmallar ännu",
+          "description": "Skapa din första exportmall för att börja exportera data från biblioteket.",
+          "createAction": "Skapa exportmall"
+        },
+        "searchPlaceholder": "Sök mallar..."
+      },
+      "achievements": {
+        "pageTitle": "Achievements",
+        "pageDescription": "Hantera achievements, tilldela till användare och konfigurera regler.",
+        "createAchievement": "Skapa achievement",
+        "searchPlaceholder": "Sök achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Redigera",
+          "award": "Tilldela",
+          "archive": "Arkivera",
+          "restore": "Återställ",
+          "delete": "Ta bort"
+        },
+        "filters": {
+          "scope": "Scope",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "Alla scopes",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Privat"
+        },
+        "statuses": {
+          "all": "Alla statusar",
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        },
+        "notifications": {
+          "saved": "Achievement sparat",
+          "deleted": "Achievement borttaget",
+          "fetchFailed": "Kunde inte hämta achievements",
+          "updateStatusFailed": "Kunde inte uppdatera status",
+          "deleteFailed": "Kunde inte ta bort",
+          "archiveFailed": "Kunde inte arkivera",
+          "activateFailed": "Kunde inte aktivera"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Ta bort achievement",
+          "confirmAction": "Bekräfta åtgärd",
+          "deleteConfirm": "Är du säker på att du vill ta bort detta achievement? Detta kan inte ångras.",
+          "areYouSure": "Är du säker?",
+          "deleteButton": "Ta bort",
+          "confirmButton": "Bekräfta"
+        },
+        "empty": {
+          "noAchievements": "Inga achievements",
+          "noMatch": "Inga achievements matchar dina filter.",
+          "getStarted": "Skapa ditt första achievement för att komma igång.",
+          "createAction": "Skapa achievement"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        }
       }
     },
     "users": {
@@ -555,6 +1796,26 @@
           "privateUser": "Privat användare",
           "systemAdmin": "Systemadmin"
         }
+      },
+      "invite": {
+        "title": "Bjud in användare",
+        "description": "Skicka en inbjudan att gå med i din organisation med lämplig roll.",
+        "emailLabel": "E-post",
+        "emailPlaceholder": "user@example.com",
+        "nameLabel": "Namn",
+        "nameOptional": "(valfritt)",
+        "namePlaceholder": "Fullständigt namn",
+        "roleLabel": "Roll",
+        "rolePlaceholder": "Välj roll",
+        "organisationLabel": "Organisation",
+        "organisationPlaceholder": "Organisationsnamn",
+        "messageLabel": "Personligt meddelande",
+        "messageOptional": "(valfritt)",
+        "messagePlaceholder": "Lägg till ett kort välkomstmeddelande till den inbjudne...",
+        "cancel": "Avbryt",
+        "sending": "Skickar...",
+        "submit": "Skicka inbjudan",
+        "required": "*"
       }
     },
     "games": {
@@ -718,6 +1979,68 @@
           "playMode": "Spelläge",
           "global": "Global"
         }
+      },
+      "builder": {
+        "artifact": {
+          "newArtifact": "Ny artefakt",
+          "visibility": {
+            "public": "Synlig för alla",
+            "leaderOnly": "Endast lekledare",
+            "rolePrivate": "Privat för roll"
+          },
+          "types": {
+            "card": "Kort",
+            "document": "Dokument",
+            "image": "Bild",
+            "conversationCards": "🗣️ Samtalskort (lek)",
+            "keypad": "🔐 Pinkod (Keypad)",
+            "riddle": "❓ Gåta / Fråga",
+            "multiAnswer": "✅ Flervalssvar",
+            "audio": "🔊 Ljudklipp",
+            "hotspot": "🎯 Klickbar bild (Hotspot)",
+            "tilePuzzle": "🧩 Pusselspel",
+            "cipher": "🔤 Kryptering / Chiffer",
+            "logicGrid": "🧠 Logikrutnät",
+            "counter": "🔢 Räknare",
+            "qrGate": "📱 QR/NFC-skanning",
+            "hintContainer": "💡 Tips-behållare",
+            "propConfirmation": "📦 Rekvisita-bekräftelse",
+            "locationCheck": "📍 Platsverifiering",
+            "soundLevel": "🎤 Ljudnivå-detektor",
+            "replayMarker": "⏱️ Replay-markör",
+            "signalGenerator": "📢 Signalgenerator",
+            "timeBankStep": "⏳ Tidsbank / Final timer",
+            "emptyArtifact": "📦 Tom slot (placeholder)"
+          },
+          "errors": {
+            "loadConversationDecks": "Kunde inte ladda samtalskorts-lekar"
+          }
+        },
+        "trigger": {
+          "newTrigger": "Ny trigger",
+          "addTrigger": "Lägg till trigger",
+          "noTriggers": "Inga triggers ännu.",
+          "noTriggersHint": "Triggers automatiserar leken: \"När X händer, gör Y\"",
+          "unnamedTrigger": "Namnlös trigger",
+          "inactive": "Inaktiv",
+          "onceLabel": "En gång",
+          "activeLabel": "Aktiv",
+          "onceCheckboxLabel": "En gång",
+          "autoDisable": "Inaktiveras automatiskt efter första körningen",
+          "delayLabel": "Fördröjning",
+          "seconds": "sekunder",
+          "step": "Steg {number}",
+          "addActionPlaceholder": "+ Lägg till åtgärd...",
+          "templates": "Mallar",
+          "howItWorks": {
+            "title": "Hur triggers fungerar",
+            "description": "Triggers automatiserar leken: när ett villkor uppfylls (t.ex. ett steg slutförs eller tid går ut) utförs en eller flera åtgärder automatiskt.",
+            "example": "När 5 minuter återstår → Visa en ledtråd"
+          },
+          "import": {
+            "error": "Importfel"
+          }
+        }
       }
     },
     "achievements": {
@@ -745,6 +2068,49 @@
           "useForeground": "Använd förgrund",
           "useSymbol": "Använd symbol"
         }
+      },
+      "metadata": {
+        "title": "Titel",
+        "titlePlaceholder": "Badge-titel",
+        "subtitle": "Undertitel",
+        "subtitlePlaceholder": "Kort undertitel",
+        "description": "Beskrivning",
+        "descriptionPlaceholder": "Beskriv hur man tjänar denna prestation.",
+        "rewardCoins": "Belöning (coins)",
+        "status": "Status",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publicerad",
+        "publishingRoles": "Publiceringsroller",
+        "addRole": "Lägg till roll",
+        "availableForOrgs": "Tillgänglig för organisationer (ID, kommaseparerat)",
+        "orgsPlaceholder": "org-1, org-2",
+        "roles": {
+          "admin": "Admin",
+          "creator": "Skapare",
+          "org_admin": "Org-admin"
+        }
+      },
+      "page": {
+        "title": "Achievements",
+        "description": "Bygg skiktade badges, tilldela teman och hantera belöningar",
+        "createAchievement": "Skapa Achievement",
+        "breadcrumbs": {
+          "home": "Startsida",
+          "achievements": "Achievements"
+        },
+        "badgeLibrary": "Badge Library",
+        "achievementCount": "{count} achievement",
+        "achievementCountPlural": "{count} achievements",
+        "published": "publicerade",
+        "drafts": "utkast",
+        "badgeBuilder": "Badge Builder",
+        "createNewBadge": "Skapa ny badge",
+        "editBadge": "Redigera badge",
+        "editing": "Redigerar: {title}",
+        "untitled": "Namnlös",
+        "visualBadgeConstruction": "Visuell badge-konstruktion och metadata",
+        "selectOrCreate": "Välj eller skapa en achievement",
+        "selectOrCreateDescription": "Välj en badge från biblioteket ovan eller skapa en ny för att börja bygga dess lager, färger och metadata."
       }
     },
     "organizations": {
@@ -780,7 +2146,144 @@
       "suspend": "Stäng av",
       "overview": "Översikt",
       "statusChanged": "Status ändrad till {status}",
-      "couldNotChangeStatus": "Kunde inte ändra status"
+      "couldNotChangeStatus": "Kunde inte ändra status",
+      "toolbar": {
+        "searchPlaceholder": "Sök organisationer...",
+        "searchAriaLabel": "Sök organisationer",
+        "billing": {
+          "all": "Alla billing-lägen",
+          "connected": "Billing kopplad",
+          "notConnected": "Ingen billing"
+        },
+        "domain": {
+          "all": "Alla domäner",
+          "yes": "Har egen domän",
+          "no": "Ingen domän"
+        },
+        "sort": {
+          "recent": "Nyast först",
+          "name": "Namn A–Ö",
+          "members": "Flest medlemmar",
+          "updated": "Senast uppdaterad"
+        },
+        "statusLabel": "Status",
+        "billingLabel": "Billing",
+        "languageLabel": "Språk",
+        "domainLabel": "Domän",
+        "sortLabel": "Sortering",
+        "clear": "Rensa",
+        "clearWithCount": "Rensa ({count})"
+      },
+      "detail": {
+        "copied": "Kopierad till urklipp",
+        "copiedWithLabel": "{label} kopierad"
+      },
+      "create": {
+        "title": "Skapa organisation",
+        "description": "Lägg till en ny organisation och ange kontaktuppgifter.",
+        "nameLabel": "Organisationsnamn",
+        "namePlaceholder": "Organisation AB",
+        "slugLabel": "Slug",
+        "slugOptional": "(valfritt)",
+        "slugPlaceholder": "organisation-ab",
+        "slugHint": "Lämna tomt för auto-slug.",
+        "contactPerson": "Kontaktperson",
+        "contactPersonPlaceholder": "Namn",
+        "contactEmail": "Kontaktmail",
+        "contactEmailPlaceholder": "email@example.com",
+        "phone": "Telefon",
+        "phoneOptional": "(valfritt)",
+        "phonePlaceholder": "+46 ...",
+        "status": "Status",
+        "statusPlaceholder": "Välj status",
+        "cancel": "Avbryt",
+        "creating": "Skapar...",
+        "submit": "Skapa organisation",
+        "required": "*"
+      },
+      "members": {
+        "title": "Medlemmar",
+        "addMember": "Lägg till medlem",
+        "addMemberDescription": "Sök efter en befintlig användare via e-post och lägg till dem direkt i organisationen.",
+        "searchByEmail": "Sök användare via e-post",
+        "searchPlaceholder": "namn@exempel.se",
+        "searching": "Söker...",
+        "search": "Sök",
+        "noUserFound": "Ingen användare hittades med den e-postadressen",
+        "searchFailed": "Kunde inte söka efter användare",
+        "searchResults": "Sökresultat",
+        "alreadyMember": "Redan medlem",
+        "role": "Roll",
+        "roleOwner": "Ägare",
+        "roleAdmin": "Admin",
+        "roleMember": "Medlem",
+        "cancel": "Avbryt",
+        "adding": "Lägger till...",
+        "addMemberButton": "Lägg till medlem",
+        "memberAdded": "{name} tillagd som {role}",
+        "alreadyMemberError": "Användaren är redan medlem i organisationen",
+        "addFailed": "Kunde inte lägga till medlem",
+        "loadFailed": "Kunde inte ladda medlemmar",
+        "unknown": "Okänd",
+        "statsTotal": "Totalt",
+        "statsOwners": "Ägare",
+        "statsAdmins": "Admins",
+        "statsPending": "Väntande",
+        "membersCount": "Medlemmar ({count})",
+        "searchNameOrEmail": "Sök på namn eller e-post...",
+        "allRoles": "Alla roller",
+        "loading": "Laddar medlemmar...",
+        "noMembersMatch": "Inga medlemmar matchar filtren",
+        "noMembersYet": "Inga medlemmar i organisationen",
+        "tableUser": "Användare",
+        "tableRole": "Roll",
+        "tableMemberSince": "Medlem sedan",
+        "tableActions": "Åtgärder",
+        "primary": "Primär",
+        "makeOwner": "Gör till ägare",
+        "makeAdmin": "Gör till admin",
+        "makeMember": "Gör till medlem",
+        "removeFromOrg": "Ta bort från organisation",
+        "confirmRemove": "Är du säker på att du vill ta bort {name} från organisationen?",
+        "cannotRemoveOnlyOwner": "Kan inte ta bort den enda ägaren",
+        "memberRemoved": "Medlem borttagen",
+        "removeFailed": "Kunde inte ta bort medlem",
+        "roleChanged": "Roll ändrad till {role}",
+        "roleChangeFailed": "Kunde inte ändra roll"
+      },
+      "audit": {
+        "title": "Aktivitetslogg",
+        "titleWithCount": "Aktivitetslogg ({count})",
+        "loadFailed": "Kunde inte ladda aktivitetslogg",
+        "loading": "Laddar händelser...",
+        "noEventsOfType": "Inga händelser av denna typ",
+        "noActivity": "Ingen aktivitet registrerad",
+        "showingRange": "Visar {from}–{to} av {total}",
+        "allEvents": "Alla händelser",
+        "event": "Händelse",
+        "justNow": "Just nu",
+        "minAgo": "{min} min sedan",
+        "hoursAgo": "{hours}h sedan",
+        "daysAgo": "{days}d sedan",
+        "enabled": "aktiverad",
+        "disabled": "inaktiverad",
+        "events": {
+          "statusChanged": "Status ändrad",
+          "memberAdded": "Medlem tillagd",
+          "memberRemoved": "Medlem borttagen",
+          "memberRoleChanged": "Roll ändrad",
+          "settingsUpdated": "Inställningar ändrade",
+          "domainAdded": "Domän tillagd",
+          "domainRemoved": "Domän borttagen",
+          "domainStatusChanged": "Domänstatus ändrad",
+          "brandingUpdated": "Branding uppdaterad",
+          "brandingLogoUpdated": "Logo uppdaterad",
+          "localeUpdated": "Språk uppdaterat",
+          "featureToggled": "Funktion ändrad",
+          "organisationSuspended": "Organisation avstängd",
+          "organisationArchived": "Organisation arkiverad"
+        }
+      }
     },
     "products": {
       "title": "Produkter",
@@ -790,6 +2293,82 @@
       "description": "Hantera produkter, licenser och syften – allt som säljs och kategoriseras i Lekbanken.",
       "productsAndContent": "Produkter & Innehåll",
       "createProduct": "Skapa produkt",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "productsAndContent": "Produkter & Innehåll",
+        "products": "Produkter"
+      },
+      "stats": {
+        "products": "Produkter",
+        "activeProducts": "Aktiva produkter",
+        "licenses": "Licenser",
+        "purposes": "Syften",
+        "mainPurposes": "Huvudsyften"
+      },
+      "tabs": {
+        "products": "Produkter",
+        "licenses": "Licenser",
+        "purposes": "Syften"
+      },
+      "productsTab": {
+        "searchPlaceholder": "Sök produkter...",
+        "newProduct": "Ny produkt",
+        "noMatchingProducts": "Inga matchande produkter",
+        "noProductsYet": "Inga produkter ännu",
+        "adjustSearch": "Justera sökningen för att se fler.",
+        "createFirstProduct": "Skapa din första produkt.",
+        "createProduct": "Skapa produkt",
+        "loadError": "Kunde inte ladda produkter.",
+        "retry": "Försök igen",
+        "view": "Visa",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "statusActive": "Aktiv",
+        "statusInactive": "Inaktiv",
+        "statusDraft": "Utkast",
+        "statusArchived": "Arkiverad"
+      },
+      "licensesTab": {
+        "searchPlaceholder": "Sök licenser...",
+        "newLicense": "Ny licens",
+        "noMatchingLicenses": "Inga matchande licenser",
+        "noLicensesYet": "Inga licenser ännu",
+        "adjustSearch": "Justera sökningen för att se fler.",
+        "createFirstLicense": "Skapa din första licens.",
+        "createLicense": "Skapa licens",
+        "loadError": "Kunde inte ladda licenser.",
+        "retry": "Försök igen",
+        "viewDetails": "Visa detaljer",
+        "edit": "Redigera",
+        "terminateLicense": "Avsluta licens",
+        "plan": "Plan",
+        "seats": "Platser",
+        "expires": "Utgår",
+        "autoRenewal": "Auto-förnyelse",
+        "toProduct": "→ Produkt",
+        "statusActive": "Aktiv",
+        "statusTrial": "Provperiod",
+        "statusExpired": "Utgången",
+        "statusSuspended": "Pausad"
+      },
+      "purposesTab": {
+        "searchPlaceholder": "Sök syften...",
+        "newPurpose": "Nytt syfte",
+        "noMatchingPurposes": "Inga matchande syften",
+        "noPurposesYet": "Inga syften ännu",
+        "adjustSearch": "Justera sökningen för att se fler.",
+        "createFirstPurpose": "Skapa ditt första syfte.",
+        "createPurpose": "Skapa syfte",
+        "loadError": "Kunde inte ladda syften.",
+        "retry": "Försök igen",
+        "viewDetails": "Visa detaljer",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "under": "Under: {parent}",
+        "productsCount": "{count} produkter",
+        "typeMain": "Huvudsyfte",
+        "typeSub": "Delsyfte"
+      },
       "categories": "Kategorier",
       "noCategories": "Inga kategorier",
       "createProductForCategories": "Skapa minst en produkt för att se kategorier.",
@@ -810,7 +2389,529 @@
       "mainPurpose": "Huvudsyfte",
       "select": "Välj",
       "selectDefaultImage": "Välj standardbild (kommer snart)",
-      "apiReadyNote": "När API:et är klart kopplas detta till media-picker och sparar till mappningstabellen."
+      "apiReadyNote": "När API:et är klart kopplas detta till media-picker och sparar till mappningstabellen.",
+      "page": {
+        "title": "Produkter",
+        "description": "Konfigurera produkter, moduler och deras förmågor",
+        "loading": "Laddar produkter...",
+        "noAccess": "Ingen åtkomst",
+        "noAccessDesc": "Du behöver vara inloggad för att hantera produkter.",
+        "goToLogin": "Gå till login",
+        "createProduct": "Skapa produkt",
+        "totalProducts": "Totalt produkter",
+        "activeCount": "Aktiva",
+        "inactiveCount": "Inaktiva",
+        "draftCount": "Utkast"
+      },
+      "breadcrumbs": {
+        "admin": "Admin",
+        "productsAndContent": "Produkter & Innehåll",
+        "products": "Produkter",
+        "home": "Startsida"
+      },
+      "tabs": {
+        "products": "Produkter",
+        "licenses": "Licenser",
+        "purposes": "Syften",
+        "categories": "Kategorier",
+        "discounts": "Rabatter",
+        "images": "Standardbilder"
+      },
+      "v2": {
+        "pageTitle": "Produkter",
+        "pageDescription": "Hantera produktkatalogen – priser, entitlements, och Stripe-integration.",
+        "breadcrumbs": {
+          "home": "Startsida",
+          "products": "Produkter"
+        },
+        "noAccess": {
+          "title": "Ingen åtkomst",
+          "description": "Du behöver administratörsbehörighet för att hantera produkter."
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktiva",
+          "draft": "Utkast",
+          "missingStripe": "Saknar Stripe"
+        },
+        "filters": {
+          "searchPlaceholder": "Sök produkter...",
+          "active": "Aktiva",
+          "draft": "Utkast",
+          "missingStripe": "Saknar Stripe",
+          "drift": "Avvikelser",
+          "unhealthy": "Problem"
+        },
+        "bulk": {
+          "selected": "{count} av {total} valda",
+          "clear": "Rensa",
+          "selectAll": "Välj alla",
+          "activate": "Aktivera",
+          "archive": "Arkivera",
+          "syncStripe": "Synka Stripe",
+          "validate": "Validera",
+          "export": "Exportera",
+          "actionSuccess": "Åtgärd utförd på {count} produkter",
+          "actionFailed": "Åtgärden misslyckades"
+        },
+        "table": {
+          "title": "Produktöversikt",
+          "name": "Namn",
+          "key": "Nyckel",
+          "type": "Typ",
+          "status": "Status",
+          "price": "Pris",
+          "stripe": "Stripe",
+          "orgs": "Org.",
+          "health": "Hälsa",
+          "updated": "Uppdaterad",
+          "selectProduct": "Välj {name}",
+          "viewProduct": "Visa produkt",
+          "syncWithStripe": "Synka med Stripe"
+        },
+        "empty": {
+          "title": "Inga produkter matchar filtren",
+          "description": "Justera filter eller lägg till en ny produkt."
+        },
+        "error": {
+          "loadFailed": "Kunde inte ladda produkter"
+        },
+        "actions": {
+          "export": "Exportera",
+          "import": "Importera",
+          "newProduct": "Ny produkt"
+        },
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "draft": "Utkast",
+          "archived": "Arkiverad"
+        },
+        "type": {
+          "license": "Licens",
+          "module": "Modul",
+          "addon": "Tillägg",
+          "usage_based": "Förbrukning",
+          "one_time": "Engångskostnad",
+          "subscription": "Prenumeration"
+        },
+        "stripeLinkage": {
+          "connected": "Kopplad",
+          "missing": "Saknas",
+          "drift": "Avvikelse",
+          "error": "Fel"
+        },
+        "health": {
+          "ok": "OK",
+          "missing_fields": "Saknade fält",
+          "stripe_drift": "Stripe-avvikelse",
+          "availability_misconfig": "Tillgänglighetsfel",
+          "no_price": "Inget pris"
+        },
+        "priceManager": {
+          "changeDefault": {
+            "title": "Byt standardpris?",
+            "description": "Det finns redan ett standardpris för {currency} ({interval}):",
+            "current": "Nuvarande:",
+            "new": "Nytt:",
+            "cancel": "Avbryt",
+            "confirm": "Byt standardpris"
+          },
+          "activePrices": "Aktiva priser ({count})",
+          "addPrice": "Lägg till pris",
+          "cancel": "Avbryt",
+          "noPrices": {
+            "title": "Inga priser konfigurerade",
+            "description": "Lägg till ett pris för att kunna synka till Stripe"
+          },
+          "priceCount": "{count} pris",
+          "priceCountPlural": "{count} priser",
+          "archivedPrices": "Arkiverade priser ({count})",
+          "archived": "Arkiverad",
+          "syncWarning": {
+            "title": "⚠️ Produkten är inte synkad till Stripe",
+            "description": "Priserna kommer synkas till Stripe när produkten först synkroniseras."
+          },
+          "tooltips": {
+            "defaultPrice": "Standardpris",
+            "makeDefault": "Gör till standardpris",
+            "taxBehaviorLocked": "Momsbeteende kan inte ändras efter att priset synkats till Stripe"
+          },
+          "badges": {
+            "synced": "Synkad",
+            "notSynced": "Ej synkad",
+            "trial": "{days}d trial"
+          },
+          "form": {
+            "amount": "Belopp",
+            "amountPlaceholder": "299.00",
+            "currency": "Valuta",
+            "billing": "Fakturering",
+            "taxBehavior": "Momshantering",
+            "taxWarning": "Kan ej ändras efter synkning",
+            "nickname": "Smeknamn (valfritt)",
+            "nicknamePlaceholder": "t.ex. Early Bird",
+            "trialPeriod": "Provperiod (dagar)",
+            "trialPeriodNote": "(ej för engångsköp)",
+            "trialPeriodHint": "0 = ingen provperiod",
+            "trialOnlySubscriptions": "Endast för prenumerationer",
+            "isDefault": "Standardpris för denna valuta/intervall",
+            "creating": "Skapar...",
+            "create": "Skapa pris"
+          },
+          "messages": {
+            "priceArchived": "Priset arkiverat",
+            "archiveFailed": "Kunde inte arkivera priset",
+            "defaultUpdated": "Standardpris uppdaterat",
+            "defaultUpdateFailed": "Kunde inte uppdatera standardpris",
+            "priceCreated": "Pris skapat",
+            "priceCreatedAndSynced": "Pris skapat och synkat till Stripe",
+            "createFailed": "Kunde inte skapa pris",
+            "taxWarningAfterSync": "OBS: Momsbeteende kan inte ändras efter synkning till Stripe",
+            "invalidAmount": "Ange ett giltigt belopp",
+            "trialOnlyRecurring": "Provperiod kan endast användas för prenumerationer"
+          },
+          "confirm": {
+            "archivePrice": "Är du säker på att du vill arkivera detta pris?"
+          }
+        },
+        "stripeTab": {
+          "title": "Stripe-synkade fält",
+          "metadataTitle": "Stripe Metadata",
+          "messages": {
+            "statementDescriptorTooLong": "Kontoutdragstext får max vara 22 tecken",
+            "imageUrlMustBeHttps": "Bild-URL måste börja med https://",
+            "couldNotSave": "Kunde inte spara",
+            "savedLocally": "Ändringar sparade lokalt",
+            "rememberToSync": "Kom ihåg att synka till Stripe",
+            "syncFailed": "Synkronisering misslyckades",
+            "syncSuccess": "Produkten synkades till Stripe",
+            "couldNotSync": "Kunde inte synka till Stripe"
+          },
+          "fields": {
+            "productImage": "Produktbild",
+            "productImageDescription": "Visas i Stripe Checkout och på fakturor",
+            "productImageAlt": "Produktbild",
+            "unitLabel": "Enhetsetikett",
+            "unitLabelDescription": "Visas på faktura: \"3 {unit}s × 299 kr\"",
+            "statementDescriptor": "Kontoutdragstext",
+            "statementDescriptorDescription": "Text som visas på kundens kontoutdrag (max 22 tecken)",
+            "statementDescriptorPlaceholder": "T.ex. LEKBANKEN BASKET",
+            "statementDescriptorCount": "{count}/22 tecken",
+            "featureTier": "Funktionsnivå",
+            "featureTierDescription": "Styr vilka funktioner som inkluderas",
+            "stripeProductId": "Stripe Product ID",
+            "lastSynced": "Senast synkad",
+            "neverSynced": "Aldrig synkad"
+          },
+          "actions": {
+            "info": "<strong>Spara</strong> sparar ändringar lokalt. <strong>Synka till Stripe</strong> pushar alla ändringar till Stripe.",
+            "reset": "Återställ",
+            "saveLocal": "Spara lokalt",
+            "saving": "Sparar...",
+            "syncToStripe": "Synka till Stripe",
+            "syncing": "Synkar..."
+          },
+          "status": {
+            "notConnected": "Ej kopplad till Stripe",
+            "synced": "Synkad med Stripe",
+            "syncLocked": "Synk låst - kontakta support",
+            "syncError": "Synkfel",
+            "unsyncedChanges": "Lokala ändringar ej synkade",
+            "lastSynced": "Senast: {date}",
+            "creating": "Skapar...",
+            "createInStripe": "Skapa i Stripe"
+          }
+        },
+        "detail": {
+          "tabs": {
+            "overview": "Översikt",
+            "pricing": "Priser",
+            "stripe": "Stripe",
+            "settings": "Inställningar",
+            "availability": "Tillgång",
+            "entitlements": "Regler",
+            "lifecycle": "Livscykel"
+          },
+          "breadcrumbs": {
+            "home": "Startsida",
+            "products": "Produkter"
+          },
+          "header": {
+            "productKey": "Produktnyckel: {key}",
+            "back": "Tillbaka",
+            "activate": "Aktivera",
+            "archive": "Arkivera",
+            "syncStripe": "Synka Stripe",
+            "forceSync": "Tvinga synk"
+          },
+          "overview": {
+            "issues": "problem",
+            "stats": {
+              "prices": "Priser",
+              "entitlements": "Entitlements",
+              "organizations": "Organisationer",
+              "lastUpdated": "Senast uppdaterad"
+            },
+            "healthIssues": "Hälsoproblem",
+            "quickActions": "Snabbåtgärder",
+            "managePrices": "Hantera priser",
+            "stripeSettings": "Stripe-inställningar",
+            "readyForPublish": "Redo för publicering",
+            "notReadyForPublish": "Ej redo för publicering",
+            "viewChecklist": "Visa checklista",
+            "basicInfo": "Grundinformation",
+            "uuid": "UUID",
+            "productKey": "Produktnyckel",
+            "type": "Typ",
+            "category": "Kategori",
+            "status": "Status",
+            "stripeStatus": "Stripe-status",
+            "linkage": "Koppling",
+            "stripeId": "Stripe ID",
+            "notLinked": "Ej kopplad",
+            "lastSynced": "Senast synkad",
+            "activePrices": "Aktiva priser",
+            "unitLabel": "Enhetsetikett",
+            "descriptions": "Beskrivningar",
+            "internalDescription": "Intern beskrivning",
+            "customerDescription": "Kundbeskrivning"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe-koppling"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements",
+            "noEntitlements": "Inga entitlements konfigurerade",
+            "enabled": "Aktiverad",
+            "disabled": "Inaktiverad",
+            "dependencies": "Beroenden",
+            "noDependencies": "Inga beroenden konfigurerade",
+            "requires": "Kräver",
+            "excludes": "Utesluter"
+          },
+          "availability": {
+            "scope": "Tillgänglighetsomfång",
+            "scopeLabel": "Omfång",
+            "description": "Beskrivning",
+            "licenseModel": "Licensmodell",
+            "perTenant": "Per organisation",
+            "perSeat": "Per säte",
+            "perUser": "Per användare",
+            "minSeats": "Min platser",
+            "maxSeats": "Max platser",
+            "tenantAssignments": "Organisationstilldelningar",
+            "orgs": "{count} org",
+            "noTenants": "Inga organisationer tilldelade",
+            "availableForAll": "Produkten är tillgänglig för alla",
+            "addOrgsForAccess": "Lägg till organisationer för att ge åtkomst",
+            "active": "Aktiv",
+            "pending": "Väntande",
+            "aboutAvailability": "Om tillgänglighet",
+            "globalDescription": "Produkten är tillgänglig för alla kunder och kan köpas via checkout.",
+            "tenantSpecificDescription": "Endast tilldelad till specifika organisationer via direktförsäljning.",
+            "regionalDescription": "Begränsad till specifika geografiska regioner (t.ex. Norden).",
+            "global": "Global",
+            "tenantSpecific": "Tenant-specifik",
+            "regional": "Regional"
+          },
+          "lifecycle": {
+            "currentState": "Aktuellt tillstånd",
+            "canActivate": "Kan aktiveras",
+            "canArchive": "Kan arkiveras",
+            "yes": "Ja",
+            "no": "Nej",
+            "activating": "Aktiverar...",
+            "activate": "Aktivera",
+            "deactivating": "Inaktiverar...",
+            "deactivate": "Inaktivera",
+            "archiving": "Arkiverar...",
+            "archive": "Arkivera",
+            "created": "Skapad",
+            "updated": "Uppdaterad",
+            "publishChecklist": "Publicerings-checklista",
+            "hasValidPrice": "Har giltigt pris",
+            "availabilityRulesOk": "Tillgänglighetsregler OK",
+            "stripeLinkageOk": "Stripe-koppling OK",
+            "readyForPublish": "Redo för publicering",
+            "notReadyForPublish": "Ej redo för publicering",
+            "eventLog": "Händelselogg",
+            "events": "{count} händelser",
+            "noEvents": "Inga loggade händelser",
+            "changedFields": "Ändrade fält: {fields}",
+            "error": "Fel: {error}",
+            "statusChangeFailed": "Kunde inte ändra status",
+            "statusChangedTo": "Status ändrad till {status}",
+            "statusActive": "aktiv",
+            "statusInactive": "inaktiv",
+            "statusArchived": "arkiverad"
+          },
+          "audit": {
+            "recentEvents": "Senaste händelser",
+            "noEvents": "Inga loggade händelser"
+          },
+          "settings": {
+            "title": "Produktinställningar",
+            "customerDescription": "Kundbeskrivning",
+            "customerDescriptionHint": "Synkas till Stripe som produktbeskrivning",
+            "customerDescriptionPlaceholder": "Beskrivning som visas för kunder...",
+            "minSeats": "Min platser",
+            "minSeatsHint": "Minsta antal vid köp",
+            "maxSeats": "Max platser",
+            "maxSeatsHint": "Högsta antal vid köp",
+            "reset": "Återställ",
+            "saving": "Sparar...",
+            "saveChanges": "Spara ändringar",
+            "aboutSettings": "Om inställningar",
+            "aboutCustomerDescription": "Synkas till Stripe som produktbeskrivning vid nästa Stripe-synk.",
+            "aboutSeats": "Begränsar hur många platser en kund kan köpa. Används för säljlogik och validering.",
+            "stripeFieldsNote": "💡 Stripe-specifika fält finns nu i den dedikerade <strong>Stripe</strong>-fliken.",
+            "minSeatsError": "Min platser måste vara minst 1",
+            "maxSeatsError": "Max platser måste vara större än eller lika med min platser",
+            "saveError": "Kunde inte spara",
+            "saved": "Inställningar sparade",
+            "saveSettingsError": "Kunde inte spara inställningar"
+          },
+          "errors": {
+            "loadFailed": "Kunde inte ladda produkt",
+            "notFound": "Produkten hittades inte",
+            "statusUpdateFailed": "Kunde inte uppdatera status",
+            "syncFailed": "Kunde inte synkronisera"
+          },
+          "sync": {
+            "alreadySynced": "Produkten är redan synkroniserad",
+            "created": "Synkronisering skapad",
+            "updated": "Synkronisering uppdaterad",
+            "statusUpdated": "Status uppdaterad till {status}"
+          }
+        },
+        "drawer": {
+          "copied": "Kopierat till urklipp",
+          "copyTooltip": "Kopiera {label}",
+          "tabs": {
+            "overview": "Översikt",
+            "pricing": "Prissättning",
+            "entitlements": "Entitlements",
+            "availability": "Tillgänglighet",
+            "lifecycle": "Livscykel",
+            "audit": "Logg"
+          },
+          "quickActions": {
+            "edit": "Redigera",
+            "activate": "Aktivera",
+            "archive": "Arkivera",
+            "sync": "Synka"
+          },
+          "messages": {
+            "statusUpdated": "Status uppdaterad till {status}",
+            "statusUpdateFailed": "Kunde inte uppdatera status",
+            "syncStarted": "Synkronisering startad",
+            "syncFailed": "Kunde inte synkronisera"
+          },
+          "overview": {
+            "issues": "problem",
+            "stats": {
+              "prices": "Priser",
+              "entitlements": "Entitlements",
+              "organizations": "Organisationer",
+              "lastUpdated": "Senast uppdaterad"
+            },
+            "basicInfo": "Grundinformation",
+            "uuid": "UUID",
+            "productKey": "Produktnyckel",
+            "type": "Typ",
+            "category": "Kategori",
+            "status": "Status",
+            "stripe": "Stripe",
+            "descriptions": "Beskrivningar",
+            "internalDescription": "Intern beskrivning",
+            "customerDescription": "Kundbeskrivning",
+            "tags": "Taggar",
+            "healthIssues": "Hälsoproblem",
+            "editProduct": "Redigera produkt"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe-koppling",
+            "status": "Status",
+            "stripeProductId": "Stripe Product ID",
+            "notLinked": "Ej kopplad",
+            "lastSynced": "Senast synkad",
+            "activePrices": "Aktiva priser",
+            "driftDetection": "Avvikelser mot Stripe",
+            "driftField": "Fält",
+            "driftLocal": "Lokalt",
+            "driftStripe": "Stripe",
+            "pricesTitle": "Priser ({count})",
+            "addPrice": "Lägg till pris",
+            "noPrices": "Inga priser konfigurerade",
+            "tableAmount": "Belopp",
+            "tableInterval": "Intervall",
+            "tableStripeId": "Stripe ID",
+            "tableStatus": "Status",
+            "tableActions": "Åtgärder",
+            "default": "Standard",
+            "active": "Aktiv",
+            "inactive": "Inaktiv",
+            "edit": "Redigera",
+            "syncStripe": "Synkronisera med Stripe"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements ({count})",
+            "add": "Lägg till",
+            "noEntitlements": "Inga entitlements konfigurerade",
+            "noEntitlementsHint": "Definiera vilka funktioner denna produkt låser upp",
+            "enabled": "Aktiverad",
+            "disabled": "Inaktiverad",
+            "dependencies": "Beroenden",
+            "noDependencies": "Inga beroenden konfigurerade",
+            "requires": "Kräver",
+            "excludes": "Utesluter"
+          },
+          "availability": {
+            "scope": "Tillgänglighetsomfång",
+            "scopeLabel": "Omfång",
+            "description": "Beskrivning",
+            "licenseModel": "Licensmodell",
+            "perTenant": "Per organisation",
+            "perSeat": "Per säte",
+            "perUser": "Per användare",
+            "tenantAssignments": "Organisationstilldelningar ({count})",
+            "assign": "Tilldela",
+            "noTenants": "Inga organisationer tilldelade",
+            "tableOrganization": "Organisation",
+            "tableStatus": "Status",
+            "tableStripe": "Stripe",
+            "tableAssigned": "Tilldelad",
+            "statusActive": "Aktiv",
+            "statusPending": "Väntande",
+            "statusRevoked": "Återkallad",
+            "stripeLinked": "Kopplad",
+            "stripeMissing": "Saknas"
+          },
+          "lifecycle": {
+            "currentState": "Aktuellt tillstånd",
+            "status": "Status",
+            "canActivate": "Kan aktiveras",
+            "canArchive": "Kan arkiveras",
+            "yes": "Ja",
+            "no": "Nej",
+            "activationBlockers": "Aktiveringsblockerare",
+            "publishChecklist": "Publicerings-checklista",
+            "checklistPrice": "Har giltigt pris (om betald)",
+            "checklistAvailability": "Tillgänglighetsregler giltiga",
+            "checklistStripe": "Stripe-koppling OK",
+            "timestamps": "Tidsstämplar",
+            "created": "Skapad",
+            "lastUpdated": "Senast uppdaterad"
+          },
+          "audit": {
+            "title": "Senaste händelser",
+            "export": "Exportera",
+            "noEvents": "Inga loggade händelser",
+            "systemActor": "System"
+          }
+        }
+      }
     },
     "participants": {
       "title": "Deltagare",
@@ -821,7 +2922,58 @@
       "showingMockData": "Visar mockdata tills riktiga kopplingen är klar.",
       "riskLevel": "Risknivå: {level}",
       "actionsAndLog": "Åtgärder & logg",
-      "noLogYet": "Ingen logg ännu."
+      "noLogYet": "Ingen logg ännu.",
+      "noEmailProvided": "Ingen e-post angiven",
+      "organisation": "Organisation",
+      "risk": "Risk",
+      "lastActive": "Senast aktiv",
+      "profile": "Profil",
+      "email": "E-post",
+      "notes": "Anteckningar",
+      "mute": "Mute",
+      "muteSent": "Mute skickad.",
+      "kick": "Kick",
+      "kickSent": "Kick skickad.",
+      "ban": "Ban",
+      "banSent": "Ban skickad.",
+      "breadcrumbs": {
+        "home": "Startsida",
+        "tenant": "Tenant",
+        "participants": "Deltagare"
+      },
+      "pageDescription": "Översikt av deltagare, risknivåer och senaste aktivitet.",
+      "stats": {
+        "participants": "Deltagare",
+        "highRisk": "Hög risk",
+        "lowRisk": "Låg risk"
+      },
+      "cardTitle": "Deltagaröversikt",
+      "searchPlaceholder": "Sök (ej aktiv ännu)",
+      "riskFilter": {
+        "all": "Alla risknivåer",
+        "low": "Låg risk",
+        "high": "Hög risk"
+      },
+      "emptyState": {
+        "title": "Inga deltagare",
+        "description": "Justera filter eller försök igen senare."
+      },
+      "columns": {
+        "name": "Namn",
+        "email": "E-post",
+        "tenant": "Tenant",
+        "risk": "Risk",
+        "lastActive": "Senast aktiv"
+      },
+      "riskLabels": {
+        "high": "Hög",
+        "low": "Låg",
+        "none": "Ingen"
+      },
+      "missing": "Saknas",
+      "global": "Global",
+      "noPermission": "Du har inte behörighet att se deltagare.",
+      "loadError": "Kunde inte ladda deltagare just nu."
     },
     "sessions": {
       "title": "Sessioner",
@@ -833,7 +2985,566 @@
       "detailsAndStatus": "Detaljer och status för vald session.",
       "host": "Värd",
       "actionsAndLog": "Åtgärder & logg",
-      "noLogYet": "Ingen logg ännu."
+      "noLogYet": "Ingen logg ännu.",
+      "breadcrumbs": {
+        "home": "Startsida",
+        "tenant": "Tenant",
+        "sessions": "Sessioner"
+      },
+      "pageDescription": "Översikt över aktiva och avslutade sessioner.",
+      "stats": {
+        "sessions": "Sessioner",
+        "active": "Aktiva",
+        "flagged": "Flaggade"
+      },
+      "cardTitle": "Sessioner",
+      "searchPlaceholder": "Sök (ej aktiv ännu)",
+      "statusFilter": {
+        "all": "Alla statusar",
+        "active": "Aktiva",
+        "completed": "Avslutade",
+        "flagged": "Flaggade"
+      },
+      "emptyState": {
+        "title": "Inga sessioner",
+        "description": "Justera filter eller försök igen senare."
+      },
+      "columns": {
+        "title": "Titel",
+        "tenant": "Tenant",
+        "host": "Värd",
+        "participants": "Deltagare",
+        "status": "Status",
+        "started": "Startad"
+      },
+      "statusLabels": {
+        "active": "Aktiv",
+        "completed": "Avslutad",
+        "flagged": "Flaggad"
+      },
+      "global": "Global",
+      "noPermission": "Du har inte behörighet att se sessioner.",
+      "loadError": "Kunde inte ladda sessioner just nu.",
+      "detail": {
+        "pageDescription": "Detaljer och status för vald session.",
+        "metadata": "Metadata",
+        "status": "Status",
+        "organisation": "Organisation",
+        "start": "Start",
+        "notes": "Anteckningar",
+        "noNotes": "—",
+        "actionsAndLog": "Åtgärder & logg",
+        "noLogYet": "Ingen logg ännu.",
+        "muteParticipant": "Mute deltagare",
+        "kickSession": "Kick session",
+        "banParticipant": "Ban deltagare",
+        "muteSent": "Mute skickad.",
+        "kickSent": "Kick skickad.",
+        "banSent": "Ban skickad.",
+        "noAccess": "Ingen åtkomst",
+        "noAccessDescription": "Du behöver behörighet för att se sessioner.",
+        "notFound": "Sessionen hittades inte",
+        "notFoundDescription": "Kontrollera länken eller gå tillbaka till listan."
+      },
+      "emptyState": {
+        "noAccess": "Ingen åtkomst",
+        "noAccessDescription": "Du behöver behörighet för att se sessioner.",
+        "noSessions": "Inga sessioner",
+        "noSessionsDescription": "Justera filter eller försök igen senare."
+      }
+    },
+    "tickets": {
+      "page": {
+        "title": "Ärenden",
+        "description": "Hantera supportärenden, status, prioritet och konversationer."
+      },
+      "breadcrumbs": {
+        "admin": "Admin",
+        "operations": "Drift",
+        "tickets": "Ärenden"
+      },
+      "status": {
+        "all": "Alla statusar",
+        "open": "Öppen",
+        "inProgress": "Hanteras",
+        "waitingForUser": "Väntar på användare",
+        "resolved": "Löst",
+        "closed": "Stängt"
+      },
+      "priority": {
+        "all": "Alla prioriteter",
+        "urgent": "Brådskande",
+        "high": "Hög",
+        "medium": "Medel",
+        "low": "Låg"
+      },
+      "stats": {
+        "total": "Totalt",
+        "open": "Öppna",
+        "inProgress": "Pågående",
+        "avgResolutionTime": "Snitt lösningstid"
+      },
+      "filters": {
+        "searchPlaceholder": "Sök titel/ID",
+        "allOrganizations": "Alla organisationer",
+        "myTickets": "Mina ärenden",
+        "unassigned": "Otilldelade",
+        "needsResponse": "Behöver svar",
+        "clearFilters": "Rensa filter"
+      },
+      "list": {
+        "loading": "Laddar...",
+        "page": "Sida",
+        "of": "av",
+        "previous": "Föregående",
+        "next": "Nästa"
+      },
+      "detail": {
+        "description": "Beskrivning",
+        "created": "Skapad",
+        "category": "Kategori",
+        "categoryDefault": "Allmänt",
+        "user": "Användare",
+        "userUnknown": "Okänd",
+        "organization": "Organisation",
+        "status": "Status",
+        "priority": "Prioritet",
+        "assignedTo": "Tilldelad",
+        "unassigned": "Ingen tilldelad",
+        "messages": "Meddelanden",
+        "loadingMessages": "Laddar meddelanden...",
+        "noMessages": "Inga meddelanden än",
+        "internal": "Internt",
+        "internalCheckbox": "Internt (synligt endast för admin)",
+        "messagePlaceholder": "Skicka ett meddelande...",
+        "internalPlaceholder": "Intern anteckning...",
+        "send": "Skicka",
+        "selectTicket": "Välj ett ärende för att se detaljer"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte hämta ärenden",
+        "unexpectedError": "Ett oväntat fel uppstod"
+      },
+      "noAccess": {
+        "title": "Åtkomst nekad",
+        "description": "Du har inte behörighet att hantera supportärenden."
+      },
+      "empty": {
+        "title": "Inga ärenden",
+        "description": "Det finns inga supportärenden att visa med aktuella filter."
+      },
+      "loading": {
+        "checkingPermissions": "Kontrollerar behörighet..."
+      }
+    },
+    "support": {
+      "kb": {
+        "pageTitle": "Kunskapsbas",
+        "pageDescription": "Hantera FAQ och hjälpartiklar",
+        "noAccess": "Ingen åtkomst",
+        "allOrganizations": "Alla organisationer",
+        "allCategories": "Alla kategorier",
+        "globalOption": "🌐 Global (synlig för alla)",
+        "back": "Tillbaka",
+        "createFaq": "Skapa FAQ",
+        "editFaq": "Redigera FAQ",
+        "newFaq": "Ny FAQ",
+        "form": {
+          "organization": "Organisation",
+          "globalHelp": "Globala FAQ är synliga för alla användare",
+          "questionLabel": "Fråga *",
+          "questionPlaceholder": "Hur gör jag...?",
+          "answerLabel": "Svar (Markdown) *",
+          "answerPlaceholder": "Skriv svaret här... (stöder markdown)",
+          "categoryLabel": "Kategori",
+          "categoryPlaceholder": "t.ex. Konto, Fakturering, Funktioner"
+        },
+        "status": {
+          "published": "Publicerad",
+          "draft": "Utkast"
+        },
+        "actions": {
+          "delete": "Ta bort",
+          "deleting": "Tar bort...",
+          "cancel": "Avbryt",
+          "save": "Spara",
+          "saving": "Sparar...",
+          "publish": "Publicera",
+          "unpublish": "Avpublicera"
+        },
+        "filters": {
+          "searchPlaceholder": "Sök i frågor...",
+          "showDrafts": "Visa utkast"
+        },
+        "empty": {
+          "title": "Inga FAQ ännu",
+          "description": "Skapa din första FAQ för att hjälpa användare hitta svar."
+        },
+        "list": {
+          "global": "Global",
+          "views": "visningar"
+        },
+        "errors": {
+          "createFailed": "Kunde inte skapa FAQ",
+          "updateFailed": "Kunde inte uppdatera FAQ",
+          "deleteFailed": "Kunde inte ta bort FAQ"
+        }
+      },
+      "notifications": {
+        "pageTitle": "Notifikationshistorik",
+        "pageDescription": "Se och hantera skickade notifikationer",
+        "noAccess": "Du har inte åtkomst till notifikationshistorik",
+        "noAccessDescription": "Kontakta en administratör för att få tillgång.",
+        "back": "Tillbaka",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "support": "Support",
+          "notificationHistory": "Notifikationshistorik"
+        },
+        "errors": {
+          "couldNotFetch": "Kunde inte ladda notifikationer"
+        },
+        "list": {
+          "title": "Skickade notifikationer",
+          "count": "({count})"
+        },
+        "filters": {
+          "allOrganizations": "Alla organisationer",
+          "allCategories": "Alla kategorier",
+          "unread": "Olästa"
+        },
+        "categories": {
+          "support": "Support",
+          "system": "System",
+          "learning": "Utbildning",
+          "gamification": "Gamification"
+        },
+        "loading": "Laddar...",
+        "empty": {
+          "title": "Inga notifikationer hittades",
+          "description": "Endast de senaste 7 dagarnas notifikationer visas."
+        },
+        "status": {
+          "unread": "Oläst"
+        },
+        "details": {
+          "to": "Till:",
+          "unknown": "Okänd",
+          "org": "Org:"
+        }
+      }
+    },
+    "moderation": {
+      "page": {
+        "title": "Moderering",
+        "description": "Content reports, åtgärder och statistik."
+      },
+      "noTenant": {
+        "title": "Ingen organisation vald",
+        "description": "Välj en organisation för att hantera moderering."
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda modereringsdata",
+        "loadFailedDescription": "Kunde inte ladda modereringsdata.",
+        "updateReportFailed": "Kunde inte uppdatera rapporten.",
+        "updateQueueFailed": "Kunde inte uppdatera modereringskön."
+      },
+      "stats": {
+        "openReports": "Öppna rapporter",
+        "queue": "Kö",
+        "actions": "Åtgärder",
+        "actionsTotal": "Åtgärder totalt",
+        "suspended": "Suspenderade"
+      },
+      "tabs": {
+        "queue": "Kö",
+        "reports": "Rapporter",
+        "stats": "Statistik"
+      },
+      "queue": {
+        "loading": "Laddar kö...",
+        "emptyTitle": "Ingen kö",
+        "emptyDescription": "Inga poster i modereringskön just nu.",
+        "markHandled": "Markera hanterad"
+      },
+      "reports": {
+        "loading": "Laddar rapporter...",
+        "emptyTitle": "Inga rapporter",
+        "emptyDescription": "Det finns inga öppna rapporter.",
+        "created": "Skapad:"
+      },
+      "statsTab": {
+        "loading": "Laddar statistik...",
+        "emptyTitle": "Ingen statistik",
+        "emptyDescription": "Statistik kunde inte hämtas."
+      },
+      "actions": {
+        "dismiss": "Avfärda",
+        "block": "Blockera"
+      }
+    },
+    "learning": {
+      "hub": {
+        "breadcrumbLabel": "Utbildning",
+        "pageTitle": "Utbildning",
+        "pageDescription": "Lekledarutbildning - kurser, lärstigar och krav",
+        "filters": {
+          "all": "Alla",
+          "global": "Globala",
+          "tenant": "Organisation",
+          "selectOrganization": "Välj organisation"
+        },
+        "stats": {
+          "activeCourses": "Aktiva kurser",
+          "paths": "Lärstigar",
+          "activeRequirements": "Aktiva krav",
+          "totalCourses": "Totalt kurser"
+        },
+        "modules": {
+          "courses": {
+            "title": "Kurser",
+            "description": "Skapa och hantera utbildningskurser med text, quiz och belöningar.",
+            "features": {
+              "courseContent": "Kursinnehåll",
+              "quizBuilder": "Quiz-builder",
+              "rewards": "Belöningar",
+              "scopeManagement": "Scope-hantering"
+            }
+          },
+          "paths": {
+            "title": "Lärstigar",
+            "description": "Bygg lärstigar med förutsättningar och progression.",
+            "features": {
+              "viewOnly": "Endast visning (Fas 1)",
+              "graphEditor": "Graf-editor (planerad)",
+              "prerequisites": "Förutsättningar",
+              "roleBased": "Rollbaserade"
+            }
+          },
+          "requirements": {
+            "title": "Krav & Grind",
+            "description": "Konfigurera vilka kurser som krävs för aktiviteter och roller.",
+            "features": {
+              "activityRequirements": "Aktivitetskrav",
+              "roleRequirements": "Rollkrav",
+              "gameRequirements": "Spelkrav",
+              "toggleActive": "Toggle aktiv/inaktiv"
+            }
+          },
+          "reports": {
+            "title": "Rapporter",
+            "description": "Översikt av gruppens framsteg och kursstatistik.",
+            "features": {
+              "progressOverview": "Framstegsöversikt",
+              "courseStats": "Kursstatistik",
+              "userReports": "Användarrapporter",
+              "export": "Export"
+            }
+          }
+        },
+        "status": {
+          "implemented": "Implementerad",
+          "partial": "Delvis",
+          "planned": "Planerad"
+        },
+        "sandbox": {
+          "title": "🧪 Sandbox",
+          "description": "Testa och prototypa utbildningsmodulen i sandlådan",
+          "open": "Öppna sandbox"
+        }
+      },
+      "courses": {
+        "breadcrumbs": {
+          "learning": "Utbildning",
+          "courses": "Kurser"
+        },
+        "pageTitle": "Kurser",
+        "pageDescription": "Skapa och hantera utbildningskurser",
+        "newCourse": "Ny kurs",
+        "stats": {
+          "total": "Totalt kurser",
+          "active": "Aktiva",
+          "draft": "Utkast",
+          "archived": "Arkiverade"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        },
+        "difficulty": {
+          "beginner": "Nybörjare",
+          "intermediate": "Medel",
+          "advanced": "Avancerad",
+          "expert": "Expert"
+        },
+        "search": {
+          "placeholder": "Sök kurser..."
+        },
+        "filter": {
+          "allStatuses": "Alla statusar",
+          "allScopes": "Alla scope",
+          "global": "Globala",
+          "tenant": "Organisation",
+          "allOrganizations": "Alla organisationer"
+        },
+        "loading": "Laddar kurser...",
+        "error": {
+          "loadFailed": "Kunde inte hämta kurser",
+          "archiveFailed": "Kunde inte arkivera kursen"
+        },
+        "table": {
+          "scope": "Scope",
+          "course": "Kurs",
+          "status": "Status",
+          "level": "Nivå",
+          "time": "Tid",
+          "passScore": "Godkänt",
+          "actions": "Åtgärder",
+          "global": "Global",
+          "organization": "Organisation",
+          "minutes": "{minutes} min",
+          "noMatchingCourses": "Inga kurser matchar filtren",
+          "noCourses": "Inga kurser ännu"
+        },
+        "actions": {
+          "edit": "Redigera",
+          "viewOnly": "Endast visning",
+          "archive": "Arkivera"
+        },
+        "pagination": {
+          "showing": "Visar {start}–{end} av {total}",
+          "previous": "Föregående",
+          "next": "Nästa"
+        },
+        "archiveDialog": {
+          "title": "Arkivera kurs",
+          "description": "Är du säker på att du vill arkivera \"{title}\"? Kursen kommer inte längre vara synlig för deltagare.",
+          "confirm": "Arkivera",
+          "cancel": "Avbryt"
+        }
+      },
+      "requirements": {
+        "breadcrumbs": {
+          "learning": "Utbildning",
+          "requirements": "Krav & Grind"
+        },
+        "pageTitle": "Krav & Grind",
+        "pageDescription": "Konfigurera vilka kurser som krävs för aktiviteter och roller",
+        "newRequirement": "Nytt krav",
+        "info": {
+          "title": "Hur fungerar krav?",
+          "description": "Krav blockerar användare från att utföra vissa aktiviteter eller ta roller tills de har slutfört specifika kurser. När en användare försöker göra något som kräver en kurs visas en modal med information om vilka kurser som behöver slutföras."
+        },
+        "stats": {
+          "total": "Totalt krav",
+          "active": "Aktiva",
+          "inactive": "Inaktiva"
+        },
+        "types": {
+          "game_unlock": "Spelåtkomst",
+          "role_unlock": "Rollkrav",
+          "activity_unlock": "Aktivitetsgrind",
+          "onboarding_required": "Onboarding"
+        },
+        "search": {
+          "placeholder": "Sök krav..."
+        },
+        "filter": {
+          "allScopes": "Alla scope",
+          "global": "Globala",
+          "tenant": "Organisation",
+          "allOrganizations": "Alla organisationer"
+        },
+        "loading": "Laddar krav...",
+        "error": {
+          "loadFailed": "Kunde inte hämta krav",
+          "toggleFailed": "Kunde inte ändra status",
+          "deleteFailed": "Kunde inte ta bort kravet"
+        },
+        "table": {
+          "title": "Alla krav",
+          "scope": "Scope",
+          "type": "Typ",
+          "target": "Mål",
+          "requiredCourse": "Krävd kurs",
+          "status": "Status",
+          "actions": "Åtgärder",
+          "global": "Global",
+          "organization": "Organisation",
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "noMatchingRequirements": "Inga krav matchar sökningen",
+          "noRequirements": "Inga krav konfigurerade ännu"
+        },
+        "actions": {
+          "delete": "Ta bort",
+          "noAccess": "Ingen åtkomst"
+        },
+        "pagination": {
+          "showing": "Visar {start}–{end} av {total}",
+          "previous": "Föregående",
+          "next": "Nästa"
+        },
+        "deleteDialog": {
+          "title": "Ta bort krav",
+          "description": "Är du säker på att du vill ta bort detta krav? Användare kommer inte längre blockeras av det.",
+          "confirm": "Ta bort",
+          "cancel": "Avbryt"
+        }
+      }
+    },
+    "library": {
+      "coachDiagrams": {
+        "title": "Coach Diagrams",
+        "pageDescription": "Diagram som kan användas som instruktionsmedia i steg.",
+        "noTenantSelected": "Ingen organisation vald",
+        "selectTenantDescription": "Välj en organisation för att se diagram-biblioteket.",
+        "loading": "Laddar…",
+        "loadError": "Kunde inte ladda diagram",
+        "retry": "Försök igen",
+        "noDiagrams": "Inga diagram ännu",
+        "noDiagramsDescription": "Skapa diagram i Coach Diagram Builder och de dyker upp här.",
+        "updated": "Uppdaterad",
+        "openEditor": "Öppna editor",
+        "openSvg": "Öppna SVG",
+        "createNew": "Skapa nytt",
+        "creating": "Skapar…",
+        "newDiagram": "Nytt diagram"
+      },
+      "badges": {
+        "breadcrumbs": {
+          "home": "Startsida",
+          "library": "Bibliotek",
+          "badges": "Badges"
+        },
+        "title": "Bibliotek",
+        "description": "Hantera badges (via builder exports)",
+        "noPermission": "Du saknar behörighet att visa Bibliotek.",
+        "selectTenant": "Välj en organisation (active tenant) för att visa biblioteket.",
+        "badgesTitle": "Badges",
+        "loading": "Laddar…",
+        "badgeCount": "{count} badge",
+        "badgeCountPlural": "{count} badges",
+        "published": "publicerade",
+        "drafts": "utkast",
+        "badgeBuilder": "Badge Builder",
+        "editBadge": "Redigera badge",
+        "editing": "Redigerar: {title}",
+        "untitled": "Namnlös",
+        "selectFromLibrary": "Välj en badge från biblioteket",
+        "selectOrCreate": "Välj eller skapa en badge",
+        "selectOrCreateDescription": "Välj en badge från biblioteket ovan eller skapa en ny för att börja bygga dess lager, färger och metadata.",
+        "createBadge": "Skapa badge",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global"
+      }
+    },
+    "tools": {
+      "breadcrumbHome": "Startsida",
+      "breadcrumbTitle": "Verktyg",
+      "pageTitle": "Verktyg",
+      "pageDescription": "Koddefinierade verktyg som kan aktiveras per spel. Ingen CRUD i MVP."
     },
     "settings": {
       "title": "Inställningar",
@@ -1010,7 +3721,72 @@
         "players": "Spelare",
         "time": "Tid",
         "age": "Ålder",
-        "notSet": "Inte satt"
+        "notSet": "Inte satt",
+        "back": "Tillbaka",
+        "edit": "Redigera",
+        "publish": "Publicera",
+        "delete": "Ta bort",
+        "metadata": "Metadata",
+        "description": "Beskrivning",
+        "noDescription": "Ingen beskrivning angiven.",
+        "noShortDescription": "Ingen kort beskrivning angiven.",
+        "technical": "Tekniskt",
+        "createdAt": "Skapad",
+        "updatedAt": "Uppdaterad",
+        "deleteTitle": "Ta bort spelet?",
+        "deleteDescription": "Detta raderar spelet permanent.",
+        "deleteConfirm": "Ta bort"
+      },
+      "form": {
+        "editTitle": "Redigera lek",
+        "createTitle": "Skapa ny lek",
+        "description": "Hantera grunddata för lekbanken. Minimikrav: namn, kort beskrivning och huvudsyfte.",
+        "name": "Namn",
+        "namePlaceholder": "Ex. Samarbetsstafett",
+        "shortDescription": "Kort beskrivning",
+        "shortDescriptionPlaceholder": "1-2 meningar som sammanfattar leken.",
+        "fullDescription": "Full beskrivning",
+        "fullDescriptionPlaceholder": "Instruktioner, tips och säkerhetsnotiser.",
+        "status": "Status",
+        "statusPlaceholder": "Välj status",
+        "owner": "Ägare",
+        "ownerPlaceholder": "Välj ägare",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Syfte",
+        "purposePlaceholder": "Välj syfte",
+        "product": "Produkt",
+        "productPlaceholder": "Välj produkt",
+        "productNone": "Ingen",
+        "category": "Kategori",
+        "categoryPlaceholder": "Ex. Samarbete, Uppvärmning",
+        "energy": "Energi",
+        "energyPlaceholder": "Välj energinivå",
+        "energyNone": "Ingen",
+        "energyLow": "Låg",
+        "energyMedium": "Medel",
+        "energyHigh": "Hög",
+        "location": "Spelplats",
+        "locationPlaceholder": "Välj spelplats",
+        "locationUnknown": "Okänt",
+        "locationIndoor": "Inomhus",
+        "locationOutdoor": "Utomhus",
+        "locationBoth": "Både och",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publicerad",
+        "timeEstimate": "Beräknad tid (min)",
+        "timeEstimatePlaceholder": "Ex. 15",
+        "players": "Spelare (min-max)",
+        "playersMin": "Min",
+        "playersMax": "Max",
+        "age": "Ålder (min-max)",
+        "ageMin": "Min",
+        "ageMax": "Max",
+        "requiredError": "Namn, kort beskrivning och syfte måste anges.",
+        "saveError": "Kunde inte spara spelet. Försök igen.",
+        "cancel": "Avbryt",
+        "saving": "Sparar...",
+        "saveChanges": "Spara ändringar",
+        "create": "Skapa lek"
       },
       "pageDescription": "Navet för att skapa, uppdatera, publicera och exportera hela spelkatalogen.",
       "cardTitle": "Spelöversikt",
@@ -1023,7 +3799,34 @@
         "total": "Totalt",
         "published": "Publicerade",
         "drafts": "Utkast",
-        "tenantOwned": "Tenant-ägda"
+        "tenantOwned": "Tenant-ägda",
+        "withErrors": "Med fel"
+      },
+      "page": {
+        "noAccess": "Ingen åtkomst",
+        "noAccessDesc": "Du behöver administratörsbehörighet för att hantera spel.",
+        "title": "Spel (globalt)",
+        "description": "Hantera spelkatalogen – sök, filtrera, och utför massåtgärder.",
+        "csvExport": "CSV Export",
+        "import": "Importera",
+        "newInBuilder": "Ny i Builder",
+        "loadError": "Kunde inte ladda spel",
+        "noGamesTitle": "Inga spel matchar filtren",
+        "noGamesDesc": "Justera filter eller lägg till ett nytt spel.",
+        "selectGame": "Välj {name}",
+        "openInBuilder": "Öppna i Builder",
+        "showDetails": "Visa detaljer",
+        "unpublish": "Avpublicera",
+        "publish": "Publicera"
+      },
+      "table": {
+        "name": "Namn",
+        "mode": "Läge",
+        "purpose": "Syfte",
+        "status": "Status",
+        "valid": "Valid",
+        "owner": "Ägare",
+        "updated": "Uppdaterad"
       },
       "filters": {
         "allStatuses": "Alla statusar",
@@ -1449,11 +4252,74 @@
         "dedicatedSupport": "Dedikerad support"
       },
       "invoices": {
-        "title": "Faktureringshistorik",
+        "title": "Fakturor",
+        "description": "Visa och hantera fakturor och betalningar",
         "paid": "Betald",
         "pending": "Väntande",
         "failed": "Misslyckad",
-        "download": "Ladda ner"
+        "download": "Ladda ner",
+        "emptyTitle": "Inga fakturor",
+        "emptyDescription": "Det finns inga fakturor att visa.",
+        "noResultsFor": "Inga resultat för \"{query}\"",
+        "clearSearch": "Rensa sökning",
+        "paymentsForInvoice": "Betalningar för faktura",
+        "close": "Stäng",
+        "loadingPayments": "Laddar betalningar...",
+        "noPaymentsRegistered": "Inga betalningar registrerade.",
+        "unknownProvider": "Okänd leverantör",
+        "paidAt": "Betald: {date}",
+        "markAsPaid": "Markera betald",
+        "addPayment": "Lägg till betalning",
+        "savePayment": "Spara betalning",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering",
+          "invoices": "Fakturor"
+        },
+        "buttons": {
+          "createStripeCustomer": "Skapa/visa Stripe-kund",
+          "manualInvoice": "Manuell faktura",
+          "sendViaStripe": "Skicka via Stripe"
+        },
+        "stats": {
+          "totalRevenue": "Totalt intäkter",
+          "outstanding": "Utestående",
+          "paid": "Betalda",
+          "overdue": "Förfallna"
+        },
+        "status": {
+          "paid": "Betald",
+          "sent": "Skickad",
+          "issued": "Utfärdad",
+          "overdue": "Förfallen",
+          "draft": "Utkast",
+          "canceled": "Makulerad"
+        },
+        "filter": {
+          "all": "Alla",
+          "paid": "Betalda",
+          "sent": "Skickade",
+          "issued": "Utfärdade",
+          "overdue": "Förfallna",
+          "draft": "Utkast",
+          "canceled": "Makulerade"
+        },
+        "paymentStatus": {
+          "pending": "Väntar",
+          "confirmed": "Bekräftad",
+          "failed": "Misslyckad",
+          "refunded": "Återbetald"
+        },
+        "form": {
+          "name": "Namn",
+          "namePlaceholder": "Kortbetalning, Swish ...",
+          "amount": "Belopp",
+          "provider": "Provider",
+          "providerPlaceholder": "Stripe, Swish, Bankgiro",
+          "reference": "Referens"
+        },
+        "search": "Sök faktura",
+        "downloadPdf": "Ladda ner PDF"
       }
     },
     "learning": {

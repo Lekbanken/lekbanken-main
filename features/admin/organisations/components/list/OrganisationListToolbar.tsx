@@ -1,6 +1,8 @@
 "use client";
 
 import type { ChangeEvent } from "react";
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Button, Select } from "@/components/ui";
 import type { OrganisationListFilters, OrganisationListStatus } from "../../types";
@@ -15,25 +17,6 @@ type OrganisationListToolbarProps = {
   onClearFilters: () => void;
 };
 
-const billingOptions = [
-  { value: "all", label: "Alla billing-lägen" },
-  { value: "connected", label: "Billing kopplad" },
-  { value: "not_connected", label: "Ingen billing" },
-];
-
-const domainOptions = [
-  { value: "all", label: "Alla domäner" },
-  { value: "yes", label: "Har egen domän" },
-  { value: "no", label: "Ingen domän" },
-];
-
-const sortOptions = [
-  { value: "recent", label: "Nyast först" },
-  { value: "name", label: "Namn A–Ö" },
-  { value: "members", label: "Flest medlemmar" },
-  { value: "updated", label: "Senast uppdaterad" },
-];
-
 export function OrganisationListToolbar({
   filters,
   searchValue,
@@ -43,6 +26,27 @@ export function OrganisationListToolbar({
   onFiltersChange,
   onClearFilters,
 }: OrganisationListToolbarProps) {
+  const t = useTranslations('admin.organizations.toolbar');
+
+  const billingOptions = useMemo(() => [
+    { value: "all", label: t('billing.all') },
+    { value: "connected", label: t('billing.connected') },
+    { value: "not_connected", label: t('billing.notConnected') },
+  ], [t]);
+
+  const domainOptions = useMemo(() => [
+    { value: "all", label: t('domain.all') },
+    { value: "yes", label: t('domain.yes') },
+    { value: "no", label: t('domain.no') },
+  ], [t]);
+
+  const sortOptions = useMemo(() => [
+    { value: "recent", label: t('sort.recent') },
+    { value: "name", label: t('sort.name') },
+    { value: "members", label: t('sort.members') },
+    { value: "updated", label: t('sort.updated') },
+  ], [t]);
+
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(event.target.value);
   };
@@ -84,51 +88,51 @@ export function OrganisationListToolbar({
               type="search"
               value={searchValue}
               onChange={handleSearchChange}
-              placeholder="Sök organisationer..."
+              placeholder={t('searchPlaceholder')}
               className="w-full rounded-lg border border-border bg-background py-2 pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              aria-label="Sök organisationer"
+              aria-label={t('searchAriaLabel')}
             />
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <Select
-              aria-label="Status"
+              aria-label={t('statusLabel')}
               value={filters.status}
               onChange={handleStatusChange}
               options={statusOptions}
-              placeholder="Status"
+              placeholder={t('statusLabel')}
               className="w-auto min-w-[140px]"
             />
             <Select
-              aria-label="Billing"
+              aria-label={t('billingLabel')}
               value={filters.billing}
               onChange={handleBillingChange}
               options={billingOptions}
-              placeholder="Billing"
+              placeholder={t('billingLabel')}
               className="w-auto min-w-[160px]"
             />
             <Select
-              aria-label="Språk"
+              aria-label={t('languageLabel')}
               value={filters.language}
               onChange={handleLanguageChange}
               options={languageOptions}
-              placeholder="Språk"
+              placeholder={t('languageLabel')}
               className="w-auto min-w-[140px]"
             />
             <Select
-              aria-label="Domän"
+              aria-label={t('domainLabel')}
               value={filters.domain}
               onChange={handleDomainChange}
               options={domainOptions}
-              placeholder="Domän"
+              placeholder={t('domainLabel')}
               className="w-auto min-w-[140px]"
             />
             <Select
-              aria-label="Sortering"
+              aria-label={t('sortLabel')}
               value={filters.sort}
               onChange={handleSortChange}
               options={sortOptions}
-              placeholder="Sortering"
+              placeholder={t('sortLabel')}
               className="w-auto min-w-[160px]"
             />
           </div>
@@ -143,7 +147,7 @@ export function OrganisationListToolbar({
               className="text-muted-foreground"
             >
               <XMarkIcon className="mr-1.5 h-4 w-4" />
-              Rensa {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
+              {activeFilterCount > 0 ? t('clearWithCount', { count: activeFilterCount }) : t('clear')}
             </Button>
           )}
         </div>

@@ -348,11 +348,11 @@ export function ProductAdminPage() {
       <AdminPageLayout>
         <AdminPageHeader
           icon={<CubeIcon className="h-6 w-6" />}
-          title="Produkter"
-          description="Konfigurera produkter, moduler och deras formagor"
+          title={t('page.title')}
+          description={t('page.description')}
         />
         <SkeletonStats />
-        <LoadingState message="Laddar produkter..." />
+        <LoadingState message={t('page.loading')} />
       </AdminPageLayout>
     );
   }
@@ -360,26 +360,26 @@ export function ProductAdminPage() {
   if (!user || !canViewProducts) {
     return (
       <EmptyState
-        title="Ingen atkomst"
-        description="Du behover vara inloggad for att hantera produkter."
-        action={{ label: "Ga till login", onClick: () => (window.location.href = "/auth/login") }}
+        title={t('page.noAccess')}
+        description={t('page.noAccessDesc')}
+        action={{ label: t('page.goToLogin'), onClick: () => (window.location.href = "/auth/login") }}
       />
     );
   }
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: "Startsida", href: "/admin" }, { label: "Produkter" }]} />
+      <AdminBreadcrumbs items={[{ label: t('breadcrumbs.home'), href: "/admin" }, { label: t('page.title') }]} />
 
       <AdminPageHeader
         icon={<CubeIcon className="h-6 w-6" />}
-        title="Produkter"
-        description="Konfigurera produkter, moduler och deras formagor"
+        title={t('page.title')}
+        description={t('page.description')}
         actions={
           canCreateProduct && (
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <PlusIcon className="h-4 w-4" />
-              Skapa produkt
+              {t('page.createProduct')}
             </Button>
           )
         }
@@ -387,25 +387,25 @@ export function ProductAdminPage() {
 
       <div className="mb-4 flex flex-wrap gap-2">
         <Button variant={activeTab === "products" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("products")}>
-          Produkter
+          {t('tabs.products')}
         </Button>
         <Button variant={activeTab === "categories" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("categories")}>
-          Kategorier
+          {t('tabs.categories')}
         </Button>
         <Button variant={activeTab === "discounts" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("discounts")}>
-          Rabatter
+          {t('tabs.discounts')}
         </Button>
         <Button variant={activeTab === "images" ? "default" : "outline"} size="sm" onClick={() => setActiveTab("images")}>
-          Standardbilder
+          {t('tabs.images')}
         </Button>
       </div>
 
       {activeTab === "products" && (
         <>
           <AdminStatGrid cols={3}>
-            <AdminStatCard label="Totalt produkter" value={products.length} icon={<CubeIcon className="h-5 w-5" />} />
-            <AdminStatCard label="Aktiva" value={statusCounts.active} icon={<CheckBadgeIcon className="h-5 w-5" />} iconColor="green" />
-            <AdminStatCard label="Inaktiva" value={statusCounts.inactive} icon={<PauseCircleIcon className="h-5 w-5" />} iconColor="amber" />
+            <AdminStatCard label={t('page.totalProducts')} value={products.length} icon={<CubeIcon className="h-5 w-5" />} />
+            <AdminStatCard label={t('page.activeCount')} value={statusCounts.active} icon={<CheckBadgeIcon className="h-5 w-5" />} iconColor="green" />
+            <AdminStatCard label={t('page.inactiveCount')} value={statusCounts.inactive} icon={<PauseCircleIcon className="h-5 w-5" />} iconColor="amber" />
           </AdminStatGrid>
 
           <Card className="overflow-hidden rounded-xl border border-border">

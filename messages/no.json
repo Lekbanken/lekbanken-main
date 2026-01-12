@@ -257,6 +257,642 @@
       "account": "Konto",
       "settings": "Innstillinger"
     },
+    "notifications": {
+      "pageTitle": "Varsler",
+      "pageDescription": "Send meldinger til organisasjonens brukere.",
+      "noTenantTitle": "Ingen organisasjon valgt",
+      "noTenantDescription": "Velg en organisasjon for å sende varsler.",
+      "errorTitle": "En feil oppstod",
+      "form": {
+        "sendNotification": "Send varsel",
+        "title": "Tittel",
+        "type": "Type",
+        "message": "Melding",
+        "category": "Kategori",
+        "targetAudience": "Målgruppe",
+        "selectRecipients": "Velg mottakere",
+        "actionUrl": "Action URL (valgfritt)",
+        "actionLabel": "Action label (valgfritt)"
+      },
+      "placeholders": {
+        "title": "Appoppdatering",
+        "message": "Din melding...",
+        "actionLabel": "Åpne"
+      },
+      "options": {
+        "allInOrg": "Alle i organisasjonen",
+        "specificUsers": "Spesifikke brukere"
+      },
+      "loading": {
+        "users": "Laster brukere..."
+      },
+      "empty": {
+        "noUsers": "Ingen brukere å velge."
+      },
+      "recipients": {
+        "title": "Mottakere",
+        "count": "{count} brukere i organisasjonen.",
+        "hint": "Når du velger spesifikke brukere, kan du velge fra listen. Ellers sendes det til alle."
+      },
+      "actions": {
+        "sending": "Sender...",
+        "send": "Send varsel"
+      },
+      "errors": {
+        "loadUsers": "Kunne ikke laste brukere for organisasjonen.",
+        "loadUsersFailed": "Kunne ikke laste brukere.",
+        "noUsersToSend": "Det finnes ingen brukere å sende til.",
+        "sendFailed": "Kunne ikke sende varsler."
+      }
+    },
+    "purposes": {
+      "legacy": {
+        "pageTitle": "Formål & underformål",
+        "pageDescription": "Administrer hovedformål og underformål som brukes i spill, produkter og filtre.",
+        "breadcrumbHome": "Hjem",
+        "breadcrumbPurposes": "Formål",
+        "newPurpose": "Nytt formål",
+        "exportColumns": {
+          "id": "ID",
+          "type": "Type",
+          "key": "Nøkkel",
+          "name": "Navn",
+          "parentId": "Parent ID",
+          "tenantId": "Tenant ID",
+          "standard": "Standard",
+          "yes": "ja",
+          "no": "nei"
+        },
+        "stats": {
+          "mainPurposes": "Hovedformål",
+          "subPurposes": "Underformål",
+          "total": "Totalt"
+        },
+        "tabs": {
+          "standard": "Standard (låst)",
+          "global": "Spesiell global",
+          "tenant": "Tenant-spesifikke"
+        },
+        "selectTenant": "Velg tenant",
+        "purposeTree": "Formålstre",
+        "loading": "Laster...",
+        "subPurposesCount": "{count} underformål",
+        "standardLabel": "(standard)",
+        "actions": {
+          "edit": "Rediger",
+          "quickDelete": "Hurtig sletting",
+          "detachDelete": "Koble fra + slett",
+          "editMain": "Rediger hovedformål"
+        },
+        "errors": {
+          "loadPurposes": "Kunne ikke laste formål",
+          "loadPurposesNow": "Kunne ikke laste formål akkurat nå.",
+          "selectTenantFirst": "Velg en tenant før du oppretter et tenant-spesifikt formål.",
+          "selectTenantForPurpose": "Velg en tenant for tenant-spesifikt formål.",
+          "savePurpose": "Kunne ikke lagre formålet.",
+          "deletePurpose": "Kunne ikke slette formålet.",
+          "readUsage": "Kunne ikke lese bruk.",
+          "detachDeleteFailed": "Kunne ikke koble fra og slette.",
+          "detachDeletePurpose": "Kunne ikke koble fra og slette formålet.",
+          "standardCannotDelete": "Standardformål kan ikke slettes."
+        },
+        "empty": {
+          "noAccess": "Ingen tilgang",
+          "noAccessDescription": "Du trenger tillatelse for å se formål.",
+          "selectTenant": "Velg tenant",
+          "selectTenantDescription": "Velg en tenant for å se eller administrere formål.",
+          "noPurposes": "Ingen formål",
+          "noPurposesDescription": "Kjør seed eller legg til formål via API/UI."
+        },
+        "problem": "Problem",
+        "dialog": {
+          "editTitle": "Rediger formål",
+          "createTitle": "Nytt formål",
+          "nameLabel": "Navn",
+          "keyLabel": "Nøkkel",
+          "typeLabel": "Type",
+          "parentLabel": "Parent",
+          "tenantLabel": "Tenant",
+          "typeMain": "Hovedformål",
+          "typeSub": "Underformål",
+          "selectMain": "Velg hovedformål",
+          "cancel": "Avbryt",
+          "save": "Lagre",
+          "create": "Opprett"
+        },
+        "confirm": {
+          "usageMessage": "Dette formålet brukes av:\n- {gamesMain} spill (main)\n- {gamesSecondary} spill (secondary)\n- {products} produkter\n- {media} media\n- {childSubs} underformål (vil bli slettet)\nDet vil bli koblet fra og slettet. Vil du fortsette?"
+        }
+      }
+    },
+    "licenses": {
+      "legacy": {
+        "pageTitle": "Lisenser",
+        "pageDescription": "Oversikt over kundelisenser, status og bruk.",
+        "notLoggedIn": "Du er ikke logget inn",
+        "notLoggedInDescription": "Logg inn for å se lisenser.",
+        "errorTitle": "En feil oppstod",
+        "loading": "Laster lisenser...",
+        "searchPlaceholder": "Søk organisasjon eller produkt",
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktive",
+          "trial": "Prøveperiode",
+          "expired": "Utgått"
+        },
+        "status": {
+          "active": "Aktiv",
+          "trial": "Prøveperiode",
+          "expired": "Utgått",
+          "suspended": "Suspendert"
+        },
+        "filter": {
+          "all": "Alle statuser"
+        },
+        "empty": {
+          "noLicenses": "Ingen lisenser",
+          "noLicensesDescription": "Ingen lisenser funnet med gjeldende filtre."
+        },
+        "unknownOrg": "Ukjent org",
+        "plan": "Årlig",
+        "seatsLabel": "Plan: {plan} • Seter: {used}/{total}",
+        "validLabel": "Gyldig: {start} – {end}"
+      }
+    },
+    "leaderboard": {
+      "legacy": {
+        "pageTitle": "Toppliste",
+        "pageDescription": "Se rangeringer for brukere og organisasjoner",
+        "breadcrumbAdmin": "Admin",
+        "breadcrumbLeaderboard": "Toppliste",
+        "refresh": "Oppdater",
+        "notLoggedIn": "Du må være logget inn for å se denne siden.",
+        "stats": {
+          "users": "Brukere",
+          "organisations": "Organisasjoner",
+          "totalCoins": "Totalt coins",
+          "achievements": "Achievements"
+        },
+        "table": {
+          "rank": "Rang",
+          "name": "Navn",
+          "coins": "Coins",
+          "games": "Spill",
+          "achievements": "Achievements",
+          "score": "Poeng"
+        },
+        "type": {
+          "user": "Bruker",
+          "organisation": "Organisasjon"
+        },
+        "searchPlaceholder": "Søk navn...",
+        "timeframe": {
+          "7d": "Siste 7 dager",
+          "30d": "Siste 30 dager",
+          "90d": "Siste 90 dager",
+          "all": "All tid"
+        },
+        "typeFilter": {
+          "all": "Alle typer",
+          "users": "Kun brukere",
+          "organisations": "Kun organisasjoner"
+        },
+        "metricSort": {
+          "score": "Sorter: Poeng",
+          "coins": "Sorter: Coins",
+          "games": "Sorter: Spill",
+          "achievements": "Sorter: Achievements"
+        },
+        "empty": {
+          "noResults": "Ingen resultater",
+          "noResultsForQuery": "Ingen resultater for \"{query}\"",
+          "noData": "Det er ingen data å vise ennå.",
+          "clearSearch": "Tøm søk"
+        },
+        "mockUserLabel": "Bruker {number}"
+      }
+    },
+    "planner": {
+      "pageTitle": "Planlegger",
+      "pageDescription": "Administrer planbibliotek, publisering og synlighet.",
+      "detailDescription": "Historikk over publiserte versjoner.",
+      "noPermission": "Ingen tilgang",
+      "noPermissionDescription": "Du har ikke tilgang til å vise planlegger-admin.",
+      "noOrganizationSelected": "Ingen organisasjon valgt",
+      "noOrganizationDescription": "Velg en organisasjon for å se dens planer.",
+      "planNotFound": "Plan mangler",
+      "planNotFoundDescription": "Planen kunne ikke finnes eller du mangler tilgang.",
+      "noDescription": "Ingen beskrivelse",
+      "loadingPlans": "Laster planer...",
+      "loadingPlan": "Laster plan...",
+      "loadingVersions": "Laster versjoner...",
+      "errorLoadPlans": "Kunne ikke laste planer.",
+      "errorLoadPlansTitle": "Kunne ikke laste planer",
+      "errorLoadPlan": "Kunne ikke laste plan.",
+      "errorLoadPlanTitle": "Kunne ikke laste plan",
+      "errorLoadVersions": "Kunne ikke laste versjoner.",
+      "errorLoadVersionsTitle": "Kunne ikke laste versjoner",
+      "scopeTenantDescription": "Viser planer for {name}",
+      "scopeGlobalDescription": "Viser offentlige planer",
+      "searchPlaceholder": "Søk planer...",
+      "noPlans": "Ingen planer",
+      "noPlansByFilter": "Ingen planer samsvarer med filtrene dine.",
+      "noBlocks": "Ingen blokker",
+      "noBlocksDescription": "Planen inneholder ingen blokker.",
+      "noVersions": "Ingen versjoner",
+      "noVersionsDescription": "Planen har ingen publiserte versjoner.",
+      "updatedAt": "Oppdatert {date}",
+      "publishedAt": "Publisert {date}",
+      "actions": {
+        "createPlan": "Opprett plan",
+        "creating": "Oppretter...",
+        "open": "Åpne",
+        "publish": "Publiser",
+        "archive": "Arkiver",
+        "restore": "Gjenopprett",
+        "delete": "Slett",
+        "loadMore": "Last flere",
+        "showAll": "Vis alle",
+        "startRun": "Start kjøring",
+        "backToPlan": "Tilbake til plan"
+      },
+      "sections": {
+        "scope": "Omfang",
+        "filter": "Filter",
+        "plans": "Planer",
+        "statusVisibility": "Status og synlighet",
+        "metadata": "Metadata",
+        "blocks": "Blokker",
+        "versions": "Versjoner",
+        "versionList": "Versjonsliste"
+      },
+      "metadata": {
+        "ownerUser": "Eier bruker",
+        "ownerTenant": "Eier organisasjon",
+        "totalTime": "Total tid",
+        "lastUpdated": "Sist oppdatert",
+        "currentVersion": "Gjeldende versjon",
+        "none": "Ingen",
+        "global": "Global"
+      },
+      "unpublishedChanges": "⚠ Upubliserte endringer",
+      "dialogs": {
+        "deletePlanTitle": "Slett plan",
+        "deletePlanConfirm": "Er du sikker på at du vil slette plan \"{name}\"?",
+        "deletePlanConfirmGeneric": "Er du sikker på at du vil slette planen?"
+      },
+      "toasts": {
+        "planPublished": "Plan publisert.",
+        "planPublishError": "Kunne ikke publisere plan.",
+        "visibilityUpdated": "Synlighet oppdatert.",
+        "visibilityError": "Kunne ikke oppdatere synlighet.",
+        "planDeleted": "Plan slettet.",
+        "planDeleteError": "Kunne ikke slette plan.",
+        "planCreated": "Plan opprettet!",
+        "planCreateError": "Kunne ikke opprette plan.",
+        "planArchived": "Plan arkivert.",
+        "planArchiveError": "Kunne ikke arkivere plan.",
+        "planRestored": "Plan gjenopprettet.",
+        "planRestoreError": "Kunne ikke gjenopprette plan."
+      }
+    },
+    "tenant": {
+      "members": {
+        "title": "Medlemmer",
+        "description": "Administrer organisasjonens medlemmer og roller.",
+        "noOrganizationTitle": "Ingen organisasjon valgt",
+        "noOrganizationDescription": "Velg eller bytt organisasjon for å se medlemmer.",
+        "errorTitle": "Kunne ikke laste medlemmer",
+        "errorDescription": "Kunne ikke laste medlemmer akkurat nå.",
+        "searchPlaceholder": "Søk på navn, e-post eller rolle",
+        "loading": "Laster medlemmer...",
+        "emptyTitle": "Ingen medlemmer",
+        "emptyDescription": "Det finnes ingen medlemmer å vise for denne organisasjonen.",
+        "unknownUser": "Ukjent bruker",
+        "noEmail": "Ingen e-post",
+        "primaryContact": "Primærkontakt",
+        "member": "Medlem"
+      },
+      "games": {
+        "title": "Spill",
+        "description": "Velg hvilke spill som skal være tilgjengelige for organisasjonen.",
+        "noOrganizationTitle": "Ingen organisasjon valgt",
+        "noOrganizationDescription": "Velg eller bytt organisasjon for å se spill.",
+        "errorTitle": "Kunne ikke laste spill",
+        "errorDescription": "Kunne ikke laste spill for organisasjonen.",
+        "searchPlaceholder": "Søk på navn eller kategori",
+        "loading": "Laster spill...",
+        "emptyTitle": "Ingen spill",
+        "emptyDescription": "Ingen spill funnet for denne organisasjonen.",
+        "noDescription": "Ingen beskrivelse",
+        "unknownCategory": "Ukjent kategori",
+        "unknownLevel": "Nivå ukjent"
+      },
+      "billing": {
+        "title": "Fakturering",
+        "description": "Oversikt over abonnement og fakturaer.",
+        "noOrganizationTitle": "Ingen organisasjon valgt",
+        "noOrganizationDescription": "Velg eller bytt organisasjon for å se fakturering.",
+        "loading": "Laster...",
+        "loadingInvoices": "Laster fakturaer...",
+        "activePlan": "Aktiv plan",
+        "noPlan": "Ingen aktiv plan",
+        "unknownPlan": "Ukjent plan",
+        "noStatus": "Ingen status",
+        "mrr": "MRR",
+        "mrrSubtitle": "Estimert",
+        "totalBilled": "Totalt fakturert",
+        "totalBilledSubtitle": "Sum",
+        "invoicesTitle": "Fakturaer",
+        "noInvoicesTitle": "Ingen fakturaer ennå",
+        "noInvoicesDescription": "Når fakturaer finnes for denne organisasjonen, vises de her.",
+        "invoiceFallbackName": "Faktura"
+      },
+      "analytics": {
+        "pageTitle": "Statistikk",
+        "pageDescription": "Nøkkeltall for organisasjonens bruk.",
+        "noOrganization": {
+          "title": "Ingen organisasjon valgt",
+          "description": "Velg eller bytt organisasjon for å se statistikk."
+        },
+        "error": {
+          "loadFailed": "Kunne ikke laste statistikk",
+          "message": "Kunne ikke laste statistikk akkurat nå."
+        },
+        "loading": "Laster statistikk...",
+        "stats": {
+          "pageViews": "Sidevisninger",
+          "uniqueViews": "Unike: {count}",
+          "sessions": "Økter",
+          "completedSessions": "Fullførte: {count}",
+          "avgTime": "Gjennomsnittlig tid",
+          "avgVisitTime": "Snitt besøkstid: {seconds}s",
+          "avgScore": "Gjennomsnittlig poengsum",
+          "last30Days": "Siste 30 dager"
+        }
+      },
+      "content": {
+        "pageTitle": "Innhold",
+        "pageDescription": "Administrer organisasjonens innhold og bibliotek.",
+        "noOrganization": {
+          "title": "Ingen organisasjon valgt",
+          "description": "Velg eller bytt organisasjon for å se innhold."
+        },
+        "error": {
+          "loadFailed": "Kunne ikke laste innhold",
+          "message": "Kunne ikke laste innhold for organisasjonen."
+        },
+        "search": {
+          "placeholder": "Søk på tittel eller beskrivelse"
+        },
+        "filter": {
+          "allTypes": "Alle typer",
+          "game": "Spill",
+          "lesson": "Leksjon",
+          "resource": "Ressurs"
+        },
+        "loading": "Laster innhold...",
+        "empty": {
+          "title": "Ingen innhold",
+          "description": "Ingen innhold funnet for denne organisasjonen."
+        },
+        "item": {
+          "noDescription": "Ingen beskrivelse",
+          "published": "Publisert",
+          "draft": "Utkast"
+        }
+      },
+      "subscription": {
+        "pageTitle": "Abonnement",
+        "pageDescription": "Abonnementsplan og bruk for organisasjonen.",
+        "noOrganization": {
+          "title": "Ingen organisasjon valgt",
+          "description": "Velg en organisasjon for å se abonnement."
+        },
+        "loading": "Laster abonnement...",
+        "loadingShort": "Laster...",
+        "empty": {
+          "title": "Ingen aktivt abonnement",
+          "description": "Ingen abonnement funnet for denne organisasjonen."
+        },
+        "plan": {
+          "title": "Plan",
+          "noActivePlan": "Ingen aktiv plan",
+          "unknownPlan": "Ukjent plan",
+          "status": "Status: {status}",
+          "period": "Periode: {period}"
+        },
+        "billing": {
+          "title": "Fakturering",
+          "stripeSubscriptionId": "Stripe Subscription ID: {id}",
+          "stripeCustomerId": "Stripe Customer ID: {id}",
+          "usageIncluded": "Bruk inkludert"
+        }
+      },
+      "settings": {
+        "pageTitle": "Innstillinger",
+        "pageDescription": "Administrer organisasjonens innstillinger, merkevarebygging og gamification.",
+        "comingSoon": {
+          "title": "Innstillinger kommer snart",
+          "description": "Her legger vi til merkevarebygging, gamification-konfigurasjon og sikkerhetsinnstillinger."
+        }
+      },
+      "achievements": {
+        "pageTitle": "Utmerkelser",
+        "pageDescription": "Opprett og administrer utmerkelser for {tenantName}",
+        "newButton": "Ny utmerkelse",
+        "noTenant": {
+          "title": "Ingen organisasjon valgt",
+          "description": "Velg en organisasjon for å administrere utmerkelser."
+        },
+        "fetchError": "Kunne ikke hente utmerkelser",
+        "onlyActiveCanBeAwarded": "Kun aktive utmerkelser kan deles ut",
+        "achievementSaved": "Utmerkelse lagret",
+        "statusChangedTo": "Status endret til {status}",
+        "couldNotUpdateStatus": "Kunne ikke oppdatere status",
+        "achievementDeleted": "Utmerkelse slettet",
+        "couldNotDelete": "Kunne ikke slette",
+        "achievementsUpdated": "{count} utmerkelser oppdatert",
+        "couldNotUpdate": "Kunne ikke oppdatere",
+        "awardedTo": "Tildelt til {count} brukere",
+        "awardedWithDuplicates": "Tildelt til {count} brukere ({duplicates} hadde allerede)",
+        "allHadAlready": "Alle {count} brukere hadde allerede denne utmerkelsen",
+        "status": {
+          "all": "Alle statuser",
+          "draft": "Utkast",
+          "draftPlural": "Utkast",
+          "active": "Aktiv",
+          "activePlural": "Aktive",
+          "archived": "Arkivert",
+          "archivedPlural": "Arkiverte"
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktive",
+          "draft": "Utkast",
+          "archived": "Arkiverte"
+        },
+        "search": {
+          "placeholder": "Søk utmerkelser..."
+        },
+        "table": {
+          "name": "Navn",
+          "description": "Beskrivelse",
+          "status": "Status",
+          "noDescription": "–"
+        },
+        "actions": {
+          "edit": "Rediger",
+          "award": "Del ut",
+          "activate": "Aktiver",
+          "archive": "Arkiver",
+          "delete": "Slett"
+        },
+        "empty": {
+          "title": "Ingen utmerkelser funnet",
+          "titleNoAchievements": "Ingen utmerkelser ennå",
+          "filtered": "Juster søkefiltrene eller opprett en ny utmerkelse.",
+          "noAchievements": "Opprett din første utmerkelse for å engasjere deltakerne.",
+          "createButton": "Opprett utmerkelse"
+        },
+        "confirm": {
+          "deleteTitle": "Slett utmerkelse",
+          "archiveTitle": "Arkiver utmerkelse",
+          "activateTitle": "Aktiver utmerkelse",
+          "deleteDescription": "Er du sikker på at du vil slette \"{name}\"? Dette kan ikke angres.",
+          "archiveDescription": "Vil du arkivere \"{name}\"?",
+          "activateDescription": "Vil du aktivere \"{name}\"?",
+          "deleteLabel": "Slett",
+          "confirmLabel": "Bekreft"
+        }
+      }
+    },
+    "conversationCards": {
+      "breadcrumbHome": "Startside",
+      "breadcrumbTitle": "Samtalekort",
+      "pageTitle": "Samtalekort",
+      "pageDescription": "Administrer samtalekortsamlinger (Toolbelt) og importer kort via CSV.",
+      "importButton": "Importer",
+      "createCollectionButton": "Opprett samling",
+      "filterTitle": "Filter",
+      "filterScope": "Omfang",
+      "filterStatus": "Status",
+      "filterMainPurpose": "Hovedformål",
+      "filterSubPurpose": "Underformål",
+      "statusAll": "Alle",
+      "loading": "Laster…",
+      "errorLoadPurposes": "Kunne ikke laste formål",
+      "errorLoadCollections": "Kunne ikke laste samlinger",
+      "errorLoadTitle": "Kunne ikke laste",
+      "noCollections": "Ingen samlinger",
+      "noCollectionsDescription": "Opprett en samling eller endre filter.",
+      "cardsCount": "{count} kort",
+      "editButton": "Rediger",
+      "viewButton": "Vis",
+      "new": {
+        "breadcrumbHome": "Startside",
+        "breadcrumbTitle": "Samtalekort",
+        "breadcrumbNew": "Ny",
+        "breadcrumbCreate": "Opprett samling",
+        "pageTitle": "Opprett samling",
+        "pageDescription": "Opprett en samtalekortsamling (kortstokk).",
+        "noAccessTitle": "Ingen tilgang",
+        "noAccessDescription": "Du har ikke tillatelse for Samtalekort.",
+        "noPermission": "Du har ikke tillatelse til å opprette samlinger.",
+        "selectTenantError": "Velg tenant (mangler i din kontekst).",
+        "couldNotCreate": "Kunne ikke opprette samling",
+        "couldNotSave": "Kunne ikke lagre",
+        "cancel": "Avbryt",
+        "creating": "Oppretter…",
+        "create": "Opprett",
+        "basicInfo": "Grunninfo",
+        "scope": "Omfang",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global",
+        "scopeHint": "Tenant styres av din aktive tenant i Admin.",
+        "status": "Status",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "title": "Tittel",
+        "titlePlaceholder": "Tittel",
+        "language": "Språk",
+        "languagePlaceholder": "no",
+        "description": "Beskrivelse",
+        "descriptionPlaceholder": "Kort beskrivelse (valgfritt)",
+        "audience": "Målgruppe",
+        "audiencePlaceholder": "f.eks. 10–12 år",
+        "purposes": "Formål",
+        "mainPurpose": "Hovedformål",
+        "mainPurposeLoading": "Laster…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Underformål",
+        "noSubPurposes": "Ingen underformål å velge."
+      },
+      "edit": {
+        "breadcrumbHome": "Startside",
+        "breadcrumbCards": "Samtalskort",
+        "breadcrumbLoading": "Laster…",
+        "breadcrumbCollection": "Samling",
+        "loading": "Laster…",
+        "loadError": "Kunne ikke laste",
+        "notFoundTitle": "Ikke funnet",
+        "notFoundDescription": "Samlingen finnes ikke eller du har ikke tilgang.",
+        "pageDescription": "Rediger samling og administrer kort.",
+        "importCsv": "Import (CSV)",
+        "delete": "Slett",
+        "saving": "Lagrer…",
+        "save": "Lagre",
+        "errorTitle": "Noe gikk galt",
+        "basicInfo": "Grunninfo",
+        "viewOnlyNotice": "Du kan se, men ikke redigere, denne samlingen.",
+        "title": "Tittel",
+        "status": "Status",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "language": "Språk",
+        "languagePlaceholder": "no",
+        "audience": "Målgruppe",
+        "audiencePlaceholder": "f.eks. 10–12 år",
+        "description": "Beskrivelse",
+        "descriptionPlaceholder": "Kort beskrivelse (valgfritt)",
+        "purposes": "Formål",
+        "mainPurpose": "Hovedformål",
+        "mainPurposeLoading": "Laster…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Underformål",
+        "noSubPurposes": "Ingen underformål å velge.",
+        "cardsTitle": "Kort",
+        "addCardSection": "Legg til kort",
+        "sortOrder": "Sortering",
+        "cardTitleOptional": "Tittel (valgfritt)",
+        "cardTitle": "Tittel",
+        "primaryPrompt": "Primært spørsmål / prompt",
+        "followup1": "Oppfølging 1",
+        "followup2": "Oppfølging 2",
+        "followup3": "Oppfølging 3",
+        "leaderTip": "Ledertips (valgfritt)",
+        "leaderTipLabel": "Ledertips",
+        "addButton": "Legg til",
+        "setSortToEnd": "Sett sortering til slutten",
+        "noCardsYet": "Ingen kort ennå.",
+        "cardLabel": "Kort",
+        "close": "Lukk",
+        "edit": "Rediger",
+        "deleteCard": "Slett",
+        "saveCard": "Lagre kort",
+        "preview": "Forhåndsvisning",
+        "noCardsToPreview": "Ingen kort å forhåndsvise.",
+        "confirmDeleteCollection": "Slette samlingen? Dette sletter også alle kort i samlingen.",
+        "confirmDeleteCard": "Slette kortet?",
+        "couldNotLoadCollection": "Kunne ikke laste samling",
+        "couldNotSaveCollection": "Kunne ikke lagre samling",
+        "couldNotDeleteCollection": "Kunne ikke slette",
+        "primaryPromptRequired": "primary_prompt er påkrevd",
+        "couldNotCreateCard": "Kunne ikke opprette kort",
+        "couldNotSaveCard": "Kunne ikke lagre kort",
+        "couldNotDeleteCard": "Kunne ikke slette kort"
+      }
+    },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Velkommen til Lekbanken Admin",
@@ -294,6 +930,611 @@
         "productAdminDesc": "Produkter, egenskaper, tilgjengelighet.",
         "achievementsAdmin": "Prestasjonadmin",
         "achievementsAdminDesc": "Badge-bygger og belønninger."
+      }
+    },
+    "webhooks": {
+      "pageTitle": "Webhooks",
+      "pageDescription": "Administrer webhook-endepunkter og logger.",
+      "emptyTitle": "Ingen webhooks konfigurert ennå",
+      "emptyDescription": "Her kan du legge til endepunkter, se leveringsstatus og logger. Backend-integrasjon mangler ennå."
+    },
+    "apiKeys": {
+      "pageTitle": "API-nøkler",
+      "pageDescription": "Administrer API-nøkler og scopes.",
+      "emptyTitle": "Ingen API-nøkler ennå",
+      "emptyDescription": "Her vil du opprette, rotere og begrense nøkler. Backend-integrasjon mangler ennå."
+    },
+    "featureFlags": {
+      "pageTitle": "Feature Flags",
+      "pageDescription": "Administrer systemflagg og utrulling.",
+      "emptyTitle": "Ingen flagg å vise ennå",
+      "emptyDescription": "Flagghåndtering aktiveres når backend-støtte er tilgjengelig. Her kan du toggle, segmentere og versjonsadministrere."
+    },
+    "releaseNotes": {
+      "pageTitle": "Utgivelsesnotater",
+      "pageDescription": "Se og publiser versjonsnyheter.",
+      "emptyTitle": "Ingen utgivelsesnotater ennå",
+      "emptyDescription": "Her kommer versjonshistorikk og redigering/publisering når backend-integrasjon er klar."
+    },
+    "systemHealth": {
+      "pageTitle": "System Health",
+      "pageDescription": "Oversikt over systemets helse og ytelse",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "systemHealth": "System Health"
+      },
+      "notLoggedIn": "Du må være innlogget for å se denne siden.",
+      "autoRefresh": "Automatisk oppdatering (30s)",
+      "refreshNow": "Oppdater nå",
+      "systemStatus": "Systemstatus",
+      "lastChecked": "Sist sjekket: {time}",
+      "version": "Versjon",
+      "status": {
+        "healthy": "Alle systemer fungerer",
+        "degraded": "Redusert ytelse",
+        "unhealthy": "Systemfeil oppdaget"
+      },
+      "checks": {
+        "database": "Database",
+        "storage": "Lagring",
+        "api": "API",
+        "ok": "OK",
+        "error": "Feil",
+        "latency": "{ms}ms forsinkelse",
+        "responding": "Responderer"
+      },
+      "metrics": {
+        "errorsLastHour": "Feil siste time",
+        "activeUsersNow": "Aktive brukere (nå)",
+        "apiLatencyP95": "API Forsinkelse (P95)",
+        "totalFiles": "Totalt filer"
+      },
+      "cards": {
+        "errorRate": "Feilfrekvens",
+        "apiPerformance": "API-ytelse",
+        "users": "Brukere",
+        "storageDatabase": "Lagring & Database"
+      },
+      "timeRanges": {
+        "lastHour": "Siste time",
+        "last24h": "Siste 24t",
+        "last7d": "Siste 7 dager"
+      },
+      "latency": {
+        "p50": "P50 (median)",
+        "p95": "P95",
+        "p99": "P99"
+      },
+      "activeUsers": {
+        "now": "Aktive nå (5 min)",
+        "last24h": "Siste 24t"
+      },
+      "storage": {
+        "totalFiles": "Totalt filer",
+        "databaseRecords": "Database-poster",
+        "connectionPool": "Tilkoblingspool"
+      }
+    },
+    "auditLog": {
+      "pageTitle": "Audit Logs",
+      "pageDescription": "Gjennomgå alle systemaktiviteter og endringer",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "auditLog": "Audit Logs"
+      },
+      "notLoggedIn": "Du må være innlogget for å se denne siden.",
+      "loading": "Laster...",
+      "noEvents": "Ingen aktiviteter funnet",
+      "exportCsv": "Eksporter CSV",
+      "stats": {
+        "totalEvents": "Totalt hendelser",
+        "created": "Opprettet",
+        "updated": "Oppdatert",
+        "deleted": "Slettet"
+      },
+      "filters": {
+        "title": "Filter",
+        "from": "Fra",
+        "to": "Til",
+        "action": "Handling",
+        "resourceType": "Ressurstype",
+        "searchPlaceholder": "Søk i aktiviteter...",
+        "autoApply": "Filtre blir brukt automatisk",
+        "actions": {
+          "all": "Alle",
+          "create": "Opprett",
+          "update": "Oppdater",
+          "delete": "Slett",
+          "login": "Innlogging",
+          "logout": "Utlogging"
+        },
+        "resources": {
+          "all": "Alle",
+          "game": "Spill",
+          "product": "Produkt",
+          "user": "Bruker",
+          "tenant": "Organisasjon",
+          "media": "Media",
+          "achievement": "Prestasjon"
+        }
+      },
+      "table": {
+        "title": "Aktivitetslogg",
+        "eventsCount": "{count} hendelser",
+        "timestamp": "Tidspunkt",
+        "action": "Handling",
+        "resource": "Ressurs",
+        "user": "Bruker",
+        "details": "Detaljer",
+        "showMetadata": "Vis metadata",
+        "system": "System"
+      }
+    },
+    "design": {
+      "mediaDefaults": {
+        "noDefaultProfileImages": "Ingen standard profilbilder lastet opp",
+        "noDefaultCoverImages": "Ingen standard omslagsbilder lastet opp"
+      }
+    },
+    "billing": {
+      "hub": {
+        "pageTitle": "Fakturering",
+        "pageDescription": "Administrer abonnementer, fakturaer og betalinger",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering"
+        },
+        "notLoggedIn": "Du må være logget inn for å se denne siden.",
+        "stats": {
+          "activeSubscriptions": "Aktive abonnementer",
+          "mrr": "MRR",
+          "totalRevenue": "Total inntekt",
+          "paidInvoices": "Betalte fakturaer",
+          "outstanding": "Utestående"
+        },
+        "actions": {
+          "subscriptions": {
+            "title": "Abonnementer",
+            "description": "Administrer kundeabonnementer og planer.",
+            "button": "Vis abonnementer"
+          },
+          "invoices": {
+            "title": "Fakturaer",
+            "description": "Se og administrer kundefakturaer og betalinger.",
+            "button": "Vis fakturaer"
+          },
+          "plans": {
+            "title": "Prisplaner",
+            "description": "Konfigurer abonnementsnivåer og prissetting.",
+            "button": "Administrer planer"
+          },
+          "settings": {
+            "title": "Betalingsinnstillinger",
+            "description": "Konfigurer betalingsmetoder og integrasjoner.",
+            "button": "Innstillinger"
+          }
+        },
+        "about": {
+          "title": "Om fakturering",
+          "paragraph1": "Faktureringsdashboardet gir en oversikt over alle abonnements- og betalingsaktiviteter.",
+          "paragraph2": "Her kan du administrere kundeabonnementer, vise fakturaer, konfigurere prisplaner og overvåke betalingsmetoder.",
+          "note": "MERK: Stripe-integrasjon vil bli aktivert i produksjon. For øyeblikket lagres faktureringsdata i Supabase."
+        }
+      },
+      "subscriptions": {
+        "title": "Abonnementer",
+        "description": "Administrer aktive abonnementer og planer",
+        "emptyTitle": "Ingen abonnementer",
+        "emptyDescription": "Det finnes ingen abonnementer å vise.",
+        "noResultsFor": "Ingen resultater for \"{query}\"",
+        "clearSearch": "Tøm søk",
+        "back": "Tilbake",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering",
+          "subscriptions": "Abonnementer"
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktive",
+          "trial": "Prøveperiode",
+          "mrr": "MRR"
+        },
+        "search": "Søk organisasjon...",
+        "filter": {
+          "all": "Alle statuser",
+          "active": "Aktive",
+          "trial": "Prøveperiode",
+          "paused": "Pausede",
+          "canceled": "Kansellerte"
+        }
+      },
+      "invoices": {
+        "emptyTitle": "Ingen fakturaer",
+        "emptyDescription": "Det finnes ingen fakturaer å vise.",
+        "noResultsFor": "Ingen resultater for \"{query}\"",
+        "clearSearch": "Tøm søk"
+      }
+    },
+    "gamification": {
+      "hub": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification hub"
+        },
+        "pageTitle": "Gamification hub",
+        "pageDescription": "Sentralt nav for alle gamification-funksjoner: progresjon, achievements, belønninger og eksporter.",
+        "stats": {
+          "activePlayers": "Aktive spillere",
+          "totalXpAwarded": "Totalt XP utdelt",
+          "achievementsUnlocked": "Achievements låst opp",
+          "purchasesThisWeek": "Kjøp denne uken"
+        },
+        "status": {
+          "implemented": "Implementert",
+          "partial": "Delvis",
+          "planned": "Planlagt"
+        },
+        "modules": {
+          "dashboard": {
+            "title": "Economy Dashboard",
+            "description": "Overvåk mint/burn-rater, topptjenere og mistenkelig aktivitet i sanntid.",
+            "features": {
+              "mintRate": "Mint Rate",
+              "burnRate": "Burn Rate",
+              "topEarners": "Top Earners",
+              "ruleToggles": "Rule Toggles",
+              "abuseDetection": "Abuse Detection"
+            },
+            "stats": {
+              "activeToday": "Aktive i dag",
+              "net24h": "Netto 24t"
+            }
+          },
+          "dicecoinXp": {
+            "title": "DiceCoin & XP",
+            "description": "Administrer progresjon, nivåer, XP-regler og leaderboards for å engasjere brukere.",
+            "features": {
+              "xpRules": "XP-regler",
+              "levels": "Nivåer",
+              "leaderboards": "Leaderboards",
+              "coinTransactions": "Coin-transaksjoner"
+            },
+            "stats": {
+              "activePlayers": "Aktive spillere",
+              "levels": "Nivåer"
+            }
+          },
+          "achievements": {
+            "title": "Achievements",
+            "description": "Administrer achievements, badges, tiers og belønningskriterier.",
+            "features": {
+              "badgeLibrary": "Badge-bibliotek",
+              "tierSystem": "Tier-system",
+              "triggerRules": "Trigger-regler",
+              "rewardConnection": "Belønningskobling"
+            },
+            "stats": {
+              "badges": "Badges",
+              "activeTriggers": "Aktive triggers"
+            }
+          },
+          "shopRewards": {
+            "title": "Butikk & Belønninger",
+            "description": "Administrer butikk, belønninger, priser og tilgjengelighetsregler.",
+            "features": {
+              "shopItems": "Butikk-items",
+              "pricing": "Prissetting",
+              "inventory": "Inventory",
+              "purchaseHistory": "Kjøpshistorikk"
+            },
+            "stats": {
+              "items": "Items",
+              "purchasesToday": "Kjøp i dag"
+            }
+          },
+          "libraryExports": {
+            "title": "Library Exports",
+            "description": "Eksportpakker fra biblioteket – CSV, PDF og merkede eksporter.",
+            "features": {
+              "exportTemplates": "Eksportmaler",
+              "formatSelection": "Formatvalg",
+              "versioning": "Versjonering",
+              "exportLog": "Eksportlogg"
+            },
+            "stats": {
+              "templates": "Maler",
+              "exports": "Eksporter"
+            }
+          }
+        }
+      },
+      "dicecoinXp": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification hub",
+          "dicecoinXp": "DiceCoin & XP"
+        },
+        "pageTitle": "DiceCoin & XP",
+        "pageDescription": "Administrer XP-triggere, nivåer og ledertavler. Seed alle standard-triggere til databasen.",
+        "actions": {
+          "refresh": "Oppdater",
+          "settings": "Innstillinger"
+        },
+        "stats": {
+          "totalTriggers": "Totalt triggere",
+          "inDatabase": "I databasen",
+          "missing": "Mangler",
+          "levels": "Nivåer"
+        },
+        "tabs": {
+          "xpTriggers": "XP & DiceCoin Triggere",
+          "levels": "Nivåer",
+          "leaderboards": "Ledertavler"
+        },
+        "cooldown": {
+          "none": "Ingen",
+          "daily": "Daglig",
+          "weekly": "Ukentlig",
+          "once": "Én gang",
+          "oncePerStreak": "Per streak"
+        },
+        "categories": {
+          "play": "Spill",
+          "planner": "Planlegger",
+          "engagement": "Engasjement",
+          "content": "Innhold",
+          "social": "Sosialt",
+          "learning": "Læring",
+          "custom": "Egendefinert"
+        },
+        "xpTab": {
+          "searchPlaceholder": "Søk triggere...",
+          "addMissing": "Legg til {count} manglende",
+          "seeding": "Seeder...",
+          "resetAll": "Tilbakestill alle",
+          "createCustom": "Opprett egendefinert trigger",
+          "resetWarning": "Dette vil slette alle standard-triggere og legge dem til på nytt med standardverdier. Egendefinerte triggere beholdes.",
+          "confirmReset": "Ja, tilbakestill",
+          "cancel": "Avbryt",
+          "table": {
+            "status": "Status",
+            "name": "Navn",
+            "eventType": "Event Type",
+            "coins": "Coins",
+            "xp": "XP",
+            "cooldown": "Nedkjøling",
+            "active": "Aktiv",
+            "inactive": "Inaktiv"
+          },
+          "custom": "Egendefinert",
+          "noTriggers": "Ingen triggere funnet"
+        },
+        "levelsTab": {
+          "description": "Nivåer basert på total XP. Nivåbonus aktiveres fra nivå 5 (1.1x) og øker med 0.1x per nivå, maks 2.0x.",
+          "levelPrefix": "Nivå",
+          "reward": "Belønning",
+          "levelNames": {
+            "1": "Nybegynner",
+            "2": "Lærling",
+            "3": "Utforsker",
+            "4": "Eventyrer",
+            "5": "Mester",
+            "6": "Ekspert",
+            "7": "Veteran",
+            "8": "Legende",
+            "9": "Mester",
+            "10": "Stormester"
+          }
+        },
+        "leaderboardsTab": {
+          "description": "Toppliste over brukere basert på total XP. Brukere kan velge å skjule seg fra ledertavler.",
+          "refresh": "Oppdater",
+          "emptyState": "Ingen data ennå. Ledertavlen fylles når brukere tjener XP.",
+          "table": {
+            "rank": "Rangering",
+            "name": "Navn",
+            "xp": "XP",
+            "dicecoin": "DiceCoin"
+          },
+          "anonymous": "Anonym"
+        },
+        "errors": {
+          "generic": "En feil oppstod",
+          "fetchFailed": "Kunne ikke hente regler"
+        }
+      },
+      "achievements": {
+        "emptyTitle": "Ingen achievements"
+      },
+      "shopRewards": {
+        "pageTitle": "Butikk & Belønninger",
+        "pageDescription": "Administrer butikk og belønninger for {tenantName}.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "shopRewards": "Butikk & Belønninger"
+        },
+        "addItem": "Legg til vare",
+        "stats": {
+          "totalItems": "Totalt varer",
+          "available": "Tilgjengelige",
+          "totalSold": "Totalt solgt",
+          "totalRevenue": "Total inntekt"
+        },
+        "currencyWarning": "Du må opprette minst én valuta før du kan legge til butikkvarer.",
+        "goToCurrency": "Gå til Valuta →",
+        "searchPlaceholder": "Søk butikkvarer...",
+        "filters": {
+          "category": "Kategori",
+          "availability": "Tilgjengelighet",
+          "featured": "Fremhevet"
+        },
+        "categories": {
+          "all": "Alle kategorier",
+          "cosmetic": "Kosmetisk",
+          "powerup": "Power-up",
+          "bundle": "Pakke",
+          "seasonPass": "Sesongpass",
+          "avatar": "Avatar",
+          "avatarFrame": "Avatarramme",
+          "background": "Bakgrunn",
+          "title": "Tittel",
+          "badge": "Merke",
+          "hint": "Hint",
+          "skip": "Hopp over",
+          "timeExtend": "Forleng tid",
+          "doubleXp": "Doblet XP",
+          "shield": "Skjold"
+        },
+        "availability": {
+          "all": "Alle",
+          "available": "Tilgjengelige",
+          "unavailable": "Utilgjengelige"
+        },
+        "featuredFilter": {
+          "all": "Alle",
+          "featured": "Fremhevede",
+          "notFeatured": "Ikke fremhevede"
+        },
+        "columns": {
+          "name": "Navn",
+          "category": "Kategori",
+          "price": "Pris",
+          "sales": "Salg",
+          "status": "Status",
+          "actions": "Handlinger"
+        },
+        "status": {
+          "available": "Tilgjengelig",
+          "hidden": "Skjult"
+        },
+        "actions": {
+          "edit": "Rediger",
+          "hide": "Skjul",
+          "show": "Vis",
+          "removeFeatured": "Fjern fremheving",
+          "addFeatured": "Fremhev",
+          "duplicate": "Dupliser",
+          "delete": "Slett",
+          "showInShop": "Vis i butikken",
+          "hideFromShop": "Skjul fra butikken"
+        },
+        "bulkActions": {
+          "itemsHidden": "{count} varer skjult",
+          "itemsVisible": "{count} varer synlige"
+        },
+        "empty": {
+          "title": "Ingen butikkvarer",
+          "noMatch": "Ingen butikkvarer matcher filtrene dine.",
+          "getStarted": "Opprett din første butikkvare for å komme i gang."
+        },
+        "notifications": {
+          "itemSaved": "Butikkvare lagret",
+          "hiddenFromShop": "Skjult fra butikken",
+          "visibleInShop": "Synlig i butikken",
+          "removedFromFeatured": "Fjernet fra fremhevede",
+          "addedToFeatured": "Lagt til som fremhevet",
+          "duplicated": "\"{name}\" duplisert",
+          "deleted": "Butikkvare slettet",
+          "couldNotFetch": "Kunne ikke hente butikkvarer",
+          "couldNotUpdate": "Kunne ikke oppdatere",
+          "couldNotDuplicate": "Kunne ikke duplisere",
+          "couldNotDelete": "Kunne ikke slette",
+          "couldNotHide": "Kunne ikke skjule",
+          "couldNotShow": "Kunne ikke vise"
+        },
+        "confirmDelete": {
+          "title": "Slett butikkvare",
+          "description": "Er du sikker på at du vil slette \"{name}\"? Dette kan ikke angres hvis det ikke finnes kjøp.",
+          "confirm": "Slett"
+        },
+        "featured": "Fremhevet",
+        "tenantSelector": {
+          "title": "Velg organisasjon",
+          "description": "Velg en organisasjon for å administrere butikk og belønninger.",
+          "noAccess": "Du har ikke tilgang til noen organisasjoner."
+        },
+        "loading": "Laster butikkvarer...",
+        "unknownTenant": "Ukjent organisasjon"
+      },
+      "libraryExports": {
+        "pageTitle": "Library Exports",
+        "pageDescription": "Eksportpakker fra biblioteket – CSV, PDF og merkede eksporter.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification Hub",
+          "libraryExports": "Library Exports"
+        },
+        "empty": {
+          "title": "Ingen eksportmaler ennå",
+          "description": "Opprett din første eksportmal for å begynne å eksportere data fra biblioteket.",
+          "createAction": "Opprett eksportmal"
+        },
+        "searchPlaceholder": "Søk maler..."
+      },
+      "achievements": {
+        "pageTitle": "Achievements",
+        "pageDescription": "Administrer achievements, tildel til brukere og konfigurer regler.",
+        "createAchievement": "Opprett achievement",
+        "searchPlaceholder": "Søk achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Rediger",
+          "award": "Tildel",
+          "archive": "Arkiver",
+          "restore": "Gjenopprett",
+          "delete": "Slett"
+        },
+        "filters": {
+          "scope": "Omfang",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "Alle omfang",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Privat"
+        },
+        "statuses": {
+          "all": "Alle statuser",
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        },
+        "notifications": {
+          "saved": "Achievement lagret",
+          "deleted": "Achievement slettet",
+          "fetchFailed": "Kunne ikke hente achievements",
+          "updateStatusFailed": "Kunne ikke oppdatere status",
+          "deleteFailed": "Kunne ikke slette",
+          "archiveFailed": "Kunne ikke arkivere",
+          "activateFailed": "Kunne ikke aktivere"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Slett achievement",
+          "confirmAction": "Bekreft handling",
+          "deleteConfirm": "Er du sikker på at du vil slette dette achievement? Dette kan ikke angres.",
+          "areYouSure": "Er du sikker?",
+          "deleteButton": "Slett",
+          "confirmButton": "Bekreft"
+        },
+        "empty": {
+          "noAchievements": "Ingen achievements",
+          "noMatch": "Ingen achievements matcher filtrene dine.",
+          "getStarted": "Opprett din første achievement for å komme i gang.",
+          "createAction": "Opprett achievement"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        }
       }
     },
     "users": {
@@ -555,6 +1796,26 @@
           "privateUser": "Privat bruker",
           "systemAdmin": "Systemadmin"
         }
+      },
+      "invite": {
+        "title": "Inviter bruker",
+        "description": "Send en invitasjon til å bli med i organisasjonen din med riktig rolle.",
+        "emailLabel": "E-post",
+        "emailPlaceholder": "user@example.com",
+        "nameLabel": "Navn",
+        "nameOptional": "(valgfritt)",
+        "namePlaceholder": "Fullt navn",
+        "roleLabel": "Rolle",
+        "rolePlaceholder": "Velg rolle",
+        "organisationLabel": "Organisasjon",
+        "organisationPlaceholder": "Organisasjonsnavn",
+        "messageLabel": "Personlig melding",
+        "messageOptional": "(valgfritt)",
+        "messagePlaceholder": "Legg til en kort velkomstmelding til den inviterte...",
+        "cancel": "Avbryt",
+        "sending": "Sender...",
+        "submit": "Send invitasjon",
+        "required": "*"
       }
     },
     "games": {
@@ -718,6 +1979,68 @@
           "playMode": "Spillmodus",
           "global": "Global"
         }
+      },
+      "builder": {
+        "artifact": {
+          "newArtifact": "Ny artefakt",
+          "visibility": {
+            "public": "Synlig for alle",
+            "leaderOnly": "Kun leder",
+            "rolePrivate": "Privat for rolle"
+          },
+          "types": {
+            "card": "Kort",
+            "document": "Dokument",
+            "image": "Bilde",
+            "conversationCards": "🗣️ Samtalekort (lek)",
+            "keypad": "🔐 Pinkode (Keypad)",
+            "riddle": "❓ Gåte / Spørsmål",
+            "multiAnswer": "✅ Flervalgssvar",
+            "audio": "🔊 Lydklipp",
+            "hotspot": "🎯 Klikkbart bilde (Hotspot)",
+            "tilePuzzle": "🧩 Puslespill",
+            "cipher": "🔤 Kryptering / Chiffer",
+            "logicGrid": "🧠 Logikkrutenett",
+            "counter": "🔢 Teller",
+            "qrGate": "📱 QR/NFC-skanning",
+            "hintContainer": "💡 Tips-beholder",
+            "propConfirmation": "📦 Rekvisitt-bekreftelse",
+            "locationCheck": "📍 Stedsverifisering",
+            "soundLevel": "🎤 Lydnivå-detektor",
+            "replayMarker": "⏱️ Replay-markør",
+            "signalGenerator": "📢 Signalgenerator",
+            "timeBankStep": "⏳ Tidsbank / Final timer",
+            "emptyArtifact": "📦 Tom slot (placeholder)"
+          },
+          "errors": {
+            "loadConversationDecks": "Kunne ikke laste samtalekort-dekker"
+          }
+        },
+        "trigger": {
+          "newTrigger": "Ny trigger",
+          "addTrigger": "Legg til trigger",
+          "noTriggers": "Ingen triggere ennå.",
+          "noTriggersHint": "Triggere automatiserer leken: \"Når X skjer, gjør Y\"",
+          "unnamedTrigger": "Navnløs trigger",
+          "inactive": "Inaktiv",
+          "onceLabel": "Én gang",
+          "activeLabel": "Aktiv",
+          "onceCheckboxLabel": "Én gang",
+          "autoDisable": "Deaktiveres automatisk etter første kjøring",
+          "delayLabel": "Forsinkelse",
+          "seconds": "sekunder",
+          "step": "Steg {number}",
+          "addActionPlaceholder": "+ Legg til handling...",
+          "templates": "Maler",
+          "howItWorks": {
+            "title": "Hvordan triggere fungerer",
+            "description": "Triggere automatiserer leken: når en betingelse er oppfylt (f.eks. et steg fullføres eller tiden går ut) utføres en eller flere handlinger automatisk.",
+            "example": "Når 5 minutter gjenstår → Vis et hint"
+          },
+          "import": {
+            "error": "Importfeil"
+          }
+        }
       }
     },
     "achievements": {
@@ -745,6 +2068,49 @@
           "useForeground": "Bruk forgrunn",
           "useSymbol": "Bruk symbol"
         }
+      },
+      "metadata": {
+        "title": "Tittel",
+        "titlePlaceholder": "Badge-tittel",
+        "subtitle": "Undertittel",
+        "subtitlePlaceholder": "Kort undertittel",
+        "description": "Beskrivelse",
+        "descriptionPlaceholder": "Beskriv hvordan man oppnår denne prestasjonen.",
+        "rewardCoins": "Belønning (coins)",
+        "status": "Status",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "publishingRoles": "Publiseringsroller",
+        "addRole": "Legg til rolle",
+        "availableForOrgs": "Tilgjengelig for organisasjoner (IDer, kommaseparert)",
+        "orgsPlaceholder": "org-1, org-2",
+        "roles": {
+          "admin": "Admin",
+          "creator": "Skaper",
+          "org_admin": "Org-admin"
+        }
+      },
+      "page": {
+        "title": "Achievements",
+        "description": "Bygg lagdelte merker, tildel temaer og administrer belønninger",
+        "createAchievement": "Opprett Achievement",
+        "breadcrumbs": {
+          "home": "Hjem",
+          "achievements": "Achievements"
+        },
+        "badgeLibrary": "Badge Library",
+        "achievementCount": "{count} achievement",
+        "achievementCountPlural": "{count} achievements",
+        "published": "publisert",
+        "drafts": "utkast",
+        "badgeBuilder": "Badge Builder",
+        "createNewBadge": "Opprett nytt merke",
+        "editBadge": "Rediger merke",
+        "editing": "Redigerer: {title}",
+        "untitled": "Uten tittel",
+        "visualBadgeConstruction": "Visuell merkekonstruksjon og metadata",
+        "selectOrCreate": "Velg eller opprett en achievement",
+        "selectOrCreateDescription": "Velg et merke fra biblioteket over eller opprett et nytt for å begynne å bygge lagene, fargene og metadataene."
       }
     },
     "organizations": {
@@ -780,7 +2146,144 @@
       "suspend": "Suspender",
       "overview": "Oversikt",
       "statusChanged": "Status endret til {status}",
-      "couldNotChangeStatus": "Kunne ikke endre status"
+      "couldNotChangeStatus": "Kunne ikke endre status",
+      "toolbar": {
+        "searchPlaceholder": "Søk organisasjoner...",
+        "searchAriaLabel": "Søk organisasjoner",
+        "billing": {
+          "all": "Alle faktureringsmodi",
+          "connected": "Fakturering tilkoblet",
+          "notConnected": "Ingen fakturering"
+        },
+        "domain": {
+          "all": "Alle domener",
+          "yes": "Har eget domene",
+          "no": "Ingen domene"
+        },
+        "sort": {
+          "recent": "Nyeste først",
+          "name": "Navn A–Å",
+          "members": "Flest medlemmer",
+          "updated": "Sist oppdatert"
+        },
+        "statusLabel": "Status",
+        "billingLabel": "Fakturering",
+        "languageLabel": "Språk",
+        "domainLabel": "Domene",
+        "sortLabel": "Sortering",
+        "clear": "Tøm",
+        "clearWithCount": "Tøm ({count})"
+      },
+      "detail": {
+        "copied": "Kopiert til utklippstavlen",
+        "copiedWithLabel": "{label} kopiert"
+      },
+      "create": {
+        "title": "Opprett organisasjon",
+        "description": "Legg til en ny organisasjon og oppgi kontaktinformasjon.",
+        "nameLabel": "Organisasjonsnavn",
+        "namePlaceholder": "Organisasjon AS",
+        "slugLabel": "Slug",
+        "slugOptional": "(valgfritt)",
+        "slugPlaceholder": "organisasjon-as",
+        "slugHint": "La stå tomt for auto-slug.",
+        "contactPerson": "Kontaktperson",
+        "contactPersonPlaceholder": "Navn",
+        "contactEmail": "Kontakt-e-post",
+        "contactEmailPlaceholder": "email@example.com",
+        "phone": "Telefon",
+        "phoneOptional": "(valgfritt)",
+        "phonePlaceholder": "+47 ...",
+        "status": "Status",
+        "statusPlaceholder": "Velg status",
+        "cancel": "Avbryt",
+        "creating": "Oppretter...",
+        "submit": "Opprett organisasjon",
+        "required": "*"
+      },
+      "members": {
+        "title": "Medlemmer",
+        "addMember": "Legg til medlem",
+        "addMemberDescription": "Søk etter en eksisterende bruker via e-post og legg dem direkte til i organisasjonen.",
+        "searchByEmail": "Søk bruker via e-post",
+        "searchPlaceholder": "navn@eksempel.no",
+        "searching": "Søker...",
+        "search": "Søk",
+        "noUserFound": "Ingen bruker funnet med den e-postadressen",
+        "searchFailed": "Kunne ikke søke etter brukere",
+        "searchResults": "Søkeresultater",
+        "alreadyMember": "Allerede medlem",
+        "role": "Rolle",
+        "roleOwner": "Eier",
+        "roleAdmin": "Admin",
+        "roleMember": "Medlem",
+        "cancel": "Avbryt",
+        "adding": "Legger til...",
+        "addMemberButton": "Legg til medlem",
+        "memberAdded": "{name} lagt til som {role}",
+        "alreadyMemberError": "Brukeren er allerede medlem av organisasjonen",
+        "addFailed": "Kunne ikke legge til medlem",
+        "loadFailed": "Kunne ikke laste medlemmer",
+        "unknown": "Ukjent",
+        "statsTotal": "Totalt",
+        "statsOwners": "Eiere",
+        "statsAdmins": "Admins",
+        "statsPending": "Ventende",
+        "membersCount": "Medlemmer ({count})",
+        "searchNameOrEmail": "Søk på navn eller e-post...",
+        "allRoles": "Alle roller",
+        "loading": "Laster medlemmer...",
+        "noMembersMatch": "Ingen medlemmer matcher filtrene",
+        "noMembersYet": "Ingen medlemmer i organisasjonen",
+        "tableUser": "Bruker",
+        "tableRole": "Rolle",
+        "tableMemberSince": "Medlem siden",
+        "tableActions": "Handlinger",
+        "primary": "Primær",
+        "makeOwner": "Gjør til eier",
+        "makeAdmin": "Gjør til admin",
+        "makeMember": "Gjør til medlem",
+        "removeFromOrg": "Fjern fra organisasjon",
+        "confirmRemove": "Er du sikker på at du vil fjerne {name} fra organisasjonen?",
+        "cannotRemoveOnlyOwner": "Kan ikke fjerne den eneste eieren",
+        "memberRemoved": "Medlem fjernet",
+        "removeFailed": "Kunne ikke fjerne medlem",
+        "roleChanged": "Rolle endret til {role}",
+        "roleChangeFailed": "Kunne ikke endre rolle"
+      },
+      "audit": {
+        "title": "Aktivitetslogg",
+        "titleWithCount": "Aktivitetslogg ({count})",
+        "loadFailed": "Kunne ikke laste aktivitetslogg",
+        "loading": "Laster hendelser...",
+        "noEventsOfType": "Ingen hendelser av denne typen",
+        "noActivity": "Ingen aktivitet registrert",
+        "showingRange": "Viser {from}–{to} av {total}",
+        "allEvents": "Alle hendelser",
+        "event": "Hendelse",
+        "justNow": "Akkurat nå",
+        "minAgo": "{min} min siden",
+        "hoursAgo": "{hours}t siden",
+        "daysAgo": "{days}d siden",
+        "enabled": "aktivert",
+        "disabled": "deaktivert",
+        "events": {
+          "statusChanged": "Status endret",
+          "memberAdded": "Medlem lagt til",
+          "memberRemoved": "Medlem fjernet",
+          "memberRoleChanged": "Rolle endret",
+          "settingsUpdated": "Innstillinger oppdatert",
+          "domainAdded": "Domene lagt til",
+          "domainRemoved": "Domene fjernet",
+          "domainStatusChanged": "Domenestatus endret",
+          "brandingUpdated": "Branding oppdatert",
+          "brandingLogoUpdated": "Logo oppdatert",
+          "localeUpdated": "Språk oppdatert",
+          "featureToggled": "Funksjon endret",
+          "organisationSuspended": "Organisasjon suspendert",
+          "organisationArchived": "Organisasjon arkivert"
+        }
+      }
     },
     "products": {
       "title": "Produkter",
@@ -790,6 +2293,82 @@
       "description": "Administrer produkter, lisenser og formål – alt som selges og kategoriseres i Lekbanken.",
       "productsAndContent": "Produkter & Innhold",
       "createProduct": "Opprett produkt",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "productsAndContent": "Produkter & Innhold",
+        "products": "Produkter"
+      },
+      "stats": {
+        "products": "Produkter",
+        "activeProducts": "Aktive produkter",
+        "licenses": "Lisenser",
+        "purposes": "Formål",
+        "mainPurposes": "Hovedformål"
+      },
+      "tabs": {
+        "products": "Produkter",
+        "licenses": "Lisenser",
+        "purposes": "Formål"
+      },
+      "productsTab": {
+        "searchPlaceholder": "Søk produkter...",
+        "newProduct": "Nytt produkt",
+        "noMatchingProducts": "Ingen matchende produkter",
+        "noProductsYet": "Ingen produkter ennå",
+        "adjustSearch": "Juster søket for å se flere.",
+        "createFirstProduct": "Opprett ditt første produkt.",
+        "createProduct": "Opprett produkt",
+        "loadError": "Kunne ikke laste produkter.",
+        "retry": "Prøv igjen",
+        "view": "Vis",
+        "edit": "Rediger",
+        "delete": "Slett",
+        "statusActive": "Aktiv",
+        "statusInactive": "Inaktiv",
+        "statusDraft": "Utkast",
+        "statusArchived": "Arkivert"
+      },
+      "licensesTab": {
+        "searchPlaceholder": "Søk lisenser...",
+        "newLicense": "Ny lisens",
+        "noMatchingLicenses": "Ingen matchende lisenser",
+        "noLicensesYet": "Ingen lisenser ennå",
+        "adjustSearch": "Juster søket for å se flere.",
+        "createFirstLicense": "Opprett din første lisens.",
+        "createLicense": "Opprett lisens",
+        "loadError": "Kunne ikke laste lisenser.",
+        "retry": "Prøv igjen",
+        "viewDetails": "Vis detaljer",
+        "edit": "Rediger",
+        "terminateLicense": "Avslutt lisens",
+        "plan": "Plan",
+        "seats": "Plasser",
+        "expires": "Utløper",
+        "autoRenewal": "Auto-fornyelse",
+        "toProduct": "→ Produkt",
+        "statusActive": "Aktiv",
+        "statusTrial": "Prøveperiode",
+        "statusExpired": "Utløpt",
+        "statusSuspended": "Suspendert"
+      },
+      "purposesTab": {
+        "searchPlaceholder": "Søk formål...",
+        "newPurpose": "Nytt formål",
+        "noMatchingPurposes": "Ingen matchende formål",
+        "noPurposesYet": "Ingen formål ennå",
+        "adjustSearch": "Juster søket for å se flere.",
+        "createFirstPurpose": "Opprett ditt første formål.",
+        "createPurpose": "Opprett formål",
+        "loadError": "Kunne ikke laste formål.",
+        "retry": "Prøv igjen",
+        "viewDetails": "Vis detaljer",
+        "edit": "Rediger",
+        "delete": "Slett",
+        "under": "Under: {parent}",
+        "productsCount": "{count} produkter",
+        "typeMain": "Hovedformål",
+        "typeSub": "Delformål"
+      },
       "categories": "Kategorier",
       "noCategories": "Ingen kategorier",
       "createProductForCategories": "Opprett minst ett produkt for å se kategorier.",
@@ -810,7 +2389,515 @@
       "mainPurpose": "Hovedformål",
       "select": "Velg",
       "selectDefaultImage": "Velg standardbilde (kommer snart)",
-      "apiReadyNote": "Når API-et er klart, kobles dette til media-picker og lagres i mappetabellen."
+      "apiReadyNote": "Når API-et er klart, kobles dette til media-picker og lagres i mappetabellen.",
+      "page": {
+        "title": "Produkter",
+        "description": "Konfigurer produkter, moduler og deres funksjoner",
+        "loading": "Laster produkter...",
+        "noAccess": "Ingen tilgang",
+        "noAccessDesc": "Du må være innlogget for å administrere produkter.",
+        "goToLogin": "Gå til innlogging",
+        "createProduct": "Opprett produkt",
+        "totalProducts": "Totalt produkter",
+        "activeCount": "Aktive",
+        "inactiveCount": "Inaktive",
+        "draftCount": "Utkast"
+      },
+      "v2": {
+        "pageTitle": "Produkter",
+        "pageDescription": "Administrer produktkatalogen – priser, rettigheter og Stripe-integrasjon.",
+        "breadcrumbs": {
+          "home": "Hjem",
+          "products": "Produkter"
+        },
+        "noAccess": {
+          "title": "Ingen tilgang",
+          "description": "Du trenger administratortilgang for å administrere produkter."
+        },
+        "stats": {
+          "total": "Totalt",
+          "active": "Aktive",
+          "draft": "Utkast",
+          "missingStripe": "Mangler Stripe"
+        },
+        "filters": {
+          "searchPlaceholder": "Søk produkter...",
+          "active": "Aktive",
+          "draft": "Utkast",
+          "missingStripe": "Mangler Stripe",
+          "drift": "Avvik",
+          "unhealthy": "Problemer"
+        },
+        "bulk": {
+          "selected": "{count} av {total} valgt",
+          "clear": "Tøm",
+          "selectAll": "Velg alle",
+          "activate": "Aktiver",
+          "archive": "Arkiver",
+          "syncStripe": "Synk Stripe",
+          "validate": "Valider",
+          "export": "Eksporter",
+          "actionSuccess": "Handling utført på {count} produkter",
+          "actionFailed": "Handlingen mislyktes"
+        },
+        "table": {
+          "title": "Produktoversikt",
+          "name": "Navn",
+          "key": "Nøkkel",
+          "type": "Type",
+          "status": "Status",
+          "price": "Pris",
+          "stripe": "Stripe",
+          "orgs": "Org.",
+          "health": "Helse",
+          "updated": "Oppdatert",
+          "selectProduct": "Velg {name}",
+          "viewProduct": "Vis produkt",
+          "syncWithStripe": "Synk med Stripe"
+        },
+        "empty": {
+          "title": "Ingen produkter matcher filtrene",
+          "description": "Juster filtre eller legg til et nytt produkt."
+        },
+        "error": {
+          "loadFailed": "Kunne ikke laste produkter"
+        },
+        "actions": {
+          "export": "Eksporter",
+          "import": "Importer",
+          "newProduct": "Nytt produkt"
+        },
+        "status": {
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "draft": "Utkast",
+          "archived": "Arkivert"
+        },
+        "type": {
+          "license": "Lisens",
+          "module": "Modul",
+          "addon": "Tillegg",
+          "usage_based": "Forbruksbasert",
+          "one_time": "Engangskjøp",
+          "subscription": "Abonnement"
+        },
+        "stripeLinkage": {
+          "connected": "Koblet",
+          "missing": "Mangler",
+          "drift": "Avvik",
+          "error": "Feil"
+        },
+        "health": {
+          "ok": "OK",
+          "missing_fields": "Manglende felt",
+          "stripe_drift": "Stripe-avvik",
+          "availability_misconfig": "Tilgjengelighetsfeil",
+          "no_price": "Ingen pris"
+        },
+        "priceManager": {
+          "changeDefault": {
+            "title": "Endre standardpris?",
+            "description": "Det finnes allerede en standardpris for {currency} ({interval}):",
+            "current": "Nåværende:",
+            "new": "Ny:",
+            "cancel": "Avbryt",
+            "confirm": "Endre standardpris"
+          },
+          "activePrices": "Aktive priser ({count})",
+          "addPrice": "Legg til pris",
+          "cancel": "Avbryt",
+          "noPrices": {
+            "title": "Ingen priser konfigurert",
+            "description": "Legg til en pris for å synkronisere til Stripe"
+          },
+          "priceCount": "{count} pris",
+          "priceCountPlural": "{count} priser",
+          "archivedPrices": "Arkiverte priser ({count})",
+          "archived": "Arkivert",
+          "syncWarning": {
+            "title": "⚠️ Produktet er ikke synkronisert til Stripe",
+            "description": "Prisene synkroniseres når produktet først synkroniseres."
+          },
+          "tooltips": {
+            "defaultPrice": "Standardpris",
+            "makeDefault": "Gjør til standardpris",
+            "taxBehaviorLocked": "Momsoppførsel kan ikke endres etter at prisen er synkronisert til Stripe"
+          },
+          "badges": {
+            "synced": "Synkronisert",
+            "notSynced": "Ikke synkronisert",
+            "trial": "{days}d prøveperiode"
+          },
+          "form": {
+            "amount": "Beløp",
+            "amountPlaceholder": "299.00",
+            "currency": "Valuta",
+            "billing": "Fakturering",
+            "taxBehavior": "Momsbehandling",
+            "taxWarning": "Kan ikke endres etter synkronisering",
+            "nickname": "Kallenavn (valgfritt)",
+            "nicknamePlaceholder": "f.eks. Early Bird",
+            "trialPeriod": "Prøveperiode (dager)",
+            "trialPeriodNote": "(ikke for engangskjøp)",
+            "trialPeriodHint": "0 = ingen prøveperiode",
+            "trialOnlySubscriptions": "Kun for abonnementer",
+            "isDefault": "Standardpris for denne valuta/intervall",
+            "creating": "Oppretter...",
+            "create": "Opprett pris"
+          },
+          "messages": {
+            "priceArchived": "Prisen arkivert",
+            "archiveFailed": "Kunne ikke arkivere prisen",
+            "defaultUpdated": "Standardpris oppdatert",
+            "defaultUpdateFailed": "Kunne ikke oppdatere standardpris",
+            "priceCreated": "Pris opprettet",
+            "priceCreatedAndSynced": "Pris opprettet og synkronisert til Stripe",
+            "createFailed": "Kunne ikke opprette pris",
+            "taxWarningAfterSync": "OBS: Momsoppførsel kan ikke endres etter synkronisering til Stripe",
+            "invalidAmount": "Angi et gyldig beløp",
+            "trialOnlyRecurring": "Prøveperiode kan kun brukes for abonnementer"
+          },
+          "confirm": {
+            "archivePrice": "Er du sikker på at du vil arkivere denne prisen?"
+          }
+        },
+        "stripeTab": {
+          "title": "Stripe-synkroniserte felt",
+          "metadataTitle": "Stripe Metadata",
+          "messages": {
+            "statementDescriptorTooLong": "Kontoutskriftstekst må være maks 22 tegn",
+            "imageUrlMustBeHttps": "Bilde-URL må starte med https://",
+            "couldNotSave": "Kunne ikke lagre",
+            "savedLocally": "Endringer lagret lokalt",
+            "rememberToSync": "Husk å synkronisere til Stripe",
+            "syncFailed": "Synkronisering mislyktes",
+            "syncSuccess": "Produktet synkronisert til Stripe",
+            "couldNotSync": "Kunne ikke synkronisere til Stripe"
+          },
+          "fields": {
+            "productImage": "Produktbilde",
+            "productImageDescription": "Vises i Stripe Checkout og på fakturaer",
+            "productImageAlt": "Produktbilde",
+            "unitLabel": "Enhetsetikett",
+            "unitLabelDescription": "Vises på faktura: \"3 {unit}s × 299 kr\"",
+            "statementDescriptor": "Kontoutskriftstekst",
+            "statementDescriptorDescription": "Tekst som vises på kundens kontoutskrift (maks 22 tegn)",
+            "statementDescriptorPlaceholder": "F.eks. LEKBANKEN BASKET",
+            "statementDescriptorCount": "{count}/22 tegn",
+            "featureTier": "Funksjonsnivå",
+            "featureTierDescription": "Styrer hvilke funksjoner som inkluderes",
+            "stripeProductId": "Stripe Product ID",
+            "lastSynced": "Sist synkronisert",
+            "neverSynced": "Aldri synkronisert"
+          },
+          "actions": {
+            "info": "<strong>Lagre</strong> lagrer endringer lokalt. <strong>Synkroniser til Stripe</strong> pusher alle endringer til Stripe.",
+            "reset": "Tilbakestill",
+            "saveLocal": "Lagre lokalt",
+            "saving": "Lagrer...",
+            "syncToStripe": "Synkroniser til Stripe",
+            "syncing": "Synkroniserer..."
+          },
+          "status": {
+            "notConnected": "Ikke koblet til Stripe",
+            "synced": "Synkronisert med Stripe",
+            "syncLocked": "Synkronisering låst - kontakt support",
+            "syncError": "Synkroniseringsfeil",
+            "unsyncedChanges": "Lokale endringer ikke synkronisert",
+            "lastSynced": "Sist: {date}",
+            "creating": "Oppretter...",
+            "createInStripe": "Opprett i Stripe"
+          }
+        },
+        "detail": {
+          "tabs": {
+            "overview": "Oversikt",
+            "pricing": "Priser",
+            "stripe": "Stripe",
+            "settings": "Innstillinger",
+            "availability": "Tilgjengelighet",
+            "entitlements": "Regler",
+            "lifecycle": "Livssyklus"
+          },
+          "breadcrumbs": {
+            "home": "Startsiden",
+            "products": "Produkter"
+          },
+          "header": {
+            "productKey": "Produktnøkkel: {key}",
+            "back": "Tilbake",
+            "activate": "Aktiver",
+            "archive": "Arkiver",
+            "syncStripe": "Synkroniser Stripe",
+            "forceSync": "Tving synkronisering"
+          },
+          "overview": {
+            "issues": "problemer",
+            "stats": {
+              "prices": "Priser",
+              "entitlements": "Entitlements",
+              "organizations": "Organisasjoner",
+              "lastUpdated": "Sist oppdatert"
+            },
+            "healthIssues": "Helseproblemer",
+            "quickActions": "Hurtighandlinger",
+            "managePrices": "Administrer priser",
+            "stripeSettings": "Stripe-innstillinger",
+            "readyForPublish": "Klar for publisering",
+            "notReadyForPublish": "Ikke klar for publisering",
+            "viewChecklist": "Vis sjekkliste",
+            "basicInfo": "Grunnleggende informasjon",
+            "uuid": "UUID",
+            "productKey": "Produktnøkkel",
+            "type": "Type",
+            "category": "Kategori",
+            "status": "Status",
+            "stripeStatus": "Stripe-status",
+            "linkage": "Kobling",
+            "stripeId": "Stripe ID",
+            "notLinked": "Ikke koblet",
+            "lastSynced": "Sist synkronisert",
+            "activePrices": "Aktive priser",
+            "unitLabel": "Enhetsetikett",
+            "descriptions": "Beskrivelser",
+            "internalDescription": "Intern beskrivelse",
+            "customerDescription": "Kundebeskrivelse"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe-kobling"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements",
+            "noEntitlements": "Ingen entitlements konfigurert",
+            "enabled": "Aktivert",
+            "disabled": "Deaktivert",
+            "dependencies": "Avhengigheter",
+            "noDependencies": "Ingen avhengigheter konfigurert",
+            "requires": "Krever",
+            "excludes": "Ekskluderer"
+          },
+          "availability": {
+            "scope": "Tilgjengelighetsomfang",
+            "scopeLabel": "Omfang",
+            "description": "Beskrivelse",
+            "licenseModel": "Lisensmodell",
+            "perTenant": "Per organisasjon",
+            "perSeat": "Per sete",
+            "perUser": "Per bruker",
+            "minSeats": "Min seter",
+            "maxSeats": "Maks seter",
+            "tenantAssignments": "Organisasjonstildelinger",
+            "orgs": "{count} org",
+            "noTenants": "Ingen organisasjoner tildelt",
+            "availableForAll": "Produktet er tilgjengelig for alle",
+            "addOrgsForAccess": "Legg til organisasjoner for å gi tilgang",
+            "active": "Aktiv",
+            "pending": "Venter",
+            "aboutAvailability": "Om tilgjengelighet",
+            "globalDescription": "Produktet er tilgjengelig for alle kunder og kan kjøpes via checkout.",
+            "tenantSpecificDescription": "Kun tildelt til spesifikke organisasjoner via direktesalg.",
+            "regionalDescription": "Begrenset til spesifikke geografiske regioner (f.eks. Norden).",
+            "global": "Global",
+            "tenantSpecific": "Tenant-spesifikk",
+            "regional": "Regional"
+          },
+          "lifecycle": {
+            "currentState": "Nåværende tilstand",
+            "canActivate": "Kan aktiveres",
+            "canArchive": "Kan arkiveres",
+            "yes": "Ja",
+            "no": "Nei",
+            "activating": "Aktiverer...",
+            "activate": "Aktiver",
+            "deactivating": "Deaktiverer...",
+            "deactivate": "Deaktiver",
+            "archiving": "Arkiverer...",
+            "archive": "Arkiver",
+            "created": "Opprettet",
+            "updated": "Oppdatert",
+            "publishChecklist": "Publiseringssjekkliste",
+            "hasValidPrice": "Har gyldig pris",
+            "availabilityRulesOk": "Tilgjengelighetsregler OK",
+            "stripeLinkageOk": "Stripe-kobling OK",
+            "readyForPublish": "Klar for publisering",
+            "notReadyForPublish": "Ikke klar for publisering",
+            "eventLog": "Hendelseslogg",
+            "events": "{count} hendelser",
+            "noEvents": "Ingen loggede hendelser",
+            "changedFields": "Endrede felt: {fields}",
+            "error": "Feil: {error}",
+            "statusChangeFailed": "Kunne ikke endre status",
+            "statusChangedTo": "Status endret til {status}",
+            "statusActive": "aktiv",
+            "statusInactive": "inaktiv",
+            "statusArchived": "arkivert"
+          },
+          "audit": {
+            "recentEvents": "Nylige hendelser",
+            "noEvents": "Ingen loggede hendelser"
+          },
+          "settings": {
+            "title": "Produktinnstillinger",
+            "customerDescription": "Kundebeskrivelse",
+            "customerDescriptionHint": "Synkroniseres til Stripe som produktbeskrivelse",
+            "customerDescriptionPlaceholder": "Beskrivelse som vises for kunder...",
+            "minSeats": "Min seter",
+            "minSeatsHint": "Minste antall ved kjøp",
+            "maxSeats": "Maks seter",
+            "maxSeatsHint": "Høyeste antall ved kjøp",
+            "reset": "Tilbakestill",
+            "saving": "Lagrer...",
+            "saveChanges": "Lagre endringer",
+            "aboutSettings": "Om innstillinger",
+            "aboutCustomerDescription": "Synkroniseres til Stripe som produktbeskrivelse ved neste Stripe-synkronisering.",
+            "aboutSeats": "Begrenser hvor mange seter en kunde kan kjøpe. Brukes for salgslogikk og validering.",
+            "stripeFieldsNote": "💡 Stripe-spesifikke felt finnes nå i den dedikerte <strong>Stripe</strong>-fanen.",
+            "minSeatsError": "Min seter må være minst 1",
+            "maxSeatsError": "Maks seter må være større enn eller lik min seter",
+            "saveError": "Kunne ikke lagre",
+            "saved": "Innstillinger lagret",
+            "saveSettingsError": "Kunne ikke lagre innstillinger"
+          },
+          "errors": {
+            "loadFailed": "Kunne ikke laste produkt",
+            "notFound": "Produktet ble ikke funnet",
+            "statusUpdateFailed": "Kunne ikke oppdatere status",
+            "syncFailed": "Kunne ikke synkronisere"
+          },
+          "sync": {
+            "alreadySynced": "Produktet er allerede synkronisert",
+            "created": "Synkronisering opprettet",
+            "updated": "Synkronisering oppdatert",
+            "statusUpdated": "Status oppdatert til {status}"
+          }
+        },
+        "drawer": {
+          "copied": "Kopiert til utklippstavlen",
+          "copyTooltip": "Kopier {label}",
+          "tabs": {
+            "overview": "Oversikt",
+            "pricing": "Prissetting",
+            "entitlements": "Entitlements",
+            "availability": "Tilgjengelighet",
+            "lifecycle": "Livssyklus",
+            "audit": "Logg"
+          },
+          "quickActions": {
+            "edit": "Rediger",
+            "activate": "Aktiver",
+            "archive": "Arkiver",
+            "sync": "Synkroniser"
+          },
+          "messages": {
+            "statusUpdated": "Status oppdatert til {status}",
+            "statusUpdateFailed": "Kunne ikke oppdatere status",
+            "syncStarted": "Synkronisering startet",
+            "syncFailed": "Kunne ikke synkronisere"
+          },
+          "overview": {
+            "issues": "problemer",
+            "stats": {
+              "prices": "Priser",
+              "entitlements": "Entitlements",
+              "organizations": "Organisasjoner",
+              "lastUpdated": "Sist oppdatert"
+            },
+            "basicInfo": "Grunnleggende informasjon",
+            "uuid": "UUID",
+            "productKey": "Produktnøkkel",
+            "type": "Type",
+            "category": "Kategori",
+            "status": "Status",
+            "stripe": "Stripe",
+            "descriptions": "Beskrivelser",
+            "internalDescription": "Intern beskrivelse",
+            "customerDescription": "Kundebeskrivelse",
+            "tags": "Tagger",
+            "healthIssues": "Helseproblemer",
+            "editProduct": "Rediger produkt"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe-kobling",
+            "status": "Status",
+            "stripeProductId": "Stripe Product ID",
+            "notLinked": "Ikke koblet",
+            "lastSynced": "Sist synkronisert",
+            "activePrices": "Aktive priser",
+            "driftDetection": "Avvik mot Stripe",
+            "driftField": "Felt",
+            "driftLocal": "Lokalt",
+            "driftStripe": "Stripe",
+            "pricesTitle": "Priser ({count})",
+            "addPrice": "Legg til pris",
+            "noPrices": "Ingen priser konfigurert",
+            "tableAmount": "Beløp",
+            "tableInterval": "Intervall",
+            "tableStripeId": "Stripe ID",
+            "tableStatus": "Status",
+            "tableActions": "Handlinger",
+            "default": "Standard",
+            "active": "Aktiv",
+            "inactive": "Inaktiv",
+            "edit": "Rediger",
+            "syncStripe": "Synkroniser med Stripe"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements ({count})",
+            "add": "Legg til",
+            "noEntitlements": "Ingen entitlements konfigurert",
+            "noEntitlementsHint": "Definer hvilke funksjoner dette produktet låser opp",
+            "enabled": "Aktivert",
+            "disabled": "Deaktivert",
+            "dependencies": "Avhengigheter",
+            "noDependencies": "Ingen avhengigheter konfigurert",
+            "requires": "Krever",
+            "excludes": "Ekskluderer"
+          },
+          "availability": {
+            "scope": "Tilgjengelighetsomfang",
+            "scopeLabel": "Omfang",
+            "description": "Beskrivelse",
+            "licenseModel": "Lisensmodell",
+            "perTenant": "Per organisasjon",
+            "perSeat": "Per sete",
+            "perUser": "Per bruker",
+            "tenantAssignments": "Organisasjonstildelinger ({count})",
+            "assign": "Tildel",
+            "noTenants": "Ingen organisasjoner tildelt",
+            "tableOrganization": "Organisasjon",
+            "tableStatus": "Status",
+            "tableStripe": "Stripe",
+            "tableAssigned": "Tildelt",
+            "statusActive": "Aktiv",
+            "statusPending": "Venter",
+            "statusRevoked": "Tilbakekalt",
+            "stripeLinked": "Koblet",
+            "stripeMissing": "Mangler"
+          },
+          "lifecycle": {
+            "currentState": "Nåværende tilstand",
+            "status": "Status",
+            "canActivate": "Kan aktiveres",
+            "canArchive": "Kan arkiveres",
+            "yes": "Ja",
+            "no": "Nei",
+            "activationBlockers": "Aktiveringsblokkere",
+            "publishChecklist": "Publiserings-sjekkliste",
+            "checklistPrice": "Har gyldig pris (hvis betalt)",
+            "checklistAvailability": "Tilgjengelighetsregler gyldige",
+            "checklistStripe": "Stripe-kobling OK",
+            "timestamps": "Tidsstempler",
+            "created": "Opprettet",
+            "lastUpdated": "Sist oppdatert"
+          },
+          "audit": {
+            "title": "Siste hendelser",
+            "export": "Eksporter",
+            "noEvents": "Ingen loggede hendelser",
+            "systemActor": "System"
+          }
+        }
+      }
     },
     "participants": {
       "title": "Deltakere",
@@ -821,7 +2908,58 @@
       "showingMockData": "Viser mockdata til ekte tilkobling er klar.",
       "riskLevel": "Risikonivå: {level}",
       "actionsAndLog": "Handlinger & logg",
-      "noLogYet": "Ingen logg ennå."
+      "noLogYet": "Ingen logg ennå.",
+      "noEmailProvided": "Ingen e-post oppgitt",
+      "organisation": "Organisasjon",
+      "risk": "Risiko",
+      "lastActive": "Sist aktiv",
+      "profile": "Profil",
+      "email": "E-post",
+      "notes": "Notater",
+      "mute": "Mute",
+      "muteSent": "Mute sendt.",
+      "kick": "Kick",
+      "kickSent": "Kick sendt.",
+      "ban": "Ban",
+      "banSent": "Ban sendt.",
+      "breadcrumbs": {
+        "home": "Hjem",
+        "tenant": "Tenant",
+        "participants": "Deltakere"
+      },
+      "pageDescription": "Oversikt over deltakere, risikonivåer og nylig aktivitet.",
+      "stats": {
+        "participants": "Deltakere",
+        "highRisk": "Høy risiko",
+        "lowRisk": "Lav risiko"
+      },
+      "cardTitle": "Deltakeroversikt",
+      "searchPlaceholder": "Søk (ikke aktiv ennå)",
+      "riskFilter": {
+        "all": "Alle risikonivåer",
+        "low": "Lav risiko",
+        "high": "Høy risiko"
+      },
+      "emptyState": {
+        "title": "Ingen deltakere",
+        "description": "Juster filtre eller prøv igjen senere."
+      },
+      "columns": {
+        "name": "Navn",
+        "email": "E-post",
+        "tenant": "Tenant",
+        "risk": "Risiko",
+        "lastActive": "Sist aktiv"
+      },
+      "riskLabels": {
+        "high": "Høy",
+        "low": "Lav",
+        "none": "Ingen"
+      },
+      "missing": "Mangler",
+      "global": "Global",
+      "noPermission": "Du har ikke tillatelse til å se deltakere.",
+      "loadError": "Kunne ikke laste deltakere akkurat nå."
     },
     "sessions": {
       "title": "Økter",
@@ -833,7 +2971,566 @@
       "detailsAndStatus": "Detaljer og status for valgt økt.",
       "host": "Vert",
       "actionsAndLog": "Handlinger & logg",
-      "noLogYet": "Ingen logg ennå."
+      "noLogYet": "Ingen logg ennå.",
+      "breadcrumbs": {
+        "home": "Hjem",
+        "tenant": "Tenant",
+        "sessions": "Økter"
+      },
+      "pageDescription": "Oversikt over aktive og fullførte økter.",
+      "stats": {
+        "sessions": "Økter",
+        "active": "Aktive",
+        "flagged": "Flaggede"
+      },
+      "cardTitle": "Økter",
+      "searchPlaceholder": "Søk (ikke aktiv ennå)",
+      "statusFilter": {
+        "all": "Alle statuser",
+        "active": "Aktive",
+        "completed": "Fullførte",
+        "flagged": "Flaggede"
+      },
+      "emptyState": {
+        "title": "Ingen økter",
+        "description": "Juster filtre eller prøv igjen senere."
+      },
+      "columns": {
+        "title": "Tittel",
+        "tenant": "Tenant",
+        "host": "Vert",
+        "participants": "Deltakere",
+        "status": "Status",
+        "started": "Startet"
+      },
+      "statusLabels": {
+        "active": "Aktiv",
+        "completed": "Fullført",
+        "flagged": "Flagget"
+      },
+      "global": "Global",
+      "noPermission": "Du har ikke tillatelse til å se økter.",
+      "loadError": "Kunne ikke laste økter akkurat nå.",
+      "detail": {
+        "pageDescription": "Detaljer og status for valgt økt.",
+        "metadata": "Metadata",
+        "status": "Status",
+        "organisation": "Organisasjon",
+        "start": "Start",
+        "notes": "Notater",
+        "noNotes": "—",
+        "actionsAndLog": "Handlinger & logg",
+        "noLogYet": "Ingen logg ennå.",
+        "muteParticipant": "Demp deltaker",
+        "kickSession": "Spark økt",
+        "banParticipant": "Utesteng deltaker",
+        "muteSent": "Demping sendt.",
+        "kickSent": "Spark sendt.",
+        "banSent": "Utestengelse sendt.",
+        "noAccess": "Ingen tilgang",
+        "noAccessDescription": "Du trenger tillatelse for å se økter.",
+        "notFound": "Økten ble ikke funnet",
+        "notFoundDescription": "Sjekk lenken eller gå tilbake til listen."
+      },
+      "emptyState": {
+        "noAccess": "Ingen tilgang",
+        "noAccessDescription": "Du trenger tillatelse for å se økter.",
+        "noSessions": "Ingen økter",
+        "noSessionsDescription": "Juster filtre eller prøv igjen senere."
+      }
+    },
+    "tickets": {
+      "page": {
+        "title": "Saker",
+        "description": "Håndter supportsaker, status, prioritet og samtaler."
+      },
+      "breadcrumbs": {
+        "admin": "Admin",
+        "operations": "Drift",
+        "tickets": "Saker"
+      },
+      "status": {
+        "all": "Alle statuser",
+        "open": "Åpen",
+        "inProgress": "Under behandling",
+        "waitingForUser": "Venter på bruker",
+        "resolved": "Løst",
+        "closed": "Lukket"
+      },
+      "priority": {
+        "all": "Alle prioriteter",
+        "urgent": "Haster",
+        "high": "Høy",
+        "medium": "Medium",
+        "low": "Lav"
+      },
+      "stats": {
+        "total": "Totalt",
+        "open": "Åpne",
+        "inProgress": "Pågående",
+        "avgResolutionTime": "Gj.snitt løsningstid"
+      },
+      "filters": {
+        "searchPlaceholder": "Søk tittel/ID",
+        "allOrganizations": "Alle organisasjoner",
+        "myTickets": "Mine saker",
+        "unassigned": "Ikke tildelt",
+        "needsResponse": "Trenger svar",
+        "clearFilters": "Tøm filtre"
+      },
+      "list": {
+        "loading": "Laster...",
+        "page": "Side",
+        "of": "av",
+        "previous": "Forrige",
+        "next": "Neste"
+      },
+      "detail": {
+        "description": "Beskrivelse",
+        "created": "Opprettet",
+        "category": "Kategori",
+        "categoryDefault": "Generelt",
+        "user": "Bruker",
+        "userUnknown": "Ukjent",
+        "organization": "Organisasjon",
+        "status": "Status",
+        "priority": "Prioritet",
+        "assignedTo": "Tildelt",
+        "unassigned": "Ingen tildelt",
+        "messages": "Meldinger",
+        "loadingMessages": "Laster meldinger...",
+        "noMessages": "Ingen meldinger ennå",
+        "internal": "Internt",
+        "internalCheckbox": "Internt (kun synlig for admin)",
+        "messagePlaceholder": "Send en melding...",
+        "internalPlaceholder": "Intern notat...",
+        "send": "Send",
+        "selectTicket": "Velg en sak for å se detaljer"
+      },
+      "errors": {
+        "loadFailed": "Kunne ikke laste saker",
+        "unexpectedError": "En uventet feil oppstod"
+      },
+      "noAccess": {
+        "title": "Tilgang nektet",
+        "description": "Du har ikke tillatelse til å håndtere supportsaker."
+      },
+      "empty": {
+        "title": "Ingen saker",
+        "description": "Det finnes ingen supportsaker å vise med gjeldende filtre."
+      },
+      "loading": {
+        "checkingPermissions": "Sjekker tillatelser..."
+      }
+    },
+    "support": {
+      "kb": {
+        "pageTitle": "Kunnskapsbase",
+        "pageDescription": "Administrer FAQ og hjelpeartikler",
+        "noAccess": "Ingen tilgang",
+        "allOrganizations": "Alle organisasjoner",
+        "allCategories": "Alle kategorier",
+        "globalOption": "🌐 Global (synlig for alle)",
+        "back": "Tilbake",
+        "createFaq": "Opprett FAQ",
+        "editFaq": "Rediger FAQ",
+        "newFaq": "Ny FAQ",
+        "form": {
+          "organization": "Organisasjon",
+          "globalHelp": "Globale FAQ er synlige for alle brukere",
+          "questionLabel": "Spørsmål *",
+          "questionPlaceholder": "Hvordan gjør jeg...?",
+          "answerLabel": "Svar (Markdown) *",
+          "answerPlaceholder": "Skriv svaret ditt her... (støtter markdown)",
+          "categoryLabel": "Kategori",
+          "categoryPlaceholder": "f.eks. Konto, Fakturering, Funksjoner"
+        },
+        "status": {
+          "published": "Publisert",
+          "draft": "Utkast"
+        },
+        "actions": {
+          "delete": "Slett",
+          "deleting": "Sletter...",
+          "cancel": "Avbryt",
+          "save": "Lagre",
+          "saving": "Lagrer...",
+          "publish": "Publiser",
+          "unpublish": "Avpubliser"
+        },
+        "filters": {
+          "searchPlaceholder": "Søk i spørsmål...",
+          "showDrafts": "Vis utkast"
+        },
+        "empty": {
+          "title": "Ingen FAQ ennå",
+          "description": "Opprett din første FAQ for å hjelpe brukere å finne svar."
+        },
+        "list": {
+          "global": "Global",
+          "views": "visninger"
+        },
+        "errors": {
+          "createFailed": "Kunne ikke opprette FAQ",
+          "updateFailed": "Kunne ikke oppdatere FAQ",
+          "deleteFailed": "Kunne ikke slette FAQ"
+        }
+      },
+      "notifications": {
+        "pageTitle": "Varselshistorikk",
+        "pageDescription": "Se og administrer sendte varsler",
+        "noAccess": "Du har ikke tilgang til varselshistorikk",
+        "noAccessDescription": "Kontakt en administrator for å få tilgang.",
+        "back": "Tilbake",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "support": "Support",
+          "notificationHistory": "Varselshistorikk"
+        },
+        "errors": {
+          "couldNotFetch": "Kunne ikke laste varsler"
+        },
+        "list": {
+          "title": "Sendte varsler",
+          "count": "({count})"
+        },
+        "filters": {
+          "allOrganizations": "Alle organisasjoner",
+          "allCategories": "Alle kategorier",
+          "unread": "Uleste"
+        },
+        "categories": {
+          "support": "Support",
+          "system": "System",
+          "learning": "Opplæring",
+          "gamification": "Gamification"
+        },
+        "loading": "Laster...",
+        "empty": {
+          "title": "Ingen varsler funnet",
+          "description": "Bare varsler fra de siste 7 dagene vises."
+        },
+        "status": {
+          "unread": "Ulest"
+        },
+        "details": {
+          "to": "Til:",
+          "unknown": "Ukjent",
+          "org": "Org:"
+        }
+      }
+    },
+    "moderation": {
+      "page": {
+        "title": "Moderering",
+        "description": "Innholdsrapporter, handlinger og statistikk."
+      },
+      "noTenant": {
+        "title": "Ingen organisasjon valgt",
+        "description": "Velg en organisasjon for å håndtere moderering."
+      },
+      "errors": {
+        "loadFailed": "Kunne ikke laste modereringsdata",
+        "loadFailedDescription": "Kunne ikke laste modereringsdata.",
+        "updateReportFailed": "Kunne ikke oppdatere rapporten.",
+        "updateQueueFailed": "Kunne ikke oppdatere modereringskøen."
+      },
+      "stats": {
+        "openReports": "Åpne rapporter",
+        "queue": "Kø",
+        "actions": "Handlinger",
+        "actionsTotal": "Totalt handlinger",
+        "suspended": "Suspendert"
+      },
+      "tabs": {
+        "queue": "Kø",
+        "reports": "Rapporter",
+        "stats": "Statistikk"
+      },
+      "queue": {
+        "loading": "Laster kø...",
+        "emptyTitle": "Ingen kø",
+        "emptyDescription": "Ingen elementer i modereringskøen akkurat nå.",
+        "markHandled": "Marker håndtert"
+      },
+      "reports": {
+        "loading": "Laster rapporter...",
+        "emptyTitle": "Ingen rapporter",
+        "emptyDescription": "Det finnes ingen åpne rapporter.",
+        "created": "Opprettet:"
+      },
+      "statsTab": {
+        "loading": "Laster statistikk...",
+        "emptyTitle": "Ingen statistikk",
+        "emptyDescription": "Statistikk kunne ikke hentes."
+      },
+      "actions": {
+        "dismiss": "Avvis",
+        "block": "Blokker"
+      }
+    },
+    "learning": {
+      "hub": {
+        "breadcrumbLabel": "Opplæring",
+        "pageTitle": "Opplæring",
+        "pageDescription": "Leklederopplæring - kurs, læringsløyper og krav",
+        "filters": {
+          "all": "Alle",
+          "global": "Globale",
+          "tenant": "Organisasjon",
+          "selectOrganization": "Velg organisasjon"
+        },
+        "stats": {
+          "activeCourses": "Aktive kurs",
+          "paths": "Læringsløyper",
+          "activeRequirements": "Aktive krav",
+          "totalCourses": "Totalt kurs"
+        },
+        "modules": {
+          "courses": {
+            "title": "Kurs",
+            "description": "Opprett og administrer opplæringskurs med tekst, quiz og belønninger.",
+            "features": {
+              "courseContent": "Kursinnhold",
+              "quizBuilder": "Quiz-bygger",
+              "rewards": "Belønninger",
+              "scopeManagement": "Omfangshåndtering"
+            }
+          },
+          "paths": {
+            "title": "Læringsløyper",
+            "description": "Bygg læringsløyper med forutsetninger og progresjon.",
+            "features": {
+              "viewOnly": "Kun visning (Fase 1)",
+              "graphEditor": "Graf-editor (planlagt)",
+              "prerequisites": "Forutsetninger",
+              "roleBased": "Rollebaserte"
+            }
+          },
+          "requirements": {
+            "title": "Krav & Port",
+            "description": "Konfigurer hvilke kurs som kreves for aktiviteter og roller.",
+            "features": {
+              "activityRequirements": "Aktivitetskrav",
+              "roleRequirements": "Rollekrav",
+              "gameRequirements": "Spillkrav",
+              "toggleActive": "Aktiver/deaktiver"
+            }
+          },
+          "reports": {
+            "title": "Rapporter",
+            "description": "Oversikt over gruppens fremgang og kursstatistikk.",
+            "features": {
+              "progressOverview": "Fremgangsoversikt",
+              "courseStats": "Kursstatistikk",
+              "userReports": "Brukerrapporter",
+              "export": "Eksporter"
+            }
+          }
+        },
+        "status": {
+          "implemented": "Implementert",
+          "partial": "Delvis",
+          "planned": "Planlagt"
+        },
+        "sandbox": {
+          "title": "🧪 Sandbox",
+          "description": "Test og prototype opplæringsmodulen i sandkassen",
+          "open": "Åpne sandbox"
+        }
+      },
+      "courses": {
+        "breadcrumbs": {
+          "learning": "Opplæring",
+          "courses": "Kurs"
+        },
+        "pageTitle": "Kurs",
+        "pageDescription": "Opprett og administrer opplæringskurs",
+        "newCourse": "Nytt kurs",
+        "stats": {
+          "total": "Totalt kurs",
+          "active": "Aktive",
+          "draft": "Utkast",
+          "archived": "Arkiverte"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        },
+        "difficulty": {
+          "beginner": "Nybegynner",
+          "intermediate": "Middels",
+          "advanced": "Avansert",
+          "expert": "Ekspert"
+        },
+        "search": {
+          "placeholder": "Søk kurs..."
+        },
+        "filter": {
+          "allStatuses": "Alle statuser",
+          "allScopes": "Alle scopes",
+          "global": "Globale",
+          "tenant": "Organisasjon",
+          "allOrganizations": "Alle organisasjoner"
+        },
+        "loading": "Laster kurs...",
+        "error": {
+          "loadFailed": "Kunne ikke laste kurs",
+          "archiveFailed": "Kunne ikke arkivere kurset"
+        },
+        "table": {
+          "scope": "Scope",
+          "course": "Kurs",
+          "status": "Status",
+          "level": "Nivå",
+          "time": "Tid",
+          "passScore": "Bestått",
+          "actions": "Handlinger",
+          "global": "Global",
+          "organization": "Organisasjon",
+          "minutes": "{minutes} min",
+          "noMatchingCourses": "Ingen kurs matcher filtrene",
+          "noCourses": "Ingen kurs ennå"
+        },
+        "actions": {
+          "edit": "Rediger",
+          "viewOnly": "Kun visning",
+          "archive": "Arkiver"
+        },
+        "pagination": {
+          "showing": "Viser {start}–{end} av {total}",
+          "previous": "Forrige",
+          "next": "Neste"
+        },
+        "archiveDialog": {
+          "title": "Arkiver kurs",
+          "description": "Er du sikker på at du vil arkivere \"{title}\"? Kurset vil ikke lenger være synlig for deltakere.",
+          "confirm": "Arkiver",
+          "cancel": "Avbryt"
+        }
+      },
+      "requirements": {
+        "breadcrumbs": {
+          "learning": "Opplæring",
+          "requirements": "Krav & Porter"
+        },
+        "pageTitle": "Krav & Porter",
+        "pageDescription": "Konfigurer hvilke kurs som kreves for aktiviteter og roller",
+        "newRequirement": "Nytt krav",
+        "info": {
+          "title": "Hvordan fungerer krav?",
+          "description": "Krav blokkerer brukere fra å utføre visse aktiviteter eller ta roller til de har fullført spesifikke kurs. Når en bruker prøver å gjøre noe som krever et kurs, vises en modal med informasjon om hvilke kurs som må fullføres."
+        },
+        "stats": {
+          "total": "Totalt krav",
+          "active": "Aktive",
+          "inactive": "Inaktive"
+        },
+        "types": {
+          "game_unlock": "Spilltilgang",
+          "role_unlock": "Rollekrav",
+          "activity_unlock": "Aktivitetsport",
+          "onboarding_required": "Onboarding"
+        },
+        "search": {
+          "placeholder": "Søk krav..."
+        },
+        "filter": {
+          "allScopes": "Alle scopes",
+          "global": "Globale",
+          "tenant": "Organisasjon",
+          "allOrganizations": "Alle organisasjoner"
+        },
+        "loading": "Laster krav...",
+        "error": {
+          "loadFailed": "Kunne ikke laste krav",
+          "toggleFailed": "Kunne ikke endre status",
+          "deleteFailed": "Kunne ikke slette kravet"
+        },
+        "table": {
+          "title": "Alle krav",
+          "scope": "Scope",
+          "type": "Type",
+          "target": "Mål",
+          "requiredCourse": "Påkrevd kurs",
+          "status": "Status",
+          "actions": "Handlinger",
+          "global": "Global",
+          "organization": "Organisasjon",
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "noMatchingRequirements": "Ingen krav matcher søket",
+          "noRequirements": "Ingen krav konfigurert ennå"
+        },
+        "actions": {
+          "delete": "Slett",
+          "noAccess": "Ingen tilgang"
+        },
+        "pagination": {
+          "showing": "Viser {start}–{end} av {total}",
+          "previous": "Forrige",
+          "next": "Neste"
+        },
+        "deleteDialog": {
+          "title": "Slett krav",
+          "description": "Er du sikker på at du vil slette dette kravet? Brukere vil ikke lenger bli blokkert av det.",
+          "confirm": "Slett",
+          "cancel": "Avbryt"
+        }
+      }
+    },
+    "library": {
+      "coachDiagrams": {
+        "title": "Coach Diagrams",
+        "pageDescription": "Diagrammer som kan brukes som instruksjonsmedier i trinn.",
+        "noTenantSelected": "Ingen organisasjon valgt",
+        "selectTenantDescription": "Velg en organisasjon for å se diagrambiblioteket.",
+        "loading": "Laster…",
+        "loadError": "Kunne ikke laste diagrammer",
+        "retry": "Prøv igjen",
+        "noDiagrams": "Ingen diagrammer ennå",
+        "noDiagramsDescription": "Opprett diagrammer i Coach Diagram Builder og de vil vises her.",
+        "updated": "Oppdatert",
+        "openEditor": "Åpne editor",
+        "openSvg": "Åpne SVG",
+        "createNew": "Opprett ny",
+        "creating": "Oppretter…",
+        "newDiagram": "Nytt diagram"
+      },
+      "badges": {
+        "breadcrumbs": {
+          "home": "Hjem",
+          "library": "Bibliotek",
+          "badges": "Merker"
+        },
+        "title": "Bibliotek",
+        "description": "Administrer merker (via builder exports)",
+        "noPermission": "Du har ikke tillatelse til å se Bibliotek.",
+        "selectTenant": "Velg en organisasjon (aktiv tenant) for å se biblioteket.",
+        "badgesTitle": "Merker",
+        "loading": "Laster…",
+        "badgeCount": "{count} merke",
+        "badgeCountPlural": "{count} merker",
+        "published": "publisert",
+        "drafts": "utkast",
+        "badgeBuilder": "Badge Builder",
+        "editBadge": "Rediger merke",
+        "editing": "Redigerer: {title}",
+        "untitled": "Uten tittel",
+        "selectFromLibrary": "Velg et merke fra biblioteket",
+        "selectOrCreate": "Velg eller opprett et merke",
+        "selectOrCreateDescription": "Velg et merke fra biblioteket over eller opprett et nytt for å begynne å bygge lagene, fargene og metadataene.",
+        "createBadge": "Opprett merke",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global"
+      }
+    },
+    "tools": {
+      "breadcrumbHome": "Hjem",
+      "breadcrumbTitle": "Verktøy",
+      "pageTitle": "Verktøy",
+      "pageDescription": "Kodedefinerte verktøy som kan aktiveres per spill. Ingen CRUD i MVP."
     },
     "settings": {
       "title": "Innstillinger",
@@ -1010,7 +3707,72 @@
         "players": "Spillere",
         "time": "Tid",
         "age": "Alder",
-        "notSet": "Ikke satt"
+        "notSet": "Ikke satt",
+        "back": "Tilbake",
+        "edit": "Rediger",
+        "publish": "Publiser",
+        "delete": "Slett",
+        "metadata": "Metadata",
+        "description": "Beskrivelse",
+        "noDescription": "Ingen beskrivelse angitt.",
+        "noShortDescription": "Ingen kort beskrivelse angitt.",
+        "technical": "Teknisk",
+        "createdAt": "Opprettet",
+        "updatedAt": "Oppdatert",
+        "deleteTitle": "Slette spillet?",
+        "deleteDescription": "Dette sletter spillet permanent.",
+        "deleteConfirm": "Slett"
+      },
+      "form": {
+        "editTitle": "Rediger lek",
+        "createTitle": "Opprett ny lek",
+        "description": "Administrer grunndata for lekbanken. Minimumskrav: navn, kort beskrivelse og hovedformål.",
+        "name": "Navn",
+        "namePlaceholder": "F.eks. Samarbeidsstafett",
+        "shortDescription": "Kort beskrivelse",
+        "shortDescriptionPlaceholder": "1-2 setninger som oppsummerer leken.",
+        "fullDescription": "Full beskrivelse",
+        "fullDescriptionPlaceholder": "Instruksjoner, tips og sikkerhetsnotater.",
+        "status": "Status",
+        "statusPlaceholder": "Velg status",
+        "owner": "Eier",
+        "ownerPlaceholder": "Velg eier",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Formål",
+        "purposePlaceholder": "Velg formål",
+        "product": "Produkt",
+        "productPlaceholder": "Velg produkt",
+        "productNone": "Ingen",
+        "category": "Kategori",
+        "categoryPlaceholder": "F.eks. Samarbeid, Oppvarming",
+        "energy": "Energi",
+        "energyPlaceholder": "Velg energinivå",
+        "energyNone": "Ingen",
+        "energyLow": "Lav",
+        "energyMedium": "Medium",
+        "energyHigh": "Høy",
+        "location": "Spillested",
+        "locationPlaceholder": "Velg spillested",
+        "locationUnknown": "Ukjent",
+        "locationIndoor": "Innendørs",
+        "locationOutdoor": "Utendørs",
+        "locationBoth": "Begge deler",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "timeEstimate": "Estimert tid (min)",
+        "timeEstimatePlaceholder": "F.eks. 15",
+        "players": "Spillere (min-maks)",
+        "playersMin": "Min",
+        "playersMax": "Maks",
+        "age": "Alder (min-maks)",
+        "ageMin": "Min",
+        "ageMax": "Maks",
+        "requiredError": "Navn, kort beskrivelse og formål må angis.",
+        "saveError": "Kunne ikke lagre spillet. Prøv igjen.",
+        "cancel": "Avbryt",
+        "saving": "Lagrer...",
+        "saveChanges": "Lagre endringer",
+        "create": "Opprett lek"
       },
       "pageDescription": "Navet for å opprette, oppdatere, publisere og eksportere hele spillkatalogen.",
       "cardTitle": "Spilloversikt",
@@ -1023,7 +3785,34 @@
         "total": "Totalt",
         "published": "Publiserte",
         "drafts": "Utkast",
-        "tenantOwned": "Tenant-eide"
+        "tenantOwned": "Tenant-eide",
+        "withErrors": "Med feil"
+      },
+      "page": {
+        "noAccess": "Ingen tilgang",
+        "noAccessDesc": "Du trenger administratorrettigheter for å administrere spill.",
+        "title": "Spill (globalt)",
+        "description": "Administrer spillkatalogen – søk, filtrer og utfør massehandlinger.",
+        "csvExport": "CSV-eksport",
+        "import": "Importer",
+        "newInBuilder": "Ny i Builder",
+        "loadError": "Kunne ikke laste spill",
+        "noGamesTitle": "Ingen spill matcher filtrene",
+        "noGamesDesc": "Juster filtre eller legg til et nytt spill.",
+        "selectGame": "Velg {name}",
+        "openInBuilder": "Åpne i Builder",
+        "showDetails": "Vis detaljer",
+        "unpublish": "Avpubliser",
+        "publish": "Publiser"
+      },
+      "table": {
+        "name": "Navn",
+        "mode": "Modus",
+        "purpose": "Formål",
+        "status": "Status",
+        "valid": "Gyldig",
+        "owner": "Eier",
+        "updated": "Oppdatert"
       },
       "filters": {
         "allStatuses": "Alle statuser",
@@ -1449,11 +4238,74 @@
         "dedicatedSupport": "Dedikert støtte"
       },
       "invoices": {
-        "title": "Faktureringshistorikk",
+        "title": "Fakturaer",
+        "description": "Vis og administrer fakturaer og betalinger",
         "paid": "Betalt",
         "pending": "Venter",
         "failed": "Mislykket",
-        "download": "Last ned"
+        "download": "Last ned",
+        "emptyTitle": "Ingen fakturaer",
+        "emptyDescription": "Det er ingen fakturaer å vise.",
+        "noResultsFor": "Ingen resultater for \"{query}\"",
+        "clearSearch": "Fjern søk",
+        "paymentsForInvoice": "Betalinger for faktura",
+        "close": "Lukk",
+        "loadingPayments": "Laster betalinger...",
+        "noPaymentsRegistered": "Ingen betalinger registrert.",
+        "unknownProvider": "Ukjent leverandør",
+        "paidAt": "Betalt: {date}",
+        "markAsPaid": "Merk som betalt",
+        "addPayment": "Legg til betaling",
+        "savePayment": "Lagre betaling",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Fakturering",
+          "invoices": "Fakturaer"
+        },
+        "buttons": {
+          "createStripeCustomer": "Opprett/vis Stripe-kunde",
+          "manualInvoice": "Manuell faktura",
+          "sendViaStripe": "Send via Stripe"
+        },
+        "stats": {
+          "totalRevenue": "Totale inntekter",
+          "outstanding": "Utestående",
+          "paid": "Betalte",
+          "overdue": "Forfalt"
+        },
+        "status": {
+          "paid": "Betalt",
+          "sent": "Sendt",
+          "issued": "Utstedt",
+          "overdue": "Forfalt",
+          "draft": "Utkast",
+          "canceled": "Kansellert"
+        },
+        "filter": {
+          "all": "Alle",
+          "paid": "Betalte",
+          "sent": "Sendte",
+          "issued": "Utstedte",
+          "overdue": "Forfalte",
+          "draft": "Utkast",
+          "canceled": "Kansellerte"
+        },
+        "paymentStatus": {
+          "pending": "Venter",
+          "confirmed": "Bekreftet",
+          "failed": "Mislykket",
+          "refunded": "Refundert"
+        },
+        "form": {
+          "name": "Navn",
+          "namePlaceholder": "Kortbetaling, Vipps ...",
+          "amount": "Beløp",
+          "provider": "Leverandør",
+          "providerPlaceholder": "Stripe, Vipps, Bankoverføring",
+          "reference": "Referanse"
+        },
+        "search": "Søk faktura",
+        "downloadPdf": "Last ned PDF"
       }
     },
     "learning": {

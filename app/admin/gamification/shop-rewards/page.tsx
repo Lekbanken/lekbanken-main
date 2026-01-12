@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
+import { getTranslations } from 'next-intl/server';
 import { createServerRlsClient } from '@/lib/supabase/server';
 import { isSystemAdmin as checkSystemAdmin } from '@/lib/utils/tenantAuth';
 import {
@@ -25,29 +26,31 @@ interface SearchParams {
 // TENANT SELECTOR (for when no tenant is selected)
 // ============================================
 
-function TenantSelector({ tenants }: { tenants: TenantOption[] }) {
+async function TenantSelector({ tenants }: { tenants: TenantOption[] }) {
+  const t = await getTranslations('admin.gamification.shopRewards');
+
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Gamification', href: '/admin/gamification' },
-          { label: 'Shop & Rewards' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.gamification'), href: '/admin/gamification' },
+          { label: t('breadcrumbs.shopRewards') },
         ]}
       />
 
       <AdminPageHeader
-        title="Shop & Rewards"
-        description="Välj en organisation för att hantera butik och belöningar."
+        title={t('pageTitle')}
+        description={t('tenantSelector.description')}
       />
 
       <div className="mt-8 max-w-xl mx-auto">
         <div className="rounded-lg border bg-card p-6">
-          <h2 className="text-lg font-semibold mb-4">Välj organisation</h2>
+          <h2 className="text-lg font-semibold mb-4">{t('tenantSelector.title')}</h2>
           
           {tenants.length === 0 ? (
             <p className="text-muted-foreground">
-              Du har inte tillgång till några organisationer.
+              {t('tenantSelector.noAccess')}
             </p>
           ) : (
             <div className="space-y-2">
@@ -109,24 +112,26 @@ async function ShopContent({ tenantId, tenantName }: { tenantId: string; tenantN
 // LOADING FALLBACK
 // ============================================
 
-function LoadingFallback() {
+async function LoadingFallback() {
+  const t = await getTranslations('admin.gamification.shopRewards');
+
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Gamification', href: '/admin/gamification' },
-          { label: 'Shop & Rewards' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.gamification'), href: '/admin/gamification' },
+          { label: t('breadcrumbs.shopRewards') },
         ]}
       />
       <AdminPageHeader
-        title="Shop & Rewards"
-        description="Hantera butik och belöningar"
+        title={t('pageTitle')}
+        description={t('pageDescription', { tenantName: '' })}
       />
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Laddar shop items...</p>
+          <p className="text-sm text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     </AdminPageLayout>
@@ -142,6 +147,7 @@ export default async function ShopRewardsPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
+  const t = await getTranslations('admin.gamification.shopRewards');
   const params = await searchParams;
   const supabase = await createServerRlsClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -161,21 +167,21 @@ export default async function ShopRewardsPage({
 
   if (tenantId) {
     // Validate user has access to this tenant
-    const tenant = tenants.find((t) => t.id === tenantId);
+    const tenant = tenants.find((tn) => tn.id === tenantId);
     if (!tenant && !isSystemAdmin) {
       // User doesn't have access to this tenant
       redirect('/admin/gamification/shop-rewards');
     }
     // For system admin, fetch tenant name if not in list
     if (isSystemAdmin && !tenant) {
-      const { data: t } = await supabase
+      const { data: tn } = await supabase
         .from('tenants')
         .select('name')
         .eq('id', tenantId)
         .single();
-      tenantName = t?.name || 'Okänd organisation';
+      tenantName = tn?.name || t('unknownTenant');
     } else {
-      tenantName = tenant?.name || 'Okänd organisation';
+      tenantName = tenant?.name || t('unknownTenant');
     }
   } else if (tenants.length === 1) {
     // Auto-select if user only has one tenant

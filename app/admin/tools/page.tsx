@@ -1,4 +1,5 @@
 import { WrenchScrewdriverIcon } from '@heroicons/react/24/outline';
+import { getTranslations } from 'next-intl/server';
 import { AdminPageHeader, AdminPageLayout, AdminBreadcrumbs } from '@/components/admin/shared';
 import { Card } from '@/components/ui/card';
 import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
@@ -6,14 +7,15 @@ import { TOOL_REGISTRY } from '@/features/tools/registry';
 
 export default async function ToolsAdminPage() {
   await requireSystemAdmin('/admin');
+  const t = await getTranslations('admin.tools');
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Verktyg' }]} />
+      <AdminBreadcrumbs items={[{ label: t('breadcrumbHome'), href: '/admin' }, { label: t('breadcrumbTitle') }]} />
 
       <AdminPageHeader
-        title="Verktyg"
-        description="Koddefinierade verktyg som kan aktiveras per spel. Ingen CRUD i MVP."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<WrenchScrewdriverIcon className="h-8 w-8 text-primary" />}
       />
 

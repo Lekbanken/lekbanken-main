@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   AdminBreadcrumbs,
   AdminDataTable,
@@ -32,6 +33,7 @@ type Props = {
 };
 
 export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
+  const t = useTranslations('admin.participants');
   const { can } = useRbac();
   const { warning } = useToast();
   const [riskFilter, setRiskFilter] = useState<'all' | RiskLevel>('all');
@@ -45,28 +47,28 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
     const high = participants.filter((p) => p.risk === 'high').length;
     const low = participants.filter((p) => p.risk === 'low').length;
     return [
-      { label: 'Deltagare', value: total },
-      { label: 'Hog risk', value: high },
-      { label: 'Lag risk', value: low },
+      { label: t('stats.participants'), value: total },
+      { label: t('stats.highRisk'), value: high },
+      { label: t('stats.lowRisk'), value: low },
     ];
-  }, [participants]);
+  }, [participants, t]);
 
   const breadcrumbs = tenantId
     ? [
-        { label: 'Startsida', href: '/admin' },
-        { label: 'Tenant', href: `/admin/tenant/${tenantId}` },
-        { label: 'Deltagare' },
+        { label: t('breadcrumbs.home'), href: '/admin' },
+        { label: t('breadcrumbs.tenant'), href: `/admin/tenant/${tenantId}` },
+        { label: t('breadcrumbs.participants') },
       ]
     : [
-        { label: 'Startsida', href: '/admin' },
-        { label: 'Deltagare' },
+        { label: t('breadcrumbs.home'), href: '/admin' },
+        { label: t('breadcrumbs.participants') },
       ];
 
   const load = useCallback(async () => {
     if (inFlight.current) return;
     inFlight.current = true;
     if (!can('admin.participants.list')) {
-      warning('Du har inte behorighet att se deltagare.');
+      warning(t('noPermission'));
       inFlight.current = false;
       return;
     }
@@ -83,14 +85,14 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
       setParticipants(rows || []);
     } catch (err) {
       console.error('[admin/participants] load error', err);
-      setError('Kunde inte ladda deltagare just nu.');
+      setError(t('loadError'));
       setParticipants([]);
     } finally {
       setIsLoading(false);
       inFlight.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [can, tenantId]);
+  }, [can, tenantId, t]);
 
   useEffect(() => {
     let cancelled = false;
@@ -113,7 +115,7 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
   if (!can('admin.participants.list')) {
     return (
       <AdminPageLayout>
-        <AdminEmptyState title="Ingen atkomst" description="Du behover behorighet for att se deltagare." />
+        <AdminEmptyState title={t('emptyState.noAccess')} description={t('emptyState.noAccessDescription')} />
       </AdminPageLayout>
     );
   }
@@ -122,12 +124,12 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
     <AdminPageLayout>
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
-        title="Deltagare"
-        description="Oversikt av deltagare, risknivaer och senaste aktivitet."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<Badge variant="outline">P</Badge>}
       />
 
-      {error && <AdminErrorState title="Kunde inte ladda deltagare" description={error} onRetry={load} />}
+      {error && <AdminErrorState title={t('errorState.title')} description={error} onRetry={load} />}
 
       <AdminStatGrid className="mb-4">
         {stats.map((s) => (
@@ -137,24 +139,24 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
 
       <Card className="mb-4 border border-border">
         <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
-          <CardTitle>Deltagaroversikt</CardTitle>
+          <CardTitle>{t('cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <AdminTableToolbar
             searchValue=""
             onSearchChange={() => {}}
-            searchPlaceholder="Sok (ej aktiv annu)"
+            searchPlaceholder={t('searchPlaceholder')}
             filters={
               <div className="flex flex-wrap gap-2">
                 <Select
                   value={riskFilter}
                   onChange={(event) => setRiskFilter(event.target.value as 'all' | RiskLevel)}
                   options={[
-                    { value: 'all', label: 'Alla risknivaer' },
-                    { value: 'low', label: 'Lag risk' },
-                    { value: 'high', label: 'Hog risk' },
+                    { value: 'all', label: t('riskFilter.all') },
+                    { value: 'low', label: t('riskFilter.low') },
+                    { value: 'high', label: t('riskFilter.high') },
                   ]}
-                  placeholder="Risk"
+                  placeholder={t('riskFilter.placeholder')}
                 />
               </div>
             }
@@ -167,26 +169,26 @@ export function ParticipantsPage({ tenantId, onSelectParticipant }: Props) {
             selectable={false}
             emptyState={
               <AdminEmptyState
-                title="Inga deltagare"
-                description="Justera filter eller forsok igen senare."
+                title={t('emptyState.noParticipants')}
+                description={t('emptyState.noParticipantsDescription')}
               />
             }
             onRowClick={onSelectParticipant ? (row) => onSelectParticipant(row.id) : undefined}
             columns={[
-              { header: 'Namn', accessor: (row) => row.name },
-              { header: 'E-post', accessor: (row) => row.email || 'Saknas' },
-              { header: 'Tenant', accessor: (row) => row.tenantName || 'Global' },
+              { header: t('columns.name'), accessor: (row) => row.name },
+              { header: t('columns.email'), accessor: (row) => row.email || t('columns.missing') },
+              { header: t('columns.tenant'), accessor: (row) => row.tenantName || t('columns.global') },
               {
-                header: 'Risk',
+                header: t('columns.risk'),
                 accessor: (row) => row.risk,
                 cell: (row) => (
                   <Badge variant={row.risk === 'high' ? 'destructive' : row.risk === 'low' ? 'warning' : 'secondary'}>
-                    {row.risk === 'high' ? 'Hog' : row.risk === 'low' ? 'Lag' : 'Ingen'}
+                    {row.risk === 'high' ? t('riskLabels.high') : row.risk === 'low' ? t('riskLabels.low') : t('riskLabels.none')}
                   </Badge>
                 ),
               },
               {
-                header: 'Senast aktiv',
+                header: t('columns.lastActive'),
                 accessor: (row) => new Date(row.lastActive).toLocaleString(),
               },
             ]}

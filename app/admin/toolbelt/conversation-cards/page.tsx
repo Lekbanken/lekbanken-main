@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
 import { useTenant } from '@/lib/context/TenantContext'
 import {
@@ -46,6 +47,7 @@ type Filters = {
 }
 
 export default function ConversationCardsAdminPage() {
+  const t = useTranslations('admin.conversationCards')
   const { can, isSystemAdmin, isTenantAdmin, currentTenantId } = useRbac()
   const { currentTenant } = useTenant()
 
@@ -71,7 +73,7 @@ export default function ConversationCardsAdminPage() {
       try {
         const res = await fetch('/api/purposes?includeStandard=true', { cache: 'no-store' })
         const data = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda syften')
+        if (!res.ok) throw new Error(data.error || t('errorLoadPurposes'))
         setPurposes((data.purposes ?? []) as Purpose[])
       } catch (e) {
         // Purposes are optional for list view; keep empty.
@@ -113,10 +115,10 @@ export default function ConversationCardsAdminPage() {
         cache: 'no-store',
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ladda samlingar')
+      if (!res.ok) throw new Error(data.error || t('errorLoadCollections'))
       setCollections((data.collections ?? []) as CollectionListRow[])
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Kunde inte ladda samlingar')
+      setError(e instanceof Error ? e.message : t('errorLoadCollections'))
     } finally {
       setLoading(false)
     }
@@ -132,11 +134,11 @@ export default function ConversationCardsAdminPage() {
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Samtalskort' }]} />
+      <AdminBreadcrumbs items={[{ label: t('breadcrumbHome'), href: '/admin' }, { label: t('breadcrumbTitle') }]} />
 
       <AdminPageHeader
-        title="Samtalskort"
-        description="Hantera samtalskortssamlingar (Toolbelt) och importera kort via CSV."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
@@ -145,11 +147,11 @@ export default function ConversationCardsAdminPage() {
               <>
                 <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
                   <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
-                  Importera
+                  {t('importButton')}
                 </Button>
                 <Button size="sm" href="/admin/toolbelt/conversation-cards/new">
                   <PlusIcon className="mr-2 h-4 w-4" />
-                  Skapa samling
+                  {t('createCollectionButton')}
                 </Button>
               </>
             )}
@@ -168,12 +170,12 @@ export default function ConversationCardsAdminPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Filter</CardTitle>
+          <CardTitle className="text-base">{t('filterTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-4">
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Scope</div>
+              <div className="text-xs text-muted-foreground">{t('filterScope')}</div>
               <Select
                 value={filters.scopeType}
                 onChange={(e) => setFilters((f) => ({ ...f, scopeType: e.target.value as ScopeType }))}
@@ -185,12 +187,12 @@ export default function ConversationCardsAdminPage() {
             </div>
 
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Status</div>
+              <div className="text-xs text-muted-foreground">{t('filterStatus')}</div>
               <Select
                 value={filters.status}
                 onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value as Filters['status'] }))}
                 options={[
-                  { value: 'all', label: 'Alla' },
+                  { value: 'all', label: t('statusAll') },
                   { value: 'draft', label: 'Draft' },
                   { value: 'published', label: 'Published' },
                 ]}
@@ -198,9 +200,9 @@ export default function ConversationCardsAdminPage() {
             </div>
 
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Huvudsyfte</div>
+              <div className="text-xs text-muted-foreground">{t('filterMainPurpose')}</div>
               <AdminFilterSelect
-                label="Huvudsyfte"
+                label={t('filterMainPurpose')}
                 value={filters.mainPurposeId}
                 onChange={(value) =>
                   setFilters((f) => ({
@@ -210,20 +212,20 @@ export default function ConversationCardsAdminPage() {
                   }))
                 }
                 options={[
-                  { value: 'all', label: loadingPurposes ? 'Laddar…' : 'Alla' },
+                  { value: 'all', label: loadingPurposes ? t('loading') : t('statusAll') },
                   ...mainPurposes.map((p) => ({ value: p.id, label: p.name })),
                 ]}
               />
             </div>
 
             <div className="space-y-1">
-              <div className="text-xs text-muted-foreground">Undersyfte</div>
+              <div className="text-xs text-muted-foreground">{t('filterSubPurpose')}</div>
               <AdminFilterSelect
-                label="Undersyfte"
+                label={t('filterSubPurpose')}
                 value={filters.subPurposeId}
                 onChange={(value) => setFilters((f) => ({ ...f, subPurposeId: value }))}
                 options={[
-                  { value: 'all', label: loadingPurposes ? 'Laddar…' : 'Alla' },
+                  { value: 'all', label: loadingPurposes ? t('loading') : t('statusAll') },
                   ...subPurposes.map((p) => ({ value: p.id, label: p.name })),
                 ]}
               />
@@ -234,15 +236,15 @@ export default function ConversationCardsAdminPage() {
 
       {loading ? (
         <Card className="p-6">
-          <p className="text-sm text-muted-foreground">Laddar…</p>
+          <p className="text-sm text-muted-foreground">{t('loading')}</p>
         </Card>
       ) : error ? (
-        <AdminErrorState title="Kunde inte ladda" description={error} />
+        <AdminErrorState title={t('errorLoadTitle')} description={error} />
       ) : collections.length === 0 ? (
         <AdminEmptyState
           icon={<ChatBubbleLeftRightIcon className="h-6 w-6" />}
-          title="Inga samlingar" 
-          description="Skapa en samling eller byt filter." 
+          title={t('noCollections')} 
+          description={t('noCollectionsDescription')} 
         />
       ) : (
         <div className="grid gap-3">
@@ -260,7 +262,7 @@ export default function ConversationCardsAdminPage() {
                       <div className="font-semibold truncate">{c.title}</div>
                       {statusBadge(c.status)}
                       <Badge variant="outline">{c.scope_type}</Badge>
-                      <span className="text-xs text-muted-foreground">{cardCount} kort</span>
+                      <span className="text-xs text-muted-foreground">{t('cardsCount', { count: cardCount })}</span>
                     </div>
                     {c.description ? (
                       <div className="mt-1 text-sm text-muted-foreground line-clamp-2">{c.description}</div>
@@ -269,7 +271,7 @@ export default function ConversationCardsAdminPage() {
 
                   <div className="flex items-center gap-2">
                     <Button href={`/admin/toolbelt/conversation-cards/${c.id}`} size="sm" variant="outline">
-                      {canEditThis ? 'Redigera' : 'Visa'}
+                      {canEditThis ? t('editButton') : t('viewButton')}
                     </Button>
                     {canEditThis ? (
                       <Button href={`/admin/toolbelt/conversation-cards/${c.id}/import`} size="sm">

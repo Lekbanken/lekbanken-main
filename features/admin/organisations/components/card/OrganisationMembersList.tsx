@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from 'next-intl';
 import { formatDateLong } from '@/lib/i18n/format-utils';
 import {
   UsersIcon,
@@ -56,12 +57,6 @@ type OrganisationMembersListProps = {
   tenantId: string;
   summary: MemberSummary;
   onRefresh: () => void;
-};
-
-const roleLabels: Record<TenantRole, string> = {
-  owner: 'Ägare',
-  admin: 'Admin',
-  member: 'Medlem',
 };
 
 const roleColors: Record<TenantRole, string> = {
@@ -154,6 +149,7 @@ function AddMemberDialog({
   onOpenChange,
   onMemberAdded,
 }: AddMemberDialogProps) {
+  const t = useTranslations('admin.organizations.members');
   const { success, error: toastError } = useToast();
   
   const [searchEmail, setSearchEmail] = useState('');
@@ -195,7 +191,7 @@ function AddMemberDialog({
       if (error) throw error;
       
       if (!data || data.length === 0) {
-        setSearchError('Ingen användare hittades med den e-postadressen');
+        setSearchError(t('noUserFound'));
         return;
       }
       
@@ -211,7 +207,7 @@ function AddMemberDialog({
       setSearchResults(results);
     } catch (err) {
       console.error('User search failed:', err);
-      setSearchError('Kunde inte söka efter användare');
+      setSearchError(t('searchFailed'));
     } finally {
       setIsSearching(false);
     }
@@ -243,7 +239,7 @@ function AddMemberDialog({
       
       if (error) {
         if (error.code === '23505') {
-          toastError('Användaren är redan medlem i organisationen');
+          toastError(t('alreadyMemberError'));
         } else {
           throw error;
         }
@@ -263,12 +259,13 @@ function AddMemberDialog({
         },
       });
       
-      success(`${selectedUser.fullName || selectedUser.email} tillagd som ${roleLabels[selectedRole].toLowerCase()}`);
+      const roleLabel = selectedRole === 'owner' ? t('roleOwner') : selectedRole === 'admin' ? t('roleAdmin') : t('roleMember');
+      success(t('memberAdded', { name: selectedUser.fullName || selectedUser.email, role: roleLabel.toLowerCase() }));
       onOpenChange(false);
       onMemberAdded();
     } catch (err) {
       console.error('Failed to add member:', err);
-      toastError('Kunde inte lägga till medlem');
+      toastError(t('addFailed'));
     } finally {
       setIsAdding(false);
     }
@@ -280,17 +277,17 @@ function AddMemberDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UserPlusIcon className="h-5 w-5" />
-            Lägg till medlem
+            {t('addMember')}
           </DialogTitle>
           <DialogDescription>
-            Sök efter en befintlig användare via e-post och lägg till dem direkt i organisationen.
+            {t('addMemberDescription')}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           {/* Search input */}
           <div className="space-y-2">
-            <Label>Sök användare via e-post</Label>
+            <Label>{t('searchByEmail')}</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -298,7 +295,7 @@ function AddMemberDialog({
                   value={searchEmail}
                   onChange={(e) => setSearchEmail(e.target.value)}
                   onKeyPress={handleSearchKeyPress}
-                  placeholder="namn@exempel.se"
+                  placeholder={t('searchPlaceholder')}
                   className="pl-9"
                 />
               </div>
@@ -306,7 +303,7 @@ function AddMemberDialog({
                 onClick={handleSearch}
                 disabled={isSearching || !searchEmail.trim()}
               >
-                {isSearching ? 'Söker...' : 'Sök'}
+                {isSearching ? t('searching') : t('search')}
               </Button>
             </div>
           </div>
@@ -322,7 +319,7 @@ function AddMemberDialog({
           {/* Search results */}
           {searchResults.length > 0 && !selectedUser && (
             <div className="space-y-2">
-              <Label>Sökresultat</Label>
+              <Label>{t('searchResults')}</Label>
               <div className="border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
                 {searchResults.map((user) => (
                   <button
@@ -348,7 +345,7 @@ function AddMemberDialog({
                     </div>
                     {user.alreadyMember ? (
                       <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                        Redan medlem
+                        {t('alreadyMember')}
                       </span>
                     ) : (
                       <CheckCircleIcon className="h-5 w-5 text-muted-foreground/30" />
@@ -386,14 +383,14 @@ function AddMemberDialog({
               
               {/* Role selection */}
               <div className="space-y-2">
-                <Label>Roll</Label>
+                <Label>{t('role')}</Label>
                 <Select
                   value={selectedRole}
                   onChange={(e) => setSelectedRole(e.target.value as TenantRole)}
                   options={[
-                    { value: 'member', label: 'Medlem' },
-                    { value: 'admin', label: 'Admin' },
-                    { value: 'owner', label: 'Ägare' },
+                    { value: 'member', label: t('roleMember') },
+                    { value: 'admin', label: t('roleAdmin') },
+                    { value: 'owner', label: t('roleOwner') },
                   ]}
                 />
               </div>
@@ -403,13 +400,13 @@ function AddMemberDialog({
         
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Avbryt
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleAddMember}
             disabled={!selectedUser || isAdding}
           >
-            {isAdding ? 'Lägger till...' : 'Lägg till medlem'}
+            {isAdding ? t('adding') : t('addMemberButton')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -422,6 +419,7 @@ export function OrganisationMembersList({
   summary,
   onRefresh,
 }: OrganisationMembersListProps) {
+  const t = useTranslations('admin.organizations.members');
   const { success, error: toastError } = useToast();
   
   const [members, setMembers] = useState<Member[]>([]);
@@ -460,7 +458,7 @@ export function OrganisationMembersList({
         return {
           id: m.id,
           userId: m.user_id,
-          email: user?.email || 'Okänd',
+          email: user?.email || t('unknown'),
           fullName: user?.full_name || null,
           avatarUrl: user?.avatar_url || null,
           role: m.role as TenantRole,
@@ -473,7 +471,7 @@ export function OrganisationMembersList({
       setMembers(mappedMembers);
     } catch (err) {
       console.error('Failed to load members:', err);
-      toastError('Kunde inte ladda medlemmar');
+      toastError(t('loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -527,12 +525,13 @@ export function OrganisationMembersList({
         },
       });
       
-      success(`Roll ändrad till ${roleLabels[newRole]}`);
+      const roleLabel = newRole === 'owner' ? t('roleOwner') : newRole === 'admin' ? t('roleAdmin') : t('roleMember');
+      success(t('roleChanged', { role: roleLabel }));
       loadMembers();
       onRefresh();
     } catch (err) {
       console.error('Failed to change role:', err);
-      toastError('Kunde inte ändra roll');
+      toastError(t('roleChangeFailed'));
     } finally {
       setIsUpdatingRole(null);
     }
@@ -545,11 +544,11 @@ export function OrganisationMembersList({
     
     // Prevent removing owner
     if (member.role === 'owner' && members.filter(m => m.role === 'owner').length <= 1) {
-      toastError('Kan inte ta bort den enda ägaren');
+      toastError(t('cannotRemoveOnlyOwner'));
       return;
     }
     
-    if (!confirm(`Är du säker på att du vill ta bort ${member.fullName || member.email} från organisationen?`)) {
+    if (!confirm(t('confirmRemove', { name: member.fullName || member.email }))) {
       return;
     }
     
@@ -573,21 +572,21 @@ export function OrganisationMembersList({
         },
       });
       
-      success('Medlem borttagen');
+      success(t('memberRemoved'));
       loadMembers();
       onRefresh();
     } catch (err) {
       console.error('Failed to remove member:', err);
-      toastError('Kunde inte ta bort medlem');
+      toastError(t('removeFailed'));
     }
   };
   
   // Stats cards
   const stats = [
-    { label: 'Totalt', value: summary.total, icon: UsersIcon },
-    { label: 'Ägare', value: summary.owners, icon: ShieldCheckIcon },
-    { label: 'Admins', value: summary.admins, icon: ShieldCheckIcon },
-    { label: 'Väntande', value: summary.pendingInvites, icon: EnvelopeIcon },
+    { label: t('statsTotal'), value: summary.total, icon: UsersIcon },
+    { label: t('statsOwners'), value: summary.owners, icon: ShieldCheckIcon },
+    { label: t('statsAdmins'), value: summary.admins, icon: ShieldCheckIcon },
+    { label: t('statsPending'), value: summary.pendingInvites, icon: EnvelopeIcon },
   ];
   
   return (
@@ -619,7 +618,7 @@ export function OrganisationMembersList({
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-base font-medium flex items-center gap-2">
             <UsersIcon className="h-4 w-4" />
-            Medlemmar ({filteredMembers.length})
+            {t('membersCount', { count: filteredMembers.length })}
           </CardTitle>
           <div className="flex items-center gap-2">
             <Button
@@ -632,7 +631,7 @@ export function OrganisationMembersList({
             </Button>
             <Button size="sm" onClick={() => setShowAddMemberDialog(true)}>
               <UserPlusIcon className="h-4 w-4 mr-1" />
-              Lägg till medlem
+              {t('addMember')}
             </Button>
           </div>
         </CardHeader>
@@ -644,7 +643,7 @@ export function OrganisationMembersList({
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Sök på namn eller e-post..."
+                placeholder={t('searchNameOrEmail')}
                 className="pl-9 h-9"
               />
             </div>
@@ -652,10 +651,10 @@ export function OrganisationMembersList({
               value={roleFilter}
               onChange={(e) => setRoleFilter(e.target.value as TenantRole | 'all')}
               options={[
-                { value: 'all', label: 'Alla roller' },
-                { value: 'owner', label: 'Ägare' },
-                { value: 'admin', label: 'Admin' },
-                { value: 'member', label: 'Medlem' },
+                { value: 'all', label: t('allRoles') },
+                { value: 'owner', label: t('roleOwner') },
+                { value: 'admin', label: t('roleAdmin') },
+                { value: 'member', label: t('roleMember') },
               ]}
             />
           </div>
@@ -663,13 +662,13 @@ export function OrganisationMembersList({
           {/* Table */}
           {isLoading ? (
             <div className="py-8 text-center text-muted-foreground">
-              Laddar medlemmar...
+              {t('loading')}
             </div>
           ) : filteredMembers.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
               {searchQuery || roleFilter !== 'all' 
-                ? 'Inga medlemmar matchar filtren'
-                : 'Inga medlemmar i organisationen'
+                ? t('noMembersMatch')
+                : t('noMembersYet')
               }
             </div>
           ) : (
@@ -678,22 +677,23 @@ export function OrganisationMembersList({
                 <thead className="bg-muted/50">
                   <tr>
                     <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
-                      Användare
+                      {t('tableUser')}
                     </th>
                     <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
-                      Roll
+                      {t('tableRole')}
                     </th>
                     <th className="text-left text-xs font-medium text-muted-foreground px-4 py-3">
-                      Medlem sedan
+                      {t('tableMemberSince')}
                     </th>
                     <th className="text-right text-xs font-medium text-muted-foreground px-4 py-3">
-                      Åtgärder
+                      {t('tableActions')}
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {filteredMembers.map((member) => {
                     const RoleIcon = roleIcons[member.role];
+                    const roleLabel = member.role === 'owner' ? t('roleOwner') : member.role === 'admin' ? t('roleAdmin') : t('roleMember');
                     return (
                       <tr key={member.id} className="hover:bg-muted/30 transition-colors">
                         <td className="px-4 py-3">
@@ -711,7 +711,7 @@ export function OrganisationMembersList({
                             </div>
                             {member.isPrimary && (
                               <span className="text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">
-                                Primär
+                                {t('primary')}
                               </span>
                             )}
                           </div>
@@ -719,7 +719,7 @@ export function OrganisationMembersList({
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${roleColors[member.role]}`}>
                             <RoleIcon className="h-3.5 w-3.5" />
-                            {roleLabels[member.role]}
+                            {roleLabel}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-muted-foreground">
@@ -743,28 +743,28 @@ export function OrganisationMembersList({
                                 onClick={() => handleRoleChange(member.id, 'owner')}
                               >
                                 <ShieldCheckIcon className="h-4 w-4 mr-2 text-emerald-600" />
-                                Gör till ägare
+                                {t('makeOwner')}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 disabled={member.role === 'admin'}
                                 onClick={() => handleRoleChange(member.id, 'admin')}
                               >
                                 <ShieldCheckIcon className="h-4 w-4 mr-2 text-blue-600" />
-                                Gör till admin
+                                {t('makeAdmin')}
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 disabled={member.role === 'member'}
                                 onClick={() => handleRoleChange(member.id, 'member')}
                               >
                                 <UserIcon className="h-4 w-4 mr-2" />
-                                Gör till medlem
+                                {t('makeMember')}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 className="text-destructive focus:text-destructive"
                                 onClick={() => handleRemoveMember(member.id)}
                               >
-                                Ta bort från organisation
+                                {t('removeFromOrg')}
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>

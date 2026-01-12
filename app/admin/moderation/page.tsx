@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
@@ -30,6 +31,7 @@ type TabType = 'queue' | 'reports' | 'stats';
 type QueueItem = ModerationQueueItem;
 
 export default function ModerationAdminPage() {
+  const t = useTranslations('admin.moderation');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -61,7 +63,7 @@ export default function ModerationAdminPage() {
         setStats(statsData);
       } catch (err) {
         console.error('Error loading moderation data:', err);
-        setError('Kunde inte ladda modereringsdata.');
+        setError(t('errors.loadFailedDescription'));
       } finally {
         setLoading(false);
       }
@@ -97,7 +99,7 @@ export default function ModerationAdminPage() {
       setSelectedReport(null);
     } catch (err) {
       console.error('Error resolving report:', err);
-      setError('Kunde inte uppdatera rapporten.');
+      setError(t('errors.updateReportFailed'));
     }
   };
 
@@ -107,7 +109,7 @@ export default function ModerationAdminPage() {
       setQueue((prev) => prev.filter((q) => q.id !== queueId));
     } catch (err) {
       console.error('Error completing queue item:', err);
-      setError('Kunde inte uppdatera modereringskön.');
+      setError(t('errors.updateQueueFailed'));
     }
   };
 
@@ -118,8 +120,8 @@ export default function ModerationAdminPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<ShieldExclamationIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj en organisation för att hantera moderering."
+          title={t('noTenant.title')}
+          description={t('noTenant.description')}
         />
       </AdminPageLayout>
     );
@@ -129,14 +131,14 @@ export default function ModerationAdminPage() {
     <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
-        title="Moderering"
-        description="Content reports, åtgärder och statistik."
+        title={t('page.title')}
+        description={t('page.description')}
         icon={<ShieldExclamationIcon className="h-8 w-8 text-primary" />}
       />
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda modereringsdata"
+          title={t('errors.loadFailed')}
           description={error}
           onRetry={() => {
             setError(null);
@@ -147,10 +149,10 @@ export default function ModerationAdminPage() {
 
       {stats && (
       <AdminStatGrid className="mb-4">
-          <AdminStatCard label="Öppna rapporter" value={stats.pending_reports ?? reports.length} />
-          <AdminStatCard label="Kö" value={openQueueCount} />
-          <AdminStatCard label="Åtgärder" value={stats.actions_taken ?? 0} />
-          <AdminStatCard label="Suspenderade" value={stats.users_suspended ?? 0} />
+          <AdminStatCard label={t('stats.openReports')} value={stats.pending_reports ?? reports.length} />
+          <AdminStatCard label={t('stats.queue')} value={openQueueCount} />
+          <AdminStatCard label={t('stats.actions')} value={stats.actions_taken ?? 0} />
+          <AdminStatCard label={t('stats.suspended')} value={stats.users_suspended ?? 0} />
         </AdminStatGrid>
       )}
 
@@ -165,7 +167,7 @@ export default function ModerationAdminPage() {
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
-            {tab === 'queue' ? 'Kö' : tab === 'reports' ? 'Rapporter' : 'Statistik'}
+            {tab === 'queue' ? t('tabs.queue') : tab === 'reports' ? t('tabs.reports') : t('tabs.stats')}
             {tab === 'queue' && openQueueCount > 0 && (
               <Badge variant="destructive" className="ml-2">
                 {openQueueCount}
@@ -178,12 +180,12 @@ export default function ModerationAdminPage() {
       {activeTab === 'queue' && (
         <div className="space-y-4">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Laddar kö...</p>
+            <p className="text-sm text-muted-foreground">{t('queue.loading')}</p>
           ) : queue.length === 0 ? (
             <AdminEmptyState
               icon={<ShieldExclamationIcon className="h-6 w-6" />}
-              title="Ingen kö"
-              description="Inga poster i modereringskön just nu."
+              title={t('queue.emptyTitle')}
+              description={t('queue.emptyDescription')}
             />
           ) : (
             queue.map((item) => (
@@ -202,7 +204,7 @@ export default function ModerationAdminPage() {
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => void handleCompleteQueueItem(item.id)}>
-                    Markera hanterad
+                    {t('queue.markHandled')}
                   </Button>
                 </CardContent>
               </Card>
@@ -214,12 +216,12 @@ export default function ModerationAdminPage() {
       {activeTab === 'reports' && (
         <div className="grid gap-4 md:grid-cols-2">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Laddar rapporter...</p>
+            <p className="text-sm text-muted-foreground">{t('reports.loading')}</p>
           ) : reports.length === 0 ? (
             <AdminEmptyState
               icon={<ShieldExclamationIcon className="h-6 w-6" />}
-              title="Inga rapporter"
-              description="Det finns inga öppna rapporter."
+              title={t('reports.emptyTitle')}
+              description={t('reports.emptyDescription')}
             />
           ) : (
             reports.map((report) => (
@@ -240,7 +242,7 @@ export default function ModerationAdminPage() {
                     <p className="text-sm text-muted-foreground line-clamp-2">{report.description}</p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    Skapad: {new Date(report.created_at).toLocaleDateString('sv-SE')}
+                    {t('reports.created')} {new Date(report.created_at).toLocaleDateString('sv-SE')}
                   </p>
                 </CardContent>
               </Card>
@@ -253,18 +255,18 @@ export default function ModerationAdminPage() {
         <Card>
           <CardContent className="py-6">
             {loading ? (
-              <p className="text-sm text-muted-foreground">Laddar statistik...</p>
+              <p className="text-sm text-muted-foreground">{t('statsTab.loading')}</p>
             ) : !stats ? (
               <AdminEmptyState
                 icon={<ShieldExclamationIcon className="h-6 w-6" />}
-                title="Ingen statistik"
-                description="Statistik kunde inte hämtas."
+                title={t('statsTab.emptyTitle')}
+                description={t('statsTab.emptyDescription')}
               />
             ) : (
               <div className="grid md:grid-cols-3 gap-4">
-                <AdminStatCard label="Öppna rapporter" value={stats.pending_reports ?? 0} />
-                <AdminStatCard label="Åtgärder totalt" value={stats.actions_taken ?? 0} />
-                <AdminStatCard label="Suspenderade" value={stats.users_suspended ?? 0} />
+                <AdminStatCard label={t('stats.openReports')} value={stats.pending_reports ?? 0} />
+                <AdminStatCard label={t('stats.actionsTotal')} value={stats.actions_taken ?? 0} />
+                <AdminStatCard label={t('stats.suspended')} value={stats.users_suspended ?? 0} />
               </div>
             )}
           </CardContent>
@@ -290,13 +292,13 @@ export default function ModerationAdminPage() {
                 variant="outline"
                 onClick={() => void handleResolveReport(selectedReport, 'dismiss')}
               >
-                Avfärda
+                {t('actions.dismiss')}
               </Button>
               <Button
                 size="sm"
                 onClick={() => void handleResolveReport(selectedReport, 'block')}
               >
-                Blockera
+                {t('actions.block')}
               </Button>
             </div>
           </CardContent>

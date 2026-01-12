@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   AdminBreadcrumbs,
   AdminEmptyState,
@@ -78,6 +79,7 @@ export default function ConversationCardCollectionDetailPage() {
   const params = useParams<{ collectionId: string }>()
   const collectionId = params.collectionId
   const router = useRouter()
+  const t = useTranslations('admin.conversationCards.edit')
 
   const { can, isSystemAdmin, isTenantAdmin } = useRbac()
   const canManage = can('admin.conversation_cards.manage')
@@ -147,7 +149,7 @@ export default function ConversationCardCollectionDetailPage() {
     try {
       const res = await fetch(`/api/admin/toolbelt/conversation-cards/collections/${collectionId}`, { cache: 'no-store' })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ladda samling')
+      if (!res.ok) throw new Error(data.error || t('couldNotLoadCollection'))
 
       const col = data.collection as Collection
       const cardRows = (data.cards ?? []) as CardRow[]
@@ -183,7 +185,7 @@ export default function ConversationCardCollectionDetailPage() {
       }
       setCardEdits(initialEdits)
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : 'Kunde inte ladda samling')
+      setLoadError(e instanceof Error ? e.message : t('couldNotLoadCollection'))
     } finally {
       setLoading(false)
     }
@@ -225,11 +227,11 @@ export default function ConversationCardCollectionDetailPage() {
       })
 
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte spara samling')
+      if (!res.ok) throw new Error(data.error || t('couldNotSaveCollection'))
 
       await load()
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : 'Kunde inte spara samling')
+      setActionError(e instanceof Error ? e.message : t('couldNotSaveCollection'))
     } finally {
       setSaving(false)
     }
@@ -237,17 +239,17 @@ export default function ConversationCardCollectionDetailPage() {
 
   const deleteCollection = async () => {
     if (!collection) return
-    if (!window.confirm('Ta bort samlingen? Detta tar även bort alla kort i samlingen.')) return
+    if (!window.confirm(t('confirmDeleteCollection'))) return
 
     setSaving(true)
     setActionError(null)
     try {
       const res = await fetch(`/api/admin/toolbelt/conversation-cards/collections/${collectionId}`, { method: 'DELETE' })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ta bort')
+      if (!res.ok) throw new Error(data.error || t('couldNotDeleteCollection'))
       router.push('/admin/toolbelt/conversation-cards')
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : 'Kunde inte ta bort')
+      setActionError(e instanceof Error ? e.message : t('couldNotDeleteCollection'))
     } finally {
       setSaving(false)
     }
@@ -255,7 +257,7 @@ export default function ConversationCardCollectionDetailPage() {
 
   const createCard = async () => {
     if (!newCard.primary_prompt.trim()) {
-      setActionError('primary_prompt krävs')
+      setActionError(t('primaryPromptRequired'))
       return
     }
     setSaving(true)
@@ -275,7 +277,7 @@ export default function ConversationCardCollectionDetailPage() {
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte skapa kort')
+      if (!res.ok) throw new Error(data.error || t('couldNotCreateCard'))
 
       setNewCard({
         sort_order: nextSortOrder + 1,
@@ -289,7 +291,7 @@ export default function ConversationCardCollectionDetailPage() {
 
       await load()
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : 'Kunde inte skapa kort')
+      setActionError(e instanceof Error ? e.message : t('couldNotCreateCard'))
     } finally {
       setSaving(false)
     }
@@ -299,7 +301,7 @@ export default function ConversationCardCollectionDetailPage() {
     const draft = cardEdits[cardId]
     if (!draft) return
     if (!draft.primary_prompt.trim()) {
-      setActionError('primary_prompt krävs')
+      setActionError(t('primaryPromptRequired'))
       return
     }
 
@@ -320,30 +322,30 @@ export default function ConversationCardCollectionDetailPage() {
         }),
       })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte spara kort')
+      if (!res.ok) throw new Error(data.error || t('couldNotSaveCard'))
 
       setEditingCardId(null)
       await load()
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : 'Kunde inte spara kort')
+      setActionError(e instanceof Error ? e.message : t('couldNotSaveCard'))
     } finally {
       setSaving(false)
     }
   }
 
   const deleteCard = async (cardId: string) => {
-    if (!window.confirm('Ta bort kortet?')) return
+    if (!window.confirm(t('confirmDeleteCard'))) return
 
     setSaving(true)
     setActionError(null)
     try {
       const res = await fetch(`/api/admin/toolbelt/conversation-cards/cards/${cardId}`, { method: 'DELETE' })
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte ta bort kort')
+      if (!res.ok) throw new Error(data.error || t('couldNotDeleteCard'))
       if (editingCardId === cardId) setEditingCardId(null)
       await load()
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : 'Kunde inte ta bort kort')
+      setActionError(e instanceof Error ? e.message : t('couldNotDeleteCard'))
     } finally {
       setSaving(false)
     }
@@ -354,13 +356,13 @@ export default function ConversationCardCollectionDetailPage() {
       <AdminPageLayout>
         <AdminBreadcrumbs
           items={[
-            { label: 'Startsida', href: '/admin' },
-            { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
-            { label: 'Laddar…' },
+            { label: t('breadcrumbHome'), href: '/admin' },
+            { label: t('breadcrumbCards'), href: '/admin/toolbelt/conversation-cards' },
+            { label: t('breadcrumbLoading') },
           ]}
         />
         <Card className="p-6">
-          <p className="text-sm text-muted-foreground">Laddar…</p>
+          <p className="text-sm text-muted-foreground">{t('loading')}</p>
         </Card>
       </AdminPageLayout>
     )
@@ -371,12 +373,12 @@ export default function ConversationCardCollectionDetailPage() {
       <AdminPageLayout>
         <AdminBreadcrumbs
           items={[
-            { label: 'Startsida', href: '/admin' },
-            { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
-            { label: 'Samling' },
+            { label: t('breadcrumbHome'), href: '/admin' },
+            { label: t('breadcrumbCards'), href: '/admin/toolbelt/conversation-cards' },
+            { label: t('breadcrumbCollection') },
           ]}
         />
-        <AdminErrorState title="Kunde inte ladda" description={loadError} />
+        <AdminErrorState title={t('loadError')} description={loadError} />
       </AdminPageLayout>
     )
   }
@@ -386,12 +388,12 @@ export default function ConversationCardCollectionDetailPage() {
       <AdminPageLayout>
         <AdminBreadcrumbs
           items={[
-            { label: 'Startsida', href: '/admin' },
-            { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
-            { label: 'Samling' },
+            { label: t('breadcrumbHome'), href: '/admin' },
+            { label: t('breadcrumbCards'), href: '/admin/toolbelt/conversation-cards' },
+            { label: t('breadcrumbCollection') },
           ]}
         />
-        <AdminEmptyState title="Hittades inte" description="Samlingen finns inte eller du saknar åtkomst." />
+        <AdminEmptyState title={t('notFoundTitle')} description={t('notFoundDescription')} />
       </AdminPageLayout>
     )
   }
@@ -400,36 +402,36 @@ export default function ConversationCardCollectionDetailPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
+          { label: t('breadcrumbHome'), href: '/admin' },
+          { label: t('breadcrumbCards'), href: '/admin/toolbelt/conversation-cards' },
           { label: collection.title },
         ]}
       />
 
       <AdminPageHeader
         title={collection.title}
-        description="Redigera samling och hantera kort."
+        description={t('pageDescription')}
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button href={`/admin/toolbelt/conversation-cards/${collectionId}/import`} variant="outline">
-              Import (CSV)
+              {t('importCsv')}
             </Button>
             {canEditThisCollection ? (
               <Button variant="outline" onClick={deleteCollection} disabled={saving}>
-                Ta bort
+                {t('delete')}
               </Button>
             ) : null}
             {canEditThisCollection ? (
               <Button onClick={saveCollection} disabled={saving || !form.title.trim()}>
-                {saving ? 'Sparar…' : 'Spara'}
+                {saving ? t('saving') : t('save')}
               </Button>
             ) : null}
           </div>
         }
       />
 
-      {actionError ? <AdminErrorState title="Något gick fel" description={actionError} /> : null}
+      {actionError ? <AdminErrorState title={t('errorTitle')} description={actionError} /> : null}
 
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="outline">{collection.scope_type}</Badge>
@@ -438,16 +440,16 @@ export default function ConversationCardCollectionDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Grundinfo</CardTitle>
+          <CardTitle>{t('basicInfo')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {!canEditThisCollection ? (
-            <div className="text-sm text-muted-foreground">Du kan visa, men inte redigera, denna samling.</div>
+            <div className="text-sm text-muted-foreground">{t('viewOnlyNotice')}</div>
           ) : null}
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <div className="text-sm font-medium">Titel</div>
+              <div className="text-sm font-medium">{t('title')}</div>
               <Input
                 value={form.title}
                 disabled={!canEditThisCollection}
@@ -455,14 +457,14 @@ export default function ConversationCardCollectionDetailPage() {
               />
             </div>
             <div className="space-y-1">
-              <div className="text-sm font-medium">Status</div>
+              <div className="text-sm font-medium">{t('status')}</div>
               <Select
                 value={form.status}
                 disabled={!canEditThisCollection}
                 onChange={(e) => setForm((f) => (f ? { ...f, status: e.target.value as CollectionForm['status'] } : f))}
                 options={[
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'published', label: 'Published' },
+                  { value: 'draft', label: t('statusDraft') },
+                  { value: 'published', label: t('statusPublished') },
                 ]}
               />
             </div>
@@ -470,32 +472,32 @@ export default function ConversationCardCollectionDetailPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <div className="text-sm font-medium">Språk</div>
+              <div className="text-sm font-medium">{t('language')}</div>
               <Input
                 value={form.language}
                 disabled={!canEditThisCollection}
                 onChange={(e) => setForm((f) => (f ? { ...f, language: e.target.value } : f))}
-                placeholder="sv"
+                placeholder={t('languagePlaceholder')}
               />
             </div>
             <div className="space-y-1">
-              <div className="text-sm font-medium">Målgrupp</div>
+              <div className="text-sm font-medium">{t('audience')}</div>
               <Input
                 value={form.audience}
                 disabled={!canEditThisCollection}
                 onChange={(e) => setForm((f) => (f ? { ...f, audience: e.target.value } : f))}
-                placeholder="t.ex. 10–12 år"
+                placeholder={t('audiencePlaceholder')}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium">Beskrivning</div>
+            <div className="text-sm font-medium">{t('description')}</div>
             <Textarea
               value={form.description}
               disabled={!canEditThisCollection}
               onChange={(e) => setForm((f) => (f ? { ...f, description: e.target.value } : f))}
-              placeholder="Kort beskrivning (valfri)"
+              placeholder={t('descriptionPlaceholder')}
             />
           </div>
         </CardContent>
@@ -503,11 +505,11 @@ export default function ConversationCardCollectionDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Syften</CardTitle>
+          <CardTitle>{t('purposes')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <div className="text-sm font-medium">Huvudsyfte</div>
+            <div className="text-sm font-medium">{t('mainPurpose')}</div>
             <Select
               value={form.main_purpose_id ?? ''}
               disabled={!canEditThisCollection}
@@ -523,17 +525,17 @@ export default function ConversationCardCollectionDetailPage() {
                 )
               }
               options={[
-                { value: '', label: loadingPurposes ? 'Laddar…' : '—' },
+                { value: '', label: loadingPurposes ? t('mainPurposeLoading') : t('mainPurposeNone') },
                 ...mainPurposes.map((p) => ({ value: p.id, label: p.name })),
               ]}
             />
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium">Undersyften</div>
+            <div className="text-sm font-medium">{t('subPurposes')}</div>
             <div className="flex flex-wrap gap-2">
               {subPurposes.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Inga undersyften att välja.</div>
+                <div className="text-sm text-muted-foreground">{t('noSubPurposes')}</div>
               ) : (
                 subPurposes.map((p) => {
                   const active = form.secondary_purpose_ids.includes(p.id)
@@ -562,15 +564,15 @@ export default function ConversationCardCollectionDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Kort ({cards.length})</CardTitle>
+          <CardTitle>{t('cardsTitle')} ({cards.length})</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {canEditThisCollection ? (
             <div className="rounded-md border border-border p-4 space-y-3">
-              <div className="text-sm font-medium">Lägg till kort</div>
+              <div className="text-sm font-medium">{t('addCardSection')}</div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">Sortering</div>
+                  <div className="text-xs text-muted-foreground">{t('sortOrder')}</div>
                   <Input
                     type="number"
                     value={newCard.sort_order}
@@ -578,49 +580,49 @@ export default function ConversationCardCollectionDetailPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">Titel (valfri)</div>
+                  <div className="text-xs text-muted-foreground">{t('cardTitleOptional')}</div>
                   <Input value={newCard.card_title} onChange={(e) => setNewCard((c) => ({ ...c, card_title: e.target.value }))} />
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Primär fråga / prompt</div>
+                <div className="text-xs text-muted-foreground">{t('primaryPrompt')}</div>
                 <Textarea value={newCard.primary_prompt} onChange={(e) => setNewCard((c) => ({ ...c, primary_prompt: e.target.value }))} />
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">Följdfråga 1</div>
+                  <div className="text-xs text-muted-foreground">{t('followup1')}</div>
                   <Input value={newCard.followup_1} onChange={(e) => setNewCard((c) => ({ ...c, followup_1: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">Följdfråga 2</div>
+                  <div className="text-xs text-muted-foreground">{t('followup2')}</div>
                   <Input value={newCard.followup_2} onChange={(e) => setNewCard((c) => ({ ...c, followup_2: e.target.value }))} />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs text-muted-foreground">Följdfråga 3</div>
+                  <div className="text-xs text-muted-foreground">{t('followup3')}</div>
                   <Input value={newCard.followup_3} onChange={(e) => setNewCard((c) => ({ ...c, followup_3: e.target.value }))} />
                 </div>
               </div>
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Ledartips (valfri)</div>
+                <div className="text-xs text-muted-foreground">{t('leaderTip')}</div>
                 <Textarea value={newCard.leader_tip} onChange={(e) => setNewCard((c) => ({ ...c, leader_tip: e.target.value }))} />
               </div>
               <div className="flex items-center gap-2">
                 <Button onClick={createCard} disabled={saving || !newCard.primary_prompt.trim()}>
-                  Lägg till
+                  {t('addButton')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setNewCard((c) => ({ ...c, sort_order: nextSortOrder }))}
                   disabled={saving}
                 >
-                  Sätt sortering till slutet
+                  {t('setSortToEnd')}
                 </Button>
               </div>
             </div>
           ) : null}
 
           {cards.length === 0 ? (
-            <div className="text-sm text-muted-foreground">Inga kort än.</div>
+            <div className="text-sm text-muted-foreground">{t('noCardsYet')}</div>
           ) : (
             <div className="space-y-3">
               {cards.map((c) => {
@@ -633,7 +635,7 @@ export default function ConversationCardCollectionDetailPage() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <Badge variant="outline">#{c.sort_order}</Badge>
-                          <div className="font-medium truncate">{c.card_title || 'Kort'}</div>
+                          <div className="font-medium truncate">{c.card_title || t('cardLabel')}</div>
                         </div>
                         <div className="mt-1 text-sm text-muted-foreground line-clamp-2">{c.primary_prompt}</div>
                       </div>
@@ -644,11 +646,11 @@ export default function ConversationCardCollectionDetailPage() {
                           size="sm"
                           onClick={() => setEditingCardId((id) => (id === c.id ? null : c.id))}
                         >
-                          {isEditing ? 'Stäng' : 'Redigera'}
+                          {isEditing ? t('close') : t('edit')}
                         </Button>
                         {canEditThisCollection ? (
                           <Button variant="outline" size="sm" onClick={() => deleteCard(c.id)} disabled={saving}>
-                            Ta bort
+                            {t('deleteCard')}
                           </Button>
                         ) : null}
                       </div>
@@ -658,7 +660,7 @@ export default function ConversationCardCollectionDetailPage() {
                       <div className="mt-4 space-y-3">
                         <div className="grid gap-3 sm:grid-cols-2">
                           <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Sortering</div>
+                            <div className="text-xs text-muted-foreground">{t('sortOrder')}</div>
                             <Input
                               type="number"
                               value={draft.sort_order}
@@ -672,7 +674,7 @@ export default function ConversationCardCollectionDetailPage() {
                             />
                           </div>
                           <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Titel</div>
+                            <div className="text-xs text-muted-foreground">{t('cardTitle')}</div>
                             <Input
                               value={draft.card_title}
                               disabled={!canEditThisCollection}
@@ -687,7 +689,7 @@ export default function ConversationCardCollectionDetailPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <div className="text-xs text-muted-foreground">Primär fråga / prompt</div>
+                          <div className="text-xs text-muted-foreground">{t('primaryPrompt')}</div>
                           <Textarea
                             value={draft.primary_prompt}
                             disabled={!canEditThisCollection}
@@ -702,7 +704,7 @@ export default function ConversationCardCollectionDetailPage() {
 
                         <div className="grid gap-3 sm:grid-cols-3">
                           <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Följdfråga 1</div>
+                            <div className="text-xs text-muted-foreground">{t('followup1')}</div>
                             <Input
                               value={draft.followup_1}
                               disabled={!canEditThisCollection}
@@ -715,7 +717,7 @@ export default function ConversationCardCollectionDetailPage() {
                             />
                           </div>
                           <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Följdfråga 2</div>
+                            <div className="text-xs text-muted-foreground">{t('followup2')}</div>
                             <Input
                               value={draft.followup_2}
                               disabled={!canEditThisCollection}
@@ -728,7 +730,7 @@ export default function ConversationCardCollectionDetailPage() {
                             />
                           </div>
                           <div className="space-y-1">
-                            <div className="text-xs text-muted-foreground">Följdfråga 3</div>
+                            <div className="text-xs text-muted-foreground">{t('followup3')}</div>
                             <Input
                               value={draft.followup_3}
                               disabled={!canEditThisCollection}
@@ -743,7 +745,7 @@ export default function ConversationCardCollectionDetailPage() {
                         </div>
 
                         <div className="space-y-1">
-                          <div className="text-xs text-muted-foreground">Ledartips</div>
+                          <div className="text-xs text-muted-foreground">{t('leaderTipLabel')}</div>
                           <Textarea
                             value={draft.leader_tip}
                             disabled={!canEditThisCollection}
@@ -759,7 +761,7 @@ export default function ConversationCardCollectionDetailPage() {
                         {canEditThisCollection ? (
                           <div className="flex items-center gap-2">
                             <Button onClick={() => saveCard(c.id)} disabled={saving || !draft.primary_prompt.trim()}>
-                              Spara kort
+                              {t('saveCard')}
                             </Button>
                           </div>
                         ) : null}
@@ -775,11 +777,11 @@ export default function ConversationCardCollectionDetailPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Förhandsvisning</CardTitle>
+          <CardTitle>{t('preview')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {cards.length === 0 ? (
-            <div className="text-sm text-muted-foreground">Inga kort att förhandsvisa.</div>
+            <div className="text-sm text-muted-foreground">{t('noCardsToPreview')}</div>
           ) : (
             <div className="space-y-4">
               {cards
@@ -788,20 +790,20 @@ export default function ConversationCardCollectionDetailPage() {
                 .map((c) => (
                   <div key={c.id} className="rounded-md border border-border p-4">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="font-medium">{c.card_title || 'Kort'}</div>
+                      <div className="font-medium">{c.card_title || t('cardLabel')}</div>
                       <Badge variant="outline">#{c.sort_order}</Badge>
                     </div>
                     <div className="mt-2 whitespace-pre-wrap">{c.primary_prompt}</div>
                     {c.followup_1 || c.followup_2 || c.followup_3 ? (
                       <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                        {c.followup_1 ? <div>Följdfråga 1: {c.followup_1}</div> : null}
-                        {c.followup_2 ? <div>Följdfråga 2: {c.followup_2}</div> : null}
-                        {c.followup_3 ? <div>Följdfråga 3: {c.followup_3}</div> : null}
+                        {c.followup_1 ? <div>{t('followup1')}: {c.followup_1}</div> : null}
+                        {c.followup_2 ? <div>{t('followup2')}: {c.followup_2}</div> : null}
+                        {c.followup_3 ? <div>{t('followup3')}: {c.followup_3}</div> : null}
                       </div>
                     ) : null}
                     {c.leader_tip ? (
                       <div className="mt-3 text-sm">
-                        <span className="font-medium">Ledartips:</span> {c.leader_tip}
+                        <span className="font-medium">{t('leaderTipLabel')}:</span> {c.leader_tip}
                       </div>
                     ) : null}
                   </div>

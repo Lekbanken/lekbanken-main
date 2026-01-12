@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
@@ -63,6 +64,7 @@ const statusConfig: Record<SubscriptionStatus, { label: string; variant: 'defaul
 };
 
 export default function SubscriptionsPage() {
+  const t = useTranslations('admin.billing.subscriptions');
   const router = useRouter();
   const { user } = useAuth();
   const { currentTenant } = useTenant();
@@ -200,18 +202,18 @@ export default function SubscriptionsPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Prenumerationer"
-        description="Hantera aktiva prenumerationer och abonnemang"
+        title={t('title')}
+        description={t('description')}
         icon={<CreditCardIcon className="h-6 w-6" />}
         breadcrumbs={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Fakturering', href: '/admin/billing' },
-          { label: 'Prenumerationer' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.billing'), href: '/admin/billing' },
+          { label: t('breadcrumbs.subscriptions') },
         ]}
         actions={
           <Button variant="outline" onClick={() => router.push('/admin/billing')} className="gap-2">
             <ArrowLeftIcon className="h-4 w-4" />
-            Tillbaka
+            {t('back')}
           </Button>
         }
       />
@@ -219,28 +221,28 @@ export default function SubscriptionsPage() {
       {/* Stats */}
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Totalt"
+          label={t('stats.total')}
           value={stats?.total ?? 0}
           icon={<CreditCardIcon className="h-5 w-5" />}
           iconColor="primary"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Aktiva"
+          label={t('stats.active')}
           value={stats?.active ?? 0}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Testperiod"
+          label={t('stats.trial')}
           value={stats?.trial ?? 0}
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="amber"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="MRR"
+          label={t('stats.mrr')}
           value={stats ? `${stats.mrr.toLocaleString('sv-SE')} ${subscriptions[0]?.billing_product?.currency || 'SEK'}` : '-'}
           icon={<span className="text-base">💰</span>}
           iconColor="blue"
@@ -252,7 +254,7 @@ export default function SubscriptionsPage() {
       <AdminTableToolbar
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Sök organisation..."
+        searchPlaceholder={t('search')}
         className="mb-4"
         filters={
           <select
@@ -260,11 +262,11 @@ export default function SubscriptionsPage() {
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="all">Alla statusar</option>
-            <option value="active">Aktiva</option>
-            <option value="trial">Testperiod</option>
-            <option value="paused">Pausade</option>
-            <option value="canceled">Avslutade</option>
+            <option value="all">{t('filter.all')}</option>
+            <option value="active">{t('filter.active')}</option>
+            <option value="trial">{t('filter.trial')}</option>
+            <option value="paused">{t('filter.paused')}</option>
+            <option value="canceled">{t('filter.canceled')}</option>
           </select>
         }
       />
@@ -278,9 +280,9 @@ export default function SubscriptionsPage() {
         emptyState={
           <EmptyState
             icon={<CreditCardIcon className="h-8 w-8" />}
-            title="Inga prenumerationer"
-            description={loadError ? loadError : searchQuery ? `Inga resultat för "${searchQuery}"` : 'Det finns inga prenumerationer att visa.'}
-            action={searchQuery ? { label: 'Rensa sökning', onClick: () => setSearchQuery('') } : undefined}
+            title={t('emptyTitle')}
+            description={loadError ? loadError : searchQuery ? t('noResultsFor', { query: searchQuery }) : t('emptyDescription')}
+            action={searchQuery ? { label: t('clearSearch'), onClick: () => setSearchQuery('') } : undefined}
           />
         }
         className="mb-4"

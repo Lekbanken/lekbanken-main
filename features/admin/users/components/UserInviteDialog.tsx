@@ -2,6 +2,7 @@
 
 import type { FormEvent} from "react";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 import {
   Button,
@@ -28,6 +29,7 @@ type UserInviteDialogProps = {
 const inviteRoles: UserRole[] = ["owner", "admin", "editor", "member"];
 
 export function UserInviteDialog({ open, onOpenChange, onInvite, defaultOrganisation }: UserInviteDialogProps) {
+  const t = useTranslations('admin.users.invite');
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [role, setRole] = useState<UserRole>("member");
@@ -67,62 +69,62 @@ export function UserInviteDialog({ open, onOpenChange, onInvite, defaultOrganisa
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
               <EnvelopeIcon className="h-4 w-4 text-primary" />
             </div>
-            Invite user
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Send an invitation to join your organisation with the appropriate role.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="space-y-1.5">
             <label htmlFor="invite-email" className="text-sm font-medium text-foreground">
-              Email <span className="text-destructive">*</span>
+              {t('emailLabel')} <span className="text-destructive">{t('required')}</span>
             </label>
             <Input
               id="invite-email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="user@example.com"
+              placeholder={t('emailPlaceholder')}
               required
             />
           </div>
 
           <div className="space-y-1.5">
             <label htmlFor="invite-name" className="text-sm font-medium text-foreground">
-              Name <span className="text-muted-foreground">(optional)</span>
+              {t('nameLabel')} <span className="text-muted-foreground">{t('nameOptional')}</span>
             </label>
             <Input
               id="invite-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
-              placeholder="Full name"
+              placeholder={t('namePlaceholder')}
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label htmlFor="invite-role" className="text-sm font-medium text-foreground">
-                Role <span className="text-destructive">*</span>
+                {t('roleLabel')} <span className="text-destructive">{t('required')}</span>
               </label>
               <Select
                 id="invite-role"
                 value={role}
                 onChange={(event) => setRole(event.target.value as UserRole)}
                 options={inviteRoles.map((value) => ({ value, label: roleLabels[value] }))}
-                placeholder="Select role"
+                placeholder={t('rolePlaceholder')}
               />
             </div>
             <div className="space-y-1.5">
               <label htmlFor="invite-org" className="text-sm font-medium text-foreground">
-                Organisation
+                {t('organisationLabel')}
               </label>
               <Input
                 id="invite-org"
                 value={organisation}
                 onChange={(event) => setOrganisation(event.target.value)}
-                placeholder="Organisation name"
+                placeholder={t('organisationPlaceholder')}
                 disabled
                 className="bg-muted"
               />
@@ -131,24 +133,24 @@ export function UserInviteDialog({ open, onOpenChange, onInvite, defaultOrganisa
 
           <div className="space-y-1.5">
             <label htmlFor="invite-message" className="text-sm font-medium text-foreground">
-              Personal message <span className="text-muted-foreground">(optional)</span>
+              {t('messageLabel')} <span className="text-muted-foreground">{t('messageOptional')}</span>
             </label>
             <Textarea
               id="invite-message"
               value={message}
               onChange={(event) => setMessage(event.target.value)}
-              placeholder="Add a short welcome message for the invitee..."
+              placeholder={t('messagePlaceholder')}
               rows={3}
             />
           </div>
 
           <DialogFooter className="gap-2 pt-4">
             <Button variant="outline" type="button" onClick={() => onOpenChange(false)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={!email || isSubmitting} className="gap-2">
               <EnvelopeIcon className="h-4 w-4" />
-              {isSubmitting ? "Sending..." : "Send invite"}
+              {isSubmitting ? t('sending') : t('submit')}
             </Button>
           </DialogFooter>
         </form>

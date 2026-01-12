@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   CubeIcon,
   PlusIcon,
@@ -46,15 +47,16 @@ type ProductListItem = {
   updatedAt: string | null;
 };
 
-const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
-  active: { label: "Aktiv", variant: "default" },
-  inactive: { label: "Inaktiv", variant: "secondary" },
-  draft: { label: "Utkast", variant: "outline" },
-  archived: { label: "Arkiverad", variant: "destructive" },
+const statusVariants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  active: "default",
+  inactive: "secondary",
+  draft: "outline",
+  archived: "destructive",
 };
 
 export function ProductsTab() {
   const router = useRouter();
+  const t = useTranslations('admin.products.productsTab');
   const { can } = useRbac();
   const _toast = useToast(); // Reserved for future toast notifications
 
@@ -91,7 +93,7 @@ export function ProductsTab() {
         if (isMounted) setProducts(items);
       } catch (err) {
         console.error("Failed to load products", err);
-        if (isMounted) setError("Kunde inte ladda produkter.");
+        if (isMounted) setError(t('loadError'));
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -134,7 +136,7 @@ export function ProductsTab() {
         <CardContent className="p-6 text-center">
           <p className="text-destructive">{error}</p>
           <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
-            Försök igen
+            {t('retry')}
           </Button>
         </CardContent>
       </Card>
@@ -149,7 +151,7 @@ export function ProductsTab() {
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Sök produkter..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -158,7 +160,7 @@ export function ProductsTab() {
         {canCreate && (
           <Button className="gap-2">
             <PlusIcon className="h-4 w-4" />
-            Ny produkt
+            {t('newProduct')}
           </Button>
         )}
       </div>
@@ -166,14 +168,15 @@ export function ProductsTab() {
       {/* Product grid */}
       {filteredProducts.length === 0 ? (
         <EmptyState
-          title={searchQuery ? "Inga matchande produkter" : "Inga produkter ännu"}
-          description={searchQuery ? "Justera sökningen för att se fler." : "Skapa din första produkt."}
-          action={!searchQuery && canCreate ? { label: "Skapa produkt", onClick: () => {} } : undefined}
+          title={searchQuery ? t('noMatchingProducts') : t('noProductsYet')}
+          description={searchQuery ? t('adjustSearch') : t('createFirstProduct')}
+          action={!searchQuery && canCreate ? { label: t('createProduct'), onClick: () => {} } : undefined}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredProducts.map((product) => {
-            const statusInfo = statusConfig[product.status] ?? statusConfig.active;
+            const statusVariant = statusVariants[product.status] ?? statusVariants.active;
+            const statusLabel = product.status === 'active' ? t('statusActive') : product.status === 'inactive' ? t('statusInactive') : product.status === 'draft' ? t('statusDraft') : t('statusArchived');
             return (
               <Card
                 key={product.id}
@@ -200,18 +203,18 @@ export function ProductsTab() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => router.push(`/admin/products/${product.id}`)}>
                           <ArrowTopRightOnSquareIcon className="mr-2 h-4 w-4" />
-                          Visa
+                          {t('view')}
                         </DropdownMenuItem>
                         {canEdit && (
                           <DropdownMenuItem onClick={() => router.push(`/admin/products/${product.id}/edit`)}>
                             <PencilSquareIcon className="mr-2 h-4 w-4" />
-                            Redigera
+                            {t('edit')}
                           </DropdownMenuItem>
                         )}
                         {canDelete && (
                           <DropdownMenuItem className="text-destructive">
                             <TrashIcon className="mr-2 h-4 w-4" />
-                            Ta bort
+                            {t('delete')}
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -227,7 +230,7 @@ export function ProductsTab() {
 
                   {/* Footer */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                    <Badge variant={statusVariant}>{statusLabel}</Badge>
                     {product.purposeName && (
                       <Badge
                         variant="outline"

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   formatCurrencyWithDecimals as formatCurrency,
   formatDateLong as formatDate,
@@ -65,18 +66,19 @@ import {
 // ============================================================================
 
 function CopyButton({ text, label }: { text: string; label?: string }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const { info } = useToast();
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(text);
-    info('Kopierat till urklipp');
-  }, [text, info]);
+    info(t('copied'));
+  }, [text, info, t]);
 
   return (
     <button
       onClick={handleCopy}
       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      title={`Kopiera ${label || text}`}
+      title={t('copyTooltip', { label: label || text })}
     >
       <ClipboardDocumentIcon className="h-3.5 w-3.5" />
       {label && <span>{label}</span>}
@@ -100,6 +102,7 @@ function StripeBadge({ status }: { status: StripeLinkageStatus }) {
 }
 
 function HealthBadge({ status, issues }: { status: HealthStatus; issues?: string[] }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const meta = HEALTH_STATUS_META[status];
   const Icon = status === 'ok' ? CheckCircleIcon : ExclamationTriangleIcon;
 
@@ -114,7 +117,7 @@ function HealthBadge({ status, issues }: { status: HealthStatus; issues?: string
         {meta.label}
       </Badge>
       {issues && issues.length > 0 && (
-        <span className="text-xs text-muted-foreground">({issues.length} problem)</span>
+        <span className="text-xs text-muted-foreground">({issues.length} {t('overview.issues')})</span>
       )}
     </div>
   );
@@ -155,17 +158,18 @@ function OverviewTab({
   product: ProductDetail;
   onEdit: () => void;
 }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const typeMeta = PRODUCT_TYPE_META[product.product_type];
 
   return (
     <div className="space-y-6">
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard label="Priser" value={product.prices_count} icon={CurrencyDollarIcon} />
-        <StatCard label="Entitlements" value={product.entitlements?.length ?? 0} icon={KeyIcon} />
-        <StatCard label="Organisationer" value={product.assigned_tenants_count} icon={BuildingOfficeIcon} />
+        <StatCard label={t('overview.stats.prices')} value={product.prices_count} icon={CurrencyDollarIcon} />
+        <StatCard label={t('overview.stats.entitlements')} value={product.entitlements?.length ?? 0} icon={KeyIcon} />
+        <StatCard label={t('overview.stats.organizations')} value={product.assigned_tenants_count} icon={BuildingOfficeIcon} />
         <StatCard
-          label="Senast uppdaterad"
+          label={t('overview.stats.lastUpdated')}
           value={formatDate(product.updated_at)}
           icon={ClockIcon}
         />
@@ -176,30 +180,30 @@ function OverviewTab({
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <CubeIcon className="h-4 w-4" />
-            Grundinformation
+            {t('overview.basicInfo')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="UUID" copyValue={product.id}>
+          <InfoRow label={t('overview.uuid')} copyValue={product.id}>
             <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">
               {product.id.slice(0, 8)}...
             </code>
           </InfoRow>
-          <InfoRow label="Produktnyckel" copyValue={product.product_key || ''}>
+          <InfoRow label={t('overview.productKey')} copyValue={product.product_key || ''}>
             <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">
               {product.product_key || '—'}
             </code>
           </InfoRow>
-          <InfoRow label="Typ">
+          <InfoRow label={t('overview.type')}>
             <Badge variant="outline">{typeMeta.label}</Badge>
           </InfoRow>
-          <InfoRow label="Kategori">
+          <InfoRow label={t('overview.category')}>
             {product.category || '—'}
           </InfoRow>
-          <InfoRow label="Status">
+          <InfoRow label={t('overview.status')}>
             <StatusBadge status={product.status} />
           </InfoRow>
-          <InfoRow label="Stripe">
+          <InfoRow label={t('overview.stripe')}>
             <StripeBadge status={product.stripe_linkage.status} />
           </InfoRow>
         </CardContent>
@@ -210,16 +214,16 @@ function OverviewTab({
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <DocumentTextIcon className="h-4 w-4" />
-            Beskrivningar
+            {t('overview.descriptions')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-3">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Intern beskrivning</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('overview.internalDescription')}</p>
             <p className="text-sm">{product.internal_description || '—'}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground mb-1">Kundbeskrivning</p>
+            <p className="text-xs text-muted-foreground mb-1">{t('overview.customerDescription')}</p>
             <p className="text-sm">{product.customer_description || '—'}</p>
           </div>
         </CardContent>
@@ -231,7 +235,7 @@ function OverviewTab({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <TagIcon className="h-4 w-4" />
-              Taggar
+              {t('overview.tags')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -252,7 +256,7 @@ function OverviewTab({
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-destructive">
               <ExclamationTriangleIcon className="h-4 w-4" />
-              Hälsoproblem
+              {t('overview.healthIssues')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -269,7 +273,7 @@ function OverviewTab({
       {/* Edit Button */}
       <Button className="w-full" onClick={onEdit}>
         <PencilSquareIcon className="mr-2 h-4 w-4" />
-        Redigera produkt
+        {t('overview.editProduct')}
       </Button>
     </div>
   );
@@ -280,6 +284,7 @@ function OverviewTab({
 // ============================================================================
 
 function PricingTab({ product }: { product: ProductDetail }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const linkage = product.stripe_linkage;
 
   return (
@@ -289,26 +294,26 @@ function PricingTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <LinkIcon className="h-4 w-4" />
-            Stripe-koppling
+            {t('pricing.stripeLinkage')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Status">
+          <InfoRow label={t('pricing.status')}>
             <StripeBadge status={linkage.status} />
           </InfoRow>
-          <InfoRow label="Stripe Product ID" copyValue={linkage.stripe_product_id || ''}>
+          <InfoRow label={t('pricing.stripeProductId')} copyValue={linkage.stripe_product_id || ''}>
             {linkage.stripe_product_id ? (
               <code className="text-xs bg-muted px-1.5 py-0.5 rounded font-mono">
                 {linkage.stripe_product_id}
               </code>
             ) : (
-              <span className="text-muted-foreground">Ej kopplad</span>
+              <span className="text-muted-foreground">{t('pricing.notLinked')}</span>
             )}
           </InfoRow>
-          <InfoRow label="Senast synkad">
+          <InfoRow label={t('pricing.lastSynced')}>
             {formatDateTime(linkage.last_synced_at)}
           </InfoRow>
-          <InfoRow label="Aktiva priser">
+          <InfoRow label={t('pricing.activePrices')}>
             {linkage.active_prices_count}
           </InfoRow>
         </CardContent>
@@ -320,7 +325,7 @@ function PricingTab({ product }: { product: ProductDetail }) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-warning">
               <ExclamationTriangleIcon className="h-4 w-4" />
-              Avvikelser mot Stripe
+              {t('pricing.driftDetection')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -328,9 +333,9 @@ function PricingTab({ product }: { product: ProductDetail }) {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 text-muted-foreground font-medium">Fält</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Lokalt</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Stripe</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.driftField')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.driftLocal')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.driftStripe')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -353,28 +358,28 @@ function PricingTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <CurrencyDollarIcon className="h-4 w-4" />
-            Priser ({product.prices?.length ?? 0})
+            {t('pricing.pricesTitle', { count: product.prices?.length ?? 0 })}
           </CardTitle>
           <Button variant="outline" size="sm" disabled>
-            Lägg till pris
+            {t('pricing.addPrice')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
           {(!product.prices || product.prices.length === 0) ? (
             <div className="py-8 text-center text-muted-foreground">
               <CurrencyDollarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga priser konfigurerade</p>
+              <p>{t('pricing.noPrices')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 text-muted-foreground font-medium">Belopp</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Intervall</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Stripe ID</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                    <th className="text-right py-2 text-muted-foreground font-medium">Åtgärder</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.tableAmount')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.tableInterval')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.tableStripeId')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('pricing.tableStatus')}</th>
+                    <th className="text-right py-2 text-muted-foreground font-medium">{t('pricing.tableActions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -391,13 +396,14 @@ function PricingTab({ product }: { product: ProductDetail }) {
       {/* Sync Button */}
       <Button variant="outline" className="w-full" disabled>
         <ArrowPathIcon className="mr-2 h-4 w-4" />
-        Synkronisera med Stripe
+        {t('pricing.syncStripe')}
       </Button>
     </div>
   );
 }
 
 function PriceRow({ price }: { price: ProductPrice }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const intervalMeta = PRICE_INTERVAL_META[price.interval];
 
   return (
@@ -406,7 +412,7 @@ function PriceRow({ price }: { price: ProductPrice }) {
         <div className="flex items-center gap-2">
           <span className="font-medium">{formatCurrency(price.amount, price.currency)}</span>
           {price.is_default && (
-            <Badge variant="secondary" className="text-xs">Standard</Badge>
+            <Badge variant="secondary" className="text-xs">{t('pricing.default')}</Badge>
           )}
         </div>
       </td>
@@ -424,12 +430,12 @@ function PriceRow({ price }: { price: ProductPrice }) {
       </td>
       <td className="py-2">
         <Badge variant={price.active ? 'default' : 'secondary'}>
-          {price.active ? 'Aktiv' : 'Inaktiv'}
+          {price.active ? t('pricing.active') : t('pricing.inactive')}
         </Badge>
       </td>
       <td className="py-2 text-right">
         <Button variant="ghost" size="sm" disabled>
-          Redigera
+          {t('pricing.edit')}
         </Button>
       </td>
     </tr>
@@ -441,6 +447,7 @@ function PriceRow({ price }: { price: ProductPrice }) {
 // ============================================================================
 
 function EntitlementsTab({ product }: { product: ProductDetail }) {
+  const t = useTranslations('admin.products.v2.drawer');
   return (
     <div className="space-y-6">
       {/* Entitlements List */}
@@ -448,18 +455,18 @@ function EntitlementsTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <KeyIcon className="h-4 w-4" />
-            Feature Entitlements ({product.entitlements?.length ?? 0})
+            {t('entitlements.title', { count: product.entitlements?.length ?? 0 })}
           </CardTitle>
           <Button variant="outline" size="sm" disabled>
-            Lägg till
+            {t('entitlements.add')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
           {(!product.entitlements || product.entitlements.length === 0) ? (
             <div className="py-8 text-center text-muted-foreground">
               <KeyIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga entitlements konfigurerade</p>
-              <p className="text-xs mt-1">Definiera vilka funktioner denna produkt låser upp</p>
+              <p>{t('entitlements.noEntitlements')}</p>
+              <p className="text-xs mt-1">{t('entitlements.noEntitlementsHint')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -476,13 +483,13 @@ function EntitlementsTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <LinkIcon className="h-4 w-4" />
-            Beroenden
+            {t('entitlements.dependencies')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           {(!product.dependencies || product.dependencies.length === 0) ? (
             <div className="py-4 text-center text-muted-foreground text-sm">
-              Inga beroenden konfigurerade
+              {t('entitlements.noDependencies')}
             </div>
           ) : (
             <div className="space-y-2">
@@ -493,7 +500,7 @@ function EntitlementsTab({ product }: { product: ProductDetail }) {
                 >
                   <div className="flex items-center gap-2">
                     <Badge variant={dep.dependency_type === 'requires' ? 'default' : 'destructive'}>
-                      {dep.dependency_type === 'requires' ? 'Kräver' : 'Utesluter'}
+                      {dep.dependency_type === 'requires' ? t('entitlements.requires') : t('entitlements.excludes')}
                     </Badge>
                     <span className="text-sm">{dep.target_product_name}</span>
                   </div>
@@ -508,6 +515,7 @@ function EntitlementsTab({ product }: { product: ProductDetail }) {
 }
 
 function EntitlementRow({ entitlement }: { entitlement: ProductEntitlement }) {
+  const t = useTranslations('admin.products.v2.drawer');
   return (
     <div className="flex items-center justify-between py-2 px-3 rounded-lg border border-border bg-muted/20">
       <div className="flex items-center gap-3">
@@ -520,7 +528,7 @@ function EntitlementRow({ entitlement }: { entitlement: ProductEntitlement }) {
         </div>
       </div>
       <Badge variant={entitlement.enabled ? 'default' : 'secondary'}>
-        {entitlement.enabled ? 'Aktiverad' : 'Inaktiverad'}
+        {entitlement.enabled ? t('entitlements.enabled') : t('entitlements.disabled')}
       </Badge>
     </div>
   );
@@ -531,6 +539,7 @@ function EntitlementRow({ entitlement }: { entitlement: ProductEntitlement }) {
 // ============================================================================
 
 function AvailabilityTab({ product }: { product: ProductDetail }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const availability = product.availability;
   const scopeMeta = AVAILABILITY_SCOPE_META[availability?.scope ?? 'global'];
 
@@ -541,20 +550,20 @@ function AvailabilityTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <GlobeAltIcon className="h-4 w-4" />
-            Tillgänglighetsomfång
+            {t('availability.scope')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Omfång">
+          <InfoRow label={t('availability.scopeLabel')}>
             <Badge variant="outline">{scopeMeta.label}</Badge>
           </InfoRow>
-          <InfoRow label="Beskrivning">
+          <InfoRow label={t('availability.description')}>
             {scopeMeta.description}
           </InfoRow>
-          <InfoRow label="Licensmodell">
-            {availability?.license_model === 'per_tenant' && 'Per organisation'}
-            {availability?.license_model === 'per_seat' && 'Per säte'}
-            {availability?.license_model === 'per_user' && 'Per användare'}
+          <InfoRow label={t('availability.licenseModel')}>
+            {availability?.license_model === 'per_tenant' && t('availability.perTenant')}
+            {availability?.license_model === 'per_seat' && t('availability.perSeat')}
+            {availability?.license_model === 'per_user' && t('availability.perUser')}
             {!availability?.license_model && '—'}
           </InfoRow>
         </CardContent>
@@ -565,27 +574,27 @@ function AvailabilityTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <BuildingOfficeIcon className="h-4 w-4" />
-            Organisationstilldelningar ({availability?.total_assigned_tenants ?? 0})
+            {t('availability.tenantAssignments', { count: availability?.total_assigned_tenants ?? 0 })}
           </CardTitle>
           <Button variant="outline" size="sm" disabled>
-            Tilldela
+            {t('availability.assign')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
           {(!availability?.tenant_assignments || availability.tenant_assignments.length === 0) ? (
             <div className="py-8 text-center text-muted-foreground">
               <BuildingOfficeIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga organisationer tilldelade</p>
+              <p>{t('availability.noTenants')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-2 text-muted-foreground font-medium">Organisation</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Status</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Stripe</th>
-                    <th className="text-left py-2 text-muted-foreground font-medium">Tilldelad</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('availability.tableOrganization')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('availability.tableStatus')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('availability.tableStripe')}</th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">{t('availability.tableAssigned')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -603,6 +612,7 @@ function AvailabilityTab({ product }: { product: ProductDetail }) {
 }
 
 function TenantRow({ assignment }: { assignment: TenantAssignment }) {
+  const t = useTranslations('admin.products.v2.drawer');
   return (
     <tr className="border-b border-border last:border-0">
       <td className="py-2">
@@ -618,21 +628,21 @@ function TenantRow({ assignment }: { assignment: TenantAssignment }) {
               : 'destructive'
           }
         >
-          {assignment.status === 'active' && 'Aktiv'}
-          {assignment.status === 'pending' && 'Väntande'}
-          {assignment.status === 'revoked' && 'Återkallad'}
+          {assignment.status === 'active' && t('availability.statusActive')}
+          {assignment.status === 'pending' && t('availability.statusPending')}
+          {assignment.status === 'revoked' && t('availability.statusRevoked')}
         </Badge>
       </td>
       <td className="py-2">
         {assignment.has_stripe_customer ? (
           <Badge variant="default" className="gap-1">
             <CheckCircleIcon className="h-3 w-3" />
-            Kopplad
+            {t('availability.stripeLinked')}
           </Badge>
         ) : (
           <Badge variant="secondary" className="gap-1">
             <XCircleIcon className="h-3 w-3" />
-            Saknas
+            {t('availability.stripeMissing')}
           </Badge>
         )}
       </td>
@@ -648,6 +658,7 @@ function TenantRow({ assignment }: { assignment: TenantAssignment }) {
 // ============================================================================
 
 function LifecycleTab({ product }: { product: ProductDetail }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const lifecycle = product.lifecycle;
   const checklist = product.publish_checklist;
 
@@ -658,25 +669,25 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <ClockIcon className="h-4 w-4" />
-            Aktuellt tillstånd
+            {t('lifecycle.currentState')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Status">
+          <InfoRow label={t('lifecycle.status')}>
             <StatusBadge status={product.status} />
           </InfoRow>
-          <InfoRow label="Kan aktiveras">
+          <InfoRow label={t('lifecycle.canActivate')}>
             {lifecycle?.can_activate ? (
-              <Badge variant="default">Ja</Badge>
+              <Badge variant="default">{t('lifecycle.yes')}</Badge>
             ) : (
-              <Badge variant="destructive">Nej</Badge>
+              <Badge variant="destructive">{t('lifecycle.no')}</Badge>
             )}
           </InfoRow>
-          <InfoRow label="Kan arkiveras">
+          <InfoRow label={t('lifecycle.canArchive')}>
             {lifecycle?.can_archive ? (
-              <Badge variant="default">Ja</Badge>
+              <Badge variant="default">{t('lifecycle.yes')}</Badge>
             ) : (
-              <Badge variant="destructive">Nej</Badge>
+              <Badge variant="destructive">{t('lifecycle.no')}</Badge>
             )}
           </InfoRow>
         </CardContent>
@@ -688,7 +699,7 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2 text-destructive">
               <LockClosedIcon className="h-4 w-4" />
-              Aktiveringsblockerare
+              {t('lifecycle.activationBlockers')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -707,12 +718,12 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <CheckCircleIcon className="h-4 w-4" />
-            Publicerings-checklista
+            {t('lifecycle.publishChecklist')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0 space-y-2">
           <ChecklistItem
-            label="Har giltigt pris (om betald)"
+            label={t('lifecycle.checklistPrice')}
             passed={checklist?.has_valid_price ?? false}
           />
           {/* Entitlements check disabled until feature is implemented */}
@@ -721,11 +732,11 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
             passed={checklist?.has_entitlements ?? false}
           /> */}
           <ChecklistItem
-            label="Tillgänglighetsregler giltiga"
+            label={t('lifecycle.checklistAvailability')}
             passed={checklist?.availability_rules_valid ?? false}
           />
           <ChecklistItem
-            label="Stripe-koppling OK"
+            label={t('lifecycle.checklistStripe')}
             passed={checklist?.stripe_linkage_ok ?? false}
           />
         </CardContent>
@@ -734,13 +745,13 @@ function LifecycleTab({ product }: { product: ProductDetail }) {
       {/* Timestamps */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Tidsstämplar</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('lifecycle.timestamps')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Skapad">
+          <InfoRow label={t('lifecycle.created')}>
             {formatDateTime(product.created_at)}
           </InfoRow>
-          <InfoRow label="Senast uppdaterad">
+          <InfoRow label={t('lifecycle.lastUpdated')}>
             {formatDateTime(product.updated_at)}
           </InfoRow>
         </CardContent>
@@ -769,6 +780,7 @@ function ChecklistItem({ label, passed }: { label: string; passed: boolean }) {
 // ============================================================================
 
 function AuditTab({ product }: { product: ProductDetail }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const events = product.recent_audit_events || [];
 
   return (
@@ -777,17 +789,17 @@ function AuditTab({ product }: { product: ProductDetail }) {
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <DocumentTextIcon className="h-4 w-4" />
-            Senaste händelser
+            {t('audit.title')}
           </CardTitle>
           <Button variant="outline" size="sm" disabled>
-            Exportera
+            {t('audit.export')}
           </Button>
         </CardHeader>
         <CardContent className="pt-0">
           {events.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
               <DocumentTextIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga loggade händelser</p>
+              <p>{t('audit.noEvents')}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -803,6 +815,7 @@ function AuditTab({ product }: { product: ProductDetail }) {
 }
 
 function AuditEventRow({ event }: { event: ProductAuditEvent }) {
+  const t = useTranslations('admin.products.v2.drawer');
   const eventMeta = AUDIT_EVENT_META[event.event_type as keyof typeof AUDIT_EVENT_META] || {
     label: event.event_type,
     color: '#6b7280',
@@ -826,7 +839,7 @@ function AuditEventRow({ event }: { event: ProductAuditEvent }) {
           </span>
         </div>
         <p className="text-xs text-muted-foreground">
-          {event.actor_email || 'System'}
+          {event.actor_email || t('audit.systemActor')}
         </p>
       </div>
     </div>
@@ -850,17 +863,18 @@ export function ProductCardDrawer({
   onOpenChange,
   onRefresh,
 }: ProductCardDrawerProps) {
+  const t = useTranslations('admin.products.v2.drawer');
   const router = useRouter();
   const { success, warning } = useToast();
   const { activeTab, setActiveTab } = useTabs('overview');
 
   const tabs: Array<{ id: ProductCardTab; label: string }> = [
-    { id: 'overview', label: 'Översikt' },
-    { id: 'pricing', label: 'Prissättning' },
-    { id: 'entitlements', label: 'Entitlements' },
-    { id: 'availability', label: 'Tillgänglighet' },
-    { id: 'lifecycle', label: 'Livscykel' },
-    { id: 'audit', label: 'Logg' },
+    { id: 'overview', label: t('tabs.overview') },
+    { id: 'pricing', label: t('tabs.pricing') },
+    { id: 'entitlements', label: t('tabs.entitlements') },
+    { id: 'availability', label: t('tabs.availability') },
+    { id: 'lifecycle', label: t('tabs.lifecycle') },
+    { id: 'audit', label: t('tabs.audit') },
   ];
 
   const handleEdit = useCallback(() => {
@@ -887,12 +901,12 @@ export function ProductCardDrawer({
 
       if (!res.ok) throw new Error('Failed to update status');
 
-      success(`Status uppdaterad till ${PRODUCT_STATUS_META[newStatus].label}`);
+      success(t('messages.statusUpdated', { status: PRODUCT_STATUS_META[newStatus].label }));
       onRefresh?.();
     } catch {
-      warning('Kunde inte uppdatera status');
+      warning(t('messages.statusUpdateFailed'));
     }
-  }, [product, success, warning, onRefresh]);
+  }, [product, success, warning, onRefresh, t]);
 
   const handleSyncStripe = useCallback(async () => {
     if (!product) return;
@@ -904,12 +918,12 @@ export function ProductCardDrawer({
 
       if (!res.ok) throw new Error('Failed to sync');
 
-      success('Synkronisering startad');
+      success(t('messages.syncStarted'));
       onRefresh?.();
     } catch {
-      warning('Kunde inte synkronisera');
+      warning(t('messages.syncFailed'));
     }
-  }, [product, success, warning, onRefresh]);
+  }, [product, success, warning, onRefresh, t]);
 
   if (!product) {
     return null;
@@ -953,7 +967,7 @@ export function ProductCardDrawer({
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleEdit}>
               <PencilSquareIcon className="mr-1.5 h-4 w-4" />
-              Redigera
+              {t('quickActions.edit')}
             </Button>
             {product.status === 'draft' && (
               <Button
@@ -962,7 +976,7 @@ export function ProductCardDrawer({
                 onClick={() => handleStatusChange('active')}
               >
                 <CheckCircleIcon className="mr-1.5 h-4 w-4" />
-                Aktivera
+                {t('quickActions.activate')}
               </Button>
             )}
             {product.status === 'active' && (
@@ -972,12 +986,12 @@ export function ProductCardDrawer({
                 onClick={() => handleStatusChange('archived')}
               >
                 <ArchiveBoxIcon className="mr-1.5 h-4 w-4" />
-                Arkivera
+                {t('quickActions.archive')}
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={handleSyncStripe}>
               <ArrowPathIcon className="mr-1.5 h-4 w-4" />
-              Synka
+              {t('quickActions.sync')}
             </Button>
           </div>
         </SheetHeader>

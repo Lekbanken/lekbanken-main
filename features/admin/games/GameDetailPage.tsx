@@ -187,28 +187,28 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   const meta = useMemo(() => {
     if (!game) return [];
     return [
-      { label: 'Status', value: game.status === 'published' ? 'Publicerad' : 'Utkast' },
-      { label: 'Kategori', value: game.category || 'Inte satt' },
-      { label: 'Energi', value: game.energy_level || 'Inte satt' },
-      { label: 'Syfte', value: game.main_purpose?.name || 'Inte satt' },
-      { label: 'Produkt', value: game.product?.name || 'Inte satt' },
-      { label: 'Ägare', value: game.owner?.name || 'Global' },
+      { label: t('detail.status'), value: game.status === 'published' ? t('detail.published') : t('detail.draft') },
+      { label: t('detail.category'), value: game.category || t('detail.notSet') },
+      { label: t('detail.energy'), value: game.energy_level || t('detail.notSet') },
+      { label: t('detail.purpose'), value: game.main_purpose?.name || t('detail.notSet') },
+      { label: t('detail.product'), value: game.product?.name || t('detail.notSet') },
+      { label: t('detail.owner'), value: game.owner?.name || t('detail.global') },
       {
-        label: 'Spelare',
+        label: t('detail.players'),
         value: `${game.min_players ?? '?'} - ${game.max_players ?? '?'}`,
       },
-      { label: 'Tid', value: game.time_estimate_min ? `${game.time_estimate_min} min` : 'Inte satt' },
-      { label: 'Ålder', value: `${game.age_min ?? '?'} - ${game.age_max ?? '?'}` },
+      { label: t('detail.time'), value: game.time_estimate_min ? `${game.time_estimate_min} min` : t('detail.notSet') },
+      { label: t('detail.age'), value: `${game.age_min ?? '?'} - ${game.age_max ?? '?'}` },
     ];
-  }, [game]);
+  }, [game, t]);
 
   if (!canView) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
           icon={<ArrowLeftIcon className="h-6 w-6" />}
-          title="Ingen åtkomst"
-          description="Du behöver administratörsbehörighet för att visa spel."
+          title={t('detail.noAccess')}
+          description={t('detail.noAccessDesc')}
         />
       </AdminPageLayout>
     );
@@ -217,7 +217,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   if (error) {
     return (
       <AdminPageLayout>
-        <AdminErrorState title="Något gick fel" description={error} onRetry={load} />
+        <AdminErrorState title={t('detail.somethingWentWrong')} description={error} onRetry={load} />
       </AdminPageLayout>
     );
   }
@@ -225,7 +225,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
   if (!game && isLoading) {
     return (
       <AdminPageLayout>
-        <AdminPageHeader title="Laddar..." description="Hämtar speldata." />
+        <AdminPageHeader title={t('detail.loading')} description={t('detail.loadingGameData')} />
       </AdminPageLayout>
     );
   }
@@ -235,10 +235,10 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<ArrowLeftIcon className="h-6 w-6" />}
-          title="Spelet hittades inte"
-          description="Kontrollera länken eller gå tillbaka till listan."
+          title={t('detail.gameNotFound')}
+          description={t('detail.checkLinkOrGoBack')}
           action={{
-            label: 'Tillbaka till spel',
+            label: t('detail.backToGames'),
             onClick: () => router.push('/admin/games'),
           }}
         />
@@ -250,26 +250,26 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Spel', href: '/admin/games' },
+          { label: t('breadcrumbs.home'), href: '/admin' },
+          { label: t('breadcrumbs.games'), href: '/admin/games' },
           { label: game.name },
         ]}
       />
 
       <AdminPageHeader
         title={game.name}
-        description={game.short_description || 'Ingen kort beskrivning angiven.'}
+        description={game.short_description || t('detail.noShortDescription')}
         icon={<ArrowLeftIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="outline" size="sm" onClick={() => router.push('/admin/games')}>
               <ArrowLeftIcon className="mr-2 h-4 w-4" />
-              Tillbaka
+              {t('detail.back')}
             </Button>
             {canEdit && (
               <Button size="sm" onClick={() => setEditOpen(true)}>
                 <PencilSquareIcon className="mr-2 h-4 w-4" />
-                Redigera
+                {t('detail.edit')}
               </Button>
             )}
             <Button
@@ -280,19 +280,19 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
               {game.status === 'published' ? (
                 <>
                   <XCircleIcon className="mr-2 h-4 w-4" />
-                  Gör till utkast
+                  {t('detail.makeDraft')}
                 </>
               ) : (
                 <>
                   <CheckCircleIcon className="mr-2 h-4 w-4" />
-                  Publicera
+                  {t('detail.publish')}
                 </>
               )}
             </Button>
             {canEdit && (
               <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)}>
                 <TrashIcon className="mr-2 h-4 w-4" />
-                Ta bort
+                {t('detail.delete')}
               </Button>
             )}
           </div>
@@ -300,15 +300,15 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       />
 
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Status" value={game.status === 'published' ? 'Publicerad' : 'Utkast'} />
-        <AdminStatCard label="Ägare" value={game.owner?.name || 'Global'} />
-        <AdminStatCard label="Syfte" value={game.main_purpose?.name || 'Inte satt'} />
-        <AdminStatCard label="Produkt" value={game.product?.name || 'Inte satt'} />
+        <AdminStatCard label={t('detail.status')} value={game.status === 'published' ? t('detail.published') : t('detail.draft')} />
+        <AdminStatCard label={t('detail.owner')} value={game.owner?.name || t('detail.global')} />
+        <AdminStatCard label={t('detail.purpose')} value={game.main_purpose?.name || t('detail.notSet')} />
+        <AdminStatCard label={t('detail.product')} value={game.product?.name || t('detail.notSet')} />
       </AdminStatGrid>
 
       <Card className="mb-4 border border-border">
         <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
-          <CardTitle>Metadata</CardTitle>
+          <CardTitle>{t('detail.metadata')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -321,9 +321,9 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
           </div>
           <div className="h-px w-full bg-border" />
           <div className="space-y-2">
-            <p className="text-xs font-medium uppercase text-muted-foreground">Beskrivning</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">{t('detail.description')}</p>
             <p className="text-sm whitespace-pre-line text-foreground">
-              {game.description || 'Ingen beskrivning angiven.'}
+              {game.description || t('detail.noDescription')}
             </p>
           </div>
         </CardContent>
@@ -331,7 +331,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
 
       <Card className="border border-border">
         <CardHeader className="border-b border-border bg-muted/40 px-6 py-4">
-          <CardTitle>Tekniskt</CardTitle>
+          <CardTitle>{t('detail.technical')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
           <div className="flex items-center gap-2">
@@ -339,7 +339,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
             <code className="text-xs">{game.id}</code>
           </div>
           <p className="text-xs text-muted-foreground">
-            Skapad {new Date(game.created_at).toLocaleString()} · Uppdaterad {new Date(game.updated_at).toLocaleString()}
+            {t('detail.createdAt')} {new Date(game.created_at).toLocaleString()} · {t('detail.updatedAt')} {new Date(game.updated_at).toLocaleString()}
           </p>
         </CardContent>
       </Card>
@@ -357,9 +357,9 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
       <AdminConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title="Ta bort spelet?"
-        description="Detta raderar spelet permanent."
-        confirmLabel="Ta bort"
+        title={t('detail.deleteTitle')}
+        description={t('detail.deleteDescription')}
+        confirmLabel={t('detail.deleteConfirm')}
         variant="danger"
         onConfirm={handleDelete}
       />

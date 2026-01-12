@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   FolderIcon,
   PlusIcon,
@@ -41,13 +42,14 @@ type PurposeListItem = {
   createdAt: string | null;
 };
 
-const typeConfig: Record<string, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  main: { label: "Huvudsyfte", variant: "default" },
-  sub: { label: "Delsyfte", variant: "secondary" },
+const typeVariants: Record<string, "default" | "secondary" | "outline"> = {
+  main: "default",
+  sub: "secondary",
 };
 
 export function PurposesTab() {
   const _router = useRouter(); // Reserved for future navigation
+  const t = useTranslations('admin.products.purposesTab');
   const { can } = useRbac();
   const _toast = useToast(); // Reserved for future toast notifications
 
@@ -92,7 +94,7 @@ export function PurposesTab() {
         if (isMounted) setPurposes(items);
       } catch (err) {
         console.error("Failed to load purposes", err);
-        if (isMounted) setError("Kunde inte ladda syften.");
+        if (isMounted) setError(t('loadError'));
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -142,7 +144,7 @@ export function PurposesTab() {
         <CardContent className="p-6 text-center">
           <p className="text-destructive">{error}</p>
           <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
-            Försök igen
+            {t('retry')}
           </Button>
         </CardContent>
       </Card>
@@ -157,7 +159,7 @@ export function PurposesTab() {
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Sök syften..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -166,7 +168,7 @@ export function PurposesTab() {
         {canCreate && (
           <Button className="gap-2">
             <PlusIcon className="h-4 w-4" />
-            Nytt syfte
+            {t('newPurpose')}
           </Button>
         )}
       </div>
@@ -174,14 +176,15 @@ export function PurposesTab() {
       {/* Purpose grid */}
       {filteredPurposes.length === 0 ? (
         <EmptyState
-          title={searchQuery ? "Inga matchande syften" : "Inga syften ännu"}
-          description={searchQuery ? "Justera sökningen för att se fler." : "Skapa ditt första syfte."}
-          action={!searchQuery && canCreate ? { label: "Skapa syfte", onClick: () => {} } : undefined}
+          title={searchQuery ? t('noMatchingPurposes') : t('noPurposesYet')}
+          description={searchQuery ? t('adjustSearch') : t('createFirstPurpose')}
+          action={!searchQuery && canCreate ? { label: t('createPurpose'), onClick: () => {} } : undefined}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredPurposes.map((purpose) => {
-            const typeInfo = typeConfig[purpose.type] ?? typeConfig.main;
+            const typeVariant = typeVariants[purpose.type] ?? typeVariants.main;
+            const typeLabel = purpose.type === 'main' ? t('typeMain') : t('typeSub');
             return (
               <Card
                 key={purpose.id}
@@ -210,18 +213,18 @@ export function PurposesTab() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <ArrowTopRightOnSquareIcon className="mr-2 h-4 w-4" />
-                          Visa detaljer
+                          {t('viewDetails')}
                         </DropdownMenuItem>
                         {canEdit && (
                           <DropdownMenuItem>
                             <PencilSquareIcon className="mr-2 h-4 w-4" />
-                            Redigera
+                            {t('edit')}
                           </DropdownMenuItem>
                         )}
                         {canDelete && (
                           <DropdownMenuItem className="text-destructive">
                             <TrashIcon className="mr-2 h-4 w-4" />
-                            Ta bort
+                            {t('delete')}
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -232,15 +235,15 @@ export function PurposesTab() {
                   {purpose.parentName && (
                     <div className="mb-3 flex items-center gap-1 text-sm text-muted-foreground">
                       <ChevronRightIcon className="h-3 w-3" />
-                      <span>Under: {purpose.parentName}</span>
+                      <span>{t('under', { parent: purpose.parentName })}</span>
                     </div>
                   )}
 
                   {/* Footer */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={typeInfo.variant}>{typeInfo.label}</Badge>
+                    <Badge variant={typeVariant}>{typeLabel}</Badge>
                     {purpose.productCount > 0 && (
-                      <Badge variant="outline">{purpose.productCount} produkter</Badge>
+                      <Badge variant="outline">{t('productsCount', { count: purpose.productCount })}</Badge>
                     )}
                   </div>
                 </CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   AdminBreadcrumbs,
   AdminEmptyState,
@@ -53,6 +54,7 @@ type Props = {
 export function ParticipantDetailPage({ participantId }: Props) {
   const { can } = useRbac();
   const { success, warning } = useToast();
+  const t = useTranslations('admin.participants');
   const [participant, setParticipant] = useState<Participant | null>(null);
   const [log, setLog] = useState<ActionLogEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -76,30 +78,30 @@ export function ParticipantDetailPage({ participantId }: Props) {
         if (!active) return;
         setParticipant(mockParticipant);
         setLog(mockLog);
-        setError('Visar mockdata tills riktiga kopplingen är klar.');
+        setError(t('showingMockData'));
       }
     };
     void load();
     return () => {
       active = false;
     };
-  }, [participantId]);
+  }, [participantId, t]);
 
   const breadcrumbs = useMemo(
     () => [
-      { label: 'Startsida', href: '/admin' },
-      { label: 'Deltagare', href: '/admin/participants' },
-      { label: participant?.name || 'Deltagare' },
+      { label: t('breadcrumbs.home'), href: '/admin' },
+      { label: t('breadcrumbs.participants'), href: '/admin/participants' },
+      { label: participant?.name || t('title') },
     ],
-    [participant]
+    [participant, t]
   );
 
   if (!can('admin.participants.view')) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
-          title="Ingen åtkomst"
-          description="Du behöver behörighet för att se deltagare."
+          title={t('noAccess')}
+          description={t('noPermissionParticipants')}
         />
       </AdminPageLayout>
     );
@@ -109,8 +111,8 @@ export function ParticipantDetailPage({ participantId }: Props) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
-          title="Deltagaren hittades inte"
-          description="Kontrollera länken eller gå tillbaka till listan."
+          title={t('notFound')}
+          description={t('checkLinkOrGoBack')}
         />
       </AdminPageLayout>
     );
@@ -121,25 +123,25 @@ export function ParticipantDetailPage({ participantId }: Props) {
       <AdminBreadcrumbs items={breadcrumbs} />
       <AdminPageHeader
         title={participant.name}
-        description={participant.email || 'Ingen e-post angiven'}
+        description={participant.email || t('noEmailProvided')}
       />
 
       {error && <p className="mb-2 text-sm text-amber-600">{error}</p>}
 
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Organisation" value={participant.tenantName} />
-        <AdminStatCard label="Risk" value={participant.risk} />
-        <AdminStatCard label="Senast aktiv" value={new Date(participant.lastActive).toLocaleString()} />
+        <AdminStatCard label={t('organisation')} value={participant.tenantName} />
+        <AdminStatCard label={t('risk')} value={participant.risk} />
+        <AdminStatCard label={t('lastActive')} value={new Date(participant.lastActive).toLocaleString()} />
       </AdminStatGrid>
 
       <Card className="border border-border mb-4">
         <CardHeader className="border-b border-border bg-muted/40">
-          <CardTitle>Profil</CardTitle>
+          <CardTitle>{t('profile')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
-          <p className="text-sm text-muted-foreground">E-post: {participant.email || '—'}</p>
+          <p className="text-sm text-muted-foreground">{t('email')}: {participant.email || '—'}</p>
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Risk:</span>
+            <span className="text-sm font-medium">{t('risk')}:</span>
             <Badge
               variant={
                 participant.risk === 'high' ? 'destructive' : participant.risk === 'low' ? 'secondary' : 'success'
@@ -149,13 +151,13 @@ export function ParticipantDetailPage({ participantId }: Props) {
               {participant.risk}
             </Badge>
           </div>
-          <p className="text-sm text-muted-foreground">Anteckningar: {participant.notes || '—'}</p>
+          <p className="text-sm text-muted-foreground">{t('notes')}: {participant.notes || '—'}</p>
         </CardContent>
       </Card>
 
       <Card className="border border-border">
         <CardHeader className="border-b border-border bg-muted/40">
-          <CardTitle>Åtgärder & logg</CardTitle>
+          <CardTitle>{t('actionsAndLog')}</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-3">
           <div className="flex flex-wrap gap-2">
@@ -169,10 +171,10 @@ export function ParticipantDetailPage({ participantId }: Props) {
                 });
                 const json = await res.json().catch(() => ({}));
                 if (json?.logEntry) setLog((prev) => [json.logEntry, ...prev]);
-                success('Mute skickad.');
+                success(t('muteSent'));
               }}
             >
-              Mute
+              {t('mute')}
             </button>
             <button
               className="rounded border px-3 py-1 text-sm"
@@ -184,10 +186,10 @@ export function ParticipantDetailPage({ participantId }: Props) {
                 });
                 const json = await res.json().catch(() => ({}));
                 if (json?.logEntry) setLog((prev) => [json.logEntry, ...prev]);
-                warning('Kick skickad.');
+                warning(t('kickSent'));
               }}
             >
-              Kick
+              {t('kick')}
             </button>
             <button
               className="rounded border px-3 py-1 text-sm"
@@ -199,15 +201,15 @@ export function ParticipantDetailPage({ participantId }: Props) {
                 });
                 const json = await res.json().catch(() => ({}));
                 if (json?.logEntry) setLog((prev) => [json.logEntry, ...prev]);
-                warning('Ban skickad.');
+                warning(t('banSent'));
               }}
             >
-              Ban
+              {t('ban')}
             </button>
           </div>
           <div className="space-y-2">
             {log.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Ingen logg ännu.</p>
+              <p className="text-sm text-muted-foreground">{t('noLogYet')}</p>
             ) : (
               log.map((entry) => (
                 <div key={entry.id} className="rounded border border-border px-3 py-2">

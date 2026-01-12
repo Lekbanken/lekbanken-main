@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   BuildingOffice2Icon,
   ClipboardDocumentIcon,
@@ -71,18 +72,19 @@ function OrganisationDetailSkeleton() {
 
 // Copy button component
 function CopyButton({ value, label }: { value: string; label?: string }) {
+  const t = useTranslations('admin.organizations.detail');
   const { success } = useToast();
   
   const handleCopy = async () => {
     await navigator.clipboard.writeText(value);
-    success(label ? `${label} kopierad` : "Kopierad till urklipp");
+    success(label ? t('copiedWithLabel', { label }) : t('copied'));
   };
   
   return (
     <button
       onClick={handleCopy}
       className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      title="Kopiera"
+      title={t('copied')}
     >
       <ClipboardDocumentIcon className="h-3.5 w-3.5" />
     </button>

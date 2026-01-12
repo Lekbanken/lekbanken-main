@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { DocumentTextIcon, ArchiveBoxIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
@@ -57,6 +58,7 @@ export default function AdminPlannerDetailPage() {
   const { success, warning } = useToast();
   const { can, isLoading: isRbacLoading } = useRbac();
   const { currentTenant } = useTenant();
+  const t = useTranslations("admin.planner");
 
   const [plan, setPlan] = useState<PlanWithCapabilities | null>(null);
   const [versions, setVersions] = useState<PlannerVersion[]>([]);
@@ -84,7 +86,7 @@ export default function AdminPlannerDetailPage() {
       setPlan({ ...data.plan, _capabilities: data._capabilities });
     } catch (err) {
       console.error("[admin/planner] load detail error", err);
-      setError("Kunde inte ladda plan.");
+      setError(t("errorLoadPlan"));
     } finally {
       setIsLoading(false);
     }
@@ -139,11 +141,11 @@ export default function AdminPlannerDetailPage() {
             }
           : prev
       );
-      success("Plan publicerad.");
+      success(t("toasts.planPublished"));
       void loadVersions();
     } catch (err) {
       console.error("[admin/planner] publish error", err);
-      warning("Kunde inte publicera plan.");
+      warning(t("toasts.planPublishError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -168,10 +170,10 @@ export default function AdminPlannerDetailPage() {
       setPlan((prev) =>
         prev ? { ...prev, ...payload.plan, _capabilities: prev._capabilities } : prev
       );
-      success("Synlighet uppdaterad.");
+      success(t("toasts.visibilityUpdated"));
     } catch (err) {
       console.error("[admin/planner] visibility error", err);
-      warning("Kunde inte uppdatera synlighet.");
+      warning(t("toasts.visibilityError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -185,11 +187,11 @@ export default function AdminPlannerDetailPage() {
       if (!res.ok) {
         throw new Error("Failed to delete plan");
       }
-      success("Plan borttagen.");
+      success(t("toasts.planDeleted"));
       router.push("/admin/planner");
     } catch (err) {
       console.error("[admin/planner] delete error", err);
-      warning("Kunde inte ta bort plan.");
+      warning(t("toasts.planDeleteError"));
     } finally {
       setPendingPlanId(null);
       setDeleteOpen(false);
@@ -213,10 +215,10 @@ export default function AdminPlannerDetailPage() {
       setPlan((prev) =>
         prev ? { ...prev, ...payload.plan, _capabilities: prev._capabilities } : prev
       );
-      success("Plan arkiverad.");
+      success(t("toasts.planArchived"));
     } catch (err) {
       console.error("[admin/planner] archive error", err);
-      warning("Kunde inte arkivera plan.");
+      warning(t("toasts.planArchiveError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -239,10 +241,10 @@ export default function AdminPlannerDetailPage() {
       setPlan((prev) =>
         prev ? { ...prev, ...payload.plan, _capabilities: prev._capabilities } : prev
       );
-      success("Plan återställd.");
+      success(t("toasts.planRestored"));
     } catch (err) {
       console.error("[admin/planner] restore error", err);
-      warning("Kunde inte återställa plan.");
+      warning(t("toasts.planRestoreError"));
     } finally {
       setPendingPlanId(null);
     }
@@ -253,8 +255,8 @@ export default function AdminPlannerDetailPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<DocumentTextIcon className="h-6 w-6" />}
-          title="Ingen behorighet"
-          description="Du saknar behorighet for att visa planner-admin."
+          title={t("noPermission")}
+          description={t("noPermissionDescription")}
         />
       </AdminPageLayout>
     );
@@ -263,7 +265,7 @@ export default function AdminPlannerDetailPage() {
   if (isLoading) {
     return (
       <AdminPageLayout>
-        <LoadingState message="Laddar plan..." />
+        <LoadingState message={t("loadingPlan")} />
       </AdminPageLayout>
     );
   }
@@ -272,7 +274,7 @@ export default function AdminPlannerDetailPage() {
     return (
       <AdminPageLayout>
         <AdminErrorState
-          title="Kunde inte ladda plan"
+          title={t("errorLoadPlanTitle")}
           description={error}
           onRetry={() => void loadPlan()}
         />
@@ -285,8 +287,8 @@ export default function AdminPlannerDetailPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<DocumentTextIcon className="h-6 w-6" />}
-          title="Plan saknas"
-          description="Planen kunde inte hittas eller saknar access."
+          title={t("planNotFound")}
+          description={t("planNotFoundDescription")}
         />
       </AdminPageLayout>
     );
@@ -298,18 +300,18 @@ export default function AdminPlannerDetailPage() {
     <AdminPageLayout>
       <AdminPageHeader
         title={plan.name}
-        description={plan.description ?? "Ingen beskrivning"}
+        description={plan.description ?? t("noDescription")}
         icon={<DocumentTextIcon className="h-6 w-6" />}
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
-          { label: "Planner", href: "/admin/planner" },
+          { label: t("pageTitle"), href: "/admin/planner" },
           { label: plan.name },
         ]}
         actions={
           <div className="flex flex-wrap gap-2">
             {plan._capabilities?.canPublish && plan.status !== 'archived' && (
               <Button size="sm" onClick={() => void handlePublish()} disabled={isPending}>
-                Publicera
+                {t("actions.publish")}
               </Button>
             )}
             {plan._capabilities?.canUpdate && plan.status !== 'archived' && canPerformAction(plan.status, 'archive') && (
@@ -320,7 +322,7 @@ export default function AdminPlannerDetailPage() {
                 disabled={isPending}
               >
                 <ArchiveBoxIcon className="mr-1 h-4 w-4" />
-                Arkivera
+                {t("actions.archive")}
               </Button>
             )}
             {plan._capabilities?.canUpdate && plan.status === 'archived' && (
@@ -331,7 +333,7 @@ export default function AdminPlannerDetailPage() {
                 disabled={isPending}
               >
                 <ArrowPathIcon className="mr-1 h-4 w-4" />
-                Återställ
+                {t("actions.restore")}
               </Button>
             )}
             {plan._capabilities?.canDelete && (
@@ -341,14 +343,14 @@ export default function AdminPlannerDetailPage() {
                 onClick={() => setDeleteOpen(true)}
                 disabled={isPending}
               >
-                Ta bort
+                {t("actions.delete")}
               </Button>
             )}
           </div>
         }
       />
 
-      <AdminSection title="Status och synlighet">
+      <AdminSection title={t("sections.statusVisibility")}>
         <AdminCard>
           <div className="flex flex-wrap items-center gap-3">
             <StatusBadge status={plan.status} />
@@ -357,7 +359,7 @@ export default function AdminPlannerDetailPage() {
             </Badge>
             {plan.status === 'modified' && (
               <span className="text-xs text-amber-600 font-medium">
-                ⚠ Opublicerade ändringar
+                {t("unpublishedChanges")}
               </span>
             )}
             {plan._capabilities?.canUpdate && plan.status !== 'archived' && (
@@ -378,53 +380,53 @@ export default function AdminPlannerDetailPage() {
             )}
             {plan._capabilities?.canStartRun && plan.status !== 'archived' && (
               <Button size="sm" variant="outline" href={`/app/play/${plan.id}/start`}>
-                Starta run
+                {t("actions.startRun")}
               </Button>
             )}
           </div>
         </AdminCard>
       </AdminSection>
 
-      <AdminSection title="Metadata">
+      <AdminSection title={t("sections.metadata")}>
         <AdminCard>
           <div className="grid gap-3 md:grid-cols-2">
             <div>
-              <p className="text-xs text-muted-foreground">Owner user</p>
+              <p className="text-xs text-muted-foreground">{t("metadata.ownerUser")}</p>
               <p className="text-sm font-medium text-foreground">{plan.ownerUserId}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Owner tenant</p>
+              <p className="text-xs text-muted-foreground">{t("metadata.ownerTenant")}</p>
               <p className="text-sm font-medium text-foreground">
-                {plan.ownerTenantId ?? "Global"}
+                {plan.ownerTenantId ?? t("metadata.global")}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Total tid</p>
+              <p className="text-xs text-muted-foreground">{t("metadata.totalTime")}</p>
               <p className="text-sm font-medium text-foreground">
                 {formatDuration(plan.totalTimeMinutes)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Senast uppdaterad</p>
+              <p className="text-xs text-muted-foreground">{t("metadata.lastUpdated")}</p>
               <p className="text-sm font-medium text-foreground">{formatDate(plan.updatedAt)}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Current version</p>
+              <p className="text-xs text-muted-foreground">{t("metadata.currentVersion")}</p>
               <p className="text-sm font-medium text-foreground">
-                {plan.currentVersionId ?? "Ingen"}
+                {plan.currentVersionId ?? t("metadata.none")}
               </p>
             </div>
           </div>
         </AdminCard>
       </AdminSection>
 
-      <AdminSection title="Blocks">
+      <AdminSection title={t("sections.blocks")}>
         <AdminCard>
           {sortedBlocks.length === 0 ? (
             <AdminEmptyState
               icon={<DocumentTextIcon className="h-6 w-6" />}
-              title="Inga block"
-              description="Planen innehaller inga block."
+              title={t("noBlocks")}
+              description={t("noBlocksDescription")}
             />
           ) : (
             <div className="space-y-3">
@@ -458,11 +460,11 @@ export default function AdminPlannerDetailPage() {
         </AdminCard>
       </AdminSection>
 
-      <AdminSection title="Versions">
+      <AdminSection title={t("sections.versions")}>
         <AdminCard
           actions={
             <Button size="sm" variant="outline" href={`/admin/planner/${plan.id}/versions`}>
-              Visa alla
+              {t("actions.showAll")}
             </Button>
           }
         >
@@ -477,7 +479,7 @@ export default function AdminPlannerDetailPage() {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                Publicerad {formatDate(latestVersion.publishedAt)} •
+                {t("publishedAt", { date: formatDate(latestVersion.publishedAt) })} •
                 {" "}
                 {latestVersion.name}
               </p>
@@ -485,8 +487,8 @@ export default function AdminPlannerDetailPage() {
           ) : (
             <AdminEmptyState
               icon={<DocumentTextIcon className="h-6 w-6" />}
-              title="Inga versioner"
-              description="Planen har inga publicerade versioner."
+              title={t("noVersions")}
+              description={t("noVersionsDescription")}
             />
           )}
         </AdminCard>
@@ -495,9 +497,9 @@ export default function AdminPlannerDetailPage() {
       <AdminConfirmDialog
         open={deleteOpen}
         onOpenChange={setDeleteOpen}
-        title="Ta bort plan"
-        description={`Ar du saker pa att du vill ta bort plan \"${plan.name}\"?`}
-        confirmLabel="Ta bort"
+        title={t("dialogs.deletePlanTitle")}
+        description={t("dialogs.deletePlanConfirm", { name: plan.name })}
+        confirmLabel={t("actions.delete")}
         variant="danger"
         onConfirm={handleDelete}
       />

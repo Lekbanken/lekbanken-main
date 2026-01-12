@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useTransition } from 'react';
+import { useState, useEffect, useCallback, useTransition, useMemo } from 'react';
 import {
   ShieldCheckIcon,
   PlusIcon,
@@ -13,6 +13,7 @@ import {
   BuildingOffice2Icon,
   AcademicCapIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -46,14 +47,10 @@ import {
 } from '@/app/actions/learning-admin';
 import { RequirementEditorDrawer } from './RequirementEditorDrawer';
 
-const typeConfig: Record<string, { label: string; icon: typeof PuzzlePieceIcon; color: string }> = {
-  game_unlock: { label: 'Spelåtkomst', icon: PuzzlePieceIcon, color: 'text-purple-500 bg-purple-500/10' },
-  role_unlock: { label: 'Rollkrav', icon: UserGroupIcon, color: 'text-blue-500 bg-blue-500/10' },
-  activity_unlock: { label: 'Aktivitetsgrind', icon: PlayIcon, color: 'text-green-500 bg-green-500/10' },
-  onboarding_required: { label: 'Onboarding', icon: AcademicCapIcon, color: 'text-amber-500 bg-amber-500/10' },
-};
+type RequirementType = 'game_unlock' | 'role_unlock' | 'activity_unlock' | 'onboarding_required';
 
 export default function AdminRequirementsPage() {
+  const t = useTranslations('admin.learning.requirements');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<LearningRequirementListResult | null>(null);
@@ -123,7 +120,7 @@ export default function AdminRequirementsPage() {
       setResult(data);
     } catch (err) {
       console.error('Failed to load requirements:', err);
-      setError(err instanceof Error ? err.message : 'Kunde inte hämta krav');
+      setError(err instanceof Error ? err.message : t('error.loadFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -144,7 +141,7 @@ export default function AdminRequirementsPage() {
       if (result.success) {
         loadRequirements();
       } else {
-        alert(result.error || 'Kunde inte ändra status');
+        alert(result.error || t('error.toggleFailed'));
       }
     } finally {
       setTogglingId(null);
@@ -166,7 +163,7 @@ export default function AdminRequirementsPage() {
         setConfirmReq(null);
         loadRequirements();
       } else {
-        alert(result.error || 'Kunde inte ta bort kravet');
+        alert(result.error || t('error.deleteFailed'));
       }
     });
   };
@@ -187,23 +184,31 @@ export default function AdminRequirementsPage() {
   // Determine current tenant for non-system admins
   const currentTenantId = !isSystemAdmin && userTenantIds.length > 0 ? userTenantIds[0] : undefined;
 
+  // Type config with translations
+  const typeConfig = useMemo(() => ({
+    game_unlock: { label: t('types.game_unlock'), icon: PuzzlePieceIcon, color: 'text-purple-500 bg-purple-500/10' },
+    role_unlock: { label: t('types.role_unlock'), icon: UserGroupIcon, color: 'text-blue-500 bg-blue-500/10' },
+    activity_unlock: { label: t('types.activity_unlock'), icon: PlayIcon, color: 'text-green-500 bg-green-500/10' },
+    onboarding_required: { label: t('types.onboarding_required'), icon: AcademicCapIcon, color: 'text-amber-500 bg-amber-500/10' },
+  }), [t]);
+
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Utbildning', href: '/admin/learning' },
-          { label: 'Krav & Grind', href: '/admin/learning/requirements' },
+          { label: t('breadcrumbs.learning'), href: '/admin/learning' },
+          { label: t('breadcrumbs.requirements'), href: '/admin/learning/requirements' },
         ]}
       />
 
       <AdminPageHeader
-        title="Krav & Grind"
-        description="Konfigurera vilka kurser som krävs för aktiviteter och roller"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ShieldCheckIcon className="h-8 w-8" />}
         actions={
           <Button onClick={handleCreateNew}>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Nytt krav
+            {t('newRequirement')}
           </Button>
         }
       />
@@ -214,11 +219,9 @@ export default function AdminRequirementsPage() {
           <div className="flex gap-3">
             <ShieldCheckIcon className="h-5 w-5 shrink-0 text-blue-500" />
             <div className="text-sm">
-              <p className="font-medium text-foreground">Hur fungerar krav?</p>
+              <p className="font-medium text-foreground">{t('info.title')}</p>
               <p className="mt-1 text-muted-foreground">
-                Krav blockerar användare från att utföra vissa aktiviteter eller ta roller tills de har slutfört
-                specifika kurser. När en användare försöker göra något som kräver en kurs visas en modal med
-                information om vilka kurser som behöver slutföras.
+                {t('info.description')}
               </p>
             </div>
           </div>
@@ -230,19 +233,19 @@ export default function AdminRequirementsPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-2xl font-bold">{stats.total}</p>
-            <p className="text-sm text-muted-foreground">Totalt krav</p>
+            <p className="text-sm text-muted-foreground">{t('stats.total')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <p className="text-2xl font-bold text-green-600">{stats.active}</p>
-            <p className="text-sm text-muted-foreground">Aktiva</p>
+            <p className="text-sm text-muted-foreground">{t('stats.active')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4">
             <p className="text-2xl font-bold text-muted-foreground">{stats.inactive}</p>
-            <p className="text-sm text-muted-foreground">Inaktiva</p>
+            <p className="text-sm text-muted-foreground">{t('stats.inactive')}</p>
           </CardContent>
         </Card>
       </div>
@@ -252,7 +255,7 @@ export default function AdminRequirementsPage() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Sök krav..."
+            placeholder={t('search.placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -269,9 +272,9 @@ export default function AdminRequirementsPage() {
               }}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              <option value="all">Alla scope</option>
-              <option value="global">Globala</option>
-              <option value="tenant">Organisation</option>
+              <option value="all">{t('filter.allScopes')}</option>
+              <option value="global">{t('filter.global')}</option>
+              <option value="tenant">{t('filter.tenant')}</option>
             </select>
 
             {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
@@ -283,7 +286,7 @@ export default function AdminRequirementsPage() {
                 }}
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
-                <option value="">Alla organisationer</option>
+                <option value="">{t('filter.allOrganizations')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -305,7 +308,7 @@ export default function AdminRequirementsPage() {
       {/* Loading state */}
       {isLoading && !result && (
         <div className="mt-6 flex items-center justify-center py-12">
-          <div className="text-muted-foreground">Laddar krav...</div>
+          <div className="text-muted-foreground">{t('loading')}</div>
         </div>
       )}
 
@@ -313,30 +316,30 @@ export default function AdminRequirementsPage() {
       {result && (
         <Card className="mt-6">
           <CardHeader>
-            <CardTitle>Alla krav</CardTitle>
+            <CardTitle>{t('table.title')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Scope</TableHead>
-                  <TableHead>Typ</TableHead>
-                  <TableHead>Mål</TableHead>
-                  <TableHead>Krävd kurs</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Åtgärder</TableHead>
+                  <TableHead>{t('table.scope')}</TableHead>
+                  <TableHead>{t('table.type')}</TableHead>
+                  <TableHead>{t('table.target')}</TableHead>
+                  <TableHead>{t('table.requiredCourse')}</TableHead>
+                  <TableHead>{t('table.status')}</TableHead>
+                  <TableHead className="text-right">{t('table.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {requirements.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      {searchDebounced ? 'Inga krav matchar sökningen' : 'Inga krav konfigurerade ännu'}
+                      {searchDebounced ? t('table.noMatchingRequirements') : t('table.noRequirements')}
                     </TableCell>
                   </TableRow>
                 ) : (
                   requirements.map((req) => {
-                    const typeInfo = typeConfig[req.requirement_type] || typeConfig.game_unlock;
+                    const typeInfo = typeConfig[req.requirement_type as RequirementType] || typeConfig.game_unlock;
                     const TypeIcon = typeInfo.icon;
                     const isGlobal = req.tenant_id === null;
                     const canEdit = isSystemAdmin || (!isGlobal && userTenantIds.includes(req.tenant_id!));
@@ -348,12 +351,12 @@ export default function AdminRequirementsPage() {
                           {isGlobal ? (
                             <Badge variant="secondary" className="gap-1">
                               <GlobeAltIcon className="h-3 w-3" />
-                              Global
+                              {t('table.global')}
                             </Badge>
                           ) : (
                             <Badge variant="outline" className="gap-1">
                               <BuildingOffice2Icon className="h-3 w-3" />
-                              {req.tenant_name || 'Organisation'}
+                              {req.tenant_name || t('table.organization')}
                             </Badge>
                           )}
                         </TableCell>
@@ -382,7 +385,7 @@ export default function AdminRequirementsPage() {
                               disabled={!canEdit || togglingId === req.id}
                             />
                             <Badge variant={req.is_active ? 'default' : 'outline'}>
-                              {req.is_active ? 'Aktiv' : 'Inaktiv'}
+                              {req.is_active ? t('table.active') : t('table.inactive')}
                             </Badge>
                           </div>
                         </TableCell>
@@ -393,7 +396,7 @@ export default function AdminRequirementsPage() {
                               size="sm"
                               onClick={() => handleDelete(req)}
                               disabled={!canEdit}
-                              title={canEdit ? 'Ta bort' : 'Ingen åtkomst'}
+                              title={canEdit ? t('actions.delete') : t('actions.noAccess')}
                             >
                               <TrashIcon className="h-4 w-4 text-destructive" />
                             </Button>
@@ -413,7 +416,7 @@ export default function AdminRequirementsPage() {
       {result && totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Visar {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, result.totalCount)} av {result.totalCount}
+            {t('pagination.showing', { start: (page - 1) * pageSize + 1, end: Math.min(page * pageSize, result.totalCount), total: result.totalCount })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -422,7 +425,7 @@ export default function AdminRequirementsPage() {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
             >
-              Föregående
+              {t('pagination.previous')}
             </Button>
             <Button
               variant="outline"
@@ -430,7 +433,7 @@ export default function AdminRequirementsPage() {
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
-              Nästa
+              {t('pagination.next')}
             </Button>
           </div>
         </div>
@@ -454,10 +457,10 @@ export default function AdminRequirementsPage() {
           setConfirmOpen(open);
           if (!open) setConfirmReq(null);
         }}
-        title="Ta bort krav"
-        description="Är du säker på att du vill ta bort detta krav? Användare kommer inte längre blockeras av det."
-        confirmLabel="Ta bort"
-        cancelLabel="Avbryt"
+        title={t('deleteDialog.title')}
+        description={t('deleteDialog.description')}
+        confirmLabel={t('deleteDialog.confirm')}
+        cancelLabel={t('deleteDialog.cancel')}
         onConfirm={confirmDelete}
         isLoading={isDeleting}
         variant="danger"

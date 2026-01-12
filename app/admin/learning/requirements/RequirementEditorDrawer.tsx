@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Input } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
@@ -24,25 +25,6 @@ interface RequirementEditorDrawerProps {
   onSave: () => void;
 }
 
-const REQUIREMENT_TYPES = [
-  { value: 'game_unlock', label: 'Spelåtkomst', description: 'Krävs för att spela ett spel' },
-  { value: 'role_unlock', label: 'Rollkrav', description: 'Krävs för att få en roll' },
-  { value: 'activity_unlock', label: 'Aktivitetsgrind', description: 'Krävs för att utföra en aktivitet' },
-  { value: 'onboarding_required', label: 'Onboarding', description: 'Krävs under onboarding' },
-];
-
-const TARGET_KINDS = [
-  { value: 'game', label: 'Spel' },
-  { value: 'role', label: 'Roll' },
-  { value: 'activity', label: 'Aktivitet' },
-  { value: 'feature', label: 'Funktion' },
-];
-
-const SCOPE_OPTIONS = [
-  { value: 'global', label: 'Global', description: 'Gäller för alla organisationer' },
-  { value: 'tenant', label: 'Organisation', description: 'Gäller endast inom vald organisation' },
-];
-
 interface CourseOption {
   id: string;
   title: string;
@@ -59,10 +41,31 @@ export function RequirementEditorDrawer({
   onClose,
   onSave,
 }: RequirementEditorDrawerProps) {
+  const t = useTranslations('admin.learning.requirements.editor');
   const isEditing = !!requirement;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [courses, setCourses] = useState<CourseOption[]>([]);
+
+  // Static arrays using useMemo to access translations
+  const REQUIREMENT_TYPES = useMemo(() => [
+    { value: 'game_unlock', label: t('types.gameUnlock'), description: t('types.gameUnlockDesc') },
+    { value: 'role_unlock', label: t('types.roleUnlock'), description: t('types.roleUnlockDesc') },
+    { value: 'activity_unlock', label: t('types.activityUnlock'), description: t('types.activityUnlockDesc') },
+    { value: 'onboarding_required', label: t('types.onboarding'), description: t('types.onboardingDesc') },
+  ], [t]);
+
+  const TARGET_KINDS = useMemo(() => [
+    { value: 'game', label: t('targetKinds.game') },
+    { value: 'role', label: t('targetKinds.role') },
+    { value: 'activity', label: t('targetKinds.activity') },
+    { value: 'feature', label: t('targetKinds.feature') },
+  ], [t]);
+
+  const SCOPE_OPTIONS = useMemo(() => [
+    { value: 'global', label: t('scope.global'), description: t('scope.globalDesc') },
+    { value: 'tenant', label: t('scope.tenant'), description: t('scope.tenantDesc') },
+  ], [t]);
 
   // Form state
   const [requirementType, setRequirementType] = useState<string>('game_unlock');
@@ -121,15 +124,15 @@ export function RequirementEditorDrawer({
 
     // Validation
     if (!targetId.trim()) {
-      setError('Mål-ID krävs');
+      setError(t('errors.targetIdRequired'));
       return;
     }
     if (!requiredCourseId) {
-      setError('Välj en kurs');
+      setError(t('errors.selectCourse'));
       return;
     }
     if (scope === 'tenant' && !tenantId) {
-      setError('Välj en organisation');
+      setError(t('errors.selectOrganization'));
       return;
     }
 
@@ -164,20 +167,20 @@ export function RequirementEditorDrawer({
             is_active: isActive,
           });
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera kravet');
+            setError(result.error || t('errors.updateFailed'));
             return;
           }
         } else {
           // Create mode
           const result = await createRequirementAdmin(formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa kravet');
+            setError(result.error || t('errors.createFailed'));
             return;
           }
         }
         onSave();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -188,19 +191,19 @@ export function RequirementEditorDrawer({
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            {isEditing ? 'Redigera krav' : 'Skapa nytt krav'}
+            {isEditing ? t('title.edit') : t('title.create')}
           </SheetTitle>
           <SheetDescription>
             {isEditing
-              ? 'Uppdatera kravets inställningar.'
-              : 'Konfigurera ett nytt kurskrav för en aktivitet, roll eller spel.'}
+              ? t('description.edit')
+              : t('description.create')}
           </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           {/* Requirement Type */}
           <div className="space-y-2">
-            <Label htmlFor="requirementType">Kravtyp *</Label>
+            <Label htmlFor="requirementType">{t('labels.requirementType')} *</Label>
             <select
               id="requirementType"
               value={requirementType}
@@ -214,13 +217,13 @@ export function RequirementEditorDrawer({
               ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              {REQUIREMENT_TYPES.find(t => t.value === requirementType)?.description}
+              {REQUIREMENT_TYPES.find(rt => rt.value === requirementType)?.description}
             </p>
           </div>
 
           {/* Target Kind */}
           <div className="space-y-2">
-            <Label htmlFor="targetKind">Måltyp *</Label>
+            <Label htmlFor="targetKind">{t('labels.targetKind')} *</Label>
             <select
               id="targetKind"
               value={targetKind}
@@ -237,44 +240,44 @@ export function RequirementEditorDrawer({
 
           {/* Target ID */}
           <div className="space-y-2">
-            <Label htmlFor="targetId">Mål-ID *</Label>
+            <Label htmlFor="targetId">{t('labels.targetId')} *</Label>
             <Input
               id="targetId"
               value={targetId}
               onChange={(e) => setTargetId(e.target.value)}
-              placeholder="T.ex. outdoor-relay eller assistant-leader"
+              placeholder={t('placeholders.targetId')}
               required
             />
             <p className="text-xs text-muted-foreground">
-              UUID eller slug för det objekt som kravet gäller.
+              {t('hints.targetId')}
             </p>
           </div>
 
           {/* Target Name */}
           <div className="space-y-2">
-            <Label htmlFor="targetName">Visningsnamn</Label>
+            <Label htmlFor="targetName">{t('labels.displayName')}</Label>
             <Input
               id="targetName"
               value={targetName}
               onChange={(e) => setTargetName(e.target.value)}
-              placeholder="T.ex. Utomhusstafett"
+              placeholder={t('placeholders.displayName')}
             />
             <p className="text-xs text-muted-foreground">
-              Valfritt namn för enklare identifiering.
+              {t('hints.displayName')}
             </p>
           </div>
 
           {/* Scope - only for system admin, locked when editing */}
           {isSystemAdmin && (
             <div className="space-y-2">
-              <Label>Scope *</Label>
+              <Label>{t('labels.scope')} *</Label>
               {isEditing ? (
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-sm">
-                    {scope === 'global' ? 'Global' : `Organisation: ${tenants.find(t => t.id === tenantId)?.name || tenantId}`}
+                    {scope === 'global' ? t('scope.global') : `${t('scope.tenant')}: ${tenants.find(tn => tn.id === tenantId)?.name || tenantId}`}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Scope kan inte ändras efter skapande.
+                    {t('hints.scopeLocked')}
                   </p>
                 </div>
               ) : (
@@ -310,7 +313,7 @@ export function RequirementEditorDrawer({
           {/* Tenant selector - only when creating */}
           {scope === 'tenant' && isSystemAdmin && !isEditing && (
             <div className="space-y-2">
-              <Label htmlFor="tenant">Organisation *</Label>
+              <Label htmlFor="tenant">{t('labels.organization')} *</Label>
               <select
                 id="tenant"
                 value={tenantId}
@@ -318,7 +321,7 @@ export function RequirementEditorDrawer({
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               >
-                <option value="">Välj organisation</option>
+                <option value="">{t('placeholders.selectOrganization')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -332,14 +335,14 @@ export function RequirementEditorDrawer({
           {!isSystemAdmin && currentTenantId && (
             <div className="rounded-lg border border-border bg-muted/30 p-3">
               <p className="text-sm text-muted-foreground">
-                Kravet skapas för din organisation: <strong>{tenants.find(t => t.id === currentTenantId)?.name || 'Din organisation'}</strong>
+                {t('hints.creatingForOrg')} <strong>{tenants.find(tn => tn.id === currentTenantId)?.name || t('hints.yourOrganization')}</strong>
               </p>
             </div>
           )}
 
           {/* Required Course */}
           <div className="space-y-2">
-            <Label htmlFor="course">Krävd kurs *</Label>
+            <Label htmlFor="course">{t('labels.requiredCourse')} *</Label>
             <select
               id="course"
               value={requiredCourseId}
@@ -347,10 +350,10 @@ export function RequirementEditorDrawer({
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               required
             >
-              <option value="">Välj kurs</option>
+              <option value="">{t('placeholders.selectCourse')}</option>
               {courses.map((course) => (
                 <option key={course.id} value={course.id}>
-                  {course.title} {course.tenant_id === null ? '(Global)' : ''}
+                  {course.title} {course.tenant_id === null ? `(${t('scope.global')})` : ''}
                 </option>
               ))}
             </select>

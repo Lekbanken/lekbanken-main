@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Textarea, Select } from '@/components/ui';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
@@ -28,43 +29,7 @@ type ArtifactEditorProps = {
   onChange: (artifacts: ArtifactFormData[]) => void;
 };
 
-const visibilityOptions = [
-  { value: 'public', label: 'Synlig för alla' },
-  { value: 'leader_only', label: 'Endast lekledare' },
-  { value: 'role_private', label: 'Privat för roll' },
-] satisfies { value: ArtifactVisibility; label: string }[];
-
-const artifactTypeOptions = [
-  // Grundläggande
-  { value: 'card', label: 'Kort' },
-  { value: 'document', label: 'Dokument' },
-  { value: 'image', label: 'Bild' },
-  // Verktyg
-  { value: 'conversation_cards_collection', label: '🗣️ Samtalskort (lek)' },
-  // Kod & Input
-  { value: 'keypad', label: '🔐 Pinkod (Keypad)' },
-  { value: 'riddle', label: '❓ Gåta / Fråga' },
-  { value: 'multi_answer', label: '✅ Flervalssvar' },
-  // Media & Interaktion
-  { value: 'audio', label: '🔊 Ljudklipp' },
-  { value: 'hotspot', label: '🎯 Klickbar bild (Hotspot)' },
-  { value: 'tile_puzzle', label: '🧩 Pusselspel' },
-  // Kryptografi & Logik
-  { value: 'cipher', label: '🔤 Kryptering / Chiffer' },
-  { value: 'logic_grid', label: '🧠 Logikrutnät' },
-  // Speciella
-  { value: 'counter', label: '🔢 Räknare' },
-  { value: 'qr_gate', label: '📱 QR/NFC-skanning' },
-  { value: 'hint_container', label: '💡 Tips-behållare' },
-  { value: 'prop_confirmation', label: '📦 Rekvisita-bekräftelse' },
-  { value: 'location_check', label: '📍 Platsverifiering' },
-  { value: 'sound_level', label: '🎤 Ljudnivå-detektor' },
-  { value: 'replay_marker', label: '⏱️ Replay-markör' },
-  // Session Cockpit (Task 2.1-2.3)
-  { value: 'signal_generator', label: '📢 Signalgenerator' },
-  { value: 'time_bank_step', label: '⏳ Tidsbank / Final timer' },
-  { value: 'empty_artifact', label: '📦 Tom slot (placeholder)' },
-];
+// Options are now defined in component with useMemo to support translations
 
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
@@ -85,10 +50,10 @@ function createVariant(): ArtifactVariantFormData {
   };
 }
 
-function createArtifact(): ArtifactFormData {
+function createArtifact(t: ReturnType<typeof useTranslations>): ArtifactFormData {
   return {
     id: makeId(),
-    title: 'Ny artefakt',
+    title: t('artifact.newArtifact'),
     description: '',
     artifact_type: 'card',
     tags: [],
@@ -98,7 +63,47 @@ function createArtifact(): ArtifactFormData {
 }
 
 export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChange }: ArtifactEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [wizardOpen, setWizardOpen] = useState(false);
+
+  // Translated options using useMemo
+  const visibilityOptions = useMemo(() => [
+    { value: 'public' as const, label: t('artifact.visibility.public') },
+    { value: 'leader_only' as const, label: t('artifact.visibility.leaderOnly') },
+    { value: 'role_private' as const, label: t('artifact.visibility.rolePrivate') },
+  ], [t]);
+
+  const artifactTypeOptions = useMemo(() => [
+    // Grundläggande
+    { value: 'card', label: t('artifact.types.card') },
+    { value: 'document', label: t('artifact.types.document') },
+    { value: 'image', label: t('artifact.types.image') },
+    // Verktyg
+    { value: 'conversation_cards_collection', label: t('artifact.types.conversationCards') },
+    // Kod & Input
+    { value: 'keypad', label: t('artifact.types.keypad') },
+    { value: 'riddle', label: t('artifact.types.riddle') },
+    { value: 'multi_answer', label: t('artifact.types.multiAnswer') },
+    // Media & Interaktion
+    { value: 'audio', label: t('artifact.types.audio') },
+    { value: 'hotspot', label: t('artifact.types.hotspot') },
+    { value: 'tile_puzzle', label: t('artifact.types.tilePuzzle') },
+    // Kryptografi & Logik
+    { value: 'cipher', label: t('artifact.types.cipher') },
+    { value: 'logic_grid', label: t('artifact.types.logicGrid') },
+    // Speciella
+    { value: 'counter', label: t('artifact.types.counter') },
+    { value: 'qr_gate', label: t('artifact.types.qrGate') },
+    { value: 'hint_container', label: t('artifact.types.hintContainer') },
+    { value: 'prop_confirmation', label: t('artifact.types.propConfirmation') },
+    { value: 'location_check', label: t('artifact.types.locationCheck') },
+    { value: 'sound_level', label: t('artifact.types.soundLevel') },
+    { value: 'replay_marker', label: t('artifact.types.replayMarker') },
+    // Session Cockpit (Task 2.1-2.3)
+    { value: 'signal_generator', label: t('artifact.types.signalGenerator') },
+    { value: 'time_bank_step', label: t('artifact.types.timeBankStep') },
+    { value: 'empty_artifact', label: t('artifact.types.emptyArtifact') },
+  ], [t]);
 
   const [conversationDecks, setConversationDecks] = useState<Array<{ id: string; title: string }>>([]);
   const [conversationDecksError, setConversationDecksError] = useState<string | null>(null);
@@ -117,7 +122,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
           collections?: Array<{ id: string; title: string; status?: string | null }>;
           error?: string;
         };
-        if (!res.ok) throw new Error(typeof data?.error === 'string' ? data.error : 'Kunde inte ladda samtalskorts-lekar');
+        if (!res.ok) throw new Error(typeof data?.error === 'string' ? data.error : t('artifact.errors.loadConversationDecks'));
 
         const published = (data.collections ?? []).filter((c) => c.status === 'published');
         const items = published
@@ -126,7 +131,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
 
         if (!cancelled) setConversationDecks(items);
       } catch (e) {
-        if (!cancelled) setConversationDecksError(e instanceof Error ? e.message : 'Kunde inte ladda samtalskorts-lekar');
+        if (!cancelled) setConversationDecksError(e instanceof Error ? e.message : t('artifact.errors.loadConversationDecks'));
       }
     }
 
@@ -134,7 +139,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
     return () => {
       cancelled = true;
     };
-  }, [artifacts]);
+  }, [artifacts, t]);
 
   const roleOptions = useMemo(
     () => roles.map((r) => ({ value: r.id, label: r.name || 'Roll' })),
@@ -214,7 +219,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <SparklesIcon className="h-4 w-4 mr-1" />
             Wizard
           </Button>
-          <Button size="sm" onClick={() => onChange([...artifacts, createArtifact()])}>
+          <Button size="sm" onClick={() => onChange([...artifacts, createArtifact(t)])}>
             <PlusIcon className="h-4 w-4 mr-1" />
             Lägg till
           </Button>

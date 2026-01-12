@@ -1,6 +1,8 @@
 'use client';
 
+import { useMemo } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   CurrencyDollarIcon,
   TrophyIcon,
@@ -25,126 +27,131 @@ type ModuleStatus = "implemented" | "partial" | "planned";
 
 interface GamificationModule {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   href: string;
   icon: React.ReactNode;
   status: ModuleStatus;
-  features: string[];
-  stats?: { label: string; value: string | number }[];
+  featureKeys: string[];
+  statKeys?: { labelKey: string; value: string | number }[];
 }
 
-const statusConfig: Record<ModuleStatus, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  implemented: { label: "Implementerad", variant: "default" },
-  partial: { label: "Delvis", variant: "secondary" },
-  planned: { label: "Planerad", variant: "outline" },
-};
-
-const modules: GamificationModule[] = [
+const moduleDefinitions: Omit<GamificationModule, 'icon'>[] = [
   {
     id: "dashboard",
-    title: "Economy Dashboard",
-    description: "Övervaka mint/burn-rates, topptjänare och misstänkt aktivitet i realtid.",
+    titleKey: "modules.dashboard.title",
+    descriptionKey: "modules.dashboard.description",
     href: "/admin/gamification/dashboard",
-    icon: <PresentationChartLineIcon className="h-8 w-8" />,
     status: "implemented",
-    features: ["Mint Rate", "Burn Rate", "Top Earners", "Rule Toggles", "Abuse Detection"],
-    stats: [
-      { label: "Aktiva idag", value: "89" },
-      { label: "Netto 24h", value: "+778" },
+    featureKeys: ["modules.dashboard.features.mintRate", "modules.dashboard.features.burnRate", "modules.dashboard.features.topEarners", "modules.dashboard.features.ruleToggles", "modules.dashboard.features.abuseDetection"],
+    statKeys: [
+      { labelKey: "modules.dashboard.stats.activeToday", value: "89" },
+      { labelKey: "modules.dashboard.stats.net24h", value: "+778" },
     ],
   },
   {
     id: "dicecoin-xp",
-    title: "DiceCoin & XP",
-    description: "Hantera progression, nivåer, XP-regler och leaderboards för att engagera användare.",
+    titleKey: "modules.dicecoinXp.title",
+    descriptionKey: "modules.dicecoinXp.description",
     href: "/admin/gamification/dicecoin-xp",
-    icon: <CurrencyDollarIcon className="h-8 w-8" />,
     status: "implemented",
-    features: ["XP-regler", "Nivåer", "Leaderboards", "Coin-transaktioner"],
-    stats: [
-      { label: "Aktiva spelare", value: "1,234" },
-      { label: "Nivåer", value: 25 },
+    featureKeys: ["modules.dicecoinXp.features.xpRules", "modules.dicecoinXp.features.levels", "modules.dicecoinXp.features.leaderboards", "modules.dicecoinXp.features.coinTransactions"],
+    statKeys: [
+      { labelKey: "modules.dicecoinXp.stats.activePlayers", value: "1,234" },
+      { labelKey: "modules.dicecoinXp.stats.levels", value: 25 },
     ],
   },
   {
     id: "achievements",
-    title: "Achievements",
-    description: "Administrera achievements, badges, tiers och belöningskriterier.",
+    titleKey: "modules.achievements.title",
+    descriptionKey: "modules.achievements.description",
     href: "/admin/gamification/achievements",
-    icon: <TrophyIcon className="h-8 w-8" />,
     status: "partial",
-    features: ["Badge-bibliotek", "Tier-system", "Trigger-regler", "Reward-koppling"],
-    stats: [
-      { label: "Badges", value: 48 },
-      { label: "Aktiva triggers", value: 12 },
+    featureKeys: ["modules.achievements.features.badgeLibrary", "modules.achievements.features.tierSystem", "modules.achievements.features.triggerRules", "modules.achievements.features.rewardConnection"],
+    statKeys: [
+      { labelKey: "modules.achievements.stats.badges", value: 48 },
+      { labelKey: "modules.achievements.stats.activeTriggers", value: 12 },
     ],
   },
   {
     id: "shop-rewards",
-    title: "Shop & Rewards",
-    description: "Hantera butik, belöningar, priser och tillgänglighetsregler.",
+    titleKey: "modules.shopRewards.title",
+    descriptionKey: "modules.shopRewards.description",
     href: "/admin/gamification/shop-rewards",
-    icon: <ShoppingBagIcon className="h-8 w-8" />,
     status: "implemented",
-    features: ["Butik-items", "Prissättning", "Inventory", "Köphistorik"],
-    stats: [
-      { label: "Items", value: 24 },
-      { label: "Köp idag", value: 156 },
+    featureKeys: ["modules.shopRewards.features.shopItems", "modules.shopRewards.features.pricing", "modules.shopRewards.features.inventory", "modules.shopRewards.features.purchaseHistory"],
+    statKeys: [
+      { labelKey: "modules.shopRewards.stats.items", value: 24 },
+      { labelKey: "modules.shopRewards.stats.purchasesToday", value: 156 },
     ],
   },
   {
     id: "library-exports",
-    title: "Library Exports",
-    description: "Exportpaket från biblioteket – CSV, PDF och brandade exports.",
+    titleKey: "modules.libraryExports.title",
+    descriptionKey: "modules.libraryExports.description",
     href: "/admin/gamification/library-exports",
-    icon: <DocumentArrowDownIcon className="h-8 w-8" />,
     status: "planned",
-    features: ["Export-mallar", "Format-val", "Versioning", "Export-logg"],
-    stats: [
-      { label: "Mallar", value: 0 },
-      { label: "Exports", value: 0 },
+    featureKeys: ["modules.libraryExports.features.exportTemplates", "modules.libraryExports.features.formatSelection", "modules.libraryExports.features.versioning", "modules.libraryExports.features.exportLog"],
+    statKeys: [
+      { labelKey: "modules.libraryExports.stats.templates", value: 0 },
+      { labelKey: "modules.libraryExports.stats.exports", value: 0 },
     ],
   },
 ];
 
+const moduleIcons: Record<string, React.ReactNode> = {
+  dashboard: <PresentationChartLineIcon className="h-8 w-8" />,
+  "dicecoin-xp": <CurrencyDollarIcon className="h-8 w-8" />,
+  achievements: <TrophyIcon className="h-8 w-8" />,
+  "shop-rewards": <ShoppingBagIcon className="h-8 w-8" />,
+  "library-exports": <DocumentArrowDownIcon className="h-8 w-8" />,
+};
+
 export default function GamificationHubPage() {
+  const t = useTranslations('admin.gamification.hub');
+
+  const statusConfig = useMemo(() => ({
+    implemented: { label: t('status.implemented'), variant: "default" as const },
+    partial: { label: t('status.partial'), variant: "secondary" as const },
+    planned: { label: t('status.planned'), variant: "outline" as const },
+  }), [t]);
+
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: "Admin", href: "/admin" },
-          { label: "Gamification hub" },
+          { label: t('breadcrumbs.admin'), href: "/admin" },
+          { label: t('breadcrumbs.gamification') },
         ]}
       />
 
       <AdminPageHeader
-        title="Gamification hub"
-        description="Centralt nav för alla gamification-funktioner: progression, achievements, belöningar och exports."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
       />
 
       {/* Quick Stats */}
       <AdminStatGrid cols={4} className="mb-8">
         <AdminStatCard
-          label="Aktiva spelare"
+          label={t('stats.activePlayers')}
           value="1,234"
           icon={<UserGroupIcon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
-          label="Totalt XP utdelat"
+          label={t('stats.totalXpAwarded')}
           value="2.4M"
           icon={<SparklesIcon className="h-5 w-5" />}
           iconColor="amber"
         />
         <AdminStatCard
-          label="Achievements låsta upp"
+          label={t('stats.achievementsUnlocked')}
           value="8,912"
           icon={<TrophyIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Köp denna vecka"
+          label={t('stats.purchasesThisWeek')}
           value="342"
           icon={<ChartBarIcon className="h-5 w-5" />}
           iconColor="blue"
@@ -153,7 +160,7 @@ export default function GamificationHubPage() {
 
       {/* Module Cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        {modules.map((module) => (
+        {moduleDefinitions.map((module) => (
           <Link key={module.id} href={module.href} className="group">
             <Card className="h-full transition-all hover:border-primary hover:shadow-md">
               <CardContent className="p-6">
@@ -161,10 +168,10 @@ export default function GamificationHubPage() {
                 <div className="mb-4 flex items-start justify-between">
                   <div className="flex items-center gap-4">
                     <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      {module.icon}
+                      {moduleIcons[module.id]}
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground">{module.title}</h3>
+                      <h3 className="text-lg font-semibold text-foreground">{t(module.titleKey)}</h3>
                       <Badge variant={statusConfig[module.status].variant} className="mt-1">
                         {statusConfig[module.status].label}
                       </Badge>
@@ -174,27 +181,27 @@ export default function GamificationHubPage() {
                 </div>
 
                 {/* Description */}
-                <p className="mb-4 text-sm text-muted-foreground">{module.description}</p>
+                <p className="mb-4 text-sm text-muted-foreground">{t(module.descriptionKey)}</p>
 
                 {/* Features */}
                 <div className="mb-4 flex flex-wrap gap-2">
-                  {module.features.slice(0, 4).map((feature) => (
+                  {module.featureKeys.slice(0, 4).map((featureKey) => (
                     <span
-                      key={feature}
+                      key={featureKey}
                       className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
                     >
-                      {feature}
+                      {t(featureKey)}
                     </span>
                   ))}
                 </div>
 
                 {/* Stats */}
-                {module.stats && module.stats.length > 0 && (
+                {module.statKeys && module.statKeys.length > 0 && (
                   <div className="flex gap-6 border-t border-border pt-4">
-                    {module.stats.map((stat) => (
-                      <div key={stat.label}>
+                    {module.statKeys.map((stat) => (
+                      <div key={stat.labelKey}>
                         <p className="text-lg font-semibold text-foreground">{stat.value}</p>
-                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                        <p className="text-xs text-muted-foreground">{t(stat.labelKey)}</p>
                       </div>
                     ))}
                   </div>

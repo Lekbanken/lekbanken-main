@@ -257,6 +257,642 @@
       "account": "Account",
       "settings": "Settings"
     },
+    "notifications": {
+      "pageTitle": "Notifications",
+      "pageDescription": "Send messages to organization users.",
+      "noTenantTitle": "No organization selected",
+      "noTenantDescription": "Select an organization to send notifications.",
+      "errorTitle": "An error occurred",
+      "form": {
+        "sendNotification": "Send notification",
+        "title": "Title",
+        "type": "Type",
+        "message": "Message",
+        "category": "Category",
+        "targetAudience": "Target audience",
+        "selectRecipients": "Select recipients",
+        "actionUrl": "Action URL (optional)",
+        "actionLabel": "Action label (optional)"
+      },
+      "placeholders": {
+        "title": "App update",
+        "message": "Your message...",
+        "actionLabel": "Open"
+      },
+      "options": {
+        "allInOrg": "All in organization",
+        "specificUsers": "Specific users"
+      },
+      "loading": {
+        "users": "Loading users..."
+      },
+      "empty": {
+        "noUsers": "No users to select."
+      },
+      "recipients": {
+        "title": "Recipients",
+        "count": "{count} users in the organization.",
+        "hint": "When selecting specific users, you can choose from the list. Otherwise, it will be sent to everyone."
+      },
+      "actions": {
+        "sending": "Sending...",
+        "send": "Send notification"
+      },
+      "errors": {
+        "loadUsers": "Could not load users for the organization.",
+        "loadUsersFailed": "Could not load users.",
+        "noUsersToSend": "There are no users to send to.",
+        "sendFailed": "Could not send notifications."
+      }
+    },
+    "purposes": {
+      "legacy": {
+        "pageTitle": "Purposes & Sub-purposes",
+        "pageDescription": "Manage main purposes and sub-purposes used in games, products and filters.",
+        "breadcrumbHome": "Home",
+        "breadcrumbPurposes": "Purposes",
+        "newPurpose": "New purpose",
+        "exportColumns": {
+          "id": "ID",
+          "type": "Type",
+          "key": "Key",
+          "name": "Name",
+          "parentId": "Parent ID",
+          "tenantId": "Tenant ID",
+          "standard": "Standard",
+          "yes": "yes",
+          "no": "no"
+        },
+        "stats": {
+          "mainPurposes": "Main purposes",
+          "subPurposes": "Sub-purposes",
+          "total": "Total"
+        },
+        "tabs": {
+          "standard": "Standard (locked)",
+          "global": "Special global",
+          "tenant": "Tenant-specific"
+        },
+        "selectTenant": "Select tenant",
+        "purposeTree": "Purpose tree",
+        "loading": "Loading...",
+        "subPurposesCount": "{count} sub-purposes",
+        "standardLabel": "(standard)",
+        "actions": {
+          "edit": "Edit",
+          "quickDelete": "Quick delete",
+          "detachDelete": "Detach + delete",
+          "editMain": "Edit main purpose"
+        },
+        "errors": {
+          "loadPurposes": "Could not load purposes",
+          "loadPurposesNow": "Could not load purposes right now.",
+          "selectTenantFirst": "Select a tenant before creating a tenant-specific purpose.",
+          "selectTenantForPurpose": "Select a tenant for tenant-specific purpose.",
+          "savePurpose": "Could not save the purpose.",
+          "deletePurpose": "Could not delete the purpose.",
+          "readUsage": "Could not read usage.",
+          "detachDeleteFailed": "Failed to detach and delete.",
+          "detachDeletePurpose": "Could not detach and delete the purpose.",
+          "standardCannotDelete": "Standard purposes cannot be deleted."
+        },
+        "empty": {
+          "noAccess": "No access",
+          "noAccessDescription": "You need permission to view purposes.",
+          "selectTenant": "Select tenant",
+          "selectTenantDescription": "Select a tenant to view or manage purposes.",
+          "noPurposes": "No purposes",
+          "noPurposesDescription": "Run the seed or add purposes via API/UI."
+        },
+        "problem": "Problem",
+        "dialog": {
+          "editTitle": "Edit purpose",
+          "createTitle": "New purpose",
+          "nameLabel": "Name",
+          "keyLabel": "Key",
+          "typeLabel": "Type",
+          "parentLabel": "Parent",
+          "tenantLabel": "Tenant",
+          "typeMain": "Main purpose",
+          "typeSub": "Sub-purpose",
+          "selectMain": "Select main purpose",
+          "cancel": "Cancel",
+          "save": "Save",
+          "create": "Create"
+        },
+        "confirm": {
+          "usageMessage": "This purpose is used by:\n- {gamesMain} games (main)\n- {gamesSecondary} games (secondary)\n- {products} products\n- {media} media\n- {childSubs} sub-purposes (will be deleted)\nIt will be detached and deleted. Do you want to continue?"
+        }
+      }
+    },
+    "licenses": {
+      "legacy": {
+        "pageTitle": "Licenses",
+        "pageDescription": "Overview of customer licenses, status and usage.",
+        "notLoggedIn": "You are not logged in",
+        "notLoggedInDescription": "Log in to view licenses.",
+        "errorTitle": "An error occurred",
+        "loading": "Loading licenses...",
+        "searchPlaceholder": "Search organization or product",
+        "stats": {
+          "total": "Total",
+          "active": "Active",
+          "trial": "Trial",
+          "expired": "Expired"
+        },
+        "status": {
+          "active": "Active",
+          "trial": "Trial",
+          "expired": "Expired",
+          "suspended": "Suspended"
+        },
+        "filter": {
+          "all": "All statuses"
+        },
+        "empty": {
+          "noLicenses": "No licenses",
+          "noLicensesDescription": "No licenses found with current filters."
+        },
+        "unknownOrg": "Unknown org",
+        "plan": "Annual",
+        "seatsLabel": "Plan: {plan} • Seats: {used}/{total}",
+        "validLabel": "Valid: {start} – {end}"
+      }
+    },
+    "leaderboard": {
+      "legacy": {
+        "pageTitle": "Leaderboard",
+        "pageDescription": "View rankings for users and organizations",
+        "breadcrumbAdmin": "Admin",
+        "breadcrumbLeaderboard": "Leaderboard",
+        "refresh": "Refresh",
+        "notLoggedIn": "You must be logged in to view this page.",
+        "stats": {
+          "users": "Users",
+          "organisations": "Organizations",
+          "totalCoins": "Total coins",
+          "achievements": "Achievements"
+        },
+        "table": {
+          "rank": "Rank",
+          "name": "Name",
+          "coins": "Coins",
+          "games": "Games",
+          "achievements": "Achievements",
+          "score": "Score"
+        },
+        "type": {
+          "user": "User",
+          "organisation": "Organization"
+        },
+        "searchPlaceholder": "Search name...",
+        "timeframe": {
+          "7d": "Last 7 days",
+          "30d": "Last 30 days",
+          "90d": "Last 90 days",
+          "all": "All time"
+        },
+        "typeFilter": {
+          "all": "All types",
+          "users": "Users only",
+          "organisations": "Organizations only"
+        },
+        "metricSort": {
+          "score": "Sort: Score",
+          "coins": "Sort: Coins",
+          "games": "Sort: Games",
+          "achievements": "Sort: Achievements"
+        },
+        "empty": {
+          "noResults": "No results",
+          "noResultsForQuery": "No results for \"{query}\"",
+          "noData": "There is no data to display yet.",
+          "clearSearch": "Clear search"
+        },
+        "mockUserLabel": "User {number}"
+      }
+    },
+    "planner": {
+      "pageTitle": "Planner",
+      "pageDescription": "Manage plan library, publishing and visibility.",
+      "detailDescription": "History of published versions.",
+      "noPermission": "No permission",
+      "noPermissionDescription": "You do not have permission to view the planner admin.",
+      "noOrganizationSelected": "No organization selected",
+      "noOrganizationDescription": "Select an organization to view its plans.",
+      "planNotFound": "Plan not found",
+      "planNotFoundDescription": "The plan could not be found or you lack access.",
+      "noDescription": "No description",
+      "loadingPlans": "Loading plans...",
+      "loadingPlan": "Loading plan...",
+      "loadingVersions": "Loading versions...",
+      "errorLoadPlans": "Could not load plans.",
+      "errorLoadPlansTitle": "Could not load plans",
+      "errorLoadPlan": "Could not load plan.",
+      "errorLoadPlanTitle": "Could not load plan",
+      "errorLoadVersions": "Could not load versions.",
+      "errorLoadVersionsTitle": "Could not load versions",
+      "scopeTenantDescription": "Showing plans for {name}",
+      "scopeGlobalDescription": "Showing public plans",
+      "searchPlaceholder": "Search plans...",
+      "noPlans": "No plans",
+      "noPlansByFilter": "No plans match your filters.",
+      "noBlocks": "No blocks",
+      "noBlocksDescription": "The plan contains no blocks.",
+      "noVersions": "No versions",
+      "noVersionsDescription": "The plan has no published versions.",
+      "updatedAt": "Updated {date}",
+      "publishedAt": "Published {date}",
+      "actions": {
+        "createPlan": "Create plan",
+        "creating": "Creating...",
+        "open": "Open",
+        "publish": "Publish",
+        "archive": "Archive",
+        "restore": "Restore",
+        "delete": "Delete",
+        "loadMore": "Load more",
+        "showAll": "Show all",
+        "startRun": "Start run",
+        "backToPlan": "Back to plan"
+      },
+      "sections": {
+        "scope": "Scope",
+        "filter": "Filter",
+        "plans": "Plans",
+        "statusVisibility": "Status and visibility",
+        "metadata": "Metadata",
+        "blocks": "Blocks",
+        "versions": "Versions",
+        "versionList": "Version list"
+      },
+      "metadata": {
+        "ownerUser": "Owner user",
+        "ownerTenant": "Owner tenant",
+        "totalTime": "Total time",
+        "lastUpdated": "Last updated",
+        "currentVersion": "Current version",
+        "none": "None",
+        "global": "Global"
+      },
+      "unpublishedChanges": "⚠ Unpublished changes",
+      "dialogs": {
+        "deletePlanTitle": "Delete plan",
+        "deletePlanConfirm": "Are you sure you want to delete plan \"{name}\"?",
+        "deletePlanConfirmGeneric": "Are you sure you want to delete the plan?"
+      },
+      "toasts": {
+        "planPublished": "Plan published.",
+        "planPublishError": "Could not publish plan.",
+        "visibilityUpdated": "Visibility updated.",
+        "visibilityError": "Could not update visibility.",
+        "planDeleted": "Plan deleted.",
+        "planDeleteError": "Could not delete plan.",
+        "planCreated": "Plan created!",
+        "planCreateError": "Could not create plan.",
+        "planArchived": "Plan archived.",
+        "planArchiveError": "Could not archive plan.",
+        "planRestored": "Plan restored.",
+        "planRestoreError": "Could not restore plan."
+      }
+    },
+    "tenant": {
+      "members": {
+        "title": "Members",
+        "description": "Manage organization members and roles.",
+        "noOrganizationTitle": "No organization selected",
+        "noOrganizationDescription": "Select or switch organization to see members.",
+        "errorTitle": "Could not load members",
+        "errorDescription": "Could not load members right now.",
+        "searchPlaceholder": "Search by name, email or role",
+        "loading": "Loading members...",
+        "emptyTitle": "No members",
+        "emptyDescription": "There are no members to display for this organization.",
+        "unknownUser": "Unknown user",
+        "noEmail": "No email",
+        "primaryContact": "Primary contact",
+        "member": "Member"
+      },
+      "games": {
+        "title": "Games",
+        "description": "Choose which games should be available for the organization.",
+        "noOrganizationTitle": "No organization selected",
+        "noOrganizationDescription": "Select or switch organization to see games.",
+        "errorTitle": "Could not load games",
+        "errorDescription": "Could not load games for the organization.",
+        "searchPlaceholder": "Search by name or category",
+        "loading": "Loading games...",
+        "emptyTitle": "No games",
+        "emptyDescription": "No games found for this organization.",
+        "noDescription": "No description",
+        "unknownCategory": "Unknown category",
+        "unknownLevel": "Unknown level"
+      },
+      "billing": {
+        "title": "Billing",
+        "description": "Overview of subscription and invoices.",
+        "noOrganizationTitle": "No organization selected",
+        "noOrganizationDescription": "Select or switch organization to see billing.",
+        "loading": "Loading...",
+        "loadingInvoices": "Loading invoices...",
+        "activePlan": "Active plan",
+        "noPlan": "No active plan",
+        "unknownPlan": "Unknown plan",
+        "noStatus": "No status",
+        "mrr": "MRR",
+        "mrrSubtitle": "Estimated",
+        "totalBilled": "Total billed",
+        "totalBilledSubtitle": "Sum",
+        "invoicesTitle": "Invoices",
+        "noInvoicesTitle": "No invoices yet",
+        "noInvoicesDescription": "When invoices exist for this organization, they will be displayed here.",
+        "invoiceFallbackName": "Invoice"
+      },
+      "analytics": {
+        "pageTitle": "Statistics",
+        "pageDescription": "Key metrics for the organization's usage.",
+        "noOrganization": {
+          "title": "No organization selected",
+          "description": "Select or switch organization to view statistics."
+        },
+        "error": {
+          "loadFailed": "Could not load statistics",
+          "message": "Could not load statistics right now."
+        },
+        "loading": "Loading statistics...",
+        "stats": {
+          "pageViews": "Page views",
+          "uniqueViews": "Unique: {count}",
+          "sessions": "Sessions",
+          "completedSessions": "Completed: {count}",
+          "avgTime": "Average time",
+          "avgVisitTime": "Avg visit time: {seconds}s",
+          "avgScore": "Average score",
+          "last30Days": "Last 30 days"
+        }
+      },
+      "content": {
+        "pageTitle": "Content",
+        "pageDescription": "Manage the organization's content and library.",
+        "noOrganization": {
+          "title": "No organization selected",
+          "description": "Select or switch organization to view content."
+        },
+        "error": {
+          "loadFailed": "Could not load content",
+          "message": "Could not load content for the organization."
+        },
+        "search": {
+          "placeholder": "Search by title or description"
+        },
+        "filter": {
+          "allTypes": "All types",
+          "game": "Game",
+          "lesson": "Lesson",
+          "resource": "Resource"
+        },
+        "loading": "Loading content...",
+        "empty": {
+          "title": "No content",
+          "description": "No content found for this organization."
+        },
+        "item": {
+          "noDescription": "No description",
+          "published": "Published",
+          "draft": "Draft"
+        }
+      },
+      "subscription": {
+        "pageTitle": "Subscription",
+        "pageDescription": "Subscription plan and usage for the organization.",
+        "noOrganization": {
+          "title": "No organization selected",
+          "description": "Select an organization to view subscription."
+        },
+        "loading": "Loading subscription...",
+        "loadingShort": "Loading...",
+        "empty": {
+          "title": "No active subscription",
+          "description": "No subscription found for this organization."
+        },
+        "plan": {
+          "title": "Plan",
+          "noActivePlan": "No active plan",
+          "unknownPlan": "Unknown plan",
+          "status": "Status: {status}",
+          "period": "Period: {period}"
+        },
+        "billing": {
+          "title": "Billing",
+          "stripeSubscriptionId": "Stripe Subscription ID: {id}",
+          "stripeCustomerId": "Stripe Customer ID: {id}",
+          "usageIncluded": "Usage included"
+        }
+      },
+      "settings": {
+        "pageTitle": "Settings",
+        "pageDescription": "Manage the organization's settings, branding and gamification.",
+        "comingSoon": {
+          "title": "Settings coming soon",
+          "description": "Here we will add branding, gamification configuration and security settings."
+        }
+      },
+      "achievements": {
+        "pageTitle": "Achievements",
+        "pageDescription": "Create and manage achievements for {tenantName}",
+        "newButton": "New achievement",
+        "noTenant": {
+          "title": "No organization selected",
+          "description": "Select an organization to manage achievements."
+        },
+        "fetchError": "Could not fetch achievements",
+        "onlyActiveCanBeAwarded": "Only active achievements can be awarded",
+        "achievementSaved": "Achievement saved",
+        "statusChangedTo": "Status changed to {status}",
+        "couldNotUpdateStatus": "Could not update status",
+        "achievementDeleted": "Achievement deleted",
+        "couldNotDelete": "Could not delete",
+        "achievementsUpdated": "{count} achievements updated",
+        "couldNotUpdate": "Could not update",
+        "awardedTo": "Awarded to {count} users",
+        "awardedWithDuplicates": "Awarded to {count} users ({duplicates} already had)",
+        "allHadAlready": "All {count} users already had this achievement",
+        "status": {
+          "all": "All statuses",
+          "draft": "Draft",
+          "draftPlural": "Drafts",
+          "active": "Active",
+          "activePlural": "Active",
+          "archived": "Archived",
+          "archivedPlural": "Archived"
+        },
+        "stats": {
+          "total": "Total",
+          "active": "Active",
+          "draft": "Drafts",
+          "archived": "Archived"
+        },
+        "search": {
+          "placeholder": "Search achievements..."
+        },
+        "table": {
+          "name": "Name",
+          "description": "Description",
+          "status": "Status",
+          "noDescription": "–"
+        },
+        "actions": {
+          "edit": "Edit",
+          "award": "Award",
+          "activate": "Activate",
+          "archive": "Archive",
+          "delete": "Delete"
+        },
+        "empty": {
+          "title": "No achievements found",
+          "titleNoAchievements": "No achievements yet",
+          "filtered": "Adjust search filters or create a new achievement.",
+          "noAchievements": "Create your first achievement to engage participants.",
+          "createButton": "Create achievement"
+        },
+        "confirm": {
+          "deleteTitle": "Delete achievement",
+          "archiveTitle": "Archive achievement",
+          "activateTitle": "Activate achievement",
+          "deleteDescription": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+          "archiveDescription": "Do you want to archive \"{name}\"?",
+          "activateDescription": "Do you want to activate \"{name}\"?",
+          "deleteLabel": "Delete",
+          "confirmLabel": "Confirm"
+        }
+      }
+    },
+    "conversationCards": {
+      "breadcrumbHome": "Home",
+      "breadcrumbTitle": "Conversation Cards",
+      "pageTitle": "Conversation Cards",
+      "pageDescription": "Manage conversation card collections (Toolbelt) and import cards via CSV.",
+      "importButton": "Import",
+      "createCollectionButton": "Create collection",
+      "filterTitle": "Filter",
+      "filterScope": "Scope",
+      "filterStatus": "Status",
+      "filterMainPurpose": "Main purpose",
+      "filterSubPurpose": "Sub purpose",
+      "statusAll": "All",
+      "loading": "Loading…",
+      "errorLoadPurposes": "Could not load purposes",
+      "errorLoadCollections": "Could not load collections",
+      "errorLoadTitle": "Could not load",
+      "noCollections": "No collections",
+      "noCollectionsDescription": "Create a collection or change filter.",
+      "cardsCount": "{count} cards",
+      "editButton": "Edit",
+      "viewButton": "View",
+      "new": {
+        "breadcrumbHome": "Home",
+        "breadcrumbTitle": "Conversation Cards",
+        "breadcrumbNew": "New",
+        "breadcrumbCreate": "Create collection",
+        "pageTitle": "Create collection",
+        "pageDescription": "Create a conversation card collection (deck).",
+        "noAccessTitle": "No access",
+        "noAccessDescription": "You don't have permission for Conversation Cards.",
+        "noPermission": "You don't have permission to create collections.",
+        "selectTenantError": "Select tenant (missing in your context).",
+        "couldNotCreate": "Could not create collection",
+        "couldNotSave": "Could not save",
+        "cancel": "Cancel",
+        "creating": "Creating…",
+        "create": "Create",
+        "basicInfo": "Basic info",
+        "scope": "Scope",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global",
+        "scopeHint": "Tenant is controlled by your active tenant in Admin.",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "title": "Title",
+        "titlePlaceholder": "Title",
+        "language": "Language",
+        "languagePlaceholder": "en",
+        "description": "Description",
+        "descriptionPlaceholder": "Short description (optional)",
+        "audience": "Audience",
+        "audiencePlaceholder": "e.g. 10–12 years",
+        "purposes": "Purposes",
+        "mainPurpose": "Main purpose",
+        "mainPurposeLoading": "Loading…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Sub purposes",
+        "noSubPurposes": "No sub purposes to select."
+      },
+      "edit": {
+        "breadcrumbHome": "Home",
+        "breadcrumbCards": "Conversation Cards",
+        "breadcrumbLoading": "Loading…",
+        "breadcrumbCollection": "Collection",
+        "loading": "Loading…",
+        "loadError": "Could not load",
+        "notFoundTitle": "Not found",
+        "notFoundDescription": "The collection does not exist or you don't have access.",
+        "pageDescription": "Edit collection and manage cards.",
+        "importCsv": "Import (CSV)",
+        "delete": "Delete",
+        "saving": "Saving…",
+        "save": "Save",
+        "errorTitle": "Something went wrong",
+        "basicInfo": "Basic info",
+        "viewOnlyNotice": "You can view, but not edit, this collection.",
+        "title": "Title",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "language": "Language",
+        "languagePlaceholder": "en",
+        "audience": "Audience",
+        "audiencePlaceholder": "e.g. ages 10–12",
+        "description": "Description",
+        "descriptionPlaceholder": "Short description (optional)",
+        "purposes": "Purposes",
+        "mainPurpose": "Main purpose",
+        "mainPurposeLoading": "Loading…",
+        "mainPurposeNone": "—",
+        "subPurposes": "Sub purposes",
+        "noSubPurposes": "No sub purposes to select.",
+        "cardsTitle": "Cards",
+        "addCardSection": "Add card",
+        "sortOrder": "Sort order",
+        "cardTitleOptional": "Title (optional)",
+        "cardTitle": "Title",
+        "primaryPrompt": "Primary question / prompt",
+        "followup1": "Followup 1",
+        "followup2": "Followup 2",
+        "followup3": "Followup 3",
+        "leaderTip": "Leader tip (optional)",
+        "leaderTipLabel": "Leader tip",
+        "addButton": "Add",
+        "setSortToEnd": "Set sort order to end",
+        "noCardsYet": "No cards yet.",
+        "cardLabel": "Card",
+        "close": "Close",
+        "edit": "Edit",
+        "deleteCard": "Delete",
+        "saveCard": "Save card",
+        "preview": "Preview",
+        "noCardsToPreview": "No cards to preview.",
+        "confirmDeleteCollection": "Delete the collection? This will also delete all cards in the collection.",
+        "confirmDeleteCard": "Delete the card?",
+        "couldNotLoadCollection": "Could not load collection",
+        "couldNotSaveCollection": "Could not save collection",
+        "couldNotDeleteCollection": "Could not delete",
+        "primaryPromptRequired": "primary_prompt is required",
+        "couldNotCreateCard": "Could not create card",
+        "couldNotSaveCard": "Could not save card",
+        "couldNotDeleteCard": "Could not delete card"
+      }
+    },
     "dashboard": {
       "title": "Dashboard",
       "welcome": "Welcome to Lekbanken Admin",
@@ -294,6 +930,611 @@
         "productAdminDesc": "Products, capabilities, availability.",
         "achievementsAdmin": "Achievements Admin",
         "achievementsAdminDesc": "Badge builder and rewards."
+      }
+    },
+    "webhooks": {
+      "pageTitle": "Webhooks",
+      "pageDescription": "Manage webhook endpoints and logs.",
+      "emptyTitle": "No webhooks configured yet",
+      "emptyDescription": "Here you can add endpoints, view delivery status and logs. Backend integration is pending."
+    },
+    "apiKeys": {
+      "pageTitle": "API Keys",
+      "pageDescription": "Manage API keys and scopes.",
+      "emptyTitle": "No API keys yet",
+      "emptyDescription": "Here you will create, rotate and restrict keys. Backend integration is pending."
+    },
+    "featureFlags": {
+      "pageTitle": "Feature Flags",
+      "pageDescription": "Manage system flags and rollout.",
+      "emptyTitle": "No flags to show yet",
+      "emptyDescription": "Flag management will be enabled when backend support is available. Here you can toggle, segment and version manage."
+    },
+    "releaseNotes": {
+      "pageTitle": "Release Notes",
+      "pageDescription": "View and publish version updates.",
+      "emptyTitle": "No release notes yet",
+      "emptyDescription": "Version history and editing/publishing will be available once backend integration is complete."
+    },
+    "systemHealth": {
+      "pageTitle": "System Health",
+      "pageDescription": "Overview of system health and performance",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "systemHealth": "System Health"
+      },
+      "notLoggedIn": "You must be logged in to view this page.",
+      "autoRefresh": "Auto-refresh (30s)",
+      "refreshNow": "Refresh now",
+      "systemStatus": "System Status",
+      "lastChecked": "Last checked: {time}",
+      "version": "Version",
+      "status": {
+        "healthy": "All systems operational",
+        "degraded": "Degraded performance",
+        "unhealthy": "System error detected"
+      },
+      "checks": {
+        "database": "Database",
+        "storage": "Storage",
+        "api": "API",
+        "ok": "OK",
+        "error": "Error",
+        "latency": "{ms}ms latency",
+        "responding": "Responding"
+      },
+      "metrics": {
+        "errorsLastHour": "Errors last hour",
+        "activeUsersNow": "Active users (now)",
+        "apiLatencyP95": "API Latency (P95)",
+        "totalFiles": "Total files"
+      },
+      "cards": {
+        "errorRate": "Error Rate",
+        "apiPerformance": "API Performance",
+        "users": "Users",
+        "storageDatabase": "Storage & Database"
+      },
+      "timeRanges": {
+        "lastHour": "Last hour",
+        "last24h": "Last 24h",
+        "last7d": "Last 7 days"
+      },
+      "latency": {
+        "p50": "P50 (median)",
+        "p95": "P95",
+        "p99": "P99"
+      },
+      "activeUsers": {
+        "now": "Active now (5 min)",
+        "last24h": "Last 24h"
+      },
+      "storage": {
+        "totalFiles": "Total files",
+        "databaseRecords": "Database records",
+        "connectionPool": "Connection pool"
+      }
+    },
+    "auditLog": {
+      "pageTitle": "Audit Logs",
+      "pageDescription": "Review all system activities and changes",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "auditLog": "Audit Logs"
+      },
+      "notLoggedIn": "You must be logged in to view this page.",
+      "loading": "Loading...",
+      "noEvents": "No activities found",
+      "exportCsv": "Export CSV",
+      "stats": {
+        "totalEvents": "Total events",
+        "created": "Created",
+        "updated": "Updated",
+        "deleted": "Deleted"
+      },
+      "filters": {
+        "title": "Filter",
+        "from": "From",
+        "to": "To",
+        "action": "Action",
+        "resourceType": "Resource type",
+        "searchPlaceholder": "Search activities...",
+        "autoApply": "Filters are applied automatically",
+        "actions": {
+          "all": "All",
+          "create": "Create",
+          "update": "Update",
+          "delete": "Delete",
+          "login": "Login",
+          "logout": "Logout"
+        },
+        "resources": {
+          "all": "All",
+          "game": "Game",
+          "product": "Product",
+          "user": "User",
+          "tenant": "Organization",
+          "media": "Media",
+          "achievement": "Achievement"
+        }
+      },
+      "table": {
+        "title": "Activity log",
+        "eventsCount": "{count} events",
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "resource": "Resource",
+        "user": "User",
+        "details": "Details",
+        "showMetadata": "Show metadata",
+        "system": "System"
+      }
+    },
+    "design": {
+      "mediaDefaults": {
+        "noDefaultProfileImages": "No default profile images uploaded",
+        "noDefaultCoverImages": "No default cover images uploaded"
+      }
+    },
+    "billing": {
+      "hub": {
+        "pageTitle": "Billing",
+        "pageDescription": "Manage subscriptions, invoices and payments",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Billing"
+        },
+        "notLoggedIn": "You must be logged in to view this page.",
+        "stats": {
+          "activeSubscriptions": "Active subscriptions",
+          "mrr": "MRR",
+          "totalRevenue": "Total revenue",
+          "paidInvoices": "Paid invoices",
+          "outstanding": "Outstanding"
+        },
+        "actions": {
+          "subscriptions": {
+            "title": "Subscriptions",
+            "description": "Manage customer subscriptions and plans.",
+            "button": "View subscriptions"
+          },
+          "invoices": {
+            "title": "Invoices",
+            "description": "View and manage customer invoices and payments.",
+            "button": "View invoices"
+          },
+          "plans": {
+            "title": "Pricing Plans",
+            "description": "Configure subscription tiers and pricing.",
+            "button": "Manage plans"
+          },
+          "settings": {
+            "title": "Payment Settings",
+            "description": "Configure payment methods and integrations.",
+            "button": "Settings"
+          }
+        },
+        "about": {
+          "title": "About billing",
+          "paragraph1": "The billing dashboard provides an overview of all subscription and payment activities.",
+          "paragraph2": "Here you can manage customer subscriptions, view invoices, configure pricing plans and monitor payment methods.",
+          "note": "NOTE: Stripe integration will be enabled in production. For now, billing data is stored in Supabase."
+        }
+      },
+      "subscriptions": {
+        "title": "Subscriptions",
+        "description": "Manage active subscriptions and plans",
+        "emptyTitle": "No subscriptions",
+        "emptyDescription": "There are no subscriptions to display.",
+        "noResultsFor": "No results for \"{query}\"",
+        "clearSearch": "Clear search",
+        "back": "Back",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Billing",
+          "subscriptions": "Subscriptions"
+        },
+        "stats": {
+          "total": "Total",
+          "active": "Active",
+          "trial": "Trial",
+          "mrr": "MRR"
+        },
+        "search": "Search organization...",
+        "filter": {
+          "all": "All statuses",
+          "active": "Active",
+          "trial": "Trial",
+          "paused": "Paused",
+          "canceled": "Canceled"
+        }
+      },
+      "invoices": {
+        "emptyTitle": "No invoices",
+        "emptyDescription": "There are no invoices to display.",
+        "noResultsFor": "No results for \"{query}\"",
+        "clearSearch": "Clear search"
+      }
+    },
+    "gamification": {
+      "hub": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification hub"
+        },
+        "pageTitle": "Gamification hub",
+        "pageDescription": "Central hub for all gamification features: progression, achievements, rewards and exports.",
+        "stats": {
+          "activePlayers": "Active players",
+          "totalXpAwarded": "Total XP awarded",
+          "achievementsUnlocked": "Achievements unlocked",
+          "purchasesThisWeek": "Purchases this week"
+        },
+        "status": {
+          "implemented": "Implemented",
+          "partial": "Partial",
+          "planned": "Planned"
+        },
+        "modules": {
+          "dashboard": {
+            "title": "Economy Dashboard",
+            "description": "Monitor mint/burn rates, top earners and suspicious activity in real-time.",
+            "features": {
+              "mintRate": "Mint Rate",
+              "burnRate": "Burn Rate",
+              "topEarners": "Top Earners",
+              "ruleToggles": "Rule Toggles",
+              "abuseDetection": "Abuse Detection"
+            },
+            "stats": {
+              "activeToday": "Active today",
+              "net24h": "Net 24h"
+            }
+          },
+          "dicecoinXp": {
+            "title": "DiceCoin & XP",
+            "description": "Manage progression, levels, XP rules and leaderboards to engage users.",
+            "features": {
+              "xpRules": "XP rules",
+              "levels": "Levels",
+              "leaderboards": "Leaderboards",
+              "coinTransactions": "Coin transactions"
+            },
+            "stats": {
+              "activePlayers": "Active players",
+              "levels": "Levels"
+            }
+          },
+          "achievements": {
+            "title": "Achievements",
+            "description": "Administer achievements, badges, tiers and reward criteria.",
+            "features": {
+              "badgeLibrary": "Badge library",
+              "tierSystem": "Tier system",
+              "triggerRules": "Trigger rules",
+              "rewardConnection": "Reward connection"
+            },
+            "stats": {
+              "badges": "Badges",
+              "activeTriggers": "Active triggers"
+            }
+          },
+          "shopRewards": {
+            "title": "Shop & Rewards",
+            "description": "Manage shop, rewards, prices and availability rules.",
+            "features": {
+              "shopItems": "Shop items",
+              "pricing": "Pricing",
+              "inventory": "Inventory",
+              "purchaseHistory": "Purchase history"
+            },
+            "stats": {
+              "items": "Items",
+              "purchasesToday": "Purchases today"
+            }
+          },
+          "libraryExports": {
+            "title": "Library Exports",
+            "description": "Export packages from the library – CSV, PDF and branded exports.",
+            "features": {
+              "exportTemplates": "Export templates",
+              "formatSelection": "Format selection",
+              "versioning": "Versioning",
+              "exportLog": "Export log"
+            },
+            "stats": {
+              "templates": "Templates",
+              "exports": "Exports"
+            }
+          }
+        }
+      },
+      "dicecoinXp": {
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification hub",
+          "dicecoinXp": "DiceCoin & XP"
+        },
+        "pageTitle": "DiceCoin & XP",
+        "pageDescription": "Manage XP triggers, levels, and leaderboards. Seed all default triggers to the database.",
+        "actions": {
+          "refresh": "Refresh",
+          "settings": "Settings"
+        },
+        "stats": {
+          "totalTriggers": "Total triggers",
+          "inDatabase": "In database",
+          "missing": "Missing",
+          "levels": "Levels"
+        },
+        "tabs": {
+          "xpTriggers": "XP & DiceCoin Triggers",
+          "levels": "Levels",
+          "leaderboards": "Leaderboards"
+        },
+        "cooldown": {
+          "none": "None",
+          "daily": "Daily",
+          "weekly": "Weekly",
+          "once": "Once",
+          "oncePerStreak": "Per streak"
+        },
+        "categories": {
+          "play": "Play",
+          "planner": "Planner",
+          "engagement": "Engagement",
+          "content": "Content",
+          "social": "Social",
+          "learning": "Learning",
+          "custom": "Custom"
+        },
+        "xpTab": {
+          "searchPlaceholder": "Search triggers...",
+          "addMissing": "Add {count} missing",
+          "seeding": "Seeding...",
+          "resetAll": "Reset all",
+          "createCustom": "Create custom trigger",
+          "resetWarning": "This will delete all default triggers and re-add them with default values. Custom triggers will be preserved.",
+          "confirmReset": "Yes, reset",
+          "cancel": "Cancel",
+          "table": {
+            "status": "Status",
+            "name": "Name",
+            "eventType": "Event Type",
+            "coins": "Coins",
+            "xp": "XP",
+            "cooldown": "Cooldown",
+            "active": "Active",
+            "inactive": "Inactive"
+          },
+          "custom": "Custom",
+          "noTriggers": "No triggers found"
+        },
+        "levelsTab": {
+          "description": "Levels based on total XP. Level bonus is activated from level 5 (1.1x) and increases by 0.1x per level, capped at 2.0x.",
+          "levelPrefix": "Level",
+          "reward": "Reward",
+          "levelNames": {
+            "1": "Beginner",
+            "2": "Apprentice",
+            "3": "Explorer",
+            "4": "Adventurer",
+            "5": "Master",
+            "6": "Expert",
+            "7": "Veteran",
+            "8": "Legend",
+            "9": "Champion",
+            "10": "Grandmaster"
+          }
+        },
+        "leaderboardsTab": {
+          "description": "Leaderboard of users based on total XP. Users can choose to hide themselves from leaderboards.",
+          "refresh": "Refresh",
+          "emptyState": "No data yet. Leaderboard will populate when users earn XP.",
+          "table": {
+            "rank": "Rank",
+            "name": "Name",
+            "xp": "XP",
+            "dicecoin": "DiceCoin"
+          },
+          "anonymous": "Anonymous"
+        },
+        "errors": {
+          "generic": "An error occurred",
+          "fetchFailed": "Failed to fetch rules"
+        }
+      },
+      "achievements": {
+        "emptyTitle": "No achievements"
+      },
+      "shopRewards": {
+        "pageTitle": "Shop & Rewards",
+        "pageDescription": "Manage shop and rewards for {tenantName}.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "shopRewards": "Shop & Rewards"
+        },
+        "addItem": "Add item",
+        "stats": {
+          "totalItems": "Total items",
+          "available": "Available",
+          "totalSold": "Total sold",
+          "totalRevenue": "Total revenue"
+        },
+        "currencyWarning": "You need to create at least one currency before you can add shop items.",
+        "goToCurrency": "Go to Currency →",
+        "searchPlaceholder": "Search shop items...",
+        "filters": {
+          "category": "Category",
+          "availability": "Availability",
+          "featured": "Featured"
+        },
+        "categories": {
+          "all": "All categories",
+          "cosmetic": "Cosmetic",
+          "powerup": "Power-up",
+          "bundle": "Bundle",
+          "seasonPass": "Season Pass",
+          "avatar": "Avatar",
+          "avatarFrame": "Avatar Frame",
+          "background": "Background",
+          "title": "Title",
+          "badge": "Badge",
+          "hint": "Hint",
+          "skip": "Skip",
+          "timeExtend": "Time Extension",
+          "doubleXp": "Double XP",
+          "shield": "Shield"
+        },
+        "availability": {
+          "all": "All",
+          "available": "Available",
+          "unavailable": "Unavailable"
+        },
+        "featuredFilter": {
+          "all": "All",
+          "featured": "Featured",
+          "notFeatured": "Not featured"
+        },
+        "columns": {
+          "name": "Name",
+          "category": "Category",
+          "price": "Price",
+          "sales": "Sales",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "available": "Available",
+          "hidden": "Hidden"
+        },
+        "actions": {
+          "edit": "Edit",
+          "hide": "Hide",
+          "show": "Show",
+          "removeFeatured": "Remove from featured",
+          "addFeatured": "Add to featured",
+          "duplicate": "Duplicate",
+          "delete": "Delete",
+          "showInShop": "Show in shop",
+          "hideFromShop": "Hide from shop"
+        },
+        "bulkActions": {
+          "itemsHidden": "{count} items hidden",
+          "itemsVisible": "{count} items visible"
+        },
+        "empty": {
+          "title": "No shop items",
+          "noMatch": "No shop items match your filters.",
+          "getStarted": "Create your first shop item to get started."
+        },
+        "notifications": {
+          "itemSaved": "Shop item saved",
+          "hiddenFromShop": "Hidden from shop",
+          "visibleInShop": "Visible in shop",
+          "removedFromFeatured": "Removed from featured",
+          "addedToFeatured": "Added to featured",
+          "duplicated": "\"{name}\" duplicated",
+          "deleted": "Shop item deleted",
+          "couldNotFetch": "Could not fetch shop items",
+          "couldNotUpdate": "Could not update",
+          "couldNotDuplicate": "Could not duplicate",
+          "couldNotDelete": "Could not delete",
+          "couldNotHide": "Could not hide",
+          "couldNotShow": "Could not show"
+        },
+        "confirmDelete": {
+          "title": "Delete shop item",
+          "description": "Are you sure you want to delete \"{name}\"? This cannot be undone if there are no purchases.",
+          "confirm": "Delete"
+        },
+        "featured": "Featured",
+        "tenantSelector": {
+          "title": "Select organization",
+          "description": "Select an organization to manage shop and rewards.",
+          "noAccess": "You don't have access to any organizations."
+        },
+        "loading": "Loading shop items...",
+        "unknownTenant": "Unknown organization"
+      },
+      "libraryExports": {
+        "pageTitle": "Library Exports",
+        "pageDescription": "Export packages from the library – CSV, PDF and branded exports.",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamificationHub": "Gamification Hub",
+          "libraryExports": "Library Exports"
+        },
+        "empty": {
+          "title": "No export templates yet",
+          "description": "Create your first export template to start exporting data from the library.",
+          "createAction": "Create export template"
+        },
+        "searchPlaceholder": "Search templates..."
+      },
+      "achievements": {
+        "pageTitle": "Achievements",
+        "pageDescription": "Manage achievements, award to users and configure rules.",
+        "createAchievement": "Create achievement",
+        "searchPlaceholder": "Search achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Edit",
+          "award": "Award",
+          "archive": "Archive",
+          "restore": "Restore",
+          "delete": "Delete"
+        },
+        "filters": {
+          "scope": "Scope",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "All scopes",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Private"
+        },
+        "statuses": {
+          "all": "All statuses",
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        },
+        "notifications": {
+          "saved": "Achievement saved",
+          "deleted": "Achievement deleted",
+          "fetchFailed": "Could not fetch achievements",
+          "updateStatusFailed": "Could not update status",
+          "deleteFailed": "Could not delete",
+          "archiveFailed": "Could not archive",
+          "activateFailed": "Could not activate"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Delete achievement",
+          "confirmAction": "Confirm action",
+          "deleteConfirm": "Are you sure you want to delete this achievement? This cannot be undone.",
+          "areYouSure": "Are you sure?",
+          "deleteButton": "Delete",
+          "confirmButton": "Confirm"
+        },
+        "empty": {
+          "noAchievements": "No achievements",
+          "noMatch": "No achievements match your filters.",
+          "getStarted": "Create your first achievement to get started.",
+          "createAction": "Create achievement"
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        }
       }
     },
     "users": {
@@ -555,6 +1796,26 @@
           "privateUser": "Private user",
           "systemAdmin": "System admin"
         }
+      },
+      "invite": {
+        "title": "Invite user",
+        "description": "Send an invitation to join your organisation with the appropriate role.",
+        "emailLabel": "Email",
+        "emailPlaceholder": "user@example.com",
+        "nameLabel": "Name",
+        "nameOptional": "(optional)",
+        "namePlaceholder": "Full name",
+        "roleLabel": "Role",
+        "rolePlaceholder": "Select role",
+        "organisationLabel": "Organisation",
+        "organisationPlaceholder": "Organisation name",
+        "messageLabel": "Personal message",
+        "messageOptional": "(optional)",
+        "messagePlaceholder": "Add a short welcome message for the invitee...",
+        "cancel": "Cancel",
+        "sending": "Sending...",
+        "submit": "Send invite",
+        "required": "*"
       }
     },
     "games": {
@@ -718,6 +1979,68 @@
           "playMode": "Play Mode",
           "global": "Global"
         }
+      },
+      "builder": {
+        "artifact": {
+          "newArtifact": "New artifact",
+          "visibility": {
+            "public": "Visible to all",
+            "leaderOnly": "Leader only",
+            "rolePrivate": "Private to role"
+          },
+          "types": {
+            "card": "Card",
+            "document": "Document",
+            "image": "Image",
+            "conversationCards": "🗣️ Conversation cards (play)",
+            "keypad": "🔐 Keypad (PIN)",
+            "riddle": "❓ Riddle / Question",
+            "multiAnswer": "✅ Multi-choice answer",
+            "audio": "🔊 Audio clip",
+            "hotspot": "🎯 Clickable image (Hotspot)",
+            "tilePuzzle": "🧩 Tile puzzle",
+            "cipher": "🔤 Cipher / Encryption",
+            "logicGrid": "🧠 Logic grid",
+            "counter": "🔢 Counter",
+            "qrGate": "📱 QR/NFC scan",
+            "hintContainer": "💡 Hint container",
+            "propConfirmation": "📦 Prop confirmation",
+            "locationCheck": "📍 Location check",
+            "soundLevel": "🎤 Sound level detector",
+            "replayMarker": "⏱️ Replay marker",
+            "signalGenerator": "📢 Signal generator",
+            "timeBankStep": "⏳ Time bank / Final timer",
+            "emptyArtifact": "📦 Empty slot (placeholder)"
+          },
+          "errors": {
+            "loadConversationDecks": "Could not load conversation card decks"
+          }
+        },
+        "trigger": {
+          "newTrigger": "New trigger",
+          "addTrigger": "Add trigger",
+          "noTriggers": "No triggers yet.",
+          "noTriggersHint": "Triggers automate the game: \"When X happens, do Y\"",
+          "unnamedTrigger": "Unnamed trigger",
+          "inactive": "Inactive",
+          "onceLabel": "Once",
+          "activeLabel": "Active",
+          "onceCheckboxLabel": "Once",
+          "autoDisable": "Automatically disabled after first execution",
+          "delayLabel": "Delay",
+          "seconds": "seconds",
+          "step": "Step {number}",
+          "addActionPlaceholder": "+ Add action...",
+          "templates": "Templates",
+          "howItWorks": {
+            "title": "How triggers work",
+            "description": "Triggers automate the game: when a condition is met (e.g. a step is completed or time runs out) one or more actions are automatically performed.",
+            "example": "When 5 minutes remain → Show a clue"
+          },
+          "import": {
+            "error": "Import error"
+          }
+        }
       }
     },
     "achievements": {
@@ -745,6 +2068,49 @@
           "useForeground": "Use foreground",
           "useSymbol": "Use symbol"
         }
+      },
+      "metadata": {
+        "title": "Title",
+        "titlePlaceholder": "Badge title",
+        "subtitle": "Subtitle",
+        "subtitlePlaceholder": "Short subtitle",
+        "description": "Description",
+        "descriptionPlaceholder": "Describe how to earn this achievement.",
+        "rewardCoins": "Reward (coins)",
+        "status": "Status",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "publishingRoles": "Publishing roles",
+        "addRole": "Add role",
+        "availableForOrgs": "Available for organizations (IDs, comma-separated)",
+        "orgsPlaceholder": "org-1, org-2",
+        "roles": {
+          "admin": "Admin",
+          "creator": "Creator",
+          "org_admin": "Org admin"
+        }
+      },
+      "page": {
+        "title": "Achievements",
+        "description": "Build layered badges, assign themes and manage rewards",
+        "createAchievement": "Create Achievement",
+        "breadcrumbs": {
+          "home": "Home",
+          "achievements": "Achievements"
+        },
+        "badgeLibrary": "Badge Library",
+        "achievementCount": "{count} achievement",
+        "achievementCountPlural": "{count} achievements",
+        "published": "published",
+        "drafts": "drafts",
+        "badgeBuilder": "Badge Builder",
+        "createNewBadge": "Create New Badge",
+        "editBadge": "Edit Badge",
+        "editing": "Editing: {title}",
+        "untitled": "Untitled",
+        "visualBadgeConstruction": "Visual badge construction and metadata",
+        "selectOrCreate": "Select or create an achievement",
+        "selectOrCreateDescription": "Choose a badge from the library above or create a new one to start building its layers, colors, and metadata."
       }
     },
     "organizations": {
@@ -780,7 +2146,144 @@
       "suspend": "Suspend",
       "overview": "Overview",
       "statusChanged": "Status changed to {status}",
-      "couldNotChangeStatus": "Could not change status"
+      "couldNotChangeStatus": "Could not change status",
+      "toolbar": {
+        "searchPlaceholder": "Search organizations...",
+        "searchAriaLabel": "Search organizations",
+        "billing": {
+          "all": "All billing modes",
+          "connected": "Billing connected",
+          "notConnected": "No billing"
+        },
+        "domain": {
+          "all": "All domains",
+          "yes": "Has custom domain",
+          "no": "No domain"
+        },
+        "sort": {
+          "recent": "Newest first",
+          "name": "Name A–Z",
+          "members": "Most members",
+          "updated": "Recently updated"
+        },
+        "statusLabel": "Status",
+        "billingLabel": "Billing",
+        "languageLabel": "Language",
+        "domainLabel": "Domain",
+        "sortLabel": "Sort",
+        "clear": "Clear",
+        "clearWithCount": "Clear ({count})"
+      },
+      "detail": {
+        "copied": "Copied to clipboard",
+        "copiedWithLabel": "{label} copied"
+      },
+      "create": {
+        "title": "Create organization",
+        "description": "Add a new organization and enter contact details.",
+        "nameLabel": "Organization name",
+        "namePlaceholder": "Organization Inc",
+        "slugLabel": "Slug",
+        "slugOptional": "(optional)",
+        "slugPlaceholder": "organization-inc",
+        "slugHint": "Leave empty for auto-slug.",
+        "contactPerson": "Contact person",
+        "contactPersonPlaceholder": "Name",
+        "contactEmail": "Contact email",
+        "contactEmailPlaceholder": "email@example.com",
+        "phone": "Phone",
+        "phoneOptional": "(optional)",
+        "phonePlaceholder": "+1 ...",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "submit": "Create organization",
+        "required": "*"
+      },
+      "members": {
+        "title": "Members",
+        "addMember": "Add member",
+        "addMemberDescription": "Search for an existing user by email and add them directly to the organization.",
+        "searchByEmail": "Search user by email",
+        "searchPlaceholder": "name@example.com",
+        "searching": "Searching...",
+        "search": "Search",
+        "noUserFound": "No user found with that email address",
+        "searchFailed": "Could not search for users",
+        "searchResults": "Search results",
+        "alreadyMember": "Already a member",
+        "role": "Role",
+        "roleOwner": "Owner",
+        "roleAdmin": "Admin",
+        "roleMember": "Member",
+        "cancel": "Cancel",
+        "adding": "Adding...",
+        "addMemberButton": "Add member",
+        "memberAdded": "{name} added as {role}",
+        "alreadyMemberError": "The user is already a member of the organization",
+        "addFailed": "Could not add member",
+        "loadFailed": "Could not load members",
+        "unknown": "Unknown",
+        "statsTotal": "Total",
+        "statsOwners": "Owners",
+        "statsAdmins": "Admins",
+        "statsPending": "Pending",
+        "membersCount": "Members ({count})",
+        "searchNameOrEmail": "Search by name or email...",
+        "allRoles": "All roles",
+        "loading": "Loading members...",
+        "noMembersMatch": "No members match the filters",
+        "noMembersYet": "No members in the organization",
+        "tableUser": "User",
+        "tableRole": "Role",
+        "tableMemberSince": "Member since",
+        "tableActions": "Actions",
+        "primary": "Primary",
+        "makeOwner": "Make owner",
+        "makeAdmin": "Make admin",
+        "makeMember": "Make member",
+        "removeFromOrg": "Remove from organization",
+        "confirmRemove": "Are you sure you want to remove {name} from the organization?",
+        "cannotRemoveOnlyOwner": "Cannot remove the only owner",
+        "memberRemoved": "Member removed",
+        "removeFailed": "Could not remove member",
+        "roleChanged": "Role changed to {role}",
+        "roleChangeFailed": "Could not change role"
+      },
+      "audit": {
+        "title": "Activity log",
+        "titleWithCount": "Activity log ({count})",
+        "loadFailed": "Could not load activity log",
+        "loading": "Loading events...",
+        "noEventsOfType": "No events of this type",
+        "noActivity": "No activity recorded",
+        "showingRange": "Showing {from}–{to} of {total}",
+        "allEvents": "All events",
+        "event": "Event",
+        "justNow": "Just now",
+        "minAgo": "{min} min ago",
+        "hoursAgo": "{hours}h ago",
+        "daysAgo": "{days}d ago",
+        "enabled": "enabled",
+        "disabled": "disabled",
+        "events": {
+          "statusChanged": "Status changed",
+          "memberAdded": "Member added",
+          "memberRemoved": "Member removed",
+          "memberRoleChanged": "Role changed",
+          "settingsUpdated": "Settings updated",
+          "domainAdded": "Domain added",
+          "domainRemoved": "Domain removed",
+          "domainStatusChanged": "Domain status changed",
+          "brandingUpdated": "Branding updated",
+          "brandingLogoUpdated": "Logo updated",
+          "localeUpdated": "Language updated",
+          "featureToggled": "Feature changed",
+          "organisationSuspended": "Organization suspended",
+          "organisationArchived": "Organization archived"
+        }
+      }
     },
     "products": {
       "title": "Products",
@@ -790,6 +2293,82 @@
       "description": "Manage products, licenses and purposes – everything that is sold and categorized in Lekbanken.",
       "productsAndContent": "Products & Content",
       "createProduct": "Create product",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "productsAndContent": "Products & Content",
+        "products": "Products"
+      },
+      "stats": {
+        "products": "Products",
+        "activeProducts": "Active products",
+        "licenses": "Licenses",
+        "purposes": "Purposes",
+        "mainPurposes": "Main purposes"
+      },
+      "tabs": {
+        "products": "Products",
+        "licenses": "Licenses",
+        "purposes": "Purposes"
+      },
+      "productsTab": {
+        "searchPlaceholder": "Search products...",
+        "newProduct": "New product",
+        "noMatchingProducts": "No matching products",
+        "noProductsYet": "No products yet",
+        "adjustSearch": "Adjust your search to see more.",
+        "createFirstProduct": "Create your first product.",
+        "createProduct": "Create product",
+        "loadError": "Could not load products.",
+        "retry": "Try again",
+        "view": "View",
+        "edit": "Edit",
+        "delete": "Delete",
+        "statusActive": "Active",
+        "statusInactive": "Inactive",
+        "statusDraft": "Draft",
+        "statusArchived": "Archived"
+      },
+      "licensesTab": {
+        "searchPlaceholder": "Search licenses...",
+        "newLicense": "New license",
+        "noMatchingLicenses": "No matching licenses",
+        "noLicensesYet": "No licenses yet",
+        "adjustSearch": "Adjust your search to see more.",
+        "createFirstLicense": "Create your first license.",
+        "createLicense": "Create license",
+        "loadError": "Could not load licenses.",
+        "retry": "Try again",
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "terminateLicense": "Terminate license",
+        "plan": "Plan",
+        "seats": "Seats",
+        "expires": "Expires",
+        "autoRenewal": "Auto-renewal",
+        "toProduct": "→ Product",
+        "statusActive": "Active",
+        "statusTrial": "Trial",
+        "statusExpired": "Expired",
+        "statusSuspended": "Suspended"
+      },
+      "purposesTab": {
+        "searchPlaceholder": "Search purposes...",
+        "newPurpose": "New purpose",
+        "noMatchingPurposes": "No matching purposes",
+        "noPurposesYet": "No purposes yet",
+        "adjustSearch": "Adjust your search to see more.",
+        "createFirstPurpose": "Create your first purpose.",
+        "createPurpose": "Create purpose",
+        "loadError": "Could not load purposes.",
+        "retry": "Try again",
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "delete": "Delete",
+        "under": "Under: {parent}",
+        "productsCount": "{count} products",
+        "typeMain": "Main purpose",
+        "typeSub": "Sub-purpose"
+      },
       "categories": "Categories",
       "noCategories": "No categories",
       "createProductForCategories": "Create at least one product to see categories.",
@@ -810,7 +2389,529 @@
       "mainPurpose": "Main purpose",
       "select": "Select",
       "selectDefaultImage": "Select default image (coming soon)",
-      "apiReadyNote": "When the API is ready, this will be connected to the media picker and saved to the mapping table."
+      "apiReadyNote": "When the API is ready, this will be connected to the media picker and saved to the mapping table.",
+      "page": {
+        "title": "Products",
+        "description": "Configure products, modules and their capabilities",
+        "loading": "Loading products...",
+        "noAccess": "No access",
+        "noAccessDesc": "You need to be logged in to manage products.",
+        "goToLogin": "Go to login",
+        "createProduct": "Create product",
+        "totalProducts": "Total products",
+        "activeCount": "Active",
+        "inactiveCount": "Inactive",
+        "draftCount": "Drafts"
+      },
+      "breadcrumbs": {
+        "admin": "Admin",
+        "productsAndContent": "Products & Content",
+        "products": "Products",
+        "home": "Home"
+      },
+      "tabs": {
+        "products": "Products",
+        "licenses": "Licenses",
+        "purposes": "Purposes",
+        "categories": "Categories",
+        "discounts": "Discounts",
+        "images": "Default images"
+      },
+      "v2": {
+        "pageTitle": "Products",
+        "pageDescription": "Manage product catalog – pricing, entitlements, and Stripe integration.",
+        "breadcrumbs": {
+          "home": "Home",
+          "products": "Products"
+        },
+        "noAccess": {
+          "title": "No access",
+          "description": "You need administrator permission to manage products."
+        },
+        "stats": {
+          "total": "Total",
+          "active": "Active",
+          "draft": "Draft",
+          "missingStripe": "Missing Stripe"
+        },
+        "filters": {
+          "searchPlaceholder": "Search products...",
+          "active": "Active",
+          "draft": "Draft",
+          "missingStripe": "Missing Stripe",
+          "drift": "Drift",
+          "unhealthy": "Issues"
+        },
+        "bulk": {
+          "selected": "{count} of {total} selected",
+          "clear": "Clear",
+          "selectAll": "Select all",
+          "activate": "Activate",
+          "archive": "Archive",
+          "syncStripe": "Sync Stripe",
+          "validate": "Validate",
+          "export": "Export",
+          "actionSuccess": "Action completed on {count} products",
+          "actionFailed": "Action failed"
+        },
+        "table": {
+          "title": "Product overview",
+          "name": "Name",
+          "key": "Key",
+          "type": "Type",
+          "status": "Status",
+          "price": "Price",
+          "stripe": "Stripe",
+          "orgs": "Orgs",
+          "health": "Health",
+          "updated": "Updated",
+          "selectProduct": "Select {name}",
+          "viewProduct": "View product",
+          "syncWithStripe": "Sync with Stripe"
+        },
+        "empty": {
+          "title": "No products match filters",
+          "description": "Adjust filters or add a new product."
+        },
+        "error": {
+          "loadFailed": "Could not load products"
+        },
+        "actions": {
+          "export": "Export",
+          "import": "Import",
+          "newProduct": "New product"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive",
+          "draft": "Draft",
+          "archived": "Archived"
+        },
+        "type": {
+          "license": "License",
+          "module": "Module",
+          "addon": "Add-on",
+          "usage_based": "Usage-based",
+          "one_time": "One-time",
+          "subscription": "Subscription"
+        },
+        "stripeLinkage": {
+          "connected": "Connected",
+          "missing": "Missing",
+          "drift": "Drift",
+          "error": "Error"
+        },
+        "health": {
+          "ok": "OK",
+          "missing_fields": "Missing fields",
+          "stripe_drift": "Stripe drift",
+          "availability_misconfig": "Availability error",
+          "no_price": "No price"
+        },
+        "priceManager": {
+          "changeDefault": {
+            "title": "Change default price?",
+            "description": "There is already a default price for {currency} ({interval}):",
+            "current": "Current:",
+            "new": "New:",
+            "cancel": "Cancel",
+            "confirm": "Change default"
+          },
+          "activePrices": "Active prices ({count})",
+          "addPrice": "Add price",
+          "cancel": "Cancel",
+          "noPrices": {
+            "title": "No prices configured",
+            "description": "Add a price to sync to Stripe"
+          },
+          "priceCount": "{count} price",
+          "priceCountPlural": "{count} prices",
+          "archivedPrices": "Archived prices ({count})",
+          "archived": "Archived",
+          "syncWarning": {
+            "title": "⚠️ Product not synced to Stripe",
+            "description": "Prices will be synced when the product is first synchronized."
+          },
+          "tooltips": {
+            "defaultPrice": "Default price",
+            "makeDefault": "Make default price",
+            "taxBehaviorLocked": "Tax behavior cannot be changed after price is synced to Stripe"
+          },
+          "badges": {
+            "synced": "Synced",
+            "notSynced": "Not synced",
+            "trial": "{days}d trial"
+          },
+          "form": {
+            "amount": "Amount",
+            "amountPlaceholder": "299.00",
+            "currency": "Currency",
+            "billing": "Billing",
+            "taxBehavior": "Tax behavior",
+            "taxWarning": "Cannot be changed after sync",
+            "nickname": "Nickname (optional)",
+            "nicknamePlaceholder": "e.g. Early Bird",
+            "trialPeriod": "Trial period (days)",
+            "trialPeriodNote": "(not for one-time)",
+            "trialPeriodHint": "0 = no trial period",
+            "trialOnlySubscriptions": "Only for subscriptions",
+            "isDefault": "Default price for this currency/interval",
+            "creating": "Creating...",
+            "create": "Create price"
+          },
+          "messages": {
+            "priceArchived": "Price archived",
+            "archiveFailed": "Could not archive price",
+            "defaultUpdated": "Default price updated",
+            "defaultUpdateFailed": "Could not update default price",
+            "priceCreated": "Price created",
+            "priceCreatedAndSynced": "Price created and synced to Stripe",
+            "createFailed": "Could not create price",
+            "taxWarningAfterSync": "Note: Tax behavior cannot be changed after syncing to Stripe",
+            "invalidAmount": "Enter a valid amount",
+            "trialOnlyRecurring": "Trial period can only be used for subscriptions"
+          },
+          "confirm": {
+            "archivePrice": "Are you sure you want to archive this price?"
+          }
+        },
+        "stripeTab": {
+          "title": "Stripe-synced Fields",
+          "metadataTitle": "Stripe Metadata",
+          "messages": {
+            "statementDescriptorTooLong": "Statement descriptor must be max 22 characters",
+            "imageUrlMustBeHttps": "Image URL must start with https://",
+            "couldNotSave": "Could not save",
+            "savedLocally": "Changes saved locally",
+            "rememberToSync": "Remember to sync to Stripe",
+            "syncFailed": "Synchronization failed",
+            "syncSuccess": "Product synced to Stripe",
+            "couldNotSync": "Could not sync to Stripe"
+          },
+          "fields": {
+            "productImage": "Product Image",
+            "productImageDescription": "Displayed in Stripe Checkout and on invoices",
+            "productImageAlt": "Product image",
+            "unitLabel": "Unit Label",
+            "unitLabelDescription": "Displayed on invoice: \"3 {unit}s × $299\"",
+            "statementDescriptor": "Statement Descriptor",
+            "statementDescriptorDescription": "Text shown on customer's bank statement (max 22 characters)",
+            "statementDescriptorPlaceholder": "E.g. LEKBANKEN BASKET",
+            "statementDescriptorCount": "{count}/22 characters",
+            "featureTier": "Feature Tier",
+            "featureTierDescription": "Controls which features are included",
+            "stripeProductId": "Stripe Product ID",
+            "lastSynced": "Last Synced",
+            "neverSynced": "Never synced"
+          },
+          "actions": {
+            "info": "<strong>Save</strong> saves changes locally. <strong>Sync to Stripe</strong> pushes all changes to Stripe.",
+            "reset": "Reset",
+            "saveLocal": "Save Locally",
+            "saving": "Saving...",
+            "syncToStripe": "Sync to Stripe",
+            "syncing": "Syncing..."
+          },
+          "status": {
+            "notConnected": "Not connected to Stripe",
+            "synced": "Synced with Stripe",
+            "syncLocked": "Sync locked - contact support",
+            "syncError": "Sync error",
+            "unsyncedChanges": "Local changes not synced",
+            "lastSynced": "Last: {date}",
+            "creating": "Creating...",
+            "createInStripe": "Create in Stripe"
+          }
+        },
+        "detail": {
+          "tabs": {
+            "overview": "Overview",
+            "pricing": "Pricing",
+            "stripe": "Stripe",
+            "settings": "Settings",
+            "availability": "Availability",
+            "entitlements": "Rules",
+            "lifecycle": "Lifecycle"
+          },
+          "breadcrumbs": {
+            "home": "Home",
+            "products": "Products"
+          },
+          "header": {
+            "productKey": "Product key: {key}",
+            "back": "Back",
+            "activate": "Activate",
+            "archive": "Archive",
+            "syncStripe": "Sync Stripe",
+            "forceSync": "Force sync"
+          },
+          "overview": {
+            "issues": "issues",
+            "stats": {
+              "prices": "Prices",
+              "entitlements": "Entitlements",
+              "organizations": "Organizations",
+              "lastUpdated": "Last Updated"
+            },
+            "healthIssues": "Health Issues",
+            "quickActions": "Quick Actions",
+            "managePrices": "Manage Prices",
+            "stripeSettings": "Stripe Settings",
+            "readyForPublish": "Ready for publishing",
+            "notReadyForPublish": "Not ready for publishing",
+            "viewChecklist": "View checklist",
+            "basicInfo": "Basic Information",
+            "uuid": "UUID",
+            "productKey": "Product Key",
+            "type": "Type",
+            "category": "Category",
+            "status": "Status",
+            "stripeStatus": "Stripe Status",
+            "linkage": "Linkage",
+            "stripeId": "Stripe ID",
+            "notLinked": "Not linked",
+            "lastSynced": "Last Synced",
+            "activePrices": "Active Prices",
+            "unitLabel": "Unit Label",
+            "descriptions": "Descriptions",
+            "internalDescription": "Internal Description",
+            "customerDescription": "Customer Description"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe Linkage"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements",
+            "noEntitlements": "No entitlements configured",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "dependencies": "Dependencies",
+            "noDependencies": "No dependencies configured",
+            "requires": "Requires",
+            "excludes": "Excludes"
+          },
+          "availability": {
+            "scope": "Availability Scope",
+            "scopeLabel": "Scope",
+            "description": "Description",
+            "licenseModel": "License Model",
+            "perTenant": "Per organization",
+            "perSeat": "Per seat",
+            "perUser": "Per user",
+            "minSeats": "Min seats",
+            "maxSeats": "Max seats",
+            "tenantAssignments": "Organization Assignments",
+            "orgs": "{count} orgs",
+            "noTenants": "No organizations assigned",
+            "availableForAll": "Product is available to all",
+            "addOrgsForAccess": "Add organizations to grant access",
+            "active": "Active",
+            "pending": "Pending",
+            "aboutAvailability": "About Availability",
+            "globalDescription": "Product is available to all customers and can be purchased via checkout.",
+            "tenantSpecificDescription": "Only assigned to specific organizations via direct sales.",
+            "regionalDescription": "Limited to specific geographic regions (e.g. Nordics).",
+            "global": "Global",
+            "tenantSpecific": "Tenant-specific",
+            "regional": "Regional"
+          },
+          "lifecycle": {
+            "currentState": "Current State",
+            "canActivate": "Can Activate",
+            "canArchive": "Can Archive",
+            "yes": "Yes",
+            "no": "No",
+            "activating": "Activating...",
+            "activate": "Activate",
+            "deactivating": "Deactivating...",
+            "deactivate": "Deactivate",
+            "archiving": "Archiving...",
+            "archive": "Archive",
+            "created": "Created",
+            "updated": "Updated",
+            "publishChecklist": "Publishing Checklist",
+            "hasValidPrice": "Has valid price",
+            "availabilityRulesOk": "Availability rules OK",
+            "stripeLinkageOk": "Stripe linkage OK",
+            "readyForPublish": "Ready for publishing",
+            "notReadyForPublish": "Not ready for publishing",
+            "eventLog": "Event Log",
+            "events": "{count} events",
+            "noEvents": "No logged events",
+            "changedFields": "Changed fields: {fields}",
+            "error": "Error: {error}",
+            "statusChangeFailed": "Could not change status",
+            "statusChangedTo": "Status changed to {status}",
+            "statusActive": "active",
+            "statusInactive": "inactive",
+            "statusArchived": "archived"
+          },
+          "audit": {
+            "recentEvents": "Recent Events",
+            "noEvents": "No logged events"
+          },
+          "settings": {
+            "title": "Product Settings",
+            "customerDescription": "Customer Description",
+            "customerDescriptionHint": "Synced to Stripe as product description",
+            "customerDescriptionPlaceholder": "Description shown to customers...",
+            "minSeats": "Min Seats",
+            "minSeatsHint": "Minimum quantity for purchase",
+            "maxSeats": "Max Seats",
+            "maxSeatsHint": "Maximum quantity for purchase",
+            "reset": "Reset",
+            "saving": "Saving...",
+            "saveChanges": "Save Changes",
+            "aboutSettings": "About Settings",
+            "aboutCustomerDescription": "Synced to Stripe as product description on next Stripe sync.",
+            "aboutSeats": "Limits how many seats a customer can purchase. Used for sales logic and validation.",
+            "stripeFieldsNote": "💡 Stripe-specific fields are now in the dedicated <strong>Stripe</strong> tab.",
+            "minSeatsError": "Min seats must be at least 1",
+            "maxSeatsError": "Max seats must be greater than or equal to min seats",
+            "saveError": "Could not save",
+            "saved": "Settings saved",
+            "saveSettingsError": "Could not save settings"
+          },
+          "errors": {
+            "loadFailed": "Could not load product",
+            "notFound": "Product not found",
+            "statusUpdateFailed": "Could not update status",
+            "syncFailed": "Could not synchronize"
+          },
+          "sync": {
+            "alreadySynced": "Product is already synced",
+            "created": "Sync created",
+            "updated": "Sync updated",
+            "statusUpdated": "Status updated to {status}"
+          }
+        },
+        "drawer": {
+          "copied": "Copied to clipboard",
+          "copyTooltip": "Copy {label}",
+          "tabs": {
+            "overview": "Overview",
+            "pricing": "Pricing",
+            "entitlements": "Entitlements",
+            "availability": "Availability",
+            "lifecycle": "Lifecycle",
+            "audit": "Log"
+          },
+          "quickActions": {
+            "edit": "Edit",
+            "activate": "Activate",
+            "archive": "Archive",
+            "sync": "Sync"
+          },
+          "messages": {
+            "statusUpdated": "Status updated to {status}",
+            "statusUpdateFailed": "Could not update status",
+            "syncStarted": "Sync started",
+            "syncFailed": "Could not sync"
+          },
+          "overview": {
+            "issues": "issues",
+            "stats": {
+              "prices": "Prices",
+              "entitlements": "Entitlements",
+              "organizations": "Organizations",
+              "lastUpdated": "Last updated"
+            },
+            "basicInfo": "Basic information",
+            "uuid": "UUID",
+            "productKey": "Product key",
+            "type": "Type",
+            "category": "Category",
+            "status": "Status",
+            "stripe": "Stripe",
+            "descriptions": "Descriptions",
+            "internalDescription": "Internal description",
+            "customerDescription": "Customer description",
+            "tags": "Tags",
+            "healthIssues": "Health issues",
+            "editProduct": "Edit product"
+          },
+          "pricing": {
+            "stripeLinkage": "Stripe linkage",
+            "status": "Status",
+            "stripeProductId": "Stripe Product ID",
+            "notLinked": "Not linked",
+            "lastSynced": "Last synced",
+            "activePrices": "Active prices",
+            "driftDetection": "Stripe drift detected",
+            "driftField": "Field",
+            "driftLocal": "Local",
+            "driftStripe": "Stripe",
+            "pricesTitle": "Prices ({count})",
+            "addPrice": "Add price",
+            "noPrices": "No prices configured",
+            "tableAmount": "Amount",
+            "tableInterval": "Interval",
+            "tableStripeId": "Stripe ID",
+            "tableStatus": "Status",
+            "tableActions": "Actions",
+            "default": "Default",
+            "active": "Active",
+            "inactive": "Inactive",
+            "edit": "Edit",
+            "syncStripe": "Sync with Stripe"
+          },
+          "entitlements": {
+            "title": "Feature Entitlements ({count})",
+            "add": "Add",
+            "noEntitlements": "No entitlements configured",
+            "noEntitlementsHint": "Define which features this product unlocks",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "dependencies": "Dependencies",
+            "noDependencies": "No dependencies configured",
+            "requires": "Requires",
+            "excludes": "Excludes"
+          },
+          "availability": {
+            "scope": "Availability scope",
+            "scopeLabel": "Scope",
+            "description": "Description",
+            "licenseModel": "License model",
+            "perTenant": "Per organization",
+            "perSeat": "Per seat",
+            "perUser": "Per user",
+            "tenantAssignments": "Organization assignments ({count})",
+            "assign": "Assign",
+            "noTenants": "No organizations assigned",
+            "tableOrganization": "Organization",
+            "tableStatus": "Status",
+            "tableStripe": "Stripe",
+            "tableAssigned": "Assigned",
+            "statusActive": "Active",
+            "statusPending": "Pending",
+            "statusRevoked": "Revoked",
+            "stripeLinked": "Linked",
+            "stripeMissing": "Missing"
+          },
+          "lifecycle": {
+            "currentState": "Current state",
+            "status": "Status",
+            "canActivate": "Can activate",
+            "canArchive": "Can archive",
+            "yes": "Yes",
+            "no": "No",
+            "activationBlockers": "Activation blockers",
+            "publishChecklist": "Publish checklist",
+            "checklistPrice": "Has valid price (if paid)",
+            "checklistAvailability": "Availability rules valid",
+            "checklistStripe": "Stripe linkage OK",
+            "timestamps": "Timestamps",
+            "created": "Created",
+            "lastUpdated": "Last updated"
+          },
+          "audit": {
+            "title": "Recent events",
+            "export": "Export",
+            "noEvents": "No logged events",
+            "systemActor": "System"
+          }
+        }
+      }
     },
     "participants": {
       "title": "Participants",
@@ -821,7 +2922,58 @@
       "showingMockData": "Showing mock data until the real connection is ready.",
       "riskLevel": "Risk level: {level}",
       "actionsAndLog": "Actions & log",
-      "noLogYet": "No log yet."
+      "noLogYet": "No log yet.",
+      "noEmailProvided": "No email provided",
+      "organisation": "Organisation",
+      "risk": "Risk",
+      "lastActive": "Last active",
+      "profile": "Profile",
+      "email": "Email",
+      "notes": "Notes",
+      "mute": "Mute",
+      "muteSent": "Mute sent.",
+      "kick": "Kick",
+      "kickSent": "Kick sent.",
+      "ban": "Ban",
+      "banSent": "Ban sent.",
+      "breadcrumbs": {
+        "home": "Home",
+        "tenant": "Tenant",
+        "participants": "Participants"
+      },
+      "pageDescription": "Overview of participants, risk levels and recent activity.",
+      "stats": {
+        "participants": "Participants",
+        "highRisk": "High risk",
+        "lowRisk": "Low risk"
+      },
+      "cardTitle": "Participant Overview",
+      "searchPlaceholder": "Search (not active yet)",
+      "riskFilter": {
+        "all": "All risk levels",
+        "low": "Low risk",
+        "high": "High risk"
+      },
+      "emptyState": {
+        "title": "No participants",
+        "description": "Adjust filters or try again later."
+      },
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "tenant": "Tenant",
+        "risk": "Risk",
+        "lastActive": "Last active"
+      },
+      "riskLabels": {
+        "high": "High",
+        "low": "Low",
+        "none": "None"
+      },
+      "missing": "Missing",
+      "global": "Global",
+      "noPermission": "You do not have permission to view participants.",
+      "loadError": "Could not load participants right now."
     },
     "sessions": {
       "title": "Sessions",
@@ -833,7 +2985,566 @@
       "detailsAndStatus": "Details and status for selected session.",
       "host": "Host",
       "actionsAndLog": "Actions & log",
-      "noLogYet": "No log yet."
+      "noLogYet": "No log yet.",
+      "breadcrumbs": {
+        "home": "Home",
+        "tenant": "Tenant",
+        "sessions": "Sessions"
+      },
+      "pageDescription": "Overview of active and completed sessions.",
+      "stats": {
+        "sessions": "Sessions",
+        "active": "Active",
+        "flagged": "Flagged"
+      },
+      "cardTitle": "Sessions",
+      "searchPlaceholder": "Search (not active yet)",
+      "statusFilter": {
+        "all": "All statuses",
+        "active": "Active",
+        "completed": "Completed",
+        "flagged": "Flagged"
+      },
+      "emptyState": {
+        "title": "No sessions",
+        "description": "Adjust filters or try again later."
+      },
+      "columns": {
+        "title": "Title",
+        "tenant": "Tenant",
+        "host": "Host",
+        "participants": "Participants",
+        "status": "Status",
+        "started": "Started"
+      },
+      "statusLabels": {
+        "active": "Active",
+        "completed": "Completed",
+        "flagged": "Flagged"
+      },
+      "global": "Global",
+      "noPermission": "You do not have permission to view sessions.",
+      "loadError": "Could not load sessions right now.",
+      "detail": {
+        "pageDescription": "Details and status for the selected session.",
+        "metadata": "Metadata",
+        "status": "Status",
+        "organisation": "Organisation",
+        "start": "Start",
+        "notes": "Notes",
+        "noNotes": "—",
+        "actionsAndLog": "Actions & log",
+        "noLogYet": "No log yet.",
+        "muteParticipant": "Mute participant",
+        "kickSession": "Kick session",
+        "banParticipant": "Ban participant",
+        "muteSent": "Mute sent.",
+        "kickSent": "Kick sent.",
+        "banSent": "Ban sent.",
+        "noAccess": "No access",
+        "noAccessDescription": "You need permission to view sessions.",
+        "notFound": "Session not found",
+        "notFoundDescription": "Check the link or go back to the list."
+      },
+      "emptyState": {
+        "noAccess": "No access",
+        "noAccessDescription": "You need permission to view sessions.",
+        "noSessions": "No sessions",
+        "noSessionsDescription": "Adjust filters or try again later."
+      }
+    },
+    "tickets": {
+      "page": {
+        "title": "Tickets",
+        "description": "Manage support tickets, status, priority and conversations."
+      },
+      "breadcrumbs": {
+        "admin": "Admin",
+        "operations": "Operations",
+        "tickets": "Tickets"
+      },
+      "status": {
+        "all": "All statuses",
+        "open": "Open",
+        "inProgress": "In Progress",
+        "waitingForUser": "Waiting for user",
+        "resolved": "Resolved",
+        "closed": "Closed"
+      },
+      "priority": {
+        "all": "All priorities",
+        "urgent": "Urgent",
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "stats": {
+        "total": "Total",
+        "open": "Open",
+        "inProgress": "In Progress",
+        "avgResolutionTime": "Avg resolution time"
+      },
+      "filters": {
+        "searchPlaceholder": "Search title/ID",
+        "allOrganizations": "All organizations",
+        "myTickets": "My tickets",
+        "unassigned": "Unassigned",
+        "needsResponse": "Needs response",
+        "clearFilters": "Clear filters"
+      },
+      "list": {
+        "loading": "Loading...",
+        "page": "Page",
+        "of": "of",
+        "previous": "Previous",
+        "next": "Next"
+      },
+      "detail": {
+        "description": "Description",
+        "created": "Created",
+        "category": "Category",
+        "categoryDefault": "General",
+        "user": "User",
+        "userUnknown": "Unknown",
+        "organization": "Organization",
+        "status": "Status",
+        "priority": "Priority",
+        "assignedTo": "Assigned to",
+        "unassigned": "Unassigned",
+        "messages": "Messages",
+        "loadingMessages": "Loading messages...",
+        "noMessages": "No messages yet",
+        "internal": "Internal",
+        "internalCheckbox": "Internal (visible only for admin)",
+        "messagePlaceholder": "Send a message...",
+        "internalPlaceholder": "Internal note...",
+        "send": "Send",
+        "selectTicket": "Select a ticket to see details"
+      },
+      "errors": {
+        "loadFailed": "Could not load tickets",
+        "unexpectedError": "An unexpected error occurred"
+      },
+      "noAccess": {
+        "title": "Access denied",
+        "description": "You do not have permission to manage support tickets."
+      },
+      "empty": {
+        "title": "No tickets",
+        "description": "There are no support tickets to show with current filters."
+      },
+      "loading": {
+        "checkingPermissions": "Checking permissions..."
+      }
+    },
+    "support": {
+      "kb": {
+        "pageTitle": "Knowledge Base",
+        "pageDescription": "Manage FAQ and help articles",
+        "noAccess": "No access",
+        "allOrganizations": "All organizations",
+        "allCategories": "All categories",
+        "globalOption": "🌐 Global (visible to all)",
+        "back": "Back",
+        "createFaq": "Create FAQ",
+        "editFaq": "Edit FAQ",
+        "newFaq": "New FAQ",
+        "form": {
+          "organization": "Organization",
+          "globalHelp": "Global FAQs are visible to all users",
+          "questionLabel": "Question *",
+          "questionPlaceholder": "How do I...?",
+          "answerLabel": "Answer (Markdown) *",
+          "answerPlaceholder": "Write your answer here... (supports markdown)",
+          "categoryLabel": "Category",
+          "categoryPlaceholder": "e.g. Account, Billing, Features"
+        },
+        "status": {
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "actions": {
+          "delete": "Delete",
+          "deleting": "Deleting...",
+          "cancel": "Cancel",
+          "save": "Save",
+          "saving": "Saving...",
+          "publish": "Publish",
+          "unpublish": "Unpublish"
+        },
+        "filters": {
+          "searchPlaceholder": "Search questions...",
+          "showDrafts": "Show drafts"
+        },
+        "empty": {
+          "title": "No FAQs yet",
+          "description": "Create your first FAQ to help users find answers."
+        },
+        "list": {
+          "global": "Global",
+          "views": "views"
+        },
+        "errors": {
+          "createFailed": "Could not create FAQ",
+          "updateFailed": "Could not update FAQ",
+          "deleteFailed": "Could not delete FAQ"
+        }
+      },
+      "notifications": {
+        "pageTitle": "Notification History",
+        "pageDescription": "View and manage sent notifications",
+        "noAccess": "You do not have access to notification history",
+        "noAccessDescription": "Contact an administrator to gain access.",
+        "back": "Back",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "support": "Support",
+          "notificationHistory": "Notification History"
+        },
+        "errors": {
+          "couldNotFetch": "Could not load notifications"
+        },
+        "list": {
+          "title": "Sent notifications",
+          "count": "({count})"
+        },
+        "filters": {
+          "allOrganizations": "All organizations",
+          "allCategories": "All categories",
+          "unread": "Unread"
+        },
+        "categories": {
+          "support": "Support",
+          "system": "System",
+          "learning": "Learning",
+          "gamification": "Gamification"
+        },
+        "loading": "Loading...",
+        "empty": {
+          "title": "No notifications found",
+          "description": "Only notifications from the last 7 days are shown."
+        },
+        "status": {
+          "unread": "Unread"
+        },
+        "details": {
+          "to": "To:",
+          "unknown": "Unknown",
+          "org": "Org:"
+        }
+      }
+    },
+    "moderation": {
+      "page": {
+        "title": "Moderation",
+        "description": "Content reports, actions and statistics."
+      },
+      "noTenant": {
+        "title": "No organization selected",
+        "description": "Select an organization to manage moderation."
+      },
+      "errors": {
+        "loadFailed": "Could not load moderation data",
+        "loadFailedDescription": "Could not load moderation data.",
+        "updateReportFailed": "Could not update the report.",
+        "updateQueueFailed": "Could not update moderation queue."
+      },
+      "stats": {
+        "openReports": "Open reports",
+        "queue": "Queue",
+        "actions": "Actions",
+        "actionsTotal": "Total actions",
+        "suspended": "Suspended"
+      },
+      "tabs": {
+        "queue": "Queue",
+        "reports": "Reports",
+        "stats": "Statistics"
+      },
+      "queue": {
+        "loading": "Loading queue...",
+        "emptyTitle": "No queue",
+        "emptyDescription": "No items in the moderation queue right now.",
+        "markHandled": "Mark handled"
+      },
+      "reports": {
+        "loading": "Loading reports...",
+        "emptyTitle": "No reports",
+        "emptyDescription": "There are no open reports.",
+        "created": "Created:"
+      },
+      "statsTab": {
+        "loading": "Loading statistics...",
+        "emptyTitle": "No statistics",
+        "emptyDescription": "Statistics could not be retrieved."
+      },
+      "actions": {
+        "dismiss": "Dismiss",
+        "block": "Block"
+      }
+    },
+    "learning": {
+      "hub": {
+        "breadcrumbLabel": "Learning",
+        "pageTitle": "Learning",
+        "pageDescription": "Play leader training - courses, learning paths and requirements",
+        "filters": {
+          "all": "All",
+          "global": "Global",
+          "tenant": "Organization",
+          "selectOrganization": "Select organization"
+        },
+        "stats": {
+          "activeCourses": "Active courses",
+          "paths": "Learning paths",
+          "activeRequirements": "Active requirements",
+          "totalCourses": "Total courses"
+        },
+        "modules": {
+          "courses": {
+            "title": "Courses",
+            "description": "Create and manage training courses with text, quizzes and rewards.",
+            "features": {
+              "courseContent": "Course content",
+              "quizBuilder": "Quiz builder",
+              "rewards": "Rewards",
+              "scopeManagement": "Scope management"
+            }
+          },
+          "paths": {
+            "title": "Learning Paths",
+            "description": "Build learning paths with prerequisites and progression.",
+            "features": {
+              "viewOnly": "View only (Phase 1)",
+              "graphEditor": "Graph editor (planned)",
+              "prerequisites": "Prerequisites",
+              "roleBased": "Role-based"
+            }
+          },
+          "requirements": {
+            "title": "Requirements & Gate",
+            "description": "Configure which courses are required for activities and roles.",
+            "features": {
+              "activityRequirements": "Activity requirements",
+              "roleRequirements": "Role requirements",
+              "gameRequirements": "Game requirements",
+              "toggleActive": "Toggle active/inactive"
+            }
+          },
+          "reports": {
+            "title": "Reports",
+            "description": "Overview of group progress and course statistics.",
+            "features": {
+              "progressOverview": "Progress overview",
+              "courseStats": "Course statistics",
+              "userReports": "User reports",
+              "export": "Export"
+            }
+          }
+        },
+        "status": {
+          "implemented": "Implemented",
+          "partial": "Partial",
+          "planned": "Planned"
+        },
+        "sandbox": {
+          "title": "🧪 Sandbox",
+          "description": "Test and prototype the learning module in the sandbox",
+          "open": "Open sandbox"
+        }
+      },
+      "courses": {
+        "breadcrumbs": {
+          "learning": "Learning",
+          "courses": "Courses"
+        },
+        "pageTitle": "Courses",
+        "pageDescription": "Create and manage training courses",
+        "newCourse": "New course",
+        "stats": {
+          "total": "Total courses",
+          "active": "Active",
+          "draft": "Draft",
+          "archived": "Archived"
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        },
+        "difficulty": {
+          "beginner": "Beginner",
+          "intermediate": "Intermediate",
+          "advanced": "Advanced",
+          "expert": "Expert"
+        },
+        "search": {
+          "placeholder": "Search courses..."
+        },
+        "filter": {
+          "allStatuses": "All statuses",
+          "allScopes": "All scopes",
+          "global": "Global",
+          "tenant": "Organization",
+          "allOrganizations": "All organizations"
+        },
+        "loading": "Loading courses...",
+        "error": {
+          "loadFailed": "Could not load courses",
+          "archiveFailed": "Could not archive the course"
+        },
+        "table": {
+          "scope": "Scope",
+          "course": "Course",
+          "status": "Status",
+          "level": "Level",
+          "time": "Time",
+          "passScore": "Pass",
+          "actions": "Actions",
+          "global": "Global",
+          "organization": "Organization",
+          "minutes": "{minutes} min",
+          "noMatchingCourses": "No courses match the filters",
+          "noCourses": "No courses yet"
+        },
+        "actions": {
+          "edit": "Edit",
+          "viewOnly": "View only",
+          "archive": "Archive"
+        },
+        "pagination": {
+          "showing": "Showing {start}–{end} of {total}",
+          "previous": "Previous",
+          "next": "Next"
+        },
+        "archiveDialog": {
+          "title": "Archive course",
+          "description": "Are you sure you want to archive \"{title}\"? The course will no longer be visible to participants.",
+          "confirm": "Archive",
+          "cancel": "Cancel"
+        }
+      },
+      "requirements": {
+        "breadcrumbs": {
+          "learning": "Learning",
+          "requirements": "Requirements & Gates"
+        },
+        "pageTitle": "Requirements & Gates",
+        "pageDescription": "Configure which courses are required for activities and roles",
+        "newRequirement": "New requirement",
+        "info": {
+          "title": "How do requirements work?",
+          "description": "Requirements block users from performing certain activities or taking roles until they have completed specific courses. When a user tries to do something that requires a course, a modal is shown with information about which courses need to be completed."
+        },
+        "stats": {
+          "total": "Total requirements",
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "types": {
+          "game_unlock": "Game access",
+          "role_unlock": "Role requirement",
+          "activity_unlock": "Activity gate",
+          "onboarding_required": "Onboarding"
+        },
+        "search": {
+          "placeholder": "Search requirements..."
+        },
+        "filter": {
+          "allScopes": "All scopes",
+          "global": "Global",
+          "tenant": "Organization",
+          "allOrganizations": "All organizations"
+        },
+        "loading": "Loading requirements...",
+        "error": {
+          "loadFailed": "Could not load requirements",
+          "toggleFailed": "Could not change status",
+          "deleteFailed": "Could not delete the requirement"
+        },
+        "table": {
+          "title": "All requirements",
+          "scope": "Scope",
+          "type": "Type",
+          "target": "Target",
+          "requiredCourse": "Required course",
+          "status": "Status",
+          "actions": "Actions",
+          "global": "Global",
+          "organization": "Organization",
+          "active": "Active",
+          "inactive": "Inactive",
+          "noMatchingRequirements": "No requirements match the search",
+          "noRequirements": "No requirements configured yet"
+        },
+        "actions": {
+          "delete": "Delete",
+          "noAccess": "No access"
+        },
+        "pagination": {
+          "showing": "Showing {start}–{end} of {total}",
+          "previous": "Previous",
+          "next": "Next"
+        },
+        "deleteDialog": {
+          "title": "Delete requirement",
+          "description": "Are you sure you want to delete this requirement? Users will no longer be blocked by it.",
+          "confirm": "Delete",
+          "cancel": "Cancel"
+        }
+      }
+    },
+    "library": {
+      "coachDiagrams": {
+        "title": "Coach Diagrams",
+        "pageDescription": "Diagrams that can be used as instructional media in steps.",
+        "noTenantSelected": "No organization selected",
+        "selectTenantDescription": "Select an organization to view the diagram library.",
+        "loading": "Loading…",
+        "loadError": "Could not load diagrams",
+        "retry": "Try again",
+        "noDiagrams": "No diagrams yet",
+        "noDiagramsDescription": "Create diagrams in Coach Diagram Builder and they will appear here.",
+        "updated": "Updated",
+        "openEditor": "Open editor",
+        "openSvg": "Open SVG",
+        "createNew": "Create new",
+        "creating": "Creating…",
+        "newDiagram": "New diagram"
+      },
+      "badges": {
+        "breadcrumbs": {
+          "home": "Home",
+          "library": "Library",
+          "badges": "Badges"
+        },
+        "title": "Library",
+        "description": "Manage badges (via builder exports)",
+        "noPermission": "You don't have permission to view Library.",
+        "selectTenant": "Select an organization (active tenant) to view the library.",
+        "badgesTitle": "Badges",
+        "loading": "Loading…",
+        "badgeCount": "{count} badge",
+        "badgeCountPlural": "{count} badges",
+        "published": "published",
+        "drafts": "drafts",
+        "badgeBuilder": "Badge Builder",
+        "editBadge": "Edit Badge",
+        "editing": "Editing: {title}",
+        "untitled": "Untitled",
+        "selectFromLibrary": "Select a badge from the library",
+        "selectOrCreate": "Select or create a badge",
+        "selectOrCreateDescription": "Choose a badge from the library above or create a new one to start building its layers, colors, and metadata.",
+        "createBadge": "Create Badge",
+        "scopeTenant": "Tenant",
+        "scopeGlobal": "Global"
+      }
+    },
+    "tools": {
+      "breadcrumbHome": "Home",
+      "breadcrumbTitle": "Tools",
+      "pageTitle": "Tools",
+      "pageDescription": "Code-defined tools that can be enabled per game. No CRUD in MVP."
     },
     "settings": {
       "title": "Settings",
@@ -1010,7 +3721,72 @@
         "players": "Players",
         "time": "Time",
         "age": "Age",
-        "notSet": "Not set"
+        "notSet": "Not set",
+        "back": "Back",
+        "edit": "Edit",
+        "publish": "Publish",
+        "delete": "Delete",
+        "metadata": "Metadata",
+        "description": "Description",
+        "noDescription": "No description provided.",
+        "noShortDescription": "No short description provided.",
+        "technical": "Technical",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "deleteTitle": "Delete the game?",
+        "deleteDescription": "This will permanently delete the game.",
+        "deleteConfirm": "Delete"
+      },
+      "form": {
+        "editTitle": "Edit game",
+        "createTitle": "Create new game",
+        "description": "Manage basic game data. Requirements: name, short description and main purpose.",
+        "name": "Name",
+        "namePlaceholder": "E.g. Teamwork Relay",
+        "shortDescription": "Short description",
+        "shortDescriptionPlaceholder": "1-2 sentences summarizing the game.",
+        "fullDescription": "Full description",
+        "fullDescriptionPlaceholder": "Instructions, tips and safety notes.",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "owner": "Owner",
+        "ownerPlaceholder": "Select owner",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Purpose",
+        "purposePlaceholder": "Select purpose",
+        "product": "Product",
+        "productPlaceholder": "Select product",
+        "productNone": "None",
+        "category": "Category",
+        "categoryPlaceholder": "E.g. Teamwork, Warm-up",
+        "energy": "Energy",
+        "energyPlaceholder": "Select energy level",
+        "energyNone": "None",
+        "energyLow": "Low",
+        "energyMedium": "Medium",
+        "energyHigh": "High",
+        "location": "Location",
+        "locationPlaceholder": "Select location",
+        "locationUnknown": "Unknown",
+        "locationIndoor": "Indoor",
+        "locationOutdoor": "Outdoor",
+        "locationBoth": "Both",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "timeEstimate": "Estimated time (min)",
+        "timeEstimatePlaceholder": "E.g. 15",
+        "players": "Players (min-max)",
+        "playersMin": "Min",
+        "playersMax": "Max",
+        "age": "Age (min-max)",
+        "ageMin": "Min",
+        "ageMax": "Max",
+        "requiredError": "Name, short description and purpose are required.",
+        "saveError": "Could not save the game. Please try again.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "create": "Create game"
       },
       "pageDescription": "The hub for creating, updating, publishing and exporting the entire game catalog.",
       "cardTitle": "Game Overview",
@@ -1023,7 +3799,34 @@
         "total": "Total",
         "published": "Published",
         "drafts": "Drafts",
-        "tenantOwned": "Tenant-owned"
+        "tenantOwned": "Tenant-owned",
+        "withErrors": "With errors"
+      },
+      "page": {
+        "noAccess": "No access",
+        "noAccessDesc": "You need administrator permissions to manage games.",
+        "title": "Games (global)",
+        "description": "Manage the game catalog – search, filter, and perform bulk actions.",
+        "csvExport": "CSV Export",
+        "import": "Import",
+        "newInBuilder": "New in Builder",
+        "loadError": "Could not load games",
+        "noGamesTitle": "No games match the filters",
+        "noGamesDesc": "Adjust filters or add a new game.",
+        "selectGame": "Select {name}",
+        "openInBuilder": "Open in Builder",
+        "showDetails": "Show details",
+        "unpublish": "Unpublish",
+        "publish": "Publish"
+      },
+      "table": {
+        "name": "Name",
+        "mode": "Mode",
+        "purpose": "Purpose",
+        "status": "Status",
+        "valid": "Valid",
+        "owner": "Owner",
+        "updated": "Updated"
       },
       "filters": {
         "allStatuses": "All statuses",
@@ -1449,11 +4252,74 @@
         "dedicatedSupport": "Dedicated support"
       },
       "invoices": {
-        "title": "Billing history",
+        "title": "Invoices",
+        "description": "View and manage invoices and payments",
         "paid": "Paid",
         "pending": "Pending",
         "failed": "Failed",
-        "download": "Download"
+        "download": "Download",
+        "emptyTitle": "No invoices",
+        "emptyDescription": "There are no invoices to display.",
+        "noResultsFor": "No results for \"{query}\"",
+        "clearSearch": "Clear search",
+        "paymentsForInvoice": "Payments for invoice",
+        "close": "Close",
+        "loadingPayments": "Loading payments...",
+        "noPaymentsRegistered": "No payments registered.",
+        "unknownProvider": "Unknown provider",
+        "paidAt": "Paid: {date}",
+        "markAsPaid": "Mark as paid",
+        "addPayment": "Add payment",
+        "savePayment": "Save payment",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "billing": "Billing",
+          "invoices": "Invoices"
+        },
+        "buttons": {
+          "createStripeCustomer": "Create/view Stripe customer",
+          "manualInvoice": "Manual invoice",
+          "sendViaStripe": "Send via Stripe"
+        },
+        "stats": {
+          "totalRevenue": "Total revenue",
+          "outstanding": "Outstanding",
+          "paid": "Paid",
+          "overdue": "Overdue"
+        },
+        "status": {
+          "paid": "Paid",
+          "sent": "Sent",
+          "issued": "Issued",
+          "overdue": "Overdue",
+          "draft": "Draft",
+          "canceled": "Canceled"
+        },
+        "filter": {
+          "all": "All",
+          "paid": "Paid",
+          "sent": "Sent",
+          "issued": "Issued",
+          "overdue": "Overdue",
+          "draft": "Draft",
+          "canceled": "Canceled"
+        },
+        "paymentStatus": {
+          "pending": "Pending",
+          "confirmed": "Confirmed",
+          "failed": "Failed",
+          "refunded": "Refunded"
+        },
+        "form": {
+          "name": "Name",
+          "namePlaceholder": "Card payment, Swish ...",
+          "amount": "Amount",
+          "provider": "Provider",
+          "providerPlaceholder": "Stripe, Swish, Bank transfer",
+          "reference": "Reference"
+        },
+        "search": "Search invoice",
+        "downloadPdf": "Download PDF"
       }
     },
     "learning": {

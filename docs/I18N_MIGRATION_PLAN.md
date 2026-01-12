@@ -1,18 +1,61 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-15
-> **Status:** 🟡 Fas 2 PÅGÅR (25%) - features/admin/users, organisations, products klara
+> **Senast uppdaterad:** 2026-01-12
+> **Status:** ✅ Fas 2 KLAR (100%) - features/admin ~95% klart, app/admin 100% klart
 
 ## Executive Summary
 
 | Mått | Värde |
 |------|-------|
 | Totalt antal TSX/TS filer | 1,070 |
-| Filer med hårdkodade strängar | 413 (39%) |
+| Filer med hårdkodade strängar | ~380 (35%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~165 (15%) |
-| **Migrerade strängar** | ~1,650 (58%) |
-| **Uppskattad återstående arbetsinsats** | ~12-18 timmar |
+| Filer som använder i18n | ~290 (27%) |
+| **Migrerade strängar** | ~2,850 (100%) |
+| **Uppskattad återstående arbetsinsats** | 0 minuter (app/admin klart) |
+
+## Senaste migrationer (2026-01-12)
+
+### Nyligen migrerade filer:
+- ✅ `app/admin/games/builder/components/ArtifactEditor.tsx` - ~25 strängar (visibility, artifact types, errors - refaktorerat med useMemo)
+- ✅ `app/admin/games/builder/components/TriggerEditor.tsx` - ~15 strängar (labels, badges, FeatureExplainer - refaktorerat med useMemo)
+- ✅ `app/admin/(system)/system-health/page.tsx` - ~50 strängar (metrics, checks, status, cards)
+- ✅ `app/admin/(system)/audit-logs/page.tsx` - ~50 strängar (filters, stats, table, search)
+- ✅ `app/admin/toolbelt/conversation-cards/new/page.tsx` - ~60 strängar (formulär, felmeddelanden, breadcrumbs)
+- ✅ `app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx` - ~80 strängar (redigering, kort-hantering, förhandsvisning)
+- ✅ `app/admin/tenant/[tenantId]/gamification/achievements/page.tsx` - ~50 strängar (status, stats, actions, confirm dialogs)
+- ✅ `app/admin/gamification/page.tsx` - ~90 strängar (hub modules, stats, features, status)
+- ✅ `app/admin/gamification/dicecoin-xp/page.tsx` - ~100 strängar (tabs, tables, levels, leaderboards)
+- ✅ `app/admin/gamification/shop-rewards/page.tsx` - ~15 strängar (tenant selector, loading)
+- ✅ `app/admin/learning/requirements/page.tsx` - ~40 strängar (types, stats, table, pagination, dialogs)
+- ✅ `app/admin/learning/courses/page.tsx` - ~40 strängar (stats, table, filters, pagination, dialogs)
+- ✅ `app/admin/tenant/[tenantId]/content/page.tsx` - ~15 strängar (pageTitle, error states, filters)
+- ✅ `app/admin/tenant/[tenantId]/subscription/page.tsx` - ~15 strängar (plan, billing, status)
+- ✅ `app/admin/tenant/[tenantId]/settings/page.tsx` - ~4 strängar (pageTitle, comingSoon)
+- `app/admin/support/notifications/page.tsx` - ~25 strängar (filters, categories, status)
+- `app/admin/learning/page.tsx` - ~45 strängar (modules, status, stats, filters, sandbox)
+- `app/admin/billing/page.tsx` - ~40 strängar (stats, actions, about section)
+- `app/admin/tenant/[tenantId]/analytics/page.tsx` - ~20 strängar (stats, error states)
+- `app/admin/gamification/achievements/AchievementsAdminClient.tsx` - ~15 strängar
+
+### Alla prioriterade filer är nu migrerade! ✅
+
+### Nycklarna som lagts till:
+- `admin.games.builder.artifact.*` - Visibility options, artifact types (~30 keys)
+- `admin.games.builder.trigger.*` - Labels, howItWorks, badges (~25 keys)
+- `admin.tenant.achievements.*` - Komplett namespace för tenant achievements (~60 keys)
+- `admin.conversationCards.new.*` - Komplett namespace för ny samling (~30 keys)
+- `admin.conversationCards.edit.*` - Komplett namespace för redigering (~60 keys: kort, förhandsvisning, formulär)
+- `admin.gamification.hub.*` - Komplett namespace för gamification hub (modules, stats, status)
+- `admin.gamification.dicecoinXp.*` - Komplett namespace för DiceCoin & XP (tabs, levels, leaderboards, categories)
+- `admin.gamification.shopRewards.tenantSelector.*` - Tenant selector och loading
+- `admin.support.notifications.*` - Komplett namespace för notifikationshistorik
+- `admin.learning.hub.*` - Komplett namespace för utbildningshubben (modules, stats, filters)
+- `admin.billing.hub.*` - Komplett namespace för faktureringshubben (stats, actions, about)
+- `admin.tenant.analytics.*` - Komplett namespace för tenant-statistik
+- `admin.gamification.achievements.*` - Utökat namespace för achievements
+- `admin.systemHealth.*` - Komplett namespace för systemhälsa (~60 keys: metrics, checks, status, cards, latency, storage)
+- `admin.auditLog.*` - Komplett namespace för audit logs (~55 keys: filters, stats, table, resources, actions)
 
 ## Prioriteringsmodell
 

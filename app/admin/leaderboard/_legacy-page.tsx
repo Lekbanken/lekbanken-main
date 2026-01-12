@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
 import { supabase } from '@/lib/supabase/client';
@@ -112,6 +113,7 @@ function generateMockData(): { entries: LeaderboardEntry[]; stats: LeaderboardSt
 }
 
 export default function LeaderboardAdminPage() {
+  const t = useTranslations('admin.leaderboard.legacy');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -151,7 +153,7 @@ export default function LeaderboardAdminPage() {
             const mappedEntries: LeaderboardEntry[] = leaderboardData.map((row, i) => ({
               id: row.user_id,
               rank: i + 1,
-              name: 'Användare ' + (i + 1),
+              name: t('mockUserLabel', { number: i + 1 }),
               type: 'user' as const,
               coins: row.total_achievement_points || 0,
               gamesPlayed: row.achievement_count || 0,
@@ -226,7 +228,7 @@ export default function LeaderboardAdminPage() {
   // Table columns
   const columns = [
     {
-      header: 'Rank',
+      header: t('table.rank'),
       accessor: (row: LeaderboardEntry) => (
         <div className="flex items-center gap-2">
           {row.rank <= 3 ? (
@@ -245,7 +247,7 @@ export default function LeaderboardAdminPage() {
       width: 'w-20',
     },
     {
-      header: 'Namn',
+      header: t('table.name'),
       accessor: (row: LeaderboardEntry) => (
         <div className="flex items-center gap-3">
           <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
@@ -259,13 +261,13 @@ export default function LeaderboardAdminPage() {
           </div>
           <div>
             <p className="font-medium text-foreground">{row.name}</p>
-            <p className="text-xs text-muted-foreground capitalize">{row.type === 'user' ? 'Användare' : 'Organisation'}</p>
+            <p className="text-xs text-muted-foreground capitalize">{row.type === 'user' ? t('type.user') : t('type.organisation')}</p>
           </div>
         </div>
       ),
     },
     {
-      header: 'Coins',
+      header: t('table.coins'),
       accessor: (row: LeaderboardEntry) => (
         <span className="font-medium text-amber-600">{row.coins.toLocaleString('sv-SE')}</span>
       ),
@@ -273,13 +275,13 @@ export default function LeaderboardAdminPage() {
       hideBelow: 'sm' as const,
     },
     {
-      header: 'Spel',
+      header: t('table.games'),
       accessor: (row: LeaderboardEntry) => row.gamesPlayed.toLocaleString('sv-SE'),
       align: 'right' as const,
       hideBelow: 'md' as const,
     },
     {
-      header: 'Achievements',
+      header: t('table.achievements'),
       accessor: (row: LeaderboardEntry) => (
         <div className="flex items-center justify-end gap-1">
           <SparklesIcon className="h-4 w-4 text-purple-500" />
@@ -290,7 +292,7 @@ export default function LeaderboardAdminPage() {
       hideBelow: 'md' as const,
     },
     {
-      header: 'Poäng',
+      header: t('table.score'),
       accessor: (row: LeaderboardEntry) => (
         <Badge variant="secondary" size="sm">
           {row.score.toLocaleString('sv-SE')}
@@ -304,7 +306,7 @@ export default function LeaderboardAdminPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     );
@@ -313,17 +315,17 @@ export default function LeaderboardAdminPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Leaderboard"
-        description="Se rankingar för användare och organisationer"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<TrophyIcon className="h-6 w-6" />}
         breadcrumbs={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Leaderboard' },
+          { label: t('breadcrumbAdmin'), href: '/admin' },
+          { label: t('breadcrumbLeaderboard') },
         ]}
         actions={
           <Button onClick={handleRefresh} variant="outline" className="gap-2">
             <ArrowPathIcon className="h-4 w-4" />
-            Uppdatera
+            {t('refresh')}
           </Button>
         }
       />
@@ -331,28 +333,28 @@ export default function LeaderboardAdminPage() {
       {/* Stats */}
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Användare"
+          label={t('stats.users')}
           value={stats?.totalUsers ?? 0}
           icon={<UsersIcon className="h-5 w-5" />}
           iconColor="blue"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Organisationer"
+          label={t('stats.organisations')}
           value={stats?.totalOrganisations ?? 0}
           icon={<BuildingOfficeIcon className="h-5 w-5" />}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Totalt coins"
+          label={t('stats.totalCoins')}
           value={stats?.totalCoinsEarned.toLocaleString('sv-SE') ?? 0}
           icon={<span className="text-lg">🪙</span>}
           iconColor="amber"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Achievements"
+          label={t('stats.achievements')}
           value={stats?.totalAchievements ?? 0}
           icon={<SparklesIcon className="h-5 w-5" />}
           iconColor="purple"
@@ -364,7 +366,7 @@ export default function LeaderboardAdminPage() {
       <AdminTableToolbar
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
-        searchPlaceholder="Sök namn..."
+        searchPlaceholder={t('searchPlaceholder')}
         className="mb-4"
         filters={
           <>
@@ -373,29 +375,29 @@ export default function LeaderboardAdminPage() {
               onChange={(e) => setTimeframe(e.target.value as TimeframeFilter)}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="7d">Senaste 7 dagarna</option>
-              <option value="30d">Senaste 30 dagarna</option>
-              <option value="90d">Senaste 90 dagarna</option>
-              <option value="all">All tid</option>
+              <option value="7d">{t('timeframe.7d')}</option>
+              <option value="30d">{t('timeframe.30d')}</option>
+              <option value="90d">{t('timeframe.90d')}</option>
+              <option value="all">{t('timeframe.all')}</option>
             </select>
             <select
               value={typeFilter}
               onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="all">Alla typer</option>
-              <option value="users">Endast användare</option>
-              <option value="organisations">Endast organisationer</option>
+              <option value="all">{t('typeFilter.all')}</option>
+              <option value="users">{t('typeFilter.users')}</option>
+              <option value="organisations">{t('typeFilter.organisations')}</option>
             </select>
             <select
               value={metricFilter}
               onChange={(e) => setMetricFilter(e.target.value as MetricFilter)}
               className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             >
-              <option value="score">Sortera: Poäng</option>
-              <option value="coins">Sortera: Coins</option>
-              <option value="games">Sortera: Spel</option>
-              <option value="achievements">Sortera: Achievements</option>
+              <option value="score">{t('metricSort.score')}</option>
+              <option value="coins">{t('metricSort.coins')}</option>
+              <option value="games">{t('metricSort.games')}</option>
+              <option value="achievements">{t('metricSort.achievements')}</option>
             </select>
           </>
         }
@@ -410,9 +412,9 @@ export default function LeaderboardAdminPage() {
         emptyState={
           <EmptyState
             icon={<TrophyIcon className="h-8 w-8" />}
-            title="Inga resultat"
-            description={searchQuery ? `Inga resultat för "${searchQuery}"` : 'Det finns ingen data att visa ännu.'}
-            action={searchQuery ? { label: 'Rensa sökning', onClick: () => setSearchQuery('') } : undefined}
+            title={t('empty.noResults')}
+            description={searchQuery ? t('empty.noResultsForQuery', { query: searchQuery }) : t('empty.noData')}
+            action={searchQuery ? { label: t('empty.clearSearch'), onClick: () => setSearchQuery('') } : undefined}
           />
         }
         className="mb-4"

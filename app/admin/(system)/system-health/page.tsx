@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import {
   AdminPageHeader,
@@ -59,6 +60,7 @@ interface HealthStatus {
 
 export default function SystemHealthPage() {
   const { user } = useAuth()
+  const t = useTranslations('admin.systemHealth')
   const [metrics, setMetrics] = useState<SystemMetrics | null>(null)
   const [health, setHealth] = useState<HealthStatus | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -104,7 +106,7 @@ export default function SystemHealthPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     )
@@ -120,10 +122,10 @@ export default function SystemHealthPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="System Health"
-        description="Översikt över systemets hälsa och prestanda"
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ServerIcon className="h-6 w-6" />}
-        breadcrumbs={[{ label: 'Admin', href: '/admin' }, { label: 'System Health' }]}
+        breadcrumbs={[{ label: t('breadcrumbs.admin'), href: '/admin' }, { label: t('breadcrumbs.systemHealth') }]}
         actions={
           <div className="flex items-center gap-4">
             <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
@@ -133,14 +135,14 @@ export default function SystemHealthPage() {
                 onChange={(e) => setAutoRefresh(e.target.checked)}
                 className="rounded border-gray-300"
               />
-              Auto-refresh (30s)
+              {t('autoRefresh')}
             </label>
             <button
               onClick={loadData}
               className="text-sm text-primary hover:underline"
               disabled={isLoading}
             >
-              Uppdatera nu
+              {t('refreshNow')}
             </button>
           </div>
         }
@@ -151,7 +153,7 @@ export default function SystemHealthPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SignalIcon className="h-5 w-5" />
-            Systemstatus
+            {t('systemStatus')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -163,18 +165,18 @@ export default function SystemHealthPage() {
                 {overallStatus === 'healthy' && <CheckCircleIcon className="h-5 w-5" />}
                 {overallStatus === 'degraded' && <ExclamationTriangleIcon className="h-5 w-5" />}
                 {overallStatus === 'unhealthy' && <ExclamationTriangleIcon className="h-5 w-5" />}
-                {overallStatus === 'healthy' && 'Alla system fungerar'}
-                {overallStatus === 'degraded' && 'Nedsatt prestanda'}
-                {overallStatus === 'unhealthy' && 'Systemfel upptäckt'}
+                {overallStatus === 'healthy' && t('status.healthy')}
+                {overallStatus === 'degraded' && t('status.degraded')}
+                {overallStatus === 'unhealthy' && t('status.unhealthy')}
               </div>
               {health && (
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Senast kontrollerad: {new Date(health.timestamp).toLocaleString('sv-SE')}
+                  {t('lastChecked', { time: new Date(health.timestamp).toLocaleString('sv-SE') })}
                 </p>
               )}
             </div>
             <div className="text-right">
-              <p className="text-sm text-muted-foreground">Version</p>
+              <p className="text-sm text-muted-foreground">{t('version')}</p>
               <p className="text-lg font-semibold">{health?.version || 'Unknown'}</p>
             </div>
           </div>
@@ -258,28 +260,28 @@ export default function SystemHealthPage() {
       {/* Metrics Grid */}
       <AdminStatGrid cols={4} className="mb-8">
         <AdminStatCard
-          label="Fel senaste timmen"
+          label={t('metrics.errorsLastHour')}
           value={metrics?.errorRate.last1h ?? 0}
           icon={<ExclamationTriangleIcon className="h-5 w-5" />}
           iconColor={metrics && metrics.errorRate.last1h > 10 ? 'red' : 'amber'}
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Aktiva användare (nu)"
+          label={t('metrics.activeUsersNow')}
           value={metrics?.activeUsers.now ?? 0}
           icon={<UsersIcon className="h-5 w-5" />}
           iconColor="blue"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="API Latency (P95)"
+          label={t('metrics.apiLatencyP95')}
           value={metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : 'N/A'}
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="purple"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Totalt filer"
+          label={t('metrics.totalFiles')}
           value={metrics?.storage.totalFiles ?? 0}
           icon={<CircleStackIcon className="h-5 w-5" />}
           iconColor="green"
@@ -291,20 +293,20 @@ export default function SystemHealthPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Felfrekvens</CardTitle>
+            <CardTitle>{t('cards.errorRate')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Senaste timmen</span>
+                <span className="text-sm text-muted-foreground">{t('timeRanges.lastHour')}</span>
                 <span className="text-lg font-semibold">{metrics?.errorRate.last1h ?? 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Senaste 24h</span>
+                <span className="text-sm text-muted-foreground">{t('timeRanges.last24h')}</span>
                 <span className="text-lg font-semibold">{metrics?.errorRate.last24h ?? 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Senaste 7 dagar</span>
+                <span className="text-sm text-muted-foreground">{t('timeRanges.last7d')}</span>
                 <span className="text-lg font-semibold">{metrics?.errorRate.last7d ?? 0}</span>
               </div>
             </div>
@@ -313,24 +315,24 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>API Performance</CardTitle>
+            <CardTitle>{t('cards.apiPerformance')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">P50 (median)</span>
+                <span className="text-sm text-muted-foreground">{t('latency.p50')}</span>
                 <span className="text-lg font-semibold">
                   {metrics?.apiLatency.p50 ? `${metrics.apiLatency.p50.toFixed(2)}s` : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">P95</span>
+                <span className="text-sm text-muted-foreground">{t('latency.p95')}</span>
                 <span className="text-lg font-semibold">
                   {metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : 'N/A'}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">P99</span>
+                <span className="text-sm text-muted-foreground">{t('latency.p99')}</span>
                 <span className="text-lg font-semibold">
                   {metrics?.apiLatency.p99 ? `${metrics.apiLatency.p99.toFixed(2)}s` : 'N/A'}
                 </span>
@@ -341,16 +343,16 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Användare</CardTitle>
+            <CardTitle>{t('cards.users')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Aktiva just nu (5 min)</span>
+                <span className="text-sm text-muted-foreground">{t('activeUsers.now')}</span>
                 <span className="text-lg font-semibold">{metrics?.activeUsers.now ?? 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Senaste 24h</span>
+                <span className="text-sm text-muted-foreground">{t('activeUsers.last24h')}</span>
                 <span className="text-lg font-semibold">{metrics?.activeUsers.last24h ?? 0}</span>
               </div>
             </div>
@@ -359,20 +361,20 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Storage & Database</CardTitle>
+            <CardTitle>{t('cards.storageDatabase')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Totalt filer</span>
+                <span className="text-sm text-muted-foreground">{t('storage.totalFiles')}</span>
                 <span className="text-lg font-semibold">{metrics?.storage.totalFiles ?? 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Database records</span>
+                <span className="text-sm text-muted-foreground">{t('storage.databaseRecords')}</span>
                 <span className="text-lg font-semibold">{metrics?.database.totalRecords ?? 0}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Connection pool</span>
+                <span className="text-sm text-muted-foreground">{t('storage.connectionPool')}</span>
                 <span className="text-sm font-semibold text-emerald-600">
                   {metrics?.database.connectionPool || 'Unknown'}
                 </span>

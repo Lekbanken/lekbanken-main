@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   CubeIcon,
   KeyIcon,
@@ -52,6 +53,7 @@ const defaultStats: ProductHubStats = {
 export function ProductHubPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations('admin.products');
   const { can, isLoading: rbacLoading } = useRbac();
   const _toast = useToast(); // Reserved for future toast notifications
 
@@ -155,7 +157,7 @@ export function ProductHubPage() {
   if (rbacLoading) {
     return (
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Produkter" }]} />
+        <AdminBreadcrumbs items={[{ label: t('breadcrumbs.admin'), href: "/admin" }, { label: t('title') }]} />
         <div className="animate-pulse space-y-4">
           <div className="h-8 w-64 rounded bg-muted" />
           <div className="h-4 w-96 rounded bg-muted" />
@@ -173,9 +175,9 @@ export function ProductHubPage() {
     return (
       <AdminPageLayout>
         <EmptyState
-          title="Åtkomst nekad"
-          description="Du har inte behörighet att se produkter."
-          action={{ label: "Gå till dashboard", onClick: () => router.push("/admin") }}
+          title={t('accessDenied')}
+          description={t('noPermissionProducts')}
+          action={{ label: t('goToDashboard'), onClick: () => router.push("/admin") }}
         />
       </AdminPageLayout>
     );
@@ -185,21 +187,21 @@ export function ProductHubPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: "Admin", href: "/admin" },
-          { label: "Produkter & Innehåll" },
-          { label: "Produkter" },
+          { label: t('breadcrumbs.admin'), href: "/admin" },
+          { label: t('breadcrumbs.productsAndContent') },
+          { label: t('breadcrumbs.products') },
         ]}
       />
 
       <AdminPageHeader
-        title="Produkter"
-        description="Hantera produkter, licenser och syften – allt som säljs och kategoriseras i Lekbanken."
+        title={t('title')}
+        description={t('description')}
         icon={<CubeIcon className="h-6 w-6" />}
         actions={
           canCreateProduct && (
             <Button className="gap-2">
               <PlusIcon className="h-4 w-4" />
-              Skapa produkt
+              {t('createProduct')}
             </Button>
           )
         }
@@ -208,31 +210,31 @@ export function ProductHubPage() {
       {/* Summary Stats */}
       <AdminStatGrid cols={5} className="mb-6">
         <AdminStatCard
-          label="Produkter"
+          label={t('stats.products')}
           value={stats.totalProducts}
           icon={<CubeIcon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
-          label="Aktiva produkter"
+          label={t('stats.activeProducts')}
           value={stats.activeProducts}
           icon={<CheckBadgeIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Licenser"
+          label={t('stats.licenses')}
           value={stats.totalLicenses}
           icon={<KeyIcon className="h-5 w-5" />}
           iconColor="blue"
         />
         <AdminStatCard
-          label="Syften"
+          label={t('stats.purposes')}
           value={stats.totalPurposes}
           icon={<FolderIcon className="h-5 w-5" />}
           iconColor="purple"
         />
         <AdminStatCard
-          label="Huvudsyften"
+          label={t('stats.mainPurposes')}
           value={stats.mainPurposes}
           icon={<ArchiveBoxIcon className="h-5 w-5" />}
           iconColor="amber"
@@ -243,9 +245,9 @@ export function ProductHubPage() {
       <div className="space-y-4">
         <Tabs
           tabs={[
-            { id: "products", label: "Produkter", icon: <CubeIcon className="h-4 w-4" /> },
-            { id: "licenses", label: "Licenser", icon: <KeyIcon className="h-4 w-4" /> },
-            { id: "purposes", label: "Syften", icon: <FolderIcon className="h-4 w-4" /> },
+            { id: "products", label: t('tabs.products'), icon: <CubeIcon className="h-4 w-4" /> },
+            { id: "licenses", label: t('tabs.licenses'), icon: <KeyIcon className="h-4 w-4" /> },
+            { id: "purposes", label: t('tabs.purposes'), icon: <FolderIcon className="h-4 w-4" /> },
           ]}
           activeTab={activeTab}
           onChange={(tabId) => handleTabChange(tabId)}

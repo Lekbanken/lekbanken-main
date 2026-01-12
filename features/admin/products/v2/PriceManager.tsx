@@ -14,6 +14,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CurrencyDollarIcon,
   PlusIcon,
@@ -83,6 +84,7 @@ export function PriceManager({
   prices,
   onPricesChanged,
 }: PriceManagerProps) {
+  const t = useTranslations('admin.products.v2.priceManager');
   const { success, error: toastError } = useToast();
   const [showAddForm, setShowAddForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -130,7 +132,7 @@ export function PriceManager({
   }, []);
   
   const handleDeletePrice = useCallback(async (priceId: string) => {
-    if (!confirm('Är du säker på att du vill arkivera detta pris?')) {
+    if (!confirm(t('confirm.archivePrice'))) {
       return;
     }
     
@@ -145,14 +147,14 @@ export function PriceManager({
         throw new Error(data.error || 'Failed to delete price');
       }
       
-      success('Priset arkiverat');
+      success(t('messages.priceArchived'));
       onPricesChanged?.();
     } catch (err) {
-      toastError(err instanceof Error ? err.message : 'Kunde inte arkivera priset');
+      toastError(err instanceof Error ? err.message : t('messages.archiveFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [productId, success, toastError, onPricesChanged]);
+  }, [productId, success, toastError, onPricesChanged, t]);
   
   const handleSetDefault = useCallback(async (priceId: string) => {
     setIsLoading(true);
@@ -169,14 +171,14 @@ export function PriceManager({
         throw new Error(data.error || 'Failed to set default');
       }
       
-      success('Standardpris uppdaterat');
+      success(t('messages.defaultUpdated'));
       onPricesChanged?.();
     } catch (err) {
-      toastError(err instanceof Error ? err.message : 'Kunde inte uppdatera standardpris');
+      toastError(err instanceof Error ? err.message : t('messages.defaultUpdateFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [productId, success, toastError, onPricesChanged]);
+  }, [productId, success, toastError, onPricesChanged, t]);
   
   const handleSetDefaultClick = useCallback((price: ProductPrice) => {
     // Find current default for this currency/interval
@@ -199,21 +201,23 @@ export function PriceManager({
       {confirmDefaultChange && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-background rounded-lg shadow-lg p-6 max-w-md mx-4">
-            <h3 className="text-lg font-semibold mb-2">Byt standardpris?</h3>
+            <h3 className="text-lg font-semibold mb-2">{t('changeDefault.title')}</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Det finns redan ett standardpris för {confirmDefaultChange.currentDefault?.currency}{' '}
-              ({getIntervalLabel(confirmDefaultChange.currentDefault?.interval || 'month')}):
+              {t('changeDefault.description', { 
+                currency: confirmDefaultChange.currentDefault?.currency || 'SEK',
+                interval: getIntervalLabel(confirmDefaultChange.currentDefault?.interval || 'month')
+              })}
             </p>
             <div className="bg-muted/50 rounded-lg p-3 mb-4">
               <p className="text-sm">
-                <strong>Nuvarande:</strong>{' '}
+                <strong>{t('changeDefault.current')}</strong>{' '}
                 {formatCurrency(confirmDefaultChange.currentDefault?.amount || 0, confirmDefaultChange.currentDefault?.currency || 'SEK')}
                 {confirmDefaultChange.currentDefault?.nickname && (
                   <span className="text-muted-foreground"> ({confirmDefaultChange.currentDefault.nickname})</span>
                 )}
               </p>
               <p className="text-sm mt-1">
-                <strong>Nytt:</strong>{' '}
+                <strong>{t('changeDefault.new')}</strong>{' '}
                 {formatCurrency(confirmDefaultChange.newPrice.amount, confirmDefaultChange.newPrice.currency)}
                 {confirmDefaultChange.newPrice.nickname && (
                   <span className="text-muted-foreground"> ({confirmDefaultChange.newPrice.nickname})</span>
@@ -222,10 +226,10 @@ export function PriceManager({
             </div>
             <div className="flex justify-end gap-2">
               <Button variant="outline" size="sm" onClick={() => setConfirmDefaultChange(null)}>
-                Avbryt
+                {t('changeDefault.cancel')}
               </Button>
               <Button size="sm" onClick={() => handleSetDefault(confirmDefaultChange.priceId)}>
-                Byt standardpris
+                {t('changeDefault.confirm')}
               </Button>
             </div>
           </div>
@@ -237,7 +241,7 @@ export function PriceManager({
         <CardHeader className="pb-2 flex flex-row items-center justify-between">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <CurrencyDollarIcon className="h-4 w-4" />
-            Aktiva priser ({activePrices.length})
+            {t('activePrices', { count: activePrices.length })}
           </CardTitle>
           <Button 
             variant="outline" 
@@ -248,12 +252,12 @@ export function PriceManager({
             {showAddForm ? (
               <>
                 <XMarkIcon className="mr-1 h-4 w-4" />
-                Avbryt
+                {t('cancel')}
               </>
             ) : (
               <>
                 <PlusIcon className="mr-1 h-4 w-4" />
-                Lägg till pris
+                {t('addPrice')}
               </>
             )}
           </Button>
@@ -277,8 +281,8 @@ export function PriceManager({
           {activePrices.length === 0 && !showAddForm ? (
             <div className="py-8 text-center text-muted-foreground">
               <CurrencyDollarIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga priser konfigurerade</p>
-              <p className="text-xs mt-1">Lägg till ett pris för att kunna synka till Stripe</p>
+              <p>{t('noPrices.title')}</p>
+              <p className="text-xs mt-1">{t('noPrices.description')}</p>
             </div>
           ) : (
             <div className="space-y-4 mt-4">
@@ -302,7 +306,7 @@ export function PriceManager({
                         )}
                         <span className="font-medium">{currencyInfo?.label || currency}</span>
                         <Badge variant="secondary" className="text-xs">
-                          {currencyPrices.length} pris{currencyPrices.length !== 1 ? 'er' : ''}
+                          {currencyPrices.length === 1 ? t('priceCount', { count: 1 }) : t('priceCountPlural', { count: currencyPrices.length })}
                         </Badge>
                       </div>
                       <span className="text-sm text-muted-foreground">
@@ -337,7 +341,7 @@ export function PriceManager({
         <Card className="opacity-60">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Arkiverade priser ({archivedPrices.length})
+              {t('archivedPrices', { count: archivedPrices.length })}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
@@ -348,7 +352,7 @@ export function PriceManager({
                     <span className="font-medium line-through">{formatCurrency(price.amount, price.currency)}</span>
                     <span className="text-muted-foreground text-sm">{getIntervalLabel(price.interval)}</span>
                   </div>
-                  <Badge variant="secondary">Arkiverad</Badge>
+                  <Badge variant="secondary">{t('archived')}</Badge>
                 </div>
               ))}
             </div>
@@ -359,8 +363,8 @@ export function PriceManager({
       {/* Stripe Sync Warning */}
       {!stripeProductId && activePrices.length > 0 && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800 text-sm">
-          <p className="font-medium">⚠️ Produkten är inte synkad till Stripe</p>
-          <p className="mt-1">Priserna kommer synkas till Stripe när produkten först synkroniseras.</p>
+          <p className="font-medium">{t('syncWarning.title')}</p>
+          <p className="mt-1">{t('syncWarning.description')}</p>
         </div>
       )}
     </div>
@@ -379,7 +383,8 @@ interface PriceRowProps {
 }
 
 function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
-  const taxLabel = TAX_BEHAVIORS.find(t => t.value === price.tax_behavior)?.label || price.tax_behavior;
+  const t = useTranslations('admin.products.v2.priceManager');
+  const taxLabel = TAX_BEHAVIORS.find(tb => tb.value === price.tax_behavior)?.label || price.tax_behavior;
   const isSynced = !!price.stripe_price_id;
   const isRecurring = price.interval !== 'one_time';
   
@@ -391,7 +396,7 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
           onClick={onSetDefault}
           disabled={isLoading || price.is_default}
           className={`p-1 rounded hover:bg-muted ${price.is_default ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500'}`}
-          title={price.is_default ? 'Standardpris' : 'Gör till standardpris'}
+          title={price.is_default ? t('tooltips.defaultPrice') : t('tooltips.makeDefault')}
         >
           <StarIcon className="h-4 w-4" />
         </button>
@@ -420,7 +425,7 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
               <div className="bg-popover text-popover-foreground text-xs p-2 rounded shadow-lg border max-w-xs">
                 <div className="flex items-start gap-1.5">
                   <ExclamationTriangleIcon className="h-3.5 w-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <span>Momsbeteende kan inte ändras efter att priset synkats till Stripe</span>
+                  <span>{t('tooltips.taxBehaviorLocked')}</span>
                 </div>
               </div>
             </div>
@@ -439,18 +444,18 @@ function PriceRow({ price, onSetDefault, onDelete, isLoading }: PriceRowProps) {
         {/* Trial Period Badge - only for recurring */}
         {isRecurring && price.trial_period_days > 0 && (
           <Badge variant="secondary" className="text-xs" title={`${price.trial_period_days} dagars provperiod`}>
-            🎁 {price.trial_period_days}d trial
+            🎁 {t('badges.trial', { days: price.trial_period_days })}
           </Badge>
         )}
         
         {/* Stripe Sync Badge */}
         {isSynced ? (
           <Badge variant="outline" className="text-xs font-mono text-emerald-600" title={price.stripe_price_id || ''}>
-            ✓ Synkad
+            ✓ {t('badges.synced')}
           </Badge>
         ) : (
           <Badge variant="secondary" className="text-xs">
-            Ej synkad
+            {t('badges.notSynced')}
           </Badge>
         )}
         
@@ -482,6 +487,7 @@ interface AddPriceFormProps {
 }
 
 function AddPriceForm({ productId, productName: _productName, stripeProductId, onSuccess, onCancel }: AddPriceFormProps) {
+  const t = useTranslations('admin.products.v2.priceManager');
   const { success, error: toastError, warning } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -516,13 +522,13 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
     
     const amountNumber = parseFloat(amount);
     if (isNaN(amountNumber) || amountNumber <= 0) {
-      toastError('Ange ett giltigt belopp');
+      toastError(t('messages.invalidAmount'));
       return;
     }
     
     // Validate trial period for one_time
     if (!isRecurring && trialPeriodDays > 0) {
-      toastError('Provperiod kan endast användas för prenumerationer');
+      toastError(t('messages.trialOnlyRecurring'));
       return;
     }
     
@@ -552,13 +558,13 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         throw new Error(data.error || 'Failed to create price');
       }
       
-      success(data.synced ? 'Pris skapat och synkat till Stripe' : 'Pris skapat');
+      success(data.synced ? t('messages.priceCreatedAndSynced') : t('messages.priceCreated'));
       if (showTaxWarning) {
-        warning('OBS: Momsbeteende kan inte ändras efter synkning till Stripe');
+        warning(t('messages.taxWarningAfterSync'));
       }
       onSuccess();
     } catch (err) {
-      toastError(err instanceof Error ? err.message : 'Kunde inte skapa pris');
+      toastError(err instanceof Error ? err.message : t('messages.createFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -569,14 +575,14 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {/* Amount */}
         <div>
-          <label className="block text-sm font-medium mb-1">Belopp</label>
+          <label className="block text-sm font-medium mb-1">{t('form.amount')}</label>
           <input
             type="number"
             step="0.01"
             min="0"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            placeholder="299.00"
+            placeholder={t('form.amountPlaceholder')}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
             required
           />
@@ -584,7 +590,7 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         
         {/* Currency */}
         <div>
-          <label className="block text-sm font-medium mb-1">Valuta</label>
+          <label className="block text-sm font-medium mb-1">{t('form.currency')}</label>
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value as 'NOK' | 'SEK' | 'EUR')}
@@ -598,7 +604,7 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         
         {/* Interval */}
         <div>
-          <label className="block text-sm font-medium mb-1">Fakturering</label>
+          <label className="block text-sm font-medium mb-1">{t('form.billing')}</label>
           <select
             value={interval}
             onChange={(e) => handleIntervalChange(e.target.value as 'month' | 'year' | 'one_time')}
@@ -612,32 +618,32 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         
         {/* Tax Behavior */}
         <div>
-          <label className="block text-sm font-medium mb-1">Momshantering</label>
+          <label className="block text-sm font-medium mb-1">{t('form.taxBehavior')}</label>
           <select
             value={taxBehavior}
             onChange={(e) => handleTaxBehaviorChange(e.target.value as 'inclusive' | 'exclusive' | 'unspecified')}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
-            {TAX_BEHAVIORS.map(t => (
-              <option key={t.value} value={t.value}>{t.label}</option>
+            {TAX_BEHAVIORS.map(tb => (
+              <option key={tb.value} value={tb.value}>{tb.label}</option>
             ))}
           </select>
           {showTaxWarning && stripeProductId && (
             <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
               <ExclamationTriangleIcon className="h-3 w-3" />
-              Kan ej ändras efter synkning
+              {t('form.taxWarning')}
             </p>
           )}
         </div>
         
         {/* Nickname */}
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-1">Smeknamn (valfritt)</label>
+          <label className="block text-sm font-medium mb-1">{t('form.nickname')}</label>
           <input
             type="text"
             value={nickname}
             onChange={(e) => setNickname(e.target.value)}
-            placeholder="t.ex. Early Bird"
+            placeholder={t('form.nicknamePlaceholder')}
             className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
         </div>
@@ -645,9 +651,9 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
         {/* Trial Period Days - only for recurring */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Provperiod (dagar)
+            {t('form.trialPeriod')}
             {!isRecurring && (
-              <span className="text-muted-foreground font-normal ml-1">(ej för engångsköp)</span>
+              <span className="text-muted-foreground font-normal ml-1">{t('form.trialPeriodNote')}</span>
             )}
           </label>
           <input
@@ -659,10 +665,10 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
             placeholder="0"
             className={`w-full rounded-md border border-input bg-background px-3 py-2 text-sm ${!isRecurring ? 'opacity-50 cursor-not-allowed' : ''}`}
             disabled={!isRecurring}
-            title={!isRecurring ? 'Provperiod gäller endast prenumerationer' : undefined}
+            title={!isRecurring ? t('form.trialOnlySubscriptions') : undefined}
           />
           <p className="text-xs text-muted-foreground mt-1">
-            {isRecurring ? '0 = ingen provperiod' : 'Endast för prenumerationer'}
+            {isRecurring ? t('form.trialPeriodHint') : t('form.trialOnlySubscriptions')}
           </p>
         </div>
       </div>
@@ -676,7 +682,7 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
           onChange={(e) => setIsDefault(e.target.checked)}
           className="rounded border-input"
         />
-        <label htmlFor="isDefault" className="text-sm">Standardpris för denna valuta/intervall</label>
+        <label htmlFor="isDefault" className="text-sm">{t('form.isDefault')}</label>
       </div>
       
       {/* Actions */}
@@ -685,17 +691,17 @@ function AddPriceForm({ productId, productName: _productName, stripeProductId, o
           {isSubmitting ? (
             <>
               <ArrowPathIcon className="mr-1 h-4 w-4 animate-spin" />
-              Skapar...
+              {t('form.creating')}
             </>
           ) : (
             <>
               <CheckIcon className="mr-1 h-4 w-4" />
-              Skapa pris
+              {t('form.create')}
             </>
           )}
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={isSubmitting}>
-          Avbryt
+          {t('cancel')}
         </Button>
       </div>
     </form>

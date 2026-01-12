@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@/components/ui'
 import {
   BellIcon,
@@ -28,14 +29,8 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
   error: <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />,
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  support: 'Support',
-  system: 'System',
-  learning: 'Utbildning',
-  gamification: 'Gamification',
-}
-
 export default function NotificationHistoryPage() {
+  const t = useTranslations('admin.support.notifications')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [hasAccess, setHasAccess] = useState(false)
@@ -45,6 +40,13 @@ export default function NotificationHistoryPage() {
   const [notifications, setNotifications] = useState<NotificationHistoryItem[]>([])
   const [categoryFilter, setCategoryFilter] = useState<string>('')
   const [showUnreadOnly, setShowUnreadOnly] = useState(false)
+
+  const CATEGORY_LABELS: Record<string, string> = useMemo(() => ({
+    support: t('categories.support'),
+    system: t('categories.system'),
+    learning: t('categories.learning'),
+    gamification: t('categories.gamification'),
+  }), [t])
 
   useEffect(() => {
     checkAccess()
@@ -60,7 +62,7 @@ export default function NotificationHistoryPage() {
   async function checkAccess() {
     const result = await checkSupportHubAccess()
     if (!result.hasAccess) {
-      setError(result.error || 'Ingen åtkomst')
+      setError(result.error || t('noAccess'))
       setLoading(false)
       return
     }
@@ -90,7 +92,7 @@ export default function NotificationHistoryPage() {
     if (result.success && result.data) {
       setNotifications(result.data)
     } else {
-      setError(result.error || 'Kunde inte hämta notifikationer')
+      setError(result.error || t('errors.couldNotFetch'))
     }
     
     setLoading(false)
@@ -115,8 +117,8 @@ export default function NotificationHistoryPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<BellIcon className="h-6 w-6" />}
-          title="Ingen åtkomst"
-          description={error || 'Du har inte behörighet att se notifikationshistorik.'}
+          title={t('noAccess')}
+          description={error || t('noAccessDescription')}
         />
       </AdminPageLayout>
     )
@@ -126,22 +128,22 @@ export default function NotificationHistoryPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Support', href: '/admin/support' },
-          { label: 'Notifikationshistorik' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.support'), href: '/admin/support' },
+          { label: t('breadcrumbs.notificationHistory') },
         ]}
       />
 
       <AdminPageHeader
-        title="Notifikationshistorik"
-        description="Senaste 7 dagarnas skickade notifikationer för felsökning."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<BellIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
             <Link href="/admin/support">
               <Button variant="outline" size="sm">
                 <ChevronLeftIcon className="h-4 w-4 mr-1" />
-                Tillbaka
+                {t('back')}
               </Button>
             </Link>
             <Button variant="outline" size="sm" onClick={loadNotifications} disabled={loading}>
@@ -153,7 +155,7 @@ export default function NotificationHistoryPage() {
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda notifikationer"
+          title={t('errors.couldNotFetch')}
           description={error}
           onRetry={loadNotifications}
         />
@@ -163,7 +165,7 @@ export default function NotificationHistoryPage() {
         <CardHeader className="border-b border-border">
           <div className="flex flex-wrap gap-3 items-center justify-between">
             <CardTitle className="text-lg">
-              Skickade notifikationer ({filteredNotifications.length})
+              {t('list.title')} ({filteredNotifications.length})
             </CardTitle>
             
             <div className="flex gap-2 flex-wrap items-center">
@@ -173,9 +175,9 @@ export default function NotificationHistoryPage() {
                   onChange={(e) => setSelectedTenantId(e.target.value || undefined)}
                   className="px-3 py-1.5 border border-border rounded-lg text-sm bg-background text-foreground"
                 >
-                  <option value="">Alla organisationer</option>
-                  {tenants.map(t => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
+                  <option value="">{t('filters.allOrganizations')}</option>
+                  {tenants.map(tenant => (
+                    <option key={tenant.id} value={tenant.id}>{tenant.name}</option>
                   ))}
                 </select>
               )}
@@ -185,11 +187,11 @@ export default function NotificationHistoryPage() {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-3 py-1.5 border border-border rounded-lg text-sm bg-background text-foreground"
               >
-                <option value="">Alla kategorier</option>
-                <option value="support">Support</option>
-                <option value="system">System</option>
-                <option value="learning">Utbildning</option>
-                <option value="gamification">Gamification</option>
+                <option value="">{t('filters.allCategories')}</option>
+                <option value="support">{t('categories.support')}</option>
+                <option value="system">{t('categories.system')}</option>
+                <option value="learning">{t('categories.learning')}</option>
+                <option value="gamification">{t('categories.gamification')}</option>
               </select>
               
               <Button
@@ -198,7 +200,7 @@ export default function NotificationHistoryPage() {
                 onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               >
                 <EnvelopeIcon className="h-4 w-4 mr-1" />
-                Olästa
+                {t('filters.unread')}
               </Button>
             </div>
           </div>
@@ -208,13 +210,13 @@ export default function NotificationHistoryPage() {
           {loading && notifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <ArrowPathIcon className="h-5 w-5 animate-spin mx-auto mb-2" />
-              Laddar...
+              {t('loading')}
             </div>
           ) : filteredNotifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <BellIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>Inga notifikationer hittades</p>
-              <p className="text-sm mt-1">Endast de senaste 7 dagarnas notifikationer visas.</p>
+              <p>{t('empty.title')}</p>
+              <p className="text-sm mt-1">{t('empty.description')}</p>
             </div>
           ) : (
             <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
@@ -236,7 +238,7 @@ export default function NotificationHistoryPage() {
                           {notification.title}
                         </span>
                         {!notification.is_read && (
-                          <Badge variant="primary" className="text-xs">Oläst</Badge>
+                          <Badge variant="primary" className="text-xs">{t('status.unread')}</Badge>
                         )}
                         {notification.category && (
                           <Badge variant="outline" className="text-xs">
@@ -251,10 +253,10 @@ export default function NotificationHistoryPage() {
                       
                       <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-xs text-muted-foreground">
                         <span>
-                          Till: {notification.user_email || notification.user_id?.slice(0, 8) || 'Okänd'}
+                          {t('details.to')} {notification.user_email || notification.user_id?.slice(0, 8) || t('details.unknown')}
                         </span>
                         {isSystemAdmin && notification.tenant_name && (
-                          <span>Org: {notification.tenant_name}</span>
+                          <span>{t('details.org')} {notification.tenant_name}</span>
                         )}
                         <span>{notification.created_at ? formatDate(notification.created_at) : ''}</span>
                         {notification.event_key && (

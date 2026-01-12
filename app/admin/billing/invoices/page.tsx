@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useTenant } from '@/lib/context/TenantContext';
 import { useAuth } from '@/lib/supabase/auth';
 import {
@@ -62,18 +63,37 @@ interface Payment {
   created_at: string;
 }
 
-const statusConfig: Record<InvoiceStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  paid: { label: 'Betald', variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
-  sent: { label: 'Skickad', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
-  issued: { label: 'Utfärdad', variant: 'secondary', icon: <DocumentTextIcon className="h-4 w-4" /> },
-  overdue: { label: 'Förfallen', variant: 'destructive', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
-  draft: { label: 'Utkast', variant: 'outline', icon: <DocumentTextIcon className="h-4 w-4" /> },
-  canceled: { label: 'Makulerad', variant: 'outline', icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
+const statusIcons: Record<InvoiceStatus, React.ReactNode> = {
+  paid: <CheckCircleIcon className="h-4 w-4" />,
+  sent: <ClockIcon className="h-4 w-4" />,
+  issued: <DocumentTextIcon className="h-4 w-4" />,
+  overdue: <ExclamationTriangleIcon className="h-4 w-4" />,
+  draft: <DocumentTextIcon className="h-4 w-4" />,
+  canceled: <ExclamationTriangleIcon className="h-4 w-4" />,
+};
+
+const statusVariants: Record<InvoiceStatus, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+  paid: 'default',
+  sent: 'secondary',
+  issued: 'secondary',
+  overdue: 'destructive',
+  draft: 'outline',
+  canceled: 'outline',
 };
 
 export default function InvoicesPage() {
+  const t = useTranslations('admin.billing.invoices');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
+
+  const statusConfig = useMemo(() => ({
+    paid: { label: t('status.paid'), variant: statusVariants.paid, icon: statusIcons.paid },
+    sent: { label: t('status.sent'), variant: statusVariants.sent, icon: statusIcons.sent },
+    issued: { label: t('status.issued'), variant: statusVariants.issued, icon: statusIcons.issued },
+    overdue: { label: t('status.overdue'), variant: statusVariants.overdue, icon: statusIcons.overdue },
+    draft: { label: t('status.draft'), variant: statusVariants.draft, icon: statusIcons.draft },
+    canceled: { label: t('status.canceled'), variant: statusVariants.canceled, icon: statusIcons.canceled },
+  }), [t]);
 
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [stats, setStats] = useState<InvoiceStats | null>(null);
@@ -351,7 +371,7 @@ export default function InvoicesPage() {
               e.stopPropagation();
               handleDownload(row);
             }}
-            title="Ladda ner PDF"
+            title={t('downloadPdf')}
           >
             <ArrowDownTrayIcon className="h-4 w-4" />
           </Button>
@@ -385,24 +405,24 @@ export default function InvoicesPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Fakturor"
-        description="Visa och hantera fakturor och betalningar"
+        title={t('title')}
+        description={t('description')}
         icon={<DocumentTextIcon className="h-6 w-6" />}
         breadcrumbs={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Fakturering', href: '/admin/billing' },
-          { label: 'Fakturor' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.billing'), href: '/admin/billing' },
+          { label: t('breadcrumbs.invoices') },
         ]}
         actions={
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={handleEnsureStripeCustomer}>
-              Skapa/visa Stripe-kund
+              {t('buttons.createStripeCustomer')}
             </Button>
             <Button variant="outline" size="sm" onClick={handleCreateManualInvoice}>
-              Manuell faktura
+              {t('buttons.manualInvoice')}
             </Button>
             <Button size="sm" onClick={handleCreateStripeInvoice}>
-              Skicka via Stripe
+              {t('buttons.sendViaStripe')}
             </Button>
           </div>
         }
@@ -410,28 +430,28 @@ export default function InvoicesPage() {
 
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Totalt intäkter"
+          label={t('stats.totalRevenue')}
           value={stats ? `${stats.totalRevenue.toLocaleString('sv-SE')} SEK` : '-'}
           icon={<span className="text-base">💰</span>}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Utestående"
+          label={t('stats.outstanding')}
           value={stats ? `${stats.outstanding.toLocaleString('sv-SE')} SEK` : '-'}
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="amber"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Betalda"
+          label={t('stats.paid')}
           value={stats?.paid ?? 0}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Förfallna"
+          label={t('stats.overdue')}
           value={stats?.overdue ?? 0}
           icon={<ExclamationTriangleIcon className="h-5 w-5" />}
           iconColor="red"
@@ -440,7 +460,7 @@ export default function InvoicesPage() {
       </AdminStatGrid>
 
       <AdminTableToolbar
-        searchPlaceholder="Sök faktura"
+        searchPlaceholder={t('search')}
         searchValue={searchQuery}
         onSearchChange={setSearchQuery}
         filters={
@@ -449,13 +469,13 @@ export default function InvoicesPage() {
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           >
-            <option value="all">Alla</option>
-            <option value="paid">Betalda</option>
-            <option value="sent">Skickade</option>
-            <option value="issued">Utfärdade</option>
-            <option value="overdue">Förfallna</option>
-            <option value="draft">Utkast</option>
-            <option value="canceled">Makulerade</option>
+            <option value="all">{t('filter.all')}</option>
+            <option value="paid">{t('filter.paid')}</option>
+            <option value="sent">{t('filter.sent')}</option>
+            <option value="issued">{t('filter.issued')}</option>
+            <option value="overdue">{t('filter.overdue')}</option>
+            <option value="draft">{t('filter.draft')}</option>
+            <option value="canceled">{t('filter.canceled')}</option>
           </select>
         }
       />
@@ -468,9 +488,9 @@ export default function InvoicesPage() {
         emptyState={
           <EmptyState
             icon={<DocumentTextIcon className="h-8 w-8" />}
-            title="Inga fakturor"
-            description={searchQuery ? `Inga resultat för "${searchQuery}"` : 'Det finns inga fakturor att visa.'}
-            action={searchQuery ? { label: 'Rensa sökning', onClick: () => setSearchQuery('') } : undefined}
+            title={t('emptyTitle')}
+            description={searchQuery ? t('noResultsFor', { query: searchQuery }) : t('emptyDescription')}
+            action={searchQuery ? { label: t('clearSearch'), onClick: () => setSearchQuery('') } : undefined}
           />
         }
         className="mb-4"
@@ -488,11 +508,11 @@ export default function InvoicesPage() {
         <div className="mt-6 space-y-3 rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Betalningar för faktura</p>
+              <p className="text-sm text-muted-foreground">{t('paymentsForInvoice')}</p>
               <p className="font-semibold">{selectedInvoiceId}</p>
             </div>
             <Button variant="ghost" size="sm" onClick={() => setSelectedInvoiceId(null)}>
-              Stäng
+              {t('close')}
             </Button>
           </div>
 
@@ -500,20 +520,20 @@ export default function InvoicesPage() {
 
           <div className="grid gap-3">
             {isLoadingPayments ? (
-              <p className="text-sm text-muted-foreground">Laddar betalningar...</p>
+              <p className="text-sm text-muted-foreground">{t('loadingPayments')}</p>
             ) : payments.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Inga betalningar registrerade.</p>
+              <p className="text-sm text-muted-foreground">{t('noPaymentsRegistered')}</p>
             ) : (
               payments.map((p) => (
                 <div key={p.id} className="flex flex-col gap-2 rounded-md border border-border p-3 md:flex-row md:items-center md:justify-between">
                   <div>
                     <p className="font-medium">{p.name}</p>
-                    <p className="text-xs text-muted-foreground">{p.amount.toLocaleString('sv-SE')} {p.currency} · {p.provider || 'Okänd leverantör'}</p>
+                    <p className="text-xs text-muted-foreground">{p.amount.toLocaleString('sv-SE')} {p.currency} · {p.provider || t('unknownProvider')}</p>
                     {p.transaction_reference && (
                       <p className="text-xs text-muted-foreground">Ref: {p.transaction_reference}</p>
                     )}
                     {p.paid_at && (
-                      <p className="text-xs text-muted-foreground">Betald: {new Date(p.paid_at).toLocaleString('sv-SE')}</p>
+                      <p className="text-xs text-muted-foreground">{t('paidAt', { date: new Date(p.paid_at).toLocaleString('sv-SE') })}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -522,13 +542,13 @@ export default function InvoicesPage() {
                       onChange={(e) => handleUpdatePaymentStatus(p.id, e.target.value as PaymentStatus)}
                       className="rounded-md border border-border bg-background px-2 py-1 text-sm"
                     >
-                      <option value="pending">Väntar</option>
-                      <option value="confirmed">Bekräftad</option>
-                      <option value="failed">Misslyckad</option>
-                      <option value="refunded">Återbetald</option>
+                      <option value="pending">{t('paymentStatus.pending')}</option>
+                      <option value="confirmed">{t('paymentStatus.confirmed')}</option>
+                      <option value="failed">{t('paymentStatus.failed')}</option>
+                      <option value="refunded">{t('paymentStatus.refunded')}</option>
                     </select>
                     <Button variant="outline" size="sm" onClick={() => handleUpdatePaymentStatus(p.id, 'confirmed')}>
-                      Markera betald
+                      {t('markAsPaid')}
                     </Button>
                   </div>
                 </div>
@@ -537,20 +557,20 @@ export default function InvoicesPage() {
           </div>
 
           <div className="rounded-md border border-dashed border-border p-3">
-            <p className="mb-3 font-semibold">Lägg till betalning</p>
+            <p className="mb-3 font-semibold">{t('addPayment')}</p>
             <div className="grid gap-2 md:grid-cols-2">
               <div className="space-y-1">
-                <label htmlFor="payment-name" className="text-sm font-medium">Namn</label>
+                <label htmlFor="payment-name" className="text-sm font-medium">{t('form.name')}</label>
                 <input
                   id="payment-name"
                   value={newPayment.name}
                   onChange={(e) => setNewPayment((prev) => ({ ...prev, name: e.target.value }))}
-                  placeholder="Kortbetalning, Swish ..."
+                  placeholder={t('form.namePlaceholder')}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="payment-amount" className="text-sm font-medium">Belopp</label>
+                <label htmlFor="payment-amount" className="text-sm font-medium">{t('form.amount')}</label>
                 <input
                   id="payment-amount"
                   type="number"
@@ -561,17 +581,17 @@ export default function InvoicesPage() {
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="payment-provider" className="text-sm font-medium">Provider</label>
+                <label htmlFor="payment-provider" className="text-sm font-medium">{t('form.provider')}</label>
                 <input
                   id="payment-provider"
                   value={newPayment.provider}
                   onChange={(e) => setNewPayment((prev) => ({ ...prev, provider: e.target.value }))}
-                  placeholder="Stripe, Swish, Bankgiro"
+                  placeholder={t('form.providerPlaceholder')}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 />
               </div>
               <div className="space-y-1">
-                <label htmlFor="payment-ref" className="text-sm font-medium">Referens</label>
+                <label htmlFor="payment-ref" className="text-sm font-medium">{t('form.reference')}</label>
                 <input
                   id="payment-ref"
                   value={newPayment.reference}
@@ -582,7 +602,7 @@ export default function InvoicesPage() {
               </div>
             </div>
             <div className="mt-3 flex justify-end">
-              <Button size="sm" onClick={handleCreatePayment}>Spara betalning</Button>
+              <Button size="sm" onClick={handleCreatePayment}>{t('savePayment')}</Button>
             </div>
           </div>
         </div>

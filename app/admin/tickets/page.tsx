@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Badge, Input, Button, Select } from '@/components/ui';
 import { 
   TicketIcon, 
@@ -39,26 +40,6 @@ import {
 type StatusFilter = 'all' | 'open' | 'in_progress' | 'waiting_for_user' | 'resolved' | 'closed';
 type PriorityFilter = 'all' | 'low' | 'medium' | 'high' | 'urgent';
 
-const STATUS_OPTIONS = [
-  { value: 'all', label: 'Alla statusar' },
-  { value: 'open', label: 'Öppen' },
-  { value: 'in_progress', label: 'Hanteras' },
-  { value: 'waiting_for_user', label: 'Väntar på användare' },
-  { value: 'resolved', label: 'Löst' },
-  { value: 'closed', label: 'Stängt' },
-];
-
-const PRIORITY_OPTIONS = [
-  { value: 'all', label: 'Alla prioriteter' },
-  { value: 'urgent', label: 'Brådskande' },
-  { value: 'high', label: 'Hög' },
-  { value: 'medium', label: 'Medel' },
-  { value: 'low', label: 'Låg' },
-];
-
-const STATUS_UPDATE_OPTIONS = STATUS_OPTIONS.filter(s => s.value !== 'all');
-const PRIORITY_UPDATE_OPTIONS = PRIORITY_OPTIONS.filter(p => p.value !== 'all');
-
 const priorityColors: Record<string, string> = {
   urgent: 'border-l-red-500',
   high: 'border-l-orange-500',
@@ -67,6 +48,27 @@ const priorityColors: Record<string, string> = {
 };
 
 export default function AdminTicketsPage() {
+  const t = useTranslations('admin.tickets');
+
+  const STATUS_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('status.all') },
+    { value: 'open', label: t('status.open') },
+    { value: 'in_progress', label: t('status.inProgress') },
+    { value: 'waiting_for_user', label: t('status.waitingForUser') },
+    { value: 'resolved', label: t('status.resolved') },
+    { value: 'closed', label: t('status.closed') },
+  ], [t]);
+
+  const PRIORITY_OPTIONS = useMemo(() => [
+    { value: 'all', label: t('priority.all') },
+    { value: 'urgent', label: t('priority.urgent') },
+    { value: 'high', label: t('priority.high') },
+    { value: 'medium', label: t('priority.medium') },
+    { value: 'low', label: t('priority.low') },
+  ], [t]);
+
+  const STATUS_UPDATE_OPTIONS = useMemo(() => STATUS_OPTIONS.filter(s => s.value !== 'all'), [STATUS_OPTIONS]);
+  const PRIORITY_UPDATE_OPTIONS = useMemo(() => PRIORITY_OPTIONS.filter(p => p.value !== 'all'), [PRIORITY_OPTIONS]);
   // Access state
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isSystemAdmin, setIsSystemAdmin] = useState(false);
@@ -156,7 +158,7 @@ export default function AdminTicketsPage() {
         setTickets(ticketsResult.data.tickets);
         setTotalCount(ticketsResult.data.totalCount);
       } else {
-        setError(ticketsResult.error || 'Kunde inte hämta ärenden');
+        setError(ticketsResult.error || t('errors.loadFailed'));
       }
 
       if (statsResult.success && statsResult.data) {
@@ -164,7 +166,7 @@ export default function AdminTicketsPage() {
       }
     } catch (err) {
       console.error(err);
-      setError('Ett oväntat fel uppstod');
+      setError(t('errors.unexpectedError'));
     } finally {
       setIsLoading(false);
     }
@@ -270,8 +272,8 @@ export default function AdminTicketsPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<LockClosedIcon className="h-6 w-6" />}
-          title="Åtkomst nekad"
-          description="Du har inte behörighet att hantera supportärenden."
+          title={t('noAccess.title')}
+          description={t('noAccess.description')}
         />
       </AdminPageLayout>
     );
@@ -284,7 +286,7 @@ export default function AdminTicketsPage() {
         <div className="flex h-[60vh] items-center justify-center">
           <div className="flex items-center gap-2 text-muted-foreground">
             <ArrowPathIcon className="h-5 w-5 animate-spin" />
-            <span>Kontrollerar behörighet...</span>
+            <span>{t('loading.checkingPermissions')}</span>
           </div>
         </div>
       </AdminPageLayout>
@@ -295,15 +297,15 @@ export default function AdminTicketsPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Drift' },
-          { label: 'Ärenden' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.operations') },
+          { label: t('breadcrumbs.tickets') },
         ]}
       />
 
       <AdminPageHeader
-        title="Ärenden"
-        description="Hantera supportärenden, status, prioritet och konversationer."
+        title={t('page.title')}
+        description={t('page.description')}
         icon={<TicketIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
@@ -315,7 +317,7 @@ export default function AdminTicketsPage() {
             {isLoading && (
               <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <ArrowPathIcon className="h-4 w-4 animate-spin" />
-                Laddar...
+                {t('list.loading')}
               </span>
             )}
           </div>
@@ -324,7 +326,7 @@ export default function AdminTicketsPage() {
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda ärenden"
+          title={t('errors.loadFailed')}
           description={error}
           onRetry={loadTickets}
         />
@@ -333,11 +335,11 @@ export default function AdminTicketsPage() {
       {/* Stats */}
       {stats && (
         <AdminStatGrid>
-          <AdminStatCard label="Totalt" value={stats.totalTickets} />
-          <AdminStatCard label="Öppna" value={stats.openTickets} />
-          <AdminStatCard label="Pågående" value={stats.inProgressTickets} />
+          <AdminStatCard label={t('stats.total')} value={stats.totalTickets} />
+          <AdminStatCard label={t('stats.open')} value={stats.openTickets} />
+          <AdminStatCard label={t('stats.inProgress')} value={stats.inProgressTickets} />
           <AdminStatCard 
-            label="Snitt lösningstid" 
+            label={t('stats.avgResolutionTime')} 
             value={stats.avgResolutionTimeMinutes 
               ? `${Math.round(stats.avgResolutionTimeMinutes / 60)}h` 
               : '–'
@@ -353,7 +355,7 @@ export default function AdminTicketsPage() {
             {/* Search and tenant filter row */}
             <div className="flex gap-2 flex-wrap items-center">
               <Input
-                placeholder="Sök titel/ID"
+                placeholder={t('filters.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full sm:w-64"
@@ -369,7 +371,7 @@ export default function AdminTicketsPage() {
                   }}
                   className="px-3 py-2 border border-border rounded-lg text-sm bg-background text-foreground focus:ring-2 focus:ring-primary focus:border-transparent"
                 >
-                  <option value="">Alla organisationer</option>
+                  <option value="">{t('filters.allOrganizations')}</option>
                   {tenants.map(t => (
                     <option key={t.id} value={t.id}>{t.name}</option>
                   ))}
@@ -427,7 +429,7 @@ export default function AdminTicketsPage() {
                 }}
               >
                 <UserCircleIcon className="h-4 w-4 mr-1" />
-                Mina ärenden
+                {t('filters.myTickets')}
               </Button>
               
               <Button
@@ -439,7 +441,7 @@ export default function AdminTicketsPage() {
                   setCurrentPage(1);
                 }}
               >
-                Otilldelade
+                {t('filters.unassigned')}
               </Button>
               
               <Button
@@ -451,7 +453,7 @@ export default function AdminTicketsPage() {
                 }}
               >
                 <ChatBubbleLeftIcon className="h-4 w-4 mr-1" />
-                Behöver svar
+                {t('filters.needsResponse')}
               </Button>
               
               {(assignedToMe || unassigned || needsFirstResponse) && (
@@ -465,7 +467,7 @@ export default function AdminTicketsPage() {
                     setCurrentPage(1);
                   }}
                 >
-                  Rensa filter
+                  {t('filters.clearFilters')}
                 </Button>
               )}
             </div>
@@ -473,12 +475,12 @@ export default function AdminTicketsPage() {
 
           <div className="divide-y divide-border overflow-y-auto flex-1 max-h-[32rem]">
             {isLoading && tickets.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">Laddar...</div>
+              <div className="p-4 text-center text-muted-foreground">{t('list.loading')}</div>
             ) : tickets.length === 0 ? (
               <AdminEmptyState
                 icon={<TicketIcon className="h-6 w-6" />}
-                title="Inga ärenden"
-                description="Det finns inga supportärenden att visa med aktuella filter."
+                title={t('empty.title')}
+                description={t('empty.description')}
                 className="py-8"
               />
             ) : (
@@ -533,10 +535,10 @@ export default function AdminTicketsPage() {
                 variant="outline"
                 size="sm"
               >
-                Föregående
+                {t('list.previous')}
               </Button>
               <span className="text-sm text-muted-foreground">
-                Sida {currentPage} av {totalPages}
+                {t('list.page')} {currentPage} {t('list.of')} {totalPages}
               </span>
               <Button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
@@ -544,7 +546,7 @@ export default function AdminTicketsPage() {
                 variant="outline"
                 size="sm"
               >
-                Nästa
+                {t('list.next')}
               </Button>
             </div>
           )}
@@ -567,26 +569,26 @@ export default function AdminTicketsPage() {
               <div className="space-y-3 pb-4 border-b border-border">
                 {selectedTicket.description && (
                   <div>
-                    <p className="text-xs text-muted-foreground font-medium">Beskrivning</p>
+                    <p className="text-xs text-muted-foreground font-medium">{t('detail.description')}</p>
                     <p className="text-sm text-foreground">{selectedTicket.description}</p>
                   </div>
                 )}
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
-                    <p className="text-xs text-muted-foreground">Skapad</p>
+                    <p className="text-xs text-muted-foreground">{t('detail.created')}</p>
                     <p>{new Date(selectedTicket.created_at).toLocaleString('sv-SE')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Kategori</p>
-                    <p>{selectedTicket.category || 'Allmänt'}</p>
+                    <p className="text-xs text-muted-foreground">{t('detail.category')}</p>
+                    <p>{selectedTicket.category || t('detail.categoryDefault')}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-muted-foreground">Användare</p>
-                    <p>{selectedTicket.user_email || 'Okänd'}</p>
+                    <p className="text-xs text-muted-foreground">{t('detail.user')}</p>
+                    <p>{selectedTicket.user_email || t('detail.userUnknown')}</p>
                   </div>
                   {isSystemAdmin && selectedTicket.tenant_name && (
                     <div>
-                      <p className="text-xs text-muted-foreground">Organisation</p>
+                      <p className="text-xs text-muted-foreground">{t('detail.organization')}</p>
                       <p>{selectedTicket.tenant_name}</p>
                     </div>
                   )}
@@ -597,7 +599,7 @@ export default function AdminTicketsPage() {
               <div className="space-y-3">
                 <div>
                   <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    Status
+                    {t('detail.status')}
                   </label>
                   <select
                     value={selectedTicket.status}
@@ -612,7 +614,7 @@ export default function AdminTicketsPage() {
 
                 <div>
                   <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    Prioritet
+                    {t('detail.priority')}
                   </label>
                   <select
                     value={selectedTicket.priority}
@@ -627,14 +629,14 @@ export default function AdminTicketsPage() {
 
                 <div>
                   <label className="text-xs text-muted-foreground font-medium mb-1 block">
-                    Tilldelad
+                    {t('detail.assignedTo')}
                   </label>
                   <select
                     value={selectedTicket.assigned_to_user_id || ''}
                     onChange={(e) => handleAssignChange(selectedTicket.id, e.target.value)}
                     className="w-full px-2 py-1.5 text-sm border border-border rounded-lg bg-background text-foreground"
                   >
-                    <option value="">Ingen tilldelad</option>
+                    <option value="">{t('detail.unassigned')}</option>
                     {assignableUsers.map(u => (
                       <option key={u.id} value={u.id}>{u.email || u.id}</option>
                     ))}
@@ -646,13 +648,13 @@ export default function AdminTicketsPage() {
               <div className="pt-2">
                 <p className="text-xs text-muted-foreground font-medium mb-2 flex items-center gap-1">
                   <ChatBubbleLeftIcon className="h-3 w-3" />
-                  Meddelanden ({ticketMessages.length})
+                  {t('detail.messages')} ({ticketMessages.length})
                 </p>
                 <div className="space-y-2 max-h-40 overflow-y-auto">
                   {isLoadingMessages ? (
-                    <p className="text-sm text-muted-foreground">Laddar meddelanden...</p>
+                    <p className="text-sm text-muted-foreground">{t('detail.loadingMessages')}</p>
                   ) : ticketMessages.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Inga meddelanden än</p>
+                    <p className="text-sm text-muted-foreground">{t('detail.noMessages')}</p>
                   ) : (
                     ticketMessages.map((msg) => (
                       <div
@@ -665,9 +667,9 @@ export default function AdminTicketsPage() {
                       >
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
                           {msg.is_internal && (
-                            <Badge variant="outline" className="text-[10px] py-0">Internt</Badge>
+                            <Badge variant="outline" className="text-[10px] py-0">{t('detail.internal')}</Badge>
                           )}
-                          <span>{msg.user_email || 'Användare'}</span>
+                          <span>{msg.user_email || t('detail.user')}</span>
                           <span>·</span>
                           <span>{new Date(msg.created_at).toLocaleString('sv-SE')}</span>
                         </div>
@@ -690,7 +692,7 @@ export default function AdminTicketsPage() {
                       onChange={(e) => setIsInternal(e.target.checked)}
                       className="rounded border-border"
                     />
-                    Internt (synligt endast för admin)
+                    {t('detail.internalCheckbox')}
                   </label>
                 </div>
                 <div className="flex gap-2">
@@ -698,7 +700,7 @@ export default function AdminTicketsPage() {
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={isInternal ? "Intern anteckning..." : "Skicka ett meddelande..."}
+                    placeholder={isInternal ? t('detail.internalPlaceholder') : t('detail.messagePlaceholder')}
                     className="flex-1"
                   />
                   <Button 
@@ -706,7 +708,7 @@ export default function AdminTicketsPage() {
                     disabled={isSendingMessage || !newMessage.trim()} 
                     size="sm"
                   >
-                    Skicka
+                    {t('detail.send')}
                   </Button>
                 </div>
               </form>
@@ -714,7 +716,7 @@ export default function AdminTicketsPage() {
           </Card>
         ) : (
           <Card className="p-6 flex items-center justify-center min-h-64">
-            <p className="text-muted-foreground">Välj ett ärende för att se detaljer</p>
+            <p className="text-muted-foreground">{t('detail.selectTicket')}</p>
           </Card>
         )}
       </div>

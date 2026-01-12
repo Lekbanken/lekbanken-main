@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatCurrency, formatDate } from '@/lib/i18n/format-utils';
 import { useRouter } from 'next/navigation';
 import {
@@ -53,12 +54,6 @@ import type {
   HealthStatus,
   BulkOperationResult,
 } from './types';
-import {
-  PRODUCT_STATUS_META,
-  PRODUCT_TYPE_META,
-  STRIPE_LINKAGE_META,
-  HEALTH_STATUS_META,
-} from './types';
 
 // ============================================================================
 // CONSTANTS
@@ -66,36 +61,48 @@ import {
 
 const DEFAULT_PAGE_SIZE = 25;
 
+// Status variant mappings (non-translatable)
+const STATUS_VARIANTS: Record<ProductStatus, 'default' | 'secondary' | 'destructive' | 'warning' | 'accent' | 'success' | 'outline'> = {
+  active: 'success',
+  inactive: 'secondary',
+  draft: 'warning',
+  archived: 'secondary',
+};
+
+const STRIPE_LINKAGE_VARIANTS: Record<StripeLinkageStatus, 'default' | 'secondary' | 'destructive' | 'warning'> = {
+  connected: 'default',
+  missing: 'warning',
+  drift: 'destructive',
+  error: 'destructive',
+};
+
 // ============================================================================
 // HELPER COMPONENTS
 // ============================================================================
 
-function StatusBadge({ status }: { status: ProductStatus }) {
-  const meta = PRODUCT_STATUS_META[status];
-  return <Badge variant={meta.variant}>{meta.label}</Badge>;
+function StatusBadge({ status, label }: { status: ProductStatus; label: string }) {
+  return <Badge variant={STATUS_VARIANTS[status]}>{label}</Badge>;
 }
 
-function StripeLinkageBadge({ status }: { status: StripeLinkageStatus }) {
-  const meta = STRIPE_LINKAGE_META[status];
+function StripeLinkageBadge({ status, label }: { status: StripeLinkageStatus; label: string }) {
   const Icon = status === 'connected' ? CheckCircleIcon : status === 'drift' ? ExclamationTriangleIcon : XCircleIcon;
 
   return (
-    <Badge variant={meta.variant} className="gap-1">
+    <Badge variant={STRIPE_LINKAGE_VARIANTS[status]} className="gap-1">
       <Icon className="h-3 w-3" />
-      {meta.label}
+      {label}
     </Badge>
   );
 }
 
-function HealthBadge({ status }: { status: HealthStatus }) {
-  const meta = HEALTH_STATUS_META[status];
+function HealthBadge({ status, label }: { status: HealthStatus; label: string }) {
   const Icon = status === 'ok' ? CheckCircleIcon : ExclamationTriangleIcon;
 
   return (
     <Badge
       variant={status === 'ok' ? 'default' : 'destructive'}
       className="gap-1 h-6 w-6 p-0 justify-center"
-      title={meta.label}
+      title={label}
     >
       <Icon className="h-3 w-3" />
     </Badge>
@@ -112,13 +119,15 @@ type FilterBarProps = {
 };
 
 function FilterBar({ filters, onChange }: FilterBarProps) {
-  const quickFilters: Array<{ key: string; label: string; filter: Partial<ProductFilters> }> = [
-    { key: 'active', label: 'Aktiva', filter: { statuses: ['active'] } },
-    { key: 'draft', label: 'Utkast', filter: { statuses: ['draft'] } },
-    { key: 'missing-stripe', label: 'Saknar Stripe', filter: { stripeLinkageStatuses: ['missing'] } },
-    { key: 'drift', label: 'Avvikelser', filter: { stripeLinkageStatuses: ['drift'] } },
-    { key: 'unhealthy', label: 'Problem', filter: { healthStatuses: ['missing_fields', 'stripe_drift', 'no_price', 'availability_misconfig'] } },
-  ];
+  const t = useTranslations('admin.products.v2');
+  
+  const quickFilters: Array<{ key: string; label: string; filter: Partial<ProductFilters> }> = useMemo(() => [
+    { key: 'active', label: t('filters.active'), filter: { statuses: ['active'] } },
+    { key: 'draft', label: t('filters.draft'), filter: { statuses: ['draft'] } },
+    { key: 'missing-stripe', label: t('filters.missingStripe'), filter: { stripeLinkageStatuses: ['missing'] } },
+    { key: 'drift', label: t('filters.drift'), filter: { stripeLinkageStatuses: ['drift'] } },
+    { key: 'unhealthy', label: t('filters.unhealthy'), filter: { healthStatuses: ['missing_fields', 'stripe_drift', 'no_price', 'availability_misconfig'] } },
+  ], [t]);
 
   const isQuickFilterActive = (key: string): boolean => {
     const f = quickFilters.find((qf) => qf.key === key);
@@ -169,7 +178,7 @@ function FilterBar({ filters, onChange }: FilterBarProps) {
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Sök produkter..."
+          placeholder={t('filters.searchPlaceholder')}
           value={filters.search || ''}
           onChange={(e) => onChange({ ...filters, search: e.target.value, page: 1 })}
           className="pl-9"
@@ -221,6 +230,7 @@ function BulkActionsBar({
   totalCount,
   onActionComplete,
 }: BulkActionsBarProps) {
+  const t = useTranslations('admin.products.v2');
   const { success, warning } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -239,10 +249,10 @@ function BulkActionsBar({
       if (!res.ok) throw new Error('Bulk operation failed');
 
       const result: BulkOperationResult = await res.json();
-      success(`Åtgärd utförd på ${result.processed} produkter`);
+      success(t('bulk.actionSuccess', { count: result.processed }));
       onActionComplete(result);
     } catch {
-      warning('Åtgärden misslyckades');
+      warning(t('bulk.actionFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -254,14 +264,14 @@ function BulkActionsBar({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="text-sm font-medium">
-              {selectedCount} av {totalCount} valda
+              {t('bulk.selected', { count: selectedCount, total: totalCount })}
             </span>
             <Button variant="ghost" size="sm" onClick={onClear}>
-              Rensa
+              {t('bulk.clear')}
             </Button>
             {!allSelected && (
               <Button variant="ghost" size="sm" onClick={onSelectAll}>
-                Välj alla
+                {t('bulk.selectAll')}
               </Button>
             )}
           </div>
@@ -274,7 +284,7 @@ function BulkActionsBar({
               onClick={() => handleBulkAction('activate')}
             >
               <CheckCircleIcon className="mr-1.5 h-4 w-4" />
-              Aktivera
+              {t('bulk.activate')}
             </Button>
             <Button
               variant="outline"
@@ -283,7 +293,7 @@ function BulkActionsBar({
               onClick={() => handleBulkAction('archive')}
             >
               <ArchiveBoxIcon className="mr-1.5 h-4 w-4" />
-              Arkivera
+              {t('bulk.archive')}
             </Button>
             <Button
               variant="outline"
@@ -292,7 +302,7 @@ function BulkActionsBar({
               onClick={() => handleBulkAction('sync_stripe')}
             >
               <ArrowPathIcon className="mr-1.5 h-4 w-4" />
-              Synka Stripe
+              {t('bulk.syncStripe')}
             </Button>
             <Button
               variant="outline"
@@ -301,7 +311,7 @@ function BulkActionsBar({
               onClick={() => handleBulkAction('validate')}
             >
               <CheckCircleIcon className="mr-1.5 h-4 w-4" />
-              Validera
+              {t('bulk.validate')}
             </Button>
             <Button
               variant="outline"
@@ -310,7 +320,7 @@ function BulkActionsBar({
               onClick={() => handleBulkAction('export')}
             >
               <ArrowDownTrayIcon className="mr-1.5 h-4 w-4" />
-              Exportera
+              {t('bulk.export')}
             </Button>
           </div>
         </div>
@@ -329,6 +339,15 @@ type ProductRowProps = {
   onToggleSelect: () => void;
   onOpenCard: () => void;
   canEdit: boolean;
+  labels: {
+    statusLabels: Record<string, string>;
+    typeLabels: Record<string, string>;
+    stripeLinkageLabels: Record<string, string>;
+    healthLabels: Record<string, string>;
+    selectProduct: string;
+    viewProduct: string;
+    syncWithStripe: string;
+  };
 };
 
 function ProductRow({
@@ -337,8 +356,8 @@ function ProductRow({
   onToggleSelect,
   onOpenCard,
   canEdit,
+  labels,
 }: ProductRowProps) {
-  const typeMeta = PRODUCT_TYPE_META[product.product_type];
   const primaryPrice = product.primary_price;
 
   return (
@@ -354,7 +373,7 @@ function ProductRow({
           type="checkbox"
           checked={isSelected}
           onChange={onToggleSelect}
-          aria-label={`Välj ${product.name}`}
+          aria-label={labels.selectProduct.replace('{name}', product.name)}
           className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
         />
       </td>
@@ -388,13 +407,13 @@ function ProductRow({
       {/* Type */}
       <td className="px-3 py-3 hidden md:table-cell">
         <Badge variant="outline" className="text-xs">
-          {typeMeta.label}
+          {labels.typeLabels[product.product_type] || product.product_type}
         </Badge>
       </td>
 
       {/* Status */}
       <td className="px-3 py-3">
-        <StatusBadge status={product.status} />
+        <StatusBadge status={product.status} label={labels.statusLabels[product.status] || product.status} />
       </td>
 
       {/* Pricing */}
@@ -410,7 +429,10 @@ function ProductRow({
 
       {/* Stripe Linkage */}
       <td className="px-3 py-3 hidden lg:table-cell">
-        <StripeLinkageBadge status={product.stripe_linkage.status} />
+        <StripeLinkageBadge 
+          status={product.stripe_linkage.status} 
+          label={labels.stripeLinkageLabels[product.stripe_linkage.status] || product.stripe_linkage.status}
+        />
       </td>
 
       {/* Availability */}
@@ -423,7 +445,10 @@ function ProductRow({
 
       {/* Health */}
       <td className="px-3 py-3 hidden md:table-cell">
-        <HealthBadge status={product.health_status} />
+        <HealthBadge 
+          status={product.health_status} 
+          label={labels.healthLabels[product.health_status] || product.health_status}
+        />
       </td>
 
       {/* Updated */}
@@ -444,14 +469,14 @@ function ProductRow({
           <DropdownMenuContent align="end">
             <DropdownMenuItem onClick={onOpenCard}>
               <CubeIcon className="h-4 w-4 mr-2" />
-              Visa produkt
+              {labels.viewProduct}
             </DropdownMenuItem>
             {canEdit && (
               <>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <ArrowPathIcon className="h-4 w-4 mr-2" />
-                  Synka med Stripe
+                  {labels.syncWithStripe}
                 </DropdownMenuItem>
               </>
             )}
@@ -516,9 +541,44 @@ function useBulkSelection(products: ProductAdminRow[]) {
 // ============================================================================
 
 export function ProductAdminPageV2() {
+  const t = useTranslations('admin.products.v2');
   const { can } = useRbac();
   const { warning } = useToast();
   const router = useRouter();
+
+  // Create labels object for ProductRow
+  const productRowLabels = useMemo(() => ({
+    statusLabels: {
+      active: t('status.active'),
+      inactive: t('status.inactive'),
+      draft: t('status.draft'),
+      archived: t('status.archived'),
+    },
+    typeLabels: {
+      license: t('type.license'),
+      module: t('type.module'),
+      addon: t('type.addon'),
+      usage_based: t('type.usage_based'),
+      one_time: t('type.one_time'),
+      subscription: t('type.subscription'),
+    },
+    stripeLinkageLabels: {
+      connected: t('stripeLinkage.connected'),
+      missing: t('stripeLinkage.missing'),
+      drift: t('stripeLinkage.drift'),
+      error: t('stripeLinkage.error'),
+    },
+    healthLabels: {
+      ok: t('health.ok'),
+      missing_fields: t('health.missing_fields'),
+      stripe_drift: t('health.stripe_drift'),
+      availability_misconfig: t('health.availability_misconfig'),
+      no_price: t('health.no_price'),
+    },
+    selectProduct: t('table.selectProduct'),
+    viewProduct: t('table.viewProduct'),
+    syncWithStripe: t('table.syncWithStripe'),
+  }), [t]);
 
   // State
   const [products, setProducts] = useState<ProductAdminRow[]>([]);
@@ -618,8 +678,8 @@ export function ProductAdminPageV2() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<CubeIcon className="h-6 w-6" />}
-          title="Ingen åtkomst"
-          description="Du behöver administratörsbehörighet för att hantera produkter."
+          title={t('noAccess.title')}
+          description={t('noAccess.description')}
         />
       </AdminPageLayout>
     );
@@ -630,22 +690,22 @@ export function ProductAdminPageV2() {
   return (
     <AdminPageLayout>
       <AdminBreadcrumbs
-        items={[{ label: 'Startsida', href: '/admin' }, { label: 'Produkter' }]}
+        items={[{ label: t('breadcrumbs.home'), href: '/admin' }, { label: t('breadcrumbs.products') }]}
       />
 
       <AdminPageHeader
-        title="Produkter"
-        description="Hantera produktkatalogen – priser, entitlements, och Stripe-integration."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<CubeIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" disabled>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              Exportera
+              {t('actions.export')}
             </Button>
             <Button variant="outline" size="sm" disabled>
               <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
-              Importera
+              {t('actions.import')}
             </Button>
             {canCreate && (
               <Button
@@ -654,7 +714,7 @@ export function ProductAdminPageV2() {
                 onClick={() => router.push('/admin/products/new')}
               >
                 <PlusIcon className="mr-2 h-4 w-4" />
-                Ny produkt
+                {t('actions.newProduct')}
               </Button>
             )}
           </div>
@@ -663,7 +723,7 @@ export function ProductAdminPageV2() {
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda produkter"
+          title={t('error.loadFailed')}
           description={error}
           onRetry={() => void loadProducts()}
         />
@@ -671,10 +731,10 @@ export function ProductAdminPageV2() {
 
       {/* Stats */}
       <AdminStatGrid className="mb-4">
-        <AdminStatCard label="Totalt" value={stats.total} />
-        <AdminStatCard label="Aktiva" value={stats.active} />
-        <AdminStatCard label="Utkast" value={stats.draft} />
-        <AdminStatCard label="Saknar Stripe" value={stats.missingStripe} />
+        <AdminStatCard label={t('stats.total')} value={stats.total} />
+        <AdminStatCard label={t('stats.active')} value={stats.active} />
+        <AdminStatCard label={t('stats.draft')} value={stats.draft} />
+        <AdminStatCard label={t('stats.missingStripe')} value={stats.missingStripe} />
       </AdminStatGrid>
 
       {/* Bulk Actions Bar */}
@@ -696,7 +756,7 @@ export function ProductAdminPageV2() {
       <Card className="overflow-hidden">
         <CardHeader className="border-b border-border bg-muted/30 px-6 py-4">
           <div className="flex items-center justify-between">
-            <CardTitle>Produktöversikt</CardTitle>
+            <CardTitle>{t('table.title')}</CardTitle>
           </div>
         </CardHeader>
 
@@ -714,8 +774,8 @@ export function ProductAdminPageV2() {
           ) : products.length === 0 ? (
             <AdminEmptyState
               icon={<CubeIcon className="h-6 w-6" />}
-              title="Inga produkter matchar filtren"
-              description="Justera filter eller lägg till en ny produkt."
+              title={t('empty.title')}
+              description={t('empty.description')}
             />
           ) : (
             <div className="overflow-x-auto">
@@ -736,31 +796,31 @@ export function ProductAdminPageV2() {
                     </th>
                     <th className="w-12 px-2 py-3"></th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Namn
+                      {t('table.name')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden lg:table-cell">
-                      Nyckel
+                      {t('table.key')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden md:table-cell">
-                      Typ
+                      {t('table.type')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase">
-                      Status
+                      {t('table.status')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden xl:table-cell">
-                      Pris
+                      {t('table.price')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden lg:table-cell">
-                      Stripe
+                      {t('table.stripe')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden xl:table-cell">
-                      Org.
+                      {t('table.orgs')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden md:table-cell">
-                      Hälsa
+                      {t('table.health')}
                     </th>
                     <th className="px-3 py-3 text-left text-xs font-medium text-muted-foreground uppercase hidden lg:table-cell">
-                      Uppdaterad
+                      {t('table.updated')}
                     </th>
                     <th className="w-10 px-3 py-3"></th>
                   </tr>
@@ -774,6 +834,7 @@ export function ProductAdminPageV2() {
                       onToggleSelect={() => selection.toggle(product)}
                       onOpenCard={() => handleOpenCard(product)}
                       canEdit={canEdit}
+                      labels={productRowLabels}
                     />
                   ))}
                 </tbody>

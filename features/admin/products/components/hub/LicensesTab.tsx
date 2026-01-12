@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDate } from '@/lib/i18n/format-utils';
 import { useRouter } from "next/navigation";
+import { useTranslations } from 'next-intl';
 import {
   KeyIcon,
   PlusIcon,
@@ -48,11 +49,18 @@ type LicenseListItem = {
   autoRenew: boolean;
 };
 
-const statusConfig: Record<LicenseStatus, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; icon: React.ReactNode }> = {
-  active: { label: "Aktiv", variant: "default", icon: <CheckCircleIcon className="h-4 w-4" /> },
-  trial: { label: "Provperiod", variant: "outline", icon: <ClockIcon className="h-4 w-4" /> },
-  expired: { label: "Utgången", variant: "destructive", icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
-  suspended: { label: "Pausad", variant: "secondary", icon: <ExclamationTriangleIcon className="h-4 w-4" /> },
+const statusVariants: Record<LicenseStatus, "default" | "secondary" | "destructive" | "outline"> = {
+  active: "default",
+  trial: "outline",
+  expired: "destructive",
+  suspended: "secondary",
+};
+
+const statusIcons: Record<LicenseStatus, React.ReactNode> = {
+  active: <CheckCircleIcon className="h-4 w-4" />,
+  trial: <ClockIcon className="h-4 w-4" />,
+  expired: <ExclamationTriangleIcon className="h-4 w-4" />,
+  suspended: <ExclamationTriangleIcon className="h-4 w-4" />,
 };
 
 // Mock data for now - will be replaced with real API
@@ -103,6 +111,7 @@ const mockLicenses: LicenseListItem[] = [
 
 export function LicensesTab() {
   const router = useRouter();
+  const t = useTranslations('admin.products.licensesTab');
   const { can } = useRbac();
   const _toast = useToast(); // Reserved for future toast notifications
 
@@ -128,7 +137,7 @@ export function LicensesTab() {
         if (isMounted) setLicenses(mockLicenses);
       } catch (err) {
         console.error("Failed to load licenses", err);
-        if (isMounted) setError("Kunde inte ladda licenser.");
+        if (isMounted) setError(t('loadError'));
       } finally {
         if (isMounted) setIsLoading(false);
       }
@@ -171,7 +180,7 @@ export function LicensesTab() {
         <CardContent className="p-6 text-center">
           <p className="text-destructive">{error}</p>
           <Button variant="outline" onClick={() => window.location.reload()} className="mt-4">
-            Försök igen
+            {t('retry')}
           </Button>
         </CardContent>
       </Card>
@@ -186,7 +195,7 @@ export function LicensesTab() {
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Sök licenser..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -195,7 +204,7 @@ export function LicensesTab() {
         {canCreate && (
           <Button className="gap-2">
             <PlusIcon className="h-4 w-4" />
-            Ny licens
+            {t('newLicense')}
           </Button>
         )}
       </div>
@@ -203,14 +212,16 @@ export function LicensesTab() {
       {/* License grid */}
       {filteredLicenses.length === 0 ? (
         <EmptyState
-          title={searchQuery ? "Inga matchande licenser" : "Inga licenser ännu"}
-          description={searchQuery ? "Justera sökningen för att se fler." : "Skapa din första licens."}
-          action={!searchQuery && canCreate ? { label: "Skapa licens", onClick: () => {} } : undefined}
+          title={searchQuery ? t('noMatchingLicenses') : t('noLicensesYet')}
+          description={searchQuery ? t('adjustSearch') : t('createFirstLicense')}
+          action={!searchQuery && canCreate ? { label: t('createLicense'), onClick: () => {} } : undefined}
         />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {filteredLicenses.map((license) => {
-            const statusInfo = statusConfig[license.status];
+            const statusVariant = statusVariants[license.status];
+            const statusIcon = statusIcons[license.status];
+            const statusLabel = license.status === 'active' ? t('statusActive') : license.status === 'trial' ? t('statusTrial') : license.status === 'expired' ? t('statusExpired') : t('statusSuspended');
             const seatUsage = license.seats > 0 ? Math.round((license.usedSeats / license.seats) * 100) : 0;
             return (
               <Card
@@ -238,18 +249,18 @@ export function LicensesTab() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>
                           <ArrowTopRightOnSquareIcon className="mr-2 h-4 w-4" />
-                          Visa detaljer
+                          {t('viewDetails')}
                         </DropdownMenuItem>
                         {canEdit && (
                           <DropdownMenuItem>
                             <PencilSquareIcon className="mr-2 h-4 w-4" />
-                            Redigera
+                            {t('edit')}
                           </DropdownMenuItem>
                         )}
                         {canDelete && (
                           <DropdownMenuItem className="text-destructive">
                             <TrashIcon className="mr-2 h-4 w-4" />
-                            Avsluta licens
+                            {t('terminateLicense')}
                           </DropdownMenuItem>
                         )}
                       </DropdownMenuContent>
@@ -259,11 +270,11 @@ export function LicensesTab() {
                   {/* License details */}
                   <div className="mb-3 space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Plan</span>
+                      <span className="text-muted-foreground">{t('plan')}</span>
                       <span className="font-medium">{license.plan}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Platser</span>
+                      <span className="text-muted-foreground">{t('seats')}</span>
                       <span className="font-medium">{license.usedSeats} / {license.seats}</span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -275,19 +286,19 @@ export function LicensesTab() {
                       />
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Utgår</span>
+                      <span className="text-muted-foreground">{t('expires')}</span>
                       <span className="font-medium">{formatDate(license.endDate)}</span>
                     </div>
                   </div>
 
                   {/* Footer */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant={statusInfo.variant} className="gap-1">
-                      {statusInfo.icon}
-                      {statusInfo.label}
+                    <Badge variant={statusVariant} className="gap-1">
+                      {statusIcon}
+                      {statusLabel}
                     </Badge>
                     {license.autoRenew && (
-                      <Badge variant="outline">Auto-förnyelse</Badge>
+                      <Badge variant="outline">{t('autoRenewal')}</Badge>
                     )}
                     {license.productId && (
                       <Badge
@@ -295,7 +306,7 @@ export function LicensesTab() {
                         className="cursor-pointer hover:bg-muted"
                         onClick={() => router.push(`/admin/products?tab=products&highlight=${license.productId}`)}
                       >
-                        → Produkt
+                        {t('toProduct')}
                       </Badge>
                     )}
                   </div>

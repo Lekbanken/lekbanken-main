@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   SparklesIcon,
   PlusIcon,
@@ -20,6 +21,7 @@ import { AchievementLibraryGrid } from "./components/AchievementLibraryGrid";
 import { AchievementEditor } from "./editor/AchievementEditor";
 
 export function AchievementAdminPage() {
+  const t = useTranslations('admin.achievements.page');
   const { can } = useRbac();
 
   // RBAC permissions
@@ -115,20 +117,20 @@ export function AchievementAdminPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Achievements' },
+          { label: t('breadcrumbs.home'), href: '/admin' },
+          { label: t('breadcrumbs.achievements') },
         ]}
       />
 
       <AdminPageHeader
         icon={<SparklesIcon className="h-6 w-6" />}
-        title="Achievements"
-        description="Bygg skiktade badges, tilldela teman och hantera belöningar"
+        title={t('title')}
+        description={t('description')}
         actions={
           canCreateAchievement && (
             <Button onClick={handleCreate} className="gap-2 shadow-sm">
               <PlusIcon className="h-4 w-4" />
-              Skapa Achievement
+              {t('createAchievement')}
             </Button>
           )
         }
@@ -142,18 +144,18 @@ export function AchievementAdminPage() {
               <div className="flex items-center gap-3">
                 <Squares2X2Icon className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <CardTitle className="text-base">Badge Library</CardTitle>
+                  <CardTitle className="text-base">{t('badgeLibrary')}</CardTitle>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {filtered.length} achievement{filtered.length !== 1 ? 's' : ''}
+                    {filtered.length === 1 ? t('achievementCount', { count: filtered.length }) : t('achievementCountPlural', { count: filtered.length })}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" size="sm">
-                  {achievements.filter(a => a.status === 'published').length} published
+                  {achievements.filter(a => a.status === 'published').length} {t('published')}
                 </Badge>
                 <Badge variant="outline" size="sm">
-                  {achievements.filter(a => a.status === 'draft').length} drafts
+                  {achievements.filter(a => a.status === 'draft').length} {t('drafts')}
                 </Badge>
               </div>
             </div>
@@ -183,10 +185,10 @@ export function AchievementAdminPage() {
                 </div>
                 <div>
                   <CardTitle className="text-base">
-                    {isCreating ? 'Create New Badge' : editing ? 'Edit Badge' : 'Badge Builder'}
+                    {isCreating ? t('createNewBadge') : editing ? t('editBadge') : t('badgeBuilder')}
                   </CardTitle>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {editing ? `Editing: ${editing.title || 'Untitled'}` : 'Visual badge construction and metadata'}
+                    {editing ? t('editing', { title: editing.title || t('untitled') }) : t('visualBadgeConstruction')}
                   </p>
                 </div>
               </div>
@@ -197,7 +199,7 @@ export function AchievementAdminPage() {
                     size="sm"
                     dot
                   >
-                    {editing.status === 'published' ? 'Published' : 'Draft'}
+                    {editing.status === 'published' ? t('published') : t('drafts')}
                   </Badge>
                   {editing.version && (
                     <Badge variant="outline" size="sm">
@@ -222,14 +224,14 @@ export function AchievementAdminPage() {
                   <SparklesIcon className="h-8 w-8" />
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">
-                  Select or create an achievement
+                  {t('selectOrCreate')}
                 </h3>
                 <p className="mt-2 max-w-sm text-sm text-muted-foreground">
-                  Choose a badge from the library above or create a new one to start building its layers, colors, and metadata.
+                  {t('selectOrCreateDescription')}
                 </p>
                 <Button onClick={handleCreate} className="mt-6 gap-2">
                   <PlusIcon className="h-4 w-4" />
-                  Create Achievement
+                  {t('createAchievement')}
                 </Button>
               </div>
             )}

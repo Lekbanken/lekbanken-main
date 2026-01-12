@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChartBarIcon } from '@heroicons/react/24/outline';
 import {
   AdminPageHeader,
@@ -16,6 +17,7 @@ import { getPageViewStats, getSessionStats } from '@/lib/services/analyticsServi
 type DateRange = { startDate: string; endDate: string };
 
 export default function TenantAnalyticsPage() {
+  const t = useTranslations('admin.tenant.analytics');
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id ?? null;
 
@@ -46,7 +48,7 @@ export default function TenantAnalyticsPage() {
         setSessionStats(sessionData ?? null);
       } catch (err) {
         console.error(err);
-        setError('Kunde inte ladda statistik just nu.');
+        setError(t('error.message'));
       } finally {
         setIsLoading(false);
       }
@@ -59,8 +61,8 @@ export default function TenantAnalyticsPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<ChartBarIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj eller byt organisation för att se statistik."
+          title={t('noOrganization.title')}
+          description={t('noOrganization.description')}
         />
       </AdminPageLayout>
     );
@@ -69,14 +71,14 @@ export default function TenantAnalyticsPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Statistik"
-        description="Nyckeltal för organisationens användning."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ChartBarIcon className="h-8 w-8 text-primary" />}
       />
 
       {error && (
         <AdminErrorState
-          title="Kunde inte ladda statistik"
+          title={t('error.loadFailed')}
           description={error}
           onRetry={() => {
             setError(null);
@@ -86,31 +88,31 @@ export default function TenantAnalyticsPage() {
       )}
 
       {isLoading ? (
-        <p className="text-sm text-muted-foreground">Laddar statistik...</p>
+        <p className="text-sm text-muted-foreground">{t('loading')}</p>
       ) : (
         <AdminStatGrid>
           <AdminStatCard
-            label="Sidvisningar"
+            label={t('stats.pageViews')}
             value={pageStats ? pageStats.total : '–'}
-            change={pageStats ? `Unika: ${pageStats.unique}` : undefined}
+            change={pageStats ? t('stats.uniqueViews', { count: pageStats.unique }) : undefined}
             trend="flat"
           />
           <AdminStatCard
-            label="Sessioner"
+            label={t('stats.sessions')}
             value={sessionStats ? sessionStats.totalSessions : '–'}
-            change={sessionStats ? `Avslutade: ${sessionStats.completedSessions}` : undefined}
+            change={sessionStats ? t('stats.completedSessions', { count: sessionStats.completedSessions }) : undefined}
             trend="flat"
           />
           <AdminStatCard
-            label="Genomsnittlig tid"
+            label={t('stats.avgTime')}
             value={sessionStats ? `${Math.round(sessionStats.avgDuration / 60)} min` : '–'}
-            subtitle={pageStats ? `Snitt besökstid: ${Math.round(pageStats.avgDuration)}s` : undefined}
+            subtitle={pageStats ? t('stats.avgVisitTime', { seconds: Math.round(pageStats.avgDuration) }) : undefined}
             trend="flat"
           />
           <AdminStatCard
-            label="Genomsnittlig poäng"
+            label={t('stats.avgScore')}
             value={sessionStats ? sessionStats.avgScore : '–'}
-            subtitle="Senaste 30 dagarna"
+            subtitle={t('stats.last30Days')}
             trend="flat"
           />
         </AdminStatGrid>

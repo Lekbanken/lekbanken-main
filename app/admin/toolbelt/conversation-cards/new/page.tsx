@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   AdminBreadcrumbs,
   AdminErrorState,
@@ -35,6 +36,7 @@ type FormState = {
 
 export default function NewConversationCardCollectionPage() {
   const router = useRouter()
+  const t = useTranslations('admin.conversationCards.new')
   const { can, isSystemAdmin, isTenantAdmin, currentTenantId } = useRbac()
 
   const canManage = can('admin.conversation_cards.manage')
@@ -65,7 +67,7 @@ export default function NewConversationCardCollectionPage() {
       try {
         const res = await fetch('/api/purposes?includeStandard=true', { cache: 'no-store' })
         const data = await res.json().catch(() => ({}))
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda syften')
+        if (!res.ok) throw new Error(data.error || t('couldNotCreate'))
         setPurposes((data.purposes ?? []) as Purpose[])
       } catch (e) {
         console.error(e)
@@ -73,7 +75,7 @@ export default function NewConversationCardCollectionPage() {
         setLoadingPurposes(false)
       }
     })()
-  }, [])
+  }, [t])
 
   const mainPurposes = useMemo(() => purposes.filter((p) => p.type === 'main'), [purposes])
   const subPurposes = useMemo(() => {
@@ -94,12 +96,12 @@ export default function NewConversationCardCollectionPage() {
   const onSubmit = async () => {
     setError(null)
     if (!canManage || (!canCreateGlobal && !canCreateTenant)) {
-      setError('Du har inte behörighet att skapa samlingar.')
+      setError(t('noPermission'))
       return
     }
 
     if (form.scope_type === 'tenant' && !form.tenant_id) {
-      setError('Välj tenant (saknas i din kontext).')
+      setError(t('selectTenantError'))
       return
     }
 
@@ -119,14 +121,14 @@ export default function NewConversationCardCollectionPage() {
       })
 
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.error || 'Kunde inte skapa samling')
+      if (!res.ok) throw new Error(data.error || t('couldNotCreate'))
 
       const id = data.collection?.id as string | undefined
       if (!id) throw new Error('Missing collection id')
 
       router.push(`/admin/toolbelt/conversation-cards/${id}`)
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Kunde inte skapa samling')
+      setError(e instanceof Error ? e.message : t('couldNotCreate'))
     } finally {
       setSaving(false)
     }
@@ -135,8 +137,8 @@ export default function NewConversationCardCollectionPage() {
   if (!canManage) {
     return (
       <AdminPageLayout>
-        <AdminBreadcrumbs items={[{ label: 'Startsida', href: '/admin' }, { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' }, { label: 'Ny' }]} />
-        <AdminErrorState title="Ingen åtkomst" description="Du saknar behörighet för Samtalskort." />
+        <AdminBreadcrumbs items={[{ label: t('breadcrumbHome'), href: '/admin' }, { label: t('breadcrumbTitle'), href: '/admin/toolbelt/conversation-cards' }, { label: t('breadcrumbNew') }]} />
+        <AdminErrorState title={t('noAccessTitle')} description={t('noAccessDescription')} />
       </AdminPageLayout>
     )
   }
@@ -145,38 +147,38 @@ export default function NewConversationCardCollectionPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
-          { label: 'Skapa samling' },
+          { label: t('breadcrumbHome'), href: '/admin' },
+          { label: t('breadcrumbTitle'), href: '/admin/toolbelt/conversation-cards' },
+          { label: t('breadcrumbCreate') },
         ]}
       />
 
       <AdminPageHeader
-        title="Skapa samling"
-        description="Skapa en samtalskortssamling (deck)."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={() => router.push('/admin/toolbelt/conversation-cards')}>
-              Avbryt
+              {t('cancel')}
             </Button>
             <Button onClick={onSubmit} disabled={saving || !form.title.trim()}>
-              {saving ? 'Skapar…' : 'Skapa'}
+              {saving ? t('creating') : t('create')}
             </Button>
           </div>
         }
       />
 
-      {error ? <AdminErrorState title="Kunde inte spara" description={error} /> : null}
+      {error ? <AdminErrorState title={t('couldNotSave')} description={error} /> : null}
 
       <Card>
         <CardHeader>
-          <CardTitle>Grundinfo</CardTitle>
+          <CardTitle>{t('basicInfo')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <div className="text-sm font-medium">Scope</div>
+              <div className="text-sm font-medium">{t('scope')}</div>
               <Select
                 value={form.scope_type}
                 onChange={(e) => {
@@ -188,23 +190,23 @@ export default function NewConversationCardCollectionPage() {
                   }))
                 }}
                 options={[
-                  ...(canCreateTenant ? [{ value: 'tenant', label: 'Tenant' }] : []),
-                  ...(canCreateGlobal ? [{ value: 'global', label: 'Global' }] : []),
+                  ...(canCreateTenant ? [{ value: 'tenant', label: t('scopeTenant') }] : []),
+                  ...(canCreateGlobal ? [{ value: 'global', label: t('scopeGlobal') }] : []),
                 ]}
               />
               {form.scope_type === 'tenant' && !currentTenantId ? (
-                <div className="text-xs text-muted-foreground">Tenant styrs av din aktiva tenant i Admin.</div>
+                <div className="text-xs text-muted-foreground">{t('scopeHint')}</div>
               ) : null}
             </div>
 
             <div className="space-y-1">
-              <div className="text-sm font-medium">Status</div>
+              <div className="text-sm font-medium">{t('status')}</div>
               <Select
                 value={form.status}
                 onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as FormState['status'] }))}
                 options={[
-                  { value: 'draft', label: 'Draft' },
-                  { value: 'published', label: 'Published' },
+                  { value: 'draft', label: t('statusDraft') },
+                  { value: 'published', label: t('statusPublished') },
                 ]}
               />
             </div>
@@ -212,38 +214,38 @@ export default function NewConversationCardCollectionPage() {
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
-              <div className="text-sm font-medium">Titel</div>
-              <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder="Titel" />
+              <div className="text-sm font-medium">{t('title')}</div>
+              <Input value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} placeholder={t('titlePlaceholder')} />
             </div>
             <div className="space-y-1">
-              <div className="text-sm font-medium">Språk</div>
-              <Input value={form.language} onChange={(e) => setForm((f) => ({ ...f, language: e.target.value }))} placeholder="sv" />
+              <div className="text-sm font-medium">{t('language')}</div>
+              <Input value={form.language} onChange={(e) => setForm((f) => ({ ...f, language: e.target.value }))} placeholder={t('languagePlaceholder')} />
             </div>
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium">Beskrivning</div>
+            <div className="text-sm font-medium">{t('description')}</div>
             <Textarea
               value={form.description}
               onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              placeholder="Kort beskrivning (valfri)"
+              placeholder={t('descriptionPlaceholder')}
             />
           </div>
 
           <div className="space-y-1">
-            <div className="text-sm font-medium">Målgrupp</div>
-            <Input value={form.audience} onChange={(e) => setForm((f) => ({ ...f, audience: e.target.value }))} placeholder="t.ex. 10–12 år" />
+            <div className="text-sm font-medium">{t('audience')}</div>
+            <Input value={form.audience} onChange={(e) => setForm((f) => ({ ...f, audience: e.target.value }))} placeholder={t('audiencePlaceholder')} />
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Syften</CardTitle>
+          <CardTitle>{t('purposes')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <div className="text-sm font-medium">Huvudsyfte</div>
+            <div className="text-sm font-medium">{t('mainPurpose')}</div>
             <Select
               value={form.main_purpose_id ?? ''}
               onChange={(e) =>
@@ -254,17 +256,17 @@ export default function NewConversationCardCollectionPage() {
                 }))
               }
               options={[
-                { value: '', label: loadingPurposes ? 'Laddar…' : '—' },
+                { value: '', label: loadingPurposes ? t('mainPurposeLoading') : t('mainPurposeNone') },
                 ...mainPurposes.map((p) => ({ value: p.id, label: p.name })),
               ]}
             />
           </div>
 
           <div className="space-y-2">
-            <div className="text-sm font-medium">Undersyften</div>
+            <div className="text-sm font-medium">{t('subPurposes')}</div>
             <div className="flex flex-wrap gap-2">
               {subPurposes.length === 0 ? (
-                <div className="text-sm text-muted-foreground">Inga undersyften att välja.</div>
+                <div className="text-sm text-muted-foreground">{t('noSubPurposes')}</div>
               ) : (
                 subPurposes.map((p) => {
                   const active = form.secondary_purpose_ids.includes(p.id)

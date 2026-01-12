@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,6 +29,7 @@ type DiagramListRow = {
 };
 
 export function CoachDiagramsLibraryPage() {
+  const t = useTranslations('admin.library.coachDiagrams');
   const { currentTenant } = useTenant();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -96,7 +98,7 @@ export function CoachDiagramsLibraryPage() {
       const draft: CoachDiagramDocumentV1 = {
         schemaVersion: 1,
         id,
-        title: 'Nytt diagram',
+        title: t('newDiagram'),
         sportType: 'custom',
         fieldTemplateId: 'default',
         objects: [],
@@ -132,30 +134,30 @@ export function CoachDiagramsLibraryPage() {
     } finally {
       setCreating(false);
     }
-  }, [currentTenant?.id, router]);
+  }, [currentTenant?.id, router, t]);
 
   const content = useMemo(() => {
     if (!canLoad) {
       return (
         <AdminEmptyState
           icon={<PhotoIcon className="h-6 w-6" />}
-          title="Ingen organisation vald"
-          description="Välj en organisation för att se diagram-biblioteket."
+          title={t('noTenantSelected')}
+          description={t('selectTenantDescription')}
         />
       );
     }
 
     if (loading) {
-      return <div className="text-sm text-muted-foreground">Laddar…</div>;
+      return <div className="text-sm text-muted-foreground">{t('loading')}</div>;
     }
 
     if (error) {
       return (
         <AdminEmptyState
           icon={<PhotoIcon className="h-6 w-6" />}
-          title="Kunde inte ladda diagram"
+          title={t('loadError')}
           description={error}
-          action={{ label: 'Försök igen', onClick: fetchDiagrams }}
+          action={{ label: t('retry'), onClick: fetchDiagrams }}
         />
       );
     }
@@ -164,8 +166,8 @@ export function CoachDiagramsLibraryPage() {
       return (
         <AdminEmptyState
           icon={<PhotoIcon className="h-6 w-6" />}
-          title="Inga diagram ännu"
-          description="Skapa diagram i Coach Diagram Builder och de dyker upp här."
+          title={t('noDiagrams')}
+          description={t('noDiagramsDescription')}
         />
       );
     }
@@ -177,11 +179,11 @@ export function CoachDiagramsLibraryPage() {
             <div className="space-y-1">
               <div className="text-sm font-semibold text-foreground">{d.title}</div>
               <div className="text-xs text-muted-foreground">
-                Uppdaterad: {new Date(d.updated_at).toLocaleString()}
+                {t('updated')}: {new Date(d.updated_at).toLocaleString()}
               </div>
               <div className="pt-2 text-xs text-muted-foreground">
                 <Link className="underline" href={`/admin/library/coach-diagrams/${d.id}`}>
-                  Öppna editor
+                  {t('openEditor')}
                 </Link>
               </div>
               <div className="pt-2 text-xs text-muted-foreground">
@@ -191,7 +193,7 @@ export function CoachDiagramsLibraryPage() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Öppna SVG
+                  {t('openSvg')}
                 </a>
               </div>
             </div>
@@ -199,17 +201,17 @@ export function CoachDiagramsLibraryPage() {
         ))}
       </div>
     );
-  }, [canLoad, diagrams, error, fetchDiagrams, loading]);
+  }, [canLoad, diagrams, error, fetchDiagrams, loading, t]);
 
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Coach Diagrams"
-        description="Diagram som kan användas som instruktionsmedia i steg."
+        title={t('title')}
+        description={t('pageDescription')}
         icon={<PhotoIcon className="h-8 w-8 text-primary" />}
         actions={
           <Button type="button" onClick={createNew} disabled={!canLoad || creating}>
-            {creating ? 'Skapar…' : 'Skapa nytt'}
+            {creating ? t('creating') : t('createNew')}
           </Button>
         }
       />

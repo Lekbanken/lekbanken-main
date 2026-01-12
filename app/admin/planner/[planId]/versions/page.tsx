@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { DocumentTextIcon } from "@heroicons/react/24/outline";
 import {
   AdminPageHeader,
@@ -29,6 +30,7 @@ export default function AdminPlannerVersionsPage() {
   const params = useParams<{ planId: string }>();
   const planId = Array.isArray(params.planId) ? params.planId[0] : params.planId;
   const { can, isLoading: isRbacLoading } = useRbac();
+  const t = useTranslations("admin.planner");
 
   const [versions, setVersions] = useState<PlannerVersion[]>([]);
   const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
@@ -51,7 +53,7 @@ export default function AdminPlannerVersionsPage() {
       setCurrentVersionId(data.currentVersionId ?? null);
     } catch (err) {
       console.error("[admin/planner] versions error", err);
-      setError("Kunde inte ladda versioner.");
+      setError(t("errorLoadVersions"));
     } finally {
       setIsLoading(false);
     }
@@ -70,8 +72,8 @@ export default function AdminPlannerVersionsPage() {
       <AdminPageLayout>
         <AdminEmptyState
           icon={<DocumentTextIcon className="h-6 w-6" />}
-          title="Ingen behorighet"
-          description="Du saknar behorighet for att visa planner-admin."
+          title={t("noPermission")}
+          description={t("noPermissionDescription")}
         />
       </AdminPageLayout>
     );
@@ -80,7 +82,7 @@ export default function AdminPlannerVersionsPage() {
   if (isLoading) {
     return (
       <AdminPageLayout>
-        <LoadingState message="Laddar versioner..." />
+        <LoadingState message={t("loadingVersions")} />
       </AdminPageLayout>
     );
   }
@@ -89,7 +91,7 @@ export default function AdminPlannerVersionsPage() {
     return (
       <AdminPageLayout>
         <AdminErrorState
-          title="Kunde inte ladda versioner"
+          title={t("errorLoadVersionsTitle")}
           description={error}
           onRetry={() => void loadVersions()}
         />
@@ -100,28 +102,28 @@ export default function AdminPlannerVersionsPage() {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Plan versions"
-        description="Historik over publicerade versioner."
+        title={t("sections.versions")}
+        description={t("detailDescription")}
         icon={<DocumentTextIcon className="h-6 w-6" />}
         breadcrumbs={[
           { label: "Admin", href: "/admin" },
-          { label: "Planner", href: "/admin/planner" },
-          { label: "Versions" },
+          { label: t("pageTitle"), href: "/admin/planner" },
+          { label: t("sections.versions") },
         ]}
         actions={
           <Button size="sm" variant="outline" href={`/admin/planner/${planId}`}>
-            Tillbaka till plan
+            {t("actions.backToPlan")}
           </Button>
         }
       />
 
-      <AdminSection title="Versionslista">
+      <AdminSection title={t("sections.versionList")}>
         <AdminCard>
           {sortedVersions.length === 0 ? (
             <AdminEmptyState
               icon={<DocumentTextIcon className="h-6 w-6" />}
-              title="Inga versioner"
-              description="Planen har inga publicerade versioner."
+              title={t("noVersions")}
+              description={t("noVersionsDescription")}
             />
           ) : (
             <div className="space-y-3">
@@ -140,7 +142,7 @@ export default function AdminPlannerVersionsPage() {
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {version.name} • Publicerad {formatDate(version.publishedAt)}
+                      {version.name} • {t("publishedAt", { date: formatDate(version.publishedAt) })}
                     </p>
                   </div>
                   <div className="text-xs text-muted-foreground">

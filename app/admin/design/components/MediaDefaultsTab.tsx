@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -20,6 +21,7 @@ interface MediaDefaultsTabProps {
 }
 
 export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
+  const t = useTranslations('admin.design.mediaDefaults')
   return (
     <div className="space-y-6">
       {/* Default Profile Images */}
@@ -45,7 +47,7 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
               const images = (config?.defaultProfileImages || []).filter(u => u !== url)
               onUpdate({ ...config, defaultProfileImages: images })
             }}
-            emptyMessage="Inga standardprofilbilder uppladdade"
+            emptyMessage={t('noDefaultProfileImages')}
           />
         </CardContent>
       </Card>
@@ -73,7 +75,7 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
               const images = (config?.defaultCoverImages || []).filter(u => u !== url)
               onUpdate({ ...config, defaultCoverImages: images })
             }}
-            emptyMessage="Inga standardomslagsbilder uppladdade"
+            emptyMessage={t('noDefaultCoverImages')}
             aspectRatio="wide"
           />
         </CardContent>

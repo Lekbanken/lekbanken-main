@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
 > **Senast uppdaterad:** 2026-01-12
-> **Status:** ✅ Fas 2 (~95%) - features/admin ~95% klart, app/admin ~95% klart
+> **Status:** ✅ Fas 2 (~97%) - features/admin ~95% klart, app/admin ~97% klart
 
 ## Executive Summary
 
@@ -10,13 +10,17 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | ~380 (35%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~290 (27%) |
-| **Migrerade strängar** | ~2,700 (95%) |
-| **Uppskattad återstående arbetsinsats** | ~30 minuter |
+| Filer som använder i18n | ~300 (28%) |
+| **Migrerade strängar** | ~2,750 (97%) |
+| **Uppskattad återstående arbetsinsats** | ~20 minuter |
 
 ## Senaste migrationer (2026-01-12)
 
 ### Nyligen migrerade filer:
+- ✅ `app/admin/design/components/AdvancedTab.tsx` - ~15 strängar (tokens, border radius, CSS variables)
+- ✅ `app/admin/design/components/BrandAssetsTab.tsx` - ~35 strängar (logos, favicons, colors, upload)
+- ✅ `app/admin/design/components/TypographyTab.tsx` - ~25 strängar (fonts, formats, preview)
+- ✅ `app/admin/design/components/MediaDefaultsTab.tsx` - ~15 strängar (profile images, cover images, gallery)
 - ✅ `app/admin/games/builder/components/ArtifactEditor.tsx` - ~25 strängar (visibility, artifact types, errors - refaktorerat med useMemo)
 - ✅ `app/admin/games/builder/components/TriggerEditor.tsx` - ~15 strängar (labels, badges, FeatureExplainer - refaktorerat med useMemo)
 - ✅ `app/admin/(system)/system-health/page.tsx` - ~50 strängar (metrics, checks, status, cards)
@@ -39,14 +43,9 @@
 - `app/admin/gamification/achievements/AchievementsAdminClient.tsx` - ~15 strängar
 
 ### Alla prioriterade PAGE-filer är nu migrerade! ✅
+### Design-komponenter är nu migrerade! ✅
 
 ### Kvarvarande områden (mindre prioritet):
-**Design-komponenter (app/admin/design/components/):**
-- `AdvancedTab.tsx` - ~5 strängar (toasts, knappar)
-- `BrandAssetsTab.tsx` - ~10 strängar (toasts, knappar)
-- `TypographyTab.tsx` - ~10 strängar (labels, knappar)
-- `MediaDefaultsTab.tsx` - ~5 strängar (knappar)
-
 **Game Builder-komponenter (app/admin/games/builder/components/):**
 - `ArtifactWizard.tsx` - ~30 strängar (wizard-steg, exempeldata)
 - `PhaseEditor.tsx` - ~15 strängar (formulär, knappar)
@@ -60,6 +59,7 @@
 - `admin-nav-items.tsx` - ~15 strängar (nav labels)
 
 ### Nycklarna som lagts till:
+- `admin.design.*` - Komplett namespace för design settings (~100 keys: advanced, brand, typography, mediaDefaults)
 - `admin.games.builder.artifact.*` - Visibility options, artifact types (~30 keys)
 - `admin.games.builder.trigger.*` - Labels, howItWorks, badges (~25 keys)
 - `admin.tenant.achievements.*` - Komplett namespace för tenant achievements (~60 keys)

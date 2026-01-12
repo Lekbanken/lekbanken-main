@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import {
   Button,
   Card,
@@ -36,20 +37,6 @@ import {
 } from '@/app/actions/legal'
 import { useAuth } from '@/lib/supabase/auth'
 
-const CATEGORY_LABELS: Record<CookieCategory, string> = {
-  necessary: 'Necessary',
-  functional: 'Functional',
-  analytics: 'Analytics',
-  marketing: 'Marketing',
-}
-
-const CATEGORY_DESCRIPTIONS: Record<CookieCategory, string> = {
-  necessary: 'Required to keep core services running.',
-  functional: 'Preferences and enhanced features.',
-  analytics: 'Anonymous usage analytics and measurements.',
-  marketing: 'Marketing and advertising tracking.',
-}
-
 function formatDate(value?: string | null) {
   if (!value) return 'N/A'
   const date = new Date(value)
@@ -57,6 +44,7 @@ function formatDate(value?: string | null) {
 }
 
 export default function CookiePreferencesPage() {
+  const t = useTranslations('app.preferences.cookies')
   const { user, isLoading } = useAuth()
   const [isPending, startTransition] = useTransition()
   const [catalog, setCatalog] = useState<CookieCatalogRow[]>([])
@@ -142,7 +130,7 @@ export default function CookiePreferencesPage() {
     setConsent(normalized)
     setUpdatedAt(new Date().toISOString())
     setSource('settings')
-    setNotice({ type: 'success', message: 'Preferences saved.' })
+    setNotice({ type: 'success', message: t('preferencesSaved') })
 
     if (!user) return
 
@@ -154,13 +142,13 @@ export default function CookiePreferencesPage() {
   const handleDownloadReceipt = async () => {
     setNotice(null)
     if (!user) {
-      setNotice({ type: 'error', message: 'Sign in to download your receipt.' })
+      setNotice({ type: 'error', message: t('signInForReceipt') })
       return
     }
 
     const result = await getCookieConsentReceipt()
     if (!result.success || !result.data) {
-      setNotice({ type: 'error', message: result.error ?? 'Failed to load receipt.' })
+      setNotice({ type: 'error', message: result.error ?? t('receiptLoadFailed') })
       return
     }
 
@@ -186,7 +174,7 @@ export default function CookiePreferencesPage() {
     if (user) {
       const result = await deleteCookieConsentHistory()
       if (!result.success) {
-        setNotice({ type: 'error', message: result.error ?? 'Failed to reset consent.' })
+        setNotice({ type: 'error', message: result.error ?? t('consentResetFailed') })
         return
       }
     }
@@ -195,22 +183,22 @@ export default function CookiePreferencesPage() {
     setConsent(DEFAULT_COOKIE_CONSENT)
     setUpdatedAt(null)
     setSource(null)
-    setNotice({ type: 'success', message: 'Consent history cleared.' })
+    setNotice({ type: 'success', message: t('consentCleared') })
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Cookie preferences</h1>
+          <h1 className="text-2xl font-bold text-foreground">{t('title')}</h1>
           <p className="text-sm text-muted-foreground">
-            Manage how Lekbanken uses cookies on your device.
+            {t('subtitle')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline">Schema v{COOKIE_CONSENT_SCHEMA_VERSION}</Badge>
+          <Badge variant="outline">{t('schemaVersion', { version: COOKIE_CONSENT_SCHEMA_VERSION })}</Badge>
           {source && (
-            <Badge variant="secondary">Source: {source}</Badge>
+            <Badge variant="secondary">{t('source', { source })}</Badge>
           )}
         </div>
       </div>
@@ -230,7 +218,7 @@ export default function CookiePreferencesPage() {
       {gpcEnforced && (
         <Card>
           <CardContent className="py-4 text-sm text-muted-foreground">
-            Global Privacy Control or Do Not Track is enabled. Only necessary cookies are allowed.
+            {t('gpcNotice')}
           </CardContent>
         </Card>
       )}
@@ -238,15 +226,15 @@ export default function CookiePreferencesPage() {
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
         <Card>
           <CardHeader>
-            <CardTitle>Cookie categories</CardTitle>
+            <CardTitle>{t('categories')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-5">
             {COOKIE_CATEGORIES.map((category) => (
               <div key={category} className="space-y-2 border-b border-border pb-4 last:border-b-0 last:pb-0">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-sm font-semibold text-foreground">{CATEGORY_LABELS[category]}</p>
-                    <p className="text-xs text-muted-foreground">{CATEGORY_DESCRIPTIONS[category]}</p>
+                    <p className="text-sm font-semibold text-foreground">{t(`categoryLabels.${category}`)}</p>
+                    <p className="text-xs text-muted-foreground">{t(`categoryDescriptions.${category}`)}</p>
                   </div>
                   <Switch
                     checked={effectiveConsent[category]}
@@ -272,26 +260,26 @@ export default function CookiePreferencesPage() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Consent summary</CardTitle>
+              <CardTitle>{t('consentSummary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2 text-sm text-muted-foreground">
               <div className="flex items-center justify-between">
-                <span>Last updated</span>
+                <span>{t('lastUpdated')}</span>
                 <span className="text-foreground">{formatDate(updatedAt)}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Active categories</span>
+                <span>{t('activeCategories')}</span>
                 <span className="text-foreground">
                   {Object.values(effectiveConsent).filter(Boolean).length}/{COOKIE_CATEGORIES.length}
                 </span>
               </div>
               <div className="flex items-center justify-between">
-                <span>Retention</span>
-                <span className="text-foreground">{COOKIE_CONSENT_RETENTION_DAYS} days</span>
+                <span>{t('retention')}</span>
+                <span className="text-foreground">{t('retentionDays', { days: COOKIE_CONSENT_RETENTION_DAYS })}</span>
               </div>
               <div className="pt-3">
                 <Link href="/legal/cookie-policy" className="text-primary hover:underline">
-                  Read cookie policy
+                  {t('readCookiePolicy')}
                 </Link>
               </div>
             </CardContent>
@@ -299,17 +287,17 @@ export default function CookiePreferencesPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
+              <CardTitle>{t('actions')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Button onClick={handleSave} disabled={isPending}>
-                {isPending ? 'Saving...' : 'Save preferences'}
+                {isPending ? t('saving') : t('savePreferences')}
               </Button>
               <Button variant="outline" onClick={handleDownloadReceipt}>
-                Download consent receipt
+                {t('downloadConsentReceipt')}
               </Button>
               <Button variant="ghost" onClick={handleReset}>
-                Reset consent
+                {t('resetConsent')}
               </Button>
             </CardContent>
           </Card>

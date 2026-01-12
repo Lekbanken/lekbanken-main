@@ -265,7 +265,36 @@
       "activeUsers": "Aktiva användare",
       "totalOrganizations": "Totalt organisationer",
       "activeSessions": "Aktiva sessioner",
-      "pendingTickets": "Väntande ärenden"
+      "pendingTickets": "Väntande ärenden",
+      "breadcrumb": {
+        "admin": "Admin",
+        "overview": "Översikt"
+      },
+      "pageTitle": "Dashboard",
+      "pageDescription": "Snabb översikt och ingångar till adminområden",
+      "support": "Support",
+      "settings": "Inställningar",
+      "metrics": {
+        "totalUsers": "Totalt användare",
+        "organisations": "Organisationer",
+        "achievementsCreated": "Skapade prestationer",
+        "activeProducts": "Aktiva produkter",
+        "change30d": "+{percent}% senaste 30d",
+        "changeWeek": "+{count} denna vecka",
+        "stable": "Stabil"
+      },
+      "quickLinks": {
+        "title": "Snabblänkar",
+        "subtitle": "Hoppa till adminsektioner",
+        "userAdmin": "Användaradmin",
+        "userAdminDesc": "Hantera roller, åtkomst och inbjudningar.",
+        "orgAdmin": "Organisationsadmin",
+        "orgAdminDesc": "Licenser, kontakter, medlemsöversikt.",
+        "productAdmin": "Produktadmin",
+        "productAdminDesc": "Produkter, funktioner, tillgänglighet.",
+        "achievementsAdmin": "Prestationsadmin",
+        "achievementsAdminDesc": "Badge-byggare och belöningar."
+      }
     },
     "users": {
       "title": "Användare",
@@ -525,6 +554,196 @@
           "member": "Standard (member)",
           "privateUser": "Privat användare",
           "systemAdmin": "Systemadmin"
+        }
+      }
+    },
+    "games": {
+      "drawer": {
+        "tabs": {
+          "overview": "Översikt",
+          "content": "Innehåll",
+          "availability": "Tillgänglighet",
+          "metadata": "Metadata",
+          "history": "Historik"
+        },
+        "validation": {
+          "valid": "Godkänd",
+          "warnings": "Varningar",
+          "errors": "Fel",
+          "pending": "Väntar",
+          "outdated": "Inaktuell"
+        },
+        "status": {
+          "published": "Publicerad",
+          "draft": "Utkast"
+        },
+        "overview": {
+          "steps": "Steg",
+          "phases": "Faser",
+          "roles": "Roller",
+          "timeMin": "Tid (min)",
+          "coreInfo": "Grundinformation",
+          "status": "Status",
+          "playMode": "Spelläge",
+          "validation": "Validering",
+          "mainPurpose": "Huvudsyfte",
+          "owner": "Ägare",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Valideringsproblem",
+          "openInBuilder": "Öppna i Game Builder"
+        },
+        "content": {
+          "playModeLabel": "Spelläge: {mode}",
+          "materials": "Material",
+          "timer": "Timer",
+          "artifacts": "Artifacts",
+          "triggers": "Triggers",
+          "board": "Tavla",
+          "schemaVersion": "Schema & Version",
+          "contentVersion": "Content version",
+          "schemaStatus": "Schema status",
+          "current": "Aktuellt",
+          "contentWarnings": "Innehållsvarningar"
+        },
+        "availability": {
+          "title": "Tillgänglighet",
+          "global": "Global",
+          "globalDescription": "Tillgänglig för alla tenants",
+          "tenantSpecific": "Tenant-specifik",
+          "unknownTenant": "Okänd tenant",
+          "productAssociation": "Produktkoppling",
+          "product": "Produkt",
+          "adminControls": "Admin-kontroller",
+          "adminControlsDescription": "Tenant-tilldelning och licenshantering kommer snart."
+        },
+        "metadata": {
+          "gameParameters": "Spelparametrar",
+          "players": "Spelare",
+          "age": "Ålder",
+          "ageYears": "{min} – {max} år",
+          "time": "Tid",
+          "timeMinutes": "{time} min",
+          "energyLevel": "Energinivå",
+          "locationType": "Plats",
+          "purposes": "Syften",
+          "noPurposes": "Inga syften kopplade",
+          "category": "Kategori"
+        },
+        "history": {
+          "timestamps": "Tidsstämplar",
+          "created": "Skapad",
+          "lastUpdated": "Senast uppdaterad",
+          "importSource": "Importkälla",
+          "type": "Typ",
+          "imported": "Importerad",
+          "schema": "Schema",
+          "changeHistory": "Ändringshistorik",
+          "changeHistoryDescription": "Detaljerad ändringshistorik kommer i framtida version."
+        }
+      },
+      "filters": {
+        "title": "Filter",
+        "search": "Sök spel...",
+        "clearFilters": "Rensa filter",
+        "removeFilter": "Ta bort filter: {label}",
+        "presets": "Sparade filter",
+        "savePreset": "Spara som förinställning",
+        "noMatchingPresets": "Inga matchande förinställningar",
+        "groups": {
+          "classification": "Klassificering",
+          "playExecution": "Spel & Utförande",
+          "lifecycle": "Livscykel & Kvalitet",
+          "ownership": "Ägarskap & Scope",
+          "technical": "Tekniska Filter"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Publicerad",
+          "draft": "Utkast"
+        },
+        "energy": {
+          "label": "Energinivå",
+          "low": "Låg",
+          "medium": "Medel",
+          "high": "Hög"
+        },
+        "location": {
+          "label": "Plats",
+          "indoor": "Inomhus",
+          "outdoor": "Utomhus",
+          "both": "Båda"
+        },
+        "validation": {
+          "label": "Validering",
+          "valid": "Godkänd",
+          "warnings": "Varningar",
+          "errors": "Fel",
+          "pending": "Väntar"
+        },
+        "ownerSource": {
+          "label": "Källa",
+          "system": "System",
+          "imported": "Importerad",
+          "tenant": "Tenant-skapad",
+          "ai_generated": "AI-genererad"
+        },
+        "contentVersion": {
+          "label": "Innehållsversion",
+          "v1": "v1 (Legacy)",
+          "v2": "v2 (Builder)"
+        },
+        "playMode": "Spelläge",
+        "purposes": "Syften",
+        "tenants": "Tenants",
+        "products": "Produkter",
+        "global": "Global",
+        "players": {
+          "label": "Antal spelare",
+          "min": "Min",
+          "max": "Max"
+        },
+        "age": {
+          "label": "Ålder",
+          "min": "Min",
+          "max": "Max"
+        },
+        "time": {
+          "label": "Tid (min)",
+          "min": "Min",
+          "max": "Max"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Spelläge",
+          "global": "Global"
+        }
+      }
+    },
+    "achievements": {
+      "publishing": {
+        "status": "Status",
+        "draft": "Utkast",
+        "published": "Publicerad",
+        "rolesCanPublish": "Roller som kan publicera",
+        "addRole": "Lägg till roll",
+        "roles": {
+          "owner": "Ägare",
+          "admin": "Admin",
+          "editor": "Redaktör",
+          "member": "Medlem"
+        },
+        "availableForOrgs": "Tillgänglig för organisationer",
+        "addOrg": "Lägg till org",
+        "profileFrameSync": {
+          "title": "Profilram-synk",
+          "syncedDescription": "Synkad - Badge uppdaterar användarens profilram",
+          "disabled": "Inaktiverad",
+          "durationLabel": "Varaktighet (dagar, valfritt)",
+          "useBase": "Använd baslager",
+          "useBackground": "Använd bakgrund",
+          "useForeground": "Använd förgrund",
+          "useSymbol": "Använd symbol"
         }
       }
     },

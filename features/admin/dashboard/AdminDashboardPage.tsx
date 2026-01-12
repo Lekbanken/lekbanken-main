@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   UsersIcon,
   BuildingOfficeIcon,
@@ -15,80 +16,7 @@ import { QuickLinks } from "./components/QuickLinks";
 import { ActivityFeed } from "./components/ActivityFeed";
 import type { ActivityItem, OverviewMetric, QuickLinkItem } from "./types";
 
-const metrics: OverviewMetric[] = [
-  {
-    id: "users",
-    label: "Total users",
-    value: "2,847",
-    change: "+12% last 30d",
-    trend: "up",
-    icon: <UsersIcon className="h-5 w-5" />,
-    iconGradient: "from-blue-500 to-indigo-600",
-  },
-  {
-    id: "orgs",
-    label: "Organisations",
-    value: "184",
-    change: "+4% last 30d",
-    trend: "up",
-    icon: <BuildingOfficeIcon className="h-5 w-5" />,
-    iconGradient: "from-emerald-500 to-teal-600",
-  },
-  {
-    id: "achievements",
-    label: "Achievements created",
-    value: "48",
-    change: "+7 this week",
-    trend: "up",
-    icon: <TrophyIcon className="h-5 w-5" />,
-    iconGradient: "from-amber-500 to-orange-600",
-  },
-  {
-    id: "products",
-    label: "Active products",
-    value: "12",
-    change: "Stable",
-    trend: "flat",
-    icon: <RectangleGroupIcon className="h-5 w-5" />,
-    iconGradient: "from-primary to-purple-600",
-  },
-];
-
-const quickLinks: QuickLinkItem[] = [
-  {
-    id: "users",
-    label: "User Admin",
-    description: "Manage roles, access, and invites.",
-    href: "/admin/users",
-    icon: <UsersIcon className="h-5 w-5" />,
-    iconGradient: "from-blue-500 to-indigo-600",
-  },
-  {
-    id: "organisations",
-    label: "Organisation Admin",
-    description: "Licenses, contacts, member oversight.",
-    href: "/admin/organisations",
-    icon: <BuildingOfficeIcon className="h-5 w-5" />,
-    iconGradient: "from-emerald-500 to-teal-600",
-  },
-  {
-    id: "products",
-    label: "Product Admin",
-    description: "Products, capabilities, availability.",
-    href: "/admin/products",
-    icon: <RectangleGroupIcon className="h-5 w-5" />,
-    iconGradient: "from-amber-500 to-orange-600",
-  },
-  {
-    id: "achievements",
-    label: "Achievements Admin",
-    description: "Badge builder and rewards.",
-    href: "/admin/achievements",
-    icon: <TrophyIcon className="h-5 w-5" />,
-    iconGradient: "from-primary to-purple-600",
-  },
-];
-
+// Activity items are mock data - these would come from an API in production
 const activity: ActivityItem[] = [
   { id: "1", type: "user_created", message: "New user invited: alex.berg@lekbanken.test", createdAt: "2025-12-15T10:00:00Z", createdAtLabel: "Just now", status: "info" },
   { id: "2", type: "organisation_created", message: "Organisation added: Sunrise Schools", createdAt: "2025-12-15T09:25:00Z", createdAtLabel: "35m ago", status: "success" },
@@ -98,6 +26,81 @@ const activity: ActivityItem[] = [
 ];
 
 export function AdminDashboardPage() {
+  const t = useTranslations('admin.dashboard');
+
+  const metrics: OverviewMetric[] = [
+    {
+      id: "users",
+      label: t('metrics.totalUsers'),
+      value: "2,847",
+      change: t('metrics.change30d', { percent: 12 }),
+      trend: "up",
+      icon: <UsersIcon className="h-5 w-5" />,
+      iconGradient: "from-blue-500 to-indigo-600",
+    },
+    {
+      id: "orgs",
+      label: t('metrics.organisations'),
+      value: "184",
+      change: t('metrics.change30d', { percent: 4 }),
+      trend: "up",
+      icon: <BuildingOfficeIcon className="h-5 w-5" />,
+      iconGradient: "from-emerald-500 to-teal-600",
+    },
+    {
+      id: "achievements",
+      label: t('metrics.achievementsCreated'),
+      value: "48",
+      change: t('metrics.changeWeek', { count: 7 }),
+      trend: "up",
+      icon: <TrophyIcon className="h-5 w-5" />,
+      iconGradient: "from-amber-500 to-orange-600",
+    },
+    {
+      id: "products",
+      label: t('metrics.activeProducts'),
+      value: "12",
+      change: t('metrics.stable'),
+      trend: "flat",
+      icon: <RectangleGroupIcon className="h-5 w-5" />,
+      iconGradient: "from-primary to-purple-600",
+    },
+  ];
+
+  const quickLinks: QuickLinkItem[] = [
+    {
+      id: "users",
+      label: t('quickLinks.userAdmin'),
+      description: t('quickLinks.userAdminDesc'),
+      href: "/admin/users",
+      icon: <UsersIcon className="h-5 w-5" />,
+      iconGradient: "from-blue-500 to-indigo-600",
+    },
+    {
+      id: "organisations",
+      label: t('quickLinks.orgAdmin'),
+      description: t('quickLinks.orgAdminDesc'),
+      href: "/admin/organisations",
+      icon: <BuildingOfficeIcon className="h-5 w-5" />,
+      iconGradient: "from-emerald-500 to-teal-600",
+    },
+    {
+      id: "products",
+      label: t('quickLinks.productAdmin'),
+      description: t('quickLinks.productAdminDesc'),
+      href: "/admin/products",
+      icon: <RectangleGroupIcon className="h-5 w-5" />,
+      iconGradient: "from-amber-500 to-orange-600",
+    },
+    {
+      id: "achievements",
+      label: t('quickLinks.achievementsAdmin'),
+      description: t('quickLinks.achievementsAdminDesc'),
+      href: "/admin/achievements",
+      icon: <TrophyIcon className="h-5 w-5" />,
+      iconGradient: "from-primary to-purple-600",
+    },
+  ];
   return (
     <div className="space-y-8">
       {/* Page Header */}
@@ -110,16 +113,16 @@ export function AdminDashboardPage() {
           <div>
             {/* Breadcrumb */}
             <nav className="mb-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">Admin</span>
+              <span className="font-medium text-foreground">{t('breadcrumb.admin')}</span>
               <span>/</span>
-              <span>Overview</span>
+              <span>{t('breadcrumb.overview')}</span>
             </nav>
             {/* Title */}
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Dashboard
+              {t('pageTitle')}
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground">
-              Quick health check and entry points for admin areas
+              {t('pageDescription')}
             </p>
           </div>
         </div>
@@ -128,11 +131,11 @@ export function AdminDashboardPage() {
         <div className="flex gap-2">
           <Button variant="outline" href="/admin/support" size="sm" className="gap-1.5">
             <QuestionMarkCircleIcon className="h-4 w-4" />
-            Support
+            {t('support')}
           </Button>
           <Button href="/admin/settings" size="sm" className="gap-1.5">
             <Cog6ToothIcon className="h-4 w-4" />
-            Settings
+            {t('settings')}
           </Button>
         </div>
       </header>
@@ -151,8 +154,8 @@ export function AdminDashboardPage() {
                 <RectangleGroupIcon className="h-4 w-4" />
               </div>
               <div>
-                <CardTitle className="text-base">Quick Links</CardTitle>
-                <p className="text-xs text-muted-foreground">Jump to admin sections</p>
+                <CardTitle className="text-base">{t('quickLinks.title')}</CardTitle>
+                <p className="text-xs text-muted-foreground">{t('quickLinks.subtitle')}</p>
               </div>
             </div>
           </CardHeader>

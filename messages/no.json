@@ -265,7 +265,36 @@
       "activeUsers": "Aktive brukere",
       "totalOrganizations": "Totalt organisasjoner",
       "activeSessions": "Aktive økter",
-      "pendingTickets": "Ventende saker"
+      "pendingTickets": "Ventende saker",
+      "breadcrumb": {
+        "admin": "Admin",
+        "overview": "Oversikt"
+      },
+      "pageTitle": "Dashboard",
+      "pageDescription": "Rask oversikt og inngangspunkter til adminområder",
+      "support": "Support",
+      "settings": "Innstillinger",
+      "metrics": {
+        "totalUsers": "Totalt brukere",
+        "organisations": "Organisasjoner",
+        "achievementsCreated": "Opprettede prestasjoner",
+        "activeProducts": "Aktive produkter",
+        "change30d": "+{percent}% siste 30d",
+        "changeWeek": "+{count} denne uken",
+        "stable": "Stabil"
+      },
+      "quickLinks": {
+        "title": "Hurtiglenker",
+        "subtitle": "Hopp til adminseksjoner",
+        "userAdmin": "Brukeradmin",
+        "userAdminDesc": "Administrer roller, tilgang og invitasjoner.",
+        "orgAdmin": "Organisasjonsadmin",
+        "orgAdminDesc": "Lisenser, kontakter, medlemsoversikt.",
+        "productAdmin": "Produktadmin",
+        "productAdminDesc": "Produkter, egenskaper, tilgjengelighet.",
+        "achievementsAdmin": "Prestasjonadmin",
+        "achievementsAdminDesc": "Badge-bygger og belønninger."
+      }
     },
     "users": {
       "title": "Brukere",
@@ -525,6 +554,196 @@
           "member": "Standard (member)",
           "privateUser": "Privat bruker",
           "systemAdmin": "Systemadmin"
+        }
+      }
+    },
+    "games": {
+      "drawer": {
+        "tabs": {
+          "overview": "Oversikt",
+          "content": "Innhold",
+          "availability": "Tilgjengelighet",
+          "metadata": "Metadata",
+          "history": "Historikk"
+        },
+        "validation": {
+          "valid": "Godkjent",
+          "warnings": "Advarsler",
+          "errors": "Feil",
+          "pending": "Venter",
+          "outdated": "Utdatert"
+        },
+        "status": {
+          "published": "Publisert",
+          "draft": "Utkast"
+        },
+        "overview": {
+          "steps": "Trinn",
+          "phases": "Faser",
+          "roles": "Roller",
+          "timeMin": "Tid (min)",
+          "coreInfo": "Grunnleggende informasjon",
+          "status": "Status",
+          "playMode": "Spillmodus",
+          "validation": "Validering",
+          "mainPurpose": "Hovedformål",
+          "owner": "Eier",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Valideringsproblemer",
+          "openInBuilder": "Åpne i Game Builder"
+        },
+        "content": {
+          "playModeLabel": "Spillmodus: {mode}",
+          "materials": "Materialer",
+          "timer": "Timer",
+          "artifacts": "Artifacts",
+          "triggers": "Triggers",
+          "board": "Tavle",
+          "schemaVersion": "Skjema & versjon",
+          "contentVersion": "Innholdsversjon",
+          "schemaStatus": "Skjemastatus",
+          "current": "Gjeldende",
+          "contentWarnings": "Innholdsadvarsler"
+        },
+        "availability": {
+          "title": "Tilgjengelighet",
+          "global": "Global",
+          "globalDescription": "Tilgjengelig for alle tenants",
+          "tenantSpecific": "Tenant-spesifikk",
+          "unknownTenant": "Ukjent tenant",
+          "productAssociation": "Produkttilknytning",
+          "product": "Produkt",
+          "adminControls": "Admin-kontroller",
+          "adminControlsDescription": "Tenant-tildeling og lisenshåndtering kommer snart."
+        },
+        "metadata": {
+          "gameParameters": "Spillparametere",
+          "players": "Spillere",
+          "age": "Alder",
+          "ageYears": "{min} – {max} år",
+          "time": "Tid",
+          "timeMinutes": "{time} min",
+          "energyLevel": "Energinivå",
+          "locationType": "Sted",
+          "purposes": "Formål",
+          "noPurposes": "Ingen formål knyttet",
+          "category": "Kategori"
+        },
+        "history": {
+          "timestamps": "Tidsstempler",
+          "created": "Opprettet",
+          "lastUpdated": "Sist oppdatert",
+          "importSource": "Importkilde",
+          "type": "Type",
+          "imported": "Importert",
+          "schema": "Skjema",
+          "changeHistory": "Endringshistorikk",
+          "changeHistoryDescription": "Detaljert endringshistorikk kommer i en fremtidig versjon."
+        }
+      },
+      "filters": {
+        "title": "Filtre",
+        "search": "Søk spill...",
+        "clearFilters": "Nullstill filtre",
+        "removeFilter": "Fjern filter: {label}",
+        "presets": "Lagrede filtre",
+        "savePreset": "Lagre som forhåndsinnstilling",
+        "noMatchingPresets": "Ingen matchende forhåndsinnstillinger",
+        "groups": {
+          "classification": "Klassifisering",
+          "playExecution": "Spill & Utførelse",
+          "lifecycle": "Livssyklus & Kvalitet",
+          "ownership": "Eierskap & Omfang",
+          "technical": "Tekniske Filtre"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Publisert",
+          "draft": "Utkast"
+        },
+        "energy": {
+          "label": "Energinivå",
+          "low": "Lav",
+          "medium": "Middels",
+          "high": "Høy"
+        },
+        "location": {
+          "label": "Sted",
+          "indoor": "Innendørs",
+          "outdoor": "Utendørs",
+          "both": "Begge"
+        },
+        "validation": {
+          "label": "Validering",
+          "valid": "Godkjent",
+          "warnings": "Advarsler",
+          "errors": "Feil",
+          "pending": "Venter"
+        },
+        "ownerSource": {
+          "label": "Kilde",
+          "system": "System",
+          "imported": "Importert",
+          "tenant": "Tenant-opprettet",
+          "ai_generated": "AI-generert"
+        },
+        "contentVersion": {
+          "label": "Innholdsversjon",
+          "v1": "v1 (Legacy)",
+          "v2": "v2 (Builder)"
+        },
+        "playMode": "Spillmodus",
+        "purposes": "Formål",
+        "tenants": "Tenants",
+        "products": "Produkter",
+        "global": "Global",
+        "players": {
+          "label": "Antall spillere",
+          "min": "Min",
+          "max": "Maks"
+        },
+        "age": {
+          "label": "Alder",
+          "min": "Min",
+          "max": "Maks"
+        },
+        "time": {
+          "label": "Tid (min)",
+          "min": "Min",
+          "max": "Maks"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Spillmodus",
+          "global": "Global"
+        }
+      }
+    },
+    "achievements": {
+      "publishing": {
+        "status": "Status",
+        "draft": "Utkast",
+        "published": "Publisert",
+        "rolesCanPublish": "Roller som kan publisere",
+        "addRole": "Legg til rolle",
+        "roles": {
+          "owner": "Eier",
+          "admin": "Admin",
+          "editor": "Redaktør",
+          "member": "Medlem"
+        },
+        "availableForOrgs": "Tilgjengelig for organisasjoner",
+        "addOrg": "Legg til org",
+        "profileFrameSync": {
+          "title": "Profilramme-synk",
+          "syncedDescription": "Synkronisert - Badge oppdaterer brukerens profilramme",
+          "disabled": "Deaktivert",
+          "durationLabel": "Varighet (dager, valgfritt)",
+          "useBase": "Bruk basslag",
+          "useBackground": "Bruk bakgrunn",
+          "useForeground": "Bruk forgrunn",
+          "useSymbol": "Bruk symbol"
         }
       }
     },

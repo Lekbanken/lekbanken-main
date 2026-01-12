@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import { formatDate, formatDateTimeLong } from '@/lib/i18n/format-utils';
 import { useRouter } from 'next/navigation';
 import {
@@ -40,16 +41,16 @@ import { PLAY_MODE_META } from '../types';
 // SUB-COMPONENTS
 // ============================================================================
 
-function ValidationBadge({ state, className }: { state: ValidationState; className?: string }) {
+function ValidationBadge({ state, label, className }: { state: ValidationState; label: string; className?: string }) {
   const config = {
-    valid: { icon: CheckCircleIcon, label: 'Godkänd', variant: 'success' as const },
-    warnings: { icon: ExclamationTriangleIcon, label: 'Varningar', variant: 'warning' as const },
-    errors: { icon: XCircleIcon, label: 'Fel', variant: 'destructive' as const },
-    pending: { icon: ClockIcon, label: 'Väntar', variant: 'secondary' as const },
-    outdated: { icon: InformationCircleIcon, label: 'Inaktuell', variant: 'outline' as const },
+    valid: { icon: CheckCircleIcon, variant: 'success' as const },
+    warnings: { icon: ExclamationTriangleIcon, variant: 'warning' as const },
+    errors: { icon: XCircleIcon, variant: 'destructive' as const },
+    pending: { icon: ClockIcon, variant: 'secondary' as const },
+    outdated: { icon: InformationCircleIcon, variant: 'outline' as const },
   };
 
-  const { icon: Icon, label, variant } = config[state] || config.pending;
+  const { icon: Icon, variant } = config[state] || config.pending;
 
   return (
     <Badge variant={variant} className={className}>
@@ -59,9 +60,8 @@ function ValidationBadge({ state, className }: { state: ValidationState; classNa
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, label }: { status: string; label: string }) {
   const variant = status === 'published' ? 'success' : 'secondary';
-  const label = status === 'published' ? 'Publicerad' : 'Utkast';
   return <Badge variant={variant}>{label}</Badge>;
 }
 
@@ -101,6 +101,7 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: number |
 // ============================================================================
 
 function OverviewTab({ game, onOpenBuilder }: { game: GameAdminRow; onOpenBuilder: () => void }) {
+  const t = useTranslations('admin.games.drawer');
   const coverMedia = game.media?.find(m => m.kind === 'cover');
   const coverUrl = coverMedia?.media?.url;
 
@@ -120,34 +121,34 @@ function OverviewTab({ game, onOpenBuilder }: { game: GameAdminRow; onOpenBuilde
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard label="Steg" value={game.step_count ?? 0} />
-        <StatCard label="Faser" value={game.phase_count ?? 0} />
-        <StatCard label="Roller" value={game.role_count ?? 0} />
-        <StatCard label="Tid (min)" value={game.time_estimate_min ?? '—'} icon={ClockIcon} />
+        <StatCard label={t('overview.steps')} value={game.step_count ?? 0} />
+        <StatCard label={t('overview.phases')} value={game.phase_count ?? 0} />
+        <StatCard label={t('overview.roles')} value={game.role_count ?? 0} />
+        <StatCard label={t('overview.timeMin')} value={game.time_estimate_min ?? '—'} icon={ClockIcon} />
       </div>
 
       {/* Core Info */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Grundinformation</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('overview.coreInfo')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Status">
-            <StatusBadge status={game.status} />
+          <InfoRow label={t('overview.status')}>
+            <StatusBadge status={game.status} label={t(`status.${game.status === 'published' ? 'published' : 'draft'}`)} />
           </InfoRow>
-          <InfoRow label="Spelläge">
+          <InfoRow label={t('overview.playMode')}>
             <PlayModeBadge mode={game.play_mode} />
           </InfoRow>
-          <InfoRow label="Validering">
-            <ValidationBadge state={game.validation_state ?? 'pending'} />
+          <InfoRow label={t('overview.validation')}>
+            <ValidationBadge state={game.validation_state ?? 'pending'} label={t(`validation.${game.validation_state ?? 'pending'}`)} />
           </InfoRow>
-          <InfoRow label="Huvudsyfte">
+          <InfoRow label={t('overview.mainPurpose')}>
             {game.main_purpose?.name || '—'}
           </InfoRow>
-          <InfoRow label="Ägare">
-            {game.owner?.name || 'Global'}
+          <InfoRow label={t('overview.owner')}>
+            {game.owner?.name || t('overview.global')}
           </InfoRow>
-          <InfoRow label="UUID">
+          <InfoRow label={t('overview.uuid')}>
             <code className="text-xs bg-muted px-1 py-0.5 rounded">{game.id.slice(0, 8)}...</code>
           </InfoRow>
         </CardContent>
@@ -159,7 +160,7 @@ function OverviewTab({ game, onOpenBuilder }: { game: GameAdminRow; onOpenBuilde
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <ExclamationTriangleIcon className="h-4 w-4 text-warning" />
-              Valideringsproblem
+              {t('overview.validationIssues')}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0 space-y-2">
@@ -182,26 +183,27 @@ function OverviewTab({ game, onOpenBuilder }: { game: GameAdminRow; onOpenBuilde
       {/* Open Builder Button */}
       <Button className="w-full" onClick={onOpenBuilder}>
         <PencilSquareIcon className="mr-2 h-4 w-4" />
-        Öppna i Game Builder
+        {t('overview.openInBuilder')}
       </Button>
     </div>
   );
 }
 
 function ContentTab({ game }: { game: GameAdminRow }) {
+  const t = useTranslations('admin.games.drawer');
   const playMode = game.play_mode || 'basic';
   const meta = PLAY_MODE_META[playMode];
   const features = meta.features;
 
   const featureStatus = {
-    steps: { label: 'Steg', count: game.step_count ?? 0, required: true },
-    materials: { label: 'Material', count: 0, required: false },
-    phases: { label: 'Faser', count: game.phase_count ?? 0, required: playMode !== 'basic' },
-    timer: { label: 'Timer', count: 0, required: false },
-    roles: { label: 'Roller', count: game.role_count ?? 0, required: playMode === 'participants' },
-    artifacts: { label: 'Artifacts', count: game.artifact_count ?? 0, required: false },
-    triggers: { label: 'Triggers', count: game.trigger_count ?? 0, required: false },
-    board: { label: 'Tavla', count: 0, required: false },
+    steps: { label: t('overview.steps'), count: game.step_count ?? 0, required: true },
+    materials: { label: t('content.materials'), count: 0, required: false },
+    phases: { label: t('overview.phases'), count: game.phase_count ?? 0, required: playMode !== 'basic' },
+    timer: { label: t('content.timer'), count: 0, required: false },
+    roles: { label: t('overview.roles'), count: game.role_count ?? 0, required: playMode === 'participants' },
+    artifacts: { label: t('content.artifacts'), count: game.artifact_count ?? 0, required: false },
+    triggers: { label: t('content.triggers'), count: game.trigger_count ?? 0, required: false },
+    board: { label: t('content.board'), count: 0, required: false },
   };
 
   return (
@@ -209,7 +211,7 @@ function ContentTab({ game }: { game: GameAdminRow }) {
       {/* Play Mode Info */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Spelläge: {meta.label}</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('content.playModeLabel', { mode: meta.label })}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground mb-4">{meta.description}</p>
@@ -240,14 +242,14 @@ function ContentTab({ game }: { game: GameAdminRow }) {
       {/* Content Version */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Schema & Version</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('content.schemaVersion')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Content version">
+          <InfoRow label={t('content.contentVersion')}>
             <Badge variant="outline">{game.game_content_version || 'v1'}</Badge>
           </InfoRow>
-          <InfoRow label="Schema status">
-            <Badge variant="success">Aktuellt</Badge>
+          <InfoRow label={t('content.schemaStatus')}>
+            <Badge variant="success">{t('content.current')}</Badge>
           </InfoRow>
         </CardContent>
       </Card>
@@ -256,7 +258,7 @@ function ContentTab({ game }: { game: GameAdminRow }) {
       {game.validation_warnings && game.validation_warnings.length > 0 && (
         <Card className="border-warning/50">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-warning">Innehållsvarningar</CardTitle>
+            <CardTitle className="text-sm font-medium text-warning">{t('content.contentWarnings')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <ul className="space-y-1">
@@ -272,6 +274,7 @@ function ContentTab({ game }: { game: GameAdminRow }) {
 }
 
 function AvailabilityTab({ game }: { game: GameAdminRow }) {
+  const t = useTranslations('admin.games.drawer');
   const isGlobal = !game.owner_tenant_id;
 
   return (
@@ -279,7 +282,7 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
       {/* Scope */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Tillgänglighet</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('availability.title')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <div className="flex items-center gap-3 py-4">
@@ -287,9 +290,9 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
               <>
                 <GlobeAltIcon className="h-8 w-8 text-primary" />
                 <div>
-                  <p className="font-medium">Global</p>
+                  <p className="font-medium">{t('availability.global')}</p>
                   <p className="text-sm text-muted-foreground">
-                    Tillgänglig för alla tenants
+                    {t('availability.globalDescription')}
                   </p>
                 </div>
               </>
@@ -297,9 +300,9 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
               <>
                 <BuildingOfficeIcon className="h-8 w-8 text-muted-foreground" />
                 <div>
-                  <p className="font-medium">Tenant-specifik</p>
+                  <p className="font-medium">{t('availability.tenantSpecific')}</p>
                   <p className="text-sm text-muted-foreground">
-                    {game.owner?.name || 'Okänd tenant'}
+                    {game.owner?.name || t('availability.unknownTenant')}
                   </p>
                 </div>
               </>
@@ -312,10 +315,10 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
       {game.product && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Produktkoppling</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('availability.productAssociation')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <InfoRow label="Produkt">
+            <InfoRow label={t('availability.product')}>
               {game.product.name}
             </InfoRow>
           </CardContent>
@@ -326,12 +329,12 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
       <Card className="border-dashed">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
-            Admin-kontroller
+            {t('availability.adminControls')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground">
-            Tenant-tilldelning och licenshantering kommer snart.
+            {t('availability.adminControlsDescription')}
           </p>
         </CardContent>
       </Card>
@@ -340,6 +343,7 @@ function AvailabilityTab({ game }: { game: GameAdminRow }) {
 }
 
 function MetadataTab({ game }: { game: GameAdminRow }) {
+  const t = useTranslations('admin.games.drawer');
   const purposes = [
     game.main_purpose,
     ...(game.secondary_purposes?.map(sp => sp.purpose) || []),
@@ -350,30 +354,30 @@ function MetadataTab({ game }: { game: GameAdminRow }) {
       {/* Basic Metadata */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Spelparametrar</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('metadata.gameParameters')}</CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Spelare">
+          <InfoRow label={t('metadata.players')}>
             <div className="flex items-center gap-1">
               <UserGroupIcon className="h-4 w-4" />
               {game.min_players || '?'} – {game.max_players || '?'}
             </div>
           </InfoRow>
-          <InfoRow label="Ålder">
-            {game.age_min || '?'} – {game.age_max || '?'} år
+          <InfoRow label={t('metadata.age')}>
+            {t('metadata.ageYears', { min: game.age_min || '?', max: game.age_max || '?' })}
           </InfoRow>
-          <InfoRow label="Tid">
+          <InfoRow label={t('metadata.time')}>
             <div className="flex items-center gap-1">
               <ClockIcon className="h-4 w-4" />
-              {game.time_estimate_min || '?'} min
+              {t('metadata.timeMinutes', { time: game.time_estimate_min || '?' })}
             </div>
           </InfoRow>
-          <InfoRow label="Energinivå">
+          <InfoRow label={t('metadata.energyLevel')}>
             <Badge variant="outline" className="capitalize">
               {game.energy_level || '—'}
             </Badge>
           </InfoRow>
-          <InfoRow label="Plats">
+          <InfoRow label={t('metadata.locationType')}>
             <Badge variant="outline" className="capitalize">
               {game.location_type || '—'}
             </Badge>
@@ -386,7 +390,7 @@ function MetadataTab({ game }: { game: GameAdminRow }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <TagIcon className="h-4 w-4" />
-            Syften
+            {t('metadata.purposes')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
@@ -399,7 +403,7 @@ function MetadataTab({ game }: { game: GameAdminRow }) {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Inga syften kopplade</p>
+            <p className="text-sm text-muted-foreground">{t('metadata.noPurposes')}</p>
           )}
         </CardContent>
       </Card>
@@ -408,7 +412,7 @@ function MetadataTab({ game }: { game: GameAdminRow }) {
       {game.category && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Kategori</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('metadata.category')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
             <Badge variant="outline">{game.category}</Badge>
@@ -420,6 +424,7 @@ function MetadataTab({ game }: { game: GameAdminRow }) {
 }
 
 function HistoryTab({ game }: { game: GameAdminRow }) {
+  const t = useTranslations('admin.games.drawer');
   return (
     <div className="space-y-6">
       {/* Timestamps */}
@@ -427,14 +432,14 @@ function HistoryTab({ game }: { game: GameAdminRow }) {
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
             <CalendarIcon className="h-4 w-4" />
-            Tidsstämplar
+            {t('history.timestamps')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
-          <InfoRow label="Skapad">
+          <InfoRow label={t('history.created')}>
             {formatDateTimeLong(game.created_at)}
           </InfoRow>
-          <InfoRow label="Senast uppdaterad">
+          <InfoRow label={t('history.lastUpdated')}>
             {formatDateTimeLong(game.updated_at)}
           </InfoRow>
         </CardContent>
@@ -444,19 +449,19 @@ function HistoryTab({ game }: { game: GameAdminRow }) {
       {game.import_source && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Importkälla</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('history.importSource')}</CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <InfoRow label="Typ">
+            <InfoRow label={t('history.type')}>
               <Badge variant="outline" className="uppercase">
                 {game.import_source.type}
               </Badge>
             </InfoRow>
-            <InfoRow label="Importerad">
+            <InfoRow label={t('history.imported')}>
               {formatDate(game.import_source.importedAt)}
             </InfoRow>
             {game.import_source.schemaVersion && (
-              <InfoRow label="Schema">
+              <InfoRow label={t('history.schema')}>
                 {game.import_source.schemaVersion}
               </InfoRow>
             )}
@@ -468,12 +473,12 @@ function HistoryTab({ game }: { game: GameAdminRow }) {
       <Card className="border-dashed">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium text-muted-foreground">
-            Ändringshistorik
+            {t('history.changeHistory')}
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-0">
           <p className="text-sm text-muted-foreground">
-            Detaljerad ändringshistorik kommer i framtida version.
+            {t('history.changeHistoryDescription')}
           </p>
         </CardContent>
       </Card>
@@ -491,17 +496,18 @@ type GameCardDrawerProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-const TABS: Array<{ id: GameCardTab; label: string }> = [
-  { id: 'overview', label: 'Översikt' },
-  { id: 'content', label: 'Innehåll' },
-  { id: 'availability', label: 'Tillgänglighet' },
-  { id: 'metadata', label: 'Metadata' },
-  { id: 'history', label: 'Historik' },
-];
-
 export function GameCardDrawer({ game, open, onOpenChange }: GameCardDrawerProps) {
+  const t = useTranslations('admin.games.drawer');
   const router = useRouter();
   const { activeTab, setActiveTab } = useTabs('overview');
+
+  const TABS: Array<{ id: GameCardTab; label: string }> = [
+    { id: 'overview', label: t('tabs.overview') },
+    { id: 'content', label: t('tabs.content') },
+    { id: 'availability', label: t('tabs.availability') },
+    { id: 'metadata', label: t('tabs.metadata') },
+    { id: 'history', label: t('tabs.history') },
+  ];
 
   // Reset tab when game changes
   useEffect(() => {
@@ -530,9 +536,9 @@ export function GameCardDrawer({ game, open, onOpenChange }: GameCardDrawerProps
                 {game.name}
               </SheetTitle>
               <SheetDescription className="mt-1 flex items-center gap-2 flex-wrap">
-                <StatusBadge status={game.status} />
+                <StatusBadge status={game.status} label={t(`status.${game.status === 'published' ? 'published' : 'draft'}`)} />
                 <PlayModeBadge mode={game.play_mode} />
-                <ValidationBadge state={game.validation_state ?? 'pending'} />
+                <ValidationBadge state={game.validation_state ?? 'pending'} label={t(`validation.${game.validation_state ?? 'pending'}`)} />
               </SheetDescription>
             </div>
             <Button

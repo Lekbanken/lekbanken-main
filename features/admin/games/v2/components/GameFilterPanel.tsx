@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   AdjustmentsHorizontalIcon,
   XMarkIcon,
@@ -43,9 +44,10 @@ type FilterChipProps = {
   label: string;
   value?: string;
   onRemove: () => void;
+  removeAriaLabel?: string;
 };
 
-function FilterChip({ label, value, onRemove }: FilterChipProps) {
+function FilterChip({ label, value, onRemove, removeAriaLabel }: FilterChipProps) {
   return (
     <Badge variant="secondary" className="flex items-center gap-1 pr-1">
       <span className="text-xs">
@@ -55,7 +57,7 @@ function FilterChip({ label, value, onRemove }: FilterChipProps) {
       <button
         onClick={onRemove}
         className="ml-1 rounded-full p-0.5 hover:bg-muted-foreground/20"
-        aria-label={`Ta bort filter: ${label}`}
+        aria-label={removeAriaLabel}
       >
         <XMarkIcon className="h-3 w-3" />
       </button>
@@ -230,47 +232,6 @@ type GameFilterPanelProps = {
   className?: string;
 };
 
-const PLAY_MODE_OPTIONS: SelectOption[] = Object.values(PLAY_MODE_META).map(m => ({
-  value: m.key,
-  label: m.label,
-}));
-
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: 'published', label: 'Publicerad' },
-  { value: 'draft', label: 'Utkast' },
-];
-
-const ENERGY_OPTIONS: SelectOption[] = [
-  { value: 'low', label: 'Låg' },
-  { value: 'medium', label: 'Medel' },
-  { value: 'high', label: 'Hög' },
-];
-
-const LOCATION_OPTIONS: SelectOption[] = [
-  { value: 'indoor', label: 'Inomhus' },
-  { value: 'outdoor', label: 'Utomhus' },
-  { value: 'both', label: 'Båda' },
-];
-
-const VALIDATION_OPTIONS: SelectOption[] = [
-  { value: 'valid', label: 'Godkänd' },
-  { value: 'warnings', label: 'Varningar' },
-  { value: 'errors', label: 'Fel' },
-  { value: 'pending', label: 'Väntar' },
-];
-
-const OWNER_SOURCE_OPTIONS: SelectOption[] = [
-  { value: 'system', label: 'System' },
-  { value: 'imported', label: 'Importerad' },
-  { value: 'tenant', label: 'Tenant-skapad' },
-  { value: 'ai_generated', label: 'AI-genererad' },
-];
-
-const CONTENT_VERSION_OPTIONS: SelectOption[] = [
-  { value: 'v1', label: 'v1 (Legacy)' },
-  { value: 'v2', label: 'v2 (Builder)' },
-];
-
 export function GameFilterPanel({
   filters,
   onChange,
@@ -282,6 +243,49 @@ export function GameFilterPanel({
   onLoadPreset,
   className = '',
 }: GameFilterPanelProps) {
+  const t = useTranslations('admin.games.filters');
+  
+  const PLAY_MODE_OPTIONS: SelectOption[] = Object.values(PLAY_MODE_META).map(m => ({
+    value: m.key,
+    label: m.label,
+  }));
+
+  const STATUS_OPTIONS: SelectOption[] = [
+    { value: 'published', label: t('status.published') },
+    { value: 'draft', label: t('status.draft') },
+  ];
+
+  const ENERGY_OPTIONS: SelectOption[] = [
+    { value: 'low', label: t('energy.low') },
+    { value: 'medium', label: t('energy.medium') },
+    { value: 'high', label: t('energy.high') },
+  ];
+
+  const LOCATION_OPTIONS: SelectOption[] = [
+    { value: 'indoor', label: t('location.indoor') },
+    { value: 'outdoor', label: t('location.outdoor') },
+    { value: 'both', label: t('location.both') },
+  ];
+
+  const VALIDATION_OPTIONS: SelectOption[] = [
+    { value: 'valid', label: t('validation.valid') },
+    { value: 'warnings', label: t('validation.warnings') },
+    { value: 'errors', label: t('validation.errors') },
+    { value: 'pending', label: t('validation.pending') },
+  ];
+
+  const OWNER_SOURCE_OPTIONS: SelectOption[] = [
+    { value: 'system', label: t('ownerSource.system') },
+    { value: 'imported', label: t('ownerSource.imported') },
+    { value: 'tenant', label: t('ownerSource.tenant') },
+    { value: 'ai_generated', label: t('ownerSource.ai_generated') },
+  ];
+
+  const CONTENT_VERSION_OPTIONS: SelectOption[] = [
+    { value: 'v1', label: t('contentVersion.v1') },
+    { value: 'v2', label: t('contentVersion.v2') },
+  ];
+
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({
     classification: true,
     playExecution: false,
@@ -448,111 +452,117 @@ export function GameFilterPanel({
       <CardContent className="p-0">
         {/* Classification Filters */}
         <FilterGroup
-          title="Klassificering"
+          title={t('groups.classification')}
           expanded={expandedGroups.classification}
           onToggle={() => toggleGroup('classification')}
           activeCount={classificationCount}
         >
           <MultiSelect
-            label="Huvudsyfte"
+            label={t('purposes')}
             options={purposes}
             selected={filters.classification?.mainPurposes || []}
             onChange={(values) => updateClassification({ mainPurposes: values })}
-            placeholder="Välj syften..."
+            placeholder={t('purposes')}
           />
           <RangeInput
-            label="Ålder"
+            label={t('age.label')}
             minValue={filters.classification?.ageMin}
             maxValue={filters.classification?.ageMax}
             onMinChange={(v) => updateClassification({ ageMin: v })}
             onMaxChange={(v) => updateClassification({ ageMax: v })}
+            minPlaceholder={t('age.min')}
+            maxPlaceholder={t('age.max')}
           />
           <RangeInput
-            label="Speltid (minuter)"
+            label={t('time.label')}
             minValue={filters.classification?.durationMin}
             maxValue={filters.classification?.durationMax}
             onMinChange={(v) => updateClassification({ durationMin: v })}
             onMaxChange={(v) => updateClassification({ durationMax: v })}
+            minPlaceholder={t('time.min')}
+            maxPlaceholder={t('time.max')}
           />
         </FilterGroup>
 
         {/* Play Execution Filters */}
         <FilterGroup
-          title="Spel & Utförande"
+          title={t('groups.playExecution')}
           expanded={expandedGroups.playExecution}
           onToggle={() => toggleGroup('playExecution')}
           activeCount={playExecutionCount}
         >
           <MultiSelect
-            label="Spelläge"
+            label={t('playMode')}
             options={PLAY_MODE_OPTIONS}
             selected={filters.playExecution?.playModes || []}
             onChange={(values) => updatePlayExecution({ playModes: values as PlayMode[] })}
-            placeholder="Välj spellägen..."
+            placeholder={t('playMode')}
           />
           <RangeInput
-            label="Antal spelare"
+            label={t('players.label')}
             minValue={filters.playExecution?.minPlayers}
             maxValue={filters.playExecution?.maxPlayers}
             onMinChange={(v) => updatePlayExecution({ minPlayers: v })}
             onMaxChange={(v) => updatePlayExecution({ maxPlayers: v })}
+            minPlaceholder={t('players.min')}
+            maxPlaceholder={t('players.max')}
           />
           <MultiSelect
-            label="Energinivå"
+            label={t('energy.label')}
             options={ENERGY_OPTIONS}
             selected={filters.playExecution?.energyLevels || []}
             onChange={(values) => updatePlayExecution({ energyLevels: values as ('low' | 'medium' | 'high')[] })}
-            placeholder="Välj energinivå..."
+            placeholder={t('energy.label')}
           />
           <MultiSelect
-            label="Platstyp"
+            label={t('location.label')}
             options={LOCATION_OPTIONS}
             selected={filters.playExecution?.locationType || []}
             onChange={(values) => updatePlayExecution({ locationType: values as ('indoor' | 'outdoor' | 'both')[] })}
-            placeholder="Välj platstyp..."
+            placeholder={t('location.label')}
           />
         </FilterGroup>
 
         {/* Lifecycle Filters */}
         <FilterGroup
-          title="Livscykel & Kvalitet"
+          title={t('groups.lifecycle')}
           expanded={expandedGroups.lifecycle}
           onToggle={() => toggleGroup('lifecycle')}
           activeCount={lifecycleCount}
         >
           <MultiSelect
-            label="Status"
+            label={t('status.label')}
             options={STATUS_OPTIONS}
             selected={filters.lifecycle?.statuses || []}
             onChange={(values) => updateLifecycle({ statuses: values as ('draft' | 'published')[] })}
-            placeholder="Välj status..."
+            placeholder={t('status.label')}
           />
           <MultiSelect
-            label="Valideringsstatus"
+            label={t('validation.label')}
             options={VALIDATION_OPTIONS}
             selected={filters.lifecycle?.validationStates || []}
             onChange={(values) => updateLifecycle({ validationStates: values as ValidationState[] })}
-            placeholder="Välj valideringsstatus..."
+            placeholder={t('validation.label')}
           />
         </FilterGroup>
 
         {/* Ownership Filters */}
         <FilterGroup
-          title="Ägarskap & Scope"
+          title={t('groups.ownership')}
           expanded={expandedGroups.ownership}
           onToggle={() => toggleGroup('ownership')}
           activeCount={ownershipCount}
         >
           <MultiSelect
-            label="Källa"
+            label={t('ownerSource.label')}
             options={OWNER_SOURCE_OPTIONS}
             selected={filters.ownership?.ownerSources || []}
             onChange={(values) => updateOwnership({ ownerSources: values as ('system' | 'imported' | 'tenant' | 'ai_generated')[] })}
-            placeholder="Välj källa..."
+            placeholder={t('ownerSource.label')}
           />
           <MultiSelect
-            label="Tenant"
-            options={[{ value: '__global__', label: 'Global' }, ...tenants]}
+            label={t('tenants')}
+            options={[{ value: '__global__', label: t('global') }, ...tenants]}
             selected={
               filters.ownership?.isGlobal 
                 ? ['__global__'] 
@@ -565,23 +575,23 @@ export function GameFilterPanel({
                 updateOwnership({ isGlobal: undefined, tenantIds: values.length ? values : undefined });
               }
             }}
-            placeholder="Välj ägare..."
+            placeholder={t('tenants')}
           />
         </FilterGroup>
 
         {/* Technical Filters */}
         <FilterGroup
-          title="Tekniska Filter"
+          title={t('groups.technical')}
           expanded={expandedGroups.technical}
           onToggle={() => toggleGroup('technical')}
           activeCount={technicalCount}
         >
           <MultiSelect
-            label="Content Version"
+            label={t('contentVersion.label')}
             options={CONTENT_VERSION_OPTIONS}
             selected={filters.technical?.gameContentVersions || []}
             onChange={(values) => updateTechnical({ gameContentVersions: values })}
-            placeholder="Välj version..."
+            placeholder={t('contentVersion.label')}
           />
         </FilterGroup>
       </CardContent>
@@ -606,19 +616,22 @@ export function GameFilterBar({
   onOpenFullPanel,
   totalActiveFilters,
 }: GameFilterBarProps) {
+  const t = useTranslations('admin.games.filters');
+  
   const activeChips = useMemo(() => {
-    const chips: Array<{ key: string; label: string; value?: string; onRemove: () => void }> = [];
+    const chips: Array<{ key: string; label: string; value?: string; onRemove: () => void; removeAriaLabel: string }> = [];
 
     // Lifecycle - Status
     if (filters.lifecycle?.statuses?.length) {
       chips.push({
         key: 'status',
-        label: 'Status',
+        label: t('chips.status'),
         value: filters.lifecycle.statuses.join(', '),
         onRemove: () => onChange({
           ...filters,
           lifecycle: { ...filters.lifecycle, statuses: undefined },
         }),
+        removeAriaLabel: t('removeFilter', { label: t('chips.status') }),
       });
     }
 
@@ -627,12 +640,13 @@ export function GameFilterBar({
       const modeLabels = filters.playExecution.playModes.map(m => PLAY_MODE_META[m].labelShort);
       chips.push({
         key: 'playMode',
-        label: 'Spelläge',
+        label: t('chips.playMode'),
         value: modeLabels.join(', '),
         onRemove: () => onChange({
           ...filters,
           playExecution: { ...filters.playExecution, playModes: undefined },
         }),
+        removeAriaLabel: t('removeFilter', { label: t('chips.playMode') }),
       });
     }
 
@@ -640,16 +654,17 @@ export function GameFilterBar({
     if (filters.ownership?.isGlobal) {
       chips.push({
         key: 'global',
-        label: 'Global',
+        label: t('chips.global'),
         onRemove: () => onChange({
           ...filters,
           ownership: { ...filters.ownership, isGlobal: undefined },
         }),
+        removeAriaLabel: t('removeFilter', { label: t('chips.global') }),
       });
     }
 
     return chips;
-  }, [filters, onChange]);
+  }, [filters, onChange, t]);
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
@@ -658,14 +673,14 @@ export function GameFilterBar({
         <Input
           value={filters.search || ''}
           onChange={(e) => onChange({ ...filters, search: e.target.value, page: 1 })}
-          placeholder="Sök på namn, syfte eller ID..."
+          placeholder={t('search')}
           className="pl-9"
         />
       </div>
 
       <Button variant="outline" size="sm" onClick={onOpenFullPanel}>
         <AdjustmentsHorizontalIcon className="mr-2 h-4 w-4" />
-        Filter
+        {t('title')}
         {totalActiveFilters > 0 && (
           <Badge variant="default" className="ml-2">
             {totalActiveFilters}
@@ -679,6 +694,7 @@ export function GameFilterBar({
           label={chip.label}
           value={chip.value}
           onRemove={chip.onRemove}
+          removeAriaLabel={chip.removeAriaLabel}
         />
       ))}
     </div>

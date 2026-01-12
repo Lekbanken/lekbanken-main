@@ -265,7 +265,36 @@
       "activeUsers": "Active Users",
       "totalOrganizations": "Total Organizations",
       "activeSessions": "Active Sessions",
-      "pendingTickets": "Pending Tickets"
+      "pendingTickets": "Pending Tickets",
+      "breadcrumb": {
+        "admin": "Admin",
+        "overview": "Overview"
+      },
+      "pageTitle": "Dashboard",
+      "pageDescription": "Quick health check and entry points for admin areas",
+      "support": "Support",
+      "settings": "Settings",
+      "metrics": {
+        "totalUsers": "Total users",
+        "organisations": "Organisations",
+        "achievementsCreated": "Achievements created",
+        "activeProducts": "Active products",
+        "change30d": "+{percent}% last 30d",
+        "changeWeek": "+{count} this week",
+        "stable": "Stable"
+      },
+      "quickLinks": {
+        "title": "Quick Links",
+        "subtitle": "Jump to admin sections",
+        "userAdmin": "User Admin",
+        "userAdminDesc": "Manage roles, access, and invites.",
+        "orgAdmin": "Organisation Admin",
+        "orgAdminDesc": "Licenses, contacts, member oversight.",
+        "productAdmin": "Product Admin",
+        "productAdminDesc": "Products, capabilities, availability.",
+        "achievementsAdmin": "Achievements Admin",
+        "achievementsAdminDesc": "Badge builder and rewards."
+      }
     },
     "users": {
       "title": "Users",
@@ -525,6 +554,196 @@
           "member": "Standard (member)",
           "privateUser": "Private user",
           "systemAdmin": "System admin"
+        }
+      }
+    },
+    "games": {
+      "drawer": {
+        "tabs": {
+          "overview": "Overview",
+          "content": "Content",
+          "availability": "Availability",
+          "metadata": "Metadata",
+          "history": "History"
+        },
+        "validation": {
+          "valid": "Valid",
+          "warnings": "Warnings",
+          "errors": "Errors",
+          "pending": "Pending",
+          "outdated": "Outdated"
+        },
+        "status": {
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "overview": {
+          "steps": "Steps",
+          "phases": "Phases",
+          "roles": "Roles",
+          "timeMin": "Time (min)",
+          "coreInfo": "Core Information",
+          "status": "Status",
+          "playMode": "Play Mode",
+          "validation": "Validation",
+          "mainPurpose": "Main Purpose",
+          "owner": "Owner",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Validation Issues",
+          "openInBuilder": "Open in Game Builder"
+        },
+        "content": {
+          "playModeLabel": "Play Mode: {mode}",
+          "materials": "Materials",
+          "timer": "Timer",
+          "artifacts": "Artifacts",
+          "triggers": "Triggers",
+          "board": "Board",
+          "schemaVersion": "Schema & Version",
+          "contentVersion": "Content version",
+          "schemaStatus": "Schema status",
+          "current": "Current",
+          "contentWarnings": "Content Warnings"
+        },
+        "availability": {
+          "title": "Availability",
+          "global": "Global",
+          "globalDescription": "Available to all tenants",
+          "tenantSpecific": "Tenant-specific",
+          "unknownTenant": "Unknown tenant",
+          "productAssociation": "Product Association",
+          "product": "Product",
+          "adminControls": "Admin Controls",
+          "adminControlsDescription": "Tenant assignment and license management coming soon."
+        },
+        "metadata": {
+          "gameParameters": "Game Parameters",
+          "players": "Players",
+          "age": "Age",
+          "ageYears": "{min} – {max} years",
+          "time": "Time",
+          "timeMinutes": "{time} min",
+          "energyLevel": "Energy Level",
+          "locationType": "Location",
+          "purposes": "Purposes",
+          "noPurposes": "No purposes linked",
+          "category": "Category"
+        },
+        "history": {
+          "timestamps": "Timestamps",
+          "created": "Created",
+          "lastUpdated": "Last Updated",
+          "importSource": "Import Source",
+          "type": "Type",
+          "imported": "Imported",
+          "schema": "Schema",
+          "changeHistory": "Change History",
+          "changeHistoryDescription": "Detailed change history coming in a future version."
+        }
+      },
+      "filters": {
+        "title": "Filters",
+        "search": "Search games...",
+        "clearFilters": "Clear filters",
+        "removeFilter": "Remove filter: {label}",
+        "presets": "Saved filters",
+        "savePreset": "Save as preset",
+        "noMatchingPresets": "No matching presets",
+        "groups": {
+          "classification": "Classification",
+          "playExecution": "Play & Execution",
+          "lifecycle": "Lifecycle & Quality",
+          "ownership": "Ownership & Scope",
+          "technical": "Technical Filters"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "energy": {
+          "label": "Energy Level",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "location": {
+          "label": "Location",
+          "indoor": "Indoor",
+          "outdoor": "Outdoor",
+          "both": "Both"
+        },
+        "validation": {
+          "label": "Validation",
+          "valid": "Valid",
+          "warnings": "Warnings",
+          "errors": "Errors",
+          "pending": "Pending"
+        },
+        "ownerSource": {
+          "label": "Source",
+          "system": "System",
+          "imported": "Imported",
+          "tenant": "Tenant-created",
+          "ai_generated": "AI-generated"
+        },
+        "contentVersion": {
+          "label": "Content Version",
+          "v1": "v1 (Legacy)",
+          "v2": "v2 (Builder)"
+        },
+        "playMode": "Play Mode",
+        "purposes": "Purposes",
+        "tenants": "Tenants",
+        "products": "Products",
+        "global": "Global",
+        "players": {
+          "label": "Number of Players",
+          "min": "Min",
+          "max": "Max"
+        },
+        "age": {
+          "label": "Age",
+          "min": "Min",
+          "max": "Max"
+        },
+        "time": {
+          "label": "Time (min)",
+          "min": "Min",
+          "max": "Max"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Play Mode",
+          "global": "Global"
+        }
+      }
+    },
+    "achievements": {
+      "publishing": {
+        "status": "Status",
+        "draft": "Draft",
+        "published": "Published",
+        "rolesCanPublish": "Roles that can publish",
+        "addRole": "Add role",
+        "roles": {
+          "owner": "Owner",
+          "admin": "Admin",
+          "editor": "Editor",
+          "member": "Member"
+        },
+        "availableForOrgs": "Available for organizations",
+        "addOrg": "Add org",
+        "profileFrameSync": {
+          "title": "Profile Frame Sync",
+          "syncedDescription": "Synced - Badge updates user profile frame",
+          "disabled": "Disabled",
+          "durationLabel": "Duration (days, optional)",
+          "useBase": "Use base layer",
+          "useBackground": "Use background",
+          "useForeground": "Use foreground",
+          "useSymbol": "Use symbol"
         }
       }
     },

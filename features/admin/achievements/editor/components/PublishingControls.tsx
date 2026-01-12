@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { PlusIcon, XMarkIcon, LinkIcon } from "@heroicons/react/24/outline";
 import { Badge, Switch } from "@/components/ui";
 import type { AchievementItem, ProfileFrameSyncConfig } from "../../types";
@@ -10,23 +11,24 @@ type PublishingControlsProps = {
   onChange: (next: Partial<AchievementItem>) => void;
 };
 
-const roleOptions = [
-  { value: "owner", label: "Owner" },
-  { value: "admin", label: "Admin" },
-  { value: "editor", label: "Editor" },
-  { value: "member", label: "Member" },
-];
-
-const orgOptions = [
-  { value: "org-1", label: "Organization Alpha" },
-  { value: "org-2", label: "Beta School" },
-  { value: "org-3", label: "Gamma Learning" },
-];
-
 export function PublishingControls({ value, onChange }: PublishingControlsProps) {
+  const t = useTranslations('admin.achievements.publishing');
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
   const [showOrgDropdown, setShowOrgDropdown] = useState(false);
   const frame = value.profileFrameSync ?? { enabled: false };
+
+  const roleOptions = [
+    { value: "owner", label: t('roles.owner') },
+    { value: "admin", label: t('roles.admin') },
+    { value: "editor", label: t('roles.editor') },
+    { value: "member", label: t('roles.member') },
+  ];
+
+  const orgOptions = [
+    { value: "org-1", label: "Organization Alpha" },
+    { value: "org-2", label: "Beta School" },
+    { value: "org-3", label: "Gamma Learning" },
+  ];
 
   const handleStatusChange = (status: "draft" | "published") => {
     onChange({ status });
@@ -60,7 +62,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
     <div className="space-y-5">
       {/* Status Toggle */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Status</label>
+        <label className="text-sm font-medium text-foreground">{t('status')}</label>
         <div className="flex rounded-lg border border-border/60 bg-muted/20 p-1">
           <button
             onClick={() => handleStatusChange("draft")}
@@ -70,7 +72,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Draft
+            {t('draft')}
           </button>
           <button
             onClick={() => handleStatusChange("published")}
@@ -80,14 +82,14 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Published
+            {t('published')}
           </button>
         </div>
       </div>
 
       {/* Roles that can publish */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Roles that can publish</label>
+        <label className="text-sm font-medium text-foreground">{t('rolesCanPublish')}</label>
         <div className="flex flex-wrap gap-2">
           {(value.publishedRoles ?? []).map((role) => {
             const roleLabel = roleOptions.find((r) => r.value === role)?.label || role;
@@ -112,7 +114,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
                          text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
             >
               <PlusIcon className="h-3 w-3" />
-              Add role
+              {t('addRole')}
             </button>
             
             {showRoleDropdown && (
@@ -136,7 +138,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
 
       {/* Available Organizations */}
       <div className="space-y-2">
-        <label className="text-sm font-medium text-foreground">Available for organizations</label>
+        <label className="text-sm font-medium text-foreground">{t('availableForOrgs')}</label>
         <div className="flex flex-wrap gap-2">
           {(value.availableForOrgs ?? []).map((org) => {
             const orgLabel = orgOptions.find((o) => o.value === org)?.label || org;
@@ -161,7 +163,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
                          text-muted-foreground hover:border-primary/40 hover:text-primary transition-colors"
             >
               <PlusIcon className="h-3 w-3" />
-              Add org
+              {t('addOrg')}
             </button>
             
             {showOrgDropdown && (
@@ -200,11 +202,11 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
             <LinkIcon className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-medium text-foreground">Profile Frame Sync</p>
+            <p className="text-sm font-medium text-foreground">{t('profileFrameSync.title')}</p>
             <p className={`text-xs ${frame.enabled ? 'text-accent' : 'text-muted-foreground'}`}>
               {frame.enabled
-                ? 'Synced - Badge updates user profile frame' 
-                : 'Disabled'
+                ? t('profileFrameSync.syncedDescription') 
+                : t('profileFrameSync.disabled')
               }
             </p>
           </div>
@@ -219,7 +221,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
       {frame.enabled && (
         <div className="grid gap-3 rounded-xl border border-border/60 bg-muted/10 p-4">
           <label className="text-xs text-muted-foreground">
-            Duration (days, optional)
+            {t('profileFrameSync.durationLabel')}
             <input
               type="number"
               min={1}
@@ -239,11 +241,11 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
           <div className="flex flex-wrap gap-2 text-sm text-foreground">
             {(
               [
-                { key: "useBase", label: "Use base layer" },
-                { key: "useBackground", label: "Use background" },
-                { key: "useForeground", label: "Use foreground" },
-                { key: "useSymbol", label: "Use symbol" },
-              ] as Array<{ key: Extract<keyof ProfileFrameSyncConfig, "useBase" | "useBackground" | "useForeground" | "useSymbol">; label: string }>
+                { key: "useBase", labelKey: "profileFrameSync.useBase" as const },
+                { key: "useBackground", labelKey: "profileFrameSync.useBackground" as const },
+                { key: "useForeground", labelKey: "profileFrameSync.useForeground" as const },
+                { key: "useSymbol", labelKey: "profileFrameSync.useSymbol" as const },
+              ] as Array<{ key: Extract<keyof ProfileFrameSyncConfig, "useBase" | "useBackground" | "useForeground" | "useSymbol">; labelKey: string }>
             ).map((item) => (
               <label
                 key={item.key}
@@ -261,7 +263,7 @@ export function PublishingControls({ value, onChange }: PublishingControlsProps)
                     })
                   }
                 />
-                {item.label}
+                {t(item.labelKey)}
               </label>
             ))}
           </div>

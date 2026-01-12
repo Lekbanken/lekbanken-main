@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
 > **Senast uppdaterad:** 2026-01-12
-> **Status:** ✅ Fas 2 KLAR (100%) - features/admin ~95% klart, app/admin 100% klart
+> **Status:** ✅ Fas 2 (~95%) - features/admin ~95% klart, app/admin ~95% klart
 
 ## Executive Summary
 
@@ -11,8 +11,8 @@
 | Filer med hårdkodade strängar | ~380 (35%) |
 | Totalt hårdkodade strängar | 2,834 |
 | Filer som använder i18n | ~290 (27%) |
-| **Migrerade strängar** | ~2,850 (100%) |
-| **Uppskattad återstående arbetsinsats** | 0 minuter (app/admin klart) |
+| **Migrerade strängar** | ~2,700 (95%) |
+| **Uppskattad återstående arbetsinsats** | ~30 minuter |
 
 ## Senaste migrationer (2026-01-12)
 
@@ -38,7 +38,26 @@
 - `app/admin/tenant/[tenantId]/analytics/page.tsx` - ~20 strängar (stats, error states)
 - `app/admin/gamification/achievements/AchievementsAdminClient.tsx` - ~15 strängar
 
-### Alla prioriterade filer är nu migrerade! ✅
+### Alla prioriterade PAGE-filer är nu migrerade! ✅
+
+### Kvarvarande områden (mindre prioritet):
+**Design-komponenter (app/admin/design/components/):**
+- `AdvancedTab.tsx` - ~5 strängar (toasts, knappar)
+- `BrandAssetsTab.tsx` - ~10 strängar (toasts, knappar)
+- `TypographyTab.tsx` - ~10 strängar (labels, knappar)
+- `MediaDefaultsTab.tsx` - ~5 strängar (knappar)
+
+**Game Builder-komponenter (app/admin/games/builder/components/):**
+- `ArtifactWizard.tsx` - ~30 strängar (wizard-steg, exempeldata)
+- `PhaseEditor.tsx` - ~15 strängar (formulär, knappar)
+- `BoardEditor.tsx` - ~10 strängar (labels)
+- `RoleEditor.tsx` - ~10 strängar (labels)
+- `StepEditor.tsx` - ~15 strängar (formulär)
+- `GameBuilderForm.tsx` - ~10 strängar (knappar)
+
+**Navigationskomponenter:**
+- `admin-nav-config.tsx` - ~15 strängar (nav labels, använder redan t())
+- `admin-nav-items.tsx` - ~15 strängar (nav labels)
 
 ### Nycklarna som lagts till:
 - `admin.games.builder.artifact.*` - Visibility options, artifact types (~30 keys)

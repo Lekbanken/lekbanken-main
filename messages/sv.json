@@ -1073,7 +1073,125 @@
     "design": {
       "mediaDefaults": {
         "noDefaultProfileImages": "Inga standardprofilbilder uppladdade",
-        "noDefaultCoverImages": "Inga standardomslagsbilder uppladdade"
+        "noDefaultCoverImages": "Inga standardomslagsbilder uppladdade",
+        "profileImages": {
+          "title": "Standard profilbilder",
+          "description": "Förvalda profilbilder som användare kan välja. Används också som fallback."
+        },
+        "coverImages": {
+          "title": "Standard omslagsbilder",
+          "description": "Förvalda omslagsbilder för lekar och aktiviteter."
+        },
+        "imageAlt": "Bild {index}",
+        "addImage": "Lägg till",
+        "loading": "Laddar..."
+      },
+      "toasts": {
+        "saving": "Sparar...",
+        "saved": "Sparad",
+        "tokensSaved": "Tokens sparade",
+        "typographySaved": "Typografi sparad",
+        "colorsSaved": "Färger sparade",
+        "uploadComplete": "Uppladdning klar",
+        "imageUploaded": "Bild uppladdad",
+        "deleted": "Borttagen",
+        "imageDeleted": "Bild borttagen",
+        "copied": "Kopierad!",
+        "error": "Ett fel uppstod",
+        "uploadFailed": "Uppladdning misslyckades",
+        "couldNotSave": "Kunde inte spara",
+        "couldNotDelete": "Kunde inte ta bort"
+      },
+      "advanced": {
+        "title": "Avancerade inställningar",
+        "warning": "Dessa inställningar påverkar globala design tokens. Ändra med försiktighet.",
+        "saveTokens": "Spara tokens",
+        "borderRadius": {
+          "title": "Border Radius",
+          "badge": "Tokens",
+          "description": "Hörnradie för komponenter. Använder CSS-värden (rem, px, etc)."
+        },
+        "cssVariables": {
+          "title": "CSS Variabler",
+          "badge": "Kommande",
+          "description": "Egna CSS-variabler för avancerad anpassning.",
+          "info": "Möjligheten att definiera egna CSS-variabler kommer i en framtida version."
+        },
+        "spacingScale": {
+          "title": "Spacing Scale",
+          "badge": "Kommande",
+          "description": "Anpassad spacing-skala för margin och padding.",
+          "info": "Anpassad spacing-skala kommer i en framtida version."
+        }
+      },
+      "brand": {
+        "logos": {
+          "title": "Logotyper",
+          "description": "Ladda upp logotyper för ljust och mörkt läge. Rekommenderat format: SVG eller PNG med transparent bakgrund.",
+          "light": "Logotyp (ljust läge)",
+          "lightDesc": "Används på ljusa bakgrunder",
+          "dark": "Logotyp (mörkt läge)",
+          "darkDesc": "Används på mörka bakgrunder"
+        },
+        "appIcon": {
+          "title": "App-ikon",
+          "description": "Används i navigering och som PWA-ikon. Kvadratiskt format, minst 512x512 px.",
+          "label": "App-ikon",
+          "labelDesc": "Kvadratisk ikon för app"
+        },
+        "favicons": {
+          "title": "Favicons",
+          "description": "Webbläsarflikikon. Ladda upp ICO, PNG eller SVG.",
+          "light": "Favicon (ljust)",
+          "lightDesc": "För ljust tema",
+          "dark": "Favicon (mörkt)",
+          "darkDesc": "För mörkt tema"
+        },
+        "colors": {
+          "title": "Varumärkesfärger",
+          "description": "Primär och sekundär färg används i komponenter och teman.",
+          "primary": "Primär färg",
+          "secondary": "Sekundär färg",
+          "saveColors": "Spara färger"
+        },
+        "assetUploader": {
+          "replace": "Ersätt",
+          "copyUrl": "Kopiera URL",
+          "clickToUpload": "Klicka för att ladda upp",
+          "uploading": "Laddar upp...",
+          "fileTypes": "PNG, JPEG, SVG, WebP (max 5 MB)"
+        }
+      },
+      "typography": {
+        "fontFamily": {
+          "title": "Typsnitt",
+          "description": "Välj typsnitt för plattformen. Påverkar all text.",
+          "selectLabel": "Förvalt typsnitt",
+          "selectPlaceholder": "Välj typsnitt",
+          "custom": "Custom...",
+          "customFontFamily": "Font family",
+          "customFontFamilyPlaceholder": "'Custom Font', sans-serif",
+          "customFontUrl": "Font URL (Google Fonts, etc.)",
+          "customFontUrlPlaceholder": "https://fonts.googleapis.com/css2?family=...",
+          "preview": "Förhandsvisning",
+          "previewHeading": "Rubriker ser ut så här",
+          "previewBody": "Brödtext med normalt typsnitt. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        },
+        "titleFormat": {
+          "title": "Rubrikformat",
+          "description": "Hur rubriker formateras (text-transform).",
+          "label": "Format",
+          "normal": "Normal",
+          "uppercase": "Stora bokstäver",
+          "capitalize": "Initial versal",
+          "example": "Exempel på rubrik"
+        },
+        "size": {
+          "title": "Storlek",
+          "description": "Basstorlek för typsnitt. Alla storlekar skalas relativt.",
+          "baseSize": "Basstorlek (px)"
+        },
+        "saveTypography": "Spara typografi"
       }
     },
     "billing": {
@@ -1345,7 +1463,67 @@
         }
       },
       "achievements": {
-        "emptyTitle": "Inga achievements"
+        "pageTitle": "Achievements",
+        "pageDescription": "Hantera achievements, tilldela till användare och konfigurera regler.",
+        "createAchievement": "Skapa achievement",
+        "searchPlaceholder": "Sök achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Redigera",
+          "award": "Tilldela",
+          "archive": "Arkivera",
+          "restore": "Återställ",
+          "delete": "Ta bort"
+        },
+        "filters": {
+          "scope": "Scope",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "Alla scopes",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Privat"
+        },
+        "statuses": {
+          "all": "Alla statusar",
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        },
+        "notifications": {
+          "saved": "Achievement sparat",
+          "deleted": "Achievement borttaget",
+          "fetchFailed": "Kunde inte hämta achievements",
+          "updateStatusFailed": "Kunde inte uppdatera status",
+          "deleteFailed": "Kunde inte ta bort",
+          "archiveFailed": "Kunde inte arkivera",
+          "activateFailed": "Kunde inte aktivera"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Ta bort achievement",
+          "confirmAction": "Bekräfta åtgärd",
+          "deleteConfirm": "Är du säker på att du vill ta bort detta achievement? Detta kan inte ångras.",
+          "areYouSure": "Är du säker?",
+          "deleteButton": "Ta bort",
+          "confirmButton": "Bekräfta"
+        },
+        "empty": {
+          "noAchievements": "Inga achievements",
+          "noMatch": "Inga achievements matchar dina filter.",
+          "getStarted": "Skapa ditt första achievement för att komma igång.",
+          "createAction": "Skapa achievement"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        }
       },
       "shopRewards": {
         "pageTitle": "Shop & Rewards",
@@ -1472,69 +1650,6 @@
           "createAction": "Skapa exportmall"
         },
         "searchPlaceholder": "Sök mallar..."
-      },
-      "achievements": {
-        "pageTitle": "Achievements",
-        "pageDescription": "Hantera achievements, tilldela till användare och konfigurera regler.",
-        "createAchievement": "Skapa achievement",
-        "searchPlaceholder": "Sök achievements...",
-        "breadcrumbs": {
-          "admin": "Admin",
-          "gamification": "Gamification",
-          "achievements": "Achievements"
-        },
-        "actions": {
-          "edit": "Redigera",
-          "award": "Tilldela",
-          "archive": "Arkivera",
-          "restore": "Återställ",
-          "delete": "Ta bort"
-        },
-        "filters": {
-          "scope": "Scope",
-          "status": "Status",
-          "tenant": "Tenant"
-        },
-        "scopes": {
-          "all": "Alla scopes",
-          "global": "Global",
-          "tenant": "Tenant",
-          "private": "Privat"
-        },
-        "statuses": {
-          "all": "Alla statusar",
-          "draft": "Utkast",
-          "active": "Aktiv",
-          "archived": "Arkiverad"
-        },
-        "notifications": {
-          "saved": "Achievement sparat",
-          "deleted": "Achievement borttaget",
-          "fetchFailed": "Kunde inte hämta achievements",
-          "updateStatusFailed": "Kunde inte uppdatera status",
-          "deleteFailed": "Kunde inte ta bort",
-          "archiveFailed": "Kunde inte arkivera",
-          "activateFailed": "Kunde inte aktivera"
-        },
-        "confirmDialog": {
-          "deleteTitle": "Ta bort achievement",
-          "confirmAction": "Bekräfta åtgärd",
-          "deleteConfirm": "Är du säker på att du vill ta bort detta achievement? Detta kan inte ångras.",
-          "areYouSure": "Är du säker?",
-          "deleteButton": "Ta bort",
-          "confirmButton": "Bekräfta"
-        },
-        "empty": {
-          "noAchievements": "Inga achievements",
-          "noMatch": "Inga achievements matchar dina filter.",
-          "getStarted": "Skapa ditt första achievement för att komma igång.",
-          "createAction": "Skapa achievement"
-        },
-        "status": {
-          "draft": "Utkast",
-          "active": "Aktiv",
-          "archived": "Arkiverad"
-        }
       }
     },
     "users": {
@@ -1546,7 +1661,12 @@
       "deleteUser": "Ta bort användare",
       "userDetails": "Användardetaljer",
       "searchUsers": "Sök användare...",
-      "noUsers": "Inga användare hittades",
+      "noUsers": {
+        "title": "Inga användare",
+        "titleWithFilters": "Inga matchande användare",
+        "description": "Det finns inga användare i systemet ännu.",
+        "descriptionWithFilters": "Justera sökningen eller rensa filter för att se fler."
+      },
       "role": "Roll",
       "roles": {
         "systemAdmin": "Systemadministratör",
@@ -1604,12 +1724,6 @@
         "invited": "Inbjudna",
         "disabled": "Avstängda",
         "withoutOrg": "Utan organisation"
-      },
-      "noUsers": {
-        "title": "Inga användare",
-        "titleWithFilters": "Inga matchande användare",
-        "description": "Det finns inga användare i systemet ännu.",
-        "descriptionWithFilters": "Justera sökningen eller rensa filter för att se fler."
       },
       "noAccess": {
         "title": "Åtkomst nekad",
@@ -1819,228 +1933,257 @@
       }
     },
     "games": {
-      "drawer": {
-        "tabs": {
-          "overview": "Översikt",
-          "content": "Innehåll",
-          "availability": "Tillgänglighet",
-          "metadata": "Metadata",
-          "history": "Historik"
-        },
-        "validation": {
-          "valid": "Godkänd",
-          "warnings": "Varningar",
-          "errors": "Fel",
-          "pending": "Väntar",
-          "outdated": "Inaktuell"
-        },
-        "status": {
-          "published": "Publicerad",
-          "draft": "Utkast"
-        },
-        "overview": {
-          "steps": "Steg",
-          "phases": "Faser",
-          "roles": "Roller",
-          "timeMin": "Tid (min)",
-          "coreInfo": "Grundinformation",
-          "status": "Status",
-          "playMode": "Spelläge",
-          "validation": "Validering",
-          "mainPurpose": "Huvudsyfte",
-          "owner": "Ägare",
-          "global": "Global",
-          "uuid": "UUID",
-          "validationIssues": "Valideringsproblem",
-          "openInBuilder": "Öppna i Game Builder"
-        },
-        "content": {
-          "playModeLabel": "Spelläge: {mode}",
-          "materials": "Material",
-          "timer": "Timer",
-          "artifacts": "Artifacts",
-          "triggers": "Triggers",
-          "board": "Tavla",
-          "schemaVersion": "Schema & Version",
-          "contentVersion": "Content version",
-          "schemaStatus": "Schema status",
-          "current": "Aktuellt",
-          "contentWarnings": "Innehållsvarningar"
-        },
-        "availability": {
-          "title": "Tillgänglighet",
-          "global": "Global",
-          "globalDescription": "Tillgänglig för alla tenants",
-          "tenantSpecific": "Tenant-specifik",
-          "unknownTenant": "Okänd tenant",
-          "productAssociation": "Produktkoppling",
-          "product": "Produkt",
-          "adminControls": "Admin-kontroller",
-          "adminControlsDescription": "Tenant-tilldelning och licenshantering kommer snart."
-        },
-        "metadata": {
-          "gameParameters": "Spelparametrar",
-          "players": "Spelare",
-          "age": "Ålder",
-          "ageYears": "{min} – {max} år",
-          "time": "Tid",
-          "timeMinutes": "{time} min",
-          "energyLevel": "Energinivå",
-          "locationType": "Plats",
-          "purposes": "Syften",
-          "noPurposes": "Inga syften kopplade",
-          "category": "Kategori"
-        },
-        "history": {
-          "timestamps": "Tidsstämplar",
-          "created": "Skapad",
-          "lastUpdated": "Senast uppdaterad",
-          "importSource": "Importkälla",
-          "type": "Typ",
-          "imported": "Importerad",
-          "schema": "Schema",
-          "changeHistory": "Ändringshistorik",
-          "changeHistoryDescription": "Detaljerad ändringshistorik kommer i framtida version."
-        }
+      "pageTitle": "Spelhantering",
+      "import": {
+        "selectPrompt": "Välj prompt",
+        "artifactsOrTriggers": "Behöver du artifacts eller triggers? Välj <strong>Legendary (JSON)</strong>.",
+        "copy": "Kopiera",
+        "overviewTab": "Översikt",
+        "whatImportDoes": "Vad importen gör",
+        "importCanRead": "Importen kan läsa <strong>CSV</strong> (bulk/massimport) och <strong>JSON</strong> (full fidelity).",
+        "csvVsJson": "CSV vs JSON",
+        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light inom canonical header.",
+        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + avancerade step-fält).",
+        "startHere": "Start här (3 steg)",
+        "step1": "Välj spelläge (basic/facilitated/participants).",
+        "step2": "Välj format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).",
+        "step3": "Validera i Import-dialogen (dry-run) innan import.",
+        "commonErrors": "Vanliga fel",
+        "invalidPurpose": "<strong>Ogiltigt purpose-id:</strong> main_purpose_id/sub_purpose_ids måste vara riktiga UUID från databasen.",
+        "jsonEscaping": "<strong>JSON escaping i CSV:</strong> citat i JSON måste skrivas som <code>{'\"\"'}</code> i CSV-cellen.",
+        "missingSteps": "<strong>Saknade steg:</strong> om step_N_title finns måste step_N_body finnas.",
+        "playModesTab": "Spellägen",
+        "playModes": "Spellägen (play_mode)",
+        "chooseEarly": "Välj läge tidigt – QA, UI och runtime förväntar sig rätt struktur.",
+        "basicMode": "<strong>Enkel lek (basic):</strong> steg + material. Ingen digital interaktion.",
+        "facilitatedMode": "<strong>Ledd aktivitet (facilitated):</strong> steg + faser/timer, ev. publik tavla.",
+        "participantsMode": "<strong>Deltagarlek (participants):</strong> steg + faser + roller + ev. publik tavla. För Legendary (artifacts/triggers) ska du använda JSON-import.",
+        "minimumRequired": "Minimum required",
+        "basicReq": "<strong>basic:</strong> minst step_1_title + step_1_body.",
+        "facilitatedReq": "<strong>facilitated:</strong> steg krävs; phases_json starkt rekommenderat.",
+        "participantsReq": "<strong>participants:</strong> steg krävs; roles_json rekommenderas starkt.",
+        "csvTab": "CSV",
+        "jsonTab": "JSON",
+        "aiPromptsTab": "AI Prompts",
+        "csvFormat": "CSV-format (canonical)",
+        "csvFormatList1": "UTF-8 (med/utan BOM), separator ,",
+        "csvFormatList2": "Celler med komma/radbrytning/citat omsluts av \"...\"; citat skrivs som \"\"",
+        "csvFormatList3": "En rad = en lek",
+        "canonicalCsvHeader": "Canonical CSV-header (kopiera exakt)",
+        "jsonColumnsInCsv": "JSON-kolumner som stöds i CSV",
+        "useJsonForArtifacts": "Vill du använda artifacts eller triggers? CSV-kontraktet innehåller inte det. Välj JSON-import (Legendary).",
+        "commonMistakes": "Vanligaste felen",
+        "invalidJsonInColumn": "Ogiltig JSON i JSON-kolumn (oftast fel citat/escaping).",
+        "stepTitleWithoutBody": "step_N_title ifyllt men step_N_body saknas.",
+        "invalidUuid": "main_purpose_id/sub_purpose_ids är inte giltiga UUID.",
+        "jsonImportFull": "JSON-import (full fidelity)",
+        "jsonLegendaryDesc": "JSON är formatet för Legendary/escape-room: artifacts + triggers + avancerade step-fält.",
+        "minimalJson": "Minimal JSON (1 lek)",
+        "orderResolution": "Order-resolution i triggers",
+        "orderResolutionDesc": "Triggers kan referera till stepOrder/phaseOrder/artifactOrder i condition/actions. Importen resolverar det till faktiska ID:n.",
+        "infoDialogTitle": "Information om lekar"
+      },
+      "playModes": {
+        "basic": "Enkel lek",
+        "facilitated": "Ledd aktivitet",
+        "participants": "Deltagarlek"
+      },
+      "detail": {
+        "noAccess": "Ingen åtkomst",
+        "noAccessDesc": "Du behöver administratörsbehörighet för att visa spel.",
+        "somethingWentWrong": "Något gick fel",
+        "loading": "Laddar...",
+        "loadingGameData": "Hämtar speldata.",
+        "gameNotFound": "Spelet hittades inte",
+        "gameMissing": "Spelet saknas",
+        "checkLinkOrGoBack": "Kontrollera länken eller gå tillbaka till listan.",
+        "backToGames": "Tillbaka till spel",
+        "makeDraft": "Gör till utkast",
+        "status": "Status",
+        "published": "Publicerad",
+        "draft": "Utkast",
+        "category": "Kategori",
+        "energy": "Energi",
+        "purpose": "Syfte",
+        "product": "Produkt",
+        "owner": "Ägare",
+        "global": "Global",
+        "players": "Spelare",
+        "time": "Tid",
+        "age": "Ålder",
+        "notSet": "Inte satt",
+        "back": "Tillbaka",
+        "edit": "Redigera",
+        "publish": "Publicera",
+        "delete": "Ta bort",
+        "metadata": "Metadata",
+        "description": "Beskrivning",
+        "noDescription": "Ingen beskrivning angiven.",
+        "noShortDescription": "Ingen kort beskrivning angiven.",
+        "technical": "Tekniskt",
+        "createdAt": "Skapad",
+        "updatedAt": "Uppdaterad",
+        "deleteTitle": "Ta bort spelet?",
+        "deleteDescription": "Detta raderar spelet permanent.",
+        "deleteConfirm": "Ta bort"
+      },
+      "form": {
+        "editTitle": "Redigera lek",
+        "createTitle": "Skapa ny lek",
+        "description": "Hantera grunddata för lekbanken. Minimikrav: namn, kort beskrivning och huvudsyfte.",
+        "name": "Namn",
+        "namePlaceholder": "Ex. Samarbetsstafett",
+        "shortDescription": "Kort beskrivning",
+        "shortDescriptionPlaceholder": "1-2 meningar som sammanfattar leken.",
+        "fullDescription": "Full beskrivning",
+        "fullDescriptionPlaceholder": "Instruktioner, tips och säkerhetsnotiser.",
+        "status": "Status",
+        "statusPlaceholder": "Välj status",
+        "owner": "Ägare",
+        "ownerPlaceholder": "Välj ägare",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Syfte",
+        "purposePlaceholder": "Välj syfte",
+        "product": "Produkt",
+        "productPlaceholder": "Välj produkt",
+        "productNone": "Ingen",
+        "category": "Kategori",
+        "categoryPlaceholder": "Ex. Samarbete, Uppvärmning",
+        "energy": "Energi",
+        "energyPlaceholder": "Välj energinivå",
+        "energyNone": "Ingen",
+        "energyLow": "Låg",
+        "energyMedium": "Medel",
+        "energyHigh": "Hög",
+        "location": "Spelplats",
+        "locationPlaceholder": "Välj spelplats",
+        "locationUnknown": "Okänt",
+        "locationIndoor": "Inomhus",
+        "locationOutdoor": "Utomhus",
+        "locationBoth": "Både och",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publicerad",
+        "timeEstimate": "Beräknad tid (min)",
+        "timeEstimatePlaceholder": "Ex. 15",
+        "players": "Spelare (min-max)",
+        "playersMin": "Min",
+        "playersMax": "Max",
+        "age": "Ålder (min-max)",
+        "ageMin": "Min",
+        "ageMax": "Max",
+        "requiredError": "Namn, kort beskrivning och syfte måste anges.",
+        "saveError": "Kunde inte spara spelet. Försök igen.",
+        "cancel": "Avbryt",
+        "saving": "Sparar...",
+        "saveChanges": "Spara ändringar",
+        "create": "Skapa lek"
+      },
+      "pageDescription": "Navet för att skapa, uppdatera, publicera och exportera hela spelkatalogen.",
+      "cardTitle": "Spelöversikt",
+      "searchPlaceholder": "Sök på namn, syfte eller kategori",
+      "breadcrumbs": {
+        "home": "Startsida",
+        "games": "Spel"
+      },
+      "stats": {
+        "total": "Totalt",
+        "published": "Publicerade",
+        "drafts": "Utkast",
+        "tenantOwned": "Tenant-ägda",
+        "withErrors": "Med fel"
+      },
+      "page": {
+        "noAccess": "Ingen åtkomst",
+        "noAccessDesc": "Du behöver administratörsbehörighet för att hantera spel.",
+        "title": "Spel (globalt)",
+        "description": "Hantera spelkatalogen – sök, filtrera, och utför massåtgärder.",
+        "csvExport": "CSV Export",
+        "import": "Importera",
+        "newInBuilder": "Ny i Builder",
+        "loadError": "Kunde inte ladda spel",
+        "noGamesTitle": "Inga spel matchar filtren",
+        "noGamesDesc": "Justera filter eller lägg till ett nytt spel.",
+        "selectGame": "Välj {name}",
+        "openInBuilder": "Öppna i Builder",
+        "showDetails": "Visa detaljer",
+        "unpublish": "Avpublicera",
+        "publish": "Publicera"
+      },
+      "table": {
+        "name": "Namn",
+        "mode": "Läge",
+        "purpose": "Syfte",
+        "status": "Status",
+        "valid": "Valid",
+        "owner": "Ägare",
+        "updated": "Uppdaterad"
       },
       "filters": {
-        "title": "Filter",
-        "search": "Sök spel...",
-        "clearFilters": "Rensa filter",
-        "removeFilter": "Ta bort filter: {label}",
-        "presets": "Sparade filter",
-        "savePreset": "Spara som förinställning",
-        "noMatchingPresets": "Inga matchande förinställningar",
-        "groups": {
-          "classification": "Klassificering",
-          "playExecution": "Spel & Utförande",
-          "lifecycle": "Livscykel & Kvalitet",
-          "ownership": "Ägarskap & Scope",
-          "technical": "Tekniska Filter"
-        },
-        "status": {
-          "label": "Status",
-          "published": "Publicerad",
-          "draft": "Utkast"
-        },
-        "energy": {
-          "label": "Energinivå",
-          "low": "Låg",
-          "medium": "Medel",
-          "high": "Hög"
-        },
-        "location": {
-          "label": "Plats",
-          "indoor": "Inomhus",
-          "outdoor": "Utomhus",
-          "both": "Båda"
-        },
-        "validation": {
-          "label": "Validering",
-          "valid": "Godkänd",
-          "warnings": "Varningar",
-          "errors": "Fel",
-          "pending": "Väntar"
-        },
-        "ownerSource": {
-          "label": "Källa",
-          "system": "System",
-          "imported": "Importerad",
-          "tenant": "Tenant-skapad",
-          "ai_generated": "AI-genererad"
-        },
-        "contentVersion": {
-          "label": "Innehållsversion",
-          "v1": "v1 (Legacy)",
-          "v2": "v2 (Builder)"
-        },
+        "allStatuses": "Alla statusar",
+        "published": "Publicerade",
+        "draft": "Utkast",
+        "allEnergyLevels": "Alla energinivåer",
+        "low": "Låg",
+        "medium": "Medel",
+        "high": "Hög",
+        "energy": "Energi",
+        "allPlayModes": "Alla spellägen",
+        "basicPlay": "Enkel lek",
+        "facilitatedActivity": "Ledd aktivitet",
+        "participantPlay": "Deltagarlek",
         "playMode": "Spelläge",
-        "purposes": "Syften",
-        "tenants": "Tenants",
-        "products": "Produkter",
+        "allOwners": "Alla ägare",
         "global": "Global",
-        "players": {
-          "label": "Antal spelare",
-          "min": "Min",
-          "max": "Max"
-        },
-        "age": {
-          "label": "Ålder",
-          "min": "Min",
-          "max": "Max"
-        },
-        "time": {
-          "label": "Tid (min)",
-          "min": "Min",
-          "max": "Max"
-        },
-        "chips": {
-          "status": "Status",
-          "playMode": "Spelläge",
-          "global": "Global"
-        }
+        "owner": "Ägare",
+        "status": "Status"
       },
-      "builder": {
-        "artifact": {
-          "newArtifact": "Ny artefakt",
-          "visibility": {
-            "public": "Synlig för alla",
-            "leaderOnly": "Endast lekledare",
-            "rolePrivate": "Privat för roll"
-          },
-          "types": {
-            "card": "Kort",
-            "document": "Dokument",
-            "image": "Bild",
-            "conversationCards": "🗣️ Samtalskort (lek)",
-            "keypad": "🔐 Pinkod (Keypad)",
-            "riddle": "❓ Gåta / Fråga",
-            "multiAnswer": "✅ Flervalssvar",
-            "audio": "🔊 Ljudklipp",
-            "hotspot": "🎯 Klickbar bild (Hotspot)",
-            "tilePuzzle": "🧩 Pusselspel",
-            "cipher": "🔤 Kryptering / Chiffer",
-            "logicGrid": "🧠 Logikrutnät",
-            "counter": "🔢 Räknare",
-            "qrGate": "📱 QR/NFC-skanning",
-            "hintContainer": "💡 Tips-behållare",
-            "propConfirmation": "📦 Rekvisita-bekräftelse",
-            "locationCheck": "📍 Platsverifiering",
-            "soundLevel": "🎤 Ljudnivå-detektor",
-            "replayMarker": "⏱️ Replay-markör",
-            "signalGenerator": "📢 Signalgenerator",
-            "timeBankStep": "⏳ Tidsbank / Final timer",
-            "emptyArtifact": "📦 Tom slot (placeholder)"
-          },
-          "errors": {
-            "loadConversationDecks": "Kunde inte ladda samtalskorts-lekar"
-          }
-        },
-        "trigger": {
-          "newTrigger": "Ny trigger",
-          "addTrigger": "Lägg till trigger",
-          "noTriggers": "Inga triggers ännu.",
-          "noTriggersHint": "Triggers automatiserar leken: \"När X händer, gör Y\"",
-          "unnamedTrigger": "Namnlös trigger",
-          "inactive": "Inaktiv",
-          "onceLabel": "En gång",
-          "activeLabel": "Aktiv",
-          "onceCheckboxLabel": "En gång",
-          "autoDisable": "Inaktiveras automatiskt efter första körningen",
-          "delayLabel": "Fördröjning",
-          "seconds": "sekunder",
-          "step": "Steg {number}",
-          "addActionPlaceholder": "+ Lägg till åtgärd...",
-          "templates": "Mallar",
-          "howItWorks": {
-            "title": "Hur triggers fungerar",
-            "description": "Triggers automatiserar leken: när ett villkor uppfylls (t.ex. ett steg slutförs eller tid går ut) utförs en eller flera åtgärder automatiskt.",
-            "example": "När 5 minuter återstår → Visa en ledtråd"
-          },
-          "import": {
-            "error": "Importfel"
-          }
-        }
+      "noGames": {
+        "title": "Inga spel matchar filtren",
+        "description": "Justera filter eller lägg till ett nytt spel."
+      },
+      "noAccess": {
+        "title": "Ingen åtkomst",
+        "description": "Du behöver administratörsbehörighet för att hantera spel."
+      },
+      "labels": {
+        "unnamedOrganisation": "Namnlös organisation",
+        "unknownPurpose": "Okänt syfte",
+        "unknownProduct": "Okänd produkt",
+        "nameMissing": "Namn saknas",
+        "noDescription": "Ingen beskrivning"
+      },
+      "errors": {
+        "fetchFailed": "Kunde inte hämta spel",
+        "loadFailed": "Kunde inte ladda spel just nu.",
+        "loadTitle": "Kunde inte ladda spel",
+        "publishFailed": "Publicering misslyckades",
+        "draftFailed": "Kunde inte återställa till utkast",
+        "deleteFailed": "Kunde inte ta bort leken",
+        "updateFailed": "Misslyckades att uppdatera spelet",
+        "unknownError": "Okänt fel"
+      },
+      "messages": {
+        "published": "Publicerad",
+        "restoredToDraft": "Återställd till utkast",
+        "gameDeleted": "Leken togs bort.",
+        "importComplete": "Import klar! Spellistan uppdaterad.",
+        "importedGames": "Importerade {count} spel.",
+        "importFailed": "Misslyckades för {count} spel.",
+        "changesSaved": "Ändringar sparade."
+      },
+      "actions": {
+        "edit": "Redigera",
+        "makeDraft": "Gör till utkast",
+        "publish": "Publicera",
+        "delete": "Ta bort"
+      },
+      "list": {
+        "selectGame": "Välj {name}",
+        "openMenu": "Öppna meny"
+      },
+      "deleteDialog": {
+        "title": "Ta bort lek?",
+        "description": "Denna åtgärd kan inte ångras. Leken tas bort permanent."
       }
     },
     "achievements": {
@@ -2121,7 +2264,56 @@
       "organizationDetails": "Organisationsdetaljer",
       "searchOrganizations": "Sök organisationer...",
       "noOrganizations": "Inga organisationer hittades",
-      "members": "Medlemmar",
+      "members": {
+        "title": "Medlemmar",
+        "addMember": "Lägg till medlem",
+        "addMemberDescription": "Sök efter en befintlig användare via e-post och lägg till dem direkt i organisationen.",
+        "searchByEmail": "Sök användare via e-post",
+        "searchPlaceholder": "namn@exempel.se",
+        "searching": "Söker...",
+        "search": "Sök",
+        "noUserFound": "Ingen användare hittades med den e-postadressen",
+        "searchFailed": "Kunde inte söka efter användare",
+        "searchResults": "Sökresultat",
+        "alreadyMember": "Redan medlem",
+        "role": "Roll",
+        "roleOwner": "Ägare",
+        "roleAdmin": "Admin",
+        "roleMember": "Medlem",
+        "cancel": "Avbryt",
+        "adding": "Lägger till...",
+        "addMemberButton": "Lägg till medlem",
+        "memberAdded": "{name} tillagd som {role}",
+        "alreadyMemberError": "Användaren är redan medlem i organisationen",
+        "addFailed": "Kunde inte lägga till medlem",
+        "loadFailed": "Kunde inte ladda medlemmar",
+        "unknown": "Okänd",
+        "statsTotal": "Totalt",
+        "statsOwners": "Ägare",
+        "statsAdmins": "Admins",
+        "statsPending": "Väntande",
+        "membersCount": "Medlemmar ({count})",
+        "searchNameOrEmail": "Sök på namn eller e-post...",
+        "allRoles": "Alla roller",
+        "loading": "Laddar medlemmar...",
+        "noMembersMatch": "Inga medlemmar matchar filtren",
+        "noMembersYet": "Inga medlemmar i organisationen",
+        "tableUser": "Användare",
+        "tableRole": "Roll",
+        "tableMemberSince": "Medlem sedan",
+        "tableActions": "Åtgärder",
+        "primary": "Primär",
+        "makeOwner": "Gör till ägare",
+        "makeAdmin": "Gör till admin",
+        "makeMember": "Gör till medlem",
+        "removeFromOrg": "Ta bort från organisation",
+        "confirmRemove": "Är du säker på att du vill ta bort {name} från organisationen?",
+        "cannotRemoveOnlyOwner": "Kan inte ta bort den enda ägaren",
+        "memberRemoved": "Medlem borttagen",
+        "removeFailed": "Kunde inte ta bort medlem",
+        "roleChanged": "Roll ändrad till {role}",
+        "roleChangeFailed": "Kunde inte ändra roll"
+      },
       "memberCount": "{count} medlemmar",
       "plan": "Plan",
       "subscription": "Prenumeration",
@@ -2201,56 +2393,6 @@
         "submit": "Skapa organisation",
         "required": "*"
       },
-      "members": {
-        "title": "Medlemmar",
-        "addMember": "Lägg till medlem",
-        "addMemberDescription": "Sök efter en befintlig användare via e-post och lägg till dem direkt i organisationen.",
-        "searchByEmail": "Sök användare via e-post",
-        "searchPlaceholder": "namn@exempel.se",
-        "searching": "Söker...",
-        "search": "Sök",
-        "noUserFound": "Ingen användare hittades med den e-postadressen",
-        "searchFailed": "Kunde inte söka efter användare",
-        "searchResults": "Sökresultat",
-        "alreadyMember": "Redan medlem",
-        "role": "Roll",
-        "roleOwner": "Ägare",
-        "roleAdmin": "Admin",
-        "roleMember": "Medlem",
-        "cancel": "Avbryt",
-        "adding": "Lägger till...",
-        "addMemberButton": "Lägg till medlem",
-        "memberAdded": "{name} tillagd som {role}",
-        "alreadyMemberError": "Användaren är redan medlem i organisationen",
-        "addFailed": "Kunde inte lägga till medlem",
-        "loadFailed": "Kunde inte ladda medlemmar",
-        "unknown": "Okänd",
-        "statsTotal": "Totalt",
-        "statsOwners": "Ägare",
-        "statsAdmins": "Admins",
-        "statsPending": "Väntande",
-        "membersCount": "Medlemmar ({count})",
-        "searchNameOrEmail": "Sök på namn eller e-post...",
-        "allRoles": "Alla roller",
-        "loading": "Laddar medlemmar...",
-        "noMembersMatch": "Inga medlemmar matchar filtren",
-        "noMembersYet": "Inga medlemmar i organisationen",
-        "tableUser": "Användare",
-        "tableRole": "Roll",
-        "tableMemberSince": "Medlem sedan",
-        "tableActions": "Åtgärder",
-        "primary": "Primär",
-        "makeOwner": "Gör till ägare",
-        "makeAdmin": "Gör till admin",
-        "makeMember": "Gör till medlem",
-        "removeFromOrg": "Ta bort från organisation",
-        "confirmRemove": "Är du säker på att du vill ta bort {name} från organisationen?",
-        "cannotRemoveOnlyOwner": "Kan inte ta bort den enda ägaren",
-        "memberRemoved": "Medlem borttagen",
-        "removeFailed": "Kunde inte ta bort medlem",
-        "roleChanged": "Roll ändrad till {role}",
-        "roleChangeFailed": "Kunde inte ändra roll"
-      },
       "audit": {
         "title": "Aktivitetslogg",
         "titleWithCount": "Aktivitetslogg ({count})",
@@ -2296,7 +2438,8 @@
       "breadcrumbs": {
         "admin": "Admin",
         "productsAndContent": "Produkter & Innehåll",
-        "products": "Produkter"
+        "products": "Produkter",
+        "home": "Startsida"
       },
       "stats": {
         "products": "Produkter",
@@ -2308,7 +2451,10 @@
       "tabs": {
         "products": "Produkter",
         "licenses": "Licenser",
-        "purposes": "Syften"
+        "purposes": "Syften",
+        "categories": "Kategorier",
+        "discounts": "Rabatter",
+        "images": "Standardbilder"
       },
       "productsTab": {
         "searchPlaceholder": "Sök produkter...",
@@ -2402,20 +2548,6 @@
         "activeCount": "Aktiva",
         "inactiveCount": "Inaktiva",
         "draftCount": "Utkast"
-      },
-      "breadcrumbs": {
-        "admin": "Admin",
-        "productsAndContent": "Produkter & Innehåll",
-        "products": "Produkter",
-        "home": "Startsida"
-      },
-      "tabs": {
-        "products": "Produkter",
-        "licenses": "Licenser",
-        "purposes": "Syften",
-        "categories": "Kategorier",
-        "discounts": "Rabatter",
-        "images": "Standardbilder"
       },
       "v2": {
         "pageTitle": "Produkter",
@@ -3006,8 +3138,10 @@
         "flagged": "Flaggade"
       },
       "emptyState": {
-        "title": "Inga sessioner",
-        "description": "Justera filter eller försök igen senare."
+        "noAccess": "Ingen åtkomst",
+        "noAccessDescription": "Du behöver behörighet för att se sessioner.",
+        "noSessions": "Inga sessioner",
+        "noSessionsDescription": "Justera filter eller försök igen senare."
       },
       "columns": {
         "title": "Titel",
@@ -3045,12 +3179,6 @@
         "noAccessDescription": "Du behöver behörighet för att se sessioner.",
         "notFound": "Sessionen hittades inte",
         "notFoundDescription": "Kontrollera länken eller gå tillbaka till listan."
-      },
-      "emptyState": {
-        "noAccess": "Ingen åtkomst",
-        "noAccessDescription": "Du behöver behörighet för att se sessioner.",
-        "noSessions": "Inga sessioner",
-        "noSessionsDescription": "Justera filter eller försök igen senare."
       }
     },
     "tickets": {
@@ -3640,260 +3768,6 @@
         "shopItemTranslations": "Butiksartikel",
         "notificationTemplateTranslations": "Notismall",
         "tenantTranslationOverrides": "Tenant-anpassning"
-      }
-    },
-    "games": {
-      "pageTitle": "Spelhantering",
-      "import": {
-        "selectPrompt": "Välj prompt",
-        "artifactsOrTriggers": "Behöver du artifacts eller triggers? Välj <strong>Legendary (JSON)</strong>.",
-        "copy": "Kopiera",
-        "overviewTab": "Översikt",
-        "whatImportDoes": "Vad importen gör",
-        "importCanRead": "Importen kan läsa <strong>CSV</strong> (bulk/massimport) och <strong>JSON</strong> (full fidelity).",
-        "csvVsJson": "CSV vs JSON",
-        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light inom canonical header.",
-        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + avancerade step-fält).",
-        "startHere": "Start här (3 steg)",
-        "step1": "Välj spelläge (basic/facilitated/participants).",
-        "step2": "Välj format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).",
-        "step3": "Validera i Import-dialogen (dry-run) innan import.",
-        "commonErrors": "Vanliga fel",
-        "invalidPurpose": "<strong>Ogiltigt purpose-id:</strong> main_purpose_id/sub_purpose_ids måste vara riktiga UUID från databasen.",
-        "jsonEscaping": "<strong>JSON escaping i CSV:</strong> citat i JSON måste skrivas som <code>{'\"\"'}</code> i CSV-cellen.",
-        "missingSteps": "<strong>Saknade steg:</strong> om step_N_title finns måste step_N_body finnas.",
-        "playModesTab": "Spellägen",
-        "playModes": "Spellägen (play_mode)",
-        "chooseEarly": "Välj läge tidigt – QA, UI och runtime förväntar sig rätt struktur.",
-        "basicMode": "<strong>Enkel lek (basic):</strong> steg + material. Ingen digital interaktion.",
-        "facilitatedMode": "<strong>Ledd aktivitet (facilitated):</strong> steg + faser/timer, ev. publik tavla.",
-        "participantsMode": "<strong>Deltagarlek (participants):</strong> steg + faser + roller + ev. publik tavla. För Legendary (artifacts/triggers) ska du använda JSON-import.",
-        "minimumRequired": "Minimum required",
-        "basicReq": "<strong>basic:</strong> minst step_1_title + step_1_body.",
-        "facilitatedReq": "<strong>facilitated:</strong> steg krävs; phases_json starkt rekommenderat.",
-        "participantsReq": "<strong>participants:</strong> steg krävs; roles_json rekommenderas starkt.",
-        "csvTab": "CSV",
-        "jsonTab": "JSON",
-        "aiPromptsTab": "AI Prompts",
-        "csvFormat": "CSV-format (canonical)",
-        "csvFormatList1": "UTF-8 (med/utan BOM), separator ,",
-        "csvFormatList2": "Celler med komma/radbrytning/citat omsluts av \"...\"; citat skrivs som \"\"",
-        "csvFormatList3": "En rad = en lek",
-        "canonicalCsvHeader": "Canonical CSV-header (kopiera exakt)",
-        "jsonColumnsInCsv": "JSON-kolumner som stöds i CSV",
-        "useJsonForArtifacts": "Vill du använda artifacts eller triggers? CSV-kontraktet innehåller inte det. Välj JSON-import (Legendary).",
-        "commonMistakes": "Vanligaste felen",
-        "invalidJsonInColumn": "Ogiltig JSON i JSON-kolumn (oftast fel citat/escaping).",
-        "stepTitleWithoutBody": "step_N_title ifyllt men step_N_body saknas.",
-        "invalidUuid": "main_purpose_id/sub_purpose_ids är inte giltiga UUID.",
-        "jsonImportFull": "JSON-import (full fidelity)",
-        "jsonLegendaryDesc": "JSON är formatet för Legendary/escape-room: artifacts + triggers + avancerade step-fält.",
-        "minimalJson": "Minimal JSON (1 lek)",
-        "orderResolution": "Order-resolution i triggers",
-        "orderResolutionDesc": "Triggers kan referera till stepOrder/phaseOrder/artifactOrder i condition/actions. Importen resolverar det till faktiska ID:n.",
-        "infoDialogTitle": "Information om lekar"
-      },
-      "playModes": {
-        "basic": "Enkel lek",
-        "facilitated": "Ledd aktivitet",
-        "participants": "Deltagarlek"
-      },
-      "detail": {
-        "noAccess": "Ingen åtkomst",
-        "noAccessDesc": "Du behöver administratörsbehörighet för att visa spel.",
-        "somethingWentWrong": "Något gick fel",
-        "loading": "Laddar...",
-        "loadingGameData": "Hämtar speldata.",
-        "gameNotFound": "Spelet hittades inte",
-        "gameMissing": "Spelet saknas",
-        "checkLinkOrGoBack": "Kontrollera länken eller gå tillbaka till listan.",
-        "backToGames": "Tillbaka till spel",
-        "makeDraft": "Gör till utkast",
-        "status": "Status",
-        "published": "Publicerad",
-        "draft": "Utkast",
-        "category": "Kategori",
-        "energy": "Energi",
-        "purpose": "Syfte",
-        "product": "Produkt",
-        "owner": "Ägare",
-        "global": "Global",
-        "players": "Spelare",
-        "time": "Tid",
-        "age": "Ålder",
-        "notSet": "Inte satt",
-        "back": "Tillbaka",
-        "edit": "Redigera",
-        "publish": "Publicera",
-        "delete": "Ta bort",
-        "metadata": "Metadata",
-        "description": "Beskrivning",
-        "noDescription": "Ingen beskrivning angiven.",
-        "noShortDescription": "Ingen kort beskrivning angiven.",
-        "technical": "Tekniskt",
-        "createdAt": "Skapad",
-        "updatedAt": "Uppdaterad",
-        "deleteTitle": "Ta bort spelet?",
-        "deleteDescription": "Detta raderar spelet permanent.",
-        "deleteConfirm": "Ta bort"
-      },
-      "form": {
-        "editTitle": "Redigera lek",
-        "createTitle": "Skapa ny lek",
-        "description": "Hantera grunddata för lekbanken. Minimikrav: namn, kort beskrivning och huvudsyfte.",
-        "name": "Namn",
-        "namePlaceholder": "Ex. Samarbetsstafett",
-        "shortDescription": "Kort beskrivning",
-        "shortDescriptionPlaceholder": "1-2 meningar som sammanfattar leken.",
-        "fullDescription": "Full beskrivning",
-        "fullDescriptionPlaceholder": "Instruktioner, tips och säkerhetsnotiser.",
-        "status": "Status",
-        "statusPlaceholder": "Välj status",
-        "owner": "Ägare",
-        "ownerPlaceholder": "Välj ägare",
-        "ownerGlobal": "Global (Lekbanken)",
-        "purpose": "Syfte",
-        "purposePlaceholder": "Välj syfte",
-        "product": "Produkt",
-        "productPlaceholder": "Välj produkt",
-        "productNone": "Ingen",
-        "category": "Kategori",
-        "categoryPlaceholder": "Ex. Samarbete, Uppvärmning",
-        "energy": "Energi",
-        "energyPlaceholder": "Välj energinivå",
-        "energyNone": "Ingen",
-        "energyLow": "Låg",
-        "energyMedium": "Medel",
-        "energyHigh": "Hög",
-        "location": "Spelplats",
-        "locationPlaceholder": "Välj spelplats",
-        "locationUnknown": "Okänt",
-        "locationIndoor": "Inomhus",
-        "locationOutdoor": "Utomhus",
-        "locationBoth": "Både och",
-        "statusDraft": "Utkast",
-        "statusPublished": "Publicerad",
-        "timeEstimate": "Beräknad tid (min)",
-        "timeEstimatePlaceholder": "Ex. 15",
-        "players": "Spelare (min-max)",
-        "playersMin": "Min",
-        "playersMax": "Max",
-        "age": "Ålder (min-max)",
-        "ageMin": "Min",
-        "ageMax": "Max",
-        "requiredError": "Namn, kort beskrivning och syfte måste anges.",
-        "saveError": "Kunde inte spara spelet. Försök igen.",
-        "cancel": "Avbryt",
-        "saving": "Sparar...",
-        "saveChanges": "Spara ändringar",
-        "create": "Skapa lek"
-      },
-      "pageDescription": "Navet för att skapa, uppdatera, publicera och exportera hela spelkatalogen.",
-      "cardTitle": "Spelöversikt",
-      "searchPlaceholder": "Sök på namn, syfte eller kategori",
-      "breadcrumbs": {
-        "home": "Startsida",
-        "games": "Spel"
-      },
-      "stats": {
-        "total": "Totalt",
-        "published": "Publicerade",
-        "drafts": "Utkast",
-        "tenantOwned": "Tenant-ägda",
-        "withErrors": "Med fel"
-      },
-      "page": {
-        "noAccess": "Ingen åtkomst",
-        "noAccessDesc": "Du behöver administratörsbehörighet för att hantera spel.",
-        "title": "Spel (globalt)",
-        "description": "Hantera spelkatalogen – sök, filtrera, och utför massåtgärder.",
-        "csvExport": "CSV Export",
-        "import": "Importera",
-        "newInBuilder": "Ny i Builder",
-        "loadError": "Kunde inte ladda spel",
-        "noGamesTitle": "Inga spel matchar filtren",
-        "noGamesDesc": "Justera filter eller lägg till ett nytt spel.",
-        "selectGame": "Välj {name}",
-        "openInBuilder": "Öppna i Builder",
-        "showDetails": "Visa detaljer",
-        "unpublish": "Avpublicera",
-        "publish": "Publicera"
-      },
-      "table": {
-        "name": "Namn",
-        "mode": "Läge",
-        "purpose": "Syfte",
-        "status": "Status",
-        "valid": "Valid",
-        "owner": "Ägare",
-        "updated": "Uppdaterad"
-      },
-      "filters": {
-        "allStatuses": "Alla statusar",
-        "published": "Publicerade",
-        "draft": "Utkast",
-        "allEnergyLevels": "Alla energinivåer",
-        "low": "Låg",
-        "medium": "Medel",
-        "high": "Hög",
-        "energy": "Energi",
-        "allPlayModes": "Alla spellägen",
-        "basicPlay": "Enkel lek",
-        "facilitatedActivity": "Ledd aktivitet",
-        "participantPlay": "Deltagarlek",
-        "playMode": "Spelläge",
-        "allOwners": "Alla ägare",
-        "global": "Global",
-        "owner": "Ägare",
-        "status": "Status"
-      },
-      "noGames": {
-        "title": "Inga spel matchar filtren",
-        "description": "Justera filter eller lägg till ett nytt spel."
-      },
-      "noAccess": {
-        "title": "Ingen åtkomst",
-        "description": "Du behöver administratörsbehörighet för att hantera spel."
-      },
-      "labels": {
-        "unnamedOrganisation": "Namnlös organisation",
-        "unknownPurpose": "Okänt syfte",
-        "unknownProduct": "Okänd produkt",
-        "nameMissing": "Namn saknas",
-        "noDescription": "Ingen beskrivning"
-      },
-      "errors": {
-        "fetchFailed": "Kunde inte hämta spel",
-        "loadFailed": "Kunde inte ladda spel just nu.",
-        "loadTitle": "Kunde inte ladda spel",
-        "publishFailed": "Publicering misslyckades",
-        "draftFailed": "Kunde inte återställa till utkast",
-        "deleteFailed": "Kunde inte ta bort leken",
-        "updateFailed": "Misslyckades att uppdatera spelet",
-        "unknownError": "Okänt fel"
-      },
-      "messages": {
-        "published": "Publicerad",
-        "restoredToDraft": "Återställd till utkast",
-        "gameDeleted": "Leken togs bort.",
-        "importComplete": "Import klar! Spellistan uppdaterad.",
-        "importedGames": "Importerade {count} spel.",
-        "importFailed": "Misslyckades för {count} spel.",
-        "changesSaved": "Ändringar sparade."
-      },
-      "actions": {
-        "edit": "Redigera",
-        "makeDraft": "Gör till utkast",
-        "publish": "Publicera",
-        "delete": "Ta bort"
-      },
-      "list": {
-        "selectGame": "Välj {name}",
-        "openMenu": "Öppna meny"
-      },
-      "deleteDialog": {
-        "title": "Ta bort lek?",
-        "description": "Denna åtgärd kan inte ångras. Leken tas bort permanent."
       }
     }
   },
@@ -5612,18 +5486,14 @@
       "requestHint": "Be om ledtråd av lekledaren"
     },
     "roleAssigner": {
+      "noRolesCopied": "Inga roller kopierade ännu",
+      "copyRolesHint": "Klicka på \"Kopiera roller från spel\" ovan för att hämta rollerna från spelets mall.",
+      "afterCopyHint": "Efter kopiering kan du tilldela roller till deltagare manuellt eller slumpmässigt.",
       "errors": {
-        "randomAssignFailed": "Ett fel uppstod vid slumpmässig tilldelning"
-      },
-      "minRequirements": {
-        "notSatisfied": "Minimikrav ej uppfyllt",
-        "needMore": "{roleName}: {count} fler behövs"
-      },
-      "needs": "Behöver {count}",
-      "noAssignedYet": "Ingen tilldelad ännu",
-      "selectRoleFor": "Välj roll för",
-      "noRolesAvailable": "Inga roller tillgängliga (alla fulla eller konflikt)",
-      "cancel": "Avbryt"
+        "loadFailed": "Kunde inte ladda data",
+        "assignFailed": "Kunde inte tilldela roller",
+        "unassignFailed": "Kunde inte ta bort rolltilldelning"
+      }
     },
     "sessionChatDrawer": {
       "title": "Chatt",
@@ -6239,16 +6109,10 @@
       "open": "Öppna"
     },
     "sessionHeader": {
-      "back": "Tillbaka",
-      "settings": "Inställningar",
-      "codeCopied": "Kod kopierad",
-      "copySessionCode": "Kopiera sessionskod",
-      "participants": "deltagare",
-      "ongoing": "Pågått",
-      "duration": {
-        "hoursMinutes": "{hours}h {minutes}m",
-        "minutes": "{minutes}m"
-      }
+      "sessionFor": "Session för",
+      "copyCode": "Kopiera kod",
+      "copiedCode": "Kopierat!",
+      "joinUrl": "Anslutningslänk"
     },
     "sessionStatusBadge": {
       "active": "Aktiv",
@@ -6856,12 +6720,6 @@
         "body": "Notifikationer fungerar!"
       }
     },
-    "sessionHeader": {
-      "sessionFor": "Session för",
-      "copyCode": "Kopiera kod",
-      "copiedCode": "Kopierat!",
-      "joinUrl": "Anslutningslänk"
-    },
     "signalPanel": {
       "title": "Signals",
       "description": "Skicka snabba events med färdiga knappar eller egen kanal.",
@@ -6889,16 +6747,6 @@
       "errors": {
         "loadFailed": "Kunde inte ladda signals",
         "sendFailed": "Kunde inte skicka signal"
-      }
-    },
-    "roleAssigner": {
-      "noRolesCopied": "Inga roller kopierade ännu",
-      "copyRolesHint": "Klicka på \"Kopiera roller från spel\" ovan för att hämta rollerna från spelets mall.",
-      "afterCopyHint": "Efter kopiering kan du tilldela roller till deltagare manuellt eller slumpmässigt.",
-      "errors": {
-        "loadFailed": "Kunde inte ladda data",
-        "assignFailed": "Kunde inte tilldela roller",
-        "unassignFailed": "Kunde inte ta bort rolltilldelning"
       }
     },
     "storyView": {

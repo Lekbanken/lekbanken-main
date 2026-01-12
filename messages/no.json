@@ -1073,7 +1073,125 @@
     "design": {
       "mediaDefaults": {
         "noDefaultProfileImages": "Ingen standard profilbilder lastet opp",
-        "noDefaultCoverImages": "Ingen standard omslagsbilder lastet opp"
+        "noDefaultCoverImages": "Ingen standard omslagsbilder lastet opp",
+        "profileImages": {
+          "title": "Standard profilbilder",
+          "description": "Standard profilbilder som brukere kan velge. Brukes også som fallback."
+        },
+        "coverImages": {
+          "title": "Standard omslagsbilder",
+          "description": "Standard omslagsbilder for leker og aktiviteter."
+        },
+        "imageAlt": "Bilde {index}",
+        "addImage": "Legg til",
+        "loading": "Laster..."
+      },
+      "toasts": {
+        "saving": "Lagrer...",
+        "saved": "Lagret",
+        "tokensSaved": "Tokens lagret",
+        "typographySaved": "Typografi lagret",
+        "colorsSaved": "Farger lagret",
+        "uploadComplete": "Opplasting fullført",
+        "imageUploaded": "Bilde lastet opp",
+        "deleted": "Slettet",
+        "imageDeleted": "Bilde slettet",
+        "copied": "Kopiert!",
+        "error": "En feil oppstod",
+        "uploadFailed": "Opplasting mislyktes",
+        "couldNotSave": "Kunne ikke lagre",
+        "couldNotDelete": "Kunne ikke slette"
+      },
+      "advanced": {
+        "title": "Avanserte innstillinger",
+        "warning": "Disse innstillingene påvirker globale design tokens. Endre med forsiktighet.",
+        "saveTokens": "Lagre tokens",
+        "borderRadius": {
+          "title": "Border Radius",
+          "badge": "Tokens",
+          "description": "Hjørneradius for komponenter. Bruker CSS-verdier (rem, px, etc)."
+        },
+        "cssVariables": {
+          "title": "CSS Variabler",
+          "badge": "Kommer snart",
+          "description": "Egne CSS-variabler for avansert tilpasning.",
+          "info": "Muligheten til å definere egne CSS-variabler kommer i en fremtidig versjon."
+        },
+        "spacingScale": {
+          "title": "Spacing Scale",
+          "badge": "Kommer snart",
+          "description": "Tilpasset spacing-skala for margin og padding.",
+          "info": "Tilpasset spacing-skala kommer i en fremtidig versjon."
+        }
+      },
+      "brand": {
+        "logos": {
+          "title": "Logoer",
+          "description": "Last opp logoer for lyst og mørkt modus. Anbefalt format: SVG eller PNG med gjennomsiktig bakgrunn.",
+          "light": "Logo (lys modus)",
+          "lightDesc": "Brukes på lyse bakgrunner",
+          "dark": "Logo (mørk modus)",
+          "darkDesc": "Brukes på mørke bakgrunner"
+        },
+        "appIcon": {
+          "title": "App-ikon",
+          "description": "Brukes i navigering og som PWA-ikon. Kvadratisk format, minst 512x512 px.",
+          "label": "App-ikon",
+          "labelDesc": "Kvadratisk ikon for app"
+        },
+        "favicons": {
+          "title": "Favicons",
+          "description": "Nettleserfaneikon. Last opp ICO, PNG eller SVG.",
+          "light": "Favicon (lys)",
+          "lightDesc": "For lyst tema",
+          "dark": "Favicon (mørk)",
+          "darkDesc": "For mørkt tema"
+        },
+        "colors": {
+          "title": "Merkevarefarger",
+          "description": "Primær og sekundær farge brukes i komponenter og temaer.",
+          "primary": "Primærfarge",
+          "secondary": "Sekundærfarge",
+          "saveColors": "Lagre farger"
+        },
+        "assetUploader": {
+          "replace": "Erstatt",
+          "copyUrl": "Kopier URL",
+          "clickToUpload": "Klikk for å laste opp",
+          "uploading": "Laster opp...",
+          "fileTypes": "PNG, JPEG, SVG, WebP (maks 5 MB)"
+        }
+      },
+      "typography": {
+        "fontFamily": {
+          "title": "Skrifttype",
+          "description": "Velg skrifttype for plattformen. Påvirker all tekst.",
+          "selectLabel": "Standard skrifttype",
+          "selectPlaceholder": "Velg skrifttype",
+          "custom": "Egendefinert...",
+          "customFontFamily": "Font family",
+          "customFontFamilyPlaceholder": "'Custom Font', sans-serif",
+          "customFontUrl": "Font URL (Google Fonts, etc.)",
+          "customFontUrlPlaceholder": "https://fonts.googleapis.com/css2?family=...",
+          "preview": "Forhåndsvisning",
+          "previewHeading": "Overskrifter ser slik ut",
+          "previewBody": "Brødtekst med normal skrifttype. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        },
+        "titleFormat": {
+          "title": "Overskriftformat",
+          "description": "Hvordan overskrifter formateres (text-transform).",
+          "label": "Format",
+          "normal": "Normal",
+          "uppercase": "Store bokstaver",
+          "capitalize": "Stor forbokstav",
+          "example": "Eksempel på overskrift"
+        },
+        "size": {
+          "title": "Størrelse",
+          "description": "Basisstørrelse for skrift. Alle størrelser skaleres relativt.",
+          "baseSize": "Basisstørrelse (px)"
+        },
+        "saveTypography": "Lagre typografi"
       }
     },
     "billing": {
@@ -1345,7 +1463,67 @@
         }
       },
       "achievements": {
-        "emptyTitle": "Ingen achievements"
+        "pageTitle": "Achievements",
+        "pageDescription": "Administrer achievements, tildel til brukere og konfigurer regler.",
+        "createAchievement": "Opprett achievement",
+        "searchPlaceholder": "Søk achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Rediger",
+          "award": "Tildel",
+          "archive": "Arkiver",
+          "restore": "Gjenopprett",
+          "delete": "Slett"
+        },
+        "filters": {
+          "scope": "Omfang",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "Alle omfang",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Privat"
+        },
+        "statuses": {
+          "all": "Alle statuser",
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        },
+        "notifications": {
+          "saved": "Achievement lagret",
+          "deleted": "Achievement slettet",
+          "fetchFailed": "Kunne ikke hente achievements",
+          "updateStatusFailed": "Kunne ikke oppdatere status",
+          "deleteFailed": "Kunne ikke slette",
+          "archiveFailed": "Kunne ikke arkivere",
+          "activateFailed": "Kunne ikke aktivere"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Slett achievement",
+          "confirmAction": "Bekreft handling",
+          "deleteConfirm": "Er du sikker på at du vil slette dette achievement? Dette kan ikke angres.",
+          "areYouSure": "Er du sikker?",
+          "deleteButton": "Slett",
+          "confirmButton": "Bekreft"
+        },
+        "empty": {
+          "noAchievements": "Ingen achievements",
+          "noMatch": "Ingen achievements matcher filtrene dine.",
+          "getStarted": "Opprett din første achievement for å komme i gang.",
+          "createAction": "Opprett achievement"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        }
       },
       "shopRewards": {
         "pageTitle": "Butikk & Belønninger",
@@ -1472,69 +1650,6 @@
           "createAction": "Opprett eksportmal"
         },
         "searchPlaceholder": "Søk maler..."
-      },
-      "achievements": {
-        "pageTitle": "Achievements",
-        "pageDescription": "Administrer achievements, tildel til brukere og konfigurer regler.",
-        "createAchievement": "Opprett achievement",
-        "searchPlaceholder": "Søk achievements...",
-        "breadcrumbs": {
-          "admin": "Admin",
-          "gamification": "Gamification",
-          "achievements": "Achievements"
-        },
-        "actions": {
-          "edit": "Rediger",
-          "award": "Tildel",
-          "archive": "Arkiver",
-          "restore": "Gjenopprett",
-          "delete": "Slett"
-        },
-        "filters": {
-          "scope": "Omfang",
-          "status": "Status",
-          "tenant": "Tenant"
-        },
-        "scopes": {
-          "all": "Alle omfang",
-          "global": "Global",
-          "tenant": "Tenant",
-          "private": "Privat"
-        },
-        "statuses": {
-          "all": "Alle statuser",
-          "draft": "Utkast",
-          "active": "Aktiv",
-          "archived": "Arkivert"
-        },
-        "notifications": {
-          "saved": "Achievement lagret",
-          "deleted": "Achievement slettet",
-          "fetchFailed": "Kunne ikke hente achievements",
-          "updateStatusFailed": "Kunne ikke oppdatere status",
-          "deleteFailed": "Kunne ikke slette",
-          "archiveFailed": "Kunne ikke arkivere",
-          "activateFailed": "Kunne ikke aktivere"
-        },
-        "confirmDialog": {
-          "deleteTitle": "Slett achievement",
-          "confirmAction": "Bekreft handling",
-          "deleteConfirm": "Er du sikker på at du vil slette dette achievement? Dette kan ikke angres.",
-          "areYouSure": "Er du sikker?",
-          "deleteButton": "Slett",
-          "confirmButton": "Bekreft"
-        },
-        "empty": {
-          "noAchievements": "Ingen achievements",
-          "noMatch": "Ingen achievements matcher filtrene dine.",
-          "getStarted": "Opprett din første achievement for å komme i gang.",
-          "createAction": "Opprett achievement"
-        },
-        "status": {
-          "draft": "Utkast",
-          "active": "Aktiv",
-          "archived": "Arkivert"
-        }
       }
     },
     "users": {
@@ -1546,7 +1661,12 @@
       "deleteUser": "Slett bruker",
       "userDetails": "Brukerdetaljer",
       "searchUsers": "Søk brukere...",
-      "noUsers": "Ingen brukere funnet",
+      "noUsers": {
+        "title": "Ingen brukere",
+        "titleWithFilters": "Ingen matchende brukere",
+        "description": "Det finnes ingen brukere i systemet ennå.",
+        "descriptionWithFilters": "Juster søket eller tøm filter for å se flere."
+      },
       "role": "Rolle",
       "roles": {
         "systemAdmin": "Systemadministrator",
@@ -1604,12 +1724,6 @@
         "invited": "Inviterte",
         "disabled": "Deaktiverte",
         "withoutOrg": "Uten organisasjon"
-      },
-      "noUsers": {
-        "title": "Ingen brukere",
-        "titleWithFilters": "Ingen matchende brukere",
-        "description": "Det finnes ingen brukere i systemet ennå.",
-        "descriptionWithFilters": "Juster søket eller tøm filter for å se flere."
       },
       "noAccess": {
         "title": "Tilgang nektet",
@@ -1819,228 +1933,257 @@
       }
     },
     "games": {
-      "drawer": {
-        "tabs": {
-          "overview": "Oversikt",
-          "content": "Innhold",
-          "availability": "Tilgjengelighet",
-          "metadata": "Metadata",
-          "history": "Historikk"
-        },
-        "validation": {
-          "valid": "Godkjent",
-          "warnings": "Advarsler",
-          "errors": "Feil",
-          "pending": "Venter",
-          "outdated": "Utdatert"
-        },
-        "status": {
-          "published": "Publisert",
-          "draft": "Utkast"
-        },
-        "overview": {
-          "steps": "Trinn",
-          "phases": "Faser",
-          "roles": "Roller",
-          "timeMin": "Tid (min)",
-          "coreInfo": "Grunnleggende informasjon",
-          "status": "Status",
-          "playMode": "Spillmodus",
-          "validation": "Validering",
-          "mainPurpose": "Hovedformål",
-          "owner": "Eier",
-          "global": "Global",
-          "uuid": "UUID",
-          "validationIssues": "Valideringsproblemer",
-          "openInBuilder": "Åpne i Game Builder"
-        },
-        "content": {
-          "playModeLabel": "Spillmodus: {mode}",
-          "materials": "Materialer",
-          "timer": "Timer",
-          "artifacts": "Artifacts",
-          "triggers": "Triggers",
-          "board": "Tavle",
-          "schemaVersion": "Skjema & versjon",
-          "contentVersion": "Innholdsversjon",
-          "schemaStatus": "Skjemastatus",
-          "current": "Gjeldende",
-          "contentWarnings": "Innholdsadvarsler"
-        },
-        "availability": {
-          "title": "Tilgjengelighet",
-          "global": "Global",
-          "globalDescription": "Tilgjengelig for alle tenants",
-          "tenantSpecific": "Tenant-spesifikk",
-          "unknownTenant": "Ukjent tenant",
-          "productAssociation": "Produkttilknytning",
-          "product": "Produkt",
-          "adminControls": "Admin-kontroller",
-          "adminControlsDescription": "Tenant-tildeling og lisenshåndtering kommer snart."
-        },
-        "metadata": {
-          "gameParameters": "Spillparametere",
-          "players": "Spillere",
-          "age": "Alder",
-          "ageYears": "{min} – {max} år",
-          "time": "Tid",
-          "timeMinutes": "{time} min",
-          "energyLevel": "Energinivå",
-          "locationType": "Sted",
-          "purposes": "Formål",
-          "noPurposes": "Ingen formål knyttet",
-          "category": "Kategori"
-        },
-        "history": {
-          "timestamps": "Tidsstempler",
-          "created": "Opprettet",
-          "lastUpdated": "Sist oppdatert",
-          "importSource": "Importkilde",
-          "type": "Type",
-          "imported": "Importert",
-          "schema": "Skjema",
-          "changeHistory": "Endringshistorikk",
-          "changeHistoryDescription": "Detaljert endringshistorikk kommer i en fremtidig versjon."
-        }
+      "pageTitle": "Spilladministrasjon",
+      "import": {
+        "selectPrompt": "Velg prompt",
+        "artifactsOrTriggers": "Trenger du artefakter eller triggere? Velg <strong>Legendary (JSON)</strong>.",
+        "copy": "Kopier",
+        "overviewTab": "Oversikt",
+        "whatImportDoes": "Hva importen gjør",
+        "importCanRead": "Importen kan lese <strong>CSV</strong> (masseimport) og <strong>JSON</strong> (full fidelity).",
+        "csvVsJson": "CSV vs JSON",
+        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light innenfor canonical header.",
+        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artefakter + triggere + avanserte step-felt).",
+        "startHere": "Start her (3 steg)",
+        "step1": "Velg spillmodus (basic/facilitated/participants).",
+        "step2": "Velg format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).",
+        "step3": "Valider i Import-dialogen (dry-run) før import.",
+        "commonErrors": "Vanlige feil",
+        "invalidPurpose": "<strong>Ugyldig purpose-id:</strong> main_purpose_id/sub_purpose_ids må være gyldige UUID fra databasen.",
+        "jsonEscaping": "<strong>JSON escaping i CSV:</strong> anførselstegn i JSON må skrives som <code>{'\"\"'}</code> i CSV-cellen.",
+        "missingSteps": "<strong>Manglende steg:</strong> hvis step_N_title finnes, må step_N_body også finnes.",
+        "playModesTab": "Spillmoduser",
+        "playModes": "Spillmoduser (play_mode)",
+        "chooseEarly": "Velg modus tidlig – QA, UI og runtime forventer riktig struktur.",
+        "basicMode": "<strong>Enkel lek (basic):</strong> steg + materialer. Ingen digital interaksjon.",
+        "facilitatedMode": "<strong>Ledet aktivitet (facilitated):</strong> steg + faser/timer, ev. offentlig tavle.",
+        "participantsMode": "<strong>Deltakerlek (participants):</strong> steg + faser + roller + ev. offentlig tavle. For Legendary (artefakter/triggere), bruk JSON-import.",
+        "minimumRequired": "Minimum påkrevd",
+        "basicReq": "<strong>basic:</strong> minst step_1_title + step_1_body.",
+        "facilitatedReq": "<strong>facilitated:</strong> steg påkrevd; phases_json sterkt anbefalt.",
+        "participantsReq": "<strong>participants:</strong> steg påkrevd; roles_json sterkt anbefalt.",
+        "csvTab": "CSV",
+        "jsonTab": "JSON",
+        "aiPromptsTab": "AI Prompts",
+        "csvFormat": "CSV-format (canonical)",
+        "csvFormatList1": "UTF-8 (med/uten BOM), separator ,",
+        "csvFormatList2": "Celler med komma/linjeskift/anførselstegn omsluttet av \"...\"; anførselstegn skrives som \"\"",
+        "csvFormatList3": "En rad = ett spill",
+        "canonicalCsvHeader": "Canonical CSV-header (kopier nøyaktig)",
+        "jsonColumnsInCsv": "JSON-kolonner som støttes i CSV",
+        "useJsonForArtifacts": "Vil du bruke artefakter eller triggere? CSV-kontrakten inkluderer ikke det. Velg JSON-import (Legendary).",
+        "commonMistakes": "Vanligste feilene",
+        "invalidJsonInColumn": "Ugyldig JSON i JSON-kolonne (ofte feil anførselstegn/escaping).",
+        "stepTitleWithoutBody": "step_N_title fylt ut men step_N_body mangler.",
+        "invalidUuid": "main_purpose_id/sub_purpose_ids er ikke gyldige UUID.",
+        "jsonImportFull": "JSON-import (full fidelity)",
+        "jsonLegendaryDesc": "JSON er formatet for Legendary/escape-room: artefakter + triggere + avanserte step-felt.",
+        "minimalJson": "Minimal JSON (1 spill)",
+        "orderResolution": "Order-oppløsning i triggere",
+        "orderResolutionDesc": "Triggere kan referere til stepOrder/phaseOrder/artifactOrder i condition/actions. Importen løser disse til faktiske ID-er.",
+        "infoDialogTitle": "Informasjon om spill"
+      },
+      "playModes": {
+        "basic": "Enkel lek",
+        "facilitated": "Ledet aktivitet",
+        "participants": "Deltakerlek"
+      },
+      "detail": {
+        "noAccess": "Ingen tilgang",
+        "noAccessDesc": "Du trenger administratorrettigheter for å se spill.",
+        "somethingWentWrong": "Noe gikk galt",
+        "loading": "Laster...",
+        "loadingGameData": "Henter spilldata.",
+        "gameNotFound": "Spillet ble ikke funnet",
+        "gameMissing": "Spillet mangler",
+        "checkLinkOrGoBack": "Sjekk lenken eller gå tilbake til listen.",
+        "backToGames": "Tilbake til spill",
+        "makeDraft": "Gjør til utkast",
+        "status": "Status",
+        "published": "Publisert",
+        "draft": "Utkast",
+        "category": "Kategori",
+        "energy": "Energi",
+        "purpose": "Formål",
+        "product": "Produkt",
+        "owner": "Eier",
+        "global": "Global",
+        "players": "Spillere",
+        "time": "Tid",
+        "age": "Alder",
+        "notSet": "Ikke satt",
+        "back": "Tilbake",
+        "edit": "Rediger",
+        "publish": "Publiser",
+        "delete": "Slett",
+        "metadata": "Metadata",
+        "description": "Beskrivelse",
+        "noDescription": "Ingen beskrivelse angitt.",
+        "noShortDescription": "Ingen kort beskrivelse angitt.",
+        "technical": "Teknisk",
+        "createdAt": "Opprettet",
+        "updatedAt": "Oppdatert",
+        "deleteTitle": "Slette spillet?",
+        "deleteDescription": "Dette sletter spillet permanent.",
+        "deleteConfirm": "Slett"
+      },
+      "form": {
+        "editTitle": "Rediger lek",
+        "createTitle": "Opprett ny lek",
+        "description": "Administrer grunndata for lekbanken. Minimumskrav: navn, kort beskrivelse og hovedformål.",
+        "name": "Navn",
+        "namePlaceholder": "F.eks. Samarbeidsstafett",
+        "shortDescription": "Kort beskrivelse",
+        "shortDescriptionPlaceholder": "1-2 setninger som oppsummerer leken.",
+        "fullDescription": "Full beskrivelse",
+        "fullDescriptionPlaceholder": "Instruksjoner, tips og sikkerhetsnotater.",
+        "status": "Status",
+        "statusPlaceholder": "Velg status",
+        "owner": "Eier",
+        "ownerPlaceholder": "Velg eier",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Formål",
+        "purposePlaceholder": "Velg formål",
+        "product": "Produkt",
+        "productPlaceholder": "Velg produkt",
+        "productNone": "Ingen",
+        "category": "Kategori",
+        "categoryPlaceholder": "F.eks. Samarbeid, Oppvarming",
+        "energy": "Energi",
+        "energyPlaceholder": "Velg energinivå",
+        "energyNone": "Ingen",
+        "energyLow": "Lav",
+        "energyMedium": "Medium",
+        "energyHigh": "Høy",
+        "location": "Spillested",
+        "locationPlaceholder": "Velg spillested",
+        "locationUnknown": "Ukjent",
+        "locationIndoor": "Innendørs",
+        "locationOutdoor": "Utendørs",
+        "locationBoth": "Begge deler",
+        "statusDraft": "Utkast",
+        "statusPublished": "Publisert",
+        "timeEstimate": "Estimert tid (min)",
+        "timeEstimatePlaceholder": "F.eks. 15",
+        "players": "Spillere (min-maks)",
+        "playersMin": "Min",
+        "playersMax": "Maks",
+        "age": "Alder (min-maks)",
+        "ageMin": "Min",
+        "ageMax": "Maks",
+        "requiredError": "Navn, kort beskrivelse og formål må angis.",
+        "saveError": "Kunne ikke lagre spillet. Prøv igjen.",
+        "cancel": "Avbryt",
+        "saving": "Lagrer...",
+        "saveChanges": "Lagre endringer",
+        "create": "Opprett lek"
+      },
+      "pageDescription": "Navet for å opprette, oppdatere, publisere og eksportere hele spillkatalogen.",
+      "cardTitle": "Spilloversikt",
+      "searchPlaceholder": "Søk etter navn, formål eller kategori",
+      "breadcrumbs": {
+        "home": "Startside",
+        "games": "Spill"
+      },
+      "stats": {
+        "total": "Totalt",
+        "published": "Publiserte",
+        "drafts": "Utkast",
+        "tenantOwned": "Tenant-eide",
+        "withErrors": "Med feil"
+      },
+      "page": {
+        "noAccess": "Ingen tilgang",
+        "noAccessDesc": "Du trenger administratorrettigheter for å administrere spill.",
+        "title": "Spill (globalt)",
+        "description": "Administrer spillkatalogen – søk, filtrer og utfør massehandlinger.",
+        "csvExport": "CSV-eksport",
+        "import": "Importer",
+        "newInBuilder": "Ny i Builder",
+        "loadError": "Kunne ikke laste spill",
+        "noGamesTitle": "Ingen spill matcher filtrene",
+        "noGamesDesc": "Juster filtre eller legg til et nytt spill.",
+        "selectGame": "Velg {name}",
+        "openInBuilder": "Åpne i Builder",
+        "showDetails": "Vis detaljer",
+        "unpublish": "Avpubliser",
+        "publish": "Publiser"
+      },
+      "table": {
+        "name": "Navn",
+        "mode": "Modus",
+        "purpose": "Formål",
+        "status": "Status",
+        "valid": "Gyldig",
+        "owner": "Eier",
+        "updated": "Oppdatert"
       },
       "filters": {
-        "title": "Filtre",
-        "search": "Søk spill...",
-        "clearFilters": "Nullstill filtre",
-        "removeFilter": "Fjern filter: {label}",
-        "presets": "Lagrede filtre",
-        "savePreset": "Lagre som forhåndsinnstilling",
-        "noMatchingPresets": "Ingen matchende forhåndsinnstillinger",
-        "groups": {
-          "classification": "Klassifisering",
-          "playExecution": "Spill & Utførelse",
-          "lifecycle": "Livssyklus & Kvalitet",
-          "ownership": "Eierskap & Omfang",
-          "technical": "Tekniske Filtre"
-        },
-        "status": {
-          "label": "Status",
-          "published": "Publisert",
-          "draft": "Utkast"
-        },
-        "energy": {
-          "label": "Energinivå",
-          "low": "Lav",
-          "medium": "Middels",
-          "high": "Høy"
-        },
-        "location": {
-          "label": "Sted",
-          "indoor": "Innendørs",
-          "outdoor": "Utendørs",
-          "both": "Begge"
-        },
-        "validation": {
-          "label": "Validering",
-          "valid": "Godkjent",
-          "warnings": "Advarsler",
-          "errors": "Feil",
-          "pending": "Venter"
-        },
-        "ownerSource": {
-          "label": "Kilde",
-          "system": "System",
-          "imported": "Importert",
-          "tenant": "Tenant-opprettet",
-          "ai_generated": "AI-generert"
-        },
-        "contentVersion": {
-          "label": "Innholdsversjon",
-          "v1": "v1 (Legacy)",
-          "v2": "v2 (Builder)"
-        },
+        "allStatuses": "Alle statuser",
+        "published": "Publiserte",
+        "draft": "Utkast",
+        "allEnergyLevels": "Alle energinivåer",
+        "low": "Lav",
+        "medium": "Medium",
+        "high": "Høy",
+        "energy": "Energi",
+        "allPlayModes": "Alle spillmoduser",
+        "basicPlay": "Enkel lek",
+        "facilitatedActivity": "Ledet aktivitet",
+        "participantPlay": "Deltakerlek",
         "playMode": "Spillmodus",
-        "purposes": "Formål",
-        "tenants": "Tenants",
-        "products": "Produkter",
+        "allOwners": "Alle eiere",
         "global": "Global",
-        "players": {
-          "label": "Antall spillere",
-          "min": "Min",
-          "max": "Maks"
-        },
-        "age": {
-          "label": "Alder",
-          "min": "Min",
-          "max": "Maks"
-        },
-        "time": {
-          "label": "Tid (min)",
-          "min": "Min",
-          "max": "Maks"
-        },
-        "chips": {
-          "status": "Status",
-          "playMode": "Spillmodus",
-          "global": "Global"
-        }
+        "owner": "Eier",
+        "status": "Status"
       },
-      "builder": {
-        "artifact": {
-          "newArtifact": "Ny artefakt",
-          "visibility": {
-            "public": "Synlig for alle",
-            "leaderOnly": "Kun leder",
-            "rolePrivate": "Privat for rolle"
-          },
-          "types": {
-            "card": "Kort",
-            "document": "Dokument",
-            "image": "Bilde",
-            "conversationCards": "🗣️ Samtalekort (lek)",
-            "keypad": "🔐 Pinkode (Keypad)",
-            "riddle": "❓ Gåte / Spørsmål",
-            "multiAnswer": "✅ Flervalgssvar",
-            "audio": "🔊 Lydklipp",
-            "hotspot": "🎯 Klikkbart bilde (Hotspot)",
-            "tilePuzzle": "🧩 Puslespill",
-            "cipher": "🔤 Kryptering / Chiffer",
-            "logicGrid": "🧠 Logikkrutenett",
-            "counter": "🔢 Teller",
-            "qrGate": "📱 QR/NFC-skanning",
-            "hintContainer": "💡 Tips-beholder",
-            "propConfirmation": "📦 Rekvisitt-bekreftelse",
-            "locationCheck": "📍 Stedsverifisering",
-            "soundLevel": "🎤 Lydnivå-detektor",
-            "replayMarker": "⏱️ Replay-markør",
-            "signalGenerator": "📢 Signalgenerator",
-            "timeBankStep": "⏳ Tidsbank / Final timer",
-            "emptyArtifact": "📦 Tom slot (placeholder)"
-          },
-          "errors": {
-            "loadConversationDecks": "Kunne ikke laste samtalekort-dekker"
-          }
-        },
-        "trigger": {
-          "newTrigger": "Ny trigger",
-          "addTrigger": "Legg til trigger",
-          "noTriggers": "Ingen triggere ennå.",
-          "noTriggersHint": "Triggere automatiserer leken: \"Når X skjer, gjør Y\"",
-          "unnamedTrigger": "Navnløs trigger",
-          "inactive": "Inaktiv",
-          "onceLabel": "Én gang",
-          "activeLabel": "Aktiv",
-          "onceCheckboxLabel": "Én gang",
-          "autoDisable": "Deaktiveres automatisk etter første kjøring",
-          "delayLabel": "Forsinkelse",
-          "seconds": "sekunder",
-          "step": "Steg {number}",
-          "addActionPlaceholder": "+ Legg til handling...",
-          "templates": "Maler",
-          "howItWorks": {
-            "title": "Hvordan triggere fungerer",
-            "description": "Triggere automatiserer leken: når en betingelse er oppfylt (f.eks. et steg fullføres eller tiden går ut) utføres en eller flere handlinger automatisk.",
-            "example": "Når 5 minutter gjenstår → Vis et hint"
-          },
-          "import": {
-            "error": "Importfeil"
-          }
-        }
+      "noGames": {
+        "title": "Ingen spill matcher filtrene",
+        "description": "Juster filtre eller legg til et nytt spill."
+      },
+      "noAccess": {
+        "title": "Ingen tilgang",
+        "description": "Du trenger administratorrettigheter for å administrere spill."
+      },
+      "labels": {
+        "unnamedOrganisation": "Navnløs organisasjon",
+        "unknownPurpose": "Ukjent formål",
+        "unknownProduct": "Ukjent produkt",
+        "nameMissing": "Navn mangler",
+        "noDescription": "Ingen beskrivelse"
+      },
+      "errors": {
+        "fetchFailed": "Kunne ikke hente spill",
+        "loadFailed": "Kunne ikke laste spill akkurat nå.",
+        "loadTitle": "Kunne ikke laste spill",
+        "publishFailed": "Publisering mislyktes",
+        "draftFailed": "Kunne ikke gjenopprette til utkast",
+        "deleteFailed": "Kunne ikke slette spillet",
+        "updateFailed": "Kunne ikke oppdatere spillet",
+        "unknownError": "Ukjent feil"
+      },
+      "messages": {
+        "published": "Publisert",
+        "restoredToDraft": "Gjenopprettet til utkast",
+        "gameDeleted": "Spillet ble slettet.",
+        "importComplete": "Import fullført! Spillisten oppdatert.",
+        "importedGames": "Importerte {count} spill.",
+        "importFailed": "Mislyktes for {count} spill.",
+        "changesSaved": "Endringer lagret."
+      },
+      "actions": {
+        "edit": "Rediger",
+        "makeDraft": "Gjør til utkast",
+        "publish": "Publiser",
+        "delete": "Slett"
+      },
+      "list": {
+        "selectGame": "Velg {name}",
+        "openMenu": "Åpne meny"
+      },
+      "deleteDialog": {
+        "title": "Slette spill?",
+        "description": "Denne handlingen kan ikke angres. Spillet vil bli permanent slettet."
       }
     },
     "achievements": {
@@ -2121,7 +2264,56 @@
       "organizationDetails": "Organisasjonsdetaljer",
       "searchOrganizations": "Søk organisasjoner...",
       "noOrganizations": "Ingen organisasjoner funnet",
-      "members": "Medlemmer",
+      "members": {
+        "title": "Medlemmer",
+        "addMember": "Legg til medlem",
+        "addMemberDescription": "Søk etter en eksisterende bruker via e-post og legg dem direkte til i organisasjonen.",
+        "searchByEmail": "Søk bruker via e-post",
+        "searchPlaceholder": "navn@eksempel.no",
+        "searching": "Søker...",
+        "search": "Søk",
+        "noUserFound": "Ingen bruker funnet med den e-postadressen",
+        "searchFailed": "Kunne ikke søke etter brukere",
+        "searchResults": "Søkeresultater",
+        "alreadyMember": "Allerede medlem",
+        "role": "Rolle",
+        "roleOwner": "Eier",
+        "roleAdmin": "Admin",
+        "roleMember": "Medlem",
+        "cancel": "Avbryt",
+        "adding": "Legger til...",
+        "addMemberButton": "Legg til medlem",
+        "memberAdded": "{name} lagt til som {role}",
+        "alreadyMemberError": "Brukeren er allerede medlem av organisasjonen",
+        "addFailed": "Kunne ikke legge til medlem",
+        "loadFailed": "Kunne ikke laste medlemmer",
+        "unknown": "Ukjent",
+        "statsTotal": "Totalt",
+        "statsOwners": "Eiere",
+        "statsAdmins": "Admins",
+        "statsPending": "Ventende",
+        "membersCount": "Medlemmer ({count})",
+        "searchNameOrEmail": "Søk på navn eller e-post...",
+        "allRoles": "Alle roller",
+        "loading": "Laster medlemmer...",
+        "noMembersMatch": "Ingen medlemmer matcher filtrene",
+        "noMembersYet": "Ingen medlemmer i organisasjonen",
+        "tableUser": "Bruker",
+        "tableRole": "Rolle",
+        "tableMemberSince": "Medlem siden",
+        "tableActions": "Handlinger",
+        "primary": "Primær",
+        "makeOwner": "Gjør til eier",
+        "makeAdmin": "Gjør til admin",
+        "makeMember": "Gjør til medlem",
+        "removeFromOrg": "Fjern fra organisasjon",
+        "confirmRemove": "Er du sikker på at du vil fjerne {name} fra organisasjonen?",
+        "cannotRemoveOnlyOwner": "Kan ikke fjerne den eneste eieren",
+        "memberRemoved": "Medlem fjernet",
+        "removeFailed": "Kunne ikke fjerne medlem",
+        "roleChanged": "Rolle endret til {role}",
+        "roleChangeFailed": "Kunne ikke endre rolle"
+      },
       "memberCount": "{count} medlemmer",
       "plan": "Plan",
       "subscription": "Abonnement",
@@ -2200,56 +2392,6 @@
         "creating": "Oppretter...",
         "submit": "Opprett organisasjon",
         "required": "*"
-      },
-      "members": {
-        "title": "Medlemmer",
-        "addMember": "Legg til medlem",
-        "addMemberDescription": "Søk etter en eksisterende bruker via e-post og legg dem direkte til i organisasjonen.",
-        "searchByEmail": "Søk bruker via e-post",
-        "searchPlaceholder": "navn@eksempel.no",
-        "searching": "Søker...",
-        "search": "Søk",
-        "noUserFound": "Ingen bruker funnet med den e-postadressen",
-        "searchFailed": "Kunne ikke søke etter brukere",
-        "searchResults": "Søkeresultater",
-        "alreadyMember": "Allerede medlem",
-        "role": "Rolle",
-        "roleOwner": "Eier",
-        "roleAdmin": "Admin",
-        "roleMember": "Medlem",
-        "cancel": "Avbryt",
-        "adding": "Legger til...",
-        "addMemberButton": "Legg til medlem",
-        "memberAdded": "{name} lagt til som {role}",
-        "alreadyMemberError": "Brukeren er allerede medlem av organisasjonen",
-        "addFailed": "Kunne ikke legge til medlem",
-        "loadFailed": "Kunne ikke laste medlemmer",
-        "unknown": "Ukjent",
-        "statsTotal": "Totalt",
-        "statsOwners": "Eiere",
-        "statsAdmins": "Admins",
-        "statsPending": "Ventende",
-        "membersCount": "Medlemmer ({count})",
-        "searchNameOrEmail": "Søk på navn eller e-post...",
-        "allRoles": "Alle roller",
-        "loading": "Laster medlemmer...",
-        "noMembersMatch": "Ingen medlemmer matcher filtrene",
-        "noMembersYet": "Ingen medlemmer i organisasjonen",
-        "tableUser": "Bruker",
-        "tableRole": "Rolle",
-        "tableMemberSince": "Medlem siden",
-        "tableActions": "Handlinger",
-        "primary": "Primær",
-        "makeOwner": "Gjør til eier",
-        "makeAdmin": "Gjør til admin",
-        "makeMember": "Gjør til medlem",
-        "removeFromOrg": "Fjern fra organisasjon",
-        "confirmRemove": "Er du sikker på at du vil fjerne {name} fra organisasjonen?",
-        "cannotRemoveOnlyOwner": "Kan ikke fjerne den eneste eieren",
-        "memberRemoved": "Medlem fjernet",
-        "removeFailed": "Kunne ikke fjerne medlem",
-        "roleChanged": "Rolle endret til {role}",
-        "roleChangeFailed": "Kunne ikke endre rolle"
       },
       "audit": {
         "title": "Aktivitetslogg",
@@ -2992,8 +3134,10 @@
         "flagged": "Flaggede"
       },
       "emptyState": {
-        "title": "Ingen økter",
-        "description": "Juster filtre eller prøv igjen senere."
+        "noAccess": "Ingen tilgang",
+        "noAccessDescription": "Du trenger tillatelse for å se økter.",
+        "noSessions": "Ingen økter",
+        "noSessionsDescription": "Juster filtre eller prøv igjen senere."
       },
       "columns": {
         "title": "Tittel",
@@ -3031,12 +3175,6 @@
         "noAccessDescription": "Du trenger tillatelse for å se økter.",
         "notFound": "Økten ble ikke funnet",
         "notFoundDescription": "Sjekk lenken eller gå tilbake til listen."
-      },
-      "emptyState": {
-        "noAccess": "Ingen tilgang",
-        "noAccessDescription": "Du trenger tillatelse for å se økter.",
-        "noSessions": "Ingen økter",
-        "noSessionsDescription": "Juster filtre eller prøv igjen senere."
       }
     },
     "tickets": {
@@ -3626,260 +3764,6 @@
         "shopItemTranslations": "Butikkartikkel",
         "notificationTemplateTranslations": "Varslingsmal",
         "tenantTranslationOverrides": "Tenant-tilpasning"
-      }
-    },
-    "games": {
-      "pageTitle": "Spilladministrasjon",
-      "import": {
-        "selectPrompt": "Velg prompt",
-        "artifactsOrTriggers": "Trenger du artefakter eller triggere? Velg <strong>Legendary (JSON)</strong>.",
-        "copy": "Kopier",
-        "overviewTab": "Oversikt",
-        "whatImportDoes": "Hva importen gjør",
-        "importCanRead": "Importen kan lese <strong>CSV</strong> (masseimport) og <strong>JSON</strong> (full fidelity).",
-        "csvVsJson": "CSV vs JSON",
-        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light innenfor canonical header.",
-        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artefakter + triggere + avanserte step-felt).",
-        "startHere": "Start her (3 steg)",
-        "step1": "Velg spillmodus (basic/facilitated/participants).",
-        "step2": "Velg format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).",
-        "step3": "Valider i Import-dialogen (dry-run) før import.",
-        "commonErrors": "Vanlige feil",
-        "invalidPurpose": "<strong>Ugyldig purpose-id:</strong> main_purpose_id/sub_purpose_ids må være gyldige UUID fra databasen.",
-        "jsonEscaping": "<strong>JSON escaping i CSV:</strong> anførselstegn i JSON må skrives som <code>{'\"\"'}</code> i CSV-cellen.",
-        "missingSteps": "<strong>Manglende steg:</strong> hvis step_N_title finnes, må step_N_body også finnes.",
-        "playModesTab": "Spillmoduser",
-        "playModes": "Spillmoduser (play_mode)",
-        "chooseEarly": "Velg modus tidlig – QA, UI og runtime forventer riktig struktur.",
-        "basicMode": "<strong>Enkel lek (basic):</strong> steg + materialer. Ingen digital interaksjon.",
-        "facilitatedMode": "<strong>Ledet aktivitet (facilitated):</strong> steg + faser/timer, ev. offentlig tavle.",
-        "participantsMode": "<strong>Deltakerlek (participants):</strong> steg + faser + roller + ev. offentlig tavle. For Legendary (artefakter/triggere), bruk JSON-import.",
-        "minimumRequired": "Minimum påkrevd",
-        "basicReq": "<strong>basic:</strong> minst step_1_title + step_1_body.",
-        "facilitatedReq": "<strong>facilitated:</strong> steg påkrevd; phases_json sterkt anbefalt.",
-        "participantsReq": "<strong>participants:</strong> steg påkrevd; roles_json sterkt anbefalt.",
-        "csvTab": "CSV",
-        "jsonTab": "JSON",
-        "aiPromptsTab": "AI Prompts",
-        "csvFormat": "CSV-format (canonical)",
-        "csvFormatList1": "UTF-8 (med/uten BOM), separator ,",
-        "csvFormatList2": "Celler med komma/linjeskift/anførselstegn omsluttet av \"...\"; anførselstegn skrives som \"\"",
-        "csvFormatList3": "En rad = ett spill",
-        "canonicalCsvHeader": "Canonical CSV-header (kopier nøyaktig)",
-        "jsonColumnsInCsv": "JSON-kolonner som støttes i CSV",
-        "useJsonForArtifacts": "Vil du bruke artefakter eller triggere? CSV-kontrakten inkluderer ikke det. Velg JSON-import (Legendary).",
-        "commonMistakes": "Vanligste feilene",
-        "invalidJsonInColumn": "Ugyldig JSON i JSON-kolonne (ofte feil anførselstegn/escaping).",
-        "stepTitleWithoutBody": "step_N_title fylt ut men step_N_body mangler.",
-        "invalidUuid": "main_purpose_id/sub_purpose_ids er ikke gyldige UUID.",
-        "jsonImportFull": "JSON-import (full fidelity)",
-        "jsonLegendaryDesc": "JSON er formatet for Legendary/escape-room: artefakter + triggere + avanserte step-felt.",
-        "minimalJson": "Minimal JSON (1 spill)",
-        "orderResolution": "Order-oppløsning i triggere",
-        "orderResolutionDesc": "Triggere kan referere til stepOrder/phaseOrder/artifactOrder i condition/actions. Importen løser disse til faktiske ID-er.",
-        "infoDialogTitle": "Informasjon om spill"
-      },
-      "playModes": {
-        "basic": "Enkel lek",
-        "facilitated": "Ledet aktivitet",
-        "participants": "Deltakerlek"
-      },
-      "detail": {
-        "noAccess": "Ingen tilgang",
-        "noAccessDesc": "Du trenger administratorrettigheter for å se spill.",
-        "somethingWentWrong": "Noe gikk galt",
-        "loading": "Laster...",
-        "loadingGameData": "Henter spilldata.",
-        "gameNotFound": "Spillet ble ikke funnet",
-        "gameMissing": "Spillet mangler",
-        "checkLinkOrGoBack": "Sjekk lenken eller gå tilbake til listen.",
-        "backToGames": "Tilbake til spill",
-        "makeDraft": "Gjør til utkast",
-        "status": "Status",
-        "published": "Publisert",
-        "draft": "Utkast",
-        "category": "Kategori",
-        "energy": "Energi",
-        "purpose": "Formål",
-        "product": "Produkt",
-        "owner": "Eier",
-        "global": "Global",
-        "players": "Spillere",
-        "time": "Tid",
-        "age": "Alder",
-        "notSet": "Ikke satt",
-        "back": "Tilbake",
-        "edit": "Rediger",
-        "publish": "Publiser",
-        "delete": "Slett",
-        "metadata": "Metadata",
-        "description": "Beskrivelse",
-        "noDescription": "Ingen beskrivelse angitt.",
-        "noShortDescription": "Ingen kort beskrivelse angitt.",
-        "technical": "Teknisk",
-        "createdAt": "Opprettet",
-        "updatedAt": "Oppdatert",
-        "deleteTitle": "Slette spillet?",
-        "deleteDescription": "Dette sletter spillet permanent.",
-        "deleteConfirm": "Slett"
-      },
-      "form": {
-        "editTitle": "Rediger lek",
-        "createTitle": "Opprett ny lek",
-        "description": "Administrer grunndata for lekbanken. Minimumskrav: navn, kort beskrivelse og hovedformål.",
-        "name": "Navn",
-        "namePlaceholder": "F.eks. Samarbeidsstafett",
-        "shortDescription": "Kort beskrivelse",
-        "shortDescriptionPlaceholder": "1-2 setninger som oppsummerer leken.",
-        "fullDescription": "Full beskrivelse",
-        "fullDescriptionPlaceholder": "Instruksjoner, tips og sikkerhetsnotater.",
-        "status": "Status",
-        "statusPlaceholder": "Velg status",
-        "owner": "Eier",
-        "ownerPlaceholder": "Velg eier",
-        "ownerGlobal": "Global (Lekbanken)",
-        "purpose": "Formål",
-        "purposePlaceholder": "Velg formål",
-        "product": "Produkt",
-        "productPlaceholder": "Velg produkt",
-        "productNone": "Ingen",
-        "category": "Kategori",
-        "categoryPlaceholder": "F.eks. Samarbeid, Oppvarming",
-        "energy": "Energi",
-        "energyPlaceholder": "Velg energinivå",
-        "energyNone": "Ingen",
-        "energyLow": "Lav",
-        "energyMedium": "Medium",
-        "energyHigh": "Høy",
-        "location": "Spillested",
-        "locationPlaceholder": "Velg spillested",
-        "locationUnknown": "Ukjent",
-        "locationIndoor": "Innendørs",
-        "locationOutdoor": "Utendørs",
-        "locationBoth": "Begge deler",
-        "statusDraft": "Utkast",
-        "statusPublished": "Publisert",
-        "timeEstimate": "Estimert tid (min)",
-        "timeEstimatePlaceholder": "F.eks. 15",
-        "players": "Spillere (min-maks)",
-        "playersMin": "Min",
-        "playersMax": "Maks",
-        "age": "Alder (min-maks)",
-        "ageMin": "Min",
-        "ageMax": "Maks",
-        "requiredError": "Navn, kort beskrivelse og formål må angis.",
-        "saveError": "Kunne ikke lagre spillet. Prøv igjen.",
-        "cancel": "Avbryt",
-        "saving": "Lagrer...",
-        "saveChanges": "Lagre endringer",
-        "create": "Opprett lek"
-      },
-      "pageDescription": "Navet for å opprette, oppdatere, publisere og eksportere hele spillkatalogen.",
-      "cardTitle": "Spilloversikt",
-      "searchPlaceholder": "Søk etter navn, formål eller kategori",
-      "breadcrumbs": {
-        "home": "Startside",
-        "games": "Spill"
-      },
-      "stats": {
-        "total": "Totalt",
-        "published": "Publiserte",
-        "drafts": "Utkast",
-        "tenantOwned": "Tenant-eide",
-        "withErrors": "Med feil"
-      },
-      "page": {
-        "noAccess": "Ingen tilgang",
-        "noAccessDesc": "Du trenger administratorrettigheter for å administrere spill.",
-        "title": "Spill (globalt)",
-        "description": "Administrer spillkatalogen – søk, filtrer og utfør massehandlinger.",
-        "csvExport": "CSV-eksport",
-        "import": "Importer",
-        "newInBuilder": "Ny i Builder",
-        "loadError": "Kunne ikke laste spill",
-        "noGamesTitle": "Ingen spill matcher filtrene",
-        "noGamesDesc": "Juster filtre eller legg til et nytt spill.",
-        "selectGame": "Velg {name}",
-        "openInBuilder": "Åpne i Builder",
-        "showDetails": "Vis detaljer",
-        "unpublish": "Avpubliser",
-        "publish": "Publiser"
-      },
-      "table": {
-        "name": "Navn",
-        "mode": "Modus",
-        "purpose": "Formål",
-        "status": "Status",
-        "valid": "Gyldig",
-        "owner": "Eier",
-        "updated": "Oppdatert"
-      },
-      "filters": {
-        "allStatuses": "Alle statuser",
-        "published": "Publiserte",
-        "draft": "Utkast",
-        "allEnergyLevels": "Alle energinivåer",
-        "low": "Lav",
-        "medium": "Medium",
-        "high": "Høy",
-        "energy": "Energi",
-        "allPlayModes": "Alle spillmoduser",
-        "basicPlay": "Enkel lek",
-        "facilitatedActivity": "Ledet aktivitet",
-        "participantPlay": "Deltakerlek",
-        "playMode": "Spillmodus",
-        "allOwners": "Alle eiere",
-        "global": "Global",
-        "owner": "Eier",
-        "status": "Status"
-      },
-      "noGames": {
-        "title": "Ingen spill matcher filtrene",
-        "description": "Juster filtre eller legg til et nytt spill."
-      },
-      "noAccess": {
-        "title": "Ingen tilgang",
-        "description": "Du trenger administratorrettigheter for å administrere spill."
-      },
-      "labels": {
-        "unnamedOrganisation": "Navnløs organisasjon",
-        "unknownPurpose": "Ukjent formål",
-        "unknownProduct": "Ukjent produkt",
-        "nameMissing": "Navn mangler",
-        "noDescription": "Ingen beskrivelse"
-      },
-      "errors": {
-        "fetchFailed": "Kunne ikke hente spill",
-        "loadFailed": "Kunne ikke laste spill akkurat nå.",
-        "loadTitle": "Kunne ikke laste spill",
-        "publishFailed": "Publisering mislyktes",
-        "draftFailed": "Kunne ikke gjenopprette til utkast",
-        "deleteFailed": "Kunne ikke slette spillet",
-        "updateFailed": "Kunne ikke oppdatere spillet",
-        "unknownError": "Ukjent feil"
-      },
-      "messages": {
-        "published": "Publisert",
-        "restoredToDraft": "Gjenopprettet til utkast",
-        "gameDeleted": "Spillet ble slettet.",
-        "importComplete": "Import fullført! Spillisten oppdatert.",
-        "importedGames": "Importerte {count} spill.",
-        "importFailed": "Mislyktes for {count} spill.",
-        "changesSaved": "Endringer lagret."
-      },
-      "actions": {
-        "edit": "Rediger",
-        "makeDraft": "Gjør til utkast",
-        "publish": "Publiser",
-        "delete": "Slett"
-      },
-      "list": {
-        "selectGame": "Velg {name}",
-        "openMenu": "Åpne meny"
-      },
-      "deleteDialog": {
-        "title": "Slette spill?",
-        "description": "Denne handlingen kan ikke angres. Spillet vil bli permanent slettet."
       }
     }
   },
@@ -5602,18 +5486,14 @@
       "requestHint": "Be om et hint fra verten"
     },
     "roleAssigner": {
+      "noRolesCopied": "Ingen roller kopiert ennå",
+      "copyRolesHint": "Klikk på \"Kopier roller fra spill\" ovenfor for å hente rollene fra spillmalen.",
+      "afterCopyHint": "Etter kopiering kan du tildele roller til deltakere manuelt eller tilfeldig.",
       "errors": {
-        "randomAssignFailed": "En feil oppstod under tilfeldig tildeling"
-      },
-      "minRequirements": {
-        "notSatisfied": "Minimumskrav ikke oppfylt",
-        "needMore": "{roleName}: {count} flere trengs"
-      },
-      "needs": "Trenger {count}",
-      "noAssignedYet": "Ingen tildelt ennå",
-      "selectRoleFor": "Velg rolle for",
-      "noRolesAvailable": "Ingen roller tilgjengelige (alle fulle eller konflikt)",
-      "cancel": "Avbryt"
+        "loadFailed": "Kunne ikke laste data",
+        "assignFailed": "Kunne ikke tildele roller",
+        "unassignFailed": "Kunne ikke fjerne rolletildeling"
+      }
     },
     "sessionChatDrawer": {
       "title": "Chat",
@@ -6522,12 +6402,12 @@
       }
     },
     "preflightChecklist": {
-      "title": "Klar til \u00e5 starte?",
-      "description": "Kontroller at alt er p\u00e5 plass f\u00f8r du starter spillmodus.",
+      "title": "Klar til å starte?",
+      "description": "Kontroller at alt er på plass før du starter spillmodus.",
       "itemsReady": "{ready} / {total} klare",
-      "errorMessage": "Fiks feilene ovenfor for \u00e5 starte.",
-      "warningMessage": "Sjekk advarslene f\u00f8r du starter.",
-      "successMessage": "\u2713 Alt ser bra ut! Du kan starte sesjonen.",
+      "errorMessage": "Fiks feilene ovenfor for å starte.",
+      "warningMessage": "Sjekk advarslene før du starter.",
+      "successMessage": "✓ Alt ser bra ut! Du kan starte sesjonen.",
       "starting": "Starter...",
       "startPlayMode": "Start spillmodus",
       "items": {
@@ -6542,24 +6422,24 @@
         },
         "rolesSnapshot": {
           "label": "Roller kopiert",
-          "notCopied": "Kopier roller fra spillet f\u00f8r du kan tildele dem",
+          "notCopied": "Kopier roller fra spillet før du kan tildele dem",
           "copied": "{count} roller kopiert fra spillet",
           "copyAction": "Kopier roller"
         },
         "rolesAssigned": {
           "label": "Roller tildelt",
           "allMinMet": "Alle minimumskrav oppfylt",
-          "allAssigned": "Alle deltakere har f\u00e5tt roller",
+          "allAssigned": "Alle deltakere har fått roller",
           "someAssigned": "{assigned} av {total} deltakere har roller",
           "noneAssigned": "Ingen deltaker har blitt tildelt rolle enda",
           "assignAction": "Tildel roller"
         },
         "secrets": {
           "label": "Hemmelige instruksjoner",
-          "unlocked": "L\u00e5st opp ({revealed}/{total} har vist)",
-          "readyToUnlock": "Klar til \u00e5 l\u00e5ses opp",
-          "assignRolesFirst": "Tildel roller f\u00f8rst",
-          "unlockAction": "L\u00e5s opp"
+          "unlocked": "Låst opp ({revealed}/{total} har vist)",
+          "readyToUnlock": "Klar til å låses opp",
+          "assignRolesFirst": "Tildel roller først",
+          "unlockAction": "Lås opp"
         },
         "artifacts": {
           "label": "Artefakter",
@@ -6598,8 +6478,8 @@
     },
     "batchArtifactPanel": {
       "title": "Masseoperasjoner",
-      "description": "Velg artefakter og utf\u00f8r operasjoner p\u00e5 flere samtidig",
-      "processing": "Utf\u00f8rer operasjon...",
+      "description": "Velg artefakter og utfør operasjoner på flere samtidig",
+      "processing": "Utfører operasjon...",
       "progressCount": "{done} av {total}",
       "resultSuccess": "{operation}: {count} lyktes",
       "resultWithErrors": "{operation}: {count} lyktes, {failed} feilet",
@@ -6777,16 +6657,6 @@
       "errors": {
         "loadFailed": "Kunne ikke laste signaler",
         "sendFailed": "Kunne ikke sende signal"
-      }
-    },
-    "roleAssigner": {
-      "noRolesCopied": "Ingen roller kopiert ennå",
-      "copyRolesHint": "Klikk på \"Kopier roller fra spill\" ovenfor for å hente rollene fra spillmalen.",
-      "afterCopyHint": "Etter kopiering kan du tildele roller til deltakere manuelt eller tilfeldig.",
-      "errors": {
-        "loadFailed": "Kunne ikke laste data",
-        "assignFailed": "Kunne ikke tildele roller",
-        "unassignFailed": "Kunne ikke fjerne rolletildeling"
       }
     },
     "storyView": {

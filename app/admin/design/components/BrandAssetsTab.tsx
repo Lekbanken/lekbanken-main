@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -24,20 +25,21 @@ interface BrandAssetsTabProps {
 }
 
 export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
+  const t = useTranslations('admin.design')
   return (
     <div className="space-y-6">
       {/* Logos */}
       <Card>
         <CardHeader>
-          <CardTitle>Logotyper</CardTitle>
+          <CardTitle>{t('brand.logos.title')}</CardTitle>
           <CardDescription>
-            Ladda upp logotyper för ljust och mörkt läge. Rekommenderat format: SVG eller PNG med transparent bakgrund.
+            {t('brand.logos.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
           <AssetUploader
-            label="Logotyp (ljust läge)"
-            description="Används på ljusa bakgrunder"
+            label={t('brand.logos.light')}
+            description={t('brand.logos.lightDesc')}
             icon={<SunIcon className="h-5 w-5" />}
             currentUrl={config?.logoLightUrl}
             assetType="logo-light"
@@ -45,8 +47,8 @@ export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
             onDelete={() => onUpdate({ ...config, logoLightUrl: undefined })}
           />
           <AssetUploader
-            label="Logotyp (mörkt läge)"
-            description="Används på mörka bakgrunder"
+            label={t('brand.logos.dark')}
+            description={t('brand.logos.darkDesc')}
             icon={<MoonIcon className="h-5 w-5" />}
             currentUrl={config?.logoDarkUrl}
             assetType="logo-dark"
@@ -59,15 +61,15 @@ export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
       {/* App Icon */}
       <Card>
         <CardHeader>
-          <CardTitle>App-ikon</CardTitle>
+          <CardTitle>{t('brand.appIcon.title')}</CardTitle>
           <CardDescription>
-            Används i navigering och som PWA-ikon. Kvadratiskt format, minst 512x512 px.
+            {t('brand.appIcon.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <AssetUploader
-            label="App-ikon"
-            description="Kvadratisk ikon för app"
+            label={t('brand.appIcon.label')}
+            description={t('brand.appIcon.labelDesc')}
             currentUrl={config?.iconUrl}
             assetType="icon"
             onUpload={(url) => onUpdate({ ...config, iconUrl: url })}
@@ -80,15 +82,15 @@ export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
       {/* Favicons */}
       <Card>
         <CardHeader>
-          <CardTitle>Favicons</CardTitle>
+          <CardTitle>{t('brand.favicons.title')}</CardTitle>
           <CardDescription>
-            Webbläsarflikikon. Ladda upp ICO, PNG eller SVG.
+            {t('brand.favicons.description')}
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
           <AssetUploader
-            label="Favicon (ljust)"
-            description="För ljust tema"
+            label={t('brand.favicons.light')}
+            description={t('brand.favicons.lightDesc')}
             icon={<SunIcon className="h-4 w-4" />}
             currentUrl={config?.faviconLightUrl}
             assetType="favicon-light"
@@ -97,8 +99,8 @@ export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
             previewSize="small"
           />
           <AssetUploader
-            label="Favicon (mörkt)"
-            description="För mörkt tema"
+            label={t('brand.favicons.dark')}
+            description={t('brand.favicons.darkDesc')}
             icon={<MoonIcon className="h-4 w-4" />}
             currentUrl={config?.faviconDarkUrl}
             assetType="favicon-dark"
@@ -112,9 +114,9 @@ export function BrandAssetsTab({ config, onUpdate }: BrandAssetsTabProps) {
       {/* Brand Colors */}
       <Card>
         <CardHeader>
-          <CardTitle>Varumärkesfärger</CardTitle>
+          <CardTitle>{t('brand.colors.title')}</CardTitle>
           <CardDescription>
-            Primär och sekundär färg används i komponenter och teman.
+            {t('brand.colors.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -150,6 +152,7 @@ function AssetUploader({
   onDelete,
   previewSize = 'large',
 }: AssetUploaderProps) {
+  const t = useTranslations('admin.design')
   const [isUploading, setIsUploading] = useState(false)
   const [copied, setCopied] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -168,33 +171,33 @@ function AssetUploader({
       
       if (result.success && result.data) {
         onUpload(result.data.url)
-        toastSuccess('Uppladdning klar')
+        toastSuccess(t('toasts.uploadComplete'))
       } else {
-        toastError(result.error || 'Uppladdning misslyckades')
+        toastError(result.error || t('toasts.uploadFailed'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     } finally {
       setIsUploading(false)
       if (inputRef.current) inputRef.current.value = ''
     }
-  }, [assetType, onUpload, toastSuccess, toastError])
+  }, [assetType, onUpload, toastSuccess, toastError, t])
 
   const handleDelete = useCallback(async () => {
     try {
       const result = await deleteSystemAsset(assetType)
       if (result.success) {
         onDelete()
-        toastSuccess('Borttagen')
+        toastSuccess(t('toasts.deleted'))
       } else {
-        toastError(result.error || 'Kunde inte ta bort')
+        toastError(result.error || t('toasts.couldNotDelete'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     }
-  }, [assetType, onDelete, toastSuccess, toastError])
+  }, [assetType, onDelete, toastSuccess, toastError, t])
 
   const handleCopyUrl = useCallback(() => {
     if (currentUrl) {
@@ -243,7 +246,7 @@ function AssetUploader({
               disabled={isUploading}
             >
               <CloudArrowUpIcon className="h-4 w-4 mr-1" />
-              Ersätt
+              {t('brand.assetUploader.replace')}
             </Button>
             <Button
               variant="outline"
@@ -255,7 +258,7 @@ function AssetUploader({
               ) : (
                 <ClipboardIcon className="h-4 w-4 mr-1" />
               )}
-              {copied ? 'Kopierad!' : 'Kopiera URL'}
+              {copied ? t('toasts.copied') : t('brand.assetUploader.copyUrl')}
             </Button>
             <Button
               variant="ghost"
@@ -282,10 +285,10 @@ function AssetUploader({
         >
           <CloudArrowUpIcon className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
           <p className="text-sm font-medium">
-            {isUploading ? 'Laddar upp...' : 'Klicka för att ladda upp'}
+            {isUploading ? t('brand.assetUploader.uploading') : t('brand.assetUploader.clickToUpload')}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
-            PNG, JPEG, SVG, WebP (max 5 MB)
+            {t('brand.assetUploader.fileTypes')}
           </p>
         </button>
       )}
@@ -311,6 +314,7 @@ interface ColorPickersProps {
 }
 
 function ColorPickers({ config, onUpdate }: ColorPickersProps) {
+  const t = useTranslations('admin.design')
   const [isSaving, setIsSaving] = useState(false)
   const [primaryColor, setPrimaryColor] = useState(config?.primaryColor || '#6366f1')
   const [secondaryColor, setSecondaryColor] = useState(config?.secondaryColor || '#8b5cf6')
@@ -324,12 +328,12 @@ function ColorPickers({ config, onUpdate }: ColorPickersProps) {
       })
       if (result.success) {
         onUpdate({ ...config, primaryColor, secondaryColor })
-        toastSuccess('Färger sparade')
+        toastSuccess(t('toasts.colorsSaved'))
       } else {
-        toastError(result.error || 'Kunde inte spara')
+        toastError(result.error || t('toasts.couldNotSave'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     } finally {
       setIsSaving(false)
@@ -344,7 +348,7 @@ function ColorPickers({ config, onUpdate }: ColorPickersProps) {
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="primaryColor">Primär färg</Label>
+          <Label htmlFor="primaryColor">{t('brand.colors.primary')}</Label>
           <div className="flex gap-2">
             <div 
               className="w-10 h-10 rounded-lg border shadow-sm"
@@ -368,7 +372,7 @@ function ColorPickers({ config, onUpdate }: ColorPickersProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="secondaryColor">Sekundär färg</Label>
+          <Label htmlFor="secondaryColor">{t('brand.colors.secondary')}</Label>
           <div className="flex gap-2">
             <div 
               className="w-10 h-10 rounded-lg border shadow-sm"
@@ -394,7 +398,7 @@ function ColorPickers({ config, onUpdate }: ColorPickersProps) {
 
       {hasChanges && (
         <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? 'Sparar...' : 'Spara färger'}
+          {isSaving ? t('toasts.saving') : t('brand.colors.saveColors')}
         </Button>
       )}
     </div>

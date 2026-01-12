@@ -1073,7 +1073,125 @@
     "design": {
       "mediaDefaults": {
         "noDefaultProfileImages": "No default profile images uploaded",
-        "noDefaultCoverImages": "No default cover images uploaded"
+        "noDefaultCoverImages": "No default cover images uploaded",
+        "profileImages": {
+          "title": "Default profile images",
+          "description": "Default profile images that users can choose. Also used as fallback."
+        },
+        "coverImages": {
+          "title": "Default cover images",
+          "description": "Default cover images for games and activities."
+        },
+        "imageAlt": "Image {index}",
+        "addImage": "Add",
+        "loading": "Loading..."
+      },
+      "toasts": {
+        "saving": "Saving...",
+        "saved": "Saved",
+        "tokensSaved": "Tokens saved",
+        "typographySaved": "Typography saved",
+        "colorsSaved": "Colors saved",
+        "uploadComplete": "Upload complete",
+        "imageUploaded": "Image uploaded",
+        "deleted": "Deleted",
+        "imageDeleted": "Image deleted",
+        "copied": "Copied!",
+        "error": "An error occurred",
+        "uploadFailed": "Upload failed",
+        "couldNotSave": "Could not save",
+        "couldNotDelete": "Could not delete"
+      },
+      "advanced": {
+        "title": "Advanced settings",
+        "warning": "These settings affect global design tokens. Change with caution.",
+        "saveTokens": "Save tokens",
+        "borderRadius": {
+          "title": "Border Radius",
+          "badge": "Tokens",
+          "description": "Corner radius for components. Uses CSS values (rem, px, etc)."
+        },
+        "cssVariables": {
+          "title": "CSS Variables",
+          "badge": "Coming soon",
+          "description": "Custom CSS variables for advanced customization.",
+          "info": "The ability to define custom CSS variables is coming in a future version."
+        },
+        "spacingScale": {
+          "title": "Spacing Scale",
+          "badge": "Coming soon",
+          "description": "Custom spacing scale for margin and padding.",
+          "info": "Custom spacing scale is coming in a future version."
+        }
+      },
+      "brand": {
+        "logos": {
+          "title": "Logos",
+          "description": "Upload logos for light and dark mode. Recommended format: SVG or PNG with transparent background.",
+          "light": "Logo (light mode)",
+          "lightDesc": "Used on light backgrounds",
+          "dark": "Logo (dark mode)",
+          "darkDesc": "Used on dark backgrounds"
+        },
+        "appIcon": {
+          "title": "App icon",
+          "description": "Used in navigation and as PWA icon. Square format, at least 512x512 px.",
+          "label": "App icon",
+          "labelDesc": "Square icon for app"
+        },
+        "favicons": {
+          "title": "Favicons",
+          "description": "Browser tab icon. Upload ICO, PNG or SVG.",
+          "light": "Favicon (light)",
+          "lightDesc": "For light theme",
+          "dark": "Favicon (dark)",
+          "darkDesc": "For dark theme"
+        },
+        "colors": {
+          "title": "Brand colors",
+          "description": "Primary and secondary colors used in components and themes.",
+          "primary": "Primary color",
+          "secondary": "Secondary color",
+          "saveColors": "Save colors"
+        },
+        "assetUploader": {
+          "replace": "Replace",
+          "copyUrl": "Copy URL",
+          "clickToUpload": "Click to upload",
+          "uploading": "Uploading...",
+          "fileTypes": "PNG, JPEG, SVG, WebP (max 5 MB)"
+        }
+      },
+      "typography": {
+        "fontFamily": {
+          "title": "Font family",
+          "description": "Choose font for the platform. Affects all text.",
+          "selectLabel": "Default font",
+          "selectPlaceholder": "Choose font",
+          "custom": "Custom...",
+          "customFontFamily": "Font family",
+          "customFontFamilyPlaceholder": "'Custom Font', sans-serif",
+          "customFontUrl": "Font URL (Google Fonts, etc.)",
+          "customFontUrlPlaceholder": "https://fonts.googleapis.com/css2?family=...",
+          "preview": "Preview",
+          "previewHeading": "Headings look like this",
+          "previewBody": "Body text with normal font. Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+        },
+        "titleFormat": {
+          "title": "Heading format",
+          "description": "How headings are formatted (text-transform).",
+          "label": "Format",
+          "normal": "Normal",
+          "uppercase": "Uppercase",
+          "capitalize": "Capitalize",
+          "example": "Example heading"
+        },
+        "size": {
+          "title": "Size",
+          "description": "Base font size. All sizes scale relatively.",
+          "baseSize": "Base size (px)"
+        },
+        "saveTypography": "Save typography"
       }
     },
     "billing": {
@@ -1345,7 +1463,67 @@
         }
       },
       "achievements": {
-        "emptyTitle": "No achievements"
+        "pageTitle": "Achievements",
+        "pageDescription": "Manage achievements, award to users and configure rules.",
+        "createAchievement": "Create achievement",
+        "searchPlaceholder": "Search achievements...",
+        "breadcrumbs": {
+          "admin": "Admin",
+          "gamification": "Gamification",
+          "achievements": "Achievements"
+        },
+        "actions": {
+          "edit": "Edit",
+          "award": "Award",
+          "archive": "Archive",
+          "restore": "Restore",
+          "delete": "Delete"
+        },
+        "filters": {
+          "scope": "Scope",
+          "status": "Status",
+          "tenant": "Tenant"
+        },
+        "scopes": {
+          "all": "All scopes",
+          "global": "Global",
+          "tenant": "Tenant",
+          "private": "Private"
+        },
+        "statuses": {
+          "all": "All statuses",
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        },
+        "notifications": {
+          "saved": "Achievement saved",
+          "deleted": "Achievement deleted",
+          "fetchFailed": "Could not fetch achievements",
+          "updateStatusFailed": "Could not update status",
+          "deleteFailed": "Could not delete",
+          "archiveFailed": "Could not archive",
+          "activateFailed": "Could not activate"
+        },
+        "confirmDialog": {
+          "deleteTitle": "Delete achievement",
+          "confirmAction": "Confirm action",
+          "deleteConfirm": "Are you sure you want to delete this achievement? This cannot be undone.",
+          "areYouSure": "Are you sure?",
+          "deleteButton": "Delete",
+          "confirmButton": "Confirm"
+        },
+        "empty": {
+          "noAchievements": "No achievements",
+          "noMatch": "No achievements match your filters.",
+          "getStarted": "Create your first achievement to get started.",
+          "createAction": "Create achievement"
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        }
       },
       "shopRewards": {
         "pageTitle": "Shop & Rewards",
@@ -1472,69 +1650,6 @@
           "createAction": "Create export template"
         },
         "searchPlaceholder": "Search templates..."
-      },
-      "achievements": {
-        "pageTitle": "Achievements",
-        "pageDescription": "Manage achievements, award to users and configure rules.",
-        "createAchievement": "Create achievement",
-        "searchPlaceholder": "Search achievements...",
-        "breadcrumbs": {
-          "admin": "Admin",
-          "gamification": "Gamification",
-          "achievements": "Achievements"
-        },
-        "actions": {
-          "edit": "Edit",
-          "award": "Award",
-          "archive": "Archive",
-          "restore": "Restore",
-          "delete": "Delete"
-        },
-        "filters": {
-          "scope": "Scope",
-          "status": "Status",
-          "tenant": "Tenant"
-        },
-        "scopes": {
-          "all": "All scopes",
-          "global": "Global",
-          "tenant": "Tenant",
-          "private": "Private"
-        },
-        "statuses": {
-          "all": "All statuses",
-          "draft": "Draft",
-          "active": "Active",
-          "archived": "Archived"
-        },
-        "notifications": {
-          "saved": "Achievement saved",
-          "deleted": "Achievement deleted",
-          "fetchFailed": "Could not fetch achievements",
-          "updateStatusFailed": "Could not update status",
-          "deleteFailed": "Could not delete",
-          "archiveFailed": "Could not archive",
-          "activateFailed": "Could not activate"
-        },
-        "confirmDialog": {
-          "deleteTitle": "Delete achievement",
-          "confirmAction": "Confirm action",
-          "deleteConfirm": "Are you sure you want to delete this achievement? This cannot be undone.",
-          "areYouSure": "Are you sure?",
-          "deleteButton": "Delete",
-          "confirmButton": "Confirm"
-        },
-        "empty": {
-          "noAchievements": "No achievements",
-          "noMatch": "No achievements match your filters.",
-          "getStarted": "Create your first achievement to get started.",
-          "createAction": "Create achievement"
-        },
-        "status": {
-          "draft": "Draft",
-          "active": "Active",
-          "archived": "Archived"
-        }
       }
     },
     "users": {
@@ -1546,7 +1661,12 @@
       "deleteUser": "Delete user",
       "userDetails": "User details",
       "searchUsers": "Search users...",
-      "noUsers": "No users found",
+      "noUsers": {
+        "title": "No users",
+        "titleWithFilters": "No matching users",
+        "description": "There are no users in the system yet.",
+        "descriptionWithFilters": "Adjust search or clear filters to see more."
+      },
       "role": "Role",
       "roles": {
         "systemAdmin": "System Administrator",
@@ -1604,12 +1724,6 @@
         "invited": "Invited",
         "disabled": "Disabled",
         "withoutOrg": "Without organisation"
-      },
-      "noUsers": {
-        "title": "No users",
-        "titleWithFilters": "No matching users",
-        "description": "There are no users in the system yet.",
-        "descriptionWithFilters": "Adjust search or clear filters to see more."
       },
       "noAccess": {
         "title": "Access denied",
@@ -1819,228 +1933,257 @@
       }
     },
     "games": {
-      "drawer": {
-        "tabs": {
-          "overview": "Overview",
-          "content": "Content",
-          "availability": "Availability",
-          "metadata": "Metadata",
-          "history": "History"
-        },
-        "validation": {
-          "valid": "Valid",
-          "warnings": "Warnings",
-          "errors": "Errors",
-          "pending": "Pending",
-          "outdated": "Outdated"
-        },
-        "status": {
-          "published": "Published",
-          "draft": "Draft"
-        },
-        "overview": {
-          "steps": "Steps",
-          "phases": "Phases",
-          "roles": "Roles",
-          "timeMin": "Time (min)",
-          "coreInfo": "Core Information",
-          "status": "Status",
-          "playMode": "Play Mode",
-          "validation": "Validation",
-          "mainPurpose": "Main Purpose",
-          "owner": "Owner",
-          "global": "Global",
-          "uuid": "UUID",
-          "validationIssues": "Validation Issues",
-          "openInBuilder": "Open in Game Builder"
-        },
-        "content": {
-          "playModeLabel": "Play Mode: {mode}",
-          "materials": "Materials",
-          "timer": "Timer",
-          "artifacts": "Artifacts",
-          "triggers": "Triggers",
-          "board": "Board",
-          "schemaVersion": "Schema & Version",
-          "contentVersion": "Content version",
-          "schemaStatus": "Schema status",
-          "current": "Current",
-          "contentWarnings": "Content Warnings"
-        },
-        "availability": {
-          "title": "Availability",
-          "global": "Global",
-          "globalDescription": "Available to all tenants",
-          "tenantSpecific": "Tenant-specific",
-          "unknownTenant": "Unknown tenant",
-          "productAssociation": "Product Association",
-          "product": "Product",
-          "adminControls": "Admin Controls",
-          "adminControlsDescription": "Tenant assignment and license management coming soon."
-        },
-        "metadata": {
-          "gameParameters": "Game Parameters",
-          "players": "Players",
-          "age": "Age",
-          "ageYears": "{min} – {max} years",
-          "time": "Time",
-          "timeMinutes": "{time} min",
-          "energyLevel": "Energy Level",
-          "locationType": "Location",
-          "purposes": "Purposes",
-          "noPurposes": "No purposes linked",
-          "category": "Category"
-        },
-        "history": {
-          "timestamps": "Timestamps",
-          "created": "Created",
-          "lastUpdated": "Last Updated",
-          "importSource": "Import Source",
-          "type": "Type",
-          "imported": "Imported",
-          "schema": "Schema",
-          "changeHistory": "Change History",
-          "changeHistoryDescription": "Detailed change history coming in a future version."
-        }
+      "pageTitle": "Game Management",
+      "import": {
+        "selectPrompt": "Select prompt",
+        "artifactsOrTriggers": "Need artifacts or triggers? Choose <strong>Legendary (JSON)</strong>.",
+        "copy": "Copy",
+        "overviewTab": "Overview",
+        "whatImportDoes": "What import does",
+        "importCanRead": "Import can read <strong>CSV</strong> (bulk import) and <strong>JSON</strong> (full fidelity).",
+        "csvVsJson": "CSV vs JSON",
+        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light within canonical header.",
+        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + advanced step fields).",
+        "startHere": "Start here (3 steps)",
+        "step1": "Choose play mode (basic/facilitated/participants).",
+        "step2": "Choose format: CSV (simple/bulk) or JSON (Legendary/full fidelity).",
+        "step3": "Validate in Import dialog (dry-run) before import.",
+        "commonErrors": "Common errors",
+        "invalidPurpose": "<strong>Invalid purpose-id:</strong> main_purpose_id/sub_purpose_ids must be valid UUIDs from the database.",
+        "jsonEscaping": "<strong>JSON escaping in CSV:</strong> quotes in JSON must be written as <code>{'\"\"'}</code> in CSV cell.",
+        "missingSteps": "<strong>Missing steps:</strong> if step_N_title exists, step_N_body must also exist.",
+        "playModesTab": "Play Modes",
+        "playModes": "Play Modes (play_mode)",
+        "chooseEarly": "Choose mode early – QA, UI and runtime expect the correct structure.",
+        "basicMode": "<strong>Simple play (basic):</strong> steps + materials. No digital interaction.",
+        "facilitatedMode": "<strong>Facilitated activity (facilitated):</strong> steps + phases/timer, optional public board.",
+        "participantsMode": "<strong>Participant play (participants):</strong> steps + phases + roles + optional public board. For Legendary (artifacts/triggers), use JSON import.",
+        "minimumRequired": "Minimum required",
+        "basicReq": "<strong>basic:</strong> at least step_1_title + step_1_body.",
+        "facilitatedReq": "<strong>facilitated:</strong> steps required; phases_json strongly recommended.",
+        "participantsReq": "<strong>participants:</strong> steps required; roles_json strongly recommended.",
+        "csvTab": "CSV",
+        "jsonTab": "JSON",
+        "aiPromptsTab": "AI Prompts",
+        "csvFormat": "CSV format (canonical)",
+        "csvFormatList1": "UTF-8 (with/without BOM), separator ,",
+        "csvFormatList2": "Cells with comma/newline/quote wrapped in \"...\"; quotes written as \"\"",
+        "csvFormatList3": "One row = one game",
+        "canonicalCsvHeader": "Canonical CSV header (copy exactly)",
+        "jsonColumnsInCsv": "JSON columns supported in CSV",
+        "useJsonForArtifacts": "Want to use artifacts or triggers? CSV contract doesn't include that. Choose JSON import (Legendary).",
+        "commonMistakes": "Most common mistakes",
+        "invalidJsonInColumn": "Invalid JSON in JSON column (usually wrong quotes/escaping).",
+        "stepTitleWithoutBody": "step_N_title filled but step_N_body missing.",
+        "invalidUuid": "main_purpose_id/sub_purpose_ids are not valid UUIDs.",
+        "jsonImportFull": "JSON import (full fidelity)",
+        "jsonLegendaryDesc": "JSON is the format for Legendary/escape-room: artifacts + triggers + advanced step fields.",
+        "minimalJson": "Minimal JSON (1 game)",
+        "orderResolution": "Order resolution in triggers",
+        "orderResolutionDesc": "Triggers can reference stepOrder/phaseOrder/artifactOrder in condition/actions. Import resolves these to actual IDs.",
+        "infoDialogTitle": "Information about games"
+      },
+      "playModes": {
+        "basic": "Simple play",
+        "facilitated": "Facilitated activity",
+        "participants": "Participant play"
+      },
+      "detail": {
+        "noAccess": "No access",
+        "noAccessDesc": "You need administrator permissions to view games.",
+        "somethingWentWrong": "Something went wrong",
+        "loading": "Loading...",
+        "loadingGameData": "Fetching game data.",
+        "gameNotFound": "Game not found",
+        "gameMissing": "Game is missing",
+        "checkLinkOrGoBack": "Check the link or go back to the list.",
+        "backToGames": "Back to games",
+        "makeDraft": "Make draft",
+        "status": "Status",
+        "published": "Published",
+        "draft": "Draft",
+        "category": "Category",
+        "energy": "Energy",
+        "purpose": "Purpose",
+        "product": "Product",
+        "owner": "Owner",
+        "global": "Global",
+        "players": "Players",
+        "time": "Time",
+        "age": "Age",
+        "notSet": "Not set",
+        "back": "Back",
+        "edit": "Edit",
+        "publish": "Publish",
+        "delete": "Delete",
+        "metadata": "Metadata",
+        "description": "Description",
+        "noDescription": "No description provided.",
+        "noShortDescription": "No short description provided.",
+        "technical": "Technical",
+        "createdAt": "Created",
+        "updatedAt": "Updated",
+        "deleteTitle": "Delete the game?",
+        "deleteDescription": "This will permanently delete the game.",
+        "deleteConfirm": "Delete"
+      },
+      "form": {
+        "editTitle": "Edit game",
+        "createTitle": "Create new game",
+        "description": "Manage basic game data. Requirements: name, short description and main purpose.",
+        "name": "Name",
+        "namePlaceholder": "E.g. Teamwork Relay",
+        "shortDescription": "Short description",
+        "shortDescriptionPlaceholder": "1-2 sentences summarizing the game.",
+        "fullDescription": "Full description",
+        "fullDescriptionPlaceholder": "Instructions, tips and safety notes.",
+        "status": "Status",
+        "statusPlaceholder": "Select status",
+        "owner": "Owner",
+        "ownerPlaceholder": "Select owner",
+        "ownerGlobal": "Global (Lekbanken)",
+        "purpose": "Purpose",
+        "purposePlaceholder": "Select purpose",
+        "product": "Product",
+        "productPlaceholder": "Select product",
+        "productNone": "None",
+        "category": "Category",
+        "categoryPlaceholder": "E.g. Teamwork, Warm-up",
+        "energy": "Energy",
+        "energyPlaceholder": "Select energy level",
+        "energyNone": "None",
+        "energyLow": "Low",
+        "energyMedium": "Medium",
+        "energyHigh": "High",
+        "location": "Location",
+        "locationPlaceholder": "Select location",
+        "locationUnknown": "Unknown",
+        "locationIndoor": "Indoor",
+        "locationOutdoor": "Outdoor",
+        "locationBoth": "Both",
+        "statusDraft": "Draft",
+        "statusPublished": "Published",
+        "timeEstimate": "Estimated time (min)",
+        "timeEstimatePlaceholder": "E.g. 15",
+        "players": "Players (min-max)",
+        "playersMin": "Min",
+        "playersMax": "Max",
+        "age": "Age (min-max)",
+        "ageMin": "Min",
+        "ageMax": "Max",
+        "requiredError": "Name, short description and purpose are required.",
+        "saveError": "Could not save the game. Please try again.",
+        "cancel": "Cancel",
+        "saving": "Saving...",
+        "saveChanges": "Save changes",
+        "create": "Create game"
+      },
+      "pageDescription": "The hub for creating, updating, publishing and exporting the entire game catalog.",
+      "cardTitle": "Game Overview",
+      "searchPlaceholder": "Search by name, purpose or category",
+      "breadcrumbs": {
+        "home": "Home",
+        "games": "Games"
+      },
+      "stats": {
+        "total": "Total",
+        "published": "Published",
+        "drafts": "Drafts",
+        "tenantOwned": "Tenant-owned",
+        "withErrors": "With errors"
+      },
+      "page": {
+        "noAccess": "No access",
+        "noAccessDesc": "You need administrator permissions to manage games.",
+        "title": "Games (global)",
+        "description": "Manage the game catalog – search, filter, and perform bulk actions.",
+        "csvExport": "CSV Export",
+        "import": "Import",
+        "newInBuilder": "New in Builder",
+        "loadError": "Could not load games",
+        "noGamesTitle": "No games match the filters",
+        "noGamesDesc": "Adjust filters or add a new game.",
+        "selectGame": "Select {name}",
+        "openInBuilder": "Open in Builder",
+        "showDetails": "Show details",
+        "unpublish": "Unpublish",
+        "publish": "Publish"
+      },
+      "table": {
+        "name": "Name",
+        "mode": "Mode",
+        "purpose": "Purpose",
+        "status": "Status",
+        "valid": "Valid",
+        "owner": "Owner",
+        "updated": "Updated"
       },
       "filters": {
-        "title": "Filters",
-        "search": "Search games...",
-        "clearFilters": "Clear filters",
-        "removeFilter": "Remove filter: {label}",
-        "presets": "Saved filters",
-        "savePreset": "Save as preset",
-        "noMatchingPresets": "No matching presets",
-        "groups": {
-          "classification": "Classification",
-          "playExecution": "Play & Execution",
-          "lifecycle": "Lifecycle & Quality",
-          "ownership": "Ownership & Scope",
-          "technical": "Technical Filters"
-        },
-        "status": {
-          "label": "Status",
-          "published": "Published",
-          "draft": "Draft"
-        },
-        "energy": {
-          "label": "Energy Level",
-          "low": "Low",
-          "medium": "Medium",
-          "high": "High"
-        },
-        "location": {
-          "label": "Location",
-          "indoor": "Indoor",
-          "outdoor": "Outdoor",
-          "both": "Both"
-        },
-        "validation": {
-          "label": "Validation",
-          "valid": "Valid",
-          "warnings": "Warnings",
-          "errors": "Errors",
-          "pending": "Pending"
-        },
-        "ownerSource": {
-          "label": "Source",
-          "system": "System",
-          "imported": "Imported",
-          "tenant": "Tenant-created",
-          "ai_generated": "AI-generated"
-        },
-        "contentVersion": {
-          "label": "Content Version",
-          "v1": "v1 (Legacy)",
-          "v2": "v2 (Builder)"
-        },
-        "playMode": "Play Mode",
-        "purposes": "Purposes",
-        "tenants": "Tenants",
-        "products": "Products",
+        "allStatuses": "All statuses",
+        "published": "Published",
+        "draft": "Draft",
+        "allEnergyLevels": "All energy levels",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "energy": "Energy",
+        "allPlayModes": "All play modes",
+        "basicPlay": "Simple play",
+        "facilitatedActivity": "Facilitated activity",
+        "participantPlay": "Participant play",
+        "playMode": "Play mode",
+        "allOwners": "All owners",
         "global": "Global",
-        "players": {
-          "label": "Number of Players",
-          "min": "Min",
-          "max": "Max"
-        },
-        "age": {
-          "label": "Age",
-          "min": "Min",
-          "max": "Max"
-        },
-        "time": {
-          "label": "Time (min)",
-          "min": "Min",
-          "max": "Max"
-        },
-        "chips": {
-          "status": "Status",
-          "playMode": "Play Mode",
-          "global": "Global"
-        }
+        "owner": "Owner",
+        "status": "Status"
       },
-      "builder": {
-        "artifact": {
-          "newArtifact": "New artifact",
-          "visibility": {
-            "public": "Visible to all",
-            "leaderOnly": "Leader only",
-            "rolePrivate": "Private to role"
-          },
-          "types": {
-            "card": "Card",
-            "document": "Document",
-            "image": "Image",
-            "conversationCards": "🗣️ Conversation cards (play)",
-            "keypad": "🔐 Keypad (PIN)",
-            "riddle": "❓ Riddle / Question",
-            "multiAnswer": "✅ Multi-choice answer",
-            "audio": "🔊 Audio clip",
-            "hotspot": "🎯 Clickable image (Hotspot)",
-            "tilePuzzle": "🧩 Tile puzzle",
-            "cipher": "🔤 Cipher / Encryption",
-            "logicGrid": "🧠 Logic grid",
-            "counter": "🔢 Counter",
-            "qrGate": "📱 QR/NFC scan",
-            "hintContainer": "💡 Hint container",
-            "propConfirmation": "📦 Prop confirmation",
-            "locationCheck": "📍 Location check",
-            "soundLevel": "🎤 Sound level detector",
-            "replayMarker": "⏱️ Replay marker",
-            "signalGenerator": "📢 Signal generator",
-            "timeBankStep": "⏳ Time bank / Final timer",
-            "emptyArtifact": "📦 Empty slot (placeholder)"
-          },
-          "errors": {
-            "loadConversationDecks": "Could not load conversation card decks"
-          }
-        },
-        "trigger": {
-          "newTrigger": "New trigger",
-          "addTrigger": "Add trigger",
-          "noTriggers": "No triggers yet.",
-          "noTriggersHint": "Triggers automate the game: \"When X happens, do Y\"",
-          "unnamedTrigger": "Unnamed trigger",
-          "inactive": "Inactive",
-          "onceLabel": "Once",
-          "activeLabel": "Active",
-          "onceCheckboxLabel": "Once",
-          "autoDisable": "Automatically disabled after first execution",
-          "delayLabel": "Delay",
-          "seconds": "seconds",
-          "step": "Step {number}",
-          "addActionPlaceholder": "+ Add action...",
-          "templates": "Templates",
-          "howItWorks": {
-            "title": "How triggers work",
-            "description": "Triggers automate the game: when a condition is met (e.g. a step is completed or time runs out) one or more actions are automatically performed.",
-            "example": "When 5 minutes remain → Show a clue"
-          },
-          "import": {
-            "error": "Import error"
-          }
-        }
+      "noGames": {
+        "title": "No games match the filters",
+        "description": "Adjust filters or add a new game."
+      },
+      "noAccess": {
+        "title": "No access",
+        "description": "You need administrator permissions to manage games."
+      },
+      "labels": {
+        "unnamedOrganisation": "Unnamed organisation",
+        "unknownPurpose": "Unknown purpose",
+        "unknownProduct": "Unknown product",
+        "nameMissing": "Name missing",
+        "noDescription": "No description"
+      },
+      "errors": {
+        "fetchFailed": "Could not fetch games",
+        "loadFailed": "Could not load games right now.",
+        "loadTitle": "Could not load games",
+        "publishFailed": "Publishing failed",
+        "draftFailed": "Could not restore to draft",
+        "deleteFailed": "Could not delete the game",
+        "updateFailed": "Failed to update the game",
+        "unknownError": "Unknown error"
+      },
+      "messages": {
+        "published": "Published",
+        "restoredToDraft": "Restored to draft",
+        "gameDeleted": "The game was deleted.",
+        "importComplete": "Import complete! Game list updated.",
+        "importedGames": "Imported {count} games.",
+        "importFailed": "Failed for {count} games.",
+        "changesSaved": "Changes saved."
+      },
+      "actions": {
+        "edit": "Edit",
+        "makeDraft": "Make draft",
+        "publish": "Publish",
+        "delete": "Delete"
+      },
+      "list": {
+        "selectGame": "Select {name}",
+        "openMenu": "Open menu"
+      },
+      "deleteDialog": {
+        "title": "Delete game?",
+        "description": "This action cannot be undone. The game will be permanently deleted."
       }
     },
     "achievements": {
@@ -2121,7 +2264,56 @@
       "organizationDetails": "Organization details",
       "searchOrganizations": "Search organizations...",
       "noOrganizations": "No organizations found",
-      "members": "Members",
+      "members": {
+        "title": "Members",
+        "addMember": "Add member",
+        "addMemberDescription": "Search for an existing user by email and add them directly to the organization.",
+        "searchByEmail": "Search user by email",
+        "searchPlaceholder": "name@example.com",
+        "searching": "Searching...",
+        "search": "Search",
+        "noUserFound": "No user found with that email address",
+        "searchFailed": "Could not search for users",
+        "searchResults": "Search results",
+        "alreadyMember": "Already a member",
+        "role": "Role",
+        "roleOwner": "Owner",
+        "roleAdmin": "Admin",
+        "roleMember": "Member",
+        "cancel": "Cancel",
+        "adding": "Adding...",
+        "addMemberButton": "Add member",
+        "memberAdded": "{name} added as {role}",
+        "alreadyMemberError": "The user is already a member of the organization",
+        "addFailed": "Could not add member",
+        "loadFailed": "Could not load members",
+        "unknown": "Unknown",
+        "statsTotal": "Total",
+        "statsOwners": "Owners",
+        "statsAdmins": "Admins",
+        "statsPending": "Pending",
+        "membersCount": "Members ({count})",
+        "searchNameOrEmail": "Search by name or email...",
+        "allRoles": "All roles",
+        "loading": "Loading members...",
+        "noMembersMatch": "No members match the filters",
+        "noMembersYet": "No members in the organization",
+        "tableUser": "User",
+        "tableRole": "Role",
+        "tableMemberSince": "Member since",
+        "tableActions": "Actions",
+        "primary": "Primary",
+        "makeOwner": "Make owner",
+        "makeAdmin": "Make admin",
+        "makeMember": "Make member",
+        "removeFromOrg": "Remove from organization",
+        "confirmRemove": "Are you sure you want to remove {name} from the organization?",
+        "cannotRemoveOnlyOwner": "Cannot remove the only owner",
+        "memberRemoved": "Member removed",
+        "removeFailed": "Could not remove member",
+        "roleChanged": "Role changed to {role}",
+        "roleChangeFailed": "Could not change role"
+      },
       "memberCount": "{count} members",
       "plan": "Plan",
       "subscription": "Subscription",
@@ -2201,56 +2393,6 @@
         "submit": "Create organization",
         "required": "*"
       },
-      "members": {
-        "title": "Members",
-        "addMember": "Add member",
-        "addMemberDescription": "Search for an existing user by email and add them directly to the organization.",
-        "searchByEmail": "Search user by email",
-        "searchPlaceholder": "name@example.com",
-        "searching": "Searching...",
-        "search": "Search",
-        "noUserFound": "No user found with that email address",
-        "searchFailed": "Could not search for users",
-        "searchResults": "Search results",
-        "alreadyMember": "Already a member",
-        "role": "Role",
-        "roleOwner": "Owner",
-        "roleAdmin": "Admin",
-        "roleMember": "Member",
-        "cancel": "Cancel",
-        "adding": "Adding...",
-        "addMemberButton": "Add member",
-        "memberAdded": "{name} added as {role}",
-        "alreadyMemberError": "The user is already a member of the organization",
-        "addFailed": "Could not add member",
-        "loadFailed": "Could not load members",
-        "unknown": "Unknown",
-        "statsTotal": "Total",
-        "statsOwners": "Owners",
-        "statsAdmins": "Admins",
-        "statsPending": "Pending",
-        "membersCount": "Members ({count})",
-        "searchNameOrEmail": "Search by name or email...",
-        "allRoles": "All roles",
-        "loading": "Loading members...",
-        "noMembersMatch": "No members match the filters",
-        "noMembersYet": "No members in the organization",
-        "tableUser": "User",
-        "tableRole": "Role",
-        "tableMemberSince": "Member since",
-        "tableActions": "Actions",
-        "primary": "Primary",
-        "makeOwner": "Make owner",
-        "makeAdmin": "Make admin",
-        "makeMember": "Make member",
-        "removeFromOrg": "Remove from organization",
-        "confirmRemove": "Are you sure you want to remove {name} from the organization?",
-        "cannotRemoveOnlyOwner": "Cannot remove the only owner",
-        "memberRemoved": "Member removed",
-        "removeFailed": "Could not remove member",
-        "roleChanged": "Role changed to {role}",
-        "roleChangeFailed": "Could not change role"
-      },
       "audit": {
         "title": "Activity log",
         "titleWithCount": "Activity log ({count})",
@@ -2296,7 +2438,8 @@
       "breadcrumbs": {
         "admin": "Admin",
         "productsAndContent": "Products & Content",
-        "products": "Products"
+        "products": "Products",
+        "home": "Home"
       },
       "stats": {
         "products": "Products",
@@ -2308,7 +2451,10 @@
       "tabs": {
         "products": "Products",
         "licenses": "Licenses",
-        "purposes": "Purposes"
+        "purposes": "Purposes",
+        "categories": "Categories",
+        "discounts": "Discounts",
+        "images": "Default images"
       },
       "productsTab": {
         "searchPlaceholder": "Search products...",
@@ -2402,20 +2548,6 @@
         "activeCount": "Active",
         "inactiveCount": "Inactive",
         "draftCount": "Drafts"
-      },
-      "breadcrumbs": {
-        "admin": "Admin",
-        "productsAndContent": "Products & Content",
-        "products": "Products",
-        "home": "Home"
-      },
-      "tabs": {
-        "products": "Products",
-        "licenses": "Licenses",
-        "purposes": "Purposes",
-        "categories": "Categories",
-        "discounts": "Discounts",
-        "images": "Default images"
       },
       "v2": {
         "pageTitle": "Products",
@@ -3006,8 +3138,10 @@
         "flagged": "Flagged"
       },
       "emptyState": {
-        "title": "No sessions",
-        "description": "Adjust filters or try again later."
+        "noAccess": "No access",
+        "noAccessDescription": "You need permission to view sessions.",
+        "noSessions": "No sessions",
+        "noSessionsDescription": "Adjust filters or try again later."
       },
       "columns": {
         "title": "Title",
@@ -3045,12 +3179,6 @@
         "noAccessDescription": "You need permission to view sessions.",
         "notFound": "Session not found",
         "notFoundDescription": "Check the link or go back to the list."
-      },
-      "emptyState": {
-        "noAccess": "No access",
-        "noAccessDescription": "You need permission to view sessions.",
-        "noSessions": "No sessions",
-        "noSessionsDescription": "Adjust filters or try again later."
       }
     },
     "tickets": {
@@ -3640,260 +3768,6 @@
         "shopItemTranslations": "Shop Item",
         "notificationTemplateTranslations": "Notification Template",
         "tenantTranslationOverrides": "Tenant Override"
-      }
-    },
-    "games": {
-      "pageTitle": "Game Management",
-      "import": {
-        "selectPrompt": "Select prompt",
-        "artifactsOrTriggers": "Need artifacts or triggers? Choose <strong>Legendary (JSON)</strong>.",
-        "copy": "Copy",
-        "overviewTab": "Overview",
-        "whatImportDoes": "What import does",
-        "importCanRead": "Import can read <strong>CSV</strong> (bulk import) and <strong>JSON</strong> (full fidelity).",
-        "csvVsJson": "CSV vs JSON",
-        "csvBasic": "<strong>CSV:</strong> basic/facilitated + participants-light within canonical header.",
-        "jsonLegendary": "<strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + advanced step fields).",
-        "startHere": "Start here (3 steps)",
-        "step1": "Choose play mode (basic/facilitated/participants).",
-        "step2": "Choose format: CSV (simple/bulk) or JSON (Legendary/full fidelity).",
-        "step3": "Validate in Import dialog (dry-run) before import.",
-        "commonErrors": "Common errors",
-        "invalidPurpose": "<strong>Invalid purpose-id:</strong> main_purpose_id/sub_purpose_ids must be valid UUIDs from the database.",
-        "jsonEscaping": "<strong>JSON escaping in CSV:</strong> quotes in JSON must be written as <code>{'\"\"'}</code> in CSV cell.",
-        "missingSteps": "<strong>Missing steps:</strong> if step_N_title exists, step_N_body must also exist.",
-        "playModesTab": "Play Modes",
-        "playModes": "Play Modes (play_mode)",
-        "chooseEarly": "Choose mode early – QA, UI and runtime expect the correct structure.",
-        "basicMode": "<strong>Simple play (basic):</strong> steps + materials. No digital interaction.",
-        "facilitatedMode": "<strong>Facilitated activity (facilitated):</strong> steps + phases/timer, optional public board.",
-        "participantsMode": "<strong>Participant play (participants):</strong> steps + phases + roles + optional public board. For Legendary (artifacts/triggers), use JSON import.",
-        "minimumRequired": "Minimum required",
-        "basicReq": "<strong>basic:</strong> at least step_1_title + step_1_body.",
-        "facilitatedReq": "<strong>facilitated:</strong> steps required; phases_json strongly recommended.",
-        "participantsReq": "<strong>participants:</strong> steps required; roles_json strongly recommended.",
-        "csvTab": "CSV",
-        "jsonTab": "JSON",
-        "aiPromptsTab": "AI Prompts",
-        "csvFormat": "CSV format (canonical)",
-        "csvFormatList1": "UTF-8 (with/without BOM), separator ,",
-        "csvFormatList2": "Cells with comma/newline/quote wrapped in \"...\"; quotes written as \"\"",
-        "csvFormatList3": "One row = one game",
-        "canonicalCsvHeader": "Canonical CSV header (copy exactly)",
-        "jsonColumnsInCsv": "JSON columns supported in CSV",
-        "useJsonForArtifacts": "Want to use artifacts or triggers? CSV contract doesn't include that. Choose JSON import (Legendary).",
-        "commonMistakes": "Most common mistakes",
-        "invalidJsonInColumn": "Invalid JSON in JSON column (usually wrong quotes/escaping).",
-        "stepTitleWithoutBody": "step_N_title filled but step_N_body missing.",
-        "invalidUuid": "main_purpose_id/sub_purpose_ids are not valid UUIDs.",
-        "jsonImportFull": "JSON import (full fidelity)",
-        "jsonLegendaryDesc": "JSON is the format for Legendary/escape-room: artifacts + triggers + advanced step fields.",
-        "minimalJson": "Minimal JSON (1 game)",
-        "orderResolution": "Order resolution in triggers",
-        "orderResolutionDesc": "Triggers can reference stepOrder/phaseOrder/artifactOrder in condition/actions. Import resolves these to actual IDs.",
-        "infoDialogTitle": "Information about games"
-      },
-      "playModes": {
-        "basic": "Simple play",
-        "facilitated": "Facilitated activity",
-        "participants": "Participant play"
-      },
-      "detail": {
-        "noAccess": "No access",
-        "noAccessDesc": "You need administrator permissions to view games.",
-        "somethingWentWrong": "Something went wrong",
-        "loading": "Loading...",
-        "loadingGameData": "Fetching game data.",
-        "gameNotFound": "Game not found",
-        "gameMissing": "Game is missing",
-        "checkLinkOrGoBack": "Check the link or go back to the list.",
-        "backToGames": "Back to games",
-        "makeDraft": "Make draft",
-        "status": "Status",
-        "published": "Published",
-        "draft": "Draft",
-        "category": "Category",
-        "energy": "Energy",
-        "purpose": "Purpose",
-        "product": "Product",
-        "owner": "Owner",
-        "global": "Global",
-        "players": "Players",
-        "time": "Time",
-        "age": "Age",
-        "notSet": "Not set",
-        "back": "Back",
-        "edit": "Edit",
-        "publish": "Publish",
-        "delete": "Delete",
-        "metadata": "Metadata",
-        "description": "Description",
-        "noDescription": "No description provided.",
-        "noShortDescription": "No short description provided.",
-        "technical": "Technical",
-        "createdAt": "Created",
-        "updatedAt": "Updated",
-        "deleteTitle": "Delete the game?",
-        "deleteDescription": "This will permanently delete the game.",
-        "deleteConfirm": "Delete"
-      },
-      "form": {
-        "editTitle": "Edit game",
-        "createTitle": "Create new game",
-        "description": "Manage basic game data. Requirements: name, short description and main purpose.",
-        "name": "Name",
-        "namePlaceholder": "E.g. Teamwork Relay",
-        "shortDescription": "Short description",
-        "shortDescriptionPlaceholder": "1-2 sentences summarizing the game.",
-        "fullDescription": "Full description",
-        "fullDescriptionPlaceholder": "Instructions, tips and safety notes.",
-        "status": "Status",
-        "statusPlaceholder": "Select status",
-        "owner": "Owner",
-        "ownerPlaceholder": "Select owner",
-        "ownerGlobal": "Global (Lekbanken)",
-        "purpose": "Purpose",
-        "purposePlaceholder": "Select purpose",
-        "product": "Product",
-        "productPlaceholder": "Select product",
-        "productNone": "None",
-        "category": "Category",
-        "categoryPlaceholder": "E.g. Teamwork, Warm-up",
-        "energy": "Energy",
-        "energyPlaceholder": "Select energy level",
-        "energyNone": "None",
-        "energyLow": "Low",
-        "energyMedium": "Medium",
-        "energyHigh": "High",
-        "location": "Location",
-        "locationPlaceholder": "Select location",
-        "locationUnknown": "Unknown",
-        "locationIndoor": "Indoor",
-        "locationOutdoor": "Outdoor",
-        "locationBoth": "Both",
-        "statusDraft": "Draft",
-        "statusPublished": "Published",
-        "timeEstimate": "Estimated time (min)",
-        "timeEstimatePlaceholder": "E.g. 15",
-        "players": "Players (min-max)",
-        "playersMin": "Min",
-        "playersMax": "Max",
-        "age": "Age (min-max)",
-        "ageMin": "Min",
-        "ageMax": "Max",
-        "requiredError": "Name, short description and purpose are required.",
-        "saveError": "Could not save the game. Please try again.",
-        "cancel": "Cancel",
-        "saving": "Saving...",
-        "saveChanges": "Save changes",
-        "create": "Create game"
-      },
-      "pageDescription": "The hub for creating, updating, publishing and exporting the entire game catalog.",
-      "cardTitle": "Game Overview",
-      "searchPlaceholder": "Search by name, purpose or category",
-      "breadcrumbs": {
-        "home": "Home",
-        "games": "Games"
-      },
-      "stats": {
-        "total": "Total",
-        "published": "Published",
-        "drafts": "Drafts",
-        "tenantOwned": "Tenant-owned",
-        "withErrors": "With errors"
-      },
-      "page": {
-        "noAccess": "No access",
-        "noAccessDesc": "You need administrator permissions to manage games.",
-        "title": "Games (global)",
-        "description": "Manage the game catalog – search, filter, and perform bulk actions.",
-        "csvExport": "CSV Export",
-        "import": "Import",
-        "newInBuilder": "New in Builder",
-        "loadError": "Could not load games",
-        "noGamesTitle": "No games match the filters",
-        "noGamesDesc": "Adjust filters or add a new game.",
-        "selectGame": "Select {name}",
-        "openInBuilder": "Open in Builder",
-        "showDetails": "Show details",
-        "unpublish": "Unpublish",
-        "publish": "Publish"
-      },
-      "table": {
-        "name": "Name",
-        "mode": "Mode",
-        "purpose": "Purpose",
-        "status": "Status",
-        "valid": "Valid",
-        "owner": "Owner",
-        "updated": "Updated"
-      },
-      "filters": {
-        "allStatuses": "All statuses",
-        "published": "Published",
-        "draft": "Draft",
-        "allEnergyLevels": "All energy levels",
-        "low": "Low",
-        "medium": "Medium",
-        "high": "High",
-        "energy": "Energy",
-        "allPlayModes": "All play modes",
-        "basicPlay": "Simple play",
-        "facilitatedActivity": "Facilitated activity",
-        "participantPlay": "Participant play",
-        "playMode": "Play mode",
-        "allOwners": "All owners",
-        "global": "Global",
-        "owner": "Owner",
-        "status": "Status"
-      },
-      "noGames": {
-        "title": "No games match the filters",
-        "description": "Adjust filters or add a new game."
-      },
-      "noAccess": {
-        "title": "No access",
-        "description": "You need administrator permissions to manage games."
-      },
-      "labels": {
-        "unnamedOrganisation": "Unnamed organisation",
-        "unknownPurpose": "Unknown purpose",
-        "unknownProduct": "Unknown product",
-        "nameMissing": "Name missing",
-        "noDescription": "No description"
-      },
-      "errors": {
-        "fetchFailed": "Could not fetch games",
-        "loadFailed": "Could not load games right now.",
-        "loadTitle": "Could not load games",
-        "publishFailed": "Publishing failed",
-        "draftFailed": "Could not restore to draft",
-        "deleteFailed": "Could not delete the game",
-        "updateFailed": "Failed to update the game",
-        "unknownError": "Unknown error"
-      },
-      "messages": {
-        "published": "Published",
-        "restoredToDraft": "Restored to draft",
-        "gameDeleted": "The game was deleted.",
-        "importComplete": "Import complete! Game list updated.",
-        "importedGames": "Imported {count} games.",
-        "importFailed": "Failed for {count} games.",
-        "changesSaved": "Changes saved."
-      },
-      "actions": {
-        "edit": "Edit",
-        "makeDraft": "Make draft",
-        "publish": "Publish",
-        "delete": "Delete"
-      },
-      "list": {
-        "selectGame": "Select {name}",
-        "openMenu": "Open menu"
-      },
-      "deleteDialog": {
-        "title": "Delete game?",
-        "description": "This action cannot be undone. The game will be permanently deleted."
       }
     }
   },
@@ -5616,18 +5490,14 @@
       "requestHint": "Request a hint from the host"
     },
     "roleAssigner": {
+      "noRolesCopied": "No roles copied yet",
+      "copyRolesHint": "Click \"Copy roles from game\" above to fetch roles from the game template.",
+      "afterCopyHint": "After copying, you can assign roles to participants manually or randomly.",
       "errors": {
-        "randomAssignFailed": "An error occurred during random assignment"
-      },
-      "minRequirements": {
-        "notSatisfied": "Minimum requirements not met",
-        "needMore": "{roleName}: {count} more needed"
-      },
-      "needs": "Needs {count}",
-      "noAssignedYet": "No one assigned yet",
-      "selectRoleFor": "Select role for",
-      "noRolesAvailable": "No roles available (all full or conflict)",
-      "cancel": "Cancel"
+        "loadFailed": "Could not load data",
+        "assignFailed": "Could not assign roles",
+        "unassignFailed": "Could not remove role assignment"
+      }
     },
     "sessionChatDrawer": {
       "title": "Chat",
@@ -6241,16 +6111,10 @@
       "open": "Open"
     },
     "sessionHeader": {
-      "back": "Back",
-      "settings": "Settings",
-      "codeCopied": "Code copied",
-      "copySessionCode": "Copy session code",
-      "participants": "participants",
-      "ongoing": "Ongoing",
-      "duration": {
-        "hoursMinutes": "{hours}h {minutes}m",
-        "minutes": "{minutes}m"
-      }
+      "sessionFor": "Session for",
+      "copyCode": "Copy code",
+      "copiedCode": "Copied!",
+      "joinUrl": "Join link"
     },
     "sessionStatusBadge": {
       "active": "Active",
@@ -6605,7 +6469,7 @@
       "confirmEndSession": "Are you sure you want to end the session?"
     },
     "outcomePanel": {
-      "loading": "Loading outcomes\u2026",
+      "loading": "Loading outcomes…",
       "title": "Outcomes",
       "description": "Write an outcome and reveal it on the board.",
       "errors": {
@@ -6618,7 +6482,7 @@
         "titleLabel": "Title",
         "titlePlaceholder": "E.g.: The verdict is in",
         "textLabel": "Text",
-        "textPlaceholder": "Optional description\u2026",
+        "textPlaceholder": "Optional description…",
         "createOutcome": "Create outcome"
       },
       "empty": {
@@ -6641,7 +6505,7 @@
       "itemsReady": "{ready} / {total} ready",
       "errorMessage": "Fix the errors above to start.",
       "warningMessage": "Check the warnings before starting.",
-      "successMessage": "\u2713 Everything looks good! You can start the session.",
+      "successMessage": "✓ Everything looks good! You can start the session.",
       "starting": "Starting...",
       "startPlayMode": "Start play mode",
       "items": {
@@ -6858,12 +6722,6 @@
         "body": "Notifications are working!"
       }
     },
-    "sessionHeader": {
-      "sessionFor": "Session for",
-      "copyCode": "Copy code",
-      "copiedCode": "Copied!",
-      "joinUrl": "Join link"
-    },
     "signalPanel": {
       "title": "Signals",
       "description": "Send quick events with preset buttons or custom channel.",
@@ -6891,16 +6749,6 @@
       "errors": {
         "loadFailed": "Could not load signals",
         "sendFailed": "Could not send signal"
-      }
-    },
-    "roleAssigner": {
-      "noRolesCopied": "No roles copied yet",
-      "copyRolesHint": "Click \"Copy roles from game\" above to fetch roles from the game template.",
-      "afterCopyHint": "After copying, you can assign roles to participants manually or randomly.",
-      "errors": {
-        "loadFailed": "Could not load data",
-        "assignFailed": "Could not assign roles",
-        "unassignFailed": "Could not remove role assignment"
       }
     },
     "storyView": {

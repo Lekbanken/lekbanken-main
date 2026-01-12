@@ -21,7 +21,7 @@ interface MediaDefaultsTabProps {
 }
 
 export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
-  const t = useTranslations('admin.design.mediaDefaults')
+  const t = useTranslations('admin.design')
   return (
     <div className="space-y-6">
       {/* Default Profile Images */}
@@ -29,10 +29,10 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserCircleIcon className="h-5 w-5" />
-            Standard profilbilder
+            {t('mediaDefaults.profileImages.title')}
           </CardTitle>
           <CardDescription>
-            Förvalda profilbilder som användare kan välja. Används också som fallback.
+            {t('mediaDefaults.profileImages.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -47,7 +47,7 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
               const images = (config?.defaultProfileImages || []).filter(u => u !== url)
               onUpdate({ ...config, defaultProfileImages: images })
             }}
-            emptyMessage={t('noDefaultProfileImages')}
+            emptyMessage={t('mediaDefaults.noDefaultProfileImages')}
           />
         </CardContent>
       </Card>
@@ -57,10 +57,10 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <PhotoIcon className="h-5 w-5" />
-            Standard omslagsbilder
+            {t('mediaDefaults.coverImages.title')}
           </CardTitle>
           <CardDescription>
-            Förvalda omslagsbilder för lekar och aktiviteter.
+            {t('mediaDefaults.coverImages.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -75,7 +75,7 @@ export function MediaDefaultsTab({ config, onUpdate }: MediaDefaultsTabProps) {
               const images = (config?.defaultCoverImages || []).filter(u => u !== url)
               onUpdate({ ...config, defaultCoverImages: images })
             }}
-            emptyMessage={t('noDefaultCoverImages')}
+            emptyMessage={t('mediaDefaults.noDefaultCoverImages')}
             aspectRatio="wide"
           />
         </CardContent>
@@ -105,6 +105,7 @@ function ImageGallery({
   emptyMessage,
   aspectRatio = 'square',
 }: ImageGalleryProps) {
+  const t = useTranslations('admin.design')
   const [isUploading, setIsUploading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { success: toastSuccess, error: toastError } = useToast()
@@ -122,33 +123,33 @@ function ImageGallery({
       
       if (result.success && result.data) {
         onAdd(result.data.url)
-        toastSuccess('Bild uppladdad')
+        toastSuccess(t('toasts.imageUploaded'))
       } else {
-        toastError(result.error || 'Uppladdning misslyckades')
+        toastError(result.error || t('toasts.uploadFailed'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     } finally {
       setIsUploading(false)
       if (inputRef.current) inputRef.current.value = ''
     }
-  }, [assetType, onAdd, toastSuccess, toastError])
+  }, [assetType, onAdd, toastSuccess, toastError, t])
 
   const handleRemove = useCallback(async (url: string) => {
     try {
       const result = await deleteSystemAsset(assetType, url)
       if (result.success) {
         onRemove(url)
-        toastSuccess('Bild borttagen')
+        toastSuccess(t('toasts.imageDeleted'))
       } else {
-        toastError(result.error || 'Kunde inte ta bort')
+        toastError(result.error || t('toasts.couldNotDelete'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     }
-  }, [assetType, onRemove, toastSuccess, toastError])
+  }, [assetType, onRemove, toastSuccess, toastError, t])
 
   const gridClass = aspectRatio === 'wide' 
     ? 'grid gap-4 grid-cols-2 lg:grid-cols-3'
@@ -165,7 +166,7 @@ function ImageGallery({
           <div key={url} className={itemClass}>
             <Image
               src={url}
-              alt={`Bild ${index + 1}`}
+              alt={t('mediaDefaults.imageAlt', { index: index + 1 })}
               fill
               className="object-cover"
               unoptimized
@@ -196,7 +197,7 @@ function ImageGallery({
         >
           <CloudArrowUpIcon className="h-8 w-8 mb-1" />
           <span className="text-xs">
-            {isUploading ? 'Laddar...' : 'Lägg till'}
+            {isUploading ? t('mediaDefaults.loading') : t('mediaDefaults.addImage')}
           </span>
         </button>
       </div>

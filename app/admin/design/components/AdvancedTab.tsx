@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -18,6 +19,7 @@ interface AdvancedTabProps {
 }
 
 export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
+  const t = useTranslations('admin.design')
   const [isSaving, setIsSaving] = useState(false)
   const [radius, setRadius] = useState(config?.radius || DEFAULT_TOKENS.radius || {})
   const { success: toastSuccess, error: toastError } = useToast()
@@ -34,12 +36,12 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
       
       if (result.success) {
         onUpdate(tokens)
-        toastSuccess('Tokens sparade')
+        toastSuccess(t('toasts.tokensSaved'))
       } else {
-        toastError(result.error || 'Kunde inte spara')
+        toastError(result.error || t('toasts.couldNotSave'))
       }
     } catch (error) {
-      toastError('Ett fel uppstod')
+      toastError(t('toasts.error'))
       console.error(error)
     } finally {
       setIsSaving(false)
@@ -56,10 +58,10 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
           <BeakerIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm text-amber-800 dark:text-amber-200 font-medium">
-              Avancerade inställningar
+              {t('advanced.title')}
             </p>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              Dessa inställningar påverkar globala design tokens. Ändra med försiktighet.
+              {t('advanced.warning')}
             </p>
           </div>
         </CardContent>
@@ -69,11 +71,11 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Border Radius
-            <Badge variant="secondary">Tokens</Badge>
+            {t('advanced.borderRadius.title')}
+            <Badge variant="secondary">{t('advanced.borderRadius.badge')}</Badge>
           </CardTitle>
           <CardDescription>
-            Hörnradie för komponenter. Använder CSS-värden (rem, px, etc).
+            {t('advanced.borderRadius.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -108,18 +110,18 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            CSS Variabler
-            <Badge variant="outline">Kommande</Badge>
+            {t('advanced.cssVariables.title')}
+            <Badge variant="outline">{t('advanced.cssVariables.badge')}</Badge>
           </CardTitle>
           <CardDescription>
-            Egna CSS-variabler för avancerad anpassning.
+            {t('advanced.cssVariables.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
             <InformationCircleIcon className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              Möjligheten att definiera egna CSS-variabler kommer i en framtida version.
+              {t('advanced.cssVariables.info')}
             </p>
           </div>
         </CardContent>
@@ -129,18 +131,18 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            Spacing Scale
-            <Badge variant="outline">Kommande</Badge>
+            {t('advanced.spacingScale.title')}
+            <Badge variant="outline">{t('advanced.spacingScale.badge')}</Badge>
           </CardTitle>
           <CardDescription>
-            Anpassad spacing-skala för margin och padding.
+            {t('advanced.spacingScale.description')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
             <InformationCircleIcon className="h-5 w-5 text-muted-foreground" />
             <p className="text-sm text-muted-foreground">
-              Anpassad spacing-skala kommer i en framtida version.
+              {t('advanced.spacingScale.info')}
             </p>
           </div>
         </CardContent>
@@ -150,7 +152,7 @@ export function AdvancedTab({ config, onUpdate }: AdvancedTabProps) {
       {hasChanges && (
         <div className="flex justify-end">
           <Button onClick={handleSave} disabled={isSaving} size="lg">
-            {isSaving ? 'Sparar...' : 'Spara tokens'}
+            {isSaving ? t('toasts.saving') : t('advanced.saveTokens')}
           </Button>
         </div>
       )}

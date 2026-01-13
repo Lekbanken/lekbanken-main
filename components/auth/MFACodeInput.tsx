@@ -66,8 +66,9 @@ export function MFACodeInput({
       inputRefs.current[index + 1]?.focus();
     }
     
-    // Check if complete
-    if (code.length === length && !code.includes('')) {
+    // Check if complete - all digits filled
+    const isComplete = newValues.every(v => v !== '');
+    if (isComplete && code.length === length) {
       onComplete?.(code);
     }
   }, [values, length, onChange, onComplete]);

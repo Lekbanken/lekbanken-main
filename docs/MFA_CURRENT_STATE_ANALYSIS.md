@@ -1,14 +1,14 @@
 # MFA Nulägesanalys för Lekbanken
 
 **Datum:** 2026-01-13  
-**Version:** 1.0  
-**Status:** Komplett analys
+**Version:** 1.1  
+**Status:** ✅ Enterprise-ready implementation
 
 ---
 
 ## 📊 Executive Summary
 
-Lekbanken har en **fungerande grundläggande MFA-implementation** baserad på Supabase Auth TOTP. Implementationen täcker enrollment, verifiering, disable och recovery codes. Dock saknas flera enterprise-kritiska funktioner som MFA-enforcement på proxy/middleware-nivå, tenant-wide policies, trusted devices och MFA challenge vid login.
+Lekbanken har en **komplett MFA-implementation** baserad på Supabase Auth TOTP med enterprise-funktioner för enforcement på proxy-nivå, tenant-policies, trusted devices och MFA challenge vid login.
 
 ### Övergripande bedömning
 
@@ -16,11 +16,23 @@ Lekbanken har en **fungerande grundläggande MFA-implementation** baserad på Su
 |----------|--------|-----------|
 | **TOTP Enrollment** | ✅ Fungerar | Komplett UI + API |
 | **Recovery Codes** | ✅ Fungerar | SHA-256 hashade |
-| **MFA Challenge vid Login** | ❌ Saknas | Kritisk lucka |
-| **Trusted Devices** | ❌ Saknas | Ej implementerat |
-| **Tenant Policies** | ❌ Saknas | Endast `mfa_enforced` boolean |
-| **Admin MFA Management** | ⚠️ Delvis | Ingen admin-UI |
+| **MFA Challenge vid Login** | ✅ Implementerat | `/auth/mfa-challenge` |
+| **Trusted Devices** | ✅ Implementerat | `mfa_trusted_devices` tabell |
+| **Tenant Policies** | ✅ Implementerat | `tenant_mfa_policies` tabell |
+| **Admin MFA Management** | ✅ Implementerat | Via admin-UI |
 | **Audit Trail** | ✅ Fungerar | Via `user_audit_logs` |
+| **Proxy Enforcement** | ✅ Implementerat | `lib/auth/mfa-aal.ts` + `proxy.ts` |
+
+### ✅ Nyligen Implementerat
+
+| Komponent | Fil | Status |
+|-----------|-----|--------|
+| MFA Enterprise Foundation | `supabase/migrations/20260113200000_mfa_enterprise_foundation.sql` | ✅ |
+| MFA AAL Helpers | `lib/auth/mfa-aal.ts` | ✅ |
+| MFA Guard Utility | `lib/utils/mfaGuard.ts` | ✅ |
+| MFA Service | `lib/services/mfa/mfaService.server.ts` | ✅ |
+| MFA Challenge Page | `app/auth/mfa-challenge/page.tsx` | ✅ |
+| Proxy MFA Enforcement | `proxy.ts` (lines 307-365) | ✅ |
 
 ---
 

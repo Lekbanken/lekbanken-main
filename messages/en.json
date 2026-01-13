@@ -4686,6 +4686,88 @@
         "savePreferences": "Save preferences",
         "downloadConsentReceipt": "Download consent receipt",
         "resetConsent": "Reset consent"
+      },
+      "privacy": {
+        "title": "Privacy & Data Management",
+        "subtitle": "Manage your personal data and privacy choices according to GDPR",
+        "export": {
+          "title": "Export your data",
+          "description": "According to GDPR, you have the right to receive a copy of all your personal data (Article 15 - Right of access, Article 20 - Right to data portability).",
+          "includes": "Your export includes:",
+          "profile": "Profile and account information",
+          "gameHistory": "Game history and achievements",
+          "progress": "Learning progress and badges",
+          "consents": "Consents and settings",
+          "createdGames": "Created games and content",
+          "button": "Download my data",
+          "exporting": "Exporting...",
+          "success": "Export downloaded"
+        },
+        "consents": {
+          "title": "Consents",
+          "description": "Manage your consents. Some consents are required to use the service.",
+          "active": "Active",
+          "inactive": "Inactive",
+          "updated": "Updated: {date}",
+          "withdraw": "Withdraw",
+          "withdrawn": "Withdrawn"
+        },
+        "requestHistory": {
+          "title": "Request History",
+          "empty": "No GDPR requests have been made yet."
+        },
+        "accessLog": {
+          "title": "Data Access Log",
+          "description": "Log of when and how your data has been accessed by the system.",
+          "empty": "No data access has been logged yet."
+        },
+        "delete": {
+          "title": "Delete my account",
+          "description": "According to GDPR Article 17, you have the right to be forgotten. This permanently deletes your account and all associated personal data.",
+          "warning": "Important to know",
+          "irreversible": "This action cannot be undone",
+          "dataDeleted": "All your games, progress and badges will be deleted",
+          "subscriptionCancelled": "Any subscriptions will be automatically cancelled",
+          "legalRetention": "Some data is retained according to law (7 years for accounting)",
+          "initiateButton": "I want to delete my account",
+          "step1Title": "Step 1: Understand the consequences",
+          "step1Description": "You are about to permanently delete your account. Would you like to export your data first?",
+          "exportFirst": "Export first",
+          "continueWithout": "Continue without export",
+          "step2Title": "Step 2: Confirm deletion",
+          "step2Description": "Type DELETE MY ACCOUNT to confirm:",
+          "confirmPlaceholder": "DELETE MY ACCOUNT",
+          "cancel": "Cancel",
+          "deleteButton": "Delete permanently",
+          "deleting": "Deleting..."
+        },
+        "rights": {
+          "title": "Your rights according to GDPR",
+          "article15": {
+            "title": "Article 15 - Right of access",
+            "description": "You have the right to know what data we process about you."
+          },
+          "article16": {
+            "title": "Article 16 - Right to rectification",
+            "description": "You can request that incorrect data be corrected."
+          },
+          "article17": {
+            "title": "Article 17 - Right to erasure",
+            "description": "You can request that your data be deleted."
+          },
+          "article20": {
+            "title": "Article 20 - Data portability",
+            "description": "You can receive your data in a machine-readable format."
+          },
+          "dpo": "Data Protection Officer:",
+          "dpoContact": "Contact us at {email} for questions about your personal data."
+        },
+        "errors": {
+          "title": "An error occurred",
+          "exportFailed": "Export failed",
+          "deleteFailed": "Deletion failed",
+          "confirmationRequired": "Please type \"DELETE MY ACCOUNT\" to confirm"
+        }
       }
     },
     "shop": {

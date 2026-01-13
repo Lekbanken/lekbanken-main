@@ -4717,6 +4717,88 @@
         "savePreferences": "Spara inställningar",
         "downloadConsentReceipt": "Ladda ner samtyckeskvitto",
         "resetConsent": "Återställ samtycke"
+      },
+      "privacy": {
+        "title": "Integritet & Datahantering",
+        "subtitle": "Hantera dina personuppgifter och integritetsval enligt GDPR",
+        "export": {
+          "title": "Exportera dina data",
+          "description": "Enligt GDPR har du rätt att få en kopia av alla dina personuppgifter (Artikel 15 - Rätt till tillgång, Artikel 20 - Rätt till dataportabilitet).",
+          "includes": "Din export innehåller:",
+          "profile": "Profil och kontoinformation",
+          "gameHistory": "Spelhistorik och prestationer",
+          "progress": "Inlärningsframsteg och badges",
+          "consents": "Samtycken och inställningar",
+          "createdGames": "Skapade spel och innehåll",
+          "button": "Ladda ner mina data",
+          "exporting": "Exporterar...",
+          "success": "Export nedladdad"
+        },
+        "consents": {
+          "title": "Samtycken",
+          "description": "Hantera dina samtycken. Vissa samtycken krävs för att använda tjänsten.",
+          "active": "Aktivt",
+          "inactive": "Ej aktivt",
+          "updated": "Uppdaterat: {date}",
+          "withdraw": "Dra tillbaka",
+          "withdrawn": "Återkallat"
+        },
+        "requestHistory": {
+          "title": "Förfrågningshistorik",
+          "empty": "Inga GDPR-förfrågningar har gjorts ännu."
+        },
+        "accessLog": {
+          "title": "Dataåtkomstlogg",
+          "description": "Logg över när och hur dina data har använts av systemet.",
+          "empty": "Ingen dataåtkomst har loggats ännu."
+        },
+        "delete": {
+          "title": "Radera mitt konto",
+          "description": "Enligt GDPR Artikel 17 har du rätt att bli glömd. Detta raderar permanent ditt konto och alla tillhörande personuppgifter.",
+          "warning": "Viktigt att veta",
+          "irreversible": "Denna åtgärd kan inte ångras",
+          "dataDeleted": "Alla dina spel, framsteg och badges raderas",
+          "subscriptionCancelled": "Ev. prenumerationer avslutas automatiskt",
+          "legalRetention": "Vissa uppgifter behålls enligt lag (7 år för bokföring)",
+          "initiateButton": "Jag vill radera mitt konto",
+          "step1Title": "Steg 1: Förstå konsekvenserna",
+          "step1Description": "Du är på väg att permanent radera ditt konto. Vill du exportera dina data först?",
+          "exportFirst": "Exportera först",
+          "continueWithout": "Fortsätt utan export",
+          "step2Title": "Steg 2: Bekräfta radering",
+          "step2Description": "Skriv DELETE MY ACCOUNT för att bekräfta:",
+          "confirmPlaceholder": "DELETE MY ACCOUNT",
+          "cancel": "Avbryt",
+          "deleteButton": "Radera permanent",
+          "deleting": "Raderar..."
+        },
+        "rights": {
+          "title": "Dina rättigheter enligt GDPR",
+          "article15": {
+            "title": "Artikel 15 - Rätt till tillgång",
+            "description": "Du har rätt att få veta vilka uppgifter vi behandlar om dig."
+          },
+          "article16": {
+            "title": "Artikel 16 - Rätt till rättelse",
+            "description": "Du kan begära att felaktiga uppgifter rättas."
+          },
+          "article17": {
+            "title": "Artikel 17 - Rätt till radering",
+            "description": "Du kan begära att dina uppgifter raderas."
+          },
+          "article20": {
+            "title": "Artikel 20 - Dataportabilitet",
+            "description": "Du kan få dina data i ett maskinläsbart format."
+          },
+          "dpo": "Dataskyddsombud:",
+          "dpoContact": "Kontakta oss på {email} för frågor om dina personuppgifter."
+        },
+        "errors": {
+          "title": "Ett fel uppstod",
+          "exportFailed": "Export misslyckades",
+          "deleteFailed": "Radering misslyckades",
+          "confirmationRequired": "Vänligen skriv \"DELETE MY ACCOUNT\" för att bekräfta"
+        }
       }
     },
     "shop": {

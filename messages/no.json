@@ -4682,6 +4682,88 @@
         "savePreferences": "Lagre innstillinger",
         "downloadConsentReceipt": "Last ned samtykkekvittering",
         "resetConsent": "Tilbakestill samtykke"
+      },
+      "privacy": {
+        "title": "Personvern & Datahåndtering",
+        "subtitle": "Administrer dine personopplysninger og personvernvalg i henhold til GDPR",
+        "export": {
+          "title": "Eksporter dine data",
+          "description": "I henhold til GDPR har du rett til å få en kopi av alle dine personopplysninger (Artikkel 15 - Rett til innsyn, Artikkel 20 - Rett til dataportabilitet).",
+          "includes": "Din eksport inkluderer:",
+          "profile": "Profil og kontoinformasjon",
+          "gameHistory": "Spillhistorikk og prestasjoner",
+          "progress": "Læringsframgang og merker",
+          "consents": "Samtykker og innstillinger",
+          "createdGames": "Opprettede spill og innhold",
+          "button": "Last ned mine data",
+          "exporting": "Eksporterer...",
+          "success": "Eksport lastet ned"
+        },
+        "consents": {
+          "title": "Samtykker",
+          "description": "Administrer dine samtykker. Noen samtykker kreves for å bruke tjenesten.",
+          "active": "Aktiv",
+          "inactive": "Inaktiv",
+          "updated": "Oppdatert: {date}",
+          "withdraw": "Trekk tilbake",
+          "withdrawn": "Tilbakekalt"
+        },
+        "requestHistory": {
+          "title": "Forespørselshistorikk",
+          "empty": "Ingen GDPR-forespørsler er gjort ennå."
+        },
+        "accessLog": {
+          "title": "Datatilgangslogg",
+          "description": "Logg over når og hvordan dine data har blitt brukt av systemet.",
+          "empty": "Ingen datatilgang er logget ennå."
+        },
+        "delete": {
+          "title": "Slett min konto",
+          "description": "I henhold til GDPR artikkel 17 har du rett til å bli glemt. Dette sletter permanent kontoen din og alle tilknyttede personopplysninger.",
+          "warning": "Viktig å vite",
+          "irreversible": "Denne handlingen kan ikke angres",
+          "dataDeleted": "Alle dine spill, framgang og merker slettes",
+          "subscriptionCancelled": "Eventuelle abonnementer avsluttes automatisk",
+          "legalRetention": "Noen data beholdes i henhold til loven (7 år for regnskap)",
+          "initiateButton": "Jeg vil slette kontoen min",
+          "step1Title": "Trinn 1: Forstå konsekvensene",
+          "step1Description": "Du er i ferd med å permanent slette kontoen din. Vil du eksportere dataene dine først?",
+          "exportFirst": "Eksporter først",
+          "continueWithout": "Fortsett uten eksport",
+          "step2Title": "Trinn 2: Bekreft sletting",
+          "step2Description": "Skriv DELETE MY ACCOUNT for å bekrefte:",
+          "confirmPlaceholder": "DELETE MY ACCOUNT",
+          "cancel": "Avbryt",
+          "deleteButton": "Slett permanent",
+          "deleting": "Sletter..."
+        },
+        "rights": {
+          "title": "Dine rettigheter i henhold til GDPR",
+          "article15": {
+            "title": "Artikkel 15 - Rett til innsyn",
+            "description": "Du har rett til å vite hvilke opplysninger vi behandler om deg."
+          },
+          "article16": {
+            "title": "Artikkel 16 - Rett til retting",
+            "description": "Du kan be om at feilaktige opplysninger rettes."
+          },
+          "article17": {
+            "title": "Artikkel 17 - Rett til sletting",
+            "description": "Du kan be om at opplysningene dine slettes."
+          },
+          "article20": {
+            "title": "Artikkel 20 - Dataportabilitet",
+            "description": "Du kan motta dataene dine i et maskinlesbart format."
+          },
+          "dpo": "Personvernombud:",
+          "dpoContact": "Kontakt oss på {email} for spørsmål om dine personopplysninger."
+        },
+        "errors": {
+          "title": "En feil oppstod",
+          "exportFailed": "Eksport mislyktes",
+          "deleteFailed": "Sletting mislyktes",
+          "confirmationRequired": "Vennligst skriv \"DELETE MY ACCOUNT\" for å bekrefte"
+        }
       }
     },
     "shop": {

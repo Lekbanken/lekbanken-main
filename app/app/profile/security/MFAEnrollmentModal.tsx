@@ -127,7 +127,7 @@ export function MFAEnrollmentModal({
       
       if (recoveryRes.ok) {
         const recoveryData = await recoveryRes.json();
-        setRecoveryCodes(recoveryData.codes || []);
+        setRecoveryCodes(recoveryData.recovery_codes || []);
       }
       
       setStep('recovery');

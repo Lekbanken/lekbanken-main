@@ -9,18 +9,11 @@ type PageTitleHeaderProps = {
   subtitle: string;
   rightSlot?: ReactNode;
   className?: string;
-  /** Show on mobile? (default: false - hidden on mobile, shown on lg+) */
-  showOnMobile?: boolean;
 };
 
-export function PageTitleHeader({ icon, title, subtitle, rightSlot, className, showOnMobile = false }: PageTitleHeaderProps) {
+export function PageTitleHeader({ icon, title, subtitle, rightSlot, className }: PageTitleHeaderProps) {
   return (
-    <header className={cn(
-      "flex items-start justify-between",
-      // Hide on mobile by default (AppTopbar shows the branding there)
-      !showOnMobile && "hidden lg:flex",
-      className
-    )}>
+    <header className={cn("flex items-start justify-between", className)}>
       <div className="flex items-center gap-2">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
           {icon}

@@ -46,45 +46,44 @@ export function AppTopbar() {
 
   return (
     <header className="relative flex items-center justify-between">
-      <div className={`flex items-center gap-2.5 sm:gap-3 ${isDashboard ? "flex-1 justify-center sm:flex-none" : ""}`}>
+      {/* Logo section - centered on mobile for all pages, left-aligned on desktop */}
+      <div className={`flex items-center gap-2.5 sm:gap-3 ${isDashboard ? "flex-1 justify-center lg:flex-none lg:justify-start" : "lg:flex-none"}`}>
         <button
           type="button"
           onClick={() => router.push("/app")}
           className="flex items-center gap-2.5 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           aria-label={t("goToDashboard")}
         >
+          {/* Mobile: only dice icon, centered */}
           <Image
             src="/lekbanken-icon.png"
             alt={t("logoAlt")}
             width={36}
             height={36}
-            className={`rounded-xl ${isDashboard ? "h-10 w-10" : "h-8 w-8"} sm:h-9 sm:w-9`}
+            className={`rounded-xl ${isDashboard ? "h-10 w-10 lg:h-9 lg:w-9" : "h-8 w-8"} sm:h-9 sm:w-9`}
           />
-          <div className="hidden sm:block">
+          {/* Desktop only: show App + Lekbanken text */}
+          <div className="hidden lg:block">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">App</p>
             <h1 className="text-xl font-semibold tracking-tight text-foreground">Lekbanken</h1>
           </div>
-          {!isDashboard && (
-            <h1 className="text-lg font-semibold tracking-tight text-foreground sm:hidden">Lekbanken</h1>
-          )}
         </button>
       </div>
 
-      <div className={`flex items-center gap-3 ${isDashboard ? "absolute right-0 sm:static" : ""}`}>
-        <div className="hidden items-center gap-3 sm:flex">
-          {isAdmin && (
-            <Badge
-              variant="accent"
-              size="sm"
-              className="cursor-pointer transition-opacity hover:opacity-80"
-              onClick={() => router.push("/admin")}
-            >
-              Admin
-            </Badge>
-          )}
-          <LanguageSwitcher />
-          <ThemeToggle />
-        </div>
+      {/* Right side controls - hidden on mobile (profile in BottomNav) */}
+      <div className={`hidden lg:flex items-center gap-3 ${isDashboard ? "absolute right-0 lg:static" : ""}`}>
+        {isAdmin && (
+          <Badge
+            variant="accent"
+            size="sm"
+            className="cursor-pointer transition-opacity hover:opacity-80"
+            onClick={() => router.push("/admin")}
+          >
+            Admin
+          </Badge>
+        )}
+        <LanguageSwitcher />
+        <ThemeToggle />
         <ProfileMenu context="app" />
       </div>
     </header>

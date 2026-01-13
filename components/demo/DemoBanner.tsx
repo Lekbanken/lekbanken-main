@@ -8,7 +8,7 @@
 
 import { useIsDemo, formatTimeRemaining, useConvertDemo } from '@/hooks/useIsDemo';
 import { XMarkIcon, ClockIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function DemoBanner() {
   const {
@@ -21,6 +21,20 @@ export function DemoBanner() {
 
   const convertDemo = useConvertDemo();
   const [dismissed, setDismissed] = useState(false);
+  const bannerRef = useRef<HTMLDivElement>(null);
+
+  // Set CSS variable for SideNav offset
+  useEffect(() => {
+    if (bannerRef.current && isDemoMode && !dismissed) {
+      const height = bannerRef.current.offsetHeight;
+      document.documentElement.style.setProperty('--demo-banner-height', `${height}px`);
+    } else {
+      document.documentElement.style.setProperty('--demo-banner-height', '0px');
+    }
+    return () => {
+      document.documentElement.style.setProperty('--demo-banner-height', '0px');
+    };
+  }, [isDemoMode, dismissed, isLoading]);
 
   // Don't show if not in demo or dismissed
   if (!isDemoMode || dismissed || isLoading) {
@@ -46,6 +60,7 @@ export function DemoBanner() {
 
   return (
     <div
+      ref={bannerRef}
       className={`
         relative w-full px-4 sm:px-6 py-3 flex items-center justify-between gap-4
         ${isWarning ? 'bg-amber-500' : isPremium ? 'bg-purple-600' : 'bg-blue-600'}

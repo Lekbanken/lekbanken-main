@@ -32,12 +32,14 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
 
   return (
     <ToastProvider>
-      <div className="flex flex-col h-screen">
-        {/* Demo Banner (only shown if in demo mode) */}
-        <DemoBanner />
+      <div className="flex flex-col min-h-screen">
+        {/* Demo Banner (only shown if in demo mode) - sticky at top */}
+        <div className="sticky top-0 z-50">
+          <DemoBanner />
+        </div>
 
-        {/* Main App Shell */}
-        <div className="flex-1 overflow-hidden">
+        {/* Main App Shell - flex-1 to fill remaining space */}
+        <div className="flex-1">
           <Shell header={<AppTopbar />}>{children}</Shell>
         </div>
       </div>

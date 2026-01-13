@@ -62,6 +62,7 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
         is_ephemeral: true,
         is_demo_user: true,
         demo_tier: tier,
+        full_name: 'Demo', // Friendly display name instead of ugly email
         created_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24h
       },
@@ -84,6 +85,7 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
         {
           id: authData.user.id,
           email,
+          full_name: 'Demo', // Friendly display name
           is_demo_user: true,
           is_ephemeral: true,
           global_role: 'demo_private_user',

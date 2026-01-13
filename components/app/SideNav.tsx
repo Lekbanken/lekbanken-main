@@ -4,14 +4,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { Avatar } from "@/components/ui/avatar";
+import { useAuth } from "@/lib/supabase/auth";
 import { appNavItems } from "./nav-items";
 
 export function SideNav() {
   const pathname = usePathname();
   const t = useTranslations();
+  const { user, userProfile } = useAuth();
+
+  const displayName = userProfile?.full_name || user?.user_metadata?.full_name || user?.email || "Profil";
+  const avatarUrl = userProfile?.avatar_url;
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border/50 bg-card/98 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col">
+    <aside className="fixed top-0 bottom-0 left-0 z-30 hidden w-64 border-r border-border/50 bg-card/98 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col" style={{ marginTop: 'var(--demo-banner-height, 0px)' }}>
       <div className="flex items-center gap-3 border-b border-border/50 px-2 pb-6">
         <Image
           src="/lekbanken-icon.png"
@@ -30,6 +36,14 @@ export function SideNav() {
       <nav className="mt-6 space-y-1" aria-label="Sidnavigation">
         {appNavItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const isProfileTab = item.href === "/app/profile";
+          const iconNode = isProfileTab ? (
+            <Avatar src={avatarUrl || undefined} name={displayName} size="sm" className="h-7 w-7" />
+          ) : active ? (
+            item.iconActive
+          ) : (
+            item.icon
+          );
           return (
             <Link
               key={item.href}
@@ -47,7 +61,7 @@ export function SideNav() {
               <span className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${
                 active ? "bg-primary/15 text-primary" : "bg-muted/60 text-inherit group-hover:bg-muted"
               }`}>
-                {active ? item.iconActive : item.icon}
+                {iconNode}
               </span>
               <span>{t(item.labelKey)}</span>
             </Link>

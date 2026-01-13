@@ -756,6 +756,112 @@
           "description": "Här lägger vi till branding, gamification-konfiguration och säkerhetsinställningar."
         }
       },
+      "security": {
+        "mfa": {
+          "pageTitle": "MFA-policy",
+          "pageDescription": "Konfigurera krav för tvåfaktorsautentisering i din organisation",
+          "breadcrumb": {
+            "settings": "Inställningar",
+            "security": "Säkerhet"
+          },
+          "stats": {
+            "totalUsers": "Totalt användare",
+            "mfaEnabled": "MFA aktiverad",
+            "mfaRequired": "MFA krävs",
+            "inGracePeriod": "I respitperiod"
+          },
+          "policy": {
+            "enabled": "MFA-krav aktiverat",
+            "enabledDescription": "Användare måste konfigurera tvåfaktorsautentisering enligt vald policy.",
+            "disabled": "MFA valfritt",
+            "disabledDescription": "Användare kan aktivera MFA frivilligt.",
+            "enforcementLevel": "Nivå av tvång",
+            "gracePeriod": "Respitperiod",
+            "gracePeriodHelp": "Hur lång tid användare har på sig att aktivera MFA efter att kravet införts.",
+            "trustedDevices": "Betrodda enheter",
+            "trustedDevicesEnabled": "Tillåt betrodda enheter",
+            "trustedDevicesDescription": "Användare kan markera enheter som betrodda för att slippa MFA vid varje inloggning.",
+            "trustedDeviceDuration": "Enhet betrodd i"
+          },
+          "enforcement": {
+            "optional": "Valfritt",
+            "optionalDescription": "Användare kan aktivera MFA om de vill, men det krävs inte.",
+            "adminsRequired": "Endast administratörer",
+            "adminsRequiredDescription": "Ägare och administratörer måste aktivera MFA. Vanliga användare kan välja.",
+            "allUsers": "Alla användare",
+            "allUsersDescription": "Alla användare i organisationen måste aktivera MFA."
+          },
+          "gracePeriodOptions": {
+            "immediate": "Ingen (omedelbart)",
+            "days3": "3 dagar",
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar"
+          },
+          "deviceTrustOptions": {
+            "days7": "7 dagar",
+            "days14": "14 dagar",
+            "days30": "30 dagar",
+            "days60": "60 dagar",
+            "days90": "90 dagar"
+          },
+          "actions": {
+            "save": "Spara ändringar",
+            "saving": "Sparar...",
+            "reset": "Återställ"
+          },
+          "messages": {
+            "loadError": "Kunde inte ladda MFA-policy",
+            "saveSuccess": "MFA-policy sparad",
+            "saveError": "Kunde inte spara policy",
+            "retry": "Försök igen"
+          },
+          "users": {
+            "pageTitle": "Användare & MFA",
+            "pageDescription": "Visa och hantera MFA-status för användare i organisationen",
+            "searchPlaceholder": "Sök användare...",
+            "filterAll": "Alla statusar",
+            "filterEnabled": "MFA aktiverad",
+            "filterDisabled": "MFA inaktiverad",
+            "filterRequired": "MFA krävs",
+            "filterGracePeriod": "I respitperiod",
+            "refresh": "Uppdatera",
+            "columns": {
+              "user": "Användare",
+              "role": "Roll",
+              "mfaStatus": "MFA-status",
+              "enrolledAt": "Aktiverad",
+              "trustedDevices": "Betrodda enheter"
+            },
+            "status": {
+              "enabled": "Aktiverad",
+              "required": "Krävs",
+              "gracePeriod": "Respitperiod",
+              "disabled": "Inaktiverad"
+            },
+            "roles": {
+              "owner": "Ägare",
+              "admin": "Admin",
+              "editor": "Redaktör",
+              "member": "Medlem"
+            },
+            "empty": {
+              "title": "Inga användare hittades",
+              "description": "Prova att ändra dina sökkriterier",
+              "noUsersTitle": "Det finns inga användare i den här organisationen"
+            },
+            "pagination": {
+              "showing": "Visar {from} till {to} av {total} användare",
+              "page": "Sida {current} av {total}",
+              "previous": "Föregående",
+              "next": "Nästa"
+            },
+            "tip": {
+              "adminTip": "Som administratör kan du konfigurera MFA-policyn för organisationen under"
+            }
+          }
+        }
+      },
       "achievements": {
         "pageTitle": "Utmärkelser",
         "pageDescription": "Skapa och hantera utmärkelser för {tenantName}",
@@ -4990,6 +5096,133 @@
       "submit": "Skicka länk",
       "backToLogin": "Tillbaka till inloggning",
       "sent": "Länk skickad! Kolla din e-post."
+    },
+    "mfa": {
+      "challenge": {
+        "title": "Tvåfaktorsautentisering",
+        "description": "Ange koden från din autentiseringsapp",
+        "recoveryTitle": "Återställningskod",
+        "recoveryDescription": "Ange en av dina återställningskoder",
+        "verificationSuccess": "Verifiering lyckades!",
+        "redirecting": "Du omdirigeras nu...",
+        "codeLabel": "6-siffrig kod",
+        "codePlaceholder": "Ange kod",
+        "verifyButton": "Verifiera",
+        "verifying": "Verifierar...",
+        "useRecoveryCode": "Använd återställningskod istället",
+        "useAuthenticator": "Använd autentiseringsapp",
+        "recoveryCodeLabel": "Återställningskod",
+        "recoveryCodePlaceholder": "XXXX-XXXX-XXXX",
+        "recoveryCodeHelp": "Ange en av dina återställningskoder. Varje kod kan bara användas en gång.",
+        "verifyWithRecovery": "Verifiera med återställningskod",
+        "trustDevice": "Lita på denna enhet i {days} dagar",
+        "trustDeviceDescription": "Du behöver inte verifiera med MFA på denna enhet under perioden.",
+        "trustDeviceHelp": "Du behöver inte ange kod nästa gång på denna enhet",
+        "needHelp": "Problem med att logga in?",
+        "contactSupport": "Kontakta support",
+        "lowRecoveryCodes": "Du har endast {count} återställningskod(er) kvar. Generera nya koder i dina säkerhetsinställningar.",
+        "attemptsRemaining": "{count} försök kvar",
+        "error": {
+          "invalidCode": "Ogiltig kod. Försök igen.",
+          "invalidRecoveryCode": "Ogiltig återställningskod.",
+          "tooManyAttempts": "För många försök. Försök igen senare.",
+          "generic": "Ett fel uppstod. Försök igen."
+        }
+      },
+      "enroll": {
+        "title": "Aktivera tvåfaktorsautentisering",
+        "protectAccount": "Skydda ditt konto",
+        "description": "Tvåfaktorsautentisering lägger till ett extra lager av säkerhet genom att kräva en kod från din telefon vid inloggning.",
+        "youNeed": "Du behöver:",
+        "needAuthenticator": "En autentiseringsapp (Google Authenticator, Authy, etc.)",
+        "needPhone": "Din telefon tillgänglig",
+        "preparing": "Förbereder...",
+        "start": "Börja",
+        "scanQrTitle": "Skanna QR-koden",
+        "scanQrDescription": "Öppna din autentiseringsapp och skanna QR-koden",
+        "showSecret": "Eller ange koden manuellt:",
+        "scanned": "Jag har skannat koden",
+        "verifyTitle": "Verifiera koden",
+        "verifyDescription": "Ange den 6-siffriga koden från din autentiseringsapp",
+        "verifying": "Verifierar...",
+        "back": "Tillbaka",
+        "step1Title": "Skanna QR-kod",
+        "step1Description": "Öppna din autentiseringsapp och skanna QR-koden nedan.",
+        "step2Title": "Ange verifieringskod",
+        "step2Description": "Ange den 6-siffriga koden som visas i din app.",
+        "step3Title": "Spara återställningskoder",
+        "step3Description": "Spara dessa koder på en säker plats. Du behöver dem om du tappar åtkomst till din enhet.",
+        "qrCodeAlt": "QR-kod för MFA",
+        "manualEntry": "Kan du inte skanna? Ange manuellt:",
+        "copySecret": "Kopiera hemlig nyckel",
+        "secretCopied": "Kopierad!",
+        "verifyCode": "Verifiera kod",
+        "recoveryCodesTitle": "Dina återställningskoder",
+        "recoveryCodesWarning": "Viktigt: Spara dessa koder nu. De visas endast en gång.",
+        "copyAllCodes": "Kopiera alla koder",
+        "codesCopied": "Koder kopierade!",
+        "downloadCodes": "Ladda ner koder",
+        "confirmSaved": "Jag har sparat koderna",
+        "complete": "Slutför aktivering",
+        "success": "MFA har aktiverats!",
+        "recoveryCodes": {
+          "title": "Spara dina återställningskoder",
+          "description": "Om du förlorar tillgång till din telefon kan du använda dessa koder för att logga in",
+          "warning": "Spara dessa koder på ett säkert ställe. Du kommer inte att kunna se dem igen!",
+          "copy": "Kopiera",
+          "copied": "Kopierat!",
+          "download": "Ladda ner",
+          "continue": "Jag har sparat mina koder"
+        },
+        "error": {
+          "enrollFailed": "Kunde inte starta MFA-registrering",
+          "verifyFailed": "Ogiltig kod. Försök igen.",
+          "generic": "Ett fel uppstod. Försök igen."
+        }
+      },
+      "settings": {
+        "title": "Tvåfaktorsautentisering",
+        "description": "Lägg till ett extra lager av säkerhet på ditt konto",
+        "enabled": "MFA är aktiverat",
+        "enabledDescription": "Ditt konto skyddas med tvåfaktorsautentisering.",
+        "disabled": "MFA är inte aktiverat",
+        "disabledDescription": "Aktivera MFA för att skydda ditt konto ytterligare.",
+        "required": "MFA krävs",
+        "requiredDescription": "Din organisation kräver att du aktiverar MFA.",
+        "enableButton": "Aktivera MFA",
+        "disableButton": "Inaktivera MFA",
+        "regenerateCodes": "Generera nya återställningskoder",
+        "trustedDevices": "Betrodda enheter",
+        "trustedDevicesDescription": "Enheter som inte kräver MFA-verifiering",
+        "noTrustedDevices": "Inga betrodda enheter",
+        "unknownDevice": "Okänd enhet",
+        "on": "på",
+        "revokeDevice": "Ta bort",
+        "revokeAllDevices": "Ta bort alla",
+        "lastUsed": "Senast använd",
+        "deviceName": "Enhetsnamn",
+        "expiresAt": "Upphör",
+        "loading": "Laddar...",
+        "recoveryCodes": "Återställningskoder",
+        "recoveryCodesDescription": "Använd dessa koder för att logga in om du förlorar tillgång till din autentiseringsapp",
+        "codesRemaining": "{count} koder kvar",
+        "confirm": {
+          "disableTitle": "Inaktivera MFA?",
+          "disableDescription": "Detta minskar säkerheten på ditt konto. Är du säker?",
+          "disableConfirm": "Ja, inaktivera",
+          "disableCancel": "Avbryt",
+          "revokeTitle": "Ta bort betrodd enhet?",
+          "revokeDescription": "Du måste verifiera med MFA nästa gång du loggar in från denna enhet.",
+          "revokeConfirm": "Ta bort",
+          "revokeCancel": "Avbryt"
+        },
+        "messages": {
+          "disabled": "MFA har inaktiverats",
+          "codesRegenerated": "Nya återställningskoder har genererats",
+          "deviceRevoked": "Enheten har tagits bort",
+          "allDevicesRevoked": "Alla enheter har tagits bort"
+        }
+      }
     },
     "errors": {
       "invalidCredentials": "Ogiltiga inloggningsuppgifter",

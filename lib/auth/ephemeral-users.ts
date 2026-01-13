@@ -15,6 +15,15 @@ import { randomBytes } from 'crypto';
 export const DEMO_TENANT_ID = '00000000-0000-0000-0000-00000000de01';
 
 /**
+ * Demo avatar URL - static image for all demo users
+ * This avatar cannot be selected by regular users (not in avatarPresets)
+ * Stored in Supabase storage bucket 'avatars'
+ * Cache-bust param updated when image changes
+ */
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://qohhnufxididbmzqnjwg.supabase.co';
+export const DEMO_AVATAR_URL = `${SUPABASE_URL}/storage/v1/object/public/avatars/demo-avatar.png?v=2`;
+
+/**
  * Demo tier types (from Decision 1: Hybrid model)
  */
 export type DemoTier = 'free' | 'premium';
@@ -63,6 +72,7 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
         is_demo_user: true,
         demo_tier: tier,
         full_name: 'Demo', // Friendly display name instead of ugly email
+        avatar_url: DEMO_AVATAR_URL, // Demo-specific avatar
         created_at: new Date().toISOString(),
         expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24h
       },
@@ -86,6 +96,7 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
           id: authData.user.id,
           email,
           full_name: 'Demo', // Friendly display name
+          avatar_url: DEMO_AVATAR_URL, // Demo-specific avatar
           is_demo_user: true,
           is_ephemeral: true,
           global_role: 'demo_private_user',

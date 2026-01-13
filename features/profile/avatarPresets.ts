@@ -4,6 +4,11 @@ export type AvatarPreset = {
   src: string;
 };
 
+/**
+ * Avatar presets from Supabase storage
+ * Note: Demo avatar (/avatars/demo-avatar.png) is NOT included here
+ * as it's reserved for demo users only and stored in public folder
+ */
 const AVATAR_BASE =
   typeof process !== "undefined" && process.env.NEXT_PUBLIC_SUPABASE_URL
     ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars`

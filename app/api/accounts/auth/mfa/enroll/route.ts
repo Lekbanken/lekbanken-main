@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerRlsClient } from '@/lib/supabase/server'
+import { logEnrollmentStarted } from '@/lib/services/mfa/mfaAudit.server'
 
 export async function POST() {
   const supabase = await createServerRlsClient()
@@ -14,6 +15,9 @@ export async function POST() {
     console.error('[mfa/enroll] enroll error', error)
     return NextResponse.json({ error: 'Failed to start MFA enrollment' }, { status: 500 })
   }
+
+  // Log enrollment started
+  await logEnrollmentStarted(user.id)
 
   return NextResponse.json({
     factorId: data?.id,

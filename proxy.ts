@@ -5,6 +5,7 @@ import { env } from '@/lib/config/env'
 import { deriveEffectiveGlobalRoleFromClaims, resolveTenantForMiddlewareRequest } from '@/lib/auth/middleware-helpers'
 import { setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
 import { locales, defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
+import { checkMFAStatus, MFA_TRUST_COOKIE, buildMFAChallengeUrl, buildMFAEnrollUrl, extractDeviceFingerprint } from '@/lib/auth/mfa-aal'
 
 const guestOnlyPaths = new Set(['/auth/login', '/auth/signup'])
 
@@ -300,6 +301,71 @@ export default async function proxy(request: NextRequest) {
     const redirectResponse = NextResponse.redirect(new URL('/app', request.url))
     redirectResponse.headers.set('x-request-id', requestId)
     return redirectResponse
+  }
+
+  // ============================================
+  // MFA ENFORCEMENT (Sprint 4)
+  // Check MFA requirements for protected paths
+  // Skip for MFA-related paths to avoid redirect loops
+  // ============================================
+  
+  const mfaExemptPaths = [
+    '/auth/mfa-challenge',
+    '/auth/signout',
+    '/auth/callback',
+    '/app/profile/security',
+    '/api/',
+  ]
+  
+  const isMFAExempt = mfaExemptPaths.some(p => pathname.startsWith(p))
+  
+  if (user && isProtected && !isMFAExempt && !isDemoMode) {
+    // Check MFA enforcement settings
+    const enforceAdmins = process.env.MFA_ENFORCE_ADMINS !== 'false'
+    const enforceTenantAdmins = process.env.MFA_ENFORCE_TENANT_ADMINS !== 'false'
+    
+    // Only check if enforcement is enabled
+    if (enforceAdmins || enforceTenantAdmins) {
+      // Get trusted device token from cookie
+      const trustToken = request.cookies.get(MFA_TRUST_COOKIE)?.value
+      const deviceFingerprint = extractDeviceFingerprint(request.headers, request.cookies)
+      
+      const mfaStatus = await checkMFAStatus(supabase, user, {
+        trustToken,
+        deviceFingerprint: deviceFingerprint ?? undefined,
+        enforceAdmins,
+        enforceTenantAdmins,
+      })
+      
+      // Set MFA status headers for debugging/logging
+      response.headers.set('x-mfa-required', mfaStatus.mfaRequired ? 'true' : 'false')
+      response.headers.set('x-mfa-satisfied', mfaStatus.mfaSatisfied ? 'true' : 'false')
+      
+      if (mfaStatus.mfaRequired && !mfaStatus.mfaSatisfied) {
+        // MFA required but not satisfied
+        if (mfaStatus.mfaEnrolled) {
+          // User is enrolled but needs to verify (AAL1 -> AAL2)
+          const challengeUrl = buildMFAChallengeUrl(request.nextUrl)
+          const redirectResponse = NextResponse.redirect(challengeUrl)
+          redirectResponse.headers.set('x-request-id', requestId)
+          redirectResponse.headers.set('x-mfa-redirect-reason', 'verification_required')
+          return redirectResponse
+        } else {
+          // User not enrolled - redirect to enrollment page
+          const enrollUrl = buildMFAEnrollUrl(request.nextUrl)
+          const redirectResponse = NextResponse.redirect(enrollUrl)
+          redirectResponse.headers.set('x-request-id', requestId)
+          redirectResponse.headers.set('x-mfa-redirect-reason', 'enrollment_required')
+          return redirectResponse
+        }
+      }
+      
+      // Add grace period warning header if applicable
+      if (mfaStatus.gracePeriod?.active) {
+        response.headers.set('x-mfa-grace-period', 'true')
+        response.headers.set('x-mfa-grace-days', String(mfaStatus.gracePeriod.daysRemaining))
+      }
+    }
   }
 
   // ============================================

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
@@ -29,6 +30,7 @@ type CardRow = {
 };
 
 export function ConversationCardsV1() {
+  const t = useTranslations('tools.conversationCards');
   const [collections, setCollections] = useState<CollectionListRow[] | null>(null);
   const [activeCollectionId, setActiveCollectionId] = useState<string>('');
   const [cards, setCards] = useState<CardRow[] | null>(null);
@@ -44,7 +46,7 @@ export function ConversationCardsV1() {
         const data = (await res.json().catch(() => ({}))) as unknown;
         if (!res.ok) {
           const msg = (data as { error?: unknown })?.error;
-          throw new Error(typeof msg === 'string' ? msg : 'Kunde inte ladda samlingar');
+          throw new Error(typeof msg === 'string' ? msg : t('errorLoadCollections'));
         }
 
         const rows = (data as { collections?: unknown })?.collections;
@@ -59,7 +61,7 @@ export function ConversationCardsV1() {
       } catch (e) {
         if (cancelled) return;
         setCollections([]);
-        setError(e instanceof Error ? e.message : 'Kunde inte ladda samlingar');
+        setError(e instanceof Error ? e.message : t('errorLoadCollections'));
       }
     })();
 
@@ -82,7 +84,7 @@ export function ConversationCardsV1() {
         const data = (await res.json().catch(() => ({}))) as unknown;
         if (!res.ok) {
           const msg = (data as { error?: unknown })?.error;
-          throw new Error(typeof msg === 'string' ? msg : 'Kunde inte ladda kort');
+          throw new Error(typeof msg === 'string' ? msg : t('errorLoadCards'));
         }
 
         const rows = (data as { cards?: unknown })?.cards;
@@ -92,14 +94,14 @@ export function ConversationCardsV1() {
       } catch (e) {
         if (cancelled) return;
         setCards([]);
-        setError(e instanceof Error ? e.message : 'Kunde inte ladda kort');
+        setError(e instanceof Error ? e.message : t('errorLoadCards'));
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [activeCollectionId]);
+  }, [activeCollectionId, t]);
 
   const activeCard = useMemo(() => {
     if (!cards || cards.length === 0) return null;
@@ -112,19 +114,19 @@ export function ConversationCardsV1() {
   return (
     <Card className="p-4">
       <div className="space-y-1">
-        <h3 className="text-sm font-semibold text-foreground">Samtalskort</h3>
+        <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
         <p className="text-xs text-muted-foreground">
-          Välj en samling och bläddra mellan kort.
+          {t('description')}
         </p>
       </div>
 
       <div className="mt-4">
         <Select
-          label="Samling"
+          label={t('collection')}
           value={activeCollectionId}
           onChange={(e) => setActiveCollectionId(e.target.value)}
           options={[
-            { value: '', label: collections === null ? 'Laddar…' : 'Välj samling', disabled: true },
+            { value: '', label: collections === null ? t('loading') : t('selectCollection'), disabled: true },
             ...(collections ?? []).map((c) => ({ value: c.id, label: c.title })),
           ]}
         />
@@ -133,18 +135,18 @@ export function ConversationCardsV1() {
       {error ? <div className="mt-3 text-sm text-destructive">{error}</div> : null}
 
       {collections && collections.length === 0 ? (
-        <div className="mt-4 text-sm text-muted-foreground">Inga publicerade samlingar hittades.</div>
+        <div className="mt-4 text-sm text-muted-foreground">{t('noCollections')}</div>
       ) : null}
 
       <div className="mt-4">
         {cards === null ? (
-          <div className="text-sm text-muted-foreground">Laddar kort…</div>
+          <div className="text-sm text-muted-foreground">{t('loadingCards')}</div>
         ) : cards.length === 0 ? (
-          <div className="text-sm text-muted-foreground">Inga kort i denna samling.</div>
+          <div className="text-sm text-muted-foreground">{t('noCardsInCollection')}</div>
         ) : activeCard ? (
           <div className="rounded-lg border border-border p-4">
             <div className="flex items-start justify-between gap-3">
-              <div className="text-sm font-semibold text-foreground">{activeCard.card_title || 'Kort'}</div>
+              <div className="text-sm font-semibold text-foreground">{activeCard.card_title || t('card')}</div>
               <div className="text-xs text-muted-foreground">
                 {activeIndex + 1}/{cards.length}
               </div>
@@ -154,25 +156,25 @@ export function ConversationCardsV1() {
 
             {activeCard.followup_1 || activeCard.followup_2 || activeCard.followup_3 ? (
               <div className="mt-3 space-y-1 text-xs text-muted-foreground">
-                {activeCard.followup_1 ? <div>Följdfråga 1: {activeCard.followup_1}</div> : null}
-                {activeCard.followup_2 ? <div>Följdfråga 2: {activeCard.followup_2}</div> : null}
-                {activeCard.followup_3 ? <div>Följdfråga 3: {activeCard.followup_3}</div> : null}
+                {activeCard.followup_1 ? <div>{t('followup', { n: 1 })}: {activeCard.followup_1}</div> : null}
+                {activeCard.followup_2 ? <div>{t('followup', { n: 2 })}: {activeCard.followup_2}</div> : null}
+                {activeCard.followup_3 ? <div>{t('followup', { n: 3 })}: {activeCard.followup_3}</div> : null}
               </div>
             ) : null}
 
             {activeCard.leader_tip ? (
               <div className="mt-3 text-xs">
-                <span className="font-semibold text-foreground">Ledartips:</span>{' '}
+                <span className="font-semibold text-foreground">{t('leaderTip')}:</span>{' '}
                 <span className="text-muted-foreground">{activeCard.leader_tip}</span>
               </div>
             ) : null}
 
             <div className="mt-4 flex items-center gap-2">
               <Button type="button" size="sm" variant="outline" onClick={() => setActiveIndex((i) => Math.max(0, i - 1))} disabled={!canPrev}>
-                Föregående
+                {t('previous')}
               </Button>
               <Button type="button" size="sm" onClick={() => setActiveIndex((i) => i + 1)} disabled={!canNext}>
-                Nästa
+                {t('next')}
               </Button>
             </div>
           </div>

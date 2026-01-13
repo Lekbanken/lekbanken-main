@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { appNavItems } from "./nav-items";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations();
   const { user, userProfile, effectiveGlobalRole } = useAuth();
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -57,13 +59,13 @@ export function BottomNav() {
               <button
                 key={tab.href}
                 type="button"
-                aria-label={tab.label}
+                aria-label={t(tab.labelKey)}
                 aria-current={active ? "page" : undefined}
                 className={buttonClasses}
                 onClick={() => setProfileOpen(true)}
               >
                 <span className={iconClasses}>{iconNode}</span>
-                <span className={labelClasses}>{tab.label}</span>
+                <span className={labelClasses}>{t(tab.labelKey)}</span>
               </button>
             );
           }
@@ -72,12 +74,12 @@ export function BottomNav() {
             <Link
               key={tab.href}
               href={tab.href}
-              aria-label={tab.label}
+              aria-label={t(tab.labelKey)}
               aria-current={active ? "page" : undefined}
               className={buttonClasses}
             >
               <span className={iconClasses}>{iconNode}</span>
-              <span className={labelClasses}>{tab.label}</span>
+              <span className={labelClasses}>{t(tab.labelKey)}</span>
             </Link>
           );
         })}
@@ -86,7 +88,7 @@ export function BottomNav() {
       <Sheet open={profileOpen} onOpenChange={setProfileOpen}>
         <SheetContent side="bottom" className="rounded-t-3xl px-5 pb-6 pt-4 sm:hidden">
           <SheetHeader className="flex flex-row items-center justify-between">
-            <SheetTitle>Profil</SheetTitle>
+            <SheetTitle>{t('app.nav.profile')}</SheetTitle>
             <SheetClose asChild>
               <Button variant="ghost" size="sm" className="h-9 w-9 p-0">
                 <XMarkIcon className="h-5 w-5" />
@@ -120,7 +122,7 @@ export function BottomNav() {
                 href="/app/profile"
                 className="flex items-center justify-between rounded-xl border border-border/60 bg-muted/40 px-4 py-3 text-sm font-medium text-foreground"
               >
-                Profil
+                {t('app.nav.profile')}
                 <span className="text-xs text-muted-foreground">/app/profile</span>
               </Link>
             </SheetClose>

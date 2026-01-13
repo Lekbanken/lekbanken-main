@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Select, HelpText } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -464,10 +465,10 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
 ];
 
 const CATEGORIES = [
-  { id: 'escape_room', name: 'Escape Room', icon: '🔐' },
-  { id: 'party', name: 'Partyspel', icon: '🎉' },
-  { id: 'educational', name: 'Utbildning', icon: '📚' },
-  { id: 'general', name: 'Allmänt', icon: '📦' },
+  { id: 'escape_room', labelKey: 'wizard.categories.escape_room', icon: '🔐' },
+  { id: 'party', labelKey: 'wizard.categories.party', icon: '🎉' },
+  { id: 'educational', labelKey: 'wizard.categories.educational', icon: '📚' },
+  { id: 'general', labelKey: 'wizard.categories.general', icon: '📦' },
 ] as const;
 
 // =============================================================================
@@ -516,6 +517,7 @@ export function ArtifactWizard({
   onComplete,
   roles: _roles = [],
 }: ArtifactWizardProps) {
+  const t = useTranslations('admin.games.builder');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<ArtifactTemplate | null>(null);
   const [customizing, setCustomizing] = useState(false);
@@ -556,7 +558,7 @@ export function ArtifactWizard({
           <div className="flex items-center gap-2">
             <SparklesIcon className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">
-              {customizing ? 'Anpassa artefakt' : 'Skapa ny artefakt'}
+              {customizing ? t('wizard.customizeArtifact') : t('wizard.createNewArtifact')}
             </h2>
           </div>
           <Button variant="ghost" size="sm" onClick={handleClose}>
@@ -568,7 +570,7 @@ export function ArtifactWizard({
         {!customizing && (
           <div className="px-4 pt-3">
             <HelpText>
-              Artefakter är ledtrådar, keypads och dokument som deltagarna interagerar med. Välj en mall nedan eller börja från scratch.
+              {t('wizard.helpText')}
             </HelpText>
           </div>
         )}
@@ -586,7 +588,7 @@ export function ArtifactWizard({
                     : 'hover:bg-surface-secondary'
                 }`}
               >
-                Alla mallar
+                {t('wizard.allTemplates')}
               </button>
               {CATEGORIES.map((cat) => (
                 <button
@@ -599,7 +601,7 @@ export function ArtifactWizard({
                   }`}
                 >
                   <span>{cat.icon}</span>
-                  <span>{cat.name}</span>
+                  <span>{t(cat.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -641,23 +643,23 @@ export function ArtifactWizard({
               <>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Titel</label>
+                    <label className="text-sm font-medium">{t('wizard.fields.title')}</label>
                     <Input
                       value={artifact.title}
                       onChange={(e) => setArtifact({ ...artifact, title: e.target.value })}
-                      placeholder="Artefaktnamn"
+                      placeholder={t('wizard.placeholders.title')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Typ</label>
+                    <label className="text-sm font-medium">{t('wizard.fields.type')}</label>
                     <Select
                       value={artifact.artifact_type}
                       onChange={(e) => setArtifact({ ...artifact, artifact_type: e.target.value })}
                       options={[
-                        { value: 'card', label: 'Kort' },
-                        { value: 'keypad', label: 'Keypad' },
-                        { value: 'document', label: 'Dokument' },
-                        { value: 'image', label: 'Bild' },
+                        { value: 'card', label: t('wizard.types.card') },
+                        { value: 'keypad', label: t('wizard.types.keypad') },
+                        { value: 'document', label: t('wizard.types.document') },
+                        { value: 'image', label: t('wizard.types.image') },
                       ]}
                     />
                   </div>
@@ -668,11 +670,11 @@ export function ArtifactWizard({
                   <Card className="p-4 bg-amber-500/5 border-amber-500/30">
                     <div className="flex items-center gap-2 mb-3">
                       <LockClosedIcon className="h-5 w-5 text-amber-600" />
-                      <h3 className="font-medium">Keypad-inställningar</h3>
+                      <h3 className="font-medium">{t('wizard.keypad.settings')}</h3>
                     </div>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Korrekt kod</label>
+                        <label className="text-sm font-medium">{t('wizard.keypad.correctCode')}</label>
                         <Input
                           value={(artifact.metadata?.correctCode as string) ?? ''}
                           onChange={(e) =>
@@ -686,7 +688,7 @@ export function ArtifactWizard({
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-medium">Kodlängd</label>
+                        <label className="text-sm font-medium">{t('wizard.keypad.codeLength')}</label>
                         <Input
                           type="number"
                           min={2}
@@ -705,17 +707,17 @@ export function ArtifactWizard({
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Beskrivning</label>
+                  <label className="text-sm font-medium">{t('wizard.fields.description')}</label>
                   <Input
                     value={artifact.description}
                     onChange={(e) => setArtifact({ ...artifact, description: e.target.value })}
-                    placeholder="Kort beskrivning av artefakten"
+                    placeholder={t('wizard.placeholders.description')}
                   />
                 </div>
 
                 {/* Preview */}
                 <Card className="p-4 bg-surface-secondary">
-                  <h3 className="text-sm font-medium mb-2">Förhandsvisning</h3>
+                  <h3 className="text-sm font-medium mb-2">{t('wizard.preview.title')}</h3>
                   <div className="flex items-start gap-3 p-3 bg-background rounded border">
                     <span className="text-2xl">
                       {artifact.artifact_type === 'keypad' ? '🔐' :
@@ -723,16 +725,16 @@ export function ArtifactWizard({
                        artifact.artifact_type === 'image' ? '🖼️' : '📇'}
                     </span>
                     <div>
-                      <p className="font-medium">{artifact.title || 'Namnlös'}</p>
+                      <p className="font-medium">{artifact.title || t('wizard.preview.unnamed')}</p>
                       <p className="text-sm text-foreground-secondary">
-                        {artifact.description || 'Ingen beskrivning'}
+                        {artifact.description || t('wizard.preview.noDescription')}
                       </p>
                       <div className="flex gap-1 mt-2">
                         <Badge variant="outline" size="sm">
                           {artifact.artifact_type}
                         </Badge>
                         <Badge variant="outline" size="sm">
-                          {artifact.variants?.length ?? 1} variant(er)
+                          {artifact.variants?.length ?? 1} {t('wizard.preview.variants')}
                         </Badge>
                       </div>
                     </div>
@@ -747,31 +749,31 @@ export function ArtifactWizard({
         <div className="flex items-center justify-between p-4 border-t bg-surface-secondary/50">
           <div className="text-sm text-foreground-secondary">
             {selectedTemplate
-              ? `Vald: ${selectedTemplate.name}`
-              : 'Välj en mall att börja med'}
+              ? t('wizard.selectedTemplate', { name: selectedTemplate.name })
+              : t('wizard.selectTemplateHint')}
           </div>
           <div className="flex gap-2">
             {customizing ? (
               <>
                 <Button variant="outline" onClick={() => setCustomizing(false)}>
-                  Tillbaka
+                  {t('wizard.buttons.back')}
                 </Button>
                 <Button variant="default" onClick={handleCreate} disabled={!artifact?.title}>
                   <PlusIcon className="h-4 w-4 mr-1" />
-                  Skapa artefakt
+                  {t('wizard.buttons.createArtifact')}
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" onClick={handleClose}>
-                  Avbryt
+                  {t('wizard.buttons.cancel')}
                 </Button>
                 <Button
                   variant="default"
                   onClick={() => setCustomizing(true)}
                   disabled={!selectedTemplate}
                 >
-                  Anpassa
+                  {t('wizard.buttons.customize')}
                 </Button>
                 <Button
                   variant="default"
@@ -779,7 +781,7 @@ export function ArtifactWizard({
                   disabled={!artifact}
                 >
                   <PlusIcon className="h-4 w-4 mr-1" />
-                  Snabbskapa
+                  {t('wizard.buttons.quickCreate')}
                 </Button>
               </>
             )}

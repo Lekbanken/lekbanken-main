@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import { Button, Card, CardContent, Badge, Input, Textarea, Select } from '@/components/ui'
 import {
@@ -54,27 +54,8 @@ export default function KnowledgeBaseAdminPage() {
   const [formIsPublished, setFormIsPublished] = useState(false)
   const [formTenantId, setFormTenantId] = useState<string | null>(null)
 
-  const checkAccessFn = useCallback(async () => {
-    const result = await checkSupportHubAccess()
-    if (!result.hasAccess) {
-      setError(result.error || t('noAccess'))
-      setLoading(false)
-      return
-    }
-    setHasAccess(true)
-    setIsSystemAdmin(result.isSystemAdmin)
-    
-    if (result.isSystemAdmin) {
-      const tenantsResult = await listTenantsForSupportHub()
-      if (tenantsResult.success && tenantsResult.data) {
-        setTenants(tenantsResult.data)
-      }
-    } else if (result.tenantIds.length > 0) {
-      setSelectedTenantId(result.tenantIds[0])
-    }
-  }, [t])
-
-  const loadData = useCallback(async () => {
+  // Manual reload function for use after CRUD operations
+  async function loadData() {
     setLoading(true)
     
     const [entriesResult, categoriesResult] = await Promise.all([
@@ -96,17 +77,56 @@ export default function KnowledgeBaseAdminPage() {
     }
     
     setLoading(false)
-  }, [selectedTenantId, showUnpublished, categoryFilter, searchQuery])
+  }
 
   useEffect(() => {
-    checkAccessFn()
-  }, [checkAccessFn])
+    void (async () => {
+      const result = await checkSupportHubAccess()
+      if (!result.hasAccess) {
+        setError(result.error || t('noAccess'))
+        setLoading(false)
+        return
+      }
+      setHasAccess(true)
+      setIsSystemAdmin(result.isSystemAdmin)
+      
+      if (result.isSystemAdmin) {
+        const tenantsResult = await listTenantsForSupportHub()
+        if (tenantsResult.success && tenantsResult.data) {
+          setTenants(tenantsResult.data)
+        }
+      } else if (result.tenantIds.length > 0) {
+        setSelectedTenantId(result.tenantIds[0])
+      }
+    })()
+  }, [t])
 
   useEffect(() => {
-    if (hasAccess) {
-      loadData()
-    }
-  }, [hasAccess, loadData])
+    if (!hasAccess) return
+    void (async () => {
+      setLoading(true)
+      
+      const [entriesResult, categoriesResult] = await Promise.all([
+        listFAQEntries({
+          tenantId: selectedTenantId,
+          includeUnpublished: showUnpublished,
+          category: categoryFilter || undefined,
+          search: searchQuery || undefined,
+          limit: 100,
+        }),
+        listFAQCategories({ tenantId: selectedTenantId }),
+      ])
+      
+      if (entriesResult.success && entriesResult.data) {
+        setEntries(entriesResult.data)
+      }
+      if (categoriesResult.success && categoriesResult.data) {
+        setCategories(categoriesResult.data)
+      }
+      
+      setLoading(false)
+    })()
+  }, [hasAccess, selectedTenantId, showUnpublished, categoryFilter, searchQuery])
 
   function openCreateForm() {
     setFormQuestion('')

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Textarea } from '@/components/ui';
 import {
   TvIcon,
@@ -42,17 +43,17 @@ type BoardEditorProps = {
 // Theme Config
 // =============================================================================
 
-const themeOptions: { value: BoardTheme; label: string; emoji: string; bgColor: string }[] = [
-  { value: 'mystery', label: 'Mysterium', emoji: '🔍', bgColor: 'bg-slate-800' },
-  { value: 'party', label: 'Fest', emoji: '🎉', bgColor: 'bg-pink-600' },
-  { value: 'sport', label: 'Sport', emoji: '⚽', bgColor: 'bg-green-600' },
-  { value: 'nature', label: 'Natur', emoji: '🌲', bgColor: 'bg-emerald-700' },
-  { value: 'neutral', label: 'Neutral', emoji: '⚪', bgColor: 'bg-zinc-700' },
+const themeOptions: { value: BoardTheme; labelKey: string; emoji: string; bgColor: string }[] = [
+  { value: 'mystery', labelKey: 'board.themes.mystery', emoji: '🔍', bgColor: 'bg-slate-800' },
+  { value: 'party', labelKey: 'board.themes.party', emoji: '🎉', bgColor: 'bg-pink-600' },
+  { value: 'sport', labelKey: 'board.themes.sport', emoji: '⚽', bgColor: 'bg-green-600' },
+  { value: 'nature', labelKey: 'board.themes.nature', emoji: '🌲', bgColor: 'bg-emerald-700' },
+  { value: 'neutral', labelKey: 'board.themes.neutral', emoji: '⚪', bgColor: 'bg-zinc-700' },
 ];
 
-const layoutOptions: { value: BoardLayout; label: string }[] = [
-  { value: 'standard', label: 'Standard' },
-  { value: 'fullscreen', label: 'Fullscreen' },
+const layoutOptions: { value: BoardLayout; labelKey: string }[] = [
+  { value: 'standard', labelKey: 'board.layouts.standard' },
+  { value: 'fullscreen', labelKey: 'board.layouts.fullscreen' },
 ];
 
 // =============================================================================
@@ -104,6 +105,7 @@ type BoardPreviewProps = {
 };
 
 function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
+  const t = useTranslations('admin.games.builder');
   const theme = themeOptions.find((t) => t.value === config.theme) || themeOptions[4];
   const isFullscreen = layout === 'fullscreen';
 
@@ -120,7 +122,7 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
         <div className="text-center mb-4">
           {config.show_game_name && (
             <h2 className={`font-bold tracking-wide ${isFullscreen ? 'text-3xl' : 'text-xl'}`}>
-              {gameName || 'Spelnamn'}
+              {gameName || t('board.preview.gameName')}
             </h2>
           )}
           {config.welcome_message && (
@@ -134,13 +136,13 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
         <div className="flex-1 flex items-center justify-center gap-8">
           {config.show_current_phase && (
             <div className="text-center">
-              <span className="text-white/60 text-xs uppercase tracking-wide">Fas</span>
-              <p className={`font-semibold ${isFullscreen ? 'text-xl' : 'text-base'}`}>Utredning</p>
+              <span className="text-white/60 text-xs uppercase tracking-wide">{t('board.preview.phase')}</span>
+              <p className={`font-semibold ${isFullscreen ? 'text-xl' : 'text-base'}`}>{t('board.preview.investigation')}</p>
             </div>
           )}
           {config.show_timer && (
             <div className="text-center">
-              <span className="text-white/60 text-xs uppercase tracking-wide">Tid kvar</span>
+              <span className="text-white/60 text-xs uppercase tracking-wide">{t('board.preview.timeRemaining')}</span>
               <p className={`font-mono font-bold ${isFullscreen ? 'text-3xl' : 'text-xl'}`}>04:32</p>
             </div>
           )}
@@ -152,19 +154,19 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
             {config.show_participants && (
               <div className="flex items-center gap-1.5 text-white/80">
                 <UserGroupIcon className="h-4 w-4" />
-                <span className="text-sm">12 deltagare</span>
+                <span className="text-sm">{t('board.preview.participants')}</span>
               </div>
             )}
             {config.show_public_roles && (
               <div className="flex items-center gap-1.5 text-white/80">
                 <UserIcon className="h-4 w-4" />
-                <span className="text-sm">3 roller</span>
+                <span className="text-sm">{t('board.preview.roles')}</span>
               </div>
             )}
             {config.show_leaderboard && (
               <div className="flex items-center gap-1.5 text-white/80">
                 <TrophyIcon className="h-4 w-4" />
-                <span className="text-sm">Topplista</span>
+                <span className="text-sm">{t('board.preview.leaderboard')}</span>
               </div>
             )}
           </div>
@@ -173,7 +175,7 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
               <div className="w-12 h-12 bg-white rounded-md flex items-center justify-center">
                 <QrCodeIcon className="h-8 w-8 text-gray-800" />
               </div>
-              <span className="text-xs text-white/60 mt-1">Skanna</span>
+              <span className="text-xs text-white/60 mt-1">{t('board.preview.scan')}</span>
             </div>
           )}
         </div>
@@ -187,6 +189,7 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
 // =============================================================================
 
 export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [previewLayout, setPreviewLayout] = useState<BoardLayout>('standard');
 
   const updateConfig = <K extends keyof BoardConfigData>(key: K, value: BoardConfigData[K]) => {
@@ -202,9 +205,9 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Publik Tavla</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('board.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Konfiguration för projektor/storskärm under spelet
+            {t('board.subtitle')}
           </p>
         </div>
       </div>
@@ -213,7 +216,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
         {/* Left: Preview */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">Förhandsgranskning</span>
+            <span className="text-sm font-medium text-foreground">{t('board.preview.title')}</span>
             <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
               {layoutOptions.map((opt) => (
                 <button
@@ -241,7 +244,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
           {!hasContent && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
               <ChatBubbleBottomCenterTextIcon className="h-5 w-5 flex-shrink-0" />
-              <span>Aktivera minst ett element eller lägg till välkomstmeddelande.</span>
+              <span>{t('board.noContentWarning')}</span>
             </div>
           )}
         </div>
@@ -250,49 +253,49 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
         <div className="space-y-6">
           {/* Element Toggles */}
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-foreground">Tavlaelement</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('board.fields.elements')}</h4>
             <div className="grid sm:grid-cols-2 gap-2">
               <ToggleItem
-                label="Spelnamn"
+                label={t('board.toggles.showGameName')}
                 checked={config.show_game_name}
                 onChange={(v) => updateConfig('show_game_name', v)}
                 icon={<ChatBubbleBottomCenterTextIcon className="h-4 w-4" />}
               />
               <ToggleItem
-                label="Aktuell fas"
+                label={t('board.toggles.showCurrentPhase')}
                 checked={config.show_current_phase}
                 onChange={(v) => updateConfig('show_current_phase', v)}
                 icon={<ClockIcon className="h-4 w-4" />}
               />
               <ToggleItem
-                label="Timer"
+                label={t('board.toggles.showTimer')}
                 checked={config.show_timer}
                 onChange={(v) => updateConfig('show_timer', v)}
                 icon={<ClockIcon className="h-4 w-4" />}
               />
               <ToggleItem
-                label="Deltagare"
+                label={t('board.toggles.showParticipants')}
                 checked={config.show_participants}
                 onChange={(v) => updateConfig('show_participants', v)}
                 icon={<UserGroupIcon className="h-4 w-4" />}
               />
               <ToggleItem
-                label="Publika roller"
+                label={t('board.toggles.showPublicRoles')}
                 checked={config.show_public_roles}
                 onChange={(v) => updateConfig('show_public_roles', v)}
                 icon={<UserIcon className="h-4 w-4" />}
               />
               <ToggleItem
-                label="Ledartavla"
-                description="Kommer snart"
+                label={t('board.toggles.showLeaderboard')}
+                description={t('board.comingSoon')}
                 checked={config.show_leaderboard}
                 onChange={(v) => updateConfig('show_leaderboard', v)}
                 icon={<TrophyIcon className="h-4 w-4" />}
                 disabled
               />
               <ToggleItem
-                label="QR-kod"
-                description="Länk till /join/[code]"
+                label={t('board.toggles.showQrCode')}
+                description={t('board.qrCodeDescription')}
                 checked={config.show_qr_code}
                 onChange={(v) => updateConfig('show_qr_code', v)}
                 icon={<QrCodeIcon className="h-4 w-4" />}
@@ -302,7 +305,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
 
           {/* Theme Selector */}
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-foreground">Tema</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('board.fields.theme')}</h4>
             <div className="flex flex-wrap gap-2">
               {themeOptions.map((theme) => (
                 <button
@@ -316,7 +319,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
                   }`}
                 >
                   <span className="text-lg">{theme.emoji}</span>
-                  <span className="text-sm font-medium">{theme.label}</span>
+                  <span className="text-sm font-medium">{t(theme.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -324,7 +327,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
 
           {/* Background Color */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-foreground">Bakgrundsfärg (valfritt)</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('board.fields.backgroundColor')}</h4>
             <div className="flex items-center gap-3">
               <input
                 type="color"
@@ -344,7 +347,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
                   size="sm"
                   onClick={() => updateConfig('background_color', '')}
                 >
-                  Rensa
+                  {t('board.clear')}
                 </Button>
               )}
             </div>
@@ -352,7 +355,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
 
           {/* Layout Variant */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-foreground">Layout</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('board.fields.layout')}</h4>
             <div className="flex gap-2">
               {layoutOptions.map((opt) => (
                 <button
@@ -365,7 +368,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
                       : 'border-border text-muted-foreground hover:border-muted-foreground'
                   }`}
                 >
-                  {opt.label}
+                  {t(opt.labelKey)}
                 </button>
               ))}
             </div>
@@ -373,11 +376,11 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
 
           {/* Welcome Message */}
           <div className="space-y-2">
-            <h4 className="text-sm font-medium text-foreground">Välkomstmeddelande</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('board.fields.welcomeMessage')}</h4>
             <Textarea
               value={config.welcome_message}
               onChange={(e) => updateConfig('welcome_message', e.target.value)}
-              placeholder="Välkomna till kvällens mysterium!"
+              placeholder={t('board.welcomeMessagePlaceholder')}
               rows={3}
             />
           </div>

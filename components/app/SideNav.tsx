@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { appNavItems } from "./nav-items";
 
 export function SideNav() {
   const pathname = usePathname();
+  const t = useTranslations();
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border/50 bg-card/98 px-4 py-6 backdrop-blur-xl lg:flex lg:flex-col">
@@ -47,7 +49,7 @@ export function SideNav() {
               }`}>
                 {active ? item.iconActive : item.icon}
               </span>
-              <span>{item.label}</span>
+              <span>{t(item.labelKey)}</span>
             </Link>
           );
         })}
@@ -57,10 +59,10 @@ export function SideNav() {
           <svg className="h-4 w-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <p className="font-semibold text-foreground">Tips</p>
+          <p className="font-semibold text-foreground">{t('app.nav.tip')}</p>
         </div>
         <p className="mt-2 leading-relaxed">
-          Lägg till dina mest använda filter som snabbval för snabbare planering.
+          {t('app.nav.tipText')}
         </p>
       </div>
     </aside>

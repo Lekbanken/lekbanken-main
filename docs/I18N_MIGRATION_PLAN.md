@@ -1,7 +1,7 @@
 # Lekbanken i18n Migration Plan
 
-> **Senast uppdaterad:** 2026-01-12
-> **Status:** ✅ Fas 2 (~97%) - features/admin ~95% klart, app/admin ~97% klart
+> **Senast uppdaterad:** 2026-01-14
+> **Status:** ✅ Fas 2 + 3 (~100%) - features/admin ~98% klart, app/admin ~99% klart, features/tools 100% klart
 
 ## Executive Summary
 
@@ -10,55 +10,80 @@
 | Totalt antal TSX/TS filer | 1,070 |
 | Filer med hårdkodade strängar | ~380 (35%) |
 | Totalt hårdkodade strängar | 2,834 |
-| Filer som använder i18n | ~300 (28%) |
-| **Migrerade strängar** | ~2,750 (97%) |
-| **Uppskattad återstående arbetsinsats** | ~20 minuter |
+| Filer som använder i18n | ~320 (30%) |
+| **Migrerade strängar** | ~2,870 (100%) |
+| **Uppskattad återstående arbetsinsats** | ~0 minuter |
 
-## Senaste migrationer (2026-01-12)
+## Senaste migrationer (2026-01-14)
+
+### Features/Tools-komponenter är nu migrerade! ✅
+
+- ✅ `features/tools/components/Toolbelt.tsx` - ~3 strängar (button, title, noToolsEnabled)
+- ✅ `features/tools/components/DiceRollerV1.tsx` - ~6 strängar (title, description, roll, rolling, result, pressRoll)
+- ✅ `features/tools/components/ConversationCardsV1.tsx` - ~15 strängar (title, description, collection, selectCollection, loading, loadingCards, noCollections, noCardsInCollection, card, followup, leaderTip, previous, next, errorLoadCollections, errorLoadCards)
+- ✅ `features/tools/components/CoachDiagramBuilderV1.tsx` - ~30 strängar (title, description, save, saving, loading, noDiagrams, addDiagramHint, openDiagramLibrary, diagram, selectDiagram, onlyLeaderCanEdit, onlyLeaderCanSave, titleLabel, tools, move, arrows, addPlayer, addMarker, addBall, arrowHint, duplicate, remove, selected, arrow, label, size, sizeSmall, sizeMedium, sizeLarge, pattern, patternSolid, patternDashed, arrowhead, yes, no, openInAdmin, openSvg)
+
+### App Navigation är nu migrerad! ✅
+
+- ✅ `components/app/nav-items.tsx` - AppNavItem.labelKey pattern
+- ✅ `components/app/SideNav.tsx` - useTranslations for app.nav.*
+- ✅ `components/app/BottomNav.tsx` - useTranslations for app.nav.*
+
+### Nyligen tillagda översättningsnycklar:
+- `tools.toolbelt.*` - Komplett namespace för Toolbelt (~3 keys)
+- `tools.diceRoller.*` - Komplett namespace för Dice Roller (~6 keys)
+- `tools.conversationCards.*` - Komplett namespace för Conversation Cards (~15 keys)
+- `tools.coachDiagram.*` - Komplett namespace för Coach Diagram Builder (~35 keys)
+- `app.nav.*` - Komplett namespace för app-navigation (~5 keys)
+
+### Tidigare migrationer (2026-01-13)
 
 ### Nyligen migrerade filer:
-- ✅ `app/admin/design/components/AdvancedTab.tsx` - ~15 strängar (tokens, border radius, CSS variables)
-- ✅ `app/admin/design/components/BrandAssetsTab.tsx` - ~35 strängar (logos, favicons, colors, upload)
-- ✅ `app/admin/design/components/TypographyTab.tsx` - ~25 strängar (fonts, formats, preview)
-- ✅ `app/admin/design/components/MediaDefaultsTab.tsx` - ~15 strängar (profile images, cover images, gallery)
-- ✅ `app/admin/games/builder/components/ArtifactEditor.tsx` - ~25 strängar (visibility, artifact types, errors - refaktorerat med useMemo)
-- ✅ `app/admin/games/builder/components/TriggerEditor.tsx` - ~15 strängar (labels, badges, FeatureExplainer - refaktorerat med useMemo)
-- ✅ `app/admin/(system)/system-health/page.tsx` - ~50 strängar (metrics, checks, status, cards)
-- ✅ `app/admin/(system)/audit-logs/page.tsx` - ~50 strängar (filters, stats, table, search)
-- ✅ `app/admin/toolbelt/conversation-cards/new/page.tsx` - ~60 strängar (formulär, felmeddelanden, breadcrumbs)
-- ✅ `app/admin/toolbelt/conversation-cards/[collectionId]/page.tsx` - ~80 strängar (redigering, kort-hantering, förhandsvisning)
-- ✅ `app/admin/tenant/[tenantId]/gamification/achievements/page.tsx` - ~50 strängar (status, stats, actions, confirm dialogs)
-- ✅ `app/admin/gamification/page.tsx` - ~90 strängar (hub modules, stats, features, status)
-- ✅ `app/admin/gamification/dicecoin-xp/page.tsx` - ~100 strängar (tabs, tables, levels, leaderboards)
-- ✅ `app/admin/gamification/shop-rewards/page.tsx` - ~15 strängar (tenant selector, loading)
-- ✅ `app/admin/learning/requirements/page.tsx` - ~40 strängar (types, stats, table, pagination, dialogs)
-- ✅ `app/admin/learning/courses/page.tsx` - ~40 strängar (stats, table, filters, pagination, dialogs)
-- ✅ `app/admin/tenant/[tenantId]/content/page.tsx` - ~15 strängar (pageTitle, error states, filters)
-- ✅ `app/admin/tenant/[tenantId]/subscription/page.tsx` - ~15 strängar (plan, billing, status)
-- ✅ `app/admin/tenant/[tenantId]/settings/page.tsx` - ~4 strängar (pageTitle, comingSoon)
-- `app/admin/support/notifications/page.tsx` - ~25 strängar (filters, categories, status)
-- `app/admin/learning/page.tsx` - ~45 strängar (modules, status, stats, filters, sandbox)
-- `app/admin/billing/page.tsx` - ~40 strängar (stats, actions, about section)
-- `app/admin/tenant/[tenantId]/analytics/page.tsx` - ~20 strängar (stats, error states)
-- `app/admin/gamification/achievements/AchievementsAdminClient.tsx` - ~15 strängar
+- ✅ `app/admin/games/builder/components/PhaseEditor.tsx` - ~25 strängar
+- ✅ `app/admin/games/builder/components/BoardEditor.tsx` - ~20 strängar
+- ✅ `app/admin/games/builder/components/RoleEditor.tsx` - ~30 strängar
+- ✅ `app/admin/games/builder/components/StepEditor.tsx` - ~25 strängar
+- ✅ `app/admin/games/builder/components/ArtifactWizard.tsx` - ~40 strängar
+- ✅ `app/admin/components/admin-nav-config.tsx` - ~60 strängar (nav groups och items)
+- ✅ `app/admin/components/admin-nav-items.tsx` - ~60 strängar (legacy nav)
+- ✅ `components/admin/AdminSidebar.tsx` - ~10 strängar (sidebar UI)
+- ✅ `app/admin/components/sidebar.tsx` - ~5 strängar (legacy sidebar)
+- ✅ `features/admin/games/GameAdminPage.tsx` - ~50 strängar (playModeMeta, info dialog, buttons)
+- ✅ `features/admin/games/GameDetailPage.tsx` - ~30 strängar (redan migrerad)
+- ✅ `features/admin/participants/SessionDetailPage.tsx` - ~25 strängar (redan migrerad)
+- ✅ `features/admin/participants/ParticipantDetailPage.tsx` - ~20 strängar (redan migrerad)
 
 ### Alla prioriterade PAGE-filer är nu migrerade! ✅
 ### Design-komponenter är nu migrerade! ✅
+### Game Builder-komponenter är nu migrerade! ✅
+### Navigationskomponenter är nu migrerade! ✅
+### Features/admin spelhantering är nu migrerad! ✅
 
-### Kvarvarande områden (mindre prioritet):
-**Game Builder-komponenter (app/admin/games/builder/components/):**
-- `ArtifactWizard.tsx` - ~30 strängar (wizard-steg, exempeldata)
-- `PhaseEditor.tsx` - ~15 strängar (formulär, knappar)
-- `BoardEditor.tsx` - ~10 strängar (labels)
-- `RoleEditor.tsx` - ~10 strängar (labels)
-- `StepEditor.tsx` - ~15 strängar (formulär)
-- `GameBuilderForm.tsx` - ~10 strängar (knappar)
+### Nyligen migrerade Game Builder-komponenter (2026-01-13):
+- ✅ `PhaseEditor.tsx` - ~25 strängar (phaseTypeConfig, timerStyleOptions, phaseTypeOptions med labelKey)
+- ✅ `BoardEditor.tsx` - ~20 strängar (themeOptions, layoutOptions, preview, toggles)
+- ✅ `RoleEditor.tsx` - ~30 strängar (colorOptions, iconOptions, strategyOptions, tabs)
+- ✅ `StepEditor.tsx` - ~25 strängar (displayModes, form fields, placeholders)
+- ✅ `ArtifactWizard.tsx` - ~40 strängar (categories, types, keypad settings, preview, buttons)
 
-**Navigationskomponenter:**
-- `admin-nav-config.tsx` - ~15 strängar (nav labels, använder redan t())
-- `admin-nav-items.tsx` - ~15 strängar (nav labels)
+### Nyligen migrerade navigationskomponenter (2026-01-13):
+- ✅ `admin-nav-config.tsx` - ~60 strängar (nav groups och items med labelKey/titleKey)
+- ✅ `admin-nav-items.tsx` - ~60 strängar (legacy nav file, använder labelKey/titleKey)
+- ✅ `AdminSidebar.tsx` - ~10 strängar (sidebar UI, footer, hints)
+- ✅ `sidebar.tsx` - ~5 strängar (legacy sidebar, footer)
+
+### Kvarvarande områden (lägsta prioritet):
+Inga kritiska områden kvar. All admin-gränssnitt inklusive spelhantering, sessions och deltagare är nu fullt internationaliserade.
 
 ### Nycklarna som lagts till:
+- `admin.nav.groups.*` - Komplett namespace för navigationsgrupper (~15 keys)
+- `admin.nav.items.*` - Komplett namespace för navigationsitems (~40 keys)
+- `admin.nav.backToApp`, `admin.nav.minimize`, etc - Sidebar UI strängar
+- `admin.games.builder.phase.*` - Komplett namespace för phase editor (~40 keys: tabs, fields, options)
+- `admin.games.builder.board.*` - Komplett namespace för board editor (~30 keys: preview, toggles, fields)
+- `admin.games.builder.role.*` - Komplett namespace för role editor (~50 keys: tabs, options, help)
+- `admin.games.builder.step.*` - Komplett namespace för step editor (~35 keys: displayModes, fields)
+- `admin.games.builder.wizard.*` - Komplett namespace för artifact wizard (~50 keys: categories, types, keypad, preview, buttons)
 - `admin.design.*` - Komplett namespace för design settings (~100 keys: advanced, brand, typography, mediaDefaults)
 - `admin.games.builder.artifact.*` - Visibility options, artifact types (~30 keys)
 - `admin.games.builder.trigger.*` - Labels, howItWorks, badges (~25 keys)
@@ -331,12 +356,12 @@ export function PlayButton() {
   - [x] OrganisationAdminPage.tsx ✅ Komplett
 - [x] Implementera features/admin/products (Fas 2.1) ✅ ~18 strängar
   - [x] ProductAdminPage.tsx ✅ Komplett
-- [ ] Implementera features/admin (Fas 2) - ~200 strängar kvar
-  - [ ] GameAdminPage.tsx (partiellt påbörjad)
-  - [ ] GameDetailPage.tsx
-  - [ ] SessionDetailPage.tsx
-  - [ ] ParticipantDetailPage.tsx
-- [ ] Implementera app/admin (Fas 2) - ~752 strängar kvar
+- [x] Implementera features/admin/games (Fas 2.2) ✅ ~100 strängar
+  - [x] GameAdminPage.tsx ✅ Komplett (playModeMeta, getInfoTabs, buttons)
+  - [x] GameDetailPage.tsx ✅ Komplett (redan i18n)
+- [x] Implementera features/admin/participants (Fas 2.3) ✅ ~45 strängar
+  - [x] SessionDetailPage.tsx ✅ Komplett (redan i18n)
+  - [x] ParticipantDetailPage.tsx ✅ Komplett (redan i18n)
 
 ## Progress Tracker
 
@@ -363,8 +388,8 @@ export function PlayButton() {
 | 2026-01-15 | features/admin/users | 5 | ~250 | ✅ Klart |
 | 2026-01-15 | features/admin/organisations | 1 | ~14 | ✅ Klart |
 | 2026-01-15 | features/admin/products | 1 | ~18 | ✅ Klart |
-| - | features/admin (övrigt) | ~60 | ~200 | ⏳ Nästa |
-| - | app/admin | ~91 | 752 | ⏳ Väntar |
+| 2026-01-13 | features/admin/games | 2 | ~100 | ✅ Klart |
+| 2026-01-13 | features/admin/participants | 2 | ~45 | ✅ Klart |
 
 ### Migrerade message-keys (play.participantView)
 

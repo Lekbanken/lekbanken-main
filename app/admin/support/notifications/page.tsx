@@ -49,8 +49,24 @@ export default function NotificationHistoryPage() {
   }), [t])
 
   useEffect(() => {
-    checkAccess()
-  }, [])
+    void (async () => {
+      const result = await checkSupportHubAccess()
+      if (!result.hasAccess) {
+        setError(result.error || t('noAccess'))
+        setLoading(false)
+        return
+      }
+      setHasAccess(true)
+      setIsSystemAdmin(result.isSystemAdmin)
+      
+      if (result.isSystemAdmin) {
+        const tenantsResult = await listTenantsForSupportHub()
+        if (tenantsResult.success && tenantsResult.data) {
+          setTenants(tenantsResult.data)
+        }
+      }
+    })()
+  }, [t])
 
   useEffect(() => {
     if (hasAccess) {
@@ -58,26 +74,6 @@ export default function NotificationHistoryPage() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasAccess, selectedTenantId, categoryFilter])
-
-  async function checkAccess() {
-    const result = await checkSupportHubAccess()
-    if (!result.hasAccess) {
-      setError(result.error || t('noAccess'))
-      setLoading(false)
-      return
-    }
-    setHasAccess(true)
-    setIsSystemAdmin(result.isSystemAdmin)
-    
-    if (result.isSystemAdmin) {
-      const tenantsResult = await listTenantsForSupportHub()
-      if (tenantsResult.success && tenantsResult.data) {
-        setTenants(tenantsResult.data)
-      }
-    } else if (result.tenantIds.length > 0) {
-      setSelectedTenantId(result.tenantIds[0])
-    }
-  }
 
   async function loadNotifications() {
     setLoading(true)

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   DndContext,
   closestCenter,
@@ -48,6 +49,7 @@ type SortableStepItemProps = {
 };
 
 function SortableStepItem({ step, index, onEdit, onRemove, canRemove }: SortableStepItemProps) {
+  const t = useTranslations('admin.games.builder');
   const {
     attributes,
     listeners,
@@ -90,7 +92,7 @@ function SortableStepItem({ step, index, onEdit, onRemove, canRemove }: Sortable
             {index + 1}
           </span>
           <h4 className="font-medium text-foreground truncate">
-            {step.title || 'Namnlöst steg'}
+            {step.title || t('step.unnamed')}
           </h4>
           {durationMinutes && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -136,6 +138,7 @@ type StepEditorDrawerProps = {
 };
 
 function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
+  const t = useTranslations('admin.games.builder');
   const [formData, setFormData] = useState<StepData>(() =>
     step
       ? { ...step, media_ref: step.media_ref ?? '' }
@@ -157,7 +160,7 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
       <form onSubmit={handleSubmit} className="flex flex-col h-full">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4">
-          <h3 className="text-lg font-semibold text-foreground">Redigera steg</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('step.editStep')}</h3>
           <button
             type="button"
             onClick={onClose}
@@ -171,46 +174,46 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
         <div className="flex-1 overflow-y-auto p-6 space-y-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              Rubrik <span className="text-destructive">*</span>
+              {t('step.fields.title')} <span className="text-destructive">*</span>
             </label>
             <Input
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Ex. Samla gruppen"
+              placeholder={t('step.titlePlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              Beskrivning
+              {t('step.fields.description')}
             </label>
             <Textarea
               value={formData.body}
               onChange={(e) => setFormData({ ...formData, body: e.target.value })}
               rows={5}
-              placeholder="Vad ska deltagarna göra i detta steg?"
+              placeholder={t('step.descriptionPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              💬 Ledarskript (valfritt)
+              💬 {t('step.fields.leaderScript')}
             </label>
             <Textarea
               value={formData.leader_script || ''}
               onChange={(e) => setFormData({ ...formData, leader_script: e.target.value })}
               rows={3}
-              placeholder="Säg till gruppen: 'Nu ska vi...'"
+              placeholder={t('step.leaderScriptPlaceholder')}
               className="font-mono text-sm"
             />
             <p className="text-xs text-muted-foreground">
-              Ordagrant vad ledaren kan säga till gruppen
+              {t('step.leaderScriptHelp')}
             </p>
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              ⏱ Beräknad tid (sekunder)
+              ⏱ {t('step.fields.duration')}
             </label>
             <Input
               type="number"
@@ -222,13 +225,13 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
                   duration_seconds: e.target.value ? Number(e.target.value) : null,
                 })
               }
-              placeholder="Ex. 120 (2 minuter)"
+              placeholder={t('step.durationPlaceholder')}
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">
-              ✨ Textvisning
+              ✨ {t('step.fields.displayMode')}
             </label>
             <Select
               value={formData.display_mode || 'instant'}
@@ -239,18 +242,18 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
                 })
               }
               options={[
-                { value: 'instant', label: 'Direkt (standard)' },
-                { value: 'typewriter', label: '✍️ Typewriter – tecken för tecken' },
-                { value: 'dramatic', label: '🎭 Dramatisk – långsam med paus' },
+                { value: 'instant', label: t('step.displayModes.instant') },
+                { value: 'typewriter', label: t('step.displayModes.typewriter') },
+                { value: 'dramatic', label: t('step.displayModes.dramatic') },
               ]}
             />
             <p className="text-xs text-muted-foreground">
-              Hur beskrivningen visas för deltagare
+              {t('step.displayModeHelp')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">🧩 Diagram (valfritt)</label>
+            <label className="text-sm font-medium text-foreground">🧩 {t('step.fields.diagram')}</label>
             <div className="flex items-center gap-2">
               <MediaPicker
                 value={formData.media_ref || null}
@@ -263,7 +266,7 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
                 }}
                 trigger={
                   <Button type="button" variant="outline" size="sm">
-                    Välj diagram
+                    {t('step.selectDiagram')}
                   </Button>
                 }
               />
@@ -277,17 +280,17 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
                     setDiagramUrl(null);
                   }}
                 >
-                  Rensa
+                  {t('step.clear')}
                 </Button>
               )}
             </div>
             {diagramUrl ? (
               <div className="overflow-hidden rounded-lg border bg-muted/10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={diagramUrl} alt="Valt diagram" className="h-auto w-full" />
+                <img src={diagramUrl} alt={t('step.selectedDiagram')} className="h-auto w-full" />
               </div>
             ) : formData.media_ref ? (
-              <p className="text-xs text-muted-foreground">Valt: {formData.media_ref}</p>
+              <p className="text-xs text-muted-foreground">{t('step.selected')}: {formData.media_ref}</p>
             ) : null}
           </div>
         </div>
@@ -295,9 +298,9 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
         {/* Footer */}
         <div className="border-t border-border px-6 py-4 flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onClose}>
-            Avbryt
+            {t('step.cancel')}
           </Button>
-          <Button type="submit">Spara steg</Button>
+          <Button type="submit">{t('step.saveStep')}</Button>
         </div>
       </form>
     </div>
@@ -310,6 +313,7 @@ type StepEditorProps = {
 };
 
 export function StepEditor({ steps, onChange }: StepEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [editingStep, setEditingStep] = useState<StepData | null>(null);
 
   const sensors = useSensors(
@@ -365,14 +369,14 @@ export function StepEditor({ steps, onChange }: StepEditorProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Steg-för-steg</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('step.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Dra för att ändra ordning. Klicka för att redigera.
+            {t('step.subtitle')}
           </p>
         </div>
         <Button type="button" size="sm" onClick={addStep}>
           <PlusIcon className="h-4 w-4 mr-1.5" />
-          Lägg till steg
+          {t('step.addStep')}
         </Button>
       </div>
 
@@ -381,12 +385,12 @@ export function StepEditor({ steps, onChange }: StepEditorProps) {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
             <PlusIcon className="h-6 w-6 text-muted-foreground" />
           </div>
-          <h4 className="font-medium text-foreground mb-1">Inga steg ännu</h4>
+          <h4 className="font-medium text-foreground mb-1">{t('step.noStepsYet')}</h4>
           <p className="text-sm text-muted-foreground mb-4">
-            Lägg till steg för att guida ledaren genom leken.
+            {t('step.noStepsDescription')}
           </p>
           <Button type="button" onClick={addStep}>
-            + Lägg till första steget
+            + {t('step.addFirstStep')}
           </Button>
         </div>
       ) : (

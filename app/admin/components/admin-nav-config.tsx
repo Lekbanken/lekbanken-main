@@ -7,7 +7,7 @@ import type { AdminPermission } from '@/features/admin/shared/hooks/useRbac';
 export interface AdminNavItemConfig {
   id: string;
   href: string;
-  label: string;
+  labelKey: string;
   icon: ReactNode;
   badge?: string;
   permission?: AdminPermission;
@@ -17,7 +17,7 @@ export interface AdminNavItemConfig {
 
 export interface AdminNavGroupConfig {
   id: string;
-  title: string;
+  titleKey: string;
   items: AdminNavItemConfig[];
   systemAdminOnly?: boolean;
 }
@@ -220,47 +220,47 @@ export const navIcons = {
 export const adminNavConfig: AdminNavConfig = [
   {
     id: 'overview',
-    title: 'Översikt',
-    items: [{ id: 'dashboard', href: '/admin', label: 'Dashboard', icon: navIcons.dashboard }],
+    titleKey: 'admin.nav.groups.overview',
+    items: [{ id: 'dashboard', href: '/admin', labelKey: 'admin.nav.items.dashboard', icon: navIcons.dashboard }],
   },
   {
     id: 'organisation-users',
-    title: 'Organisation & Användare',
+    titleKey: 'admin.nav.groups.organisationUsers',
     items: [
       {
         id: 'organisations',
         href: '/admin/organisations',
-        label: 'Organisationer',
+        labelKey: 'admin.nav.items.organisations',
         icon: navIcons.organisations,
         permission: 'admin.tenants.list',
       },
-      { id: 'users', href: '/admin/users', label: 'Användare', icon: navIcons.users, permission: 'admin.users.list' },
+      { id: 'users', href: '/admin/users', labelKey: 'admin.nav.items.users', icon: navIcons.users, permission: 'admin.users.list' },
     ],
   },
   {
     id: 'products-content',
-    title: 'Produkter & Innehåll',
+    titleKey: 'admin.nav.groups.productsContent',
     items: [
-      { id: 'products', href: '/admin/products', label: 'Produkter', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
-      { id: 'games', href: '/admin/games', label: 'Lekhanteraren', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
-      { id: 'planner', href: '/admin/planner', label: 'Planläggaren', icon: navIcons.content, permission: 'admin.planner.list' },
+      { id: 'products', href: '/admin/products', labelKey: 'admin.nav.items.products', icon: navIcons.products, permission: 'admin.products.list', systemAdminOnly: true },
+      { id: 'games', href: '/admin/games', labelKey: 'admin.nav.items.games', icon: navIcons.games, permission: 'admin.games.list', systemAdminOnly: true },
+      { id: 'planner', href: '/admin/planner', labelKey: 'admin.nav.items.planner', icon: navIcons.content, permission: 'admin.planner.list' },
     ],
   },
   {
     id: 'library',
-    title: 'Bibliotek',
+    titleKey: 'admin.nav.groups.library',
     items: [
       {
         id: 'library-badges',
         href: '/admin/library/badges',
-        label: 'Badges',
+        labelKey: 'admin.nav.items.badges',
         icon: navIcons.achievements,
         permission: 'admin.achievements.list',
       },
       {
         id: 'library-coach-diagrams',
         href: '/admin/library/coach-diagrams',
-        label: 'Coach Diagrams',
+        labelKey: 'admin.nav.items.coachDiagrams',
         icon: navIcons.achievements,
         permission: 'admin.content.list',
       },
@@ -268,63 +268,63 @@ export const adminNavConfig: AdminNavConfig = [
   },
   {
     id: 'toolbelt',
-    title: 'Verktyg (Toolbelt)',
+    titleKey: 'admin.nav.groups.toolbelt',
     items: [
-      { id: 'dice-simulator', href: '/admin/tools', label: 'Tärningssimulator', icon: navIcons.key, systemAdminOnly: true },
-      { id: 'conversation-cards', href: '/admin/toolbelt/conversation-cards', label: 'Samtalskort', icon: navIcons.key, permission: 'admin.conversation_cards.manage' },
+      { id: 'dice-simulator', href: '/admin/tools', labelKey: 'admin.nav.items.diceSimulator', icon: navIcons.key, systemAdminOnly: true },
+      { id: 'conversation-cards', href: '/admin/toolbelt/conversation-cards', labelKey: 'admin.nav.items.conversationCards', icon: navIcons.key, permission: 'admin.conversation_cards.manage' },
     ],
   },
   {
     id: 'gamification',
-    title: 'Gamification hub',
+    titleKey: 'admin.nav.groups.gamification',
     items: [
-      { id: 'gamification-hub', href: '/admin/gamification', label: 'Översikt', icon: navIcons.leaderboard },
-      { id: 'dicecoin-xp', href: '/admin/gamification/dicecoin-xp', label: 'DiceCoin & XP', icon: navIcons.leaderboard },
-      { id: 'achievements', href: '/admin/gamification/achievements', label: 'Achievements', icon: navIcons.achievements },
-      { id: 'shop-rewards', href: '/admin/gamification/shop-rewards', label: 'Shop & Rewards', icon: navIcons.marketplace },
-      { id: 'library-exports', href: '/admin/gamification/library-exports', label: 'Library Exports', icon: navIcons.content },
+      { id: 'gamification-hub', href: '/admin/gamification', labelKey: 'admin.nav.items.overview', icon: navIcons.leaderboard },
+      { id: 'dicecoin-xp', href: '/admin/gamification/dicecoin-xp', labelKey: 'admin.nav.items.dicecoinXp', icon: navIcons.leaderboard },
+      { id: 'achievements', href: '/admin/gamification/achievements', labelKey: 'admin.nav.items.achievements', icon: navIcons.achievements },
+      { id: 'shop-rewards', href: '/admin/gamification/shop-rewards', labelKey: 'admin.nav.items.shopRewards', icon: navIcons.marketplace },
+      { id: 'library-exports', href: '/admin/gamification/library-exports', labelKey: 'admin.nav.items.libraryExports', icon: navIcons.content },
     ],
   },
   {
     id: 'learning',
-    title: 'Utbildning',
+    titleKey: 'admin.nav.groups.learning',
     items: [
-      { id: 'learning-hub', href: '/admin/learning', label: 'Översikt', icon: navIcons.learning },
-      { id: 'learning-courses', href: '/admin/learning/courses', label: 'Kurser', icon: navIcons.learning },
-      { id: 'learning-paths', href: '/admin/learning/paths', label: 'Lärstigar', icon: navIcons.learning },
-      { id: 'learning-requirements', href: '/admin/learning/requirements', label: 'Krav & Grind', icon: navIcons.learning },
+      { id: 'learning-hub', href: '/admin/learning', labelKey: 'admin.nav.items.overview', icon: navIcons.learning },
+      { id: 'learning-courses', href: '/admin/learning/courses', labelKey: 'admin.nav.items.courses', icon: navIcons.learning },
+      { id: 'learning-paths', href: '/admin/learning/paths', labelKey: 'admin.nav.items.learningPaths', icon: navIcons.learning },
+      { id: 'learning-requirements', href: '/admin/learning/requirements', labelKey: 'admin.nav.items.requirements', icon: navIcons.learning },
     ],
   },
   {
     id: 'operations',
-    title: 'Operativt / Live',
+    titleKey: 'admin.nav.groups.operations',
     items: [
-      { id: 'sessions', href: '/admin/sessions', label: 'Sessioner', icon: navIcons.sessions, permission: 'admin.sessions.list' },
-      { id: 'participants', href: '/admin/participants', label: 'Deltagare', icon: navIcons.participants, permission: 'admin.participants.list' },
-      { id: 'moderation', href: '/admin/moderation', label: 'Moderering', icon: navIcons.moderation, permission: 'admin.moderation.view', systemAdminOnly: true },
-      { id: 'tickets', href: '/admin/tickets', label: 'Ärenden', icon: navIcons.tickets, permission: 'admin.tickets.view', systemAdminOnly: true },
+      { id: 'sessions', href: '/admin/sessions', labelKey: 'admin.nav.items.sessions', icon: navIcons.sessions, permission: 'admin.sessions.list' },
+      { id: 'participants', href: '/admin/participants', labelKey: 'admin.nav.items.participants', icon: navIcons.participants, permission: 'admin.participants.list' },
+      { id: 'moderation', href: '/admin/moderation', labelKey: 'admin.nav.items.moderation', icon: navIcons.moderation, permission: 'admin.moderation.view', systemAdminOnly: true },
+      { id: 'tickets', href: '/admin/tickets', labelKey: 'admin.nav.items.tickets', icon: navIcons.tickets, permission: 'admin.tickets.view', systemAdminOnly: true },
     ],
   },
   {
     id: 'analytics',
-    title: 'Analys',
-    items: [{ id: 'analytics', href: '/admin/analytics', label: 'Analys', icon: navIcons.analytics }],
+    titleKey: 'admin.nav.groups.analytics',
+    items: [{ id: 'analytics', href: '/admin/analytics', labelKey: 'admin.nav.items.analytics', icon: navIcons.analytics }],
   },
   {
     id: 'system',
-    title: 'System',
+    titleKey: 'admin.nav.groups.system',
     systemAdminOnly: true,
     items: [
-      { id: 'billing', href: '/admin/billing', label: 'Fakturering', icon: navIcons.billing, permission: 'admin.billing.view' },
-      { id: 'notifications', href: '/admin/notifications', label: 'Notifikationer', icon: navIcons.notifications, permission: 'admin.notifications.send', systemAdminOnly: true },
-      { id: 'system-health', href: '/admin/system-health', label: 'System Health', icon: navIcons.systemHealth, permission: 'admin.system.view' },
-      { id: 'audit-logs', href: '/admin/audit-logs', label: 'Granskningslogg', icon: navIcons.audit, permission: 'admin.audit.view' },
-      { id: 'feature-flags', href: '/admin/feature-flags', label: 'Feature Flags', icon: navIcons.flag, permission: 'admin.system.view' },
-      { id: 'api-keys', href: '/admin/api-keys', label: 'API-nycklar', icon: navIcons.key, permission: 'admin.system.view' },
-      { id: 'webhooks', href: '/admin/webhooks', label: 'Webhooks', icon: navIcons.rss, permission: 'admin.system.view' },
-      { id: 'incidents', href: '/admin/incidents', label: 'Incidenter', icon: navIcons.incident, permission: 'admin.system.view' },
-      { id: 'release-notes', href: '/admin/release-notes', label: 'Release Notes', icon: navIcons.megaphone, permission: 'admin.system.view' },
-      { id: 'settings', href: '/admin/settings', label: 'Inställningar', icon: navIcons.settings, permission: 'admin.settings.view' },
+      { id: 'billing', href: '/admin/billing', labelKey: 'admin.nav.items.billing', icon: navIcons.billing, permission: 'admin.billing.view' },
+      { id: 'notifications', href: '/admin/notifications', labelKey: 'admin.nav.items.notifications', icon: navIcons.notifications, permission: 'admin.notifications.send', systemAdminOnly: true },
+      { id: 'system-health', href: '/admin/system-health', labelKey: 'admin.nav.items.systemHealth', icon: navIcons.systemHealth, permission: 'admin.system.view' },
+      { id: 'audit-logs', href: '/admin/audit-logs', labelKey: 'admin.nav.items.auditLogs', icon: navIcons.audit, permission: 'admin.audit.view' },
+      { id: 'feature-flags', href: '/admin/feature-flags', labelKey: 'admin.nav.items.featureFlags', icon: navIcons.flag, permission: 'admin.system.view' },
+      { id: 'api-keys', href: '/admin/api-keys', labelKey: 'admin.nav.items.apiKeys', icon: navIcons.key, permission: 'admin.system.view' },
+      { id: 'webhooks', href: '/admin/webhooks', labelKey: 'admin.nav.items.webhooks', icon: navIcons.rss, permission: 'admin.system.view' },
+      { id: 'incidents', href: '/admin/incidents', labelKey: 'admin.nav.items.incidents', icon: navIcons.incident, permission: 'admin.system.view' },
+      { id: 'release-notes', href: '/admin/release-notes', labelKey: 'admin.nav.items.releaseNotes', icon: navIcons.megaphone, permission: 'admin.system.view' },
+      { id: 'settings', href: '/admin/settings', labelKey: 'admin.nav.items.settings', icon: navIcons.settings, permission: 'admin.settings.view' },
     ],
   },
 ];
@@ -332,28 +332,28 @@ export const adminNavConfig: AdminNavConfig = [
 export const tenantAdminNavConfig: AdminNavConfig = [
   {
     id: 'tenant-main',
-    title: 'Min Organisation',
+    titleKey: 'admin.nav.groups.myOrganisation',
     items: [
-      { id: 'tenant-dashboard', href: '/admin/tenant/[tenantId]', label: 'Oversikt', icon: navIcons.dashboard },
-      { id: 'tenant-members', href: '/admin/tenant/[tenantId]/members', label: 'Medlemmar', icon: navIcons.users },
-      { id: 'tenant-settings', href: '/admin/tenant/[tenantId]/settings', label: 'Installningar', icon: navIcons.settings },
+      { id: 'tenant-dashboard', href: '/admin/tenant/[tenantId]', labelKey: 'admin.nav.items.overview', icon: navIcons.dashboard },
+      { id: 'tenant-members', href: '/admin/tenant/[tenantId]/members', labelKey: 'admin.nav.items.members', icon: navIcons.users },
+      { id: 'tenant-settings', href: '/admin/tenant/[tenantId]/settings', labelKey: 'admin.nav.items.settings', icon: navIcons.settings },
     ],
   },
   {
     id: 'tenant-content',
-    title: 'Innehall',
+    titleKey: 'admin.nav.groups.content',
     items: [
-      { id: 'tenant-games', href: '/admin/tenant/[tenantId]/games', label: 'Spel', icon: navIcons.games },
-      { id: 'tenant-content', href: '/admin/tenant/[tenantId]/content', label: 'Material', icon: navIcons.content },
-      { id: 'tenant-participants', href: '/admin/tenant/[tenantId]/participants', label: 'Deltagare', icon: navIcons.participants },
+      { id: 'tenant-games', href: '/admin/tenant/[tenantId]/games', labelKey: 'admin.nav.items.games', icon: navIcons.games },
+      { id: 'tenant-content', href: '/admin/tenant/[tenantId]/content', labelKey: 'admin.nav.items.material', icon: navIcons.content },
+      { id: 'tenant-participants', href: '/admin/tenant/[tenantId]/participants', labelKey: 'admin.nav.items.participants', icon: navIcons.participants },
     ],
   },
   {
     id: 'tenant-billing',
-    title: 'Konto',
+    titleKey: 'admin.nav.groups.account',
     items: [
-      { id: 'tenant-subscription', href: '/admin/tenant/[tenantId]/subscription', label: 'Prenumeration', icon: navIcons.billing },
-      { id: 'tenant-analytics', href: '/admin/tenant/[tenantId]/analytics', label: 'Statistik', icon: navIcons.analytics },
+      { id: 'tenant-subscription', href: '/admin/tenant/[tenantId]/subscription', labelKey: 'admin.nav.items.subscription', icon: navIcons.billing },
+      { id: 'tenant-analytics', href: '/admin/tenant/[tenantId]/analytics', labelKey: 'admin.nav.items.statistics', icon: navIcons.analytics },
     ],
   },
 ];

@@ -167,6 +167,65 @@
   },
   "admin": {
     "nav": {
+      "groups": {
+        "overview": "Oversikt",
+        "organisationUsers": "Organisasjon & Brukere",
+        "productsContent": "Produkter & Innhold",
+        "library": "Bibliotek",
+        "toolbelt": "Verktøy (Toolbelt)",
+        "gamification": "Gamification hub",
+        "learning": "Opplæring",
+        "operations": "Operativt / Live",
+        "analytics": "Analyse",
+        "system": "System",
+        "myOrganisation": "Min Organisasjon",
+        "content": "Innhold",
+        "account": "Konto"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "overview": "Oversikt",
+        "organisations": "Organisasjoner",
+        "users": "Brukere",
+        "products": "Produkter",
+        "games": "Spillhåndtering",
+        "planner": "Planlegger",
+        "badges": "Badges",
+        "coachDiagrams": "Coach Diagrams",
+        "diceSimulator": "Terningsimulator",
+        "conversationCards": "Samtalekort",
+        "dicecoinXp": "DiceCoin & XP",
+        "achievements": "Achievements",
+        "shopRewards": "Butikk & Belønninger",
+        "libraryExports": "Bibliotekeksport",
+        "courses": "Kurs",
+        "learningPaths": "Læringsveier",
+        "requirements": "Krav",
+        "sessions": "Økter",
+        "participants": "Deltakere",
+        "moderation": "Moderering",
+        "tickets": "Saker",
+        "analytics": "Analyse",
+        "billing": "Fakturering",
+        "notifications": "Varsler",
+        "systemHealth": "Systemhelse",
+        "auditLogs": "Revisjonslogg",
+        "featureFlags": "Funksjonsflagg",
+        "apiKeys": "API-nøkler",
+        "webhooks": "Webhooks",
+        "incidents": "Hendelser",
+        "releaseNotes": "Utgivelsesnotater",
+        "settings": "Innstillinger",
+        "members": "Medlemmer",
+        "material": "Materiale",
+        "subscription": "Abonnement",
+        "statistics": "Statistikk"
+      },
+      "backToApp": "Tilbake til appen",
+      "minimize": "Minimer",
+      "noOrganisationSelected": "Ingen organisasjon valgt.",
+      "noPagesToShow": "Ingen sider å vise.",
+      "selectOrganisationHint": "Velg organisasjon for å se tenant-menyen.",
       "dashboard": "Dashboard",
       "overview": "Oversikt",
       "organizations": "Organisasjoner",
@@ -2184,6 +2243,338 @@
       "deleteDialog": {
         "title": "Slette spill?",
         "description": "Denne handlingen kan ikke angres. Spillet vil bli permanent slettet."
+      },
+      "builder": {
+        "toasts": {
+          "saving": "Lagrer...",
+          "saved": "Lagret",
+          "error": "En feil oppstod",
+          "deleted": "Slettet",
+          "added": "Lagt til"
+        },
+        "phase": {
+          "title": "Faser & Runder",
+          "subtitle": "Del opp leken i tydelige faser med egne tidsbegrensninger.",
+          "addPhase": "Legg til fase",
+          "editPhase": "Rediger fase",
+          "newPhase": "Ny fase",
+          "addFirstPhase": "Legg til første fase",
+          "noPhasesYet": "Ingen faser ennå",
+          "noPhases": "Ingen faser ennå. Legg til din første fase.",
+          "namePlaceholder": "F.eks. Etterforskningen begynner",
+          "descriptionPlaceholder": "Hva skjer i denne fasen?",
+          "boardMessagePlaceholder": "Vises på projektoren under denne fasen",
+          "boardMessageHelpText": "Denne meldingen vises på tavlen/projektoren under hele fasen.",
+          "durationPlaceholder": "F.eks. 10",
+          "durationHelpText": "La stå tomt for ubegrenset tid",
+          "typeHelpText": "Intro = velkommen, Runde = hovedspill, Finale = avslutning, Pause = hvilepause.",
+          "timerSettings": "Timer-innstillinger",
+          "unnamed": "Navnløs fase",
+          "cancel": "Avbryt",
+          "save": "Lagre",
+          "add": "Legg til",
+          "types": {
+            "intro": "Intro",
+            "round": "Runde",
+            "finale": "Finale",
+            "break": "Pause"
+          },
+          "timerStyles": {
+            "countdown": "Nedtelling",
+            "elapsed": "Oppover",
+            "trafficlight": "Trafikklys"
+          },
+          "fields": {
+            "name": "Fasenavn",
+            "type": "Fasetype",
+            "description": "Beskrivelse",
+            "boardMessage": "Tavle-melding",
+            "duration": "Varighet (minutter)",
+            "durationMinutes": "Tid (minutter)",
+            "timerVisible": "Vis timer på tavlen",
+            "timerStyle": "Timer-stil",
+            "autoAdvance": "Automatisk overgang",
+            "autoAdvanceLabel": "Fortsett automatisk når tiden er ute"
+          },
+          "duration": "{min} min"
+        },
+        "role": {
+          "title": "Roller",
+          "subtitle": "Definer spillerroller med hemmelige instruksjoner",
+          "addRole": "Legg til rolle",
+          "editRole": "Rediger rolle",
+          "newRole": "Ny rolle",
+          "addFirstRole": "Legg til første rolle",
+          "noRoles": "Ingen roller ennå. Legg til din første rolle.",
+          "noRolesYet": "Ingen roller definert ennå",
+          "unnamed": "Navnløs rolle",
+          "hasPrivate": "Har hemmelige instruksjoner",
+          "unlimited": "Ubegrenset",
+          "min": "min {count}",
+          "range": "{min}–{max}",
+          "cancel": "Avbryt",
+          "saveChanges": "Lagre endringer",
+          "namePlaceholder": "F.eks. Detektiv",
+          "publicDescriptionHelp": "Vises for alle deltakere og på den offentlige tavlen.",
+          "publicDescriptionPlaceholder": "Beskriv rollens synlige egenskaper...",
+          "privateInfoWarning": "Denne informasjonen vises kun for deltakeren med rollen.",
+          "privateInstructionsHelp": "Rollens mål og oppgaver som kun spilleren ser.",
+          "privateInstructionsPlaceholder": "Ditt hemmelige oppdrag er å...",
+          "privateHintsHelp": "Ekstra hjelp og strategitips for rollen.",
+          "privateHintsPlaceholder": "Tips: Prøv å...",
+          "minCountHelp": "Hvor mange spillere som minimum trenger denne rollen.",
+          "maxCountHelp": "La stå tomt for ubegrenset.",
+          "tabs": {
+            "basic": "Grunninfo",
+            "public": "Offentlig info",
+            "private": "Hemmelig",
+            "rules": "Regler"
+          },
+          "colors": {
+            "red": "Rød",
+            "orange": "Oransje",
+            "yellow": "Gul",
+            "green": "Grønn",
+            "cyan": "Cyan",
+            "blue": "Blå",
+            "purple": "Lilla",
+            "pink": "Rosa",
+            "gray": "Grå"
+          },
+          "icons": {
+            "mask": "Maske",
+            "spy": "Spion",
+            "crown": "Krone",
+            "sword": "Sverd",
+            "shield": "Skjold",
+            "crystal": "Krystallkule",
+            "star": "Stjerne",
+            "target": "Mål",
+            "idea": "Idé",
+            "key": "Nøkkel",
+            "circus": "Sirkustelt",
+            "hero": "Helt",
+            "wizard": "Trollmann",
+            "robot": "Robot",
+            "person": "Person"
+          },
+          "strategies": {
+            "random": "Tilfeldig",
+            "leader_picks": "Leder velger",
+            "player_picks": "Spiller velger"
+          },
+          "fields": {
+            "name": "Navn",
+            "icon": "Ikon",
+            "color": "Farge",
+            "publicDescription": "Offentlig beskrivelse",
+            "privateInstructions": "Hemmelige instruksjoner",
+            "privateHints": "Tips & ledetråder",
+            "minCount": "Minste antall",
+            "maxCount": "Høyeste antall",
+            "strategy": "Tildelingsstrategi"
+          }
+        },
+        "board": {
+          "title": "Offentlig Tavle",
+          "subtitle": "Konfigurasjon for projektor/storskjerm under spillet",
+          "preview": {
+            "title": "Forhåndsvisning",
+            "gameName": "Spillnavn",
+            "phase": "Fase",
+            "investigation": "Etterforskning",
+            "timeRemaining": "Tid igjen",
+            "participants": "12 deltakere",
+            "roles": "3 roller",
+            "leaderboard": "Toppliste",
+            "scan": "Skann"
+          },
+          "themes": {
+            "mystery": "Mysterium",
+            "party": "Fest",
+            "sport": "Sport",
+            "nature": "Natur",
+            "neutral": "Nøytral"
+          },
+          "layouts": {
+            "standard": "Standard",
+            "fullscreen": "Fullskjerm"
+          },
+          "toggles": {
+            "showGameName": "Spillnavn",
+            "showCurrentPhase": "Nåværende fase",
+            "showTimer": "Timer",
+            "showParticipants": "Deltakere",
+            "showPublicRoles": "Offentlige roller",
+            "showLeaderboard": "Ledertavle",
+            "showQrCode": "QR-kode"
+          },
+          "fields": {
+            "elements": "Tavleelementer",
+            "welcomeMessage": "Velkomstmelding",
+            "theme": "Tema",
+            "backgroundColor": "Bakgrunnsfarge (valgfritt)",
+            "layout": "Layout"
+          },
+          "noContentWarning": "Aktiver minst ett element eller legg til velkomstmelding.",
+          "comingSoon": "Kommer snart",
+          "qrCodeDescription": "Lenke til /join/[code]",
+          "welcomeMessagePlaceholder": "Velkommen til kveldens mysterium!",
+          "clear": "Tøm"
+        },
+        "step": {
+          "title": "Steg-for-steg",
+          "subtitle": "Dra for å endre rekkefølge. Klikk for å redigere.",
+          "addStep": "Legg til steg",
+          "editStep": "Rediger steg",
+          "saveStep": "Lagre steg",
+          "addFirstStep": "Legg til første steg",
+          "noSteps": "Ingen steg ennå. Legg til ditt første steg.",
+          "noStepsYet": "Ingen steg ennå",
+          "noStepsDescription": "Legg til steg for å veilede lederen gjennom leken.",
+          "unnamed": "Navnløst steg",
+          "cancel": "Avbryt",
+          "clear": "Tøm",
+          "selected": "Valgt",
+          "selectedDiagram": "Valgt diagram",
+          "selectDiagram": "Velg diagram",
+          "titlePlaceholder": "F.eks. Samle gruppen",
+          "descriptionPlaceholder": "Hva skal deltakerne gjøre i dette steget?",
+          "leaderScriptPlaceholder": "Si til gruppen: 'Nå skal vi...'",
+          "leaderScriptHelp": "Ordrett hva lederen kan si til gruppen",
+          "durationPlaceholder": "F.eks. 120 (2 minutter)",
+          "displayModeHelp": "Hvordan beskrivelsen vises for deltakere",
+          "displayModes": {
+            "instant": "Umiddelbar (standard)",
+            "typewriter": "✍️ Skrivemaskin – tegn for tegn",
+            "dramatic": "🎭 Dramatisk – sakte med pause"
+          },
+          "fields": {
+            "title": "Tittel",
+            "description": "Beskrivelse",
+            "duration": "Estimert tid (sekunder)",
+            "leaderScript": "Lederskript (valgfritt)",
+            "displayMode": "Tekstvisning",
+            "diagram": "Diagram (valgfritt)"
+          }
+        },
+        "wizard": {
+          "title": "Legg til artefakt",
+          "createNewArtifact": "Opprett ny artefakt",
+          "customizeArtifact": "Tilpass artefakt",
+          "helpText": "Artefakter er ledetråder, keypads og dokumenter som deltakerne samhandler med. Velg en mal nedenfor eller start fra bunnen av.",
+          "allTemplates": "Alle maler",
+          "selectTemplate": "Velg mal",
+          "selectTemplateHint": "Velg en mal for å begynne",
+          "selectedTemplate": "Valgt: {name}",
+          "customize": "Tilpass",
+          "close": "Lukk",
+          "create": "Opprett",
+          "back": "Tilbake",
+          "next": "Neste",
+          "cancel": "Avbryt",
+          "fields": {
+            "title": "Tittel",
+            "type": "Type",
+            "description": "Beskrivelse"
+          },
+          "placeholders": {
+            "title": "Artefaktnavn",
+            "description": "Kort beskrivelse av artefakten"
+          },
+          "types": {
+            "card": "Kort",
+            "keypad": "Keypad",
+            "document": "Dokument",
+            "image": "Bilde"
+          },
+          "keypad": {
+            "settings": "Keypad-innstillinger",
+            "correctCode": "Korrekt kode",
+            "codeLength": "Kodelengde"
+          },
+          "preview": {
+            "title": "Forhåndsvisning",
+            "unnamed": "Navnløs",
+            "noDescription": "Ingen beskrivelse",
+            "variants": "variant(er)"
+          },
+          "buttons": {
+            "back": "Tilbake",
+            "cancel": "Avbryt",
+            "customize": "Tilpass",
+            "createArtifact": "Opprett artefakt",
+            "quickCreate": "Hurtigopprett"
+          },
+          "categories": {
+            "escape_room": "Escape Room",
+            "party": "Festspill",
+            "educational": "Pedagogisk",
+            "general": "Generelt"
+          },
+          "templates": {
+            "keypadBasic": {
+              "name": "Keypad (4 sifre)",
+              "description": "En enkel 4-sifret pinkode for å låse opp noe"
+            },
+            "keypadAdvanced": {
+              "name": "Keypad (med forsøksgrense)",
+              "description": "Pinkode med maks 3 forsøk før låsing"
+            },
+            "riddle": {
+              "name": "Gåte / Spørsmål",
+              "description": "En gåte med tekstinntasting for svar"
+            },
+            "cipher": {
+              "name": "Caesar-chiffer",
+              "description": "Kryptert melding med bokstavforskyvning"
+            },
+            "hotspot": {
+              "name": "Klikkbart bilde",
+              "description": "Bilde med skjulte soner å finne"
+            },
+            "tilePuzzle": {
+              "name": "Puslespill (3x3)",
+              "description": "Sliding tile puzzle for å avsløre et bilde"
+            },
+            "logicGrid": {
+              "name": "Logikkrutenett",
+              "description": "Logikkpuslespill der ting skal matches"
+            },
+            "counter": {
+              "name": "Ledetrådteller",
+              "description": "Tell fundne ledetråder eller fremgang"
+            },
+            "hints": {
+              "name": "Tips-beholder",
+              "description": "Progressive tips som kan avsløres"
+            },
+            "qrGate": {
+              "name": "QR-kode checkpoint",
+              "description": "Skann QR-kode for å fortsette"
+            },
+            "location": {
+              "name": "Plassering-checkpoint",
+              "description": "GPS-verifisering for byspill"
+            },
+            "clueCard": {
+              "name": "Ledetråd/Tips",
+              "description": "Et kort med en ledetråd som kan avsløres"
+            },
+            "secretDocument": {
+              "name": "Hemmelig dokument",
+              "description": "Et dokument som avsløres på rett tidspunkt"
+            },
+            "revealCard": {
+              "name": "Avslørende kort",
+              "description": "Et kort for dramatiske avsløringer"
+            },
+            "roleSecret": {
+              "name": "Rollehemmelighet",
+              "description": "Hemmelig informasjon synlig bare for én rolle"
+            }
+          }
+        }
       }
     },
     "achievements": {
@@ -3615,6 +4006,12 @@
           "description": "Er du sikker på at du vil slette dette kravet? Brukere vil ikke lenger bli blokkert av det.",
           "confirm": "Slett",
           "cancel": "Avbryt"
+        },
+        "editor": {
+          "form": {
+            "courseHelp": "Kurset som må fullføres for å oppfylle kravet.",
+            "isActive": "Aktivt krav"
+          }
         }
       }
     },
@@ -3779,7 +4176,12 @@
       "help": "Hjelp",
       "logout": "Logg ut",
       "goToDashboard": "Gå til dashboard",
-      "logoAlt": "Lekbanken ikon"
+      "logoAlt": "Lekbanken ikon",
+      "gamification": "Poeng",
+      "browse": "Utforsk",
+      "play": "Spill",
+      "tip": "Tips",
+      "tipText": "Legg til dine mest brukte filtre som hurtigvalg for raskere planlegging."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -6730,6 +7132,77 @@
         "balance_below": "Hvis tid under",
         "balance_above": "Hvis tid over"
       }
+    }
+  },
+  "tools": {
+    "toolbelt": {
+      "button": "🧰 Verktøy",
+      "title": "Verktøy",
+      "noToolsEnabled": "Ingen verktøy er aktivert for dette spillet."
+    },
+    "diceRoller": {
+      "title": "Terningkaster",
+      "description": "Resultatet bestemmes umiddelbart, deretter spilles en kort animasjon.",
+      "roll": "Kast",
+      "rolling": "Kaster…",
+      "result": "Resultat",
+      "pressRoll": "Trykk på Kast"
+    },
+    "conversationCards": {
+      "title": "Samtalekort",
+      "description": "Velg en samling og bla gjennom kort.",
+      "collection": "Samling",
+      "selectCollection": "Velg samling",
+      "loading": "Laster…",
+      "loadingCards": "Laster kort…",
+      "noCollections": "Ingen publiserte samlinger funnet.",
+      "noCardsInCollection": "Ingen kort i denne samlingen.",
+      "card": "Kort",
+      "followup": "Oppfølging {n}",
+      "leaderTip": "Ledertips",
+      "previous": "Forrige",
+      "next": "Neste",
+      "errorLoadCollections": "Kunne ikke laste samlinger",
+      "errorLoadCards": "Kunne ikke laste kort"
+    },
+    "coachDiagram": {
+      "title": "Coach Diagram Builder",
+      "description": "Rediger diagrammer som brukes i sesjonsstrinn.",
+      "save": "Lagre",
+      "saving": "Lagrer…",
+      "loading": "Laster…",
+      "noDiagrams": "Ingen diagrammer i denne sesjonen",
+      "addDiagramHint": "Legg til et diagram i Game Builder (trinnmedier) og aktiver verktøyet i spillets Toolbelt-innstillinger.",
+      "openDiagramLibrary": "Åpne diagrambibliotek",
+      "diagram": "Diagram",
+      "selectDiagram": "Velg diagram",
+      "onlyLeaderCanEdit": "Kun ledere kan redigere diagrammer i Toolbelt.",
+      "onlyLeaderCanSave": "Kun ledere kan lagre endringer.",
+      "titleLabel": "Tittel",
+      "tools": "Verktøy",
+      "move": "Flytt",
+      "arrows": "Piler",
+      "addPlayer": "+ Spiller",
+      "addMarker": "+ Markør",
+      "addBall": "+ Ball",
+      "arrowHint": "Klikk startpunkt, klikk sluttpunkt.",
+      "duplicate": "Dupliser",
+      "remove": "Fjern",
+      "selected": "Valgt",
+      "arrow": "pil",
+      "label": "Etikett",
+      "size": "Størrelse",
+      "sizeSmall": "Liten",
+      "sizeMedium": "Medium",
+      "sizeLarge": "Stor",
+      "pattern": "Mønster",
+      "patternSolid": "Solid",
+      "patternDashed": "Stiplet",
+      "arrowhead": "Pilhode",
+      "yes": "Ja",
+      "no": "Nei",
+      "openInAdmin": "Åpne i admin",
+      "openSvg": "Åpne SVG"
     }
   }
 }

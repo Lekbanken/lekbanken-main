@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -65,6 +66,7 @@ export function CoachDiagramBuilderV1({
   sessionId: string;
   participantToken?: string;
 }) {
+  const t = useTranslations('tools.coachDiagram');
   const isParticipant = Boolean(participantToken);
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -140,7 +142,7 @@ export function CoachDiagramBuilderV1({
     if (isParticipant) {
       setDoc(null);
       setLoading(false);
-      setError('Endast ledare kan redigera diagram i Toolbelt.');
+      setError(t('onlyLeaderCanEdit'));
       return;
     }
 
@@ -181,7 +183,7 @@ export function CoachDiagramBuilderV1({
   const save = useCallback(async () => {
     if (!doc || !selectedDiagramId) return;
     if (isParticipant) {
-      setError('Endast ledare kan spara ändringar.');
+      setError(t('onlyLeaderCanSave'));
       return;
     }
     setSaving(true);
@@ -486,11 +488,11 @@ export function CoachDiagramBuilderV1({
     <div className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
-          <div className="text-sm font-medium text-foreground">Coach Diagram Builder</div>
-          <div className="text-xs text-muted-foreground">Redigera diagram som används i sessionens steg.</div>
+          <div className="text-sm font-medium text-foreground">{t('title')}</div>
+          <div className="text-xs text-muted-foreground">{t('description')}</div>
         </div>
         <Button type="button" size="sm" onClick={save} disabled={!doc || saving}>
-          {saving ? 'Sparar…' : 'Spara'}
+          {saving ? t('saving') : t('save')}
         </Button>
       </div>
 
@@ -498,13 +500,13 @@ export function CoachDiagramBuilderV1({
 
       {!hasDiagrams ? (
         <Card className="p-4">
-          <div className="text-sm font-medium">Inga diagram i den här sessionen</div>
+          <div className="text-sm font-medium">{t('noDiagrams')}</div>
           <div className="mt-1 text-xs text-muted-foreground">
-            Lägg till ett diagram i Game Builder (steg-media) och aktivera verktyget i spelets Toolbelt-inställningar.
+            {t('addDiagramHint')}
           </div>
           <div className="mt-3 text-xs text-muted-foreground">
             <Link className="underline" href="/admin/library/coach-diagrams" target="_blank" rel="noreferrer">
-              Öppna diagram-bibliotek
+              {t('openDiagramLibrary')}
             </Link>
           </div>
         </Card>
@@ -512,26 +514,26 @@ export function CoachDiagramBuilderV1({
         <div className="grid gap-3 sm:grid-cols-[240px_1fr]">
           <Card className="p-3 space-y-3">
             <Select
-              label="Diagram"
+              label={t('diagram')}
               value={selectedDiagramId}
               onChange={(e) => setSelectedDiagramId(e.target.value)}
               options={toolOptions}
-              placeholder="Välj diagram"
+              placeholder={t('selectDiagram')}
             />
 
             {isParticipant && (
               <div className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-                Endast ledare kan redigera diagram i Toolbelt.
+                {t('onlyLeaderCanEdit')}
               </div>
             )}
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Titel</label>
+              <label className="text-sm font-medium">{t('titleLabel')}</label>
               <Input value={doc?.title ?? ''} onChange={(e) => setTitle(e.target.value)} disabled={!doc} />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Verktyg</label>
+              <label className="text-sm font-medium">{t('tools')}</label>
               <div className="flex flex-wrap gap-2">
                 <Button
                   type="button"
@@ -542,7 +544,7 @@ export function CoachDiagramBuilderV1({
                     setPendingArrowStart(null);
                   }}
                 >
-                  Flytta
+                  {t('move')}
                 </Button>
                 <Button
                   type="button"
@@ -553,45 +555,45 @@ export function CoachDiagramBuilderV1({
                     setPendingArrowStart(null);
                   }}
                 >
-                  Pilar
+                  {t('arrows')}
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={() => addObject('player')}>
-                  + Spelare
+                  {t('addPlayer')}
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={() => addObject('marker')}>
-                  + Markör
+                  {t('addMarker')}
                 </Button>
                 <Button type="button" variant="outline" size="sm" onClick={() => addObject('ball')}>
-                  + Boll
+                  {t('addBall')}
                 </Button>
               </div>
-              {mode === 'arrow' && <div className="text-xs text-muted-foreground">Klicka startpunkt, klicka slutpunkt.</div>}
+              {mode === 'arrow' && <div className="text-xs text-muted-foreground">{t('arrowHint')}</div>}
             </div>
 
             <div className="flex gap-2">
               <Button type="button" variant="outline" size="sm" onClick={duplicateSelected} disabled={selection.kind === 'none'}>
-                Duplicera
+                {t('duplicate')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={removeSelected} disabled={selection.kind === 'none'}>
-                Ta bort
+                {t('remove')}
               </Button>
             </div>
 
             {selection.kind === 'object' && selectedObject && (
               <div className="space-y-3 pt-2 border-t">
-                <div className="text-sm font-medium">Vald: {selectedObject.type}</div>
+                <div className="text-sm font-medium">{t('selected')}: {selectedObject.type}</div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Label</label>
+                  <label className="text-sm font-medium">{t('label')}</label>
                   <Input value={selectedObject.style.label ?? ''} onChange={(e) => setSelectedLabel(e.target.value)} />
                 </div>
                 <Select
-                  label="Storlek"
+                  label={t('size')}
                   value={selectedObject.style.size}
                   onChange={(e) => setSelectedSize(e.target.value as 'sm' | 'md' | 'lg')}
                   options={[
-                    { value: 'sm', label: 'Small' },
-                    { value: 'md', label: 'Medium' },
-                    { value: 'lg', label: 'Large' },
+                    { value: 'sm', label: t('sizeSmall') },
+                    { value: 'md', label: t('sizeMedium') },
+                    { value: 'lg', label: t('sizeLarge') },
                   ]}
                 />
               </div>
@@ -599,27 +601,27 @@ export function CoachDiagramBuilderV1({
 
             {selection.kind === 'arrow' && selectedArrow && (
               <div className="space-y-3 pt-2 border-t">
-                <div className="text-sm font-medium">Vald: pil</div>
+                <div className="text-sm font-medium">{t('selected')}: {t('arrow')}</div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Label</label>
+                  <label className="text-sm font-medium">{t('label')}</label>
                   <Input value={selectedArrow.label ?? ''} onChange={(e) => setArrowLabel(e.target.value)} />
                 </div>
                 <Select
-                  label="Mönster"
+                  label={t('pattern')}
                   value={selectedArrow.style.pattern}
                   onChange={(e) => setArrowPattern(e.target.value as 'solid' | 'dashed')}
                   options={[
-                    { value: 'solid', label: 'Solid' },
-                    { value: 'dashed', label: 'Dashed' },
+                    { value: 'solid', label: t('patternSolid') },
+                    { value: 'dashed', label: t('patternDashed') },
                   ]}
                 />
                 <Select
-                  label="Pilhuvud"
+                  label={t('arrowhead')}
                   value={String(selectedArrow.style.arrowhead)}
                   onChange={(e) => setArrowHead(e.target.value === 'true')}
                   options={[
-                    { value: 'true', label: 'Ja' },
-                    { value: 'false', label: 'Nej' },
+                    { value: 'true', label: t('yes') },
+                    { value: 'false', label: t('no') },
                   ]}
                 />
               </div>
@@ -628,12 +630,12 @@ export function CoachDiagramBuilderV1({
             <div className="pt-2 border-t text-xs text-muted-foreground">
               <div>
                 <Link className="underline" href={`/admin/library/coach-diagrams/${selectedDiagramId}`} target="_blank" rel="noreferrer">
-                  Öppna i admin
+                  {t('openInAdmin')}
                 </Link>
               </div>
               <div className="mt-1">
                 <Link className="underline" href={`/api/coach-diagrams/${selectedDiagramId}/svg`} target="_blank" rel="noreferrer">
-                  Öppna SVG
+                  {t('openSvg')}
                 </Link>
               </div>
             </div>
@@ -641,12 +643,12 @@ export function CoachDiagramBuilderV1({
 
           <Card className="p-3">
             {loading ? (
-              <div className="text-sm text-muted-foreground">Laddar…</div>
+              <div className="text-sm text-muted-foreground">{t('loading')}</div>
             ) : isParticipant ? (
               <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
                 <Image
                   src={`/api/coach-diagrams/${selectedDiagramId}/svg`}
-                  alt="Coach diagram"
+                  alt={t('title')}
                   width={diagramViewBox.width}
                   height={diagramViewBox.height}
                   className="h-full w-full object-contain"

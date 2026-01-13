@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useId, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   DndContext,
   closestCenter,
@@ -55,24 +56,24 @@ type PhaseEditorProps = {
 // Phase Type Config
 // =============================================================================
 
-const phaseTypeConfig: Record<PhaseType, { label: string; emoji: string; color: string }> = {
-  intro: { label: 'Intro', emoji: '👋', color: 'bg-blue-500' },
-  round: { label: 'Runda', emoji: '🎯', color: 'bg-emerald-500' },
-  finale: { label: 'Final', emoji: '🏆', color: 'bg-amber-500' },
-  break: { label: 'Paus', emoji: '☕', color: 'bg-gray-400' },
+const phaseTypeConfig: Record<PhaseType, { labelKey: string; emoji: string; color: string }> = {
+  intro: { labelKey: 'phase.types.intro', emoji: '👋', color: 'bg-blue-500' },
+  round: { labelKey: 'phase.types.round', emoji: '🎯', color: 'bg-emerald-500' },
+  finale: { labelKey: 'phase.types.finale', emoji: '🏆', color: 'bg-amber-500' },
+  break: { labelKey: 'phase.types.break', emoji: '☕', color: 'bg-gray-400' },
 };
 
 const timerStyleOptions = [
-  { value: 'countdown', label: 'Nedräkning' },
-  { value: 'elapsed', label: 'Uppåträkning' },
-  { value: 'trafficlight', label: 'Trafikljus' },
+  { value: 'countdown', labelKey: 'phase.timerStyles.countdown' },
+  { value: 'elapsed', labelKey: 'phase.timerStyles.elapsed' },
+  { value: 'trafficlight', labelKey: 'phase.timerStyles.trafficlight' },
 ];
 
-const phaseTypeOptions: { value: PhaseType; label: string }[] = [
-  { value: 'intro', label: '👋 Intro' },
-  { value: 'round', label: '🎯 Runda' },
-  { value: 'finale', label: '🏆 Final' },
-  { value: 'break', label: '☕ Paus' },
+const phaseTypeOptions: { value: PhaseType; labelKey: string }[] = [
+  { value: 'intro', labelKey: 'phase.types.intro' },
+  { value: 'round', labelKey: 'phase.types.round' },
+  { value: 'finale', labelKey: 'phase.types.finale' },
+  { value: 'break', labelKey: 'phase.types.break' },
 ];
 
 // =============================================================================
@@ -86,6 +87,7 @@ type SortablePhaseItemProps = {
 };
 
 function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) {
+  const t = useTranslations('admin.games.builder');
   const {
     attributes,
     listeners,
@@ -130,9 +132,9 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-medium text-foreground truncate">{phase.name || 'Namnlös fas'}</h4>
+            <h4 className="font-medium text-foreground truncate">{phase.name || t('phase.unnamed')}</h4>
             <span className="text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-muted">
-              {config.label}
+              {t(config.labelKey)}
             </span>
           </div>
           
@@ -146,14 +148,14 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
             {durationMin !== null && (
               <span className="flex items-center gap-1">
                 <ClockIcon className="h-3.5 w-3.5" />
-                {durationMin} min
+                {t('phase.duration', { min: durationMin })}
               </span>
             )}
             {phase.timer_visible && phase.duration_seconds && (
-              <span>Timer: {timerStyleOptions.find(o => o.value === phase.timer_style)?.label}</span>
+              <span>Timer: {t(timerStyleOptions.find(o => o.value === phase.timer_style)?.labelKey || 'phase.timerStyles.countdown')}</span>
             )}
             {phase.auto_advance && (
-              <span className="text-blue-600">Auto-fortsätt</span>
+              <span className="text-blue-600">{t('phase.fields.autoAdvance')}</span>
             )}
           </div>
         </div>
@@ -191,6 +193,7 @@ type PhaseEditDrawerProps = {
 };
 
 function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
+  const t = useTranslations('admin.games.builder');
   const generatedId = useId();
   const initialForm = useMemo<PhaseData>(
     () =>
@@ -226,7 +229,7 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <h3 className="text-lg font-semibold text-foreground">
-          {phase ? 'Redigera fas' : 'Ny fas'}
+          {phase ? t('phase.editPhase') : t('phase.addPhase')}
         </h3>
         <button
           type="button"
@@ -242,40 +245,40 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
         {/* Name */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">
-            Namn <span className="text-destructive">*</span>
+            {t('phase.fields.name')} <span className="text-destructive">*</span>
           </label>
           <Input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Ex. Första rundan"
+            placeholder={t('phase.namePlaceholder')}
           />
         </div>
 
         {/* Phase Type */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Typ</label>
+          <label className="text-sm font-medium text-foreground">{t('phase.fields.type')}</label>
           <Select
             value={form.phase_type}
             onChange={(e) => setForm({ ...form, phase_type: e.target.value as PhaseType })}
-            options={phaseTypeOptions}
+            options={phaseTypeOptions.map(o => ({ ...o, label: t(o.labelKey) }))}
           />
-          <HelpText>Intro = välkomst, Runda = huvudspel, Final = avslutning, Paus = vilopaus.</HelpText>
+          <HelpText>{t('phase.typeHelpText')}</HelpText>
         </div>
 
         {/* Description */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Beskrivning</label>
+          <label className="text-sm font-medium text-foreground">{t('phase.fields.description')}</label>
           <Textarea
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={3}
-            placeholder="Vad händer under denna fas?"
+            placeholder={t('phase.descriptionPlaceholder')}
           />
         </div>
 
         {/* Duration */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Tid (minuter)</label>
+          <label className="text-sm font-medium text-foreground">{t('phase.fields.durationMinutes')}</label>
           <Input
             type="number"
             min={0}
@@ -284,17 +287,17 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
               ...form, 
               duration_seconds: e.target.value ? Number(e.target.value) * 60 : null 
             })}
-            placeholder="Ex. 10"
+            placeholder={t('phase.durationPlaceholder')}
           />
           <p className="text-xs text-muted-foreground">
-            Lämna tomt för obegränsad tid
+            {t('phase.durationHelpText')}
           </p>
         </div>
 
         {/* Timer Settings */}
         {form.duration_seconds && (
           <Card className="p-4 space-y-4 bg-muted/30">
-            <h4 className="text-sm font-medium text-foreground">Timer-inställningar</h4>
+            <h4 className="text-sm font-medium text-foreground">{t('phase.timerSettings')}</h4>
             
             <div className="flex items-center gap-3">
               <input
@@ -305,17 +308,17 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
                 className="rounded border-border"
               />
               <label htmlFor="timer_visible" className="text-sm text-foreground">
-                Visa timer på tavlan
+                {t('phase.fields.timerVisible')}
               </label>
             </div>
 
             {form.timer_visible && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Timer-stil</label>
+                <label className="text-sm font-medium text-foreground">{t('phase.fields.timerStyle')}</label>
                 <Select
                   value={form.timer_style}
                   onChange={(e) => setForm({ ...form, timer_style: e.target.value as TimerStyle })}
-                  options={timerStyleOptions}
+                  options={timerStyleOptions.map(o => ({ value: o.value, label: t(o.labelKey) }))}
                 />
               </div>
             )}
@@ -329,7 +332,7 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
                 className="rounded border-border"
               />
               <label htmlFor="auto_advance" className="text-sm text-foreground">
-                Fortsätt automatiskt när tiden är slut
+                {t('phase.fields.autoAdvanceLabel')}
               </label>
             </div>
           </Card>
@@ -337,28 +340,28 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
 
         {/* Board Message */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Tavla-meddelande</label>
+          <label className="text-sm font-medium text-foreground">{t('phase.fields.boardMessage')}</label>
           <Textarea
             value={form.board_message}
             onChange={(e) => setForm({ ...form, board_message: e.target.value })}
             rows={2}
-            placeholder="Visas på projektorn under denna fas"
+            placeholder={t('phase.boardMessagePlaceholder')}
           />
-          <HelpText>Detta meddelande visas på tavlan/projektorn under hela fasen.</HelpText>
+          <HelpText>{t('phase.boardMessageHelpText')}</HelpText>
         </div>
       </div>
 
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/30">
         <Button type="button" variant="ghost" onClick={onClose}>
-          Avbryt
+          {t('phase.cancel')}
         </Button>
         <Button
           type="button"
           onClick={handleSave}
           disabled={!form.name.trim()}
         >
-          {phase ? 'Spara' : 'Lägg till'}
+          {phase ? t('phase.save') : t('phase.add')}
         </Button>
       </div>
     </div>
@@ -370,6 +373,7 @@ function PhaseEditDrawer({ phase, onSave, onClose }: PhaseEditDrawerProps) {
 // =============================================================================
 
 export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [editingPhase, setEditingPhase] = useState<PhaseData | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
@@ -442,9 +446,9 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-1">Faser & Rundor</h2>
+        <h2 className="text-xl font-semibold text-foreground mb-1">{t('phase.title')}</h2>
         <p className="text-sm text-muted-foreground">
-          Dela upp leken i tydliga faser med egna tidsbegränsningar.
+          {t('phase.subtitle')}
         </p>
       </div>
 
@@ -458,7 +462,7 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
                 <div
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${config.color} text-white whitespace-nowrap`}
                 >
-                  {config.emoji} {phase.name || config.label}
+                  {config.emoji} {phase.name || t(config.labelKey)}
                 </div>
                 {idx < phases.length - 1 && (
                   <span className="text-muted-foreground">→</span>
@@ -472,7 +476,7 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
             className="flex items-center gap-1 px-3 py-1.5 rounded-full border border-dashed border-border text-xs text-muted-foreground hover:text-foreground hover:border-foreground transition-colors whitespace-nowrap"
           >
             <PlusIcon className="h-3.5 w-3.5" />
-            Ny fas
+            {t('phase.newPhase')}
           </button>
         </div>
       )}
@@ -483,13 +487,13 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
             <ClockIcon className="h-6 w-6 text-muted-foreground" />
           </div>
-          <h4 className="font-medium text-foreground mb-1">Inga faser ännu</h4>
+          <h4 className="font-medium text-foreground mb-1">{t('phase.noPhasesYet')}</h4>
           <p className="text-sm text-muted-foreground mb-4">
-            Dela upp leken i tydliga faser med egna tidsbegränsningar.
+            {t('phase.subtitle')}
           </p>
           <Button type="button" onClick={handleAddPhase}>
             <PlusIcon className="h-4 w-4 mr-1.5" />
-            Lägg till första fasen
+            {t('phase.addFirstPhase')}
           </Button>
         </Card>
       ) : (
@@ -520,7 +524,7 @@ export function PhaseEditor({ phases, onChange }: PhaseEditorProps) {
       {phases.length > 0 && (
         <Button type="button" variant="outline" onClick={handleAddPhase}>
           <PlusIcon className="h-4 w-4 mr-1.5" />
-          Lägg till fas
+          {t('phase.addPhase')}
         </Button>
       )}
 

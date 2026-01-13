@@ -4,106 +4,106 @@ import { navIcons } from './admin-nav-config'
 
 export type AdminNavItem = {
   href: string
-  label: string
+  labelKey: string
   icon: ReactNode
   badge?: string
 }
 
 export type AdminNavGroup = {
   id: string
-  title: string
+  titleKey: string
   items: AdminNavItem[]
 }
 
 export const adminNavGroups: AdminNavGroup[] = [
   {
     id: 'overview',
-    title: 'Översikt',
-    items: [{ href: '/admin', label: 'Dashboard', icon: navIcons.dashboard }],
+    titleKey: 'admin.nav.groups.overview',
+    items: [{ href: '/admin', labelKey: 'admin.nav.items.dashboard', icon: navIcons.dashboard }],
   },
   {
     id: 'organisation-users',
-    title: 'Organisation & Användare',
+    titleKey: 'admin.nav.groups.organisationUsers',
     items: [
-      { href: '/admin/organisations', label: 'Organisationer', icon: navIcons.organisations },
-      { href: '/admin/users', label: 'Användare', icon: navIcons.users },
+      { href: '/admin/organisations', labelKey: 'admin.nav.items.organisations', icon: navIcons.organisations },
+      { href: '/admin/users', labelKey: 'admin.nav.items.users', icon: navIcons.users },
     ],
   },
   {
     id: 'products-content',
-    title: 'Produkter & Innehåll',
+    titleKey: 'admin.nav.groups.productsContent',
     items: [
-      { href: '/admin/products', label: 'Produkter', icon: navIcons.products },
-      { href: '/admin/games', label: 'Lekhanteraren', icon: navIcons.games },
-      { href: '/admin/planner', label: 'Planläggaren', icon: navIcons.content },
+      { href: '/admin/products', labelKey: 'admin.nav.items.products', icon: navIcons.products },
+      { href: '/admin/games', labelKey: 'admin.nav.items.games', icon: navIcons.games },
+      { href: '/admin/planner', labelKey: 'admin.nav.items.planner', icon: navIcons.content },
     ],
   },
   {
     id: 'library',
-    title: 'Bibliotek',
+    titleKey: 'admin.nav.groups.library',
     items: [
-      { href: '/admin/library/badges', label: 'Badges', icon: navIcons.achievements },
-      { href: '/admin/library/coach-diagrams', label: 'Coach Diagrams', icon: navIcons.achievements },
+      { href: '/admin/library/badges', labelKey: 'admin.nav.items.badges', icon: navIcons.achievements },
+      { href: '/admin/library/coach-diagrams', labelKey: 'admin.nav.items.coachDiagrams', icon: navIcons.achievements },
     ],
   },
   {
     id: 'toolbelt',
-    title: 'Verktyg (Toolbelt)',
+    titleKey: 'admin.nav.groups.toolbelt',
     items: [
-      { href: '/admin/tools', label: 'Tärningssimulator', icon: navIcons.key },
-      { href: '/admin/toolbelt/conversation-cards', label: 'Samtalskort', icon: navIcons.key },
+      { href: '/admin/tools', labelKey: 'admin.nav.items.diceSimulator', icon: navIcons.key },
+      { href: '/admin/toolbelt/conversation-cards', labelKey: 'admin.nav.items.conversationCards', icon: navIcons.key },
     ],
   },
   {
     id: 'gamification',
-    title: 'Gamification hub',
+    titleKey: 'admin.nav.groups.gamification',
     items: [
-      { href: '/admin/gamification', label: 'Översikt', icon: navIcons.leaderboard },
-      { href: '/admin/gamification/dicecoin-xp', label: 'DiceCoin & XP', icon: navIcons.leaderboard },
-      { href: '/admin/gamification/achievements', label: 'Achievements', icon: navIcons.achievements },
-      { href: '/admin/gamification/shop-rewards', label: 'Shop & Rewards', icon: navIcons.marketplace },
-      { href: '/admin/gamification/library-exports', label: 'Library Exports', icon: navIcons.content },
+      { href: '/admin/gamification', labelKey: 'admin.nav.items.overview', icon: navIcons.leaderboard },
+      { href: '/admin/gamification/dicecoin-xp', labelKey: 'admin.nav.items.dicecoinXp', icon: navIcons.leaderboard },
+      { href: '/admin/gamification/achievements', labelKey: 'admin.nav.items.achievements', icon: navIcons.achievements },
+      { href: '/admin/gamification/shop-rewards', labelKey: 'admin.nav.items.shopRewards', icon: navIcons.marketplace },
+      { href: '/admin/gamification/library-exports', labelKey: 'admin.nav.items.libraryExports', icon: navIcons.content },
     ],
   },
   {
     id: 'learning',
-    title: 'Utbildning',
+    titleKey: 'admin.nav.groups.learning',
     items: [
-      { href: '/admin/learning', label: 'Översikt', icon: navIcons.learning },
-      { href: '/admin/learning/courses', label: 'Kurser', icon: navIcons.learning },
-      { href: '/admin/learning/paths', label: 'Lärstigar', icon: navIcons.learning },
-      { href: '/admin/learning/requirements', label: 'Krav & Grind', icon: navIcons.learning },
+      { href: '/admin/learning', labelKey: 'admin.nav.items.overview', icon: navIcons.learning },
+      { href: '/admin/learning/courses', labelKey: 'admin.nav.items.courses', icon: navIcons.learning },
+      { href: '/admin/learning/paths', labelKey: 'admin.nav.items.learningPaths', icon: navIcons.learning },
+      { href: '/admin/learning/requirements', labelKey: 'admin.nav.items.requirements', icon: navIcons.learning },
     ],
   },
   {
     id: 'operations',
-    title: 'Operativt / Live',
+    titleKey: 'admin.nav.groups.operations',
     items: [
-      { href: '/admin/sessions', label: 'Sessioner', icon: navIcons.sessions },
-      { href: '/admin/participants', label: 'Deltagare', icon: navIcons.participants },
-      { href: '/admin/moderation', label: 'Moderering', icon: navIcons.moderation },
-      { href: '/admin/tickets', label: 'Ärenden', icon: navIcons.tickets },
+      { href: '/admin/sessions', labelKey: 'admin.nav.items.sessions', icon: navIcons.sessions },
+      { href: '/admin/participants', labelKey: 'admin.nav.items.participants', icon: navIcons.participants },
+      { href: '/admin/moderation', labelKey: 'admin.nav.items.moderation', icon: navIcons.moderation },
+      { href: '/admin/tickets', labelKey: 'admin.nav.items.tickets', icon: navIcons.tickets },
     ],
   },
   {
     id: 'analytics',
-    title: 'Analys',
-    items: [{ href: '/admin/analytics', label: 'Analys', icon: navIcons.analytics }],
+    titleKey: 'admin.nav.groups.analytics',
+    items: [{ href: '/admin/analytics', labelKey: 'admin.nav.items.analytics', icon: navIcons.analytics }],
   },
   {
     id: 'system',
-    title: 'System',
+    titleKey: 'admin.nav.groups.system',
     items: [
-      { href: '/admin/billing', label: 'Fakturering', icon: navIcons.billing },
-      { href: '/admin/notifications', label: 'Notifikationer', icon: navIcons.notifications },
-      { href: '/admin/system-health', label: 'System Health', icon: navIcons.systemHealth },
-      { href: '/admin/audit-logs', label: 'Granskningslogg', icon: navIcons.audit },
-      { href: '/admin/feature-flags', label: 'Feature Flags', icon: navIcons.flag },
-      { href: '/admin/api-keys', label: 'API-nycklar', icon: navIcons.key },
-      { href: '/admin/webhooks', label: 'Webhooks', icon: navIcons.rss },
-      { href: '/admin/incidents', label: 'Incidenter', icon: navIcons.incident },
-      { href: '/admin/release-notes', label: 'Release Notes', icon: navIcons.megaphone },
-      { href: '/admin/settings', label: 'Inställningar', icon: navIcons.settings },
+      { href: '/admin/billing', labelKey: 'admin.nav.items.billing', icon: navIcons.billing },
+      { href: '/admin/notifications', labelKey: 'admin.nav.items.notifications', icon: navIcons.notifications },
+      { href: '/admin/system-health', labelKey: 'admin.nav.items.systemHealth', icon: navIcons.systemHealth },
+      { href: '/admin/audit-logs', labelKey: 'admin.nav.items.auditLogs', icon: navIcons.audit },
+      { href: '/admin/feature-flags', labelKey: 'admin.nav.items.featureFlags', icon: navIcons.flag },
+      { href: '/admin/api-keys', labelKey: 'admin.nav.items.apiKeys', icon: navIcons.key },
+      { href: '/admin/webhooks', labelKey: 'admin.nav.items.webhooks', icon: navIcons.rss },
+      { href: '/admin/incidents', labelKey: 'admin.nav.items.incidents', icon: navIcons.incident },
+      { href: '/admin/release-notes', labelKey: 'admin.nav.items.releaseNotes', icon: navIcons.megaphone },
+      { href: '/admin/settings', labelKey: 'admin.nav.items.settings', icon: navIcons.settings },
     ],
   },
 ]

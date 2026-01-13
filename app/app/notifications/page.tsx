@@ -104,7 +104,8 @@ export default function NotificationsPage() {
     return t('timeAgo.days', { days: diffDays })
   }, [t])
 
-  const loadNotifications = useCallback(async () => {
+  // Manual reload function for use after CRUD operations  
+  async function loadNotifications() {
     setLoading(true)
     setError(null)
     
@@ -117,11 +118,25 @@ export default function NotificationsPage() {
     }
     
     setLoading(false)
-  }, [t])
+  }
 
   useEffect(() => {
-    loadNotifications()
-  }, [loadNotifications])
+    void (async () => {
+      setLoading(true)
+      setError(null)
+      
+      const result = await getUserNotifications({ limit: 100 })
+      
+      if (result.success && result.data) {
+        setNotifications(result.data)
+      } else {
+        setError(result.error || t('error.load'))
+      }
+      
+      setLoading(false)
+    })()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const filteredNotifications = notifications.filter((n) => {
     if (filter === 'unread') return !n.is_read

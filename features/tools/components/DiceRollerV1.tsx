@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { getAnimationDuration } from '@/lib/accessibility/a11y-utils';
@@ -14,6 +15,7 @@ function rollD6(): number {
 }
 
 export function DiceRollerV1() {
+  const t = useTranslations('tools.diceRoller');
   const [rolling, setRolling] = useState(false);
   const [result, setResult] = useState<number | null>(null);
   const [computedResult, setComputedResult] = useState<number | null>(null);
@@ -75,13 +77,13 @@ export function DiceRollerV1() {
     <Card className="p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
-          <h3 className="text-sm font-semibold text-foreground">Dice Roller</h3>
+          <h3 className="text-sm font-semibold text-foreground">{t('title')}</h3>
           <p className="text-xs text-muted-foreground">
-            Resultatet bestäms direkt, sedan spelas en kort animation.
+            {t('description')}
           </p>
         </div>
         <Button type="button" size="sm" onClick={startRoll} disabled={rolling}>
-          {rolling ? 'Rullar…' : 'Rulla'}
+          {rolling ? t('rolling') : t('roll')}
         </Button>
       </div>
 
@@ -119,10 +121,10 @@ export function DiceRollerV1() {
       <div className="mt-4 text-center">
         {showFinal ? (
           <p className="text-sm">
-            Resultat: <span className="font-semibold text-foreground">{result}</span>
+            {t('result')}: <span className="font-semibold text-foreground">{result}</span>
           </p>
         ) : (
-          <p className="text-xs text-muted-foreground">{rolling ? '…' : 'Tryck på Rulla'}</p>
+          <p className="text-xs text-muted-foreground">{rolling ? '…' : t('pressRoll')}</p>
         )}
       </div>
 

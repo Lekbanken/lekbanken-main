@@ -167,6 +167,65 @@
   },
   "admin": {
     "nav": {
+      "groups": {
+        "overview": "Översikt",
+        "organisationUsers": "Organisation & Användare",
+        "productsContent": "Produkter & Innehåll",
+        "library": "Bibliotek",
+        "toolbelt": "Verktyg (Toolbelt)",
+        "gamification": "Gamification hub",
+        "learning": "Utbildning",
+        "operations": "Operativt / Live",
+        "analytics": "Analys",
+        "system": "System",
+        "myOrganisation": "Min Organisation",
+        "content": "Innehåll",
+        "account": "Konto"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "overview": "Översikt",
+        "organisations": "Organisationer",
+        "users": "Användare",
+        "products": "Produkter",
+        "games": "Lekhanteraren",
+        "planner": "Planläggaren",
+        "badges": "Badges",
+        "coachDiagrams": "Coach Diagrams",
+        "diceSimulator": "Tärningssimulator",
+        "conversationCards": "Samtalskort",
+        "dicecoinXp": "DiceCoin & XP",
+        "achievements": "Achievements",
+        "shopRewards": "Shop & Rewards",
+        "libraryExports": "Library Exports",
+        "courses": "Kurser",
+        "learningPaths": "Lärstigar",
+        "requirements": "Krav & Grind",
+        "sessions": "Sessioner",
+        "participants": "Deltagare",
+        "moderation": "Moderering",
+        "tickets": "Ärenden",
+        "analytics": "Analys",
+        "billing": "Fakturering",
+        "notifications": "Notifikationer",
+        "systemHealth": "System Health",
+        "auditLogs": "Granskningslogg",
+        "featureFlags": "Feature Flags",
+        "apiKeys": "API-nycklar",
+        "webhooks": "Webhooks",
+        "incidents": "Incidenter",
+        "releaseNotes": "Release Notes",
+        "settings": "Inställningar",
+        "members": "Medlemmar",
+        "material": "Material",
+        "subscription": "Prenumeration",
+        "statistics": "Statistik"
+      },
+      "backToApp": "Tillbaka till appen",
+      "minimize": "Minimera",
+      "noOrganisationSelected": "Ingen organisation vald.",
+      "noPagesToShow": "Inga sidor att visa.",
+      "selectOrganisationHint": "Välj organisation för att se tenant-menyn.",
       "dashboard": "Översikt",
       "overview": "Översikt",
       "organizations": "Organisationer",
@@ -2184,6 +2243,338 @@
       "deleteDialog": {
         "title": "Ta bort lek?",
         "description": "Denna åtgärd kan inte ångras. Leken tas bort permanent."
+      },
+      "builder": {
+        "toasts": {
+          "saving": "Sparar...",
+          "saved": "Sparad",
+          "error": "Ett fel uppstod",
+          "deleted": "Borttagen",
+          "added": "Tillagd"
+        },
+        "phase": {
+          "title": "Faser & Rundor",
+          "subtitle": "Dela upp leken i tydliga faser med egna tidsbegränsningar.",
+          "addPhase": "Lägg till fas",
+          "editPhase": "Redigera fas",
+          "newPhase": "Ny fas",
+          "addFirstPhase": "Lägg till första fasen",
+          "noPhasesYet": "Inga faser ännu",
+          "noPhases": "Inga faser ännu. Lägg till din första fas.",
+          "namePlaceholder": "Ex. Utredningen börjar",
+          "descriptionPlaceholder": "Vad händer i denna fas?",
+          "boardMessagePlaceholder": "Visas på projektorn under denna fas",
+          "boardMessageHelpText": "Detta meddelande visas på tavlan/projektorn under hela fasen.",
+          "durationPlaceholder": "Ex. 10",
+          "durationHelpText": "Lämna tomt för obegränsad tid",
+          "typeHelpText": "Intro = välkomst, Runda = huvudspel, Final = avslutning, Paus = vilopaus.",
+          "timerSettings": "Timer-inställningar",
+          "unnamed": "Namnlös fas",
+          "cancel": "Avbryt",
+          "save": "Spara",
+          "add": "Lägg till",
+          "types": {
+            "intro": "Intro",
+            "round": "Runda",
+            "finale": "Final",
+            "break": "Paus"
+          },
+          "timerStyles": {
+            "countdown": "Nedräkning",
+            "elapsed": "Uppåträkning",
+            "trafficlight": "Trafikljus"
+          },
+          "fields": {
+            "name": "Fasnamn",
+            "type": "Fastyp",
+            "description": "Beskrivning",
+            "boardMessage": "Tavla-meddelande",
+            "duration": "Varaktighet (minuter)",
+            "durationMinutes": "Tid (minuter)",
+            "timerVisible": "Visa timer på tavlan",
+            "timerStyle": "Timer-stil",
+            "autoAdvance": "Automatisk övergång",
+            "autoAdvanceLabel": "Fortsätt automatiskt när tiden är slut"
+          },
+          "duration": "{min} min"
+        },
+        "role": {
+          "title": "Roller",
+          "subtitle": "Definiera spelarroller med hemliga instruktioner",
+          "addRole": "Lägg till roll",
+          "editRole": "Redigera roll",
+          "newRole": "Ny roll",
+          "addFirstRole": "Lägg till första rollen",
+          "noRoles": "Inga roller ännu. Lägg till din första roll.",
+          "noRolesYet": "Inga roller definierade ännu",
+          "unnamed": "Namnlös roll",
+          "hasPrivate": "Har hemliga instruktioner",
+          "unlimited": "Obegränsad",
+          "min": "min {count}",
+          "range": "{min}–{max}",
+          "cancel": "Avbryt",
+          "saveChanges": "Spara ändringar",
+          "namePlaceholder": "Ex. Detektiv",
+          "publicDescriptionHelp": "Visas för alla deltagare och på den publika tavlan.",
+          "publicDescriptionPlaceholder": "Beskriv rollens synliga egenskaper...",
+          "privateInfoWarning": "Denna information visas endast för deltagaren med rollen.",
+          "privateInstructionsHelp": "Rollens mål och uppgifter som endast spelaren ser.",
+          "privateInstructionsPlaceholder": "Ditt hemliga uppdrag är att...",
+          "privateHintsHelp": "Extra hjälp och strategitips för rollen.",
+          "privateHintsPlaceholder": "Tips: Försök att...",
+          "minCountHelp": "Hur många spelare som minst behöver denna roll.",
+          "maxCountHelp": "Lämna tomt för obegränsat.",
+          "tabs": {
+            "basic": "Grundinfo",
+            "public": "Publik info",
+            "private": "Hemligt",
+            "rules": "Regler"
+          },
+          "colors": {
+            "red": "Röd",
+            "orange": "Orange",
+            "yellow": "Gul",
+            "green": "Grön",
+            "cyan": "Cyan",
+            "blue": "Blå",
+            "purple": "Lila",
+            "pink": "Rosa",
+            "gray": "Grå"
+          },
+          "icons": {
+            "mask": "Mask",
+            "spy": "Spion",
+            "crown": "Krona",
+            "sword": "Svärd",
+            "shield": "Sköld",
+            "crystal": "Kristallkula",
+            "star": "Stjärna",
+            "target": "Mål",
+            "idea": "Idé",
+            "key": "Nyckel",
+            "circus": "Cirkustält",
+            "hero": "Hjälte",
+            "wizard": "Trollkarl",
+            "robot": "Robot",
+            "person": "Person"
+          },
+          "strategies": {
+            "random": "Slumpmässig",
+            "leader_picks": "Ledaren väljer",
+            "player_picks": "Spelare väljer"
+          },
+          "fields": {
+            "name": "Namn",
+            "icon": "Ikon",
+            "color": "Färg",
+            "publicDescription": "Publik beskrivning",
+            "privateInstructions": "Hemliga instruktioner",
+            "privateHints": "Tips & ledtrådar",
+            "minCount": "Minsta antal",
+            "maxCount": "Högsta antal",
+            "strategy": "Tilldelningsstrategi"
+          }
+        },
+        "board": {
+          "title": "Publik Tavla",
+          "subtitle": "Konfiguration för projektor/storskärm under spelet",
+          "preview": {
+            "title": "Förhandsvisning",
+            "gameName": "Spelnamn",
+            "phase": "Fas",
+            "investigation": "Utredning",
+            "timeRemaining": "Tid kvar",
+            "participants": "12 deltagare",
+            "roles": "3 roller",
+            "leaderboard": "Topplista",
+            "scan": "Skanna"
+          },
+          "themes": {
+            "mystery": "Mysterium",
+            "party": "Fest",
+            "sport": "Sport",
+            "nature": "Natur",
+            "neutral": "Neutral"
+          },
+          "layouts": {
+            "standard": "Standard",
+            "fullscreen": "Fullscreen"
+          },
+          "toggles": {
+            "showGameName": "Spelnamn",
+            "showCurrentPhase": "Aktuell fas",
+            "showTimer": "Timer",
+            "showParticipants": "Deltagare",
+            "showPublicRoles": "Publika roller",
+            "showLeaderboard": "Ledartavla",
+            "showQrCode": "QR-kod"
+          },
+          "fields": {
+            "elements": "Tavlaelement",
+            "welcomeMessage": "Välkomstmeddelande",
+            "theme": "Tema",
+            "backgroundColor": "Bakgrundsfärg (valfritt)",
+            "layout": "Layout"
+          },
+          "noContentWarning": "Aktivera minst ett element eller lägg till välkomstmeddelande.",
+          "comingSoon": "Kommer snart",
+          "qrCodeDescription": "Länk till /join/[code]",
+          "welcomeMessagePlaceholder": "Välkomna till kvällens mysterium!",
+          "clear": "Rensa"
+        },
+        "step": {
+          "title": "Steg-för-steg",
+          "subtitle": "Dra för att ändra ordning. Klicka för att redigera.",
+          "addStep": "Lägg till steg",
+          "editStep": "Redigera steg",
+          "saveStep": "Spara steg",
+          "addFirstStep": "Lägg till första steget",
+          "noSteps": "Inga steg ännu. Lägg till ditt första steg.",
+          "noStepsYet": "Inga steg ännu",
+          "noStepsDescription": "Lägg till steg för att guida ledaren genom leken.",
+          "unnamed": "Namnlöst steg",
+          "cancel": "Avbryt",
+          "clear": "Rensa",
+          "selected": "Valt",
+          "selectedDiagram": "Valt diagram",
+          "selectDiagram": "Välj diagram",
+          "titlePlaceholder": "Ex. Samla gruppen",
+          "descriptionPlaceholder": "Vad ska deltagarna göra i detta steg?",
+          "leaderScriptPlaceholder": "Säg till gruppen: 'Nu ska vi...'",
+          "leaderScriptHelp": "Ordagrant vad ledaren kan säga till gruppen",
+          "durationPlaceholder": "Ex. 120 (2 minuter)",
+          "displayModeHelp": "Hur beskrivningen visas för deltagare",
+          "displayModes": {
+            "instant": "Direkt (standard)",
+            "typewriter": "✍️ Typewriter – tecken för tecken",
+            "dramatic": "🎭 Dramatisk – långsam med paus"
+          },
+          "fields": {
+            "title": "Rubrik",
+            "description": "Beskrivning",
+            "duration": "Beräknad tid (sekunder)",
+            "leaderScript": "Ledarskript (valfritt)",
+            "displayMode": "Textvisning",
+            "diagram": "Diagram (valfritt)"
+          }
+        },
+        "wizard": {
+          "title": "Lägg till artefakt",
+          "createNewArtifact": "Skapa ny artefakt",
+          "customizeArtifact": "Anpassa artefakt",
+          "helpText": "Artefakter är ledtrådar, keypads och dokument som deltagarna interagerar med. Välj en mall nedan eller börja från scratch.",
+          "allTemplates": "Alla mallar",
+          "selectTemplate": "Välj mall",
+          "selectTemplateHint": "Välj en mall att börja med",
+          "selectedTemplate": "Vald: {name}",
+          "customize": "Anpassa",
+          "close": "Stäng",
+          "create": "Skapa",
+          "back": "Tillbaka",
+          "next": "Nästa",
+          "cancel": "Avbryt",
+          "fields": {
+            "title": "Titel",
+            "type": "Typ",
+            "description": "Beskrivning"
+          },
+          "placeholders": {
+            "title": "Artefaktnamn",
+            "description": "Kort beskrivning av artefakten"
+          },
+          "types": {
+            "card": "Kort",
+            "keypad": "Keypad",
+            "document": "Dokument",
+            "image": "Bild"
+          },
+          "keypad": {
+            "settings": "Keypad-inställningar",
+            "correctCode": "Korrekt kod",
+            "codeLength": "Kodlängd"
+          },
+          "preview": {
+            "title": "Förhandsvisning",
+            "unnamed": "Namnlös",
+            "noDescription": "Ingen beskrivning",
+            "variants": "variant(er)"
+          },
+          "buttons": {
+            "back": "Tillbaka",
+            "cancel": "Avbryt",
+            "customize": "Anpassa",
+            "createArtifact": "Skapa artefakt",
+            "quickCreate": "Snabbskapa"
+          },
+          "categories": {
+            "escape_room": "Escape Room",
+            "party": "Festspel",
+            "educational": "Pedagogiskt",
+            "general": "Allmänt"
+          },
+          "templates": {
+            "keypadBasic": {
+              "name": "Keypad (4 siffror)",
+              "description": "En enkel 4-siffrig pinkod för att låsa upp något"
+            },
+            "keypadAdvanced": {
+              "name": "Keypad (med försöksbegränsning)",
+              "description": "Pinkod med max 3 försök innan låsning"
+            },
+            "riddle": {
+              "name": "Gåta / Fråga",
+              "description": "En gåta med textinmatning för svar"
+            },
+            "cipher": {
+              "name": "Caesar-chiffer",
+              "description": "Krypterat meddelande med bokstavsförskjutning"
+            },
+            "hotspot": {
+              "name": "Klickbar bild",
+              "description": "Bild med dolda zoner att hitta"
+            },
+            "tilePuzzle": {
+              "name": "Pusselspel (3x3)",
+              "description": "Sliding tile puzzle för att avslöja en bild"
+            },
+            "logicGrid": {
+              "name": "Logikrutnät",
+              "description": "Logikpussel där saker ska matchas"
+            },
+            "counter": {
+              "name": "Ledtrådsräknare",
+              "description": "Räkna hittade ledtrådar eller framsteg"
+            },
+            "hints": {
+              "name": "Tips-behållare",
+              "description": "Progressiva tips som kan avslöjas"
+            },
+            "qrGate": {
+              "name": "QR-kod checkpoint",
+              "description": "Skanna QR-kod för att fortsätta"
+            },
+            "location": {
+              "name": "Plats-checkpoint",
+              "description": "GPS-verifiering för stadsspel"
+            },
+            "clueCard": {
+              "name": "Ledtråd/Hint",
+              "description": "Ett kort med en ledtråd som kan avslöjas"
+            },
+            "secretDocument": {
+              "name": "Hemligt dokument",
+              "description": "Ett dokument som avslöjas vid rätt tidpunkt"
+            },
+            "revealCard": {
+              "name": "Avslöjande kort",
+              "description": "Ett kort för dramatiska avslöjanden"
+            },
+            "roleSecret": {
+              "name": "Rollhemlighet",
+              "description": "Hemlig information synlig endast för en roll"
+            }
+          }
+        }
       }
     },
     "achievements": {
@@ -3619,6 +4010,12 @@
           "description": "Är du säker på att du vill ta bort detta krav? Användare kommer inte längre blockeras av det.",
           "confirm": "Ta bort",
           "cancel": "Avbryt"
+        },
+        "editor": {
+          "form": {
+            "courseHelp": "Kursen som måste slutföras för att uppfylla kravet.",
+            "isActive": "Aktivt krav"
+          }
         }
       }
     },
@@ -3776,14 +4173,19 @@
       "home": "Hem",
       "dashboard": "Dashboard",
       "games": "Spel",
-      "planner": "Planering",
+      "planner": "Planera",
       "library": "Bibliotek",
       "profile": "Profil",
       "settings": "Inställningar",
       "help": "Hjälp",
       "logout": "Logga ut",
       "goToDashboard": "Gå till dashboard",
-      "logoAlt": "Lekbanken ikon"
+      "logoAlt": "Lekbanken ikon",
+      "gamification": "Poäng",
+      "browse": "Upptäck",
+      "play": "Spela",
+      "tip": "Tips",
+      "tipText": "Lägg till dina mest använda filter som snabbval för snabbare planering."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -6820,6 +7222,77 @@
         "balance_below": "Om tid under",
         "balance_above": "Om tid över"
       }
+    }
+  },
+  "tools": {
+    "toolbelt": {
+      "button": "🧰 Verktyg",
+      "title": "Verktyg",
+      "noToolsEnabled": "Inga verktyg är aktiverade för det här spelet."
+    },
+    "diceRoller": {
+      "title": "Dice Roller",
+      "description": "Resultatet bestäms direkt, sedan spelas en kort animation.",
+      "roll": "Rulla",
+      "rolling": "Rullar…",
+      "result": "Resultat",
+      "pressRoll": "Tryck på Rulla"
+    },
+    "conversationCards": {
+      "title": "Samtalskort",
+      "description": "Välj en samling och bläddra mellan kort.",
+      "collection": "Samling",
+      "selectCollection": "Välj samling",
+      "loading": "Laddar…",
+      "loadingCards": "Laddar kort…",
+      "noCollections": "Inga publicerade samlingar hittades.",
+      "noCardsInCollection": "Inga kort i denna samling.",
+      "card": "Kort",
+      "followup": "Följdfråga {n}",
+      "leaderTip": "Ledartips",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "errorLoadCollections": "Kunde inte ladda samlingar",
+      "errorLoadCards": "Kunde inte ladda kort"
+    },
+    "coachDiagram": {
+      "title": "Coach Diagram Builder",
+      "description": "Redigera diagram som används i sessionens steg.",
+      "save": "Spara",
+      "saving": "Sparar…",
+      "loading": "Laddar…",
+      "noDiagrams": "Inga diagram i den här sessionen",
+      "addDiagramHint": "Lägg till ett diagram i Game Builder (steg-media) och aktivera verktyget i spelets Toolbelt-inställningar.",
+      "openDiagramLibrary": "Öppna diagram-bibliotek",
+      "diagram": "Diagram",
+      "selectDiagram": "Välj diagram",
+      "onlyLeaderCanEdit": "Endast ledare kan redigera diagram i Toolbelt.",
+      "onlyLeaderCanSave": "Endast ledare kan spara ändringar.",
+      "titleLabel": "Titel",
+      "tools": "Verktyg",
+      "move": "Flytta",
+      "arrows": "Pilar",
+      "addPlayer": "+ Spelare",
+      "addMarker": "+ Markör",
+      "addBall": "+ Boll",
+      "arrowHint": "Klicka startpunkt, klicka slutpunkt.",
+      "duplicate": "Duplicera",
+      "remove": "Ta bort",
+      "selected": "Vald",
+      "arrow": "pil",
+      "label": "Label",
+      "size": "Storlek",
+      "sizeSmall": "Small",
+      "sizeMedium": "Medium",
+      "sizeLarge": "Large",
+      "pattern": "Mönster",
+      "patternSolid": "Solid",
+      "patternDashed": "Dashed",
+      "arrowhead": "Pilhuvud",
+      "yes": "Ja",
+      "no": "Nej",
+      "openInAdmin": "Öppna i admin",
+      "openSvg": "Öppna SVG"
     }
   }
 }

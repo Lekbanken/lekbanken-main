@@ -3,7 +3,7 @@ import type { JSX } from "react";
 
 export type AppNavItem = {
   href: string;
-  label: string;
+  labelKey: string;
   icon: JSX.Element;
   iconActive: JSX.Element;
 };
@@ -55,9 +55,9 @@ const iconUserActive = (
 );
 
 export const appNavItems: AppNavItem[] = [
-  { href: "/app/gamification", label: "Poäng", icon: iconLekvaluta, iconActive: iconLekvalutaActive },
-  { href: "/app/browse", label: "Upptäck", icon: iconBrowse, iconActive: iconBrowseActive },
-  { href: "/app/play", label: "Spela", icon: iconPlay, iconActive: iconPlayActive },
-  { href: "/app/planner", label: "Planera", icon: iconPlanning, iconActive: iconPlanningActive },
-  { href: "/app/profile", label: "Profil", icon: iconUser, iconActive: iconUserActive },
+  { href: "/app/gamification", labelKey: "app.nav.gamification", icon: iconLekvaluta, iconActive: iconLekvalutaActive },
+  { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive },
+  { href: "/app/play", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive },
+  { href: "/app/planner", labelKey: "app.nav.planner", icon: iconPlanning, iconActive: iconPlanningActive },
+  { href: "/app/profile", labelKey: "app.nav.profile", icon: iconUser, iconActive: iconUserActive },
 ];

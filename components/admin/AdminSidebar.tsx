@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
+import { useTranslations } from 'next-intl';
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import {
@@ -77,19 +78,22 @@ function useFilteredNavGroups(mode: 'system' | 'tenant'): AdminNavGroupConfig[] 
 }
 
 function NavSection({ 
-  title, 
+  titleKey, 
   items, 
   onNavigate,
   collapsed = false 
 }: { 
-  title?: string; 
+  titleKey?: string; 
   items: AdminNavItemConfig[]; 
   onNavigate?: () => void;
   collapsed?: boolean;
 }) {
   const pathname = usePathname();
+  const t = useTranslations();
 
   if (items.length === 0) return null;
+
+  const title = titleKey ? t(titleKey) : undefined;
 
   return (
     <div>
@@ -104,12 +108,13 @@ function NavSection({
       <nav className="space-y-1">
         {items.map((item) => {
           const isActive = pathname === item.href || (item.href !== "/admin" && pathname.startsWith(item.href));
+          const label = t(item.labelKey);
           return (
             <Link
               key={item.id}
               href={item.href}
               onClick={onNavigate}
-              title={collapsed ? item.label : undefined}
+              title={collapsed ? label : undefined}
               className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
                 isActive 
                   ? "bg-primary/15 text-primary" 
@@ -125,7 +130,7 @@ function NavSection({
               </span>
               {!collapsed && (
                 <>
-                  <span className="flex-1">{item.label}</span>
+                  <span className="flex-1">{label}</span>
                   {item.badge && (
                     <Badge variant="error" size="sm" className="bg-red-500 text-white">
                       {item.badge}
@@ -150,6 +155,7 @@ function SidebarContent({
   collapsed?: boolean;
   onToggleCollapse?: () => void;
 }) {
+  const t = useTranslations();
   const { isSystemAdmin, currentTenantId } = useRbac();
   const { mode, setMode, canSwitchMode, isHydrated } = useAdminMode({ isSystemAdmin });
   const filteredGroups = useFilteredNavGroups(mode);
@@ -255,7 +261,7 @@ function SidebarContent({
 
         {mode === 'tenant' && !currentTenantId && !collapsed && (
           <p className="mt-2 px-1 text-xs text-slate-400">
-            Välj organisation för att se tenant-menyn.
+            {t('admin.nav.selectOrganisationHint')}
           </p>
         )}
       </div>
@@ -264,13 +270,13 @@ function SidebarContent({
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-3">
         {filteredGroups.length === 0 ? (
           <div className="px-3 text-xs text-slate-500">
-            {mode === 'tenant' ? 'Ingen organisation vald.' : 'Inga sidor att visa.'}
+            {mode === 'tenant' ? t('admin.nav.noOrganisationSelected') : t('admin.nav.noPagesToShow')}
           </div>
         ) : (
           filteredGroups.map((group, index) => (
             <NavSection
               key={group.id}
-              title={index > 0 ? group.title : undefined} // First group has no title
+              titleKey={index > 0 ? group.titleKey : undefined} // First group has no title
               items={group.items}
               onNavigate={onNavigate}
               collapsed={collapsed}
@@ -284,11 +290,11 @@ function SidebarContent({
         <Link
           href="/app"
           onClick={onNavigate}
-          title={collapsed ? "Tillbaka till appen" : undefined}
+          title={collapsed ? t('admin.nav.backToApp') : undefined}
           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 transition-colors hover:bg-slate-800/50 hover:text-white ${collapsed ? "justify-center" : ""}`}
         >
           <ArrowRightStartOnRectangleIcon className="h-5 w-5" />
-          {!collapsed && <span>Tillbaka till appen</span>}
+          {!collapsed && <span>{t('admin.nav.backToApp')}</span>}
         </Link>
         
         {/* Collapse toggle (desktop only) */}
@@ -298,7 +304,7 @@ function SidebarContent({
             className={`mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-800/50 hover:text-slate-300 ${collapsed ? "justify-center" : ""}`}
           >
             <ChevronDoubleLeftIcon className={`h-4 w-4 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
-            {!collapsed && <span className="text-xs">Minimera</span>}
+            {!collapsed && <span className="text-xs">{t('admin.nav.minimize')}</span>}
           </button>
         )}
       </div>

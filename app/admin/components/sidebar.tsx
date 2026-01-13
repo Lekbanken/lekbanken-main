@@ -2,17 +2,21 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Badge } from '@/components/ui/badge'
 import { adminNavGroups, type AdminNavItem } from './admin-nav-items'
 
 function NavSection({ 
-  title, 
+  titleKey, 
   items 
 }: { 
-  title?: string
+  titleKey?: string
   items: AdminNavItem[] 
 }) {
   const pathname = usePathname()
+  const t = useTranslations()
+
+  const title = titleKey ? t(titleKey) : undefined
 
   return (
     <div>
@@ -25,6 +29,7 @@ function NavSection({
         {items.map((item) => {
           const isActive = pathname === item.href || 
             (item.href !== '/admin' && pathname.startsWith(item.href))
+          const label = t(item.labelKey)
           
           return (
             <Link
@@ -39,7 +44,7 @@ function NavSection({
               <span className={isActive ? 'text-primary' : 'text-muted-foreground'}>
                 {item.icon}
               </span>
-              <span className="flex-1">{item.label}</span>
+              <span className="flex-1">{label}</span>
               {item.badge && (
                 <Badge variant="error" size="sm">{item.badge}</Badge>
               )}
@@ -52,6 +57,8 @@ function NavSection({
 }
 
 export function AdminSidebar() {
+  const t = useTranslations()
+
   return (
     <aside className="hidden h-full w-64 flex-shrink-0 border-r border-border bg-card/50 backdrop-blur lg:block">
       {/* Header */}
@@ -72,7 +79,7 @@ export function AdminSidebar() {
       {/* Navigation */}
       <div className="flex flex-col gap-6 p-4">
         {adminNavGroups.map((group) => (
-          <NavSection key={group.id} title={group.title} items={group.items} />
+          <NavSection key={group.id} titleKey={group.titleKey} items={group.items} />
         ))}
       </div>
 
@@ -87,7 +94,7 @@ export function AdminSidebar() {
             <polyline points="16 17 21 12 16 7" />
             <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Tillbaka till appen
+          {t('admin.nav.backToApp')}
         </Link>
       </div>
     </aside>

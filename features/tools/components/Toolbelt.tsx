@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { TOOL_REGISTRY } from '../registry';
@@ -36,7 +37,7 @@ export function Toolbelt({
   sessionId,
   role,
   participantToken,
-  buttonLabel = '🧰 Verktyg',
+  buttonLabel,
   buttonClassName,
 }: {
   sessionId: string;
@@ -45,6 +46,7 @@ export function Toolbelt({
   buttonLabel?: string;
   buttonClassName?: string;
 }) {
+  const t = useTranslations('tools.toolbelt');
   const isDesktop = useIsDesktopSm();
   const [open, setOpen] = useState(false);
   const [tools, setTools] = useState<GameToolRow[] | null>(null);
@@ -84,7 +86,7 @@ export function Toolbelt({
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button type="button" variant="outline" size="sm" className={buttonClassName} disabled={tools === null}>
-          {buttonLabel}
+          {buttonLabel ?? t('button')}
         </Button>
       </SheetTrigger>
       <SheetContent
@@ -92,12 +94,12 @@ export function Toolbelt({
         className={isDesktop ? '' : 'rounded-t-3xl'}
       >
         <SheetHeader>
-          <SheetTitle>Verktyg</SheetTitle>
+          <SheetTitle>{t('title')}</SheetTitle>
         </SheetHeader>
 
         {tools && availableToolDefs.length === 0 ? (
           <div className="mt-4 text-sm text-muted-foreground">
-            Inga verktyg är aktiverade för det här spelet.
+            {t('noToolsEnabled')}
           </div>
         ) : (
 

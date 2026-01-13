@@ -358,7 +358,7 @@ export function RequirementEditorDrawer({
               ))}
             </select>
             <p className="text-xs text-muted-foreground">
-              Kursen som måste slutföras för att uppfylla kravet.
+              {t('form.courseHelp')}
             </p>
           </div>
 
@@ -372,7 +372,7 @@ export function RequirementEditorDrawer({
               className="h-4 w-4 rounded border-input"
             />
             <Label htmlFor="isActive" className="cursor-pointer">
-              Aktivt krav
+              {t('form.isActive')}
             </Label>
           </div>
 

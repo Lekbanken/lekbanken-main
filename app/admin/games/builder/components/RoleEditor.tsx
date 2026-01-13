@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo, useId, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   DndContext,
   closestCenter,
@@ -61,39 +62,39 @@ type RoleEditorProps = {
 // =============================================================================
 
 const colorOptions = [
-  { value: '#EF4444', label: 'Röd' },
-  { value: '#F97316', label: 'Orange' },
-  { value: '#EAB308', label: 'Gul' },
-  { value: '#22C55E', label: 'Grön' },
-  { value: '#06B6D4', label: 'Cyan' },
-  { value: '#3B82F6', label: 'Blå' },
-  { value: '#8B5CF6', label: 'Lila' },
-  { value: '#EC4899', label: 'Rosa' },
-  { value: '#6B7280', label: 'Grå' },
+  { value: '#EF4444', labelKey: 'role.colors.red' },
+  { value: '#F97316', labelKey: 'role.colors.orange' },
+  { value: '#EAB308', labelKey: 'role.colors.yellow' },
+  { value: '#22C55E', labelKey: 'role.colors.green' },
+  { value: '#06B6D4', labelKey: 'role.colors.cyan' },
+  { value: '#3B82F6', labelKey: 'role.colors.blue' },
+  { value: '#8B5CF6', labelKey: 'role.colors.purple' },
+  { value: '#EC4899', labelKey: 'role.colors.pink' },
+  { value: '#6B7280', labelKey: 'role.colors.gray' },
 ];
 
 const iconOptions = [
-  { value: '🎭', label: 'Mask' },
-  { value: '🕵️', label: 'Spion' },
-  { value: '👑', label: 'Krona' },
-  { value: '⚔️', label: 'Svärd' },
-  { value: '🛡️', label: 'Sköld' },
-  { value: '🔮', label: 'Kristallkula' },
-  { value: '🌟', label: 'Stjärna' },
-  { value: '🎯', label: 'Mål' },
-  { value: '💡', label: 'Idé' },
-  { value: '🔑', label: 'Nyckel' },
-  { value: '🎪', label: 'Cirkustält' },
-  { value: '🦸', label: 'Hjälte' },
-  { value: '🧙', label: 'Trollkarl' },
-  { value: '🤖', label: 'Robot' },
-  { value: '👤', label: 'Person' },
+  { value: '🎭', labelKey: 'role.icons.mask' },
+  { value: '🕵️', labelKey: 'role.icons.spy' },
+  { value: '👑', labelKey: 'role.icons.crown' },
+  { value: '⚔️', labelKey: 'role.icons.sword' },
+  { value: '🛡️', labelKey: 'role.icons.shield' },
+  { value: '🔮', labelKey: 'role.icons.crystal' },
+  { value: '🌟', labelKey: 'role.icons.star' },
+  { value: '🎯', labelKey: 'role.icons.target' },
+  { value: '💡', labelKey: 'role.icons.idea' },
+  { value: '🔑', labelKey: 'role.icons.key' },
+  { value: '🎪', labelKey: 'role.icons.circus' },
+  { value: '🦸', labelKey: 'role.icons.hero' },
+  { value: '🧙', labelKey: 'role.icons.wizard' },
+  { value: '🤖', labelKey: 'role.icons.robot' },
+  { value: '👤', labelKey: 'role.icons.person' },
 ];
 
-const strategyOptions: { value: AssignmentStrategy; label: string }[] = [
-  { value: 'random', label: 'Slumpmässig' },
-  { value: 'leader_picks', label: 'Ledaren väljer' },
-  { value: 'player_picks', label: 'Spelare väljer' },
+const strategyOptions: { value: AssignmentStrategy; labelKey: string }[] = [
+  { value: 'random', labelKey: 'role.strategies.random' },
+  { value: 'leader_picks', labelKey: 'role.strategies.leader_picks' },
+  { value: 'player_picks', labelKey: 'role.strategies.player_picks' },
 ];
 
 // =============================================================================
@@ -107,6 +108,7 @@ type SortableRoleCardProps = {
 };
 
 function SortableRoleCard({ role, onEdit, onDelete }: SortableRoleCardProps) {
+  const t = useTranslations('admin.games.builder');
   const {
     attributes,
     listeners,
@@ -123,10 +125,10 @@ function SortableRoleCard({ role, onEdit, onDelete }: SortableRoleCardProps) {
 
   const hasPrivate = role.private_instructions || role.private_hints;
   const countText = role.max_count
-    ? `${role.min_count}–${role.max_count}`
+    ? t('role.range', { min: role.min_count, max: role.max_count })
     : role.min_count > 0
-    ? `min ${role.min_count}`
-    : 'Obegränsad';
+    ? t('role.min', { count: role.min_count })
+    : t('role.unlimited');
 
   return (
     <div
@@ -159,10 +161,10 @@ function SortableRoleCard({ role, onEdit, onDelete }: SortableRoleCardProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h4 className="font-medium text-foreground truncate">
-              {role.name || 'Namnlös roll'}
+              {role.name || t('role.unnamed')}
             </h4>
             {hasPrivate && (
-              <span className="text-muted-foreground" title="Har hemliga instruktioner">
+              <span className="text-muted-foreground" title={t('role.hasPrivate')}>
                 <EyeSlashIcon className="h-4 w-4" />
               </span>
             )}
@@ -180,7 +182,7 @@ function SortableRoleCard({ role, onEdit, onDelete }: SortableRoleCardProps) {
               {countText}
             </span>
             <span>
-              {strategyOptions.find((s) => s.value === role.assignment_strategy)?.label}
+              {t(strategyOptions.find((s) => s.value === role.assignment_strategy)?.labelKey || 'role.strategies.random')}
             </span>
           </div>
         </div>
@@ -218,6 +220,7 @@ type RoleEditDrawerProps = {
 };
 
 function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
+  const t = useTranslations('admin.games.builder');
   const generatedId = useId();
   const initialForm = useMemo<RoleData>(
     () =>
@@ -252,10 +255,10 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
   };
 
   const tabs = [
-    { id: 'basic', label: 'Grundinfo' },
-    { id: 'public', label: 'Publik info' },
-    { id: 'private', label: 'Hemligt' },
-    { id: 'rules', label: 'Regler' },
+    { id: 'basic', labelKey: 'role.tabs.basic' },
+    { id: 'public', labelKey: 'role.tabs.public' },
+    { id: 'private', labelKey: 'role.tabs.private' },
+    { id: 'rules', labelKey: 'role.tabs.rules' },
   ] as const;
 
   return (
@@ -263,7 +266,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-border">
         <h3 className="text-lg font-semibold text-foreground">
-          {role ? 'Redigera roll' : 'Ny roll'}
+          {role ? t('role.editRole') : t('role.newRole')}
         </h3>
         <button
           type="button"
@@ -287,7 +290,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
                 : 'border-transparent text-muted-foreground hover:text-foreground'
             }`}
           >
-            {tab.label}
+            {t(tab.labelKey)}
           </button>
         ))}
       </div>
@@ -299,18 +302,18 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
             {/* Name */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
-                Namn <span className="text-destructive">*</span>
+                {t('role.fields.name')} <span className="text-destructive">*</span>
               </label>
               <Input
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                placeholder="Ex. Detektiv"
+                placeholder={t('role.namePlaceholder')}
               />
             </div>
 
             {/* Icon */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Ikon</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.icon')}</label>
               <div className="grid grid-cols-5 gap-2">
                 {iconOptions.map((opt) => (
                   <button
@@ -322,7 +325,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
                         ? 'border-primary bg-primary/10 ring-2 ring-primary/50'
                         : 'border-border hover:border-muted-foreground'
                     }`}
-                    title={opt.label}
+                    title={t(opt.labelKey)}
                   >
                     {opt.value}
                   </button>
@@ -332,7 +335,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
 
             {/* Color */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Färg</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.color')}</label>
               <div className="grid grid-cols-9 gap-2">
                 {colorOptions.map((opt) => (
                   <button
@@ -345,7 +348,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
                         : 'border-transparent'
                     }`}
                     style={{ backgroundColor: opt.value }}
-                    title={opt.label}
+                    title={t(opt.labelKey)}
                   />
                 ))}
               </div>
@@ -353,13 +356,13 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
 
             {/* Assignment Strategy */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Tilldelningsstrategi</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.strategy')}</label>
               <Select
                 value={form.assignment_strategy}
                 onChange={(e) =>
                   setForm({ ...form, assignment_strategy: e.target.value as AssignmentStrategy })
                 }
-                options={strategyOptions}
+                options={strategyOptions.map(o => ({ value: o.value, label: t(o.labelKey) }))}
               />
             </div>
           </>
@@ -369,14 +372,14 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
           <>
             {/* Public description */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Publik beskrivning</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.publicDescription')}</label>
               <p className="text-xs text-muted-foreground">
-                Visas för alla deltagare och på den publika tavlan.
+                {t('role.publicDescriptionHelp')}
               </p>
               <Textarea
                 value={form.public_description}
                 onChange={(e) => setForm({ ...form, public_description: e.target.value })}
-                placeholder="Beskriv rollens synliga egenskaper..."
+                placeholder={t('role.publicDescriptionPlaceholder')}
                 rows={6}
               />
             </div>
@@ -387,33 +390,33 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
           <>
             <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
               <LockClosedIcon className="h-5 w-5 flex-shrink-0" />
-              <span>Denna information visas endast för deltagaren med rollen.</span>
+              <span>{t('role.privateInfoWarning')}</span>
             </div>
 
             {/* Private instructions */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Hemliga instruktioner</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.privateInstructions')}</label>
               <p className="text-xs text-muted-foreground">
-                Rollens mål och uppgifter som endast spelaren ser.
+                {t('role.privateInstructionsHelp')}
               </p>
               <Textarea
                 value={form.private_instructions}
                 onChange={(e) => setForm({ ...form, private_instructions: e.target.value })}
-                placeholder="Ditt hemliga uppdrag är att..."
+                placeholder={t('role.privateInstructionsPlaceholder')}
                 rows={5}
               />
             </div>
 
             {/* Private hints */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Tips & ledtrådar</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.privateHints')}</label>
               <p className="text-xs text-muted-foreground">
-                Extra hjälp och strategitips för rollen.
+                {t('role.privateHintsHelp')}
               </p>
               <Textarea
                 value={form.private_hints}
                 onChange={(e) => setForm({ ...form, private_hints: e.target.value })}
-                placeholder="Tips: Försök att..."
+                placeholder={t('role.privateHintsPlaceholder')}
                 rows={4}
               />
             </div>
@@ -424,9 +427,9 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
           <>
             {/* Min count */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Minsta antal</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.minCount')}</label>
               <p className="text-xs text-muted-foreground">
-                Hur många spelare som minst behöver denna roll.
+                {t('role.minCountHelp')}
               </p>
               <Input
                 type="number"
@@ -438,9 +441,9 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
 
             {/* Max count */}
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Högsta antal</label>
+              <label className="text-sm font-medium text-foreground">{t('role.fields.maxCount')}</label>
               <p className="text-xs text-muted-foreground">
-                Lämna tomt för obegränsat.
+                {t('role.maxCountHelp')}
               </p>
               <Input
                 type="number"
@@ -452,7 +455,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
                     max_count: e.target.value ? parseInt(e.target.value) : null,
                   })
                 }
-                placeholder="Obegränsad"
+                placeholder={t('role.unlimited')}
               />
             </div>
           </>
@@ -462,10 +465,10 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
       {/* Footer */}
       <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border bg-muted/30">
         <Button variant="ghost" onClick={onClose}>
-          Avbryt
+          {t('role.cancel')}
         </Button>
         <Button onClick={handleSave} disabled={!form.name.trim()}>
-          {role ? 'Spara ändringar' : 'Lägg till roll'}
+          {role ? t('role.saveChanges') : t('role.addRole')}
         </Button>
       </div>
     </div>
@@ -477,6 +480,7 @@ function RoleEditDrawer({ role, onSave, onClose }: RoleEditDrawerProps) {
 // =============================================================================
 
 export function RoleEditor({ roles, onChange }: RoleEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -537,9 +541,9 @@ export function RoleEditor({ roles, onChange }: RoleEditorProps) {
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-foreground">Roller</h3>
+          <h3 className="text-lg font-semibold text-foreground">{t('role.title')}</h3>
           <p className="text-sm text-muted-foreground">
-            Definiera spelarroller med hemliga instruktioner
+            {t('role.subtitle')}
           </p>
         </div>
         <Button
@@ -551,14 +555,14 @@ export function RoleEditor({ roles, onChange }: RoleEditorProps) {
           }}
         >
           <PlusIcon className="h-4 w-4 mr-1.5" />
-          Lägg till roll
+          {t('role.addRole')}
         </Button>
       </div>
 
       {roles.length === 0 ? (
         <div className="text-center py-12 border-2 border-dashed border-border rounded-lg">
           <UserGroupIcon className="h-10 w-10 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">Inga roller definierade ännu</p>
+          <p className="text-sm text-muted-foreground mb-4">{t('role.noRolesYet')}</p>
           <Button
             variant="outline"
             size="sm"
@@ -568,7 +572,7 @@ export function RoleEditor({ roles, onChange }: RoleEditorProps) {
             }}
           >
             <PlusIcon className="h-4 w-4 mr-1.5" />
-            Lägg till första rollen
+            {t('role.addFirstRole')}
           </Button>
         </div>
       ) : (

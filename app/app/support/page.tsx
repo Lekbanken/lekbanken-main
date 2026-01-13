@@ -76,7 +76,7 @@ export default function SupportPage() {
   const [faqs, setFaqs] = useState<Array<{ id?: string; question: string; answer_markdown: string }>>([])
   const [faqsLoading, setFaqsLoading] = useState(false)
 
-  // Load tickets function
+  // Manual reload function for use after CRUD operations
   async function loadTickets() {
     setTicketsLoading(true)
     setTicketsError(null)
@@ -90,33 +90,29 @@ export default function SupportPage() {
     setTicketsLoading(false)
   }
 
-  // Load FAQs function
-  async function loadFAQs() {
-    setFaqsLoading(true)
-    try {
-      const result = await getPublishedFAQs(undefined)
-      if (result.success && result.data && result.data.length > 0) {
-        setFaqs(result.data)
-      }
-    } catch (err) {
-      console.error('Failed to load FAQs:', err)
-    }
-    // If no FAQs found in DB, keep the fallbacks
-    setFaqsLoading(false)
-  }
-
   // Load tickets when the tickets tab is activated
   useEffect(() => {
-    if (activeTab === 'tickets') {
-      loadTickets()
-    }
+    if (activeTab !== 'tickets') return
+    void loadTickets()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab])
 
   // Load FAQs when the faq tab is activated
   useEffect(() => {
-    if (activeTab === 'faq') {
-      loadFAQs()
-    }
+    if (activeTab !== 'faq') return
+    void (async () => {
+      setFaqsLoading(true)
+      try {
+        const result = await getPublishedFAQs(undefined)
+        if (result.success && result.data && result.data.length > 0) {
+          setFaqs(result.data)
+        }
+      } catch (err) {
+        console.error('Failed to load FAQs:', err)
+      }
+      // If no FAQs found in DB, keep the fallbacks
+      setFaqsLoading(false)
+    })()
   }, [activeTab])
 
   const handleSubmit = async () => {

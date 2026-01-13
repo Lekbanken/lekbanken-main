@@ -115,83 +115,76 @@ export default function SupportHubPage() {
   const [recentFeedback, setRecentFeedback] = useState<RecentFeedback[]>([])
   const [recentBugs, setRecentBugs] = useState<RecentBugReport[]>([])
 
-  // Check access
-  async function checkAccess() {
-    const result = await checkSupportHubAccess()
-    if (!result.hasAccess) {
-      setError(result.error || t('noAccess'))
-      setLoading(false)
-      return
-    }
-    setHasAccess(true)
-    setIsSystemAdmin(result.isSystemAdmin)
-    
-    // Load tenants for filter
-    if (result.isSystemAdmin) {
-      const tenantsResult = await listTenantsForSupportHub()
-      if (tenantsResult.success && tenantsResult.data) {
-        setTenants(tenantsResult.data)
-      }
-    } else if (result.tenantIds.length > 0) {
-      // Set default tenant for tenant admin
-      setSelectedTenantId(result.tenantIds[0])
-    }
-  }
-
-  // Load data
-  async function loadData() {
-    setLoading(true)
-    
-    const params = { tenantId: selectedTenantId }
-    
-    const [
-      statsResult,
-      myTicketsResult,
-      recentResult,
-      urgentResult,
-      feedbackResult,
-      bugsResult,
-    ] = await Promise.all([
-      getSupportHubStats(params),
-      listMyAssignedTickets({ ...params, limit: 5 }),
-      listRecentTickets({ ...params, limit: 10 }),
-      listUrgentTickets({ ...params, limit: 5 }),
-      listRecentFeedback({ ...params, limit: 5 }),
-      listRecentBugReports({ ...params, limit: 5 }),
-    ])
-    
-    if (statsResult.success && statsResult.data) {
-      setStats(statsResult.data)
-    }
-    if (myTicketsResult.success && myTicketsResult.data) {
-      setMyTickets(myTicketsResult.data)
-    }
-    if (recentResult.success && recentResult.data) {
-      setRecentTickets(recentResult.data)
-    }
-    if (urgentResult.success && urgentResult.data) {
-      setUrgentTickets(urgentResult.data)
-    }
-    if (feedbackResult.success && feedbackResult.data) {
-      setRecentFeedback(feedbackResult.data)
-    }
-    if (bugsResult.success && bugsResult.data) {
-      setRecentBugs(bugsResult.data)
-    }
-    
-    setLoading(false)
-  }
-
   // Initial access check
   useEffect(() => {
-    checkAccess()
-  }, [])
+    void (async () => {
+      const result = await checkSupportHubAccess()
+      if (!result.hasAccess) {
+        setError(result.error || t('noAccess'))
+        setLoading(false)
+        return
+      }
+      setHasAccess(true)
+      setIsSystemAdmin(result.isSystemAdmin)
+      
+      // Load tenants for filter
+      if (result.isSystemAdmin) {
+        const tenantsResult = await listTenantsForSupportHub()
+        if (tenantsResult.success && tenantsResult.data) {
+          setTenants(tenantsResult.data)
+        }
+      } else if (result.tenantIds.length > 0) {
+        // Set default tenant for tenant admin
+        setSelectedTenantId(result.tenantIds[0])
+      }
+    })()
+  }, [t])
 
   // Load data when access is confirmed or tenant changes
   useEffect(() => {
-    if (hasAccess) {
-      loadData()
-    }
+    if (!hasAccess) return
+    void (async () => {
+      setLoading(true)
+      
+      const params = { tenantId: selectedTenantId }
+      
+      const [
+        statsResult,
+        myTicketsResult,
+        recentResult,
+        urgentResult,
+        feedbackResult,
+        bugsResult,
+      ] = await Promise.all([
+        getSupportHubStats(params),
+        listMyAssignedTickets({ ...params, limit: 5 }),
+        listRecentTickets({ ...params, limit: 10 }),
+        listUrgentTickets({ ...params, limit: 5 }),
+        listRecentFeedback({ ...params, limit: 5 }),
+        listRecentBugReports({ ...params, limit: 5 }),
+      ])
+      
+      if (statsResult.success && statsResult.data) {
+        setStats(statsResult.data)
+      }
+      if (myTicketsResult.success && myTicketsResult.data) {
+        setMyTickets(myTicketsResult.data)
+      }
+      if (recentResult.success && recentResult.data) {
+        setRecentTickets(recentResult.data)
+      }
+      if (urgentResult.success && urgentResult.data) {
+        setUrgentTickets(urgentResult.data)
+      }
+      if (feedbackResult.success && feedbackResult.data) {
+        setRecentFeedback(feedbackResult.data)
+      }
+      if (bugsResult.success && bugsResult.data) {
+        setRecentBugs(bugsResult.data)
+      }
+      
+      setLoading(false)
+    })()
   }, [hasAccess, selectedTenantId])
 
   if (error) {

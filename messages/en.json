@@ -167,6 +167,65 @@
   },
   "admin": {
     "nav": {
+      "groups": {
+        "overview": "Overview",
+        "organisationUsers": "Organisation & Users",
+        "productsContent": "Products & Content",
+        "library": "Library",
+        "toolbelt": "Tools (Toolbelt)",
+        "gamification": "Gamification hub",
+        "learning": "Learning",
+        "operations": "Operations / Live",
+        "analytics": "Analytics",
+        "system": "System",
+        "myOrganisation": "My Organisation",
+        "content": "Content",
+        "account": "Account"
+      },
+      "items": {
+        "dashboard": "Dashboard",
+        "overview": "Overview",
+        "organisations": "Organisations",
+        "users": "Users",
+        "products": "Products",
+        "games": "Game Manager",
+        "planner": "Planner",
+        "badges": "Badges",
+        "coachDiagrams": "Coach Diagrams",
+        "diceSimulator": "Dice Simulator",
+        "conversationCards": "Conversation Cards",
+        "dicecoinXp": "DiceCoin & XP",
+        "achievements": "Achievements",
+        "shopRewards": "Shop & Rewards",
+        "libraryExports": "Library Exports",
+        "courses": "Courses",
+        "learningPaths": "Learning Paths",
+        "requirements": "Requirements",
+        "sessions": "Sessions",
+        "participants": "Participants",
+        "moderation": "Moderation",
+        "tickets": "Tickets",
+        "analytics": "Analytics",
+        "billing": "Billing",
+        "notifications": "Notifications",
+        "systemHealth": "System Health",
+        "auditLogs": "Audit Log",
+        "featureFlags": "Feature Flags",
+        "apiKeys": "API Keys",
+        "webhooks": "Webhooks",
+        "incidents": "Incidents",
+        "releaseNotes": "Release Notes",
+        "settings": "Settings",
+        "members": "Members",
+        "material": "Material",
+        "subscription": "Subscription",
+        "statistics": "Statistics"
+      },
+      "backToApp": "Back to app",
+      "minimize": "Minimize",
+      "noOrganisationSelected": "No organisation selected.",
+      "noPagesToShow": "No pages to show.",
+      "selectOrganisationHint": "Select an organisation to see the tenant menu.",
       "dashboard": "Dashboard",
       "overview": "Overview",
       "organizations": "Organizations",
@@ -2184,6 +2243,338 @@
       "deleteDialog": {
         "title": "Delete game?",
         "description": "This action cannot be undone. The game will be permanently deleted."
+      },
+      "builder": {
+        "toasts": {
+          "saving": "Saving...",
+          "saved": "Saved",
+          "error": "An error occurred",
+          "deleted": "Deleted",
+          "added": "Added"
+        },
+        "phase": {
+          "title": "Phases & Rounds",
+          "subtitle": "Divide the game into clear phases with their own time limits.",
+          "addPhase": "Add phase",
+          "editPhase": "Edit phase",
+          "newPhase": "New phase",
+          "addFirstPhase": "Add first phase",
+          "noPhasesYet": "No phases yet",
+          "noPhases": "No phases yet. Add your first phase.",
+          "namePlaceholder": "E.g. The investigation begins",
+          "descriptionPlaceholder": "What happens in this phase?",
+          "boardMessagePlaceholder": "Shown on the projector during this phase",
+          "boardMessageHelpText": "This message is shown on the board/projector during the entire phase.",
+          "durationPlaceholder": "E.g. 10",
+          "durationHelpText": "Leave empty for unlimited time",
+          "typeHelpText": "Intro = welcome, Round = main game, Finale = ending, Break = rest pause.",
+          "timerSettings": "Timer settings",
+          "unnamed": "Unnamed phase",
+          "cancel": "Cancel",
+          "save": "Save",
+          "add": "Add",
+          "types": {
+            "intro": "Intro",
+            "round": "Round",
+            "finale": "Finale",
+            "break": "Break"
+          },
+          "timerStyles": {
+            "countdown": "Countdown",
+            "elapsed": "Elapsed",
+            "trafficlight": "Traffic light"
+          },
+          "fields": {
+            "name": "Phase name",
+            "type": "Phase type",
+            "description": "Description",
+            "boardMessage": "Board message",
+            "duration": "Duration (minutes)",
+            "durationMinutes": "Time (minutes)",
+            "timerVisible": "Show timer on board",
+            "timerStyle": "Timer style",
+            "autoAdvance": "Auto advance",
+            "autoAdvanceLabel": "Continue automatically when time is up"
+          },
+          "duration": "{min} min"
+        },
+        "role": {
+          "title": "Roles",
+          "subtitle": "Define player roles with secret instructions",
+          "addRole": "Add role",
+          "editRole": "Edit role",
+          "newRole": "New role",
+          "addFirstRole": "Add first role",
+          "noRoles": "No roles yet. Add your first role.",
+          "noRolesYet": "No roles defined yet",
+          "unnamed": "Unnamed role",
+          "hasPrivate": "Has private instructions",
+          "unlimited": "Unlimited",
+          "min": "min {count}",
+          "range": "{min}–{max}",
+          "cancel": "Cancel",
+          "saveChanges": "Save changes",
+          "namePlaceholder": "E.g. Detective",
+          "publicDescriptionHelp": "Shown to all participants and on the public board.",
+          "publicDescriptionPlaceholder": "Describe the role's visible properties...",
+          "privateInfoWarning": "This information is only shown to the participant with this role.",
+          "privateInstructionsHelp": "The role's goals and tasks that only the player sees.",
+          "privateInstructionsPlaceholder": "Your secret mission is to...",
+          "privateHintsHelp": "Extra help and strategy tips for the role.",
+          "privateHintsPlaceholder": "Tip: Try to...",
+          "minCountHelp": "How many players need this role at minimum.",
+          "maxCountHelp": "Leave empty for unlimited.",
+          "tabs": {
+            "basic": "Basic info",
+            "public": "Public info",
+            "private": "Secret",
+            "rules": "Rules"
+          },
+          "colors": {
+            "red": "Red",
+            "orange": "Orange",
+            "yellow": "Yellow",
+            "green": "Green",
+            "cyan": "Cyan",
+            "blue": "Blue",
+            "purple": "Purple",
+            "pink": "Pink",
+            "gray": "Gray"
+          },
+          "icons": {
+            "mask": "Mask",
+            "spy": "Spy",
+            "crown": "Crown",
+            "sword": "Sword",
+            "shield": "Shield",
+            "crystal": "Crystal ball",
+            "star": "Star",
+            "target": "Target",
+            "idea": "Idea",
+            "key": "Key",
+            "circus": "Circus tent",
+            "hero": "Hero",
+            "wizard": "Wizard",
+            "robot": "Robot",
+            "person": "Person"
+          },
+          "strategies": {
+            "random": "Random",
+            "leader_picks": "Leader picks",
+            "player_picks": "Player picks"
+          },
+          "fields": {
+            "name": "Name",
+            "icon": "Icon",
+            "color": "Color",
+            "publicDescription": "Public description",
+            "privateInstructions": "Private instructions",
+            "privateHints": "Tips & hints",
+            "minCount": "Minimum count",
+            "maxCount": "Maximum count",
+            "strategy": "Assignment strategy"
+          }
+        },
+        "board": {
+          "title": "Public Board",
+          "subtitle": "Configuration for projector/big screen during the game",
+          "preview": {
+            "title": "Preview",
+            "gameName": "Game name",
+            "phase": "Phase",
+            "investigation": "Investigation",
+            "timeRemaining": "Time left",
+            "participants": "12 participants",
+            "roles": "3 roles",
+            "leaderboard": "Leaderboard",
+            "scan": "Scan"
+          },
+          "themes": {
+            "mystery": "Mystery",
+            "party": "Party",
+            "sport": "Sport",
+            "nature": "Nature",
+            "neutral": "Neutral"
+          },
+          "layouts": {
+            "standard": "Standard",
+            "fullscreen": "Fullscreen"
+          },
+          "toggles": {
+            "showGameName": "Game name",
+            "showCurrentPhase": "Current phase",
+            "showTimer": "Timer",
+            "showParticipants": "Participants",
+            "showPublicRoles": "Public roles",
+            "showLeaderboard": "Leaderboard",
+            "showQrCode": "QR code"
+          },
+          "fields": {
+            "elements": "Board elements",
+            "welcomeMessage": "Welcome message",
+            "theme": "Theme",
+            "backgroundColor": "Background color (optional)",
+            "layout": "Layout"
+          },
+          "noContentWarning": "Enable at least one element or add a welcome message.",
+          "comingSoon": "Coming soon",
+          "qrCodeDescription": "Link to /join/[code]",
+          "welcomeMessagePlaceholder": "Welcome to tonight's mystery!",
+          "clear": "Clear"
+        },
+        "step": {
+          "title": "Step-by-step",
+          "subtitle": "Drag to reorder. Click to edit.",
+          "addStep": "Add step",
+          "editStep": "Edit step",
+          "saveStep": "Save step",
+          "addFirstStep": "Add first step",
+          "noSteps": "No steps yet. Add your first step.",
+          "noStepsYet": "No steps yet",
+          "noStepsDescription": "Add steps to guide the leader through the game.",
+          "unnamed": "Unnamed step",
+          "cancel": "Cancel",
+          "clear": "Clear",
+          "selected": "Selected",
+          "selectedDiagram": "Selected diagram",
+          "selectDiagram": "Select diagram",
+          "titlePlaceholder": "E.g. Gather the group",
+          "descriptionPlaceholder": "What should participants do in this step?",
+          "leaderScriptPlaceholder": "Tell the group: 'Now we will...'",
+          "leaderScriptHelp": "Exactly what the leader can say to the group",
+          "durationPlaceholder": "E.g. 120 (2 minutes)",
+          "displayModeHelp": "How the description is displayed to participants",
+          "displayModes": {
+            "instant": "Instant (default)",
+            "typewriter": "✍️ Typewriter – character by character",
+            "dramatic": "🎭 Dramatic – slow with pause"
+          },
+          "fields": {
+            "title": "Title",
+            "description": "Description",
+            "duration": "Estimated time (seconds)",
+            "leaderScript": "Leader script (optional)",
+            "displayMode": "Text display",
+            "diagram": "Diagram (optional)"
+          }
+        },
+        "wizard": {
+          "title": "Add artifact",
+          "createNewArtifact": "Create new artifact",
+          "customizeArtifact": "Customize artifact",
+          "helpText": "Artifacts are clues, keypads and documents that participants interact with. Choose a template below or start from scratch.",
+          "allTemplates": "All templates",
+          "selectTemplate": "Select template",
+          "selectTemplateHint": "Select a template to begin",
+          "selectedTemplate": "Selected: {name}",
+          "customize": "Customize",
+          "close": "Close",
+          "create": "Create",
+          "back": "Back",
+          "next": "Next",
+          "cancel": "Cancel",
+          "fields": {
+            "title": "Title",
+            "type": "Type",
+            "description": "Description"
+          },
+          "placeholders": {
+            "title": "Artifact name",
+            "description": "Short description of the artifact"
+          },
+          "types": {
+            "card": "Card",
+            "keypad": "Keypad",
+            "document": "Document",
+            "image": "Image"
+          },
+          "keypad": {
+            "settings": "Keypad settings",
+            "correctCode": "Correct code",
+            "codeLength": "Code length"
+          },
+          "preview": {
+            "title": "Preview",
+            "unnamed": "Unnamed",
+            "noDescription": "No description",
+            "variants": "variant(s)"
+          },
+          "buttons": {
+            "back": "Back",
+            "cancel": "Cancel",
+            "customize": "Customize",
+            "createArtifact": "Create artifact",
+            "quickCreate": "Quick create"
+          },
+          "categories": {
+            "escape_room": "Escape Room",
+            "party": "Party game",
+            "educational": "Educational",
+            "general": "General"
+          },
+          "templates": {
+            "keypadBasic": {
+              "name": "Keypad (4 digits)",
+              "description": "A simple 4-digit PIN code to unlock something"
+            },
+            "keypadAdvanced": {
+              "name": "Keypad (with attempt limit)",
+              "description": "PIN code with max 3 attempts before lock"
+            },
+            "riddle": {
+              "name": "Riddle / Question",
+              "description": "A riddle with text input for answer"
+            },
+            "cipher": {
+              "name": "Caesar cipher",
+              "description": "Encrypted message with letter shift"
+            },
+            "hotspot": {
+              "name": "Clickable image",
+              "description": "Image with hidden zones to find"
+            },
+            "tilePuzzle": {
+              "name": "Tile puzzle (3x3)",
+              "description": "Sliding tile puzzle to reveal an image"
+            },
+            "logicGrid": {
+              "name": "Logic grid",
+              "description": "Logic puzzle where things need to be matched"
+            },
+            "counter": {
+              "name": "Clue counter",
+              "description": "Count found clues or progress"
+            },
+            "hints": {
+              "name": "Hint container",
+              "description": "Progressive hints that can be revealed"
+            },
+            "qrGate": {
+              "name": "QR code checkpoint",
+              "description": "Scan QR code to continue"
+            },
+            "location": {
+              "name": "Location checkpoint",
+              "description": "GPS verification for city games"
+            },
+            "clueCard": {
+              "name": "Clue/Hint",
+              "description": "A card with a clue that can be revealed"
+            },
+            "secretDocument": {
+              "name": "Secret document",
+              "description": "A document revealed at the right moment"
+            },
+            "revealCard": {
+              "name": "Reveal card",
+              "description": "A card for dramatic reveals"
+            },
+            "roleSecret": {
+              "name": "Role secret",
+              "description": "Secret information visible only to one role"
+            }
+          }
+        }
       }
     },
     "achievements": {
@@ -3619,6 +4010,12 @@
           "description": "Are you sure you want to delete this requirement? Users will no longer be blocked by it.",
           "confirm": "Delete",
           "cancel": "Cancel"
+        },
+        "editor": {
+          "form": {
+            "courseHelp": "The course that must be completed to fulfill the requirement.",
+            "isActive": "Active requirement"
+          }
         }
       }
     },
@@ -3783,7 +4180,12 @@
       "help": "Help",
       "logout": "Log out",
       "goToDashboard": "Go to dashboard",
-      "logoAlt": "Lekbanken icon"
+      "logoAlt": "Lekbanken icon",
+      "gamification": "Points",
+      "browse": "Discover",
+      "play": "Play",
+      "tip": "Tip",
+      "tipText": "Add your most used filters as quick selections for faster planning."
     },
     "dashboard": {
       "title": "Dashboard",
@@ -6822,6 +7224,77 @@
         "balance_below": "If time below",
         "balance_above": "If time above"
       }
+    }
+  },
+  "tools": {
+    "toolbelt": {
+      "button": "🧰 Tools",
+      "title": "Tools",
+      "noToolsEnabled": "No tools are enabled for this game."
+    },
+    "diceRoller": {
+      "title": "Dice Roller",
+      "description": "The result is determined immediately, then a short animation plays.",
+      "roll": "Roll",
+      "rolling": "Rolling…",
+      "result": "Result",
+      "pressRoll": "Press Roll"
+    },
+    "conversationCards": {
+      "title": "Conversation Cards",
+      "description": "Select a collection and browse through cards.",
+      "collection": "Collection",
+      "selectCollection": "Select collection",
+      "loading": "Loading…",
+      "loadingCards": "Loading cards…",
+      "noCollections": "No published collections found.",
+      "noCardsInCollection": "No cards in this collection.",
+      "card": "Card",
+      "followup": "Follow-up {n}",
+      "leaderTip": "Leader tip",
+      "previous": "Previous",
+      "next": "Next",
+      "errorLoadCollections": "Could not load collections",
+      "errorLoadCards": "Could not load cards"
+    },
+    "coachDiagram": {
+      "title": "Coach Diagram Builder",
+      "description": "Edit diagrams used in session steps.",
+      "save": "Save",
+      "saving": "Saving…",
+      "loading": "Loading…",
+      "noDiagrams": "No diagrams in this session",
+      "addDiagramHint": "Add a diagram in Game Builder (step media) and enable the tool in the game's Toolbelt settings.",
+      "openDiagramLibrary": "Open diagram library",
+      "diagram": "Diagram",
+      "selectDiagram": "Select diagram",
+      "onlyLeaderCanEdit": "Only leaders can edit diagrams in Toolbelt.",
+      "onlyLeaderCanSave": "Only leaders can save changes.",
+      "titleLabel": "Title",
+      "tools": "Tools",
+      "move": "Move",
+      "arrows": "Arrows",
+      "addPlayer": "+ Player",
+      "addMarker": "+ Marker",
+      "addBall": "+ Ball",
+      "arrowHint": "Click start point, click end point.",
+      "duplicate": "Duplicate",
+      "remove": "Remove",
+      "selected": "Selected",
+      "arrow": "arrow",
+      "label": "Label",
+      "size": "Size",
+      "sizeSmall": "Small",
+      "sizeMedium": "Medium",
+      "sizeLarge": "Large",
+      "pattern": "Pattern",
+      "patternSolid": "Solid",
+      "patternDashed": "Dashed",
+      "arrowhead": "Arrowhead",
+      "yes": "Yes",
+      "no": "No",
+      "openInAdmin": "Open in admin",
+      "openSvg": "Open SVG"
     }
   }
 }

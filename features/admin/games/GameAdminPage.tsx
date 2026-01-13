@@ -320,17 +320,17 @@ export function GameAdminPage() {
             <GameInfoDialog />
             <Button variant="outline" size="sm" onClick={() => setExportOpen(true)}>
               <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-              CSV Export
+              {t('page.csvExport')}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setImportOpen(true)}>
               <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
-              Importera
+              {t('page.import')}
             </Button>
             {canEdit && (
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => router.push('/admin/games/new')}>
                   <PlusIcon className="mr-2 h-4 w-4" />
-                  Builder
+                  {t('page.newInBuilder')}
                 </Button>
               </div>
             )}
@@ -473,7 +473,7 @@ export function GameAdminPage() {
                 <li
                   key={game.id}
                   className="flex items-center justify-between gap-x-6 py-5 pl-3"
-                  style={{ borderLeft: `4px solid ${playModeMeta(game.play_mode).color}` }}
+                  style={{ borderLeft: `4px solid ${getPlayModeMeta(game.play_mode, t).color}` }}
                 >
                   {/* Checkbox */}
                   <div className="flex items-center gap-x-4">
@@ -496,7 +496,7 @@ export function GameAdminPage() {
                           {game.status === 'published' ? t('filters.published') : t('filters.draft')}
                         </Badge>
                         <Badge variant="outline" className="mt-0.5">
-                          {playModeMeta(game.play_mode).label}
+                          {getPlayModeMeta(game.play_mode, t).label}
                         </Badge>
                         {game.category && (
                           <Badge variant="outline" className="mt-0.5">
@@ -527,7 +527,7 @@ export function GameAdminPage() {
                           </div>
                         )}
                         <span className="text-muted-foreground/60">•</span>
-                        <span>{game.owner?.name || 'Global'}</span>
+                        <span>{game.owner?.name || t('filters.global')}</span>
                       </div>
                     </div>
                   </div>
@@ -542,7 +542,7 @@ export function GameAdminPage() {
                         className="hidden sm:flex"
                       >
                         <WrenchScrewdriverIcon className="mr-1.5 h-4 w-4" />
-                        Builder
+                        {t('page.openInBuilder')}
                       </Button>
                     )}
                     
@@ -566,7 +566,7 @@ export function GameAdminPage() {
                             className="sm:hidden"
                           >
                             <WrenchScrewdriverIcon className="h-4 w-4" />
-                            Builder
+                            {t('page.openInBuilder')}
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem
@@ -634,16 +634,15 @@ export function GameAdminPage() {
 }
 
 // Map play modes to consistent label and color for markers and badges
-// Note: Labels moved to translations, but this helper still returns them statically for now
-function playModeMeta(mode: GameWithRelations['play_mode']): { label: string; color: string } {
+function getPlayModeMeta(mode: GameWithRelations['play_mode'], t: ReturnType<typeof useTranslations<'admin.games'>>): { label: string; color: string } {
   switch (mode) {
     case 'facilitated':
-      return { label: 'Ledd aktivitet', color: '#2563eb' };
+      return { label: t('playModes.facilitated'), color: '#2563eb' };
     case 'participants':
-      return { label: 'Deltagarlek', color: '#a855f7' };
+      return { label: t('playModes.participants'), color: '#a855f7' };
     case 'basic':
     default:
-      return { label: 'Enkel lek', color: '#10b981' };
+      return { label: t('playModes.basic'), color: '#10b981' };
   }
 }
 
@@ -666,12 +665,12 @@ function GameInfoDialog() {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <InformationCircleIcon className="mr-2 h-4 w-4" />
-          Information
+          {t('import.infoDialogTitle')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Information om lekar</DialogTitle>
+          <DialogTitle>{t('import.infoDialogTitle')}</DialogTitle>
         </DialogHeader>
         <Tabs
           tabs={infoTabs.map((t) => ({ id: t.id, label: t.label }))}
@@ -721,6 +720,7 @@ function CopyHeaderRow({ label, value, copy, copyLabel }: { label: string; value
 }
 
 function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
+  const t = useTranslations('admin.games.import');
   const [selected, setSelected] = useState<'basic' | 'facilitated' | 'participants-light' | 'legendary'>('basic');
 
   const prompt =
@@ -732,22 +732,18 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
           ? PROMPT_PARTICIPANTS_LIGHT_CSV
           : PROMPT_LEGENDARY_JSON;
 
-  const title =
-    selected === 'basic'
-      ? 'Basic (CSV)'
-      : selected === 'facilitated'
-        ? 'Facilitated (CSV)'
-        : selected === 'participants-light'
-          ? 'Participants Light (CSV)'
-          : 'Legendary (JSON)';
+  const titleLabels: Record<string, string> = {
+    basic: 'Basic (CSV)',
+    facilitated: 'Facilitated (CSV)',
+    'participants-light': 'Participants Light (CSV)',
+    legendary: 'Legendary (JSON)',
+  };
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <p className="font-semibold">Välj prompt</p>
-        <p className="text-sm text-muted-foreground">
-          Behöver du artifacts eller triggers? Välj <strong>Legendary (JSON)</strong>.
-        </p>
+        <p className="font-semibold">{t('selectPrompt')}</p>
+        <p className="text-sm text-muted-foreground" dangerouslySetInnerHTML={{ __html: t('artifactsOrTriggers') }} />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -778,9 +774,9 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
       </div>
 
       <div className="flex items-center justify-between">
-        <p className="font-semibold">{title}</p>
+        <p className="font-semibold">{titleLabels[selected]}</p>
         <Button variant="ghost" size="sm" onClick={() => copy(prompt)}>
-          Kopiera
+          {t('copy')}
         </Button>
       </div>
 
@@ -817,50 +813,38 @@ function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): Info
   return [
     {
       id: 'overview',
-      label: 'Översikt',
+      label: t('import.overviewTab'),
       render: () => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">Vad importen gör</p>
-            <p className="text-sm text-foreground">
-              Importen kan läsa <strong>CSV</strong> (bulk/massimport) och <strong>JSON</strong> (full fidelity).
-            </p>
+            <p className="font-semibold">{t('import.whatImportDoes')}</p>
+            <p className="text-sm text-foreground" dangerouslySetInnerHTML={{ __html: t('import.importCanRead') }} />
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">CSV vs JSON</p>
+            <p className="font-semibold">{t('import.csvVsJson')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>
-                <strong>CSV:</strong> basic/facilitated + participants-light inom canonical header.
-              </li>
-              <li>
-                <strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + avancerade step-fält).
-              </li>
+              <li dangerouslySetInnerHTML={{ __html: t('import.csvBasic') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.jsonLegendary') }} />
             </ul>
             <p className="text-sm text-muted-foreground">{CANONICAL_CSV_SCOPE_NOTE}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Start här (3 steg)</p>
+            <p className="font-semibold">{t('import.startHere')}</p>
             <ol className="list-decimal pl-5 space-y-1 text-foreground">
-              <li>Välj spelläge (basic/facilitated/participants).</li>
-              <li>Välj format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).</li>
-              <li>Validera i Import-dialogen (dry-run) innan import.</li>
+              <li>{t('import.step1')}</li>
+              <li>{t('import.step2')}</li>
+              <li>{t('import.step3')}</li>
             </ol>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Vanliga fel</p>
+            <p className="font-semibold">{t('import.commonErrors')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>
-                <strong>Ogiltigt purpose-id:</strong> main_purpose_id/sub_purpose_ids måste vara riktiga UUID från databasen.
-              </li>
-              <li>
-                <strong>JSON escaping i CSV:</strong> citat i JSON måste skrivas som <code>{'""'}</code> i CSV-cellen.
-              </li>
-              <li>
-                <strong>Saknade steg:</strong> om step_N_title finns måste step_N_body finnas.
-              </li>
+              <li dangerouslySetInnerHTML={{ __html: t('import.invalidPurpose') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.jsonEscaping') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.missingSteps') }} />
             </ul>
           </div>
         </div>
@@ -868,27 +852,24 @@ function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): Info
     },
     {
       id: 'modes',
-      label: 'Spellägen',
+      label: t('import.playModesTab'),
       render: () => (
         <div className="space-y-3">
-          <p className="font-semibold">Spellägen (play_mode)</p>
+          <p className="font-semibold">{t('import.playModes')}</p>
           <div className="space-y-2 text-muted-foreground">
-            <p className="text-sm">Välj läge tidigt – QA, UI och runtime förväntar sig rätt struktur.</p>
+            <p className="text-sm">{t('import.chooseEarly')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li><strong>Enkel lek (basic):</strong> steg + material. Ingen digital interaktion.</li>
-              <li><strong>Ledd aktivitet (facilitated):</strong> steg + faser/timer, ev. publik tavla.</li>
-              <li>
-                <strong>Deltagarlek (participants):</strong> steg + faser + roller + ev. publik tavla. För Legendary (artifacts/triggers)
-                ska du använda JSON-import.
-              </li>
+              <li dangerouslySetInnerHTML={{ __html: t('import.basicMode') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.facilitatedMode') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.participantsMode') }} />
             </ul>
           </div>
           <div className="space-y-1">
-            <p className="font-semibold">Minimum required</p>
+            <p className="font-semibold">{t('import.minimumRequired')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li><strong>basic:</strong> minst step_1_title + step_1_body.</li>
-              <li><strong>facilitated:</strong> steg krävs; phases_json starkt rekommenderat.</li>
-              <li><strong>participants:</strong> steg krävs; roles_json rekommenderas starkt.</li>
+              <li dangerouslySetInnerHTML={{ __html: t('import.basicReq') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.facilitatedReq') }} />
+              <li dangerouslySetInnerHTML={{ __html: t('import.participantsReq') }} />
             </ul>
           </div>
         </div>
@@ -896,34 +877,32 @@ function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): Info
     },
     {
       id: 'csv',
-      label: 'CSV',
+      label: t('import.csvTab'),
       render: (copy) => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">CSV-format (canonical)</p>
+            <p className="font-semibold">{t('import.csvFormat')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>UTF-8 (med/utan BOM), separator ,</li>
-              <li>Celler med komma/radbrytning/citat omsluts av &quot;...&quot;; citat skrivs som &quot;&quot;</li>
-              <li>En rad = en lek</li>
+              <li>{t('import.csvFormatList1')}</li>
+              <li>{t('import.csvFormatList2')}</li>
+              <li>{t('import.csvFormatList3')}</li>
             </ul>
           </div>
 
-          <CopyHeaderRow label="Canonical CSV-header (kopiera exakt)" value={CANONICAL_CSV_HEADER} copy={copy} copyLabel={t('import.copy')} />
+          <CopyHeaderRow label={t('import.canonicalCsvHeader')} value={CANONICAL_CSV_HEADER} copy={copy} copyLabel={t('import.copy')} />
 
           <div className="space-y-1">
-            <p className="font-semibold">JSON-kolumner som stöds i CSV</p>
+            <p className="font-semibold">{t('import.jsonColumnsInCsv')}</p>
             <p className="text-sm text-foreground">{CANONICAL_CSV_JSON_COLUMNS.join(', ')}</p>
-            <p className="text-sm text-muted-foreground">
-              Vill du använda artifacts eller triggers? CSV-kontraktet innehåller inte det. Välj JSON-import (Legendary).
-            </p>
+            <p className="text-sm text-muted-foreground">{t('import.useJsonForArtifacts')}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Vanligaste felen</p>
+            <p className="font-semibold">{t('import.commonMistakes')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>Ogiltig JSON i JSON-kolumn (oftast fel citat/escaping).</li>
-              <li>step_N_title ifyllt men step_N_body saknas.</li>
-              <li>main_purpose_id/sub_purpose_ids är inte giltiga UUID.</li>
+              <li>{t('import.invalidJsonInColumn')}</li>
+              <li>{t('import.stepTitleWithoutBody')}</li>
+              <li>{t('import.invalidUuid')}</li>
             </ul>
           </div>
         </div>
@@ -931,34 +910,29 @@ function getInfoTabs(t: ReturnType<typeof useTranslations<'admin.games'>>): Info
     },
     {
       id: 'json',
-      label: 'JSON',
+      label: t('import.jsonTab'),
       render: () => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">JSON-import (full fidelity)</p>
-            <p className="text-sm text-foreground">
-              JSON är formatet för Legendary/escape-room: artifacts + triggers + avancerade step-fält.
-            </p>
+            <p className="font-semibold">{t('import.jsonImportFull')}</p>
+            <p className="text-sm text-foreground">{t('import.jsonLegendaryDesc')}</p>
           </div>
 
           <div className="space-y-2">
-            <p className="font-semibold">Minimal JSON (1 lek)</p>
+            <p className="font-semibold">{t('import.minimalJson')}</p>
             <CodeBlock>{minimalJsonExample}</CodeBlock>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Order-resolution i triggers</p>
-            <p className="text-sm text-foreground">
-              Triggers kan referera till <code>stepOrder</code>/<code>phaseOrder</code>/<code>artifactOrder</code> i condition/actions.
-              Importen resolverar det till faktiska ID:n.
-            </p>
+            <p className="font-semibold">{t('import.orderResolution')}</p>
+            <p className="text-sm text-foreground">{t('import.orderResolutionDesc')}</p>
           </div>
         </div>
       ),
     },
     {
       id: 'ai',
-      label: 'AI Prompts',
+      label: t('import.aiPromptsTab'),
       render: (copy) => <AiPromptsTab copy={copy} />,
     },
   ];

@@ -7,6 +7,7 @@ import { useTenant } from "@/lib/context/TenantContext";
 import { AppShell as Shell } from "@/components/app/AppShell";
 import { AppTopbar } from "./components/app-topbar";
 import { ToastProvider } from "@/components/ui/toast";
+import { DemoBanner } from "@/components/demo/DemoBanner";
 
 export default function AppShellContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -31,7 +32,15 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
 
   return (
     <ToastProvider>
-      <Shell header={<AppTopbar />}>{children}</Shell>
+      <div className="flex flex-col h-screen">
+        {/* Demo Banner (only shown if in demo mode) */}
+        <DemoBanner />
+
+        {/* Main App Shell */}
+        <div className="flex-1 overflow-hidden">
+          <Shell header={<AppTopbar />}>{children}</Shell>
+        </div>
+      </div>
     </ToastProvider>
   );
 }

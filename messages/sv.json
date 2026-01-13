@@ -991,6 +991,58 @@
         "achievementsAdminDesc": "Badge-byggare och belöningar."
       }
     },
+    "demo": {
+      "metadata": {
+        "title": "Demo-övervakning",
+        "description": "Övervaka demosessioner och konverteringar"
+      },
+      "title": "Demo-övervakning",
+      "description": "Övervaka demosessioner, konverteringsgrad och användaraktivitet.",
+      "stats": {
+        "activeSessions": "Aktiva sessioner",
+        "activeSessionsDesc": "Demoanvändare senaste timmen",
+        "sessions24h": "Sessioner (24h)",
+        "sessions24hDesc": "Totala demosessioner senaste dygnet",
+        "conversionRate": "Konverteringsgrad",
+        "conversionRateDesc": "Demo till betalande kund",
+        "avgDuration": "Snittlängd",
+        "avgDurationDesc": "Genomsnittlig sessionslängd"
+      },
+      "chart": {
+        "title": "Sessioner och konverteringar (7 dagar)",
+        "loading": "Laddar diagramdata...",
+        "noData": "Ingen data tillgänglig",
+        "sessions": "Sessioner",
+        "conversions": "Konverteringar",
+        "summary": "Totalt: {totalSessions} sessioner, {totalConversions} konverteringar"
+      },
+      "table": {
+        "loading": "Laddar sessioner...",
+        "noSessions": "Inga demosessioner hittades.",
+        "user": "Användare",
+        "created": "Skapad",
+        "status": "Status",
+        "sessionId": "Sessions-ID",
+        "anonymousUser": "Anonym demo-användare",
+        "status": {
+          "active": "Aktiv",
+          "expired": "Utgången",
+          "old": "Gammal"
+        }
+      },
+      "quickActions": {
+        "title": "Snabbåtgärder",
+        "testDemo": "Testa demo",
+        "testDemoDesc": "Öppna demolandningssidan",
+        "testUpgrade": "Testa uppgradering",
+        "testUpgradeDesc": "Öppna uppgraderingssidan",
+        "salesGuide": "Säljguide",
+        "salesGuideDesc": "Öppna dokumentation för säljteamet"
+      },
+      "recentSessions": {
+        "title": "Senaste demosessioner"
+      }
+    },
     "webhooks": {
       "pageTitle": "Webhooks",
       "pageDescription": "Hantera webhook-endpoints och loggar.",
@@ -5001,6 +5053,120 @@
       "goToMarketing": "Gå till startsidan"
     }
   },
+  "demo": {
+    "landing": {
+      "badge": "Ingen registrering krävs",
+      "title": "Prova Lekbanken – utan att skapa konto",
+      "description": "Utforska plattformen utan att skapa ett konto. Din demo-session varar i 2 timmar och all data raderas automatiskt.",
+      "startDemo": "Starta gratis demo",
+      "startingDemo": "Startar demo...",
+      "learnMore": "Läs mer om Lekbanken",
+      "compareTiers": "Jämför demo-nivåer"
+    },
+    "tiers": {
+      "free": {
+        "title": "Gratis demo",
+        "description": "Perfekt för att utforska plattformen",
+        "button": "Starta gratis demo"
+      },
+      "premium": {
+        "title": "Premium demo",
+        "description": "Full tillgång med personlig guide",
+        "button": "Kontakta säljare"
+      }
+    },
+    "privacy": {
+      "title": "Din integritet är viktig",
+      "description": "Demo-sessioner använder en sessionscookie som varar i 2 timmar. Ingen personlig data samlas in. All demo-data raderas automatiskt efter din session."
+    },
+    "upgrade": {
+      "success": {
+        "title": "Tack för din förfrågan!",
+        "description": "Vi har tagit emot din förfrågan om premium-demo. En av våra produktexperter kommer att kontakta dig inom 24 timmar.",
+        "backToDemo": "Prova gratis demo medan du väntar"
+      },
+      "hero": {
+        "title": "Få full tillgång med",
+        "titleHighlight": "Premium Demo",
+        "description": "Boka en personlig demo med en av våra produktexperter. Vi anpassar genomgången efter era specifika behov och utmaningar."
+      },
+      "features": {
+        "title": "Vad ingår i premium-demo?",
+        "personal": "Personlig genomgång",
+        "personalDescription": "En produktexpert guider dig genom plattformen",
+        "teamFeatures": "Team-funktioner upplåsta",
+        "teamDescription": "Perfekt för teams, lärare och organisationer",
+        "customSetup": "Anpassad setup",
+        "customDescription": "Skräddarsydda lösningar för stora organisationer"
+      },
+      "form": {
+        "title": "Boka premium-demo",
+        "description": "Fyll i formuläret så kontaktar vi dig inom 24 timmar.",
+        "name": "Namn",
+        "namePlaceholder": "Ditt namn",
+        "email": "E-post",
+        "emailPlaceholder": "din@email.se",
+        "organization": "Organisation",
+        "organizationPlaceholder": "Företag/skola",
+        "size": "Organisationsstorlek",
+        "sizePlaceholder": "Välj storlek",
+        "sizeOptions": {
+          "small": "1-10 personer",
+          "medium": "11-50 personer",
+          "large": "51-200 personer",
+          "enterprise": "200+ personer"
+        },
+        "message": "Beskriv era behov",
+        "messagePlaceholder": "Berätta gärna om era behov och utmaningar...",
+        "submit": "Skicka förfrågan",
+        "submitting": "Skickar...",
+        "consent": "Genom att skicka godkänner du vår",
+        "privacyPolicy": "integritetspolicy"
+      }
+    },
+    "expired": {
+      "title": "Din demo-session har gått ut",
+      "description": "Din 2-timmars demo-session har avslutats. Skapa ett gratis konto för att fortsätta utforska Lekbanken och spara dina framsteg.",
+      "createAccount": "Skapa gratis konto",
+      "startAnother": "Starta ny demo",
+      "premiumPrompt": "Vill du ha mer tid och fler funktioner?",
+      "contactSales": "Kontakta oss för premium-demo",
+      "haveAccount": "Har du redan ett konto?",
+      "login": "Logga in",
+      "backToHome": "Tillbaka till startsidan"
+    },
+    "error": {
+      "restartDemo": "Starta om demo",
+      "backToHome": "Tillbaka till startsidan",
+      "technicalDetails": "Tekniska detaljer",
+      "persistentProblem": "Problemet kvarstår?",
+      "contactSupport": "Kontakta support",
+      "retry": "Försök igen",
+      "startNewDemo": "Starta ny demo",
+      "types": {
+        "rateLimit": {
+          "title": "För många förfrågningar",
+          "description": "Du har gjort för många demo-förfrågningar. Vänta en stund och försök igen."
+        },
+        "session": {
+          "title": "Sessionsproblem",
+          "description": "Din demo-session kunde inte startas eller har gått ut. Starta en ny demo."
+        },
+        "network": {
+          "title": "Nätverksfel",
+          "description": "Kunde inte ansluta till servern. Kontrollera din internetanslutning."
+        },
+        "server": {
+          "title": "Serverfel",
+          "description": "Något gick fel på vår sida. Vårt team har informerats."
+        },
+        "generic": {
+          "title": "Något gick fel",
+          "description": "Ett oväntat fel inträffade. Försök igen eller starta om demon."
+        }
+      }
+    }
+  },
   "legal": {
     "common": {
       "backToHome": "← Tillbaka till startsidan",
@@ -5131,6 +5297,32 @@
           "functional": "Funktionella cookies: Språkval, preferenser",
           "analytics": "Analytiska cookies: Användningsstatistik (anonymiserad)",
           "manage": "Du kan hantera cookies i dina webbläsarinställningar. Observera att vissa funktioner kanske inte fungerar korrekt om du blockerar cookies."
+        },
+        "demoSessions": {
+          "title": "9. Demo-sessioner",
+          "intro": "Lekbanken erbjuder demo-sessioner som låter dig prova plattformen utan att skapa ett konto.",
+          "dataCollected": {
+            "title": "9.1 Data som samlas in under demo",
+            "content": "Under en demo-session samlar vi in:",
+            "sessionCookie": "Sessionscookie: En temporär cookie som identifierar din demo-session (varar 2 timmar)",
+            "ipAddress": "IP-adress: För rate-limiting och bedrägeriförebyggande (lagras inte permanent)",
+            "usageData": "Användningsdata: Anonymiserad statistik om funktioner du använder"
+          },
+          "dataRetention": {
+            "title": "9.2 Lagring av demo-data",
+            "content": "All data skapad under en demo-session raderas automatiskt:",
+            "sessionData": "Sessionsdata: Raderas efter 24 timmar",
+            "userCreated": "Användarskapade data: Raderas vid nattlig rensning",
+            "noPersonal": "Vi samlar inte in personuppgifter (namn, e-post) under demo-sessioner om du inte frivilligt anger dem för att begära premium-demo."
+          },
+          "legalBasis": {
+            "title": "9.3 Rättslig grund",
+            "content": "Demo-sessioner baseras på berättigat intresse för att låta potentiella kunder utvärdera vår produkt innan köp."
+          },
+          "conversionData": {
+            "title": "9.4 Konverteringsdata",
+            "content": "Om du begär en premium-demo via formuläret samlar vi in de uppgifter du anger (namn, e-post, organisation) baserat på samtycke för att kontakta dig."
+          }
         },
         "children": {
           "title": "9. Barn",

@@ -8,7 +8,7 @@
 
 import { useIsDemo, useDemoTier, useConvertDemo } from '@/hooks/useIsDemo';
 import { LockClosedIcon, SparklesIcon } from '@heroicons/react/24/outline';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 interface DemoFeatureGateProps {
   children: ReactNode;

@@ -23,7 +23,7 @@ USING (
   -- OR if user is system_admin
   OR (
     SELECT global_role
-    FROM profiles
+    FROM users
     WHERE id = auth.uid()
   ) = 'system_admin'
 );
@@ -38,7 +38,7 @@ USING (
   demo_flag = false
   OR (
     SELECT global_role
-    FROM profiles
+    FROM users
     WHERE id = auth.uid()
   ) = 'system_admin'
 );
@@ -54,15 +54,15 @@ BEGIN
     -- Drop existing policy if it exists
     IF EXISTS (
         SELECT 1 FROM pg_policies
-        WHERE tablename = 'activities'
+        WHERE tablename = 'games'
         AND policyname = 'demo_content_access'
     ) THEN
-        DROP POLICY "demo_content_access" ON activities;
+        DROP POLICY "demo_content_access" ON games;
     END IF;
 END $$;
 
 CREATE POLICY "demo_content_access"
-ON activities
+ON games
 FOR SELECT
 TO authenticated
 USING (
@@ -70,25 +70,25 @@ USING (
   CASE
     WHEN EXISTS (
       SELECT 1
-      FROM profiles
+      FROM users
       WHERE id = auth.uid()
         AND (is_demo_user = true OR is_ephemeral = true)
     )
     THEN
-      -- Demo users: Only curated global content OR own created activities
+      -- Demo users: Only curated demo content OR own created games
       (
-        (is_global = true AND is_demo_content = true)
+        is_demo_content = true
         OR created_by = auth.uid()
       )
     ELSE
       -- Normal users: All content they have access to
       (
-        tenant_id IN (
+        owner_tenant_id IN (
           SELECT m.tenant_id
-          FROM memberships m
+          FROM user_tenant_memberships m
           WHERE m.user_id = auth.uid()
         )
-        OR is_global = true
+        OR owner_tenant_id IS NULL
         OR created_by = auth.uid()
       )
   END
@@ -99,25 +99,25 @@ USING (
 -- Prevents users from modifying their is_demo_user or is_ephemeral flags
 -- ============================================================================
 
-DROP POLICY IF EXISTS "demo_user_flag_protection" ON profiles;
+DROP POLICY IF EXISTS "demo_user_flag_protection" ON users;
 CREATE POLICY "demo_user_flag_protection"
-ON profiles
+ON users
 FOR UPDATE
 TO authenticated
 USING (
   -- Can update own profile ONLY if demo flags remain unchanged
   (
     id = auth.uid()
-    AND is_demo_user = (SELECT is_demo_user FROM profiles WHERE id = auth.uid())
+    AND is_demo_user = (SELECT is_demo_user FROM users WHERE id = auth.uid())
     AND (
       is_ephemeral IS NULL
-      OR is_ephemeral = (SELECT is_ephemeral FROM profiles WHERE id = auth.uid())
+      OR is_ephemeral = (SELECT is_ephemeral FROM users WHERE id = auth.uid())
     )
   )
   -- OR system admin can do anything
   OR (
     SELECT global_role
-    FROM profiles
+    FROM users
     WHERE id = auth.uid()
   ) = 'system_admin'
 );
@@ -127,26 +127,26 @@ USING (
 -- Demo users cannot create public sessions
 -- ============================================================================
 
--- Check if sessions table exists and has visibility column
+-- Check if game_sessions table exists and has visibility column
 DO $$
 BEGIN
     IF EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'sessions'
+        WHERE table_name = 'game_sessions'
         AND column_name = 'visibility'
     ) THEN
         -- Drop existing policy if it exists
         IF EXISTS (
             SELECT 1 FROM pg_policies
-            WHERE tablename = 'sessions'
+            WHERE tablename = 'game_sessions'
             AND policyname = 'demo_no_public_sessions'
         ) THEN
-            DROP POLICY "demo_no_public_sessions" ON sessions;
+            DROP POLICY "demo_no_public_sessions" ON game_sessions;
         END IF;
 
         -- Create policy
         CREATE POLICY "demo_no_public_sessions"
-        ON sessions
+        ON game_sessions
         FOR INSERT
         TO authenticated
         WITH CHECK (
@@ -154,7 +154,7 @@ BEGIN
           CASE
             WHEN EXISTS (
               SELECT 1
-              FROM profiles
+              FROM users
               WHERE id = auth.uid()
                 AND (is_demo_user = true OR is_ephemeral = true)
             )
@@ -166,6 +166,10 @@ BEGIN
               true
           END
         );
+        
+        RAISE NOTICE 'Created demo_no_public_sessions policy on game_sessions';
+    ELSE
+        RAISE NOTICE 'Skipping demo_no_public_sessions policy - game_sessions.visibility column does not exist';
     END IF;
 END $$;
 
@@ -174,39 +178,50 @@ END $$;
 -- Demo users can only see/edit their own created sessions
 -- ============================================================================
 
--- Drop existing policy if it exists
+-- Make this policy conditional on the game_sessions table existing
 DO $$
 BEGIN
     IF EXISTS (
-        SELECT 1 FROM pg_policies
-        WHERE tablename = 'sessions'
-        AND policyname = 'demo_session_ownership'
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'game_sessions'
     ) THEN
-        DROP POLICY "demo_session_ownership" ON sessions;
+        -- Drop existing policy if it exists
+        IF EXISTS (
+            SELECT 1 FROM pg_policies
+            WHERE tablename = 'game_sessions'
+            AND policyname = 'demo_session_ownership'
+        ) THEN
+            DROP POLICY "demo_session_ownership" ON game_sessions;
+        END IF;
+
+        -- Create policy
+        CREATE POLICY "demo_session_ownership"
+        ON game_sessions
+        FOR ALL
+        TO authenticated
+        USING (
+          -- Own sessions
+          user_id = auth.uid()
+          -- OR sessions in user's tenant (if not demo user)
+          OR (
+            NOT EXISTS (
+              SELECT 1 FROM users
+              WHERE id = auth.uid()
+                AND (is_demo_user = true OR is_ephemeral = true)
+            )
+            AND tenant_id IN (
+              SELECT m.tenant_id
+              FROM user_tenant_memberships m
+              WHERE m.user_id = auth.uid()
+            )
+          )
+        );
+        
+        RAISE NOTICE 'Created demo_session_ownership policy on game_sessions';
+    ELSE
+        RAISE NOTICE 'Skipping demo_session_ownership policy - game_sessions table does not exist';
     END IF;
 END $$;
-
-CREATE POLICY "demo_session_ownership"
-ON sessions
-FOR ALL
-TO authenticated
-USING (
-  -- Own sessions
-  created_by = auth.uid()
-  -- OR sessions in user's tenant (if not demo user)
-  OR (
-    NOT EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid()
-        AND (is_demo_user = true OR is_ephemeral = true)
-    )
-    AND tenant_id IN (
-      SELECT m.tenant_id
-      FROM memberships m
-      WHERE m.user_id = auth.uid()
-    )
-  )
-);
 
 -- ============================================================================
 -- POLICY 6: Demo Tenant Settings Protection
@@ -261,10 +276,10 @@ BEGIN;
 
 DROP POLICY IF EXISTS "demo_tenant_write_protection" ON tenants;
 DROP POLICY IF EXISTS "demo_tenant_delete_protection" ON tenants;
-DROP POLICY IF EXISTS "demo_content_access" ON activities;
-DROP POLICY IF EXISTS "demo_user_flag_protection" ON profiles;
-DROP POLICY IF EXISTS "demo_no_public_sessions" ON sessions;
-DROP POLICY IF EXISTS "demo_session_ownership" ON sessions;
+DROP POLICY IF EXISTS "demo_content_access" ON games;
+DROP POLICY IF EXISTS "demo_user_flag_protection" ON users;
+DROP POLICY IF EXISTS "demo_no_public_sessions" ON game_sessions;
+DROP POLICY IF EXISTS "demo_session_ownership" ON game_sessions;
 
 DELETE FROM public.migration_log WHERE migration_name = '20260114_demo_rls_policies';
 

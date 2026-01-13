@@ -8,7 +8,7 @@
 BEGIN;
 
 -- ============================================================================
--- PART 1: Extend Activities Table
+-- PART 1: Extend Games Table
 -- Add is_demo_content flag for content curation
 -- ============================================================================
 
@@ -16,29 +16,29 @@ DO $$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'activities'
+        WHERE table_name = 'games'
         AND column_name = 'is_demo_content'
     ) THEN
-        ALTER TABLE activities
+        ALTER TABLE games
         ADD COLUMN is_demo_content BOOLEAN DEFAULT false;
 
-        RAISE NOTICE 'Added is_demo_content column to activities table';
+        RAISE NOTICE 'Added is_demo_content column to games table';
     ELSE
-        RAISE NOTICE 'Column is_demo_content already exists on activities table';
+        RAISE NOTICE 'Column is_demo_content already exists on games table';
     END IF;
 END $$;
 
 -- Create index for efficient demo content queries
-CREATE INDEX IF NOT EXISTS idx_activities_demo_content
-ON activities(is_demo_content)
+CREATE INDEX IF NOT EXISTS idx_games_demo_content
+ON games(is_demo_content)
 WHERE is_demo_content = true;
 
 -- Add comment for documentation
-COMMENT ON COLUMN activities.is_demo_content IS
-'Indicates if this activity should be visible in demo mode. Only activities with this flag set to true are shown to demo users.';
+COMMENT ON COLUMN games.is_demo_content IS
+'Indicates if this game should be visible in demo mode. Only games with this flag set to true are shown to demo users.';
 
 -- ============================================================================
--- PART 2: Extend Profiles Table
+-- PART 2: Extend users Table
 -- Add demo user tracking columns
 -- ============================================================================
 
@@ -47,81 +47,81 @@ BEGIN
     -- Add is_demo_user column
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'profiles'
+        WHERE table_name = 'users'
         AND column_name = 'is_demo_user'
     ) THEN
-        ALTER TABLE profiles
+        ALTER TABLE users
         ADD COLUMN is_demo_user BOOLEAN DEFAULT false;
 
-        RAISE NOTICE 'Added is_demo_user column to profiles table';
+        RAISE NOTICE 'Added is_demo_user column to users table';
     ELSE
-        RAISE NOTICE 'Column is_demo_user already exists on profiles table';
+        RAISE NOTICE 'Column is_demo_user already exists on users table';
     END IF;
 
     -- Add is_ephemeral column
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'profiles'
+        WHERE table_name = 'users'
         AND column_name = 'is_ephemeral'
     ) THEN
-        ALTER TABLE profiles
+        ALTER TABLE users
         ADD COLUMN is_ephemeral BOOLEAN DEFAULT false;
 
-        RAISE NOTICE 'Added is_ephemeral column to profiles table';
+        RAISE NOTICE 'Added is_ephemeral column to users table';
     ELSE
-        RAISE NOTICE 'Column is_ephemeral already exists on profiles table';
+        RAISE NOTICE 'Column is_ephemeral already exists on users table';
     END IF;
 
     -- Add demo_last_used_at column
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'profiles'
+        WHERE table_name = 'users'
         AND column_name = 'demo_last_used_at'
     ) THEN
-        ALTER TABLE profiles
+        ALTER TABLE users
         ADD COLUMN demo_last_used_at TIMESTAMPTZ;
 
-        RAISE NOTICE 'Added demo_last_used_at column to profiles table';
+        RAISE NOTICE 'Added demo_last_used_at column to users table';
     ELSE
-        RAISE NOTICE 'Column demo_last_used_at already exists on profiles table';
+        RAISE NOTICE 'Column demo_last_used_at already exists on users table';
     END IF;
 
     -- Add demo_session_count column
     IF NOT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'profiles'
+        WHERE table_name = 'users'
         AND column_name = 'demo_session_count'
     ) THEN
-        ALTER TABLE profiles
+        ALTER TABLE users
         ADD COLUMN demo_session_count INTEGER DEFAULT 0;
 
-        RAISE NOTICE 'Added demo_session_count column to profiles table';
+        RAISE NOTICE 'Added demo_session_count column to users table';
     ELSE
-        RAISE NOTICE 'Column demo_session_count already exists on profiles table';
+        RAISE NOTICE 'Column demo_session_count already exists on users table';
     END IF;
 END $$;
 
 -- Create index for finding available demo users
-CREATE INDEX IF NOT EXISTS idx_profiles_demo_users
-ON profiles(is_demo_user, demo_last_used_at)
+CREATE INDEX IF NOT EXISTS idx_users_demo_users
+ON users(is_demo_user, demo_last_used_at)
 WHERE is_demo_user = true;
 
 -- Create index for ephemeral users (for cleanup)
-CREATE INDEX IF NOT EXISTS idx_profiles_ephemeral_users
-ON profiles(is_ephemeral, created_at)
+CREATE INDEX IF NOT EXISTS idx_users_ephemeral_users
+ON users(is_ephemeral, created_at)
 WHERE is_ephemeral = true;
 
 -- Add comments for documentation
-COMMENT ON COLUMN profiles.is_demo_user IS
+COMMENT ON COLUMN users.is_demo_user IS
 'Indicates if this profile is part of the demo user system (includes both pre-created pool and ephemeral users)';
 
-COMMENT ON COLUMN profiles.is_ephemeral IS
+COMMENT ON COLUMN users.is_ephemeral IS
 'Indicates if this user was created on-demand for a demo session and should be auto-deleted after 24h';
 
-COMMENT ON COLUMN profiles.demo_last_used_at IS
+COMMENT ON COLUMN users.demo_last_used_at IS
 'Timestamp of when this demo user was last assigned to a demo session (for rotation logic)';
 
-COMMENT ON COLUMN profiles.demo_session_count IS
+COMMENT ON COLUMN users.demo_session_count IS
 'Total number of times this demo user has been used (for analytics)';
 
 -- ============================================================================
@@ -131,7 +131,7 @@ COMMENT ON COLUMN profiles.demo_session_count IS
 
 CREATE TABLE IF NOT EXISTS demo_sessions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   demo_tier TEXT NOT NULL DEFAULT 'free' CHECK (demo_tier IN ('free', 'premium')),
   started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -327,7 +327,7 @@ INSERT INTO migration_log (migration_name, executed_at, notes)
 VALUES (
   '20260114_demo_foundation',
   now(),
-  'Added demo foundation: is_demo_content on activities, demo tracking columns on profiles, demo_sessions table with RLS, helper functions'
+  'Added demo foundation: is_demo_content on games, demo tracking columns on users, demo_sessions table with RLS, helper functions'
 )
 ON CONFLICT (migration_name) DO UPDATE SET
   executed_at = now(),
@@ -339,20 +339,20 @@ ON CONFLICT (migration_name) DO UPDATE SET
 
 DO $$
 DECLARE
-  activities_col_count INTEGER;
-  profiles_col_count INTEGER;
+  games_col_count INTEGER;
+  users_col_count INTEGER;
   sessions_table_exists BOOLEAN;
 BEGIN
-  -- Check activities columns
-  SELECT COUNT(*) INTO activities_col_count
+  -- Check games columns
+  SELECT COUNT(*) INTO games_col_count
   FROM information_schema.columns
-  WHERE table_name = 'activities'
+  WHERE table_name = 'games'
     AND column_name IN ('is_demo_content');
 
-  -- Check profiles columns
-  SELECT COUNT(*) INTO profiles_col_count
+  -- Check users columns
+  SELECT COUNT(*) INTO users_col_count
   FROM information_schema.columns
-  WHERE table_name = 'profiles'
+  WHERE table_name = 'users'
     AND column_name IN ('is_demo_user', 'is_ephemeral', 'demo_last_used_at', 'demo_session_count');
 
   -- Check demo_sessions table
@@ -364,17 +364,17 @@ BEGIN
   RAISE NOTICE '========================================';
   RAISE NOTICE 'Demo Foundation Migration Complete';
   RAISE NOTICE '========================================';
-  RAISE NOTICE 'Activities columns added: %', activities_col_count;
-  RAISE NOTICE 'Profiles columns added: %', profiles_col_count;
+  RAISE NOTICE 'Games columns added: %', games_col_count;
+  RAISE NOTICE 'users columns added: %', users_col_count;
   RAISE NOTICE 'Demo_sessions table created: %', sessions_table_exists;
   RAISE NOTICE '========================================';
 
-  IF activities_col_count < 1 THEN
-    RAISE WARNING 'Missing is_demo_content column on activities';
+  IF games_col_count < 1 THEN
+    RAISE WARNING 'Missing is_demo_content column on games';
   END IF;
 
-  IF profiles_col_count < 4 THEN
-    RAISE WARNING 'Missing demo tracking columns on profiles (expected 4, found %)', profiles_col_count;
+  IF users_col_count < 4 THEN
+    RAISE WARNING 'Missing demo tracking columns on users (expected 4, found %)', users_col_count;
   END IF;
 
   IF NOT sessions_table_exists THEN
@@ -404,15 +404,15 @@ DROP TRIGGER IF EXISTS demo_sessions_updated_at ON demo_sessions;
 -- Drop table
 DROP TABLE IF EXISTS demo_sessions CASCADE;
 
--- Remove columns from profiles
-ALTER TABLE profiles
+-- Remove columns from users
+ALTER TABLE users
   DROP COLUMN IF EXISTS is_demo_user,
   DROP COLUMN IF EXISTS is_ephemeral,
   DROP COLUMN IF EXISTS demo_last_used_at,
   DROP COLUMN IF EXISTS demo_session_count;
 
--- Remove column from activities
-ALTER TABLE activities
+-- Remove column from games
+ALTER TABLE games
   DROP COLUMN IF EXISTS is_demo_content;
 
 -- Remove from migration log

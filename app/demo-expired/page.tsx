@@ -3,95 +3,109 @@
  * Shown when demo session expires (after 2 hours)
  */
 
-import { ClockIcon } from '@heroicons/react/24/outline';
+'use client';
+
+import { useTranslations } from 'next-intl';
+import { ClockIcon, ArrowPathIcon, UserPlusIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { trackSessionExpired, getDemoSessionDuration, clearDemoTracking } from '@/lib/analytics/demo-tracking';
+import { useEffect } from 'react';
 
 export default function DemoExpiredPage() {
+  const t = useTranslations('demo.expired');
+
+  // Track session expiry on mount
+  useEffect(() => {
+    const sessionId = typeof window !== 'undefined' 
+      ? sessionStorage.getItem('demo_session_id') 
+      : null;
+    
+    if (sessionId) {
+      const duration = getDemoSessionDuration();
+      trackSessionExpired(sessionId, duration);
+      clearDemoTracking();
+    }
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full text-center">
-        {/* Icon */}
-        <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-          <ClockIcon className="h-8 w-8 text-gray-400" aria-hidden="true" />
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-muted/50 to-background px-4 py-16">
+      <Card className="max-w-md w-full text-center shadow-lg">
+        <CardHeader>
+          {/* Icon */}
+          <div className="mx-auto w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+            <ClockIcon className="h-8 w-8 text-muted-foreground" aria-hidden="true" />
+          </div>
 
-        {/* Heading */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Demo Session Expired
-        </h1>
+          <CardTitle className="text-2xl">
+            {t('title')}
+          </CardTitle>
+          <CardDescription className="text-base">
+            {t('description')}
+          </CardDescription>
+        </CardHeader>
 
-        {/* Description */}
-        <p className="text-gray-600 mb-8">
-          Your 2-hour demo session has ended. Create a free account to continue
-          exploring Lekbanken with unlimited access and save your progress.
-        </p>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-3">
+        <CardContent className="space-y-4">
           {/* Primary CTA: Create Account */}
-          <Link
+          <Button
             href="/auth/signup?source=demo_expired"
-            className="
-              w-full
-              px-6 py-3
-              bg-blue-600 text-white
-              hover:bg-blue-700
-              font-medium text-base
-              rounded-md
-              transition-colors
-              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-            "
+            className="w-full gap-2"
+            size="lg"
           >
-            Create Free Account
-          </Link>
+            <UserPlusIcon className="h-5 w-5" />
+            {t('createAccount')}
+          </Button>
 
           {/* Secondary CTA: Start Another Demo */}
           <form action="/auth/demo" method="POST" className="w-full">
-            <button
+            <Button
               type="submit"
-              className="
-                w-full
-                px-6 py-3
-                bg-white text-gray-700
-                border border-gray-300
-                hover:bg-gray-50
-                font-medium text-base
-                rounded-md
-                transition-colors
-                focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
-              "
+              variant="outline"
+              className="w-full gap-2"
+              size="lg"
             >
-              Start Another Demo
-            </button>
+              <ArrowPathIcon className="h-5 w-5" />
+              {t('startAnother')}
+            </Button>
           </form>
-        </div>
 
-        {/* Footer */}
-        <p className="text-sm text-gray-500 mt-6">
-          Already have an account?{' '}
-          <Link
-            href="/auth/login"
-            className="text-blue-600 hover:text-blue-700 font-medium"
-          >
-            Log in
-          </Link>
-        </p>
+          {/* Premium Demo Option */}
+          <div className="pt-4 border-t border-border">
+            <p className="text-sm text-muted-foreground mb-3">
+              {t('premiumPrompt')}
+            </p>
+            <Button
+              href="/demo/upgrade"
+              variant="ghost"
+              size="sm"
+            >
+              {t('contactSales')}
+            </Button>
+          </div>
 
-        {/* Back to Home */}
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <Link
-            href="/"
-            className="text-sm text-gray-500 hover:text-gray-700"
-          >
-            ← Back to Home
-          </Link>
-        </div>
-      </div>
+          {/* Footer */}
+          <p className="text-sm text-muted-foreground pt-4">
+            {t('haveAccount')}{' '}
+            <Link
+              href="/auth/login"
+              className="text-primary hover:underline font-medium"
+            >
+              {t('login')}
+            </Link>
+          </p>
+
+          {/* Back to Home */}
+          <div className="pt-4">
+            <Link
+              href="/"
+              className="text-sm text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              ← {t('backToHome')}
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
-
-export const metadata = {
-  title: 'Demo Session Expired | Lekbanken',
-  description: 'Your demo session has expired. Create an account to continue.',
-};

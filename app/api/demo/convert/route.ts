@@ -6,7 +6,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 
 /**
@@ -39,7 +39,8 @@ export async function POST(request: Request) {
     }
 
     // Get demo session ID from cookie
-    const demoSessionId = cookies().get('demo_session_id')?.value;
+    const cookieStore = await cookies();
+    const demoSessionId = cookieStore.get('demo_session_id')?.value;
 
     if (!demoSessionId) {
       return NextResponse.json({
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
     // Mark session as converted using database function
     const { error } = await supabase.rpc('mark_demo_session_converted', {
@@ -70,10 +71,7 @@ export async function POST(request: Request) {
       await supabase
         .from('demo_sessions')
         .update({
-          metadata: supabase.rpc('jsonb_merge', {
-            target: 'metadata',
-            data: JSON.stringify({ conversion_metadata: metadata }),
-          }),
+          metadata: { conversion_metadata: metadata },
         })
         .eq('id', demoSessionId);
     }
@@ -81,7 +79,7 @@ export async function POST(request: Request) {
     console.log(`[POST /api/demo/convert] Demo session converted: ${demoSessionId} (${type})`);
 
     // Clear demo session cookie (user is converting to real account)
-    cookies().delete('demo_session_id');
+    cookieStore.delete('demo_session_id');
 
     return NextResponse.json({
       success: true,
@@ -109,7 +107,8 @@ export async function POST(request: Request) {
  */
 export async function GET() {
   try {
-    const demoSessionId = cookies().get('demo_session_id')?.value;
+    const cookieStore = await cookies();
+    const demoSessionId = cookieStore.get('demo_session_id')?.value;
 
     if (!demoSessionId) {
       return NextResponse.json({
@@ -117,13 +116,14 @@ export async function GET() {
       });
     }
 
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
-    const { data: demoSession } = await supabase
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data: demoSession } = await (supabase as any)
       .from('demo_sessions')
       .select('converted, conversion_type')
       .eq('id', demoSessionId)
-      .single();
+      .single() as { data: { converted: boolean; conversion_type: string | null } | null };
 
     if (!demoSession) {
       return NextResponse.json({

@@ -6,7 +6,8 @@
 
 import { NextResponse } from 'next/server';
 import { setupDemoUser } from '@/lib/auth/ephemeral-users';
-import { cookies } from 'next/headers';
+import { cookies, headers } from 'next/headers';
+import { checkDemoRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/rate-limit/demo-rate-limit';
 import type { DemoTier } from '@/lib/auth/ephemeral-users';
 
 /**
@@ -55,6 +56,33 @@ export async function POST(request: Request) {
         },
         { status: 503 }
       );
+    }
+
+    // Rate limiting - check before any expensive operations
+    const headersList = await headers();
+    const clientIP = getClientIP(headersList);
+    const rateLimitResult = await checkDemoRateLimit(clientIP);
+
+    if (!rateLimitResult.success) {
+      console.warn(`[POST /auth/demo] Rate limit exceeded for IP: ${clientIP}`);
+      
+      const response = NextResponse.json(
+        {
+          error: rateLimitResult.error || 'Too many demo requests. Please try again later.',
+          code: 'RATE_LIMIT_EXCEEDED',
+          retryAfter: rateLimitResult.reset,
+        },
+        { status: 429 }
+      );
+
+      // Add rate limit headers
+      const rateLimitHeaders = getRateLimitHeaders(rateLimitResult);
+      for (const [key, value] of Object.entries(rateLimitHeaders)) {
+        response.headers.set(key, value);
+      }
+      response.headers.set('Retry-After', (rateLimitResult.reset - Math.floor(Date.now() / 1000)).toString());
+
+      return response;
     }
 
     // Parse query params
@@ -111,10 +139,13 @@ export async function POST(request: Request) {
     }
 
     // Step 4: Set demo session cookie (for client-side tracking)
-    if (demoSession) {
-      const expiresAt = new Date(demoSession.expires_at);
+    // demoSession has { id: string, expires_at: string } from createDemoSession
+    const typedDemoSession = demoSession as { id: string; expires_at: string } | null;
+    if (typedDemoSession) {
+      const expiresAt = new Date(typedDemoSession.expires_at);
+      const cookieStore = await cookies();
 
-      cookies().set('demo_session_id', demoSession.id, {
+      cookieStore.set('demo_session_id', typedDemoSession.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'lax',
@@ -124,7 +155,7 @@ export async function POST(request: Request) {
         // domain: process.env.NODE_ENV === 'production' ? '.lekbanken.no' : undefined,
       });
 
-      console.log(`[POST /auth/demo] Demo session created: ${demoSession.id}`);
+      console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}`);
     }
 
     // Step 5: Redirect to demo app
@@ -164,7 +195,8 @@ export async function POST(request: Request) {
  */
 export async function DELETE() {
   try {
-    const demoSessionId = cookies().get('demo_session_id')?.value;
+    const cookieStore = await cookies();
+    const demoSessionId = cookieStore.get('demo_session_id')?.value;
 
     if (!demoSessionId) {
       return NextResponse.json({
@@ -175,7 +207,7 @@ export async function DELETE() {
 
     // Note: Actual session end is handled by demo-detection utilities
     // This just clears the cookie
-    cookies().delete('demo_session_id');
+    cookieStore.delete('demo_session_id');
 
     console.log(`[DELETE /auth/demo] Demo session ended: ${demoSessionId}`);
 

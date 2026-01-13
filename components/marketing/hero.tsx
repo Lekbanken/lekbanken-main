@@ -36,10 +36,10 @@ export function Hero() {
             <Button 
               size="lg" 
               variant="outline" 
-              href="#cta"
+              href="/demo"
               className="transition-all duration-200 hover:scale-[1.02] hover:border-primary/50"
             >
-              Boka demo
+              Testa demo
             </Button>
           </div>
           <dl className="mt-10 grid max-w-xl grid-cols-3 gap-4 text-sm text-muted-foreground">

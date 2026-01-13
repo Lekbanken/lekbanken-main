@@ -36,5 +36,5 @@
     "**/*.mts",
     "tests/**/*.ts"
   ],
-  "exclude": ["node_modules", "catalyst-ui-kit", "tests/e2e/**"]
+  "exclude": ["node_modules", "catalyst-ui-kit", "tests/e2e/**", "supabase/functions/**"]
 }

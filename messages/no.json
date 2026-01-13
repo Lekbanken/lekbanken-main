@@ -991,6 +991,58 @@
         "achievementsAdminDesc": "Badge-bygger og belønninger."
       }
     },
+    "demo": {
+      "metadata": {
+        "title": "Demo-overvåkning",
+        "description": "Overvåk demoøkter og konverteringer"
+      },
+      "title": "Demo-overvåkning",
+      "description": "Overvåk demoøkter, konverteringsrate og brukeraktivitet.",
+      "stats": {
+        "activeSessions": "Aktive økter",
+        "activeSessionsDesc": "Demobrukere siste timen",
+        "sessions24h": "Økter (24t)",
+        "sessions24hDesc": "Totale demoøkter siste døgn",
+        "conversionRate": "Konverteringsrate",
+        "conversionRateDesc": "Demo til betalende kunde",
+        "avgDuration": "Snitttid",
+        "avgDurationDesc": "Gjennomsnittlig øktlengde"
+      },
+      "chart": {
+        "title": "Økter og konverteringer (7 dager)",
+        "loading": "Laster diagramdata...",
+        "noData": "Ingen data tilgjengelig",
+        "sessions": "Økter",
+        "conversions": "Konverteringer",
+        "summary": "Totalt: {totalSessions} økter, {totalConversions} konverteringer"
+      },
+      "table": {
+        "loading": "Laster økter...",
+        "noSessions": "Ingen demoøkter funnet.",
+        "user": "Bruker",
+        "created": "Opprettet",
+        "status": "Status",
+        "sessionId": "Økt-ID",
+        "anonymousUser": "Anonym demo-bruker",
+        "status": {
+          "active": "Aktiv",
+          "expired": "Utløpt",
+          "old": "Gammel"
+        }
+      },
+      "quickActions": {
+        "title": "Hurtighandlinger",
+        "testDemo": "Test demo",
+        "testDemoDesc": "Åpne demo-landingsside",
+        "testUpgrade": "Test oppgradering",
+        "testUpgradeDesc": "Åpne oppgraderingsside",
+        "salesGuide": "Salgsguide",
+        "salesGuideDesc": "Åpne dokumentasjon for salgsteamet"
+      },
+      "recentSessions": {
+        "title": "Siste demoøkter"
+      }
+    },
     "webhooks": {
       "pageTitle": "Webhooks",
       "pageDescription": "Administrer webhook-endepunkter og logger.",
@@ -4997,6 +5049,120 @@
       "goToMarketing": "Gå til markedssiden"
     }
   },
+  "demo": {
+    "landing": {
+      "badge": "Ingen registrering kreves",
+      "title": "Prøv Lekbanken – uten å lage konto",
+      "description": "Utforsk plattformen uten å opprette en konto. Din demo-økt varer i 2 timer og all data slettes automatisk.",
+      "startDemo": "Start gratis demo",
+      "startingDemo": "Starter demo...",
+      "learnMore": "Les mer om Lekbanken",
+      "compareTiers": "Sammenlign demo-nivåer"
+    },
+    "tiers": {
+      "free": {
+        "title": "Gratis demo",
+        "description": "Perfekt for å utforske plattformen",
+        "button": "Start gratis demo"
+      },
+      "premium": {
+        "title": "Premium demo",
+        "description": "Full tilgang med personlig guide",
+        "button": "Kontakt salg"
+      }
+    },
+    "privacy": {
+      "title": "Din personvern er viktig",
+      "description": "Demo-økter bruker en øktcookie som varer i 2 timer. Ingen personlig data samles inn. All demo-data slettes automatisk etter økten."
+    },
+    "upgrade": {
+      "success": {
+        "title": "Takk for din henvendelse!",
+        "description": "Vi har mottatt din forespørsel om premium-demo. En av våre produkteksperter vil kontakte deg innen 24 timer.",
+        "backToDemo": "Prøv gratis demo mens du venter"
+      },
+      "hero": {
+        "title": "Få full tilgang med",
+        "titleHighlight": "Premium Demo",
+        "description": "Bestill en personlig demo med en av våre produkteksperter. Vi tilpasser gjennomgangen etter deres spesifikke behov og utfordringer."
+      },
+      "features": {
+        "title": "Hva er inkludert i premium-demo?",
+        "personal": "Personlig gjennomgang",
+        "personalDescription": "En produktekspert guider deg gjennom plattformen",
+        "teamFeatures": "Team-funksjoner låst opp",
+        "teamDescription": "Perfekt for team, lærere og organisasjoner",
+        "customSetup": "Tilpasset oppsett",
+        "customDescription": "Skreddersydde løsninger for store organisasjoner"
+      },
+      "form": {
+        "title": "Bestill premium-demo",
+        "description": "Fyll ut skjemaet så kontakter vi deg innen 24 timer.",
+        "name": "Navn",
+        "namePlaceholder": "Ditt navn",
+        "email": "E-post",
+        "emailPlaceholder": "din@email.no",
+        "organization": "Organisasjon",
+        "organizationPlaceholder": "Bedrift/skole",
+        "size": "Organisasjonsstørrelse",
+        "sizePlaceholder": "Velg størrelse",
+        "sizeOptions": {
+          "small": "1-10 personer",
+          "medium": "11-50 personer",
+          "large": "51-200 personer",
+          "enterprise": "200+ personer"
+        },
+        "message": "Beskriv deres behov",
+        "messagePlaceholder": "Fortell gjerne om deres behov og utfordringer...",
+        "submit": "Send forespørsel",
+        "submitting": "Sender...",
+        "consent": "Ved å sende godtar du vår",
+        "privacyPolicy": "personvernerklæring"
+      }
+    },
+    "expired": {
+      "title": "Din demo-økt har utløpt",
+      "description": "Din 2-timers demo-økt er avsluttet. Opprett en gratis konto for å fortsette å utforske Lekbanken og lagre fremgangen din.",
+      "createAccount": "Opprett gratis konto",
+      "startAnother": "Start ny demo",
+      "premiumPrompt": "Ønsker du mer tid og flere funksjoner?",
+      "contactSales": "Kontakt oss for premium-demo",
+      "haveAccount": "Har du allerede en konto?",
+      "login": "Logg inn",
+      "backToHome": "Tilbake til forsiden"
+    },
+    "error": {
+      "restartDemo": "Start demo på nytt",
+      "backToHome": "Tilbake til forsiden",
+      "technicalDetails": "Tekniske detaljer",
+      "persistentProblem": "Vedvarer problemet?",
+      "contactSupport": "Kontakt support",
+      "retry": "Prøv igjen",
+      "startNewDemo": "Start ny demo",
+      "types": {
+        "rateLimit": {
+          "title": "For mange forespørsler",
+          "description": "Du har sendt for mange demo-forespørsler. Vent litt og prøv igjen."
+        },
+        "session": {
+          "title": "Øktproblem",
+          "description": "Demo-økten din kunne ikke startes eller har utløpt. Start en ny demo."
+        },
+        "network": {
+          "title": "Nettverksfeil",
+          "description": "Kunne ikke koble til serveren. Sjekk internettforbindelsen din."
+        },
+        "server": {
+          "title": "Serverfeil",
+          "description": "Noe gikk galt på vår side. Teamet vårt er informert."
+        },
+        "generic": {
+          "title": "Noe gikk galt",
+          "description": "En uventet feil oppstod. Prøv igjen eller start demoen på nytt."
+        }
+      }
+    }
+  },
   "legal": {
     "common": {
       "backToHome": "← Tilbake til forsiden",
@@ -5127,6 +5293,32 @@
           "functional": "Funksjonelle informasjonskapsler: Språkvalg, preferanser",
           "analytics": "Analytiske informasjonskapsler: Bruksstatistikk (anonymisert)",
           "manage": "Du kan administrere informasjonskapsler i nettleserinnstillingene. Merk at noen funksjoner kanskje ikke fungerer riktig hvis du blokkerer informasjonskapsler."
+        },
+        "demoSessions": {
+          "title": "9. Demo-økter",
+          "intro": "Lekbanken tilbyr demo-økter som lar deg prøve plattformen uten å opprette en konto.",
+          "dataCollected": {
+            "title": "9.1 Data som samles inn under demo",
+            "content": "Under en demo-økt samler vi inn:",
+            "sessionCookie": "Øktkapsel: En midlertidig kapsel som identifiserer din demo-økt (varer 2 timer)",
+            "ipAddress": "IP-adresse: For hastighetsbegrensning og svindelforebygging (lagres ikke permanent)",
+            "usageData": "Bruksdata: Anonymisert statistikk om funksjoner du bruker"
+          },
+          "dataRetention": {
+            "title": "9.2 Lagring av demo-data",
+            "content": "All data opprettet under en demo-økt slettes automatisk:",
+            "sessionData": "Øktdata: Slettes etter 24 timer",
+            "userCreated": "Brukerskapte data: Slettes ved nattlig rensing",
+            "noPersonal": "Vi samler ikke inn personopplysninger (navn, e-post) under demo-økter med mindre du frivillig oppgir dem for å be om premium-demo."
+          },
+          "legalBasis": {
+            "title": "9.3 Rettslig grunnlag",
+            "content": "Demo-økter er basert på berettiget interesse for å la potensielle kunder evaluere produktet vårt før kjøp."
+          },
+          "conversionData": {
+            "title": "9.4 Konverteringsdata",
+            "content": "Hvis du ber om en premium-demo via skjemaet, samler vi inn opplysningene du oppgir (navn, e-post, organisasjon) basert på samtykke for å kontakte deg."
+          }
         },
         "children": {
           "title": "9. Barn",

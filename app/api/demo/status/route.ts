@@ -6,8 +6,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { getDemoSession, getDemoTier } from '@/lib/utils/demo-detection';
-import { createClient } from '@/lib/supabase/server';
+import { getDemoSession } from '@/lib/utils/demo-detection';
+import { createServerRlsClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/demo/status
@@ -25,7 +25,7 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function GET() {
   try {
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
     // Get current user
     const {
@@ -54,10 +54,10 @@ export async function GET() {
       .eq('id', demoSession.tenantId)
       .single();
 
-    // Get user profile
+    // Get user profile - use 'users' view which includes profile data
     const { data: profile } = await supabase
-      .from('profiles')
-      .select('display_name, email')
+      .from('users')
+      .select('full_name, email')
       .eq('id', user.id)
       .single();
 
@@ -67,7 +67,7 @@ export async function GET() {
       expiresAt: demoSession.expiresAt,
       timeRemaining: demoSession.timeRemaining,
       tenantName: tenant?.name || 'Lekbanken Demo',
-      userName: profile?.display_name || profile?.email || 'Demo User',
+      userName: profile?.full_name || profile?.email || 'Demo User',
       sessionId: demoSession.id,
     });
   } catch (error) {

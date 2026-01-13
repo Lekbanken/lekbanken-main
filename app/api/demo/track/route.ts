@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 import { cookies } from 'next/headers';
 
 /**
@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     }
 
     // Get demo session ID from cookie
-    const demoSessionId = cookies().get('demo_session_id')?.value;
+    const cookieStore = await cookies();
+    const demoSessionId = cookieStore.get('demo_session_id')?.value;
 
     if (!demoSessionId) {
       // Not in demo mode - nothing to track
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
       });
     }
 
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
     // Use the database function to add feature usage
     const { error } = await supabase.rpc('add_demo_feature_usage', {
@@ -69,11 +70,8 @@ export async function POST(request: Request) {
       await supabase
         .from('demo_sessions')
         .update({
-          metadata: supabase.rpc('jsonb_set', {
-            target: 'metadata',
-            path: `{${feature}}`,
-            value: JSON.stringify(metadata),
-          }),
+          metadata: { [feature]: metadata },
+          updated_at: new Date().toISOString(),
         })
         .eq('id', demoSessionId);
     }

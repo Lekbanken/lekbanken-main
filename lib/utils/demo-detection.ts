@@ -4,7 +4,7 @@
  * Usage: Import and call from Server Components or API routes
  */
 
-import { createClient } from '@/lib/supabase/server';
+import { createServerRlsClient } from '@/lib/supabase/server';
 import { cookies, headers } from 'next/headers';
 import type { DemoTier } from '@/lib/auth/ephemeral-users';
 
@@ -31,7 +31,7 @@ export interface DemoSessionInfo {
  */
 export async function isDemoMode(): Promise<boolean> {
   try {
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
     // Get current user
     const {
@@ -45,7 +45,7 @@ export async function isDemoMode(): Promise<boolean> {
 
     // Check if user has demo flags
     const { data: profile } = await supabase
-      .from('profiles')
+      .from('users')
       .select('is_demo_user, is_ephemeral')
       .eq('id', user.id)
       .single();
@@ -86,9 +86,10 @@ export async function isDemoMode(): Promise<boolean> {
  *
  * @returns true if request is from demo.lekbanken.no
  */
-export function isDemoSubdomain(): boolean {
+export async function isDemoSubdomain(): Promise<boolean> {
   try {
-    const host = headers().get('host') || '';
+    const headerStore = await headers();
+    const host = headerStore.get('host') || '';
     return host.startsWith('demo.');
   } catch (error) {
     console.error('[isDemoSubdomain] Error:', error);
@@ -103,7 +104,7 @@ export function isDemoSubdomain(): boolean {
  */
 export async function getDemoSession(): Promise<DemoSessionInfo | null> {
   try {
-    const supabase = createClient();
+    const supabase = await createServerRlsClient();
 
     // Get current user
     const {
@@ -146,7 +147,7 @@ export async function getDemoSession(): Promise<DemoSessionInfo | null> {
       startedAt: demoSession.started_at,
       expiresAt: demoSession.expires_at,
       endedAt: demoSession.ended_at,
-      converted: demoSession.converted,
+      converted: demoSession.converted ?? false,
       timeRemaining,
     };
   } catch (error) {
@@ -202,9 +203,10 @@ export async function isDemoFeatureAvailable(feature: string): Promise<boolean> 
  * Get demo session cookie (if exists)
  * Note: Used for client-side session tracking
  */
-export function getDemoSessionCookie(): string | undefined {
+export async function getDemoSessionCookie(): Promise<string | undefined> {
   try {
-    return cookies().get('demo_session_id')?.value;
+    const cookieStore = await cookies();
+    return cookieStore.get('demo_session_id')?.value;
   } catch (error) {
     console.error('[getDemoSessionCookie] Error:', error);
     return undefined;

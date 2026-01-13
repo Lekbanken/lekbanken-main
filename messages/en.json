@@ -991,6 +991,58 @@
         "achievementsAdminDesc": "Badge builder and rewards."
       }
     },
+    "demo": {
+      "metadata": {
+        "title": "Demo Monitoring",
+        "description": "Monitor demo sessions and conversions"
+      },
+      "title": "Demo Monitoring",
+      "description": "Monitor demo sessions, conversion rate, and user activity.",
+      "stats": {
+        "activeSessions": "Active Sessions",
+        "activeSessionsDesc": "Demo users in the last hour",
+        "sessions24h": "Sessions (24h)",
+        "sessions24hDesc": "Total demo sessions in last 24 hours",
+        "conversionRate": "Conversion Rate",
+        "conversionRateDesc": "Demo to paying customer",
+        "avgDuration": "Avg Duration",
+        "avgDurationDesc": "Average session length"
+      },
+      "chart": {
+        "title": "Sessions and Conversions (7 days)",
+        "loading": "Loading chart data...",
+        "noData": "No data available",
+        "sessions": "Sessions",
+        "conversions": "Conversions",
+        "summary": "Total: {totalSessions} sessions, {totalConversions} conversions"
+      },
+      "table": {
+        "loading": "Loading sessions...",
+        "noSessions": "No demo sessions found.",
+        "user": "User",
+        "created": "Created",
+        "status": "Status",
+        "sessionId": "Session ID",
+        "anonymousUser": "Anonymous demo user",
+        "status": {
+          "active": "Active",
+          "expired": "Expired",
+          "old": "Old"
+        }
+      },
+      "quickActions": {
+        "title": "Quick Actions",
+        "testDemo": "Test Demo",
+        "testDemoDesc": "Open demo landing page",
+        "testUpgrade": "Test Upgrade",
+        "testUpgradeDesc": "Open upgrade page",
+        "salesGuide": "Sales Guide",
+        "salesGuideDesc": "Open sales team documentation"
+      },
+      "recentSessions": {
+        "title": "Recent Demo Sessions"
+      }
+    },
     "webhooks": {
       "pageTitle": "Webhooks",
       "pageDescription": "Manage webhook endpoints and logs.",
@@ -5001,6 +5053,120 @@
       "goToMarketing": "Go to marketing site"
     }
   },
+  "demo": {
+    "landing": {
+      "badge": "No registration required",
+      "title": "Try Lekbanken – without creating an account",
+      "description": "Explore the platform without creating an account. Your demo session lasts 2 hours and all data is automatically deleted.",
+      "startDemo": "Start free demo",
+      "startingDemo": "Starting demo...",
+      "learnMore": "Learn more about Lekbanken",
+      "compareTiers": "Compare demo tiers"
+    },
+    "tiers": {
+      "free": {
+        "title": "Free demo",
+        "description": "Perfect for exploring the platform",
+        "button": "Start free demo"
+      },
+      "premium": {
+        "title": "Premium demo",
+        "description": "Full access with personal guide",
+        "button": "Contact sales"
+      }
+    },
+    "privacy": {
+      "title": "Your privacy matters",
+      "description": "Demo sessions use a session cookie that lasts 2 hours. No personal data is collected. All demo data is automatically deleted after your session."
+    },
+    "upgrade": {
+      "success": {
+        "title": "Thank you for your request!",
+        "description": "We have received your premium demo request. One of our product experts will contact you within 24 hours.",
+        "backToDemo": "Try the free demo while you wait"
+      },
+      "hero": {
+        "title": "Get full access with",
+        "titleHighlight": "Premium Demo",
+        "description": "Book a personal demo with one of our product experts. We customize the walkthrough to your specific needs and challenges."
+      },
+      "features": {
+        "title": "What's included in premium demo?",
+        "personal": "Personal walkthrough",
+        "personalDescription": "A product expert guides you through the platform",
+        "teamFeatures": "Team features unlocked",
+        "teamDescription": "Perfect for teams, teachers, and organizations",
+        "customSetup": "Custom setup",
+        "customDescription": "Tailored solutions for large organizations"
+      },
+      "form": {
+        "title": "Book premium demo",
+        "description": "Fill out the form and we'll contact you within 24 hours.",
+        "name": "Name",
+        "namePlaceholder": "Your name",
+        "email": "Email",
+        "emailPlaceholder": "your@email.com",
+        "organization": "Organization",
+        "organizationPlaceholder": "Company/school",
+        "size": "Organization size",
+        "sizePlaceholder": "Select size",
+        "sizeOptions": {
+          "small": "1-10 people",
+          "medium": "11-50 people",
+          "large": "51-200 people",
+          "enterprise": "200+ people"
+        },
+        "message": "Describe your needs",
+        "messagePlaceholder": "Tell us about your needs and challenges...",
+        "submit": "Send request",
+        "submitting": "Sending...",
+        "consent": "By submitting you agree to our",
+        "privacyPolicy": "privacy policy"
+      }
+    },
+    "expired": {
+      "title": "Your demo session has expired",
+      "description": "Your 2-hour demo session has ended. Create a free account to continue exploring Lekbanken and save your progress.",
+      "createAccount": "Create free account",
+      "startAnother": "Start another demo",
+      "premiumPrompt": "Want more time and features?",
+      "contactSales": "Contact us for premium demo",
+      "haveAccount": "Already have an account?",
+      "login": "Log in",
+      "backToHome": "Back to home"
+    },
+    "error": {
+      "restartDemo": "Restart demo",
+      "backToHome": "Back to home",
+      "technicalDetails": "Technical details",
+      "persistentProblem": "Problem persists?",
+      "contactSupport": "Contact support",
+      "retry": "Try again",
+      "startNewDemo": "Start new demo",
+      "types": {
+        "rateLimit": {
+          "title": "Too many requests",
+          "description": "You have made too many demo requests. Please wait a moment and try again."
+        },
+        "session": {
+          "title": "Session problem",
+          "description": "Your demo session could not be started or has expired. Start a new demo."
+        },
+        "network": {
+          "title": "Network error",
+          "description": "Could not connect to the server. Check your internet connection."
+        },
+        "server": {
+          "title": "Server error",
+          "description": "Something went wrong on our end. Our team has been notified."
+        },
+        "generic": {
+          "title": "Something went wrong",
+          "description": "An unexpected error occurred. Try again or restart the demo."
+        }
+      }
+    }
+  },
   "legal": {
     "common": {
       "backToHome": "← Back to homepage",
@@ -5131,6 +5297,32 @@
           "functional": "Functional Cookies: Language selection, preferences",
           "analytics": "Analytical Cookies: Usage statistics (anonymized)",
           "manage": "You can manage cookies in your browser settings. Note that some features may not work properly if you block cookies."
+        },
+        "demoSessions": {
+          "title": "9. Demo Sessions",
+          "intro": "Lekbanken offers demo sessions that let you try the platform without creating an account.",
+          "dataCollected": {
+            "title": "9.1 Data collected during demo",
+            "content": "During a demo session, we collect:",
+            "sessionCookie": "Session cookie: A temporary cookie that identifies your demo session (lasts 2 hours)",
+            "ipAddress": "IP address: For rate limiting and fraud prevention (not stored permanently)",
+            "usageData": "Usage data: Anonymized statistics about features you use"
+          },
+          "dataRetention": {
+            "title": "9.2 Demo data retention",
+            "content": "All data created during a demo session is automatically deleted:",
+            "sessionData": "Session data: Deleted after 24 hours",
+            "userCreated": "User-created data: Deleted during nightly cleanup",
+            "noPersonal": "We do not collect personal data (name, email) during demo sessions unless you voluntarily provide them to request a premium demo."
+          },
+          "legalBasis": {
+            "title": "9.3 Legal basis",
+            "content": "Demo sessions are based on legitimate interest to allow potential customers to evaluate our product before purchase."
+          },
+          "conversionData": {
+            "title": "9.4 Conversion data",
+            "content": "If you request a premium demo via the form, we collect the information you provide (name, email, organization) based on consent to contact you."
+          }
         },
         "children": {
           "title": "9. Children",

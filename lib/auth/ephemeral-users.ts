@@ -4,7 +4,7 @@
  * Security: Users auto-deleted after 24h by cleanup function
  */
 
-import { createClient } from '@/lib/supabase/server';
+import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server';
 import { randomBytes } from 'crypto';
 
 /**
@@ -43,15 +43,15 @@ export function generateDemoEmail(): string {
  * @returns Object with user, password, and error
  */
 export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
-  const supabase = createClient();
+  const supabase = await createServerRlsClient();
 
   try {
     // Generate credentials
     const email = generateDemoEmail();
     const password = generateSecurePassword();
 
-    // Create auth user via admin API
-    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    // Create auth user via admin API (requires service role)
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Auto-confirm
@@ -73,10 +73,10 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
       };
     }
 
-    // Update profile with demo flags
-    // Note: Profile might be auto-created by trigger, we ensure it has correct flags
+    // Update user profile with demo flags
+    // Note: User might be auto-created by trigger, we ensure it has correct flags
     const { error: profileError } = await supabase
-      .from('profiles')
+      .from('users')
       .upsert(
         {
           id: authData.user.id,
@@ -99,10 +99,10 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
     }
 
     // Create membership in demo tenant
-    const { error: membershipError } = await supabase.from('memberships').insert({
+    const { error: membershipError } = await supabase.from('user_tenant_memberships').insert({
       user_id: authData.user.id,
       tenant_id: DEMO_TENANT_ID,
-      role: tier === 'premium' ? 'demo_org_admin' : 'demo_org_user',
+      role: tier === 'premium' ? 'admin' : 'member',
       created_at: new Date().toISOString(),
     });
 
@@ -136,7 +136,7 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
  * @returns Session data or error
  */
 export async function signInAsEphemeralUser(email: string, password: string) {
-  const supabase = createClient();
+  const supabase = await createServerRlsClient();
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -175,7 +175,7 @@ export async function signInAsEphemeralUser(email: string, password: string) {
  * @returns Demo session or error
  */
 export async function createDemoSession(userId: string, tier: DemoTier = 'free') {
-  const supabase = createClient();
+  const supabase = await createServerRlsClient();
 
   try {
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
@@ -267,7 +267,7 @@ export async function setupDemoUser(tier: DemoTier = 'free') {
  * Fallback to 'free' if not found
  */
 export async function getDemoTier(): Promise<DemoTier> {
-  const supabase = createClient();
+  const supabase = await createServerRlsClient();
 
   try {
     const {

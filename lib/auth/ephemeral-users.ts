@@ -9,8 +9,10 @@ import { randomBytes } from 'crypto';
 
 /**
  * Demo tenant ID (from seed: 01_demo_tenant.sql)
+ * Note: 00000000-0000-0000-0000-000000000001 is reserved for Lekbanken main tenant
+ * Demo uses: de01 suffix (demo 01)
  */
-export const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001';
+export const DEMO_TENANT_ID = '00000000-0000-0000-0000-00000000de01';
 
 /**
  * Demo tier types (from Decision 1: Hybrid model)

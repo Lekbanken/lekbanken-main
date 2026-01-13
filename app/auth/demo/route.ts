@@ -151,8 +151,8 @@ export async function POST(request: Request) {
         sameSite: 'lax',
         expires: expiresAt,
         path: '/',
-        // For subdomain support (future):
-        // domain: process.env.NODE_ENV === 'production' ? '.lekbanken.no' : undefined,
+        // Enable cross-subdomain cookie for demo.lekbanken.no support
+        domain: process.env.NODE_ENV === 'production' ? '.lekbanken.no' : undefined,
       });
 
       console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}`);

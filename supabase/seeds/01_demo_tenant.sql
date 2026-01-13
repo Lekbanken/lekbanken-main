@@ -5,6 +5,9 @@
 -- Date: 2026-01-14
 -- ============================================================================
 
+-- NOTE: 00000000-0000-0000-0000-000000000001 is reserved for Lekbanken main tenant
+-- Demo tenant uses: 00000000-0000-0000-0000-00000000de01 (de01 = demo 01)
+
 BEGIN;
 
 \echo 'Creating demo tenant...'
@@ -21,53 +24,20 @@ INSERT INTO tenants (
   type,
   status,
   demo_flag,
-  settings,
-  branding,
+  primary_color,
+  description,
   created_at,
   updated_at
 )
 VALUES (
-  '00000000-0000-0000-0000-000000000001'::uuid, -- Fixed UUID for demo tenant
+  '00000000-0000-0000-0000-00000000de01'::uuid, -- Fixed UUID for demo tenant (de01 = demo)
   'Lekbanken Demo',
   'demo',
   'demo',
-  'demo',
+  'active',
   true,
-  jsonb_build_object(
-    'is_demo', true,
-    'demo_tier', 'free', -- Default tier
-    'content_access', 'curated', -- Only see is_demo_content = true
-    'max_users', 50, -- Max concurrent demo users
-    'session_timeout_hours', 2, -- Auto-expire after 2h
-    'features_enabled', ARRAY[
-      'browse_activities',
-      'view_activity_details',
-      'create_sessions',
-      'join_sessions',
-      'view_gamification',
-      'earn_xp'
-    ],
-    'features_disabled', ARRAY[
-      'export_data',
-      'invite_users',
-      'modify_tenant_settings',
-      'access_billing',
-      'create_public_sessions',
-      'advanced_analytics',
-      'custom_branding'
-    ],
-    'restrictions', jsonb_build_object(
-      'max_sessions_per_user', 10,
-      'max_participants_per_session', 20,
-      'can_delete_sessions', true,
-      'can_modify_global_content', false
-    )
-  ),
-  jsonb_build_object(
-    'primary_color', '#3B82F6', -- Blue
-    'logo_url', null,
-    'custom_domain', null
-  ),
+  '#3B82F6',  -- Blue primary color
+  'Public demo tenant for trying out Lekbanken',
   now(),
   now()
 )
@@ -75,8 +45,8 @@ ON CONFLICT (id) DO UPDATE SET
   name = EXCLUDED.name,
   demo_flag = EXCLUDED.demo_flag,
   type = EXCLUDED.type,
-  status = EXCLUDED.status,
-  settings = EXCLUDED.settings,
+  status = 'active',
+  description = EXCLUDED.description,
   updated_at = now();
 
 -- Verify tenant was created
@@ -86,64 +56,43 @@ DECLARE
 BEGIN
   SELECT EXISTS (
     SELECT 1 FROM tenants
-    WHERE id = '00000000-0000-0000-0000-000000000001'::uuid
+    WHERE id = '00000000-0000-0000-0000-00000000de01'::uuid
   ) INTO tenant_exists;
 
   IF tenant_exists THEN
-    RAISE NOTICE '✓ Demo tenant created/updated: 00000000-0000-0000-0000-000000000001';
+    RAISE NOTICE '✓ Demo tenant created/updated: 00000000-0000-0000-0000-00000000de01';
   ELSE
     RAISE EXCEPTION '✗ Failed to create demo tenant';
   END IF;
 END $$;
 
 -- ============================================================================
--- Create Demo Facilitator Profile (Optional)
--- Used for creating demo session templates
+-- Register demo.lekbanken.no in tenant_domains
 -- ============================================================================
 
--- Note: This creates a profile only. Auth user should be created via Supabase Auth API
-INSERT INTO profiles (
-  id,
-  email,
-  display_name,
-  is_demo_user,
-  is_ephemeral,
-  global_role,
+INSERT INTO tenant_domains (
+  tenant_id,
+  hostname,
+  status,
+  kind,
   created_at,
   updated_at
 )
 VALUES (
-  '00000000-0000-0000-0000-000000000099'::uuid,
-  'demo-facilitator@demo.lekbanken.internal',
-  'Demo Facilitator',
-  true,
-  false, -- Not ephemeral - permanent demo account
-  'demo_private_user',
+  '00000000-0000-0000-0000-00000000de01'::uuid,
+  'demo.lekbanken.no',
+  'active',
+  'subdomain',
   now(),
   now()
 )
-ON CONFLICT (id) DO UPDATE SET
-  is_demo_user = true,
-  display_name = EXCLUDED.display_name,
+ON CONFLICT (hostname) DO UPDATE SET
+  tenant_id = EXCLUDED.tenant_id,
+  status = 'active',
+  kind = 'subdomain',
   updated_at = now();
 
--- Create membership for demo facilitator
-INSERT INTO memberships (
-  user_id,
-  tenant_id,
-  role,
-  created_at
-)
-VALUES (
-  '00000000-0000-0000-0000-000000000099'::uuid,
-  '00000000-0000-0000-0000-000000000001'::uuid,
-  'demo_org_admin',
-  now()
-)
-ON CONFLICT (user_id, tenant_id) DO UPDATE SET
-  role = EXCLUDED.role;
-
-\echo '✓ Demo facilitator profile created'
+\echo '✓ Demo domain registered: demo.lekbanken.no'
 
 -- ============================================================================
 -- Verification
@@ -152,8 +101,7 @@ ON CONFLICT (user_id, tenant_id) DO UPDATE SET
 DO $$
 DECLARE
   demo_tenant_id UUID;
-  demo_facilitator_id UUID;
-  membership_exists BOOLEAN;
+  domain_exists BOOLEAN;
 BEGIN
   -- Check tenant
   SELECT id INTO demo_tenant_id
@@ -161,25 +109,18 @@ BEGIN
   WHERE demo_flag = true AND slug = 'demo'
   LIMIT 1;
 
-  -- Check facilitator
-  SELECT id INTO demo_facilitator_id
-  FROM profiles
-  WHERE email = 'demo-facilitator@demo.lekbanken.internal'
-  LIMIT 1;
-
-  -- Check membership
+  -- Check domain
   SELECT EXISTS (
-    SELECT 1 FROM memberships
-    WHERE user_id = demo_facilitator_id
-      AND tenant_id = demo_tenant_id
-  ) INTO membership_exists;
+    SELECT 1 FROM tenant_domains
+    WHERE hostname = 'demo.lekbanken.no'
+      AND status = 'active'
+  ) INTO domain_exists;
 
   RAISE NOTICE '========================================';
   RAISE NOTICE 'Demo Tenant Seed Complete';
   RAISE NOTICE '========================================';
   RAISE NOTICE 'Demo Tenant ID: %', demo_tenant_id;
-  RAISE NOTICE 'Demo Facilitator ID: %', demo_facilitator_id;
-  RAISE NOTICE 'Membership created: %', membership_exists;
+  RAISE NOTICE 'Domain registered: %', domain_exists;
   RAISE NOTICE '========================================';
 END $$;
 
@@ -190,14 +131,13 @@ COMMIT;
 -- ============================================================================
 
 -- This seed creates:
--- 1. Demo tenant (00000000-0000-0000-0000-000000000001)
--- 2. Demo facilitator profile (for creating session templates)
--- 3. Membership linking facilitator to demo tenant
+-- 1. Demo tenant (00000000-0000-0000-0000-00000000de01)
+-- 2. Subdomain entry for demo.lekbanken.no
 
 -- Next steps:
--- 1. Create demo auth users via Supabase Auth API (see scripts/create-demo-auth-users.ts)
--- 2. Seed demo content (02_demo_content.sql)
--- 3. Create demo session templates (03_demo_sessions.sql)
+-- 1. Demo users are created on-demand via /auth/demo endpoint
+-- 2. Auto-cleaned after 24h by cleanup function
+-- 3. No need to seed users in advance
 
 -- For ephemeral users:
 -- - Created on-demand via /auth/demo endpoint

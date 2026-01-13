@@ -11,6 +11,8 @@ const guestOnlyPaths = new Set(['/auth/login', '/auth/signup'])
 // Platform domain suffix for subdomain routing
 const PLATFORM_DOMAIN = '.lekbanken.no'
 const PLATFORM_PRIMARY_HOST = 'app.lekbanken.no'
+const DEMO_SUBDOMAIN = 'demo.lekbanken.no'
+const DEMO_TENANT_ID = '00000000-0000-0000-0000-00000000de01'
 
 function generateRequestId(): string {
   return `req_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
@@ -221,14 +223,22 @@ export default async function proxy(request: NextRequest) {
   const hostname = extractHostname(request)
   let hostTenantId: string | null = null
   let isHostTrusted = false
+  let isDemoMode = false
   
   if (hostname) {
     // Check if hostname is built-in trusted (localhost, lekbanken.no, *.lekbanken.no)
     if (isBuiltInTrustedHost(hostname)) {
       isHostTrusted = true
+      
+      // Special case: demo.lekbanken.no - use fixed demo tenant ID
+      if (hostname === DEMO_SUBDOMAIN) {
+        isDemoMode = true
+        hostTenantId = DEMO_TENANT_ID
+        response.headers.set('x-demo-mode', 'true')
+      }
       // For platform subdomains (not app.lekbanken.no or lekbanken.no), resolve tenant via RPC
       // Only do RPC lookup for protected paths to avoid unnecessary DB calls
-      if (isProtected && isPlatformSubdomain(hostname) && hostname !== PLATFORM_PRIMARY_HOST && hostname !== 'lekbanken.no') {
+      else if (isProtected && isPlatformSubdomain(hostname) && hostname !== PLATFORM_PRIMARY_HOST && hostname !== 'lekbanken.no') {
         hostTenantId = await resolveTenantByHostname(supabase, hostname, requestId)
       }
     } else if (isProtected) {
@@ -254,6 +264,20 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isGuestOnly = guestOnlyPaths.has(pathname)
+
+  // Demo subdomain: redirect unauthenticated users to demo start page
+  if (!user && isProtected && isDemoMode) {
+    // Check if user has demo session cookie but no auth
+    const demoSessionId = request.cookies.get('demo_session_id')?.value
+    if (!demoSessionId) {
+      // No demo session - redirect to landing page to start demo
+      const redirectResponse = NextResponse.redirect(new URL('/', request.url))
+      redirectResponse.headers.set('x-request-id', requestId)
+      return redirectResponse
+    }
+    // Has demo cookie but no auth - session may have expired
+    // Let normal auth redirect handle it
+  }
 
   if (!user && isProtected) {
     const redirectUrl = new URL('/auth/login', request.url)

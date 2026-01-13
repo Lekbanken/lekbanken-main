@@ -5,9 +5,10 @@
  */
 
 import { NextResponse } from 'next/server';
-import { setupDemoUser } from '@/lib/auth/ephemeral-users';
+import { setupDemoUser, DEMO_TENANT_ID } from '@/lib/auth/ephemeral-users';
 import { cookies, headers } from 'next/headers';
 import { checkDemoRateLimit, getClientIP, getRateLimitHeaders } from '@/lib/rate-limit/demo-rate-limit';
+import { setTenantCookie } from '@/lib/utils/tenantCookie';
 import type { DemoTier } from '@/lib/auth/ephemeral-users';
 
 /**
@@ -145,6 +146,7 @@ export async function POST(request: Request) {
       const expiresAt = new Date(typedDemoSession.expires_at);
       const cookieStore = await cookies();
 
+      // Set demo session cookie
       cookieStore.set('demo_session_id', typedDemoSession.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
@@ -155,7 +157,14 @@ export async function POST(request: Request) {
         domain: process.env.NODE_ENV === 'production' ? '.lekbanken.no' : undefined,
       });
 
-      console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}`);
+      // CRITICAL: Set tenant cookie so the app knows which tenant to use
+      // Without this, user lands on "no tenant assigned" page
+      // Use the proper setTenantCookie function which handles HMAC signing
+      const headerStore = await headers();
+      const hostname = headerStore.get('host')?.split(':')[0] || 'localhost';
+      await setTenantCookie(cookieStore, DEMO_TENANT_ID, { hostname });
+
+      console.log(`[POST /auth/demo] Demo session created: ${typedDemoSession.id}, tenant: ${DEMO_TENANT_ID}`);
     }
 
     // Step 5: Redirect to demo app

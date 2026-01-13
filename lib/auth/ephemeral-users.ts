@@ -45,7 +45,8 @@ export function generateDemoEmail(): string {
  * @returns Object with user, password, and error
  */
 export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
-  const supabase = await createServerRlsClient();
+  // Use supabaseAdmin for all operations - RLS policies block demo user creation
+  // RLS client cannot insert into users or user_tenant_memberships for other users
 
   try {
     // Generate credentials
@@ -75,9 +76,9 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
       };
     }
 
-    // Update user profile with demo flags
+    // Update user profile with demo flags using admin client (bypasses RLS)
     // Note: User might be auto-created by trigger, we ensure it has correct flags
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseAdmin
       .from('users')
       .upsert(
         {
@@ -100,17 +101,26 @@ export async function createEphemeralDemoUser(tier: DemoTier = 'free') {
       // Continue anyway - profile might already exist with correct flags
     }
 
-    // Create membership in demo tenant
-    const { error: membershipError } = await supabase.from('user_tenant_memberships').insert({
+    // Create membership in demo tenant using admin client (bypasses RLS)
+    const { error: membershipError } = await supabaseAdmin.from('user_tenant_memberships').insert({
       user_id: authData.user.id,
       tenant_id: DEMO_TENANT_ID,
       role: tier === 'premium' ? 'admin' : 'member',
+      is_primary: true, // Demo tenant is primary for demo users
       created_at: new Date().toISOString(),
     });
 
     if (membershipError) {
       console.error('[createEphemeralDemoUser] Membership creation failed:', membershipError);
-      // This is non-critical if membership already exists
+      // This is critical - without membership, user can't access demo tenant
+      // Check if it's a duplicate error
+      if (!membershipError.message?.includes('duplicate')) {
+        return {
+          user: null,
+          password: null,
+          error: membershipError,
+        };
+      }
     }
 
     console.log(`[createEphemeralDemoUser] Created ephemeral user: ${authData.user.id} (${tier})`);
@@ -177,12 +187,11 @@ export async function signInAsEphemeralUser(email: string, password: string) {
  * @returns Demo session or error
  */
 export async function createDemoSession(userId: string, tier: DemoTier = 'free') {
-  const supabase = await createServerRlsClient();
-
+  // Use admin client to bypass RLS - demo_sessions table may have restrictive policies
   try {
     const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('demo_sessions')
       .insert({
         user_id: userId,

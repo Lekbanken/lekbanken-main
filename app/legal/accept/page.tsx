@@ -8,9 +8,9 @@ import { acceptLegalDocuments } from '@/app/actions/legal'
 import { Button } from '@/components/ui/button'
 
 type AcceptPageProps = {
-  searchParams?: {
+  searchParams: Promise<{
     redirect?: string
-  }
+  }>
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +31,8 @@ export default async function LegalAcceptPage({ searchParams }: AcceptPageProps)
   const locale = await getLocale()
   const pendingDocs = await getPendingLegalDocuments(authContext.user.id, locale as 'sv' | 'no' | 'en')
 
-  const redirectParam = searchParams?.redirect ?? ''
+  const resolvedParams = await searchParams
+  const redirectParam = resolvedParams?.redirect ?? ''
   const redirectTo = redirectParam.startsWith('/') ? redirectParam : '/app'
   if (!pendingDocs.length) {
     redirect(redirectTo)

@@ -19,9 +19,12 @@ export async function POST() {
   // Log enrollment started
   await logEnrollmentStarted(user.id)
 
+  // Return in the format expected by the frontend
   return NextResponse.json({
-    factorId: data?.id,
+    factor_id: data?.id,
     type: data?.type,
-    totp: data?.totp, // includes qr_code and secret
+    qr_code: data?.totp?.qr_code,
+    secret: data?.totp?.secret,
+    uri: data?.totp?.uri,
   })
 }

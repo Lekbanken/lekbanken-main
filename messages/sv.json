@@ -2178,6 +2178,8 @@
         "updated": "Uppdaterad"
       },
       "filters": {
+        "title": "Filter",
+        "search": "Sök spel...",
         "allStatuses": "Alla statusar",
         "published": "Publicerade",
         "draft": "Utkast",
@@ -2194,7 +2196,146 @@
         "allOwners": "Alla ägare",
         "global": "Global",
         "owner": "Ägare",
-        "status": "Status"
+        "status": "Status",
+        "removeFilter": "Ta bort filter {label}",
+        "purposes": "Syften",
+        "tenants": "Hyresgäster",
+        "groups": {
+          "classification": "Klassificering",
+          "playExecution": "Spelutförande",
+          "lifecycle": "Livscykel",
+          "ownership": "Ägarskap",
+          "technical": "Tekniskt"
+        },
+        "age": {
+          "label": "Ålder",
+          "min": "Min ålder",
+          "max": "Max ålder"
+        },
+        "time": {
+          "label": "Tid",
+          "min": "Min tid",
+          "max": "Max tid"
+        },
+        "players": {
+          "label": "Spelare",
+          "min": "Min spelare",
+          "max": "Max spelare"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Publicerad",
+          "draft": "Utkast"
+        },
+        "energy": {
+          "label": "Energinivå",
+          "low": "Låg",
+          "medium": "Medel",
+          "high": "Hög"
+        },
+        "location": {
+          "label": "Plats",
+          "indoor": "Inomhus",
+          "outdoor": "Utomhus",
+          "both": "Båda"
+        },
+        "validation": {
+          "label": "Validering",
+          "valid": "Giltig",
+          "warnings": "Varningar",
+          "errors": "Fel",
+          "pending": "Väntande"
+        },
+        "ownerSource": {
+          "label": "Källa",
+          "system": "System",
+          "imported": "Importerad",
+          "tenant": "Hyresgäst",
+          "ai_generated": "AI-genererad"
+        },
+        "contentVersion": {
+          "label": "Innehållsversion",
+          "v1": "Version 1",
+          "v2": "Version 2"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Spelläge",
+          "global": "Global"
+        }
+      },
+      "drawer": {
+        "tabs": {
+          "overview": "Översikt",
+          "content": "Innehåll",
+          "availability": "Tillgänglighet",
+          "metadata": "Metadata",
+          "history": "Historik"
+        },
+        "overview": {
+          "steps": "Steg",
+          "phases": "Faser",
+          "roles": "Roller",
+          "timeMin": "Tid (min)",
+          "coreInfo": "Grundinfo",
+          "status": "Status",
+          "playMode": "Spelläge",
+          "validation": "Validering",
+          "mainPurpose": "Huvudsyfte",
+          "owner": "Ägare",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Valideringsproblem",
+          "openInBuilder": "Öppna i Builder"
+        },
+        "content": {
+          "materials": "Material",
+          "timer": "Timer",
+          "artifacts": "Artefakter",
+          "triggers": "Triggers",
+          "board": "Spelplan",
+          "playModeLabel": "Spelläge: {mode}",
+          "schemaVersion": "Schemaversion",
+          "contentVersion": "Innehållsversion",
+          "schemaStatus": "Schemastatus",
+          "current": "Aktuell",
+          "contentWarnings": "Innehållsvarningar"
+        },
+        "availability": {
+          "title": "Tillgänglighet",
+          "global": "Global",
+          "globalDescription": "Tillgänglig för alla organisationer",
+          "tenantSpecific": "Organisationsspecifik",
+          "unknownTenant": "Okänd organisation",
+          "productAssociation": "Produktkoppling",
+          "product": "Produkt",
+          "adminControls": "Administrationskontroller",
+          "adminControlsDescription": "Hantera publicering och synlighet"
+        },
+        "metadata": {
+          "gameParameters": "Spelparametrar",
+          "players": "Spelare",
+          "age": "Ålder",
+          "ageYears": "{min}–{max} år",
+          "time": "Tid",
+          "timeMinutes": "{time} minuter",
+          "energyLevel": "Energinivå",
+          "locationType": "Platstyp",
+          "purposes": "Syften",
+          "noPurposes": "Inga syften definierade",
+          "category": "Kategori"
+        },
+        "history": {
+          "timestamps": "Tidsstämplar",
+          "created": "Skapad",
+          "lastUpdated": "Senast uppdaterad",
+          "importSource": "Importkälla",
+          "type": "Typ",
+          "imported": "Importerad",
+          "schema": "Schema",
+          "changeHistory": "Ändringshistorik",
+          "changeHistoryDescription": "Visa tidigare versioner och ändringar"
+        }
       },
       "noGames": {
         "title": "Inga spel matchar filtren",

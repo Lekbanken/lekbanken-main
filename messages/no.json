@@ -2178,6 +2178,8 @@
         "updated": "Oppdatert"
       },
       "filters": {
+        "title": "Filter",
+        "search": "Søk spill...",
         "allStatuses": "Alle statuser",
         "published": "Publiserte",
         "draft": "Utkast",
@@ -2194,7 +2196,146 @@
         "allOwners": "Alle eiere",
         "global": "Global",
         "owner": "Eier",
-        "status": "Status"
+        "status": "Status",
+        "removeFilter": "Fjern filter {label}",
+        "purposes": "Formål",
+        "tenants": "Leietakere",
+        "groups": {
+          "classification": "Klassifisering",
+          "playExecution": "Spillgjennomføring",
+          "lifecycle": "Livssyklus",
+          "ownership": "Eierskap",
+          "technical": "Teknisk"
+        },
+        "age": {
+          "label": "Alder",
+          "min": "Min alder",
+          "max": "Maks alder"
+        },
+        "time": {
+          "label": "Tid",
+          "min": "Min tid",
+          "max": "Maks tid"
+        },
+        "players": {
+          "label": "Spillere",
+          "min": "Min spillere",
+          "max": "Maks spillere"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Publisert",
+          "draft": "Utkast"
+        },
+        "energy": {
+          "label": "Energinivå",
+          "low": "Lav",
+          "medium": "Medium",
+          "high": "Høy"
+        },
+        "location": {
+          "label": "Sted",
+          "indoor": "Innendørs",
+          "outdoor": "Utendørs",
+          "both": "Begge"
+        },
+        "validation": {
+          "label": "Validering",
+          "valid": "Gyldig",
+          "warnings": "Advarsler",
+          "errors": "Feil",
+          "pending": "Venter"
+        },
+        "ownerSource": {
+          "label": "Kilde",
+          "system": "System",
+          "imported": "Importert",
+          "tenant": "Leietaker",
+          "ai_generated": "AI-generert"
+        },
+        "contentVersion": {
+          "label": "Innholdsversjon",
+          "v1": "Versjon 1",
+          "v2": "Versjon 2"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Spillmodus",
+          "global": "Global"
+        }
+      },
+      "drawer": {
+        "tabs": {
+          "overview": "Oversikt",
+          "content": "Innhold",
+          "availability": "Tilgjengelighet",
+          "metadata": "Metadata",
+          "history": "Historikk"
+        },
+        "overview": {
+          "steps": "Steg",
+          "phases": "Faser",
+          "roles": "Roller",
+          "timeMin": "Tid (min)",
+          "coreInfo": "Grunninfo",
+          "status": "Status",
+          "playMode": "Spillmodus",
+          "validation": "Validering",
+          "mainPurpose": "Hovedformål",
+          "owner": "Eier",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Valideringsproblemer",
+          "openInBuilder": "Åpne i Builder"
+        },
+        "content": {
+          "materials": "Materialer",
+          "timer": "Timer",
+          "artifacts": "Artefakter",
+          "triggers": "Triggere",
+          "board": "Spillbrett",
+          "playModeLabel": "Spillmodus: {mode}",
+          "schemaVersion": "Skjemaversjon",
+          "contentVersion": "Innholdsversjon",
+          "schemaStatus": "Skjemastatus",
+          "current": "Gjeldende",
+          "contentWarnings": "Innholdsadvarsler"
+        },
+        "availability": {
+          "title": "Tilgjengelighet",
+          "global": "Global",
+          "globalDescription": "Tilgjengelig for alle organisasjoner",
+          "tenantSpecific": "Organisasjonsspesifikk",
+          "unknownTenant": "Ukjent organisasjon",
+          "productAssociation": "Produkttilknytning",
+          "product": "Produkt",
+          "adminControls": "Administrasjonskontroller",
+          "adminControlsDescription": "Administrer publisering og synlighet"
+        },
+        "metadata": {
+          "gameParameters": "Spillparametere",
+          "players": "Spillere",
+          "age": "Alder",
+          "ageYears": "{min}–{max} år",
+          "time": "Tid",
+          "timeMinutes": "{time} minutter",
+          "energyLevel": "Energinivå",
+          "locationType": "Stedstype",
+          "purposes": "Formål",
+          "noPurposes": "Ingen formål definert",
+          "category": "Kategori"
+        },
+        "history": {
+          "timestamps": "Tidsstempler",
+          "created": "Opprettet",
+          "lastUpdated": "Sist oppdatert",
+          "importSource": "Importkilde",
+          "type": "Type",
+          "imported": "Importert",
+          "schema": "Skjema",
+          "changeHistory": "Endringshistorikk",
+          "changeHistoryDescription": "Vis tidligere versjoner og endringer"
+        }
       },
       "noGames": {
         "title": "Ingen spill matcher filtrene",

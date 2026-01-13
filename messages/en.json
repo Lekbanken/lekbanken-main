@@ -2178,6 +2178,8 @@
         "updated": "Updated"
       },
       "filters": {
+        "title": "Filter",
+        "search": "Search games...",
         "allStatuses": "All statuses",
         "published": "Published",
         "draft": "Draft",
@@ -2194,7 +2196,146 @@
         "allOwners": "All owners",
         "global": "Global",
         "owner": "Owner",
-        "status": "Status"
+        "status": "Status",
+        "removeFilter": "Remove filter {label}",
+        "purposes": "Purposes",
+        "tenants": "Tenants",
+        "groups": {
+          "classification": "Classification",
+          "playExecution": "Play Execution",
+          "lifecycle": "Lifecycle",
+          "ownership": "Ownership",
+          "technical": "Technical"
+        },
+        "age": {
+          "label": "Age",
+          "min": "Min age",
+          "max": "Max age"
+        },
+        "time": {
+          "label": "Time",
+          "min": "Min time",
+          "max": "Max time"
+        },
+        "players": {
+          "label": "Players",
+          "min": "Min players",
+          "max": "Max players"
+        },
+        "status": {
+          "label": "Status",
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "energy": {
+          "label": "Energy level",
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        },
+        "location": {
+          "label": "Location",
+          "indoor": "Indoor",
+          "outdoor": "Outdoor",
+          "both": "Both"
+        },
+        "validation": {
+          "label": "Validation",
+          "valid": "Valid",
+          "warnings": "Warnings",
+          "errors": "Errors",
+          "pending": "Pending"
+        },
+        "ownerSource": {
+          "label": "Source",
+          "system": "System",
+          "imported": "Imported",
+          "tenant": "Tenant",
+          "ai_generated": "AI generated"
+        },
+        "contentVersion": {
+          "label": "Content version",
+          "v1": "Version 1",
+          "v2": "Version 2"
+        },
+        "chips": {
+          "status": "Status",
+          "playMode": "Play mode",
+          "global": "Global"
+        }
+      },
+      "drawer": {
+        "tabs": {
+          "overview": "Overview",
+          "content": "Content",
+          "availability": "Availability",
+          "metadata": "Metadata",
+          "history": "History"
+        },
+        "overview": {
+          "steps": "Steps",
+          "phases": "Phases",
+          "roles": "Roles",
+          "timeMin": "Time (min)",
+          "coreInfo": "Core info",
+          "status": "Status",
+          "playMode": "Play mode",
+          "validation": "Validation",
+          "mainPurpose": "Main purpose",
+          "owner": "Owner",
+          "global": "Global",
+          "uuid": "UUID",
+          "validationIssues": "Validation issues",
+          "openInBuilder": "Open in Builder"
+        },
+        "content": {
+          "materials": "Materials",
+          "timer": "Timer",
+          "artifacts": "Artifacts",
+          "triggers": "Triggers",
+          "board": "Game board",
+          "playModeLabel": "Play mode: {mode}",
+          "schemaVersion": "Schema version",
+          "contentVersion": "Content version",
+          "schemaStatus": "Schema status",
+          "current": "Current",
+          "contentWarnings": "Content warnings"
+        },
+        "availability": {
+          "title": "Availability",
+          "global": "Global",
+          "globalDescription": "Available for all organisations",
+          "tenantSpecific": "Organisation specific",
+          "unknownTenant": "Unknown organisation",
+          "productAssociation": "Product association",
+          "product": "Product",
+          "adminControls": "Admin controls",
+          "adminControlsDescription": "Manage publishing and visibility"
+        },
+        "metadata": {
+          "gameParameters": "Game parameters",
+          "players": "Players",
+          "age": "Age",
+          "ageYears": "{min}–{max} years",
+          "time": "Time",
+          "timeMinutes": "{time} minutes",
+          "energyLevel": "Energy level",
+          "locationType": "Location type",
+          "purposes": "Purposes",
+          "noPurposes": "No purposes defined",
+          "category": "Category"
+        },
+        "history": {
+          "timestamps": "Timestamps",
+          "created": "Created",
+          "lastUpdated": "Last updated",
+          "importSource": "Import source",
+          "type": "Type",
+          "imported": "Imported",
+          "schema": "Schema",
+          "changeHistory": "Change history",
+          "changeHistoryDescription": "View previous versions and changes"
+        }
       },
       "noGames": {
         "title": "No games match the filters",

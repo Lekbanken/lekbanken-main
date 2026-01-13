@@ -1,0 +1,184 @@
+name: RLS Policy Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'claude/**'
+    paths:
+      - 'supabase/migrations/**'
+      - 'tests/rls/**'
+      - '.github/workflows/rls-tests.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'supabase/migrations/**'
+      - 'tests/rls/**'
+      - '.github/workflows/rls-tests.yml'
+
+jobs:
+  rls-tests:
+    name: Run RLS Policy Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local instance
+        run: supabase start
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Run migrations
+        run: |
+          echo "Running database migrations..."
+          supabase db reset --debug
+        continue-on-error: false
+
+      - name: Run RLS policy tests
+        id: rls_tests
+        run: |
+          echo "Running RLS policy test harness..."
+
+          # Get local database URL
+          DB_URL=$(supabase status -o env | grep DATABASE_URL | cut -d '=' -f2-)
+
+          # Run test suite
+          psql "$DB_URL" -f tests/rls/demo-policies.test.sql > test_output.log 2>&1
+
+          TEST_EXIT_CODE=$?
+
+          # Display output
+          cat test_output.log
+
+          # Check for failures
+          if grep -q "FAILED" test_output.log; then
+            echo "❌ RLS tests FAILED"
+            exit 1
+          fi
+
+          if [ $TEST_EXIT_CODE -ne 0 ]; then
+            echo "❌ RLS tests exited with error code: $TEST_EXIT_CODE"
+            exit 1
+          fi
+
+          echo "✅ All RLS tests PASSED"
+        continue-on-error: false
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rls-test-results
+          path: test_output.log
+
+      - name: Stop Supabase
+        if: always()
+        run: supabase stop
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const output = fs.readFileSync('test_output.log', 'utf8');
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ❌ RLS Policy Tests Failed\n\n<details>\n<summary>Test Output</summary>\n\n\`\`\`\n${output}\n\`\`\`\n\n</details>\n\nPlease review the RLS policies and fix the failing tests before merging.`
+            });
+
+  security-check:
+    name: Security Check - Demo Policies
+    runs-on: ubuntu-latest
+    needs: rls-tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for demo policy keywords
+        run: |
+          echo "Checking for required demo security keywords in migrations..."
+
+          REQUIRED_KEYWORDS=(
+            "demo_tenant_write_protection"
+            "demo_content_access"
+            "demo_user_flag_protection"
+            "demo_no_public_sessions"
+          )
+
+          MISSING_KEYWORDS=()
+
+          for keyword in "${REQUIRED_KEYWORDS[@]}"; do
+            if ! grep -rq "$keyword" supabase/migrations/; then
+              MISSING_KEYWORDS+=("$keyword")
+            fi
+          done
+
+          if [ ${#MISSING_KEYWORDS[@]} -gt 0 ]; then
+            echo "❌ Missing required demo security policies:"
+            printf '%s\n' "${MISSING_KEYWORDS[@]}"
+            exit 1
+          fi
+
+          echo "✅ All required demo security policies found"
+
+      - name: Verify RLS enabled on critical tables
+        run: |
+          echo "Verifying RLS is enabled on critical tables..."
+
+          # Check migrations for RLS enablement
+          if ! grep -rq "ALTER TABLE.*ENABLE ROW LEVEL SECURITY" supabase/migrations/ &&
+             ! grep -rq "ENABLE ROW LEVEL SECURITY" supabase/migrations/; then
+            echo "⚠️  Warning: No explicit RLS enablement found in migrations"
+            echo "Ensure RLS is enabled on: tenants, activities, profiles, sessions"
+          else
+            echo "✅ RLS enablement commands found in migrations"
+          fi
+
+  documentation-check:
+    name: Documentation Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for demo documentation
+        run: |
+          echo "Checking for demo implementation documentation..."
+
+          REQUIRED_DOCS=(
+            "docs/demo_current_state.md"
+            "docs/demo_technical_spec.md"
+            "docs/MASTERPROMPT_DEMO_IMPLEMENTATION.md"
+          )
+
+          MISSING_DOCS=()
+
+          for doc in "${REQUIRED_DOCS[@]}"; do
+            if [ ! -f "$doc" ]; then
+              MISSING_DOCS+=("$doc")
+            fi
+          done
+
+          if [ ${#MISSING_DOCS[@]} -gt 0 ]; then
+            echo "❌ Missing required documentation:"
+            printf '%s\n' "${MISSING_DOCS[@]}"
+            exit 1
+          fi
+
+          echo "✅ All required documentation present"

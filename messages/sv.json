@@ -831,7 +831,11 @@
               "role": "Roll",
               "mfaStatus": "MFA-status",
               "enrolledAt": "Aktiverad",
-              "trustedDevices": "Betrodda enheter"
+              "trustedDevices": "Betrodda enheter",
+              "actions": "Åtgärder"
+            },
+            "actions": {
+              "resetMFA": "Återställ MFA"
             },
             "status": {
               "enabled": "Aktiverad",

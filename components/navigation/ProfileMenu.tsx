@@ -88,6 +88,13 @@ export function ProfileMenu({ context = "app", onNavigate, className }: ProfileM
           </svg>
           Profile
         </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleNavigate("/app/profile/security")} className="flex items-center gap-2">
+          <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <path d="M12 3 4 7v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V7l-8-4Z" />
+            <path d="m9 12 2 2 4-4" />
+          </svg>
+          Security
+        </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleNavigate("/app")} className="flex items-center gap-2">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M3 12s2-4 9-4 9 4 9 4-2 4-9 4-9-4-9-4Z" />

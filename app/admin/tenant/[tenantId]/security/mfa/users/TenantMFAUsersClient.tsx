@@ -18,6 +18,7 @@ import {
   EnvelopeIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  TrashIcon,
 } from '@heroicons/react/24/outline';
 
 interface TenantMFAUsersClientProps {
@@ -59,6 +60,7 @@ export default function TenantMFAUsersClient({ tenantId, canManage }: TenantMFAU
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<MFAStatusFilter>('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [resettingUser, setResettingUser] = useState<string | null>(null);
 
   // Debounce search
   useEffect(() => {
@@ -176,6 +178,38 @@ export default function TenantMFAUsersClient({ tenantId, canManage }: TenantMFAU
     });
   };
 
+  const handleResetMFA = async (userId: string, displayName: string | null) => {
+    const userName = displayName || 'denna användare';
+    const confirmed = window.confirm(
+      `Är du säker på att du vill återställa MFA för ${userName}?\n\nDetta kommer att:\n• Ta bort alla MFA-faktorer\n• Återkalla alla betrodda enheter\n• Ge användaren en ny grace period för att konfigurera MFA igen`
+    );
+    
+    if (!confirmed) return;
+    
+    setResettingUser(userId);
+    
+    try {
+      const res = await fetch(`/api/admin/tenant/${tenantId}/mfa/users/${userId}/reset`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: 'Admin-initiated reset from MFA users panel' }),
+      });
+      
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to reset MFA');
+      }
+      
+      // Reload users list to reflect the change
+      await loadUsers();
+    } catch (err) {
+      console.error('Error resetting MFA:', err);
+      alert(err instanceof Error ? err.message : 'Kunde inte återställa MFA');
+    } finally {
+      setResettingUser(null);
+    }
+  };
+
   if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-900/20">
@@ -257,6 +291,11 @@ export default function TenantMFAUsersClient({ tenantId, canManage }: TenantMFAU
               <th scope="col" className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
                 {t('columns.trustedDevices')}
               </th>
+              {canManage && (
+                <th scope="col" className="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  {t('columns.actions')}
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
@@ -332,6 +371,27 @@ export default function TenantMFAUsersClient({ tenantId, canManage }: TenantMFAU
                   <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-500 dark:text-gray-400">
                     {user.trusted_devices_count}
                   </td>
+                  {canManage && (
+                    <td className="whitespace-nowrap px-4 py-4 text-right">
+                      {user.mfa_status === 'enabled' || user.mfa_status === 'grace_period' ? (
+                        <button
+                          onClick={() => handleResetMFA(user.user_id, user.display_name)}
+                          disabled={resettingUser === user.user_id}
+                          className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-700 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-red-900/20"
+                          title={t('actions.resetMFA')}
+                        >
+                          {resettingUser === user.user_id ? (
+                            <ArrowPathIcon className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <TrashIcon className="h-3.5 w-3.5" />
+                          )}
+                          {t('actions.resetMFA')}
+                        </button>
+                      ) : (
+                        <span className="text-xs text-gray-400">-</span>
+                      )}
+                    </td>
+                  )}
                 </tr>
               ))
             )}

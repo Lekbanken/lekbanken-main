@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,9 +25,14 @@ type LanguageSwitcherProps = {
 };
 
 export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherProps) {
+  const [mounted, setMounted] = useState(false);
   const { language, setLanguage } = usePreferences();
   const { switchLocale, isPending } = useLocaleSwitcher();
   const active = LANG_OPTIONS.find((option) => option.code === language);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLanguageChange = (option: typeof LANG_OPTIONS[number]) => {
     // Update both PreferencesContext (for legacy support) and next-intl locale
@@ -34,21 +40,35 @@ export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherP
     switchLocale(option.locale);
   };
 
+  const buttonContent = (
+    <>
+      <span className="text-xs font-semibold">{active?.code ?? "NO"}</span>
+      <svg viewBox="0 0 24 24" className="ml-1 inline h-3.5 w-3.5 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </>
+  );
+
+  const buttonClassName = cn(
+    "inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+    isPending && "opacity-50",
+    className,
+  );
+
+  // Return a static button during SSR to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <button type="button" aria-label="Change language" className={buttonClassName} disabled>
+        {buttonContent}
+      </button>
+    );
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        asChild
-        className={cn(
-          "inline-flex items-center gap-2 rounded-full border border-border/70 px-3 py-2 text-sm font-medium text-foreground transition hover:border-border hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
-          isPending && "opacity-50",
-          className,
-        )}
-      >
+      <DropdownMenuTrigger asChild className={buttonClassName}>
         <button type="button" aria-label="Change language" disabled={isPending}>
-          <span className="text-xs font-semibold">{active?.code ?? "NO"}</span>
-          <svg viewBox="0 0 24 24" className="ml-1 inline h-3.5 w-3.5 text-muted-foreground" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m6 9 6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {buttonContent}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align={align} className="w-40">

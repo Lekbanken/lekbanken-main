@@ -48,12 +48,15 @@ export async function POST(request: NextRequest) {
 
   // Explicitly delete the tenant cookie
   cookieStore.delete('lb_tenant')
+  
+  // Delete demo session cookie if exists
+  cookieStore.delete('demo_session_id')
 
   // Delete any remaining Supabase cookies explicitly
   // This ensures httpOnly cookies are properly cleared
   const allCookies = cookieStore.getAll()
   for (const cookie of allCookies) {
-    if (cookie.name.includes('sb-') || cookie.name.includes('supabase')) {
+    if (cookie.name.includes('sb-') || cookie.name.includes('supabase') || cookie.name.includes('demo')) {
       cookieStore.delete(cookie.name)
     }
   }
@@ -65,11 +68,20 @@ export async function POST(request: NextRequest) {
   const wantsJson = acceptHeader.includes('application/json')
 
   if (wantsJson) {
-    return NextResponse.json({ ok: true })
+    const response = NextResponse.json({ ok: true })
+    // Add cache control headers to prevent stale data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+    response.headers.set('Pragma', 'no-cache')
+    response.headers.set('Expires', '0')
+    return response
   }
 
-  // Redirect to login page
-  return NextResponse.redirect(new URL('/auth/login?signedOut=true', request.url))
+  // Redirect to login page with cache-busting
+  const response = NextResponse.redirect(new URL('/auth/login?signedOut=true', request.url))
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Expires', '0')
+  return response
 }
 
 // Also support GET for direct browser navigation

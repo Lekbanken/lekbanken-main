@@ -68,8 +68,17 @@ export function AuthProvider({
     [userProfile, user]
   )
 
-  const ensureProfile = useCallback(async (currentUser: User) => {
+  const ensureProfile = useCallback(async (currentUser: User, retryCount = 0): Promise<UserProfile | null> => {
     try {
+      const isDemoUser = currentUser.user_metadata?.is_demo_user === true
+      
+      if (isDemoUser && retryCount === 0) {
+        console.log('[ensureProfile] Demo user detected, will check profile quality', {
+          userId: currentUser.id,
+          metadata: currentUser.user_metadata
+        })
+      }
+
       // ONLY query by ID - never by email (email can have orphaned profiles)
       const { data: profile, error } = await supabase
         .from('users')
@@ -80,6 +89,32 @@ export function AuthProvider({
       if (error && error.code !== 'PGRST116') {
         console.warn('ensureProfile select error:', error)
         return null
+      }
+
+      if (isDemoUser) {
+        console.log('[ensureProfile] Demo user profile fetched:', {
+          exists: !!profile,
+          full_name: profile?.full_name,
+          avatar_url: profile?.avatar_url,
+          is_demo_user: profile?.is_demo_user
+        })
+      }
+
+      // For demo users, retry a few times if profile is incomplete
+      // This handles race condition between trigger and upsert
+      const profileIncomplete = profile && (
+        !profile.full_name || 
+        profile.full_name === currentUser.email?.split('@')[0] ||
+        !profile.avatar_url ||
+        !profile.is_demo_user
+      )
+      
+      if (isDemoUser && (!profile || profileIncomplete) && retryCount < 3) {
+        // Wait with exponential backoff: 100ms, 200ms, 400ms
+        const delay = 100 * Math.pow(2, retryCount)
+        console.log(`[ensureProfile] Demo user profile ${profileIncomplete ? 'incomplete' : 'not found'}, retrying in ${delay}ms (attempt ${retryCount + 1}/3)`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+        return ensureProfile(currentUser, retryCount + 1)
       }
 
       if (profile) return profile as UserProfile
@@ -165,12 +200,27 @@ export function AuthProvider({
       if (event === 'INITIAL_SESSION') return
 
       if (event === 'SIGNED_OUT') {
+        // Clear all client-side cookies
         if (typeof document !== 'undefined') {
           document.cookie = 'lb_tenant=; Path=/; Max-Age=0; SameSite=Lax'
+          document.cookie = 'demo_session_id=; Path=/; Max-Age=0; SameSite=Lax'
+          // Clear all supabase cookies
+          document.cookie.split(';').forEach(cookie => {
+            const name = cookie.split('=')[0].trim()
+            if (name.includes('sb-') || name.includes('supabase')) {
+              document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`
+            }
+          })
         }
         setUser(null)
         setUserProfile(null)
         setMemberships([])
+        // Force full page reload to clear any cached state
+        if (typeof window !== 'undefined') {
+          setTimeout(() => {
+            window.location.href = '/auth/login?signedOut=true'
+          }, 100)
+        }
         return
       }
 

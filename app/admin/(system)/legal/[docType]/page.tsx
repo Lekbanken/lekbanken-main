@@ -12,9 +12,10 @@ export const dynamic = 'force-dynamic'
 export default async function LegalDocumentEditorPage({
   params,
 }: {
-  params: { docType: string }
+  params: Promise<{ docType: string }>
 }) {
-  const docType = params.docType as LegalDocType
+  const { docType: rawDocType } = await params
+  const docType = rawDocType as LegalDocType
   if (!(GLOBAL_LEGAL_TYPES as readonly string[]).includes(docType)) {
     notFound()
   }

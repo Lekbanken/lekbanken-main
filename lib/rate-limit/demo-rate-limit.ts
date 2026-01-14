@@ -3,11 +3,16 @@
  * 
  * Limits demo session creation to prevent abuse:
  * - 3 demo sessions per IP per hour
- * - Uses Upstash Redis when available, falls back to in-memory
+ * - Uses in-memory rate limiting for development
  * 
- * Setup:
+ * For production with multiple server instances, install Upstash:
  * 1. npm install @upstash/ratelimit @upstash/redis
  * 2. Add UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN to .env
+ * 3. The system will automatically use Upstash when packages are available
+ * 
+ * Note: In-memory rate limiting is per-server-instance only.
+ * It works for development but in production with multiple instances,
+ * users could bypass limits by hitting different instances.
  */
 
 // In-memory fallback for development/when Upstash not configured
@@ -26,62 +31,19 @@ interface RateLimitResult {
 }
 
 /**
- * Check rate limit using Upstash Redis (if available) or in-memory fallback
+ * Check rate limit using in-memory storage
+ * 
+ * For distributed rate limiting across multiple servers,
+ * install @upstash/ratelimit and @upstash/redis packages.
  */
 export async function checkDemoRateLimit(identifier: string): Promise<RateLimitResult> {
-  // Try Upstash first if configured
-  if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
-    try {
-      return await checkUpstashRateLimit(identifier);
-    } catch (error) {
-      console.warn('[rate-limit] Upstash error, falling back to in-memory:', error);
-      return checkInMemoryRateLimit(identifier);
-    }
-  }
-
-  // Fall back to in-memory rate limiting
+  // Use in-memory rate limiting
+  // This works for development and single-server production
   return checkInMemoryRateLimit(identifier);
 }
 
 /**
- * Upstash Redis rate limiting
- */
-async function checkUpstashRateLimit(identifier: string): Promise<RateLimitResult> {
-  // Dynamic import to avoid errors when package not installed
-  // These packages are optional - install with: npm install @upstash/ratelimit @upstash/redis
-  try {
-    // @ts-expect-error - Optional dependency, may not be installed
-    const { Ratelimit } = await import('@upstash/ratelimit');
-    // @ts-expect-error - Optional dependency, may not be installed
-    const { Redis } = await import('@upstash/redis');
-
-    const redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    });
-
-    const ratelimit = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(DEMO_RATE_LIMIT.maxRequests, '1 h'),
-      analytics: true,
-      prefix: 'demo_ratelimit',
-    });
-
-    const result = await ratelimit.limit(identifier);
-
-    return {
-      success: result.success,
-      remaining: result.remaining,
-      reset: result.reset,
-    };
-  } catch (error) {
-    // Package not installed - throw to trigger fallback
-    throw error;
-  }
-}
-
-/**
- * In-memory rate limiting (for development or when Upstash not available)
+ * In-memory rate limiting (for development or single-server production)
  */
 function checkInMemoryRateLimit(identifier: string): RateLimitResult {
   const now = Date.now();

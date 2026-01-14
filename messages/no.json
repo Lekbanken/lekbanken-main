@@ -5433,12 +5433,19 @@
       "lastUpdated": "Sist oppdatert: {date}"
     },
     "accept": {
+      "header": "VILKÅR",
       "title": "Gjennomgå og godkjenn vilkår",
       "description": "Du må godkjenne for å fortsette.",
       "intro": "Les dokumentene nedenfor og bekreft ditt samtykke.",
       "versionLabel": "Versjon {version}",
       "acceptCheckbox": "Jeg har lest og godtar {title}.",
-      "acceptButton": "Godta og fortsett"
+      "acceptButton": "Godta og fortsett",
+      "progressLabel": "{accepted} av {total} godkjent",
+      "accepted": "Godkjent",
+      "selectDocument": "Velg vilkår",
+      "processing": "Behandler...",
+      "viewAccordion": "Seksjoner",
+      "viewFullText": "Fulltekst"
     },
     "cookieBanner": {
       "title": "Vi bruker informasjonskapsler",

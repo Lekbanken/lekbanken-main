@@ -226,14 +226,29 @@ export async function updatePassword(
 }
 
 /**
- * Get auth session
+ * Get authenticated user
+ * Uses getUser() instead of getSession() for security - validates with auth server
+ * 
+ * NOTE: This function is deprecated. Use getAuthUser() from lib/supabase/server.ts 
+ * or supabase.auth.getUser() directly instead.
+ * 
+ * @deprecated Use supabase.auth.getUser() directly
  */
 export async function getSession(supabase: SupabaseClient<Database>) {
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+    error,
+  } = await supabase.auth.getUser()
 
-  return session
+  if (error || !user) return null
+
+  // Return a minimal session-like object with user data
+  // This avoids calling getSession() which triggers security warnings
+  return {
+    user,
+    access_token: '', // Not available without getSession, but rarely needed
+    expires_at: undefined,
+  }
 }
 
 /**

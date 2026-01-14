@@ -5492,12 +5492,19 @@
       "lastUpdated": "Senast uppdaterad: {date}"
     },
     "accept": {
+      "header": "VILLKOR",
       "title": "Granska och godkänn villkor",
       "description": "Du måste godkänna för att fortsätta.",
       "intro": "Läs igenom dokumenten nedan och bekräfta ditt godkännande.",
       "versionLabel": "Version {version}",
       "acceptCheckbox": "Jag har läst och godkänner {title}.",
-      "acceptButton": "Godkänn och fortsätt"
+      "acceptButton": "Godkänn och fortsätt",
+      "progressLabel": "{accepted} av {total} godkända",
+      "accepted": "Godkänt",
+      "selectDocument": "Välj villkor",
+      "processing": "Bearbetar...",
+      "viewAccordion": "Sektioner",
+      "viewFullText": "Fulltext"
     },
     "cookieBanner": {
       "title": "Vi använder cookies",

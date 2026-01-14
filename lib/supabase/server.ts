@@ -13,6 +13,14 @@ const supabaseServiceRoleKey = env.supabase.serviceRoleKey
 /**
  * Request-scoped RLS-aware client for server code (app router, server actions, route handlers).
  * Uses @supabase/ssr so refreshed tokens are written back to response cookies.
+ * 
+ * NOTE: This will trigger a Supabase warning in dev mode about getSession() being insecure.
+ * This is expected behavior when using SSR with cookies. The warning means:
+ * - Don't trust session data from cookies for security-critical operations
+ * - Always use getUser() to validate user identity (validates with auth server)
+ * - We handle this correctly by using getAuthUser() helper for auth checks
+ * 
+ * The warning is informational and does not indicate a security issue in our code.
  */
 export async function createServerRlsClient() {
   const cookieStore = await cookies()
@@ -29,6 +37,23 @@ export async function createServerRlsClient() {
       },
     },
   })
+}
+
+/**
+ * Get authenticated user from server context
+ * Uses getUser() instead of getSession() for security - validates with auth server
+ * This is the recommended way to get user on the server side.
+ */
+export async function getAuthUser() {
+  const supabase = await createServerRlsClient()
+  const { data: { user }, error } = await supabase.auth.getUser()
+  
+  if (error) {
+    console.warn('[getAuthUser] Error fetching user:', error.message)
+    return null
+  }
+  
+  return user
 }
 
 /**

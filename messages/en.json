@@ -5437,12 +5437,19 @@
       "lastUpdated": "Last updated: {date}"
     },
     "accept": {
+      "header": "TERMS",
       "title": "Review and accept legal terms",
       "description": "Legal acceptance required to continue.",
       "intro": "Please review the documents below and confirm acceptance.",
       "versionLabel": "Version {version}",
       "acceptCheckbox": "I have read and accept {title}.",
-      "acceptButton": "Accept and continue"
+      "acceptButton": "Accept and continue",
+      "progressLabel": "{accepted} of {total} accepted",
+      "accepted": "Accepted",
+      "selectDocument": "Select terms",
+      "processing": "Processing...",
+      "viewAccordion": "Sections",
+      "viewFullText": "Full text"
     },
     "cookieBanner": {
       "title": "We use cookies",

@@ -70,16 +70,32 @@ export default function DemoPage() {
     setError(null);
 
     try {
+      // First, clear any cached state from previous sessions
+      if (typeof window !== 'undefined') {
+        // Clear localStorage
+        const keysToKeep = ['theme', 'locale', 'cookieConsent'];
+        Object.keys(localStorage).forEach(key => {
+          if (!keysToKeep.includes(key)) {
+            localStorage.removeItem(key);
+          }
+        });
+        
+        // Clear sessionStorage
+        sessionStorage.clear();
+      }
+
       const response = await fetch('/auth/demo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        // Prevent caching
+        cache: 'no-store',
       });
 
       if (response.redirected) {
-        // Successful redirect to demo app
-        router.push(response.url);
+        // Successful redirect to demo app - force full page reload to clear cache
+        window.location.href = response.url;
         return;
       }
 

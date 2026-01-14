@@ -1,9 +1,10 @@
 "use client"
 
 import { useMemo, useState } from 'react'
+import { EyeIcon } from '@heroicons/react/24/outline'
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge, Input, Textarea, Select, Switch } from '@/components/ui'
 import { AdminConfirmDialog } from '@/components/admin/shared'
-import { MarkdownContent } from '@/components/legal/MarkdownContent'
+import { LegalPreviewDialog } from '@/components/legal/LegalPreviewDialog'
 import {
   deleteLegalDraft,
   publishLegalDocument,
@@ -96,6 +97,7 @@ export function LegalDocEditorClient({
   const [isDeleting, setIsDeleting] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const currentDraft = drafts[locale]
   const currentPublished = activeDocs[locale]
@@ -319,12 +321,41 @@ export function LegalDocEditorClient({
               <span className="text-sm text-foreground">Requires acceptance</span>
             </div>
             <div>
-              <label className="mb-2 block text-sm font-medium text-foreground">Content (Markdown)</label>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="block text-sm font-medium text-foreground">Content (Markdown)</label>
+                <details className="text-xs">
+                  <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                    Formatting guide
+                  </summary>
+                  <div className="mt-2 p-3 rounded-lg bg-muted/50 text-muted-foreground space-y-1.5 max-w-md">
+                    <p><strong>Use ## for main sections</strong> (these become accordions):</p>
+                    <pre className="text-[11px] bg-background/50 p-2 rounded overflow-x-auto">
+{`## 1. Introduktion
+Text for this section...
+
+## 2. Next section
+More text...
+
+### 2.1 Subsection
+Subsections stay within their parent.`}
+                    </pre>
+                    <p className="pt-1">Each <code className="text-xs bg-background px-1 rounded">##</code> creates a new accordion section.</p>
+                  </div>
+                </details>
+              </div>
               <Textarea
                 value={currentForm.contentMarkdown}
                 onChange={(event) => updateForm('contentMarkdown', event.target.value)}
                 rows={18}
-                placeholder="Write the legal text here (Markdown supported)."
+                placeholder={`## 1. Introduktion
+Your introduction text here...
+
+## 2. Section title
+Content for this section...
+
+### 2.1 Subsection
+Subsections are included in their parent section.`}
+                className="font-mono text-sm"
               />
             </div>
 
@@ -402,20 +433,16 @@ export function LegalDocEditorClient({
                   {isRecording ? 'Recording...' : 'Record org acceptance'}
                 </Button>
               )}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Published preview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentPublished ? (
-                <div className="prose prose-slate max-w-none">
-                  <MarkdownContent content={currentPublished.content_markdown} />
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No published content yet.</p>
+              {currentPublished && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setPreviewOpen(true)}
+                  className="w-full mt-2"
+                >
+                  <EyeIcon className="h-4 w-4 mr-2" />
+                  Preview
+                </Button>
               )}
             </CardContent>
           </Card>
@@ -431,6 +458,14 @@ export function LegalDocEditorClient({
         variant="warning"
         onConfirm={handlePublish}
       />
+
+      {currentPublished && (
+        <LegalPreviewDialog
+          open={previewOpen}
+          onOpenChange={setPreviewOpen}
+          document={currentPublished}
+        />
+      )}
     </>
   )
 }

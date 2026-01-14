@@ -14,10 +14,10 @@ export const dynamic = 'force-dynamic'
 export default async function TenantLegalEditorPage({
   params,
 }: {
-  params: { tenantId: string; docType: string }
+  params: Promise<{ tenantId: string; docType: string }>
 }) {
-  const tenantId = params.tenantId
-  const docType = params.docType as LegalDocType
+  const { tenantId, docType: rawDocType } = await params
+  const docType = rawDocType as LegalDocType
 
   if (!tenantId) {
     notFound()

@@ -27,9 +27,9 @@ export const dynamic = 'force-dynamic'
 export default async function TenantLegalHubPage({
   params,
 }: {
-  params: { tenantId: string }
+  params: Promise<{ tenantId: string }>
 }) {
-  const tenantId = params.tenantId
+  const { tenantId } = await params
   if (!tenantId) {
     notFound()
   }

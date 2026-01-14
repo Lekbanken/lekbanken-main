@@ -22,9 +22,10 @@ export default function RecoveryPage() {
   useEffect(() => {
     // Check if user has a valid recovery session
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
+      // Use getUser() instead of getSession() for security
+      const { data: { user }, error } = await supabase.auth.getUser()
       
-      if (session) {
+      if (user && !error) {
         setIsValidSession(true)
       } else {
         setError('Invalid or expired recovery link. Please request a new password reset.')

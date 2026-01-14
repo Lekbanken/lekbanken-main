@@ -21,7 +21,7 @@ export function JourneyActions({
     },
     {
       id: 'coins',
-      label: 'Mynt',
+      label: 'DiceCoin',
       href: '/resan/mynt',
       icon: CoinIcon,
     },

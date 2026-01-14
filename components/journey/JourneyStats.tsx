@@ -18,7 +18,7 @@ export function JourneyStats({
   const stats = [
     {
       id: 'coins',
-      label: 'Mynt',
+      label: 'DiceCoin',
       value: coins,
       icon: CoinIcon,
       format: (v: number) => v.toLocaleString('sv-SE'),

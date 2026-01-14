@@ -18,7 +18,7 @@ insert into public.shop_items(
 )
 select
   t.id,
-  'Mynt-boost (24h)',
+  'DiceCoin-boost (24h)',
   'Dubbel DiceCoin-belöning på aktiviteter i 24 timmar',
   'powerup',
   null,
@@ -40,7 +40,7 @@ where not exists (
   select 1
   from public.shop_items si
   where si.tenant_id = t.id
-    and si.name = 'Mynt-boost (24h)'
+    and si.name = 'DiceCoin-boost (24h)'
 );
 
 commit;

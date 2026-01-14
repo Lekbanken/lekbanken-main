@@ -489,13 +489,13 @@
         "stats": {
           "users": "Användare",
           "organisations": "Organisationer",
-          "totalCoins": "Totalt coins",
+          "totalCoins": "Totalt DiceCoin",
           "achievements": "Achievements"
         },
         "table": {
           "rank": "Rank",
           "name": "Namn",
-          "coins": "Coins",
+          "coins": "DiceCoin",
           "games": "Spel",
           "achievements": "Achievements",
           "score": "Poäng"
@@ -518,7 +518,7 @@
         },
         "metricSort": {
           "score": "Sortera: Poäng",
-          "coins": "Sortera: Coins",
+          "coins": "Sortera: DiceCoin",
           "games": "Sortera: Spel",
           "achievements": "Sortera: Achievements"
         },
@@ -1537,7 +1537,7 @@
               "xpRules": "XP-regler",
               "levels": "Nivåer",
               "leaderboards": "Leaderboards",
-              "coinTransactions": "Coin-transaktioner"
+              "coinTransactions": "DiceCoin-transaktioner"
             },
             "stats": {
               "activePlayers": "Aktiva spelare",
@@ -1640,7 +1640,7 @@
             "status": "Status",
             "name": "Namn",
             "eventType": "Event Type",
-            "coins": "Coins",
+            "coins": "DiceCoin",
             "xp": "XP",
             "cooldown": "Cooldown",
             "active": "Aktiv",
@@ -4810,7 +4810,7 @@
       "subtitle": "Byt poäng mot belöningar och power-ups",
       "activeBoost": "Aktiv boost: {label}",
       "boostRemaining": "{hours}h {minutes}m kvar",
-      "coins": "Mynt",
+      "coins": "DiceCoin",
       "gems": "Gems",
       "featured": "Utvalt",
       "levelLocked": "Låst: nivå {level}",
@@ -5003,7 +5003,7 @@
       },
       "percentComplete": "{percent}% klart",
       "passedWith": "Godkänd med {score}%",
-      "coins": "mynt"
+      "coins": "DiceCoin"
     },
     "leaderboard": {
       "title": "Topplista",
@@ -5070,7 +5070,7 @@
       "rewards": {
         "badge": "Märke",
         "xp": "+{amount} XP",
-        "coins": "+{amount} mynt"
+        "coins": "+{amount} DiceCoin"
       },
       "status": {
         "completed": "Avklarad!",

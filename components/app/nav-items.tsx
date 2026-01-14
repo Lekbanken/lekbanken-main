@@ -23,7 +23,7 @@ function navPngIcon({ src, alt, size }: { src: string; alt: string; size: number
 const iconBrowse = navPngIcon({ src: "/icons/app-nav/browse.png", alt: "Upptäck", size: 24 });
 const iconBrowseActive = iconBrowse;
 
-const iconLekvaluta = navPngIcon({ src: "/icons/app-nav/lekvaluta.png", alt: "Poäng", size: 24 });
+const iconLekvaluta = navPngIcon({ src: "/icons/app-nav/lekvaluta.png", alt: "DiceCoin", size: 24 });
 const iconLekvalutaActive = iconLekvaluta;
 
 const iconPlanning = navPngIcon({ src: "/icons/app-nav/planning.png", alt: "Planera", size: 24 });

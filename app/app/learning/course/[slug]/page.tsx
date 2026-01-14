@@ -181,7 +181,7 @@ export default function CourseRunnerPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-lg">🪙</span>
-                <span className="font-medium">+{course.rewards.coins} mynt</span>
+                <span className="font-medium">+{course.rewards.coins} DiceCoin</span>
               </div>
             </div>
 
@@ -305,7 +305,7 @@ export default function CourseRunnerPage() {
                   </div>
                   <div className="flex items-center gap-2 rounded-lg bg-yellow-500/10 px-4 py-2">
                     <span className="text-xl">🪙</span>
-                    <span className="font-bold">+{course.rewards.coins} mynt</span>
+                    <span className="font-bold">+{course.rewards.coins} DiceCoin</span>
                   </div>
                 </div>
 

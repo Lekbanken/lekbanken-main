@@ -24,7 +24,7 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
         <p className="text-3xl font-bold text-foreground tabular-nums">
           {summary.balance.toLocaleString()}
         </p>
-        <p className="text-sm text-muted-foreground">mynt</p>
+        <p className="text-sm text-muted-foreground">DiceCoin</p>
       </div>
 
       {/* Recent Transactions */}
@@ -36,7 +36,7 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
         <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
           {summary.recentTransactions.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Ingen aktivitet ännu. Spela för att tjäna mynt!
+              Ingen aktivitet ännu. Spela för att tjäna DiceCoin!
             </div>
           ) : (
             summary.recentTransactions.slice(0, 3).map((tx, index) => {

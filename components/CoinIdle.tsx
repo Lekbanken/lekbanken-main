@@ -13,7 +13,7 @@ export function CoinIdle({
   size = 64,
   src = "/icons/app-nav/lekvaluta.png",
   className = "",
-  ariaLabel = "Lekbanken coin",
+  ariaLabel = "DiceCoin",
   paused = false,
 }: CoinIdleProps) {
   return (

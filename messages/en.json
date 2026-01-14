@@ -489,13 +489,13 @@
         "stats": {
           "users": "Users",
           "organisations": "Organizations",
-          "totalCoins": "Total coins",
+          "totalCoins": "Total DiceCoin",
           "achievements": "Achievements"
         },
         "table": {
           "rank": "Rank",
           "name": "Name",
-          "coins": "Coins",
+          "coins": "DiceCoin",
           "games": "Games",
           "achievements": "Achievements",
           "score": "Score"
@@ -518,7 +518,7 @@
         },
         "metricSort": {
           "score": "Sort: Score",
-          "coins": "Sort: Coins",
+          "coins": "Sort: DiceCoin",
           "games": "Sort: Games",
           "achievements": "Sort: Achievements"
         },
@@ -1502,7 +1502,7 @@
               "xpRules": "XP rules",
               "levels": "Levels",
               "leaderboards": "Leaderboards",
-              "coinTransactions": "Coin transactions"
+              "coinTransactions": "DiceCoin transactions"
             },
             "stats": {
               "activePlayers": "Active players",
@@ -1605,7 +1605,7 @@
             "status": "Status",
             "name": "Name",
             "eventType": "Event Type",
-            "coins": "Coins",
+            "coins": "DiceCoin",
             "xp": "XP",
             "cooldown": "Cooldown",
             "active": "Active",
@@ -4775,7 +4775,7 @@
       "subtitle": "Exchange points for rewards and power-ups",
       "activeBoost": "Active boost: {label}",
       "boostRemaining": "{hours}h {minutes}m remaining",
-      "coins": "Coins",
+      "coins": "DiceCoin",
       "gems": "Gems",
       "featured": "Featured",
       "levelLocked": "Locked: level {level}",
@@ -4968,7 +4968,7 @@
       },
       "percentComplete": "{percent}% complete",
       "passedWith": "Passed with {score}%",
-      "coins": "coins"
+      "coins": "DiceCoin"
     },
     "leaderboard": {
       "title": "Leaderboard",
@@ -5035,7 +5035,7 @@
       "rewards": {
         "badge": "Badge",
         "xp": "+{amount} XP",
-        "coins": "+{amount} coins"
+        "coins": "+{amount} DiceCoin"
       },
       "status": {
         "completed": "Completed!",

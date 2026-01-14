@@ -112,7 +112,7 @@ export async function GET(req: Request) {
       id: `tx:${t.id}`,
       type,
       occurredAt,
-      title: type === 'coin_spent' ? `Spenderade ${amount} mynt` : `Tjänade ${amount} mynt`,
+      title: type === 'coin_spent' ? `Spenderade ${amount} DiceCoin` : `Tjänade ${amount} DiceCoin`,
       description: t.description ?? undefined,
       href: '/app/gamification',
       meta: { amount },

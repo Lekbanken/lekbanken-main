@@ -39,6 +39,7 @@ function LoginForm() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
+      router.refresh()
       router.replace(redirectTo)
     }
   }, [isAuthenticated, isLoading, redirectTo, router])
@@ -49,6 +50,8 @@ function LoginForm() {
 
     try {
       await signIn(email, password)
+      // Refresh to ensure server state is updated before navigation
+      router.refresh()
       router.push(redirectTo)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')

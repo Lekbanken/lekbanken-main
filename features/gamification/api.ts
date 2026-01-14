@@ -18,7 +18,14 @@ export async function fetchGamificationSnapshot(): Promise<GamificationPayload> 
 export type PinnedAchievementsPayload = {
   tenantId: string;
   pinnedIds: string[];
-  achievements: Array<{ id: string; name: string; description: string | null; icon_url?: string | null }>;
+  achievements: Array<{ 
+    id: string; 
+    name: string; 
+    description: string | null; 
+    icon_url?: string | null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    icon_config?: Record<string, any> | null;
+  }>;
 };
 
 export async function fetchPinnedAchievements(tenantId: string): Promise<PinnedAchievementsPayload> {

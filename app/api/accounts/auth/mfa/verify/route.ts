@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { createServerRlsClient } from '@/lib/supabase/server'
 import { logUserAuditEvent } from '@/lib/services/userAudit.server'
 import {
@@ -8,9 +9,19 @@ import {
   getRecentFailedAttempts,
 } from '@/lib/services/mfa/mfaAudit.server'
 import { markMFAEnrolled, updateLastMFAVerification, checkMFARequirement } from '@/lib/services/mfa/mfaService.server'
+import { trustDevice } from '@/lib/services/mfa/mfaDevices.server'
 
 const MAX_FAILED_ATTEMPTS = 5
 const LOCKOUT_WINDOW_MINUTES = 15
+
+interface VerifyRequestBody {
+  factor_id?: string
+  code?: string
+  is_enrollment?: boolean
+  trust_device?: boolean
+  device_fingerprint?: string
+  device_name?: string
+}
 
 export async function POST(request: Request) {
   const supabase = await createServerRlsClient()
@@ -20,7 +31,7 @@ export async function POST(request: Request) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const body = (await request.json().catch(() => ({}))) as { factor_id?: string; code?: string; is_enrollment?: boolean }
+  const body = (await request.json().catch(() => ({}))) as VerifyRequestBody
   if (!body.factor_id || !body.code) {
     return NextResponse.json({ errors: ['factor_id and code are required'] }, { status: 400 })
   }
@@ -68,5 +79,32 @@ export async function POST(request: Request) {
     payload: { factor_id: body.factor_id },
   })
 
-  return NextResponse.json({ success: true })
+  // Handle device trust if requested
+  let trustToken: string | undefined
+  if (body.trust_device && body.device_fingerprint) {
+    try {
+      const headersList = await headers()
+      const ipAddress =
+        headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+        headersList.get('x-real-ip') ||
+        undefined
+      const userAgent = headersList.get('user-agent') || undefined
+
+      const result = await trustDevice(user.id, {
+        device_fingerprint: body.device_fingerprint,
+        device_name: body.device_name,
+        user_agent: userAgent,
+        ip_address: ipAddress,
+      })
+      trustToken = result.trust_token
+    } catch (trustError) {
+      // Log but don't fail the verification if device trust fails
+      console.warn('[mfa/verify] Failed to trust device:', trustError)
+    }
+  }
+
+  return NextResponse.json({ 
+    success: true,
+    trust_token: trustToken,
+  })
 }

@@ -20,6 +20,7 @@ import { Badge, Button, Card, CardContent, InlineAlert } from '@/components/ui'
 import { fetchJourneyFeed, fetchJourneySnapshot } from '@/features/journey/api'
 import type { JourneyActivity, JourneySnapshot } from '@/features/journey/types'
 import { fetchPinnedAchievements, type PinnedAchievementsPayload } from '@/features/gamification/api'
+import { BadgeIcon } from '@/features/gamification/components/BadgeIcon'
 
 type CosmeticLoadoutItem = {
   itemId: string
@@ -342,9 +343,11 @@ export default function AppDashboardPage() {
               <Card key={a.id} className="border-border/50">
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-violet-500/10 text-violet-600">
-                      <TrophyIcon className="h-5 w-5" />
-                    </div>
+                    <BadgeIcon 
+                      iconConfig={a.icon_config}
+                      size="sm"
+                      showGlow
+                    />
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground truncate">{a.name}</p>
                       <p className="text-xs text-muted-foreground line-clamp-1">{a.description ?? ''}</p>

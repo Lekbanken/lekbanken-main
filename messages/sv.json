@@ -1744,6 +1744,17 @@
           "draft": "Utkast",
           "active": "Aktiv",
           "archived": "Arkiverad"
+        },
+        "badgePicker": {
+          "title": "Välj Badge",
+          "description": "Välj en badge från biblioteket för att använda som ikon.",
+          "searchPlaceholder": "Sök badge...",
+          "noSearchResults": "Inga badges matchar din sökning.",
+          "noBadges": "Inga badges hittades i biblioteket.",
+          "createHint": "Skapa badges i Badge Builder under Bibliotek.",
+          "availableCount": "{count, plural, one {# badge} other {# badges}} tillgängliga",
+          "cancel": "Avbryt",
+          "select": "Välj Badge"
         }
       },
       "shopRewards": {
@@ -3803,6 +3814,7 @@
     },
     "sessions": {
       "title": "Sessioner",
+      "pageTitle": "Sessioner",
       "noAccess": "Ingen åtkomst",
       "noPermissionSessions": "Du behöver behörighet för att se sessioner.",
       "notFound": "Sessionen hittades inte",
@@ -3818,6 +3830,9 @@
         "sessions": "Sessioner"
       },
       "pageDescription": "Översikt över aktiva och avslutade sessioner.",
+      "errorState": {
+        "title": "Kunde inte ladda sessioner"
+      },
       "stats": {
         "sessions": "Sessioner",
         "active": "Aktiva",
@@ -3829,7 +3844,8 @@
         "all": "Alla statusar",
         "active": "Aktiva",
         "completed": "Avslutade",
-        "flagged": "Flaggade"
+        "flagged": "Flaggade",
+        "placeholder": "Välj status"
       },
       "emptyState": {
         "noAccess": "Ingen åtkomst",
@@ -3843,7 +3859,9 @@
         "host": "Värd",
         "participants": "Deltagare",
         "status": "Status",
-        "started": "Startad"
+        "started": "Startad",
+        "startedAt": "Startad",
+        "global": "Global"
       },
       "statusLabels": {
         "active": "Aktiv",
@@ -4517,6 +4535,17 @@
       "themeSystem": "System",
       "notifications": "Notifikationer"
     },
+    "gamification": {
+      "achievements": {
+        "celebration": {
+          "title": "Utmärkelse upplåst!",
+          "tapToClose": "Tryck var som helst för att stänga"
+        },
+        "detail": {
+          "unlockedPrefix": "Upplåst"
+        }
+      }
+    },
     "support": {
       "title": "Support",
       "subtitle": "Hur kan vi hjälpa dig idag?",
@@ -4999,11 +5028,48 @@
         "completed": "Avklarad",
         "inProgress": "Pågår",
         "locked": "Låst",
-        "available": "Tillgänglig"
+        "available": "Tillgänglig",
+        "failed": "Ej godkänd"
+      },
+      "empty": {
+        "title": "Inga kurser tillgängliga",
+        "description": "Det finns inga aktiva kurser för tillfället. Kontakta din organisation för mer information."
       },
       "percentComplete": "{percent}% klart",
       "passedWith": "Godkänd med {score}%",
-      "coins": "DiceCoin"
+      "failedWith": "Ej godkänd ({score}%), krävs {required}%",
+      "attemptsCount": "{count} försök gjorda",
+      "coins": "DiceCoin",
+      "runner": {
+        "backToLearning": "Tillbaka till utbildning",
+        "courseContent": "Kursinnehåll",
+        "readingSections": "läsavsnitt",
+        "quizQuestions": "quizfrågor",
+        "passThreshold": "Godkäntgräns",
+        "startCourse": "Starta kurs",
+        "retakeCourse": "Gör om kursen",
+        "alreadyCompleted": "Du har redan klarat denna kurs med {score}%",
+        "previous": "Föregående",
+        "next": "Nästa",
+        "goToQuiz": "Gå till quiz",
+        "finish": "Avsluta",
+        "quiz": "Quiz",
+        "quizInstructions": "Besvara alla frågor för att slutföra kursen. Du behöver minst {threshold}% rätt för att bli godkänd.",
+        "grading": "Rättar...",
+        "submitAnswers": "Skicka in svar",
+        "passed": {
+          "title": "Grattis! Du är godkänd!",
+          "score": "Du fick {score}% rätt ({correct}/{total} frågor)"
+        },
+        "failed": {
+          "title": "Tyvärr, du blev inte godkänd",
+          "score": "Du fick {score}% rätt, men behöver minst {threshold}%"
+        },
+        "correctAnswers": "rätta svar",
+        "tryAgain": "Försök igen",
+        "back": "Tillbaka",
+        "backToCourses": "Tillbaka till kurser"
+      }
     },
     "leaderboard": {
       "title": "Topplista",

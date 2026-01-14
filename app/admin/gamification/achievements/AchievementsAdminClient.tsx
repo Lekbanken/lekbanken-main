@@ -15,6 +15,7 @@ import {
   TrashIcon,
   CheckCircleIcon,
   ExclamationCircleIcon,
+  ClipboardDocumentIcon,
 } from '@heroicons/react/24/outline';
 import {
   AdminPageHeader,
@@ -357,6 +358,18 @@ export function AchievementsAdminClient({
       align: 'right' as const,
       cell: (row: AchievementRow) => (
         <div className="flex items-center justify-end gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              void navigator.clipboard.writeText(row.id);
+              showNotification('success', `ID kopierat: ${row.id.slice(0, 8)}...`);
+            }}
+            title="Kopiera ID"
+          >
+            <ClipboardDocumentIcon className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"

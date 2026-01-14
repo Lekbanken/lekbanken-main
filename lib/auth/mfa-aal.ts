@@ -11,6 +11,9 @@ import type { Database } from '@/types/supabase'
 // Cookie name for trusted device token
 export const MFA_TRUST_COOKIE = 'mfa_trust_token'
 
+// Cookie name for device fingerprint (stored alongside trust token)
+export const MFA_DEVICE_FP_COOKIE = 'mfa_device_fp'
+
 // How long to trust a device (in seconds)
 export const MFA_TRUST_DURATION = 30 * 24 * 60 * 60 // 30 days
 
@@ -35,10 +38,18 @@ export interface MFACheckResult {
 }
 
 /**
- * Extract device fingerprint from cookies/headers
- * Simple implementation - consider FingerprintJS for production
+ * Extract device fingerprint from cookies
+ * Prioritizes the stored fingerprint cookie over generating from headers
  */
-export function extractDeviceFingerprint(headers: Headers, _cookies: { get: (name: string) => { value: string } | undefined }): string | null {
+export function extractDeviceFingerprint(headers: Headers, cookies: { get: (name: string) => { value: string } | undefined }): string | null {
+  // First, check if we have a stored fingerprint from when the device was trusted
+  const storedFp = cookies.get(MFA_DEVICE_FP_COOKIE)?.value
+  if (storedFp) {
+    return storedFp
+  }
+  
+  // Fallback: Generate fingerprint from headers (for backwards compatibility)
+  // Note: This will NOT match client-generated fingerprints, but allows for header-based matching
   const userAgent = headers.get('user-agent') || ''
   const acceptLang = headers.get('accept-language') || ''
   
@@ -63,7 +74,7 @@ export function extractDeviceFingerprint(headers: Headers, _cookies: { get: (nam
 
 /**
  * Check if MFA is required and satisfied for a user
- * Lightweight check suitable for middleware
+ * Optimized for middleware - checks trusted device first to short-circuit
  */
 export async function checkMFAStatus(
   supabase: SupabaseClient<Database>,
@@ -90,16 +101,39 @@ export async function checkMFAStatus(
   }
 
   try {
-    // 1. Check current AAL level from Supabase Auth
-    const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-    result.currentAAL = aalData?.currentLevel as 'aal1' | 'aal2' | null
+    // OPTIMIZATION: Check trusted device FIRST if we have both token and fingerprint
+    // This is the fastest path - if device is trusted, we can skip all other checks
+    if (options?.trustToken && options?.deviceFingerprint) {
+      const isTrusted = await checkTrustedDevice(
+        supabase,
+        user.id,
+        options.trustToken,
+        options.deviceFingerprint
+      )
+      if (isTrusted) {
+        result.deviceTrusted = true
+        result.mfaSatisfied = true
+        result.mfaEnrolled = true // Trusted device implies enrolled
+        return result
+      }
+    }
+
+    // Run AAL check and factors check in parallel for better performance
+    const [aalResult, factorsResult] = await Promise.all([
+      supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+      supabase.auth.mfa.listFactors(),
+    ])
     
-    // 2. Check if user has verified MFA factors
-    const { data: factors } = await supabase.auth.mfa.listFactors()
-    result.mfaEnrolled = factors?.totp?.some(f => f.status === 'verified') ?? false
+    result.currentAAL = aalResult.data?.currentLevel as 'aal1' | 'aal2' | null
+    result.mfaEnrolled = factorsResult.data?.totp?.some(f => f.status === 'verified') ?? false
     
-    // 3. Check if MFA is required for this user via RPC
-    // Note: Using type assertion since RPC may not be in generated types yet
+    // If already at AAL2, MFA is satisfied - no need to check further
+    if (result.currentAAL === 'aal2') {
+      result.mfaSatisfied = true
+      return result
+    }
+    
+    // Check if MFA is required for this user via RPC
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { data: requirementData, error: reqError } = await (supabase as any).rpc('user_requires_mfa', {
       target_user_id: user.id,
@@ -133,9 +167,8 @@ export async function checkMFAStatus(
       return result
     }
     
-    // Check if user is enrolled
-    if (requirement.enrolled && result.currentAAL === 'aal2') {
-      // Enrolled and verified at AAL2
+    // Check if user is enrolled and at AAL2
+    if (requirement.enrolled && (result.currentAAL as string) === 'aal2') {
       result.mfaSatisfied = true
       return result
     }
@@ -155,23 +188,11 @@ export async function checkMFAStatus(
       }
     }
     
-    // Check trusted device if token provided
-    if (options?.trustToken && options?.deviceFingerprint && result.mfaEnrolled) {
-      const isTrusted = await checkTrustedDevice(
-        supabase,
-        user.id,
-        options.trustToken,
-        options.deviceFingerprint
-      )
-      if (isTrusted) {
-        result.deviceTrusted = true
-        result.mfaSatisfied = true
-        return result
-      }
-    }
+    // NOTE: Trusted device check was already done at the start of the function
+    // If we reach here, device was not trusted
     
     // MFA required but not satisfied
-    if (result.mfaEnrolled && result.currentAAL !== 'aal2') {
+    if (result.mfaEnrolled && (result.currentAAL as string) !== 'aal2') {
       // User enrolled but hasn't verified this session
       result.mfaSatisfied = false
       return result

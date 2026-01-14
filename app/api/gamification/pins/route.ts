@@ -67,7 +67,7 @@ export async function GET(request: Request) {
 
   const { data: achievements, error: achievementsError } = await supabase
     .from('achievements')
-    .select('id,name,description,icon_url')
+    .select('id,name,description,icon_url,icon_config')
     .in('id', pinnedIds)
 
   if (achievementsError) {

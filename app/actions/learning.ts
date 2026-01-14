@@ -29,7 +29,7 @@ export type StartCourseResult = {
  */
 export async function startCourseAttempt(
   courseId: string,
-  tenantId: string
+  tenantId: string | null
 ): Promise<StartCourseResult> {
   const supabase = await createServerRlsClient()
   
@@ -38,12 +38,31 @@ export async function startCourseAttempt(
     return { success: false, error: 'Not authenticated' }
   }
 
+  // For global courses, we need to get the user's active tenant
+  // since learning_user_progress requires a valid tenant_id
+  let effectiveTenantId = tenantId
+  if (!effectiveTenantId) {
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .limit(1)
+      .single()
+    
+    if (membership?.tenant_id) {
+      effectiveTenantId = membership.tenant_id
+    } else {
+      return { success: false, error: 'No active tenant membership found' }
+    }
+  }
+
   // Ensure user progress record exists
   const { error: progressError } = await supabase
     .from('learning_user_progress')
     .upsert({
       user_id: user.id,
-      tenant_id: tenantId,
+      tenant_id: effectiveTenantId,
       course_id: courseId,
       status: 'in_progress',
       attempts_count: 0,
@@ -62,7 +81,7 @@ export async function startCourseAttempt(
     .from('learning_course_attempts')
     .insert({
       user_id: user.id,
-      tenant_id: tenantId,
+      tenant_id: effectiveTenantId,
       course_id: courseId,
       started_at: new Date().toISOString(),
     })
@@ -85,7 +104,7 @@ export async function startCourseAttempt(
  */
 export async function submitQuizAnswers(
   courseId: string,
-  tenantId: string,
+  tenantId: string | null,
   attemptId: string,
   answers: Array<{ questionId: string; selectedOptionIds: string[] }>
 ): Promise<SubmitQuizResult> {
@@ -94,6 +113,24 @@ export async function submitQuizAnswers(
   const { data: { user }, error: authError } = await supabase.auth.getUser()
   if (authError || !user) {
     return { success: false, score: 0, passed: false, error: 'Not authenticated' }
+  }
+
+  // For global courses, get the user's active tenant
+  let effectiveTenantId = tenantId
+  if (!effectiveTenantId) {
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .limit(1)
+      .single()
+    
+    if (membership?.tenant_id) {
+      effectiveTenantId = membership.tenant_id
+    } else {
+      return { success: false, score: 0, passed: false, error: 'No active tenant membership found' }
+    }
   }
 
   // Fetch course with quiz
@@ -168,7 +205,7 @@ export async function submitQuizAnswers(
     .from('learning_user_progress')
     .select('best_score')
     .eq('user_id', user.id)
-    .eq('tenant_id', tenantId)
+    .eq('tenant_id', effectiveTenantId)
     .eq('course_id', courseId)
     .single()
   
@@ -185,7 +222,7 @@ export async function submitQuizAnswers(
       completed_at: passed ? new Date().toISOString() : null,
     })
     .eq('user_id', user.id)
-    .eq('tenant_id', tenantId)
+    .eq('tenant_id', effectiveTenantId)
     .eq('course_id', courseId)
 
   if (progressError) {
@@ -198,7 +235,7 @@ export async function submitQuizAnswers(
     const { data: rewardResult, error: rewardError } = await supabase
       .rpc('learning_grant_course_rewards_v1', {
         p_user_id: user.id,
-        p_tenant_id: tenantId,
+        p_tenant_id: effectiveTenantId,
         p_course_id: courseId,
         p_attempt_id: attemptId,
       })
@@ -320,4 +357,324 @@ export async function checkPrerequisites(
     .map(e => (e.from_course as { title: string })?.title || e.from_course_id) || []
 
   return { met: false, missing }
+}
+
+// ============================================
+// TYPES FOR LEARNER COURSE LIST
+// ============================================
+
+export type LearnerCourseStatus = 'available' | 'in_progress' | 'completed' | 'failed' | 'locked';
+
+export interface LearnerCourse {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  status: LearnerCourseStatus;
+  difficulty: 'beginner' | 'intermediate' | 'advanced' | 'expert' | null;
+  estimated_duration_minutes: number | null;
+  pass_score: number | null;
+  rewards: {
+    dicecoin?: number;
+    xp?: number;
+    achievement_id?: string;
+  };
+  progress?: {
+    best_score: number | null;
+    last_score: number | null;
+    attempts_count: number | null;
+    completed_at: string | null;
+  };
+  lockedReason?: string;
+}
+
+export interface LearnerDashboardData {
+  courses: LearnerCourse[];
+  stats: {
+    coursesCompleted: number;
+    totalCourses: number;
+    totalXpEarned: number;
+    totalDicecoinEarned: number;
+  };
+}
+
+/**
+ * Get available courses for the current learner
+ * Combines active courses with user progress data
+ */
+export async function getAvailableCoursesForLearner(
+  tenantId?: string
+): Promise<LearnerDashboardData> {
+  const supabase = await createServerRlsClient()
+  
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return { 
+      courses: [], 
+      stats: { coursesCompleted: 0, totalCourses: 0, totalXpEarned: 0, totalDicecoinEarned: 0 } 
+    }
+  }
+
+  // Fetch active courses - global ones (tenant_id is null) and tenant-specific if provided
+  let coursesQuery = supabase
+    .from('learning_courses')
+    .select('id, slug, title, description, difficulty, duration_minutes, pass_score, rewards_json, tenant_id')
+    .eq('status', 'active')
+    .order('title', { ascending: true })
+
+  // If tenant is specified, get global + tenant courses
+  // Otherwise, only get global courses
+  if (tenantId) {
+    coursesQuery = coursesQuery.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`)
+  } else {
+    coursesQuery = coursesQuery.is('tenant_id', null)
+  }
+
+  const { data: courses, error: coursesError } = await coursesQuery
+
+  if (coursesError || !courses) {
+    console.error('Failed to fetch courses:', coursesError)
+    return { 
+      courses: [], 
+      stats: { coursesCompleted: 0, totalCourses: 0, totalXpEarned: 0, totalDicecoinEarned: 0 } 
+    }
+  }
+
+  // Fetch user progress for all courses
+  let progressQuery = supabase
+    .from('learning_user_progress')
+    .select('course_id, status, best_score, last_score, attempts_count, completed_at')
+    .eq('user_id', user.id)
+
+  if (tenantId) {
+    progressQuery = progressQuery.eq('tenant_id', tenantId)
+  }
+
+  const { data: progressList } = await progressQuery
+
+  // Create a map for quick lookup
+  type ProgressRecord = {
+    course_id: string;
+    status: string;
+    best_score: number | null;
+    last_score: number | null;
+    attempts_count: number | null;
+    completed_at: string | null;
+  };
+  const progressMap = new Map<string, ProgressRecord>()
+  if (progressList) {
+    for (const p of progressList) {
+      progressMap.set(p.course_id, p as ProgressRecord)
+    }
+  }
+
+  // Calculate stats
+  let coursesCompleted = 0
+  let totalXpEarned = 0
+  let totalDicecoinEarned = 0
+
+  // Map courses to learner format
+  const learnerCourses: LearnerCourse[] = courses.map(course => {
+    const progress = progressMap.get(course.id)
+    const rewardsJson = (course.rewards_json as { dicecoin_amount?: number; xp_amount?: number; achievement_id?: string }) || {}
+    
+    // Map database field names to learner format
+    const rewards = {
+      dicecoin: rewardsJson.dicecoin_amount,
+      xp: rewardsJson.xp_amount,
+      achievement_id: rewardsJson.achievement_id,
+    }
+    
+    // Determine status
+    let status: LearnerCourseStatus = 'available'
+    if (progress) {
+      if (progress.status === 'completed') {
+        status = 'completed'
+        coursesCompleted++
+        totalXpEarned += rewards.xp || 0
+        totalDicecoinEarned += rewards.dicecoin || 0
+      } else if (progress.status === 'failed') {
+        status = 'failed'
+      } else if (progress.status === 'in_progress') {
+        status = 'in_progress'
+      }
+    }
+
+    return {
+      id: course.id,
+      slug: course.slug,
+      title: course.title,
+      description: course.description,
+      status,
+      difficulty: course.difficulty as LearnerCourse['difficulty'],
+      estimated_duration_minutes: course.duration_minutes,
+      pass_score: course.pass_score,
+      rewards,
+      progress: progress ? {
+        best_score: progress.best_score,
+        last_score: progress.last_score,
+        attempts_count: progress.attempts_count,
+        completed_at: progress.completed_at,
+      } : undefined,
+    }
+  })
+
+  return {
+    courses: learnerCourses,
+    stats: {
+      coursesCompleted,
+      totalCourses: courses.length,
+      totalXpEarned,
+      totalDicecoinEarned,
+    },
+  }
+}
+
+// ============================================
+// TYPES FOR COURSE RUNNER
+// ============================================
+
+export interface CourseContentBlock {
+  type: 'text' | 'image' | 'video';
+  content: string;
+  title?: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: Array<{
+    id: string;
+    text: string;
+    is_correct?: boolean; // Only visible in admin, not exposed to learner
+  }>;
+}
+
+export interface CourseRunnerData {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  estimated_duration_minutes: number | null;
+  pass_score: number | null;
+  content_blocks: CourseContentBlock[];
+  quiz_questions: QuizQuestion[];
+  rewards: {
+    dicecoin?: number;
+    xp?: number;
+    achievement_id?: string;
+  };
+  userProgress?: {
+    status: string;
+    best_score: number | null;
+    attempts_count: number | null;
+  };
+}
+
+/**
+ * Get course details for the course runner
+ */
+export async function getCourseBySlug(
+  slug: string,
+  tenantId?: string
+): Promise<CourseRunnerData | null> {
+  const supabase = await createServerRlsClient()
+  
+  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  if (authError || !user) {
+    return null
+  }
+
+  // Fetch course by slug
+  let courseQuery = supabase
+    .from('learning_courses')
+    .select('id, slug, title, description, duration_minutes, pass_score, content_json, quiz_json, rewards_json, tenant_id')
+    .eq('slug', slug)
+    .eq('status', 'active')
+
+  // If tenant is specified, get global + tenant courses
+  if (tenantId) {
+    courseQuery = courseQuery.or(`tenant_id.is.null,tenant_id.eq.${tenantId}`)
+  } else {
+    courseQuery = courseQuery.is('tenant_id', null)
+  }
+
+  const { data: course, error: courseError } = await courseQuery.single()
+
+  if (courseError || !course) {
+    console.error('Course not found:', courseError)
+    return null
+  }
+
+  // Fetch user progress for this course
+  let progressQuery = supabase
+    .from('learning_user_progress')
+    .select('status, best_score, attempts_count')
+    .eq('user_id', user.id)
+    .eq('course_id', course.id)
+
+  if (tenantId) {
+    progressQuery = progressQuery.eq('tenant_id', tenantId)
+  }
+
+  const { data: progress } = await progressQuery.maybeSingle()
+
+  // Parse and map content JSON from admin format to runner format
+  // Admin uses: { id, title, body_markdown, order }
+  // Runner expects: { type, content, title }
+  type AdminContentSection = { id: string; title?: string; body_markdown?: string; order?: number };
+  const rawContent = (course.content_json as AdminContentSection[]) || []
+  const contentBlocks: CourseContentBlock[] = rawContent.map(section => ({
+    type: 'text',
+    content: section.body_markdown || '',
+    title: section.title,
+  }))
+
+  // Parse quiz JSON - options have is_correct but we don't expose it
+  type AdminQuizQuestion = { 
+    id: string; 
+    question: string; 
+    options: Array<{ id: string; text: string; is_correct?: boolean }>; 
+    order?: number;
+  };
+  const rawQuiz = (course.quiz_json as AdminQuizQuestion[]) || []
+  const quizQuestions: QuizQuestion[] = rawQuiz.map(q => ({
+    id: q.id,
+    question: q.question,
+    options: q.options.map(opt => ({
+      id: opt.id,
+      text: opt.text,
+      // Don't expose is_correct to client
+    }))
+  }))
+
+  // Parse rewards JSON - admin uses dicecoin_amount/xp_amount, we normalize to dicecoin/xp
+  type AdminRewards = { dicecoin_amount?: number; xp_amount?: number; achievement_id?: string };
+  const rawRewards = (course.rewards_json as AdminRewards) || {}
+  const rewards = {
+    dicecoin: rawRewards.dicecoin_amount,
+    xp: rawRewards.xp_amount,
+    achievement_id: rawRewards.achievement_id,
+  }
+
+  return {
+    id: course.id,
+    slug: course.slug,
+    title: course.title,
+    description: course.description,
+    estimated_duration_minutes: course.duration_minutes,
+    pass_score: course.pass_score,
+    content_blocks: contentBlocks,
+    quiz_questions: quizQuestions,
+    rewards: {
+      dicecoin: rewards.dicecoin,
+      xp: rewards.xp,
+      achievement_id: rewards.achievement_id,
+    },
+    userProgress: progress ? {
+      status: progress.status,
+      best_score: progress.best_score,
+      attempts_count: progress.attempts_count,
+    } : undefined,
+  }
 }

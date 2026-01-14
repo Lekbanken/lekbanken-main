@@ -95,17 +95,33 @@ export async function trustDevice(
   // Get user's primary tenant if not provided
   let tenantId = params.tenant_id
   if (!tenantId) {
-    const { data: membership } = await supabase
+    // First try to get primary tenant
+    const { data: primaryMembership } = await supabase
       .from('user_tenant_memberships')
       .select('tenant_id')
       .eq('user_id', userId)
       .eq('is_primary', true)
-      .single()
-    tenantId = membership?.tenant_id
+      .maybeSingle()
+    
+    if (primaryMembership?.tenant_id) {
+      tenantId = primaryMembership.tenant_id
+    } else {
+      // Fall back to any tenant the user is a member of
+      const { data: anyMembership } = await supabase
+        .from('user_tenant_memberships')
+        .select('tenant_id')
+        .eq('user_id', userId)
+        .limit(1)
+        .maybeSingle()
+      tenantId = anyMembership?.tenant_id
+    }
   }
 
+  // If still no tenant, use a system-level placeholder for users without tenants
+  // This allows system admins or users in onboarding to still trust devices
   if (!tenantId) {
-    throw new Error('No tenant context for device trust')
+    // Use a constant UUID for "no tenant" devices - allows system admins to trust devices
+    tenantId = '00000000-0000-0000-0000-000000000000'
   }
 
   // Generate trust token

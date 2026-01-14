@@ -60,6 +60,7 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'default', size = 'm
         return (
           <button
             key={tab.id}
+            type="button"
             role="tab"
             aria-selected={isActive}
             aria-controls={`tabpanel-${tab.id}`}

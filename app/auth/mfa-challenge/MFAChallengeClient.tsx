@@ -9,13 +9,14 @@ import { MFAChallenge } from '@/components/auth/MFAChallenge';
 
 interface MFAChallengeClientProps {
   factorId: string;
+  redirectTo?: string;
 }
 
-export function MFAChallengeClient({ factorId }: MFAChallengeClientProps) {
+export function MFAChallengeClient({ factorId, redirectTo = '/app' }: MFAChallengeClientProps) {
   return (
     <MFAChallenge
       factorId={factorId}
-      redirectUrl="/app"
+      redirectUrl={redirectTo}
       showTrustDevice={true}
       trustDays={30}
     />

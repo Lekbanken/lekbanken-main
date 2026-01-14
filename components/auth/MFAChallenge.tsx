@@ -69,14 +69,27 @@ export function MFAChallenge({
     verifyCode,
     verifyRecoveryCode,
     reset,
+    deviceFingerprint,
   } = useMFAChallenge({
     factorId,
     onSuccess: (data) => {
       setIsVerified(true);
       
-      // Store trust token if provided
+      // Store trust token and device fingerprint in cookies if provided
+      // Middleware reads from cookies to verify trusted device
       if (data.trustToken) {
-        localStorage.setItem('mfa_trust_token', data.trustToken);
+        const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+        const expires = new Date();
+        expires.setDate(expires.getDate() + trustDays);
+        const cookieOptions = `Path=/; Expires=${expires.toUTCString()}; SameSite=Lax${isSecure ? '; Secure' : ''}`;
+        
+        // Set trust token cookie
+        document.cookie = `mfa_trust_token=${data.trustToken}; ${cookieOptions}`;
+        
+        // Also store the device fingerprint so middleware can match it
+        if (deviceFingerprint) {
+          document.cookie = `mfa_device_fp=${deviceFingerprint}; ${cookieOptions}`;
+        }
       }
       
       // Call success callback

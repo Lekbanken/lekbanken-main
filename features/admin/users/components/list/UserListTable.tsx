@@ -114,18 +114,17 @@ function UserListTableRow({
   canDelete,
   onSelect,
   onStatusChange,
-  onRemove,
+  onRequestRemove,
 }: {
   user: AdminUserListItem;
   canEdit: boolean;
   canDelete: boolean;
   onSelect: () => void;
   onStatusChange?: (userId: string, status: AdminUserStatus) => Promise<void>;
-  onRemove?: (userId: string) => Promise<void>;
+  onRequestRemove?: () => void;
 }) {
   const t = useTranslations('admin.users');
   const { success } = useToast();
-  const [removeOpen, setRemoveOpen] = useState(false);
   const formatRelativeTime = createFormatRelativeTime(t);
   
   const displayName = user.name || user.email.split('@')[0];
@@ -280,14 +279,14 @@ function UserListTableRow({
                 </>
               )}
               
-              {canDelete && onRemove && (
+              {canDelete && onRequestRemove && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     destructive
                     onClick={(e) => {
                       e.stopPropagation();
-                      setRemoveOpen(true);
+                      onRequestRemove();
                     }}
                   >
                     <TrashIcon className="h-4 w-4" />
@@ -299,31 +298,6 @@ function UserListTableRow({
           </DropdownMenu>
         </td>
       </tr>
-
-      {/* Delete confirmation dialog */}
-      {canDelete && onRemove && (
-        <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
-          <AlertDialogContent variant="destructive">
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t('dialog.removeTitle')}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {t('dialog.removeDescription', { email: user.email, count: user.membershipsCount })}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                onClick={() => {
-                  void onRemove(user.id);
-                }}
-              >
-                {t('actions.remove')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
     </>
   );
 }
@@ -348,6 +322,7 @@ export function UserListTable({
   onRemove,
 }: UserListTableProps) {
   const t = useTranslations('admin.users');
+  const [userToRemove, setUserToRemove] = useState<AdminUserListItem | null>(null);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -387,7 +362,7 @@ export function UserListTable({
                 canDelete={canDelete}
                 onSelect={() => onSelectUser(user)}
                 onStatusChange={onStatusChange}
-                onRemove={onRemove}
+                onRequestRemove={canDelete && onRemove ? () => setUserToRemove(user) : undefined}
               />
             ))}
           </tbody>
@@ -409,6 +384,37 @@ export function UserListTable({
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Delete confirmation dialog - rendered outside table to avoid hydration errors */}
+      {canDelete && onRemove && (
+        <AlertDialog open={!!userToRemove} onOpenChange={(open) => !open && setUserToRemove(null)}>
+          <AlertDialogContent variant="destructive">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('dialog.removeTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {userToRemove && t('dialog.removeDescription', { 
+                  email: userToRemove.email, 
+                  count: userToRemove.membershipsCount 
+                })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => {
+                  if (userToRemove) {
+                    void onRemove(userToRemove.id);
+                    setUserToRemove(null);
+                  }
+                }}
+              >
+                {t('actions.remove')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </div>
   );

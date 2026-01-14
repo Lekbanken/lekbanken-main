@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition } from 'react';
+import { TrophyIcon } from '@heroicons/react/24/outline';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
@@ -13,6 +14,9 @@ import {
 } from '@/components/ui/sheet';
 import type { AchievementRow, TenantOption } from '@/app/actions/achievements-admin';
 import { createAchievement, updateAchievement } from '@/app/actions/achievements-admin';
+import { BadgePicker, type BadgeExportItem } from '@/components/admin/BadgePicker';
+import { BadgePreviewEnhanced } from '@/features/admin/achievements/editor/components/BadgePreviewEnhanced';
+import type { AchievementIconConfig } from '@/features/admin/achievements/types';
 
 interface AchievementEditorDrawerProps {
   open: boolean;
@@ -53,6 +57,7 @@ export function AchievementEditorDrawer({
   const isEditing = !!achievement;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [badgePickerOpen, setBadgePickerOpen] = useState(false);
 
   // Form state - initialized based on whether editing or creating
   const [name, setName] = useState(achievement?.name ?? '');
@@ -66,6 +71,15 @@ export function AchievementEditorDrawer({
       : ''
   );
   const [status, setStatus] = useState<'draft' | 'active' | 'archived'>(achievement?.status ?? 'draft');
+  const [selectedBadge, setSelectedBadge] = useState<BadgeExportItem | null>(null);
+  const [iconConfig, setIconConfig] = useState<AchievementIconConfig | null>(
+    achievement?.icon_config as AchievementIconConfig | null ?? null
+  );
+
+  const handleBadgeSelect = (badge: BadgeExportItem) => {
+    setSelectedBadge(badge);
+    setIconConfig(badge.icon);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +93,7 @@ export function AchievementEditorDrawer({
       condition_type: conditionType,
       condition_value: conditionValue ? parseInt(conditionValue, 10) : null,
       status,
+      icon_config: iconConfig,
     };
 
     startTransition(async () => {
@@ -141,6 +156,34 @@ export function AchievementEditorDrawer({
               placeholder="Beskriv hur man uppnår detta achievement..."
               rows={3}
             />
+          </div>
+
+          {/* Badge/Icon */}
+          <div className="space-y-2">
+            <Label>Badge/Ikon</Label>
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30">
+                {iconConfig ? (
+                  <BadgePreviewEnhanced icon={iconConfig} size="sm" showGlow={false} />
+                ) : (
+                  <TrophyIcon className="h-8 w-8 text-muted-foreground" />
+                )}
+              </div>
+              <div className="flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setBadgePickerOpen(true)}
+                >
+                  {iconConfig ? 'Byt Badge' : 'Välj Badge'}
+                </Button>
+                {selectedBadge && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {selectedBadge.title}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Scope */}
@@ -266,6 +309,14 @@ export function AchievementEditorDrawer({
             </Button>
           </SheetFooter>
         </form>
+
+        {/* Badge Picker Dialog */}
+        <BadgePicker
+          open={badgePickerOpen}
+          onClose={() => setBadgePickerOpen(false)}
+          onSelect={handleBadgeSelect}
+          currentBadgeId={selectedBadge?.id}
+        />
       </SheetContent>
     </Sheet>
   );

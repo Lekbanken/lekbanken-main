@@ -227,6 +227,7 @@ export async function createAchievement(
       ...rest,
       scope,
       tenant_id: scope === 'tenant' ? tenant_id : null,
+      // Note: scope_tenant_id is a GENERATED column computed from tenant_id
       created_by: user.id,
       updated_by: user.id,
     })
@@ -282,6 +283,7 @@ export async function updateAchievement(
   if (scope !== undefined) {
     updateData.scope = scope;
     updateData.tenant_id = scope === 'tenant' ? tenant_id : null;
+    // Note: scope_tenant_id is a GENERATED column computed from tenant_id
   }
 
   const { data, error } = await adminClient

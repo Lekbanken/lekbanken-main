@@ -282,8 +282,16 @@ export async function getMFAStatus(userId: string): Promise<MFAStatus> {
   const recoveryCodes = userSettings?.recovery_codes_count ?? 10
   const recoveryUsed = userSettings?.recovery_codes_used ?? 0
 
+  // Check if MFA is enabled - use BOTH Supabase factors AND our settings
+  // This ensures we don't show "not enabled" when user has MFA configured in Supabase
+  const hasVerifiedTOTP = factors.some((f) => f.factor_type === 'totp' && f.status === 'verified')
+  const hasVerifiedPhone = factors.some((f) => f.factor_type === 'phone' && f.status === 'verified')
+  const isEnabledInSupabase = hasVerifiedTOTP || hasVerifiedPhone
+  const isEnabledInSettings = userSettings?.enrolled_at !== null
+
   return {
-    is_enabled: userSettings?.enrolled_at !== null,
+    // MFA is enabled if EITHER Supabase has verified factors OR our settings show enrollment
+    is_enabled: isEnabledInSupabase || isEnabledInSettings,
     is_required: requirement.required,
     required_reason: requirement.reason,
     enrolled_at: userSettings?.enrolled_at ?? null,
@@ -293,8 +301,8 @@ export async function getMFAStatus(userId: string): Promise<MFAStatus> {
     grace_period_end: userSettings?.grace_period_end ?? null,
     days_until_required: requirement.days_remaining,
     factors: {
-      totp: factors.some((f) => f.factor_type === 'totp' && f.status === 'verified'),
-      sms: factors.some((f) => f.factor_type === 'phone' && f.status === 'verified'),
+      totp: hasVerifiedTOTP,
+      sms: hasVerifiedPhone,
       webauthn: false, // Not yet implemented
     },
   }

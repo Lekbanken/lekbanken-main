@@ -16,6 +16,7 @@ type AchievementRow = {
   name: string;
   description?: string | null;
   icon_url?: string | null;
+  icon_config?: Record<string, unknown> | null;
   condition_type?: string | null;
   condition_value?: number | null;
   is_easter_egg?: boolean | null;
@@ -24,6 +25,7 @@ type AchievementRow = {
 
 type UserAchievementRow = {
   achievement_id: string;
+  unlocked_at?: string | null;
 };
 
 type UserCoinRow = {
@@ -90,16 +92,18 @@ function mapAchievements(
     name: string;
     description?: string | null;
     icon_url?: string | null;
+    icon_config?: Record<string, unknown> | null;
     condition_type?: string | null;
     condition_value?: number | null;
     is_easter_egg?: boolean | null;
     hint_text?: string | null;
   }>,
-  unlocked: Array<{ achievement_id: string }>
+  unlocked: Array<{ achievement_id: string; unlocked_at?: string | null }>
 ): Achievement[] {
-  const unlockedSet = new Set(unlocked.map((a) => a.achievement_id));
+  const unlockedMap = new Map(unlocked.map((a) => [a.achievement_id, a.unlocked_at]));
   return achievements.map((a) => {
-    const status: AchievementStatus = unlockedSet.has(a.id) ? "unlocked" : "locked";
+    const unlockedAt = unlockedMap.get(a.id);
+    const status: AchievementStatus = unlockedAt !== undefined ? "unlocked" : "locked";
     const points = a.condition_value ?? undefined;
     return {
       id: a.id,
@@ -107,10 +111,13 @@ function mapAchievements(
       description: a.description ?? "",
       status,
       icon: a.icon_url ?? undefined,
+      icon_config: a.icon_config ?? null,
       points,
       requirement: inferRequirement(a.condition_type ?? undefined, a.condition_value ?? undefined),
+      hint: a.hint_text ?? null,
       hintText: a.hint_text ?? null,
       isEasterEgg: Boolean(a.is_easter_egg ?? false),
+      unlockedAt: unlockedAt ?? null,
     } satisfies Achievement;
   });
 }
@@ -189,7 +196,7 @@ export async function GET() {
   // Build achievements query: global (tenant_id IS NULL) + tenant-specific active achievements
   let achievementsQuery = supabase
     .from("achievements")
-    .select("id,name,description,icon_url,condition_type,condition_value,is_easter_egg,hint_text,tenant_id")
+    .select("id,name,description,icon_url,icon_config,condition_type,condition_value,is_easter_egg,hint_text,tenant_id")
     .eq("status", "active")
     .order("created_at", { ascending: true });
 
@@ -203,7 +210,7 @@ export async function GET() {
 
   const [achievementsRes, userAchievementsRes, coinsRes, txRes, streakRes] = await Promise.all([
     achievementsQuery,
-    supabase.from("user_achievements").select("achievement_id").eq("user_id", userId),
+    supabase.from("user_achievements").select("achievement_id,unlocked_at").eq("user_id", userId),
     supabase
       .from("user_coins")
       .select("balance")

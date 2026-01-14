@@ -1,3 +1,5 @@
+import type { AchievementIconConfig } from "@/features/admin/achievements/types";
+
 export type AchievementStatus = "unlocked" | "locked" | "in_progress";
 
 export type Achievement = {
@@ -6,11 +8,15 @@ export type Achievement = {
   description: string;
   status: AchievementStatus;
   icon?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon_config?: AchievementIconConfig | Record<string, any> | null;
   progress?: number; // 0-100 when in progress
   points?: number;
   requirement?: string;
+  hint?: string | null;
   hintText?: string | null;
   isEasterEgg?: boolean;
+  unlockedAt?: string | null;
 };
 
 export type CoinTransaction = {

@@ -263,6 +263,7 @@
       "featureFlags": "Feature Flags",
       "apiKeys": "API-nycklar",
       "webhooks": "Webhooks",
+      "cookies": "Kakor",
       "incidents": "Incidenter",
       "releaseNotes": "Release Notes",
       "settings": "Inställningar",
@@ -1158,6 +1159,102 @@
       "pageDescription": "Hantera webhook-endpoints och loggar.",
       "emptyTitle": "Inga webhooks konfigurerade ännu",
       "emptyDescription": "Här kommer du kunna lägga till endpoints, se leveransstatus och loggar. Backendkoppling saknas ännu."
+    },
+    "cookies": {
+      "pageTitle": "Kakhantering",
+      "pageDescription": "Hantera katalog över kakor, samtyckesversioner och se samtyckesstatistik.",
+      "tabs": {
+        "catalog": "Katalog",
+        "policy": "Samtyckespolicy",
+        "statistics": "Statistik",
+        "audit": "Granskningslogg"
+      },
+      "catalog": {
+        "title": "Katalog över kakor",
+        "description": "Hantera alla kakor som används på plattformen. Ändringar reflekteras i kakdeklarationen.",
+        "addCookie": "Lägg till kaka",
+        "editCookie": "Redigera kaka",
+        "deleteCookie": "Ta bort kaka",
+        "confirmDelete": "Är du säker på att du vill ta bort denna kaka?",
+        "fields": {
+          "name": "Namn",
+          "provider": "Leverantör",
+          "category": "Kategori",
+          "purpose": "Syfte",
+          "duration": "Varaktighet",
+          "type": "Typ",
+          "isActive": "Aktiv"
+        },
+        "descriptions": {
+          "cookieName": "Unik identifierare (t.ex. _ga, session_id)",
+          "duration": "Dagar till utgång (tom = sessionbaserad)",
+          "defaultOn": "Om aktiverad är denna på som standard för sin kategori",
+          "providerPlaceholder": "Lekbanken, Google Analytics, osv."
+        },
+        "categories": {
+          "necessary": "Nödvändiga",
+          "functional": "Funktionella",
+          "analytics": "Analys",
+          "marketing": "Marknadsföring"
+        },
+        "types": {
+          "first_party": "Förstaparts",
+          "third_party": "Tredjepartskakor"
+        },
+        "emptyTitle": "Inga kakor i katalogen",
+        "emptyDescription": "Lägg till kakor i katalogen för att spåra vilken data som samlas in."
+      },
+      "policy": {
+        "title": "Samtyckesversioner",
+        "description": "Hantera policyversioner. Att skapa en ny version kommer be användare om nytt samtycke.",
+        "currentVersion": "Aktuell version",
+        "createVersion": "Skapa ny version",
+        "fields": {
+          "version": "Version",
+          "effectiveDate": "Ikraftträdandedatum",
+          "changeSummary": "Ändringssammanfattning",
+          "status": "Status"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        }
+      },
+      "statistics": {
+        "title": "Samtyckesstatistik",
+        "description": "Översikt över användarsamtycke på plattformen.",
+        "cards": {
+          "totalConsents": "Totalt samtycke",
+          "acceptAll": "Acceptera alla",
+          "denyAll": "Neka alla",
+          "customized": "Anpassat"
+        },
+        "byCategory": "Samtycke per kategori",
+        "byLocale": "Samtycke per språk",
+        "trend": "Samtyckestrend (senaste 30 dagarna)",
+        "gpcDnt": "GPC/DNT-signaler upptäckta"
+      },
+      "audit": {
+        "title": "Samtyckesgranskningslogg",
+        "description": "Visa alla samtyckeshändelser för compliance och felsökning.",
+        "fields": {
+          "timestamp": "Tidstämpel",
+          "userId": "Användar-ID",
+          "eventType": "Händelsetyp",
+          "consentState": "Samtyckesstatus",
+          "locale": "Språk",
+          "ipAddress": "IP-adress"
+        },
+        "eventTypes": {
+          "granted": "Beviljat",
+          "denied": "Nekat",
+          "updated": "Uppdaterat",
+          "withdrawn": "Återdraget"
+        },
+        "export": "Exportera granskningslogg",
+        "paginationNote": "Visar senaste {count} poster. Använd export för fullständig granskningslogg."
+      }
     },
     "apiKeys": {
       "pageTitle": "API-nycklar",
@@ -8019,5 +8116,68 @@
       "openInAdmin": "Öppna i admin",
       "openSvg": "Öppna SVG"
     }
+  },
+  "cookie_consent": {
+    "title": "Vi värnar om din integritet",
+    "description": "Vi använder cookies för att förbättra din upplevelse, analysera webbplatsanvändning och stödja vår marknadsföring. Du kan välja vilka kategorier du vill tillåta.",
+    "privacy_signal_notice": "Vi upptäckte att du har Global Privacy Control eller Do Not Track aktiverat. Vi respekterar dina integritetspreferenser och använder endast nödvändiga cookies.",
+    "accept_all": "Godkänn alla",
+    "deny_all": "Neka alla",
+    "customize": "Anpassa",
+    "save_preferences": "Spara preferenser",
+    "cancel": "Avbryt",
+    "close": "Stäng",
+    "learn_more": "Läs mer om hur vi använder cookies i vår",
+    "cookie_policy_link": "Cookiepolicy",
+    "view_full_policy": "Visa fullständig cookiepolicy",
+    "settings_title": "Cookiepreferenser",
+    "settings_description": "Hantera dina cookiepreferenser. Du kan aktivera eller inaktivera olika typer av cookies nedan.",
+    "always_active": "Alltid aktiv",
+    "manage_cookies": "Hantera cookies",
+    "categories": {
+      "necessary": {
+        "title": "Nödvändiga cookies",
+        "description": "Dessa cookies är nödvändiga för att webbplatsen ska fungera och kan inte stängas av. De sätts vanligtvis endast som svar på åtgärder du utför, som att logga in eller fylla i formulär."
+      },
+      "functional": {
+        "title": "Funktionella cookies",
+        "description": "Dessa cookies möjliggör förbättrad funktionalitet och personalisering, som att komma ihåg dina preferenser, språkinställningar och erbjuda förbättrade funktioner."
+      },
+      "analytics": {
+        "title": "Analyscookies",
+        "description": "Dessa cookies hjälper oss förstå hur besökare interagerar med vår webbplats genom att samla in och rapportera anonym information. Detta hjälper oss att förbättra våra tjänster."
+      },
+      "marketing": {
+        "title": "Marknadsföringscookies",
+        "description": "Dessa cookies används för att spåra besökare över webbplatser för att visa relevanta annonser. De kan ha satts av våra annonseringspartners."
+      }
+    },
+    "declaration": {
+      "title": "Cookiedeklaration",
+      "description": "Nedan finns en lista över alla cookies som används på denna webbplats, kategoriserade efter typ.",
+      "table": {
+        "name": "Cookienamn",
+        "purpose": "Syfte",
+        "provider": "Leverantör",
+        "duration": "Varaktighet",
+        "type": "Typ"
+      },
+      "duration": {
+        "session": "Session",
+        "persistent": "Beständig",
+        "days": "{days} dagar",
+        "year": "1 år",
+        "years": "{years} år"
+      },
+      "type": {
+        "first_party": "Förstapart",
+        "third_party": "Tredje part"
+      }
+    },
+    "consent_given": "Samtycke givet {date}",
+    "consent_expires": "Upphör {date}",
+    "consent_id": "Samtyckes-ID: {id}",
+    "change_preferences": "Ändra dina cookiepreferenser",
+    "withdraw_consent": "Återkalla samtycke"
   }
 }

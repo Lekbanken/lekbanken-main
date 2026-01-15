@@ -155,6 +155,7 @@ const systemAdminCategories: AdminNavCategory[] = [
       { id: 'design', labelKey: 'design', href: '/admin/design', icon: 'swatch', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'translations', labelKey: 'translations', href: '/admin/translations', icon: 'language', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'legal', labelKey: 'legal', href: '/admin/legal', icon: 'audit', permission: 'admin.system.view', systemAdminOnly: true },
+      { id: 'cookies', labelKey: 'cookies', href: '/admin/cookies', icon: 'cookies', permission: 'admin.system.view', systemAdminOnly: true },
       { id: 'notifications', labelKey: 'notifications', href: '/admin/notifications', icon: 'notifications', permission: 'admin.notifications.send' },
       { id: 'feature-flags', labelKey: 'featureFlags', href: '/admin/feature-flags', icon: 'flag', permission: 'admin.system.view' },
       { id: 'api-keys', labelKey: 'apiKeys', href: '/admin/api-keys', icon: 'key', permission: 'admin.system.view' },

@@ -263,6 +263,7 @@
       "featureFlags": "Feature Flags",
       "apiKeys": "API Keys",
       "webhooks": "Webhooks",
+      "cookies": "Cookie Management",
       "incidents": "Incidents",
       "releaseNotes": "Release Notes",
       "settings": "Settings",
@@ -1123,6 +1124,102 @@
       "pageDescription": "Manage webhook endpoints and logs.",
       "emptyTitle": "No webhooks configured yet",
       "emptyDescription": "Here you can add endpoints, view delivery status and logs. Backend integration is pending."
+    },
+    "cookies": {
+      "pageTitle": "Cookie Management",
+      "pageDescription": "Manage cookie catalog, consent policy versions, and view consent statistics.",
+      "tabs": {
+        "catalog": "Cookie Catalog",
+        "policy": "Consent Policy",
+        "statistics": "Consent Statistics",
+        "audit": "Audit Log"
+      },
+      "catalog": {
+        "title": "Cookie Catalog",
+        "description": "Manage all cookies used on the platform. Changes are reflected in the cookie declaration.",
+        "addCookie": "Add Cookie",
+        "editCookie": "Edit Cookie",
+        "deleteCookie": "Delete Cookie",
+        "confirmDelete": "Are you sure you want to delete this cookie?",
+        "fields": {
+          "name": "Cookie Name",
+          "provider": "Provider",
+          "category": "Category",
+          "purpose": "Purpose",
+          "duration": "Duration",
+          "type": "Type",
+          "isActive": "Active"
+        },
+        "descriptions": {
+          "cookieName": "Unique cookie identifier (e.g., _ga, session_id)",
+          "duration": "Days until expiry (empty = session)",
+          "defaultOn": "If enabled, this cookie is on by default for its category",
+          "providerPlaceholder": "Lekbanken, Google Analytics, etc."
+        },
+        "categories": {
+          "necessary": "Necessary",
+          "functional": "Functional",
+          "analytics": "Analytics",
+          "marketing": "Marketing"
+        },
+        "types": {
+          "first_party": "First-party",
+          "third_party": "Third-party"
+        },
+        "emptyTitle": "No cookies in catalog",
+        "emptyDescription": "Add cookies to the catalog to track what data is collected and displayed in the cookie declaration."
+      },
+      "policy": {
+        "title": "Consent Policy Versions",
+        "description": "Manage policy versions. Creating a new version will prompt users to re-consent.",
+        "currentVersion": "Current Version",
+        "createVersion": "Create New Version",
+        "fields": {
+          "version": "Version",
+          "effectiveDate": "Effective Date",
+          "changeSummary": "Change Summary",
+          "status": "Status"
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        }
+      },
+      "statistics": {
+        "title": "Consent Statistics",
+        "description": "Overview of user consent choices across the platform.",
+        "cards": {
+          "totalConsents": "Total Consents",
+          "acceptAll": "Accept All",
+          "denyAll": "Deny All",
+          "customized": "Customized"
+        },
+        "byCategory": "Consent by Category",
+        "byLocale": "Consent by Language",
+        "trend": "Consent Trend (Last 30 Days)",
+        "gpcDnt": "GPC/DNT Signals Detected"
+      },
+      "audit": {
+        "title": "Consent Audit Log",
+        "description": "View all consent events for compliance and debugging.",
+        "fields": {
+          "timestamp": "Timestamp",
+          "userId": "User ID",
+          "eventType": "Event Type",
+          "consentState": "Consent State",
+          "locale": "Locale",
+          "ipAddress": "IP Address"
+        },
+        "eventTypes": {
+          "granted": "Granted",
+          "denied": "Denied",
+          "updated": "Updated",
+          "withdrawn": "Withdrawn"
+        },
+        "export": "Export Audit Log",
+        "paginationNote": "Showing last {count} entries. Use export for full audit log."
+      }
     },
     "apiKeys": {
       "pageTitle": "API Keys",
@@ -7900,5 +7997,68 @@
       "openInAdmin": "Open in admin",
       "openSvg": "Open SVG"
     }
+  },
+  "cookie_consent": {
+    "title": "We value your privacy",
+    "description": "We use cookies to enhance your experience, analyze site usage, and assist in our marketing efforts. You can choose which categories to allow.",
+    "privacy_signal_notice": "We detected that you have Global Privacy Control or Do Not Track enabled. We respect your privacy preference and will only use essential cookies.",
+    "accept_all": "Accept all",
+    "deny_all": "Deny all",
+    "customize": "Customize",
+    "save_preferences": "Save preferences",
+    "cancel": "Cancel",
+    "close": "Close",
+    "learn_more": "Learn more about how we use cookies in our",
+    "cookie_policy_link": "Cookie Policy",
+    "view_full_policy": "View full cookie policy",
+    "settings_title": "Cookie Preferences",
+    "settings_description": "Manage your cookie preferences. You can enable or disable different types of cookies below.",
+    "always_active": "Always active",
+    "manage_cookies": "Manage cookie settings",
+    "categories": {
+      "necessary": {
+        "title": "Essential Cookies",
+        "description": "These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you, such as logging in or filling in forms."
+      },
+      "functional": {
+        "title": "Functional Cookies",
+        "description": "These cookies enable enhanced functionality and personalization, such as remembering your preferences, language settings, and providing enhanced features."
+      },
+      "analytics": {
+        "title": "Analytics Cookies",
+        "description": "These cookies help us understand how visitors interact with our website by collecting and reporting anonymous information. This helps us improve our services."
+      },
+      "marketing": {
+        "title": "Marketing Cookies",
+        "description": "These cookies are used to track visitors across websites to display relevant advertisements. They may be set by our advertising partners."
+      }
+    },
+    "declaration": {
+      "title": "Cookie Declaration",
+      "description": "Below is a list of all cookies used on this website, categorized by type.",
+      "table": {
+        "name": "Cookie Name",
+        "purpose": "Purpose",
+        "provider": "Provider",
+        "duration": "Duration",
+        "type": "Type"
+      },
+      "duration": {
+        "session": "Session",
+        "persistent": "Persistent",
+        "days": "{days} days",
+        "year": "1 year",
+        "years": "{years} years"
+      },
+      "type": {
+        "first_party": "First-party",
+        "third_party": "Third-party"
+      }
+    },
+    "consent_given": "Consent given on {date}",
+    "consent_expires": "Expires on {date}",
+    "consent_id": "Consent ID: {id}",
+    "change_preferences": "Change your cookie preferences",
+    "withdraw_consent": "Withdraw consent"
   }
 }

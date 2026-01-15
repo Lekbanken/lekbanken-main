@@ -263,6 +263,7 @@
       "featureFlags": "Funksjonsflagg",
       "apiKeys": "API-nøkler",
       "webhooks": "Webhooks",
+      "cookies": "Informasjonskapsler",
       "incidents": "Hendelser",
       "releaseNotes": "Utgivelsesnotater",
       "settings": "Innstillinger",
@@ -1123,6 +1124,102 @@
       "pageDescription": "Administrer webhook-endepunkter og logger.",
       "emptyTitle": "Ingen webhooks konfigurert ennå",
       "emptyDescription": "Her kan du legge til endepunkter, se leveringsstatus og logger. Backend-integrasjon mangler ennå."
+    },
+    "cookies": {
+      "pageTitle": "Informasjonskapsler",
+      "pageDescription": "Administrer katalog over informasjonskapsler, samtykkeversioner og se samtykkestatistikk.",
+      "tabs": {
+        "catalog": "Katalog",
+        "policy": "Samtykkepolicy",
+        "statistics": "Statistikk",
+        "audit": "Revisjonslogg"
+      },
+      "catalog": {
+        "title": "Katalog over informasjonskapsler",
+        "description": "Administrer alle informasjonskapsler brukt på plattformen. Endringer reflekteres i erklæringen.",
+        "addCookie": "Legg til informasjonskapsel",
+        "editCookie": "Rediger informasjonskapsel",
+        "deleteCookie": "Slett informasjonskapsel",
+        "confirmDelete": "Er du sikker på at du vil slette denne informasjonskapselen?",
+        "fields": {
+          "name": "Navn",
+          "provider": "Leverandør",
+          "category": "Kategori",
+          "purpose": "Formål",
+          "duration": "Varighet",
+          "type": "Type",
+          "isActive": "Aktiv"
+        },
+        "descriptions": {
+          "cookieName": "Unik identifikator (f.eks. _ga, session_id)",
+          "duration": "Dager til utløp (tom = øktbasert)",
+          "defaultOn": "Hvis aktivert er denne på som standard for sin kategori",
+          "providerPlaceholder": "Lekbanken, Google Analytics, osv."
+        },
+        "categories": {
+          "necessary": "Nødvendige",
+          "functional": "Funksjonelle",
+          "analytics": "Analyse",
+          "marketing": "Markedsføring"
+        },
+        "types": {
+          "first_party": "Førsteparts",
+          "third_party": "Tredjeparts"
+        },
+        "emptyTitle": "Ingen informasjonskapsler i katalogen",
+        "emptyDescription": "Legg til informasjonskapsler i katalogen for å spore hvilke data som samles inn."
+      },
+      "policy": {
+        "title": "Samtykkeversioner",
+        "description": "Administrer policyversioner. Å opprette en ny versjon vil be brukere om nytt samtykke.",
+        "currentVersion": "Gjeldende versjon",
+        "createVersion": "Opprett ny versjon",
+        "fields": {
+          "version": "Versjon",
+          "effectiveDate": "Ikrafttredelsesdato",
+          "changeSummary": "Endringssammendrag",
+          "status": "Status"
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkivert"
+        }
+      },
+      "statistics": {
+        "title": "Samtykkestatistikk",
+        "description": "Oversikt over brukersamtykke på tvers av plattformen.",
+        "cards": {
+          "totalConsents": "Totalt samtykke",
+          "acceptAll": "Godta alle",
+          "denyAll": "Avvis alle",
+          "customized": "Tilpasset"
+        },
+        "byCategory": "Samtykke etter kategori",
+        "byLocale": "Samtykke etter språk",
+        "trend": "Samtykketrend (siste 30 dager)",
+        "gpcDnt": "GPC/DNT-signaler oppdaget"
+      },
+      "audit": {
+        "title": "Samtykke revisjonslogg",
+        "description": "Se alle samtykkehendelser for compliance og feilsøking.",
+        "fields": {
+          "timestamp": "Tidsstempel",
+          "userId": "Bruker-ID",
+          "eventType": "Hendelsestype",
+          "consentState": "Samtykkestatus",
+          "locale": "Språk",
+          "ipAddress": "IP-adresse"
+        },
+        "eventTypes": {
+          "granted": "Gitt",
+          "denied": "Avvist",
+          "updated": "Oppdatert",
+          "withdrawn": "Trukket tilbake"
+        },
+        "export": "Eksporter revisjonslogg",
+        "paginationNote": "Viser siste {count} oppføringer. Bruk eksport for full revisjonslogg."
+      }
     },
     "apiKeys": {
       "pageTitle": "API-nøkler",
@@ -7808,5 +7905,68 @@
       "openInAdmin": "Åpne i admin",
       "openSvg": "Åpne SVG"
     }
+  },
+  "cookie_consent": {
+    "title": "Vi verdsetter ditt personvern",
+    "description": "Vi bruker informasjonskapsler for å forbedre opplevelsen din, analysere bruk av nettstedet og bistå i markedsføringen. Du kan velge hvilke kategorier du vil tillate.",
+    "privacy_signal_notice": "Vi oppdaget at du har Global Privacy Control eller Do Not Track aktivert. Vi respekterer dine personvernpreferanser og bruker kun nødvendige informasjonskapsler.",
+    "accept_all": "Godta alle",
+    "deny_all": "Avvis alle",
+    "customize": "Tilpass",
+    "save_preferences": "Lagre preferanser",
+    "cancel": "Avbryt",
+    "close": "Lukk",
+    "learn_more": "Les mer om hvordan vi bruker informasjonskapsler i vår",
+    "cookie_policy_link": "Informasjonskapsel-policy",
+    "view_full_policy": "Se full informasjonskapsel-policy",
+    "settings_title": "Informasjonskapsel-preferanser",
+    "settings_description": "Administrer dine informasjonskapsel-preferanser. Du kan aktivere eller deaktivere ulike typer informasjonskapsler nedenfor.",
+    "always_active": "Alltid aktiv",
+    "manage_cookies": "Administrer informasjonskapsler",
+    "categories": {
+      "necessary": {
+        "title": "Nødvendige informasjonskapsler",
+        "description": "Disse informasjonskapslene er nødvendige for at nettstedet skal fungere og kan ikke slås av. De settes vanligvis kun som svar på handlinger du utfører, som å logge inn eller fylle ut skjemaer."
+      },
+      "functional": {
+        "title": "Funksjonelle informasjonskapsler",
+        "description": "Disse informasjonskapslene muliggjør forbedret funksjonalitet og personalisering, som å huske preferansene dine, språkinnstillinger og tilby forbedrede funksjoner."
+      },
+      "analytics": {
+        "title": "Analytiske informasjonskapsler",
+        "description": "Disse informasjonskapslene hjelper oss å forstå hvordan besøkende bruker nettstedet ved å samle inn og rapportere anonym informasjon. Dette hjelper oss å forbedre tjenestene våre."
+      },
+      "marketing": {
+        "title": "Markedsføringsinformasjonskapsler",
+        "description": "Disse informasjonskapslene brukes til å spore besøkende på tvers av nettsteder for å vise relevante annonser. De kan være satt av våre annonsepartnere."
+      }
+    },
+    "declaration": {
+      "title": "Informasjonskapsel-erklæring",
+      "description": "Nedenfor er en liste over alle informasjonskapsler som brukes på dette nettstedet, kategorisert etter type.",
+      "table": {
+        "name": "Navn",
+        "purpose": "Formål",
+        "provider": "Leverandør",
+        "duration": "Varighet",
+        "type": "Type"
+      },
+      "duration": {
+        "session": "Økt",
+        "persistent": "Vedvarende",
+        "days": "{days} dager",
+        "year": "1 år",
+        "years": "{years} år"
+      },
+      "type": {
+        "first_party": "Førsteparti",
+        "third_party": "Tredjepart"
+      }
+    },
+    "consent_given": "Samtykke gitt {date}",
+    "consent_expires": "Utløper {date}",
+    "consent_id": "Samtykke-ID: {id}",
+    "change_preferences": "Endre dine informasjonskapsel-preferanser",
+    "withdraw_consent": "Trekk tilbake samtykke"
   }
 }

@@ -6,7 +6,8 @@ import type { UserProfile } from '@/types/auth'
 import type { TenantMembership } from '@/types/tenant'
 import { PreferencesProvider } from '@/lib/context/PreferencesContext'
 import { AuthProvider } from '@/lib/supabase/auth'
-import { CookieConsentBanner } from '@/components/legal/CookieConsentBanner'
+// Use the new enterprise cookie consent banner
+import { CookieConsentBanner } from '@/components/cookie/CookieConsentBanner'
 
 type ProvidersProps = {
   children: ReactNode

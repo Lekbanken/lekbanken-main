@@ -724,13 +724,15 @@ interface FactionSkillTree {
   nodes: SkillNode[]
 }
 
+// Non-nullable faction type for dictionaries
+type NonNullFactionId = Exclude<FactionId, null>
+
 // Dice images per faction
-const FACTION_DICE: Record<FactionId, string> = {
-  neutral: '/achievements/utmarkelser/lg/ic_dice.png',
+const FACTION_DICE: Record<NonNullFactionId, string> = {
   explorer: '/achievements/utmarkelser/lg/ic_dice.png',
-  viking: '/achievements/utmarkelser/lg/ic_dice.png',
-  ninja: '/achievements/utmarkelser/lg/ic_dice.png',
-  scholar: '/achievements/utmarkelser/lg/ic_dice.png',
+  guardian: '/achievements/utmarkelser/lg/ic_dice.png',
+  trickster: '/achievements/utmarkelser/lg/ic_dice.png',
+  sage: '/achievements/utmarkelser/lg/ic_dice.png',
 }
 
 // Generate mock skill tree for each faction
@@ -825,7 +827,7 @@ function SkillTreeModal({
   onClose: () => void
   currentFaction: FactionId
   onFactionChange: (faction: FactionId) => void
-  completedPerFaction: Record<FactionId, number>
+  completedPerFaction: Record<NonNullFactionId, number>
   isDarkMode: boolean
 }) {
   const factions = getAllFactions()
@@ -835,7 +837,7 @@ function SkillTreeModal({
   const [viewingFaction, setViewingFaction] = useState<FactionId>(currentFaction)
   const viewingIndex = factionList.findIndex(f => f.id === viewingFaction)
   const viewingTheme = getFactionTheme(viewingFaction)
-  const skillTree = generateSkillTree(viewingFaction, completedPerFaction[viewingFaction] || 0)
+  const skillTree = generateSkillTree(viewingFaction, viewingFaction ? completedPerFaction[viewingFaction] || 0 : 0)
 
   // Colors
   const bgColor = isDarkMode ? 'rgba(20, 20, 35, 0.98)' : 'rgba(255, 255, 255, 0.98)'
@@ -929,8 +931,8 @@ function SkillTreeModal({
               }}
             >
               <Image
-                src={FACTION_DICE[viewingFaction] || '/achievements/utmarkelser/lg/ic_dice.png'}
-                alt={viewingFaction}
+                src={viewingFaction ? FACTION_DICE[viewingFaction] : '/achievements/utmarkelser/lg/ic_dice.png'}
+                alt={viewingFaction || 'dice'}
                 width={80}
                 height={80}
                 className="object-contain"
@@ -979,7 +981,7 @@ function SkillTreeModal({
               {viewingFaction === currentFaction ? '✓ Aktivt Tema' : 'Välj Detta Tema'}
             </button>
             <p className="text-xs mt-2" style={{ color: textMuted }}>
-              {completedPerFaction[viewingFaction] || 0} / {skillTree.length} upplåsta
+              {viewingFaction ? completedPerFaction[viewingFaction] || 0 : 0} / {skillTree.length} upplåsta
             </p>
           </div>
         </div>
@@ -1471,12 +1473,11 @@ export default function JourneySandboxPage() {
 
   // Skill Tree state
   const [isSkillTreeOpen, setIsSkillTreeOpen] = useState(false)
-  const [completedPerFaction, setCompletedPerFaction] = useState<Record<FactionId, number>>({
-    neutral: 3,
+  const [completedPerFaction, setCompletedPerFaction] = useState<Record<NonNullFactionId, number>>({
     explorer: 1,
-    viking: 0,
-    ninja: 5,
-    scholar: 2,
+    guardian: 0,
+    trickster: 5,
+    sage: 2,
   })
 
   // Derive theme - use custom or faction theme
@@ -1716,7 +1717,7 @@ export default function JourneySandboxPage() {
       <SkillTreeModal
         isOpen={isSkillTreeOpen}
         onClose={() => setIsSkillTreeOpen(false)}
-        currentFaction={(settings.selectedFaction as FactionId) || 'neutral'}
+        currentFaction={(settings.selectedFaction as FactionId) || 'explorer'}
         onFactionChange={(faction) => {
           handleSettingsChange({ selectedFaction: faction })
           setIsSkillTreeOpen(false)

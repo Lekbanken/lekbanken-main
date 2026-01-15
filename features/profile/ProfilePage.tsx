@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, useCallback } from "react";
 
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
+import { TenantSwitcher } from "@/components/app/TenantSwitcher";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { usePreferences } from "@/lib/context/PreferencesContext";
+import { useTenant } from "@/lib/context/TenantContext";
 import { useAuth } from "@/lib/supabase/auth";
 import { cn } from "@/lib/utils";
 import { avatarPresets } from "./avatarPresets";
@@ -60,6 +62,7 @@ const themeOptions: Array<{ value: ThemePreference; label: string }> = [
 
 export function ProfilePage() {
   const { user, userProfile, updateProfile, isLoading: authLoading } = useAuth();
+  const { currentTenant, userTenants, isLoadingTenants } = useTenant();
   const {
     language,
     setLanguage,
@@ -331,6 +334,44 @@ export function ProfilePage() {
               Använd initialer om du inte vill visa en bild.
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Organisation / Tenant Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Organisation</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoadingTenants ? (
+            <div className="text-sm text-muted-foreground">Laddar organisationer...</div>
+          ) : userTenants.length === 0 ? (
+            <div className="text-sm text-muted-foreground">
+              Du tillhör ingen organisation ännu.
+            </div>
+          ) : (
+            <>
+              <p className="mb-4 text-sm text-muted-foreground">
+                {userTenants.length > 1
+                  ? "Välj vilken organisation du vill arbeta med. Du kan byta när som helst."
+                  : "Din nuvarande organisation visas nedan."}
+              </p>
+              <TenantSwitcher
+                variant="card"
+                memberships={userTenants.map((t) => ({
+                  tenant_id: t.id,
+                  role: t.membership?.role ?? null,
+                  is_primary: t.membership?.is_primary ?? false,
+                  tenant: {
+                    id: t.id,
+                    name: t.name,
+                    slug: t.slug,
+                  },
+                }))}
+                currentTenantId={currentTenant?.id ?? null}
+              />
+            </>
+          )}
         </CardContent>
       </Card>
 

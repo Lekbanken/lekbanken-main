@@ -85,15 +85,26 @@ export async function resolveTenant(
   }
 
   if (!selected) {
-    if (validMemberships.length > 1) {
-      redirect = '/app/select-tenant'
+    // Auto-select first available tenant instead of redirecting
+    // Priority: is_primary first, then first in list
+    if (validMemberships.length > 0) {
+      const primaryFirst = [...validMemberships].sort((a, b) => {
+        if (a.is_primary && !b.is_primary) return -1
+        if (!a.is_primary && b.is_primary) return 1
+        return 0
+      })
+      selected = primaryFirst[0]
+      source = 'auto'
     } else if (!options?.suppressNoAccessRedirect) {
       redirect = '/app/no-access'
     }
-    return {
-      resolution: { tenantId: null, source, redirect, clearCookie },
-      tenant: null,
-      tenantRole: null,
+    
+    if (!selected) {
+      return {
+        resolution: { tenantId: null, source, redirect, clearCookie },
+        tenant: null,
+        tenantRole: null,
+      }
     }
   }
 

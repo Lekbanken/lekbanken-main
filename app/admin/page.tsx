@@ -14,7 +14,8 @@ export default async function AdminDashboard() {
     if (tenantId) {
       redirect(`/admin/tenant/${tenantId}`)
     }
-    redirect('/app/select-tenant')
+    // No tenant available - send to profile to select or view status
+    redirect('/app/profile')
   }
 
   return <AdminDashboardPage />;

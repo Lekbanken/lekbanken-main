@@ -293,7 +293,8 @@ function SidebarContent({
     if (currentTenantId) {
       router.push(`/admin/tenant/${currentTenantId}`)
     } else {
-      router.push('/app/select-tenant')
+      // No tenant selected - navigate to profile where user can select one
+      router.push('/app/profile')
     }
     onNavigate?.()
   }, [setMode, currentTenantId, router, onNavigate])

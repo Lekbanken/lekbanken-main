@@ -16,7 +16,7 @@ export default function NoAccessPage() {
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
-          href="/app/select-tenant"
+          href="/app/profile"
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:border-primary/50 hover:text-primary"
         >
           {t('selectOrg')}

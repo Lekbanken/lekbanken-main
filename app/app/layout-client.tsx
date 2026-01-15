@@ -20,13 +20,10 @@ export default function AppShellContent({ children }: { children: ReactNode }) {
     // Skip redirects while loading or on exempt routes
     if (isLoadingTenants || isExemptRoute) return;
 
-    // No tenant selected and not a system admin
-    if (!currentTenant) {
-      if (userTenants.length > 1) {
-        router.replace('/app/select-tenant');
-      } else if (userTenants.length === 0 && !isSystemAdmin) {
-        router.replace('/app/no-access');
-      }
+    // No tenant selected and not a system admin, and no tenants available
+    // (tenant auto-selection now happens in resolver, so this is just a fallback)
+    if (!currentTenant && userTenants.length === 0 && !isSystemAdmin) {
+      router.replace('/app/no-access');
     }
   }, [currentTenant, userTenants, isLoadingTenants, isSystemAdmin, isExemptRoute, router]);
 

@@ -4621,7 +4621,17 @@
       "personalInfo": "Personlig information",
       "preferences": "Preferenser",
       "security": "Säkerhet",
-      "notifications": "Notifikationer"
+      "notifications": "Notifikationer",
+      "tenant": {
+        "title": "Organisation",
+        "description": "Du är medlem i följande organisationer. Klicka för att byta.",
+        "noTenant": "Ingen organisation",
+        "selectTenant": "Välj organisation",
+        "unknownName": "Okänd",
+        "primary": "Primär",
+        "currentlyActive": "Aktiv nu",
+        "switchSuccess": "Bytte till {name}"
+      }
     },
     "settings": {
       "title": "Inställningar",

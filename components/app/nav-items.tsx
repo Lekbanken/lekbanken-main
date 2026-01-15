@@ -6,36 +6,39 @@ export type AppNavItem = {
   labelKey: string;
   icon: JSX.Element;
   iconActive: JSX.Element;
+  isHero?: boolean; // For the central "Play" button
 };
 
-function navPngIcon({ src, alt, size }: { src: string; alt: string; size: number }) {
+function navPngIcon({ src, alt, size, className }: { src: string; alt: string; size: number; className?: string }) {
   return (
     <Image
       src={src}
       alt={alt}
       width={size}
       height={size}
-      className="block"
+      className={className || "block"}
     />
   );
 }
 
-const iconBrowse = navPngIcon({ src: "/icons/app-nav/browse.png", alt: "Upptäck", size: 24 });
-const iconBrowseActive = iconBrowse;
+// Larger icons for better visibility (32px standard, 36px for hero)
+const iconBrowse = navPngIcon({ src: "/icons/app-nav/browse.png", alt: "Upptäck", size: 32 });
+const iconBrowseActive = navPngIcon({ src: "/icons/app-nav/browse.png", alt: "Upptäck", size: 32, className: "block drop-shadow-lg" });
 
-const iconLekvaluta = navPngIcon({ src: "/icons/app-nav/lekvaluta.png", alt: "DiceCoin", size: 24 });
-const iconLekvalutaActive = iconLekvaluta;
+const iconLekvaluta = navPngIcon({ src: "/icons/app-nav/lekvaluta.png", alt: "DiceCoin", size: 32 });
+const iconLekvalutaActive = navPngIcon({ src: "/icons/app-nav/lekvaluta.png", alt: "DiceCoin", size: 32, className: "block drop-shadow-lg" });
 
-const iconPlanning = navPngIcon({ src: "/icons/app-nav/planning.png", alt: "Planera", size: 24 });
-const iconPlanningActive = iconPlanning;
+const iconPlanning = navPngIcon({ src: "/icons/app-nav/planning.png", alt: "Planera", size: 32 });
+const iconPlanningActive = navPngIcon({ src: "/icons/app-nav/planning.png", alt: "Planera", size: 32, className: "block drop-shadow-lg" });
 
-const iconPlay = navPngIcon({ src: "/icons/app-nav/play.png", alt: "Spela", size: 28 });
-const iconPlayActive = iconPlay;
+// Hero Play button - even larger
+const iconPlay = navPngIcon({ src: "/icons/app-nav/play.png", alt: "Spela", size: 36 });
+const iconPlayActive = navPngIcon({ src: "/icons/app-nav/play.png", alt: "Spela", size: 36 });
 
 const iconUser = (
   <svg
     viewBox="0 0 24 24"
-    className="h-5 w-5"
+    className="h-7 w-7"
     fill="none"
     stroke="currentColor"
     strokeWidth="2"
@@ -48,7 +51,7 @@ const iconUser = (
 );
 
 const iconUserActive = (
-  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor" stroke="none">
+  <svg viewBox="0 0 24 24" className="h-7 w-7 drop-shadow-lg" fill="currentColor" stroke="none">
     <circle cx="12" cy="8" r="5" />
     <path d="M20 21a8 8 0 1 0-16 0" />
   </svg>
@@ -57,7 +60,7 @@ const iconUserActive = (
 export const appNavItems: AppNavItem[] = [
   { href: "/app/gamification", labelKey: "app.nav.gamification", icon: iconLekvaluta, iconActive: iconLekvalutaActive },
   { href: "/app/browse", labelKey: "app.nav.browse", icon: iconBrowse, iconActive: iconBrowseActive },
-  { href: "/app/play", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive },
+  { href: "/app/play", labelKey: "app.nav.play", icon: iconPlay, iconActive: iconPlayActive, isHero: true },
   { href: "/app/planner", labelKey: "app.nav.planner", icon: iconPlanning, iconActive: iconPlanningActive },
   { href: "/app/profile", labelKey: "app.nav.profile", icon: iconUser, iconActive: iconUserActive },
 ];

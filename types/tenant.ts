@@ -19,7 +19,7 @@ export type TenantWithMembership = Tenant & {
 
 export type TenantResolution = {
   tenantId: string | null
-  source: 'path' | 'cookie' | 'membership' | 'none'
+  source: 'path' | 'cookie' | 'membership' | 'auto' | 'none'
   redirect?: string
   clearCookie?: boolean
 }

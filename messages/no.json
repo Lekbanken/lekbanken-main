@@ -4564,7 +4564,17 @@
       "personalInfo": "Personlig informasjon",
       "preferences": "Preferanser",
       "security": "Sikkerhet",
-      "notifications": "Varsler"
+      "notifications": "Varsler",
+      "tenant": {
+        "title": "Organisasjon",
+        "description": "Du er medlem av følgende organisasjoner. Klikk for å bytte.",
+        "noTenant": "Ingen organisasjon",
+        "selectTenant": "Velg organisasjon",
+        "unknownName": "Ukjent",
+        "primary": "Primær",
+        "currentlyActive": "Aktiv nå",
+        "switchSuccess": "Byttet til {name}"
+      }
     },
     "settings": {
       "title": "Innstillinger",

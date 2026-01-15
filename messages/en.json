@@ -4568,7 +4568,17 @@
       "personalInfo": "Personal information",
       "preferences": "Preferences",
       "security": "Security",
-      "notifications": "Notifications"
+      "notifications": "Notifications",
+      "tenant": {
+        "title": "Organisation",
+        "description": "You are a member of the following organisations. Click to switch.",
+        "noTenant": "No organisation",
+        "selectTenant": "Select organisation",
+        "unknownName": "Unknown",
+        "primary": "Primary",
+        "currentlyActive": "Currently active",
+        "switchSuccess": "Switched to {name}"
+      }
     },
     "settings": {
       "title": "Settings",

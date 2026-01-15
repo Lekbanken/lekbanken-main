@@ -15,7 +15,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { useTranslations } from 'next-intl'
 import { 
   ShieldCheckIcon, 
@@ -75,6 +75,11 @@ const CATEGORIES: CategoryConfig[] = [
 // Main Component
 // ============================================================================
 
+// Helper for hydration-safe client-only rendering
+const emptySubscribe = () => () => {}
+const getClientSnapshot = () => true
+const getServerSnapshot = () => false
+
 export function CookieConsentBanner() {
   const t = useTranslations('cookie_consent')
   const {
@@ -87,6 +92,9 @@ export function CookieConsentBanner() {
     savePreferences,
   } = useCookieConsent()
 
+  // Hydration-safe: returns false on server, true on client
+  const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot)
+  
   const [showSettings, setShowSettings] = useState(false)
   const [localPreferences, setLocalPreferences] = useState<CookieConsentState>(() => 
     consent ?? {
@@ -97,8 +105,8 @@ export function CookieConsentBanner() {
     }
   )
 
-  // Don't render during SSR or loading
-  if (typeof window === 'undefined' || isLoading) {
+  // Don't render during SSR or before hydration
+  if (!isClient || isLoading) {
     return null
   }
 

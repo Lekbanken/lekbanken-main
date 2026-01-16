@@ -4622,6 +4622,512 @@
       "preferences": "Preferenser",
       "security": "Säkerhet",
       "notifications": "Notifikationer",
+      "nav": {
+        "backToApp": "Tillbaka till appen",
+        "overview": "Översikt",
+        "overviewDesc": "Se din profilöversikt",
+        "general": "Allmänt",
+        "generalDesc": "Namn, avatar och kontaktinfo",
+        "account": "Konto",
+        "accountDesc": "E-post och lösenord",
+        "security": "Säkerhet",
+        "securityDesc": "MFA och sessioner",
+        "privacy": "Integritet",
+        "privacyDesc": "GDPR och dataskydd",
+        "notifications": "Notifikationer",
+        "notificationsDesc": "E-post och push-inställningar",
+        "preferences": "Preferenser",
+        "preferencesDesc": "Språk, tema och tillgänglighet",
+        "organizations": "Organisationer",
+        "organizationsDesc": "Dina organisationer och roller",
+        "activity": "Aktivitet",
+        "activityDesc": "Senaste aktivitet och historik"
+      },
+      "sections": {
+        "personalInfo": {
+          "title": "Personuppgifter",
+          "description": "Hantera ditt namn, avatar och kontaktinformation"
+        },
+        "general": {
+          "title": "Allmänna inställningar",
+          "description": "Hantera din grundläggande profilinformation",
+          "loading": "Laddar...",
+          "avatar": {
+            "title": "Profilbild",
+            "description": "Välj en avatar eller ladda upp en egen bild",
+            "uploadLabel": "Ladda upp bild",
+            "uploadHint": "JPG, PNG eller GIF. Max 5MB.",
+            "selectPredefined": "Eller välj en fördefinierad avatar",
+            "selected": "Avatar vald",
+            "notSelected": "Ingen avatar vald",
+            "remove": "Ta bort profilbild"
+          },
+          "personalInfo": {
+            "title": "Personuppgifter",
+            "description": "Din grundläggande profilinformation",
+            "fullName": "Fullständigt namn",
+            "fullNamePlaceholder": "Ditt namn",
+            "displayName": "Visningsnamn (valfritt)",
+            "displayNamePlaceholder": "Smeknamn eller alias",
+            "email": "E-postadress",
+            "emailChange": "Ändra",
+            "emailHint": "E-postadressen ändras under kontoinställningar",
+            "bio": "Om mig (valfritt)",
+            "bioPlaceholder": "Berätta lite om dig själv...",
+            "bioCharCount": "{count}/500 tecken",
+            "phone": "Telefonnummer (valfritt)",
+            "phonePlaceholder": "+46 70 123 45 67",
+            "location": "Plats (valfritt)",
+            "locationPlaceholder": "Stockholm, Sverige",
+            "pronouns": "Pronomen (valfritt)",
+            "pronounsPlaceholder": "hen/hen, han/honom, hon/henne"
+          },
+          "visibility": {
+            "title": "Profilsynlighet",
+            "description": "Kontrollera vem som kan se din profilinformation",
+            "label": "Synlighet",
+            "hint": "Välj vem som kan se din profil",
+            "public": "Offentlig",
+            "private": "Privat",
+            "organization": "Endast organisation",
+            "showEmail": "Visa e-postadress",
+            "showEmailDesc": "Tillåt andra att se din e-postadress på din profil",
+            "showPhone": "Visa telefonnummer",
+            "showPhoneDesc": "Tillåt andra att se ditt telefonnummer på din profil"
+          }
+        },
+        "account": {
+          "title": "Kontoinställningar",
+          "description": "Hantera e-post och lösenord",
+          "email": "E-postadress",
+          "emailHint": "Din primära e-postadress för inloggning och verifiering",
+          "changeEmail": "Ändra e-post",
+          "newEmail": "Ny e-postadress",
+          "newEmailPlaceholder": "din.nya@email.se",
+          "confirmWithPassword": "Bekräfta med ditt lösenord",
+          "currentPasswordPlaceholder": "Ditt nuvarande lösenord",
+          "emailChangeSuccess": "Verifieringslänk skickad till {email}. Kontrollera din e-post.",
+          "emailChangeHint": "En verifieringslänk skickas till din nya e-postadress. Du måste verifiera den innan ändringen träder i kraft.",
+          "password": "Lösenord",
+          "passwordHint": "Senast ändrat: {date}",
+          "changePassword": "Ändra lösenord",
+          "currentPassword": "Nuvarande lösenord",
+          "newPassword": "Nytt lösenord",
+          "newPasswordPlaceholder": "Ditt nya lösenord",
+          "confirmPassword": "Bekräfta lösenord",
+          "confirmPasswordPlaceholder": "Bekräfta ditt nya lösenord",
+          "passwordMismatch": "Lösenorden matchar inte",
+          "passwordChanged": "Lösenordet har ändrats",
+          "passwordRequirements": {
+            "title": "Lösenordskrav:",
+            "minLength": "Minst 8 tecken",
+            "uppercase": "Minst en versal (A-Z)",
+            "lowercase": "Minst en gemen (a-z)",
+            "number": "Minst en siffra (0-9)",
+            "notMet": "Lösenordet uppfyller inte kraven"
+          },
+          "updating": "Uppdaterar...",
+          "update": "Uppdatera",
+          "cancel": "Avbryt",
+          "changing": "Ändrar...",
+          "verified": "Verifierad",
+          "notVerified": "Ej verifierad",
+          "accountInfo": {
+            "title": "Kontoinformation",
+            "createdAt": "Konto skapat",
+            "lastLogin": "Senaste inloggning"
+          },
+          "currentPasswordWrong": "Nuvarande lösenord är fel"
+        },
+        "security": {
+          "title": "Säkerhetsinställningar",
+          "description": "Hantera tvåfaktorsautentisering och sessioner",
+          "mfa": {
+            "title": "Tvåfaktorsautentisering",
+            "enabled": "Aktiverad",
+            "disabled": "Ej aktiverad",
+            "enable": "Aktivera MFA",
+            "disable": "Inaktivera MFA",
+            "description": "Lägg till ett extra säkerhetslager på ditt konto"
+          },
+          "sessions": {
+            "title": "Aktiva sessioner",
+            "description": "Hantera dina inloggade enheter",
+            "current": "Nuvarande session",
+            "revoke": "Logga ut",
+            "revokeAll": "Logga ut alla enheter",
+            "lastActive": "Senast aktiv"
+          },
+          "devices": {
+            "title": "Betrodda enheter",
+            "description": "Enheter du har loggat in på",
+            "remove": "Ta bort"
+          },
+          "loginHistory": {
+            "title": "Inloggningshistorik",
+            "description": "Se dina senaste inloggningar",
+            "success": "Lyckad",
+            "failed": "Misslyckad"
+          }
+        },
+        "privacy": {
+          "title": "Integritet & GDPR",
+          "description": "Hantera dina data och samtycken enligt GDPR",
+          "dataExport": "Exportera data",
+          "requestHistory": "Begäranhistorik",
+          "requestStatus": {
+            "pending": "Väntar",
+            "processing": "Bearbetas",
+            "completed": "Slutförd",
+            "cancelled": "Avbruten"
+          },
+          "requestTypes": {
+            "portability": "Dataexport",
+            "erasure": "Kontoborttagning"
+          },
+          "validationError": "Du måste skriva \"{confirmText}\" för att bekräfta",
+          "deleteAccount": "Radera konto",
+          "deleteWarning": "När du raderar ditt konto kommer alla dina personuppgifter, speldata och framsteg att tas bort permanent. Denna åtgärd kan inte ångras.",
+          "gdprRights": {
+            "title": "Dina rättigheter enligt GDPR",
+            "description": "Du har rätt att få tillgång till, exportera och radera dina personuppgifter. Vi behandlar alla GDPR-förfrågningar inom 30 dagar i enlighet med dataskyddsförordningen."
+          },
+          "dataExportSection": {
+            "title": "Exportera data",
+            "description": "Ladda ner en kopia av alla dina personuppgifter i ett maskinläsbart format (JSON).",
+            "button": "Begär dataexport",
+            "pending": "Export pågår...",
+            "ready": "Ladda ner",
+            "success": "Din begäran om dataexport har tagits emot!",
+            "successDescription": "Du kommer att få ett e-postmeddelande med en nedladdningslänk inom 72 timmar.",
+            "contents": {
+              "title": "Din dataexport kommer att innehålla:",
+              "profile": "Profilinformation (namn, e-post, etc.)",
+              "settings": "Inställningar och preferenser",
+              "activity": "Aktivitetshistorik",
+              "gameData": "Speldata och framsteg",
+              "organizations": "Organisationsmedlemskap"
+            },
+            "confirm": "Bekräfta begäran",
+            "cancel": "Avbryt",
+            "requesting": "Skickar begäran..."
+          },
+          "deleteAccountSection": {
+            "title": "Radera konto",
+            "description": "Permanent radera ditt konto och all data",
+            "button": "Radera mitt konto",
+            "warning": "Varning: Denna åtgärd kan inte ångras",
+            "consequences": {
+              "data": "All din profildata kommer att raderas permanent",
+              "progress": "Dina spelframsteg och prestationer försvinner",
+              "organizations": "Du kommer att tas bort från alla organisationer",
+              "subscriptions": "Eventuella aktiva prenumerationer avbryts"
+            },
+            "reasonLabel": "Anledning till borttagning (valfritt)",
+            "reasonPlaceholder": "Hjälp oss förstå varför du vill radera ditt konto...",
+            "confirmLabel": "Skriv {confirmText} för att bekräfta",
+            "confirmText": "RADERA MITT KONTO",
+            "confirmButton": "Bekräfta radering",
+            "confirming": "Skickar begäran...",
+            "cancel": "Avbryt",
+            "pendingRequest": "Begäran om kontoborttagning väntar",
+            "pendingDescription": "Din begäran mottogs {date} och behandlas inom 30 dagar.",
+            "gracePeriod": "Efter att du bekräftat kommer ditt konto att markeras för radering. Du har 14 dagar på dig att ångra beslutet genom att kontakta support."
+          },
+          "consents": {
+            "title": "Samtycken",
+            "description": "Hantera vilka typer av databehandling du samtycker till.",
+            "marketing": "Marknadsföring",
+            "marketingDesc": "Tillåt att vi skickar nyhetsbrev och kampanjer via e-post.",
+            "analytics": "Analys",
+            "analyticsDesc": "Tillåt anonym användningsstatistik för att förbättra tjänsten.",
+            "functional": "Funktionell data",
+            "functionalDesc": "Tillåt delning av data med betrodda partners för förbättrad funktionalitet.",
+            "grant": "Ge samtycke",
+            "revoke": "Återkalla",
+            "loading": "Laddar..."
+          },
+          "visibility": {
+            "title": "Profilsynlighet",
+            "description": "Vem kan se din profil",
+            "public": "Offentlig",
+            "private": "Privat",
+            "organization": "Endast organisation"
+          }
+        },
+        "notifications": {
+          "title": "Notifikationsinställningar",
+          "description": "Välj hur och när du vill bli kontaktad",
+          "channels": "Notifieringskanaler",
+          "categories": "Notifieringskategorier",
+          "emailDigest": "E-postsammanfattning",
+          "quietHours": "Tysta timmar",
+          "email": {
+            "title": "E-postnotifikationer",
+            "enabled": "Aktivera e-postnotifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer",
+            "updates": "Produktuppdateringar",
+            "marketing": "Marknadsföring",
+            "digest": "Sammanfattning",
+            "digestOptions": {
+              "realtime": "Realtid",
+              "hourly": "Varje timme",
+              "daily": "Dagligen",
+              "weekly": "Veckovis",
+              "never": "Aldrig"
+            }
+          },
+          "push": {
+            "title": "Push-notifikationer",
+            "enabled": "Aktivera push-notifikationer",
+            "activity": "Aktivitetsuppdateringar",
+            "mentions": "Omnämnanden",
+            "comments": "Kommentarer"
+          },
+          "inApp": {
+            "title": "App-notifikationer",
+            "enabled": "Aktivera in-app-notifikationer"
+          },
+          "dnd": {
+            "title": "Stör ej",
+            "enabled": "Aktivera stör ej",
+            "startTime": "Starttid",
+            "endTime": "Sluttid",
+            "days": "Dagar"
+          }
+        },
+        "preferences": {
+          "title": "Preferenser",
+          "description": "Anpassa din upplevelse i Lekbanken",
+          "language": "Språk",
+          "theme": "Tema",
+          "timezone": "Tidszon",
+          "accessibility": "Tillgänglighet",
+          "fontSize": "Textstorlek",
+          "reducedMotion": "Reducera rörelse",
+          "highContrast": "Hög kontrast",
+          "saved": "Inställningarna har sparats!",
+          "save": "Spara ändringar",
+          "saving": "Sparar...",
+          "languageSection": {
+            "title": "Språk",
+            "description": "Välj vilket språk du vill använda i Lekbanken."
+          },
+          "themeSection": {
+            "title": "Tema",
+            "description": "Välj hur Lekbanken ska se ut.",
+            "light": "Ljust",
+            "dark": "Mörkt",
+            "system": "System"
+          },
+          "accessibilitySection": {
+            "title": "Tillgänglighet",
+            "description": "Anpassa Lekbanken för dina behov.",
+            "highContrast": "Hög kontrast",
+            "highContrastDesc": "Öka kontrasten för bättre läsbarhet.",
+            "reduceMotion": "Reducera rörelse",
+            "reduceMotionDesc": "Minska animationer och rörelser i gränssnittet.",
+            "textSize": "Textstorlek",
+            "textSizes": {
+              "small": "Liten",
+              "medium": "Normal",
+              "large": "Stor",
+              "extraLarge": "Extra stor"
+            }
+          },
+          "animationsSection": {
+            "title": "Animationer och feedback",
+            "animations": "Animationer",
+            "animationsDesc": "Aktivera animationer och övergångseffekter."
+          },
+          "uiSection": {
+            "title": "Gränssnitt",
+            "compactMode": "Kompakt läge",
+            "compactModeDesc": "Minska mellanrum för att visa mer innehåll.",
+            "screenReaderMode": "Skärmläsarläge",
+            "screenReaderModeDesc": "Optimera för skärmläsare och hjälpmedel."
+          },
+          "dateTime": {
+            "title": "Tid och datum",
+            "description": "Inställningar för hur tid och datum visas.",
+            "timezone": "Tidszon",
+            "dateFormat": "Datumformat",
+            "timeFormat": "Tidsformat",
+            "12h": "12-timmar",
+            "24h": "24-timmar"
+          }
+        },
+        "organizations": {
+          "title": "Organisationer",
+          "description": "Hantera dina organisationstillhörigheter och roller",
+          "role": "Roll",
+          "roles": {
+            "owner": "Ägare",
+            "admin": "Administratör",
+            "editor": "Redaktör",
+            "member": "Medlem"
+          },
+          "primary": "Primär",
+          "switch": "Byt till",
+          "leave": "Lämna",
+          "leaveConfirm": "Är du säker på att du vill lämna {name}?",
+          "joinOrg": "Gå med i organisation",
+          "createOrg": "Skapa ny organisation",
+          "joinViaCode": "Gå med via inbjudningskod",
+          "noOrgs": "Du är inte medlem i några organisationer",
+          "noOrgsDesc": "Du är inte medlem i några organisationer. Gå med i en organisation för att samarbeta med andra.",
+          "stats": {
+            "total": "Organisationer",
+            "adminRoles": "Admin-roller",
+            "activeMemberships": "Aktiva medlemskap"
+          },
+          "managedOrgs": {
+            "title": "Organisationer du hanterar",
+            "description": "Organisationer där du har administrativa rättigheter."
+          },
+          "memberships": {
+            "title": "Medlemskap",
+            "description": "Organisationer du är medlem i."
+          },
+          "quickActions": "Snabbåtgärder",
+          "joinedAt": "Gick med {date}"
+        },
+        "activity": {
+          "title": "Aktivitet",
+          "description": "Se din senaste aktivitet och inloggningshistorik",
+          "activeSessions": "Aktiva sessioner",
+          "activeSessionsDesc": "Enheter som för närvarande är inloggade på ditt konto.",
+          "noSessions": "Inga aktiva sessioner hittades.",
+          "currentDevice": "Denna enhet",
+          "unknownDevice": "Okänd enhet",
+          "unknownIp": "Okänd IP",
+          "lastActive": "Senast aktiv {time}",
+          "revokeSession": "Avsluta",
+          "revoking": "Avslutar...",
+          "recentActivity": "Senaste aktivitet",
+          "recentActivityDesc": "De senaste aktiviteterna på ditt konto.",
+          "noActivity": "Ingen aktivitet ännu",
+          "noFilteredActivity": "Ingen aktivitet att visa för detta filter.",
+          "viewAll": "Visa alla",
+          "filters": {
+            "all": "Alla",
+            "security": "Säkerhet",
+            "profile": "Profil",
+            "achievements": "Prestationer"
+          },
+          "types": {
+            "login": "Inloggning",
+            "logout": "Utloggning",
+            "password_change": "Lösenord ändrat",
+            "email_change": "E-post ändrad",
+            "profile_update": "Profil uppdaterad",
+            "mfa_enabled": "MFA aktiverat",
+            "mfa_disabled": "MFA inaktiverat",
+            "settings_change": "Inställningar ändrade",
+            "achievement_unlocked": "Prestation upplåst",
+            "gdpr_request": "GDPR-begäran",
+            "session_revoked": "Session avslutad"
+          },
+          "exportLog": "Exportera aktivitetslogg",
+          "exportDesc": "Ladda ner din aktivitetshistorik som en fil.",
+          "exportJson": "Exportera som JSON",
+          "exportCsv": "Exportera som CSV",
+          "loadMore": "Ladda fler aktiviteter",
+          "revokeAllOther": "Avsluta alla andra sessioner",
+          "relativeTime": {
+            "now": "Just nu",
+            "minutesAgo": "{minutes} min sedan",
+            "hoursAgo": "{hours} tim sedan",
+            "daysAgo": "{days} dagar sedan"
+          },
+          "csvHeaders": {
+            "date": "Datum",
+            "activity": "Aktivitet",
+            "details": "Detaljer",
+            "ip": "IP-adress"
+          }
+        },
+        "achievements": {
+          "title": "Dina prestationer",
+          "loading": "Laddar prestationer...",
+          "progress": "{unlocked} av {total}",
+          "progressLabel": "prestationer upplåsta",
+          "progressSection": "Framsteg",
+          "filters": {
+            "all": "Alla",
+            "unlocked": "Upplåsta",
+            "locked": "Låsta"
+          },
+          "emptyStates": {
+            "unlocked": "Inga prestationer upplåsta ännu. Fortsätt spela!",
+            "locked": "Grattis! Du har låst upp alla prestationer!",
+            "all": "Inga prestationer hittades."
+          },
+          "details": "Detaljer",
+          "percentComplete": "{percent}% klart",
+          "unlockedAt": "Upplåst {date}"
+        },
+        "coins": {
+          "title": "Mynthistorik",
+          "subtitle": "Visar senaste 10 transaktioner",
+          "totalBalance": "mynt totalt",
+          "earnedRecent": "Tjänat (senaste 10)",
+          "spentRecent": "Spenderat (senaste 10)",
+          "filters": {
+            "all": "Alla",
+            "earn": "Tjänat",
+            "spend": "Spenderat"
+          },
+          "loading": "Laddar transaktioner...",
+          "noTransactions": "Inga transaktioner att visa.",
+          "unknownTransaction": "Okänd transaktion",
+          "error": "Kunde inte hämta myntdata",
+          "shopLink": "Spendera dina mynt i butiken"
+        },
+        "friends": {
+          "title": "Vänner",
+          "description": "Hantera dina vänner och vänförfrågningar",
+          "loginRequired": "Du måste vara inloggad för att komma åt denna sidan.",
+          "tabs": {
+            "friends": "Vänner",
+            "requests": "Förfrågningar",
+            "add": "Lägg till"
+          },
+          "loading": "Laddar...",
+          "noFriends": "Du har inga vänner ännu",
+          "addFirstFriend": "Lägg till din första vän",
+          "remove": "Ta bort",
+          "noPendingRequests": "Inga väntande vänförfrågningar",
+          "receivedRequests": "Mottagna förfrågningar",
+          "sentRequests": "Skickade förfrågningar",
+          "requestFrom": "Vänförfrågan från:",
+          "pendingTo": "Väntande förfrågan till:",
+          "accept": "Acceptera",
+          "reject": "Avböj",
+          "pending": "Väntar",
+          "searchUsers": "Sök användare",
+          "searchPlaceholder": "Ange e-postadress",
+          "searching": "Söker...",
+          "results": "Resultat",
+          "noUserFound": "Ingen användare hittades med den e-postadressen",
+          "addFriend": "Lägg till"
+        }
+      },
+      "achievementsShowcase": {
+        "title": "Prestationer",
+        "viewAll": "Visa alla"
+      },
+      "actions": {
+        "save": "Spara ändringar",
+        "saving": "Sparar...",
+        "saved": "Ändringar sparade",
+        "cancel": "Avbryt",
+        "edit": "Redigera",
+        "delete": "Ta bort",
+        "confirm": "Bekräfta"
+      },
       "tenant": {
         "title": "Organisation",
         "description": "Du är medlem i följande organisationer. Klicka för att byta.",

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Button, Card, CardContent } from '@/components/ui';
 import {
   ArrowLeftIcon,
@@ -26,6 +27,7 @@ type CoinsPayload = {
 };
 
 export default function CoinsHistoryPage() {
+  const t = useTranslations('app.profile');
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState(0);
   const [filter, setFilter] = useState<'all' | 'earn' | 'spend'>('all');
@@ -38,7 +40,7 @@ export default function CoinsHistoryPage() {
       try {
         setIsLoading(true);
         const res = await fetch('/api/gamification', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Kunde inte h?mta myntdata');
+        if (!res.ok) throw new Error(t('sections.coins.error'));
         const payload = (await res.json()) as CoinsPayload;
         if (!isMounted) return;
         setTransactions(payload.coins?.recentTransactions ?? []);
@@ -46,7 +48,7 @@ export default function CoinsHistoryPage() {
         setError(null);
       } catch (err) {
         if (!isMounted) return;
-        setError(err instanceof Error ? err.message : 'Kunde inte h?mta myntdata');
+        setError(err instanceof Error ? err.message : t('sections.coins.error'));
         setTransactions([]);
         setBalance(0);
       } finally {
@@ -89,9 +91,9 @@ export default function CoinsHistoryPage() {
             Gamification
           </p>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Mynthistorik
+            {t('sections.coins.title')}
           </h1>
-          <p className="text-xs text-muted-foreground">Visar senaste 10 transaktioner</p>
+          <p className="text-xs text-muted-foreground">{t('sections.coins.subtitle')}</p>
         </div>
       </header>
 
@@ -106,11 +108,11 @@ export default function CoinsHistoryPage() {
       {/* Balance Card */}
       <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-500/20">
         <CardContent className="p-6 text-center">
-          <span className="text-4xl mb-2 block">??</span>
+          <span className="text-4xl mb-2 block">🪙</span>
           <p className="text-3xl font-bold text-foreground tabular-nums">
             {balance.toLocaleString()}
           </p>
-          <p className="text-sm text-muted-foreground">mynt totalt</p>
+          <p className="text-sm text-muted-foreground">{t('sections.coins.totalBalance')}</p>
 
           <div className="mt-4 grid grid-cols-2 gap-4">
             <div className="rounded-xl bg-emerald-500/10 p-3">
@@ -120,7 +122,7 @@ export default function CoinsHistoryPage() {
                   +{totalEarned.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">Tj?nat (senaste 10)</p>
+              <p className="text-xs text-muted-foreground">{t('sections.coins.earnedRecent')}</p>
             </div>
             <div className="rounded-xl bg-rose-500/10 p-3">
               <div className="flex items-center justify-center gap-1 text-rose-500">
@@ -129,7 +131,7 @@ export default function CoinsHistoryPage() {
                   -{totalSpent.toLocaleString()}
                 </span>
               </div>
-              <p className="text-xs text-muted-foreground">Spenderat (senaste 10)</p>
+              <p className="text-xs text-muted-foreground">{t('sections.coins.spentRecent')}</p>
             </div>
           </div>
         </CardContent>
@@ -142,7 +144,7 @@ export default function CoinsHistoryPage() {
           size="sm"
           onClick={() => setFilter('all')}
         >
-          Alla
+          {t('sections.coins.filters.all')}
         </Button>
         <Button
           variant={filter === 'earn' ? 'default' : 'outline'}
@@ -150,7 +152,7 @@ export default function CoinsHistoryPage() {
           onClick={() => setFilter('earn')}
         >
           <ArrowUpIcon className="h-4 w-4 mr-1" />
-          Tj?nat
+          {t('sections.coins.filters.earn')}
         </Button>
         <Button
           variant={filter === 'spend' ? 'default' : 'outline'}
@@ -158,7 +160,7 @@ export default function CoinsHistoryPage() {
           onClick={() => setFilter('spend')}
         >
           <ArrowDownIcon className="h-4 w-4 mr-1" />
-          Spenderat
+          {t('sections.coins.filters.spend')}
         </Button>
       </div>
 
@@ -166,10 +168,10 @@ export default function CoinsHistoryPage() {
       <Card>
         <CardContent className="divide-y divide-border">
           {isLoading ? (
-            <div className="py-12 text-center text-muted-foreground">Laddar transaktioner...</div>
+            <div className="py-12 text-center text-muted-foreground">{t('sections.coins.loading')}</div>
           ) : filteredTransactions.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">
-              Inga transaktioner att visa.
+              {t('sections.coins.noTransactions')}
             </div>
           ) : (
             filteredTransactions.map((tx) => (
@@ -192,7 +194,7 @@ export default function CoinsHistoryPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">
-                    {tx.description || 'Ok?nd transaktion'}
+                    {tx.description || t('sections.coins.unknownTransaction')}
                   </p>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     <CalendarIcon className="h-3 w-3" />
@@ -216,7 +218,7 @@ export default function CoinsHistoryPage() {
       {/* Link to Shop */}
       <Link href="/app/shop">
         <Button variant="outline" className="w-full">
-          Spendera dina mynt i butiken
+          {t('sections.coins.shopLink')}
         </Button>
       </Link>
     </div>

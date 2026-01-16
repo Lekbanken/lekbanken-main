@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import type {
   AchievementProgress} from '@/lib/services/achievementService';
@@ -18,6 +19,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function AchievementsPage() {
+  const t = useTranslations('app.profile');
   const { user } = useAuth();
 
   const userId = user?.id;
@@ -59,7 +61,7 @@ export default function AchievementsPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
-          <p className="text-muted-foreground">Laddar prestationer...</p>
+          <p className="text-muted-foreground">{t('sections.achievements.loading')}</p>
         </div>
       </div>
     );
@@ -77,10 +79,10 @@ export default function AchievementsPage() {
         </Link>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-            Profil
+            {t('title')}
           </p>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Dina prestationer
+            {t('sections.achievements.title')}
           </h1>
         </div>
       </header>
@@ -96,12 +98,12 @@ export default function AchievementsPage() {
               <p className="text-2xl font-bold text-foreground">
                 {unlockedCount} av {totalCount}
               </p>
-              <p className="text-sm text-muted-foreground">prestationer upplåsta</p>
+              <p className="text-sm text-muted-foreground">{t('sections.achievements.progressLabel')}</p>
             </div>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Framsteg</span>
+              <span className="text-muted-foreground">{t('sections.achievements.progressSection')}</span>
               <span className="font-semibold text-foreground">{progressPercent}%</span>
             </div>
             <div className="h-3 bg-muted rounded-full overflow-hidden">
@@ -121,7 +123,7 @@ export default function AchievementsPage() {
           size="sm"
           onClick={() => setFilterType('all')}
         >
-          Alla ({totalCount})
+          {t('sections.achievements.filters.all')} ({totalCount})
         </Button>
         <Button
           variant={filterType === 'unlocked' ? 'default' : 'outline'}
@@ -129,7 +131,7 @@ export default function AchievementsPage() {
           onClick={() => setFilterType('unlocked')}
         >
           <CheckCircleIcon className="h-4 w-4 mr-1" />
-          Upplåsta ({unlockedCount})
+          {t('sections.achievements.filters.unlocked')} ({unlockedCount})
         </Button>
         <Button
           variant={filterType === 'locked' ? 'default' : 'outline'}
@@ -137,7 +139,7 @@ export default function AchievementsPage() {
           onClick={() => setFilterType('locked')}
         >
           <LockClosedIcon className="h-4 w-4 mr-1" />
-          Låsta ({totalCount - unlockedCount})
+          {t('sections.achievements.filters.locked')} ({totalCount - unlockedCount})
         </Button>
       </div>
 
@@ -147,10 +149,10 @@ export default function AchievementsPage() {
           <CardContent className="py-12 text-center">
             <p className="text-muted-foreground">
               {filterType === 'unlocked'
-                ? 'Inga prestationer upplåsta ännu. Fortsätt spela!'
+                ? t('sections.achievements.emptyStates.unlocked')
                 : filterType === 'locked'
-                  ? 'Grattis! Du har låst upp alla prestationer!'
-                  : 'Inga prestationer hittades.'}
+                  ? t('sections.achievements.emptyStates.locked')
+                  : t('sections.achievements.emptyStates.all')}
             </p>
           </CardContent>
         </Card>
@@ -175,7 +177,7 @@ export default function AchievementsPage() {
         <Card>
           <CardContent className="divide-y divide-border">
             <div className="py-4">
-              <h2 className="text-lg font-semibold text-foreground">Detaljer</h2>
+              <h2 className="text-lg font-semibold text-foreground">{t('sections.achievements.details')}</h2>
             </div>
             {filteredAchievements.slice(0, 10).map((item) => (
               <div key={item.achievement.id} className="flex items-start gap-4 py-4">
@@ -206,13 +208,13 @@ export default function AchievementsPage() {
                         />
                       </div>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {Math.round(item.percentComplete)}% klart
+                        {t('sections.achievements.percentComplete', { percent: Math.round(item.percentComplete) })}
                       </p>
                     </div>
                   )}
                   {item.isUnlocked && item.unlockedAt && (
                     <p className="text-xs text-emerald-600 mt-1">
-                      Upplåst {new Date(item.unlockedAt).toLocaleDateString('sv-SE')}
+                      {t('sections.achievements.unlockedAt', { date: new Date(item.unlockedAt).toLocaleDateString('sv-SE') })}
                     </p>
                   )}
                 </div>

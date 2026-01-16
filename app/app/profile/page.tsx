@@ -66,7 +66,7 @@ export default function ProfileOverviewPage() {
   const displayName = userProfile?.full_name || user?.email?.split('@')[0] || 'Användare';
   const email = user?.email || '';
   const avatarUrl = userProfile?.avatar_url;
-  const initials = displayName
+  const _initials = displayName
     .split(' ')
     .map((n) => n[0])
     .join('')

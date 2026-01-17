@@ -614,6 +614,79 @@
         "planArchiveError": "Could not archive plan.",
         "planRestored": "Plan restored.",
         "planRestoreError": "Could not restore plan."
+      },
+      "createWizard": {
+        "title": "Create new plan",
+        "steps": {
+          "basics": {
+            "label": "Basics",
+            "description": "Name and description"
+          },
+          "template": {
+            "label": "Template",
+            "description": "Start from template or blank"
+          },
+          "activities": {
+            "label": "Activities",
+            "description": "Add games"
+          },
+          "confirm": {
+            "label": "Confirm",
+            "description": "Review and create"
+          }
+        },
+        "nameLabel": "Plan name",
+        "namePlaceholder": "E.g. Morning workout",
+        "nameHelp": "Give the plan a descriptive name so you can easily find it later.",
+        "descriptionLabel": "Description (optional)",
+        "descriptionPlaceholder": "What is the purpose of this plan?",
+        "templateTitle": "Choose template",
+        "templateHelp": "Choose a template to get started quickly, or start with a blank plan.",
+        "templates": {
+          "empty": {
+            "name": "Blank plan",
+            "description": "Start from scratch and build your own plan"
+          },
+          "warmup": {
+            "name": "Warm-up",
+            "description": "A short warm-up sequence with 3 activities"
+          },
+          "workshop": {
+            "name": "Workshop",
+            "description": "Structured session with intro, activities and wrap-up"
+          },
+          "teambuilding": {
+            "name": "Team building",
+            "description": "Half or full day with multiple activities and breaks"
+          }
+        },
+        "activitiesEmptyTitle": "Add activities",
+        "activitiesEmptyText": "You can add activities after the plan is created.",
+        "activitiesEmptyTip": "💡 Tip: Go to \"Discover\" to find activities and add them to your plan.",
+        "templateBlocksInfo": "The template \"{templateName}\" contains the following blocks. You can adjust these after the plan is created.",
+        "confirmTitle": "Summary",
+        "confirmName": "Name",
+        "confirmDescription": "Description",
+        "confirmNoDescription": "(No description)",
+        "confirmTemplate": "Template",
+        "confirmBlocks": "Blocks",
+        "confirmNextSteps": "After the plan is created, you can add more activities, adjust times, and share with your organization.",
+        "nextStepsLabel": "Next steps:",
+        "blockTypes": {
+          "game": "Activity",
+          "pause": "Break",
+          "preparation": "Preparation",
+          "custom": "Other"
+        },
+        "buttons": {
+          "back": "Back",
+          "next": "Next",
+          "create": "Create plan",
+          "creating": "Creating..."
+        },
+        "errors": {
+          "createFailed": "Could not create plan"
+        }
       }
     },
     "tenant": {
@@ -4546,7 +4619,7 @@
       "logout": "Log out",
       "goToDashboard": "Go to dashboard",
       "logoAlt": "Lekbanken icon",
-      "gamification": "Points",
+      "gamification": "Your journey",
       "browse": "Discover",
       "play": "Play",
       "tip": "Tip",
@@ -6265,6 +6338,44 @@
       "defaults": {
         "continueWhenReady": "Continue when the group is ready."
       }
+    },
+    "simplePlayView": {
+      "suggestedDuration": "Suggested: {minutes} min",
+      "stepOf": "Step {current} of {total}",
+      "stepsCompleted": "({count} completed)",
+      "next": "Next",
+      "finish": "Finish"
+    },
+    "facilitatedPlayView": {
+      "phase": "Phase {current}",
+      "unknownPhase": "Unknown phase"
+    },
+    "playTimer": {
+      "pause": "Pause",
+      "start": "Start",
+      "continue": "Continue",
+      "reset": "Reset"
+    },
+    "instructionsCard": {
+      "title": "Instructions"
+    },
+    "materialsChecklist": {
+      "title": "Materials"
+    },
+    "phaseNavigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "finish": "Finish"
+    },
+    "boardToggle": {
+      "showOnScreen": "Show on screen",
+      "publicBoard": "Public board",
+      "description": "Display the board on an external screen or projector for participants.",
+      "sessionCode": "Session code",
+      "openNewWindow": "Open in new window",
+      "openFullscreen": "Open in fullscreen",
+      "copyLink": "Copy link",
+      "instruction": "Drag the window to the external screen and maximize for best results."
     },
     "decisionsPanel": {
       "loading": "Loading decisions…",

@@ -53,3 +53,26 @@ next-env.d.ts
 scripts/*-output.txt
 scripts/supabase-inspect-report.json
 scripts/roles-dump.sql
+
+# Inventory files (Atlas Evolution - keep local only)
+inventory.json
+inventory.claude.json
+INVENTORY_*.md
+INVENTORY_*.json
+
+# Atlas sandbox (internal tools - keep local only)
+app/sandbox/atlas/
+app/sandbox/atlas-v2/
+app/api/sandbox/
+
+# Commands and summary files (session notes - keep local)
+commands.md
+commands.claude.md
+summary.md
+summary.claude.md
+disputes.md
+
+# Lint output files
+lint-output.txt
+play-lint.json
+play-lint.txt

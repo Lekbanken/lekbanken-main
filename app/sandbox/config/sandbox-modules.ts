@@ -88,6 +88,15 @@ export const sandboxCategories: SandboxCategory[] = [
         routes: ['/sandbox/atlas'],
       },
       {
+        id: 'atlas-v2',
+        label: 'Atlas Evolution',
+        href: '/sandbox/atlas-v2',
+        description: 'Decision support for system understanding and safe refactoring (inventory-driven)',
+        status: 'implemented',
+        components: ['@/app/sandbox/atlas-v2/*', '@/app/sandbox/atlas/lib/*'],
+        routes: ['/sandbox/atlas-v2'],
+      },
+      {
         id: 'conversation-cards',
         label: 'Samtalskort',
         href: '/sandbox/docs/conversation-cards',

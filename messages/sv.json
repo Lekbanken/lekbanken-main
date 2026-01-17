@@ -614,6 +614,79 @@
         "planArchiveError": "Kunde inte arkivera plan.",
         "planRestored": "Plan återställd.",
         "planRestoreError": "Kunde inte återställa plan."
+      },
+      "createWizard": {
+        "title": "Skapa ny plan",
+        "steps": {
+          "basics": {
+            "label": "Grundinfo",
+            "description": "Namn och beskrivning"
+          },
+          "template": {
+            "label": "Startläge",
+            "description": "Börja från mall eller tomt"
+          },
+          "activities": {
+            "label": "Aktiviteter",
+            "description": "Lägg till lekar"
+          },
+          "confirm": {
+            "label": "Bekräfta",
+            "description": "Granska och skapa"
+          }
+        },
+        "nameLabel": "Planens namn",
+        "namePlaceholder": "T.ex. Friskis morgonpass",
+        "nameHelp": "Ge planen ett beskrivande namn så du lätt hittar den senare.",
+        "descriptionLabel": "Beskrivning (valfritt)",
+        "descriptionPlaceholder": "Vad är syftet med planen?",
+        "templateTitle": "Välj mall",
+        "templateHelp": "Välj en mall för att komma igång snabbare, eller börja med en tom plan.",
+        "templates": {
+          "empty": {
+            "name": "Tom plan",
+            "description": "Börja från scratch och bygg din egen plan"
+          },
+          "warmup": {
+            "name": "Uppvärmning",
+            "description": "En kort uppvärmningssekvens med 3 aktiviteter"
+          },
+          "workshop": {
+            "name": "Workshop",
+            "description": "Strukturerad session med intro, aktiviteter och avslut"
+          },
+          "teambuilding": {
+            "name": "Teambuilding",
+            "description": "Halv- eller heldag med flera aktiviteter och pauser"
+          }
+        },
+        "activitiesEmptyTitle": "Lägg till aktiviteter",
+        "activitiesEmptyText": "Du kan lägga till aktiviteter efter att planen skapats.",
+        "activitiesEmptyTip": "💡 Tips: Gå till \"Upptäck\" för att hitta aktiviteter och lägg till dem i din plan.",
+        "templateBlocksInfo": "Mallen \"{templateName}\" innehåller följande block. Du kan justera dessa efter att planen skapats.",
+        "confirmTitle": "Sammanfattning",
+        "confirmName": "Namn",
+        "confirmDescription": "Beskrivning",
+        "confirmNoDescription": "(Ingen beskrivning)",
+        "confirmTemplate": "Mall",
+        "confirmBlocks": "Block",
+        "confirmNextSteps": "Efter att planen skapats kan du lägga till fler aktiviteter, justera tider och dela med din organisation.",
+        "nextStepsLabel": "Nästa steg:",
+        "blockTypes": {
+          "game": "Aktivitet",
+          "pause": "Paus",
+          "preparation": "Förberedelse",
+          "custom": "Övrigt"
+        },
+        "buttons": {
+          "back": "Tillbaka",
+          "next": "Nästa",
+          "create": "Skapa plan",
+          "creating": "Skapar..."
+        },
+        "errors": {
+          "createFailed": "Kunde inte skapa plan"
+        }
       }
     },
     "tenant": {
@@ -4599,7 +4672,7 @@
       "logout": "Logga ut",
       "goToDashboard": "Gå till dashboard",
       "logoAlt": "Lekbanken ikon",
-      "gamification": "Poäng",
+      "gamification": "Din resa",
       "browse": "Upptäck",
       "play": "Spela",
       "tip": "Tips",
@@ -6888,6 +6961,44 @@
       "defaults": {
         "continueWhenReady": "Fortsätt när gruppen är redo."
       }
+    },
+    "simplePlayView": {
+      "suggestedDuration": "Föreslaget: {minutes} min",
+      "stepOf": "Steg {current} av {total}",
+      "stepsCompleted": "({count} klara)",
+      "next": "Nästa",
+      "finish": "Avsluta"
+    },
+    "facilitatedPlayView": {
+      "phase": "Fas {current}",
+      "unknownPhase": "Okänd fas"
+    },
+    "playTimer": {
+      "pause": "Pausa",
+      "start": "Starta",
+      "continue": "Fortsätt",
+      "reset": "Återställ"
+    },
+    "instructionsCard": {
+      "title": "Instruktioner"
+    },
+    "materialsChecklist": {
+      "title": "Material"
+    },
+    "phaseNavigation": {
+      "previous": "Föregående",
+      "next": "Nästa",
+      "finish": "Avsluta"
+    },
+    "boardToggle": {
+      "showOnScreen": "Visa på skärm",
+      "publicBoard": "Publik tavla",
+      "description": "Visa tavlan på en extern skärm eller projektor för deltagarna.",
+      "sessionCode": "Sessionskod",
+      "openNewWindow": "Öppna i nytt fönster",
+      "openFullscreen": "Öppna i helskärm",
+      "copyLink": "Kopiera länk",
+      "instruction": "Dra fönstret till den externa skärmen och maximera för bästa resultat."
     },
     "decisionsPanel": {
       "loading": "Laddar beslut…",

@@ -614,6 +614,79 @@
         "planArchiveError": "Kunne ikke arkivere plan.",
         "planRestored": "Plan gjenopprettet.",
         "planRestoreError": "Kunne ikke gjenopprette plan."
+      },
+      "createWizard": {
+        "title": "Opprett ny plan",
+        "steps": {
+          "basics": {
+            "label": "Grunninfo",
+            "description": "Navn og beskrivelse"
+          },
+          "template": {
+            "label": "Startposisjon",
+            "description": "Start fra mal eller tom"
+          },
+          "activities": {
+            "label": "Aktiviteter",
+            "description": "Legg til leker"
+          },
+          "confirm": {
+            "label": "Bekreft",
+            "description": "Gjennomgå og opprett"
+          }
+        },
+        "nameLabel": "Planens navn",
+        "namePlaceholder": "F.eks. Morgenøkt Friskis",
+        "nameHelp": "Gi planen et beskrivende navn så du lett finner den senere.",
+        "descriptionLabel": "Beskrivelse (valgfritt)",
+        "descriptionPlaceholder": "Hva er formålet med planen?",
+        "templateTitle": "Velg mal",
+        "templateHelp": "Velg en mal for å komme raskere i gang, eller start med en tom plan.",
+        "templates": {
+          "empty": {
+            "name": "Tom plan",
+            "description": "Start fra bunnen og bygg din egen plan"
+          },
+          "warmup": {
+            "name": "Oppvarming",
+            "description": "En kort oppvarmingssekvens med 3 aktiviteter"
+          },
+          "workshop": {
+            "name": "Workshop",
+            "description": "Strukturert økt med intro, aktiviteter og avslutning"
+          },
+          "teambuilding": {
+            "name": "Teambuilding",
+            "description": "Halv- eller heldag med flere aktiviteter og pauser"
+          }
+        },
+        "activitiesEmptyTitle": "Legg til aktiviteter",
+        "activitiesEmptyText": "Du kan legge til aktiviteter etter at planen er opprettet.",
+        "activitiesEmptyTip": "💡 Tips: Gå til \"Oppdag\" for å finne aktiviteter og legg dem til i planen din.",
+        "templateBlocksInfo": "Malen \"{templateName}\" inneholder følgende blokker. Du kan justere disse etter at planen er opprettet.",
+        "confirmTitle": "Sammendrag",
+        "confirmName": "Navn",
+        "confirmDescription": "Beskrivelse",
+        "confirmNoDescription": "(Ingen beskrivelse)",
+        "confirmTemplate": "Mal",
+        "confirmBlocks": "Blokker",
+        "confirmNextSteps": "Etter at planen er opprettet kan du legge til flere aktiviteter, justere tider og dele med organisasjonen din.",
+        "nextStepsLabel": "Neste steg:",
+        "blockTypes": {
+          "game": "Aktivitet",
+          "pause": "Pause",
+          "preparation": "Forberedelse",
+          "custom": "Annet"
+        },
+        "buttons": {
+          "back": "Tilbake",
+          "next": "Neste",
+          "create": "Opprett plan",
+          "creating": "Oppretter..."
+        },
+        "errors": {
+          "createFailed": "Kunne ikke opprette plan"
+        }
       }
     },
     "tenant": {
@@ -4542,7 +4615,7 @@
       "logout": "Logg ut",
       "goToDashboard": "Gå til dashboard",
       "logoAlt": "Lekbanken ikon",
-      "gamification": "Poeng",
+      "gamification": "Din reise",
       "browse": "Utforsk",
       "play": "Spill",
       "tip": "Tips",
@@ -6261,6 +6334,44 @@
       "defaults": {
         "continueWhenReady": "Fortsett når gruppen er klar."
       }
+    },
+    "simplePlayView": {
+      "suggestedDuration": "Foreslått: {minutes} min",
+      "stepOf": "Steg {current} av {total}",
+      "stepsCompleted": "({count} ferdige)",
+      "next": "Neste",
+      "finish": "Avslutt"
+    },
+    "facilitatedPlayView": {
+      "phase": "Fase {current}",
+      "unknownPhase": "Ukjent fase"
+    },
+    "playTimer": {
+      "pause": "Pause",
+      "start": "Start",
+      "continue": "Fortsett",
+      "reset": "Tilbakestill"
+    },
+    "instructionsCard": {
+      "title": "Instruksjoner"
+    },
+    "materialsChecklist": {
+      "title": "Materiell"
+    },
+    "phaseNavigation": {
+      "previous": "Forrige",
+      "next": "Neste",
+      "finish": "Avslutt"
+    },
+    "boardToggle": {
+      "showOnScreen": "Vis på skjerm",
+      "publicBoard": "Offentlig tavle",
+      "description": "Vis tavlen på en ekstern skjerm eller projektor for deltakerne.",
+      "sessionCode": "Øktkode",
+      "openNewWindow": "Åpne i nytt vindu",
+      "openFullscreen": "Åpne i fullskjerm",
+      "copyLink": "Kopier lenke",
+      "instruction": "Dra vinduet til den eksterne skjermen og maksimer for beste resultat."
     },
     "decisionsPanel": {
       "loading": "Laster beslutninger…",

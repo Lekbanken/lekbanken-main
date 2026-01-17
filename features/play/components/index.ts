@@ -4,6 +4,44 @@
  * Export all components for the Play feature.
  */
 
+// Adaptive Play Mode Components
+export { PlaySessionView } from './PlaySessionView';
+export type { PlaySessionViewProps } from './PlaySessionView';
+
+export { SimplePlayView } from './SimplePlayView';
+export type { SimplePlayViewProps } from './SimplePlayView';
+
+export { FacilitatedPlayView } from './FacilitatedPlayView';
+export type { FacilitatedPlayViewProps } from './FacilitatedPlayView';
+
+// Shared Play Components
+export {
+  PlayHeader,
+  PlayTimer,
+  InstructionsCard,
+  MaterialsChecklist,
+} from './shared';
+export type {
+  PlayHeaderProps,
+  PlayTimerProps,
+  InstructionsCardProps,
+  MaterialsChecklistProps,
+  MaterialItem,
+} from './shared';
+
+// Facilitated Mode Components
+export {
+  PhaseIndicator,
+  PhaseNavigation,
+  BoardToggle,
+} from './facilitated';
+export type {
+  PhaseIndicatorProps,
+  Phase,
+  PhaseNavigationProps,
+  BoardToggleProps,
+} from './facilitated';
+
 // Facilitator components
 export { FacilitatorDashboard } from './FacilitatorDashboard';
 export type { FacilitatorDashboardProps } from './FacilitatorDashboard';

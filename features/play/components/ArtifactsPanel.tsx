@@ -83,7 +83,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void load();
@@ -112,7 +112,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       return;
     }
     await load();
-  }, [sessionId, load]);
+  }, [sessionId, load, t]);
 
   const updateVariant = useCallback(
     async (body: unknown) => {
@@ -129,7 +129,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
       }
       await load();
     },
-    [sessionId, load]
+    [sessionId, load, t]
   );
 
   /**
@@ -191,7 +191,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
         });
       }
     },
-    [sessionId, load]
+    [sessionId, load, t]
   );
 
   if (loading) {

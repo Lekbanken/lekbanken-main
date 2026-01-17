@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lekbanken System Graph v1.1",
+  "type": "object",
+  "required": ["meta", "nodes", "edges", "findings", "metrics"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["version", "generatedAt", "root"],
+      "properties": {
+        "version": {"type": "string"},
+        "generatedAt": {"type": "string"},
+        "root": {"type": "string"},
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/node"}
+    },
+    "edges": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/edge"}
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/definitions/finding"}
+    },
+    "metrics": {
+      "type": "object",
+      "required": ["nodeCount", "edgeCount", "findingCount"],
+      "properties": {
+        "nodeCount": {"type": "number"},
+        "edgeCount": {"type": "number"},
+        "findingCount": {"type": "number"}
+      }
+    }
+  },
+  "definitions": {
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "name",
+        "ownerDomain",
+        "status",
+        "guards",
+        "risk",
+        "notes",
+        "runtime_scope",
+        "exposure"
+      ],
+      "properties": {
+        "id": {"type": "string"},
+        "type": {
+          "type": "string",
+          "enum": [
+            "route",
+            "route_handler",
+            "layout",
+            "component",
+            "hook",
+            "service",
+            "api",
+            "server_action",
+            "middleware / proxy",
+            "edge_function",
+            "job",
+            "asset",
+            "db_table",
+            "db_view",
+            "db_function",
+            "db_trigger",
+            "rls_policy",
+            "storage_bucket",
+            "feature_flag"
+          ]
+        },
+        "name": {"type": "string"},
+        "path": {"type": ["string", "null"]},
+        "ownerDomain": {
+          "type": "string",
+          "enum": ["marketing", "app", "admin", "sandbox", "demo", "shared", "db"]
+        },
+        "status": {
+          "type": "object",
+          "required": ["usage", "confidence", "evidence"],
+          "properties": {
+            "usage": {
+              "type": "string",
+              "enum": [
+                "used_runtime",
+                "used_referenced",
+                "reachable_but_off",
+                "dormant_flagged",
+                "legacy_deprecated",
+                "dead_orphan",
+                "unknown"
+              ]
+            },
+            "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+            "evidence": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["kind", "detail"],
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "import_path",
+                      "route_reachability",
+                      "link_ref",
+                      "flag_gate",
+                      "role_gate",
+                      "tenant_gate",
+                      "runtime_signal",
+                      "db_usage",
+                      "manual_note"
+                    ]
+                  },
+                  "detail": {"type": "string"}
+                }
+              }
+            }
+          }
+        },
+        "guards": {"type": "array", "items": {"type": "string"}},
+        "risk": {"type": "string"},
+        "notes": {"type": "string"},
+        "runtime_scope": {
+          "type": "string",
+          "enum": ["prod", "dev_only", "test_only", "build_only"]
+        },
+        "exposure": {
+          "type": "string",
+          "enum": ["public", "authenticated", "tenant_scoped", "admin_only", "internal"]
+        },
+        "data_class": {
+          "type": ["string", "null"],
+          "enum": ["pii", "auth", "billing", "tenant_core", "content", "telemetry", "misc", null]
+        },
+        "rls_required": {"type": ["boolean", "null"]},
+        "rls_covered": {"type": ["string", "null"], "enum": ["true", "false", "unknown", null]},
+        "tenant_key": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "type": {
+                "enum": [
+                  "db_table",
+                  "db_view",
+                  "db_function",
+                  "db_trigger",
+                  "storage_bucket"
+                ]
+              }
+            }
+          },
+          "then": {
+            "required": ["data_class", "rls_required", "rls_covered", "tenant_key"]
+          }
+        }
+      ]
+    },
+    "edge": {
+      "type": "object",
+      "required": ["from", "to", "type", "details"],
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "type": {
+          "type": "string",
+          "enum": [
+            "route_renders",
+            "renders_component",
+            "uses_hook",
+            "calls_service",
+            "db_reads",
+            "db_writes",
+            "db_rpc",
+            "storage_access",
+            "handles_request",
+            "external_call",
+            "protected_by",
+            "triggers",
+            "used_by",
+            "gates",
+            "guards",
+            "layout_includes"
+          ]
+        },
+        "details": {"type": "string"}
+      }
+    },
+    "finding": {
+      "type": "object",
+      "required": ["category", "summary", "affected", "recommendation", "prechecks", "rollback"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": [
+            "orphan",
+            "unreachable",
+            "duplicate",
+            "dead_code",
+            "db_shadow",
+            "policy_mismatch",
+            "security_gap"
+          ]
+        },
+        "summary": {"type": "string"},
+        "affected": {"type": "array", "items": {"type": "string"}},
+        "recommendation": {"type": "string"},
+        "prechecks": {"type": "string"},
+        "rollback": {"type": "string"}
+      }
+    }
+  }
+}

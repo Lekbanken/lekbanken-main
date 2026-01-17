@@ -1,0 +1,1986 @@
+{
+  "meta": {
+    "version": "1.1.0",
+    "generatedAt": "2026-01-17T12:00:00Z",
+    "root": "d:\\Dokument\\GitHub\\Lekbanken\\lekbanken-main",
+    "notes": [
+      "Independent analysis by Claude per INVENTORY_PLAYBOOK.md",
+      "Focused on file-level granularity, not directory grouping",
+      "Security-critical areas (auth, billing, GDPR, tenant) marked unknown unless evidence strong"
+    ]
+  },
+  "nodes": [
+    {
+      "id": "layout:app/layout.tsx",
+      "type": "layout",
+      "name": "Root Layout",
+      "path": "app/layout.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Root layout used by all routes"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Root application layout, wraps all pages.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "layout:app/(marketing)/layout.tsx",
+      "type": "layout",
+      "name": "Marketing Layout",
+      "path": "app/(marketing)/layout.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by all marketing routes"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Layout for public marketing pages.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "layout:app/(marketing)/auth/layout.tsx",
+      "type": "layout",
+      "name": "Auth Layout",
+      "path": "app/(marketing)/auth/layout.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by auth routes"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Layout for authentication pages. Security-critical.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "layout:app/admin/layout.tsx",
+      "type": "layout",
+      "name": "Admin Layout",
+      "path": "app/admin/layout.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by all admin routes"},
+          {"kind": "role_gate", "detail": "Requires admin role"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "high",
+      "notes": "Admin dashboard layout. Requires authentication and admin role.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "layout:app/admin/(system)/layout.tsx",
+      "type": "layout",
+      "name": "System Admin Layout",
+      "path": "app/admin/(system)/layout.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by system admin routes"},
+          {"kind": "role_gate", "detail": "Requires system_admin role"}
+        ]
+      },
+      "guards": ["requireSystemAdmin"],
+      "risk": "high",
+      "notes": "System-level admin layout. Highest privilege level.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "layout:app/admin/tenant/[tenantId]/layout.tsx",
+      "type": "layout",
+      "name": "Tenant Admin Layout",
+      "path": "app/admin/tenant/[tenantId]/layout.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by tenant-scoped admin routes"},
+          {"kind": "tenant_gate", "detail": "Requires tenant membership"}
+        ]
+      },
+      "guards": ["requireTenantAdmin"],
+      "risk": "high",
+      "notes": "Tenant-scoped admin layout.",
+      "runtime_scope": "prod",
+      "exposure": "tenant_scoped"
+    },
+    {
+      "id": "layout:app/app/layout.tsx",
+      "type": "layout",
+      "name": "App Layout",
+      "path": "app/app/layout.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by authenticated app routes"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "medium",
+      "notes": "Main authenticated app layout.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "layout:app/app/profile/layout.tsx",
+      "type": "layout",
+      "name": "Profile Layout",
+      "path": "app/app/profile/layout.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by profile routes"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "medium",
+      "notes": "User profile section layout. Contains PII.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "layout:app/legal/layout.tsx",
+      "type": "layout",
+      "name": "Legal Layout",
+      "path": "app/legal/layout.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by legal pages"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Layout for legal documents (privacy, terms, etc.).",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "layout:app/legal/accept/layout.tsx",
+      "type": "layout",
+      "name": "Legal Accept Layout",
+      "path": "app/legal/accept/layout.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by legal acceptance flow"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Legal acceptance flow. GDPR-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "layout:app/sandbox/layout.tsx",
+      "type": "layout",
+      "name": "Sandbox Layout",
+      "path": "app/sandbox/layout.tsx",
+      "ownerDomain": "sandbox",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Used by sandbox routes"},
+          {"kind": "flag_gate", "detail": "dev_only or feature flag gated"}
+        ]
+      },
+      "guards": ["devOnly"],
+      "risk": "low",
+      "notes": "Sandbox/dev testing layout.",
+      "runtime_scope": "dev_only",
+      "exposure": "internal"
+    },
+    {
+      "id": "layout:app/sandbox/auth-demo/layout.tsx",
+      "type": "layout",
+      "name": "Auth Demo Layout",
+      "path": "app/sandbox/auth-demo/layout.tsx",
+      "ownerDomain": "sandbox",
+      "status": {
+        "usage": "dormant_flagged",
+        "confidence": 0.7,
+        "evidence": [
+          {"kind": "flag_gate", "detail": "Sandbox route, likely dev_only"}
+        ]
+      },
+      "guards": ["devOnly"],
+      "risk": "low",
+      "notes": "Auth demo layout in sandbox.",
+      "runtime_scope": "dev_only",
+      "exposure": "internal"
+    },
+    {
+      "id": "route:app/(marketing)/page.tsx",
+      "type": "route",
+      "name": "Marketing Home",
+      "path": "app/(marketing)/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public landing page"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Public marketing homepage.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/auth/login/page.tsx",
+      "type": "route",
+      "name": "Login Page",
+      "path": "app/(marketing)/auth/login/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Login entry point"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Authentication login page. Security-critical.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/auth/signup/page.tsx",
+      "type": "route",
+      "name": "Signup Page",
+      "path": "app/(marketing)/auth/signup/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Signup entry point"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "User registration page. Security-critical.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/auth/reset-password/page.tsx",
+      "type": "route",
+      "name": "Reset Password Page",
+      "path": "app/(marketing)/auth/reset-password/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Password reset flow"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Password reset page. Security-critical.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/features/page.tsx",
+      "type": "route",
+      "name": "Features Page",
+      "path": "app/(marketing)/features/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public features page"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Product features marketing page.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/pricing/page.tsx",
+      "type": "route",
+      "name": "Pricing Page",
+      "path": "app/(marketing)/pricing/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public pricing page"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Pricing information page.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/play/page.tsx",
+      "type": "route",
+      "name": "Public Play Page",
+      "path": "app/(marketing)/play/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public play entry"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Public play entry page.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/(marketing)/play/session/[code]/page.tsx",
+      "type": "route",
+      "name": "Play Session Page",
+      "path": "app/(marketing)/play/session/[code]/page.tsx",
+      "ownerDomain": "marketing",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Session join by code"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Join session by code (ephemeral participants).",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/admin/page.tsx",
+      "type": "route",
+      "name": "Admin Dashboard",
+      "path": "app/admin/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Admin home"},
+          {"kind": "role_gate", "detail": "Requires admin role"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "high",
+      "notes": "Admin dashboard home.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/billing/page.tsx",
+      "type": "route",
+      "name": "Admin Billing",
+      "path": "app/admin/billing/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Admin billing page exists"},
+          {"kind": "manual_note", "detail": "Security-critical area - billing. Defaulting to unknown."}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "critical",
+      "notes": "Admin billing management. Security-critical per INVENTORY_RULES.md.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/billing/invoices/page.tsx",
+      "type": "route",
+      "name": "Admin Invoices",
+      "path": "app/admin/billing/invoices/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Admin invoices page exists"},
+          {"kind": "manual_note", "detail": "Billing area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "critical",
+      "notes": "Invoice management. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/billing/subscriptions/page.tsx",
+      "type": "route",
+      "name": "Admin Subscriptions",
+      "path": "app/admin/billing/subscriptions/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Admin subscriptions page exists"},
+          {"kind": "manual_note", "detail": "Billing area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "critical",
+      "notes": "Subscription management. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/users/page.tsx",
+      "type": "route",
+      "name": "Admin Users",
+      "path": "app/admin/users/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "User management page"},
+          {"kind": "import_path", "detail": "features/admin/users/UserAdminPage.tsx"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "high",
+      "notes": "User management. PII access.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/organisations/page.tsx",
+      "type": "route",
+      "name": "Admin Organisations",
+      "path": "app/admin/organisations/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Organisation management"},
+          {"kind": "import_path", "detail": "features/admin/organisations/OrganisationAdminPage.tsx"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "high",
+      "notes": "Tenant/org management. Multi-tenant critical.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/games/page.tsx",
+      "type": "route",
+      "name": "Admin Games",
+      "path": "app/admin/games/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Game management"},
+          {"kind": "import_path", "detail": "features/admin/games/GameAdminPage.tsx"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "medium",
+      "notes": "Game content management.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/admin/(system)/legal/page.tsx",
+      "type": "route",
+      "name": "System Legal Admin",
+      "path": "app/admin/(system)/legal/page.tsx",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "System legal page exists"},
+          {"kind": "role_gate", "detail": "Requires system_admin"},
+          {"kind": "manual_note", "detail": "GDPR/Legal area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireSystemAdmin"],
+      "risk": "critical",
+      "notes": "System-level legal document management. GDPR-critical.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "route:app/app/page.tsx",
+      "type": "route",
+      "name": "App Home",
+      "path": "app/app/page.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Authenticated app home"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "medium",
+      "notes": "Main authenticated app dashboard.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/app/profile/page.tsx",
+      "type": "route",
+      "name": "User Profile",
+      "path": "app/app/profile/page.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "User profile page"},
+          {"kind": "import_path", "detail": "features/profile/ProfilePage.tsx"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "medium",
+      "notes": "User profile page. Contains PII.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/app/profile/privacy/page.tsx",
+      "type": "route",
+      "name": "Privacy Settings",
+      "path": "app/app/profile/privacy/page.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Privacy settings page exists"},
+          {"kind": "manual_note", "detail": "GDPR area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "high",
+      "notes": "User privacy settings. GDPR-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/app/subscription/page.tsx",
+      "type": "route",
+      "name": "User Subscription",
+      "path": "app/app/subscription/page.tsx",
+      "ownerDomain": "app",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Subscription page exists"},
+          {"kind": "manual_note", "detail": "Billing area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "high",
+      "notes": "User subscription management. Billing-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/legal/accept/page.tsx",
+      "type": "route",
+      "name": "Legal Acceptance",
+      "path": "app/legal/accept/page.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Legal acceptance page exists"},
+          {"kind": "manual_note", "detail": "GDPR/Legal area - defaulting unknown"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Legal document acceptance flow. GDPR-critical.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/legal/privacy/page.tsx",
+      "type": "route",
+      "name": "Privacy Policy",
+      "path": "app/legal/privacy/page.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public privacy policy"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Public privacy policy page.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/legal/terms/page.tsx",
+      "type": "route",
+      "name": "Terms of Service",
+      "path": "app/legal/terms/page.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public terms page"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Public terms of service page.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route:app/auth/mfa-challenge/page.tsx",
+      "type": "route",
+      "name": "MFA Challenge",
+      "path": "app/auth/mfa-challenge/page.tsx",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "MFA challenge page exists"},
+          {"kind": "manual_note", "detail": "Auth area - defaulting unknown"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "MFA challenge flow. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route:app/demo/page.tsx",
+      "type": "route",
+      "name": "Demo Page",
+      "path": "app/demo/page.tsx",
+      "ownerDomain": "demo",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Demo entry page"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Demo mode entry.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route_handler:app/auth/callback/route.ts",
+      "type": "route_handler",
+      "name": "Auth Callback",
+      "path": "app/auth/callback/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Auth callback handler exists"},
+          {"kind": "manual_note", "detail": "Auth area - critical for login flow"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "OAuth callback handler. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route_handler:app/auth/signout/route.ts",
+      "type": "route_handler",
+      "name": "Auth Signout",
+      "path": "app/auth/signout/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Signout handler"},
+          {"kind": "link_ref", "detail": "Referenced by logout buttons"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Session signout handler.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route_handler:app/auth/demo/route.ts",
+      "type": "route_handler",
+      "name": "Demo Auth",
+      "path": "app/auth/demo/route.ts",
+      "ownerDomain": "demo",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.75,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Demo auth handler"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Demo authentication handler.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route_handler:app/api/billing/webhooks/stripe/route.ts",
+      "type": "route_handler",
+      "name": "Stripe Webhook",
+      "path": "app/api/billing/webhooks/stripe/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Stripe webhook endpoint exists"},
+          {"kind": "manual_note", "detail": "Billing webhook - critical for payment processing"}
+        ]
+      },
+      "guards": ["stripeSignatureVerification"],
+      "risk": "critical",
+      "notes": "Stripe webhook handler. Billing-critical. Processes payment events.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route_handler:app/api/gdpr/export/route.ts",
+      "type": "route_handler",
+      "name": "GDPR Export",
+      "path": "app/api/gdpr/export/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "GDPR export endpoint exists"},
+          {"kind": "manual_note", "detail": "GDPR Art. 15/20 - data export"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "critical",
+      "notes": "GDPR data export (Art. 15, 20). Critical for compliance.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route_handler:app/api/gdpr/delete/route.ts",
+      "type": "route_handler",
+      "name": "GDPR Delete",
+      "path": "app/api/gdpr/delete/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "GDPR delete endpoint exists"},
+          {"kind": "manual_note", "detail": "GDPR Art. 17 - right to erasure"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "critical",
+      "notes": "GDPR data deletion (Art. 17). Critical for compliance.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route_handler:app/api/accounts/auth/mfa/*",
+      "type": "route_handler",
+      "name": "MFA API Handlers",
+      "path": "app/api/accounts/auth/mfa",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "12 MFA-related API endpoints"},
+          {"kind": "manual_note", "detail": "Auth area - MFA handlers"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "critical",
+      "notes": "MFA enrollment, verification, recovery. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route_handler:app/api/tenants/route.ts",
+      "type": "route_handler",
+      "name": "Tenants API",
+      "path": "app/api/tenants/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Tenants API endpoint"},
+          {"kind": "manual_note", "detail": "Tenant/RBAC area - defaulting unknown"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "high",
+      "notes": "Tenant management API. Multi-tenant critical.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "route_handler:app/api/public/v1/games/route.ts",
+      "type": "route_handler",
+      "name": "Public API v1 Games",
+      "path": "app/api/public/v1/games/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_referenced",
+        "confidence": 0.7,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Public API endpoint"}
+        ]
+      },
+      "guards": ["apiKeyAuth"],
+      "risk": "medium",
+      "notes": "Public API for games. API key protected.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "route_handler:app/api/health/route.ts",
+      "type": "route_handler",
+      "name": "Health Check",
+      "path": "app/api/health/route.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "route_reachability", "detail": "Health check endpoint"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Health check endpoint for monitoring.",
+      "runtime_scope": "prod",
+      "exposure": "public"
+    },
+    {
+      "id": "server_action:app/actions/legal.ts",
+      "type": "server_action",
+      "name": "Legal Actions",
+      "path": "app/actions/legal.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Server action file exists"},
+          {"kind": "manual_note", "detail": "GDPR/Legal area - defaulting unknown"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Legal-related server actions. GDPR-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "server_action:app/actions/legal-admin.ts",
+      "type": "server_action",
+      "name": "Legal Admin Actions",
+      "path": "app/actions/legal-admin.ts",
+      "ownerDomain": "admin",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Server action file exists"},
+          {"kind": "manual_note", "detail": "Admin legal actions"}
+        ]
+      },
+      "guards": ["requireAdmin"],
+      "risk": "high",
+      "notes": "Admin legal management actions.",
+      "runtime_scope": "prod",
+      "exposure": "admin_only"
+    },
+    {
+      "id": "server_action:app/actions/tenant.ts",
+      "type": "server_action",
+      "name": "Tenant Actions",
+      "path": "app/actions/tenant.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Server action file exists"},
+          {"kind": "manual_note", "detail": "Tenant/RBAC area"}
+        ]
+      },
+      "guards": ["requireAuth"],
+      "risk": "high",
+      "notes": "Tenant-related server actions. Multi-tenant critical.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated"
+    },
+    {
+      "id": "edge_function:supabase/functions/cleanup-demo-data",
+      "type": "edge_function",
+      "name": "Cleanup Demo Data",
+      "path": "supabase/functions/cleanup-demo-data",
+      "ownerDomain": "demo",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "manual_note", "detail": "Edge function exists, usage unknown"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Demo data cleanup edge function.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/auth/server-context.ts",
+      "type": "service",
+      "name": "Auth Server Context",
+      "path": "lib/auth/server-context.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "import_path", "detail": "Used by layouts and route handlers"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Server-side auth context. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/auth/requireSystemAdmin.ts",
+      "type": "service",
+      "name": "Require System Admin",
+      "path": "lib/auth/requireSystemAdmin.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_referenced",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "import_path", "detail": "Used by system admin routes"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "System admin guard. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/gdpr/user-rights.ts",
+      "type": "service",
+      "name": "GDPR User Rights",
+      "path": "lib/gdpr/user-rights.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "GDPR service exists"},
+          {"kind": "manual_note", "detail": "GDPR area - implements Art. 15-22"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "GDPR user rights implementation (Art. 15-22). Compliance-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/gdpr/data-registry.ts",
+      "type": "service",
+      "name": "GDPR Data Registry",
+      "path": "lib/gdpr/data-registry.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "GDPR data registry exists"},
+          {"kind": "manual_note", "detail": "GDPR Art. 30 - Records of Processing"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "GDPR data registry (Art. 30). Compliance-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/stripe/config.ts",
+      "type": "service",
+      "name": "Stripe Config",
+      "path": "lib/stripe/config.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Stripe config exists"},
+          {"kind": "manual_note", "detail": "Billing area - Stripe integration"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Stripe configuration. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/stripe/product-sync.ts",
+      "type": "service",
+      "name": "Stripe Product Sync",
+      "path": "lib/stripe/product-sync.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Product sync service exists"},
+          {"kind": "manual_note", "detail": "Billing area - Stripe sync"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Stripe product synchronization.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/services/billingService.ts",
+      "type": "service",
+      "name": "Billing Service",
+      "path": "lib/services/billingService.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.5,
+        "evidence": [
+          {"kind": "import_path", "detail": "Billing service exists"},
+          {"kind": "manual_note", "detail": "Billing area - defaulting unknown"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Core billing service. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "service:lib/tenant/resolver.ts",
+      "type": "service",
+      "name": "Tenant Resolver",
+      "path": "lib/tenant/resolver.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "import_path", "detail": "Used by tenant-scoped routes"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Tenant resolution logic. Multi-tenant critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    },
+    {
+      "id": "db_table:users",
+      "type": "db_table",
+      "name": "users",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('users') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Core users table. Auth and PII.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "pii",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:user_profiles",
+      "type": "db_table",
+      "name": "user_profiles",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_profiles') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "User profile data. PII.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "pii",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:tenants",
+      "type": "db_table",
+      "name": "tenants",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('tenants') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Tenant/organization data. Multi-tenant core.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "tenant_core",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "id"
+    },
+    {
+      "id": "db_table:user_tenant_memberships",
+      "type": "db_table",
+      "name": "user_tenant_memberships",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_tenant_memberships') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Tenant membership mapping. RBAC core.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "tenant_core",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:invoices",
+      "type": "db_table",
+      "name": "invoices",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('invoices') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Invoice data. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "billing",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:payments",
+      "type": "db_table",
+      "name": "payments",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('payments') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Payment records. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "billing",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:subscriptions",
+      "type": "db_table",
+      "name": "subscriptions",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('subscriptions') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Subscription data. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "billing",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:billing_accounts",
+      "type": "db_table",
+      "name": "billing_accounts",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('billing_accounts') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Billing account mapping. Billing-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "billing",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:gdpr_requests",
+      "type": "db_table",
+      "name": "gdpr_requests",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('gdpr_requests') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "GDPR request tracking. Compliance-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "pii",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:user_consents",
+      "type": "db_table",
+      "name": "user_consents",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_consents') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "User consent records. GDPR Art. 7.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "pii",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:data_access_log",
+      "type": "db_table",
+      "name": "data_access_log",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.7,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('data_access_log') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "GDPR Art. 30 audit log.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "telemetry",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:user_mfa",
+      "type": "db_table",
+      "name": "user_mfa",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_mfa') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "MFA configuration. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "auth",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:mfa_trusted_devices",
+      "type": "db_table",
+      "name": "mfa_trusted_devices",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.7,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('mfa_trusted_devices') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "MFA trusted devices. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "auth",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:games",
+      "type": "db_table",
+      "name": "games",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.95,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('games') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Game content table.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:plans",
+      "type": "db_table",
+      "name": "plans",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('plans') found in codebase"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Session plans table.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:achievements",
+      "type": "db_table",
+      "name": "achievements",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('achievements') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Achievement definitions.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:user_achievements",
+      "type": "db_table",
+      "name": "user_achievements",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_achievements') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "User achievement unlocks.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:coin_transactions",
+      "type": "db_table",
+      "name": "coin_transactions",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('coin_transactions') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Virtual currency transactions.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:legal_documents",
+      "type": "db_table",
+      "name": "legal_documents",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('legal_documents') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "Legal document storage. GDPR-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_table:user_legal_acceptances",
+      "type": "db_table",
+      "name": "user_legal_acceptances",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.8,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('user_legal_acceptances') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "User legal document acceptances. GDPR-relevant.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "pii",
+      "rls_required": true,
+      "rls_covered": "unknown",
+      "tenant_key": null
+    },
+    {
+      "id": "db_table:demo_sessions",
+      "type": "db_table",
+      "name": "demo_sessions",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.75,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".from('demo_sessions') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "low",
+      "notes": "Demo session tracking.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "telemetry",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "db_view:tenant_memberships",
+      "type": "db_view",
+      "name": "tenant_memberships",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": "View defined in database.types.ts"}
+        ]
+      },
+      "guards": [],
+      "risk": "high",
+      "notes": "View over user_tenant_memberships.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "tenant_core",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": "tenant_id"
+    },
+    {
+      "id": "db_function:is_system_admin",
+      "type": "db_function",
+      "name": "is_system_admin",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".rpc('is_system_admin') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "System admin check. Auth-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "auth",
+      "rls_required": false,
+      "rls_covered": null,
+      "tenant_key": null
+    },
+    {
+      "id": "db_function:has_tenant_role",
+      "type": "db_function",
+      "name": "has_tenant_role",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.9,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".rpc('has_tenant_role') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "critical",
+      "notes": "Tenant role check. RBAC-critical.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "auth",
+      "rls_required": false,
+      "rls_covered": null,
+      "tenant_key": null
+    },
+    {
+      "id": "db_function:apply_coin_transaction_v1",
+      "type": "db_function",
+      "name": "apply_coin_transaction_v1",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": ".rpc('apply_coin_transaction_v1') found"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Virtual currency transaction RPC.",
+      "runtime_scope": "prod",
+      "exposure": "internal",
+      "data_class": "content",
+      "rls_required": false,
+      "rls_covered": null,
+      "tenant_key": null
+    },
+    {
+      "id": "storage_bucket:media-images",
+      "type": "storage_bucket",
+      "name": "media-images",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": "Storage bucket in migrations"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Private image storage bucket.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "storage_bucket:media-audio",
+      "type": "storage_bucket",
+      "name": "media-audio",
+      "path": null,
+      "ownerDomain": "db",
+      "status": {
+        "usage": "used_runtime",
+        "confidence": 0.85,
+        "evidence": [
+          {"kind": "db_usage", "detail": "Storage bucket in migrations"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Private audio storage bucket.",
+      "runtime_scope": "prod",
+      "exposure": "authenticated",
+      "data_class": "content",
+      "rls_required": true,
+      "rls_covered": "true",
+      "tenant_key": null
+    },
+    {
+      "id": "proxy:proxy.ts",
+      "type": "middleware / proxy",
+      "name": "Proxy Configuration",
+      "path": "proxy.ts",
+      "ownerDomain": "shared",
+      "status": {
+        "usage": "unknown",
+        "confidence": 0.4,
+        "evidence": [
+          {"kind": "manual_note", "detail": "proxy.ts exists at root, purpose unclear"}
+        ]
+      },
+      "guards": [],
+      "risk": "medium",
+      "notes": "Proxy configuration file. Purpose requires verification.",
+      "runtime_scope": "prod",
+      "exposure": "internal"
+    }
+  ],
+  "edges": [
+    {
+      "from": "layout:app/layout.tsx",
+      "to": "layout:app/(marketing)/layout.tsx",
+      "type": "layout_includes",
+      "details": "Root layout includes marketing layout"
+    },
+    {
+      "from": "layout:app/layout.tsx",
+      "to": "layout:app/admin/layout.tsx",
+      "type": "layout_includes",
+      "details": "Root layout includes admin layout"
+    },
+    {
+      "from": "layout:app/layout.tsx",
+      "to": "layout:app/app/layout.tsx",
+      "type": "layout_includes",
+      "details": "Root layout includes app layout"
+    },
+    {
+      "from": "route:app/(marketing)/auth/login/page.tsx",
+      "to": "route_handler:app/auth/callback/route.ts",
+      "type": "handles_request",
+      "details": "Login redirects to auth callback"
+    },
+    {
+      "from": "route_handler:app/api/billing/webhooks/stripe/route.ts",
+      "to": "db_table:invoices",
+      "type": "db_writes",
+      "details": "Stripe webhook updates invoices"
+    },
+    {
+      "from": "route_handler:app/api/billing/webhooks/stripe/route.ts",
+      "to": "db_table:payments",
+      "type": "db_writes",
+      "details": "Stripe webhook inserts payments"
+    },
+    {
+      "from": "route_handler:app/api/gdpr/export/route.ts",
+      "to": "service:lib/gdpr/user-rights.ts",
+      "type": "calls_service",
+      "details": "GDPR export uses user-rights service"
+    },
+    {
+      "from": "route_handler:app/api/gdpr/delete/route.ts",
+      "to": "service:lib/gdpr/user-rights.ts",
+      "type": "calls_service",
+      "details": "GDPR delete uses user-rights service"
+    },
+    {
+      "from": "service:lib/gdpr/user-rights.ts",
+      "to": "db_table:gdpr_requests",
+      "type": "db_writes",
+      "details": "User rights service writes to gdpr_requests"
+    },
+    {
+      "from": "service:lib/gdpr/user-rights.ts",
+      "to": "db_table:user_consents",
+      "type": "db_reads",
+      "details": "User rights service reads user_consents"
+    },
+    {
+      "from": "layout:app/admin/layout.tsx",
+      "to": "service:lib/auth/server-context.ts",
+      "type": "calls_service",
+      "details": "Admin layout uses auth context"
+    },
+    {
+      "from": "layout:app/admin/(system)/layout.tsx",
+      "to": "service:lib/auth/requireSystemAdmin.ts",
+      "type": "calls_service",
+      "details": "System admin layout uses requireSystemAdmin"
+    },
+    {
+      "from": "service:lib/auth/requireSystemAdmin.ts",
+      "to": "db_function:is_system_admin",
+      "type": "db_rpc",
+      "details": "requireSystemAdmin calls is_system_admin RPC"
+    },
+    {
+      "from": "db_table:user_tenant_memberships",
+      "to": "db_view:tenant_memberships",
+      "type": "used_by",
+      "details": "View is based on user_tenant_memberships"
+    }
+  ],
+  "findings": [
+    {
+      "category": "security_gap",
+      "summary": "Billing tables (invoices, payments, subscriptions, billing_accounts) have unknown RLS coverage status",
+      "affected": ["db_table:invoices", "db_table:payments", "db_table:subscriptions", "db_table:billing_accounts"],
+      "recommendation": "Verify RLS policies cover all billing tables and audit for tenant isolation",
+      "prechecks": "Run verify_rls_coverage.sql script to check policy existence",
+      "rollback": "N/A - audit only"
+    },
+    {
+      "category": "security_gap",
+      "summary": "GDPR-critical tables (gdpr_requests, user_consents, data_access_log, user_legal_acceptances) have unknown RLS coverage",
+      "affected": ["db_table:gdpr_requests", "db_table:user_consents", "db_table:data_access_log", "db_table:user_legal_acceptances"],
+      "recommendation": "Audit RLS policies for GDPR compliance tables to ensure proper access control",
+      "prechecks": "Review migration 20260114200000_gdpr_compliance_tables.sql for policy definitions",
+      "rollback": "N/A - audit only"
+    },
+    {
+      "category": "security_gap",
+      "summary": "MFA tables (user_mfa, mfa_trusted_devices) have unknown RLS coverage status",
+      "affected": ["db_table:user_mfa", "db_table:mfa_trusted_devices"],
+      "recommendation": "Verify RLS policies ensure users can only access their own MFA configuration",
+      "prechecks": "Review MFA migration for policy definitions",
+      "rollback": "N/A - audit only"
+    },
+    {
+      "category": "orphan",
+      "summary": "proxy.ts at root has unclear purpose and usage status",
+      "affected": ["proxy:proxy.ts"],
+      "recommendation": "Determine if proxy.ts is actively used or can be removed",
+      "prechecks": "Search for imports of proxy.ts and check if used in development",
+      "rollback": "Restore from git if removed incorrectly"
+    },
+    {
+      "category": "policy_mismatch",
+      "summary": "Nearly 1000 RLS policies created across 170+ migrations may have overlapping or conflicting definitions",
+      "affected": ["db_table:*"],
+      "recommendation": "Run policy consolidation analysis to identify duplicates and conflicts",
+      "prechecks": "Review SECURITY_MIGRATIONS_README.md and consolidation migrations",
+      "rollback": "N/A - audit only"
+    },
+    {
+      "category": "unreachable",
+      "summary": "Edge function cleanup-demo-data has unknown invocation pattern",
+      "affected": ["edge_function:supabase/functions/cleanup-demo-data"],
+      "recommendation": "Verify if edge function is scheduled, manually triggered, or unused",
+      "prechecks": "Check Supabase dashboard for function invocations",
+      "rollback": "N/A - keep until usage confirmed"
+    },
+    {
+      "category": "security_gap",
+      "summary": "Stripe webhook handler security depends on signature verification - no additional auth guard visible",
+      "affected": ["route_handler:app/api/billing/webhooks/stripe/route.ts"],
+      "recommendation": "Confirm Stripe signature verification is properly implemented and tested",
+      "prechecks": "Review webhook handler implementation for stripeWebhookSecret usage",
+      "rollback": "N/A - audit only"
+    }
+  ],
+  "metrics": {
+    "nodeCount": 85,
+    "edgeCount": 14,
+    "findingCount": 7,
+    "nodesByType": {
+      "layout": 12,
+      "route": 25,
+      "route_handler": 10,
+      "server_action": 3,
+      "edge_function": 1,
+      "service": 10,
+      "db_table": 20,
+      "db_view": 1,
+      "db_function": 3,
+      "storage_bucket": 2,
+      "middleware / proxy": 1
+    },
+    "nodesByDomain": {
+      "shared": 35,
+      "admin": 15,
+      "app": 10,
+      "marketing": 10,
+      "db": 26,
+      "demo": 3,
+      "sandbox": 2
+    },
+    "nodesByUsage": {
+      "used_runtime": 40,
+      "used_referenced": 3,
+      "unknown": 38,
+      "dormant_flagged": 1
+    },
+    "securityCriticalUnknown": 25
+  }
+}

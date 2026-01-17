@@ -49,7 +49,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void load();
@@ -97,7 +97,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
     ]);
 
     await load();
-  }, [sessionId, newTitle, newPrompt, newOptions, load]);
+  }, [sessionId, newTitle, newPrompt, newOptions, load, t]);
 
   const action = useCallback(
     async (decisionId: string, act: 'open' | 'close' | 'reveal') => {
@@ -114,7 +114,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
       }
       await load();
     },
-    [sessionId, load]
+    [sessionId, load, t]
   );
 
   const loadResults = useCallback(

@@ -86,7 +86,7 @@ export function ActiveSessionShell({
   const topTitle = useMemo(() => {
     if (title) return title;
     return t('defaultTitle');
-  }, [role, title, t]);
+  }, [title, t]);
 
   if (!open) return null;
 

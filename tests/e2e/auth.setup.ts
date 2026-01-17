@@ -32,8 +32,38 @@ setup('authenticate', async ({ page }) => {
   // Click login button (type=submit to avoid Google button)
   await page.locator('button[type="submit"]').first().click();
 
-  // Wait for redirect to dashboard or app
-  await page.waitForURL(/\/(app|admin|dashboard)/, { timeout: 10000 });
+  // Wait for redirect (may include /legal/accept for pending documents)
+  await page.waitForURL(/\/(app|admin|dashboard|legal\/accept)/, { timeout: 10000 });
+
+  // Handle legal acceptance if required
+  if (page.url().includes('/legal/accept')) {
+    await page.waitForTimeout(1000);
+    
+    // Dismiss cookie consent dialog first
+    const cookieAcceptButton = page.locator('button').filter({ hasText: /godta alle|accept all|acceptera alla/i }).first();
+    if (await cookieAcceptButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await cookieAcceptButton.click();
+      await page.waitForTimeout(500);
+    }
+    
+    let attempts = 0;
+    while (page.url().includes('/legal/accept') && attempts < 10) {
+      attempts++;
+      const checkbox = page.locator('input[type="checkbox"]:not(:checked)').first();
+      if (await checkbox.count() > 0) {
+        await checkbox.check({ force: true });
+        await page.waitForTimeout(300);
+      }
+      const acceptButton = page.locator('button:not([disabled])').filter({ hasText: /godta og fortsett|acceptera|accept|godkänn|fortsätt|continue/i }).first();
+      if (await acceptButton.count() > 0) {
+        await acceptButton.click();
+        await page.waitForTimeout(500);
+      } else {
+        await page.waitForTimeout(500);
+      }
+    }
+    await page.waitForURL(/\/(app|admin|dashboard)/, { timeout: 15000 });
+  }
 
   // Save auth state
   await page.context().storageState({ path: authFile });

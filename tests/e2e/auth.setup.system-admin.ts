@@ -35,8 +35,48 @@ setup('authenticate system admin', async ({ page }) => {
   // Click login button (type=submit to avoid Google button)
   await page.locator('button[type="submit"]').first().click();
 
-  // Wait for redirect (may go to /admin for system_admin or /app for others)
-  await page.waitForURL(/\/(admin|app)/, { timeout: 10000 });
+  // Wait for redirect (may go to /admin, /app, or /legal/accept for pending documents)
+  await page.waitForURL(/\/(admin|app|legal\/accept)/, { timeout: 10000 });
+
+  // Handle legal acceptance if required
+  if (page.url().includes('/legal/accept')) {
+    // Wait for wizard to load
+    await page.waitForTimeout(1000);
+    
+    // Dismiss cookie consent dialog first if present
+    const cookieAcceptButton = page.locator('button').filter({ hasText: /godta alle|accept all|acceptera alla/i }).first();
+    if (await cookieAcceptButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+      await cookieAcceptButton.click();
+      await page.waitForTimeout(500);
+    }
+    
+    // Accept all documents by checking their checkboxes and submitting
+    // Loop until no more documents or we're redirected
+    let attempts = 0;
+    while (page.url().includes('/legal/accept') && attempts < 10) {
+      attempts++;
+      
+      // Find and check any unchecked checkbox
+      const checkbox = page.locator('input[type="checkbox"]:not(:checked)').first();
+      if (await checkbox.count() > 0) {
+        await checkbox.check({ force: true });
+        await page.waitForTimeout(300);
+      }
+      
+      // Try to click the accept/submit button if enabled - Norwegian/Swedish
+      const acceptButton = page.locator('button:not([disabled])').filter({ hasText: /godta og fortsett|acceptera|accept|godkänn|fortsätt|continue/i }).first();
+      if (await acceptButton.count() > 0) {
+        await acceptButton.click();
+        await page.waitForTimeout(500);
+      } else {
+        // No enabled button found, wait a bit and continue
+        await page.waitForTimeout(500);
+      }
+    }
+    
+    // Wait for redirect after acceptance
+    await page.waitForURL(/\/(admin|app)/, { timeout: 15000 });
+  }
 
   // Verify we're logged in
   await expect(page).toHaveURL(/\/(admin|app)/);

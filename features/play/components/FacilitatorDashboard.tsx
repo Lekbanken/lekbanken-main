@@ -428,7 +428,7 @@ export function FacilitatorDashboard({
       () => broadcastStateChange({ status: 'ended' })
     );
     onEndSession?.();
-  }, [updateAndBroadcast, broadcastStateChange, onEndSession]);
+  }, [updateAndBroadcast, broadcastStateChange, onEndSession, t]);
 
   // Get current step duration for timer default
   const currentStep = steps[currentStepIndex];
@@ -457,7 +457,7 @@ export function FacilitatorDashboard({
     return () => {
       cancelled = true;
     };
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     const interval = window.setInterval(async () => {
@@ -507,7 +507,7 @@ export function FacilitatorDashboard({
     } finally {
       setChatSending(false);
     }
-  }, [chatInput, latestChatTimestamp, sessionId]);
+  }, [chatInput, latestChatTimestamp, sessionId, t]);
 
   return (
     <div className="space-y-6">

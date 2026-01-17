@@ -96,7 +96,7 @@ export function ConversationCardsCollectionArtifact(props: {
     return () => {
       cancelled = true;
     };
-  }, [sessionId, participantToken, collectionId]);
+  }, [sessionId, participantToken, collectionId, t]);
 
   return (
     <div className="rounded-md border border-border p-3 space-y-2">

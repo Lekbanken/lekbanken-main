@@ -34,7 +34,10 @@ export function AchievementHistory({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
 
     const loadRecentAchievements = async () => {
       try {

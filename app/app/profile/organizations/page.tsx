@@ -53,7 +53,10 @@ export default function OrganizationsPage() {
 
   useEffect(() => {
     const loadMemberships = async () => {
-      if (!user?.id || !supabase) return;
+      if (!user?.id || !supabase) {
+        setIsLoading(false);
+        return;
+      }
 
       setIsLoading(true);
       try {

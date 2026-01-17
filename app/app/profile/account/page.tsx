@@ -260,7 +260,7 @@ export default function AccountSettingsPage() {
             {t('sections.account.password')}
           </CardTitle>
           <CardDescription>
-            {t('sections.account.passwordRequirements')}
+            {t('sections.account.passwordRequirements.title')}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

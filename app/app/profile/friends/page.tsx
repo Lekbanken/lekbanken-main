@@ -37,7 +37,10 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<FriendInfo[]>([]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
 
     const loadData = async () => {
       setIsLoading(true);

@@ -116,7 +116,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           <p className="mt-1 text-xs font-normal text-muted-foreground">Visa alla och pinna till dashboard</p>
         </Link>
         <Link
-          href="/app/profile/coins"
+          href="/app/gamification/coins"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
           DiceCoin

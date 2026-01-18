@@ -183,7 +183,7 @@ export function RoleAssigner({
     } finally {
       setIsAssigning(false);
     }
-  }, [assignments, participants, roles, roleToParticipants, onAssign]);
+  }, [assignments, participants, roles, roleToParticipants, onAssign, t]);
   
   const handleManualAssign = useCallback(async (participantId: string, roleId: string) => {
     setIsAssigning(true);
@@ -233,7 +233,7 @@ export function RoleAssigner({
           <div className="flex items-center gap-2">
             <UsersIcon className="h-5 w-5 text-muted-foreground" />
             <span className="text-sm font-medium">
-              {assignments.length} av {participants.length} tilldelade
+              {t('summary.assignedOfTotal', { assigned: assignments.length, total: participants.length })}
             </span>
           </div>
           <Button
@@ -243,7 +243,7 @@ export function RoleAssigner({
             className="gap-1.5"
           >
             <SparklesIcon className="h-4 w-4" />
-            Slumpa roller
+            {t('actions.randomAssign')}
           </Button>
         </div>
       </Card>
@@ -256,10 +256,10 @@ export function RoleAssigner({
       <div className="flex items-center justify-between gap-4">
         <div>
           <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Rolltilldelning
+            {t('title')}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            {assignments.length} av {participants.length} deltagare har roller
+            {t('summary.participantsWithRoles', { assigned: assignments.length, total: participants.length })}
           </p>
         </div>
         
@@ -273,7 +273,9 @@ export function RoleAssigner({
           ) : (
             <SparklesIcon className="h-4 w-4" />
           )}
-          Slumpa {unassigned.length > 0 ? `(${unassigned.length})` : 'roller'}
+          {unassigned.length > 0
+            ? t('actions.randomAssignCount', { count: unassigned.length })
+            : t('actions.randomAssignAll')}
         </Button>
       </div>
       
@@ -297,7 +299,7 @@ export function RoleAssigner({
             <div className="text-sm">
               {lastResult.assignments.length > 0 && (
                 <p className="font-medium">
-                  {lastResult.assignments.length} roller tilldelade
+                  {t('summary.rolesAssigned', { count: lastResult.assignments.length })}
                 </p>
               )}
               {lastResult.errors.map((err, i) => (
@@ -349,9 +351,13 @@ export function RoleAssigner({
                     <div>
                       <h4 className={`font-semibold ${colors.text}`}>{role.name}</h4>
                       <p className="text-xs text-muted-foreground">
-                        {assignedParticipants.length}
-                        {role.max_count !== null ? ` / ${role.max_count}` : ''} tilldelade
-                        {role.min_count > 1 && ` (min ${role.min_count})`}
+                        {t('roleCounts.assigned', {
+                          assigned: assignedParticipants.length,
+                          max: role.max_count ?? 0,
+                          min: role.min_count,
+                          hasMax: role.max_count !== null ? 'yes' : 'no',
+                          hasMin: role.min_count > 1 ? 'yes' : 'no',
+                        })}
                       </p>
                     </div>
                   </div>
@@ -363,7 +369,7 @@ export function RoleAssigner({
                   )}
                   {isFull && (
                     <Badge variant="default" className="text-xs bg-green-600">
-                      Full
+                      {t('status.full')}
                     </Badge>
                   )}
                 </div>
@@ -409,7 +415,7 @@ export function RoleAssigner({
       {unassigned.length > 0 && (
         <Card className="p-4">
           <h4 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-            Deltagare utan roll ({unassigned.length})
+            {t('unassigned.title', { count: unassigned.length })}
           </h4>
           <div className="flex flex-wrap gap-2">
             {unassigned.map((p) => (

@@ -19,6 +19,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "catalyst-ui-kit/**",
     "types/supabase.ts",
+    "types/database.ts",
   ]),
   // Register custom Lekbanken rules
   {

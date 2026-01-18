@@ -152,7 +152,7 @@ function SortablePhaseItem({ phase, onEdit, onDelete }: SortablePhaseItemProps) 
               </span>
             )}
             {phase.timer_visible && phase.duration_seconds && (
-              <span>Timer: {t(timerStyleOptions.find(o => o.value === phase.timer_style)?.labelKey || 'phase.timerStyles.countdown')}</span>
+              <span>{t('phase.timerLabel')}: {t(timerStyleOptions.find(o => o.value === phase.timer_style)?.labelKey || 'phase.timerStyles.countdown')}</span>
             )}
             {phase.auto_advance && (
               <span className="text-blue-600">{t('phase.fields.autoAdvance')}</span>

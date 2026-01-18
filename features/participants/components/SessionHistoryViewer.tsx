@@ -6,8 +6,9 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 
 interface SessionSummary {
   id: string;
@@ -34,6 +35,8 @@ interface SessionHistoryViewerProps {
 
 export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProps) {
   const router = useRouter();
+  const t = useTranslations('sessionHistory');
+  const locale = useLocale();
   const [sessions, setSessions] = useState<SessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +44,7 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
   const [totalCount, setTotalCount] = useState(0);
   const [offset, setOffset] = useState(0);
   const limit = 20;
+  const dateFormatter = useMemo(() => new Intl.DateTimeFormat(locale), [locale]);
 
   const fetchSessions = async () => {
     setLoading(true);
@@ -60,13 +64,13 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch sessions');
+        throw new Error(data.error || t('errors.fetchFailed'));
       }
 
       setSessions(data.sessions);
       setTotalCount(data.total_count);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('errors.unknown'));
     } finally {
       setLoading(false);
     }
@@ -98,12 +102,12 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
 
   const getStatusLabel = (status: string) => {
     const labels: Record<string, string> = {
-      active: 'Aktiv',
-      paused: 'Pausad',
-      locked: 'Låst',
-      ended: 'Avslutad',
-      cancelled: 'Avbruten',
-      archived: 'Arkiverad',
+      active: t('status.active'),
+      paused: t('status.paused'),
+      locked: t('status.locked'),
+      ended: t('status.ended'),
+      cancelled: t('status.cancelled'),
+      archived: t('status.archived'),
     };
     return labels[status] || status;
   };
@@ -116,9 +120,9 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
     const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
 
     if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+      return t('duration.hoursMinutes', { hours, minutes });
     }
-    return `${minutes}m`;
+    return t('duration.minutes', { minutes });
   };
 
   if (loading && sessions.length === 0) {
@@ -126,7 +130,7 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Laddar sessioner...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -144,7 +148,7 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex items-center gap-4 bg-white p-4 rounded-lg shadow">
-        <label className="text-sm font-medium text-gray-700">Filtrera:</label>
+        <label className="text-sm font-medium text-gray-700">{t('filters.label')}</label>
         <select
           value={statusFilter}
           onChange={(e) => {
@@ -153,24 +157,24 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
           }}
           className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          <option value="all">Alla Sessioner</option>
-          <option value="active">Aktiva</option>
-          <option value="paused">Pausade</option>
-          <option value="locked">Låsta</option>
-          <option value="ended">Avslutade</option>
-          <option value="cancelled">Avbrutna</option>
-          <option value="archived">Arkiverade</option>
+          <option value="all">{t('filters.all')}</option>
+          <option value="active">{t('filters.active')}</option>
+          <option value="paused">{t('filters.paused')}</option>
+          <option value="locked">{t('filters.locked')}</option>
+          <option value="ended">{t('filters.ended')}</option>
+          <option value="cancelled">{t('filters.cancelled')}</option>
+          <option value="archived">{t('filters.archived')}</option>
         </select>
 
         <div className="ml-auto text-sm text-gray-600">
-          {totalCount} {totalCount === 1 ? 'session' : 'sessioner'}
+          {t('summary.count', { count: totalCount })}
         </div>
       </div>
 
       {/* Session List */}
       {sessions.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-600">Inga sessioner hittades</p>
+          <p className="text-gray-600">{t('empty')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -193,19 +197,19 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
 
                   <div className="grid grid-cols-4 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500">Deltagare</p>
+                      <p className="text-gray-500">{t('metrics.participants')}</p>
                       <p className="font-semibold">{session.total_participants}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Totalt Poäng</p>
-                      <p className="font-semibold">{session.total_score.toLocaleString()}</p>
+                      <p className="text-gray-500">{t('metrics.totalScore')}</p>
+                      <p className="font-semibold">{session.total_score.toLocaleString(locale)}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Utmärkelser</p>
+                      <p className="text-gray-500">{t('metrics.achievements')}</p>
                       <p className="font-semibold">{session.total_achievements}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Längd</p>
+                      <p className="text-gray-500">{t('metrics.duration')}</p>
                       <p className="font-semibold">
                         {formatDuration(session.created_at, session.ended_at)}
                       </p>
@@ -213,9 +217,9 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
                   </div>
 
                   <div className="mt-2 text-xs text-gray-500">
-                    Skapad: {new Date(session.created_at).toLocaleString('sv-SE')}
+                    {t('timestamps.created', { date: dateFormatter.format(new Date(session.created_at)) })}
                     {session.ended_at && (
-                      <> • Avslutad: {new Date(session.ended_at).toLocaleString('sv-SE')}</>
+                      <> • {t('timestamps.ended', { date: dateFormatter.format(new Date(session.ended_at)) })}</>
                     )}
                   </div>
                 </div>
@@ -249,11 +253,15 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
             disabled={offset === 0}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            ← Föregående
+            {t('pagination.previous')}
           </button>
 
           <span className="text-sm text-gray-600">
-            Visar {offset + 1}-{Math.min(offset + limit, totalCount)} av {totalCount}
+            {t('pagination.showing', {
+              start: offset + 1,
+              end: Math.min(offset + limit, totalCount),
+              total: totalCount,
+            })}
           </span>
 
           <button
@@ -261,7 +269,7 @@ export function SessionHistoryViewer({ initialStatus }: SessionHistoryViewerProp
             disabled={offset + limit >= totalCount}
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Nästa →
+            {t('pagination.next')}
           </button>
         </div>
       )}

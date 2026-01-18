@@ -1998,10 +1998,6 @@ export async function getLearningReports(params: {
 
   // Get top courses by completions
   const courseCompletions: Record<string, number> = {};
-  completed.forEach(p => {
-    // Note: We need course_id from progress, but query above doesn't have it
-    // We'll need to adjust this - let's query with course_id
-  });
 
   // Re-query with course_id for proper stats
   let progressWithCourseQuery = supabase

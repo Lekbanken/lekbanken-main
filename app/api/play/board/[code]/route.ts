@@ -15,8 +15,9 @@ export async function GET(
   const session = await ParticipantSessionService.getSessionByCode(code);
   if (!session) return jsonError('Session not found', 404);
 
-  // Only active/paused sessions should show a board
-  if (session.status !== 'active' && session.status !== 'paused') {
+  // Allow board for active/paused/locked/ended sessions
+  const allowedStatuses = new Set(['active', 'paused', 'locked', 'ended']);
+  if (!allowedStatuses.has(session.status)) {
     return jsonError('Session is not active', 409);
   }
 
@@ -58,6 +59,27 @@ export async function GET(
       .single();
 
     currentPhaseName = (phase?.name as string | undefined) ?? null;
+  }
+
+  // Current step title + board text (best-effort)
+  let currentStepTitle: string | null = null;
+  let currentStepBoardText: string | null = null;
+  if (session.game_id) {
+    const { data: steps } = await service
+      .from('game_steps')
+      .select('title, board_text, body')
+      .eq('game_id', session.game_id)
+      .is('locale', null)
+      .order('step_order', { ascending: true });
+
+    const step = (steps ?? [])[session.current_step_index ?? 0];
+    if (step) {
+      currentStepTitle = (step.title as string | null) ?? null;
+      currentStepBoardText = (step.board_text as string | null) ?? null;
+      if (!currentStepBoardText) {
+        currentStepBoardText = (step.body as string | null) ?? null;
+      }
+    }
   }
 
   // Revealed public artifacts + highlighted variant
@@ -154,9 +176,13 @@ export async function GET(
         id: session.id,
         code: session.session_code,
         status: session.status,
+        started_at: session.started_at ?? null,
+        ended_at: session.ended_at ?? null,
         current_step_index: session.current_step_index ?? 0,
         current_phase_index: session.current_phase_index ?? 0,
         current_phase_name: currentPhaseName,
+        current_step_title: currentStepTitle,
+        current_step_board_text: currentStepBoardText,
         timer_state: session.timer_state ?? null,
         board_state: session.board_state ?? null,
       },

@@ -16,6 +16,7 @@ import { DecisionsPanel } from './DecisionsPanel';
 import { OutcomePanel } from './OutcomePanel';
 import { PuzzleProgressPanel } from './PuzzleProgressPanel';
 import { PropConfirmationManager } from './PropConfirmationManager';
+import { SimplePlayView } from './SimplePlayView';
 import { getHostPlaySession, updatePlaySessionState, type PlaySessionData } from '../api';
 import type { SessionTrigger } from '@/types/games';
 import { Card } from '@/components/ui/card';
@@ -32,6 +33,7 @@ import {
   PuzzlePieceIcon,
 } from '@heroicons/react/24/outline';
 import type { SessionRuntimeState } from '@/types/play-runtime';
+import type { Run, RunStep } from '../types';
 
 // =============================================================================
 // Types
@@ -46,6 +48,43 @@ export interface HostPlayModeProps {
   showExitButton?: boolean;
   /** Number of participants */
   participantCount?: number;
+}
+
+// =============================================================================
+// Helpers
+// =============================================================================
+
+/**
+ * Convert PlaySessionData to Run format for SimplePlayView
+ */
+function playDataToRun(playData: PlaySessionData): Run {
+  const steps: RunStep[] = playData.steps.map((step, index) => ({
+    id: step.id,
+    index,
+    blockId: step.id,
+    blockType: 'game' as const,
+    title: step.title,
+    description: step.description,
+    durationMinutes: step.durationMinutes ?? 5,
+    materials: step.materials,
+    safety: step.safety,
+    tag: step.tag,
+    note: step.note,
+  }));
+
+  return {
+    id: playData.sessionId,
+    planId: playData.gameId ?? playData.sessionId,
+    planVersionId: playData.sessionId,
+    versionNumber: 1,
+    name: playData.gameTitle,
+    status: 'in_progress',
+    steps,
+    blockCount: steps.length,
+    totalDurationMinutes: steps.reduce((acc, s) => acc + s.durationMinutes, 0),
+    currentStepIndex: playData.runtimeState.current_step_index ?? 0,
+    startedAt: new Date().toISOString(),
+  };
 }
 
 // Navigation zones: Play (main), Content (artifacts/decisions/outcomes), Manage (roles/settings)
@@ -243,6 +282,28 @@ export function HostPlayMode({
     );
   }
 
+  // Basic play mode - show simplified view
+  if (playData.playMode === 'basic') {
+    const run = playDataToRun(playData);
+    return (
+      <div className="space-y-4">
+        {showExitButton && (
+          <div className="flex justify-end border-b border-border pb-4">
+            <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
+              <ArrowLeftIcon className="h-4 w-4 mr-1" />
+              {t('navigation.lobby')}
+            </Button>
+          </div>
+        )}
+        <SimplePlayView
+          run={run}
+          onComplete={handleEndSession}
+          onBack={onExitPlayMode}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {/* Simplified 3-zone navigation */}
@@ -366,7 +427,7 @@ export function HostPlayMode({
               {t('manageTabs.roles')}
               {playData.sessionRoles.length > 0 && (
                 <span className="ml-1 text-xs opacity-75">
-                  ({playData.sessionRoles.length})
+                  {t('manageTabs.rolesCount', { count: playData.sessionRoles.length })}
                 </span>
               )}
             </Button>

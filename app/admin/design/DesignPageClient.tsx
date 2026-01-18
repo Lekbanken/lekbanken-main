@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Tabs, TabPanel } from '@/components/ui/tabs'
 import { Card, CardContent } from '@/components/ui/card'
 import { Alert } from '@/components/ui/alert'
@@ -23,14 +24,15 @@ interface DesignPageClientProps {
 }
 
 export function DesignPageClient({ initialConfig, error }: DesignPageClientProps) {
+  const t = useTranslations('design.page')
   const [config, setConfig] = useState<SystemDesignConfig | undefined>(initialConfig)
   const [activeTab, setActiveTab] = useState('brand')
 
   const tabs = [
-    { id: 'brand', label: 'Varumärke', icon: <SwatchIcon className="h-4 w-4" /> },
-    { id: 'media', label: 'Media', icon: <PhotoIcon className="h-4 w-4" /> },
-    { id: 'typography', label: 'Typografi', icon: <LanguageIcon className="h-4 w-4" /> },
-    { id: 'advanced', label: 'Avancerat', icon: <Cog6ToothIcon className="h-4 w-4" /> },
+    { id: 'brand', label: t('tabs.brand'), icon: <SwatchIcon className="h-4 w-4" /> },
+    { id: 'media', label: t('tabs.media'), icon: <PhotoIcon className="h-4 w-4" /> },
+    { id: 'typography', label: t('tabs.typography'), icon: <LanguageIcon className="h-4 w-4" /> },
+    { id: 'advanced', label: t('tabs.advanced'), icon: <Cog6ToothIcon className="h-4 w-4" /> },
   ]
 
   const handleConfigUpdate = (updates: Partial<SystemDesignConfig>) => {
@@ -43,8 +45,8 @@ export function DesignPageClient({ initialConfig, error }: DesignPageClientProps
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Design</h1>
-          <p className="text-muted-foreground">Central Design Hub</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Alert variant="error">
           {error}
@@ -59,16 +61,16 @@ export function DesignPageClient({ initialConfig, error }: DesignPageClientProps
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold tracking-tight">Design</h1>
-            <Badge variant="secondary" className="text-xs">System</Badge>
+            <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+            <Badge variant="secondary" className="text-xs">{t('badge')}</Badge>
           </div>
           <p className="text-muted-foreground mt-1">
-            Central Design Hub – Hantera plattformens visuella identitet
+            {t('description')}
           </p>
         </div>
         {config?.updatedAt && (
           <p className="text-xs text-muted-foreground">
-            Senast uppdaterad: {new Date(config.updatedAt).toLocaleString('sv-SE')}
+            {t('lastUpdated', { date: new Date(config.updatedAt).toLocaleString('sv-SE') })}
           </p>
         )}
       </div>
@@ -77,8 +79,10 @@ export function DesignPageClient({ initialConfig, error }: DesignPageClientProps
       <Card className="border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20">
         <CardContent className="pt-4">
           <p className="text-sm text-blue-800 dark:text-blue-200">
-            <strong>Central design</strong> påverkar hela plattformen. Organisationer kan överrida 
-            vissa delar om <em>Tenant Branding</em> är aktiverat (betald funktion).
+            {t.rich('info', {
+              strong: (chunks) => <strong>{chunks}</strong>,
+              em: (chunks) => <em>{chunks}</em>,
+            })}
           </p>
         </CardContent>
       </Card>

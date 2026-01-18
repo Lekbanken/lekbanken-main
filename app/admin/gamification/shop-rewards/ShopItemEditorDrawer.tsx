@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import {
   Sheet,
   SheetContent,
@@ -11,8 +13,7 @@ import {
   SheetDescription,
   SheetFooter,
 } from '@/components/ui/sheet';
-import { Switch } from '@/components/ui/switch';
-import type { ShopItemRow, CurrencyOption } from '@/app/actions/shop-rewards-admin';
+import type { CurrencyOption, ShopItemRow } from '@/app/actions/shop-rewards-admin';
 import { createShopItem, updateShopItem } from '@/app/actions/shop-rewards-admin';
 
 interface ShopItemEditorDrawerProps {
@@ -24,28 +25,15 @@ interface ShopItemEditorDrawerProps {
   onSave: () => void;
 }
 
-const CATEGORY_OPTIONS = [
-  { value: 'cosmetic', label: 'Kosmetisk', description: 'Avatarer, ramar, bakgrunder m.m.' },
-  { value: 'powerup', label: 'Power-up', description: 'Spelhjälpmedel och boosts' },
-  { value: 'bundle', label: 'Paket', description: 'Kombination av flera items (Fas 2)' },
-  { value: 'season_pass', label: 'Season Pass', description: 'Säsongspass med belöningar (Fas 2)' },
-] as const;
+type CategoryValue = 'cosmetic' | 'powerup' | 'bundle' | 'season_pass';
 
-const COSMETIC_SUBTYPES = [
-  { value: 'cosmetic:avatar', label: 'Avatar' },
-  { value: 'cosmetic:avatar_frame', label: 'Avatarram' },
-  { value: 'cosmetic:background', label: 'Bakgrund' },
-  { value: 'cosmetic:title', label: 'Titel' },
-  { value: 'cosmetic:badge', label: 'Märke' },
-];
-
-const POWERUP_SUBTYPES = [
-  { value: 'powerup:hint', label: 'Ledtråd' },
-  { value: 'powerup:skip', label: 'Hoppa över' },
-  { value: 'powerup:time_extend', label: 'Förläng tid' },
-  { value: 'powerup:double_xp', label: 'Dubblad XP' },
-  { value: 'powerup:shield', label: 'Sköld' },
-];
+const parseCategory = (value: string): { base: CategoryValue; subtype: string } => {
+  const [baseRaw, subtype = ''] = value.split(':');
+  const base = ['cosmetic', 'powerup', 'bundle', 'season_pass'].includes(baseRaw)
+    ? (baseRaw as CategoryValue)
+    : 'cosmetic';
+  return { base, subtype };
+};
 
 export function ShopItemEditorDrawer({
   open,
@@ -55,159 +43,220 @@ export function ShopItemEditorDrawer({
   onClose,
   onSave,
 }: ShopItemEditorDrawerProps) {
+  const t = useTranslations('admin.gamification.shopRewards.editor');
   const isEditing = !!item;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  // Compute initial values from item prop
-  const getInitialCategory = () => {
-    if (!item) return 'cosmetic';
-    const [mainCat] = item.category.split(':');
-    return mainCat;
-  };
+  const categoryOptions = useMemo(
+    () => [
+      {
+        value: 'cosmetic',
+        label: t('categories.cosmetic.label'),
+        description: t('categories.cosmetic.description'),
+      },
+      {
+        value: 'powerup',
+        label: t('categories.powerup.label'),
+        description: t('categories.powerup.description'),
+      },
+      {
+        value: 'bundle',
+        label: t('categories.bundle.label'),
+        description: t('categories.bundle.description'),
+        disabled: true,
+      },
+      {
+        value: 'season_pass',
+        label: t('categories.seasonPass.label'),
+        description: t('categories.seasonPass.description'),
+        disabled: true,
+      },
+    ],
+    [t]
+  );
 
-  const getInitialSubtype = () => {
-    if (!item) return '';
-    const [, subType] = item.category.split(':');
-    return subType ? item.category : '';
-  };
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState<CategoryValue>('cosmetic');
+  const [categorySubtype, setCategorySubtype] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [price, setPrice] = useState('');
+  const [currencyId, setCurrencyId] = useState('');
+  const [quantityLimit, setQuantityLimit] = useState('');
+  const [sortOrder, setSortOrder] = useState('0');
+  const [isAvailable, setIsAvailable] = useState(true);
+  const [isFeatured, setIsFeatured] = useState(false);
 
-  // Form state - reset when item changes using key on Sheet
-  const [name, setName] = useState(item?.name ?? '');
-  const [description, setDescription] = useState(item?.description ?? '');
-  const [category, setCategory] = useState(getInitialCategory());
-  const [categorySubtype, setCategorySubtype] = useState(getInitialSubtype());
-  const [imageUrl, setImageUrl] = useState(item?.image_url ?? '');
-  const [price, setPrice] = useState(item ? String(item.price) : '');
-  const [currencyId, setCurrencyId] = useState(item?.currency_id ?? currencies[0]?.id ?? '');
-  const [quantityLimit, setQuantityLimit] = useState(item?.quantity_limit ? String(item.quantity_limit) : '');
-  const [isAvailable, setIsAvailable] = useState(item?.is_available ?? true);
-  const [isFeatured, setIsFeatured] = useState(item?.is_featured ?? false);
-  const [sortOrder, setSortOrder] = useState(item ? String(item.sort_order) : '0');
+  const subtypes = useMemo(() => {
+    if (category === 'cosmetic') {
+      return [
+        { value: 'avatar', label: t('subtypes.avatar') },
+        { value: 'avatar_frame', label: t('subtypes.avatarFrame') },
+        { value: 'background', label: t('subtypes.background') },
+        { value: 'title', label: t('subtypes.title') },
+        { value: 'badge', label: t('subtypes.badge') },
+      ];
+    }
 
-  // Get subtypes based on main category
-  const getSubtypes = () => {
-    if (category === 'cosmetic') return COSMETIC_SUBTYPES;
-    if (category === 'powerup') return POWERUP_SUBTYPES;
+    if (category === 'powerup') {
+      return [
+        { value: 'hint', label: t('subtypes.hint') },
+        { value: 'skip', label: t('subtypes.skip') },
+        { value: 'time_extend', label: t('subtypes.timeExtend') },
+        { value: 'double_xp', label: t('subtypes.doubleXp') },
+        { value: 'shield', label: t('subtypes.shield') },
+      ];
+    }
+
     return [];
-  };
+  }, [category, t]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    if (!open) return;
+
+    if (item) {
+      const parsedCategory = parseCategory(item.category);
+      setName(item.name ?? '');
+      setDescription(item.description ?? '');
+      setCategory(parsedCategory.base);
+      setCategorySubtype(parsedCategory.subtype);
+      setImageUrl(item.image_url ?? '');
+      setPrice(item.price ? String(item.price) : '');
+      setCurrencyId(item.currency_id ?? '');
+      setQuantityLimit(item.quantity_limit ? String(item.quantity_limit) : '');
+      setSortOrder(item.sort_order !== undefined && item.sort_order !== null ? String(item.sort_order) : '0');
+      setIsAvailable(item.is_available ?? true);
+      setIsFeatured(item.is_featured ?? false);
+    } else {
+      setName('');
+      setDescription('');
+      setCategory('cosmetic');
+      setCategorySubtype('');
+      setImageUrl('');
+      setPrice('');
+      setCurrencyId(currencies[0]?.id ?? '');
+      setQuantityLimit('');
+      setSortOrder('0');
+      setIsAvailable(true);
+      setIsFeatured(false);
+    }
+
+    setError(null);
+  }, [open, item, currencies]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     setError(null);
 
-    if (!name.trim()) {
-      setError('Namn krävs');
+    const trimmedName = name.trim();
+    if (!trimmedName) {
+      setError(t('errors.nameRequired'));
       return;
     }
 
     if (!currencyId) {
-      setError('Välj en valuta');
+      setError(t('errors.currencyRequired'));
       return;
     }
 
-    const priceNum = parseFloat(price);
-    if (isNaN(priceNum) || priceNum < 0) {
-      setError('Ogiltigt pris');
+    const priceValue = Number(price);
+    if (!Number.isFinite(priceValue) || priceValue < 0) {
+      setError(t('errors.invalidPrice'));
       return;
     }
 
-    // Use subtype if selected, otherwise main category
-    const finalCategory = categorySubtype || category;
+    const quantityLimitValue = quantityLimit ? Number(quantityLimit) : null;
+    if (quantityLimitValue !== null && (!Number.isFinite(quantityLimitValue) || quantityLimitValue < 1)) {
+      setError(t('errors.invalidPrice'));
+      return;
+    }
 
-    const formData = {
-      name: name.trim(),
+    const sortOrderValue = Number(sortOrder);
+    const parsedSortOrder = Number.isFinite(sortOrderValue) ? Math.trunc(sortOrderValue) : 0;
+    const categoryValue = categorySubtype ? `${category}:${categorySubtype}` : category;
+
+    const payload = {
+      name: trimmedName,
       description: description.trim() || null,
-      category: finalCategory as 'cosmetic' | 'powerup' | 'bundle' | 'season_pass',
+      category: categoryValue as CategoryValue,
       image_url: imageUrl.trim() || null,
-      price: priceNum,
+      price: priceValue,
       currency_id: currencyId,
-      quantity_limit: quantityLimit ? parseInt(quantityLimit, 10) : null,
+      quantity_limit: quantityLimitValue,
       is_available: isAvailable,
       is_featured: isFeatured,
-      sort_order: parseInt(sortOrder, 10) || 0,
+      sort_order: parsedSortOrder,
     };
 
     startTransition(async () => {
       try {
         if (isEditing && item) {
-          const result = await updateShopItem(tenantId, item.id, formData);
+          const result = await updateShopItem(tenantId, item.id, payload);
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera item');
+            setError(result.error || t('errors.updateFailed'));
             return;
           }
         } else {
-          const result = await createShopItem(tenantId, formData);
+          const result = await createShopItem(tenantId, payload);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa item');
+            setError(result.error || t('errors.createFailed'));
             return;
           }
         }
+
         onSave();
-        onClose();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
         console.error(err);
+        setError(t('errors.unexpected'));
       }
     });
   };
 
-  const subtypes = getSubtypes();
-
-  // Use key to force remount when item changes, which resets all state
-  const formKey = item?.id ?? 'new';
-
   return (
-    <Sheet key={formKey} open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>
-            {isEditing ? 'Redigera shop item' : 'Skapa nytt shop item'}
-          </SheetTitle>
-          <SheetDescription>
-            {isEditing
-              ? 'Uppdatera shop item-inställningar nedan.'
-              : 'Fyll i informationen nedan för att skapa ett nytt shop item.'}
-          </SheetDescription>
+          <SheetTitle>{isEditing ? t('title.edit') : t('title.create')}</SheetTitle>
+          <SheetDescription>{isEditing ? t('description.edit') : t('description.create')}</SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Namn *</Label>
+            <Label htmlFor="name">{t('fields.name.label')}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="T.ex. Gyllene avatar"
+              placeholder={t('fields.name.placeholder')}
               required
             />
           </div>
 
-          {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Beskrivning</Label>
+            <Label htmlFor="description">{t('fields.description.label')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beskriv detta shop item..."
+              placeholder={t('fields.description.placeholder')}
               rows={3}
             />
           </div>
 
-          {/* Category */}
           <div className="space-y-2">
-            <Label>Kategori *</Label>
+            <Label>{t('fields.category.label')}</Label>
             <div className="grid gap-2">
-              {CATEGORY_OPTIONS.map((option) => (
+              {categoryOptions.map((option) => (
                 <label
                   key={option.value}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
                     category === option.value
                       ? 'border-primary bg-primary/5'
                       : 'border-border hover:border-muted-foreground/50'
-                  } ${option.value === 'bundle' || option.value === 'season_pass' ? 'opacity-50' : ''}`}
+                  } ${option.disabled ? 'opacity-50' : ''}`}
                 >
                   <input
                     type="radio"
@@ -215,10 +264,10 @@ export function ShopItemEditorDrawer({
                     value={option.value}
                     checked={category === option.value}
                     onChange={(e) => {
-                      setCategory(e.target.value);
+                      setCategory(e.target.value as CategoryValue);
                       setCategorySubtype('');
                     }}
-                    disabled={option.value === 'bundle' || option.value === 'season_pass'}
+                    disabled={option.disabled}
                     className="mt-1"
                   />
                   <div>
@@ -230,17 +279,16 @@ export function ShopItemEditorDrawer({
             </div>
           </div>
 
-          {/* Subtype (for cosmetic/powerup) */}
           {subtypes.length > 0 && (
             <div className="space-y-2">
-              <Label htmlFor="subtype">Undertyp</Label>
+              <Label htmlFor="subtype">{t('fields.subtype.label')}</Label>
               <select
                 id="subtype"
                 value={categorySubtype}
                 onChange={(e) => setCategorySubtype(e.target.value)}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
-                <option value="">Välj undertyp (valfri)</option>
+                <option value="">{t('fields.subtype.placeholder')}</option>
                 {subtypes.map((st) => (
                   <option key={st.value} value={st.value}>
                     {st.label}
@@ -250,22 +298,21 @@ export function ShopItemEditorDrawer({
             </div>
           )}
 
-          {/* Image URL */}
           <div className="space-y-2">
-            <Label htmlFor="imageUrl">Bild-URL</Label>
+            <Label htmlFor="imageUrl">{t('fields.imageUrl.label')}</Label>
             <Input
               id="imageUrl"
               type="url"
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
-              placeholder="https://example.com/image.png"
+              placeholder={t('fields.imageUrl.placeholder')}
             />
             {imageUrl && (
               <div className="mt-2 flex justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={imageUrl}
-                  alt="Preview"
+                  alt={t('fields.imageUrl.previewAlt')}
                   className="h-20 w-20 rounded-lg object-cover border"
                   onError={(e) => (e.currentTarget.style.display = 'none')}
                 />
@@ -273,10 +320,9 @@ export function ShopItemEditorDrawer({
             )}
           </div>
 
-          {/* Price & Currency */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Pris *</Label>
+              <Label htmlFor="price">{t('fields.price.label')}</Label>
               <Input
                 id="price"
                 type="number"
@@ -284,12 +330,12 @@ export function ShopItemEditorDrawer({
                 step="1"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                placeholder="100"
+                placeholder={t('fields.price.placeholder')}
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="currency">Valuta *</Label>
+              <Label htmlFor="currency">{t('fields.currency.label')}</Label>
               <select
                 id="currency"
                 value={currencyId}
@@ -297,7 +343,7 @@ export function ShopItemEditorDrawer({
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               >
-                <option value="">Välj valuta</option>
+                <option value="">{t('fields.currency.placeholder')}</option>
                 {currencies.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.symbol ? `${c.symbol} ${c.name}` : c.name}
@@ -309,82 +355,70 @@ export function ShopItemEditorDrawer({
 
           {currencies.length === 0 && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
-              ⚠️ Ingen valuta finns. Skapa en valuta först under Gamification → Valuta.
+              {t('warnings.noCurrency')}
             </div>
           )}
 
-          {/* Quantity Limit */}
           <div className="space-y-2">
-            <Label htmlFor="quantityLimit">Begränsad upplaga</Label>
+            <Label htmlFor="quantityLimit">{t('fields.quantityLimit.label')}</Label>
             <Input
               id="quantityLimit"
               type="number"
               min="1"
               value={quantityLimit}
               onChange={(e) => setQuantityLimit(e.target.value)}
-              placeholder="Lämna tomt för obegränsad"
+              placeholder={t('fields.quantityLimit.placeholder')}
             />
-            <p className="text-sm text-muted-foreground">
-              Om ifyllt begränsas totalt antal som kan köpas av alla användare.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('fields.quantityLimit.helper')}</p>
           </div>
 
-          {/* Sort Order */}
           <div className="space-y-2">
-            <Label htmlFor="sortOrder">Sorteringsordning</Label>
+            <Label htmlFor="sortOrder">{t('fields.sortOrder.label')}</Label>
             <Input
               id="sortOrder"
               type="number"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value)}
-              placeholder="0"
+              placeholder={t('fields.sortOrder.placeholder')}
             />
-            <p className="text-sm text-muted-foreground">
-              Lägre nummer visas först i shopen.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('fields.sortOrder.helper')}</p>
           </div>
 
-          {/* Toggles */}
           <div className="space-y-4 rounded-lg border p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Tillgänglig</p>
-                <p className="text-sm text-muted-foreground">
-                  Visa i shopen för deltagare
-                </p>
+                <p className="font-medium">{t('toggles.available.title')}</p>
+                <p className="text-sm text-muted-foreground">{t('toggles.available.description')}</p>
               </div>
               <Switch
                 checked={isAvailable}
                 onCheckedChange={setIsAvailable}
-                aria-label="Tillgänglig"
+                aria-label={t('toggles.available.title')}
               />
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium">Framhävd</p>
-                <p className="text-sm text-muted-foreground">
-                  Visa i featured-sektion
-                </p>
+                <p className="font-medium">{t('toggles.featured.title')}</p>
+                <p className="text-sm text-muted-foreground">{t('toggles.featured.description')}</p>
               </div>
               <Switch
                 checked={isFeatured}
                 onCheckedChange={setIsFeatured}
-                aria-label="Framhävd"
+                aria-label={t('toggles.featured.title')}
               />
             </div>
           </div>
 
-          {/* Stats (edit mode only) */}
           {isEditing && item && (
-            <div className="rounded-lg border p-4 bg-muted/50">
-              <h4 className="font-medium mb-2">Försäljningsstatistik</h4>
+            <div className="rounded-lg border bg-muted/50 p-4">
+              <h4 className="mb-2 font-medium">{t('stats.title')}</h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Sålda</p>
+                  <p className="text-muted-foreground">{t('stats.sold')}</p>
                   <p className="font-medium">{item.quantity_sold}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Kvar</p>
+                  <p className="text-muted-foreground">{t('stats.remaining')}</p>
                   <p className="font-medium">
                     {item.quantity_limit
                       ? `${item.quantity_limit - item.quantity_sold} / ${item.quantity_limit}`
@@ -395,7 +429,6 @@ export function ShopItemEditorDrawer({
             </div>
           )}
 
-          {/* Error */}
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
               {error}
@@ -404,10 +437,10 @@ export function ShopItemEditorDrawer({
 
           <SheetFooter className="flex-row justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || !name || !currencyId || currencies.length === 0}>
-              {isPending ? 'Sparar...' : isEditing ? 'Uppdatera' : 'Skapa'}
+              {isPending ? t('actions.saving') : isEditing ? t('actions.update') : t('actions.create')}
             </Button>
           </SheetFooter>
         </form>

@@ -67,7 +67,7 @@ export default function AdminCoursesPage() {
   const [editingCourse, setEditingCourse] = useState<LearningCourseRow | null>(null);
 
   // Archive confirmation
-  const { isOpen: confirmOpen, setIsOpen: setConfirmOpen, handleConfirm: handleDialogConfirm } = useConfirmDialog();
+  const { isOpen: confirmOpen, setIsOpen: setConfirmOpen } = useConfirmDialog();
   const [confirmCourse, setConfirmCourse] = useState<LearningCourseRow | null>(null);
   const [isArchiving, startArchiving] = useTransition();
 
@@ -119,7 +119,7 @@ export default function AdminCoursesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, searchDebounced, statusFilter, scopeFilter, tenantFilter, isSystemAdmin]);
+  }, [page, pageSize, searchDebounced, statusFilter, scopeFilter, tenantFilter, isSystemAdmin, t]);
 
   useEffect(() => {
     loadCourses();

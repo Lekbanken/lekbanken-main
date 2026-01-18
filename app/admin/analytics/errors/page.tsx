@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard'
@@ -46,6 +47,8 @@ interface ErrorSummary {
 }
 
 export default function ErrorManagementPage() {
+  const t = useTranslations('admin.analyticsErrors')
+  const locale = useLocale()
   const { user } = useAuth()
   const { currentTenant } = useTenant()
 
@@ -165,7 +168,7 @@ export default function ErrorManagementPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('requiresLogin')}</p>
         </div>
       </AdminPageLayout>
     )
@@ -188,41 +191,45 @@ export default function ErrorManagementPage() {
     <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
-        title="Error Management"
-        description="Granska, hantera och lös systemfel"
+        title={t('title')}
+        description={t('description')}
         icon={<ExclamationTriangleIcon className="h-6 w-6" />}
         breadcrumbs={[
-          { label: 'Admin', href: '/admin' },
-          { label: 'Analytics', href: '/admin/analytics' },
-          { label: 'Errors' },
+          { label: t('breadcrumbs.admin'), href: '/admin' },
+          { label: t('breadcrumbs.analytics'), href: '/admin/analytics' },
+          { label: t('breadcrumbs.errors') },
         ]}
       />
 
       <AdminStatGrid cols={4} className="mb-8">
         <AdminStatCard
-          label="Olösta fel"
+          label={t('stats.unresolved')}
           value={unresolvedCount}
           icon={<ExclamationTriangleIcon className="h-5 w-5" />}
           iconColor="red"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Lösta fel"
+          label={t('stats.resolved')}
           value={resolvedCount}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Unika feltyper"
+          label={t('stats.uniqueTypes')}
           value={errors.length}
           icon={<ExclamationTriangleIcon className="h-5 w-5" />}
           iconColor="amber"
           isLoading={isLoading}
         />
         <AdminStatCard
-          label="Avg tid till lösning"
-          value={avgTimeToResolve > 0 ? `${avgTimeToResolve.toFixed(1)}h` : 'N/A'}
+          label={t('stats.avgResolutionTime')}
+          value={
+            avgTimeToResolve > 0
+              ? t('stats.avgResolutionTimeValue', { hours: avgTimeToResolve.toFixed(1) })
+              : t('stats.notAvailable')
+          }
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="blue"
           isLoading={isLoading}
@@ -242,9 +249,9 @@ export default function ErrorManagementPage() {
                   : 'text-muted-foreground hover:bg-muted'
               }`}
             >
-              {tab === 'all' && 'Alla'}
-              {tab === 'unresolved' && 'Olösta'}
-              {tab === 'resolved' && 'Lösta'}
+              {tab === 'all' && t('filters.all')}
+              {tab === 'unresolved' && t('filters.unresolved')}
+              {tab === 'resolved' && t('filters.resolved')}
             </button>
           ))}
         </CardContent>
@@ -254,15 +261,15 @@ export default function ErrorManagementPage() {
         {/* Error List */}
         <Card>
           <CardHeader>
-            <CardTitle>Fel (grupperat)</CardTitle>
+            <CardTitle>{t('list.title')}</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
               {errors.length === 0 ? (
                 <div className="p-8 text-center text-muted-foreground">
-                  {filter === 'unresolved' && 'Inga olösta fel! 🎉'}
-                  {filter === 'resolved' && 'Inga lösta fel ännu'}
-                  {filter === 'all' && 'Inga fel rapporterade'}
+                  {filter === 'unresolved' && t('list.empty.unresolved')}
+                  {filter === 'resolved' && t('list.empty.resolved')}
+                  {filter === 'all' && t('list.empty.all')}
                 </div>
               ) : (
                 errors.map((error, idx) => (
@@ -276,7 +283,7 @@ export default function ErrorManagementPage() {
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="destructive">{error.error_type}</Badge>
                           <span className="text-sm text-muted-foreground">
-                            {error.count} förekomster
+                            {t('list.occurrences', { count: error.count })}
                           </span>
                         </div>
                         <p className="text-sm font-medium text-foreground truncate">
@@ -295,12 +302,12 @@ export default function ErrorManagementPage() {
         {/* Error Details */}
         <Card>
           <CardHeader>
-            <CardTitle>Feldetaljer</CardTitle>
+            <CardTitle>{t('details.title')}</CardTitle>
           </CardHeader>
           <CardContent>
             {!selectedError ? (
               <div className="p-8 text-center text-muted-foreground">
-                Välj ett fel för att se detaljer
+                {t('details.empty')}
               </div>
             ) : (
               <div className="space-y-6">
@@ -309,20 +316,20 @@ export default function ErrorManagementPage() {
                   <div className="flex items-center justify-between mb-4">
                     <Badge variant="destructive">{selectedError.error_type}</Badge>
                     {selectedError.resolved ? (
-                      <Badge className="bg-green-100 text-green-700">Löst</Badge>
+                      <Badge className="bg-green-100 text-green-700">{t('details.status.resolved')}</Badge>
                     ) : (
-                      <Badge variant="secondary">Olöst</Badge>
+                      <Badge variant="secondary">{t('details.status.unresolved')}</Badge>
                     )}
                   </div>
                   <h3 className="font-semibold text-lg mb-2">
                     {selectedError.error_message}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    Rapporterad: {new Date(selectedError.created_at).toLocaleString('sv-SE')}
+                    {t('details.reportedAt', { time: new Date(selectedError.created_at).toLocaleString(locale) })}
                   </p>
                   {selectedError.last_occurred_at && (
                     <p className="text-sm text-amber-600 mt-1">
-                      Senast: {new Date(selectedError.last_occurred_at).toLocaleString('sv-SE')}
+                      {t('details.lastSeen', { time: new Date(selectedError.last_occurred_at).toLocaleString(locale) })}
                     </p>
                   )}
                 </div>
@@ -330,7 +337,7 @@ export default function ErrorManagementPage() {
                 {/* Stack Trace */}
                 {selectedError.stack_trace && (
                   <div>
-                    <h4 className="font-semibold mb-2">Stack Trace</h4>
+                    <h4 className="font-semibold mb-2">{t('details.stackTrace')}</h4>
                     <pre className="bg-muted p-3 rounded-lg text-xs overflow-x-auto max-h-[200px] overflow-y-auto">
                       {selectedError.stack_trace}
                     </pre>
@@ -339,9 +346,7 @@ export default function ErrorManagementPage() {
 
                 {/* All Instances */}
                 <div>
-                  <h4 className="font-semibold mb-2">
-                    Alla förekomster ({errorInstances.length})
-                  </h4>
+                  <h4 className="font-semibold mb-2">{t('details.allOccurrences', { count: errorInstances.length })}</h4>
                   <div className="space-y-2 max-h-[200px] overflow-y-auto">
                     {errorInstances.map((instance) => (
                       <div
@@ -349,7 +354,7 @@ export default function ErrorManagementPage() {
                         className="flex items-center justify-between p-2 bg-muted rounded text-sm"
                       >
                         <span className="text-xs text-muted-foreground">
-                          {new Date(instance.created_at).toLocaleString('sv-SE')}
+                          {new Date(instance.created_at).toLocaleString(locale)}
                         </span>
                         {instance.resolved ? (
                           <CheckCircleIcon className="h-4 w-4 text-green-600" />
@@ -364,13 +369,13 @@ export default function ErrorManagementPage() {
                 {/* Resolution Actions */}
                 {!selectedError.resolved && (
                   <div className="border-t pt-4">
-                    <h4 className="font-semibold mb-3">Markera som löst</h4>
+                    <h4 className="font-semibold mb-3">{t('actions.title')}</h4>
                     <div className="flex gap-2">
                       <button
                         onClick={() => resolveError(selectedError.id)}
                         className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                       >
-                        Lös denna förekomst
+                        {t('actions.resolveInstance')}
                       </button>
                       <button
                         onClick={() =>
@@ -381,7 +386,7 @@ export default function ErrorManagementPage() {
                         }
                         className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
                       >
-                        Lös alla olösta
+                        {t('actions.resolveAll')}
                       </button>
                     </div>
                   </div>

@@ -112,6 +112,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
   const router = useRouter();
   const { success, error: toastError } = useToast();
   // Dynamic import to avoid circular dependency issues
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { useAuth } = require('@/lib/supabase/auth');
   const { effectiveGlobalRole } = useAuth();
   const isSystemAdmin = effectiveGlobalRole === 'system_admin';

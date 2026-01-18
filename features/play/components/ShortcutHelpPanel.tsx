@@ -78,34 +78,37 @@ const CATEGORY_ORDER: ShortcutCategory[] = [
 // Helper: Format shortcut key display
 // =============================================================================
 
-function formatKey(shortcut: DirectorShortcut): React.ReactNode {
+function formatKey(
+  shortcut: DirectorShortcut,
+  t: ReturnType<typeof useTranslations<'play.shortcutHelpPanel'>>
+): React.ReactNode {
   const parts: React.ReactNode[] = [];
   
   if (shortcut.modifiers.ctrl) {
     parts.push(
       <kbd key="ctrl" className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">
-        Ctrl
+        {t('keys.ctrl')}
       </kbd>
     );
   }
   if (shortcut.modifiers.alt) {
     parts.push(
       <kbd key="alt" className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">
-        Alt
+        {t('keys.alt')}
       </kbd>
     );
   }
   if (shortcut.modifiers.shift) {
     parts.push(
       <kbd key="shift" className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">
-        ⇧
+        {t('keys.shift')}
       </kbd>
     );
   }
   if (shortcut.modifiers.meta) {
     parts.push(
       <kbd key="meta" className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">
-        ⌘
+        {t('keys.meta')}
       </kbd>
     );
   }
@@ -116,9 +119,9 @@ function formatKey(shortcut: DirectorShortcut): React.ReactNode {
   else if (keyDisplay === 'ArrowLeft') keyDisplay = '←';
   else if (keyDisplay === 'ArrowUp') keyDisplay = '↑';
   else if (keyDisplay === 'ArrowDown') keyDisplay = '↓';
-  else if (keyDisplay === 'Space') keyDisplay = 'Space';
-  else if (keyDisplay === 'Escape') keyDisplay = 'Esc';
-  else if (keyDisplay === 'Enter') keyDisplay = 'Enter';
+  else if (keyDisplay === 'Space') keyDisplay = t('keys.space');
+  else if (keyDisplay === 'Escape') keyDisplay = t('keys.escape');
+  else if (keyDisplay === 'Enter') keyDisplay = t('keys.enter');
   
   parts.push(
     <kbd key="key" className="px-1.5 py-0.5 bg-muted rounded text-xs font-mono">
@@ -130,7 +133,7 @@ function formatKey(shortcut: DirectorShortcut): React.ReactNode {
     <div className="flex items-center gap-1">
       {parts.map((part, i) => (
         <React.Fragment key={i}>
-          {i > 0 && <span className="text-muted-foreground text-xs">+</span>}
+          {i > 0 && <span className="text-muted-foreground text-xs">{t('keys.plus')}</span>}
           {part}
         </React.Fragment>
       ))}
@@ -151,7 +154,7 @@ function ShortcutRow({ shortcut, t }: ShortcutRowProps) {
   return (
     <div className="flex items-center justify-between py-2 px-2 hover:bg-muted/50 rounded">
       <span className="text-sm">{t(`actions.${shortcut.descriptionKey}` as Parameters<typeof t>[0])}</span>
-      {formatKey(shortcut)}
+      {formatKey(shortcut, t)}
     </div>
   );
 }

@@ -8,6 +8,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -38,12 +39,6 @@ type PhaseDraft = {
   duration?: number | null;
 };
 
-const DISPLAY_MODE_LABELS: Record<'instant' | 'typewriter' | 'dramatic', string> = {
-  instant: 'Instant',
-  typewriter: 'Typewriter',
-  dramatic: 'Dramatic',
-};
-
 export interface SessionStoryPanelProps {
   sessionId: string;
   className?: string;
@@ -51,6 +46,7 @@ export interface SessionStoryPanelProps {
 }
 
 export function SessionStoryPanel({ sessionId, className, onPreview }: SessionStoryPanelProps) {
+  const t = useTranslations('play.sessionStoryPanel');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,6 +79,15 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
   const [storyAllowParticipantSkip, setStoryAllowParticipantSkip] = useState(false);
   const [storyAllowClose, setStoryAllowClose] = useState(true);
 
+  const displayModeLabels = useMemo(
+    () => ({
+      instant: t('displayModes.instant'),
+      typewriter: t('displayModes.typewriter'),
+      dramatic: t('displayModes.dramatic'),
+    }),
+    [t]
+  );
+
   const stepOverrideMap = useMemo(
     () => new Map((overrides?.steps ?? []).map((o) => [o.id, o])),
     [overrides]
@@ -102,7 +107,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       ]);
 
       if (!gameRes.ok) {
-        throw new Error('Failed to load story content');
+        throw new Error(t('errors.loadFailed'));
       }
 
       const data = (await gameRes.json()) as {
@@ -138,11 +143,11 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       });
       setPhaseDrafts(nextPhaseDrafts);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load story content');
+      setError(err instanceof Error ? err.message : t('errors.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void loadContent();
@@ -210,11 +215,11 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       };
 
       const ok = await updateSessionOverrides(sessionId, payload);
-      if (!ok) throw new Error('Failed to save story overrides');
+      if (!ok) throw new Error(t('errors.saveFailed'));
 
       await loadContent();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save story overrides');
+      setError(err instanceof Error ? err.message : t('errors.saveFailed'));
     } finally {
       setSaving(false);
     }
@@ -228,6 +233,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
     stepOverrideMap,
     phaseOverrideMap,
     loadContent,
+    t,
   ]);
 
   const handleReset = useCallback(async () => {
@@ -235,39 +241,39 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
     setError(null);
     try {
       const ok = await updateSessionOverrides(sessionId, {});
-      if (!ok) throw new Error('Failed to reset overrides');
+      if (!ok) throw new Error(t('errors.resetFailed'));
       await loadContent();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reset overrides');
+      setError(err instanceof Error ? err.message : t('errors.resetFailed'));
     } finally {
       setSaving(false);
     }
-  }, [sessionId, loadContent]);
+  }, [sessionId, loadContent, t]);
 
   return (
     <div className={cn('space-y-6', className)}>
       <Card className="p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-semibold text-foreground">Story content</h3>
+            <h3 className="text-base font-semibold text-foreground">{t('title')}</h3>
             <p className="text-sm text-muted-foreground">
-              Edit steps and phases for this session only. Changes do not affect the base game.
+              {t('description')}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             {onPreview && (
               <Button variant="outline" size="sm" onClick={onPreview} disabled={loading || saving}>
-                Preview story
+                {t('actions.previewStory')}
               </Button>
             )}
             <Button variant="outline" size="sm" onClick={() => void loadContent()} disabled={loading || saving}>
               <ArrowPathIcon className={cn('h-4 w-4', loading ? 'animate-spin' : '')} />
             </Button>
             <Button variant="outline" size="sm" onClick={() => void handleReset()} disabled={loading || saving}>
-              Reset overrides
+              {t('actions.resetOverrides')}
             </Button>
             <Button size="sm" onClick={() => void handleSave()} disabled={loading || saving}>
-              Save changes
+              {t('actions.saveChanges')}
             </Button>
           </div>
         </div>
@@ -282,16 +288,16 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Countdown overlay</h4>
-            <p className="text-xs text-muted-foreground">Broadcast a participant countdown from the lobby.</p>
+            <h4 className="text-sm font-semibold text-foreground">{t('countdown.title')}</h4>
+            <p className="text-xs text-muted-foreground">{t('countdown.description')}</p>
           </div>
           <span className="text-xs text-muted-foreground">
-            {broadcastConnected ? 'Live' : 'Offline'}
+            {broadcastConnected ? t('status.live') : t('status.offline')}
           </span>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs text-muted-foreground space-y-1">
-            Duration (sec)
+            {t('countdown.durationLabel')}
             <Input
               type="number"
               value={countdownDuration}
@@ -303,24 +309,24 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
             />
           </label>
           <label className="text-xs text-muted-foreground space-y-1 md:col-span-2">
-            Message (optional)
+            {t('countdown.messageLabel')}
             <Input
               value={countdownMessage}
               onChange={(e) => setCountdownMessage(e.target.value)}
-              placeholder="Next moment starts in..."
+              placeholder={t('countdown.messagePlaceholder')}
             />
           </label>
         </div>
         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
           <label className="flex items-center gap-2">
-            Variant
+            {t('countdown.variantLabel')}
             <select
               className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
               value={countdownVariant}
               onChange={(e) => setCountdownVariant(e.target.value as 'default' | 'dramatic')}
             >
-              <option value="default">Default</option>
-              <option value="dramatic">Dramatic</option>
+              <option value="default">{t('countdown.variantDefault')}</option>
+              <option value="dramatic">{t('countdown.variantDramatic')}</option>
             </select>
           </label>
           <div className="ml-auto flex gap-2">
@@ -336,7 +342,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               }
               disabled={!broadcastConnected}
             >
-              Show
+              {t('actions.show')}
             </Button>
             <Button
               size="sm"
@@ -344,7 +350,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onClick={() => void broadcastCountdown('skip', 0)}
               disabled={!broadcastConnected}
             >
-              Skip
+              {t('actions.skip')}
             </Button>
           </div>
         </div>
@@ -353,31 +359,31 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       <Card className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Story overlay</h4>
-            <p className="text-xs text-muted-foreground">Send a full-screen story overlay to participants.</p>
+            <h4 className="text-sm font-semibold text-foreground">{t('storyOverlay.title')}</h4>
+            <p className="text-xs text-muted-foreground">{t('storyOverlay.description')}</p>
           </div>
           <span className="text-xs text-muted-foreground">
-            {broadcastConnected ? 'Live' : 'Offline'}
+            {broadcastConnected ? t('status.live') : t('status.offline')}
           </span>
         </div>
 
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs text-muted-foreground space-y-1">
-            Source
+            {t('storyOverlay.sourceLabel')}
             <select
               className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
               value={storySource}
               onChange={(e) => setStorySource(e.target.value as 'step' | 'phase' | 'custom')}
             >
-              <option value="step">Step</option>
-              <option value="phase">Phase</option>
-              <option value="custom">Custom</option>
+              <option value="step">{t('storyOverlay.sourceStep')}</option>
+              <option value="phase">{t('storyOverlay.sourcePhase')}</option>
+              <option value="custom">{t('storyOverlay.sourceCustom')}</option>
             </select>
           </label>
 
           {storySource === 'step' && (
             <label className="text-xs text-muted-foreground space-y-1 md:col-span-2">
-              Step
+              {t('storyOverlay.stepLabel')}
               <select
                 className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                 value={storyStepId}
@@ -394,7 +400,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
 
           {storySource === 'phase' && (
             <label className="text-xs text-muted-foreground space-y-1 md:col-span-2">
-              Phase
+              {t('storyOverlay.phaseLabel')}
               <select
                 className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                 value={storyPhaseId}
@@ -411,27 +417,27 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
         </div>
 
         <label className="text-xs text-muted-foreground space-y-1">
-          Title
+          {t('storyOverlay.titleLabel')}
           <Input
             value={storyTitle}
             onChange={(e) => setStoryTitle(e.target.value)}
-            placeholder="Optional title"
+            placeholder={t('storyOverlay.titlePlaceholder')}
           />
         </label>
 
         <label className="text-xs text-muted-foreground space-y-1">
-          Text
+          {t('storyOverlay.textLabel')}
           <Textarea
             value={storyText}
             onChange={(e) => setStoryText(e.target.value)}
-            placeholder="Story text to display"
+            placeholder={t('storyOverlay.textPlaceholder')}
             rows={4}
           />
         </label>
 
         <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <label className="flex items-center gap-2">
-            Speed
+            {t('storyOverlay.speedLabel')}
             <select
               className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
               value={storySpeed}
@@ -439,22 +445,22 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                 setStorySpeed(e.target.value as 'fast' | 'normal' | 'dramatic' | 'instant')
               }
             >
-              <option value="instant">Instant</option>
-              <option value="fast">Fast</option>
-              <option value="normal">Normal</option>
-              <option value="dramatic">Dramatic</option>
+              <option value="instant">{t('storyOverlay.speedInstant')}</option>
+              <option value="fast">{t('storyOverlay.speedFast')}</option>
+              <option value="normal">{t('storyOverlay.speedNormal')}</option>
+              <option value="dramatic">{t('storyOverlay.speedDramatic')}</option>
             </select>
           </label>
           <label className="flex items-center gap-2">
-            Theme
+            {t('storyOverlay.themeLabel')}
             <select
               className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
               value={storyTheme}
               onChange={(e) => setStoryTheme(e.target.value as 'dark' | 'light' | 'dramatic')}
             >
-              <option value="dark">Dark</option>
-              <option value="light">Light</option>
-              <option value="dramatic">Dramatic</option>
+              <option value="dark">{t('storyOverlay.themeDark')}</option>
+              <option value="light">{t('storyOverlay.themeLight')}</option>
+              <option value="dramatic">{t('storyOverlay.themeDramatic')}</option>
             </select>
           </label>
           <div className="flex items-center gap-2">
@@ -464,7 +470,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onCheckedChange={(value) => setStoryShowProgress(Boolean(value))}
             />
             <Label htmlFor="story-progress" className="text-xs">
-              Show progress
+              {t('storyOverlay.showProgress')}
             </Label>
           </div>
           <div className="flex items-center gap-2">
@@ -474,7 +480,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onCheckedChange={(value) => setStoryAllowSkip(Boolean(value))}
             />
             <Label htmlFor="story-skip" className="text-xs">
-              Allow skip
+              {t('storyOverlay.allowSkip')}
             </Label>
           </div>
           <div className="flex items-center gap-2">
@@ -484,7 +490,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onCheckedChange={(value) => setStoryAllowParticipantSkip(Boolean(value))}
             />
             <Label htmlFor="story-participant-skip" className="text-xs">
-              Participant skip
+              {t('storyOverlay.participantSkip')}
             </Label>
           </div>
           <div className="flex items-center gap-2">
@@ -494,7 +500,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onCheckedChange={(value) => setStoryAllowClose(Boolean(value))}
             />
             <Label htmlFor="story-close" className="text-xs">
-              Allow close
+              {t('storyOverlay.allowClose')}
             </Label>
           </div>
 
@@ -516,7 +522,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               }
               disabled={!broadcastConnected || !storyText.trim()}
             >
-              Show
+              {t('actions.show')}
             </Button>
             <Button
               size="sm"
@@ -524,7 +530,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               onClick={() => void broadcastStoryOverlay({ action: 'close' })}
               disabled={!broadcastConnected}
             >
-              Close
+              {t('actions.close')}
             </Button>
           </div>
         </div>
@@ -533,13 +539,13 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Phases</h4>
-            <p className="text-xs text-muted-foreground">Name, description, duration</p>
+            <h4 className="text-sm font-semibold text-foreground">{t('phases.title')}</h4>
+            <p className="text-xs text-muted-foreground">{t('phases.description')}</p>
           </div>
         </div>
         <div className="space-y-3">
           {phases.length === 0 && (
-            <Card className="p-6 text-sm text-muted-foreground">No phases defined.</Card>
+            <Card className="p-6 text-sm text-muted-foreground">{t('phases.empty')}</Card>
           )}
           {phases.map((phase, index) => {
             const draft = phaseDrafts[phase.id] ?? {};
@@ -547,7 +553,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               <Card key={phase.id} className="p-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <PencilSquareIcon className="h-4 w-4 text-muted-foreground" />
-                  <span>Phase {index + 1}</span>
+                  <span>{t('phases.phaseLabel', { index: index + 1 })}</span>
                 </div>
                 <Input
                   value={draft.name ?? ''}
@@ -571,7 +577,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                   rows={2}
                 />
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>Duration (sec)</span>
+                  <span>{t('phases.durationLabel')}</span>
                   <Input
                     type="number"
                     className="w-24"
@@ -598,13 +604,13 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-sm font-semibold text-foreground">Steps</h4>
-            <p className="text-xs text-muted-foreground">Title, description, duration, display mode</p>
+            <h4 className="text-sm font-semibold text-foreground">{t('steps.title')}</h4>
+            <p className="text-xs text-muted-foreground">{t('steps.description')}</p>
           </div>
         </div>
         <div className="space-y-3">
           {steps.length === 0 && (
-            <Card className="p-6 text-sm text-muted-foreground">No steps defined.</Card>
+            <Card className="p-6 text-sm text-muted-foreground">{t('steps.empty')}</Card>
           )}
           {steps.map((step, index) => {
             const draft = stepDrafts[step.id] ?? {};
@@ -613,7 +619,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
               <Card key={step.id} className="p-4 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                   <PencilSquareIcon className="h-4 w-4 text-muted-foreground" />
-                  <span>Step {index + 1}</span>
+                  <span>{t('steps.stepLabel', { index: index + 1 })}</span>
                 </div>
                 <Input
                   value={draft.title ?? ''}
@@ -638,7 +644,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                 />
                 <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
                   <label className="flex items-center gap-2">
-                    Duration (min)
+                    {t('steps.durationLabel')}
                     <Input
                       type="number"
                       className="w-20"
@@ -657,7 +663,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                     />
                   </label>
                   <label className="flex items-center gap-2">
-                    Display
+                    {t('steps.displayLabel')}
                     <select
                       className="h-9 rounded-md border border-input bg-background px-3 text-sm text-foreground"
                       value={displayMode ?? 'instant'}
@@ -671,7 +677,7 @@ export function SessionStoryPanel({ sessionId, className, onPreview }: SessionSt
                         }))
                       }
                     >
-                      {Object.entries(DISPLAY_MODE_LABELS).map(([value, label]) => (
+                      {Object.entries(displayModeLabels).map(([value, label]) => (
                         <option key={value} value={value}>
                           {label}
                         </option>

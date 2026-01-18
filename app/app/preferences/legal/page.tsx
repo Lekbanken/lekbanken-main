@@ -31,18 +31,24 @@ export default function LegalPreferencesPage() {
   const t = useTranslations('app.preferences.legal')
   const { user, isLoading } = useAuth()
   const [receipt, setReceipt] = useState<LegalAcceptanceReceipt | null>(null)
-  const [isFetching, setIsFetching] = useState(false)
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  const authNotice = useMemo(() => {
+    if (isLoading) return null
+    if (user) return null
+    return { type: 'error', message: t('signInRequired') }
+  }, [isLoading, user, t])
+
+  const isFetching = useMemo(() => {
+    if (!user || isLoading) return false
+    return !receipt && !notice
+  }, [user, isLoading, receipt, notice])
 
   useEffect(() => {
     if (isLoading) return
-    if (!user) {
-      setNotice({ type: 'error', message: t('signInRequired') })
-      return
-    }
+    if (!user) return
 
     let active = true
-    setIsFetching(true)
 
     getLegalAcceptanceReceipt()
       .then((result) => {
@@ -60,18 +66,16 @@ export default function LegalPreferencesPage() {
         setNotice({ type: 'error', message: t('loadFailed') })
         setReceipt(null)
       })
-      .finally(() => {
-        if (!active) return
-        setIsFetching(false)
-      })
 
     return () => {
       active = false
     }
-  }, [user, isLoading])
+  }, [user, isLoading, t])
 
-  const entries = receipt?.entries ?? []
+  const entries = user ? receipt?.entries ?? [] : []
   const acceptedCount = entries.length
+
+  const displayNotice = authNotice ?? notice
 
   const lastAccepted = useMemo(() => {
     return receipt?.updatedAt ?? null
@@ -116,15 +120,15 @@ export default function LegalPreferencesPage() {
         </div>
       </div>
 
-      {notice && (
+      {displayNotice && (
         <div
           className={`rounded-lg border px-4 py-3 text-sm ${
-            notice.type === 'success'
+            displayNotice.type === 'success'
               ? 'border-green-200 bg-green-50 text-green-800'
               : 'border-red-200 bg-red-50 text-red-800'
           }`}
         >
-          {notice.message}
+          {displayNotice.message}
         </div>
       )}
 

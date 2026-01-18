@@ -300,6 +300,118 @@
       "branding": "Branding",
       "domains": "Domains"
     },
+    "analyticsErrors": {
+      "title": "Error management",
+      "description": "Review, manage, and resolve system errors",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "analytics": "Analytics",
+        "errors": "Errors"
+      },
+      "requiresLogin": "You must be signed in to view this page.",
+      "stats": {
+        "unresolved": "Unresolved errors",
+        "resolved": "Resolved errors",
+        "uniqueTypes": "Unique error types",
+        "avgResolutionTime": "Avg time to resolve",
+        "avgResolutionTimeValue": "{hours}h",
+        "notAvailable": "N/A"
+      },
+      "filters": {
+        "all": "All",
+        "unresolved": "Unresolved",
+        "resolved": "Resolved"
+      },
+      "list": {
+        "title": "Errors (grouped)",
+        "occurrences": "{count} occurrences",
+        "empty": {
+          "unresolved": "No unresolved errors! 🎉",
+          "resolved": "No resolved errors yet",
+          "all": "No errors reported"
+        }
+      },
+      "details": {
+        "title": "Error details",
+        "empty": "Select an error to see details",
+        "status": {
+          "resolved": "Resolved",
+          "unresolved": "Unresolved"
+        },
+        "reportedAt": "Reported: {time}",
+        "lastSeen": "Last seen: {time}",
+        "stackTrace": "Stack Trace",
+        "allOccurrences": "All occurrences ({count})"
+      },
+      "actions": {
+        "title": "Mark as resolved",
+        "resolveInstance": "Resolve this instance",
+        "resolveAll": "Resolve all unresolved"
+      }
+    },
+    "analyticsDashboard": {
+      "title": "Analytics",
+      "requiresAdmin": "You must be an admin in an organization to access this page.",
+      "dashboardTitle": "Analytics Dashboard",
+      "subtitle": "Track user behavior, engagement, and performance",
+      "dateRange": {
+        "from": "From",
+        "to": "To"
+      },
+      "tabs": {
+        "overview": "📊 Overview",
+        "pages": "📄 Pages",
+        "features": "⚙️ Features",
+        "errors": "❌ Errors"
+      },
+      "loading": "Loading analytics...",
+      "overview": {
+        "pageViews": "Page views",
+        "uniqueVisitors": "{count} unique visitors",
+        "sessions": "Sessions",
+        "completedSessions": "{count} completed",
+        "avgDuration": "Average duration",
+        "avgDurationValue": "{minutes}m",
+        "perSession": "per session",
+        "reportedErrors": "Errors reported",
+        "unresolvedErrors": "{count} unresolved",
+        "topPages": "Top pages",
+        "topFeatures": "Most used features",
+        "noData": "No data available",
+        "views": "{count} views",
+        "avgSeconds": "Ø {seconds}s",
+        "usageCount": "{count} uses",
+        "successRate": "{rate}% success"
+      },
+      "pages": {
+        "title": "Detailed page stats",
+        "columns": {
+          "page": "Page",
+          "views": "Views",
+          "avgDuration": "Average duration"
+        },
+        "noData": "No data available",
+        "avgDurationValue": "{seconds}s"
+      },
+      "features": {
+        "title": "Feature adoption",
+        "columns": {
+          "feature": "Feature",
+          "usage": "Usage",
+          "successRate": "Success rate"
+        },
+        "noData": "No data available"
+      },
+      "errors": {
+        "title": "Errors & issues",
+        "columns": {
+          "type": "Type",
+          "message": "Message",
+          "count": "Occurrences"
+        },
+        "noData": "No errors reported"
+      }
+    },
     "navGroups": {
       "overview": "Overview",
       "organizations": "Organizations",
@@ -614,79 +726,6 @@
         "planArchiveError": "Could not archive plan.",
         "planRestored": "Plan restored.",
         "planRestoreError": "Could not restore plan."
-      },
-      "createWizard": {
-        "title": "Create new plan",
-        "steps": {
-          "basics": {
-            "label": "Basics",
-            "description": "Name and description"
-          },
-          "template": {
-            "label": "Template",
-            "description": "Start from template or blank"
-          },
-          "activities": {
-            "label": "Activities",
-            "description": "Add games"
-          },
-          "confirm": {
-            "label": "Confirm",
-            "description": "Review and create"
-          }
-        },
-        "nameLabel": "Plan name",
-        "namePlaceholder": "E.g. Morning workout",
-        "nameHelp": "Give the plan a descriptive name so you can easily find it later.",
-        "descriptionLabel": "Description (optional)",
-        "descriptionPlaceholder": "What is the purpose of this plan?",
-        "templateTitle": "Choose template",
-        "templateHelp": "Choose a template to get started quickly, or start with a blank plan.",
-        "templates": {
-          "empty": {
-            "name": "Blank plan",
-            "description": "Start from scratch and build your own plan"
-          },
-          "warmup": {
-            "name": "Warm-up",
-            "description": "A short warm-up sequence with 3 activities"
-          },
-          "workshop": {
-            "name": "Workshop",
-            "description": "Structured session with intro, activities and wrap-up"
-          },
-          "teambuilding": {
-            "name": "Team building",
-            "description": "Half or full day with multiple activities and breaks"
-          }
-        },
-        "activitiesEmptyTitle": "Add activities",
-        "activitiesEmptyText": "You can add activities after the plan is created.",
-        "activitiesEmptyTip": "💡 Tip: Go to \"Discover\" to find activities and add them to your plan.",
-        "templateBlocksInfo": "The template \"{templateName}\" contains the following blocks. You can adjust these after the plan is created.",
-        "confirmTitle": "Summary",
-        "confirmName": "Name",
-        "confirmDescription": "Description",
-        "confirmNoDescription": "(No description)",
-        "confirmTemplate": "Template",
-        "confirmBlocks": "Blocks",
-        "confirmNextSteps": "After the plan is created, you can add more activities, adjust times, and share with your organization.",
-        "nextStepsLabel": "Next steps:",
-        "blockTypes": {
-          "game": "Activity",
-          "pause": "Break",
-          "preparation": "Preparation",
-          "custom": "Other"
-        },
-        "buttons": {
-          "back": "Back",
-          "next": "Next",
-          "create": "Create plan",
-          "creating": "Creating..."
-        },
-        "errors": {
-          "createFailed": "Could not create plan"
-        }
       }
     },
     "tenant": {
@@ -1257,6 +1296,156 @@
           "draft": "Draft",
           "active": "Active",
           "archived": "Archived"
+        },
+        "badgePicker": {
+          "title": "Select Badge",
+          "description": "Choose a badge from the library to use as an icon.",
+          "searchPlaceholder": "Search badge...",
+          "noSearchResults": "No badges match your search.",
+          "noBadges": "No badges found in the library.",
+          "createHint": "Create badges in Badge Builder under Library.",
+          "availableCount": "{count, plural, one {# badge} other {# badges}} available",
+          "cancel": "Cancel",
+          "select": "Select Badge"
+        },
+        "editor": {
+          "title": {
+            "edit": "Edit achievement",
+            "create": "Create new achievement"
+          },
+          "description": {
+            "edit": "Update achievement settings below.",
+            "create": "Fill in the information below to create a new achievement."
+          },
+          "fields": {
+            "name": {
+              "label": "Name *",
+              "placeholder": "e.g. First game"
+            },
+            "description": {
+              "label": "Description",
+              "placeholder": "Describe how to earn this achievement..."
+            },
+            "badge": {
+              "label": "Badge/Icon",
+              "select": "Select Badge",
+              "change": "Change Badge"
+            },
+            "scope": {
+              "label": "Scope *"
+            },
+            "tenant": {
+              "label": "Organization *",
+              "placeholder": "Select organization"
+            },
+            "conditionType": {
+              "label": "Trigger *"
+            },
+            "conditionValue": {
+              "gamesPlayed": "Games played",
+              "scoreReached": "Score to reach",
+              "streak": "Number of days",
+              "placeholder": "Enter value..."
+            },
+            "status": {
+              "label": "Status"
+            }
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Visible to all users"
+            },
+            "tenant": {
+              "label": "Tenant",
+              "description": "Visible within a specific organization"
+            },
+            "private": {
+              "label": "Private",
+              "description": "Visible only to assigned users"
+            }
+          },
+          "conditions": {
+            "manual": {
+              "label": "Manual",
+              "description": "Awarded manually by admin"
+            },
+            "gamesPlayed": {
+              "label": "Games played",
+              "description": "After a number of games played"
+            },
+            "scoreReached": {
+              "label": "Score reached",
+              "description": "When a certain score is reached"
+            },
+            "streak": {
+              "label": "Streak",
+              "description": "After a number of days in a row"
+            },
+            "firstGame": {
+              "label": "First game",
+              "description": "When the user plays their first game"
+            },
+            "perfectScore": {
+              "label": "Perfect score",
+              "description": "When the user gets the max score"
+            }
+          },
+          "status": {
+            "draft": "Draft",
+            "active": "Active",
+            "archived": "Archived"
+          },
+          "actions": {
+            "cancel": "Cancel",
+            "saving": "Saving...",
+            "update": "Update",
+            "create": "Create"
+          },
+          "errors": {
+            "updateFailed": "Could not update achievement",
+            "createFailed": "Could not create achievement",
+            "unexpected": "An unexpected error occurred"
+          }
+        },
+        "awardModal": {
+          "title": "Award achievement",
+          "description": "Award \"{name}\" to users.",
+          "mode": {
+            "tenant": "Whole organization",
+            "users": "Specific users"
+          },
+          "tenant": {
+            "label": "Organization",
+            "placeholder": "Select organization...",
+            "helper": "All users in {tenantName} will receive this achievement."
+          },
+          "users": {
+            "searchLabel": "Search users",
+            "searchPlaceholder": "Search by name or email...",
+            "noName": "No name",
+            "searching": "Searching...",
+            "noResults": "No users found",
+            "selectedLabel": "Selected users ({count})"
+          },
+          "message": {
+            "label": "Message (optional)",
+            "placeholder": "e.g. \"Congrats on completing the course!\"",
+            "helper": "This message will be shown to the user when they receive the achievement."
+          },
+          "actions": {
+            "cancel": "Cancel",
+            "awarding": "Awarding...",
+            "award": "Award"
+          },
+          "errors": {
+            "selectTenant": "Select an organization",
+            "fetchUsers": "Could not fetch users",
+            "noUsersInTenant": "No users found in this organization",
+            "selectUsers": "Select at least one user",
+            "awardFailed": "Could not award achievement",
+            "unexpected": "An unexpected error occurred"
+          }
         }
       },
       "statistics": {
@@ -1339,6 +1528,10 @@
         "latency": "{ms}ms latency",
         "responding": "Responding"
       },
+      "labels": {
+        "unknown": "Unknown",
+        "notAvailable": "N/A"
+      },
       "metrics": {
         "errorsLastHour": "Errors last hour",
         "activeUsersNow": "Active users (now)",
@@ -1371,6 +1564,8 @@
         "connectionPool": "Connection pool"
       }
     },
+        "minutesShort": "{count} min",
+        "scriptLabel": "Script",
     "auditLog": {
       "pageTitle": "Audit Logs",
       "pageDescription": "Review all system activities and changes",
@@ -1427,6 +1622,20 @@
       }
     },
     "design": {
+      "page": {
+        "title": "Design",
+        "subtitle": "Central Design Hub",
+        "badge": "System",
+        "description": "Central Design Hub – Manage the platform's visual identity",
+        "lastUpdated": "Last updated: {date}",
+        "info": "<strong>Central design</strong> affects the entire platform. Organizations can override certain parts if <em>Tenant Branding</em> is enabled (paid feature).",
+        "tabs": {
+          "brand": "Brand",
+          "media": "Media",
+          "typography": "Typography",
+          "advanced": "Advanced"
+        }
+      },
       "mediaDefaults": {
         "noDefaultProfileImages": "No default profile images uploaded",
         "noDefaultCoverImages": "No default cover images uploaded",
@@ -1486,6 +1695,52 @@
           "description": "Upload logos for light and dark mode. Recommended format: SVG or PNG with transparent background.",
           "light": "Logo (light mode)",
           "lightDesc": "Used on light backgrounds",
+          "loadingSession": "Loading session...",
+          "sessionCodeLabel": "Session code:",
+          "connection": {
+            "connected": "Connected",
+            "degraded": "Degraded",
+            "offline": "Offline"
+          },
+          "updatesTitle": "Updates",
+          "statusLabel": "Status",
+          "statusTitle": {
+            "lobby": "Waiting",
+            "live": "In progress",
+            "paused": "Paused",
+            "ended": "Ended",
+            "locked": "Locked"
+          },
+          "statusBadge": {
+            "lobby": "Waiting",
+            "live": "Live",
+            "paused": "Paused",
+            "ended": "Ended",
+            "locked": "Locked"
+          },
+          "pendingApproval": "Waiting for host approval…",
+          "nowTitle": "Right now",
+          "banner": {
+            "waiting": "Waiting for the host to start.",
+            "paused": "Paused. We'll be back soon.",
+            "locked": "The session is locked.",
+            "ended": "The session has ended. Thanks for joining.",
+            "degraded": "Connection is unstable. Showing the latest known state.",
+            "offline": "No connection. Please try again."
+          },
+          "events": {
+            "session_paused": "Session paused",
+            "session_resumed": "Session resumed",
+            "session_ended": "Session ended",
+            "session_locked": "Session locked",
+            "session_unlocked": "Session unlocked",
+            "host_message": "Message from host",
+            "participant_joined": "{name} joined",
+            "participant_left": "{name} left",
+            "role_changed": "Role updated",
+            "progress_updated": "Progress updated",
+            "achievement_unlocked": "Achievement unlocked"
+          },
           "dark": "Logo (dark mode)",
           "darkDesc": "Used on dark backgrounds"
         },
@@ -1598,6 +1853,7 @@
       "subscriptions": {
         "title": "Subscriptions",
         "description": "Manage active subscriptions and plans",
+        "notLoggedIn": "You must be logged in to view this page.",
         "emptyTitle": "No subscriptions",
         "emptyDescription": "There are no subscriptions to display.",
         "noResultsFor": "No results for \"{query}\"",
@@ -1608,11 +1864,27 @@
           "billing": "Billing",
           "subscriptions": "Subscriptions"
         },
+        "status": {
+          "active": "Active",
+          "trial": "Trial",
+          "paused": "Paused",
+          "canceled": "Canceled"
+        },
         "stats": {
           "total": "Total",
           "active": "Active",
           "trial": "Trial",
           "mrr": "MRR"
+        },
+        "table": {
+          "organization": "Organization",
+          "status": "Status",
+          "amount": "Amount",
+          "amountPerMonth": "{amount} {currency}/mo",
+          "renews": "Renews",
+          "missingPlan": "Plan missing",
+          "seatsLabel": "Seats: {count}",
+          "emptyValue": "—"
         },
         "search": "Search organization...",
         "filter": {
@@ -1624,11 +1896,30 @@
         }
       },
       "invoices": {
+        "notLoggedIn": "You must be logged in to view this page.",
         "emptyTitle": "No invoices",
         "emptyDescription": "There are no invoices to display.",
         "noResultsFor": "No results for \"{query}\"",
-        "clearSearch": "Clear search"
+        "clearSearch": "Clear search",
+        "table": {
+          "invoice": "Invoice",
+          "status": "Status",
+          "amount": "Amount",
+          "dueDate": "Due date",
+          "payments": "Payments"
+        },
+        "paymentRef": "Ref: {reference}",
+        "form": {
+          "amountPlaceholder": "499.00",
+          "referencePlaceholder": "Txn ID"
+        }
       }
+    },
+    "incidents": {
+      "title": "Incidents & Status",
+      "description": "View outages, planned maintenance, and status.",
+      "emptyTitle": "No incident data yet",
+      "emptyDescription": "Operational status and incident logs will appear here when the backend is connected."
     },
     "gamification": {
       "hub": {
@@ -1821,6 +2112,7 @@
       "achievements": {
         "pageTitle": "Achievements",
         "pageDescription": "Manage achievements, award to users and configure rules.",
+        "loading": "Loading achievements...",
         "createAchievement": "Create achievement",
         "searchPlaceholder": "Search achievements...",
         "breadcrumbs": {
@@ -1990,7 +2282,119 @@
           "noAccess": "You don't have access to any organizations."
         },
         "loading": "Loading shop items...",
-        "unknownTenant": "Unknown organization"
+        "unknownTenant": "Unknown organization",
+        "editor": {
+          "title": {
+            "edit": "Edit shop item",
+            "create": "Create new shop item"
+          },
+          "description": {
+            "edit": "Update shop item settings below.",
+            "create": "Fill in the information below to create a new shop item."
+          },
+          "fields": {
+            "name": {
+              "label": "Name *",
+              "placeholder": "e.g. Golden avatar"
+            },
+            "description": {
+              "label": "Description",
+              "placeholder": "Describe this shop item..."
+            },
+            "category": {
+              "label": "Category *"
+            },
+            "subtype": {
+              "label": "Subtype",
+              "placeholder": "Select subtype (optional)"
+            },
+            "imageUrl": {
+              "label": "Image URL",
+              "placeholder": "https://example.com/image.png",
+              "previewAlt": "Preview"
+            },
+            "price": {
+              "label": "Price *",
+              "placeholder": "100"
+            },
+            "currency": {
+              "label": "Currency *",
+              "placeholder": "Select currency"
+            },
+            "quantityLimit": {
+              "label": "Limited edition",
+              "placeholder": "Leave blank for unlimited",
+              "helper": "If filled in, the total number that can be purchased by all users is limited."
+            },
+            "sortOrder": {
+              "label": "Sort order",
+              "placeholder": "0",
+              "helper": "Lower numbers show first in the shop."
+            }
+          },
+          "categories": {
+            "cosmetic": {
+              "label": "Cosmetic",
+              "description": "Avatars, frames, backgrounds, etc."
+            },
+            "powerup": {
+              "label": "Power-up",
+              "description": "Gameplay aids and boosts"
+            },
+            "bundle": {
+              "label": "Bundle",
+              "description": "Combination of multiple items (Phase 2)"
+            },
+            "seasonPass": {
+              "label": "Season Pass",
+              "description": "Season pass with rewards (Phase 2)"
+            }
+          },
+          "subtypes": {
+            "avatar": "Avatar",
+            "avatarFrame": "Avatar frame",
+            "background": "Background",
+            "title": "Title",
+            "badge": "Badge",
+            "hint": "Hint",
+            "skip": "Skip",
+            "timeExtend": "Time extension",
+            "doubleXp": "Double XP",
+            "shield": "Shield"
+          },
+          "toggles": {
+            "available": {
+              "title": "Available",
+              "description": "Show in the shop for participants"
+            },
+            "featured": {
+              "title": "Featured",
+              "description": "Show in featured section"
+            }
+          },
+          "stats": {
+            "title": "Sales stats",
+            "sold": "Sold",
+            "remaining": "Remaining"
+          },
+          "warnings": {
+            "noCurrency": "⚠️ No currency available. Create a currency first under Gamification → Currency."
+          },
+          "actions": {
+            "cancel": "Cancel",
+            "saving": "Saving...",
+            "update": "Update",
+            "create": "Create"
+          },
+          "errors": {
+            "nameRequired": "Name is required",
+            "currencyRequired": "Select a currency",
+            "invalidPrice": "Invalid price",
+            "updateFailed": "Could not update item",
+            "createFailed": "Could not create item",
+            "unexpected": "An unexpected error occurred"
+          }
+        }
       },
       "libraryExports": {
         "pageTitle": "Library Exports",
@@ -1999,6 +2403,55 @@
           "admin": "Admin",
           "gamificationHub": "Gamification Hub",
           "libraryExports": "Library Exports"
+        },
+        "actions": {
+          "createTemplate": "Create export template",
+          "createTemplateShort": "Create template"
+        },
+        "stats": {
+          "templates": "Templates",
+          "active": "Active",
+          "totalExports": "Total exports",
+          "successRate": "Success rate"
+        },
+        "tabs": {
+          "templates": "Templates",
+          "logs": "Export log"
+        },
+        "formats": {
+          "csv": "CSV",
+          "json": "JSON",
+          "pdf": "PDF",
+          "xlsx": "Excel"
+        },
+        "status": {
+          "active": "Active",
+          "draft": "Draft",
+          "archived": "Archived"
+        },
+        "logStatus": {
+          "completed": "Completed",
+          "pending": "In progress",
+          "failed": "Failed"
+        },
+        "templates": {
+          "version": "v{version}",
+          "exportCount": "{count, plural, one {# export} other {# exports}}"
+        },
+        "logs": {
+          "empty": {
+            "title": "No export history",
+            "description": "Export history will appear here."
+          },
+          "table": {
+            "template": "Template",
+            "format": "Format",
+            "status": "Status",
+            "records": "Records",
+            "size": "Size",
+            "exportedBy": "Exported by",
+            "date": "Date"
+          }
         },
         "empty": {
           "title": "No export templates yet",
@@ -2690,13 +3143,709 @@
           "deleted": "Deleted",
           "added": "Added"
         },
+        "form": {
+          "loading": "Loading...",
+          "errors": {
+            "loadFailed": "Could not load game",
+            "saveFailed": "Failed to save",
+            "unexpected": "An error occurred"
+          },
+          "messages": {
+            "saved": "Saved!"
+          },
+          "core": {
+            "nameLabel": "Name",
+            "statusLabel": "Status",
+            "statusDraft": "Draft",
+            "statusPublished": "Published",
+            "shortDescriptionLabel": "Short description",
+            "shortDescriptionHelp": "Shown in the game library and helps players choose the right game.",
+            "fullDescriptionLabel": "Full description",
+            "fullDescriptionHelp": "Detailed description shown when the game opens. Explain the theme and setup.",
+            "timeMinutesLabel": "Time (min)",
+            "timeMinutesHelp": "Estimated play time in minutes.",
+            "minPlayersLabel": "Players min",
+            "minPlayersHelp": "Minimum number of participants.",
+            "maxPlayersLabel": "Players max",
+            "maxPlayersHelp": "Maximum number of participants who can join."
+          },
+          "materials": {
+            "title": "Materials & safety",
+            "itemsLabel": "Materials (one per line)",
+            "safetyLabel": "Safety",
+            "preparationLabel": "Preparation"
+          },
+          "steps": {
+            "title": "Steps / Instructions",
+            "addStep": "Add step",
+            "stepLabel": "Step {index}",
+            "remove": "Remove",
+            "titleLabel": "Title",
+            "titlePlaceholder": "E.g. Start the game",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "What should participants do?",
+            "durationLabel": "Time (seconds)",
+            "durationPlaceholder": "e.g. 60"
+          },
+          "actions": {
+            "save": "Save",
+            "saving": "Saving..."
+          }
+        },
+        "page": {
+          "common": {
+            "required": "*"
+          },
+          "errors": {
+            "loadPurposes": "Could not load purposes",
+            "loadGame": "Could not load game",
+            "loadData": "Could not load data",
+            "saveFailed": "Failed to save",
+            "unexpected": "An error occurred",
+            "publishMissingRequired": "Fill in required fields and choose a cover image before publishing."
+          },
+          "defaults": {
+            "triggerName": "Trigger"
+          },
+          "loadingGame": "Loading game...",
+          "header": {
+            "backToGames": "Back to games",
+            "editTitle": "Edit game",
+            "createTitle": "Create new game",
+            "preview": "Preview",
+            "saveDraft": "Save draft",
+            "publish": "Publish"
+          },
+          "basicInfo": {
+            "title": "Basic information",
+            "description": "Name and description shown in the game library.",
+            "nameLabel": "Name",
+            "namePlaceholder": "e.g. Cooperation relay",
+            "shortDescriptionLabel": "Short description",
+            "shortDescriptionPlaceholder": "1–2 sentences summarizing the game.",
+            "fullDescriptionLabel": "Full description",
+            "fullDescriptionPlaceholder": "Detailed description of the game..."
+          },
+          "purposes": {
+            "title": "Purposes & cover image",
+            "mainLabel": "Main purpose",
+            "subLabel": "Sub purposes",
+            "loadingOption": "Loading purposes...",
+            "emptyHint": "Select a main purpose to see sub purposes.",
+            "unknownMain": "Unknown purpose",
+            "unknownSub": "Unknown sub-purpose"
+          },
+          "classification": {
+            "title": "Classification",
+            "energyLabel": "Energy level",
+            "locationLabel": "Location",
+            "timeLabel": "Time (minutes)",
+            "minPlayersLabel": "Players min",
+            "maxPlayersLabel": "Players max",
+            "ageMinLabel": "Age min",
+            "ageMaxLabel": "Age max",
+            "timePlaceholder": "e.g. 15",
+            "minPlayersPlaceholder": "e.g. 4",
+            "maxPlayersPlaceholder": "e.g. 30",
+            "ageMinPlaceholder": "e.g. 6",
+            "ageMaxPlaceholder": "e.g. 99",
+            "energyPlaceholder": "Select energy level",
+            "energyLow": "Low",
+            "energyMedium": "Medium",
+            "energyHigh": "High",
+            "locationPlaceholder": "Select location",
+            "locationIndoor": "Indoor",
+            "locationOutdoor": "Outdoor",
+            "locationBoth": "Both"
+          },
+          "materials": {
+            "title": "Materials",
+            "description": "List materials needed to run the game.",
+            "itemsLabel": "Materials (one per line)",
+            "itemsPlaceholder": "Example:\n8 cones\n1 ball per team\nMusic (Spotify playlist)",
+            "itemsCount": "{count} materials added",
+            "preparationLabel": "Preparation",
+            "preparationPlaceholder": "What should the leader prepare before the game?"
+          },
+          "safety": {
+            "title": "Safety & inclusion",
+            "description": "Important safety notes and inclusion tips.",
+            "safetyNotesLabel": "⚠️ Safety notes",
+            "safetyNotesPlaceholder": "Example: Watch out for walls during fast movement. Avoid slippery floors.",
+            "accessibilityLabel": "♿ Accessibility notes",
+            "accessibilityPlaceholder": "Tips for adapting to different needs...",
+            "spaceLabel": "🏠 Space requirements",
+            "spacePlaceholder": "Example: At least 10x10 meters of free space",
+            "leaderTipsLabel": "💡 Leader tips",
+            "leaderTipsPlaceholder": "Tips for the leader to make the game work better..."
+          },
+          "artifacts": {
+            "title": "Artifacts",
+            "description": "Create artifacts with variants that can be unlocked per step/phase and limited by role.",
+            "rolesHint": "Tip: Add roles to enable private variants per role."
+          },
+          "triggers": {
+            "title": "Triggers",
+            "description": "Automate the game with \"When X happens, do Y\" rules.",
+            "artifactsHint": "Tip: Add artifacts (e.g., keypads) to trigger on their events."
+          },
+          "roles": {
+            "title": "Roles",
+            "description": "Define roles with secret instructions for participants."
+          },
+          "board": {
+            "title": "Public board",
+            "description": "Content shown on projector/big screen during the game."
+          },
+          "tools": {
+            "title": "Tools (Toolbelt)",
+            "description": "Enable tools that can be used during a game session.",
+            "availabilityLabel": "Available for",
+            "availabilityHost": "Leader",
+            "availabilityParticipants": "Participants",
+            "availabilityBoth": "Both",
+            "availabilityHelp": "Choose whether the tool is visible to leaders, participants, or both."
+          },
+          "translations": {
+            "title": "Translations",
+            "description": "Manage translations for different languages.",
+            "languageSwedish": "Swedish",
+            "languageNorwegian": "Norwegian",
+            "languageEnglish": "English",
+            "percent": "{percent}%",
+            "comingSoon": "Full translation management is coming soon."
+          },
+          "settings": {
+            "title": "Settings",
+            "description": "Status and visibility for the game.",
+            "taxonomyLabel": "Taxonomy / game category",
+            "taxonomyPlaceholder": "e.g. Circle games",
+            "taxonomyNote": "Keeps previous value on import; saved as game category in the database.",
+            "statusLabel": "Status",
+            "statusDraft": "Draft",
+            "statusPublished": "Published",
+            "statusHelpDraft": "Drafts are only visible to you.",
+            "statusHelpPublished": "Published games are visible to everyone with access.",
+            "dangerTitle": "Danger zone",
+            "dangerDescription": "Permanent deletion of the game. This action cannot be undone.",
+            "deleteButton": "Delete game",
+            "taxonomyPresets": {
+              "boardGames": "Board games",
+              "partyGame": "Party game",
+              "circleGames": "Circle games",
+              "outdoorGames": "Outdoor games",
+              "indoorGames": "Indoor games",
+              "icebreakers": "Icebreakers"
+            }
+          }
+        },
+        "artifact": {
+          "newArtifact": "New artifact",
+          "defaults": {
+            "role": "Role"
+          },
+          "common": {
+            "yes": "Yes",
+            "no": "No"
+          },
+          "header": {
+            "title": "Artifacts ({count})",
+            "subtitle": "Hints, keypads, documents and media",
+            "wizard": "Wizard",
+            "add": "Add"
+          },
+          "empty": {
+            "title": "No artifacts yet.",
+            "description": "Use the Wizard to quickly create artifacts, or add manually."
+          },
+          "fields": {
+            "titlePlaceholder": "Title",
+            "typeLabel": "Type",
+            "tagsLabel": "Tags (comma-separated)",
+            "tagsPlaceholder": "mystery, clue",
+            "descriptionLabel": "Description",
+            "descriptionPlaceholder": "Short background or notes"
+          },
+          "errors": {
+            "loadConversationDecks": "Could not load conversation decks."
+          },
+          "visibility": {
+            "public": "Public",
+            "leaderOnly": "Leader only",
+            "rolePrivate": "Role private"
+          },
+          "types": {
+            "card": "Card",
+            "document": "Document",
+            "image": "Image",
+            "conversationCards": "Conversation cards",
+            "keypad": "Keypad",
+            "riddle": "Riddle",
+            "multiAnswer": "Multi-answer",
+            "audio": "Audio",
+            "hotspot": "Hotspot",
+            "tilePuzzle": "Tile puzzle",
+            "cipher": "Cipher",
+            "logicGrid": "Logic grid",
+            "counter": "Counter",
+            "qrGate": "QR gate",
+            "hintContainer": "Hint container",
+            "propConfirmation": "Prop confirmation",
+            "locationCheck": "Location check",
+            "soundLevel": "Sound level",
+            "replayMarker": "Replay marker",
+            "signalGenerator": "Signal generator",
+            "timeBankStep": "Time bank step",
+            "emptyArtifact": "Empty artifact"
+          },
+          "keypad": {
+            "title": "Keypad settings",
+            "correctCodeLabel": "Correct code",
+            "correctCodePlaceholder": "1234",
+            "correctCodeHelp": "Digits only (max 8)",
+            "codeLengthLabel": "Code length",
+            "codeLengthPlaceholder": "4",
+            "codeLengthHelp": "Number of digits in the code (2-8)",
+            "successMessageLabel": "Message on correct code (optional)",
+            "successMessagePlaceholder": "Unlocked! You found the clue.",
+            "advancedTitle": "Advanced settings",
+            "maxAttemptsLabel": "Max attempts",
+            "maxAttemptsPlaceholder": "Unlimited",
+            "maxAttemptsHelp": "0 or empty = unlimited",
+            "lockOnFailLabel": "Lock on failure",
+            "lockOnFailNo": "No — can try again",
+            "lockOnFailYes": "Yes — locked permanently",
+            "failMessageLabel": "Message on incorrect code",
+            "failMessagePlaceholder": "Wrong code! Try again.",
+            "lockedMessageLabel": "Message when locked",
+            "lockedMessagePlaceholder": "The keypad is locked. Contact the host."
+          },
+          "conversation": {
+            "title": "Conversation cards",
+            "selectLabel": "Choose deck (published only)",
+            "selectPlaceholder": "— Select —",
+            "helpText": "The artifact shows the deck read-only for participants and hosts."
+          },
+          "riddle": {
+            "title": "Riddle / Question settings",
+            "promptLabel": "Question / Hint",
+            "promptPlaceholder": "What has four legs but cannot walk?",
+            "answersLabel": "Correct answers (one per line)",
+            "answersPlaceholder": "table\na table\ndesk",
+            "answersHelp": "Multiple options = all accepted",
+            "matchModeLabel": "Matching mode",
+            "matchModeExact": "Exact match",
+            "matchModeFlexible": "Flexible (ignore case/spaces)",
+            "matchModeNumeric": "Digits only",
+            "maxAttemptsLabel": "Max attempts",
+            "maxAttemptsPlaceholder": "Unlimited"
+          },
+          "counter": {
+            "title": "Counter settings",
+            "initialLabel": "Start value",
+            "initialPlaceholder": "0",
+            "targetLabel": "Target value",
+            "targetPlaceholder": "5",
+            "stepLabel": "Step size",
+            "stepPlaceholder": "1",
+            "labelLabel": "Label (optional)",
+            "labelPlaceholder": "Clues found"
+          },
+          "audio": {
+            "title": "Audio clip settings",
+            "urlLabel": "Audio URL (optional)",
+            "urlPlaceholder": "https://example.com/audio.mp3"
+          },
+          "hotspot": {
+            "title": "Clickable image settings",
+            "imageLabel": "Image URL",
+            "imagePlaceholder": "https://example.com/image.jpg",
+            "requiredHitsLabel": "Number of zones to find",
+            "requiredHitsPlaceholder": "All",
+            "showFeedbackLabel": "Show feedback",
+            "showFeedbackYes": "Yes — show hits",
+            "showFeedbackNo": "No — silent",
+            "helpText": "💡 Hotspot zones are defined in JSON metadata: zones: [{x, y, radius, label}]"
+          },
+          "tilePuzzle": {
+            "title": "Tile puzzle settings",
+            "imageLabel": "Image URL",
+            "imagePlaceholder": "https://example.com/puzzle-image.jpg",
+            "gridLabel": "Grid size",
+            "grid2": "2×2 (easy)",
+            "grid3": "3×3 (normal)",
+            "grid4": "4×4 (hard)",
+            "grid5": "5×5 (expert)",
+            "previewLabel": "Show preview"
+          },
+          "cipher": {
+            "title": "Cipher settings",
+            "methodLabel": "Cipher method",
+            "methodCaesar": "Caesar (shift)",
+            "methodAtbash": "Atbash (mirror)",
+            "methodVigenere": "Vigenère (keyword)",
+            "methodSubstitution": "Substitution (custom)",
+            "keyLabelCaesar": "Shift (1-25)",
+            "keyLabelVigenere": "Keyword",
+            "keyPlaceholderCaesar": "3",
+            "keyPlaceholderVigenere": "secret",
+            "plaintextLabel": "Plaintext (what to encrypt)",
+            "plaintextPlaceholder": "The secret is under the stairs"
+          },
+          "logicGrid": {
+            "title": "Logic grid settings",
+            "rowsLabel": "Rows (comma-separated)",
+            "rowsPlaceholder": "Alice, Bob, Charlie",
+            "columnsLabel": "Columns (comma-separated)",
+            "columnsPlaceholder": "Red, Green, Blue",
+            "helpText": "💡 The solution is defined in JSON:",
+            "helpCode": "solution: {\"Alice\": \"Red\", \"Bob\": \"Green\"}"
+          },
+          "multiAnswer": {
+            "title": "Multi-answer settings",
+            "itemsLabel": "Items to check off (one per line)",
+            "itemsPlaceholder": "Find the key\nSolve the riddle\nOpen the door",
+            "requiredCountLabel": "Required count to complete",
+            "requiredCountPlaceholder": "All"
+          },
+          "qrGate": {
+            "title": "QR/NFC scanning settings",
+            "expectedLabel": "Expected value",
+            "expectedPlaceholder": "SECRET123",
+            "expectedHelp": "The text the QR code should contain",
+            "successLabel": "Message on successful scan",
+            "successPlaceholder": "Correct code! Continue to the next clue."
+          },
+          "hintContainer": {
+            "title": "Hint container settings",
+            "hintsLabel": "Hints (one per line, in reveal order)",
+            "hintsPlaceholder": "Look under the mat\nThere is a hidden key\nThe key fits the cabinet on the right",
+            "maxHintsLabel": "Max hints to give",
+            "maxHintsPlaceholder": "All",
+            "penaltyLabel": "Penalty per hint",
+            "penaltyPlaceholder": "0"
+          },
+          "propConfirmation": {
+            "title": "Prop confirmation settings",
+            "propNameLabel": "Prop name",
+            "propNamePlaceholder": "The golden key",
+            "instructionLabel": "Instruction to participants",
+            "instructionPlaceholder": "Show the golden key to the host to continue."
+          },
+          "locationCheck": {
+            "title": "Location verification settings",
+            "latitudeLabel": "Latitude",
+            "latitudePlaceholder": "59.3293",
+            "longitudeLabel": "Longitude",
+            "longitudePlaceholder": "18.0686",
+            "radiusLabel": "Radius (meters)",
+            "radiusPlaceholder": "50",
+            "locationNameLabel": "Location name (optional)",
+            "locationNamePlaceholder": "Main square"
+          },
+          "soundLevel": {
+            "title": "Sound level detector settings",
+            "thresholdLabel": "Threshold (0-100)",
+            "thresholdPlaceholder": "70",
+            "holdLabel": "Time above threshold (sec)",
+            "holdPlaceholder": "2",
+            "instructionLabel": "Instruction",
+            "instructionPlaceholder": "Shout loudly to open the door!"
+          },
+          "replayMarker": {
+            "title": "Replay marker settings",
+            "description": "This artifact lets participants mark important moments during the session for later analysis.",
+            "maxMarkersLabel": "Max markers",
+            "maxMarkersPlaceholder": "Unlimited",
+            "allowLabelsLabel": "Allow labels"
+          },
+          "variants": {
+            "title": "Variants",
+            "subtitle": "Control visibility, role access, and when the variant can be unlocked.",
+            "add": "Add variant",
+            "label": "Variant",
+            "titleLabel": "Title",
+            "titlePlaceholder": "Variant title",
+            "visibilityLabel": "Visibility",
+            "roleLabel": "Role (for private variant)",
+            "roleNoneOption": "None (shown by visibility)",
+            "mediaLabel": "Media reference (optional)",
+            "mediaPlaceholder": "media_id or URL",
+            "bodyLabel": "Text/content",
+            "bodyPlaceholder": "What does this variant show?",
+            "stepIndexLabel": "Step index (0 = first)",
+            "stepIndexPlaceholder": "0",
+            "phaseIndexLabel": "Phase index (0 = first)",
+            "phaseIndexPlaceholder": "0"
+          }
+        },
+        "decision": {
+          "header": {
+            "title": "Polls ({count})",
+            "subtitle": "Polls, votes and quiz questions for participants",
+            "templates": "Templates",
+            "add": "Add"
+          },
+          "templatesTitle": "Choose a template:",
+          "types": {
+            "poll": "Poll",
+            "vote": "Vote",
+            "quiz": "Quiz",
+            "rating": "Rating",
+            "ranking": "Ranking"
+          },
+          "empty": {
+            "title": "No polls yet.",
+            "description": "Add a poll or choose from templates."
+          },
+          "fields": {
+            "titlePlaceholder": "Title",
+            "typeLabel": "Type",
+            "maxChoicesLabel": "Max choices",
+            "promptLabel": "Question / Prompt",
+            "promptPlaceholder": "Write the question shown to participants..."
+          },
+          "options": {
+            "title": "Options ({count})",
+            "add": "Add",
+            "placeholder": "Option text",
+            "markCorrect": "Mark as correct answer"
+          },
+          "advanced": {
+            "title": "Advanced settings",
+            "anonymousLabel": "Anonymous voting",
+            "anonymousHelp": "Hide who voted",
+            "multipleLabel": "Allow multiple choices",
+            "multipleHelp": "Participants can select multiple",
+            "revealLabel": "Reveal results immediately",
+            "revealHelp": "Reveal when closed",
+            "autoCloseLabel": "Auto-close (sec)",
+            "autoClosePlaceholder": "Manual",
+            "autoCloseHelp": "0 or empty = manual",
+            "stepLabel": "Show at step",
+            "stepPlaceholder": "Optional",
+            "phaseLabel": "Show at phase",
+            "phasePlaceholder": "Optional"
+          },
+          "defaults": {
+            "optionLabel": "Option {index}",
+            "newTitle": "New poll"
+          },
+          "templates": {
+            "yesNo": {
+              "name": "Yes/No",
+              "title": "Quick poll",
+              "prompt": "What do you think?",
+              "optionYes": "Yes",
+              "optionNo": "No"
+            },
+            "multipleChoice": {
+              "name": "Multiple choice",
+              "title": "Multiple choice",
+              "prompt": "Choose one option",
+              "optionA": "Option A",
+              "optionB": "Option B",
+              "optionC": "Option C"
+            },
+            "groupVote": {
+              "name": "Group vote",
+              "title": "What do you vote for?",
+              "prompt": "Discuss in the group and vote",
+              "option1": "Proposal 1",
+              "option2": "Proposal 2",
+              "option3": "Proposal 3",
+              "option4": "Proposal 4"
+            },
+            "quiz": {
+              "name": "Quiz",
+              "title": "Quiz question",
+              "prompt": "Which option is correct?",
+              "optionA": "Option A",
+              "optionB": "Option B",
+              "optionC": "Option C"
+            },
+            "rating": {
+              "name": "Rating scale",
+              "title": "How satisfied are you?",
+              "prompt": "Give a rating 1–5",
+              "option1": "1",
+              "option2": "2",
+              "option3": "3",
+              "option4": "4",
+              "option5": "5"
+            },
+            "anonymous": {
+              "name": "Anonymous poll",
+              "title": "Anonymous question",
+              "prompt": "Answer anonymously",
+              "option1": "Option 1",
+              "option2": "Option 2"
+            }
+          }
+        },
+        "trigger": {
+          "header": {
+            "title": "Triggers ({count})"
+          },
+          "newTrigger": "New trigger",
+          "addTrigger": "Add trigger",
+          "templates": "Templates",
+          "wizard": "Wizard",
+          "test": "Test",
+          "titles": {
+            "test": "Test triggers in simulator",
+            "export": "Export triggers to CSV",
+            "import": "Import triggers from CSV",
+            "templates": "Choose from template library"
+          },
+          "whenLabel": "When",
+          "doLabel": "Do",
+          "conditionPlaceholder": "Select condition...",
+          "targetPlaceholder": "Select target...",
+          "channelPlaceholder": "Channel (e.g. clue:found)",
+          "actionPlaceholder": "+ Add action...",
+          "artifactPlaceholder": "Select artifact...",
+          "countdownMessagePlaceholder": "Message...",
+          "sendMessagePlaceholder": "Write message...",
+          "stylePlaceholder": "Style",
+          "signalChannelPlaceholder": "Channel...",
+          "signalMessagePlaceholder": "Message...",
+          "timeBankReasonPlaceholder": "Reason...",
+          "timerNamePlaceholder": "Name...",
+          "secondsShort": "sec",
+          "summary": {
+            "actions": "{count} action(s)"
+          },
+          "nameLabel": "Name",
+          "namePlaceholder": "Trigger name...",
+          "labels": {
+            "step": "Step {index}",
+            "phase": "Phase {index}"
+          },
+          "messageStyles": {
+            "normal": "Normal",
+            "typewriter": "Typewriter",
+            "dramatic": "Dramatic"
+          },
+          "defaults": {
+            "countdownMessage": "Get ready...",
+            "timeBankReason": "trigger",
+            "timerName": "Timer"
+          },
+          "conditionTypes": {
+            "step_started": "Step starts",
+            "step_completed": "Step completes",
+            "phase_started": "Phase starts",
+            "phase_completed": "Phase ends",
+            "decision_resolved": "Decision is made",
+            "timer_ended": "Timer ends",
+            "artifact_unlocked": "Artifact unlocked",
+            "keypad_correct": "Keypad solved",
+            "keypad_failed": "Keypad failed",
+            "signal_received": "Signal received",
+            "manual": "Manual trigger"
+          },
+          "actionTypes": {
+            "reveal_artifact": "Reveal artifact",
+            "hide_artifact": "Hide artifact",
+            "unlock_decision": "Unlock decision",
+            "lock_decision": "Lock decision",
+            "advance_step": "Advance step",
+            "advance_phase": "Advance phase",
+            "start_timer": "Start timer",
+            "send_message": "Send message",
+            "send_signal": "Send signal",
+            "time_bank_apply_delta": "Time bank delta",
+            "play_sound": "Play sound",
+            "show_countdown": "Show countdown",
+            "reset_keypad": "Reset keypad"
+          },
+          "import": {
+            "error": "Import error",
+            "failed": "Import failed"
+          },
+          "noTriggers": "No triggers yet",
+          "noTriggersHint": "Create a trigger or choose from templates.",
+          "howItWorks": {
+            "title": "How triggers work",
+            "description": "Triggers run automatically when their conditions are met.",
+            "example": "Example: When a keypad is solved, reveal an artifact."
+          },
+          "unnamedTrigger": "Unnamed trigger",
+          "inactive": "Inactive",
+          "onceLabel": "Once",
+          "activeLabel": "Active",
+          "onceCheckboxLabel": "Run once",
+          "autoDisable": "Automatically disables after running.",
+          "delayLabel": "Delay",
+          "seconds": "seconds"
+        },
+        "triggerSimulator": {
+          "title": "Trigger simulator",
+          "badge": "Dry-run mode",
+          "reset": "Reset",
+          "close": "Close",
+          "helpText": "Test your triggers without starting a real session. Select an event or click a manual trigger to see what happens.",
+          "sections": {
+            "state": "Current state",
+            "simulate": "Simulate event",
+            "manual": "Manual triggers",
+            "status": "Trigger status",
+            "log": "Event log"
+          },
+          "labels": {
+            "step": "Step",
+            "phase": "Phase",
+            "timeBank": "Time bank",
+            "firedTriggers": "Fired triggers",
+            "stepFallback": "Step {index}",
+            "phaseFallback": "Phase {index}",
+            "action": "↳ {label}",
+            "event": "⚡ {label}",
+            "matched": "🎯 Trigger matched: {name}",
+            "skipped": "⏭️ {name}",
+            "manual": "🖱️ Manual: {name}"
+          },
+          "selectEventPlaceholder": "Select event...",
+          "fireEvent": "Fire event",
+          "events": {
+            "stepStarted": "🚀 Step starts: {name}",
+            "stepCompleted": "✅ Step completed: {name}",
+            "phaseStarted": "🎬 Phase starts: {name}",
+            "phaseCompleted": "🏁 Phase completed: {name}",
+            "keypadCorrect": "🔓 Keypad correct: {name}",
+            "keypadFailed": "❌ Keypad failed: {name}",
+            "artifactUnlocked": "📦 Artifact unlocked: {name}"
+          },
+          "details": {
+            "revealArtifact": "Show artifact: {id}",
+            "hideArtifact": "Hide artifact: {id}",
+            "timeBankDelta": "{delta}s ({reason})",
+            "sendMessage": "\"{message}\" ({style})",
+            "showCountdown": "{seconds}s: \"{message}\"",
+            "advanceStep": "Go to next step",
+            "advancePhase": "Go to next phase",
+            "sendSignal": "Channel: {channel}",
+            "alreadyFired": "Already fired (execute_once)",
+            "delay": "Delay: {seconds}s"
+          },
+          "status": {
+            "inactive": "Inactive",
+            "fired": "Fired",
+            "ready": "Ready"
+          },
+          "empty": {
+            "title": "No events yet.",
+            "description": "Select an event to simulate in the panel to the left."
+          }
+        },
         "phase": {
           "title": "Phases & Rounds",
           "subtitle": "Divide the game into clear phases with their own time limits.",
           "addPhase": "Add phase",
-          "editPhase": "Edit phase",
-          "newPhase": "New phase",
-          "addFirstPhase": "Add first phase",
+        "playError": "Could not play the audio",
+        "playLabel": "Play",
+        "pauseLabel": "Pause",
           "noPhasesYet": "No phases yet",
           "noPhases": "No phases yet. Add your first phase.",
           "namePlaceholder": "E.g. The investigation begins",
@@ -2722,6 +3871,7 @@
             "elapsed": "Elapsed",
             "trafficlight": "Traffic light"
           },
+          "timerLabel": "Timer",
           "fields": {
             "name": "Phase name",
             "type": "Phase type",
@@ -2816,6 +3966,7 @@
         "board": {
           "title": "Public Board",
           "subtitle": "Configuration for projector/big screen during the game",
+          "backgroundPlaceholder": "#1e293b",
           "preview": {
             "title": "Preview",
             "gameName": "Game name",
@@ -2860,6 +4011,92 @@
           "welcomeMessagePlaceholder": "Welcome to tonight's mystery!",
           "clear": "Clear"
         },
+        "snapshot": {
+          "title": "Version management",
+          "createTitle": "Create new version",
+          "versionLabelPlaceholder": "Version label (optional), e.g. 'Launch version'",
+          "createButton": "Create snapshot",
+          "creatingButton": "Creating...",
+          "helpText": "A snapshot freezes the game's current state. Sessions can use snapshots so changes don't affect ongoing sessions.",
+          "loading": "Loading versions...",
+          "emptyTitle": "No versions yet",
+          "emptyDescription": "Create a snapshot to freeze the game's current state.",
+          "latestBadge": "Latest",
+          "includes": {
+            "steps": "Steps",
+            "phases": "Phases",
+            "roles": "Roles",
+            "artifacts": "Artifacts",
+            "triggers": "Triggers",
+            "board": "Board"
+          },
+          "count": "{count, plural, one {# version} other {# versions}}",
+          "close": "Close",
+          "errors": {
+            "load": "Could not load versions",
+            "create": "Could not create version"
+          }
+        },
+        "validation": {
+          "emptyTitle": "No validation issues",
+          "emptyDescription": "All references are correct",
+          "headerTitle": "Validation issues",
+          "separator": ", ",
+          "count": {
+            "errors": "{count, plural, one {# error} other {# errors}}",
+            "warnings": "{count, plural, one {# warning} other {# warnings}}"
+          },
+          "section": {
+            "triggers": "🎯 Triggers",
+            "artifacts": "📦 Artifacts",
+            "steps": "📝 Steps",
+            "phases": "🎬 Phases",
+            "roles": "👤 Roles"
+          },
+          "itemPrefix": {
+            "triggers": "🎯 Trigger: ",
+            "artifacts": "📦 Artifact: ",
+            "steps": "📝 Step: ",
+            "phases": "🎬 Phase: ",
+            "roles": "👤 Role: "
+          },
+          "navigate": "Go to",
+          "publishBlocked": "⚠️ The game cannot be published until all errors are resolved"
+        },
+        "quality": {
+          "title": "Quality checklist",
+          "optional": "optional",
+          "status": {
+            "incomplete": "Incomplete",
+            "draft": "Draft",
+            "playable": "Playable",
+            "publishable": "Publishable"
+          },
+          "sections": {
+            "draft": "Baseline (Draft)",
+            "playable": "Ready to test (Playable)",
+            "publishable": "Ready to publish"
+          },
+          "items": {
+            "draft": {
+              "name": "Name"
+            },
+            "playable": {
+              "shortDescription": "Short description",
+              "purposeSelected": "Purpose selected",
+              "subPurposeSelected": "Sub purpose selected",
+              "stepsOrDescription": "Steps or description",
+              "energyLevel": "Energy level",
+              "location": "Location"
+            },
+            "publishable": {
+              "coverImage": "Cover image or default image",
+              "allRequired": "All requirements met",
+              "noValidationErrors": "No validation errors"
+            }
+          },
+          "published": "✓ Published"
+        },
         "step": {
           "title": "Step-by-step",
           "subtitle": "Drag to reorder. Click to edit.",
@@ -2871,6 +4108,7 @@
           "noStepsYet": "No steps yet",
           "noStepsDescription": "Add steps to guide the leader through the game.",
           "unnamed": "Unnamed step",
+          "minutesShort": "min",
           "cancel": "Cancel",
           "clear": "Clear",
           "selected": "Selected",
@@ -2911,6 +4149,9 @@
           "back": "Back",
           "next": "Next",
           "cancel": "Cancel",
+          "defaults": {
+            "newArtifact": "New artifact"
+          },
           "fields": {
             "title": "Title",
             "type": "Type",
@@ -2929,7 +4170,8 @@
           "keypad": {
             "settings": "Keypad settings",
             "correctCode": "Correct code",
-            "codeLength": "Code length"
+            "codeLength": "Code length",
+            "correctCodePlaceholder": "1234"
           },
           "preview": {
             "title": "Preview",
@@ -2943,6 +4185,166 @@
             "customize": "Customize",
             "createArtifact": "Create artifact",
             "quickCreate": "Quick create"
+          },
+          "templates": {
+            "keypadBasic": {
+              "name": "Keypad (4 digits)",
+              "description": "A simple 4-digit PIN to unlock something",
+              "title": "Secret code",
+              "correctCode": "1234",
+              "successMessage": "✅ Correct! You unlocked the clue.",
+              "failMessage": "❌ Wrong code. Try again!"
+            },
+            "keypadAdvanced": {
+              "name": "Keypad (with attempt limit)",
+              "description": "PIN with max 3 attempts before lock",
+              "title": "Security code",
+              "successMessage": "🎉 Correct! The way is open.",
+              "failMessage": "⚠️ Wrong code!",
+              "lockedMessage": "🚫 Keypad locked. Contact the host."
+            },
+            "riddle": {
+              "name": "Riddle / Question",
+              "description": "A riddle with text input for answers",
+              "title": "The riddle",
+              "prompt": "What has four legs but cannot walk?",
+              "correctAnswers": "table\na table\ndesk"
+            },
+            "cipherCaesar": {
+              "name": "Caesar cipher",
+              "description": "Encrypted message with letter shift",
+              "title": "Encrypted message",
+              "cipherKey": "3",
+              "plaintext": "the secret is under the stairs"
+            },
+            "hotspotImage": {
+              "name": "Clickable image",
+              "description": "Image with hidden zones to find",
+              "title": "Search the image"
+            },
+            "tilePuzzle": {
+              "name": "Tile puzzle (3x3)",
+              "description": "Sliding tile puzzle to reveal an image",
+              "title": "The puzzle"
+            },
+            "logicGrid": {
+              "name": "Logic grid",
+              "description": "Logic puzzle where things must be matched",
+              "title": "Who did what?",
+              "rows": "Alice\nBob\nCharlie",
+              "columns": "Red\nGreen\nBlue",
+              "solution": "{\"Alice\":\"Red\",\"Bob\":\"Green\",\"Charlie\":\"Blue\"}"
+            },
+            "counterClues": {
+              "name": "Clue counter",
+              "description": "Count found clues or progress",
+              "title": "Clues found",
+              "label": "Clues"
+            },
+            "hintContainer": {
+              "name": "Hint container",
+              "description": "Progressive hints that can be revealed",
+              "title": "Hints",
+              "hints": "Look under the mat\nThere is a hidden key\nThe key fits the cabinet on the right"
+            },
+            "qrGate": {
+              "name": "QR code checkpoint",
+              "description": "Scan a QR code to continue",
+              "title": "Scan the code",
+              "expectedValue": "SECRET123",
+              "successMessage": "✅ Correct code! Continue to the next clue."
+            },
+            "locationCheckpoint": {
+              "name": "Location checkpoint",
+              "description": "GPS verification for city games",
+              "title": "Find the location",
+              "locationName": "Main square"
+            },
+            "clueCard": {
+              "name": "Clue/Hint",
+              "description": "A card with a clue that can be revealed",
+              "title": "Clue",
+              "descriptionText": "Hidden clue that the host can show",
+              "variantTitle": "Clue",
+              "variantBody": "Write your clue here..."
+            },
+            "secretDocument": {
+              "name": "Secret document",
+              "description": "A document revealed at the right time",
+              "title": "Secret document",
+              "descriptionText": "Revealed when participants find it"
+            },
+            "revealCard": {
+              "name": "Reveal card",
+              "description": "A card for dramatic reveals",
+              "title": "The reveal"
+            },
+            "roleSecret": {
+              "name": "Role secret",
+              "description": "Secret information visible only to a role",
+              "title": "Your secret",
+              "variantTitle": "Secret information",
+              "variantBody": "Only you can see this..."
+            },
+            "audioClue": {
+              "name": "Audio clue",
+              "description": "Audio clip played for participants",
+              "title": "Listen closely"
+            },
+            "soundTrigger": {
+              "name": "Sound trigger",
+              "description": "Triggered when participants make noise",
+              "title": "Shout loudly!",
+              "instruction": "Shout loudly to open the door!"
+            },
+            "propCheck": {
+              "name": "Prop check",
+              "description": "The host confirms participants have the right item",
+              "title": "Show the item",
+              "propName": "The golden key",
+              "instruction": "Show the golden key to the host to continue."
+            },
+            "quizAnswer": {
+              "name": "Quiz answer",
+              "description": "Keypad for quiz questions with numeric answers",
+              "title": "Question",
+              "descriptionText": "Enter the answer using digits",
+              "successMessage": "✅ Correct answer!",
+              "failMessage": "❌ Wrong answer. Try again!"
+            },
+            "textQuestion": {
+              "name": "Text question",
+              "description": "Open question with text answer",
+              "title": "Answer the question",
+              "prompt": "What is the capital of Sweden?",
+              "correctAnswers": "stockholm\nStockholm"
+            },
+            "checklist": {
+              "name": "Checklist",
+              "description": "Several items to check off",
+              "title": "Checklist",
+              "items": "Task 1\nTask 2\nTask 3"
+            },
+            "learningCard": {
+              "name": "Learning card",
+              "description": "Card with information or facts",
+              "title": "Learning card"
+            },
+            "imageReveal": {
+              "name": "Image to reveal",
+              "description": "An image shown at the right time",
+              "title": "Image"
+            },
+            "replayMarker": {
+              "name": "Replay marker",
+              "description": "Let participants mark important moments",
+              "title": "Mark moment"
+            },
+            "blank": {
+              "name": "Blank artifact",
+              "description": "Start from scratch",
+              "title": "New artifact"
+            }
           },
           "categories": {
             "escape_room": "Escape Room",
@@ -3645,12 +5047,27 @@
             "title": "Feature Entitlements",
             "noEntitlements": "No entitlements configured",
             "enabled": "Enabled",
+            "header": {
+              "openMenu": "Open menu",
+              "closeMenu": "Close menu"
+            },
             "disabled": "Disabled",
             "dependencies": "Dependencies",
             "noDependencies": "No dependencies configured",
             "requires": "Requires",
             "excludes": "Excludes"
           },
+            },
+            "footer": {
+              "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",
+              "actions": {
+                "getStarted": "Get started"
+              },
+              "legal": {
+                "terms": "Terms of use",
+                "privacy": "Privacy policy"
+              },
+              "copyright": "© {year} Lekbanken AS. All rights reserved."
           "availability": {
             "scope": "Availability Scope",
             "scopeLabel": "Scope",
@@ -4381,6 +5798,329 @@
           "cancel": "Cancel"
         }
       },
+      "coursesEditor": {
+        "title": {
+          "edit": "Edit course",
+          "create": "Create new course"
+        },
+        "description": {
+          "edit": "Update course settings below.",
+          "create": "Fill in the information to create a new course."
+        },
+        "tabs": {
+          "basic": "Basic info",
+          "content": "Content",
+          "quiz": "Quiz",
+          "rewards": "Rewards"
+        },
+        "fields": {
+          "title": "Title *",
+          "titlePlaceholder": "e.g. Introduction to Lekbanken",
+          "slug": "Slug *",
+          "slugPlaceholder": "e.g. intro-lekbanken",
+          "description": "Description",
+          "descriptionPlaceholder": "A short description of the course...",
+          "scope": "Scope *",
+          "tenant": "Organization *",
+          "tenantPlaceholder": "Select organization",
+          "status": "Status",
+          "difficulty": "Difficulty",
+          "duration": "Time (min)",
+          "durationPlaceholder": "15",
+          "passScore": "Pass score (%)",
+          "tags": "Tags",
+          "tagsPlaceholder": "safety, basics, mandatory",
+          "tagsHelp": "Separate with commas."
+        },
+        "notice": {
+          "tenantScope": "The course will be created for your organization."
+        },
+        "scope": {
+          "global": {
+            "label": "Global",
+            "description": "Visible to all organizations"
+          },
+          "tenant": {
+            "label": "Organization",
+            "description": "Visible only within the selected organization"
+          }
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        },
+        "difficulty": {
+          "placeholder": "Select level...",
+          "beginner": "Beginner",
+          "intermediate": "Intermediate",
+          "advanced": "Advanced",
+          "expert": "Expert"
+        },
+        "advanced": {
+          "label": "Advanced",
+          "jsonMode": "JSON mode"
+        },
+        "content": {
+          "title": "Content sections",
+          "jsonPlaceholder": "[{\"id\": \"s1\", \"title\": \"...\", \"body_markdown\": \"...\"}]",
+          "empty": "No sections yet. Add your first section.",
+          "section": "Section {index}",
+          "sectionTitlePlaceholder": "Section title",
+          "sectionBodyPlaceholder": "Content (Markdown supported)",
+          "addSection": "Add section"
+        },
+        "quiz": {
+          "title": "Quiz questions",
+          "jsonPlaceholder": "[{\"id\": \"q1\", \"question\": \"...\", \"options\": [...]}]",
+          "empty": "No questions yet. Add your first question.",
+          "questionLabel": "Question {index}",
+          "questionPlaceholder": "Question text",
+          "optionsLabel": "Answer options",
+          "correctAnswerTitle": "Mark as correct answer",
+          "optionPlaceholder": "Option {index}",
+          "addOption": "Add option",
+          "explanationLabel": "Explanation (optional)",
+          "explanationPlaceholder": "Explanation shown after answering",
+          "addQuestion": "Add question"
+        },
+        "rewards": {
+          "title": "Rewards for passing",
+          "jsonPlaceholder": "{\"dicecoin_amount\": 100, \"xp_amount\": 50}",
+          "dicecoin": "DiceCoin",
+          "dicecoinPlaceholder": "100",
+          "xp": "XP",
+          "xpPlaceholder": "50",
+          "achievement": "Achievement ID (optional)",
+          "achievementPlaceholder": "Achievement UUID"
+        },
+        "actions": {
+          "cancel": "Cancel",
+          "saving": "Saving...",
+          "update": "Update",
+          "create": "Create"
+        },
+        "errors": {
+          "titleRequired": "Title is required",
+          "slugRequired": "Slug is required",
+          "tenantRequired": "Select an organization",
+          "updateFailed": "Failed to update the course",
+          "createFailed": "Failed to create the course",
+          "unexpected": "An unexpected error occurred"
+        }
+      },
+      "reports": {
+        "breadcrumbs": {
+          "learning": "Learning",
+          "reports": "Reports"
+        },
+        "title": "Reports",
+        "description": "Analyze learning progress and statistics",
+        "actions": {
+          "refresh": "Refresh"
+        },
+        "filters": {
+          "days": {
+            "7": "Last 7 days",
+            "30": "Last 30 days",
+            "90": "Last 90 days",
+            "365": "Last year"
+          },
+          "scope": {
+            "all": "All scopes",
+            "global": "Global courses",
+            "tenant": "Organization"
+          },
+          "tenants": {
+            "all": "All organizations"
+          }
+        },
+        "error": {
+          "unexpected": "An unexpected error occurred"
+        },
+        "stats": {
+          "activeParticipants": "Active participants",
+          "completedCourses": "Completed courses",
+          "activeCourses": "Active courses",
+          "avgScore": "Average score"
+        },
+        "table": {
+          "title": "Course statistics",
+          "loading": "Loading statistics...",
+          "empty": "No course statistics available for the selected period.",
+          "columns": {
+            "course": "Course",
+            "completed30d": "Completed (30d)",
+            "avgScore": "Average score",
+            "failed": "Failed"
+          },
+          "unknownCourse": "Unknown course",
+          "emptyValue": "—",
+          "zeroPercent": "0%"
+        }
+      },
+      "paths": {
+        "breadcrumbs": {
+          "learning": "Learning",
+          "paths": "Paths"
+        },
+        "title": "Learning paths",
+        "description": "Build learning journeys with ordered courses",
+        "actions": {
+          "create": "Create path",
+          "readOnly": "Read-only"
+        },
+        "notice": {
+          "title": "Only system admins can create paths",
+          "description": "You can view existing paths but need system admin rights to create or edit them."
+        },
+        "status": {
+          "draft": "Draft",
+          "active": "Active",
+          "archived": "Archived"
+        },
+        "kinds": {
+          "onboarding": "Onboarding",
+          "role": "Role-based",
+          "theme": "Theme",
+          "compliance": "Compliance"
+        },
+        "filters": {
+          "searchPlaceholder": "Search learning paths...",
+          "status": {
+            "all": "All statuses"
+          },
+          "scope": {
+            "all": "All scopes",
+            "global": "Global",
+            "tenant": "Organization"
+          },
+          "tenants": {
+            "all": "All organizations"
+          }
+        },
+        "loading": "Loading learning paths...",
+        "empty": {
+          "title": "No learning paths yet",
+          "filtered": "No learning paths match the filters",
+          "default": "Learning paths can be created in a future version."
+        },
+        "badges": {
+          "global": "Global",
+          "organization": "Organization"
+        },
+        "stats": {
+          "total": "Learning paths",
+          "active": "Active",
+          "draft": "Draft",
+          "nodesLabel": "courses in this path"
+        },
+        "pagination": {
+          "showing": "Showing {start}–{end} of {total}",
+          "previous": "Previous",
+          "next": "Next"
+        },
+        "emptyValue": "—",
+        "confirmDelete": "Do you really want to delete \"{title}\"?",
+        "error": {
+          "loadFailed": "Failed to load learning paths",
+          "deleteFailed": "Failed to delete learning path"
+        },
+        "editor": {
+          "title": {
+            "edit": "Edit learning path",
+            "create": "Create new learning path"
+          },
+          "description": {
+            "edit": "Update the learning path and manage courses.",
+            "create": "Fill in the information to create a new learning path."
+          },
+          "tabs": {
+            "basic": "Basic info",
+            "courses": "Courses",
+            "prerequisites": "Prerequisites"
+          },
+          "fields": {
+            "title": "Title *",
+            "titlePlaceholder": "e.g. Onboarding for new employees",
+            "slug": "Slug *",
+            "slugPlaceholder": "e.g. onboarding-new",
+            "description": "Description",
+            "descriptionPlaceholder": "A description of the learning path...",
+            "scope": "Scope *",
+            "tenant": "Organization *",
+            "tenantPlaceholder": "Select organization",
+            "status": "Status",
+            "kind": "Type"
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Visible to all organizations"
+            },
+            "tenant": {
+              "label": "Organization",
+              "description": "Visible only within the selected organization"
+            }
+          },
+          "status": {
+            "draft": "Draft",
+            "active": "Active",
+            "archived": "Archived"
+          },
+          "kinds": {
+            "onboarding": "Onboarding",
+            "role": "Role-based",
+            "theme": "Theme",
+            "compliance": "Compliance"
+          },
+          "nodes": {
+            "title": "Courses in the path",
+            "count": "{count} courses",
+            "loading": "Loading courses...",
+            "empty": "No courses yet. Add courses below.",
+            "courseFallback": "Course",
+            "addCoursePlaceholder": "Select course to add...",
+            "courseScope": {
+              "org": "(org)",
+              "global": "(global)"
+            },
+            "add": "Add"
+          },
+          "edges": {
+            "title": "Prerequisites",
+            "count": "{count} prerequisites",
+            "description": "Define which courses must be completed before others.",
+            "empty": "No prerequisites defined. All courses can be taken in any order.",
+            "courseFallback": "Course",
+            "addTitle": "Add prerequisite",
+            "addFromPlaceholder": "Select prerequisite...",
+            "addToPlaceholder": "Select target...",
+            "add": "Create",
+            "minimumNotice": "Add at least 2 courses to define prerequisites."
+          },
+          "actions": {
+            "close": "Close",
+            "cancel": "Cancel",
+            "saving": "Saving...",
+            "save": "Save",
+            "create": "Create"
+          },
+          "errors": {
+            "addCourseFailed": "Failed to add course",
+            "removeCourseFailed": "Failed to remove course",
+            "sameCoursePrereq": "Cannot create a prerequisite to the same course",
+            "addPrereqFailed": "Failed to create prerequisite",
+            "removePrereqFailed": "Failed to remove prerequisite",
+            "titleRequired": "Title is required",
+            "slugRequired": "Slug is required",
+            "tenantRequired": "Select an organization",
+            "updateFailed": "Failed to update learning path",
+            "createFailed": "Failed to create learning path",
+            "unexpected": "An unexpected error occurred"
+          }
+        }
+      },
       "requirements": {
         "breadcrumbs": {
           "learning": "Learning",
@@ -4635,6 +6375,74 @@
       "createPlan": "Create plan",
       "browseGames": "Browse games"
     },
+    "gameDetail": {
+      "notFoundTitle": "Game not found",
+      "backToBrowse": "Back to games",
+      "label": "Game",
+      "descriptionFallback": "No description available",
+      "purposeFallback": "Purpose",
+      "productFallback": "Product",
+      "ageRange": "{min}-{max} years",
+      "playersRange": "{min}-{max} participants",
+      "approxMinutes": "~{minutes} min",
+      "sections": {
+        "about": "About the game",
+        "instructions": "How to play",
+        "images": "Images",
+        "details": "Details"
+      },
+      "details": {
+        "participants": "Participants",
+        "time": "Time",
+        "age": "Age",
+        "energy": "Energy level"
+      },
+      "startGame": "Start game",
+      "energy": {
+        "low": "Low energy",
+        "medium": "Medium energy",
+        "high": "High energy"
+      }
+    },
+    "gamification": {
+      "events": {
+        "signInRequired": "You need to be signed in to view the event log.",
+        "title": "DICECOIN",
+        "subtitle": "Event log (read-only)",
+        "empty": "No events to show yet."
+      }
+    },
+    "play": {
+      "startSession": {
+        "eyebrow": "Start session",
+        "subtitle": "Create a participant session for this game.",
+        "backToGame": "Back to game",
+        "helper": "We create a new session with a unique code participants can use.",
+        "starting": "Starting...",
+        "startButton": "Start session",
+        "createFailed": "Could not create session"
+      },
+      "sessionDetail": {
+        "loadFailed": "Could not load session",
+        "updateFailed": "Could not update status",
+        "shareText": "Join the session! Code: {code}",
+        "kickFailed": "Could not remove participant",
+        "blockFailed": "Could not block participant",
+        "setNextStarterFailed": "Could not set next starter",
+        "setPositionFailed": "Could not set position",
+        "notFoundTitle": "Session not found",
+        "backToSessions": "Back to sessions",
+        "errorTitle": "Something went wrong",
+        "controlsTitle": "Session controls",
+        "shareTitle": "Share session",
+        "sessionCode": "Session code",
+        "participantJoinHint": "Participants go to {url}",
+        "copied": "Copied!",
+        "share": "Share",
+        "qrCode": "QR code",
+        "participantsTitle": "Participants"
+      }
+    },
     "profile": {
       "title": "Profile",
       "editProfile": "Edit profile",
@@ -4642,6 +6450,28 @@
       "preferences": "Preferences",
       "security": "Security",
       "notifications": "Notifications",
+      "edit": {
+        "label": "Profile",
+        "title": "Edit profile",
+        "avatarHint": "Tap to change profile picture",
+        "fullNameLabel": "Name",
+        "fullNamePlaceholder": "Your name",
+        "emailLabel": "Email address",
+        "emailHint": "The email address cannot be changed here.",
+        "saving": "Saving...",
+        "saved": "Saved!",
+        "saveChanges": "Save changes",
+        "savedMessage": "Your changes have been saved!"
+      },
+      "sections": {
+        "security": {
+          "emailVerified": "Email verified",
+          "emailNotVerified": "Email not verified",
+          "mfaEnabled": "MFA enabled",
+          "mfaDisabled": "MFA not enabled",
+          "enableMfa": "Enable now"
+        }
+      },
       "tenant": {
         "title": "Organisation",
         "description": "You are a member of the following organisations. Click to switch.",
@@ -5019,6 +6849,7 @@
         "unlimited": "Unlimited access to all features",
         "perMonth": "per month",
         "renews": "Renews: {date}",
+        "paymentMethod": "{brand} •••• {last4}",
         "changePlan": "Change plan",
         "cancel": "Cancel subscription"
       },
@@ -5518,6 +7349,61 @@
         "description": "Full access with personal guide",
         "button": "Contact sales"
       }
+      },
+      "features": {
+        "badge": "Features",
+        "title": "Architecture at a glance",
+        "description": "The UI worlds stay separate but share a component library. The app/ structure follows Next.js App Router with route groups for marketing, app, and admin.",
+        "groups": {
+          "sharedProviders": {
+            "title": "Shared providers",
+            "points": {
+              "theme": "Theme, Supabase, and i18n are loaded in the root layout.",
+              "layouts": "Layouts stay thin and focus on navigation and chrome."
+            }
+          },
+          "uiWorlds": {
+            "title": "UI worlds",
+            "points": {
+              "marketing": "Marketing uses header and footer without coupling to app flows.",
+              "app": "App has bottom navigation and mobile-first components.",
+              "admin": "Admin has a left sidebar and topbar with search/notifications."
+            }
+          },
+          "responsiveStrategy": {
+            "title": "Responsive strategy",
+            "points": {
+              "marketing": "Marketing: classic responsive layout.",
+              "app": "App: mobile-first with airy desktop layout.",
+              "admin": "Admin: desktop-first with fallback for smaller screens."
+            }
+          }
+        }
+      },
+      "pricing": {
+        "badge": "Pricing",
+        "title": "Three product experiences",
+        "description": "The architecture separates public marketing, mobile App, and desktop Admin so each team can move at its own pace.",
+        "tiers": {
+          "marketing": {
+            "name": "Marketing",
+            "price": "0 SEK",
+            "description": "Landing pages and marketing without login.",
+            "highlight": "Public"
+          },
+          "app": {
+            "name": "App",
+            "price": "Pro per facilitator",
+            "description": "Mobile-first flows with bottom navigation and shared components.",
+            "highlight": "Mobile first"
+          },
+          "admin": {
+            "name": "Admin",
+            "price": "Quote",
+            "description": "Admin portal with desktop priority, sidebar, and modular navigation.",
+            "highlight": "Desktop first"
+          }
+        }
     },
     "privacy": {
       "title": "Your privacy matters",
@@ -5615,6 +7501,12 @@
     "common": {
       "backToHome": "← Back to homepage",
       "lastUpdated": "Last updated: {date}"
+    },
+    "cookiePolicy": {
+      "fallbackTitle": "Cookie Policy",
+      "pendingContent": "Cookie policy content will be published soon.",
+      "noCookies": "No cookies registered yet.",
+      "manageDescription": "You can change your cookie preferences at any time by clicking the button below."
     },
     "accept": {
       "header": "TERMS",
@@ -5943,6 +7835,399 @@
       "sessionCode": "Session code",
       "noGameLinked": "No game is linked to the session."
     },
+    "board": {
+      "title": "Board",
+      "loading": "Loading...",
+      "updating": "Updating… Showing latest known state.",
+      "codeLabel": "Code",
+      "banner": {
+        "waiting": "Waiting to start. Participants can join with the code.",
+        "paused": "Paused. We'll be back shortly.",
+        "locked": "Session is locked.",
+        "ended": "Session has ended.",
+        "degraded": "Connection is unstable. Showing latest known state.",
+        "offline": "No connection. Showing latest known state."
+      },
+      "lobby": {
+        "sessionCodeLabel": "Session code",
+        "joinHint": "Scan the QR code or enter the code to join.",
+        "qrAlt": "QR code",
+        "qrLoading": "Loading QR code..."
+      },
+      "status": {
+        "paused": "Paused",
+        "ended": "Ended",
+        "active": "Active"
+      },
+      "currentStep": "Current step",
+      "now": "Right now",
+      "highlighted": "Highlighted",
+      "artifact": "Artifact",
+      "publicArtifacts": "Public artifacts",
+      "noPublicArtifacts": "No public artifacts yet.",
+      "decisions": "Decisions (results)",
+      "decision": "Decision",
+      "noDecisions": "No decisions are shown yet.",
+      "outcomes": "Outcomes",
+      "outcome": "Outcome",
+      "noOutcomes": "No outcomes are shown yet.",
+      "errors": {
+        "fetch": "Could not load board."
+      }
+    },
+    "hostSessions": {
+      "header": {
+        "title": "PLAY",
+        "subtitle": "Host control center",
+        "newSession": "New session"
+      },
+      "summary": {
+        "title": "My sessions",
+        "activeCount": "{count, plural, one {# active session} other {# active sessions}}",
+        "noneActive": "No active sessions"
+      },
+      "filters": {
+        "all": "All",
+        "active": "Active",
+        "paused": "Paused",
+        "ended": "Ended"
+      },
+      "empty": {
+        "titleAll": "No sessions yet",
+        "titleFiltered": "No {status} sessions",
+        "descriptionAll": "Create your first session by choosing a game.",
+        "descriptionFiltered": "Try another filter or create a new session.",
+        "action": "Choose game"
+      },
+      "errors": {
+        "fetchFailed": "Could not fetch sessions"
+      }
+    },
+    "participantsHost": {
+      "loading": "Loading session...",
+      "errors": {
+        "sessionNotFound": "Session could not be found",
+        "notHost": "You are not the host of this session"
+      },
+      "actions": {
+        "back": "Back",
+        "backArrow": "← Back"
+      },
+      "header": {
+        "title": "Host dashboard",
+        "subtitle": "Manage your session and participants"
+      },
+      "sessionInfo": {
+        "title": "Session information",
+        "codeLabel": "Session code",
+        "participantsLabel": "Participants",
+        "createdLabel": "Created",
+        "gameIdLabel": "Game ID"
+      },
+      "participants": {
+        "title": "Participants"
+      }
+    },
+    "participantRoleSelector": {
+      "roles": {
+        "observer": "Observer",
+        "player": "Player",
+        "teamLead": "Team lead",
+        "facilitator": "Facilitator"
+      },
+      "descriptions": {
+        "observer": "Can watch but not participate",
+        "player": "Active participant",
+        "teamLead": "Can coordinate team activities",
+        "facilitator": "Can assist the host"
+      },
+      "errors": {
+        "updateFailed": "Could not update role"
+      }
+    },
+    "sessionActions": {
+      "actions": {
+        "archive": "Archive session",
+        "archiving": "Archiving...",
+        "restore": "Restore session",
+        "restoring": "Restoring...",
+        "deletePermanent": "Delete permanently"
+      },
+      "confirm": {
+        "message": "Are you sure? Session <strong>{code}</strong> will be deleted permanently. This cannot be undone!",
+        "confirm": "Yes, delete",
+        "cancel": "Cancel",
+        "deleting": "Deleting..."
+      },
+      "errors": {
+        "archiveFailed": "Could not archive session",
+        "restoreFailed": "Could not restore session",
+        "deleteFailed": "Could not delete session"
+      }
+    },
+    "sessionHistory": {
+      "loading": "Loading sessions...",
+      "empty": "No sessions found",
+      "errors": {
+        "fetchFailed": "Could not fetch sessions",
+        "unknown": "Unknown error"
+      },
+      "filters": {
+        "label": "Filter:",
+        "all": "All sessions",
+        "active": "Active",
+        "paused": "Paused",
+        "locked": "Locked",
+        "ended": "Ended",
+        "cancelled": "Cancelled",
+        "archived": "Archived"
+      },
+      "summary": {
+        "count": "{count, plural, one {# session} other {# sessions}}"
+      },
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "locked": "Locked",
+        "ended": "Ended",
+        "cancelled": "Cancelled",
+        "archived": "Archived"
+      },
+      "metrics": {
+        "participants": "Participants",
+        "totalScore": "Total score",
+        "achievements": "Achievements",
+        "duration": "Duration"
+      },
+      "timestamps": {
+        "created": "Created: {date}",
+        "ended": "Ended: {date}"
+      },
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      },
+      "pagination": {
+        "previous": "← Previous",
+        "next": "Next →",
+        "showing": "Showing {start}-{end} of {total}"
+      }
+    },
+    "sessionHistoryPage": {
+      "title": "Session history",
+      "description": "View and analyze previous participant sessions"
+    },
+    "sessionAnalytics": {
+      "title": "Session analytics",
+      "sessionCodeLabel": "Code:",
+      "loading": "Loading analytics...",
+      "errors": {
+        "fetchFailed": "Could not fetch analytics",
+        "unknown": "Unknown error",
+        "notFound": "Session not found"
+      },
+      "actions": {
+        "backToHistory": "Back to history",
+        "backToHistoryArrow": "← Back to history"
+      },
+      "export": {
+        "participants": "📊 Export participants",
+        "activity": "📋 Export activity",
+        "achievements": "🏆 Export achievements",
+        "errors": {
+          "failed": "Export failed"
+        }
+      },
+      "stats": {
+        "totalParticipants": "Total participants",
+        "totalScore": "Total score",
+        "achievements": "Achievements",
+        "averageTime": "Average time"
+      },
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      },
+      "topScorers": {
+        "title": "Top scorers",
+        "empty": "No data"
+      },
+      "topAchievers": {
+        "title": "Most achievements",
+        "empty": "No data"
+      },
+      "participants": {
+        "title": "All participants",
+        "roles": {
+          "observer": "Observer",
+          "player": "Player",
+          "teamLead": "Team lead",
+          "facilitator": "Facilitator"
+        },
+        "status": {
+          "pending": "Pending",
+          "active": "Active",
+          "idle": "Idle",
+          "disconnected": "Disconnected",
+          "kicked": "Kicked",
+          "blocked": "Blocked"
+        },
+        "table": {
+          "name": "Name",
+          "role": "Role",
+          "status": "Status",
+          "score": "Score",
+          "achievements": "Achievements",
+          "joined": "Joined"
+        }
+      },
+      "recentActivity": {
+        "title": "Recent activity"
+      }
+    },
+    "participantSessionCreate": {
+      "title": "Create new session",
+      "description": "Start a new participant session for your game or activity",
+      "gameId": {
+        "label": "Game ID (optional)",
+        "placeholder": "Enter a game ID to link the session to a game",
+        "hint": "Leave blank for a standalone session"
+      },
+      "actions": {
+        "create": "Create session",
+        "creating": "Creating session..."
+      },
+      "nextSteps": {
+        "title": "What happens next?",
+        "step1": "You get a unique session code participants use to join",
+        "step2": "You are taken to the host dashboard where you manage participants",
+        "step3": "Participants join by entering the code on the join page"
+      },
+      "errors": {
+        "createFailed": "Could not create session",
+        "unknown": "An error occurred"
+      }
+    },
+    "participantJoin": {
+      "title": "Join session",
+      "description": "Enter the session code you received from your teacher",
+      "form": {
+        "sessionCodeLabel": "Session code",
+        "sessionCodePlaceholder": "H3K9QF",
+        "displayNameLabel": "Your name",
+        "displayNamePlaceholder": "Anna"
+      },
+      "actions": {
+        "join": "Join",
+        "joining": "Joining..."
+      },
+      "footerHint": "The session code is 6 letters/digits",
+      "errors": {
+        "invalidCode": "The code seems incorrect. Check and try again.",
+        "sessionFull": "The session is full. Try again later.",
+        "sessionEnded": "The session has ended.",
+        "sessionLocked": "The session is locked.",
+        "joinFailed": "Could not join the session",
+        "unknown": "An error occurred"
+      }
+    },
+    "sessionControlPanel": {
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "locked": "Locked",
+        "ended": "Ended",
+        "cancelled": "Cancelled",
+        "archived": "Archived"
+      },
+      "ended": {
+        "title": "Session ended",
+        "code": "Code: {code}"
+      },
+      "header": {
+        "title": "Session controls",
+        "codeAndCount": "Code: {code} • {count} participants"
+      },
+      "actions": {
+        "pause": "Pause",
+        "resume": "Resume",
+        "lock": "Lock session",
+        "unlock": "Unlock",
+        "end": "End session"
+      },
+      "confirm": {
+        "message": "Are you sure? This ends the session for all participants.",
+        "cancel": "Cancel",
+        "confirm": "Yes, end",
+        "ending": "Ending..."
+      },
+      "reasons": {
+        "pause": "Paused by host",
+        "resume": "Resumed by host",
+        "lock": "No new participants allowed",
+        "unlock": "New participants allowed again",
+        "end": "Session ended by host"
+      }
+    },
+    "participantHostList": {
+      "confirm": {
+        "kick": "Are you sure you want to kick {name}?",
+        "block": "Block {name}?"
+      },
+      "status": {
+        "kicked": "Kicked",
+        "blocked": "Blocked",
+        "disconnected": "Disconnected",
+        "idle": "Idle",
+        "active": "Active"
+      },
+      "errors": {
+        "title": "Error"
+      },
+      "header": {
+        "title": "Participants ({count})",
+        "code": "Code: {code}"
+      },
+      "empty": "No participants yet",
+      "table": {
+        "name": "Name",
+        "role": "Role",
+        "status": "Status",
+        "joined": "Joined",
+        "actions": "Actions"
+      },
+      "actions": {
+        "kick": "Kick",
+        "block": "Block"
+      },
+      "timeAgo": {
+        "seconds": "{count, plural, one {# sec ago} other {# secs ago}}",
+        "minutes": "{count, plural, one {# min ago} other {# mins ago}}",
+        "hours": "{count, plural, one {# hour ago} other {# hours ago}}",
+        "days": "{count, plural, one {# day ago} other {# days ago}}"
+      }
+    },
+    "liveProgress": {
+      "unknownParticipant": "Unknown",
+      "stats": {
+        "totalScore": "Total score",
+        "achievements": "Achievements",
+        "completedGames": "Completed games",
+        "activeGames": "Active games"
+      },
+      "progress": {
+        "title": "Participant progress",
+        "empty": "No activity yet",
+        "points": "{count} pts",
+        "achievementsCount": "{count} 🏆",
+        "complete": "{percent}% complete"
+      },
+      "achievements": {
+        "title": "Recent achievements",
+        "empty": "No achievements yet",
+        "points": "{count} points"
+      }
+    },
     "hostSession": {
       "tabs": {
         "participants": "Participants",
@@ -6047,15 +8332,70 @@
         }
       }
     },
+    "lobbyHub": {
+      "status": {
+        "draft": "Draft",
+        "lobby": "Lobby",
+        "active": "Active",
+        "completed": "Completed"
+      },
+      "sections": {
+        "participants": {
+          "title": "Participants",
+          "description": "Invite and manage participants"
+        },
+        "roles": {
+          "title": "Roles & secrets",
+          "description": "Assign roles and hidden information"
+        },
+        "content": {
+          "title": "Content preview",
+          "description": "Steps, phases, and artifacts"
+        },
+        "triggers": {
+          "title": "Triggers & automation",
+          "description": "Configure automation rules"
+        },
+        "settings": {
+          "title": "Session settings",
+          "description": "Timing, permissions, and advanced options"
+        }
+      },
+      "badges": {
+        "unassigned": "{count} unassigned",
+        "allAssigned": "All assigned",
+        "contentIssues": "{count} issues",
+        "ready": "Ready",
+        "triggers": "{count} triggers"
+      },
+      "actions": {
+        "start": "Start session",
+        "starting": "Starting..."
+      },
+      "hints": {
+        "addParticipant": "Add at least one participant to start",
+        "resolveErrors": "Resolve errors before starting"
+      }
+    },
     "cockpit": {
       "header": {
         "participants": "participants",
         "openChat": "Open chat"
       },
       "status": {
-        "paused": "PAUSED"
+        "paused": "PAUSED",
+        "live": "LIVE"
       },
       "startSession": "Start session",
+      "actions": {
+        "directorMode": "Director Mode"
+      },
+      "errors": {
+        "title": "Error:"
+      },
+      "session": {
+        "fallbackName": "Session"
+      },
       "confirmKick": "Remove {name} from the session?",
       "confirmKickAnonymous": "Remove this participant from the session?",
       "signalPresets": {
@@ -6073,6 +8413,71 @@
         "pendingLabel": "pending",
         "warningsLabel": "warnings",
         "errorsLabel": "errors"
+      },
+      "run": {
+        "banner": {
+          "waiting": "Waiting to start. Participants can join with the code.",
+          "paused": "Paused. Participants see the pause state.",
+          "locked": "Locked: no new participants can join.",
+          "ended": "Session has ended. Thanks for playing.",
+          "degraded": "Connection is unstable. Showing latest known state.",
+          "offline": "No connection. Please try again."
+        },
+        "status": {
+          "active": "Active",
+          "paused": "Paused",
+          "locked": "Locked",
+          "ended": "Ended"
+        },
+        "labels": {
+          "now": "NOW",
+          "next": "NEXT",
+          "controls": "CONTROLS",
+          "health": "HEALTH"
+        },
+        "empty": {
+          "currentStep": "No active step",
+          "nextStep": "No next step",
+          "dash": "—"
+        },
+        "actions": {
+          "advanceStep": "Advance step",
+          "start": "Start session",
+          "pause": "Pause",
+          "resume": "Resume",
+          "end": "End",
+          "artifacts": "Artifacts",
+          "triggers": "Triggers"
+        },
+        "health": {
+          "realtime": "Realtime",
+          "participants": "Participants",
+          "triggers": "Triggers",
+          "lastUpdated": "Last updated",
+          "connection": {
+            "connected": "Connected",
+            "degraded": "Degraded",
+            "offline": "Offline"
+          },
+          "participantStatus": "{active} active · {pending} pending · {offline} offline",
+          "triggersArmed": "{count} armed"
+        }
+      },
+      "board": {
+        "title": "Board",
+        "openInstruction": "Open the board on a separate screen:"
+      },
+      "settings": {
+        "title": "Session settings",
+        "description": "Story and phase text overrides live under the Story tab. More session settings can be restored here next.",
+        "openStory": "Open Story",
+        "sessionRoles": {
+          "title": "Session roles (session copy)",
+          "description": "Update role text and limits for this session without changing the game template.",
+          "save": "Save roles",
+          "empty": "No roles snapshotted yet. Copy roles in the Roles tab to enable edits here.",
+          "copy": "Copy roles"
+        }
       },
       "roles": {
         "noRolesCopied": "No roles copied yet",
@@ -6097,7 +8502,9 @@
       },
       "triggers": {
         "noTriggers": "No triggers in this session.",
-        "configuredViaBuilder": "Triggers are configured via the Game Builder."
+        "configuredViaBuilder": "Triggers are configured via the Game Builder.",
+        "armedLabel": "Armed ({count})",
+        "firedLabel": "Fired ({count})"
       },
       "content": {
         "stepsAndPhases": "Steps & Phases",
@@ -6111,11 +8518,17 @@
       },
       "steps": {
         "unnamedStep": "Unnamed step",
+        "unnamedPhase": "Unnamed phase",
         "missingTitle": "Missing title",
         "missingDescription": "Missing description"
       },
       "tabs": {
         "overview": "Overview",
+        "run": "Run",
+        "participants": "Participants",
+        "board": "Board",
+        "signals": "Signals",
+        "timebank": "Time bank",
         "story": "Story",
         "artifacts": "Artifacts",
         "triggers": "Triggers",
@@ -6126,6 +8539,8 @@
         "title": "The Story"
       },
       "analytics": {
+        "title": "Analytics dashboard",
+        "description": "Session performance and statistics",
         "puzzlesSolved": "Puzzles solved",
         "events": "Events",
         "hintsUsed": "Hints used",
@@ -6161,8 +8576,14 @@
         "type": "Type",
         "triggersCount": "{count} triggers",
         "triggerErrorsCount": "{count} trigger errors",
+        "export": {
+          "json": "JSON",
+          "csv": "CSV"
+        },
         "tabs": {
-          "overview": "Overview"
+          "overview": "Overview",
+          "steps": "Steps",
+          "puzzles": "Puzzles"
         }
       }
     },
@@ -6173,13 +8594,20 @@
         "signals": "Signals",
         "events": "Events"
       },
+      "common": {
+        "dash": "–"
+      },
       "header": {
         "participants": "{count} participants",
+        "separator": "•",
         "statusLive": "LIVE",
         "statusPaused": "PAUSED",
         "statusEnded": "ENDED",
         "pause": "Pause",
         "resume": "Resume"
+      },
+      "leaderScript": {
+        "title": "LEADER SCRIPT"
       },
       "steps": {
         "noSteps": "No steps available yet",
@@ -6187,6 +8615,9 @@
         "notStarted": "Not started"
       },
       "triggers": {
+        "armedLabel": "🟢 ARMED ({count})",
+        "errorLabel": "❌ ERROR ({count})",
+        "firedLabel": "✅ FIRED ({count})",
         "disableAll": "Disable all",
         "noTriggers": "No triggers in this session"
       },
@@ -6199,6 +8630,17 @@
         "send": "Send",
         "recentSignals": "Recent signals",
         "clickToResend": "Click to resend",
+        "executingIndicator": "●",
+        "notificationsStatus": "Notifications: {status}",
+        "toast": {
+          "title": "Notification",
+          "body": "In-app toast",
+          "button": "Show in-app toast"
+        },
+        "toggle": {
+          "show": "+",
+          "hide": "−"
+        },
         "presets": {
           "pause": "Pause",
           "pauseMessage": "Pause!",
@@ -6234,6 +8676,8 @@
       "eventCount": "{count} events",
       "errors": "{count} errors",
       "warnings": "{count} warnings",
+      "details": "Details",
+      "separator": "•",
       "allEvents": "All events",
       "filters": {
         "searchPlaceholder": "Search events...",
@@ -6301,6 +8745,10 @@
       "actions": {
         "switchGame": "Switch game",
         "reset": "Reset"
+      },
+      "defaults": {
+        "stepTitle": "Step {index}",
+        "instructionsTitle": "Instructions"
       }
     },
     "playPlanPage": {
@@ -6336,46 +8784,11 @@
         "reset": "Reset"
       },
       "defaults": {
-        "continueWhenReady": "Continue when the group is ready."
+        "continueWhenReady": "Continue when the group is ready.",
+        "stepTitle": "Step {index}",
+        "pauseTag": "Pause",
+        "blockTag": "Block"
       }
-    },
-    "simplePlayView": {
-      "suggestedDuration": "Suggested: {minutes} min",
-      "stepOf": "Step {current} of {total}",
-      "stepsCompleted": "({count} completed)",
-      "next": "Next",
-      "finish": "Finish"
-    },
-    "facilitatedPlayView": {
-      "phase": "Phase {current}",
-      "unknownPhase": "Unknown phase"
-    },
-    "playTimer": {
-      "pause": "Pause",
-      "start": "Start",
-      "continue": "Continue",
-      "reset": "Reset"
-    },
-    "instructionsCard": {
-      "title": "Instructions"
-    },
-    "materialsChecklist": {
-      "title": "Materials"
-    },
-    "phaseNavigation": {
-      "previous": "Previous",
-      "next": "Next",
-      "finish": "Finish"
-    },
-    "boardToggle": {
-      "showOnScreen": "Show on screen",
-      "publicBoard": "Public board",
-      "description": "Display the board on an external screen or projector for participants.",
-      "sessionCode": "Session code",
-      "openNewWindow": "Open in new window",
-      "openFullscreen": "Open in fullscreen",
-      "copyLink": "Copy link",
-      "instruction": "Drag the window to the external screen and maximize for best results."
     },
     "decisionsPanel": {
       "loading": "Loading decisions…",
@@ -6395,7 +8808,15 @@
       },
       "placeholders": {
         "title": "E.g.: What are you doing now?",
-        "prompt": "Optional context…"
+        "prompt": "Optional context…",
+        "optionKey": "key",
+        "optionLabel": "Label"
+      },
+      "status": {
+        "draft": "Draft",
+        "open": "Open",
+        "closed": "Closed",
+        "revealed": "Revealed"
       },
       "actions": {
         "addOption": "Add",
@@ -6413,6 +8834,84 @@
       },
       "results": {
         "title": "Results"
+      }
+    },
+    "sessionStoryPanel": {
+      "title": "Story content",
+      "description": "Edit steps and phases for this session only. Changes do not affect the base game.",
+      "actions": {
+        "previewStory": "Preview story",
+        "resetOverrides": "Reset overrides",
+        "saveChanges": "Save changes",
+        "show": "Show",
+        "skip": "Skip",
+        "close": "Close"
+      },
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
+      "errors": {
+        "loadFailed": "Failed to load story content",
+        "saveFailed": "Failed to save story overrides",
+        "resetFailed": "Failed to reset overrides"
+      },
+      "countdown": {
+        "title": "Countdown overlay",
+        "description": "Broadcast a participant countdown from the lobby.",
+        "durationLabel": "Duration (sec)",
+        "messageLabel": "Message (optional)",
+        "messagePlaceholder": "Next moment starts in...",
+        "variantLabel": "Variant",
+        "variantDefault": "Default",
+        "variantDramatic": "Dramatic"
+      },
+      "storyOverlay": {
+        "title": "Story overlay",
+        "description": "Send a full-screen story overlay to participants.",
+        "sourceLabel": "Source",
+        "sourceStep": "Step",
+        "sourcePhase": "Phase",
+        "sourceCustom": "Custom",
+        "stepLabel": "Step",
+        "phaseLabel": "Phase",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Optional title",
+        "textLabel": "Text",
+        "textPlaceholder": "Story text to display",
+        "speedLabel": "Speed",
+        "speedInstant": "Instant",
+        "speedFast": "Fast",
+        "speedNormal": "Normal",
+        "speedDramatic": "Dramatic",
+        "themeLabel": "Theme",
+        "themeDark": "Dark",
+        "themeLight": "Light",
+        "themeDramatic": "Dramatic",
+        "showProgress": "Show progress",
+        "allowSkip": "Allow skip",
+        "participantSkip": "Participant skip",
+        "allowClose": "Allow close"
+      },
+      "phases": {
+        "title": "Phases",
+        "description": "Name, description, duration",
+        "empty": "No phases defined.",
+        "phaseLabel": "Phase {index}",
+        "durationLabel": "Duration (sec)"
+      },
+      "steps": {
+        "title": "Steps",
+        "description": "Title, description, duration, display mode",
+        "empty": "No steps defined.",
+        "stepLabel": "Step {index}",
+        "durationLabel": "Duration (min)",
+        "displayLabel": "Display"
+      },
+      "displayModes": {
+        "instant": "Instant",
+        "typewriter": "Typewriter",
+        "dramatic": "Dramatic"
       }
     },
     "facilitator": {
@@ -6472,7 +8971,8 @@
       },
       "manageTabs": {
         "roles": "Roles",
-        "settings": "Settings"
+        "settings": "Settings",
+        "rolesCount": "({count})"
       },
       "settings": {
         "title": "Game Settings",
@@ -6493,7 +8993,8 @@
         "offline": "Offline"
       },
       "format": {
-        "minSec": "min:sec"
+        "minSec": "min:sec",
+        "deltaSeconds": "{sign}{seconds}s"
       },
       "errors": {
         "loadFailed": "Could not load time bank",
@@ -6537,6 +9038,7 @@
         "title": "Results"
       },
       "matches": "{count} matches",
+      "executeOnce": "1×",
       "delay": "{seconds}s delay",
       "actionCount": "{count, plural, =1 {1 action} other {# actions}}",
       "noMatchingTrigger": "No trigger matches this event",
@@ -6593,6 +9095,10 @@
       "addSignalsHint": "Add signals that can be triggered during the game",
       "addSignal": "Add signal",
       "copySuffix": "{name} (copy)",
+      "defaults": {
+        "name": "New signal",
+        "notificationTitle": "Signal"
+      },
       "labels": {
         "name": "Name",
         "signalType": "Signal type",
@@ -6666,7 +9172,13 @@
         "search": "Search"
       },
       "categories": {
-        "all": "All categories"
+        "all": "All categories",
+        "navigation": "Navigation",
+        "puzzle": "Puzzles & Riddles",
+        "reveal": "Show & Hide",
+        "timing": "Time & Timer",
+        "feedback": "Feedback",
+        "advanced": "Advanced"
       },
       "complexity": {
         "beginner": "Simple",
@@ -6681,6 +9193,9 @@
         "enterKeyword": "Enter a keyword to find templates",
         "noMatches": "No templates matched the search"
       },
+      "tags": {
+        "more": "+{count} more"
+      },
       "stats": {
         "templatesCount": "{count} templates",
         "simple": "{count} simple",
@@ -6692,6 +9207,11 @@
         "selectPhase": "Select phase",
         "selectArtifact": "Select artifact",
         "selectChannel": "Select channel"
+      },
+      "channels": {
+        "success": "success",
+        "warning": "warning",
+        "attention": "attention"
       },
       "configDialog": {
         "noConfiguration": "This template does not require configuration.",
@@ -6710,14 +9230,47 @@
       }
     },
     "roleCard": {
+      "yourRole": "Your role",
+      "instructionsHeading": "Your instructions",
+      "hintsHeading": "Hints",
       "showHints": "Show hints (if you're stuck)",
       "requestHint": "Request a hint from the host"
     },
     "roleAssigner": {
+      "title": "Role assignment",
+      "summary": {
+        "assignedOfTotal": "{assigned} of {total} assigned",
+        "participantsWithRoles": "{assigned} of {total} participants have roles",
+        "rolesAssigned": "{count} roles assigned"
+      },
+      "actions": {
+        "randomAssign": "Randomize roles",
+        "randomAssignCount": "Randomize ({count})",
+        "randomAssignAll": "Randomize roles"
+      },
+      "status": {
+        "full": "Full"
+      },
+      "roleCounts": {
+        "assigned": "{assigned}{hasMax, select, yes { / {max}} other {}} assigned{hasMin, select, yes { (min {min})} other {}}"
+      },
+      "needs": "Needs {count}",
+      "noAssignedYet": "No one assigned yet",
+      "unassigned": {
+        "title": "Participants without role ({count})"
+      },
+      "selectRoleFor": "Select role for",
+      "noRolesAvailable": "No roles available",
+      "cancel": "Cancel",
+      "minRequirements": {
+        "notSatisfied": "Minimum requirements not met",
+        "needMore": "Needs {count} more for {roleName}"
+      },
       "noRolesCopied": "No roles copied yet",
       "copyRolesHint": "Click \"Copy roles from game\" above to fetch roles from the game template.",
       "afterCopyHint": "After copying, you can assign roles to participants manually or randomly.",
       "errors": {
+        "randomAssignFailed": "Random assignment failed",
         "loadFailed": "Could not load data",
         "assignFailed": "Could not assign roles",
         "unassignFailed": "Could not remove role assignment"
@@ -6746,6 +9299,16 @@
       "title": "Keyboard Shortcuts",
       "description": "Quick access to Director Mode features",
       "pressToShow": "Press ? to show this help",
+      "keys": {
+        "ctrl": "Ctrl",
+        "alt": "Alt",
+        "shift": "⇧",
+        "meta": "⌘",
+        "space": "Space",
+        "escape": "Esc",
+        "enter": "Enter",
+        "plus": "+"
+      },
       "categories": {
         "navigation": "Navigation",
         "playback": "Playback",
@@ -6780,16 +9343,22 @@
       "stepOf": "Step {current} of {total}",
       "timerRunning": "Time running",
       "timerPaused": "Time paused",
+      "minutesShort": "min",
+      "secondsShort": "{count}s",
       "materials": "Materials",
       "note": "Note",
       "safety": "Safety"
     },
     "timerControl": {
+      "inputs": {
+        "minutesSeconds": "Minutes : Seconds"
+      },
       "status": {
         "paused": "Paused",
         "finished": "Done!",
         "running": "Running"
       },
+      "quickMinutes": "{count} min",
       "startTimer": "Start timer",
       "resume": "Resume",
       "pause": "Pause",
@@ -6801,6 +9370,7 @@
         "label": "Step",
         "notStartedMessage": "Steps have not started yet. Click the button below to start the first step.",
         "startFirst": "Start first step",
+        "start": "Start",
         "first": "First step",
         "last": "Last step",
         "goTo": "Go to step {number}",
@@ -6819,15 +9389,28 @@
       "ofTotal": "{current} of {total}",
       "previous": "Previous",
       "next": "Next",
+      "navigation": {
+        "title": "Navigation"
+      },
+      "mediaLabel": "Media",
+      "minutesShort": "{count} min",
       "startGame": "Start game",
       "description": "Description",
       "leaderScript": "Leader script"
     },
     "timeBankLivePanel": {
+      "title": "Time Bank",
       "paused": "Paused",
       "pause": "Pause",
       "resume": "Resume",
       "resetToStart": "Reset to start",
+      "format": {
+        "deltaLabel": "{time}"
+      },
+      "toggle": {
+        "show": "+",
+        "hide": "−"
+      },
       "status": {
         "critical": "Critical time level!",
         "warning": "Time is almost up",
@@ -6851,6 +9434,7 @@
       }
     },
     "triggerLivePanel": {
+      "title": "Triggers",
       "readyCount": "{count} ready",
       "errorCount": "{count} error",
       "description": "{count} triggers • Automated events",
@@ -6859,6 +9443,7 @@
       "rearmAll": "Rearm all",
       "noTriggersInSession": "No triggers in this session",
       "firedCount": "Fired {count}×",
+      "executeOnce": "1×",
       "groups": {
         "armed": "Ready",
         "error": "Error",
@@ -6893,6 +9478,7 @@
         "actions": "Actions",
         "actionsCount": "{count} pcs",
         "delay": "Delay",
+        "delaySeconds": "{count}s",
         "totalErrors": "Total errors"
       },
       "dialog": {
@@ -6904,7 +9490,8 @@
     },
     "puzzleArtifactRenderer": {
       "errors": {
-        "puzzleLocked": "Puzzle is locked by the game master"
+        "puzzleLocked": "Puzzle is locked by the game master",
+        "serverError": "Server error"
       },
       "status": {
         "solved": "Solved",
@@ -6962,7 +9549,8 @@
       },
       "sound": {
         "title": "Sound activation",
-        "defaultInstruction": "Make a sound!"
+        "defaultInstruction": "Make a sound!",
+        "triggered": "Activated!"
       },
       "signal": {
         "defaultLabel": "Signal",
@@ -7011,6 +9599,11 @@
       "noArtifactsButton": "If the button doesn't work, the game has no artifacts defined.",
       "variants": "{count} variants",
       "variant": "Variant",
+      "visibility": {
+        "public": "Public",
+        "leader_only": "Leader only",
+        "role_private": "Role private"
+      },
       "rolePrivate": "(role)",
       "keypad": {
         "successMessage": "The code is correct!",
@@ -7028,11 +9621,13 @@
       "loading": "Loading conversation cards…",
       "noCards": "No cards in this game.",
       "card": "Card",
+      "progress": "{current}/{total}",
+      "followupLine": "• {text}",
       "leaderTip": "Leader Tip",
       "previous": "Previous",
       "next": "Next",
       "errors": {
-        "missingCollection": "Conversation cards missing linked collection (conversation_card_collection_id).",
+        "missingCollection": "Conversation cards are missing a linked deck (conversation_card_collection_id).",
         "loadFailed": "Could not load conversation cards"
       }
     },
@@ -7049,6 +9644,8 @@
       "noPendingRequests": "No pending prop requests",
       "showPhoto": "Show photo",
       "hidePhoto": "Hide photo",
+      "photoAlt": "Prop evidence",
+      "notesLabel": "Note (optional)",
       "notesPlaceholder": "E.g. 'Great job!' or 'Incorrect item'",
       "actions": {
         "approve": "Approve",
@@ -7195,6 +9792,7 @@
       "cameraError": "Could not start camera",
       "invalidCode": "Invalid code",
       "qrNotValid": "QR code is not valid for this task",
+      "verified": "Verified!",
       "close": "Close",
       "scanQrCode": "Scan QR code",
       "readNfc": "Read NFC tag",
@@ -7207,6 +9805,22 @@
       "viaManualCode": "(via manual code)",
       "defaultPrompt": "Scan the QR code to continue",
       "devSimulateScan": "[DEV] Simulate successful scan"
+    },
+    "triggerCard": {
+      "labels": {
+        "when": "When",
+        "then": "Then"
+      },
+      "actions": {
+        "more": "{count} more"
+      },
+      "onceOnly": "Once only",
+      "status": {
+        "armed": "Armed",
+        "fired": "Fired",
+        "disabled": "Disabled",
+        "error": "Error"
+      }
     },
     "multiAnswerForm": {
       "allChecksPassed": "All checks passed!",
@@ -7246,6 +9860,7 @@
       "startsNext": "Starts next time",
       "participantActions": "Participant actions",
       "setPosition": "Set position",
+      "approve": "Approve",
       "remove": "Remove",
       "block": "Block"
     },
@@ -7266,6 +9881,9 @@
       "iHaveListened": "I have listened",
       "acknowledged": "Acknowledged",
       "loadError": "Could not load audio file",
+      "playError": "Could not play the audio",
+      "playLabel": "Play",
+      "pauseLabel": "Pause",
       "headphonesRecommended": "Headphones recommended for best experience",
       "hideTranscript": "Hide transcript",
       "showTranscript": "Show transcript"
@@ -7293,6 +9911,14 @@
       "zoomIn": "Zoom in",
       "allFound": "All objects found!"
     },
+    "joinPage": {
+      "title": "Join session",
+      "description": "Enter the code shown on the screen and choose a display name to participate.",
+      "helpText": "The session code is 6 characters long and is shared by the host.",
+      "errors": {
+        "couldNotJoin": "Could not join the session"
+      }
+    },
     "joinSessionForm": {
       "sessionCodeLabel": "Session code",
       "charLabel": "Character {current} of {total}",
@@ -7306,16 +9932,22 @@
         "invalidName": "Enter a display name (at least 2 characters)"
       }
     },
+      "checklist": {
+        "title": "Checklist",
+        "complete": "✓ All done!"
+      },
     "participantList": {
       "title": "Participants ({count})",
       "noParticipants": "No participants yet",
       "showLess": "Show less",
       "showMore": "+{count} more"
     },
-    "participantStatusBadge": {
+        "notConfigured": "Hotspot image not configured",
+        "complete": "✓ All found!"
       "active": "Connected",
       "idle": "Idle",
-      "disconnected": "Disconnected",
+        "title": "Tile puzzle",
+        "missingConfig": "Tile puzzle not configured"
       "kicked": "Kicked",
       "blocked": "Blocked"
     },
@@ -7366,6 +9998,8 @@
     },
     "activeSessionShell": {
       "defaultTitle": "Active session",
+      "backToLobby": "Back to lobby",
+      "chatLabel": "Chat",
       "participant": {
         "confirmTitle": "Back to Lobby",
         "confirmDescription": "You are about to leave the session. Are you sure?",
@@ -7499,8 +10133,14 @@
         "contentWillShow": "Content will appear here when the session starts.",
         "joinSession": "Join session",
         "sessionIsActive": "Session is active. Starting in",
+        "countdownSeconds": "{seconds}s",
         "joinNow": "Join now",
         "notYet": "Not yet",
+        "inlineJoinTitle": "Join to see the game",
+        "inlineJoinDescription": "You are not connected on this device/tab yet.",
+        "reconnectTitle": "Unable to connect",
+        "reconnectDescription": "Your connection seems invalid on this device. Try connecting again.",
+        "reconnectAction": "Connect again",
         "leaveSession": "Leave session",
         "activeSession": "Active session"
       },
@@ -7660,7 +10300,8 @@
         "resume": "Resume",
         "end": "End",
         "countdownMessage": "Next segment starts in",
-        "countdownTooltip": "Show countdown for participants"
+        "countdownTooltip": "Show countdown for participants",
+        "countdownSeconds": "{seconds}s"
       },
       "timer": {
         "title": "Timer"
@@ -7678,6 +10319,7 @@
         "channelPlaceholder": "Channel (e.g. READY)",
         "messagePlaceholder": "Message",
         "send": "Send",
+        "sendError": "Could not send signal",
         "noSignals": "No signals yet."
       },
       "chat": {
@@ -7715,8 +10357,8 @@
         "hint": "Outcomes can be shown to participants as a summary/debrief at the end of the session."
       },
       "status": {
-        "revealed": "revealed",
-        "hidden": "hidden"
+        "revealed": "Revealed",
+        "hidden": "Hidden"
       },
       "actions": {
         "hide": "Hide",
@@ -7782,6 +10424,15 @@
       }
     },
     "leaderScriptPanel": {
+      "title": "Leader script",
+      "gameStep": "{title} · Step {step}",
+      "noText": "No text",
+      "noScript": "No script",
+      "phases": {
+        "intro": "Intro",
+        "main": "Main",
+        "outro": "Outro"
+      },
       "translationLabel": "Translation ({language})",
       "noContent": "No content in this phase"
     },
@@ -7806,7 +10457,7 @@
       "resultSuccess": "{operation}: {count} succeeded",
       "resultWithErrors": "{operation}: {count} succeeded, {failed} failed",
       "confirmTitle": "Confirm operation",
-      "confirmDescription": "Are you sure you want to {operation} {count} artifact{plural}?",
+      "confirmDescription": "Are you sure you want to {operation} {count, plural, one {# artifact} other {# artifacts}}?",
       "confirmReset": "This will reset all selected puzzles to their original state.",
       "confirmSolve": "This will mark all selected as solved without players solving them.",
       "cancel": "Cancel",
@@ -7825,6 +10476,19 @@
         "puzzles": "All puzzles",
         "content": "All content"
       },
+      "types": {
+        "keypad": "Keypad",
+        "riddle": "Riddle",
+        "cipher": "Cipher",
+        "tile_puzzle": "Tile puzzle",
+        "logic_grid": "Logic grid",
+        "hotspot": "Hotspot",
+        "card": "Card",
+        "document": "Document",
+        "image": "Image",
+        "audio": "Audio",
+        "unknown": "Other ({type})"
+      },
       "operations": {
         "reveal": "Show",
         "hide": "Hide",
@@ -7832,6 +10496,14 @@
         "lock": "Lock",
         "unlock": "Unlock",
         "solve": "Mark as solved"
+      },
+      "operationVerbs": {
+        "reveal": "show",
+        "hide": "hide",
+        "reset": "reset",
+        "lock": "lock",
+        "unlock": "unlock",
+        "solve": "mark as solved"
       }
     },
     "propConfirmationManager": {
@@ -7842,15 +10514,91 @@
       }
     },
     "readinessIndicator": {
+      "title": "Session readiness",
       "criticalIssues": "Must be fixed before starting:",
       "warnings": "Recommended to fix:",
       "readyToStart": "Ready to start session",
-      "cannotStart": "Cannot start - fix critical issues"
+      "cannotStart": "Cannot start - fix critical issues",
+      "categories": {
+        "participants": "Participants",
+        "content": "Content",
+        "triggers": "Triggers",
+        "artifacts": "Artifacts",
+        "signals": "Signals",
+        "configuration": "Configuration"
+      },
+      "labels": {
+        "ready": "Ready",
+        "readyToStart": "Ready to start",
+        "almostReady": "Almost ready",
+        "preparing": "Preparing",
+        "notReady": "Not ready"
+      },
+      "summary": {
+        "ready": "Session is ready to start!",
+        "canStart": "{count} thing(s) to improve, but you can start.",
+        "blocked": "{count} critical issue(s) must be resolved before start."
+      },
+      "checks": {
+        "minParticipants": {
+          "name": "Minimum participants",
+          "pass": "{count} participants connected",
+          "fail": "Need at least {min} participants"
+        },
+        "rolesAssigned": {
+          "name": "Roles assigned",
+          "pass": "All roles assigned",
+          "partial": "{assigned}/{total} roles assigned"
+        },
+        "hasSteps": {
+          "name": "Steps defined",
+          "pass": "{count} steps defined",
+          "fail": "No steps in game"
+        },
+        "leaderScript": {
+          "name": "Leader script",
+          "pass": "Leader script available",
+          "skip": "No leader script (optional)"
+        },
+        "triggersArmed": {
+          "name": "Triggers armed",
+          "status": "{armed}/{total} triggers ready"
+        },
+        "triggersErrors": {
+          "name": "Trigger errors",
+          "warning": "{count} trigger(s) have errors"
+        },
+        "artifactsConfigured": {
+          "name": "Artifacts configured",
+          "status": "{configured}/{total} artifacts ready"
+        },
+        "signalPresets": {
+          "name": "Signal presets",
+          "pass": "{count} presets configured",
+          "skip": "No signal presets (optional)"
+        },
+        "timebankConfig": {
+          "name": "Time bank",
+          "pass": "Time bank configured",
+          "skip": "No time bank (optional)"
+        },
+        "joinCode": {
+          "name": "Join code",
+          "pass": "Join code generated",
+          "fail": "No join code"
+        },
+        "sessionName": {
+          "name": "Session name",
+          "pass": "Session name: {name}",
+          "skip": "No name (optional)"
+        }
+      }
     },
     "sessionTimeline": {
       "title": "Session Timeline",
       "description": "{count} events · {steps} steps",
       "listButton": "List",
+      "liveLabel": "LIVE",
       "stepLabel": "Step {number}",
       "showingRecent": "Showing last {maxItems} of {total} events",
       "solved": "{count} solved",
@@ -7885,6 +10633,7 @@
       "description": "Test which signals your device supports",
       "signalsLabel": "Signals",
       "availableCount": "{count}/5 available",
+      "availableCountShort": "{count}/5",
       "testAll": "Test all",
       "testing": "Testing...",
       "status": {
@@ -7957,6 +10706,10 @@
       "refresh": "Refresh",
       "loading": "Loading…",
       "noSignals": "No signals yet.",
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
       "presets": {
         "ready": "Ready",
         "hint": "Hint",
@@ -7988,6 +10741,7 @@
       "close": "Close"
     },
     "timeBankEditor": {
+      "title": "TimeBank",
       "description": "Configure time bank and reward rules",
       "initialTime": "Initial time (sec)",
       "minimum": "Minimum",
@@ -8020,6 +10774,7 @@
       "maxFires": "Max times (0 = unlimited)",
       "conditionOptional": "Condition (optional)",
       "done": "Done",
+      "maxFiresBadge": "max {count}×",
       "all": "All",
       "triggers": {
         "artifact_solved": "Artifact solved",

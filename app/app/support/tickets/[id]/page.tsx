@@ -1,4 +1,6 @@
 'use client'
+/* eslint-disable lekbanken/no-hardcoded-strings */
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'

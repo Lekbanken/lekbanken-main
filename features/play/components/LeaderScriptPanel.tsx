@@ -147,16 +147,11 @@ function LanguageSelector({
 interface PhaseNavigationProps {
   currentPhase: 'intro' | 'main' | 'outro';
   onPhaseChange: (phase: 'intro' | 'main' | 'outro') => void;
-  language: SupportedLanguage;
 }
 
-function PhaseNavigation({ currentPhase, onPhaseChange, language }: PhaseNavigationProps) {
+function PhaseNavigation({ currentPhase, onPhaseChange }: PhaseNavigationProps) {
+  const t = useTranslations('play.leaderScriptPanel');
   const phases: ('intro' | 'main' | 'outro')[] = ['intro', 'main', 'outro'];
-  const labels: Record<string, Record<string, string>> = {
-    intro: { sv: 'Intro', en: 'Intro' },
-    main: { sv: 'Huvud', en: 'Main' },
-    outro: { sv: 'Avslut', en: 'Outro' },
-  };
 
   return (
     <div className="flex gap-1">
@@ -168,7 +163,7 @@ function PhaseNavigation({ currentPhase, onPhaseChange, language }: PhaseNavigat
           onClick={() => onPhaseChange(phase)}
           className="flex-1"
         >
-          {labels[phase][language] ?? labels[phase]['sv']}
+          {t(`phases.${phase}` as Parameters<typeof t>[0])}
         </Button>
       ))}
     </div>
@@ -184,9 +179,10 @@ interface ScriptBlockProps {
   text: string;
   language: SupportedLanguage;
   compact?: boolean;
+  t: ReturnType<typeof useTranslations<'play.leaderScriptPanel'>>;
 }
 
-function ScriptBlock({ block, text, language, compact }: ScriptBlockProps) {
+function ScriptBlock({ block, text, language, compact, t }: ScriptBlockProps) {
   const icon = BLOCK_TYPE_ICONS[block.type];
   const style = BLOCK_TYPE_STYLES[block.type];
   const typeLabel = BLOCK_TYPE_LABELS[block.type][language] ?? BLOCK_TYPE_LABELS[block.type]['sv'];
@@ -216,7 +212,7 @@ function ScriptBlock({ block, text, language, compact }: ScriptBlockProps) {
       {/* Content */}
       <div className={block.type === 'heading' ? 'flex items-center gap-2' : ''}>
         {block.type === 'heading' && icon}
-        <span>{text || <span className="text-muted-foreground italic">Ingen text</span>}</span>
+        <span>{text || <span className="text-muted-foreground italic">{t('noText')}</span>}</span>
       </div>
     </div>
   );
@@ -272,6 +268,7 @@ export function LeaderScriptPanel({
   showTranslationStatus = true,
   maxHeight = 400,
 }: LeaderScriptPanelProps) {
+  const t = useTranslations('play.leaderScriptPanel');
   const [isExpanded, setIsExpanded] = useState(true);
 
   const {
@@ -297,7 +294,7 @@ export function LeaderScriptPanel({
             <CollapsibleTrigger asChild>
               <button className="flex items-center gap-2 hover:opacity-80">
                 <BookOpenIcon className="h-5 w-5" />
-                <CardTitle className="text-base">Spelledarens manus</CardTitle>
+                <CardTitle className="text-base">{t('title')}</CardTitle>
                 {isExpanded ? (
                   <ChevronUpIcon className="h-4 w-4 text-muted-foreground" />
                 ) : (
@@ -314,7 +311,7 @@ export function LeaderScriptPanel({
           </div>
           {!compact && (
             <CardDescription>
-              {gameTitle} · Steg {currentStepIndex + 1}
+              {t('gameStep', { title: gameTitle, step: currentStepIndex + 1 })}
             </CardDescription>
           )}
         </CardHeader>
@@ -351,7 +348,6 @@ export function LeaderScriptPanel({
             <PhaseNavigation
               currentPhase={currentPhase}
               onPhaseChange={goToPhase}
-              language={language}
             />
 
             {/* Phase title */}
@@ -370,6 +366,7 @@ export function LeaderScriptPanel({
                       text={content.getBlockText(block)}
                       language={language}
                       compact={compact}
+                      t={t}
                     />
                   ))
                 ) : (
@@ -405,6 +402,7 @@ export function CompactScriptLine({
   scriptHook,
   className,
 }: CompactScriptLineProps) {
+  const t = useTranslations('play.leaderScriptPanel');
   const { content, currentPhase } = scriptHook;
   
   // Get first non-empty block
@@ -415,10 +413,10 @@ export function CompactScriptLine({
     <div className={`flex items-center gap-2 text-sm ${className}`}>
       <BookOpenIcon className="h-4 w-4 text-muted-foreground flex-shrink-0" />
       <div className="flex-1 truncate">
-        {text || <span className="text-muted-foreground">Inget manus</span>}
+        {text || <span className="text-muted-foreground">{t('noScript')}</span>}
       </div>
       <Badge variant="outline" className="flex-shrink-0">
-        {currentPhase}
+        {t(`phases.${currentPhase}` as Parameters<typeof t>[0])}
       </Badge>
     </div>
   );

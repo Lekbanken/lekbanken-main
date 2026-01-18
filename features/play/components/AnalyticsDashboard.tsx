@@ -429,15 +429,16 @@ interface ExportButtonsProps {
 }
 
 function ExportButtons({ onExportJSON, onExportCSV }: ExportButtonsProps) {
+  const t = useTranslations('play.cockpit.analytics');
   return (
     <div className="flex items-center gap-2">
       <Button variant="outline" size="sm" onClick={onExportJSON}>
         <DocumentTextIcon className="h-4 w-4 mr-1" />
-        JSON
+        {t('export.json')}
       </Button>
       <Button variant="outline" size="sm" onClick={onExportCSV}>
         <TableCellsIcon className="h-4 w-4 mr-1" />
-        CSV
+        {t('export.csv')}
       </Button>
     </div>
   );
@@ -481,8 +482,8 @@ export function AnalyticsDashboard({
 
   const tabs = [
     { id: 'overview', label: t('tabs.overview') },
-    { id: 'steps', label: 'Steg' },
-    { id: 'puzzles', label: 'Pussel' },
+    { id: 'steps', label: t('tabs.steps') },
+    { id: 'puzzles', label: t('tabs.puzzles') },
   ];
 
   return (
@@ -492,11 +493,11 @@ export function AnalyticsDashboard({
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <ChartBarIcon className="h-5 w-5" />
-              Analytics Dashboard
+              {t('title')}
             </CardTitle>
             {!compact && (
               <CardDescription>
-                Session-prestanda och statistik
+                {t('description')}
               </CardDescription>
             )}
           </div>

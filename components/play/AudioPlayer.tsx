@@ -113,12 +113,12 @@ export function AudioPlayer({
           onPlay?.();
         })
         .catch((err) => {
-          const errorMsg = err instanceof Error ? err.message : 'Could not play audio';
+          const errorMsg = err instanceof Error ? err.message : t('playError');
           setError(errorMsg);
           onError?.(errorMsg);
         });
     }
-  }, [disabled, onPlay, onError, updateState]);
+  }, [disabled, onPlay, onError, updateState, t]);
 
   const handlePause = useCallback(() => {
     if (audioRef.current) {
@@ -230,7 +230,7 @@ export function AudioPlayer({
             'disabled:opacity-50 disabled:cursor-not-allowed',
             styles.button
           )}
-          aria-label={state.isPlaying ? 'Pausa' : 'Spela'}
+          aria-label={state.isPlaying ? t('pauseLabel') : t('playLabel')}
         >
           {state.isPlaying ? (
             <PauseIcon className={styles.icon} />

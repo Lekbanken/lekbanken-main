@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
@@ -21,6 +22,7 @@ interface DateRange {
 }
 
 export default function AnalyticsPage() {
+  const t = useTranslations('admin.analyticsDashboard');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -89,8 +91,8 @@ export default function AnalyticsPage() {
     <div className="min-h-screen bg-background p-4">
       <div className="max-w-6xl mx-auto pt-20">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-4">Analytics</h1>
-          <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
+          <h1 className="text-3xl font-bold text-foreground mb-4">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('requiresAdmin')}</p>
         </div>
       </div>
     </div>
@@ -101,16 +103,16 @@ export default function AnalyticsPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <ChartBarIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold text-foreground">Analytics Dashboard</h1>
+            <h1 className="text-4xl font-bold text-foreground">{t('dashboardTitle')}</h1>
           </div>
-          <p className="text-muted-foreground">Spåra användarbeteende, engagement och prestanda</p>
+          <p className="text-muted-foreground">{t('subtitle')}</p>
         </div>
 
         {/* Date Range Filter */}
         <Card className="mb-6">
           <CardContent className="p-4 flex gap-4 items-end">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Från</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t('dateRange.from')}</label>
               <input
                 type="date"
                 value={dateRange.startDate}
@@ -119,7 +121,7 @@ export default function AnalyticsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">Till</label>
+              <label className="block text-sm font-medium text-foreground mb-2">{t('dateRange.to')}</label>
               <input
                 type="date"
                 value={dateRange.endDate}
@@ -143,10 +145,10 @@ export default function AnalyticsPage() {
                     : 'text-muted-foreground hover:bg-muted'
                 }`}
               >
-                {tab === 'overview' && '📊 Överblick'}
-                {tab === 'pages' && '📄 Sidor'}
-                {tab === 'features' && '⚙️ Funktioner'}
-                {tab === 'errors' && '❌ Fel'}
+                {tab === 'overview' && t('tabs.overview')}
+                {tab === 'pages' && t('tabs.pages')}
+                {tab === 'features' && t('tabs.features')}
+                {tab === 'errors' && t('tabs.errors')}
               </button>
             ))}
           </CardContent>
@@ -154,7 +156,7 @@ export default function AnalyticsPage() {
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Laddar analytics...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         ) : (
           <>
@@ -166,12 +168,12 @@ export default function AnalyticsPage() {
                   {/* Page Views */}
                   <Card>
                     <CardContent className="p-6">
-                      <p className="text-muted-foreground text-sm font-medium mb-1">Sidvisningar</p>
+                      <p className="text-muted-foreground text-sm font-medium mb-1">{t('overview.pageViews')}</p>
                       <p className="text-3xl font-bold text-foreground">
                         {pageViewStats?.total.toLocaleString() || '-'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {pageViewStats?.unique} unika besökare
+                        {t('overview.uniqueVisitors', { count: pageViewStats?.unique ?? 0 })}
                       </p>
                     </CardContent>
                   </Card>
@@ -179,12 +181,12 @@ export default function AnalyticsPage() {
                   {/* Sessions */}
                   <Card>
                     <CardContent className="p-6">
-                      <p className="text-muted-foreground text-sm font-medium mb-1">Sessioner</p>
+                      <p className="text-muted-foreground text-sm font-medium mb-1">{t('overview.sessions')}</p>
                       <p className="text-3xl font-bold text-foreground">
                         {sessionStats?.totalSessions.toLocaleString() || '-'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {sessionStats?.completedSessions} slutförda
+                        {t('overview.completedSessions', { count: sessionStats?.completedSessions ?? 0 })}
                       </p>
                     </CardContent>
                   </Card>
@@ -192,23 +194,25 @@ export default function AnalyticsPage() {
                   {/* Avg Session Duration */}
                   <Card>
                     <CardContent className="p-6">
-                      <p className="text-muted-foreground text-sm font-medium mb-1">Genomsnittlig Varaktighet</p>
+                      <p className="text-muted-foreground text-sm font-medium mb-1">{t('overview.avgDuration')}</p>
                       <p className="text-3xl font-bold text-foreground">
-                        {sessionStats?.avgDuration ? `${Math.round(sessionStats.avgDuration / 60)}m` : '-'}
+                        {sessionStats?.avgDuration
+                          ? t('overview.avgDurationValue', { minutes: Math.round(sessionStats.avgDuration / 60) })
+                          : '-'}
                       </p>
-                      <p className="text-xs text-muted-foreground mt-2">per session</p>
+                      <p className="text-xs text-muted-foreground mt-2">{t('overview.perSession')}</p>
                     </CardContent>
                   </Card>
 
                   {/* Errors */}
                   <Card>
                     <CardContent className="p-6">
-                      <p className="text-muted-foreground text-sm font-medium mb-1">Fel Rapporterade</p>
+                      <p className="text-muted-foreground text-sm font-medium mb-1">{t('overview.reportedErrors')}</p>
                       <p className="text-3xl font-bold text-red-600">
                         {errorStats?.totalErrors || '-'}
                       </p>
                       <p className="text-xs text-muted-foreground mt-2">
-                        {errorStats?.unresolvedCount} olösta
+                        {t('overview.unresolvedErrors', { count: errorStats?.unresolvedCount ?? 0 })}
                       </p>
                     </CardContent>
                   </Card>
@@ -219,18 +223,18 @@ export default function AnalyticsPage() {
                   {/* Top Pages */}
                   <Card>
                     <CardHeader className="bg-primary p-4">
-                      <CardTitle className="text-white">Populäraste Sidor</CardTitle>
+                      <CardTitle className="text-white">{t('overview.topPages')}</CardTitle>
                     </CardHeader>
                     <div className="divide-y divide-border">
                       {topPages.length === 0 ? (
-                        <p className="p-4 text-muted-foreground text-sm">Ingen data tillgänglig</p>
+                        <p className="p-4 text-muted-foreground text-sm">{t('overview.noData')}</p>
                       ) : (
                         topPages.map((page, idx) => (
                           <div key={idx} className="p-4 hover:bg-muted">
                             <p className="font-medium text-foreground truncate">{page.path}</p>
                             <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                              <span>{page.views.toLocaleString()} visningar</span>
-                              <span>Ø {page.avgDuration}s</span>
+                              <span>{t('overview.views', { count: page.views.toLocaleString() })}</span>
+                              <span>{t('overview.avgSeconds', { seconds: page.avgDuration })}</span>
                             </div>
                           </div>
                         ))
@@ -241,19 +245,19 @@ export default function AnalyticsPage() {
                   {/* Top Features */}
                   <Card>
                     <CardHeader className="bg-purple-600 p-4">
-                      <CardTitle className="text-white">Mest Använda Funktioner</CardTitle>
+                      <CardTitle className="text-white">{t('overview.topFeatures')}</CardTitle>
                     </CardHeader>
                     <div className="divide-y divide-border">
                       {topFeatures.length === 0 ? (
-                        <p className="p-4 text-muted-foreground text-sm">Ingen data tillgänglig</p>
+                        <p className="p-4 text-muted-foreground text-sm">{t('overview.noData')}</p>
                       ) : (
                         topFeatures.map((feature, idx) => (
                           <div key={idx} className="p-4 hover:bg-muted">
                             <p className="font-medium text-foreground">{feature.name}</p>
                             <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                              <span>{feature.usage.toLocaleString()} användningar</span>
+                              <span>{t('overview.usageCount', { count: feature.usage.toLocaleString() })}</span>
                               <span className={feature.successRate === 100 ? 'text-green-600' : 'text-yellow-600'}>
-                                {feature.successRate}% framgång
+                                {t('overview.successRate', { rate: feature.successRate })}
                               </span>
                             </div>
                           </div>
@@ -269,22 +273,22 @@ export default function AnalyticsPage() {
             {activeTab === 'pages' && (
               <Card>
                 <CardHeader className="bg-primary p-4">
-                  <CardTitle className="text-white">Detaljerade Sidstatistik</CardTitle>
+                  <CardTitle className="text-white">{t('pages.title')}</CardTitle>
                 </CardHeader>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-muted border-b border-border">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Sida</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Visningar</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Genomsnittlig Varaktighet</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">{t('pages.columns.page')}</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">{t('pages.columns.views')}</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">{t('pages.columns.avgDuration')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {topPages.length === 0 ? (
                         <tr>
                           <td colSpan={3} className="px-6 py-4 text-center text-muted-foreground">
-                            Ingen data tillgänglig
+                            {t('pages.noData')}
                           </td>
                         </tr>
                       ) : (
@@ -292,7 +296,7 @@ export default function AnalyticsPage() {
                           <tr key={idx} className="hover:bg-muted">
                             <td className="px-6 py-4 font-medium text-foreground truncate">{page.path}</td>
                             <td className="px-6 py-4 text-right text-muted-foreground">{page.views.toLocaleString()}</td>
-                            <td className="px-6 py-4 text-right text-muted-foreground">{page.avgDuration}s</td>
+                            <td className="px-6 py-4 text-right text-muted-foreground">{t('pages.avgDurationValue', { seconds: page.avgDuration })}</td>
                           </tr>
                         ))
                       )}
@@ -307,22 +311,22 @@ export default function AnalyticsPage() {
               <div className="space-y-6">
                 <Card>
                   <CardHeader className="bg-purple-600 p-4">
-                    <CardTitle className="text-white">Funktionsadoption</CardTitle>
+                    <CardTitle className="text-white">{t('features.title')}</CardTitle>
                   </CardHeader>
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead className="bg-muted border-b border-border">
                         <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Funktion</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Användningar</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Framgångsgrad</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">{t('features.columns.feature')}</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">{t('features.columns.usage')}</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">{t('features.columns.successRate')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
                         {topFeatures.length === 0 ? (
                           <tr>
                             <td colSpan={3} className="px-6 py-4 text-center text-muted-foreground">
-                              Ingen data tillgänglig
+                              {t('features.noData')}
                             </td>
                           </tr>
                         ) : (
@@ -358,22 +362,22 @@ export default function AnalyticsPage() {
             {activeTab === 'errors' && (
               <Card>
                 <CardHeader className="bg-red-600 p-4">
-                  <CardTitle className="text-white">Fel & Problem</CardTitle>
+                  <CardTitle className="text-white">{t('errors.title')}</CardTitle>
                 </CardHeader>
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="bg-muted border-b border-border">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Typ</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">Meddelande</th>
-                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">Förekomster</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">{t('errors.columns.type')}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase">{t('errors.columns.message')}</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-muted-foreground uppercase">{t('errors.columns.count')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border">
                       {topErrors.length === 0 ? (
                         <tr>
                           <td colSpan={3} className="px-6 py-4 text-center text-muted-foreground">
-                            Inga fel rapporterade
+                            {t('errors.noData')}
                           </td>
                         </tr>
                       ) : (

@@ -173,7 +173,7 @@ export function RoleCard({
             </span>
             <div>
               <Badge variant="default" className={`mb-1 ${colors.bg} ${colors.text} border ${colors.border}`}>
-                Din roll
+                {t('yourRole')}
               </Badge>
               <h2 className={`text-xl font-bold ${colors.text}`}>{role.name}</h2>
             </div>
@@ -208,7 +208,7 @@ export function RoleCard({
           <div className="mb-2 flex items-center gap-2">
             <SparklesIcon className="h-4 w-4 text-primary" />
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Dina instruktioner
+              {t('instructionsHeading')}
             </h3>
           </div>
           <div className="rounded-xl bg-muted/50 p-4">
@@ -225,7 +225,7 @@ export function RoleCard({
           <div className="mb-2 flex items-center gap-2">
             <LightBulbIcon className="h-4 w-4 text-yellow-500" />
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Tips
+              {t('hintsHeading')}
             </h3>
           </div>
           

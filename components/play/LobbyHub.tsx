@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { LobbyState, SectionReadiness } from '@/types/lobby';
 import { calculateOverallReadiness, countParticipantsWithoutRoles, countContentIssues } from '@/types/lobby';
@@ -159,6 +160,7 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
     const participantsWithoutRoles = countParticipantsWithoutRoles(state.participants);
     const contentIssues = countContentIssues(state.phases);
     const overallReadiness = calculateOverallReadiness(state.readiness);
+    const t = useTranslations('play.lobbyHub');
 
     // Get section readiness
     const getReadiness = (section: string): SectionReadiness | undefined => {
@@ -166,6 +168,13 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
     };
 
     const canStart = overallReadiness !== 'error' && state.participants.length > 0;
+
+    const statusLabels: Record<LobbyState['sessionStatus'], string> = {
+      draft: t('status.draft'),
+      lobby: t('status.lobby'),
+      active: t('status.active'),
+      completed: t('status.completed'),
+    };
 
     return (
       <div ref={ref} className={cn('max-w-xl mx-auto space-y-6', className)}>
@@ -176,7 +185,7 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           </h1>
           <div className="flex items-center justify-center gap-2 mt-2">
             <Badge variant="secondary" size="sm">
-              {state.sessionStatus === 'lobby' ? 'Lobby' : state.sessionStatus}
+              {statusLabels[state.sessionStatus]}
             </Badge>
             <ReadinessBadge 
               level={overallReadiness} 
@@ -192,8 +201,8 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {/* Participants */}
           <LobbySectionCard
             icon={<UsersIcon className="h-5 w-5" />}
-            title="Participants"
-            description="View, invite, and manage participants"
+            title={t('sections.participants.title')}
+            description={t('sections.participants.description')}
             badge={
               <Badge variant="secondary" size="sm">
                 {state.participants.length}/{state.settings.maxParticipants}
@@ -206,16 +215,16 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {/* Roles & Secrets */}
           <LobbySectionCard
             icon={<SparklesIcon className="h-5 w-5" />}
-            title="Roles &amp; Secrets"
-            description="Assign characters and hidden information"
+            title={t('sections.roles.title')}
+            description={t('sections.roles.description')}
             badge={
               participantsWithoutRoles > 0 ? (
                 <Badge variant="warning" size="sm">
-                  {participantsWithoutRoles} unassigned
+                  {t('badges.unassigned', { count: participantsWithoutRoles })}
                 </Badge>
               ) : state.roles.length > 0 ? (
                 <Badge variant="success" size="sm">
-                  All assigned
+                  {t('badges.allAssigned')}
                 </Badge>
               ) : undefined
             }
@@ -226,16 +235,16 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {/* Content Preview */}
           <LobbySectionCard
             icon={<DocumentTextIcon className="h-5 w-5" />}
-            title="Content Preview"
-            description="Steps, phases, and artifacts"
+            title={t('sections.content.title')}
+            description={t('sections.content.description')}
             badge={
               contentIssues > 0 ? (
                 <Badge variant="warning" size="sm">
-                  {contentIssues} issues
+                  {t('badges.contentIssues', { count: contentIssues })}
                 </Badge>
               ) : (
                 <Badge variant="success" size="sm">
-                  Ready
+                  {t('badges.ready')}
                 </Badge>
               )
             }
@@ -246,11 +255,11 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {/* Triggers & Automation */}
           <LobbySectionCard
             icon={<BoltIcon className="h-5 w-5" />}
-            title="Triggers &amp; Automation"
-            description="Configure game automation rules"
+            title={t('sections.triggers.title')}
+            description={t('sections.triggers.description')}
             badge={
               <Badge variant="secondary" size="sm">
-                {state.triggerCount} triggers
+                {t('badges.triggers', { count: state.triggerCount })}
               </Badge>
             }
             readiness={getReadiness('triggers')}
@@ -260,8 +269,8 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {/* Session Settings */}
           <LobbySectionCard
             icon={<Cog6ToothIcon className="h-5 w-5" />}
-            title="Session Settings"
-            description="Timing, permissions, and advanced options"
+            title={t('sections.settings.title')}
+            description={t('sections.settings.description')}
             readiness={getReadiness('settings')}
             onClick={onSettingsClick}
           />
@@ -282,12 +291,12 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Starting...
+                {t('actions.starting')}
               </>
             ) : (
               <>
                 <PlayIcon className="h-6 w-6 mr-2" />
-                Start Session
+                {t('actions.start')}
               </>
             )}
           </Button>
@@ -295,8 +304,8 @@ export const LobbyHub = forwardRef<HTMLDivElement, LobbyHubProps>(
           {!canStart && (
             <p className="text-center text-sm text-error mt-2">
               {state.participants.length === 0 
-                ? 'Add at least one participant to start'
-                : 'Resolve errors before starting'
+                ? t('hints.addParticipant')
+                : t('hints.resolveErrors')
               }
             </p>
           )}

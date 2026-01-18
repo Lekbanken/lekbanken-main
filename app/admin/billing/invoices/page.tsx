@@ -318,7 +318,7 @@ export default function InvoicesPage() {
 
   const columns = [
     {
-      header: 'Faktura',
+      header: t('table.invoice'),
       accessor: (row: Invoice) => (
         <div>
           <p className="font-medium text-foreground">{row.name}</p>
@@ -327,7 +327,7 @@ export default function InvoicesPage() {
       ),
     },
     {
-      header: 'Status',
+      header: t('table.status'),
       accessor: (row: Invoice) => {
         const config = statusConfig[row.status];
         return (
@@ -339,7 +339,7 @@ export default function InvoicesPage() {
       },
     },
     {
-      header: 'Belopp',
+      header: t('table.amount'),
       accessor: (row: Invoice) => (
         <span className="font-medium">
           {(row.amount_total ?? 0).toLocaleString('sv-SE')} {row.currency}
@@ -349,7 +349,7 @@ export default function InvoicesPage() {
       hideBelow: 'sm' as const,
     },
     {
-      header: 'Förfallodatum',
+      header: t('table.dueDate'),
       accessor: (row: Invoice) => {
         const isOverdue = row.status === 'overdue';
         return (
@@ -383,7 +383,7 @@ export default function InvoicesPage() {
               handleSelectInvoicePayments(row.id);
             }}
           >
-            Betalningar
+            {t('table.payments')}
           </Button>
         </div>
       ),
@@ -396,7 +396,7 @@ export default function InvoicesPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     );
@@ -530,7 +530,7 @@ export default function InvoicesPage() {
                     <p className="font-medium">{p.name}</p>
                     <p className="text-xs text-muted-foreground">{p.amount.toLocaleString('sv-SE')} {p.currency} · {p.provider || t('unknownProvider')}</p>
                     {p.transaction_reference && (
-                      <p className="text-xs text-muted-foreground">Ref: {p.transaction_reference}</p>
+                      <p className="text-xs text-muted-foreground">{t('paymentRef', { reference: p.transaction_reference })}</p>
                     )}
                     {p.paid_at && (
                       <p className="text-xs text-muted-foreground">{t('paidAt', { date: new Date(p.paid_at).toLocaleString('sv-SE') })}</p>
@@ -576,7 +576,7 @@ export default function InvoicesPage() {
                   type="number"
                   value={newPayment.amount}
                   onChange={(e) => setNewPayment((prev) => ({ ...prev, amount: e.target.value }))}
-                  placeholder="499.00"
+                  placeholder={t('form.amountPlaceholder')}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 />
               </div>
@@ -596,7 +596,7 @@ export default function InvoicesPage() {
                   id="payment-ref"
                   value={newPayment.reference}
                   onChange={(e) => setNewPayment((prev) => ({ ...prev, reference: e.target.value }))}
-                  placeholder="Txn ID"
+                  placeholder={t('form.referencePlaceholder')}
                   className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
                 />
               </div>

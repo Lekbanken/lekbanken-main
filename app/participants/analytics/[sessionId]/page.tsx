@@ -7,8 +7,9 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { SessionActions } from '@/features/participants/components/SessionActions';
 
 interface SessionAnalytics {
@@ -76,12 +77,15 @@ interface SessionAnalytics {
 export default function SessionAnalyticsPage() {
   const params = useParams();
   const router = useRouter();
+  const t = useTranslations('sessionAnalytics');
+  const locale = useLocale();
   const sessionId = params.sessionId as string;
 
   const [analytics, setAnalytics] = useState<SessionAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const dateFormatter = useMemo(() => new Intl.DateTimeFormat(locale), [locale]);
 
   const fetchAnalytics = async () => {
     setLoading(true);
@@ -92,12 +96,12 @@ export default function SessionAnalyticsPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to fetch analytics');
+        throw new Error(data.error || t('errors.fetchFailed'));
       }
 
       setAnalytics(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : t('errors.unknown'));
     } finally {
       setLoading(false);
     }
@@ -115,7 +119,7 @@ export default function SessionAnalyticsPage() {
       const response = await fetch(`/api/participants/sessions/${sessionId}/export?type=${type}`);
 
       if (!response.ok) {
-        throw new Error('Export failed');
+        throw new Error(t('export.errors.failed'));
       }
 
       // Download the CSV file
@@ -129,7 +133,7 @@ export default function SessionAnalyticsPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch {
-      alert('Export misslyckades');
+      alert(t('export.errors.failed'));
     } finally {
       setExporting(false);
     }
@@ -140,9 +144,33 @@ export default function SessionAnalyticsPage() {
     const minutes = Math.floor((seconds % 3600) / 60);
 
     if (hours > 0) {
-      return `${hours}h ${minutes}m`;
+      return t('duration.hoursMinutes', { hours, minutes });
     }
-    return `${minutes}m`;
+    return t('duration.minutes', { minutes });
+  };
+
+  const getRoleLabel = (role: string) => {
+    const labels: Record<string, string> = {
+      observer: t('participants.roles.observer'),
+      player: t('participants.roles.player'),
+      team_lead: t('participants.roles.teamLead'),
+      facilitator: t('participants.roles.facilitator'),
+    };
+
+    return labels[role] || role;
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels: Record<string, string> = {
+      pending: t('participants.status.pending'),
+      active: t('participants.status.active'),
+      idle: t('participants.status.idle'),
+      disconnected: t('participants.status.disconnected'),
+      kicked: t('participants.status.kicked'),
+      blocked: t('participants.status.blocked'),
+    };
+
+    return labels[status] || status;
   };
 
   if (loading) {
@@ -150,7 +178,7 @@ export default function SessionAnalyticsPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Laddar analytics...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -160,12 +188,12 @@ export default function SessionAnalyticsPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Session hittades inte'}</p>
+          <p className="text-red-600 mb-4">{error || t('errors.notFound')}</p>
           <button
             onClick={() => router.push('/participants/history')}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Tillbaka till Historik
+            {t('actions.backToHistory')}
           </button>
         </div>
       </div>
@@ -181,16 +209,17 @@ export default function SessionAnalyticsPage() {
             onClick={() => router.push('/participants/history')}
             className="mb-4 text-blue-600 hover:text-blue-700"
           >
-            ← Tillbaka till Historik
+            {t('actions.backToHistoryArrow')}
           </button>
 
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Session Analytics
+                {t('title')}
               </h1>
               <p className="text-gray-600 mt-1">
-                Kod: <span className="font-mono font-semibold">{analytics.session.session_code}</span>
+                {t('sessionCodeLabel')}{' '}
+                <span className="font-mono font-semibold">{analytics.session.session_code}</span>
               </p>
             </div>
 
@@ -201,21 +230,21 @@ export default function SessionAnalyticsPage() {
                 disabled={exporting}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400"
               >
-                📊 Exportera Deltagare
+                {t('export.participants')}
               </button>
               <button
                 onClick={() => handleExport('activity')}
                 disabled={exporting}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400"
               >
-                📋 Exportera Aktivitet
+                {t('export.activity')}
               </button>
               <button
                 onClick={() => handleExport('achievements')}
                 disabled={exporting}
                 className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:bg-gray-400"
               >
-                🏆 Exportera Utmärkelser
+                {t('export.achievements')}
               </button>
             </div>
           </div>
@@ -234,19 +263,19 @@ export default function SessionAnalyticsPage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600">Totalt Deltagare</p>
+            <p className="text-sm text-gray-600">{t('stats.totalParticipants')}</p>
             <p className="text-3xl font-bold text-gray-900">{analytics.stats.total_participants}</p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600">Totalt Poäng</p>
-            <p className="text-3xl font-bold text-blue-600">{analytics.stats.total_score.toLocaleString()}</p>
+            <p className="text-sm text-gray-600">{t('stats.totalScore')}</p>
+            <p className="text-3xl font-bold text-blue-600">{analytics.stats.total_score.toLocaleString(locale)}</p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600">Utmärkelser</p>
+            <p className="text-sm text-gray-600">{t('stats.achievements')}</p>
             <p className="text-3xl font-bold text-purple-600">{analytics.stats.total_achievements}</p>
           </div>
           <div className="bg-white rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600">Genomsnittlig Tid</p>
+            <p className="text-sm text-gray-600">{t('stats.averageTime')}</p>
             <p className="text-3xl font-bold text-green-600">
               {formatDuration(analytics.stats.average_time_per_participant)}
             </p>
@@ -257,9 +286,9 @@ export default function SessionAnalyticsPage() {
         <div className="grid grid-cols-2 gap-6 mb-6">
           {/* Top Scorers */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Top Poängtagare</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('topScorers.title')}</h2>
             {analytics.top_scorers.length === 0 ? (
-              <p className="text-gray-500">Ingen data</p>
+              <p className="text-gray-500">{t('topScorers.empty')}</p>
             ) : (
               <div className="space-y-2">
                 {analytics.top_scorers.map((scorer, index) => (
@@ -268,7 +297,7 @@ export default function SessionAnalyticsPage() {
                       <span className="text-lg font-bold text-gray-400">#{index + 1}</span>
                       <span className="font-medium">{scorer.display_name}</span>
                     </div>
-                    <span className="text-lg font-bold text-blue-600">{scorer.total_score.toLocaleString()}</span>
+                    <span className="text-lg font-bold text-blue-600">{scorer.total_score.toLocaleString(locale)}</span>
                   </div>
                 ))}
               </div>
@@ -277,9 +306,9 @@ export default function SessionAnalyticsPage() {
 
           {/* Top Achievers */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">Flest Utmärkelser</h2>
+            <h2 className="text-xl font-semibold mb-4">{t('topAchievers.title')}</h2>
             {analytics.top_achievers.length === 0 ? (
-              <p className="text-gray-500">Ingen data</p>
+              <p className="text-gray-500">{t('topAchievers.empty')}</p>
             ) : (
               <div className="space-y-2">
                 {analytics.top_achievers.map((achiever, index) => (
@@ -298,29 +327,29 @@ export default function SessionAnalyticsPage() {
 
         {/* Participants Table */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Alla Deltagare</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('participants.title')}</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2">Namn</th>
-                  <th className="text-left p-2">Roll</th>
-                  <th className="text-left p-2">Status</th>
-                  <th className="text-right p-2">Poäng</th>
-                  <th className="text-right p-2">Utmärkelser</th>
-                  <th className="text-left p-2">Gick med</th>
+                  <th className="text-left p-2">{t('participants.table.name')}</th>
+                  <th className="text-left p-2">{t('participants.table.role')}</th>
+                  <th className="text-left p-2">{t('participants.table.status')}</th>
+                  <th className="text-right p-2">{t('participants.table.score')}</th>
+                  <th className="text-right p-2">{t('participants.table.achievements')}</th>
+                  <th className="text-left p-2">{t('participants.table.joined')}</th>
                 </tr>
               </thead>
               <tbody>
                 {analytics.participants.map((participant) => (
                   <tr key={participant.id} className="border-b hover:bg-gray-50">
                     <td className="p-2">{participant.display_name}</td>
-                    <td className="p-2 text-sm text-gray-600">{participant.role}</td>
-                    <td className="p-2 text-sm">{participant.status}</td>
-                    <td className="p-2 text-right font-semibold">{participant.total_score.toLocaleString()}</td>
+                    <td className="p-2 text-sm text-gray-600">{getRoleLabel(participant.role)}</td>
+                    <td className="p-2 text-sm">{getStatusLabel(participant.status)}</td>
+                    <td className="p-2 text-right font-semibold">{participant.total_score.toLocaleString(locale)}</td>
                     <td className="p-2 text-right font-semibold">{participant.total_achievements}</td>
                     <td className="p-2 text-sm text-gray-600">
-                      {new Date(participant.joined_at).toLocaleString('sv-SE')}
+                      {dateFormatter.format(new Date(participant.joined_at))}
                     </td>
                   </tr>
                 ))}
@@ -331,14 +360,14 @@ export default function SessionAnalyticsPage() {
 
         {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Senaste Aktivitet</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('recentActivity.title')}</h2>
           <div className="space-y-2">
             {analytics.recent_activity.slice(0, 10).map((activity, index) => (
               <div key={index} className="flex items-center justify-between p-2 border-b">
                 <div>
                   <span className="font-medium">{activity.event_type}</span>
                   <span className="text-sm text-gray-500 ml-2">
-                    {new Date(activity.created_at).toLocaleString('sv-SE')}
+                    {dateFormatter.format(new Date(activity.created_at))}
                   </span>
                 </div>
               </div>

@@ -148,7 +148,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   const loadRoles = useCallback(async () => {
     setRolesLoading(true);
@@ -179,7 +179,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     } finally {
       setRolesLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   const loadSecrets = useCallback(async () => {
     setSecretsLoading(true);
@@ -204,7 +204,7 @@ export function HostSessionWithPlayClient({ sessionId }: HostSessionWithPlayProp
     } finally {
       setSecretsLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   const loadGameStructure = useCallback(async () => {
     setOverridesLoading(true);

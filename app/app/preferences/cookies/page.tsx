@@ -52,11 +52,10 @@ export default function CookiePreferencesPage() {
   const [updatedAt, setUpdatedAt] = useState<string | null>(null)
   const [source, setSource] = useState<'banner' | 'settings' | null>(null)
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-  const [gpcEnforced, setGpcEnforced] = useState(false)
 
-  useEffect(() => {
+  const gpcEnforced = useMemo(() => {
     const signals = detectPrivacySignals()
-    setGpcEnforced(signals.gpc || signals.dnt)
+    return Boolean(signals.gpc || signals.dnt)
   }, [])
 
   useEffect(() => {

@@ -8,6 +8,7 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
@@ -42,6 +43,7 @@ export function AwardAchievementModal({
   onClose,
   onComplete,
 }: AwardAchievementModalProps) {
+  const t = useTranslations('admin.gamification.achievements.awardModal');
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   
@@ -114,25 +116,25 @@ export function AwardAchievementModal({
 
     if (mode === 'tenant') {
       if (!selectedTenant) {
-        setError('Välj en organisation');
+        setError(t('errors.selectTenant'));
         return;
       }
 
       // Fetch all user IDs for the tenant
       const result = await getTenantUserIds(selectedTenant);
       if (!result.success || !result.userIds) {
-        setError(result.error || 'Kunde inte hämta användare');
+        setError(result.error || t('errors.fetchUsers'));
         return;
       }
       userIds = result.userIds;
 
       if (userIds.length === 0) {
-        setError('Inga användare hittades i denna organisation');
+        setError(t('errors.noUsersInTenant'));
         return;
       }
     } else {
       if (selectedUsers.length === 0) {
-        setError('Välj minst en användare');
+        setError(t('errors.selectUsers'));
         return;
       }
       userIds = selectedUsers.map(u => u.id);
@@ -149,10 +151,10 @@ export function AwardAchievementModal({
         if (result.success) {
           onComplete(result.insertedCount ?? 0, result.duplicateCount ?? 0);
         } else {
-          setError(result.error || 'Kunde inte tilldela achievement');
+          setError(result.error || t('errors.awardFailed'));
         }
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -166,10 +168,10 @@ export function AwardAchievementModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <GiftIcon className="h-5 w-5 text-primary" />
-            Tilldela achievement
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Tilldela &quot;{achievement.name}&quot; till användare.
+            {t('description', { name: achievement.name })}
           </DialogDescription>
         </DialogHeader>
 
@@ -186,7 +188,7 @@ export function AwardAchievementModal({
               }`}
             >
               <BuildingOfficeIcon className="h-4 w-4" />
-              Hel organisation
+              {t('mode.tenant')}
             </button>
             <button
               type="button"
@@ -198,21 +200,21 @@ export function AwardAchievementModal({
               }`}
             >
               <UserGroupIcon className="h-4 w-4" />
-              Specifika användare
+              {t('mode.users')}
             </button>
           </div>
 
           {/* Tenant Mode */}
           {mode === 'tenant' && (
             <div className="space-y-2">
-              <Label htmlFor="tenant">Organisation</Label>
+              <Label htmlFor="tenant">{t('tenant.label')}</Label>
               <select
                 id="tenant"
                 value={selectedTenant}
                 onChange={(e) => setSelectedTenant(e.target.value)}
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
-                <option value="">Välj organisation...</option>
+                <option value="">{t('tenant.placeholder')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -221,7 +223,7 @@ export function AwardAchievementModal({
               </select>
               {selectedTenantName && (
                 <p className="text-sm text-muted-foreground">
-                  Alla användare i {selectedTenantName} kommer att få detta achievement.
+                  {t('tenant.helper', { tenantName: selectedTenantName })}
                 </p>
               )}
             </div>
@@ -230,13 +232,13 @@ export function AwardAchievementModal({
           {/* Users Mode */}
           {mode === 'users' && (
             <div className="space-y-3">
-              <Label>Sök användare</Label>
+              <Label>{t('users.searchLabel')}</Label>
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
-                  placeholder="Sök på namn eller e-post..."
+                  placeholder={t('users.searchPlaceholder')}
                   className="pl-9"
                 />
               </div>
@@ -256,7 +258,7 @@ export function AwardAchievementModal({
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">
-                          {user.full_name || 'Ingen namn'}
+                          {user.full_name || t('users.noName')}
                         </p>
                         <p className="truncate text-xs text-muted-foreground">
                           {user.email}
@@ -268,17 +270,17 @@ export function AwardAchievementModal({
               )}
 
               {isSearching && (
-                <p className="text-sm text-muted-foreground">Söker...</p>
+                <p className="text-sm text-muted-foreground">{t('users.searching')}</p>
               )}
 
               {userSearch.length >= 2 && searchResults.length === 0 && !isSearching && (
-                <p className="text-sm text-muted-foreground">Inga användare hittades</p>
+                <p className="text-sm text-muted-foreground">{t('users.noResults')}</p>
               )}
 
               {/* Selected Users */}
               {selectedUsers.length > 0 && (
                 <div className="space-y-2">
-                  <Label>Valda användare ({selectedUsers.length})</Label>
+                  <Label>{t('users.selectedLabel', { count: selectedUsers.length })}</Label>
                   <div className="flex flex-wrap gap-2">
                     {selectedUsers.map((user) => (
                       <span
@@ -303,16 +305,16 @@ export function AwardAchievementModal({
 
           {/* Message */}
           <div className="space-y-2">
-            <Label htmlFor="message">Meddelande (valfritt)</Label>
+            <Label htmlFor="message">{t('message.label')}</Label>
             <Textarea
               id="message"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="T.ex. 'Grattis till avslutad kurs!'"
+              placeholder={t('message.placeholder')}
               rows={2}
             />
             <p className="text-sm text-muted-foreground">
-              Detta meddelande kommer att visas för användaren när de får sitt achievement.
+              {t('message.helper')}
             </p>
           </div>
 
@@ -326,7 +328,7 @@ export function AwardAchievementModal({
 
         <DialogFooter>
           <Button type="button" variant="outline" onClick={onClose}>
-            Avbryt
+            {t('actions.cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
@@ -336,7 +338,7 @@ export function AwardAchievementModal({
               (mode === 'users' && selectedUsers.length === 0)
             }
           >
-            {isPending ? 'Tilldelar...' : 'Tilldela'}
+            {isPending ? t('actions.awarding') : t('actions.award')}
           </Button>
         </DialogFooter>
       </DialogContent>

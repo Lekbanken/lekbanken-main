@@ -8,6 +8,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import type { Database } from '@/types/supabase';
 
 type ParticipantRole = Database['public']['Enums']['participant_role'];
@@ -20,20 +21,6 @@ interface ParticipantRoleSelectorProps {
   onRoleChange?: (newRole: ParticipantRole) => void;
 }
 
-const roleLabels: Record<ParticipantRole, string> = {
-  observer: 'Observatör',
-  player: 'Spelare',
-  team_lead: 'Lagledare',
-  facilitator: 'Facilitator',
-};
-
-const roleDescriptions: Record<ParticipantRole, string> = {
-  observer: 'Kan titta men inte delta',
-  player: 'Aktiv deltagare',
-  team_lead: 'Kan koordinera lagaktiviteter',
-  facilitator: 'Kan assistera värd',
-};
-
 export function ParticipantRoleSelector({
   participantId,
   currentRole,
@@ -41,9 +28,24 @@ export function ParticipantRoleSelector({
   disabled = false,
   onRoleChange,
 }: ParticipantRoleSelectorProps) {
+  const t = useTranslations('participantRoleSelector');
   const [selectedRole, setSelectedRole] = useState<ParticipantRole>(currentRole);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const roleLabels: Record<ParticipantRole, string> = {
+    observer: t('roles.observer'),
+    player: t('roles.player'),
+    team_lead: t('roles.teamLead'),
+    facilitator: t('roles.facilitator'),
+  };
+
+  const roleDescriptions: Record<ParticipantRole, string> = {
+    observer: t('descriptions.observer'),
+    player: t('descriptions.player'),
+    team_lead: t('descriptions.teamLead'),
+    facilitator: t('descriptions.facilitator'),
+  };
   
   const handleRoleChange = async (newRole: ParticipantRole) => {
     if (newRole === selectedRole || loading || disabled) return;
@@ -64,7 +66,7 @@ export function ParticipantRoleSelector({
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to update role');
+        throw new Error(data.error || t('errors.updateFailed'));
       }
       
       setSelectedRole(newRole);
@@ -75,7 +77,7 @@ export function ParticipantRoleSelector({
       
     } catch (err) {
       console.error('[RoleSelector] Error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to update role');
+      setError(err instanceof Error ? err.message : t('errors.updateFailed'));
       // Revert on error
       setSelectedRole(currentRole);
     } finally {

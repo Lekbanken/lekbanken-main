@@ -70,7 +70,6 @@ import type {
 } from '@/features/play/hooks/useBatchArtifacts';
 import {
   PRESET_FILTERS,
-  OPERATION_LABELS,
 } from '@/features/play/hooks/useBatchArtifacts';
 
 // =============================================================================
@@ -106,6 +105,19 @@ const ARTIFACT_TYPE_ICONS: Record<string, React.ReactNode> = {
   default: <PuzzlePieceIcon className="h-4 w-4" />,
 };
 
+const ARTIFACT_TYPE_KEYS: Record<string, string> = {
+  keypad: 'keypad',
+  riddle: 'riddle',
+  cipher: 'cipher',
+  tile_puzzle: 'tile_puzzle',
+  logic_grid: 'logic_grid',
+  hotspot: 'hotspot',
+  card: 'card',
+  document: 'document',
+  image: 'image',
+  audio: 'audio',
+};
+
 const OPERATION_CONFIGS: Array<{
   operation: BatchOperation;
   icon: React.ReactNode;
@@ -131,7 +143,10 @@ interface ArtifactRowProps {
 }
 
 function ArtifactRow({ artifact, isSelected, onToggle }: ArtifactRowProps) {
+  const t = useTranslations('play.batchArtifactPanel');
   const icon = ARTIFACT_TYPE_ICONS[artifact.type] || ARTIFACT_TYPE_ICONS.default;
+  const typeKey = ARTIFACT_TYPE_KEYS[artifact.type] ?? 'unknown';
+  const typeLabel = t(`types.${typeKey}` as Parameters<typeof t>[0], { type: artifact.type });
 
   return (
     <div
@@ -145,7 +160,7 @@ function ArtifactRow({ artifact, isSelected, onToggle }: ArtifactRowProps) {
       <div className="text-muted-foreground">{icon}</div>
       <div className="flex-1 min-w-0">
         <div className="font-medium text-sm truncate">{artifact.name}</div>
-        <div className="text-xs text-muted-foreground">{artifact.type}</div>
+        <div className="text-xs text-muted-foreground">{typeLabel}</div>
       </div>
       <div className="flex items-center gap-1">
         {artifact.visible ? (
@@ -222,7 +237,9 @@ function SelectionHeader({ batch, totalCount }: SelectionHeaderProps) {
               key={type}
               onClick={() => batch.selectByFilter({ type: 'type', value: type })}
             >
-              {t('allOfType', { type })}
+              {t('allOfType', {
+                type: t(`types.${ARTIFACT_TYPE_KEYS[type] ?? 'unknown'}` as Parameters<typeof t>[0], { type }),
+              })}
             </DropdownMenuItem>
           ))}
         </DropdownMenuContent>
@@ -310,6 +327,7 @@ function ResultSummary({ result }: ResultSummaryProps) {
   if (!result) return null;
 
   const hasErrors = result.failed.length > 0;
+  const operationLabel = t(`operations.${result.operation}` as Parameters<typeof t>[0]);
 
   return (
     <div
@@ -326,8 +344,8 @@ function ResultSummary({ result }: ResultSummaryProps) {
         )}
         <span>
           {hasErrors
-            ? t('resultWithErrors', { operation: OPERATION_LABELS[result.operation], count: result.successful.length, failed: result.failed.length })
-            : t('resultSuccess', { operation: OPERATION_LABELS[result.operation], count: result.successful.length })}
+            ? t('resultWithErrors', { operation: operationLabel, count: result.successful.length, failed: result.failed.length })
+            : t('resultSuccess', { operation: operationLabel, count: result.successful.length })}
         </span>
       </div>
     </div>
@@ -414,9 +432,10 @@ export function BatchArtifactPanel({
             <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('confirmDescription', {
-                operation: confirmOperation ? OPERATION_LABELS[confirmOperation].toLowerCase() : '',
+                operation: confirmOperation
+                  ? t(`operationVerbs.${confirmOperation}` as Parameters<typeof t>[0])
+                  : '',
                 count: batch.selectedCount,
-                plural: batch.selectedCount !== 1 ? 'er' : ''
               })}
               {confirmOperation === 'reset' && (
                 <span className="block mt-2 text-yellow-600">

@@ -8,6 +8,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useSessionControl } from '@/features/participants/hooks/useSessionControl';
 import type { Database } from '@/types/supabase';
 
@@ -28,6 +29,7 @@ export function SessionControlPanel({
   participantCount,
   onStatusChange,
 }: SessionControlPanelProps) {
+  const t = useTranslations('play.sessionControlPanel');
   const [status, setStatus] = useState<SessionStatus>(currentStatus);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
   
@@ -65,7 +67,7 @@ export function SessionControlPanel({
     }
     
     try {
-      await endSession('Session ended by host');
+      await endSession(t('reasons.end'));
       setShowEndConfirm(false);
     } catch {
       // Error handled by hook
@@ -74,12 +76,12 @@ export function SessionControlPanel({
   
   const getStatusBadge = () => {
     const badges = {
-      active: { bg: 'bg-green-100', text: 'text-green-700', label: 'Aktiv' },
-      paused: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: 'Pausad' },
-      locked: { bg: 'bg-orange-100', text: 'text-orange-700', label: 'Låst' },
-      ended: { bg: 'bg-gray-100', text: 'text-gray-700', label: 'Avslutad' },
-      cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: 'Avbruten' },
-      archived: { bg: 'bg-gray-100', text: 'text-gray-500', label: 'Arkiverad' },
+      active: { bg: 'bg-green-100', text: 'text-green-700', label: t('status.active') },
+      paused: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('status.paused') },
+      locked: { bg: 'bg-orange-100', text: 'text-orange-700', label: t('status.locked') },
+      ended: { bg: 'bg-gray-100', text: 'text-gray-700', label: t('status.ended') },
+      cancelled: { bg: 'bg-red-100', text: 'text-red-700', label: t('status.cancelled') },
+      archived: { bg: 'bg-gray-100', text: 'text-gray-500', label: t('status.archived') },
     };
     
     const badge = badges[status] || badges.active;
@@ -96,8 +98,8 @@ export function SessionControlPanel({
       <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Session Avslutad</h3>
-            <p className="text-sm text-gray-600 mt-1">Kod: {sessionCode}</p>
+            <h3 className="text-lg font-semibold text-gray-900">{t('ended.title')}</h3>
+            <p className="text-sm text-gray-600 mt-1">{t('ended.code', { code: sessionCode })}</p>
           </div>
           {getStatusBadge()}
         </div>
@@ -109,9 +111,9 @@ export function SessionControlPanel({
     <div className="bg-white border border-gray-200 rounded-lg p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Session Kontroller</h3>
+          <h3 className="text-lg font-semibold text-gray-900">{t('header.title')}</h3>
           <p className="text-sm text-gray-600 mt-1">
-            Kod: <span className="font-mono font-bold">{sessionCode}</span> • {participantCount} deltagare
+            {t('header.codeAndCount', { code: sessionCode, count: participantCount })}
           </p>
         </div>
         {getStatusBadge()}
@@ -121,54 +123,54 @@ export function SessionControlPanel({
         {/* Pause/Resume */}
         {status === 'active' && (
           <button
-            onClick={() => pauseSession('Paused by host')}
+            onClick={() => pauseSession(t('reasons.pause'))}
             disabled={loading}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
             </svg>
-            Pausa
+            {t('actions.pause')}
           </button>
         )}
         
         {status === 'paused' && (
           <button
-            onClick={() => resumeSession('Resumed by host')}
+            onClick={() => resumeSession(t('reasons.resume'))}
             disabled={loading}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
             </svg>
-            Återuppta
+            {t('actions.resume')}
           </button>
         )}
         
         {/* Lock/Unlock */}
         {status !== 'locked' && (
           <button
-            onClick={() => lockSession('No new participants allowed')}
+            onClick={() => lockSession(t('reasons.lock'))}
             disabled={loading}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            Lås Session
+            {t('actions.lock')}
           </button>
         )}
         
         {status === 'locked' && (
           <button
-            onClick={() => unlockSession('New participants allowed again')}
+            onClick={() => unlockSession(t('reasons.unlock'))}
             disabled={loading}
             className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
             </svg>
-            Lås Upp
+            {t('actions.unlock')}
           </button>
         )}
         
@@ -182,26 +184,26 @@ export function SessionControlPanel({
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Avsluta Session
+            {t('actions.end')}
           </button>
         ) : (
           <div className="col-span-2 space-y-2">
             <p className="text-sm text-center text-gray-700 font-medium">
-              Är du säker? Detta avslutar sessionen för alla deltagare.
+              {t('confirm.message')}
             </p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setShowEndConfirm(false)}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
               >
-                Avbryt
+                {t('confirm.cancel')}
               </button>
               <button
                 onClick={handleEndSession}
                 disabled={loading}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
-                {loading ? 'Avslutar...' : 'Ja, Avsluta'}
+                {loading ? t('confirm.ending') : t('confirm.confirm')}
               </button>
             </div>
           </div>

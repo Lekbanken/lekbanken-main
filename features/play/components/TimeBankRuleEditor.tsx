@@ -274,7 +274,7 @@ function RuleCard({
             <span className="font-medium truncate">{rule.name}</span>
             {rule.maxFires > 0 && (
               <Badge variant="outline" className="text-xs">
-                max {rule.maxFires}×
+                {t('maxFiresBadge', { count: rule.maxFires })}
               </Badge>
             )}
           </div>
@@ -570,7 +570,7 @@ export function TimeBankRuleEditor({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ClockIcon className="h-5 w-5" />
-            TimeBank
+            {t('title')}
           </CardTitle>
           <CardDescription>
             {t('description')}

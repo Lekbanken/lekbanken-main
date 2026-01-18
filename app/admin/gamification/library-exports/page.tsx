@@ -50,24 +50,28 @@ interface ExportLogEntry {
   exportedAt: string;
 }
 
-const formatConfig: Record<ExportFormat, { label: string; icon: React.ReactNode; color: string }> = {
-  csv: { label: "CSV", icon: <TableCellsIcon className="h-4 w-4" />, color: "text-green-600" },
-  json: { label: "JSON", icon: <DocumentTextIcon className="h-4 w-4" />, color: "text-blue-600" },
-  pdf: { label: "PDF", icon: <DocumentIcon className="h-4 w-4" />, color: "text-red-600" },
-  xlsx: { label: "Excel", icon: <TableCellsIcon className="h-4 w-4" />, color: "text-green-700" },
-};
+function useLibraryExportConfigs() {
+  const t = useTranslations('admin.gamification.libraryExports');
 
-const statusConfig: Record<ExportStatus, { label: string; variant: "default" | "secondary" | "outline" }> = {
-  active: { label: "Aktiv", variant: "default" },
-  draft: { label: "Utkast", variant: "secondary" },
-  archived: { label: "Arkiverad", variant: "outline" },
-};
-
-const logStatusConfig: Record<ExportLogStatus, { label: string; icon: React.ReactNode; color: string }> = {
-  completed: { label: "Klar", icon: <CheckCircleIcon className="h-4 w-4" />, color: "text-green-600" },
-  pending: { label: "Pågår", icon: <ClockIcon className="h-4 w-4" />, color: "text-yellow-600" },
-  failed: { label: "Misslyckad", icon: <ExclamationCircleIcon className="h-4 w-4" />, color: "text-red-600" },
-};
+  return useMemo(() => ({
+    formatConfig: {
+      csv: { label: t('formats.csv'), icon: <TableCellsIcon className="h-4 w-4" />, color: "text-green-600" },
+      json: { label: t('formats.json'), icon: <DocumentTextIcon className="h-4 w-4" />, color: "text-blue-600" },
+      pdf: { label: t('formats.pdf'), icon: <DocumentIcon className="h-4 w-4" />, color: "text-red-600" },
+      xlsx: { label: t('formats.xlsx'), icon: <TableCellsIcon className="h-4 w-4" />, color: "text-green-700" },
+    } satisfies Record<ExportFormat, { label: string; icon: React.ReactNode; color: string }>,
+    statusConfig: {
+      active: { label: t('status.active'), variant: "default" },
+      draft: { label: t('status.draft'), variant: "secondary" },
+      archived: { label: t('status.archived'), variant: "outline" },
+    } satisfies Record<ExportStatus, { label: string; variant: "default" | "secondary" | "outline" }>,
+    logStatusConfig: {
+      completed: { label: t('logStatus.completed'), icon: <CheckCircleIcon className="h-4 w-4" />, color: "text-green-600" },
+      pending: { label: t('logStatus.pending'), icon: <ClockIcon className="h-4 w-4" />, color: "text-yellow-600" },
+      failed: { label: t('logStatus.failed'), icon: <ExclamationCircleIcon className="h-4 w-4" />, color: "text-red-600" },
+    } satisfies Record<ExportLogStatus, { label: string; icon: React.ReactNode; color: string }>,
+  }), [t]);
+}
 
 // Mock data - empty to show the planned state
 const mockTemplates: ExportTemplate[] = [];
@@ -77,6 +81,7 @@ type LibraryExportsTab = "templates" | "logs";
 
 export default function LibraryExportsPage() {
   const t = useTranslations('admin.gamification.libraryExports');
+  const { formatConfig, statusConfig, logStatusConfig } = useLibraryExportConfigs();
   const [activeTab, setActiveTab] = useState<LibraryExportsTab>("templates");
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -93,19 +98,19 @@ export default function LibraryExportsPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: "Admin", href: "/admin" },
-          { label: "Gamification hub", href: "/admin/gamification" },
-          { label: "Library Exports" },
+          { label: t('breadcrumbs.admin'), href: "/admin" },
+          { label: t('breadcrumbs.gamificationHub'), href: "/admin/gamification" },
+          { label: t('breadcrumbs.libraryExports') },
         ]}
       />
 
       <AdminPageHeader
-        title="Library Exports"
-        description="Exportpaket från biblioteket – CSV, PDF och brandade exports."
+        title={t('pageTitle')}
+        description={t('pageDescription')}
         actions={
           <Button>
             <PlusIcon className="mr-2 h-4 w-4" />
-            Skapa exportmall
+            {t('actions.createTemplate')}
           </Button>
         }
       />
@@ -113,25 +118,25 @@ export default function LibraryExportsPage() {
       {/* Stats */}
       <AdminStatGrid cols={4} className="mb-6">
         <AdminStatCard
-          label="Exportmallar"
+          label={t('stats.templates')}
           value={stats.totalTemplates}
           icon={<DocumentArrowDownIcon className="h-5 w-5" />}
           iconColor="primary"
         />
         <AdminStatCard
-          label="Aktiva"
+          label={t('stats.active')}
           value={stats.activeTemplates}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
         />
         <AdminStatCard
-          label="Totalt exports"
+          label={t('stats.totalExports')}
           value={stats.totalExports}
           icon={<DocumentTextIcon className="h-5 w-5" />}
           iconColor="blue"
         />
         <AdminStatCard
-          label="Framgångsgrad"
+          label={t('stats.successRate')}
           value={`${stats.successRate}%`}
           icon={<CheckCircleIcon className="h-5 w-5" />}
           iconColor="green"
@@ -143,15 +148,21 @@ export default function LibraryExportsPage() {
         activeTab={activeTab}
         onChange={(tab) => setActiveTab(tab as LibraryExportsTab)}
         tabs={[
-          { id: "templates", label: "Exportmallar" },
-          { id: "logs", label: "Exportlogg" },
+          { id: "templates", label: t('tabs.templates') },
+          { id: "logs", label: t('tabs.logs') },
         ]}
       />
       <TabPanel id="templates" activeTab={activeTab}>
-        <TemplatesTab templates={mockTemplates} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <TemplatesTab
+          templates={mockTemplates}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          formatConfig={formatConfig}
+          statusConfig={statusConfig}
+        />
       </TabPanel>
       <TabPanel id="logs" activeTab={activeTab}>
-        <LogsTab logs={mockLogs} />
+        <LogsTab logs={mockLogs} formatConfig={formatConfig} logStatusConfig={logStatusConfig} />
       </TabPanel>
     </AdminPageLayout>
   );
@@ -161,11 +172,15 @@ export default function LibraryExportsPage() {
 function TemplatesTab({ 
   templates, 
   searchQuery, 
-  setSearchQuery 
+  setSearchQuery,
+  formatConfig,
+  statusConfig,
 }: { 
   templates: ExportTemplate[]; 
   searchQuery: string; 
   setSearchQuery: (q: string) => void;
+  formatConfig: Record<ExportFormat, { label: string; icon: React.ReactNode; color: string }>;
+  statusConfig: Record<ExportStatus, { label: string; variant: "default" | "secondary" | "outline" }>;
 }) {
   const t = useTranslations('admin.gamification.libraryExports');
   const filteredTemplates = useMemo(() => {
@@ -194,7 +209,7 @@ function TemplatesTab({
         <div className="relative flex-1 max-w-md">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Sök mallar..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -202,7 +217,7 @@ function TemplatesTab({
         </div>
         <Button>
           <PlusIcon className="mr-2 h-4 w-4" />
-          Skapa mall
+          {t('actions.createTemplateShort')}
         </Button>
       </div>
 
@@ -217,7 +232,9 @@ function TemplatesTab({
                   </div>
                   <div>
                     <h3 className="font-semibold">{template.name}</h3>
-                    <p className="text-xs text-muted-foreground">v{template.version}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {t('templates.version', { version: template.version })}
+                    </p>
                   </div>
                 </div>
                 <Badge variant={statusConfig[template.status].variant}>
@@ -227,7 +244,9 @@ function TemplatesTab({
               <p className="mb-3 text-sm text-muted-foreground line-clamp-2">{template.description}</p>
               <div className="flex items-center justify-between border-t border-border pt-3 text-sm">
                 <span className="text-muted-foreground">{template.targetType}</span>
-                <span className="font-medium">{template.usageCount} exporter</span>
+                <span className="font-medium">
+                  {t('templates.exportCount', { count: template.usageCount })}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -238,13 +257,22 @@ function TemplatesTab({
 }
 
 // Logs Tab
-function LogsTab({ logs }: { logs: ExportLogEntry[] }) {
+function LogsTab({
+  logs,
+  formatConfig,
+  logStatusConfig,
+}: {
+  logs: ExportLogEntry[];
+  formatConfig: Record<ExportFormat, { label: string; icon: React.ReactNode; color: string }>;
+  logStatusConfig: Record<ExportLogStatus, { label: string; icon: React.ReactNode; color: string }>;
+}) {
+  const t = useTranslations('admin.gamification.libraryExports');
   if (logs.length === 0) {
     return (
       <EmptyState
         icon={<ClockIcon className="h-12 w-12" />}
-        title="Ingen exporthistorik"
-        description="Här visas historik över genomförda exporter."
+        title={t('logs.empty.title')}
+        description={t('logs.empty.description')}
       />
     );
   }
@@ -255,13 +283,13 @@ function LogsTab({ logs }: { logs: ExportLogEntry[] }) {
         <table className="w-full">
           <thead className="border-b bg-muted/50">
             <tr>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Mall</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Format</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Status</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Poster</th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">Storlek</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Exporterad av</th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">Datum</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('logs.table.template')}</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('logs.table.format')}</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('logs.table.status')}</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('logs.table.records')}</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-muted-foreground">{t('logs.table.size')}</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('logs.table.exportedBy')}</th>
+              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">{t('logs.table.date')}</th>
             </tr>
           </thead>
           <tbody className="divide-y">

@@ -207,12 +207,12 @@ export function PuzzleArtifactRenderer({
           onStateChange?.();
         }
       } catch (err) {
-        setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Serverfel' });
+        setMessage({ type: 'error', text: err instanceof Error ? err.message : t('errors.serverError') });
       } finally {
         setLoading(false);
       }
     },
-    [sessionId, artifact.id, participantToken, onStateChange, isLocked, enableRealtime, realtimeConnected, broadcastStateChange, setPuzzleState]
+    [sessionId, artifact.id, participantToken, onStateChange, isLocked, enableRealtime, realtimeConnected, broadcastStateChange, setPuzzleState, t]
   );
 
   // ==========================================================================
@@ -255,11 +255,11 @@ export function PuzzleArtifactRenderer({
 
         {riddleState.isCorrect ? (
           <div className="rounded bg-green-500/10 border border-green-500/30 p-3 text-center">
-            <p className="text-sm font-medium text-green-600">✓ {t('riddle.correctAnswer')}</p>
+            <p className="text-sm font-medium text-green-600">{t('riddle.correctAnswer')}</p>
           </div>
         ) : isLocked ? (
           <div className="rounded bg-destructive/10 border border-destructive/30 p-3 text-center">
-            <p className="text-sm text-destructive">🔒 {t('riddle.lockedTooManyAttempts')}</p>
+            <p className="text-sm text-destructive">{t('riddle.lockedTooManyAttempts')}</p>
           </div>
         ) : (
           <RiddleInput
@@ -378,7 +378,7 @@ export function PuzzleArtifactRenderer({
         />
 
         {audioConfig.requireAck && audioState.hasAcknowledged && (
-          <p className="text-xs text-green-600 text-center">✓ {t('audio.listened')}</p>
+          <p className="text-xs text-green-600 text-center">{t('audio.listened')}</p>
         )}
       </Card>
     );
@@ -417,7 +417,7 @@ export function PuzzleArtifactRenderer({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">✅</span>
-            <p className="font-medium">{artifact.title || 'Checklista'}</p>
+            <p className="font-medium">{artifact.title || t('checklist.title')}</p>
           </div>
           <Badge variant={multiState.isComplete ? 'default' : 'secondary'}>
             {multiState.passedCount}/{requiredCount}
@@ -433,7 +433,7 @@ export function PuzzleArtifactRenderer({
         />
 
         {multiState.isComplete && (
-          <p className="text-xs text-green-600 text-center">✓ Alla klara!</p>
+          <p className="text-xs text-green-600 text-center">{t('checklist.complete')}</p>
         )}
       </Card>
     );
@@ -471,7 +471,7 @@ export function PuzzleArtifactRenderer({
 
         {qrState.isVerified ? (
           <div className="rounded bg-green-500/10 border border-green-500/30 p-3 text-center">
-            <p className="text-sm font-medium text-green-600">✓ {t('qr.verified')}</p>
+            <p className="text-sm font-medium text-green-600">{t('qr.verified')}</p>
           </div>
         ) : (
           <QRScanner
@@ -619,7 +619,7 @@ export function PuzzleArtifactRenderer({
         />
 
         {isComplete && (
-          <p className="text-xs text-green-600 text-center">✓ Alla hittade!</p>
+          <p className="text-xs text-green-600 text-center">{t('hotspot.complete')}</p>
         )}
       </Card>
     );
@@ -655,7 +655,7 @@ export function PuzzleArtifactRenderer({
     if (!imageUrl) {
       return (
         <Card className="p-4">
-          <p className="text-sm text-muted-foreground">Pusselspel ej konfigurerat</p>
+          <p className="text-sm text-muted-foreground">{t('tilePuzzle.missingConfig')}</p>
         </Card>
       );
     }
@@ -936,9 +936,9 @@ export function PuzzleArtifactRenderer({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg">🎤</span>
-            <p className="font-medium">{artifact.title || 'Ljudaktivering'}</p>
+            <p className="font-medium">{artifact.title || t('sound.title')}</p>
           </div>
-          {soundState.isTriggered && <Badge variant="default">Aktiverad!</Badge>}
+          {soundState.isTriggered && <Badge variant="default">{t('sound.triggered')}</Badge>}
         </div>
 
         {soundInstructions && <p className="text-sm text-muted-foreground italic">{soundInstructions}</p>}
@@ -1037,12 +1037,12 @@ export function PuzzleArtifactRenderer({
         </div>
         {isPaused && (
           <Badge variant="warning" size="sm" className="mt-2">
-            ⏸️ {t('timeBank.paused')}
+            {t('timeBank.paused')}
           </Badge>
         )}
         {isExpired && (
           <Badge variant="destructive" size="sm" className="mt-2">
-            ⏰ {t('timeBank.expired')}
+            {t('timeBank.expired')}
           </Badge>
         )}
         {displayStyle === 'progress' && !isExpired && (

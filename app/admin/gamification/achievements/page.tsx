@@ -2,11 +2,15 @@ import { Suspense } from 'react';
 import { listAchievements, listTenantsForSelector } from '@/app/actions/achievements-admin';
 import { AchievementsAdminClient } from './AchievementsAdminClient';
 import { AdminPageLayout, AdminPageHeader } from '@/components/admin/shared';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata = {
-  title: 'Achievements | Admin',
-  description: 'Hantera achievements och tilldela till användare',
-};
+export async function generateMetadata() {
+  const t = await getTranslations('admin.gamification.achievements');
+  return {
+    title: `${t('pageTitle')} | Admin`,
+    description: t('pageDescription'),
+  };
+}
 
 async function AchievementsContent() {
   // Fetch initial data in parallel
@@ -31,26 +35,35 @@ async function AchievementsContent() {
   );
 }
 
-function LoadingFallback() {
+function LoadingFallback({ title, description, loadingLabel }: { title: string; description: string; loadingLabel: string }) {
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Achievements"
-        description="Hantera achievements och tilldela till användare"
+        title={title}
+        description={description}
       />
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm text-muted-foreground">Laddar achievements...</p>
+          <p className="text-sm text-muted-foreground">{loadingLabel}</p>
         </div>
       </div>
     </AdminPageLayout>
   );
 }
 
-export default function AchievementsAdminPage() {
+export default async function AchievementsAdminPage() {
+  const t = await getTranslations('admin.gamification.achievements');
   return (
-    <Suspense fallback={<LoadingFallback />}>
+    <Suspense
+      fallback={(
+        <LoadingFallback
+          title={t('pageTitle')}
+          description={t('pageDescription')}
+          loadingLabel={t('loading')}
+        />
+      )}
+    >
       <AchievementsContent />
     </Suspense>
   );

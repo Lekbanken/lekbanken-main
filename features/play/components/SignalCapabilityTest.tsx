@@ -348,7 +348,7 @@ export function SignalCapabilityTest({
             <span className="text-sm font-medium">{t('signalsLabel')}</span>
           </div>
           <Badge variant={availableCount >= 3 ? 'default' : 'outline'}>
-            {availableCount}/5
+            {t('availableCountShort', { count: availableCount })}
           </Badge>
         </div>
         

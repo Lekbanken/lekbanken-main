@@ -7,6 +7,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { createBrowserClient } from '@/lib/supabase/client';
 
 interface ProgressSummary {
@@ -31,6 +32,7 @@ interface LiveProgressDashboardProps {
 }
 
 export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps) {
+  const t = useTranslations('play.liveProgress');
   const [progressData, setProgressData] = useState<ProgressSummary[]>([]);
   const [recentUnlocks, setRecentUnlocks] = useState<AchievementUnlock[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +67,7 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
       if (progress) {
         const formatted = progress.map((p) => ({
           participant_id: p.participant_id,
-          display_name: (p.participants as unknown as { display_name: string })?.display_name || 'Unknown',
+          display_name: (p.participants as unknown as { display_name: string })?.display_name || t('unknownParticipant'),
           game_id: p.game_id,
           status: p.status,
           score: p.score || 0,
@@ -162,19 +164,19 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
       {/* Stats Overview */}
       <div className="grid grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Totalt Poäng</p>
+          <p className="text-sm text-gray-600">{t('stats.totalScore')}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.totalScore}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Utmärkelser</p>
+          <p className="text-sm text-gray-600">{t('stats.achievements')}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.totalAchievements}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Klara Spel</p>
+          <p className="text-sm text-gray-600">{t('stats.completedGames')}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.gamesCompleted}</p>
         </div>
         <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Aktiva Spel</p>
+          <p className="text-sm text-gray-600">{t('stats.activeGames')}</p>
           <p className="text-2xl font-bold text-gray-900">{stats.activeGames}</p>
         </div>
       </div>
@@ -182,9 +184,9 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
       <div className="grid grid-cols-2 gap-6">
         {/* Progress List */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Deltagare Progress</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('progress.title')}</h3>
           {progressData.length === 0 ? (
-            <p className="text-gray-500 text-sm">Ingen aktivitet än</p>
+            <p className="text-gray-500 text-sm">{t('progress.empty')}</p>
           ) : (
             <div className="space-y-3">
               {progressData.map((progress, index) => (
@@ -195,8 +197,8 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
                       <p className="text-xs text-gray-500 capitalize">{progress.status}</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-bold text-gray-900">{progress.score} pts</p>
-                      <p className="text-xs text-gray-500">{progress.achievements_count} 🏆</p>
+                      <p className="font-bold text-gray-900">{t('progress.points', { count: progress.score })}</p>
+                      <p className="text-xs text-gray-500">{t('progress.achievementsCount', { count: progress.achievements_count })}</p>
                     </div>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
@@ -205,7 +207,9 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
                       style={{ width: `${progress.progress_percentage}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">{progress.progress_percentage.toFixed(0)}% klar</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {t('progress.complete', { percent: progress.progress_percentage.toFixed(0) })}
+                  </p>
                 </div>
               ))}
             </div>
@@ -214,9 +218,9 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
 
         {/* Recent Achievements */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold mb-4">Senaste Utmärkelser</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('achievements.title')}</h3>
           {recentUnlocks.length === 0 ? (
-            <p className="text-gray-500 text-sm">Inga utmärkelser än</p>
+            <p className="text-gray-500 text-sm">{t('achievements.empty')}</p>
           ) : (
             <div className="space-y-3">
               {recentUnlocks.map((unlock, index) => (
@@ -224,7 +228,7 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
                   <div className="text-2xl">🏆</div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{unlock.achievement_name}</p>
-                    <p className="text-sm text-gray-600">{unlock.points} poäng</p>
+                    <p className="text-sm text-gray-600">{t('achievements.points', { count: unlock.points })}</p>
                     <p className="text-xs text-gray-500">
                       {new Date(unlock.unlocked_at).toLocaleTimeString('sv-SE')}
                     </p>

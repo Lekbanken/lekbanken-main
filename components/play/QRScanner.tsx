@@ -146,7 +146,7 @@ export function QRScanner({
         setShowFallback(true);
       }
     }
-  }, [config.allowManualFallback, onScanFail]);
+  }, [config.allowManualFallback, onScanFail, t]);
 
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
@@ -167,7 +167,7 @@ export function QRScanner({
       setError(t('invalidCode'));
       updateState({ scanAttempts: state.scanAttempts + 1 });
     }
-  }, [fallbackCode, validateValue, handleSuccess, updateState, state.scanAttempts]);
+  }, [fallbackCode, validateValue, handleSuccess, updateState, state.scanAttempts, t]);
 
   // Note: Real QR scanning requires a library like @zxing/library
   // This is a placeholder that shows the UI structure
@@ -179,9 +179,9 @@ export function QRScanner({
     } else {
       setError(t('qrNotValid'));
       updateState({ scanAttempts: state.scanAttempts + 1 });
-      onScanFail?.('Invalid QR code');
+      onScanFail?.(t('qrNotValid'));
     }
-  }, [validateValue, handleSuccess, updateState, state.scanAttempts, onScanFail]);
+  }, [validateValue, handleSuccess, updateState, state.scanAttempts, onScanFail, t]);
 
   const sizeStyles = {
     sm: { icon: 'h-8 w-8', button: 'h-10', video: 'h-48' },
@@ -197,7 +197,7 @@ export function QRScanner({
       <div className={cn('flex flex-col items-center gap-4 p-6', className)}>
         <CheckCircleIcon className="h-12 w-12 text-green-500" />
         <p className="text-lg font-medium text-green-500">
-          {config.successMessage ?? 'Verifierad!'}
+          {config.successMessage ?? t('verified')}
         </p>
         {state.usedFallback && (
           <p className="text-sm text-muted-foreground">

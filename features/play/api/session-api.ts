@@ -9,6 +9,7 @@
 
 import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
+import type { PlayMode } from '@/features/admin/games/v2/types';
 
 // Local step/phase types for API responses
 // Must match StepPhaseNavigation.StepInfo and ParticipantPlayView.StepData
@@ -72,6 +73,8 @@ export interface PlaySessionData {
   gameId: string | null;
   /** Game title */
   gameTitle: string;
+  /** Play mode (basic, facilitated, participants) */
+  playMode: PlayMode;
   /** Steps from game */
   steps: StepInfo[];
   /** Phases from game */
@@ -133,6 +136,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
     let gameTitle = session.displayName || 'Session';
     let boardTheme: BoardTheme | undefined;
     let tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }> = [];
+    let playMode: PlayMode = 'basic';
 
     // If game is linked, fetch game+steps/phases through Play API
     if (session.gameId) {
@@ -143,6 +147,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
       if (gameRes.ok) {
         const gameData = await gameRes.json();
         gameTitle = gameData.title || gameTitle;
+        playMode = gameData.playMode || 'basic';
         steps = gameData.steps || [];
         phases = gameData.phases || [];
         boardTheme = gameData.board?.theme;
@@ -175,6 +180,7 @@ export async function getHostPlaySession(sessionId: string): Promise<PlaySession
       sessionId,
       gameId: session.gameId || null,
       gameTitle,
+      playMode,
       steps,
       phases,
       sessionRoles,
@@ -402,6 +408,7 @@ export async function getParticipantPlaySession(
     let gameTitle = session.displayName || 'Session';
     let boardTheme: BoardTheme | undefined;
     let tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }> = [];
+    let playMode: PlayMode = 'basic';
     
     // If game is linked, fetch public game data
     if (session.gameId) {
@@ -418,6 +425,7 @@ export async function getParticipantPlaySession(
         if (gameRes.ok) {
           const gameData = await gameRes.json();
           gameTitle = gameData.title || gameTitle;
+          playMode = gameData.playMode || 'basic';
           steps = gameData.steps || [];
           phases = gameData.phases || [];
           boardTheme = gameData.board?.theme;
@@ -464,6 +472,7 @@ export async function getParticipantPlaySession(
       sessionId: session.id,
       gameId: session.gameId || null,
       gameTitle,
+      playMode,
       steps,
       phases,
       sessionRoles: [], // Participants don't see all roles

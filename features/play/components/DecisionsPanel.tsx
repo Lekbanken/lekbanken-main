@@ -141,6 +141,15 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
   }, [decisions, resultsByDecisionId, loadResults]);
 
   const optionKeySuggestions = useMemo(() => ['a', 'b', 'c', 'd', 'e'], []);
+  const statusLabels = useMemo(
+    () => ({
+      draft: t('status.draft'),
+      open: t('status.open'),
+      closed: t('status.closed'),
+      revealed: t('status.revealed'),
+    }),
+    [t]
+  );
 
   if (loading) {
     return (
@@ -197,7 +206,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
                   onChange={(e) =>
                     setNewOptions((prev) => prev.map((p, i) => (i === idx ? { ...p, key: e.target.value } : p)))
                   }
-                  placeholder="key"
+                  placeholder={t('placeholders.optionKey')}
                 />
                 <Input
                   className="col-span-4"
@@ -205,7 +214,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
                   onChange={(e) =>
                     setNewOptions((prev) => prev.map((p, i) => (i === idx ? { ...p, label: e.target.value } : p)))
                   }
-                  placeholder="Label"
+                  placeholder={t('placeholders.optionLabel')}
                 />
               </div>
             ))}
@@ -240,7 +249,7 @@ export function DecisionsPanel({ sessionId }: { sessionId: string }) {
                 <h3 className="font-medium">{d.title}</h3>
                 {d.prompt && <p className="text-sm text-muted-foreground">{d.prompt}</p>}
               </div>
-              <Badge variant="secondary">{d.status}</Badge>
+              <Badge variant="secondary">{statusLabels[d.status]}</Badge>
             </div>
 
             <ul className="text-sm list-disc list-inside text-muted-foreground">

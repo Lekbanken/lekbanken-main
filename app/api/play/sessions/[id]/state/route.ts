@@ -215,6 +215,7 @@ export async function GET(
       session: {
         id: session.id,
         status: session.status,
+        started_at: session.started_at ?? null,
         current_step_index: session.current_step_index ?? 0,
         current_phase_index: session.current_phase_index ?? 0,
         timer_state: session.timer_state,

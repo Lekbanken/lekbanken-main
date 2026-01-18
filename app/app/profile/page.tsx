@@ -19,7 +19,9 @@ import {
   ChevronRightIcon,
   CheckCircleIcon,
   ExclamationTriangleIcon,
+  TrophyIcon,
 } from '@heroicons/react/24/outline';
+import { ProfileAchievementsShowcase } from '@/features/profile/components/ProfileAchievementsShowcase';
 
 interface QuickLinkProps {
   href: string;
@@ -124,12 +126,12 @@ export default function ProfileOverviewPage() {
               {user?.email_confirmed_at ? (
                 <>
                   <CheckCircleIcon className="h-5 w-5 text-emerald-500" />
-                  <span className="text-sm">E-post verifierad</span>
+                  <span className="text-sm">{t('sections.security.emailVerified')}</span>
                 </>
               ) : (
                 <>
                   <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
-                  <span className="text-sm text-amber-600">E-post ej verifierad</span>
+                  <span className="text-sm text-amber-600">{t('sections.security.emailNotVerified')}</span>
                 </>
               )}
             </div>
@@ -137,17 +139,17 @@ export default function ProfileOverviewPage() {
               {mfaEnabled ? (
                 <>
                   <CheckCircleIcon className="h-5 w-5 text-emerald-500" />
-                  <span className="text-sm">MFA aktiverad</span>
+                  <span className="text-sm">{t('sections.security.mfaEnabled')}</span>
                 </>
               ) : (
                 <>
                   <ExclamationTriangleIcon className="h-5 w-5 text-amber-500" />
-                  <span className="text-sm text-amber-600">MFA ej aktiverad</span>
+                  <span className="text-sm text-amber-600">{t('sections.security.mfaDisabled')}</span>
                   <Link
                     href="/app/profile/security"
                     className="text-sm text-primary hover:underline"
                   >
-                    Aktivera nu
+                    {t('sections.security.enableMfa')}
                   </Link>
                 </>
               )}
@@ -204,6 +206,25 @@ export default function ProfileOverviewPage() {
           badge={userTenants.length > 0 ? `${userTenants.length}` : undefined}
         />
       </div>
+
+      {/* Achievements Showcase */}
+      {user?.id && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <TrophyIcon className="h-5 w-5 text-amber-500" />
+              {t('achievementsShowcase.title')}
+            </h2>
+            <Link
+              href="/app/profile/achievements"
+              className="text-sm text-primary hover:underline"
+            >
+              {t('achievementsShowcase.viewAll')}
+            </Link>
+          </div>
+          <ProfileAchievementsShowcase userId={user.id} maxDisplay={6} showLocked={false} />
+        </div>
+      )}
     </div>
   );
 }

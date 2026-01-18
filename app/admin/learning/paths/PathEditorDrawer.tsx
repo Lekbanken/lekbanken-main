@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition, useCallback } from 'react';
+import { useState, useEffect, useTransition, useCallback, useMemo } from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -8,6 +8,7 @@ import {
   AcademicCapIcon,
   MapIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -52,24 +53,6 @@ interface PathEditorDrawerProps {
   onSave: () => void;
 }
 
-const SCOPE_OPTIONS = [
-  { value: 'global', label: 'Global', description: 'Synlig för alla organisationer' },
-  { value: 'tenant', label: 'Organisation', description: 'Synlig endast inom vald organisation' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Utkast' },
-  { value: 'active', label: 'Aktiv' },
-  { value: 'archived', label: 'Arkiverad' },
-];
-
-const KIND_OPTIONS = [
-  { value: 'onboarding', label: 'Onboarding' },
-  { value: 'role', label: 'Rollbaserad' },
-  { value: 'theme', label: 'Tema' },
-  { value: 'compliance', label: 'Compliance' },
-];
-
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -88,6 +71,7 @@ export function PathEditorDrawer({
   onClose,
   onSave,
 }: PathEditorDrawerProps) {
+  const t = useTranslations('admin.learning.paths.editor');
   const isEditing = !!path;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -113,6 +97,40 @@ export function PathEditorDrawer({
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [selectedEdgeFrom, setSelectedEdgeFrom] = useState('');
   const [selectedEdgeTo, setSelectedEdgeTo] = useState('');
+
+  const scopeOptions = useMemo(() => ([
+    { value: 'global', label: t('scope.global.label'), description: t('scope.global.description') },
+    { value: 'tenant', label: t('scope.tenant.label'), description: t('scope.tenant.description') },
+  ]), [t]);
+
+  const statusOptions = useMemo(() => ([
+    { value: 'draft', label: t('status.draft') },
+    { value: 'active', label: t('status.active') },
+    { value: 'archived', label: t('status.archived') },
+  ]), [t]);
+
+  const kindOptions = useMemo(() => ([
+    { value: 'onboarding', label: t('kinds.onboarding') },
+    { value: 'role', label: t('kinds.role') },
+    { value: 'theme', label: t('kinds.theme') },
+    { value: 'compliance', label: t('kinds.compliance') },
+  ]), [t]);
+
+  const loadNodesAndEdges = useCallback(async (pathId: string) => {
+    setNodesLoading(true);
+    try {
+      const [nodesData, edgesData] = await Promise.all([
+        listPathNodes(pathId),
+        listPathEdges(pathId),
+      ]);
+      setNodes(nodesData);
+      setEdges(edgesData);
+    } catch (err) {
+      console.error('Failed to load nodes/edges:', err);
+    } finally {
+      setNodesLoading(false);
+    }
+  }, []);
 
   // Reset form when path changes or drawer opens
   useEffect(() => {
@@ -147,8 +165,7 @@ export function PathEditorDrawer({
       setSelectedEdgeFrom('');
       setSelectedEdgeTo('');
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, path, currentTenantId, tenants]);
+  }, [open, path, currentTenantId, tenants, loadNodesAndEdges]);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -168,22 +185,6 @@ export function PathEditorDrawer({
       console.error('Failed to load courses:', err);
     }
   }, [scope, tenantId]);
-
-  const loadNodesAndEdges = async (pathId: string) => {
-    setNodesLoading(true);
-    try {
-      const [nodesData, edgesData] = await Promise.all([
-        listPathNodes(pathId),
-        listPathEdges(pathId),
-      ]);
-      setNodes(nodesData);
-      setEdges(edgesData);
-    } catch (err) {
-      console.error('Failed to load nodes/edges:', err);
-    } finally {
-      setNodesLoading(false);
-    }
-  };
 
   // Load courses on open and when scope/tenant changes
   useEffect(() => {
@@ -215,7 +216,7 @@ export function PathEditorDrawer({
         setNodes([...nodes, { ...result.data, course_title: course?.title }]);
         setSelectedCourseId('');
       } else {
-        setError(result.error || 'Kunde inte lägga till kurs');
+        setError(result.error || t('errors.addCourseFailed'));
       }
     });
   };
@@ -236,7 +237,7 @@ export function PathEditorDrawer({
           ));
         }
       } else {
-        setError(result.error || 'Kunde inte ta bort kurs');
+        setError(result.error || t('errors.removeCourseFailed'));
       }
     });
   };
@@ -244,7 +245,7 @@ export function PathEditorDrawer({
   const handleAddEdge = async () => {
     if (!path || !selectedEdgeFrom || !selectedEdgeTo) return;
     if (selectedEdgeFrom === selectedEdgeTo) {
-      setError('Kan inte skapa förkunskapskrav till samma kurs');
+      setError(t('errors.sameCoursePrereq'));
       return;
     }
     
@@ -267,7 +268,7 @@ export function PathEditorDrawer({
         setSelectedEdgeFrom('');
         setSelectedEdgeTo('');
       } else {
-        setError(result.error || 'Kunde inte skapa förkunskapskrav');
+        setError(result.error || t('errors.addPrereqFailed'));
       }
     });
   };
@@ -278,7 +279,7 @@ export function PathEditorDrawer({
       if (result.success) {
         setEdges(edges.filter(e => e.id !== edgeId));
       } else {
-        setError(result.error || 'Kunde inte ta bort förkunskapskrav');
+        setError(result.error || t('errors.removePrereqFailed'));
       }
     });
   };
@@ -289,15 +290,15 @@ export function PathEditorDrawer({
 
     // Validation
     if (!title.trim()) {
-      setError('Titel krävs');
+      setError(t('errors.titleRequired'));
       return;
     }
     if (!slug.trim()) {
-      setError('Slug krävs');
+      setError(t('errors.slugRequired'));
       return;
     }
     if (scope === 'tenant' && !tenantId) {
-      setError('Välj en organisation');
+      setError(t('errors.tenantRequired'));
       return;
     }
 
@@ -316,19 +317,19 @@ export function PathEditorDrawer({
         if (isEditing && path) {
           const result = await updatePath({ id: path.id, ...formData });
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera lärväg');
+            setError(result.error || t('errors.updateFailed'));
             return;
           }
         } else {
           const result = await createPath(formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa lärväg');
+            setError(result.error || t('errors.createFailed'));
             return;
           }
         }
         onSave();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -341,20 +342,20 @@ export function PathEditorDrawer({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEditing ? 'Redigera lärstig' : 'Skapa ny lärstig'}</SheetTitle>
+          <SheetTitle>{isEditing ? t('title.edit') : t('title.create')}</SheetTitle>
           <SheetDescription>
             {isEditing
-              ? 'Uppdatera lärvägen och hantera kurser.'
-              : 'Fyll i information för att skapa en ny lärväg.'}
+              ? t('description.edit')
+              : t('description.create')}
           </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6">
           <Tabs
             tabs={[
-              { id: 'basic', label: 'Grundinfo' },
-              { id: 'nodes', label: 'Kurser', disabled: !isEditing },
-              { id: 'edges', label: 'Förkunskaper', disabled: !isEditing },
+              { id: 'basic', label: t('tabs.basic') },
+              { id: 'nodes', label: t('tabs.courses'), disabled: !isEditing },
+              { id: 'edges', label: t('tabs.prerequisites'), disabled: !isEditing },
             ]}
             activeTab={activeTab}
             onChange={setActiveTab}
@@ -365,42 +366,42 @@ export function PathEditorDrawer({
           {activeTab === 'basic' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Titel *</Label>
+                <Label htmlFor="title">{t('fields.title')}</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="T.ex. Onboarding för nya medarbetare"
+                  placeholder={t('fields.titlePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
+                <Label htmlFor="slug">{t('fields.slug')}</Label>
                 <Input
                   id="slug"
                   value={slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder="t.ex. onboarding-nya"
+                  placeholder={t('fields.slugPlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Beskrivning</Label>
+                <Label htmlFor="description">{t('fields.description')}</Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="En beskrivning av lärvägen..."
+                  placeholder={t('fields.descriptionPlaceholder')}
                   rows={3}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label>Scope *</Label>
+                <Label>{t('fields.scope')}</Label>
                 <div className="grid gap-2">
-                  {SCOPE_OPTIONS.map((option) => (
+                  {scopeOptions.map((option) => (
                     <label
                       key={option.value}
                       className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
@@ -428,7 +429,7 @@ export function PathEditorDrawer({
 
               {scope === 'tenant' && (
                 <div className="space-y-2">
-                  <Label htmlFor="tenant">Organisation *</Label>
+                  <Label htmlFor="tenant">{t('fields.tenant')}</Label>
                   <select
                     id="tenant"
                     value={tenantId}
@@ -436,7 +437,7 @@ export function PathEditorDrawer({
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     required
                   >
-                    <option value="">Välj organisation</option>
+                    <option value="">{t('fields.tenantPlaceholder')}</option>
                     {tenants.map((tenant) => (
                       <option key={tenant.id} value={tenant.id}>
                         {tenant.name}
@@ -448,14 +449,14 @@ export function PathEditorDrawer({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">{t('fields.status')}</Label>
                   <select
                     id="status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value as typeof status)}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {STATUS_OPTIONS.map((opt) => (
+                    {statusOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
                       </option>
@@ -464,14 +465,14 @@ export function PathEditorDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="kind">Typ</Label>
+                  <Label htmlFor="kind">{t('fields.kind')}</Label>
                   <select
                     id="kind"
                     value={kind}
                     onChange={(e) => setKind(e.target.value as 'onboarding' | 'role' | 'theme' | 'compliance')}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {KIND_OPTIONS.map((opt) => (
+                    {kindOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
                       </option>
@@ -486,12 +487,12 @@ export function PathEditorDrawer({
           {activeTab === 'nodes' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">Kurser i lärvägen</Label>
-                <Badge variant="secondary">{nodes.length} kurser</Badge>
+                <Label className="text-base font-medium">{t('nodes.title')}</Label>
+                <Badge variant="secondary">{t('nodes.count', { count: nodes.length })}</Badge>
               </div>
 
               {nodesLoading ? (
-                <div className="text-center text-muted-foreground py-4">Laddar kurser...</div>
+                <div className="text-center text-muted-foreground py-4">{t('nodes.loading')}</div>
               ) : (
                 <>
                   {/* Current nodes */}
@@ -500,7 +501,7 @@ export function PathEditorDrawer({
                       <div className="rounded-lg border border-dashed border-border p-6 text-center">
                         <AcademicCapIcon className="mx-auto h-8 w-8 text-muted-foreground" />
                         <p className="mt-2 text-sm text-muted-foreground">
-                          Inga kurser ännu. Lägg till kurser nedan.
+                          {t('nodes.empty')}
                         </p>
                       </div>
                     ) : (
@@ -513,7 +514,7 @@ export function PathEditorDrawer({
                             <div className="flex h-8 w-8 items-center justify-center rounded bg-primary/10 text-sm font-medium">
                               {idx + 1}
                             </div>
-                            <span className="font-medium">{node.course_title || 'Kurs'}</span>
+                            <span className="font-medium">{node.course_title || t('nodes.courseFallback')}</span>
                           </div>
                           <Button
                             type="button"
@@ -536,12 +537,12 @@ export function PathEditorDrawer({
                       onChange={(e) => setSelectedCourseId(e.target.value)}
                       className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
-                      <option value="">Välj kurs att lägga till...</option>
+                      <option value="">{t('nodes.addCoursePlaceholder')}</option>
                       {courses
                         .filter(c => !coursesInPath.includes(c.id))
                         .map((course) => (
                           <option key={course.id} value={course.id}>
-                            {course.title} {course.tenant_id ? '(org)' : '(global)'}
+                            {course.title} {course.tenant_id ? t('nodes.courseScope.org') : t('nodes.courseScope.global')}
                           </option>
                         ))}
                     </select>
@@ -552,7 +553,7 @@ export function PathEditorDrawer({
                       disabled={!selectedCourseId || isPending}
                     >
                       <PlusIcon className="h-4 w-4 mr-1" />
-                      Lägg till
+                      {t('nodes.add')}
                     </Button>
                   </div>
                 </>
@@ -564,13 +565,11 @@ export function PathEditorDrawer({
           {activeTab === 'edges' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">Förkunskapskrav</Label>
-                <Badge variant="secondary">{edges.length} krav</Badge>
+                <Label className="text-base font-medium">{t('edges.title')}</Label>
+                <Badge variant="secondary">{t('edges.count', { count: edges.length })}</Badge>
               </div>
 
-              <p className="text-sm text-muted-foreground">
-                Definiera vilka kurser som måste vara avklarade före andra kurser.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('edges.description')}</p>
 
               {/* Current edges */}
               <div className="space-y-2">
@@ -578,7 +577,7 @@ export function PathEditorDrawer({
                   <div className="rounded-lg border border-dashed border-border p-6 text-center">
                     <MapIcon className="mx-auto h-8 w-8 text-muted-foreground" />
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Inga förkunskapskrav definierade. Alla kurser kan tas i valfri ordning.
+                      {t('edges.empty')}
                     </p>
                   </div>
                 ) : (
@@ -588,9 +587,9 @@ export function PathEditorDrawer({
                       className="flex items-center justify-between rounded-lg border border-border bg-card p-3"
                     >
                       <div className="flex items-center gap-2 text-sm">
-                        <span className="font-medium">{edge.from_course_title || 'Kurs'}</span>
+                        <span className="font-medium">{edge.from_course_title || t('edges.courseFallback')}</span>
                         <ArrowRightIcon className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{edge.to_course_title || 'Kurs'}</span>
+                        <span className="font-medium">{edge.to_course_title || t('edges.courseFallback')}</span>
                       </div>
                       <Button
                         type="button"
@@ -609,14 +608,14 @@ export function PathEditorDrawer({
               {/* Add edge selectors */}
               {nodes.length >= 2 && (
                 <div className="space-y-2 rounded-lg border border-border p-4">
-                  <Label className="text-sm">Lägg till förkunskapskrav</Label>
+                  <Label className="text-sm">{t('edges.addTitle')}</Label>
                   <div className="flex flex-wrap gap-2 items-center">
                     <select
                       value={selectedEdgeFrom}
                       onChange={(e) => setSelectedEdgeFrom(e.target.value)}
                       className="flex-1 min-w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
-                      <option value="">Välj förkunskap...</option>
+                      <option value="">{t('edges.addFromPlaceholder')}</option>
                       {nodes.map((node) => (
                         <option key={node.id} value={node.course_id}>
                           {node.course_title}
@@ -629,7 +628,7 @@ export function PathEditorDrawer({
                       onChange={(e) => setSelectedEdgeTo(e.target.value)}
                       className="flex-1 min-w-[150px] rounded-md border border-input bg-background px-3 py-2 text-sm"
                     >
-                      <option value="">Välj mål...</option>
+                      <option value="">{t('edges.addToPlaceholder')}</option>
                       {nodes
                         .filter(n => n.course_id !== selectedEdgeFrom)
                         .map((node) => (
@@ -645,16 +644,14 @@ export function PathEditorDrawer({
                       disabled={!selectedEdgeFrom || !selectedEdgeTo || isPending}
                     >
                       <PlusIcon className="h-4 w-4 mr-1" />
-                      Skapa
+                      {t('edges.add')}
                     </Button>
                   </div>
                 </div>
               )}
 
               {nodes.length < 2 && (
-                <p className="text-sm text-amber-600 dark:text-amber-400">
-                  Lägg till minst 2 kurser för att kunna definiera förkunskapskrav.
-                </p>
+                <p className="text-sm text-amber-600 dark:text-amber-400">{t('edges.minimumNotice')}</p>
               )}
             </div>
           )}
@@ -668,10 +665,10 @@ export function PathEditorDrawer({
 
           <SheetFooter className="mt-6 flex-row justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              {isEditing ? 'Stäng' : 'Avbryt'}
+              {isEditing ? t('actions.close') : t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || !title || !slug}>
-              {isPending ? 'Sparar...' : isEditing ? 'Spara' : 'Skapa'}
+              {isPending ? t('actions.saving') : isEditing ? t('actions.save') : t('actions.create')}
             </Button>
           </SheetFooter>
         </form>

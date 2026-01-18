@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { Button, Card, CardContent, Input } from '@/components/ui';
 import {
@@ -11,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 export default function EditProfilePage() {
+  const t = useTranslations('app.profile.edit');
   const { user, userProfile } = useAuth();
   const [fullName, setFullName] = useState(userProfile?.full_name || '');
   const [isSaving, setIsSaving] = useState(false);
@@ -37,10 +39,10 @@ export default function EditProfilePage() {
         </Link>
         <div>
           <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary">
-            Profil
+            {t('label')}
           </p>
           <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Redigera profil
+            {t('title')}
           </h1>
         </div>
       </header>
@@ -61,7 +63,7 @@ export default function EditProfilePage() {
               </button>
             </div>
             <p className="text-sm text-muted-foreground">
-              Tryck för att byta profilbild
+              {t('avatarHint')}
             </p>
           </div>
         </CardContent>
@@ -75,14 +77,14 @@ export default function EditProfilePage() {
               htmlFor="fullName"
               className="block text-sm font-medium text-foreground mb-2"
             >
-              Namn
+              {t('fullNameLabel')}
             </label>
             <Input
               id="fullName"
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Ditt namn"
+              placeholder={t('fullNamePlaceholder')}
             />
           </div>
 
@@ -91,7 +93,7 @@ export default function EditProfilePage() {
               htmlFor="email"
               className="block text-sm font-medium text-foreground mb-2"
             >
-              E-postadress
+              {t('emailLabel')}
             </label>
             <Input
               id="email"
@@ -101,7 +103,7 @@ export default function EditProfilePage() {
               className="bg-muted"
             />
             <p className="mt-1 text-xs text-muted-foreground">
-              E-postadressen kan inte ändras här.
+              {t('emailHint')}
             </p>
           </div>
         </CardContent>
@@ -115,20 +117,20 @@ export default function EditProfilePage() {
         size="lg"
       >
         {isSaving ? (
-          'Sparar...'
+          t('saving')
         ) : saved ? (
           <>
             <CheckIcon className="h-5 w-5 mr-2" />
-            Sparat!
+            {t('saved')}
           </>
         ) : (
-          'Spara ändringar'
+          t('saveChanges')
         )}
       </Button>
 
       {saved && (
         <p className="text-center text-sm text-emerald-600">
-          Dina ändringar har sparats!
+          {t('savedMessage')}
         </p>
       )}
     </div>

@@ -67,11 +67,25 @@ export async function POST(request: NextRequest) {
     }
     
     // Check session status
-    if (session.status !== 'active') {
+    if (session.status === 'locked') {
+      return NextResponse.json(
+        { error: 'Session is locked', details: 'Session is locked. No new participants can join.' },
+        { status: 403 }
+      );
+    }
+
+    if (session.status === 'ended' || session.status === 'cancelled' || session.status === 'archived') {
+      return NextResponse.json(
+        { error: 'Session ended', details: 'Session has ended.' },
+        { status: 410 }
+      );
+    }
+
+    if (session.status !== 'active' && session.status !== 'paused') {
       return NextResponse.json(
         { 
           error: 'Session not available',
-          details: `Session is ${session.status}. Only active sessions accept new participants.`,
+          details: `Session is ${session.status}.`,
         },
         { status: 403 }
       );
@@ -86,13 +100,21 @@ export async function POST(request: NextRequest) {
     }
     
     // Check max participants limit
-    const settings = session.settings as { max_participants?: number };
-    if (settings.max_participants && session.participant_count >= settings.max_participants) {
+    const settings = session.settings as {
+      max_participants?: number;
+      maxParticipants?: number;
+      require_approval?: boolean;
+      requireApproval?: boolean;
+    };
+    const maxParticipants = settings.max_participants ?? settings.maxParticipants;
+    if (maxParticipants && session.participant_count >= maxParticipants) {
       return NextResponse.json(
-        { error: 'Session is full', details: `Maximum ${settings.max_participants} participants reached` },
+        { error: 'Session is full', details: `Maximum ${maxParticipants} participants reached` },
         { status: 403 }
       );
     }
+
+    const requireApproval = Boolean(settings.require_approval ?? settings.requireApproval);
     
     // Generate participant token
     const participantToken = generateParticipantToken();
@@ -116,6 +138,8 @@ export async function POST(request: NextRequest) {
         display_name: body.displayName.trim(),
         participant_token: participantToken,
         avatar_url: body.avatarUrl,
+        // NOTE: DB enum does not include 'pending' (use 'idle' to represent awaiting approval)
+        status: requireApproval ? 'idle' : 'active',
         token_expires_at: tokenExpiresAt?.toISOString(),
         ip_address: ip,
         user_agent: userAgent,
@@ -161,6 +185,7 @@ export async function POST(request: NextRequest) {
         sessionId: participant.session_id,
         displayName: participant.display_name,
         role: participant.role,
+        status: participant.status,
         token: participant.participant_token,
         expiresAt: participant.token_expires_at,
         joinedAt: participant.joined_at,

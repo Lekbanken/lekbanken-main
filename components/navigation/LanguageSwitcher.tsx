@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,14 +24,9 @@ type LanguageSwitcherProps = {
 };
 
 export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherProps) {
-  const [mounted, setMounted] = useState(false);
   const { language, setLanguage } = usePreferences();
   const { switchLocale, isPending } = useLocaleSwitcher();
   const active = LANG_OPTIONS.find((option) => option.code === language);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const handleLanguageChange = (option: typeof LANG_OPTIONS[number]) => {
     // Update both PreferencesContext (for legacy support) and next-intl locale
@@ -54,15 +48,6 @@ export function LanguageSwitcher({ className, align = "end" }: LanguageSwitcherP
     isPending && "opacity-50",
     className,
   );
-
-  // Return a static button during SSR to avoid hydration mismatch
-  if (!mounted) {
-    return (
-      <button type="button" aria-label="Change language" className={buttonClassName} disabled>
-        {buttonContent}
-      </button>
-    );
-  }
 
   return (
     <DropdownMenu>

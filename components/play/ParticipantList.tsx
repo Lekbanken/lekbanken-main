@@ -26,6 +26,7 @@ type ParticipantListProps = {
   isSessionEnded?: boolean;
   onKick?: (participantId: string) => void;
   onBlock?: (participantId: string) => void;
+  onApprove?: (participantId: string) => void;
   onSetNextStarter?: (participantId: string) => void;
   onSetPosition?: (participantId: string, position: number) => void;
   className?: string;
@@ -40,6 +41,7 @@ export function ParticipantList({
   isSessionEnded = false,
   onKick,
   onBlock,
+  onApprove,
   onSetNextStarter,
   onSetPosition,
   className = '',
@@ -129,6 +131,7 @@ export function ParticipantList({
               participantCount={participants.length}
               onKick={onKick}
               onBlock={onBlock}
+              onApprove={onApprove}
               onSetNextStarter={onSetNextStarter}
               onSetPosition={onSetPosition}
             />

@@ -1,15 +1,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline'
 import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server'
 
 type Instruction = { title?: string; description?: string; duration_minutes?: number | null }
-
-const energyConfig: Record<string, { label: string; color: string; bgColor: string }> = {
-  low: { label: 'Låg energi', color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/50' },
-  medium: { label: 'Medel energi', color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' },
-  high: { label: 'Hög energi', color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/50' },
-}
 
 const localePriority = ['sv', 'no', 'en']
 
@@ -27,21 +22,28 @@ type Props = {
 };
 
 export default async function GameDetailPage({ params }: Props) {
+  const t = await getTranslations('app.gameDetail')
   const { gameId } = await params;
   const game = await getGameById(gameId)
   const relatedGames = game ? await getRelatedGames(game, 4) : []
+
+  const energyConfig: Record<string, { label: string; color: string; bgColor: string }> = {
+    low: { label: t('energy.low'), color: 'text-green-600 dark:text-green-400', bgColor: 'bg-green-50 dark:bg-green-950/50' },
+    medium: { label: t('energy.medium'), color: 'text-amber-600 dark:text-amber-400', bgColor: 'bg-amber-50 dark:bg-amber-950/50' },
+    high: { label: t('energy.high'), color: 'text-red-600 dark:text-red-400', bgColor: 'bg-red-50 dark:bg-red-950/50' },
+  }
 
   if (!game) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Leken hittades inte</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">{t('notFoundTitle')}</h1>
           <Link
             href="/app/browse"
             className="inline-flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
           >
             <ArrowLeftIcon className="h-4 w-4" />
-            Tillbaka till lekar
+            {t('backToBrowse')}
           </Link>
         </div>
       </div>
@@ -50,7 +52,7 @@ export default async function GameDetailPage({ params }: Props) {
 
   const translation = pickTranslation(game)
   const displayTitle = translation?.title || game.name
-  const displayDescription = translation?.short_description || game.description || 'Ingen beskrivning tillgänglig'
+  const displayDescription = translation?.short_description || game.description || t('descriptionFallback')
 
   const structuredSteps =
     Array.isArray(game.steps) && game.steps.length
@@ -72,6 +74,13 @@ export default async function GameDetailPage({ params }: Props) {
   const cover = media.find((m) => m.kind === 'cover') ?? media[0]
   const gallery = media.filter((m) => m !== cover)
 
+  // Capture nullable fields into locals so TS can narrow safely in JSX
+  const ageMin = game.age_min
+  const ageMax = game.age_max
+  const minPlayers = game.min_players
+  const maxPlayers = game.max_players
+  const timeEstimateMin = game.time_estimate_min
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -81,12 +90,12 @@ export default async function GameDetailPage({ params }: Props) {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
         >
           <ArrowLeftIcon className="h-4 w-4" />
-          Tillbaka till lekar
+          {t('backToBrowse')}
         </Link>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-1">Lek</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-primary mb-1">{t('label')}</p>
             <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{displayTitle}</h1>
           </div>
         </div>
@@ -116,30 +125,30 @@ export default async function GameDetailPage({ params }: Props) {
           )}
           {game.main_purpose && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary">
-              {game.main_purpose.name || 'Syfte'}
+              {game.main_purpose.name || t('purposeFallback')}
             </span>
           )}
           {game.product && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-200">
-              {game.product.name || 'Produkt'}
+              {game.product.name || t('productFallback')}
             </span>
           )}
-          {game.age_min && game.age_max && (
+          {ageMin != null && ageMax != null && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400">
               <UserIcon className="h-4 w-4" />
-              {game.age_min}-{game.age_max} år
+              {t('ageRange', { min: ageMin, max: ageMax })}
             </span>
           )}
-          {game.min_players && game.max_players && (
+          {minPlayers != null && maxPlayers != null && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-orange-50 dark:bg-orange-950/50 text-orange-600 dark:text-orange-400">
               <UsersIcon className="h-4 w-4" />
-              {game.min_players}-{game.max_players} deltagare
+              {t('playersRange', { min: minPlayers, max: maxPlayers })}
             </span>
           )}
-          {game.time_estimate_min && (
+          {timeEstimateMin != null && (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-primary/10 text-primary">
               <ClockIcon className="h-4 w-4" />
-              ~{game.time_estimate_min} min
+              {t('approxMinutes', { minutes: timeEstimateMin })}
             </span>
           )}
         </div>
@@ -151,7 +160,7 @@ export default async function GameDetailPage({ params }: Props) {
         <div className="lg:col-span-2 space-y-6">
           {/* Description */}
           <section className="rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">Om leken</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.about')}</h2>
             <p className="text-muted-foreground leading-relaxed">
               {displayDescription}
             </p>
@@ -160,14 +169,16 @@ export default async function GameDetailPage({ params }: Props) {
           {/* Instructions */}
           {displayInstructions && displayInstructions.length > 0 ? (
             <section className="rounded-2xl border border-border/60 bg-card p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-3">Så spelar du</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.instructions')}</h2>
               <ol className="space-y-3 text-muted-foreground leading-relaxed">
                 {displayInstructions.map((step, idx) => (
                   <li key={idx} className="rounded-lg border border-border/60 bg-muted/30 p-3">
                     {step.title && <p className="font-semibold text-foreground">{step.title}</p>}
                     {step.description && <p className="mt-1 whitespace-pre-wrap">{step.description}</p>}
-                    {step.duration_minutes ? (
-                      <p className="mt-1 text-xs text-muted-foreground">~{step.duration_minutes} min</p>
+                    {step.duration_minutes != null ? (
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t('approxMinutes', { minutes: step.duration_minutes })}
+                      </p>
                     ) : null}
                   </li>
                 ))}
@@ -176,7 +187,7 @@ export default async function GameDetailPage({ params }: Props) {
           ) : (
             game.instructions && (
               <section className="rounded-2xl border border-border/60 bg-card p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-3">Så spelar du</h2>
+                <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.instructions')}</h2>
                 <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                   {game.instructions}
                 </div>
@@ -187,7 +198,7 @@ export default async function GameDetailPage({ params }: Props) {
           {/* Gallery */}
           {gallery.length > 0 && (
             <section className="rounded-2xl border border-border/60 bg-card p-6">
-              <h2 className="text-lg font-semibold text-foreground mb-3">Bilder</h2>
+              <h2 className="text-lg font-semibold text-foreground mb-3">{t('sections.images')}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {gallery.map((item) =>
                   item.media?.url ? (
@@ -210,35 +221,41 @@ export default async function GameDetailPage({ params }: Props) {
 
           {/* Game Details Grid */}
           <section className="rounded-2xl border border-border/60 bg-card p-6">
-            <h2 className="text-lg font-semibold text-foreground mb-4">Detaljer</h2>
+            <h2 className="text-lg font-semibold text-foreground mb-4">{t('sections.details')}</h2>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  Antal deltagare
+                  {t('details.participants')}
                 </h3>
                 <p className="text-xl font-bold text-foreground">
-                  {game.min_players}-{game.max_players}
+                  {minPlayers != null && maxPlayers != null
+                    ? t('playersRange', { min: minPlayers, max: maxPlayers })
+                    : '—'}
                 </p>
               </div>
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  Tid
+                  {t('details.time')}
                 </h3>
                 <p className="text-xl font-bold text-foreground">
-                  ~{game.time_estimate_min} min
+                  {timeEstimateMin != null
+                    ? t('approxMinutes', { minutes: timeEstimateMin })
+                    : '—'}
                 </p>
               </div>
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  Ålder
+                  {t('details.age')}
                 </h3>
                 <p className="text-xl font-bold text-foreground">
-                  {game.age_min}-{game.age_max} år
+                  {ageMin != null && ageMax != null
+                    ? t('ageRange', { min: ageMin, max: ageMax })
+                    : '—'}
                 </p>
               </div>
               <div>
                 <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
-                  Energinivå
+                  {t('details.energy')}
                 </h3>
                 <p className={`text-xl font-bold ${energy.color}`}>
                   {energy.label}
@@ -255,7 +272,7 @@ export default async function GameDetailPage({ params }: Props) {
             href={`/app/play/${game.id}`}
             className="block text-center w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold py-4 px-6 rounded-xl text-lg transition shadow-sm"
           >
-            Starta leken
+            {t('startGame')}
           </Link>
 
           {/* Quick Info Card */}

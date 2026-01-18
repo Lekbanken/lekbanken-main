@@ -100,7 +100,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
       />
 
 
-      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
         <Link
           href="/app/learning"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
@@ -116,7 +116,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           <p className="mt-1 text-xs font-normal text-muted-foreground">Visa alla och pinna till dashboard</p>
         </Link>
         <Link
-          href="/app/gamification/coins"
+          href="/app/profile/coins"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
           DiceCoin
@@ -128,6 +128,13 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
         >
           Butik
           <p className="mt-1 text-xs font-normal text-muted-foreground">Cosmetics och powerups</p>
+        </Link>
+        <Link
+          href="/app/gamification/events"
+          className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
+        >
+          Eventlogg
+          <p className="mt-1 text-xs font-normal text-muted-foreground">Read-only, senaste händelser</p>
         </Link>
       </div>
 

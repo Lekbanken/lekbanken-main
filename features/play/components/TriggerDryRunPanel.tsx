@@ -258,7 +258,7 @@ function SimulationResultCard({ result, t }: SimulationResultCardProps) {
                       <span className="font-medium text-sm">{trigger.name}</span>
                       {trigger.executeOnce && (
                         <Badge variant="outline" className="text-xs">
-                          1×
+                          {t('executeOnce')}
                         </Badge>
                       )}
                     </div>

@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -55,6 +55,7 @@ export function PuzzleProgressPanel({
   refreshInterval = 5000,
 }: PuzzleProgressPanelProps) {
   const t = useTranslations('play.puzzleProgress');
+  const locale = useLocale();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [puzzleStatuses, setPuzzleStatuses] = useState<PuzzleStatus[]>([]);
@@ -211,7 +212,7 @@ export function PuzzleProgressPanel({
           <div className="flex items-center gap-2">
             {lastUpdated && (
               <span className="text-xs text-muted-foreground">
-                {t('updatedAt', { time: lastUpdated.toLocaleTimeString('sv-SE') })}
+                {t('updatedAt', { time: lastUpdated.toLocaleTimeString(locale) })}
               </span>
             )}
             <Button variant="ghost" size="sm" onClick={loadProgress}>

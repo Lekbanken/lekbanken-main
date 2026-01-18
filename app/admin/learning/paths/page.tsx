@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   MapIcon,
   GlobeAltIcon,
@@ -11,6 +11,7 @@ import {
   PencilSquareIcon,
   TrashIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -31,25 +32,26 @@ import {
 } from '@/app/actions/learning-admin';
 import { PathEditorDrawer } from './PathEditorDrawer';
 
-const statusConfig = {
-  draft: { label: 'Utkast', variant: 'outline' as const },
-  active: { label: 'Aktiv', variant: 'default' as const },
-  archived: { label: 'Arkiverad', variant: 'secondary' as const },
-};
-
-const kindLabels: Record<string, string> = {
-  onboarding: 'Onboarding',
-  role: 'Rollbaserad',
-  theme: 'Tema',
-  compliance: 'Compliance',
-};
-
 export default function AdminPathsPage() {
+  const t = useTranslations('admin.learning.paths');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<LearningPathListResult | null>(null);
   const [tenants, setTenants] = useState<TenantOption[]>([]);
   const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+
+  const statusConfig = useMemo(() => ({
+    draft: { label: t('status.draft'), variant: 'outline' as const },
+    active: { label: t('status.active'), variant: 'default' as const },
+    archived: { label: t('status.archived'), variant: 'secondary' as const },
+  }), [t]);
+
+  const kindLabels: Record<string, string> = useMemo(() => ({
+    onboarding: t('kinds.onboarding'),
+    role: t('kinds.role'),
+    theme: t('kinds.theme'),
+    compliance: t('kinds.compliance'),
+  }), [t]);
 
   // Editor drawer state
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -106,11 +108,11 @@ export default function AdminPathsPage() {
       setResult(data);
     } catch (err) {
       console.error('Failed to load paths:', err);
-      setError(err instanceof Error ? err.message : 'Kunde inte hämta lärstigar');
+      setError(err instanceof Error ? err.message : t('error.loadFailed'));
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, searchDebounced, statusFilter, scopeFilter, tenantFilter, isSystemAdmin]);
+  }, [page, pageSize, searchDebounced, statusFilter, scopeFilter, tenantFilter, isSystemAdmin, t]);
 
   useEffect(() => {
     loadPaths();
@@ -127,13 +129,13 @@ export default function AdminPathsPage() {
   };
 
   const handleDeleteClick = async (path: LearningPathRow) => {
-    if (!confirm(`Vill du verkligen ta bort "${path.title}"?`)) return;
+    if (!confirm(t('confirmDelete', { title: path.title }))) return;
     
     const result = await deletePath(path.id);
     if (result.success) {
       loadPaths();
     } else {
-      setError(result.error || 'Kunde inte ta bort lärvägen');
+      setError(result.error || t('error.deleteFailed'));
     }
   };
 
@@ -155,25 +157,25 @@ export default function AdminPathsPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Utbildning', href: '/admin/learning' },
-          { label: 'Lärstigar', href: '/admin/learning/paths' },
+          { label: t('breadcrumbs.learning'), href: '/admin/learning' },
+          { label: t('breadcrumbs.paths'), href: '/admin/learning/paths' },
         ]}
       />
 
       <AdminPageHeader
-        title="Lärstigar"
-        description="Bygg utbildningsvägar med ordnade kurser"
+        title={t('title')}
+        description={t('description')}
         icon={<MapIcon className="h-8 w-8" />}
         actions={
           isSystemAdmin ? (
             <Button onClick={handleCreateClick}>
               <PlusIcon className="mr-2 h-4 w-4" />
-              Skapa lärstig
+              {t('actions.create')}
             </Button>
           ) : (
             <Badge variant="secondary" className="gap-1">
               <InformationCircleIcon className="h-4 w-4" />
-              Endast visning
+              {t('actions.readOnly')}
             </Badge>
           )
         }
@@ -186,9 +188,9 @@ export default function AdminPathsPage() {
             <div className="flex gap-3">
               <InformationCircleIcon className="h-5 w-5 shrink-0 text-amber-500" />
               <div className="text-sm">
-                <p className="font-medium text-foreground">Endast system-admin kan skapa lärstigar</p>
+                <p className="font-medium text-foreground">{t('notice.title')}</p>
                 <p className="mt-1 text-muted-foreground">
-                  Du kan se befintliga lärstigar men behöver system admin-rättigheter för att skapa eller redigera dem.
+                  {t('notice.description')}
                 </p>
               </div>
             </div>
@@ -201,7 +203,7 @@ export default function AdminPathsPage() {
         <Card>
           <CardContent className="p-4">
             <p className="text-2xl font-bold">{result?.totalCount ?? '—'}</p>
-            <p className="text-sm text-muted-foreground">Lärstigar</p>
+            <p className="text-sm text-muted-foreground">{t('stats.total')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -209,7 +211,7 @@ export default function AdminPathsPage() {
             <p className="text-2xl font-bold text-green-600">
               {paths.filter(p => p.status === 'active').length}
             </p>
-            <p className="text-sm text-muted-foreground">Aktiva</p>
+            <p className="text-sm text-muted-foreground">{t('stats.active')}</p>
           </CardContent>
         </Card>
         <Card>
@@ -217,7 +219,7 @@ export default function AdminPathsPage() {
             <p className="text-2xl font-bold text-muted-foreground">
               {paths.filter(p => p.status === 'draft').length}
             </p>
-            <p className="text-sm text-muted-foreground">Utkast</p>
+            <p className="text-sm text-muted-foreground">{t('stats.draft')}</p>
           </CardContent>
         </Card>
       </div>
@@ -227,7 +229,7 @@ export default function AdminPathsPage() {
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Sök lärstigar..."
+            placeholder={t('filters.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-9"
@@ -242,10 +244,10 @@ export default function AdminPathsPage() {
           }}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          <option value="all">Alla statusar</option>
-          <option value="draft">Utkast</option>
-          <option value="active">Aktiv</option>
-          <option value="archived">Arkiverad</option>
+          <option value="all">{t('filters.status.all')}</option>
+          <option value="draft">{t('status.draft')}</option>
+          <option value="active">{t('status.active')}</option>
+          <option value="archived">{t('status.archived')}</option>
         </select>
 
         {isSystemAdmin && (
@@ -258,9 +260,9 @@ export default function AdminPathsPage() {
               }}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              <option value="all">Alla scope</option>
-              <option value="global">Globala</option>
-              <option value="tenant">Organisation</option>
+              <option value="all">{t('filters.scope.all')}</option>
+              <option value="global">{t('filters.scope.global')}</option>
+              <option value="tenant">{t('filters.scope.tenant')}</option>
             </select>
 
             {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
@@ -272,7 +274,7 @@ export default function AdminPathsPage() {
                 }}
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
-                <option value="">Alla organisationer</option>
+                <option value="">{t('filters.tenants.all')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -294,7 +296,7 @@ export default function AdminPathsPage() {
       {/* Loading state */}
       {isLoading && !result && (
         <div className="mt-6 flex items-center justify-center py-12">
-          <div className="text-muted-foreground">Laddar lärstigar...</div>
+          <div className="text-muted-foreground">{t('loading')}</div>
         </div>
       )}
 
@@ -305,11 +307,11 @@ export default function AdminPathsPage() {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12 text-center">
                 <MapIcon className="h-12 w-12 text-muted-foreground/50" />
-                <h3 className="mt-4 font-semibold">Inga lärstigar ännu</h3>
+                <h3 className="mt-4 font-semibold">{t('empty.title')}</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {searchDebounced || statusFilter !== 'all' 
-                    ? 'Inga lärstigar matchar filtren' 
-                    : 'Lärstigar kan skapas i en framtida version.'}
+                    ? t('empty.filtered')
+                    : t('empty.default')}
                 </p>
               </CardContent>
             </Card>
@@ -333,19 +335,19 @@ export default function AdminPathsPage() {
                             {isGlobal ? (
                               <Badge variant="secondary" className="gap-1">
                                 <GlobeAltIcon className="h-3 w-3" />
-                                Global
+                                {t('badges.global')}
                               </Badge>
                             ) : (
                               <Badge variant="outline" className="gap-1">
                                 <BuildingOffice2Icon className="h-3 w-3" />
-                                {path.tenant_name || 'Organisation'}
+                                {path.tenant_name || t('badges.organization')}
                               </Badge>
                             )}
                             <Badge variant="outline">
                               {kindLabels[path.kind] || path.kind}
                             </Badge>
                           </div>
-                          <p className="mt-1 text-sm text-muted-foreground">{path.description || '—'}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{path.description || t('emptyValue')}</p>
                         </div>
                       </div>
                       {isSystemAdmin && (
@@ -371,7 +373,7 @@ export default function AdminPathsPage() {
                   <CardContent>
                     <div className="flex flex-wrap items-center gap-4 rounded-lg border border-dashed border-border bg-muted/30 p-3">
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <span className="font-medium">{path.node_count || 0}</span> kurser i denna stig
+                        <span className="font-medium">{path.node_count || 0}</span> {t('stats.nodesLabel')}
                       </div>
                     </div>
                   </CardContent>
@@ -386,7 +388,11 @@ export default function AdminPathsPage() {
       {result && totalPages > 1 && (
         <div className="mt-4 flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Visar {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, result.totalCount)} av {result.totalCount}
+            {t('pagination.showing', {
+              start: (page - 1) * pageSize + 1,
+              end: Math.min(page * pageSize, result.totalCount),
+              total: result.totalCount,
+            })}
           </p>
           <div className="flex gap-2">
             <Button
@@ -395,7 +401,7 @@ export default function AdminPathsPage() {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
             >
-              Föregående
+              {t('pagination.previous')}
             </Button>
             <Button
               variant="outline"
@@ -403,7 +409,7 @@ export default function AdminPathsPage() {
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
             >
-              Nästa
+              {t('pagination.next')}
             </Button>
           </div>
         </div>

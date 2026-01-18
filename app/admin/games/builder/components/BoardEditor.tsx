@@ -188,7 +188,7 @@ function BoardPreview({ config, gameName, layout }: BoardPreviewProps) {
 // Main BoardEditor Component
 // =============================================================================
 
-export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardEditorProps) {
+export function BoardEditor({ config, gameName, onChange }: BoardEditorProps) {
   const t = useTranslations('admin.games.builder');
   const [previewLayout, setPreviewLayout] = useState<BoardLayout>('standard');
 
@@ -239,7 +239,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
             </div>
           </div>
           
-          <BoardPreview config={config} gameName={gameName} layout={previewLayout} />
+          <BoardPreview config={config} gameName={gameName ?? ''} layout={previewLayout} />
 
           {!hasContent && (
             <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-sm">
@@ -338,7 +338,7 @@ export function BoardEditor({ config, gameName = 'Mitt spel', onChange }: BoardE
               <Input
                 value={config.background_color}
                 onChange={(e) => updateConfig('background_color', e.target.value)}
-                placeholder="#1e293b"
+                placeholder={t('board.backgroundPlaceholder')}
                 className="flex-1 font-mono text-sm"
               />
               {config.background_color && (

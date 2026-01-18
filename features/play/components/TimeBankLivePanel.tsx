@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -67,14 +67,7 @@ export interface TimeBankLivePanelProps {
 // Constants
 // =============================================================================
 
-const QUICK_ADJUSTMENTS = [
-  { delta: 30, label: '+30s' },
-  { delta: 60, label: '+1m' },
-  { delta: 300, label: '+5m' },
-  { delta: -30, label: '-30s' },
-  { delta: -60, label: '-1m' },
-  { delta: -300, label: '-5m' },
-];
+const QUICK_ADJUSTMENTS = [30, 60, 300, -30, -60, -300];
 
 // =============================================================================
 // Helper: Format Time
@@ -93,6 +86,17 @@ const formatTime = (seconds: number, showSign = false): string => {
   }
   
   return `${sign}${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const formatTimeShort = (value: string, locale: string): string => {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(value));
+  } catch {
+    return '';
+  }
 };
 
 // =============================================================================
@@ -219,6 +223,7 @@ interface LedgerHistoryProps {
 }
 
 function LedgerHistory({ ledger, maxItems = 5, t }: LedgerHistoryProps) {
+  const locale = useLocale();
   if (ledger.length === 0) {
     return (
       <div className="text-xs text-muted-foreground text-center py-2">
@@ -252,10 +257,7 @@ function LedgerHistory({ ledger, maxItems = 5, t }: LedgerHistoryProps) {
               {formatTime(entry.deltaSeconds, true)}
             </span>
             <span className="text-muted-foreground/50">
-              {new Date(entry.createdAt).toLocaleTimeString('sv-SE', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+              {formatTimeShort(entry.createdAt, locale)}
             </span>
           </div>
         </div>
@@ -280,6 +282,11 @@ export function TimeBankLivePanel({
   const [customDelta, setCustomDelta] = useState<string>('');
   const [customReason, setCustomReason] = useState<string>('');
   const [showHistory, setShowHistory] = useState(false);
+
+  const formatDeltaLabel = useCallback(
+    (delta: number) => t('format.deltaLabel', { time: formatTime(delta, true) }),
+    [t]
+  );
   
   const handleQuickAdjust = useCallback((delta: number) => {
     onApplyDelta(delta, `${t('quickAdjustment')}: ${formatTime(delta, true)}`);
@@ -362,7 +369,7 @@ export function TimeBankLivePanel({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <ClockIcon className="h-5 w-5" />
-            TimeBank
+            {t('title')}
           </CardTitle>
           
           <div className="flex items-center gap-1">
@@ -412,19 +419,19 @@ export function TimeBankLivePanel({
         
         {/* Quick adjustments */}
         <div className="grid grid-cols-6 gap-2">
-          {QUICK_ADJUSTMENTS.map((adj) => (
-            <Tooltip key={adj.delta} content={adj.delta > 0 ? t('tooltips.addSeconds', { count: Math.abs(adj.delta) }) : t('tooltips.subtractSeconds', { count: Math.abs(adj.delta) })}>
+          {QUICK_ADJUSTMENTS.map((delta) => (
+            <Tooltip key={delta} content={delta > 0 ? t('tooltips.addSeconds', { count: Math.abs(delta) }) : t('tooltips.subtractSeconds', { count: Math.abs(delta) })}>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleQuickAdjust(adj.delta)}
+                onClick={() => handleQuickAdjust(delta)}
                 className={`
                   font-mono text-xs
-                  ${adj.delta > 0 ? 'hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/50' : ''}
-                  ${adj.delta < 0 ? 'hover:bg-red-500/10 hover:text-red-600 hover:border-red-500/50' : ''}
+                  ${delta > 0 ? 'hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/50' : ''}
+                  ${delta < 0 ? 'hover:bg-red-500/10 hover:text-red-600 hover:border-red-500/50' : ''}
                 `}
               >
-                {adj.label}
+                {formatDeltaLabel(delta)}
               </Button>
             </Tooltip>
           ))}
@@ -474,7 +481,7 @@ export function TimeBankLivePanel({
                 {state.ledger.length}
               </Badge>
             </span>
-            <span>{showHistory ? '−' : '+'}</span>
+            <span>{showHistory ? t('toggle.hide') : t('toggle.show')}</span>
           </Button>
           
           {showHistory && (

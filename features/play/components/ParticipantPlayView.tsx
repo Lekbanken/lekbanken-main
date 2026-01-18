@@ -314,7 +314,7 @@ export function ParticipantPlayView({
     } catch (err) {
       setArtifactsError(err instanceof Error ? err.message : t('errors.couldNotLoadArtifacts'));
     }
-  }, [sessionId, participantToken]);
+  }, [sessionId, participantToken, t]);
 
   const loadDecisions = useCallback(async () => {
     if (!participantToken) return;
@@ -345,7 +345,7 @@ export function ParticipantPlayView({
     } catch (err) {
       setDecisionsError(err instanceof Error ? err.message : t('errors.couldNotLoadDecisions'));
     }
-  }, [sessionId, participantToken]);
+  }, [sessionId, participantToken, t]);
 
   /**
    * Submit keypad code for server-side validation.
@@ -379,7 +379,7 @@ export function ParticipantPlayView({
     } finally {
       setKeypadSubmitting((prev) => ({ ...prev, [artifactId]: false }));
     }
-  }, [sessionId, participantToken, loadArtifacts]);
+  }, [sessionId, participantToken, loadArtifacts, t]);
 
   const [signalToast, setSignalToast] = useState<{
     id: string;
@@ -537,7 +537,7 @@ export function ParticipantPlayView({
     } finally {
       setSecretRevealLoading(false);
     }
-  }, [participantToken, sessionCode]);
+  }, [participantToken, sessionCode, t]);
 
   const handleRequestHintFromHost = useCallback(async () => {
     if (!participantToken) return;
@@ -565,7 +565,7 @@ export function ParticipantPlayView({
     } finally {
       setHintRequestSending(false);
     }
-  }, [participantToken, role, sessionId, steps, currentStepIndex]);
+  }, [participantToken, role, sessionId, steps, currentStepIndex, t]);
   
   // Current step data - handle "not started" state (index -1)
   const stepNotStarted = currentStepIndex < 0;

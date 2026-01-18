@@ -1,3 +1,4 @@
+import { getTranslations } from 'next-intl/server';
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { appNavItems } from "@/components/app/nav-items";
@@ -6,6 +7,7 @@ import { createServerRlsClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export default async function GamificationEventsPage() {
+  const t = await getTranslations('app.gamification.events');
   const supabase = await createServerRlsClient();
   const {
     data: { user },
@@ -17,7 +19,7 @@ export default async function GamificationEventsPage() {
     return (
       <Card>
         <CardContent className="p-6 text-sm text-muted-foreground">
-          Du behöver vara inloggad för att se eventloggen.
+          {t('signInRequired')}
         </CardContent>
       </Card>
     );
@@ -34,8 +36,8 @@ export default async function GamificationEventsPage() {
     <div className="space-y-6 pb-32">
       <PageTitleHeader
         icon={dicecoinIcon}
-        title="DICECOIN"
-        subtitle="Eventlogg (read-only)"
+        title={t('title')}
+        subtitle={t('subtitle')}
       />
 
       <Card>
@@ -63,7 +65,7 @@ export default async function GamificationEventsPage() {
             ))
           ) : (
             <div className="py-12 text-center text-sm text-muted-foreground">
-              Inga event att visa ännu.
+              {t('empty')}
             </div>
           )}
         </CardContent>

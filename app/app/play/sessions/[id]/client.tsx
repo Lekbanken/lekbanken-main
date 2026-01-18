@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { 
   getHostSession, 
   getParticipants, 
@@ -40,6 +41,7 @@ type ParticipantWithExtras = Participant & {
 };
 
 export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientProps) {
+  const t = useTranslations('app.play.sessionDetail');
   const router = useRouter();
   const [session, setSession] = useState<PlaySession | null>(null);
   const [participants, setParticipants] = useState<ParticipantWithExtras[]>([]);
@@ -59,11 +61,11 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       setParticipants(participantsRes.participants);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte hämta session');
+      setError(err instanceof Error ? err.message : t('loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void loadData();
@@ -78,7 +80,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await updateSessionStatus(sessionId, action);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte uppdatera status');
+      setError(err instanceof Error ? err.message : t('updateFailed'));
     } finally {
       setActionPending(false);
       setLoadingAction(undefined);
@@ -89,7 +91,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
     if (!session) return;
     
     const shareUrl = `${window.location.origin}/play`;
-    const shareText = `Gå med i sessionen! Kod: ${session.sessionCode}`;
+    const shareText = t('shareText', { code: session.sessionCode });
 
     if (navigator.share) {
       try {
@@ -114,7 +116,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await kickParticipant(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte ta bort deltagare');
+      setError(err instanceof Error ? err.message : t('kickFailed'));
     }
   };
 
@@ -123,7 +125,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await blockParticipant(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte blockera deltagare');
+      setError(err instanceof Error ? err.message : t('blockFailed'));
     }
   };
 
@@ -132,7 +134,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await setNextStarter(sessionId, participantId);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte sätta nästa startare');
+      setError(err instanceof Error ? err.message : t('setNextStarterFailed'));
     }
   };
 
@@ -141,7 +143,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       await setParticipantPosition(sessionId, participantId, position);
       await loadData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte sätta position');
+      setError(err instanceof Error ? err.message : t('setPositionFailed'));
     }
   };
 
@@ -167,11 +169,11 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
             <ExclamationCircleIcon className="h-6 w-6 text-destructive" />
           </div>
           <h1 className="text-xl font-semibold text-foreground">
-            Session hittades inte
+            {t('notFoundTitle')}
           </h1>
           <p className="text-muted-foreground">{error}</p>
           <Button variant="primary" onClick={() => router.push('/app/play/sessions')}>
-            Tillbaka till sessioner
+            {t('backToSessions')}
           </Button>
         </Card>
       </div>
@@ -197,7 +199,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
       {error && (
         <SessionStatusMessage
           type="error"
-          title="Något gick fel"
+          title={t('errorTitle')}
           message={error}
           onDismiss={() => setError(null)}
           autoDismiss
@@ -211,7 +213,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
           {/* Controls */}
           <Card variant="elevated" className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Sessionskontroller
+              {t('controlsTitle')}
             </h2>
             <SessionControls
               status={session.status}
@@ -229,17 +231,17 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
           {isLive && (
             <Card variant="elevated" className="p-6">
               <h2 className="text-lg font-semibold text-foreground mb-4">
-                Dela session
+                {t('shareTitle')}
               </h2>
               <div className="flex flex-col sm:flex-row gap-4 items-center">
                 {/* Large code display */}
                 <div className="flex-1 text-center sm:text-left">
-                  <p className="text-sm text-muted-foreground mb-1">Sessionskod</p>
+                  <p className="text-sm text-muted-foreground mb-1">{t('sessionCode')}</p>
                   <p className="text-4xl font-mono font-bold text-primary tracking-widest">
                     {session.sessionCode}
                   </p>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Deltagare går till <span className="font-medium">lekbanken.se/play</span>
+                    {t('participantJoinHint', { url: 'lekbanken.se/play' })}
                   </p>
                 </div>
 
@@ -247,11 +249,11 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={handleShare}>
                     <ShareIcon className="h-4 w-4" />
-                    {copied ? 'Kopierad!' : 'Dela'}
+                    {copied ? t('copied') : t('share')}
                   </Button>
                   <Button variant="outline" disabled>
                     <QrCodeIcon className="h-4 w-4" />
-                    QR-kod
+                    {t('qrCode')}
                   </Button>
                 </div>
               </div>
@@ -263,7 +265,7 @@ export function HostSessionDetailClient({ sessionId }: HostSessionDetailClientPr
         <div>
           <Card variant="elevated" className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Deltagare
+              {t('participantsTitle')}
             </h2>
             <ParticipantList
               participants={participants.map((p) => ({

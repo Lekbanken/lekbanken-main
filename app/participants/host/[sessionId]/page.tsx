@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 import { createBrowserClient } from '@/lib/supabase/client';
 import { ParticipantList } from '@/features/participants/components/ParticipantList';
 import { SessionControlPanel } from '@/features/participants/components/SessionControlPanel';
@@ -12,9 +13,12 @@ type ParticipantSession = Database['public']['Tables']['participant_sessions']['
 type SessionStatus = Database['public']['Enums']['participant_session_status'];
 
 export default function HostDashboardPage() {
+  const t = useTranslations('play.participantsHost');
+  const locale = useLocale();
   const params = useParams();
   const router = useRouter();
   const sessionId = params.sessionId as string;
+  const dateFormatter = useMemo(() => new Intl.DateTimeFormat(locale), [locale]);
 
   const [session, setSession] = useState<ParticipantSession | null>(null);
   const [participantCount, setParticipantCount] = useState(0);
@@ -41,14 +45,14 @@ export default function HostDashboardPage() {
         .single();
 
       if (sessionError || !sessionData) {
-        setError('Session kunde inte hittas');
+        setError(t('errors.sessionNotFound'));
         setLoading(false);
         return;
       }
 
       // Verify user is the host
       if (sessionData.host_user_id !== user.id) {
-        setError('Du är inte värd för denna session');
+        setError(t('errors.notHost'));
         setLoading(false);
         return;
       }
@@ -139,7 +143,7 @@ export default function HostDashboardPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Laddar session...</p>
+          <p className="text-gray-600">{t('loading')}</p>
         </div>
       </div>
     );
@@ -149,12 +153,12 @@ export default function HostDashboardPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error || 'Session kunde inte hittas'}</p>
+          <p className="text-red-600 mb-4">{error || t('errors.sessionNotFound')}</p>
           <button
             onClick={() => router.push('/app/participants')}
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Tillbaka
+            {t('actions.back')}
           </button>
         </div>
       </div>
@@ -168,17 +172,17 @@ export default function HostDashboardPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <h1 className="text-3xl font-bold text-gray-900">
-              Värd Dashboard
+              {t('header.title')}
             </h1>
             <button
               onClick={() => router.push('/app/participants')}
               className="px-4 py-2 text-gray-600 hover:text-gray-900"
             >
-              ← Tillbaka
+              {t('actions.backArrow')}
             </button>
           </div>
           <p className="text-gray-600">
-            Hantera din session och deltagare
+            {t('header.subtitle')}
           </p>
         </div>
 
@@ -195,23 +199,23 @@ export default function HostDashboardPage() {
 
         {/* Session Info */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">Session Information</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('sessionInfo.title')}</h2>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Session Kod</p>
+              <p className="text-sm text-gray-600">{t('sessionInfo.codeLabel')}</p>
               <p className="text-2xl font-mono font-bold">{session.session_code}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Deltagare</p>
+              <p className="text-sm text-gray-600">{t('sessionInfo.participantsLabel')}</p>
               <p className="text-2xl font-bold">{participantCount}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Skapad</p>
-              <p className="text-sm">{new Date(session.created_at).toLocaleString('sv-SE')}</p>
+              <p className="text-sm text-gray-600">{t('sessionInfo.createdLabel')}</p>
+              <p className="text-sm">{dateFormatter.format(new Date(session.created_at))}</p>
             </div>
             {session.game_id && (
               <div>
-                <p className="text-sm text-gray-600">Spel ID</p>
+                <p className="text-sm text-gray-600">{t('sessionInfo.gameIdLabel')}</p>
                 <p className="text-sm font-mono">{session.game_id}</p>
               </div>
             )}
@@ -225,7 +229,7 @@ export default function HostDashboardPage() {
 
         {/* Participant List */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Deltagare</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('participants.title')}</h2>
           <ParticipantList 
             sessionId={session.id} 
             sessionCode={session.session_code}

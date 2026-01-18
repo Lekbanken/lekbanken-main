@@ -17,7 +17,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
   const totalSeconds = typeof timerTotalSeconds === "number" ? timerTotalSeconds : 0;
   const remainingSeconds = typeof timerSeconds === "number" ? timerSeconds : totalSeconds;
   const timerProgress = totalSeconds > 0 ? Math.max(0, Math.min(1, remainingSeconds / totalSeconds)) : null;
-  const timerLabel = formatTime ? formatTime(remainingSeconds) : `${remainingSeconds}s`;
+  const timerLabel = formatTime ? formatTime(remainingSeconds) : t('secondsShort', { count: remainingSeconds });
 
   return (
     <article className="space-y-5 rounded-3xl border border-border/60 bg-card p-5 shadow-md sm:p-6">
@@ -43,7 +43,7 @@ export function StepViewer({ step, index, total, timerSeconds, timerTotalSeconds
         {step.durationMinutes ? (
           <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
             <ClockIcon className="h-3.5 w-3.5" aria-hidden />
-            {step.durationMinutes} min
+            {step.durationMinutes} {t('minutesShort')}
           </span>
         ) : null}
       </div>

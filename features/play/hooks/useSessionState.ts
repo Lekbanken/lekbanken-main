@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import type {
   SessionCockpitState,
   SessionCockpitActions,
@@ -19,7 +20,6 @@ import type {
   SessionEvent,
   Signal,
   SignalOutputType,
-  ExtendedPreflightState,
 } from '@/types/session-cockpit';
 import {
   DEFAULT_SIGNAL_CAPABILITIES,
@@ -31,6 +31,7 @@ import {
   getParticipants,
   updateSessionStatus,
 } from '@/features/play-participant/api';
+import { buildPreflightItems, type SessionChecklistState } from '@/features/play/components/PreflightChecklist';
 
 // =============================================================================
 // Default State
@@ -45,6 +46,7 @@ const DEFAULT_STATE: SessionCockpitState = {
   isDirectorMode: false,
   isLoading: true,
   error: null,
+  lastSyncAt: null,
   participants: [],
   sessionRoles: [],
   roleAssignments: {},
@@ -92,144 +94,13 @@ function applyRoleAssignments(
   });
 }
 
-function buildPreflightItems(
-  state: ExtendedPreflightState,
-  actions: {
-    onSnapshotRoles?: () => void;
-    onOpenRoleAssigner?: () => void;
-    onUnlockSecrets?: () => void;
-  }
-): PreflightItem[] {
-  const items: PreflightItem[] = [];
-
-  // 1. Participants check
-  items.push({
-    id: 'participants',
-    label: 'Participants',
-    status: state.participantCount > 0 ? 'ready' : 'warning',
-    detail: state.participantCount > 0
-      ? `${state.participantCount} participants connected`
-      : 'No participants yet – session can still be started',
-  });
-
-  // 2. Game linked check
-  if (!state.hasGame) {
-    items.push({
-      id: 'game',
-      label: 'Game linked',
-      status: 'error',
-      detail: 'Session has no game linked',
-    });
-    return items; // Early return - can't continue without game
-  }
-
-  // 3. Roles snapshot check
-  if (!state.rolesSnapshotted) {
-    items.push({
-      id: 'roles-snapshot',
-      label: 'Roles copied',
-      status: 'error',
-      detail: 'Copy roles from game before assigning them',
-      action: actions.onSnapshotRoles
-        ? { label: 'Copy roles', onClick: actions.onSnapshotRoles }
-        : undefined,
-    });
-  } else {
-    items.push({
-      id: 'roles-snapshot',
-      label: 'Roles copied',
-      status: 'ready',
-      detail: `${state.totalRoles} roles copied from game`,
-    });
-
-    // 4. Roles assignment check (only if snapshotted)
-    const minCountsMet = state.roleMinCountsStatus.every((r) => r.met);
-    const someAssigned = state.rolesAssignedCount > 0;
-
-    items.push({
-      id: 'roles-assigned',
-      label: 'Roles assigned',
-      status: minCountsMet ? 'ready' : someAssigned ? 'warning' : 'pending',
-      detail: minCountsMet
-        ? 'All minimum requirements met'
-        : state.roleMinCountsStatus
-            .filter((r) => !r.met)
-            .map((r) => `${r.name}: ${r.assigned}/${r.min}`)
-            .join(', '),
-      action:
-        !minCountsMet && actions.onOpenRoleAssigner
-          ? { label: 'Assign roles', onClick: actions.onOpenRoleAssigner }
-          : undefined,
-    });
-  }
-
-  // 5. Secrets check (if applicable)
-  if (state.hasSecretInstructions) {
-    const allRolesAssigned = state.rolesAssignedCount >= state.participantCount;
-    
-    items.push({
-      id: 'secrets',
-      label: 'Secret instructions',
-      status: state.secretsUnlocked
-        ? 'ready'
-        : allRolesAssigned
-          ? 'warning'
-          : 'pending',
-      detail: state.secretsUnlocked
-        ? `Unlocked (${state.secretsRevealedCount}/${state.participantCount} revealed)`
-        : allRolesAssigned
-          ? 'Ready to unlock'
-          : 'Assign roles first',
-      action:
-        !state.secretsUnlocked && allRolesAssigned && actions.onUnlockSecrets
-          ? { label: 'Unlock', onClick: actions.onUnlockSecrets }
-          : undefined,
-    });
-  }
-
-  // 6. Triggers check
-  if (state.hasTriggers) {
-    items.push({
-      id: 'triggers',
-      label: 'Triggers',
-      status: state.triggersSnapshotted ? 'ready' : 'pending',
-      detail: state.triggersSnapshotted
-        ? `${state.armedTriggersCount} triggers ready`
-        : 'Triggers load automatically at start',
-    });
-  }
-
-  // 7. Artifacts check
-  if (state.artifactsSnapshotted !== undefined) {
-    items.push({
-      id: 'artifacts',
-      label: 'Artifacts',
-      status: state.artifactsSnapshotted ? 'ready' : 'pending',
-      detail: state.artifactsSnapshotted
-        ? 'Artifacts ready for session'
-        : 'Artifacts load automatically at start',
-    });
-  }
-
-  // 8. Signal capabilities check
-  items.push({
-    id: 'signals',
-    label: 'Signals',
-    status: state.signalCapabilitiesTested ? 'ready' : 'pending',
-    detail: state.signalCapabilitiesTested
-      ? 'Signal sources tested'
-      : 'Test signal sources in lobby',
-  });
-
-  return items;
-}
-
 // =============================================================================
 // Hook Implementation
 // =============================================================================
 
 export function useSessionState(config: SessionCockpitConfig): UseSessionStateReturn {
   const { sessionId, enableRealtime = true, pollInterval = 3000, onError } = config;
+  const tPreflight = useTranslations('play.preflightChecklist');
 
   // Core state
   const [state, setState] = useState<SessionCockpitState>({
@@ -249,12 +120,21 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     try {
       const { session } = await getHostSession(sessionId);
       
+      const resolvedStatus: SessionCockpitState['status'] = (() => {
+        if (session.status === 'paused') return 'paused';
+        if (session.status === 'locked') return 'locked';
+        if (session.status === 'ended' || session.status === 'archived' || session.status === 'cancelled') return 'ended';
+        if (session.status === 'active' && !session.startedAt) return 'lobby';
+        if (session.status === 'active' && session.startedAt) return 'active';
+        return 'lobby';
+      })();
+
       setState((prev) => ({
         ...prev,
         gameId: session.gameId ?? null,
         sessionCode: session.sessionCode,
         displayName: session.displayName,
-        status: session.status as SessionCockpitState['status'],
+        status: resolvedStatus,
         error: null,
       }));
     } catch (err) {
@@ -271,6 +151,7 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       // Map participant status to cockpit status
       const mapStatus = (status: string): CockpitParticipant['status'] => {
         switch (status) {
+          case 'pending': return 'pending';
           case 'active': return 'active';
           case 'disconnected': return 'disconnected';
           case 'kicked': return 'kicked';
@@ -364,6 +245,7 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         currentStepIndex: Number.isFinite(currentStepIndex) ? (currentStepIndex as number) : prev.currentStepIndex,
         currentPhaseIndex: Number.isFinite(currentPhaseIndex) ? (currentPhaseIndex as number) : prev.currentPhaseIndex,
         status: status ?? prev.status,
+        lastSyncAt: new Date().toISOString(),
       }));
     } catch (err) {
       console.warn('Failed to load runtime state:', err);
@@ -383,6 +265,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         stepOrder: (step.index as number | undefined) ?? 0,
         durationMinutes: (step.durationMinutes as number | undefined) ?? undefined,
         leaderScript: (step.leaderScript as string | undefined) ?? undefined,
+        participantPrompt: (step.participantPrompt as string | undefined) ?? undefined,
+        boardText: (step.boardText as string | undefined) ?? undefined,
       }));
 
       const phases = (data.phases ?? []).map((phase: Record<string, unknown>) => ({
@@ -1088,7 +972,7 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
   // ==========================================================================
 
   const preflightItems = useMemo(() => {
-    const preflightState: ExtendedPreflightState = {
+    const preflightState: SessionChecklistState = {
       participantCount: state.participants.length,
       hasGame: Boolean(state.gameId),
       rolesSnapshotted: state.sessionRoles.length > 0,
@@ -1120,8 +1004,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     return buildPreflightItems(preflightState, {
       onSnapshotRoles: snapshotRoles,
       onUnlockSecrets: unlockSecrets,
-    });
-  }, [snapshotRoles, unlockSecrets, state]);
+    }, tPreflight);
+  }, [snapshotRoles, unlockSecrets, state, tPreflight]);
 
   const canStartDirectorMode = useMemo(() => {
     return !preflightItems.some((item) => item.status === 'error');

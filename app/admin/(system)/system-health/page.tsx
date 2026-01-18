@@ -177,7 +177,7 @@ export default function SystemHealthPage() {
             </div>
             <div className="text-right">
               <p className="text-sm text-muted-foreground">{t('version')}</p>
-              <p className="text-lg font-semibold">{health?.version || 'Unknown'}</p>
+              <p className="text-lg font-semibold">{health?.version || t('labels.unknown')}</p>
             </div>
           </div>
         </CardContent>
@@ -187,21 +187,21 @@ export default function SystemHealthPage() {
       <div className="grid gap-6 md:grid-cols-3 mb-8">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Database</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('checks.database')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">
                   {health?.checks.database.status === 'ok' ? (
-                    <span className="text-emerald-600">OK</span>
+                    <span className="text-emerald-600">{t('checks.ok')}</span>
                   ) : (
-                    <span className="text-red-600">Error</span>
+                    <span className="text-red-600">{t('checks.error')}</span>
                   )}
                 </p>
                 {health?.checks.database.latency && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {health.checks.database.latency}ms latency
+                    {t('checks.latency', { ms: health.checks.database.latency })}
                   </p>
                 )}
               </div>
@@ -212,21 +212,21 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Storage</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('checks.storage')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">
                   {health?.checks.storage.status === 'ok' ? (
-                    <span className="text-emerald-600">OK</span>
+                    <span className="text-emerald-600">{t('checks.ok')}</span>
                   ) : (
-                    <span className="text-red-600">Error</span>
+                    <span className="text-red-600">{t('checks.error')}</span>
                   )}
                 </p>
                 {health?.checks.storage.latency && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    {health.checks.storage.latency}ms latency
+                    {t('checks.latency', { ms: health.checks.storage.latency })}
                   </p>
                 )}
               </div>
@@ -237,19 +237,19 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">API</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">{t('checks.api')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-2xl font-bold">
                   {health?.checks.api.status === 'ok' ? (
-                    <span className="text-emerald-600">OK</span>
+                    <span className="text-emerald-600">{t('checks.ok')}</span>
                   ) : (
-                    <span className="text-red-600">Error</span>
+                    <span className="text-red-600">{t('checks.error')}</span>
                   )}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Responding</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('checks.responding')}</p>
               </div>
               <SignalIcon className="h-8 w-8 text-muted-foreground/30" />
             </div>
@@ -275,7 +275,7 @@ export default function SystemHealthPage() {
         />
         <AdminStatCard
           label={t('metrics.apiLatencyP95')}
-          value={metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : 'N/A'}
+          value={metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : t('labels.notAvailable')}
           icon={<ClockIcon className="h-5 w-5" />}
           iconColor="purple"
           isLoading={isLoading}
@@ -322,19 +322,19 @@ export default function SystemHealthPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('latency.p50')}</span>
                 <span className="text-lg font-semibold">
-                  {metrics?.apiLatency.p50 ? `${metrics.apiLatency.p50.toFixed(2)}s` : 'N/A'}
+                  {metrics?.apiLatency.p50 ? `${metrics.apiLatency.p50.toFixed(2)}s` : t('labels.notAvailable')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('latency.p95')}</span>
                 <span className="text-lg font-semibold">
-                  {metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : 'N/A'}
+                  {metrics?.apiLatency.p95 ? `${metrics.apiLatency.p95.toFixed(2)}s` : t('labels.notAvailable')}
                 </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('latency.p99')}</span>
                 <span className="text-lg font-semibold">
-                  {metrics?.apiLatency.p99 ? `${metrics.apiLatency.p99.toFixed(2)}s` : 'N/A'}
+                  {metrics?.apiLatency.p99 ? `${metrics.apiLatency.p99.toFixed(2)}s` : t('labels.notAvailable')}
                 </span>
               </div>
             </div>
@@ -376,7 +376,7 @@ export default function SystemHealthPage() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">{t('storage.connectionPool')}</span>
                 <span className="text-sm font-semibold text-emerald-600">
-                  {metrics?.database.connectionPool || 'Unknown'}
+                  {metrics?.database.connectionPool || t('labels.unknown')}
                 </span>
               </div>
             </div>

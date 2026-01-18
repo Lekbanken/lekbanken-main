@@ -88,7 +88,7 @@ export function PropConfirmationManager({
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   // Initial load and polling
   useEffect(() => {
@@ -146,7 +146,7 @@ export function PropConfirmationManager({
         return next;
       });
     }
-  }, [sessionId, notes, onRequestHandled]);
+  }, [sessionId, notes, onRequestHandled, t]);
 
   // Filter pending requests
   const pendingRequests = requests.filter(r => r.status === 'pending' || r.status === 'waiting');
@@ -253,7 +253,7 @@ export function PropConfirmationManager({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={request.photoUrl}
-                    alt="Prop-bevis"
+                    alt={t('photoAlt')}
                     className="mt-2 rounded max-h-48 object-contain"
                   />
                 )}
@@ -264,7 +264,7 @@ export function PropConfirmationManager({
             <div className="mb-3">
               <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
                 <ChatBubbleLeftIcon className="h-3 w-3" />
-                <span>Anteckning (valfritt)</span>
+                <span>{t('notesLabel')}</span>
               </div>
               <Input
                 placeholder={t('notesPlaceholder')}

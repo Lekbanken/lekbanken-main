@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { listHostSessions, type PlaySession } from '@/features/play-participant/api';
 import { SessionCard, SessionCardSkeleton } from '@/components/play';
 import { PageTitleHeader } from '@/components/app/PageTitleHeader';
@@ -17,14 +18,8 @@ import type { Database } from '@/types/supabase';
 
 type SessionStatus = Database['public']['Enums']['participant_session_status'];
 
-const STATUS_FILTERS: { value: SessionStatus | 'all'; label: string }[] = [
-  { value: 'all', label: 'Alla' },
-  { value: 'active', label: 'Aktiva' },
-  { value: 'paused', label: 'Pausade' },
-  { value: 'ended', label: 'Avslutade' },
-];
-
 export function HostSessionsClient() {
+  const t = useTranslations('play.hostSessions');
   const router = useRouter();
   const [sessions, setSessions] = useState<PlaySession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,12 +32,12 @@ export function HostSessionsClient() {
         const res = await listHostSessions();
         setSessions(res.sessions || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Kunde inte hämta sessioner');
+        setError(err instanceof Error ? err.message : t('errors.fetchFailed'));
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [t]);
 
   const filteredSessions = filter === 'all' 
     ? sessions 
@@ -55,22 +50,22 @@ export function HostSessionsClient() {
     <div className="space-y-6">
       <PageTitleHeader
         icon={playNavIcon ?? <PlayIcon className="h-5 w-5" />}
-        title="SPELA"
-        subtitle="Lekledarcentralen"
+        title={t('header.title')}
+        subtitle={t('header.subtitle')}
         rightSlot={
           <Button variant="primary" href="/app/browse">
             <PlusIcon className="h-4 w-4" />
-            Ny session
+            {t('header.newSession')}
           </Button>
         }
       />
 
       <div className="space-y-1">
-        <h2 className="text-lg font-semibold text-foreground">Mina sessioner</h2>
+        <h2 className="text-lg font-semibold text-foreground">{t('summary.title')}</h2>
         <p className="text-sm text-muted-foreground">
           {activeSessions.length > 0
-            ? `${activeSessions.length} aktiv${activeSessions.length > 1 ? 'a' : ''} session${activeSessions.length > 1 ? 'er' : ''}`
-            : 'Inga aktiva sessioner'}
+            ? t('summary.activeCount', { count: activeSessions.length })
+            : t('summary.noneActive')}
         </p>
       </div>
 
@@ -83,7 +78,12 @@ export function HostSessionsClient() {
 
       {/* Filter tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        {STATUS_FILTERS.map((f) => (
+        {([
+          { value: 'all', label: t('filters.all') },
+          { value: 'active', label: t('filters.active') },
+          { value: 'paused', label: t('filters.paused') },
+          { value: 'ended', label: t('filters.ended') },
+        ] as const).map((f) => (
           <button
             key={f.value}
             onClick={() => setFilter(f.value)}
@@ -112,13 +112,15 @@ export function HostSessionsClient() {
       {!loading && filteredSessions.length === 0 && (
         <EmptyState
           icon={<PlayIcon className="h-12 w-12" />}
-          title={filter === 'all' ? 'Inga sessioner ännu' : `Inga ${STATUS_FILTERS.find(f => f.value === filter)?.label.toLowerCase()} sessioner`}
-          description={filter === 'all' 
-            ? 'Skapa din första session genom att välja ett spel.'
-            : 'Prova ett annat filter eller skapa en ny session.'
+          title={filter === 'all'
+            ? t('empty.titleAll')
+            : t('empty.titleFiltered', { status: t(`filters.${filter}`) })}
+          description={filter === 'all'
+            ? t('empty.descriptionAll')
+            : t('empty.descriptionFiltered')
           }
           action={filter === 'all' ? {
-            label: 'Välj spel',
+            label: t('empty.action'),
             onClick: () => router.push('/app/browse'),
           } : undefined}
         />

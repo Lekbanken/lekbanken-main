@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { TrophyIcon } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
@@ -26,27 +27,6 @@ interface AchievementEditorDrawerProps {
   onSave: () => void;
 }
 
-const SCOPE_OPTIONS = [
-  { value: 'global', label: 'Global', description: 'Synlig för alla användare' },
-  { value: 'tenant', label: 'Tenant', description: 'Synlig inom en specifik organisation' },
-  { value: 'private', label: 'Privat', description: 'Endast synlig för tilldelade användare' },
-];
-
-const CONDITION_TYPES = [
-  { value: 'manual', label: 'Manuell', description: 'Tilldelas manuellt av admin' },
-  { value: 'games_played', label: 'Spelade spel', description: 'Efter ett antal spelade spel' },
-  { value: 'score_reached', label: 'Poäng uppnådd', description: 'När en viss poängnivå nås' },
-  { value: 'streak', label: 'Streak', description: 'Efter ett antal dagar i rad' },
-  { value: 'first_game', label: 'Första spelet', description: 'När användaren spelar sitt första spel' },
-  { value: 'perfect_score', label: 'Perfekt poäng', description: 'När användaren får max poäng' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Utkast' },
-  { value: 'active', label: 'Aktiv' },
-  { value: 'archived', label: 'Arkiverad' },
-];
-
 export function AchievementEditorDrawer({
   open,
   achievement,
@@ -54,10 +34,41 @@ export function AchievementEditorDrawer({
   onClose,
   onSave,
 }: AchievementEditorDrawerProps) {
+  const t = useTranslations('admin.gamification.achievements.editor');
   const isEditing = !!achievement;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [badgePickerOpen, setBadgePickerOpen] = useState(false);
+
+  const scopeOptions = useMemo(
+    () => [
+      { value: 'global', label: t('scope.global.label'), description: t('scope.global.description') },
+      { value: 'tenant', label: t('scope.tenant.label'), description: t('scope.tenant.description') },
+      { value: 'private', label: t('scope.private.label'), description: t('scope.private.description') },
+    ],
+    [t]
+  );
+
+  const conditionTypes = useMemo(
+    () => [
+      { value: 'manual', label: t('conditions.manual.label'), description: t('conditions.manual.description') },
+      { value: 'games_played', label: t('conditions.gamesPlayed.label'), description: t('conditions.gamesPlayed.description') },
+      { value: 'score_reached', label: t('conditions.scoreReached.label'), description: t('conditions.scoreReached.description') },
+      { value: 'streak', label: t('conditions.streak.label'), description: t('conditions.streak.description') },
+      { value: 'first_game', label: t('conditions.firstGame.label'), description: t('conditions.firstGame.description') },
+      { value: 'perfect_score', label: t('conditions.perfectScore.label'), description: t('conditions.perfectScore.description') },
+    ],
+    [t]
+  );
+
+  const statusOptions = useMemo(
+    () => [
+      { value: 'draft', label: t('status.draft') },
+      { value: 'active', label: t('status.active') },
+      { value: 'archived', label: t('status.archived') },
+    ],
+    [t]
+  );
 
   // Form state - initialized based on whether editing or creating
   const [name, setName] = useState(achievement?.name ?? '');
@@ -101,19 +112,19 @@ export function AchievementEditorDrawer({
         if (isEditing && achievement) {
           const result = await updateAchievement({ id: achievement.id, ...formData });
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera achievement');
+            setError(result.error || t('errors.updateFailed'));
             return;
           }
         } else {
           const result = await createAchievement(formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa achievement');
+            setError(result.error || t('errors.createFailed'));
             return;
           }
         }
         onSave();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -124,43 +135,41 @@ export function AchievementEditorDrawer({
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            {isEditing ? 'Redigera achievement' : 'Skapa nytt achievement'}
+            {isEditing ? t('title.edit') : t('title.create')}
           </SheetTitle>
           <SheetDescription>
-            {isEditing
-              ? 'Uppdatera achievement-inställningar nedan.'
-              : 'Fyll i informationen nedan för att skapa ett nytt achievement.'}
+            {isEditing ? t('description.edit') : t('description.create')}
           </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Namn *</Label>
+            <Label htmlFor="name">{t('fields.name.label')}</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="T.ex. Första spelet"
+              placeholder={t('fields.name.placeholder')}
               required
             />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Beskrivning</Label>
+            <Label htmlFor="description">{t('fields.description.label')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beskriv hur man uppnår detta achievement..."
+              placeholder={t('fields.description.placeholder')}
               rows={3}
             />
           </div>
 
           {/* Badge/Icon */}
           <div className="space-y-2">
-            <Label>Badge/Ikon</Label>
+            <Label>{t('fields.badge.label')}</Label>
             <div className="flex items-center gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-xl border-2 border-dashed border-border bg-muted/30">
                 {iconConfig ? (
@@ -175,7 +184,7 @@ export function AchievementEditorDrawer({
                   variant="outline"
                   onClick={() => setBadgePickerOpen(true)}
                 >
-                  {iconConfig ? 'Byt Badge' : 'Välj Badge'}
+                  {iconConfig ? t('fields.badge.change') : t('fields.badge.select')}
                 </Button>
                 {selectedBadge && (
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -188,9 +197,9 @@ export function AchievementEditorDrawer({
 
           {/* Scope */}
           <div className="space-y-2">
-            <Label>Scope *</Label>
+            <Label>{t('fields.scope.label')}</Label>
             <div className="grid gap-2">
-              {SCOPE_OPTIONS.map((option) => (
+              {scopeOptions.map((option) => (
                 <label
                   key={option.value}
                   className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
@@ -219,7 +228,7 @@ export function AchievementEditorDrawer({
           {/* Tenant (conditional) */}
           {scope === 'tenant' && (
             <div className="space-y-2">
-              <Label htmlFor="tenant">Organisation *</Label>
+              <Label htmlFor="tenant">{t('fields.tenant.label')}</Label>
               <select
                 id="tenant"
                 value={tenantId}
@@ -227,7 +236,7 @@ export function AchievementEditorDrawer({
                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 required
               >
-                <option value="">Välj organisation</option>
+                <option value="">{t('fields.tenant.placeholder')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -239,21 +248,21 @@ export function AchievementEditorDrawer({
 
           {/* Condition Type */}
           <div className="space-y-2">
-            <Label htmlFor="conditionType">Trigger *</Label>
+            <Label htmlFor="conditionType">{t('fields.conditionType.label')}</Label>
             <select
               id="conditionType"
               value={conditionType}
               onChange={(e) => setConditionType(e.target.value)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              {CONDITION_TYPES.map((type) => (
+              {conditionTypes.map((type) => (
                 <option key={type.value} value={type.value}>
                   {type.label}
                 </option>
               ))}
             </select>
             <p className="text-sm text-muted-foreground">
-              {CONDITION_TYPES.find(t => t.value === conditionType)?.description}
+              {conditionTypes.find((type) => type.value === conditionType)?.description}
             </p>
           </div>
 
@@ -261,9 +270,9 @@ export function AchievementEditorDrawer({
           {['games_played', 'score_reached', 'streak'].includes(conditionType) && (
             <div className="space-y-2">
               <Label htmlFor="conditionValue">
-                {conditionType === 'games_played' && 'Antal spel'}
-                {conditionType === 'score_reached' && 'Poäng att nå'}
-                {conditionType === 'streak' && 'Antal dagar'}
+                {conditionType === 'games_played' && t('fields.conditionValue.gamesPlayed')}
+                {conditionType === 'score_reached' && t('fields.conditionValue.scoreReached')}
+                {conditionType === 'streak' && t('fields.conditionValue.streak')}
               </Label>
               <Input
                 id="conditionValue"
@@ -271,21 +280,21 @@ export function AchievementEditorDrawer({
                 min="1"
                 value={conditionValue}
                 onChange={(e) => setConditionValue(e.target.value)}
-                placeholder="Ange värde..."
+                placeholder={t('fields.conditionValue.placeholder')}
               />
             </div>
           )}
 
           {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t('fields.status.label')}</Label>
             <select
               id="status"
               value={status}
               onChange={(e) => setStatus(e.target.value as typeof status)}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              {STATUS_OPTIONS.map((option) => (
+              {statusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
                 </option>
@@ -302,10 +311,10 @@ export function AchievementEditorDrawer({
 
           <SheetFooter className="flex-row justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || !name}>
-              {isPending ? 'Sparar...' : isEditing ? 'Uppdatera' : 'Skapa'}
+              {isPending ? t('actions.saving') : isEditing ? t('actions.update') : t('actions.create')}
             </Button>
           </SheetFooter>
         </form>

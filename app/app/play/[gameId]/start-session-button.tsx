@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { createSession } from '@/features/play-participant/api';
 
 export function StartSessionButton({ gameId, gameName }: { gameId: string; gameName: string }) {
+  const t = useTranslations('app.play.startSession');
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -17,7 +19,7 @@ export function StartSessionButton({ gameId, gameName }: { gameId: string; gameN
       const sessionId = res.session.id;
       router.push(`/app/play/sessions/${sessionId}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte skapa session');
+      setError(err instanceof Error ? err.message : t('createFailed'));
     } finally {
       setLoading(false);
     }
@@ -26,7 +28,7 @@ export function StartSessionButton({ gameId, gameName }: { gameId: string; gameN
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        Vi skapar en ny session med en unik kod som deltagarna kan använda.
+        {t('helper')}
       </p>
       {error && <p className="text-sm text-destructive">{error}</p>}
       <button
@@ -34,7 +36,7 @@ export function StartSessionButton({ gameId, gameName }: { gameId: string; gameN
         disabled={loading}
         className="rounded-lg bg-primary px-4 py-2 text-primary-foreground font-semibold disabled:opacity-50"
       >
-        {loading ? 'Startar...' : 'Starta session'}
+        {loading ? t('starting') : t('startButton')}
       </button>
     </div>
   );

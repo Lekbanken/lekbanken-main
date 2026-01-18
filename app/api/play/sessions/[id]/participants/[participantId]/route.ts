@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import type { PlayBroadcastEvent } from '@/types/play-runtime';
 
-type ParticipantAction = 'kick' | 'block' | 'setNextStarter' | 'setPosition';
+type ParticipantAction = 'kick' | 'block' | 'approve' | 'setNextStarter' | 'setPosition';
 
 async function broadcastPlayEvent(sessionId: string, event: PlayBroadcastEvent) {
   try {
@@ -50,6 +50,16 @@ export async function PATCH(
 
   try {
     switch (action) {
+      case 'approve': {
+        const { error } = await supabase
+          .from('participants')
+          .update({ status: 'active' })
+          .eq('id', participantId)
+          .eq('session_id', sessionId);
+
+        if (error) throw error;
+        return NextResponse.json({ success: true, message: 'Participant approved' });
+      }
       case 'kick': {
         const { error } = await supabase
           .from('participants')

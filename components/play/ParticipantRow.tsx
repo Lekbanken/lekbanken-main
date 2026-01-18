@@ -34,6 +34,7 @@ type ParticipantRowProps = {
   participantCount?: number;
   onKick?: (participantId: string) => void;
   onBlock?: (participantId: string) => void;
+  onApprove?: (participantId: string) => void;
   onSetNextStarter?: (participantId: string) => void;
   onSetPosition?: (participantId: string, position: number) => void;
   className?: string;
@@ -49,6 +50,7 @@ export function ParticipantRow({
   participantCount = 0,
   onKick,
   onBlock,
+  onApprove,
   onSetNextStarter,
   onSetPosition,
   className = '',
@@ -63,6 +65,11 @@ export function ParticipantRow({
 
   const handleBlock = () => {
     onBlock?.(participant.id);
+    setIsMenuOpen(false);
+  };
+
+  const handleApprove = () => {
+    onApprove?.(participant.id);
     setIsMenuOpen(false);
   };
 
@@ -84,7 +91,7 @@ export function ParticipantRow({
     return t('nthPlace', { position: pos });
   };
 
-  const hasAnyAction = onKick || onBlock || onSetNextStarter || (isSessionEnded && onSetPosition);
+  const hasAnyAction = onKick || onBlock || onApprove || onSetNextStarter || (isSessionEnded && onSetPosition);
 
   return (
     <div
@@ -162,6 +169,16 @@ export function ParticipantRow({
                 
                 {/* Dropdown menu */}
                 <div className="absolute right-0 top-full z-20 mt-1 min-w-[180px] rounded-lg border border-border bg-card p-1 shadow-lg">
+                  {participant.status === 'idle' && onApprove && (
+                    <button
+                      onClick={handleApprove}
+                      className="flex w-full items-center gap-2 rounded px-3 py-2 text-left text-sm hover:bg-muted"
+                    >
+                      <HandRaisedIcon className="h-4 w-4 text-amber-500" />
+                        {t('approve')}
+                    </button>
+                  )}
+
                   {/* Set as next starter - only for active sessions */}
                   {!isSessionEnded && onSetNextStarter && (
                     <button

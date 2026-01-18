@@ -8,6 +8,7 @@
  */
 
 import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,6 +43,7 @@ function ValidationItem({
   error: ValidationError;
   onNavigate?: () => void;
 }) {
+  const t = useTranslations('admin.games.builder');
   const isError = error.severity === 'error';
   
   return (
@@ -68,11 +70,11 @@ function ValidationItem({
               {error.message}
             </div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              {error.section === 'triggers' && '🎯 Trigger: '}
-              {error.section === 'artifacts' && '📦 Artefakt: '}
-              {error.section === 'steps' && '📝 Steg: '}
-              {error.section === 'phases' && '🎬 Fas: '}
-              {error.section === 'roles' && '👤 Roll: '}
+              {error.section === 'triggers' && t('validation.itemPrefix.triggers')}
+              {error.section === 'artifacts' && t('validation.itemPrefix.artifacts')}
+              {error.section === 'steps' && t('validation.itemPrefix.steps')}
+              {error.section === 'phases' && t('validation.itemPrefix.phases')}
+              {error.section === 'roles' && t('validation.itemPrefix.roles')}
               <span className="font-medium">{error.itemName}</span>
             </div>
             {error.suggestion && (
@@ -88,7 +90,7 @@ function ValidationItem({
               onClick={onNavigate}
               className="text-xs flex-shrink-0"
             >
-              Gå till
+              {t('validation.navigate')}
             </Button>
           )}
         </div>
@@ -106,6 +108,7 @@ export function ValidationPanel({
   onNavigateToItem,
   className,
 }: ValidationPanelProps) {
+  const t = useTranslations('admin.games.builder');
   const [isExpanded, setIsExpanded] = useState(true);
   
   const { errors, warnings, isValid } = result;
@@ -131,9 +134,9 @@ export function ValidationPanel({
         <div className="flex items-center gap-3">
           <CheckCircleIcon className="h-6 w-6 text-emerald-500" />
           <div>
-            <div className="font-medium text-foreground">Inga valideringsfel</div>
+            <div className="font-medium text-foreground">{t('validation.emptyTitle')}</div>
             <div className="text-sm text-muted-foreground">
-              Alla referenser är korrekta
+              {t('validation.emptyDescription')}
             </div>
           </div>
         </div>
@@ -159,18 +162,18 @@ export function ValidationPanel({
           )}
           <div className="text-left">
             <div className="font-medium text-foreground">
-              Valideringsproblem
+              {t('validation.headerTitle')}
             </div>
             <div className="text-sm text-muted-foreground">
               {errors.length > 0 && (
                 <span className="text-destructive font-medium">
-                  {errors.length} fel
+                  {t('validation.count.errors', { count: errors.length })}
                 </span>
               )}
-              {errors.length > 0 && warnings.length > 0 && ', '}
+              {errors.length > 0 && warnings.length > 0 && t('validation.separator')}
               {warnings.length > 0 && (
                 <span className="text-warning">
-                  {warnings.length} varningar
+                  {t('validation.count.warnings', { count: warnings.length })}
                 </span>
               )}
             </div>
@@ -179,12 +182,12 @@ export function ValidationPanel({
         <div className="flex items-center gap-2">
           {errors.length > 0 && (
             <Badge variant="destructive" size="sm">
-              {errors.length} fel
+              {t('validation.count.errors', { count: errors.length })}
             </Badge>
           )}
           {warnings.length > 0 && (
             <Badge variant="warning" size="sm">
-              {warnings.length}
+              {t('validation.count.warnings', { count: warnings.length })}
             </Badge>
           )}
           {isExpanded ? (
@@ -201,11 +204,11 @@ export function ValidationPanel({
           {Object.entries(grouped).map(([section, items]) => (
             <div key={section}>
               <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
-                {section === 'triggers' && '🎯 Triggers'}
-                {section === 'artifacts' && '📦 Artefakter'}
-                {section === 'steps' && '📝 Steg'}
-                {section === 'phases' && '🎬 Faser'}
-                {section === 'roles' && '👤 Roller'}
+                {section === 'triggers' && t('validation.section.triggers')}
+                {section === 'artifacts' && t('validation.section.artifacts')}
+                {section === 'steps' && t('validation.section.steps')}
+                {section === 'phases' && t('validation.section.phases')}
+                {section === 'roles' && t('validation.section.roles')}
               </div>
               <div className="space-y-2">
                 {items.map((item) => (
@@ -226,7 +229,7 @@ export function ValidationPanel({
           {!isValid && (
             <div className="pt-2 border-t">
               <div className="text-sm text-destructive font-medium">
-                ⚠️ Spelet kan inte publiceras förrän alla fel är åtgärdade
+                {t('validation.publishBlocked')}
               </div>
             </div>
           )}

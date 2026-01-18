@@ -410,7 +410,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
                             {v.title || t('variant')}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {v.visibility}
+                            {t(`visibility.${v.visibility}` as Parameters<typeof t>[0])}
                             {v.visibility === 'role_private' && v.visible_to_session_role_id ? ` ${t('rolePrivate')}` : ''}
                           </p>
                         </div>

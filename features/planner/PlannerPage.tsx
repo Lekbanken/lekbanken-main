@@ -12,7 +12,6 @@ import { GamePicker } from "./components/GamePicker";
 import { VersionsDialog } from "./components/VersionsDialog";
 import { PreviewDialog } from "./components/PreviewDialog";
 import { ShareDialog } from "./components/ShareDialog";
-import { CreatePlanWizard } from "./components/CreatePlanWizard";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -89,7 +88,6 @@ export function PlannerPage() {
   const [showVersionsDialog, setShowVersionsDialog] = useState(false);
   const [showPreviewDialog, setShowPreviewDialog] = useState(false);
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [showCreateWizard, setShowCreateWizard] = useState(false);
   
   const { user, effectiveGlobalRole } = useAuth();
   const { currentTenant, userTenants } = useTenant();
@@ -245,21 +243,17 @@ export function PlannerPage() {
   // Event Handlers
   // ─────────────────────────────────────────────────────────────────────────────
 
-  const handleCreate = () => {
-    setShowCreateWizard(true);
-  };
-
-  const handlePlanCreated = async (plan: PlannerPlan) => {
-    // Reload plans to get blocks that were added by wizard
-    try {
-      const updatedPlans = await fetchPlans();
-      setPlans(updatedPlans);
-      setActivePlanId(plan.id);
-    } catch {
-      // Fallback: just add the plan without blocks
-      setPlans((prev) => [plan, ...prev]);
-      setActivePlanId(plan.id);
-    }
+  const handleCreate = async () => {
+    await withFeedback(
+      'create-plan',
+      async () => {
+        const plan = await createPlan({ name: "Ny plan" });
+        setPlans((prev) => [plan, ...prev]);
+        setActivePlanId(plan.id);
+        return plan;
+      },
+      { errorMessage: "Kunde inte skapa plan" }
+    );
   };
 
   const handlePlanNameBlur = async () => {
@@ -824,12 +818,6 @@ export function PlannerPage() {
           </div>
         </div>
       </div>
-
-      <CreatePlanWizard
-        open={showCreateWizard}
-        onOpenChange={setShowCreateWizard}
-        onPlanCreated={handlePlanCreated}
-      />
     </TooltipProvider>
   );
 }

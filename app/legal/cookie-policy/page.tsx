@@ -55,7 +55,7 @@ export default async function CookiePolicyPage() {
         </Link>
       </div>
 
-      <h1 className="text-4xl font-bold mb-4">{doc?.title ?? 'Cookie Policy'}</h1>
+      <h1 className="text-4xl font-bold mb-4">{doc?.title ?? t('cookiePolicy.fallbackTitle')}</h1>
       <p className="text-muted-foreground mb-8">
         {t('common.lastUpdated', { date: lastUpdated })}
       </p>
@@ -63,7 +63,7 @@ export default async function CookiePolicyPage() {
       {doc ? (
         <MarkdownContent content={doc.content_markdown} />
       ) : (
-        <p>Cookie policy content will be published soon.</p>
+        <p>{t('cookiePolicy.pendingContent')}</p>
       )}
 
       {/* Cookie Declaration Table */}
@@ -79,7 +79,7 @@ export default async function CookiePolicyPage() {
           <CookieDeclarationTable cookies={cookies} />
         ) : (
           <p className="text-zinc-600 dark:text-zinc-400">
-            No cookies registered yet.
+            {t('cookiePolicy.noCookies')}
           </p>
         )}
 
@@ -89,7 +89,7 @@ export default async function CookiePolicyPage() {
             {tConsent('change_preferences')}
           </h3>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-            You can change your cookie preferences at any time by clicking the button below.
+            {t('cookiePolicy.manageDescription')}
           </p>
           <CookieSettingsButton className="inline-flex items-center justify-center rounded-lg border border-zinc-950/10 bg-white px-4 py-2 text-sm font-semibold text-zinc-950 shadow-sm hover:bg-zinc-50 dark:border-white/15 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800" />
         </div>

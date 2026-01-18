@@ -6,25 +6,96 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useParticipantHeartbeat } from '@/features/participants/hooks/useParticipantHeartbeat';
 import { useParticipantBroadcast, type BroadcastEvent } from '@/features/participants/hooks/useParticipantBroadcast';
+import { resolveUiState } from '@/lib/play/ui-state';
 
 interface SessionInfo {
   sessionCode: string;
   displayName: string;
   participantToken: string;
   sessionId: string;
-  hostName?: string;
 }
+
+type ParticipantMeResponse = {
+  participant: {
+    id: string;
+    displayName: string;
+    role: string | null;
+    status: string;
+  };
+  session: {
+    id: string;
+    sessionCode: string;
+    displayName: string;
+    description: string | null;
+    status: string;
+    gameId: string | null;
+    participantCount: number;
+    currentStepIndex: number | null;
+    currentPhaseIndex: number | null;
+    timerState: unknown | null;
+    boardState: { message?: string | null } | null;
+    settings: Record<string, unknown> | null;
+    startedAt?: string | null;
+    pausedAt?: string | null;
+    endedAt?: string | null;
+  };
+};
+
+type GameContent = {
+  steps: Array<{
+    id: string;
+    index: number;
+    title: string;
+    description: string;
+    participantPrompt?: string;
+    boardText?: string;
+  }>;
+  phases: Array<{
+    id: string;
+    index: number;
+    name: string;
+  }>;
+};
+
+const POLL_INTERVAL = 5000;
 
 export default function ParticipantViewPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const tLobby = useTranslations('play.participantView.lobby');
   const [sessionInfo, setSessionInfo] = useState<SessionInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [broadcastMessages, setBroadcastMessages] = useState<string[]>([]);
+  const [participantStatus, setParticipantStatus] = useState<string | null>(null);
+  const [sessionState, setSessionState] = useState<ParticipantMeResponse['session'] | null>(null);
+  const [gameContent, setGameContent] = useState<GameContent | null>(null);
+  const [lastPollAt, setLastPollAt] = useState<string | null>(null);
+  const [lastRealtimeAt, setLastRealtimeAt] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const formatBroadcastMessage = (event: BroadcastEvent): string | null => {
+    if (event.type === 'host_message') {
+      const message = event.payload?.message;
+      if (typeof message === 'string' && message.trim()) return message;
+      return tLobby('events.host_message');
+    }
+
+    if (event.type === 'participant_joined' || event.type === 'participant_left') {
+      const name = event.payload?.displayName;
+      if (typeof name === 'string' && name.trim()) {
+        return tLobby(`events.${event.type}` as Parameters<typeof tLobby>[0], { name });
+      }
+    }
+
+    return tLobby(`events.${event.type}` as Parameters<typeof tLobby>[0]);
+  };
   
   // Load session info from localStorage
   useEffect(() => {
@@ -32,21 +103,21 @@ export default function ParticipantViewPage() {
     const storedSessionId = localStorage.getItem('participant_session_id');
     const storedSessionCode = localStorage.getItem('participant_session_code');
     const storedDisplayName = localStorage.getItem('participant_display_name');
+    const storedStatus = localStorage.getItem('participant_status');
     
     if (!storedToken || !storedSessionId || !storedSessionCode || !storedDisplayName) {
-      // No stored session, redirect to join page
       const code = searchParams.get('code');
       router.push(code ? `/participants/join?code=${code}` : '/participants/join');
       return;
     }
     
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessionInfo({
       participantToken: storedToken,
       sessionId: storedSessionId,
       sessionCode: storedSessionCode,
       displayName: storedDisplayName,
     });
+    setParticipantStatus(storedStatus);
     setLoading(false);
   }, [router, searchParams]);
   
@@ -59,56 +130,111 @@ export default function ParticipantViewPage() {
   
   // Listen for broadcast events
   const handleBroadcastEvent = (event: BroadcastEvent) => {
+    setLastRealtimeAt(new Date().toISOString());
     const message = formatBroadcastMessage(event);
     if (message) {
-      setBroadcastMessages(prev => [...prev, message].slice(-5)); // Keep last 5 messages
+      setBroadcastMessages(prev => [...prev, message].slice(-5));
     }
   };
   
-  const { connected: broadcastConnected } = useParticipantBroadcast({
+  useParticipantBroadcast({
     sessionId: sessionInfo?.sessionId || '',
     onEvent: handleBroadcastEvent,
     enabled: !!sessionInfo,
   });
-  
-  // Format broadcast event into human-readable message
-  const formatBroadcastMessage = (event: BroadcastEvent): string | null => {
-    switch (event.type) {
-      case 'session_paused':
-        return '⏸️ Sessionen pausad av värden';
-      case 'session_resumed':
-        return '▶️ Sessionen återupptagen';
-      case 'session_locked':
-        return '🔒 Sessionen låst - inga nya deltagare kan gå med';
-      case 'session_unlocked':
-        return '🔓 Sessionen upplåst - nya deltagare kan gå med';
-      case 'session_ended':
-        return '🏁 Sessionen avslutad av värden';
-      case 'host_message':
-        return `💬 ${event.payload?.message || 'Meddelande från värden'}`;
-      case 'participant_joined':
-        return `👋 ${event.payload?.displayName || 'Någon'} gick med`;
-      case 'participant_left':
-        return `👋 ${event.payload?.displayName || 'Någon'} lämnade`;
-      case 'role_changed':
-        return `👤 Din roll ändrades till ${event.payload?.newRole || 'okänd'}`;
-      case 'achievement_unlocked':
-        return `🏆 Utmärkelse upplåst: ${event.payload?.achievement_name || 'Okänd'}!`;
-      case 'progress_updated':
-        return null; // Don't show progress updates as messages (too noisy)
-      default:
-        return null;
-    }
-  };
-  
+
+  useEffect(() => {
+    if (!sessionInfo) return;
+    let cancelled = false;
+
+    const fetchMe = async () => {
+      try {
+        const res = await fetch(`/api/play/me?session_code=${encodeURIComponent(sessionInfo.sessionCode)}`, {
+          headers: { 'x-participant-token': sessionInfo.participantToken },
+          cache: 'no-store',
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || tLobby('couldNotGetSession'));
+        if (!cancelled) {
+          setSessionState(data.session as ParticipantMeResponse['session']);
+          setParticipantStatus(data.participant?.status ?? null);
+          setError(null);
+          setLastPollAt(new Date().toISOString());
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : tLobby('couldNotGetSession'));
+          setLastPollAt(new Date().toISOString());
+        }
+      }
+    };
+
+    void fetchMe();
+    const id = setInterval(fetchMe, POLL_INTERVAL);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [sessionInfo, tLobby]);
+
+  useEffect(() => {
+    if (!sessionInfo) return;
+    let cancelled = false;
+
+    const fetchGame = async () => {
+      try {
+        const res = await fetch(`/api/play/sessions/${sessionInfo.sessionId}/game`, {
+          headers: { 'x-participant-token': sessionInfo.participantToken },
+          cache: 'no-store',
+        });
+        const data = await res.json();
+        if (!res.ok) return;
+        if (!cancelled) {
+          setGameContent({
+            steps: data.steps ?? [],
+            phases: data.phases ?? [],
+          });
+        }
+      } catch {
+        // Ignore
+      }
+    };
+
+    void fetchGame();
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionInfo]);
+
+  const currentStep = useMemo(() => {
+    if (!gameContent || !sessionState) return null;
+    const index = sessionState.currentStepIndex ?? 0;
+    return gameContent.steps[index] ?? null;
+  }, [gameContent, sessionState]);
+
+  const uiState = resolveUiState({
+    status: sessionState?.status,
+    startedAt: sessionState?.startedAt ?? null,
+    lastPollAt,
+    lastRealtimeAt,
+  });
+
+  const bannerCopy = {
+    waiting: tLobby('banner.waiting'),
+    paused: tLobby('banner.paused'),
+    locked: tLobby('banner.locked'),
+    ended: tLobby('banner.ended'),
+    degraded: tLobby('banner.degraded'),
+    offline: tLobby('banner.offline'),
+    none: null,
+  } as const;
+
   const handleLeaveSession = () => {
-    // Clear localStorage
     localStorage.removeItem('participant_token');
     localStorage.removeItem('participant_session_id');
     localStorage.removeItem('participant_session_code');
     localStorage.removeItem('participant_display_name');
-    
-    // Redirect to join page
+    localStorage.removeItem('participant_status');
     router.push('/participants/join');
   };
   
@@ -117,91 +243,107 @@ export default function ParticipantViewPage() {
       <div className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"></div>
-          <p className="mt-4 text-sm text-zinc-500">Loading session...</p>
+          <p className="mt-4 text-sm text-muted-foreground">{tLobby('loadingSession')}</p>
         </div>
       </div>
     );
   }
   
-  if (!sessionInfo) {
-    return null; // Will redirect
-  }
-  
+  if (!sessionInfo) return null;
+
+  const isPending = participantStatus === 'pending';
+
   return (
-    <div className="min-h-screen bg-zinc-50 p-4">
-      <div className="mx-auto max-w-2xl">
-        {/* Header */}
-        <div className="mb-6 rounded-lg bg-white p-6 shadow-sm">
-          <div className="flex items-center justify-between">
+    <div className="min-h-screen bg-muted/30 p-4">
+      <div className="mx-auto max-w-3xl space-y-6">
+        <Card className="p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900">
-                {sessionInfo.displayName}
-              </h1>
-              <p className="mt-1 text-sm text-zinc-500">
-                Session Code: <span className="font-mono font-semibold">{sessionInfo.sessionCode}</span>
+              <h1 className="text-2xl font-bold text-foreground">{sessionInfo.displayName}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {tLobby('sessionCodeLabel')}{' '}
+                <span className="font-mono font-semibold">{sessionInfo.sessionCode}</span>
               </p>
             </div>
             <div className="flex items-center gap-3">
-              {/* Broadcast status */}
               <div className="flex items-center gap-2">
-                <div className={`h-2 w-2 rounded-full ${broadcastConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="text-xs text-zinc-500">
-                  {broadcastConnected ? 'Connected' : 'Disconnected'}
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    uiState.connection === 'connected'
+                      ? 'bg-emerald-500'
+                      : uiState.connection === 'offline'
+                        ? 'bg-rose-500'
+                        : 'bg-amber-500'
+                  }`}
+                />
+                <span className="text-xs text-muted-foreground">
+                  {tLobby(`connection.${uiState.connection}` as Parameters<typeof tLobby>[0])}
                 </span>
               </div>
-              
-              {/* Leave button */}
               <button
                 onClick={handleLeaveSession}
-                className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                className="rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground"
               >
-                Leave
+                {tLobby('leaveSession')}
               </button>
             </div>
           </div>
-        </div>
-        
-        {/* Broadcast messages */}
+        </Card>
+
+        {error && (
+          <Card className="p-4 border-destructive bg-destructive/10 text-sm text-destructive">
+            {error}
+          </Card>
+        )}
+
         {broadcastMessages.length > 0 && (
-          <div className="mb-6 rounded-lg bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-sm font-semibold text-zinc-700">Recent Updates</h2>
+          <Card className="p-4">
+            <h2 className="mb-3 text-sm font-semibold text-foreground">{tLobby('updatesTitle')}</h2>
             <div className="space-y-2">
               {broadcastMessages.map((message, index) => (
-                <div
-                  key={index}
-                  className="rounded-md bg-zinc-50 px-3 py-2 text-sm text-zinc-700"
-                >
+                <div key={index} className="rounded-md bg-muted px-3 py-2 text-sm text-muted-foreground">
                   {message}
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         )}
-        
-        {/* Main content area */}
-        <div className="rounded-lg bg-white p-6 shadow-sm">
-          <div className="text-center text-zinc-500">
-            <svg
-              className="mx-auto h-16 w-16 text-zinc-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-            <h3 className="mt-4 text-lg font-medium text-zinc-900">
-              Waiting for activities...
-            </h3>
-            <p className="mt-2 text-sm text-zinc-500">
-              Your host will start activities when everyone is ready.
-            </p>
+
+        <Card className="p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground">{tLobby('statusLabel')}</p>
+              <h2 className="text-lg font-semibold text-foreground">
+                {tLobby(`statusTitle.${uiState.uiMode}` as Parameters<typeof tLobby>[0])}
+              </h2>
+            </div>
+            <Badge variant={uiState.uiMode === 'live' ? 'default' : uiState.uiMode === 'paused' ? 'warning' : 'secondary'}>
+              {tLobby(`statusBadge.${uiState.uiMode}` as Parameters<typeof tLobby>[0])}
+            </Badge>
           </div>
-        </div>
+
+          {isPending && (
+            <div className="rounded-md bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+              {tLobby('pendingApproval')}
+            </div>
+          )}
+
+          {!isPending && bannerCopy[uiState.banner] && (
+            <div className="rounded-md bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+              {bannerCopy[uiState.banner]}
+            </div>
+          )}
+
+          {uiState.uiMode === 'live' && currentStep && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-foreground">{tLobby('nowTitle')}</p>
+              <p className="text-base font-semibold text-foreground">{currentStep.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {currentStep.participantPrompt || currentStep.boardText || currentStep.description}
+              </p>
+            </div>
+          )}
+        </Card>
       </div>
     </div>
   );

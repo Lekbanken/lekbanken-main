@@ -16,15 +16,10 @@ import { useAuth } from "@/lib/supabase/auth";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
   const { language } = usePreferences();
   const copy = useMemo(() => getUiCopy(language), [language]);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -61,17 +56,7 @@ export function Header() {
 
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
           <div className="flex lg:hidden">
-            {mounted ? (
-              <SheetTrigger asChild>
-                <button
-                  type="button"
-                  className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-muted-foreground hover:text-foreground"
-                >
-                  <span className="sr-only">Open menu</span>
-                  <Bars3Icon aria-hidden="true" className="h-6 w-6" />
-                </button>
-              </SheetTrigger>
-            ) : (
+            <SheetTrigger asChild>
               <button
                 type="button"
                 className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-muted-foreground hover:text-foreground"
@@ -79,7 +64,7 @@ export function Header() {
                 <span className="sr-only">Open menu</span>
                 <Bars3Icon aria-hidden="true" className="h-6 w-6" />
               </button>
-            )}
+            </SheetTrigger>
           </div>
 
           <SheetContent side="right" className="w-full border-l border-border px-6 py-4 sm:max-w-sm">

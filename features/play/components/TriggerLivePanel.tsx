@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -189,7 +189,20 @@ function TriggerRow({
   isLoading,
   t,
 }: TriggerRowProps) {
+  const locale = useLocale();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const formatTime = useCallback(
+    (value: string | Date) => {
+      try {
+        const date = value instanceof Date ? value : new Date(value);
+        return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(date);
+      } catch {
+        return '';
+      }
+    },
+    [locale]
+  );
 
   const statusColors: Record<TriggerStatus, string> = {
     armed: 'border-l-green-500',
@@ -228,7 +241,7 @@ function TriggerRow({
             </Badge>
             {trigger.executeOnce && (
               <Badge variant="outline" className="text-xs">
-                1×
+                {t('executeOnce')}
               </Badge>
             )}
           </div>
@@ -245,7 +258,7 @@ function TriggerRow({
             <div className="text-xs text-muted-foreground mt-1">
               {t('firedCount', { count: trigger.firedCount })}
               {trigger.firedAt && (
-                <> • {new Date(trigger.firedAt).toLocaleTimeString('sv-SE')}</>
+                <> • {formatTime(trigger.firedAt)}</>
               )}
             </div>
           )}
@@ -326,7 +339,7 @@ function TriggerRow({
             {trigger.delaySeconds && trigger.delaySeconds > 0 && (
               <div>
                 <span className="text-muted-foreground">{t('details.delay')}:</span>{' '}
-                {trigger.delaySeconds}s
+                {t('details.delaySeconds', { count: trigger.delaySeconds })}
               </div>
             )}
             {trigger.errorCount > 0 && (
@@ -504,7 +517,7 @@ export function TriggerLivePanel({
     return (
       <div className={`flex items-center gap-3 ${className}`}>
         <BoltIcon className="h-4 w-4" />
-        <span className="text-sm font-medium">Triggers</span>
+        <span className="text-sm font-medium">{t('title')}</span>
         <Badge variant={armedCount > 0 ? 'default' : 'outline'}>
           {t('readyCount', { count: armedCount })}
         </Badge>
@@ -523,7 +536,7 @@ export function TriggerLivePanel({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <BoltIcon className="h-5 w-5" />
-            Triggers
+            {t('title')}
           </CardTitle>
 
           <div className="flex items-center gap-2">

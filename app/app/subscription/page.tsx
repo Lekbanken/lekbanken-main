@@ -171,7 +171,7 @@ export default function SubscriptionPage() {
                   </div>
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <CreditCardIcon className="h-4 w-4" />
-                    <span>Visa •••• 4242</span>
+                    <span>{t('currentPlan.paymentMethod', { brand: 'Visa', last4: '4242' })}</span>
                   </div>
                 </div>
               </div>

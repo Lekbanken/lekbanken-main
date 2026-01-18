@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useSessionManagement } from '@/features/gamification/hooks/useSessionManagement';
 
 interface SessionActionsProps {
@@ -24,6 +25,7 @@ export function SessionActions({
   onActionComplete 
 }: SessionActionsProps) {
   const router = useRouter();
+  const t = useTranslations('sessionActions');
   const { archiveSession, restoreSession, deleteSession, isArchiving, isRestoring, isDeleting } = useSessionManagement();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export function SessionActions({
       onActionComplete?.();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to archive session');
+      setError(err instanceof Error ? err.message : t('errors.archiveFailed'));
     }
   };
 
@@ -46,7 +48,7 @@ export function SessionActions({
       onActionComplete?.();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to restore session');
+      setError(err instanceof Error ? err.message : t('errors.restoreFailed'));
     }
   };
 
@@ -58,7 +60,7 @@ export function SessionActions({
       onActionComplete?.();
       router.push('/participants/history');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete session');
+      setError(err instanceof Error ? err.message : t('errors.deleteFailed'));
     }
   };
 
@@ -88,14 +90,14 @@ export function SessionActions({
             {isArchiving ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Arkiverar...
+                {t('actions.archiving')}
               </>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
                 </svg>
-                Arkivera Session
+                {t('actions.archive')}
               </>
             )}
           </button>
@@ -110,14 +112,14 @@ export function SessionActions({
             {isRestoring ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                Återställer...
+                {t('actions.restoring')}
               </>
             ) : (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>
-                Återställ Session
+                {t('actions.restore')}
               </>
             )}
           </button>
@@ -131,28 +133,28 @@ export function SessionActions({
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-            Ta Bort Permanent
+            {t('actions.deletePermanent')}
           </button>
         )}
 
         {showDeleteConfirm && (
           <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
             <p className="text-sm text-red-800 flex-1">
-              Är du säker? Session <strong>{sessionCode}</strong> kommer att raderas permanent. Detta kan inte ångras!
+              {t.rich('confirm.message', { code: sessionCode, strong: chunks => <strong>{chunks}</strong> })}
             </p>
             <button
               onClick={handleDelete}
               disabled={isDeleting}
               className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 disabled:opacity-50 text-sm"
             >
-              {isDeleting ? 'Raderar...' : 'Ja, Radera'}
+              {isDeleting ? t('confirm.deleting') : t('confirm.confirm')}
             </button>
             <button
               onClick={() => setShowDeleteConfirm(false)}
               disabled={isDeleting}
               className="px-3 py-1 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 text-sm"
             >
-              Avbryt
+              {t('confirm.cancel')}
             </button>
           </div>
         )}

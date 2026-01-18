@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { Button } from '@/components/ui/button'
@@ -18,25 +18,13 @@ import { saveCookieConsent } from '@/app/actions/legal'
 export function CookieConsentBanner() {
   const t = useTranslations('legal.cookieBanner')
   const { user, isLoading } = useAuth()
-  const [isOpen, setIsOpen] = useState(false)
-  const [signals, setSignals] = useState({ gpc: false, dnt: false })
+  const [isDismissed, setIsDismissed] = useState(false)
   const [, startTransition] = useTransition()
 
-  useEffect(() => {
-    if (isLoading) return
-    const stored = readStoredConsent()
-    const privacySignals = detectPrivacySignals()
-    setSignals(privacySignals)
-
-    if (!stored || stored.schemaVersion !== COOKIE_CONSENT_SCHEMA_VERSION) {
-      setIsOpen(true)
-      return
-    }
-
-    setIsOpen(false)
-  }, [isLoading])
-
+  const signals = useMemo(() => detectPrivacySignals(), [])
+  const storedConsent = useMemo(() => (isLoading ? null : readStoredConsent()), [isLoading])
   const gpcEnforced = signals.gpc || signals.dnt
+  const isOpen = !isDismissed && !isLoading && (!storedConsent || storedConsent.schemaVersion !== COOKIE_CONSENT_SCHEMA_VERSION)
 
   const appliedDefault = useMemo<CookieConsentState>(() => {
     return getDefaultConsent(gpcEnforced)
@@ -44,7 +32,7 @@ export function CookieConsentBanner() {
 
   const persistConsent = (categories: CookieConsentState, source: 'banner' | 'settings') => {
     writeStoredConsent(categories, source)
-    setIsOpen(false)
+    setIsDismissed(true)
 
     if (!user) return
 

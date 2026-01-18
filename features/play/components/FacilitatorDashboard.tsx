@@ -188,12 +188,12 @@ export function FacilitatorDashboard({
       await sendSessionSignal(sessionId, { channel, message });
       setSignalMessage('');
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to send signal';
+      const msg = err instanceof Error ? err.message : t('signals.sendError');
       setSignalError(msg);
     } finally {
       setSignalSending(false);
     }
-  }, [sessionId, signalChannel, signalMessage]);
+  }, [sessionId, signalChannel, signalMessage, t]);
 
   // ========================================================================
   // State Update Helpers
@@ -613,7 +613,7 @@ export function FacilitatorDashboard({
                 title={t('session.countdownTooltip')}
               >
                 <ClockIcon className="h-4 w-4" />
-                5s
+                {t('session.countdownSeconds', { seconds: 5 })}
               </Button>
             )}
           </div>

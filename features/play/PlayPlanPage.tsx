@@ -66,6 +66,83 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     return runStepToStep(run.steps[currentStep]);
   }, [run, currentStep]);
 
+  // Legacy fallback: convert old play view to Run format
+  const mapLegacyPlayToRun = useCallback((play: {
+    planId: string;
+    name: string;
+    totalDurationMinutes?: number | null;
+    blocks: Array<{
+      id: string;
+      type: string;
+      title: string;
+      durationMinutes?: number | null;
+      notes?: string | null;
+      game?: {
+        id: string;
+        title: string;
+        summary?: string | null;
+        materials?: string[] | null;
+        steps: Array<{ title: string; description?: string | null; durationMinutes?: number | null }>;
+      } | null;
+    }>;
+  }): Run | null => {
+    const steps: RunStep[] = [];
+    let stepIndex = 0;
+
+    play.blocks.forEach((block) => {
+      const tag = block.title || (block.type === "pause" ? t('defaults.pauseTag') : t('defaults.blockTag'));
+      const baseDuration = block.durationMinutes ?? DEFAULT_STEP_DURATION_MINUTES;
+
+      if (block.game?.steps && block.game.steps.length > 0) {
+        const materials = (block.game.materials || []).filter((item): item is string => Boolean(item));
+        block.game.steps.forEach((s, idx) => {
+          steps.push({
+            id: `${block.id}:${idx}`,
+            index: stepIndex++,
+            blockId: block.id,
+            blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
+            title: s.title || t('defaults.stepTitle', { index: idx + 1 }),
+            description: s.description || "",
+            durationMinutes: s.durationMinutes ?? baseDuration,
+            materials: idx === 0 && materials.length > 0 ? materials : undefined,
+            tag,
+            note: idx === 0 ? block.notes || undefined : undefined,
+            gameSnapshot: block.game ? { id: block.game.id, title: block.game.title } : null,
+          });
+        });
+      } else {
+        steps.push({
+          id: `${block.id}:0`,
+          index: stepIndex++,
+          blockId: block.id,
+          blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
+          title: tag,
+          description: block.notes || "",
+          durationMinutes: baseDuration,
+          tag,
+          gameSnapshot: null,
+        });
+      }
+    });
+
+    if (steps.length === 0) return null;
+
+    return {
+      id: `legacy-${play.planId}`,
+      planId: play.planId,
+      planVersionId: "legacy",
+      versionNumber: 0,
+      name: play.name,
+      status: "in_progress",
+      steps,
+      blockCount: play.blocks.length,
+      totalDurationMinutes: play.totalDurationMinutes ?? steps.reduce((sum, s) => sum + s.durationMinutes, 0),
+      currentStepIndex: 0,
+      startedAt: new Date().toISOString(),
+      completedAt: null,
+    };
+  }, [t]);
+
   /**
    * Start or resume a run for this plan.
    * Uses new Run API, falls back to legacy play view for unpublished plans.
@@ -114,84 +191,7 @@ export function PlayPlanPage({ planId }: { planId?: string }) {
     
     setRun(null);
     setIsLoading(false);
-  }, [planId]);
-
-  // Legacy fallback: convert old play view to Run format
-  function mapLegacyPlayToRun(play: {
-    planId: string;
-    name: string;
-    totalDurationMinutes?: number | null;
-    blocks: Array<{
-      id: string;
-      type: string;
-      title: string;
-      durationMinutes?: number | null;
-      notes?: string | null;
-      game?: {
-        id: string;
-        title: string;
-        summary?: string | null;
-        materials?: string[] | null;
-        steps: Array<{ title: string; description?: string | null; durationMinutes?: number | null }>;
-      } | null;
-    }>;
-  }): Run | null {
-    const steps: RunStep[] = [];
-    let stepIndex = 0;
-
-    play.blocks.forEach((block) => {
-      const tag = block.title || (block.type === "pause" ? "Paus" : "Moment");
-      const baseDuration = block.durationMinutes ?? DEFAULT_STEP_DURATION_MINUTES;
-
-      if (block.game?.steps && block.game.steps.length > 0) {
-        const materials = (block.game.materials || []).filter((item): item is string => Boolean(item));
-        block.game.steps.forEach((s, idx) => {
-          steps.push({
-            id: `${block.id}:${idx}`,
-            index: stepIndex++,
-            blockId: block.id,
-            blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
-            title: s.title || `Steg ${idx + 1}`,
-            description: s.description || "",
-            durationMinutes: s.durationMinutes ?? baseDuration,
-            materials: idx === 0 && materials.length > 0 ? materials : undefined,
-            tag,
-            note: idx === 0 ? block.notes || undefined : undefined,
-            gameSnapshot: block.game ? { id: block.game.id, title: block.game.title } : null,
-          });
-        });
-      } else {
-        steps.push({
-          id: `${block.id}:0`,
-          index: stepIndex++,
-          blockId: block.id,
-          blockType: block.type as 'game' | 'pause' | 'preparation' | 'custom',
-          title: tag,
-          description: block.notes || "",
-          durationMinutes: baseDuration,
-          tag,
-          gameSnapshot: null,
-        });
-      }
-    });
-
-    if (steps.length === 0) return null;
-
-    return {
-      id: `legacy-${play.planId}`,
-      planId: play.planId,
-      planVersionId: "legacy",
-      versionNumber: 0,
-      name: play.name,
-      status: "in_progress",
-      steps,
-      blockCount: play.blocks.length,
-      totalDurationMinutes: play.totalDurationMinutes ?? steps.reduce((sum, s) => sum + s.durationMinutes, 0),
-      currentStepIndex: 0,
-      startedAt: new Date().toISOString(),
-      completedAt: null,
-    };
-  }
+  }, [planId, mapLegacyPlayToRun]);
 
   useEffect(() => {
     void loadRun();

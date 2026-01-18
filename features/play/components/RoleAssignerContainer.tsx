@@ -76,7 +76,7 @@ export function RoleAssignerContainer({
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void loadData();
@@ -104,7 +104,7 @@ export function RoleAssignerContainer({
       console.error('[RoleAssignerContainer] Assign error:', err);
       throw err;
     }
-  }, [sessionId, loadData, onAssignmentComplete]);
+  }, [sessionId, loadData, onAssignmentComplete, t]);
 
   // Handle unassign
   const handleUnassign = useCallback(async (participantId: string, roleId: string) => {
@@ -126,7 +126,7 @@ export function RoleAssignerContainer({
       console.error('[RoleAssignerContainer] Unassign error:', err);
       throw err;
     }
-  }, [sessionId, loadData, onAssignmentComplete]);
+  }, [sessionId, loadData, onAssignmentComplete, t]);
 
   // Loading state
   if (loading) {

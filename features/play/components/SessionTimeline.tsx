@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   ClockIcon,
   MagnifyingGlassPlusIcon,
@@ -91,8 +91,8 @@ const EVENT_TYPE_GROUPS: Record<string, SessionEventType[]> = {
 // Helpers
 // =============================================================================
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('sv-SE', { 
+function formatTime(date: Date, locale: string): string {
+  return date.toLocaleTimeString(locale, { 
     hour: '2-digit', 
     minute: '2-digit',
     second: '2-digit',
@@ -117,6 +117,7 @@ interface TimelineMarkerDotProps {
 }
 
 function TimelineMarkerDot({ marker, onClick }: TimelineMarkerDotProps) {
+  const locale = useLocale();
   return (
     <Tooltip
       content={
@@ -126,7 +127,7 @@ function TimelineMarkerDot({ marker, onClick }: TimelineMarkerDotProps) {
             {marker.label}
           </div>
           <div className="text-xs text-muted-foreground">
-            {formatTime(marker.timestamp)}
+            {formatTime(marker.timestamp, locale)}
           </div>
           {marker.description && (
             <div className="text-xs">{marker.description}</div>
@@ -361,6 +362,7 @@ interface MarkerListProps {
 
 function MarkerList({ markers, onMarkerClick, maxItems = 50 }: MarkerListProps) {
   const t = useTranslations('play.sessionTimeline');
+  const locale = useLocale();
   const displayMarkers = markers.slice(-maxItems);
 
   return (
@@ -377,7 +379,7 @@ function MarkerList({ markers, onMarkerClick, maxItems = 50 }: MarkerListProps) 
           <div className={`w-2 h-2 rounded-full ${SEVERITY_COLORS[marker.severity]}`} />
           <span className="flex-1 truncate">{marker.label}</span>
           <span className="text-xs text-muted-foreground">
-            {formatTime(marker.timestamp)}
+            {formatTime(marker.timestamp, locale)}
           </span>
           <Badge variant="outline" className="text-xs">
             {t('stepLabel', { number: marker.stepIndex + 1 })}
@@ -485,7 +487,7 @@ export function SessionTimeline({
           {/* Live indicator */}
           <div className="absolute top-6 right-2 flex items-center gap-1">
             <SignalIcon className="h-3 w-3 text-red-500 animate-pulse" />
-            <span className="text-xs text-red-500">LIVE</span>
+            <span className="text-xs text-red-500">{t('liveLabel')}</span>
           </div>
         </div>
 
@@ -543,6 +545,7 @@ export function CompactTimeline({
   className,
 }: CompactTimelineProps) {
   const t = useTranslations('play.sessionTimeline');
+  const locale = useLocale();
   const recentMarkers = timeline.markers.slice(-10).reverse();
 
   return (
@@ -567,7 +570,7 @@ export function CompactTimeline({
             <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${SEVERITY_COLORS[marker.severity]}`} />
             <span className="truncate flex-1">{marker.label}</span>
             <span className="text-muted-foreground flex-shrink-0">
-              {formatTime(marker.timestamp)}
+              {formatTime(marker.timestamp, locale)}
             </span>
           </button>
         ))}

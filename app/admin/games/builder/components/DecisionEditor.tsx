@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Textarea, Select, Switch } from '@/components/ui';
 import {
   ArrowDownIcon,
@@ -19,142 +20,26 @@ type DecisionEditorProps = {
   onChange: (decisions: DecisionFormData[]) => void;
 };
 
-const decisionTypeOptions: { value: DecisionType; label: string }[] = [
-  { value: 'poll', label: '📊 Omröstning (Poll)' },
-  { value: 'vote', label: '🗳️ Röstning (Vote)' },
-  { value: 'quiz', label: '❓ Quiz (rätt/fel)' },
-  { value: 'rating', label: '⭐ Betyg (Rating)' },
-  { value: 'ranking', label: '🏆 Rankning' },
-];
-
-const decisionTemplates: { name: string; type: DecisionType; icon: string; decision: Partial<DecisionFormData> }[] = [
-  {
-    name: 'Ja/Nej-fråga',
-    type: 'poll',
-    icon: '👍',
-    decision: {
-      title: 'Ja eller nej?',
-      prompt: 'Ställ din fråga här...',
-      decision_type: 'poll',
-      options: [
-        { key: 'yes', label: 'Ja', order: 0 },
-        { key: 'no', label: 'Nej', order: 1 },
-      ],
-      allow_multiple: false,
-      max_choices: 1,
-    },
-  },
-  {
-    name: 'Flervalsomröstning',
-    type: 'poll',
-    icon: '📋',
-    decision: {
-      title: 'Välj ett alternativ',
-      prompt: 'Vilken av dessa föredrar du?',
-      decision_type: 'poll',
-      options: [
-        { key: 'a', label: 'Alternativ A', order: 0 },
-        { key: 'b', label: 'Alternativ B', order: 1 },
-        { key: 'c', label: 'Alternativ C', order: 2 },
-      ],
-      allow_multiple: false,
-      max_choices: 1,
-    },
-  },
-  {
-    name: 'Gruppval (välj flera)',
-    type: 'vote',
-    icon: '✅',
-    decision: {
-      title: 'Välj dina favoriter',
-      prompt: 'Du kan välja upp till 3 alternativ',
-      decision_type: 'vote',
-      options: [
-        { key: 'opt1', label: 'Val 1', order: 0 },
-        { key: 'opt2', label: 'Val 2', order: 1 },
-        { key: 'opt3', label: 'Val 3', order: 2 },
-        { key: 'opt4', label: 'Val 4', order: 3 },
-      ],
-      allow_multiple: true,
-      max_choices: 3,
-    },
-  },
-  {
-    name: 'Quizfråga',
-    type: 'quiz',
-    icon: '❓',
-    decision: {
-      title: 'Vad är rätt svar?',
-      prompt: 'Välj det korrekta alternativet',
-      decision_type: 'quiz',
-      options: [
-        { key: 'a', label: 'Alternativ A', correct: false, order: 0 },
-        { key: 'b', label: 'Alternativ B (rätt)', correct: true, order: 1 },
-        { key: 'c', label: 'Alternativ C', correct: false, order: 2 },
-      ],
-      allow_multiple: false,
-      max_choices: 1,
-      reveal_on_close: true,
-    },
-  },
-  {
-    name: 'Betygsättning 1-5',
-    type: 'rating',
-    icon: '⭐',
-    decision: {
-      title: 'Hur nöjd är du?',
-      prompt: 'Betygsätt på en skala 1-5',
-      decision_type: 'rating',
-      options: [
-        { key: '1', label: '⭐', order: 0 },
-        { key: '2', label: '⭐⭐', order: 1 },
-        { key: '3', label: '⭐⭐⭐', order: 2 },
-        { key: '4', label: '⭐⭐⭐⭐', order: 3 },
-        { key: '5', label: '⭐⭐⭐⭐⭐', order: 4 },
-      ],
-      allow_multiple: false,
-      max_choices: 1,
-    },
-  },
-  {
-    name: 'Anonym feedback',
-    type: 'poll',
-    icon: '🎭',
-    decision: {
-      title: 'Anonym omröstning',
-      prompt: 'Din röst är helt anonym',
-      decision_type: 'poll',
-      options: [
-        { key: 'opt1', label: 'Alternativ 1', order: 0 },
-        { key: 'opt2', label: 'Alternativ 2', order: 1 },
-      ],
-      allow_anonymous: true,
-      allow_multiple: false,
-      max_choices: 1,
-    },
-  },
-];
-
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
     : `id-${Math.random().toString(36).slice(2, 9)}`;
 
-function createOption(order: number): DecisionOption {
+function createOption(order: number, t: ReturnType<typeof useTranslations>): DecisionOption {
   return {
     key: `opt-${makeId().slice(0, 6)}`,
-    label: `Alternativ ${order + 1}`,
+    label: t('decision.defaults.optionLabel', { index: order + 1 }),
     order,
   };
 }
 
-function createDecision(): DecisionFormData {
+function createDecision(t: ReturnType<typeof useTranslations>): DecisionFormData {
   return {
     id: makeId(),
-    title: 'Ny omröstning',
+    title: t('decision.defaults.newTitle'),
     prompt: '',
     decision_type: 'poll',
-    options: [createOption(0), createOption(1)],
+    options: [createOption(0, t), createOption(1, t)],
     allow_anonymous: false,
     allow_multiple: false,
     max_choices: 1,
@@ -171,10 +56,130 @@ export function DecisionEditor({
   phaseCount,
   onChange,
 }: DecisionEditorProps) {
+  const t = useTranslations('admin.games.builder');
   const [showTemplates, setShowTemplates] = useState(false);
 
+  const decisionTypeOptions = useMemo(() => [
+    { value: 'poll' as const, label: t('decision.types.poll') },
+    { value: 'vote' as const, label: t('decision.types.vote') },
+    { value: 'quiz' as const, label: t('decision.types.quiz') },
+    { value: 'rating' as const, label: t('decision.types.rating') },
+    { value: 'ranking' as const, label: t('decision.types.ranking') },
+  ], [t]);
+
+  const decisionTemplates = useMemo(
+    () => [
+      {
+        name: t('decision.templates.yesNo.name'),
+        type: 'poll' as const,
+        icon: '👍',
+        decision: {
+          title: t('decision.templates.yesNo.title'),
+          prompt: t('decision.templates.yesNo.prompt'),
+          decision_type: 'poll' as const,
+          options: [
+            { key: 'yes', label: t('decision.templates.yesNo.optionYes'), order: 0 },
+            { key: 'no', label: t('decision.templates.yesNo.optionNo'), order: 1 },
+          ],
+          allow_multiple: false,
+          max_choices: 1,
+        },
+      },
+      {
+        name: t('decision.templates.multipleChoice.name'),
+        type: 'poll' as const,
+        icon: '📋',
+        decision: {
+          title: t('decision.templates.multipleChoice.title'),
+          prompt: t('decision.templates.multipleChoice.prompt'),
+          decision_type: 'poll' as const,
+          options: [
+            { key: 'a', label: t('decision.templates.multipleChoice.optionA'), order: 0 },
+            { key: 'b', label: t('decision.templates.multipleChoice.optionB'), order: 1 },
+            { key: 'c', label: t('decision.templates.multipleChoice.optionC'), order: 2 },
+          ],
+          allow_multiple: false,
+          max_choices: 1,
+        },
+      },
+      {
+        name: t('decision.templates.groupVote.name'),
+        type: 'vote' as const,
+        icon: '✅',
+        decision: {
+          title: t('decision.templates.groupVote.title'),
+          prompt: t('decision.templates.groupVote.prompt'),
+          decision_type: 'vote' as const,
+          options: [
+            { key: 'opt1', label: t('decision.templates.groupVote.option1'), order: 0 },
+            { key: 'opt2', label: t('decision.templates.groupVote.option2'), order: 1 },
+            { key: 'opt3', label: t('decision.templates.groupVote.option3'), order: 2 },
+            { key: 'opt4', label: t('decision.templates.groupVote.option4'), order: 3 },
+          ],
+          allow_multiple: true,
+          max_choices: 3,
+        },
+      },
+      {
+        name: t('decision.templates.quiz.name'),
+        type: 'quiz' as const,
+        icon: '❓',
+        decision: {
+          title: t('decision.templates.quiz.title'),
+          prompt: t('decision.templates.quiz.prompt'),
+          decision_type: 'quiz' as const,
+          options: [
+            { key: 'a', label: t('decision.templates.quiz.optionA'), correct: false, order: 0 },
+            { key: 'b', label: t('decision.templates.quiz.optionB'), correct: true, order: 1 },
+            { key: 'c', label: t('decision.templates.quiz.optionC'), correct: false, order: 2 },
+          ],
+          allow_multiple: false,
+          max_choices: 1,
+          reveal_on_close: true,
+        },
+      },
+      {
+        name: t('decision.templates.rating.name'),
+        type: 'rating' as const,
+        icon: '⭐',
+        decision: {
+          title: t('decision.templates.rating.title'),
+          prompt: t('decision.templates.rating.prompt'),
+          decision_type: 'rating' as const,
+          options: [
+            { key: '1', label: t('decision.templates.rating.option1'), order: 0 },
+            { key: '2', label: t('decision.templates.rating.option2'), order: 1 },
+            { key: '3', label: t('decision.templates.rating.option3'), order: 2 },
+            { key: '4', label: t('decision.templates.rating.option4'), order: 3 },
+            { key: '5', label: t('decision.templates.rating.option5'), order: 4 },
+          ],
+          allow_multiple: false,
+          max_choices: 1,
+        },
+      },
+      {
+        name: t('decision.templates.anonymous.name'),
+        type: 'poll' as const,
+        icon: '🎭',
+        decision: {
+          title: t('decision.templates.anonymous.title'),
+          prompt: t('decision.templates.anonymous.prompt'),
+          decision_type: 'poll' as const,
+          options: [
+            { key: 'opt1', label: t('decision.templates.anonymous.option1'), order: 0 },
+            { key: 'opt2', label: t('decision.templates.anonymous.option2'), order: 1 },
+          ],
+          allow_anonymous: true,
+          allow_multiple: false,
+          max_choices: 1,
+        },
+      },
+    ],
+    [t]
+  );
+
   const addDecision = (template?: Partial<DecisionFormData>) => {
-    const base = createDecision();
+    const base = createDecision(t);
     const decision: DecisionFormData = template
       ? { ...base, ...template, id: base.id }
       : base;
@@ -214,7 +219,7 @@ export function DecisionEditor({
   const addOption = (decisionIndex: number) => {
     const draft = [...decisions];
     const options = [...draft[decisionIndex].options];
-    options.push(createOption(options.length));
+    options.push(createOption(options.length, t));
     draft[decisionIndex] = { ...draft[decisionIndex], options };
     onChange(draft);
   };
@@ -248,8 +253,8 @@ export function DecisionEditor({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Omröstningar ({decisions.length})</h3>
-          <p className="text-sm text-muted-foreground">Polls, röstningar och quiz-frågor för deltagare</p>
+          <h3 className="text-lg font-semibold">{t('decision.header.title', { count: decisions.length })}</h3>
+          <p className="text-sm text-muted-foreground">{t('decision.header.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -258,11 +263,11 @@ export function DecisionEditor({
             onClick={() => setShowTemplates(!showTemplates)}
           >
             <SparklesIcon className="h-4 w-4 mr-1" />
-            Mallar
+            {t('decision.header.templates')}
           </Button>
           <Button size="sm" onClick={() => addDecision()}>
             <PlusIcon className="h-4 w-4 mr-1" />
-            Lägg till
+            {t('decision.header.add')}
           </Button>
         </div>
       </div>
@@ -270,7 +275,7 @@ export function DecisionEditor({
       {/* Template picker */}
       {showTemplates && (
         <Card className="p-4 border-dashed border-2 border-primary/30 bg-primary/5">
-          <p className="text-sm font-semibold mb-3">Välj en mall:</p>
+          <p className="text-sm font-semibold mb-3">{t('decision.templatesTitle')}</p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {decisionTemplates.map((tpl) => (
               <button
@@ -281,7 +286,7 @@ export function DecisionEditor({
                 <span className="text-2xl">{tpl.icon}</span>
                 <div>
                   <p className="text-sm font-medium">{tpl.name}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{tpl.type}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{t(`decision.types.${tpl.type}`)}</p>
                 </div>
               </button>
             ))}
@@ -292,8 +297,8 @@ export function DecisionEditor({
       {/* Empty state */}
       {decisions.length === 0 && !showTemplates && (
         <Card className="p-6 text-center text-muted-foreground">
-          <p className="text-sm">Inga omröstningar ännu.</p>
-          <p className="text-xs mt-1">Lägg till en omröstning eller välj från mallar.</p>
+          <p className="text-sm">{t('decision.empty.title')}</p>
+          <p className="text-xs mt-1">{t('decision.empty.description')}</p>
         </Card>
       )}
 
@@ -312,7 +317,7 @@ export function DecisionEditor({
               <Input
                 value={decision.title}
                 onChange={(e) => updateDecision(idx, { title: e.target.value })}
-                placeholder="Titel"
+                placeholder={t('decision.fields.titlePlaceholder')}
                 className="font-medium max-w-xs"
               />
             </div>
@@ -352,7 +357,7 @@ export function DecisionEditor({
           {/* Main settings */}
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Typ</label>
+              <label className="text-sm font-medium text-foreground">{t('decision.fields.typeLabel')}</label>
               <Select
                 value={decision.decision_type}
                 onChange={(e) => updateDecision(idx, { decision_type: e.target.value as DecisionType })}
@@ -360,7 +365,7 @@ export function DecisionEditor({
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Max val</label>
+              <label className="text-sm font-medium text-foreground">{t('decision.fields.maxChoicesLabel')}</label>
               <Input
                 type="number"
                 min={1}
@@ -372,26 +377,26 @@ export function DecisionEditor({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Fråga / Prompt</label>
+            <label className="text-sm font-medium text-foreground">{t('decision.fields.promptLabel')}</label>
             <Textarea
               value={decision.prompt}
               onChange={(e) => updateDecision(idx, { prompt: e.target.value })}
               rows={2}
-              placeholder="Skriv frågan som visas för deltagarna..."
+              placeholder={t('decision.fields.promptPlaceholder')}
             />
           </div>
 
           {/* Options */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold text-foreground">Alternativ ({decision.options.length})</p>
+              <p className="text-sm font-semibold text-foreground">{t('decision.options.title', { count: decision.options.length })}</p>
               <Button
                 type="button"
                 size="sm"
                 variant="outline"
                 onClick={() => addOption(idx)}
               >
-                <PlusIcon className="h-4 w-4 mr-1" /> Lägg till
+                <PlusIcon className="h-4 w-4 mr-1" /> {t('decision.options.add')}
               </Button>
             </div>
 
@@ -405,7 +410,7 @@ export function DecisionEditor({
                   <Input
                     value={option.label}
                     onChange={(e) => updateOption(idx, oIdx, { label: e.target.value })}
-                    placeholder="Alternativtext"
+                    placeholder={t('decision.options.placeholder')}
                     className="flex-1"
                   />
                   
@@ -424,7 +429,7 @@ export function DecisionEditor({
                         }));
                         updateDecision(idx, { options: opts });
                       }}
-                      title="Markera som rätt svar"
+                      title={t('decision.options.markCorrect')}
                     >
                       <CheckCircleIcon className="h-4 w-4" />
                     </Button>
@@ -469,14 +474,14 @@ export function DecisionEditor({
           <details className="group">
             <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2">
               <span className="group-open:rotate-90 transition-transform">▶</span>
-              Avancerade inställningar
+              {t('decision.advanced.title')}
             </summary>
             <div className="mt-3 space-y-4 pl-4 border-l-2 border-primary/20">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Anonym röstning</p>
-                    <p className="text-xs text-muted-foreground">Dölj vem som röstat</p>
+                    <p className="text-sm font-medium">{t('decision.advanced.anonymousLabel')}</p>
+                    <p className="text-xs text-muted-foreground">{t('decision.advanced.anonymousHelp')}</p>
                   </div>
                   <Switch
                     checked={decision.allow_anonymous}
@@ -485,8 +490,8 @@ export function DecisionEditor({
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Tillåt flera val</p>
-                    <p className="text-xs text-muted-foreground">Deltagare kan välja flera</p>
+                    <p className="text-sm font-medium">{t('decision.advanced.multipleLabel')}</p>
+                    <p className="text-xs text-muted-foreground">{t('decision.advanced.multipleHelp')}</p>
                   </div>
                   <Switch
                     checked={decision.allow_multiple}
@@ -495,8 +500,8 @@ export function DecisionEditor({
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">Visa resultat direkt</p>
-                    <p className="text-xs text-muted-foreground">Avslöja när stängd</p>
+                    <p className="text-sm font-medium">{t('decision.advanced.revealLabel')}</p>
+                    <p className="text-xs text-muted-foreground">{t('decision.advanced.revealHelp')}</p>
                   </div>
                   <Switch
                     checked={decision.reveal_on_close}
@@ -507,7 +512,7 @@ export function DecisionEditor({
 
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Auto-stäng (sek)</label>
+                  <label className="text-sm font-medium text-foreground">{t('decision.advanced.autoCloseLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -516,12 +521,12 @@ export function DecisionEditor({
                       const val = e.target.value === '' ? null : Math.max(0, parseInt(e.target.value, 10) || 0);
                       updateDecision(idx, { auto_close_seconds: val });
                     }}
-                    placeholder="Manuell"
+                    placeholder={t('decision.advanced.autoClosePlaceholder')}
                   />
-                  <p className="text-xs text-muted-foreground">0 eller tom = manuell</p>
+                  <p className="text-xs text-muted-foreground">{t('decision.advanced.autoCloseHelp')}</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Visa vid steg</label>
+                  <label className="text-sm font-medium text-foreground">{t('decision.advanced.stepLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -531,11 +536,11 @@ export function DecisionEditor({
                       const val = e.target.value === '' ? null : Number(e.target.value);
                       updateDecision(idx, { step_index: Number.isFinite(val) ? val : null });
                     }}
-                    placeholder="Valfritt"
+                    placeholder={t('decision.advanced.stepPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Visa vid fas</label>
+                  <label className="text-sm font-medium text-foreground">{t('decision.advanced.phaseLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -545,7 +550,7 @@ export function DecisionEditor({
                       const val = e.target.value === '' ? null : Number(e.target.value);
                       updateDecision(idx, { phase_index: Number.isFinite(val) ? val : null });
                     }}
-                    placeholder="Valfritt"
+                    placeholder={t('decision.advanced.phasePlaceholder')}
                   />
                 </div>
               </div>

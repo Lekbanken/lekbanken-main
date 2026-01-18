@@ -142,8 +142,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
   }, [artifacts, t]);
 
   const roleOptions = useMemo(
-    () => roles.map((r) => ({ value: r.id, label: r.name || 'Roll' })),
-    [roles]
+    () => roles.map((r) => ({ value: r.id, label: r.name || t('artifact.defaults.role') })),
+    [roles, t]
   );
 
   const handleWizardComplete = (artifact: ArtifactFormData) => {
@@ -211,25 +211,25 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
       {/* Header with buttons */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Artefakter ({artifacts.length})</h3>
-          <p className="text-sm text-muted-foreground">Ledtrådar, keypads, dokument och media</p>
+          <h3 className="text-lg font-semibold">{t('artifact.header.title', { count: artifacts.length })}</h3>
+          <p className="text-sm text-muted-foreground">{t('artifact.header.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
             <SparklesIcon className="h-4 w-4 mr-1" />
-            Wizard
+            {t('artifact.header.wizard')}
           </Button>
           <Button size="sm" onClick={() => onChange([...artifacts, createArtifact(t)])}>
             <PlusIcon className="h-4 w-4 mr-1" />
-            Lägg till
+            {t('artifact.header.add')}
           </Button>
         </div>
       </div>
 
       {artifacts.length === 0 && (
         <Card className="p-6 text-center text-muted-foreground">
-          <p className="text-sm">Inga artefakter ännu.</p>
-          <p className="text-xs mt-1">Använd Wizard för att snabbt skapa artefakter, eller lägg till manuellt.</p>
+          <p className="text-sm">{t('artifact.empty.title')}</p>
+          <p className="text-xs mt-1">{t('artifact.empty.description')}</p>
         </Card>
       )}
 
@@ -245,7 +245,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               <Input
                 value={artifact.title}
                 onChange={(e) => updateArtifact(idx, { title: e.target.value })}
-                placeholder="Titel"
+                placeholder={t('artifact.fields.titlePlaceholder')}
                 className="font-medium"
               />
             </div>
@@ -284,7 +284,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Typ</label>
+              <label className="text-sm font-medium text-foreground">{t('artifact.fields.typeLabel')}</label>
               <Select
                 value={artifact.artifact_type}
                 onChange={(e) => updateArtifact(idx, { artifact_type: e.target.value })}
@@ -292,7 +292,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Taggar (komma-separerade)</label>
+              <label className="text-sm font-medium text-foreground">{t('artifact.fields.tagsLabel')}</label>
               <Input
                 value={artifact.tags.join(', ')}
                 onChange={(e) =>
@@ -303,7 +303,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       .filter(Boolean),
                   })
                 }
-                placeholder="mystery, clue"
+                placeholder={t('artifact.fields.tagsPlaceholder')}
               />
             </div>
           </div>
@@ -313,11 +313,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🔐</span>
-                <h4 className="text-sm font-semibold text-foreground">Pinkod-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.keypad.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Korrekt kod</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.keypad.correctCodeLabel')}</label>
                   <Input
                     type="text"
                     inputMode="numeric"
@@ -329,13 +329,13 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, correctCode: val },
                       });
                     }}
-                    placeholder="1234"
+                    placeholder={t('artifact.keypad.correctCodePlaceholder')}
                     maxLength={8}
                   />
-                  <p className="text-xs text-muted-foreground">Endast siffror (max 8)</p>
+                  <p className="text-xs text-muted-foreground">{t('artifact.keypad.correctCodeHelp')}</p>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Kodlängd</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.keypad.codeLengthLabel')}</label>
                   <Input
                     type="number"
                     min={2}
@@ -347,13 +347,13 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, codeLength: val },
                       });
                     }}
-                    placeholder="4"
+                    placeholder={t('artifact.keypad.codeLengthPlaceholder')}
                   />
-                  <p className="text-xs text-muted-foreground">Antal siffror i koden (2-8)</p>
+                  <p className="text-xs text-muted-foreground">{t('artifact.keypad.codeLengthHelp')}</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Meddelande vid rätt kod (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.keypad.successMessageLabel')}</label>
                 <Input
                   value={(artifact.metadata?.successMessage as string) || ''}
                   onChange={(e) =>
@@ -361,7 +361,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, successMessage: e.target.value },
                     })
                   }
-                  placeholder="Låst uppnådd! Du har hittat ledtråden."
+                  placeholder={t('artifact.keypad.successMessagePlaceholder')}
                 />
               </div>
 
@@ -369,12 +369,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               <details className="group">
                 <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2">
                   <span className="group-open:rotate-90 transition-transform">▶</span>
-                  Avancerade inställningar
+                  {t('artifact.keypad.advancedTitle')}
                 </summary>
                 <div className="mt-3 space-y-4 pl-4 border-l-2 border-amber-500/20">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Max försök</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.keypad.maxAttemptsLabel')}</label>
                       <Input
                         type="number"
                         min={0}
@@ -386,12 +386,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                             metadata: { ...artifact.metadata, maxAttempts: val },
                           });
                         }}
-                        placeholder="Obegränsat"
+                        placeholder={t('artifact.keypad.maxAttemptsPlaceholder')}
                       />
-                      <p className="text-xs text-muted-foreground">0 eller tom = obegränsat</p>
+                      <p className="text-xs text-muted-foreground">{t('artifact.keypad.maxAttemptsHelp')}</p>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Lås vid misslyckande</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.keypad.lockOnFailLabel')}</label>
                       <Select
                         value={(artifact.metadata?.lockOnFail as boolean) ? 'true' : 'false'}
                         onChange={(e) =>
@@ -400,14 +400,14 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                           })
                         }
                         options={[
-                          { value: 'false', label: 'Nej – kan försöka igen' },
-                          { value: 'true', label: 'Ja – låses permanent' },
+                          { value: 'false', label: t('artifact.keypad.lockOnFailNo') },
+                          { value: 'true', label: t('artifact.keypad.lockOnFailYes') },
                         ]}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Meddelande vid fel kod</label>
+                    <label className="text-sm font-medium text-foreground">{t('artifact.keypad.failMessageLabel')}</label>
                     <Input
                       value={(artifact.metadata?.failMessage as string) || ''}
                       onChange={(e) =>
@@ -415,11 +415,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                           metadata: { ...artifact.metadata, failMessage: e.target.value },
                         })
                       }
-                      placeholder="Fel kod! Försök igen."
+                      placeholder={t('artifact.keypad.failMessagePlaceholder')}
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Meddelande när låst</label>
+                    <label className="text-sm font-medium text-foreground">{t('artifact.keypad.lockedMessageLabel')}</label>
                     <Input
                       value={(artifact.metadata?.lockedMessage as string) || ''}
                       onChange={(e) =>
@@ -427,7 +427,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                           metadata: { ...artifact.metadata, lockedMessage: e.target.value },
                         })
                       }
-                      placeholder="Keypaden är låst. Kontakta spelledaren."
+                      placeholder={t('artifact.keypad.lockedMessagePlaceholder')}
                     />
                   </div>
                 </div>
@@ -439,11 +439,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-border bg-muted/20 p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🗣️</span>
-                <h4 className="text-sm font-semibold text-foreground">Samtalskort</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.conversation.title')}</h4>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Välj lek (endast publicerade)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.conversation.selectLabel')}</label>
                 <Select
                   value={typeof artifact.metadata?.conversation_card_collection_id === 'string' ? (artifact.metadata.conversation_card_collection_id as string) : ''}
                   onChange={(e) => {
@@ -456,13 +456,13 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     });
                   }}
                   options={[
-                    { value: '', label: '— Välj —' },
+                    { value: '', label: t('artifact.conversation.selectPlaceholder') },
                     ...conversationDecks.map((d) => ({ value: d.id, label: d.title })),
                   ]}
                 />
                 {conversationDecksError && <p className="text-xs text-destructive">{conversationDecksError}</p>}
                 <p className="text-xs text-muted-foreground">
-                  Artefakten visar leken read-only för deltagare och lekledare.
+                  {t('artifact.conversation.helpText')}
                 </p>
               </div>
             </div>
@@ -473,10 +473,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-purple-500/30 bg-purple-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">❓</span>
-                <h4 className="text-sm font-semibold text-foreground">Gåta / Fråga-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.riddle.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Fråga / Ledtråd</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.riddle.promptLabel')}</label>
                 <Textarea
                   value={(artifact.metadata?.prompt as string) || ''}
                   onChange={(e) =>
@@ -485,11 +485,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={2}
-                  placeholder="Vad har fyra ben men kan inte gå?"
+                  placeholder={t('artifact.riddle.promptPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Korrekta svar (ett per rad)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.riddle.answersLabel')}</label>
                 <Textarea
                   value={((artifact.metadata?.correctAnswers as string[]) || []).join('\n')}
                   onChange={(e) =>
@@ -501,13 +501,13 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={3}
-                  placeholder="bord&#10;ett bord&#10;table"
+                  placeholder={t('artifact.riddle.answersPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">Flera alternativ = alla godkänns</p>
+                <p className="text-xs text-muted-foreground">{t('artifact.riddle.answersHelp')}</p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Matchningsläge</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.riddle.matchModeLabel')}</label>
                   <Select
                     value={(artifact.metadata?.normalizeMode as string) || 'fuzzy'}
                     onChange={(e) =>
@@ -516,14 +516,14 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: 'strict', label: 'Exakt matchning' },
-                      { value: 'fuzzy', label: 'Flexibel (ignorera versaler/mellanslag)' },
-                      { value: 'numeric', label: 'Endast siffror' },
+                      { value: 'strict', label: t('artifact.riddle.matchModeExact') },
+                      { value: 'fuzzy', label: t('artifact.riddle.matchModeFlexible') },
+                      { value: 'numeric', label: t('artifact.riddle.matchModeNumeric') },
                     ]}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Max försök</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.riddle.maxAttemptsLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -535,7 +535,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, maxAttempts: val },
                       });
                     }}
-                    placeholder="Obegränsat"
+                    placeholder={t('artifact.riddle.maxAttemptsPlaceholder')}
                   />
                 </div>
               </div>
@@ -547,11 +547,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🔢</span>
-                <h4 className="text-sm font-semibold text-foreground">Räknare-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.counter.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Startvärde</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.counter.initialLabel')}</label>
                   <Input
                     type="number"
                     value={(artifact.metadata?.initialValue as number) ?? 0}
@@ -560,11 +560,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, initialValue: parseInt(e.target.value, 10) || 0 },
                       })
                     }
-                    placeholder="0"
+                    placeholder={t('artifact.counter.initialPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Målvärde</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.counter.targetLabel')}</label>
                   <Input
                     type="number"
                     min={1}
@@ -575,11 +575,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, target: val },
                       });
                     }}
-                    placeholder="5"
+                    placeholder={t('artifact.counter.targetPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Stegstorlek</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.counter.stepLabel')}</label>
                   <Input
                     type="number"
                     min={1}
@@ -589,12 +589,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, step: parseInt(e.target.value, 10) || 1 },
                       })
                     }
-                    placeholder="1"
+                    placeholder={t('artifact.counter.stepPlaceholder')}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Etikett (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.counter.labelLabel')}</label>
                 <Input
                   value={(artifact.metadata?.label as string) || ''}
                   onChange={(e) =>
@@ -602,7 +602,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, label: e.target.value },
                     })
                   }
-                  placeholder="Hittade ledtrådar"
+                  placeholder={t('artifact.counter.labelPlaceholder')}
                 />
               </div>
             </div>
@@ -613,7 +613,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-green-500/30 bg-green-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🔊</span>
-                <h4 className="text-sm font-semibold text-foreground">Ljudklipp-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.audio.title')}</h4>
               </div>
               <AudioUploadEditor
                 tenantId={null}
@@ -643,7 +643,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               />
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Ljud-URL (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.audio.urlLabel')}</label>
                 <Input
                   value={(artifact.metadata?.audioUrl as string) || ''}
                   onChange={(e) =>
@@ -651,7 +651,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, audioUrl: e.target.value },
                     })
                   }
-                  placeholder="https://example.com/audio.mp3"
+                  placeholder={t('artifact.audio.urlPlaceholder')}
                 />
               </div>
             </div>
@@ -662,7 +662,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-orange-500/30 bg-orange-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🎯</span>
-                <h4 className="text-sm font-semibold text-foreground">Klickbar bild-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.hotspot.title')}</h4>
               </div>
 
               <InteractiveImageEditor
@@ -692,7 +692,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               />
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Bild-URL</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.hotspot.imageLabel')}</label>
                 <Input
                   value={(artifact.metadata?.imageUrl as string) || ''}
                   onChange={(e) =>
@@ -700,12 +700,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, imageUrl: e.target.value },
                     })
                   }
-                  placeholder="https://example.com/image.jpg"
+                  placeholder={t('artifact.hotspot.imagePlaceholder')}
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Antal zoner att hitta</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.hotspot.requiredHitsLabel')}</label>
                   <Input
                     type="number"
                     min={1}
@@ -717,11 +717,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, requiredHits: val },
                       });
                     }}
-                    placeholder="Alla"
+                    placeholder={t('artifact.hotspot.requiredHitsPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Visa feedback</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.hotspot.showFeedbackLabel')}</label>
                   <Select
                     value={(artifact.metadata?.showFeedback as boolean) !== false ? 'true' : 'false'}
                     onChange={(e) =>
@@ -730,14 +730,14 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: 'true', label: 'Ja – visa träffar' },
-                      { value: 'false', label: 'Nej – tyst' },
+                      { value: 'true', label: t('artifact.hotspot.showFeedbackYes') },
+                      { value: 'false', label: t('artifact.hotspot.showFeedbackNo') },
                     ]}
                   />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                💡 Hotspot-zoner definieras i JSON-metadata: zones: [{'{'}x, y, radius, label{'}'}]
+                {t('artifact.hotspot.helpText')}
               </p>
             </div>
           )}
@@ -747,10 +747,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-pink-500/30 bg-pink-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🧩</span>
-                <h4 className="text-sm font-semibold text-foreground">Pusselspel-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.tilePuzzle.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Bild-URL</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.tilePuzzle.imageLabel')}</label>
                 <Input
                   value={(artifact.metadata?.imageUrl as string) || ''}
                   onChange={(e) =>
@@ -758,12 +758,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, imageUrl: e.target.value },
                     })
                   }
-                  placeholder="https://example.com/puzzle-image.jpg"
+                  placeholder={t('artifact.tilePuzzle.imagePlaceholder')}
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Rutnätsstorlek</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.tilePuzzle.gridLabel')}</label>
                   <Select
                     value={String((artifact.metadata?.gridSize as number) || 3)}
                     onChange={(e) =>
@@ -772,15 +772,15 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: '2', label: '2×2 (lätt)' },
-                      { value: '3', label: '3×3 (normal)' },
-                      { value: '4', label: '4×4 (svår)' },
-                      { value: '5', label: '5×5 (expert)' },
+                      { value: '2', label: t('artifact.tilePuzzle.grid2') },
+                      { value: '3', label: t('artifact.tilePuzzle.grid3') },
+                      { value: '4', label: t('artifact.tilePuzzle.grid4') },
+                      { value: '5', label: t('artifact.tilePuzzle.grid5') },
                     ]}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Visa förhandsvisning</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.tilePuzzle.previewLabel')}</label>
                   <Select
                     value={(artifact.metadata?.showPreview as boolean) ? 'true' : 'false'}
                     onChange={(e) =>
@@ -789,8 +789,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: 'true', label: 'Ja' },
-                      { value: 'false', label: 'Nej' },
+                      { value: 'true', label: t('artifact.common.yes') },
+                      { value: 'false', label: t('artifact.common.no') },
                     ]}
                   />
                 </div>
@@ -803,11 +803,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-indigo-500/30 bg-indigo-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🔤</span>
-                <h4 className="text-sm font-semibold text-foreground">Chiffer-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.cipher.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Chiffermetod</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.cipher.methodLabel')}</label>
                   <Select
                     value={(artifact.metadata?.cipherMethod as string) || 'caesar'}
                     onChange={(e) =>
@@ -816,16 +816,18 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: 'caesar', label: 'Caesar (förskjutning)' },
-                      { value: 'atbash', label: 'Atbash (spegling)' },
-                      { value: 'vigenere', label: 'Vigenère (nyckelord)' },
-                      { value: 'substitution', label: 'Substitution (egen)' },
+                      { value: 'caesar', label: t('artifact.cipher.methodCaesar') },
+                      { value: 'atbash', label: t('artifact.cipher.methodAtbash') },
+                      { value: 'vigenere', label: t('artifact.cipher.methodVigenere') },
+                      { value: 'substitution', label: t('artifact.cipher.methodSubstitution') },
                     ]}
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    {(artifact.metadata?.cipherMethod as string) === 'caesar' ? 'Förskjutning (1-25)' : 'Nyckelord'}
+                    {(artifact.metadata?.cipherMethod as string) === 'caesar'
+                      ? t('artifact.cipher.keyLabelCaesar')
+                      : t('artifact.cipher.keyLabelVigenere')}
                   </label>
                   <Input
                     value={(artifact.metadata?.cipherKey as string) || ''}
@@ -834,12 +836,14 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, cipherKey: e.target.value },
                       })
                     }
-                    placeholder={(artifact.metadata?.cipherMethod as string) === 'caesar' ? '3' : 'hemligt'}
+                    placeholder={(artifact.metadata?.cipherMethod as string) === 'caesar'
+                      ? t('artifact.cipher.keyPlaceholderCaesar')
+                      : t('artifact.cipher.keyPlaceholderVigenere')}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Klartext (vad som ska krypteras)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.cipher.plaintextLabel')}</label>
                 <Textarea
                   value={(artifact.metadata?.plaintext as string) || ''}
                   onChange={(e) =>
@@ -848,7 +852,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={2}
-                  placeholder="Hemligheten finns under trappan"
+                  placeholder={t('artifact.cipher.plaintextPlaceholder')}
                 />
               </div>
             </div>
@@ -859,11 +863,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-cyan-500/30 bg-cyan-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🧠</span>
-                <h4 className="text-sm font-semibold text-foreground">Logikrutnät-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.logicGrid.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Rader (kommaseparerade)</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.logicGrid.rowsLabel')}</label>
                   <Input
                     value={((artifact.metadata?.rows as string[]) || []).join(', ')}
                     onChange={(e) =>
@@ -874,11 +878,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         },
                       })
                     }
-                    placeholder="Alice, Bob, Charlie"
+                    placeholder={t('artifact.logicGrid.rowsPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Kolumner (kommaseparerade)</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.logicGrid.columnsLabel')}</label>
                   <Input
                     value={((artifact.metadata?.columns as string[]) || []).join(', ')}
                     onChange={(e) =>
@@ -889,13 +893,13 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         },
                       })
                     }
-                    placeholder="Röd, Grön, Blå"
+                    placeholder={t('artifact.logicGrid.columnsPlaceholder')}
                   />
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                💡 Lösningen definieras i JSON:{' '}
-                <code className="font-mono">solution: {'{"Alice": "Röd", "Bob": "Grön"}'}</code>
+                {t('artifact.logicGrid.helpText')}{' '}
+                <code className="font-mono">{t('artifact.logicGrid.helpCode')}</code>
               </p>
             </div>
           )}
@@ -905,10 +909,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-teal-500/30 bg-teal-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">✅</span>
-                <h4 className="text-sm font-semibold text-foreground">Flervalssvar-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.multiAnswer.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Saker att bocka av (ett per rad)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.multiAnswer.itemsLabel')}</label>
                 <Textarea
                   value={((artifact.metadata?.items as string[]) || []).join('\n')}
                   onChange={(e) =>
@@ -920,11 +924,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={4}
-                  placeholder="Hitta nyckeln&#10;Lösa gåtan&#10;Öppna dörren"
+                  placeholder={t('artifact.multiAnswer.itemsPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Kräv antal för klart</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.multiAnswer.requiredCountLabel')}</label>
                 <Input
                   type="number"
                   min={1}
@@ -935,7 +939,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, requiredCount: val },
                     });
                   }}
-                  placeholder="Alla"
+                  placeholder={t('artifact.multiAnswer.requiredCountPlaceholder')}
                 />
               </div>
             </div>
@@ -946,10 +950,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-rose-500/30 bg-rose-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">📱</span>
-                <h4 className="text-sm font-semibold text-foreground">QR/NFC-skanning-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.qrGate.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Förväntat värde</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.qrGate.expectedLabel')}</label>
                 <Input
                   value={(artifact.metadata?.expectedValue as string) || ''}
                   onChange={(e) =>
@@ -957,12 +961,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, expectedValue: e.target.value },
                     })
                   }
-                  placeholder="SECRET123"
+                  placeholder={t('artifact.qrGate.expectedPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">Texten som QR-koden ska innehålla</p>
+                <p className="text-xs text-muted-foreground">{t('artifact.qrGate.expectedHelp')}</p>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Meddelande vid lyckad skanning</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.qrGate.successLabel')}</label>
                 <Input
                   value={(artifact.metadata?.successMessage as string) || ''}
                   onChange={(e) =>
@@ -970,7 +974,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, successMessage: e.target.value },
                     })
                   }
-                  placeholder="Rätt kod! Fortsätt till nästa ledtråd."
+                  placeholder={t('artifact.qrGate.successPlaceholder')}
                 />
               </div>
             </div>
@@ -981,10 +985,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-yellow-500/30 bg-yellow-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">💡</span>
-                <h4 className="text-sm font-semibold text-foreground">Tips-behållare-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.hintContainer.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Tips (ett per rad, i ordning av avslöjande)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.hintContainer.hintsLabel')}</label>
                 <Textarea
                   value={((artifact.metadata?.hints as string[]) || []).join('\n')}
                   onChange={(e) =>
@@ -996,12 +1000,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={5}
-                  placeholder="Titta under mattan&#10;Det finns en nyckel gömd&#10;Nyckeln passar i skåpet till höger"
+                  placeholder={t('artifact.hintContainer.hintsPlaceholder')}
                 />
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Max tips att ge</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.hintContainer.maxHintsLabel')}</label>
                   <Input
                     type="number"
                     min={1}
@@ -1012,11 +1016,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, maxHints: val },
                       });
                     }}
-                    placeholder="Alla"
+                    placeholder={t('artifact.hintContainer.maxHintsPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Poängavdrag per tips</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.hintContainer.penaltyLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -1027,7 +1031,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, penaltyPerHint: val },
                       });
                     }}
-                    placeholder="0"
+                    placeholder={t('artifact.hintContainer.penaltyPlaceholder')}
                   />
                 </div>
               </div>
@@ -1039,10 +1043,10 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">📦</span>
-                <h4 className="text-sm font-semibold text-foreground">Rekvisita-bekräftelse-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.propConfirmation.title')}</h4>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Rekvisitanamn</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.propConfirmation.propNameLabel')}</label>
                 <Input
                   value={(artifact.metadata?.propName as string) || ''}
                   onChange={(e) =>
@@ -1050,11 +1054,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, propName: e.target.value },
                     })
                   }
-                  placeholder="Guldnyckeln"
+                  placeholder={t('artifact.propConfirmation.propNamePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Instruktion till deltagare</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.propConfirmation.instructionLabel')}</label>
                 <Textarea
                   value={(artifact.metadata?.instruction as string) || ''}
                   onChange={(e) =>
@@ -1063,7 +1067,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                     })
                   }
                   rows={2}
-                  placeholder="Visa upp guldnyckeln för spelledaren för att fortsätta."
+                  placeholder={t('artifact.propConfirmation.instructionPlaceholder')}
                 />
               </div>
             </div>
@@ -1074,11 +1078,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">📍</span>
-                <h4 className="text-sm font-semibold text-foreground">Platsverifiering-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.locationCheck.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Latitud</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.locationCheck.latitudeLabel')}</label>
                   <Input
                     type="number"
                     step="any"
@@ -1088,11 +1092,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, latitude: parseFloat(e.target.value) || null },
                       })
                     }
-                    placeholder="59.3293"
+                    placeholder={t('artifact.locationCheck.latitudePlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Longitud</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.locationCheck.longitudeLabel')}</label>
                   <Input
                     type="number"
                     step="any"
@@ -1102,12 +1106,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, longitude: parseFloat(e.target.value) || null },
                       })
                     }
-                    placeholder="18.0686"
+                    placeholder={t('artifact.locationCheck.longitudePlaceholder')}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Radie (meter)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.locationCheck.radiusLabel')}</label>
                 <Input
                   type="number"
                   min={1}
@@ -1117,11 +1121,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, radius: parseInt(e.target.value, 10) || 50 },
                     })
                   }
-                  placeholder="50"
+                  placeholder={t('artifact.locationCheck.radiusPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Platsnamn (valfritt)</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.locationCheck.locationNameLabel')}</label>
                 <Input
                   value={(artifact.metadata?.locationName as string) || ''}
                   onChange={(e) =>
@@ -1129,7 +1133,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, locationName: e.target.value },
                     })
                   }
-                  placeholder="Stortorget"
+                  placeholder={t('artifact.locationCheck.locationNamePlaceholder')}
                 />
               </div>
             </div>
@@ -1140,11 +1144,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-fuchsia-500/30 bg-fuchsia-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">🎤</span>
-                <h4 className="text-sm font-semibold text-foreground">Ljudnivå-detektor-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.soundLevel.title')}</h4>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Tröskel (0-100)</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.soundLevel.thresholdLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -1155,11 +1159,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, threshold: parseInt(e.target.value, 10) || 70 },
                       })
                     }
-                    placeholder="70"
+                    placeholder={t('artifact.soundLevel.thresholdPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Tid över tröskel (sek)</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.soundLevel.holdLabel')}</label>
                   <Input
                     type="number"
                     min={0}
@@ -1169,12 +1173,12 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, holdDuration: parseFloat(e.target.value) || 2 },
                       })
                     }
-                    placeholder="2"
+                    placeholder={t('artifact.soundLevel.holdPlaceholder')}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Instruktion</label>
+                <label className="text-sm font-medium text-foreground">{t('artifact.soundLevel.instructionLabel')}</label>
                 <Input
                   value={(artifact.metadata?.instruction as string) || ''}
                   onChange={(e) =>
@@ -1182,7 +1186,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       metadata: { ...artifact.metadata, instruction: e.target.value },
                     })
                   }
-                  placeholder="Ropa högt för att öppna dörren!"
+                  placeholder={t('artifact.soundLevel.instructionPlaceholder')}
                 />
               </div>
             </div>
@@ -1193,14 +1197,14 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
             <div className="rounded-lg border border-slate-500/30 bg-slate-500/5 p-4 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="text-lg">⏱️</span>
-                <h4 className="text-sm font-semibold text-foreground">Replay-markör-inställningar</h4>
+                <h4 className="text-sm font-semibold text-foreground">{t('artifact.replayMarker.title')}</h4>
               </div>
               <p className="text-sm text-muted-foreground">
-                Denna artefakt låter deltagare markera viktiga ögonblick under sessionen för senare analys.
+                {t('artifact.replayMarker.description')}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Max markörer</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.replayMarker.maxMarkersLabel')}</label>
                   <Input
                     type="number"
                     min={1}
@@ -1211,11 +1215,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                         metadata: { ...artifact.metadata, maxMarkers: val },
                       });
                     }}
-                    placeholder="Obegränsat"
+                    placeholder={t('artifact.replayMarker.maxMarkersPlaceholder')}
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Tillåt etiketter</label>
+                  <label className="text-sm font-medium text-foreground">{t('artifact.replayMarker.allowLabelsLabel')}</label>
                   <Select
                     value={(artifact.metadata?.allowLabels as boolean) !== false ? 'true' : 'false'}
                     onChange={(e) =>
@@ -1224,8 +1228,8 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       })
                     }
                     options={[
-                      { value: 'true', label: 'Ja' },
-                      { value: 'false', label: 'Nej' },
+                      { value: 'true', label: t('artifact.common.yes') },
+                      { value: 'false', label: t('artifact.common.no') },
                     ]}
                   />
                 </div>
@@ -1234,20 +1238,20 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
           )}
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Beskrivning</label>
+            <label className="text-sm font-medium text-foreground">{t('artifact.fields.descriptionLabel')}</label>
             <Textarea
               value={artifact.description}
               onChange={(e) => updateArtifact(idx, { description: e.target.value })}
               rows={3}
-              placeholder="Kort bakgrund eller anteckningar"
+              placeholder={t('artifact.fields.descriptionPlaceholder')}
             />
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-foreground">Varianter</p>
-                <p className="text-xs text-muted-foreground">Styr synlighet, rollåtkomst och när varianten kan låsas upp.</p>
+                <p className="text-sm font-semibold text-foreground">{t('artifact.variants.title')}</p>
+                <p className="text-xs text-muted-foreground">{t('artifact.variants.subtitle')}</p>
               </div>
               <Button
                 type="button"
@@ -1255,7 +1259,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 variant="outline"
                 onClick={() => updateArtifact(idx, { variants: [...artifact.variants, createVariant()] })}
               >
-                <PlusIcon className="h-4 w-4 mr-1.5" /> Lägg till variant
+                <PlusIcon className="h-4 w-4 mr-1.5" /> {t('artifact.variants.add')}
               </Button>
             </div>
 
@@ -1267,7 +1271,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-semibold">
                         {vIdx + 1}
                       </span>
-                      Variant
+                      {t('artifact.variants.label')}
                     </div>
                     <div className="flex items-center gap-1">
                       <Button
@@ -1305,15 +1309,15 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Titel</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.titleLabel')}</label>
                       <Input
                         value={variant.title}
                         onChange={(e) => updateVariant(idx, vIdx, { title: e.target.value })}
-                        placeholder="Varianttitel"
+                        placeholder={t('artifact.variants.titlePlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Synlighet</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.visibilityLabel')}</label>
                       <Select
                         value={variant.visibility}
                         onChange={(e) => updateVariant(idx, vIdx, { visibility: e.target.value as ArtifactVisibility })}
@@ -1324,36 +1328,36 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Roll (för privat variant)</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.roleLabel')}</label>
                       <Select
                         value={variant.visible_to_role_id ?? ''}
                         onChange={(e) => updateVariant(idx, vIdx, { visible_to_role_id: e.target.value || null })}
-                        options={[{ value: '', label: 'Ingen (syns enligt synlighet)' }, ...roleOptions]}
+                        options={[{ value: '', label: t('artifact.variants.roleNoneOption') }, ...roleOptions]}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Mediareferens (valfri)</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.mediaLabel')}</label>
                       <Input
                         value={variant.media_ref}
                         onChange={(e) => updateVariant(idx, vIdx, { media_ref: e.target.value })}
-                        placeholder="media_id eller URL"
+                        placeholder={t('artifact.variants.mediaPlaceholder')}
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Text/innehåll</label>
+                    <label className="text-sm font-medium text-foreground">{t('artifact.variants.bodyLabel')}</label>
                     <Textarea
                       value={variant.body}
                       onChange={(e) => updateVariant(idx, vIdx, { body: e.target.value })}
                       rows={4}
-                      placeholder="Vad visar denna variant?"
+                      placeholder={t('artifact.variants.bodyPlaceholder')}
                     />
                   </div>
 
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Steg-index (0 = första)</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.stepIndexLabel')}</label>
                       <Input
                         type="number"
                         min={0}
@@ -1363,11 +1367,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                           const val = e.target.value === '' ? null : Number(e.target.value);
                           updateVariant(idx, vIdx, { step_index: Number.isFinite(val) ? val : null });
                         }}
-                        placeholder="0"
+                        placeholder={t('artifact.variants.stepIndexPlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-foreground">Fas-index (0 = första)</label>
+                      <label className="text-sm font-medium text-foreground">{t('artifact.variants.phaseIndexLabel')}</label>
                       <Input
                         type="number"
                         min={0}
@@ -1377,7 +1381,7 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                           const val = e.target.value === '' ? null : Number(e.target.value);
                           updateVariant(idx, vIdx, { phase_index: Number.isFinite(val) ? val : null });
                         }}
-                        placeholder="0"
+                        placeholder={t('artifact.variants.phaseIndexPlaceholder')}
                       />
                     </div>
                   </div>

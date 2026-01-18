@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Input, Textarea, Select, Button, Card } from '@/components/ui';
 import { ArrowLeftIcon, EyeIcon } from '@heroicons/react/24/outline';
@@ -91,29 +92,6 @@ const defaultCore: CoreForm = {
   leader_tips: '',
 };
 
-const energyOptions = [
-  { value: '', label: 'Välj energinivå' },
-  { value: 'low', label: 'Låg' },
-  { value: 'medium', label: 'Medel' },
-  { value: 'high', label: 'Hög' },
-];
-
-const locationOptions = [
-  { value: '', label: 'Välj plats' },
-  { value: 'indoor', label: 'Inomhus' },
-  { value: 'outdoor', label: 'Utomhus' },
-  { value: 'both', label: 'Båda' },
-];
-
-const taxonomyPresets = [
-  'Brädspel',
-  'Partylek',
-  'Ringlekar',
-  'Utelekar',
-  'Inomhuslek',
-  'Isbrytare',
-];
-
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
@@ -149,6 +127,7 @@ const DEFAULT_GAME_TOOLS: GameToolForm[] = TOOL_REGISTRY.map((tool) => ({
 
 export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const router = useRouter();
+  const t = useTranslations('admin.games.builder.page');
   const isEditing = Boolean(gameId);
 
   // Form state
@@ -188,34 +167,66 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const energyOptions = useMemo(
+    () => [
+      { value: '', label: t('classification.energyPlaceholder') },
+      { value: 'low', label: t('classification.energyLow') },
+      { value: 'medium', label: t('classification.energyMedium') },
+      { value: 'high', label: t('classification.energyHigh') },
+    ],
+    [t]
+  );
+
+  const locationOptions = useMemo(
+    () => [
+      { value: '', label: t('classification.locationPlaceholder') },
+      { value: 'indoor', label: t('classification.locationIndoor') },
+      { value: 'outdoor', label: t('classification.locationOutdoor') },
+      { value: 'both', label: t('classification.locationBoth') },
+    ],
+    [t]
+  );
+
+  const taxonomyPresets = useMemo(
+    () => [
+      t('settings.taxonomyPresets.boardGames'),
+      t('settings.taxonomyPresets.partyGame'),
+      t('settings.taxonomyPresets.circleGames'),
+      t('settings.taxonomyPresets.outdoorGames'),
+      t('settings.taxonomyPresets.indoorGames'),
+      t('settings.taxonomyPresets.icebreakers'),
+    ],
+    [t]
+  );
+
   // Load purposes for main/sub purpose selection
   useEffect(() => {
     void (async () => {
       try {
         const res = await fetch('/api/purposes');
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda syften');
+        if (!res.ok) throw new Error(data.error || t('errors.loadPurposes'));
         setPurposes(data.purposes || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Kunde inte ladda syften');
+        setError(err instanceof Error ? err.message : t('errors.loadPurposes'));
       }
     })();
-  }, []);
+  }, [t]);
 
   const mainPurposeOptions = useMemo(
     () =>
       purposes
         .filter((p) => (p.type ?? 'main') !== 'sub')
-        .map((p) => ({ value: p.id, label: p.name || 'Okänt syfte' })),
-    [purposes]
+        .map((p) => ({ value: p.id, label: p.name || t('purposes.unknownMain') })),
+    [purposes, t]
   );
 
   const subPurposeOptions = useMemo(
     () =>
       purposes
         .filter((p) => (p.type ?? 'main') === 'sub' && (!core.main_purpose_id || p.parent_id === core.main_purpose_id))
-        .map((p) => ({ value: p.id, label: p.name || 'Okänt undersyfte' })),
-    [purposes, core.main_purpose_id]
+        .map((p) => ({ value: p.id, label: p.name || t('purposes.unknownSub') })),
+    [purposes, core.main_purpose_id, t]
   );
 
   useEffect(() => {
@@ -237,7 +248,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       try {
         const res = await fetch(`/api/games/builder/${gameId}`, { cache: 'no-store' });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda spel');
+        if (!res.ok) throw new Error(data.error || t('errors.loadGame'));
         
         const g = data.game;
         setCore({
@@ -368,15 +379,15 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
         // Load triggers
         const loadedTriggers = ((data.triggers as Partial<TriggerFormData>[] | undefined) ?? []).map(
-          (t) => ({
-            id: t.id || `trigger-${Math.random().toString(36).slice(2, 9)}`,
-            name: t.name || 'Trigger',
-            description: t.description || '',
-            enabled: t.enabled ?? true,
-            condition: t.condition || { type: 'manual' },
-            actions: t.actions || [],
-            execute_once: t.execute_once ?? true,
-            delay_seconds: t.delay_seconds ?? 0,
+          (trigger) => ({
+            id: trigger.id || `trigger-${Math.random().toString(36).slice(2, 9)}`,
+            name: trigger.name || t('defaults.triggerName'),
+            description: trigger.description || '',
+            enabled: trigger.enabled ?? true,
+            condition: trigger.condition || { type: 'manual' },
+            actions: trigger.actions || [],
+            execute_once: trigger.execute_once ?? true,
+            delay_seconds: trigger.delay_seconds ?? 0,
           })
         );
         setTriggers(loadedTriggers);
@@ -434,12 +445,12 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           })
         );
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Kunde inte ladda data');
+        setError(err instanceof Error ? err.message : t('errors.loadData'));
       } finally {
         setLoading(false);
       }
     })();
-  }, [gameId]);
+  }, [gameId, t]);
 
   // Validation result (Task 2.6)
   const validationResult = useMemo(() => {
@@ -631,7 +642,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               ? data.details
               : JSON.stringify(data.details)
             : '';
-        const msg = data?.error || 'Misslyckades att spara';
+        const msg = data?.error || t('errors.saveFailed');
         throw new Error(detailsText ? `${msg} (${detailsText})` : msg);
       }
 
@@ -643,26 +654,26 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
       }
     } catch (err) {
       setSaveStatus('error');
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.unexpected'));
     }
-  }, [core, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameId, router, subPurposeIds, cover, gameTools]);
+  }, [core, steps, materials, phases, roles, artifacts, triggers, boardConfig, gameId, router, subPurposeIds, cover, gameTools, t]);
 
   // Publish handler
   const handlePublish = useCallback(async () => {
     if (!qualityState.allRequiredMet) {
-      setError('Fyll i obligatoriska fält och välj omslagsbild innan publicering.');
+      setError(t('errors.publishMissingRequired'));
       return;
     }
     setCore((prev) => ({ ...prev, status: 'published' }));
     await handleSave({ status: 'published' });
-  }, [handleSave, qualityState.allRequiredMet]);
+  }, [handleSave, qualityState.allRequiredMet, t]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Laddar spel...</p>
+          <p className="text-sm text-muted-foreground">{t('loadingGame')}</p>
         </div>
       </div>
     );
@@ -679,11 +690,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <ArrowLeftIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">Tillbaka till lekar</span>
+              <span className="hidden sm:inline">{t('header.backToGames')}</span>
             </Link>
             <div className="h-4 w-px bg-border" />
             <h1 className="text-lg font-semibold text-foreground">
-              {isEditing ? 'Redigera lek' : 'Skapa ny lek'}
+              {isEditing ? t('header.editTitle') : t('header.createTitle')}
             </h1>
           </div>
 
@@ -701,7 +712,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               disabled={!gameId}
             >
               <EyeIcon className="h-4 w-4 mr-1.5" />
-              Förhandsgranska
+              {t('header.preview')}
             </Button>
 
             <Button
@@ -711,7 +722,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               onClick={() => handleSave()}
               disabled={saveStatus === 'saving'}
             >
-              Spara utkast
+              {t('header.saveDraft')}
             </Button>
 
             <Button
@@ -720,7 +731,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               onClick={handlePublish}
               disabled={!qualityState.allRequiredMet || saveStatus === 'saving'}
             >
-              Publicera
+              {t('header.publish')}
             </Button>
           </div>
         </div>
@@ -750,69 +761,73 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'grundinfo' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Grundinformation</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('basicInfo.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Namn och beskrivning som visas i lekbanken.
+                  {t('basicInfo.description')}
                 </p>
               </div>
 
               <Card className="p-6 space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Namn <span className="text-destructive">*</span>
+                    {t('basicInfo.nameLabel')} <span className="text-destructive">{t('common.required')}</span>
                   </label>
                   <Input
                     value={core.name}
                     onChange={(e) => setCore({ ...core, name: e.target.value })}
-                    placeholder="Ex. Samarbetsstafett"
+                    placeholder={t('basicInfo.namePlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Kort beskrivning <span className="text-destructive">*</span>
+                    {t('basicInfo.shortDescriptionLabel')} <span className="text-destructive">{t('common.required')}</span>
                   </label>
                   <Textarea
                     value={core.short_description}
                     onChange={(e) => setCore({ ...core, short_description: e.target.value })}
                     rows={2}
-                    placeholder="1-2 meningar som sammanfattar leken."
+                    placeholder={t('basicInfo.shortDescriptionPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Full beskrivning
+                    {t('basicInfo.fullDescriptionLabel')}
                   </label>
                   <Textarea
                     value={core.description}
                     onChange={(e) => setCore({ ...core, description: e.target.value })}
                     rows={5}
-                    placeholder="Detaljerad beskrivning av leken..."
+                    placeholder={t('basicInfo.fullDescriptionPlaceholder')}
                   />
                 </div>
               </Card>
 
               <Card className="p-6 space-y-4">
-                <h3 className="font-medium text-foreground">Syften & omslagsbild</h3>
+                <h3 className="font-medium text-foreground">{t('purposes.title')}</h3>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">
-                      Huvudsyfte <span className="text-destructive">*</span>
+                      {t('purposes.mainLabel')} <span className="text-destructive">{t('common.required')}</span>
                     </label>
                     <Select
                       value={core.main_purpose_id}
                       onChange={(e) => setCore({ ...core, main_purpose_id: e.target.value })}
-                      options={mainPurposeOptions.length > 0 ? mainPurposeOptions : [{ value: '', label: 'Laddar syften...' }]}
+                      options={
+                        mainPurposeOptions.length > 0
+                          ? mainPurposeOptions
+                          : [{ value: '', label: t('purposes.loadingOption') }]
+                      }
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Undersyften</label>
+                    <label className="text-sm font-medium text-foreground">{t('purposes.subLabel')}</label>
                     <div className="rounded-lg border border-border p-3 space-y-2 max-h-32 overflow-y-auto">
                       {subPurposeOptions.length === 0 && (
-                        <p className="text-sm text-muted-foreground">Välj huvudsyfte för att se undersyften.</p>
+                        <p className="text-sm text-muted-foreground">{t('purposes.emptyHint')}</p>
                       )}
                       {subPurposeOptions.map((opt) => (
                         <label key={opt.value} className="flex items-center gap-2 text-sm">
@@ -845,11 +860,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
               </Card>
 
               <Card className="p-6 space-y-4">
-                <h3 className="font-medium text-foreground">Klassificering</h3>
+                <h3 className="font-medium text-foreground">{t('classification.title')}</h3>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Energinivå</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.energyLabel')}</label>
                     <Select
                       value={core.energy_level || ''}
                       onChange={(e) => setCore({ ...core, energy_level: e.target.value || null })}
@@ -858,7 +873,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Plats</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.locationLabel')}</label>
                     <Select
                       value={core.location_type || ''}
                       onChange={(e) => setCore({ ...core, location_type: e.target.value || null })}
@@ -869,59 +884,59 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Tid (minuter)</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.timeLabel')}</label>
                     <Input
                       type="number"
                       min={0}
                       value={core.time_estimate_min ?? ''}
                       onChange={(e) => setCore({ ...core, time_estimate_min: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="Ex. 15"
+                      placeholder={t('classification.timePlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Spelare min</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.minPlayersLabel')}</label>
                     <Input
                       type="number"
                       min={0}
                       value={core.min_players ?? ''}
                       onChange={(e) => setCore({ ...core, min_players: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="Ex. 4"
+                      placeholder={t('classification.minPlayersPlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Spelare max</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.maxPlayersLabel')}</label>
                     <Input
                       type="number"
                       min={0}
                       value={core.max_players ?? ''}
                       onChange={(e) => setCore({ ...core, max_players: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="Ex. 30"
+                      placeholder={t('classification.maxPlayersPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Ålder min</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.ageMinLabel')}</label>
                     <Input
                       type="number"
                       min={0}
                       value={core.age_min ?? ''}
                       onChange={(e) => setCore({ ...core, age_min: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="Ex. 6"
+                      placeholder={t('classification.ageMinPlaceholder')}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">Ålder max</label>
+                    <label className="text-sm font-medium text-foreground">{t('classification.ageMaxLabel')}</label>
                     <Input
                       type="number"
                       min={0}
                       value={core.age_max ?? ''}
                       onChange={(e) => setCore({ ...core, age_max: e.target.value ? Number(e.target.value) : null })}
-                      placeholder="Ex. 99"
+                      placeholder={t('classification.ageMaxPlaceholder')}
                     />
                   </div>
                 </div>
@@ -943,37 +958,37 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'material' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Material</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('materials.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Lista material som behövs för att genomföra leken.
+                  {t('materials.description')}
                 </p>
               </div>
 
               <Card className="p-6 space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Material (ett per rad)
+                    {t('materials.itemsLabel')}
                   </label>
                   <Textarea
                     value={materials.items.join('\n')}
                     onChange={(e) => setMaterials({ ...materials, items: e.target.value.split('\n').filter(Boolean) })}
                     rows={6}
-                    placeholder="Ex:&#10;8 koner&#10;1 boll per lag&#10;Musik (Spotify-spellista)"
+                    placeholder={t('materials.itemsPlaceholder')}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {materials.items.length} material tillagt
+                    {t('materials.itemsCount', { count: materials.items.length })}
                   </p>
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    Förberedelser
+                    {t('materials.preparationLabel')}
                   </label>
                   <Textarea
                     value={materials.preparation}
                     onChange={(e) => setMaterials({ ...materials, preparation: e.target.value })}
                     rows={3}
-                    placeholder="Vad behöver ledaren förbereda innan leken?"
+                    placeholder={t('materials.preparationPlaceholder')}
                   />
                 </div>
               </Card>
@@ -984,58 +999,58 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'sakerhet' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Säkerhet & Inkludering</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('safety.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Viktiga säkerhetsnoteringar och tips för inkludering.
+                  {t('safety.description')}
                 </p>
               </div>
 
               <Card className="p-6 space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    ⚠️ Säkerhetsnoteringar
+                    {t('safety.safetyNotesLabel')}
                   </label>
                   <Textarea
                     value={materials.safety_notes}
                     onChange={(e) => setMaterials({ ...materials, safety_notes: e.target.value })}
                     rows={4}
-                    placeholder="Ex: Se upp för väggar vid snabb rörelse. Undvik glatta golv."
+                    placeholder={t('safety.safetyNotesPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    ♿ Tillgänglighetsnoteringar
+                    {t('safety.accessibilityLabel')}
                   </label>
                   <Textarea
                     value={core.accessibility_notes}
                     onChange={(e) => setCore({ ...core, accessibility_notes: e.target.value })}
                     rows={3}
-                    placeholder="Tips för anpassning till olika förutsättningar..."
+                    placeholder={t('safety.accessibilityPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    🏠 Utrymmeskrav
+                    {t('safety.spaceLabel')}
                   </label>
                   <Textarea
                     value={core.space_requirements}
                     onChange={(e) => setCore({ ...core, space_requirements: e.target.value })}
                     rows={2}
-                    placeholder="Ex: Minst 10x10 meter fritt utrymme"
+                    placeholder={t('safety.spacePlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
-                    💡 Ledartips
+                    {t('safety.leaderTipsLabel')}
                   </label>
                   <Textarea
                     value={core.leader_tips}
                     onChange={(e) => setCore({ ...core, leader_tips: e.target.value })}
                     rows={3}
-                    placeholder="Tips till ledaren för att få leken att fungera bättre..."
+                    placeholder={t('safety.leaderTipsPlaceholder')}
                   />
                 </div>
               </Card>
@@ -1066,9 +1081,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'artifacts' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Artifakter</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('artifacts.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Skapa artefakter med varianter som kan låsas upp per steg/fas och begränsas per roll.
+                  {t('artifacts.description')}
                 </p>
               </div>
 
@@ -1082,7 +1097,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
               {roles.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  Tips: Lägg till roller för att kunna göra privata varianter per roll.
+                  {t('artifacts.rolesHint')}
                 </p>
               )}
             </section>
@@ -1092,9 +1107,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'triggers' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Triggers</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('triggers.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Automatisera spelet med &quot;När X händer, gör Y&quot;-regler.
+                  {t('triggers.description')}
                 </p>
               </div>
 
@@ -1108,7 +1123,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
               {artifacts.length === 0 && (
                 <p className="text-xs text-muted-foreground">
-                  Tips: Lägg till artifakter (t.ex. keypads) för att kunna trigga på deras händelser.
+                  {t('triggers.artifactsHint')}
                 </p>
               )}
             </section>
@@ -1118,9 +1133,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'roller' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Roller</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('roles.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Definiera roller med hemliga instruktioner för deltagare.
+                  {t('roles.description')}
                 </p>
               </div>
 
@@ -1135,9 +1150,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'tavla' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Publik Tavla</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('board.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Innehåll som visas på projektor/storskärm under spelet.
+                  {t('board.description')}
                 </p>
               </div>
 
@@ -1153,9 +1168,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'verktyg' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Verktyg (Toolbelt)</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('tools.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Aktivera verktyg som kan användas under en spelsession.
+                  {t('tools.description')}
                 </p>
               </div>
 
@@ -1191,7 +1206,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
 
                       <div className="grid gap-3 sm:grid-cols-2">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground">Tillgänglig för</label>
+                          <label className="text-sm font-medium text-foreground">{t('tools.availabilityLabel')}</label>
                           <Select
                             value={current.scope}
                             onChange={(e) => {
@@ -1201,14 +1216,14 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                               );
                             }}
                             options={[
-                              { value: 'host', label: 'Ledare' },
-                              { value: 'participants', label: 'Deltagare' },
-                              { value: 'both', label: 'Båda' },
+                              { value: 'host', label: t('tools.availabilityHost') },
+                              { value: 'participants', label: t('tools.availabilityParticipants') },
+                              { value: 'both', label: t('tools.availabilityBoth') },
                             ]}
                             disabled={!current.enabled}
                           />
                           <p className="text-xs text-muted-foreground">
-                            Styr om verktyget visas för ledare, deltagare eller båda.
+                            {t('tools.availabilityHelp')}
                           </p>
                         </div>
                       </div>
@@ -1223,9 +1238,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'oversattningar' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Översättningar</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('translations.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Hantera översättningar till olika språk.
+                  {t('translations.description')}
                 </p>
               </div>
 
@@ -1234,39 +1249,39 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
                       <span className="text-lg">🇸🇪</span>
-                      <span className="font-medium">Svenska</span>
+                      <span className="font-medium">{t('translations.languageSwedish')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-2 rounded-full bg-emerald-500" />
-                      <span className="text-sm text-muted-foreground">100%</span>
+                      <span className="text-sm text-muted-foreground">{t('translations.percent', { percent: 100 })}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
                       <span className="text-lg">🇳🇴</span>
-                      <span className="font-medium">Norska</span>
+                      <span className="font-medium">{t('translations.languageNorwegian')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-2 rounded-full bg-muted" />
-                      <span className="text-sm text-muted-foreground">0%</span>
+                      <span className="text-sm text-muted-foreground">{t('translations.percent', { percent: 0 })}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
                     <div className="flex items-center gap-3">
                       <span className="text-lg">🇬🇧</span>
-                      <span className="font-medium">Engelska</span>
+                      <span className="font-medium">{t('translations.languageEnglish')}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-2 rounded-full bg-muted" />
-                      <span className="text-sm text-muted-foreground">0%</span>
+                      <span className="text-sm text-muted-foreground">{t('translations.percent', { percent: 0 })}</span>
                     </div>
                   </div>
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  Fullständig översättningshantering kommer snart.
+                  {t('translations.comingSoon')}
                 </p>
               </Card>
             </section>
@@ -1276,18 +1291,18 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           {activeSection === 'installningar' && (
             <section className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-foreground mb-1">Inställningar</h2>
+                <h2 className="text-xl font-semibold text-foreground mb-1">{t('settings.title')}</h2>
                 <p className="text-sm text-muted-foreground">
-                  Status och synlighet för leken.
+                  {t('settings.description')}
                 </p>
               </div>
 
               <Card className="p-6 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Taxonomi / spelkategori</label>
+                  <label className="text-sm font-medium text-foreground">{t('settings.taxonomyLabel')}</label>
                   <Input
                     value={core.taxonomy_category}
-                    placeholder="Ex. Ringlekar"
+                    placeholder={t('settings.taxonomyPlaceholder')}
                     onChange={(e) => setCore({ ...core, taxonomy_category: e.target.value })}
                   />
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
@@ -1302,37 +1317,35 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                       </button>
                     ))}
                     <span className="text-[11px] text-muted-foreground/70">
-                      Behåller tidigare värde vid import; sparas som spelkategori i databasen.
+                      {t('settings.taxonomyNote')}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">Status</label>
+                  <label className="text-sm font-medium text-foreground">{t('settings.statusLabel')}</label>
                   <Select
                     value={core.status}
                     onChange={(e) => setCore({ ...core, status: e.target.value as 'draft' | 'published' })}
                     options={[
-                      { value: 'draft', label: 'Utkast' },
-                      { value: 'published', label: 'Publicerad' },
+                      { value: 'draft', label: t('settings.statusDraft') },
+                      { value: 'published', label: t('settings.statusPublished') },
                     ]}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {core.status === 'draft'
-                      ? 'Utkast är endast synliga för dig.'
-                      : 'Publicerade lekar är synliga för alla med tillgång.'}
+                    {core.status === 'draft' ? t('settings.statusHelpDraft') : t('settings.statusHelpPublished')}
                   </p>
                 </div>
               </Card>
 
               {gameId && (
                 <Card className="p-6 border-destructive/20">
-                  <h3 className="font-medium text-destructive mb-2">Farozon</h3>
+                  <h3 className="font-medium text-destructive mb-2">{t('settings.dangerTitle')}</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Permanent radering av leken. Denna åtgärd kan inte ångras.
+                    {t('settings.dangerDescription')}
                   </p>
                   <Button variant="outline" size="sm" className="text-destructive border-destructive/30 hover:bg-destructive/10">
-                    Ta bort lek
+                    {t('settings.deleteButton')}
                   </Button>
                 </Card>
               )}

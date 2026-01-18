@@ -36,59 +36,59 @@ type ArtifactWizardProps = {
 // Templates
 // =============================================================================
 
-const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
+const getArtifactTemplates = (t: ReturnType<typeof useTranslations>): ArtifactTemplate[] => [
   // =============================================================================
   // Escape Room
   // =============================================================================
   {
     id: 'keypad-basic',
-    name: 'Keypad (4 siffror)',
-    description: 'En enkel 4-siffrig pinkod för att låsa upp något',
+    name: t('wizard.templates.keypadBasic.name'),
+    description: t('wizard.templates.keypadBasic.description'),
     icon: '🔐',
     category: 'escape_room',
     artifact: {
-      title: 'Hemlig kod',
+      title: t('wizard.templates.keypadBasic.title'),
       artifact_type: 'keypad',
       metadata: {
-        correctCode: '1234',
+        correctCode: t('wizard.templates.keypadBasic.correctCode'),
         codeLength: 4,
-        successMessage: '✅ Korrekt! Du har låst upp ledtråden.',
-        failMessage: '❌ Fel kod. Försök igen!',
+        successMessage: t('wizard.templates.keypadBasic.successMessage'),
+        failMessage: t('wizard.templates.keypadBasic.failMessage'),
       },
     },
   },
   {
     id: 'keypad-advanced',
-    name: 'Keypad (med försöksbegränsning)',
-    description: 'Pinkod med max 3 försök innan låsning',
+    name: t('wizard.templates.keypadAdvanced.name'),
+    description: t('wizard.templates.keypadAdvanced.description'),
     icon: '🔒',
     category: 'escape_room',
     artifact: {
-      title: 'Säkerhetskod',
+      title: t('wizard.templates.keypadAdvanced.title'),
       artifact_type: 'keypad',
       metadata: {
         correctCode: '',
         codeLength: 4,
         maxAttempts: 3,
         lockOnFail: true,
-        successMessage: '🎉 Korrekt! Vägen är öppen.',
-        failMessage: '⚠️ Fel kod!',
-        lockedMessage: '🚫 Keypad låst. Kontakta spelledaren.',
+        successMessage: t('wizard.templates.keypadAdvanced.successMessage'),
+        failMessage: t('wizard.templates.keypadAdvanced.failMessage'),
+        lockedMessage: t('wizard.templates.keypadAdvanced.lockedMessage'),
       },
     },
   },
   {
     id: 'riddle-puzzle',
-    name: 'Gåta / Fråga',
-    description: 'En gåta med textinmatning för svar',
+    name: t('wizard.templates.riddle.name'),
+    description: t('wizard.templates.riddle.description'),
     icon: '❓',
     category: 'escape_room',
     artifact: {
-      title: 'Gåtan',
+      title: t('wizard.templates.riddle.title'),
       artifact_type: 'riddle',
       metadata: {
-        prompt: 'Vad har fyra ben men kan inte gå?',
-        correctAnswers: ['bord', 'ett bord', 'table'],
+        prompt: t('wizard.templates.riddle.prompt'),
+        correctAnswers: t('wizard.templates.riddle.correctAnswers', { count: 3 }).split('\n'),
         normalizeMode: 'fuzzy',
         maxAttempts: null,
       },
@@ -96,28 +96,28 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'cipher-caesar',
-    name: 'Caesar-chiffer',
-    description: 'Krypterat meddelande med bokstavsförskjutning',
+    name: t('wizard.templates.cipherCaesar.name'),
+    description: t('wizard.templates.cipherCaesar.description'),
     icon: '🔤',
     category: 'escape_room',
     artifact: {
-      title: 'Krypterat meddelande',
+      title: t('wizard.templates.cipherCaesar.title'),
       artifact_type: 'cipher',
       metadata: {
         cipherMethod: 'caesar',
-        cipherKey: '3',
-        plaintext: 'hemligheten finns under trappan',
+        cipherKey: t('wizard.templates.cipherCaesar.cipherKey'),
+        plaintext: t('wizard.templates.cipherCaesar.plaintext'),
       },
     },
   },
   {
     id: 'hotspot-image',
-    name: 'Klickbar bild',
-    description: 'Bild med dolda zoner att hitta',
+    name: t('wizard.templates.hotspotImage.name'),
+    description: t('wizard.templates.hotspotImage.description'),
     icon: '🎯',
     category: 'escape_room',
     artifact: {
-      title: 'Sök i bilden',
+      title: t('wizard.templates.hotspotImage.title'),
       artifact_type: 'hotspot',
       metadata: {
         imageUrl: '',
@@ -130,12 +130,12 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'tile-puzzle',
-    name: 'Pusselspel (3x3)',
-    description: 'Sliding tile puzzle för att avslöja en bild',
+    name: t('wizard.templates.tilePuzzle.name'),
+    description: t('wizard.templates.tilePuzzle.description'),
     icon: '🧩',
     category: 'escape_room',
     artifact: {
-      title: 'Pusslet',
+      title: t('wizard.templates.tilePuzzle.title'),
       artifact_type: 'tile_puzzle',
       metadata: {
         imageUrl: '',
@@ -146,52 +146,48 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'logic-grid',
-    name: 'Logikrutnät',
-    description: 'Logikpussel där saker ska matchas',
+    name: t('wizard.templates.logicGrid.name'),
+    description: t('wizard.templates.logicGrid.description'),
     icon: '🧠',
     category: 'escape_room',
     artifact: {
-      title: 'Vem gjorde vad?',
+      title: t('wizard.templates.logicGrid.title'),
       artifact_type: 'logic_grid',
       metadata: {
-        rows: ['Alice', 'Bob', 'Charlie'],
-        columns: ['Röd', 'Grön', 'Blå'],
-        solution: { Alice: 'Röd', Bob: 'Grön', Charlie: 'Blå' },
+        rows: t('wizard.templates.logicGrid.rows', { count: 3 }).split('\n'),
+        columns: t('wizard.templates.logicGrid.columns', { count: 3 }).split('\n'),
+        solution: JSON.parse(t('wizard.templates.logicGrid.solution')) as Record<string, string>,
       },
     },
   },
   {
     id: 'counter-clues',
-    name: 'Ledtrådsräknare',
-    description: 'Räkna hittade ledtrådar eller framsteg',
+    name: t('wizard.templates.counterClues.name'),
+    description: t('wizard.templates.counterClues.description'),
     icon: '🔢',
     category: 'escape_room',
     artifact: {
-      title: 'Hittade ledtrådar',
+      title: t('wizard.templates.counterClues.title'),
       artifact_type: 'counter',
       metadata: {
         initialValue: 0,
         target: 5,
         step: 1,
-        label: 'Ledtrådar',
+        label: t('wizard.templates.counterClues.label'),
       },
     },
   },
   {
     id: 'hint-container',
-    name: 'Tips-behållare',
-    description: 'Progressiva tips som kan avslöjas',
+    name: t('wizard.templates.hintContainer.name'),
+    description: t('wizard.templates.hintContainer.description'),
     icon: '💡',
     category: 'escape_room',
     artifact: {
-      title: 'Tips',
+      title: t('wizard.templates.hintContainer.title'),
       artifact_type: 'hint_container',
       metadata: {
-        hints: [
-          'Titta under mattan',
-          'Det finns en nyckel gömd',
-          'Nyckeln passar i skåpet till höger',
-        ],
+        hints: t('wizard.templates.hintContainer.hints', { count: 3 }).split('\n'),
         maxHints: null,
         penaltyPerHint: 0,
       },
@@ -199,51 +195,51 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'qr-gate',
-    name: 'QR-kod checkpoint',
-    description: 'Skanna QR-kod för att fortsätta',
+    name: t('wizard.templates.qrGate.name'),
+    description: t('wizard.templates.qrGate.description'),
     icon: '📱',
     category: 'escape_room',
     artifact: {
-      title: 'Skanna koden',
+      title: t('wizard.templates.qrGate.title'),
       artifact_type: 'qr_gate',
       metadata: {
-        expectedValue: 'SECRET123',
-        successMessage: '✅ Rätt kod! Fortsätt till nästa ledtråd.',
+        expectedValue: t('wizard.templates.qrGate.expectedValue'),
+        successMessage: t('wizard.templates.qrGate.successMessage'),
       },
     },
   },
   {
     id: 'location-checkpoint',
-    name: 'Plats-checkpoint',
-    description: 'GPS-verifiering för stadsspel',
+    name: t('wizard.templates.locationCheckpoint.name'),
+    description: t('wizard.templates.locationCheckpoint.description'),
     icon: '📍',
     category: 'escape_room',
     artifact: {
-      title: 'Hitta platsen',
+      title: t('wizard.templates.locationCheckpoint.title'),
       artifact_type: 'location_check',
       metadata: {
         latitude: 59.3293,
         longitude: 18.0686,
         radius: 50,
-        locationName: 'Stortorget',
+        locationName: t('wizard.templates.locationCheckpoint.locationName'),
       },
     },
   },
   {
     id: 'clue-card',
-    name: 'Ledtråd/Hint',
-    description: 'Ett kort med en ledtråd som kan avslöjas',
+    name: t('wizard.templates.clueCard.name'),
+    description: t('wizard.templates.clueCard.description'),
     icon: '🃏',
     category: 'escape_room',
     artifact: {
-      title: 'Ledtråd',
+      title: t('wizard.templates.clueCard.title'),
       artifact_type: 'card',
-      description: 'Dold ledtråd som spelledaren kan visa',
+      description: t('wizard.templates.clueCard.descriptionText'),
       variants: [
         {
           id: 'default',
-          title: 'Ledtråd',
-          body: 'Skriv din ledtråd här...',
+          title: t('wizard.templates.clueCard.variantTitle'),
+          body: t('wizard.templates.clueCard.variantBody'),
           visibility: 'leader_only' as ArtifactVisibility,
           media_ref: '',
           visible_to_role_id: null,
@@ -256,14 +252,14 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'secret-document',
-    name: 'Hemligt dokument',
-    description: 'Ett dokument som avslöjas vid rätt tidpunkt',
+    name: t('wizard.templates.secretDocument.name'),
+    description: t('wizard.templates.secretDocument.description'),
     icon: '📄',
     category: 'escape_room',
     artifact: {
-      title: 'Hemligt dokument',
+      title: t('wizard.templates.secretDocument.title'),
       artifact_type: 'document',
-      description: 'Avslöjas när deltagarna hittar det',
+      description: t('wizard.templates.secretDocument.descriptionText'),
     },
   },
 
@@ -272,12 +268,12 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   // =============================================================================
   {
     id: 'reveal-card',
-    name: 'Avslöjande kort',
-    description: 'Ett kort för dramatiska avslöjanden',
+    name: t('wizard.templates.revealCard.name'),
+    description: t('wizard.templates.revealCard.description'),
     icon: '🎭',
     category: 'party',
     artifact: {
-      title: 'Avslöjandet',
+      title: t('wizard.templates.revealCard.title'),
       artifact_type: 'card',
       metadata: {
         revealStyle: 'dramatic',
@@ -286,18 +282,18 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'role-secret',
-    name: 'Rollhemlighet',
-    description: 'Hemlig information synlig endast för en roll',
+    name: t('wizard.templates.roleSecret.name'),
+    description: t('wizard.templates.roleSecret.description'),
     icon: '🤫',
     category: 'party',
     artifact: {
-      title: 'Din hemlighet',
+      title: t('wizard.templates.roleSecret.title'),
       artifact_type: 'card',
       variants: [
         {
           id: 'default',
-          title: 'Hemlig information',
-          body: 'Endast du kan se detta...',
+          title: t('wizard.templates.roleSecret.variantTitle'),
+          body: t('wizard.templates.roleSecret.variantBody'),
           visibility: 'role_private' as ArtifactVisibility,
           media_ref: '',
           visible_to_role_id: null,
@@ -310,12 +306,12 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'audio-clue',
-    name: 'Ljudledtråd',
-    description: 'Ljudklipp som spelas upp för deltagarna',
+    name: t('wizard.templates.audioClue.name'),
+    description: t('wizard.templates.audioClue.description'),
     icon: '🔊',
     category: 'party',
     artifact: {
-      title: 'Lyssna noga',
+      title: t('wizard.templates.audioClue.title'),
       artifact_type: 'audio',
       metadata: {
         audioUrl: '',
@@ -327,32 +323,32 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'sound-trigger',
-    name: 'Ljudaktivering',
-    description: 'Aktiveras när deltagarna gör ljud',
+    name: t('wizard.templates.soundTrigger.name'),
+    description: t('wizard.templates.soundTrigger.description'),
     icon: '🎤',
     category: 'party',
     artifact: {
-      title: 'Ropa högt!',
+      title: t('wizard.templates.soundTrigger.title'),
       artifact_type: 'sound_level',
       metadata: {
         threshold: 70,
         holdDuration: 2,
-        instruction: 'Ropa högt för att öppna dörren!',
+        instruction: t('wizard.templates.soundTrigger.instruction'),
       },
     },
   },
   {
     id: 'prop-check',
-    name: 'Rekvisita-check',
-    description: 'Spelledaren bekräftar att deltagare har rätt sak',
+    name: t('wizard.templates.propCheck.name'),
+    description: t('wizard.templates.propCheck.description'),
     icon: '📦',
     category: 'party',
     artifact: {
-      title: 'Visa upp föremålet',
+      title: t('wizard.templates.propCheck.title'),
       artifact_type: 'prop_confirmation',
       metadata: {
-        propName: 'Guldnyckeln',
-        instruction: 'Visa upp guldnyckeln för spelledaren för att fortsätta.',
+        propName: t('wizard.templates.propCheck.propName'),
+        instruction: t('wizard.templates.propCheck.instruction'),
       },
     },
   },
@@ -362,34 +358,34 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   // =============================================================================
   {
     id: 'quiz-answer',
-    name: 'Quizsvar',
-    description: 'Keypad för quiz-frågor med siffersvar',
+    name: t('wizard.templates.quizAnswer.name'),
+    description: t('wizard.templates.quizAnswer.description'),
     icon: '🔢',
     category: 'educational',
     artifact: {
-      title: 'Fråga',
+      title: t('wizard.templates.quizAnswer.title'),
       artifact_type: 'keypad',
-      description: 'Skriv in svaret med siffror',
+      description: t('wizard.templates.quizAnswer.descriptionText'),
       metadata: {
         correctCode: '',
         codeLength: 2,
-        successMessage: '✅ Rätt svar!',
-        failMessage: '❌ Fel svar. Försök igen!',
+        successMessage: t('wizard.templates.quizAnswer.successMessage'),
+        failMessage: t('wizard.templates.quizAnswer.failMessage'),
       },
     },
   },
   {
     id: 'text-question',
-    name: 'Textfråga',
-    description: 'Öppen fråga med textsvar',
+    name: t('wizard.templates.textQuestion.name'),
+    description: t('wizard.templates.textQuestion.description'),
     icon: '❓',
     category: 'educational',
     artifact: {
-      title: 'Svara på frågan',
+      title: t('wizard.templates.textQuestion.title'),
       artifact_type: 'riddle',
       metadata: {
-        prompt: 'Vad är huvudstaden i Sverige?',
-        correctAnswers: ['stockholm', 'Stockholm'],
+        prompt: t('wizard.templates.textQuestion.prompt'),
+        correctAnswers: t('wizard.templates.textQuestion.correctAnswers', { count: 2 }).split('\n'),
         normalizeMode: 'fuzzy',
         maxAttempts: 3,
       },
@@ -397,27 +393,27 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'checklist',
-    name: 'Checklista',
-    description: 'Flera saker att bocka av',
+    name: t('wizard.templates.checklist.name'),
+    description: t('wizard.templates.checklist.description'),
     icon: '✅',
     category: 'educational',
     artifact: {
-      title: 'Checklista',
+      title: t('wizard.templates.checklist.title'),
       artifact_type: 'multi_answer',
       metadata: {
-        items: ['Uppgift 1', 'Uppgift 2', 'Uppgift 3'],
+        items: t('wizard.templates.checklist.items', { count: 3 }).split('\n'),
         requiredCount: null,
       },
     },
   },
   {
     id: 'learning-card',
-    name: 'Lärokort',
-    description: 'Kort med information eller fakta',
+    name: t('wizard.templates.learningCard.name'),
+    description: t('wizard.templates.learningCard.description'),
     icon: '📚',
     category: 'educational',
     artifact: {
-      title: 'Lärokort',
+      title: t('wizard.templates.learningCard.title'),
       artifact_type: 'card',
     },
   },
@@ -427,23 +423,23 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   // =============================================================================
   {
     id: 'image-reveal',
-    name: 'Bild att avslöja',
-    description: 'En bild som visas vid rätt tillfälle',
+    name: t('wizard.templates.imageReveal.name'),
+    description: t('wizard.templates.imageReveal.description'),
     icon: '🖼️',
     category: 'general',
     artifact: {
-      title: 'Bild',
+      title: t('wizard.templates.imageReveal.title'),
       artifact_type: 'image',
     },
   },
   {
     id: 'replay-marker',
-    name: 'Replay-markör',
-    description: 'Låt deltagare markera viktiga ögonblick',
+    name: t('wizard.templates.replayMarker.name'),
+    description: t('wizard.templates.replayMarker.description'),
     icon: '⏱️',
     category: 'general',
     artifact: {
-      title: 'Markera ögonblick',
+      title: t('wizard.templates.replayMarker.title'),
       artifact_type: 'replay_marker',
       metadata: {
         maxMarkers: null,
@@ -453,12 +449,12 @@ const ARTIFACT_TEMPLATES: ArtifactTemplate[] = [
   },
   {
     id: 'blank',
-    name: 'Tom artefakt',
-    description: 'Börja från scratch',
+    name: t('wizard.templates.blank.name'),
+    description: t('wizard.templates.blank.description'),
     icon: '➕',
     category: 'general',
     artifact: {
-      title: 'Ny artefakt',
+      title: t('wizard.templates.blank.title'),
       artifact_type: 'card',
     },
   },
@@ -494,11 +490,11 @@ function createDefaultVariant() {
   };
 }
 
-function instantiateTemplate(template: ArtifactTemplate): ArtifactFormData {
+function instantiateTemplate(template: ArtifactTemplate, t: ReturnType<typeof useTranslations>): ArtifactFormData {
   const base = template.artifact;
   return {
     id: makeId(),
-    title: base.title ?? 'Ny artefakt',
+    title: base.title ?? t('wizard.defaults.newArtifact'),
     description: base.description ?? '',
     artifact_type: base.artifact_type ?? 'card',
     tags: base.tags ?? [],
@@ -523,14 +519,16 @@ export function ArtifactWizard({
   const [customizing, setCustomizing] = useState(false);
   const [artifact, setArtifact] = useState<ArtifactFormData | null>(null);
 
+  const templates = useMemo(() => getArtifactTemplates(t), [t]);
+
   const filteredTemplates = useMemo(() => {
-    if (!selectedCategory) return ARTIFACT_TEMPLATES;
-    return ARTIFACT_TEMPLATES.filter((t) => t.category === selectedCategory);
-  }, [selectedCategory]);
+    if (!selectedCategory) return templates;
+    return templates.filter((t) => t.category === selectedCategory);
+  }, [selectedCategory, templates]);
 
   const handleSelectTemplate = (template: ArtifactTemplate) => {
     setSelectedTemplate(template);
-    setArtifact(instantiateTemplate(template));
+    setArtifact(instantiateTemplate(template, t));
   };
 
   const handleCreate = () => {
@@ -683,7 +681,7 @@ export function ArtifactWizard({
                               metadata: { ...artifact.metadata, correctCode: e.target.value.replace(/\D/g, '') },
                             })
                           }
-                          placeholder="1234"
+                          placeholder={t('wizard.keypad.correctCodePlaceholder')}
                           maxLength={8}
                         />
                       </div>

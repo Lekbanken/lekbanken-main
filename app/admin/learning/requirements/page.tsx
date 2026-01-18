@@ -124,7 +124,7 @@ export default function AdminRequirementsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [page, pageSize, searchDebounced, scopeFilter, tenantFilter, isSystemAdmin]);
+  }, [page, pageSize, searchDebounced, scopeFilter, tenantFilter, isSystemAdmin, t]);
 
   useEffect(() => {
     loadRequirements();

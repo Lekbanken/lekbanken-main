@@ -43,7 +43,6 @@ import {
 } from '@heroicons/react/24/outline';
 import {
   TRIGGER_TEMPLATES,
-  TEMPLATE_CATEGORY_LABELS,
   TEMPLATE_CATEGORY_ICONS,
   searchTemplates,
   applyTemplateVariables,
@@ -157,7 +156,7 @@ function TemplateCard({ template, onSelect, t }: TemplateCardProps) {
           ))}
           {template.tags.length > 3 && (
             <Badge variant="default" className="text-xs">
-              +{template.tags.length - 3}
+              {t('tags.more', { count: template.tags.length - 3 })}
             </Badge>
           )}
         </div>
@@ -239,9 +238,9 @@ function VariableInput({
           options={[
             { value: '', label: t('variableInput.selectChannel') },
             ...channels.map((channel) => ({ value: channel, label: channel })),
-            { value: 'success', label: 'success' },
-            { value: 'warning', label: 'warning' },
-            { value: 'attention', label: 'attention' },
+            { value: 'success', label: t('channels.success') },
+            { value: 'warning', label: t('channels.warning') },
+            { value: 'attention', label: t('channels.attention') },
           ]}
         />
       );
@@ -480,7 +479,7 @@ export function TriggerTemplateLibrary({
               { value: 'all', label: t('categories.all') },
               ...CATEGORY_ORDER.map((cat) => ({
                 value: cat,
-                label: `${TEMPLATE_CATEGORY_ICONS[cat]} ${TEMPLATE_CATEGORY_LABELS[cat]}`,
+                label: `${TEMPLATE_CATEGORY_ICONS[cat]} ${t(`categories.${cat}` as Parameters<typeof t>[0])}`,
               })),
             ]}
           />

@@ -106,13 +106,13 @@ function StepCard({
             {step.durationMinutes && (
               <span className="flex items-center gap-1">
                 <ClockIcon className="h-3.5 w-3.5" />
-                {step.durationMinutes} min
+                {t('minutesShort', { count: step.durationMinutes })}
               </span>
             )}
             {hasLeaderScript && (
               <span className="flex items-center gap-1 text-amber-600">
                 <DocumentTextIcon className="h-3.5 w-3.5" />
-                Script
+                {t('scriptLabel')}
               </span>
             )}
           </div>

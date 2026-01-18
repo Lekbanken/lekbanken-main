@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { Input, Textarea, Select, Button, HelpText } from '@/components/ui';
 
 type StepForm = {
@@ -63,6 +64,7 @@ const defaultCore: CoreForm = {
 
 export function GameBuilderForm({ gameId }: { gameId?: string }) {
   const router = useRouter();
+  const t = useTranslations('admin.games.builder.form');
   const [core, setCore] = useState<CoreForm>(defaultCore);
   const [steps, setSteps] = useState<StepForm[]>([{ title: '', body: '', duration_seconds: null }]);
   const [materials, setMaterials] = useState<MaterialsForm>({
@@ -82,7 +84,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
       try {
         const res = await fetch(`/api/games/builder/${gameId}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Kunde inte ladda spel');
+        if (!res.ok) throw new Error(data.error || t('errors.loadFailed'));
         const g = data.game;
         setCore({
           ...defaultCore,
@@ -168,20 +170,20 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
         body: JSON.stringify(payload),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Misslyckades att spara');
-      setMessage('Sparat!');
+      if (!res.ok) throw new Error(data.error || t('errors.saveFailed'));
+      setMessage(t('messages.saved'));
       if (!gameId && data.gameId) {
         router.replace(`/admin/games/${data.gameId}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.unexpected'));
     } finally {
       setSaving(false);
     }
   };
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground">Laddar...</p>;
+    return <p className="text-sm text-muted-foreground">{t('loading')}</p>;
   }
 
   return (
@@ -189,76 +191,76 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4">
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Namn</label>
+            <label className="text-sm font-medium text-foreground">{t('core.nameLabel')}</label>
             <Input value={core.name} onChange={(e) => setCore({ ...core, name: e.target.value })} required />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Status</label>
+            <label className="text-sm font-medium text-foreground">{t('core.statusLabel')}</label>
             <Select
               value={core.status}
               onChange={(e) => setCore({ ...core, status: e.target.value })}
               options={[
-                { value: 'draft', label: 'Utkast' },
-                { value: 'published', label: 'Publicerad' },
+                { value: 'draft', label: t('core.statusDraft') },
+                { value: 'published', label: t('core.statusPublished') },
               ]}
             />
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Kort beskrivning</label>
+          <label className="text-sm font-medium text-foreground">{t('core.shortDescriptionLabel')}</label>
           <Textarea
             value={core.short_description}
             onChange={(e) => setCore({ ...core, short_description: e.target.value })}
             rows={2}
           />
-          <HelpText>Visas i spelbiblioteket och hjälper spelare välja rätt spel.</HelpText>
+          <HelpText>{t('core.shortDescriptionHelp')}</HelpText>
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Full beskrivning</label>
+          <label className="text-sm font-medium text-foreground">{t('core.fullDescriptionLabel')}</label>
           <Textarea
             value={core.description}
             onChange={(e) => setCore({ ...core, description: e.target.value })}
             rows={4}
           />
-          <HelpText>Detaljerad beskrivning som visas när spelet öppnas. Förklara temat och upplägget.</HelpText>
+          <HelpText>{t('core.fullDescriptionHelp')}</HelpText>
         </div>
         <div className="grid gap-3 md:grid-cols-3">
           <div className="space-y-1">
-            <label className="text-sm text-muted-foreground">Tid (min)</label>
+            <label className="text-sm text-muted-foreground">{t('core.timeMinutesLabel')}</label>
             <Input
               type="number"
               value={core.time_estimate_min ?? ''}
               onChange={(e) => setCore({ ...core, time_estimate_min: e.target.value ? Number(e.target.value) : null })}
             />
-            <HelpText>Uppskattad speltid i minuter.</HelpText>
+            <HelpText>{t('core.timeMinutesHelp')}</HelpText>
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-muted-foreground">Spelare min</label>
+            <label className="text-sm text-muted-foreground">{t('core.minPlayersLabel')}</label>
             <Input
               type="number"
               value={core.min_players ?? ''}
               onChange={(e) => setCore({ ...core, min_players: e.target.value ? Number(e.target.value) : null })}
             />
-            <HelpText>Minsta antal deltagare.</HelpText>
+            <HelpText>{t('core.minPlayersHelp')}</HelpText>
           </div>
           <div className="space-y-1">
-            <label className="text-sm text-muted-foreground">Spelare max</label>
+            <label className="text-sm text-muted-foreground">{t('core.maxPlayersLabel')}</label>
             <Input
               type="number"
               value={core.max_players ?? ''}
               onChange={(e) => setCore({ ...core, max_players: e.target.value ? Number(e.target.value) : null })}
             />
-            <HelpText>Max antal deltagare som kan delta.</HelpText>
+            <HelpText>{t('core.maxPlayersHelp')}</HelpText>
           </div>
         </div>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Material & säkerhet</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('materials.title')}</h2>
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium text-foreground">Material (ett per rad)</label>
+          <label className="text-sm font-medium text-foreground">{t('materials.itemsLabel')}</label>
           <Textarea
             value={materials.items.join('\n')}
             onChange={(e) => setMaterials({ ...materials, items: e.target.value.split('\n').filter(Boolean) })}
@@ -267,7 +269,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
         </div>
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Säkerhet</label>
+            <label className="text-sm font-medium text-foreground">{t('materials.safetyLabel')}</label>
             <Textarea
               value={materials.safety_notes}
               onChange={(e) => setMaterials({ ...materials, safety_notes: e.target.value })}
@@ -275,7 +277,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Förberedelser</label>
+            <label className="text-sm font-medium text-foreground">{t('materials.preparationLabel')}</label>
             <Textarea
               value={materials.preparation}
               onChange={(e) => setMaterials({ ...materials, preparation: e.target.value })}
@@ -287,52 +289,52 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
 
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Steg / Instruktioner</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('steps.title')}</h2>
           <Button type="button" size="sm" onClick={addStep}>
-            Lägg till steg
+            {t('steps.addStep')}
           </Button>
         </div>
         <div className="space-y-4">
           {steps.map((step, idx) => (
             <div key={idx} className="rounded-xl border border-border/60 bg-muted/30 p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold text-foreground">Steg {idx + 1}</p>
+                <p className="text-sm font-semibold text-foreground">{t('steps.stepLabel', { index: idx + 1 })}</p>
                 {steps.length > 1 && (
                   <button
                     type="button"
                     className="text-xs text-destructive"
                     onClick={() => removeStep(idx)}
                   >
-                    Ta bort
+                    {t('steps.remove')}
                   </button>
                 )}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Titel</label>
+                <label className="text-sm font-medium text-foreground">{t('steps.titleLabel')}</label>
                 <Input
                   value={step.title}
                   onChange={(e) => updateStep(idx, { title: e.target.value })}
-                  placeholder="Ex. Starta leken"
+                  placeholder={t('steps.titlePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Beskrivning</label>
+                <label className="text-sm font-medium text-foreground">{t('steps.descriptionLabel')}</label>
                 <Textarea
                   value={step.body}
                   onChange={(e) => updateStep(idx, { body: e.target.value })}
                   rows={3}
-                  placeholder="Vad ska deltagarna göra?"
+                  placeholder={t('steps.descriptionPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Tid (sekunder)</label>
+                <label className="text-sm font-medium text-foreground">{t('steps.durationLabel')}</label>
                 <Input
                   type="number"
                   value={step.duration_seconds ?? ''}
                   onChange={(e) =>
                     updateStep(idx, { duration_seconds: e.target.value ? Number(e.target.value) : null })
                   }
-                  placeholder="t.ex. 60"
+                  placeholder={t('steps.durationPlaceholder')}
                 />
               </div>
             </div>
@@ -345,7 +347,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={saving}>
-          {saving ? 'Sparar...' : 'Spara'}
+          {saving ? t('actions.saving') : t('actions.save')}
         </Button>
       </div>
     </form>

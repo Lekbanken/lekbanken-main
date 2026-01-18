@@ -97,7 +97,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
     } finally {
       setLoading(false);
     }
-  }, [code, getToken, session]);
+  }, [code, getToken, session, t]);
 
   // Send heartbeat
   const sendHeartbeat = useCallback(async () => {
@@ -385,7 +385,9 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
           {canEnterActiveSession && !activeSessionOpen && joinGateSecondsLeft !== null && (
             <div className="mt-6 space-y-3">
               <div className="text-sm text-muted-foreground">{t('sessionIsActive')}</div>
-              <div className="text-2xl font-semibold text-foreground">{joinGateSecondsLeft}s</div>
+              <div className="text-2xl font-semibold text-foreground">
+                {t('countdownSeconds', { seconds: joinGateSecondsLeft })}
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="primary"

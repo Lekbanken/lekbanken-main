@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useTransition } from 'react';
+import { useState, useEffect, useTransition, useMemo } from 'react';
 import {
   PlusIcon,
   TrashIcon,
@@ -9,6 +9,7 @@ import {
   CodeBracketIcon,
   Bars3Icon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
@@ -62,25 +63,6 @@ interface CourseEditorDrawerProps {
   onSave: () => void;
 }
 
-const SCOPE_OPTIONS = [
-  { value: 'global', label: 'Global', description: 'Synlig för alla organisationer' },
-  { value: 'tenant', label: 'Organisation', description: 'Synlig endast inom vald organisation' },
-];
-
-const STATUS_OPTIONS = [
-  { value: 'draft', label: 'Utkast' },
-  { value: 'active', label: 'Aktiv' },
-  { value: 'archived', label: 'Arkiverad' },
-];
-
-const DIFFICULTY_OPTIONS = [
-  { value: '', label: 'Välj nivå...' },
-  { value: 'beginner', label: 'Nybörjare' },
-  { value: 'intermediate', label: 'Medel' },
-  { value: 'advanced', label: 'Avancerad' },
-  { value: 'expert', label: 'Expert' },
-];
-
 function slugify(text: string): string {
   return text
     .toLowerCase()
@@ -104,12 +86,32 @@ export function CourseEditorDrawer({
   onClose,
   onSave,
 }: CourseEditorDrawerProps) {
+  const t = useTranslations('admin.learning.coursesEditor');
   const isEditing = !!course;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [advancedMode, setAdvancedMode] = useState(false);
   const [activeTab, setActiveTab] = useState('basic');
+
+  const scopeOptions = useMemo(() => ([
+    { value: 'global', label: t('scope.global.label'), description: t('scope.global.description') },
+    { value: 'tenant', label: t('scope.tenant.label'), description: t('scope.tenant.description') },
+  ]), [t]);
+
+  const statusOptions = useMemo(() => ([
+    { value: 'draft', label: t('status.draft') },
+    { value: 'active', label: t('status.active') },
+    { value: 'archived', label: t('status.archived') },
+  ]), [t]);
+
+  const difficultyOptions = useMemo(() => ([
+    { value: '', label: t('difficulty.placeholder') },
+    { value: 'beginner', label: t('difficulty.beginner') },
+    { value: 'intermediate', label: t('difficulty.intermediate') },
+    { value: 'advanced', label: t('difficulty.advanced') },
+    { value: 'expert', label: t('difficulty.expert') },
+  ]), [t]);
 
   // Basic form state
   const [title, setTitle] = useState('');
@@ -360,15 +362,15 @@ export function CourseEditorDrawer({
 
     // Validation
     if (!title.trim()) {
-      setError('Titel krävs');
+      setError(t('errors.titleRequired'));
       return;
     }
     if (!slug.trim()) {
-      setError('Slug krävs');
+      setError(t('errors.slugRequired'));
       return;
     }
     if (scope === 'tenant' && !tenantId) {
-      setError('Välj en organisation');
+      setError(t('errors.tenantRequired'));
       return;
     }
 
@@ -398,19 +400,19 @@ export function CourseEditorDrawer({
         if (isEditing && course) {
           const result = await updateCourse({ id: course.id, ...formData });
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera kursen');
+            setError(result.error || t('errors.updateFailed'));
             return;
           }
         } else {
           const result = await createCourse(formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa kursen');
+            setError(result.error || t('errors.createFailed'));
             return;
           }
         }
         onSave();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -420,21 +422,21 @@ export function CourseEditorDrawer({
     <Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <SheetContent className="w-full sm:max-w-2xl overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{isEditing ? 'Redigera kurs' : 'Skapa ny kurs'}</SheetTitle>
+          <SheetTitle>{isEditing ? t('title.edit') : t('title.create')}</SheetTitle>
           <SheetDescription>
             {isEditing
-              ? 'Uppdatera kursinställningar nedan.'
-              : 'Fyll i informationen för att skapa en ny kurs.'}
+              ? t('description.edit')
+              : t('description.create')}
           </SheetDescription>
         </SheetHeader>
 
         <form onSubmit={handleSubmit} className="mt-6">
           <Tabs
             tabs={[
-              { id: 'basic', label: 'Grundinfo' },
-              { id: 'content', label: 'Innehåll' },
-              { id: 'quiz', label: 'Quiz' },
-              { id: 'rewards', label: 'Belöningar' },
+              { id: 'basic', label: t('tabs.basic') },
+              { id: 'content', label: t('tabs.content') },
+              { id: 'quiz', label: t('tabs.quiz') },
+              { id: 'rewards', label: t('tabs.rewards') },
             ]}
             activeTab={activeTab}
             onChange={setActiveTab}
@@ -445,43 +447,43 @@ export function CourseEditorDrawer({
           {activeTab === 'basic' && (
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Titel *</Label>
+                <Label htmlFor="title">{t('fields.title')}</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="T.ex. Introduktion till Lekbanken"
+                  placeholder={t('fields.titlePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="slug">Slug *</Label>
+                <Label htmlFor="slug">{t('fields.slug')}</Label>
                 <Input
                   id="slug"
                   value={slug}
                   onChange={(e) => handleSlugChange(e.target.value)}
-                  placeholder="t.ex. intro-lekbanken"
+                  placeholder={t('fields.slugPlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Beskrivning</Label>
+                <Label htmlFor="description">{t('fields.description')}</Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="En kort beskrivning av kursen..."
+                  placeholder={t('fields.descriptionPlaceholder')}
                   rows={3}
                 />
               </div>
 
               {isSystemAdmin && (
                 <div className="space-y-2">
-                  <Label>Scope *</Label>
+                  <Label>{t('fields.scope')}</Label>
                   <div className="grid gap-2">
-                    {SCOPE_OPTIONS.map((option) => (
+                    {scopeOptions.map((option) => (
                       <label
                         key={option.value}
                         className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors ${
@@ -510,7 +512,7 @@ export function CourseEditorDrawer({
 
               {scope === 'tenant' && isSystemAdmin && (
                 <div className="space-y-2">
-                  <Label htmlFor="tenant">Organisation *</Label>
+                  <Label htmlFor="tenant">{t('fields.tenant')}</Label>
                   <select
                     id="tenant"
                     value={tenantId}
@@ -518,7 +520,7 @@ export function CourseEditorDrawer({
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                     required
                   >
-                    <option value="">Välj organisation</option>
+                    <option value="">{t('fields.tenantPlaceholder')}</option>
                     {tenants.map((tenant) => (
                       <option key={tenant.id} value={tenant.id}>
                         {tenant.name}
@@ -531,21 +533,21 @@ export function CourseEditorDrawer({
               {!isSystemAdmin && currentTenantId && (
                 <div className="rounded-lg border border-border bg-muted/30 p-3">
                   <p className="text-sm text-muted-foreground">
-                    Kursen skapas för din organisation.
+                    {t('notice.tenantScope')}
                   </p>
                 </div>
               )}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="status">Status</Label>
+                  <Label htmlFor="status">{t('fields.status')}</Label>
                   <select
                     id="status"
                     value={status}
                     onChange={(e) => setStatus(e.target.value as typeof status)}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {STATUS_OPTIONS.map((opt) => (
+                    {statusOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
                       </option>
@@ -554,14 +556,14 @@ export function CourseEditorDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="difficulty">Svårighetsgrad</Label>
+                  <Label htmlFor="difficulty">{t('fields.difficulty')}</Label>
                   <select
                     id="difficulty"
                     value={difficulty}
                     onChange={(e) => setDifficulty(e.target.value)}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                   >
-                    {DIFFICULTY_OPTIONS.map((opt) => (
+                    {difficultyOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
                         {opt.label}
                       </option>
@@ -570,19 +572,19 @@ export function CourseEditorDrawer({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="duration">Tid (min)</Label>
+                  <Label htmlFor="duration">{t('fields.duration')}</Label>
                   <Input
                     id="duration"
                     type="number"
                     min="1"
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(e.target.value)}
-                    placeholder="15"
+                    placeholder={t('fields.durationPlaceholder')}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="passScore">Godkänt (%)</Label>
+                  <Label htmlFor="passScore">{t('fields.passScore')}</Label>
                   <Input
                     id="passScore"
                     type="number"
@@ -595,14 +597,14 @@ export function CourseEditorDrawer({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags">Taggar</Label>
+                <Label htmlFor="tags">{t('fields.tags')}</Label>
                 <Input
                   id="tags"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  placeholder="säkerhet, grundkurs, obligatorisk"
+                  placeholder={t('fields.tagsPlaceholder')}
                 />
-                <p className="text-xs text-muted-foreground">Separera med komma.</p>
+                <p className="text-xs text-muted-foreground">{t('fields.tagsHelp')}</p>
               </div>
             </div>
           )}
@@ -611,10 +613,10 @@ export function CourseEditorDrawer({
           {activeTab === 'content' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">Innehållssektioner</Label>
+                <Label className="text-base font-medium">{t('content.title')}</Label>
                 <div className="flex items-center gap-2">
                   <Label htmlFor="advanced-content" className="text-sm text-muted-foreground">
-                    Avancerat
+                    {t('advanced.label')}
                   </Label>
                   <Switch
                     id="advanced-content"
@@ -628,14 +630,14 @@ export function CourseEditorDrawer({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CodeBracketIcon className="h-4 w-4" />
-                    JSON-läge
+                    {t('advanced.jsonMode')}
                   </div>
                   <Textarea
                     value={contentJson}
                     onChange={(e) => setContentJson(e.target.value)}
                     rows={12}
                     className="font-mono text-xs"
-                    placeholder='[{"id": "s1", "title": "...", "body_markdown": "..."}]'
+                    placeholder={t('content.jsonPlaceholder')}
                   />
                 </div>
               ) : (
@@ -644,7 +646,7 @@ export function CourseEditorDrawer({
                     <div className="rounded-lg border border-dashed border-border p-6 text-center">
                       <Bars3Icon className="mx-auto h-8 w-8 text-muted-foreground" />
                       <p className="mt-2 text-sm text-muted-foreground">
-                        Inga sektioner ännu. Lägg till din första sektion.
+                        {t('content.empty')}
                       </p>
                     </div>
                   ) : (
@@ -655,7 +657,7 @@ export function CourseEditorDrawer({
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium text-muted-foreground">
-                            Sektion {idx + 1}
+                            {t('content.section', { index: idx + 1 })}
                           </span>
                           <div className="flex gap-1">
                             <Button
@@ -689,12 +691,12 @@ export function CourseEditorDrawer({
                         <Input
                           value={section.title}
                           onChange={(e) => updateSection(section.id, 'title', e.target.value)}
-                          placeholder="Sektionsrubrik"
+                          placeholder={t('content.sectionTitlePlaceholder')}
                         />
                         <Textarea
                           value={section.body_markdown}
                           onChange={(e) => updateSection(section.id, 'body_markdown', e.target.value)}
-                          placeholder="Innehåll (Markdown stöds)"
+                          placeholder={t('content.sectionBodyPlaceholder')}
                           rows={4}
                         />
                       </div>
@@ -708,7 +710,7 @@ export function CourseEditorDrawer({
                     className="w-full"
                   >
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Lägg till sektion
+                    {t('content.addSection')}
                   </Button>
                 </div>
               )}
@@ -719,10 +721,10 @@ export function CourseEditorDrawer({
           {activeTab === 'quiz' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <Label className="text-base font-medium">Quizfrågor</Label>
+                <Label className="text-base font-medium">{t('quiz.title')}</Label>
                 <div className="flex items-center gap-2">
                   <Label htmlFor="advanced-quiz" className="text-sm text-muted-foreground">
-                    Avancerat
+                    {t('advanced.label')}
                   </Label>
                   <Switch
                     id="advanced-quiz"
@@ -736,14 +738,14 @@ export function CourseEditorDrawer({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CodeBracketIcon className="h-4 w-4" />
-                    JSON-läge
+                    {t('advanced.jsonMode')}
                   </div>
                   <Textarea
                     value={quizJson}
                     onChange={(e) => setQuizJson(e.target.value)}
                     rows={12}
                     className="font-mono text-xs"
-                    placeholder='[{"id": "q1", "question": "...", "options": [...]}]'
+                    placeholder={t('quiz.jsonPlaceholder')}
                   />
                 </div>
               ) : (
@@ -751,7 +753,7 @@ export function CourseEditorDrawer({
                   {questions.length === 0 ? (
                     <div className="rounded-lg border border-dashed border-border p-6 text-center">
                       <p className="text-sm text-muted-foreground">
-                        Inga frågor ännu. Lägg till din första fråga.
+                        {t('quiz.empty')}
                       </p>
                     </div>
                   ) : (
@@ -761,7 +763,7 @@ export function CourseEditorDrawer({
                         className="rounded-lg border border-border bg-card p-4 space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Fråga {qIdx + 1}</span>
+                          <span className="text-sm font-medium">{t('quiz.questionLabel', { index: qIdx + 1 })}</span>
                           <Button
                             type="button"
                             variant="ghost"
@@ -774,10 +776,10 @@ export function CourseEditorDrawer({
                         <Input
                           value={q.question}
                           onChange={(e) => updateQuestion(q.id, 'question', e.target.value)}
-                          placeholder="Frågetext"
+                          placeholder={t('quiz.questionPlaceholder')}
                         />
                         <div className="space-y-2">
-                          <Label className="text-xs text-muted-foreground">Svarsalternativ</Label>
+                          <Label className="text-xs text-muted-foreground">{t('quiz.optionsLabel')}</Label>
                           {q.options.map((opt, optIdx) => (
                             <div key={opt.id} className="flex items-center gap-2">
                               <input
@@ -785,12 +787,12 @@ export function CourseEditorDrawer({
                                 name={`correct-${q.id}`}
                                 checked={opt.is_correct}
                                 onChange={() => updateOption(q.id, opt.id, 'is_correct', true)}
-                                title="Markera som korrekt svar"
+                                title={t('quiz.correctAnswerTitle')}
                               />
                               <Input
                                 value={opt.text}
                                 onChange={(e) => updateOption(q.id, opt.id, 'text', e.target.value)}
-                                placeholder={`Alternativ ${optIdx + 1}`}
+                                placeholder={t('quiz.optionPlaceholder', { index: optIdx + 1 })}
                                 className="flex-1"
                               />
                               {q.options.length > 2 && (
@@ -814,16 +816,16 @@ export function CourseEditorDrawer({
                               className="text-xs"
                             >
                               <PlusIcon className="mr-1 h-3 w-3" />
-                              Lägg till alternativ
+                              {t('quiz.addOption')}
                             </Button>
                           )}
                         </div>
                         <div className="space-y-1">
-                          <Label className="text-xs text-muted-foreground">Förklaring (valfritt)</Label>
+                          <Label className="text-xs text-muted-foreground">{t('quiz.explanationLabel')}</Label>
                           <Textarea
                             value={q.explanation || ''}
                             onChange={(e) => updateQuestion(q.id, 'explanation', e.target.value)}
-                            placeholder="Förklaring som visas efter svar"
+                            placeholder={t('quiz.explanationPlaceholder')}
                             rows={2}
                           />
                         </div>
@@ -838,7 +840,7 @@ export function CourseEditorDrawer({
                     className="w-full"
                   >
                     <PlusIcon className="mr-2 h-4 w-4" />
-                    Lägg till fråga
+                    {t('quiz.addQuestion')}
                   </Button>
                 </div>
               )}
@@ -848,27 +850,27 @@ export function CourseEditorDrawer({
           {/* Rewards Tab */}
           {activeTab === 'rewards' && (
             <div className="space-y-4">
-              <Label className="text-base font-medium">Belöningar vid godkänt</Label>
+              <Label className="text-base font-medium">{t('rewards.title')}</Label>
 
               {advancedMode ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <CodeBracketIcon className="h-4 w-4" />
-                    JSON-läge
+                    {t('advanced.jsonMode')}
                   </div>
                   <Textarea
                     value={rewardsJson}
                     onChange={(e) => setRewardsJson(e.target.value)}
                     rows={6}
                     className="font-mono text-xs"
-                    placeholder='{"dicecoin_amount": 100, "xp_amount": 50}'
+                    placeholder={t('rewards.jsonPlaceholder')}
                   />
                 </div>
               ) : (
                 <div className="space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
-                      <Label htmlFor="dicecoin">DiceCoin</Label>
+                      <Label htmlFor="dicecoin">{t('rewards.dicecoin')}</Label>
                       <Input
                         id="dicecoin"
                         type="number"
@@ -880,11 +882,11 @@ export function CourseEditorDrawer({
                             dicecoin_amount: e.target.value ? parseInt(e.target.value, 10) : undefined,
                           })
                         }
-                        placeholder="100"
+                        placeholder={t('rewards.dicecoinPlaceholder')}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="xp">XP</Label>
+                      <Label htmlFor="xp">{t('rewards.xp')}</Label>
                       <Input
                         id="xp"
                         type="number"
@@ -896,12 +898,12 @@ export function CourseEditorDrawer({
                             xp_amount: e.target.value ? parseInt(e.target.value, 10) : undefined,
                           })
                         }
-                        placeholder="50"
+                        placeholder={t('rewards.xpPlaceholder')}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="achievement">Achievement ID (valfritt)</Label>
+                    <Label htmlFor="achievement">{t('rewards.achievement')}</Label>
                     <Input
                       id="achievement"
                       value={rewards.achievement_id ?? ''}
@@ -911,7 +913,7 @@ export function CourseEditorDrawer({
                           achievement_id: e.target.value || undefined,
                         })
                       }
-                      placeholder="UUID för achievement"
+                      placeholder={t('rewards.achievementPlaceholder')}
                     />
                   </div>
                 </div>
@@ -928,10 +930,10 @@ export function CourseEditorDrawer({
 
           <SheetFooter className="mt-6 flex-row justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || !title || !slug}>
-              {isPending ? 'Sparar...' : isEditing ? 'Uppdatera' : 'Skapa'}
+              {isPending ? t('actions.saving') : isEditing ? t('actions.update') : t('actions.create')}
             </Button>
           </SheetFooter>
         </form>

@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 export default function CreateSessionPage() {
   const router = useRouter();
+  const t = useTranslations('participantSessionCreate');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gameId, setGameId] = useState('');
@@ -25,13 +27,13 @@ export default function CreateSessionPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Kunde inte skapa session');
+        throw new Error(data.error || t('errors.createFailed'));
       }
 
       // Redirect to host dashboard
       router.push(`/participants/host/${data.session.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.unknown'));
     } finally {
       setLoading(false);
     }
@@ -41,10 +43,10 @@ export default function CreateSessionPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="max-w-md w-full bg-white rounded-lg shadow p-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Skapa Ny Session
+          {t('title')}
         </h1>
         <p className="text-gray-600 mb-6">
-          Starta en ny deltagarsession för ditt spel eller aktivitet
+          {t('description')}
         </p>
 
         {error && (
@@ -56,18 +58,18 @@ export default function CreateSessionPage() {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Spel ID (valfritt)
+              {t('gameId.label')}
             </label>
             <input
               type="text"
               value={gameId}
               onChange={(e) => setGameId(e.target.value)}
-              placeholder="Ange spel-ID om du vill koppla session till ett spel"
+              placeholder={t('gameId.placeholder')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             />
             <p className="mt-1 text-xs text-gray-500">
-              Lämna tomt för en fristående session
+              {t('gameId.hint')}
             </p>
           </div>
 
@@ -76,26 +78,26 @@ export default function CreateSessionPage() {
             disabled={loading}
             className="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
           >
-            {loading ? 'Skapar session...' : 'Skapa Session'}
+            {loading ? t('actions.creating') : t('actions.create')}
           </button>
         </div>
 
         <div className="mt-6 pt-6 border-t border-gray-200">
           <h2 className="text-sm font-semibold text-gray-900 mb-2">
-            Vad händer härnäst?
+            {t('nextSteps.title')}
           </h2>
           <ul className="text-sm text-gray-600 space-y-2">
             <li className="flex items-start">
               <span className="mr-2">1.</span>
-              <span>Du får en unik sessionskod som deltagare använder för att gå med</span>
+              <span>{t('nextSteps.step1')}</span>
             </li>
             <li className="flex items-start">
               <span className="mr-2">2.</span>
-              <span>Du kommer till värd-dashboarden där du kan hantera deltagare</span>
+              <span>{t('nextSteps.step2')}</span>
             </li>
             <li className="flex items-start">
               <span className="mr-2">3.</span>
-              <span>Deltagare går med genom att ange koden på gå med-sidan</span>
+              <span>{t('nextSteps.step3')}</span>
             </li>
           </ul>
         </div>

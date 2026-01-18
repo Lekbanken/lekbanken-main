@@ -197,9 +197,12 @@ const generateId = () => Math.random().toString(36).substring(2, 10);
 // Helper: Create Default Preset
 // =============================================================================
 
-const createDefaultPreset = (type: SignalType = 'screen_flash'): SignalPreset => ({
+const createDefaultPreset = (
+  t: ReturnType<typeof useTranslations<'play.signalPresetEditor'>>,
+  type: SignalType = 'screen_flash'
+): SignalPreset => ({
   id: generateId(),
-  name: 'Ny signal',
+  name: t('defaults.name'),
   type,
   pattern: 'single',
   repeatCount: 1,
@@ -207,7 +210,7 @@ const createDefaultPreset = (type: SignalType = 'screen_flash'): SignalPreset =>
   color: '#ffffff',
   volume: 0.5,
   audioUrl: 'beep',
-  notificationTitle: 'Signal',
+  notificationTitle: t('defaults.notificationTitle'),
   notificationBody: '',
 });
 
@@ -682,10 +685,10 @@ export function SignalPresetEditor({
   const [testingId, setTestingId] = useState<string | null>(null);
   
   const addPreset = useCallback(() => {
-    const newPreset = createDefaultPreset();
+    const newPreset = createDefaultPreset(t);
     onChange([...presets, newPreset]);
     setEditingId(newPreset.id);
-  }, [presets, onChange]);
+  }, [presets, onChange, t]);
   
   const updatePreset = useCallback((preset: SignalPreset) => {
     onChange(presets.map((p) => (p.id === preset.id ? preset : p)));

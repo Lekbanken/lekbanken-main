@@ -51,7 +51,7 @@ import type {
   ReadinessCategory,
   UseSessionReadinessReturn,
 } from '@/features/play/hooks/useSessionReadiness';
-import { READINESS_CATEGORY_LABELS } from '@/features/play/hooks/useSessionReadiness';
+import { READINESS_CATEGORY_KEYS } from '@/features/play/hooks/useSessionReadiness';
 
 // =============================================================================
 // Types
@@ -116,10 +116,12 @@ interface CheckRowProps {
 }
 
 function CheckRow({ check }: CheckRowProps) {
+  const t = useTranslations('play.readinessIndicator');
+  const name = check.nameKey ? t(check.nameKey as Parameters<typeof t>[0]) : check.name;
   return (
     <div className="flex items-center gap-2 py-1.5">
       {STATUS_ICONS[check.status]}
-      <span className="flex-1 text-sm">{check.name}</span>
+      <span className="flex-1 text-sm">{name}</span>
       {check.status !== 'skip' && (
         <span className="text-xs text-muted-foreground">
           {check.current}/{check.target}
@@ -139,6 +141,7 @@ interface CategorySectionProps {
 }
 
 function CategorySection({ category, checks }: CategorySectionProps) {
+  const t = useTranslations('play.readinessIndicator');
   const [isOpen, setIsOpen] = useState(true);
   
   if (checks.length === 0) return null;
@@ -152,7 +155,7 @@ function CategorySection({ category, checks }: CategorySectionProps) {
         {isOpen ? <ChevronDownIcon className="h-4 w-4" /> : <ChevronRightIcon className="h-4 w-4" />}
         {CATEGORY_ICONS[category]}
         <span className="font-medium text-sm flex-1 text-left">
-          {READINESS_CATEGORY_LABELS[category]}
+          {t(`categories.${READINESS_CATEGORY_KEYS[category]}` as Parameters<typeof t>[0])}
         </span>
         <Badge variant={hasIssues ? 'outline' : 'default'} className="text-xs">
           {passCount}/{checks.length}
@@ -172,6 +175,7 @@ function CategorySection({ category, checks }: CategorySectionProps) {
 // =============================================================================
 
 function InlineIndicator({ readiness, className }: ReadinessIndicatorProps) {
+  const t = useTranslations('play.readinessIndicator');
   const colors = COLOR_CLASSES[readiness.readinessColor];
   
   return (
@@ -189,19 +193,25 @@ function InlineIndicator({ readiness, className }: ReadinessIndicatorProps) {
       <PopoverContent className="w-80">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="font-medium">{readiness.readinessLabel}</span>
+            <span className="font-medium">
+              {t(readiness.readinessLabelKey as Parameters<typeof t>[0])}
+            </span>
             <Badge className={colors.bg}>{readiness.readinessPercent}%</Badge>
           </div>
           <Progress value={readiness.readinessPercent} className="h-2" />
-          <p className="text-sm text-muted-foreground">{readiness.summary}</p>
+          <p className="text-sm text-muted-foreground">
+            {t(readiness.summaryKey as Parameters<typeof t>[0], readiness.summaryParams)}
+          </p>
           
           {readiness.criticalIssues.length > 0 && (
             <div className="space-y-1 pt-2 border-t">
-              <p className="text-xs font-medium text-red-600">Kritiska problem:</p>
+              <p className="text-xs font-medium text-red-600">{t('criticalIssues')}</p>
               {readiness.criticalIssues.map((issue) => (
                 <div key={issue.id} className="flex items-center gap-2 text-sm">
                   <XCircleIcon className="h-3 w-3 text-red-500" />
-                  {issue.details}
+                  {issue.detailsKey
+                    ? t(issue.detailsKey as Parameters<typeof t>[0], issue.detailsParams)
+                    : issue.details}
                 </div>
               ))}
             </div>
@@ -217,6 +227,7 @@ function InlineIndicator({ readiness, className }: ReadinessIndicatorProps) {
 // =============================================================================
 
 function CompactIndicator({ readiness, className }: ReadinessIndicatorProps) {
+  const t = useTranslations('play.readinessIndicator');
   const colors = COLOR_CLASSES[readiness.readinessColor];
   
   return (
@@ -226,7 +237,7 @@ function CompactIndicator({ readiness, className }: ReadinessIndicatorProps) {
           <div className="flex items-center justify-between mb-1">
             <span className="text-sm font-medium flex items-center gap-2">
               <ChartBarSquareIcon className={`h-4 w-4 ${colors.text}`} />
-              {readiness.readinessLabel}
+              {t(readiness.readinessLabelKey as Parameters<typeof t>[0])}
             </span>
             <span className={`text-sm font-bold ${colors.text}`}>
               {readiness.readinessPercent}%
@@ -237,7 +248,9 @@ function CompactIndicator({ readiness, className }: ReadinessIndicatorProps) {
       </PopoverTrigger>
       <PopoverContent className="w-96" align="start">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">{readiness.summary}</p>
+          <p className="text-sm text-muted-foreground">
+            {t(readiness.summaryKey as Parameters<typeof t>[0], readiness.summaryParams)}
+          </p>
           
           <div className="space-y-1 pt-2 border-t">
             {Object.entries(readiness.checksByCategory).map(([cat, checks]) => (
@@ -268,13 +281,13 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <ChartBarSquareIcon className={`h-5 w-5 ${colors.text}`} />
-            Sessionsberedskap
+            {t('title')}
           </CardTitle>
           <Badge className={`${colors.bg} text-white`}>
             {readiness.readinessPercent}%
           </Badge>
         </div>
-        <CardDescription>{readiness.readinessLabel}</CardDescription>
+        <CardDescription>{t(readiness.readinessLabelKey as Parameters<typeof t>[0])}</CardDescription>
       </CardHeader>
       
       <CardContent className="space-y-4">
@@ -282,7 +295,9 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
         <Progress value={readiness.readinessPercent} className="h-3" />
         
         {/* Summary */}
-        <p className="text-sm">{readiness.summary}</p>
+        <p className="text-sm">
+          {t(readiness.summaryKey as Parameters<typeof t>[0], readiness.summaryParams)}
+        </p>
         
         {/* Critical issues */}
         {readiness.criticalIssues.length > 0 && (
@@ -294,7 +309,9 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
               {readiness.criticalIssues.map((issue) => (
                 <div key={issue.id} className="flex items-center gap-2 text-sm">
                   <XCircleIcon className="h-4 w-4 text-red-500" />
-                  {issue.details}
+                  {issue.detailsKey
+                    ? t(issue.detailsKey as Parameters<typeof t>[0], issue.detailsParams)
+                    : issue.details}
                 </div>
               ))}
             </div>
@@ -311,7 +328,9 @@ function DetailedIndicator({ readiness, className }: ReadinessIndicatorProps) {
               {readiness.warnings.map((warning) => (
                 <div key={warning.id} className="flex items-center gap-2 text-sm">
                   <ExclamationTriangleIcon className="h-4 w-4 text-yellow-500" />
-                  {warning.details}
+                  {warning.detailsKey
+                    ? t(warning.detailsKey as Parameters<typeof t>[0], warning.detailsParams)
+                    : warning.details}
                 </div>
               ))}
             </div>

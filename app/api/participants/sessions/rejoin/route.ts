@@ -101,22 +101,30 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Restore participant state - mark as active
-    const { error: updateError } = await supabase
-      .from('participants')
-      .update({
-        status: 'active',
-        last_seen_at: new Date().toISOString(),
-        disconnected_at: null,
-      })
-      .eq('id', participant.id);
-    
-    if (updateError) {
-      console.error('[Rejoin] Failed to restore participant:', updateError);
-      return NextResponse.json(
-        { error: 'Failed to restore session' },
-        { status: 500 }
-      );
+    const requireApproval = Boolean(
+      (session.settings as { require_approval?: boolean; requireApproval?: boolean } | null)?.require_approval ??
+      (session.settings as { require_approval?: boolean; requireApproval?: boolean } | null)?.requireApproval
+    );
+
+    const shouldActivate = !requireApproval && participant.status !== 'idle';
+
+    if (shouldActivate) {
+      const { error: updateError } = await supabase
+        .from('participants')
+        .update({
+          status: 'active',
+          last_seen_at: new Date().toISOString(),
+          disconnected_at: null,
+        })
+        .eq('id', participant.id);
+      
+      if (updateError) {
+        console.error('[Rejoin] Failed to restore participant:', updateError);
+        return NextResponse.json(
+          { error: 'Failed to restore session' },
+          { status: 500 }
+        );
+      }
     }
     
     // Log rejoin activity
@@ -141,7 +149,7 @@ export async function POST(request: NextRequest) {
         id: participant.id,
         displayName: participant.display_name,
         role: participant.role,
-        status: 'active',
+        status: shouldActivate ? 'active' : participant.status,
         joinedAt: participant.joined_at,
         progress: participant.progress,
         token: participantToken,

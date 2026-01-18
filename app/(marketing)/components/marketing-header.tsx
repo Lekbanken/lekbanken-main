@@ -1,17 +1,19 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
-  { href: "#how-it-works", label: "Så funkar det" },
-  { href: "#spotlight", label: "Produkt" },
-  { href: "#testimonials", label: "Kunder" },
-  { href: "#pricing", label: "Priser" },
+  { href: "#how-it-works", labelKey: "nav.howItWorks" },
+  { href: "#spotlight", labelKey: "nav.features" },
+  { href: "#testimonials", labelKey: "nav.customers" },
+  { href: "#pricing", labelKey: "nav.pricing" },
 ];
 
 export function MarketingHeader() {
+  const t = useTranslations("marketing");
   const [open, setOpen] = useState(false);
 
   return (
@@ -28,17 +30,17 @@ export function MarketingHeader() {
               href={item.href}
               className="rounded-full px-2 py-1 transition hover:text-foreground hover:bg-muted"
             >
-              {item.label}
+              {t(item.labelKey as Parameters<typeof t>[0])}
             </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
           <Button variant="ghost" href="/auth/login" size="sm">
-            Logga in
+            {t("actions.login")}
           </Button>
           <Button size="sm" href="/auth/signup">
-            Prova gratis
+            {t("actions.signup")}
           </Button>
         </div>
 
@@ -46,9 +48,9 @@ export function MarketingHeader() {
           type="button"
           onClick={() => setOpen(true)}
           className="inline-flex items-center justify-center rounded-lg p-2 text-foreground hover:bg-muted lg:hidden"
-          aria-label="Öppna menyn"
+          aria-label={t("header.openMenu")}
         >
-          <span className="sr-only">Öppna menyn</span>
+          <span className="sr-only">{t("header.openMenu")}</span>
           <svg viewBox="0 0 24 24" className="h-6 w-6" stroke="currentColor" fill="none" strokeWidth="1.8">
             <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
           </svg>
@@ -67,7 +69,7 @@ export function MarketingHeader() {
                 type="button"
                 onClick={() => setOpen(false)}
                 className="rounded-lg p-2 text-foreground hover:bg-muted"
-                aria-label="Stäng menyn"
+                aria-label={t("header.closeMenu")}
               >
                 <svg viewBox="0 0 24 24" className="h-6 w-6" stroke="currentColor" fill="none" strokeWidth="1.8">
                   <path d="m7 7 10 10M17 7 7 17" strokeLinecap="round" />
@@ -83,16 +85,16 @@ export function MarketingHeader() {
                   onClick={() => setOpen(false)}
                   className="block rounded-xl px-3 py-2 hover:bg-muted"
                 >
-                  {item.label}
+                  {t(item.labelKey as Parameters<typeof t>[0])}
                 </Link>
               ))}
             </div>
 
             <div className="mt-8 flex flex-col gap-3">
               <Button variant="outline" href="/auth/login">
-                Logga in
+                {t("actions.login")}
               </Button>
-              <Button href="/auth/signup">Prova gratis</Button>
+              <Button href="/auth/signup">{t("actions.signup")}</Button>
             </div>
           </div>
         </div>

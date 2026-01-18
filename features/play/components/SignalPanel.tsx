@@ -82,7 +82,7 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
     } finally {
       setLoading(false);
     }
-  }, [sessionId, channel]);
+  }, [sessionId, channel, t]);
 
   useEffect(() => {
     void load();
@@ -111,11 +111,25 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
     return channels;
   }, [signals]);
 
+  const suggestedChannelOptions = useMemo(() => ([
+    { value: 'READY', label: t('presets.ready') },
+    { value: 'HINT', label: t('presets.hint') },
+    { value: 'ATTENTION', label: t('presets.attention') },
+    { value: 'PAUSE', label: t('presets.pause') },
+    { value: 'FOUND', label: t('presets.found') },
+    { value: 'SOS', label: t('presets.sos') },
+  ]), [t]);
+
   const suggestedChannels = useMemo(() => {
-    const suggested = ['READY', 'HINT', 'ATTENTION', 'PAUSE', 'FOUND', 'SOS'];
-    const merged = [...quickChannels, ...suggested];
-    return merged.filter((value, index) => merged.indexOf(value) === index).slice(0, 8);
-  }, [quickChannels]);
+    const merged = new Map<string, { value: string; label: string }>();
+    quickChannels.forEach((value) => {
+      merged.set(value, { value, label: value });
+    });
+    suggestedChannelOptions.forEach((option) => {
+      if (!merged.has(option.value)) merged.set(option.value, option);
+    });
+    return Array.from(merged.values()).slice(0, 8);
+  }, [quickChannels, suggestedChannelOptions]);
 
   const handleSend = useCallback(async () => {
     const c = channel.trim();
@@ -163,7 +177,7 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
           <p className="text-sm text-muted-foreground">{t('description')}</p>
         </div>
         <Badge variant={connected ? 'success' : 'secondary'} size="sm">
-          {connected ? 'Live' : 'Offline'}
+          {connected ? t('status.live') : t('status.offline')}
         </Badge>
       </div>
 
@@ -218,16 +232,16 @@ export function SignalPanel({ sessionId, disabled = false }: SignalPanelProps) {
 
         {suggestedChannels.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {suggestedChannels.map((c) => (
+            {suggestedChannels.map((option) => (
               <Button
-                key={c}
+                key={option.value}
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => setChannel(c)}
+                onClick={() => setChannel(option.value)}
                 disabled={disabled || sending}
               >
-                {c}
+                {option.label}
               </Button>
             ))}
           </div>

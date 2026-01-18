@@ -17,6 +17,7 @@ import { Tabs, TabPanel } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast';
 import { cn } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/config/env';
+import { resolveUiState } from '@/lib/play/ui-state';
 import {
   PlayIcon,
   UserGroupIcon,
@@ -45,7 +46,7 @@ import { LobbyHub } from '@/components/play';
 import { StoryViewModal } from './StoryViewModal';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
-import { kickParticipant, setNextStarter } from '@/features/play-participant/api';
+import { approveParticipant, kickParticipant, setNextStarter } from '@/features/play-participant/api';
 import type { SessionCockpitState, CockpitParticipant, UseSessionStateReturn, SessionEvent as CockpitEvent } from '@/types/session-cockpit';
 import type { SessionEvent as EventFeedEvent } from '@/types/session-event';
 import type { SessionRole } from '@/types/play-runtime';
@@ -84,11 +85,12 @@ export interface SessionCockpitProps {
 }
 
 type CockpitTab =
-  | 'overview'
+  | 'run'
   | 'story'
   | 'participants'
   | 'artifacts'
   | 'triggers'
+  | 'board'
   | 'signals'
   | 'timebank'
   | 'events'
@@ -111,6 +113,170 @@ interface LobbyCheckInput {
 // Sub-components
 // =============================================================================
 
+function RunTab({
+  status,
+  steps,
+  phases,
+  currentStepIndex,
+  currentPhaseIndex,
+  participants,
+  triggers,
+  onStart,
+  onPause,
+  onResume,
+  onEnd,
+  onNextStep,
+  onOpenArtifacts,
+  onOpenTriggers,
+  lastSyncAt,
+}: {
+  status: SessionCockpitState['status'];
+  steps: SessionCockpitState['steps'];
+  phases: SessionCockpitState['phases'];
+  currentStepIndex: number;
+  currentPhaseIndex: number;
+  participants: SessionCockpitState['participants'];
+  triggers: SessionCockpitState['triggers'];
+  onStart: () => void;
+  onPause: () => void;
+  onResume: () => void;
+  onEnd: () => void;
+  onNextStep: () => void;
+  onOpenArtifacts: () => void;
+  onOpenTriggers: () => void;
+  lastSyncAt?: string | null;
+}) {
+  const tRun = useTranslations('play.cockpit.run');
+  const uiState = resolveUiState({
+    status,
+    startedAt: status === 'active' ? new Date().toISOString() : null,
+    lastPollAt: lastSyncAt ?? null,
+  });
+
+  const currentStep = steps[currentStepIndex] ?? null;
+  const nextStep = steps[currentStepIndex + 1] ?? null;
+  const currentPhase = phases[currentPhaseIndex] ?? null;
+
+  const bannerCopy: Record<string, string> = {
+    waiting: tRun('banner.waiting'),
+    paused: tRun('banner.paused'),
+    locked: tRun('banner.locked'),
+    ended: tRun('banner.ended'),
+    degraded: tRun('banner.degraded'),
+    offline: tRun('banner.offline'),
+  };
+
+  const statusBadge = status === 'paused'
+    ? tRun('status.paused')
+    : status === 'ended'
+      ? tRun('status.ended')
+      : status === 'locked'
+        ? tRun('status.locked')
+        : tRun('status.active');
+
+  const participantCounts = participants.reduce(
+    (acc, p) => {
+      acc.total += 1;
+      if (p.status === 'active') acc.active += 1;
+      if (p.status === 'disconnected') acc.disconnected += 1;
+      if (p.status === 'pending') acc.pending += 1;
+      return acc;
+    },
+    { total: 0, active: 0, disconnected: 0, pending: 0 }
+  );
+
+  return (
+    <div className="space-y-6">
+      {uiState.banner !== 'none' && bannerCopy[uiState.banner] && (
+        <Card className="p-4 border-border/60">
+          <p className="text-sm text-muted-foreground">{bannerCopy[uiState.banner]}</p>
+        </Card>
+      )}
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="p-6 space-y-3 lg:col-span-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.now')}</p>
+              <h2 className="text-lg font-semibold text-foreground">{currentStep?.title ?? tRun('empty.currentStep')}</h2>
+              {currentPhase && (
+                <p className="text-xs text-muted-foreground">{currentPhase.name}</p>
+              )}
+            </div>
+            <Badge variant={status === 'paused' ? 'warning' : status === 'ended' ? 'secondary' : 'default'}>
+              {statusBadge}
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {currentStep?.leaderScript || currentStep?.boardText || currentStep?.description || tRun('empty.dash')}
+          </p>
+        </Card>
+
+        <Card className="p-6 space-y-3">
+          <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.next')}</p>
+          <h3 className="text-base font-semibold text-foreground">{nextStep?.title ?? tRun('empty.nextStep')}</h3>
+          <p className="text-sm text-muted-foreground">
+            {nextStep?.description || tRun('empty.dash')}
+          </p>
+          <Button
+            onClick={onNextStep}
+            disabled={!uiState.allowed.advanceStep}
+            className="w-full"
+          >
+            {tRun('actions.advanceStep')}
+          </Button>
+        </Card>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <Card className="p-6 space-y-3">
+          <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.controls')}</p>
+          <div className="flex flex-col gap-2">
+            {uiState.allowed.start && <Button onClick={onStart}>{tRun('actions.start')}</Button>}
+            {uiState.allowed.pause && <Button variant="outline" onClick={onPause}>{tRun('actions.pause')}</Button>}
+            {uiState.allowed.resume && <Button onClick={onResume}>{tRun('actions.resume')}</Button>}
+            {uiState.allowed.end && <Button variant="destructive" onClick={onEnd}>{tRun('actions.end')}</Button>}
+          </div>
+          <div className="flex flex-col gap-2 pt-2">
+            <Button variant="ghost" onClick={onOpenArtifacts}>{tRun('actions.artifacts')}</Button>
+            <Button variant="ghost" onClick={onOpenTriggers}>{tRun('actions.triggers')}</Button>
+          </div>
+        </Card>
+
+        <Card className="p-6 space-y-3 lg:col-span-2">
+          <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.health')}</p>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <p className="text-sm font-medium text-foreground">{tRun('health.realtime')}</p>
+              <p className="text-sm text-muted-foreground">{tRun(`health.connection.${uiState.connection}`)}</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">{tRun('health.participants')}</p>
+              <p className="text-sm text-muted-foreground">
+                {tRun('health.participantStatus', {
+                  active: participantCounts.active,
+                  pending: participantCounts.pending,
+                  offline: participantCounts.disconnected,
+                })}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">{tRun('health.triggers')}</p>
+              <p className="text-sm text-muted-foreground">
+                {tRun('health.triggersArmed', { count: triggers.filter((tr) => tr.status === 'armed').length })}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">{tRun('health.lastUpdated')}</p>
+              <p className="text-sm text-muted-foreground">{lastSyncAt ? new Date(lastSyncAt).toLocaleTimeString() : tRun('empty.dash')}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 function SessionHeader({
   session,
   status,
@@ -130,7 +296,7 @@ function SessionHeader({
   onOpenChat?: () => void;
   chatUnreadCount?: number;
 }) {
-  const t = useTranslations('play.cockpit.header');
+  const t = useTranslations('play.cockpit');
   if (!session) return null;
 
   return (
@@ -144,11 +310,11 @@ function SessionHeader({
           <span>•</span>
           <span className="flex items-center gap-1">
             <UserGroupIcon className="h-4 w-4" />
-            {participantCount} {t('participants')}
+            {participantCount} {t('header.participants')}
           </span>
           {status === 'active' && (
             <Badge variant="success" size="sm">
-              ● LIVE
+              ● {t('status.live')}
             </Badge>
           )}
           {status === 'paused' && (
@@ -168,7 +334,7 @@ function SessionHeader({
             className="relative"
           >
             <ChatBubbleLeftRightIcon className="h-4 w-4" />
-            <span className="sr-only">{t('openChat')}</span>
+            <span className="sr-only">{t('header.openChat')}</span>
             {chatUnreadCount && chatUnreadCount > 0 && (
               <span className="absolute -right-1 -top-1 min-w-[18px] rounded-full bg-primary px-1 text-[10px] font-semibold text-primary-foreground">
                 {chatUnreadCount}
@@ -199,7 +365,7 @@ function SessionHeader({
             variant="outline"
           >
             <ChevronRightIcon className="h-5 w-5 mr-1" />
-            Director Mode
+            {t('actions.directorMode')}
           </Button>
         )}
       </div>
@@ -268,6 +434,7 @@ function ParticipantWithRoleRow({
   onAssignRole,
   onUnassignRole,
   onKick,
+  onApprove,
   onMarkNext,
   isDisabled,
 }: {
@@ -276,6 +443,7 @@ function ParticipantWithRoleRow({
   onAssignRole: (participantId: string, roleId: string | null) => void;
   onUnassignRole: (participantId: string) => void;
   onKick: (participantId: string, displayName?: string) => void;
+  onApprove?: (participantId: string, displayName?: string) => void;
   onMarkNext: (participantId: string) => void;
   isDisabled: boolean;
 }) {
@@ -311,6 +479,17 @@ function ParticipantWithRoleRow({
       </div>
       
       <div className="flex items-center gap-2">
+        {participant.status === 'pending' && onApprove && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onApprove(participant.id, participant.displayName)}
+            disabled={isDisabled}
+            className="px-2"
+          >
+            {t('approve')}
+          </Button>
+        )}
         {currentRole ? (
           <Badge
             variant="secondary"
@@ -365,6 +544,7 @@ function ParticipantsTab({
   onUnassignRole,
   onSnapshotRoles,
   onKickParticipant,
+  onApproveParticipant,
   onMarkNext,
   isReadOnly,
   isLoading,
@@ -375,6 +555,7 @@ function ParticipantsTab({
   onUnassignRole: (participantId: string) => void;
   onSnapshotRoles?: () => void;
   onKickParticipant: (participantId: string, displayName?: string) => void;
+  onApproveParticipant?: (participantId: string, displayName?: string) => void;
   onMarkNext: (participantId: string) => void;
   isReadOnly: boolean;
   isLoading: boolean;
@@ -486,6 +667,7 @@ function ParticipantsTab({
               onAssignRole={onAssignRole}
               onUnassignRole={onUnassignRole}
               onKick={onKickParticipant}
+              onApprove={onApproveParticipant}
               onMarkNext={onMarkNext}
               isDisabled={isReadOnly}
             />
@@ -523,7 +705,7 @@ function TriggersTab({
       {armed.length > 0 && (
         <div>
           <div className="text-sm font-medium text-muted-foreground mb-2">
-            🟢 Armed ({armed.length})
+            🟢 {t('armedLabel', { count: armed.length })}
           </div>
           <div className="space-y-2">
             {armed.map((t) => (
@@ -541,7 +723,7 @@ function TriggersTab({
       {fired.length > 0 && (
         <div>
           <div className="text-sm font-medium text-muted-foreground mb-2">
-            ✅ Fired ({fired.length})
+            ✅ {t('firedLabel', { count: fired.length })}
           </div>
           <div className="space-y-2">
             {fired.map((t) => (
@@ -566,7 +748,7 @@ export function SessionCockpit({
   className,
 }: SessionCockpitProps) {
   const t = useTranslations('play.cockpit');
-  const tTabs = useTranslations('play.hostSession.tabs');
+  const tTabs = useTranslations('play.cockpit.tabs');
   const sessionState = useSessionState({ sessionId });
   const {
     // State
@@ -583,6 +765,7 @@ export function SessionCockpit({
     currentPhaseIndex,
     artifacts,
     triggers,
+    lastSyncAt,
     recentSignals,
     timeBankBalance,
     timeBankPaused,
@@ -594,6 +777,7 @@ export function SessionCockpit({
     startSession,
     pauseSession,
     resumeSession,
+    endSession,
     goToStep,
     nextStep,
     previousStep,
@@ -677,9 +861,9 @@ export function SessionCockpit({
     });
 
     return presets;
-  }, [capabilities]);
+  }, [capabilities, t]);
 
-  const [activeTab, setActiveTab] = useState<CockpitTab>('overview');
+  const [activeTab, setActiveTab] = useState<CockpitTab>('run');
   const [showChecklist, setShowChecklist] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -841,7 +1025,18 @@ export function SessionCockpit({
     } catch (error) {
       console.warn('Failed to remove participant', error);
     }
-  }, [refresh, sessionId]);
+  }, [refresh, sessionId, t]);
+
+  const handleApproveParticipant = useCallback(async (participantId: string, displayName?: string) => {
+    try {
+      await approveParticipant(sessionId, participantId);
+      toast.success(displayName ? `Godkände ${displayName}` : 'Deltagare godkänd');
+      await refresh();
+    } catch (error) {
+      console.warn('Failed to approve participant', error);
+      toast.error('Kunde inte godkänna deltagare');
+    }
+  }, [refresh, sessionId, toast]);
 
   const handleMarkNext = useCallback(async (participantId: string) => {
     try {
@@ -957,7 +1152,7 @@ export function SessionCockpit({
     });
 
     const fallbackPhaseId = phases[0]?.id ?? 'phase-default';
-    const fallbackPhaseTitle = phases[0]?.name ?? 'Steg';
+    const fallbackPhaseTitle = phases[0]?.name ?? t('steps.unnamedPhase');
 
     steps.forEach((step) => {
       const missingTitle = !step.title?.trim();
@@ -987,7 +1182,7 @@ export function SessionCockpit({
 
     return {
       sessionId,
-      sessionName: displayName || 'Session',
+      sessionName: displayName || t('session.fallbackName'),
       sessionStatus: status === 'ended' ? 'completed' : status === 'active' || status === 'paused' ? 'active' : 'lobby',
       participants: participants.map((participant) => ({
         id: participant.id,
@@ -1017,7 +1212,7 @@ export function SessionCockpit({
         buildSection('settings', settingsChecks),
       ],
     };
-  }, [sessionId, displayName, status, participants, sessionRoles, phases, steps, triggers, preflightItems, sessionCode]);
+  }, [sessionId, displayName, status, participants, sessionRoles, phases, steps, triggers, preflightItems, sessionCode, t, tTabs]);
 
   // Enter director mode
   const handleEnterDirectorMode = useCallback(async () => {
@@ -1048,15 +1243,16 @@ export function SessionCockpit({
 
   // Tabs configuration
   const tabs = [
-    { id: 'overview', label: t('tabs.overview') },
-    { id: 'story', label: t('tabs.story') },
+    { id: 'run', label: tTabs('run') },
     { id: 'participants', label: tTabs('participants'), badge: participants.length },
-    { id: 'artifacts', label: t('tabs.artifacts'), badge: artifacts.length },
-    { id: 'triggers', label: t('tabs.triggers'), badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
+    { id: 'artifacts', label: tTabs('artifacts'), badge: artifacts.length },
+    { id: 'triggers', label: tTabs('triggers'), badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
+    { id: 'board', label: tTabs('board') },
+    { id: 'settings', label: tTabs('settings') },
+    { id: 'story', label: tTabs('story') },
     showSignals ? { id: 'signals', label: tTabs('signals') } : null,
     showTimeBank ? { id: 'timebank', label: tTabs('timebank') } : null,
-    showEvents ? { id: 'events', label: t('tabs.events'), badge: sessionEvents.length || undefined } : null,
-    { id: 'settings', label: t('tabs.settings') },
+    showEvents ? { id: 'events', label: tTabs('events'), badge: sessionEvents.length || undefined } : null,
   ].filter(Boolean) as Array<{ id: CockpitTab; label: string; badge?: number }>;
 
   // Map status for drawer
@@ -1087,7 +1283,7 @@ export function SessionCockpit({
             <Card className="p-4 mb-6 border-destructive bg-destructive/10">
               <div className="flex items-center gap-2 text-destructive">
                 <ExclamationTriangleIcon className="h-5 w-5" />
-                <span className="font-medium">Fel:</span>
+                <span className="font-medium">{t('errors.title')}</span>
                 <span>{error}</span>
               </div>
             </Card>
@@ -1112,16 +1308,36 @@ export function SessionCockpit({
             className="mb-6"
           />
           
-          <TabPanel id="overview" activeTab={activeTab} className="space-y-6">
-            <LobbyHub
-              state={lobbyState}
-              onParticipantsClick={() => setActiveTab('participants')}
-              onRolesClick={() => setActiveTab('participants')}
-              onContentClick={() => setActiveTab('story')}
-              onTriggersClick={() => setActiveTab('triggers')}
-              onSettingsClick={() => setActiveTab('settings')}
-              onStartSession={handleEnterDirectorMode}
-              isStarting={isLoading}
+          <TabPanel id="run" activeTab={activeTab} className="space-y-6">
+            {status === 'lobby' && (
+              <LobbyHub
+                state={lobbyState}
+                onParticipantsClick={() => setActiveTab('participants')}
+                onRolesClick={() => setActiveTab('participants')}
+                onContentClick={() => setActiveTab('story')}
+                onTriggersClick={() => setActiveTab('triggers')}
+                onSettingsClick={() => setActiveTab('settings')}
+                onStartSession={handleEnterDirectorMode}
+                isStarting={isLoading}
+              />
+            )}
+
+            <RunTab
+              status={status}
+              steps={steps}
+              phases={phases}
+              currentStepIndex={currentStepIndex}
+              currentPhaseIndex={currentPhaseIndex}
+              participants={participants}
+              triggers={triggers}
+              onStart={startSession}
+              onPause={pauseSession}
+              onResume={resumeSession}
+              onEnd={endSession}
+              onNextStep={nextStep}
+              onOpenArtifacts={() => setActiveTab('artifacts')}
+              onOpenTriggers={() => setActiveTab('triggers')}
+              lastSyncAt={lastSyncAt ?? null}
             />
 
             {children}
@@ -1149,6 +1365,7 @@ export function SessionCockpit({
               onSnapshotRoles={snapshotRoles}
               isReadOnly={status === 'ended'}
               onKickParticipant={handleKickParticipant}
+              onApproveParticipant={handleApproveParticipant}
               onMarkNext={handleMarkNext}
               isLoading={isLoading}
             />
@@ -1160,6 +1377,16 @@ export function SessionCockpit({
           
           <TabPanel id="triggers" activeTab={activeTab}>
             <TriggersTab triggers={triggers} />
+          </TabPanel>
+
+          <TabPanel id="board" activeTab={activeTab}>
+            <Card className="p-6 space-y-3">
+              <p className="text-sm font-semibold text-foreground">{t('board.title')}</p>
+              <p className="text-sm text-muted-foreground">{t('board.openInstruction')}</p>
+              <div className="rounded-md bg-muted/50 px-3 py-2 text-sm font-mono">
+                /board/{sessionCode}
+              </div>
+            </Card>
           </TabPanel>
 
           {showSignals && (
@@ -1188,28 +1415,24 @@ export function SessionCockpit({
           
           <TabPanel id="settings" activeTab={activeTab} className="space-y-6">
             <Card className="p-6">
-              <h3 className="font-medium mb-4">Session settings</h3>
-              <p className="text-sm text-muted-foreground">
-                Story and phase text overrides live under the Story tab. More session settings can be restored here next.
-              </p>
+              <h3 className="font-medium mb-4">{t('settings.title')}</h3>
+              <p className="text-sm text-muted-foreground">{t('settings.description')}</p>
               <Button variant="outline" size="sm" className="mt-4" onClick={() => setActiveTab('story')}>
-                Open Story
+                {t('settings.openStory')}
               </Button>
             </Card>
 
             <Card className="p-6 space-y-4">
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <h3 className="font-medium">Session roles (session copy)</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Update role text and limits for this session without changing the game template.
-                  </p>
+                  <h3 className="font-medium">{t('settings.sessionRoles.title')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('settings.sessionRoles.description')}</p>
                 </div>
                 <Button
                   onClick={() => void handleSaveRoleEdits()}
                   disabled={rolesSaving || sessionRoles.length === 0}
                 >
-                  Save roles
+                  {t('settings.sessionRoles.save')}
                 </Button>
               </div>
 
@@ -1220,10 +1443,10 @@ export function SessionCockpit({
               {sessionRoles.length === 0 ? (
                 <div className="space-y-2">
                   <p className="text-sm text-muted-foreground">
-                    No roles snapshotted yet. Copy roles in the Roles tab to enable edits here.
+                    {t('settings.sessionRoles.empty')}
                   </p>
                   <Button variant="outline" size="sm" onClick={() => void snapshotRoles()}>
-                    Copy roles
+                    {t('settings.sessionRoles.copy')}
                   </Button>
                 </div>
               ) : (

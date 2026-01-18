@@ -11,8 +11,12 @@ export interface PlaySession {
   participantCount?: number;
   createdAt?: string;
   updatedAt?: string;
+  startedAt?: string | null;
+  pausedAt?: string | null;
+  endedAt?: string | null;
   gameId?: string | null;
   planId?: string | null;
+  settings?: Record<string, unknown> | null;
 }
 
 export interface Participant {
@@ -56,7 +60,7 @@ export async function getHostSession(id: string): Promise<{ session: PlaySession
   return parseJson(res);
 }
 
-export async function updateSessionStatus(id: string, action: 'start' | 'pause' | 'resume' | 'end') {
+export async function updateSessionStatus(id: string, action: 'start' | 'pause' | 'resume' | 'end' | 'lock' | 'unlock') {
   const res = await fetch(`/api/play/sessions/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -133,6 +137,15 @@ export async function blockParticipant(sessionId: string, participantId: string)
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action: 'block' }),
+  });
+  return parseJson(res);
+}
+
+export async function approveParticipant(sessionId: string, participantId: string) {
+  const res = await fetch(`/api/play/sessions/${sessionId}/participants/${participantId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'approve' }),
   });
   return parseJson(res);
 }

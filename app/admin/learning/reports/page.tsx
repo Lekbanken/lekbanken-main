@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   ChartBarIcon,
   AcademicCapIcon,
@@ -9,6 +9,7 @@ import {
   XCircleIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import {
   AdminPageHeader,
   AdminPageLayout,
@@ -33,19 +34,20 @@ import {
   type TenantOption,
 } from '@/app/actions/learning-admin';
 
-const DAYS_OPTIONS = [
-  { value: 7, label: 'Senaste 7 dagarna' },
-  { value: 30, label: 'Senaste 30 dagarna' },
-  { value: 90, label: 'Senaste 90 dagarna' },
-  { value: 365, label: 'Senaste året' },
-];
-
 export default function AdminLearningReportsPage() {
+  const t = useTranslations('admin.learning.reports');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<LearningReportsResult | null>(null);
   const [tenants, setTenants] = useState<TenantOption[]>([]);
   const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+
+  const daysOptions = useMemo(() => ([
+    { value: 7, label: t('filters.days.7') },
+    { value: 30, label: t('filters.days.30') },
+    { value: 90, label: t('filters.days.90') },
+    { value: 365, label: t('filters.days.365') },
+  ]), [t]);
 
   // Filters
   const [scopeFilter, setScopeFilter] = useState<'all' | 'global' | 'tenant'>('all');
@@ -82,11 +84,11 @@ export default function AdminLearningReportsPage() {
       setResult(data);
     } catch (err) {
       console.error('Failed to load reports:', err);
-      setError(err instanceof Error ? err.message : 'Ett oväntat fel uppstod');
+      setError(err instanceof Error ? err.message : t('error.unexpected'));
     } finally {
       setIsLoading(false);
     }
-  }, [scopeFilter, tenantFilter, days, isSystemAdmin]);
+  }, [scopeFilter, tenantFilter, days, isSystemAdmin, t]);
 
   useEffect(() => {
     loadReports();
@@ -104,19 +106,19 @@ export default function AdminLearningReportsPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Utbildning', href: '/admin/learning' },
-          { label: 'Rapporter', href: '/admin/learning/reports' },
+          { label: t('breadcrumbs.learning'), href: '/admin/learning' },
+          { label: t('breadcrumbs.reports'), href: '/admin/learning/reports' },
         ]}
       />
 
       <AdminPageHeader
-        title="Rapporter"
-        description="Analysera utbildningsframsteg och statistik"
+        title={t('title')}
+        description={t('description')}
         icon={<ChartBarIcon className="h-8 w-8" />}
         actions={
           <Button variant="outline" onClick={loadReports} disabled={isLoading}>
             <ArrowPathIcon className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            Uppdatera
+            {t('actions.refresh')}
           </Button>
         }
       />
@@ -128,7 +130,7 @@ export default function AdminLearningReportsPage() {
           onChange={(e) => setDays(Number(e.target.value))}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
         >
-          {DAYS_OPTIONS.map((opt) => (
+          {daysOptions.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
             </option>
@@ -142,9 +144,9 @@ export default function AdminLearningReportsPage() {
               onChange={(e) => setScopeFilter(e.target.value as typeof scopeFilter)}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             >
-              <option value="all">Alla scope</option>
-              <option value="global">Globala kurser</option>
-              <option value="tenant">Organisation</option>
+              <option value="all">{t('filters.scope.all')}</option>
+              <option value="global">{t('filters.scope.global')}</option>
+              <option value="tenant">{t('filters.scope.tenant')}</option>
             </select>
 
             {(scopeFilter === 'tenant' || scopeFilter === 'all') && (
@@ -153,7 +155,7 @@ export default function AdminLearningReportsPage() {
                 onChange={(e) => setTenantFilter(e.target.value)}
                 className="h-10 rounded-md border border-input bg-background px-3 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               >
-                <option value="">Alla organisationer</option>
+                <option value="">{t('filters.tenants.all')}</option>
                 {tenants.map((tenant) => (
                   <option key={tenant.id} value={tenant.id}>
                     {tenant.name}
@@ -182,7 +184,7 @@ export default function AdminLearningReportsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.activeParticipants ?? '—'}</p>
-                <p className="text-sm text-muted-foreground">Aktiva deltagare</p>
+                <p className="text-sm text-muted-foreground">{t('stats.activeParticipants')}</p>
               </div>
             </div>
           </CardContent>
@@ -196,7 +198,7 @@ export default function AdminLearningReportsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.completedCourses ?? '—'}</p>
-                <p className="text-sm text-muted-foreground">Avklarade kurser</p>
+                <p className="text-sm text-muted-foreground">{t('stats.completedCourses')}</p>
               </div>
             </div>
           </CardContent>
@@ -210,7 +212,7 @@ export default function AdminLearningReportsPage() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats?.topCourses?.length ?? '—'}</p>
-                <p className="text-sm text-muted-foreground">Aktiva kurser</p>
+                <p className="text-sm text-muted-foreground">{t('stats.activeCourses')}</p>
               </div>
             </div>
           </CardContent>
@@ -226,7 +228,7 @@ export default function AdminLearningReportsPage() {
                 <p className="text-2xl font-bold">
                   {avgScore ? `${Math.round(avgScore)}%` : '—'}
                 </p>
-                <p className="text-sm text-muted-foreground">Snittresultat</p>
+                <p className="text-sm text-muted-foreground">{t('stats.avgScore')}</p>
               </div>
             </div>
           </CardContent>
@@ -236,26 +238,26 @@ export default function AdminLearningReportsPage() {
       {/* Per-course table */}
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>Statistik per kurs</CardTitle>
+          <CardTitle>{t('table.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading && !result ? (
             <div className="py-8 text-center text-muted-foreground">
-              Laddar statistik...
+              {t('table.loading')}
             </div>
           ) : courses.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
-              Ingen kursstatistik tillgänglig för vald period.
+              {t('table.empty')}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Kurs</TableHead>
-                    <TableHead className="text-right">Avklarade (30d)</TableHead>
-                    <TableHead className="text-right">Snittresultat</TableHead>
-                    <TableHead className="text-right">Underkända</TableHead>
+                    <TableHead>{t('table.columns.course')}</TableHead>
+                    <TableHead className="text-right">{t('table.columns.completed30d')}</TableHead>
+                    <TableHead className="text-right">{t('table.columns.avgScore')}</TableHead>
+                    <TableHead className="text-right">{t('table.columns.failed')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -263,7 +265,7 @@ export default function AdminLearningReportsPage() {
                     return (
                       <TableRow key={course.course_id}>
                         <TableCell>
-                          <div className="font-medium">{course.title || 'Okänd kurs'}</div>
+                          <div className="font-medium">{course.title || t('table.unknownCourse')}</div>
                           {course.tenant_name && (
                             <div className="text-xs text-muted-foreground">{course.tenant_name}</div>
                           )}
@@ -282,7 +284,7 @@ export default function AdminLearningReportsPage() {
                               {Math.round(course.avg_score_30d)}%
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground">—</span>
+                            <span className="text-muted-foreground">{t('table.emptyValue')}</span>
                           )}
                         </TableCell>
                         <TableCell className="text-right">
@@ -292,7 +294,7 @@ export default function AdminLearningReportsPage() {
                               {Math.round(course.fail_rate_30d)}%
                             </Badge>
                           ) : (
-                            <span className="text-muted-foreground">0%</span>
+                            <span className="text-muted-foreground">{t('table.zeroPercent')}</span>
                           )}
                         </TableCell>
                       </TableRow>

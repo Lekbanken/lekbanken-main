@@ -210,7 +210,7 @@ export function ActiveSessionShell({
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={requestClose}>
               <ArrowLeftIcon className="h-4 w-4" />
-              Till Lobbyn
+              {t('backToLobby')}
             </Button>
           </div>
 
@@ -219,7 +219,13 @@ export function ActiveSessionShell({
           </div>
 
           <div className="flex items-center justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={onOpenChat} aria-label="Chat" disabled={!onOpenChat}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onOpenChat}
+              aria-label={t('chatLabel')}
+              disabled={!onOpenChat}
+            >
               <span className="relative inline-flex items-center">
                 <ChatBubbleLeftRightIcon className="h-5 w-5" />
                 {chatUnreadCount > 0 && (

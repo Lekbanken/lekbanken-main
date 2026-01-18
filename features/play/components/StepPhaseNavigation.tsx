@@ -143,7 +143,7 @@ export function StepPhaseNavigation({
               className="gap-1.5"
             >
               <PlayIcon className="h-4 w-4" />
-              Starta
+              {t('steps.start')}
             </Button>
           ) : (
             <>
@@ -185,7 +185,7 @@ export function StepPhaseNavigation({
                 className="gap-1.5"
               >
                 <PlayIcon className="h-4 w-4" />
-                Starta fas
+                {t('phases.startPhase')}
               </Button>
             ) : (
               <>
@@ -227,13 +227,13 @@ export function StepPhaseNavigation({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Navigation
+              {t('navigation.title')}
             </h3>
             {!stepNotStarted && currentStep && (
               <p className="text-sm font-medium text-foreground mt-1">
                 {t('steps.stepN', { number: currentStepIndex + 1 })}: {currentStep.title}
                 {currentStep.durationMinutes && (
-                  <span className="text-muted-foreground ml-2">({currentStep.durationMinutes} min)</span>
+                  <span className="text-muted-foreground ml-2">({t('minutesShort', { count: currentStep.durationMinutes })})</span>
                 )}
               </p>
             )}
@@ -291,7 +291,7 @@ export function StepPhaseNavigation({
             {currentStep.media?.url && (
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-                  Media
+                  {t('mediaLabel')}
                 </p>
                 <div className="overflow-hidden rounded-lg border bg-background">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -458,7 +458,7 @@ export function StepPhaseNavigation({
                 <p className="font-medium text-foreground">{currentStep.title}</p>
                 {currentStep.durationMinutes && (
                   <p className="mt-1 text-sm text-muted-foreground">
-                    {currentStep.durationMinutes} min
+                    {t('minutesShort', { count: currentStep.durationMinutes })}
                   </p>
                 )}
               </div>

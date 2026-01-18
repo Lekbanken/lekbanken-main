@@ -58,7 +58,7 @@ export function ParticipantPlayMode({
     } finally {
       setLoading(false);
     }
-  }, [sessionCode, participantToken]);
+  }, [sessionCode, participantToken, t]);
 
   useEffect(() => {
     void loadData();

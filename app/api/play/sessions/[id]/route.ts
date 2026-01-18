@@ -49,6 +49,9 @@ export async function GET(
       participantCount: session.participant_count,
       createdAt: session.created_at,
       updatedAt: session.updated_at,
+      startedAt: session.started_at,
+      pausedAt: session.paused_at,
+      endedAt: session.ended_at,
       gameId: session.game_id,
       planId: session.plan_id,
       settings: session.settings,
@@ -70,7 +73,7 @@ export async function PATCH(
 
   const { data: session, error } = await supabase
     .from('participant_sessions')
-    .select('id, host_user_id, status, tenant_id, game_id, plan_id')
+    .select('id, host_user_id, status, tenant_id, game_id, plan_id, started_at')
     .eq('id', id)
     .single();
 
@@ -81,15 +84,19 @@ export async function PATCH(
   if (action === 'start' || action === 'resume') nextStatus = 'active';
   if (action === 'pause') nextStatus = 'paused';
   if (action === 'end') nextStatus = 'ended';
+  if (action === 'lock') nextStatus = 'locked';
+  if (action === 'unlock') nextStatus = 'active';
 
   if (!nextStatus) {
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   }
 
+  const shouldSetStartedAt = action === 'start' && !session.started_at;
   const { error: updateError } = await supabase
     .from('participant_sessions')
     .update({
       status: nextStatus,
+      started_at: shouldSetStartedAt ? new Date().toISOString() : session.started_at,
       paused_at: nextStatus === 'paused' ? new Date().toISOString() : null,
       ended_at: nextStatus === 'ended' ? new Date().toISOString() : null,
       updated_at: new Date().toISOString(),

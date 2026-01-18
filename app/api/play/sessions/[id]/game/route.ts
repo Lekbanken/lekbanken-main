@@ -23,6 +23,8 @@ type StepInfo = {
   title: string;
   description: string;
   content?: string;
+  participantPrompt?: string;
+  boardText?: string;
   durationMinutes?: number;
   duration?: number | null;
   display_mode?: 'instant' | 'typewriter' | 'dramatic' | null;
@@ -252,7 +254,7 @@ export async function GET(
 
     const { data: game } = await supabaseAdmin
       .from('games')
-      .select('id, name')
+      .select('id, name, play_mode')
       .eq('id', session.game_id)
       .single();
 
@@ -385,6 +387,8 @@ export async function GET(
         title: s.title || `Steg ${index + 1}`,
         description: s.body || '',
         content: s.body || '',
+        participantPrompt: s.participant_prompt ?? undefined,
+        boardText: s.board_text ?? undefined,
         durationMinutes,
         duration: durationSeconds,
         display_mode: displayMode,
@@ -411,6 +415,7 @@ export async function GET(
 
     return NextResponse.json({
       title: game?.name || session.display_name,
+      playMode: (game?.play_mode as 'basic' | 'facilitated' | 'participants' | null) ?? 'basic',
       board: {
         theme: (boardConfig?.theme as BoardTheme | null) ?? 'neutral',
       },

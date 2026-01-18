@@ -12,7 +12,7 @@ import type { TriggerConditionType } from './trigger';
 // Core Session State
 // =============================================================================
 
-export type SessionCockpitStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'ended';
+export type SessionCockpitStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'locked' | 'ended';
 
 export interface SessionCockpitState {
   // Core identifiers
@@ -26,6 +26,7 @@ export interface SessionCockpitState {
   isDirectorMode: boolean;
   isLoading: boolean;
   error: string | null;
+  lastSyncAt?: string | null;
   
   // Participants & Roles  
   participants: CockpitParticipant[];
@@ -100,6 +101,8 @@ export interface CockpitStep {
   stepOrder: number;
   durationMinutes?: number;
   leaderScript?: string; // Host-only instructions
+  participantPrompt?: string;
+  boardText?: string;
   phaseId?: string;
 }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Trigger, TriggerStatus } from '@/types/trigger';
 import { getConditionLabel, getConditionIcon, getActionLabel } from '@/types/trigger';
@@ -45,15 +46,15 @@ export interface TriggerCardProps {
 // Status Badge
 // ============================================================================
 
-function StatusBadge({ status }: { status: TriggerStatus }) {
-  const variants: Record<TriggerStatus, { variant: 'success' | 'warning' | 'secondary'; label: string }> = {
-    armed: { variant: 'success', label: 'Armed' },
-    fired: { variant: 'warning', label: 'Fired' },
-    disabled: { variant: 'secondary', label: 'Disabled' },
-    error: { variant: 'warning', label: 'Error' },
+function StatusBadge({ status, label }: { status: TriggerStatus; label: string }) {
+  const variants: Record<TriggerStatus, { variant: 'success' | 'warning' | 'secondary' }> = {
+    armed: { variant: 'success' },
+    fired: { variant: 'warning' },
+    disabled: { variant: 'secondary' },
+    error: { variant: 'warning' },
   };
 
-  const { variant, label } = variants[status];
+  const { variant } = variants[status];
 
   return (
     <Badge variant={variant} size="sm" dot>
@@ -66,7 +67,7 @@ function StatusBadge({ status }: { status: TriggerStatus }) {
 // Action Summary
 // ============================================================================
 
-function ActionSummary({ actions }: { actions: Trigger['then'] }) {
+function ActionSummary({ actions, moreLabel }: { actions: Trigger['then']; moreLabel: (count: number) => string }) {
   if (actions.length === 0) return null;
   
   if (actions.length === 1) {
@@ -75,7 +76,7 @@ function ActionSummary({ actions }: { actions: Trigger['then'] }) {
   
   return (
     <span className="text-foreground-secondary">
-      {getActionLabel(actions[0].type)} + {actions.length - 1} more
+      {getActionLabel(actions[0].type)} + {moreLabel(actions.length - 1)}
     </span>
   );
 }
@@ -100,6 +101,7 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
     },
     ref
   ) => {
+    const t = useTranslations('play.triggerCard');
     const isManual = trigger.when.type === 'manual';
     const canFire = isManual && trigger.enabled && trigger.status === 'armed';
     const canReset = trigger.status === 'fired';
@@ -127,14 +129,14 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
               {trigger.name}
             </h3>
           </div>
-          <StatusBadge status={trigger.status} />
+          <StatusBadge status={trigger.status} label={t(`status.${trigger.status}`)} />
         </div>
 
         {/* Condition & Actions */}
         <div className="mt-3 space-y-1.5 text-sm">
           <div className="flex items-center gap-2">
             <span className="text-foreground-secondary font-medium uppercase text-xs w-10">
-              When
+              {t('labels.when')}
             </span>
             <span className="flex items-center gap-1.5">
               <span aria-hidden>{getConditionIcon(trigger.when.type)}</span>
@@ -144,9 +146,12 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
           
           <div className="flex items-center gap-2">
             <span className="text-foreground-secondary font-medium uppercase text-xs w-10">
-              Then
+              {t('labels.then')}
             </span>
-            <ActionSummary actions={trigger.then} />
+            <ActionSummary
+              actions={trigger.then}
+              moreLabel={(count) => t('actions.more', { count })}
+            />
           </div>
         </div>
 
@@ -156,7 +161,7 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
             {trigger.executeOnce && (
               <span className="flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-foreground-secondary" />
-                Once only
+                {t('onceOnly')}
               </span>
             )}
             {trigger.delaySeconds && trigger.delaySeconds > 0 && (

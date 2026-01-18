@@ -47,7 +47,11 @@ function clampStep(index: number, total: number) {
   return Math.min(Math.max(index, 0), total - 1);
 }
 
-function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "no", "en"]): GameRun | null {
+function mapApiToGameRun(
+  game: ApiGame | null,
+  t: ReturnType<typeof useTranslations<'play.playPage'>>,
+  localeOrder: string[] = ["sv", "no", "en"]
+): GameRun | null {
   if (!game) return null;
   const translations = game.translations ?? [];
   const translation = localeOrder.map((l) => translations.find((t) => t.locale === l)).find(Boolean) || translations[0];
@@ -55,7 +59,7 @@ function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "n
   const mappedSteps = Array.isArray(translation?.instructions)
     ? (translation?.instructions as InstructionStep[]).map((s, i) => ({
         id: s.title || `step-${i + 1}`,
-        title: s.title || `Steg ${i + 1}`,
+        title: s.title || t('defaults.stepTitle', { index: i + 1 }),
         description: s.description || "",
         durationMinutes: s.duration_minutes ?? undefined,
         materials: s.materials?.filter((item): item is string => Boolean(item)),
@@ -64,7 +68,7 @@ function mapApiToGameRun(game: ApiGame | null, localeOrder: string[] = ["sv", "n
     : [
         {
           id: "step-1",
-          title: "Instruktioner",
+          title: t('defaults.instructionsTitle'),
           description: translation?.short_description || game.description || "",
         },
       ];
@@ -145,7 +149,7 @@ export function PlayPage({ gameId }: { gameId?: string }) {
       }
 
       const json = (await res.json()) as { game: ApiGame };
-      const mapped = mapApiToGameRun(json.game);
+      const mapped = mapApiToGameRun(json.game, t);
       if (!mapped || mapped.steps.length === 0) {
         setGame(null);
         setErrorCode("not-found");

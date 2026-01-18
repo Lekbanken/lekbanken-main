@@ -24,6 +24,9 @@
       "retry": "Försök igen",
       "submit": "Skicka",
       "apply": "Tillämpa",
+          "defaults": {
+            "newArtifact": "Ny artefakt"
+          },
       "reset": "Återställ",
       "clear": "Rensa",
       "select": "Välj",
@@ -41,8 +44,9 @@
       "hide": "Dölj",
       "show": "Visa",
       "expand": "Expandera",
-      "collapse": "Komprimera",
-      "more": "Mer",
+            "correctCode": "Korrekt kod",
+            "codeLength": "Kodlängd",
+            "correctCodePlaceholder": "1234"
       "less": "Mindre",
       "loading": "Laddar...",
       "saving": "Sparar...",
@@ -57,6 +61,166 @@
       "rejected": "Avvisad",
       "draft": "Utkast",
       "published": "Publicerad",
+          "templates": {
+            "keypadBasic": {
+              "name": "Keypad (4 siffror)",
+              "description": "En enkel 4-siffrig pinkod för att låsa upp något",
+              "title": "Hemlig kod",
+              "correctCode": "1234",
+              "successMessage": "✅ Korrekt! Du har låst upp ledtråden.",
+              "failMessage": "❌ Fel kod. Försök igen!"
+            },
+            "keypadAdvanced": {
+              "name": "Keypad (med försöksbegränsning)",
+              "description": "Pinkod med max 3 försök innan låsning",
+              "title": "Säkerhetskod",
+              "successMessage": "🎉 Korrekt! Vägen är öppen.",
+              "failMessage": "⚠️ Fel kod!",
+              "lockedMessage": "🚫 Keypad låst. Kontakta spelledaren."
+            },
+            "riddle": {
+              "name": "Gåta / Fråga",
+              "description": "En gåta med textinmatning för svar",
+              "title": "Gåtan",
+              "prompt": "Vad har fyra ben men kan inte gå?",
+              "correctAnswers": "bord\nett bord\ntable"
+            },
+            "cipherCaesar": {
+              "name": "Caesar-chiffer",
+              "description": "Krypterat meddelande med bokstavsförskjutning",
+              "title": "Krypterat meddelande",
+              "cipherKey": "3",
+              "plaintext": "hemligheten finns under trappan"
+            },
+            "hotspotImage": {
+              "name": "Klickbar bild",
+              "description": "Bild med dolda zoner att hitta",
+              "title": "Sök i bilden"
+            },
+            "tilePuzzle": {
+              "name": "Pusselspel (3x3)",
+              "description": "Sliding tile puzzle för att avslöja en bild",
+              "title": "Pusslet"
+            },
+            "logicGrid": {
+              "name": "Logikrutnät",
+              "description": "Logikpussel där saker ska matchas",
+              "title": "Vem gjorde vad?",
+              "rows": "Alice\nBob\nCharlie",
+              "columns": "Röd\nGrön\nBlå",
+              "solution": "{\"Alice\":\"Röd\",\"Bob\":\"Grön\",\"Charlie\":\"Blå\"}"
+            },
+            "counterClues": {
+              "name": "Ledtrådsräknare",
+              "description": "Räkna hittade ledtrådar eller framsteg",
+              "title": "Hittade ledtrådar",
+              "label": "Ledtrådar"
+            },
+            "hintContainer": {
+              "name": "Tips-behållare",
+              "description": "Progressiva tips som kan avslöjas",
+              "title": "Tips",
+              "hints": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger"
+            },
+            "qrGate": {
+              "name": "QR-kod checkpoint",
+              "description": "Skanna QR-kod för att fortsätta",
+              "title": "Skanna koden",
+              "expectedValue": "SECRET123",
+              "successMessage": "✅ Rätt kod! Fortsätt till nästa ledtråd."
+            },
+            "locationCheckpoint": {
+              "name": "Plats-checkpoint",
+              "description": "GPS-verifiering för stadsspel",
+              "title": "Hitta platsen",
+              "locationName": "Stortorget"
+            },
+            "clueCard": {
+              "name": "Ledtråd/Hint",
+              "description": "Ett kort med en ledtråd som kan avslöjas",
+              "title": "Ledtråd",
+              "descriptionText": "Dold ledtråd som spelledaren kan visa",
+              "variantTitle": "Ledtråd",
+              "variantBody": "Skriv din ledtråd här..."
+            },
+            "secretDocument": {
+              "name": "Hemligt dokument",
+              "description": "Ett dokument som avslöjas vid rätt tidpunkt",
+              "title": "Hemligt dokument",
+              "descriptionText": "Avslöjas när deltagarna hittar det"
+            },
+            "revealCard": {
+              "name": "Avslöjande kort",
+              "description": "Ett kort för dramatiska avslöjanden",
+              "title": "Avslöjandet"
+            },
+            "roleSecret": {
+              "name": "Rollhemlighet",
+              "description": "Hemlig information synlig endast för en roll",
+              "title": "Din hemlighet",
+              "variantTitle": "Hemlig information",
+              "variantBody": "Endast du kan se detta..."
+            },
+            "audioClue": {
+              "name": "Ljudledtråd",
+              "description": "Ljudklipp som spelas upp för deltagarna",
+              "title": "Lyssna noga"
+            },
+            "soundTrigger": {
+              "name": "Ljudaktivering",
+              "description": "Aktiveras när deltagarna gör ljud",
+              "title": "Ropa högt!",
+              "instruction": "Ropa högt för att öppna dörren!"
+            },
+            "propCheck": {
+              "name": "Rekvisita-check",
+              "description": "Spelledaren bekräftar att deltagare har rätt sak",
+              "title": "Visa upp föremålet",
+              "propName": "Guldnyckeln",
+              "instruction": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+            },
+            "quizAnswer": {
+              "name": "Quizsvar",
+              "description": "Keypad för quiz-frågor med siffersvar",
+              "title": "Fråga",
+              "descriptionText": "Skriv in svaret med siffror",
+              "successMessage": "✅ Rätt svar!",
+              "failMessage": "❌ Fel svar. Försök igen!"
+            },
+            "textQuestion": {
+              "name": "Textfråga",
+              "description": "Öppen fråga med textsvar",
+              "title": "Svara på frågan",
+              "prompt": "Vad är huvudstaden i Sverige?",
+              "correctAnswers": "stockholm\nStockholm"
+            },
+            "checklist": {
+              "name": "Checklista",
+              "description": "Flera saker att bocka av",
+              "title": "Checklista",
+              "items": "Uppgift 1\nUppgift 2\nUppgift 3"
+            },
+            "learningCard": {
+              "name": "Lärokort",
+              "description": "Kort med information eller fakta",
+              "title": "Lärokort"
+            },
+            "imageReveal": {
+              "name": "Bild att avslöja",
+              "description": "En bild som visas vid rätt tillfälle",
+              "title": "Bild"
+            },
+            "replayMarker": {
+              "name": "Replay-markör",
+              "description": "Låt deltagare markera viktiga ögonblick",
+              "title": "Markera ögonblick"
+            },
+            "blank": {
+              "name": "Tom artefakt",
+              "description": "Börja från scratch",
+              "title": "Ny artefakt"
+            }
+          },
       "archived": "Arkiverad",
       "enabled": "Aktiverad",
       "disabled": "Inaktiverad"
@@ -300,6 +464,167 @@
       "branding": "Varumärke",
       "domains": "Domäner"
     },
+    "analyticsErrors": {
+      "title": "Felhantering",
+      "description": "Granska, hantera och lös systemfel",
+      "breadcrumbs": {
+        "admin": "Admin",
+        "analytics": "Analys",
+        "errors": "Fel"
+      },
+      "requiresLogin": "Du måste vara inloggad för att se denna sida.",
+      "stats": {
+        "unresolved": "Olösta fel",
+        "resolved": "Lösta fel",
+        "uniqueTypes": "Unika feltyper",
+        "avgResolutionTime": "Avg tid till lösning",
+        "avgResolutionTimeValue": "{hours}h",
+        "notAvailable": "N/A"
+      },
+      "filters": {
+        "all": "Alla",
+        "unresolved": "Olösta",
+        "resolved": "Lösta"
+      },
+      "list": {
+        "title": "Fel (grupperat)",
+        "occurrences": "{count} förekomster",
+        "form": {
+          "loading": "Laddar...",
+          "errors": {
+            "loadFailed": "Kunde inte ladda spel",
+            "saveFailed": "Misslyckades att spara",
+            "unexpected": "Ett fel uppstod"
+          },
+          "messages": {
+            "saved": "Sparat!"
+          },
+          "core": {
+            "nameLabel": "Namn",
+            "statusLabel": "Status",
+            "statusDraft": "Utkast",
+            "statusPublished": "Publicerad",
+            "shortDescriptionLabel": "Kort beskrivning",
+            "shortDescriptionHelp": "Visas i spelbiblioteket och hjälper spelare välja rätt spel.",
+            "fullDescriptionLabel": "Full beskrivning",
+            "fullDescriptionHelp": "Detaljerad beskrivning som visas när spelet öppnas. Förklara temat och upplägget.",
+            "timeMinutesLabel": "Tid (min)",
+            "timeMinutesHelp": "Uppskattad speltid i minuter.",
+            "minPlayersLabel": "Spelare min",
+            "minPlayersHelp": "Minsta antal deltagare.",
+            "maxPlayersLabel": "Spelare max",
+            "maxPlayersHelp": "Max antal deltagare som kan delta."
+          },
+          "materials": {
+            "title": "Material & säkerhet",
+            "itemsLabel": "Material (ett per rad)",
+            "safetyLabel": "Säkerhet",
+            "preparationLabel": "Förberedelser"
+          },
+          "steps": {
+            "title": "Steg / Instruktioner",
+            "addStep": "Lägg till steg",
+            "stepLabel": "Steg {index}",
+            "remove": "Ta bort",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Ex. Starta leken",
+            "descriptionLabel": "Beskrivning",
+            "descriptionPlaceholder": "Vad ska deltagarna göra?",
+            "durationLabel": "Tid (sekunder)",
+            "durationPlaceholder": "t.ex. 60"
+          },
+          "actions": {
+            "save": "Spara",
+            "saving": "Sparar..."
+          }
+        },
+        "empty": {
+          "unresolved": "Inga olösta fel! 🎉",
+          "resolved": "Inga lösta fel ännu",
+          "all": "Inga fel rapporterade"
+        }
+      },
+      "details": {
+        "title": "Feldetaljer",
+        "empty": "Välj ett fel för att se detaljer",
+        "status": {
+          "resolved": "Löst",
+          "unresolved": "Olöst"
+        },
+        "reportedAt": "Rapporterad: {time}",
+        "lastSeen": "Senast: {time}",
+        "stackTrace": "Stack Trace",
+        "allOccurrences": "Alla förekomster ({count})"
+      },
+      "actions": {
+        "title": "Markera som löst",
+        "resolveInstance": "Lös denna förekomst",
+        "resolveAll": "Lös alla olösta"
+      }
+    },
+    "analyticsDashboard": {
+      "title": "Analytics",
+      "requiresAdmin": "Du måste vara admin i en organisation för att komma åt denna sidan.",
+      "dashboardTitle": "Analytics Dashboard",
+      "subtitle": "Spåra användarbeteende, engagement och prestanda",
+      "dateRange": {
+        "from": "Från",
+        "to": "Till"
+      },
+      "tabs": {
+        "overview": "📊 Överblick",
+        "pages": "📄 Sidor",
+        "features": "⚙️ Funktioner",
+        "errors": "❌ Fel"
+      },
+      "loading": "Laddar analytics...",
+      "overview": {
+        "pageViews": "Sidvisningar",
+        "uniqueVisitors": "{count} unika besökare",
+        "sessions": "Sessioner",
+        "completedSessions": "{count} slutförda",
+        "avgDuration": "Genomsnittlig Varaktighet",
+        "avgDurationValue": "{minutes}m",
+        "perSession": "per session",
+        "reportedErrors": "Fel Rapporterade",
+        "unresolvedErrors": "{count} olösta",
+        "topPages": "Populäraste Sidor",
+        "topFeatures": "Mest Använda Funktioner",
+        "noData": "Ingen data tillgänglig",
+        "views": "{count} visningar",
+        "avgSeconds": "Ø {seconds}s",
+        "usageCount": "{count} användningar",
+        "successRate": "{rate}% framgång"
+      },
+      "pages": {
+        "title": "Detaljerade Sidstatistik",
+        "columns": {
+          "page": "Sida",
+          "views": "Visningar",
+          "avgDuration": "Genomsnittlig Varaktighet"
+        },
+        "noData": "Ingen data tillgänglig",
+        "avgDurationValue": "{seconds}s"
+      },
+      "features": {
+        "title": "Funktionsadoption",
+        "columns": {
+          "feature": "Funktion",
+          "usage": "Användningar",
+          "successRate": "Framgångsgrad"
+        },
+        "noData": "Ingen data tillgänglig"
+      },
+      "errors": {
+        "title": "Fel & Problem",
+        "columns": {
+          "type": "Typ",
+          "message": "Meddelande",
+          "count": "Förekomster"
+        },
+        "noData": "Inga fel rapporterade"
+      }
+    },
     "navGroups": {
       "overview": "Översikt",
       "organizations": "Organisationer",
@@ -344,6 +669,393 @@
         "specificUsers": "Specifika användare"
       },
       "loading": {
+        "page": {
+          "common": {
+            "required": "*"
+          },
+          "errors": {
+            "loadPurposes": "Kunde inte ladda syften",
+            "loadGame": "Kunde inte ladda spel",
+            "loadData": "Kunde inte ladda data",
+            "saveFailed": "Misslyckades att spara",
+            "unexpected": "Ett fel uppstod",
+            "publishMissingRequired": "Fyll i obligatoriska fält och välj omslagsbild innan publicering."
+          },
+          "defaults": {
+            "triggerName": "Trigger"
+          },
+          "loadingGame": "Laddar spel...",
+          "header": {
+            "backToGames": "Tillbaka till lekar",
+            "editTitle": "Redigera lek",
+            "createTitle": "Skapa ny lek",
+            "preview": "Förhandsgranska",
+            "saveDraft": "Spara utkast",
+            "publish": "Publicera"
+          },
+          "basicInfo": {
+            "title": "Grundinformation",
+            "description": "Namn och beskrivning som visas i lekbanken.",
+            "nameLabel": "Namn",
+            "namePlaceholder": "Ex. Samarbetsstafett",
+            "shortDescriptionLabel": "Kort beskrivning",
+            "shortDescriptionPlaceholder": "1-2 meningar som sammanfattar leken.",
+            "fullDescriptionLabel": "Full beskrivning",
+            "fullDescriptionPlaceholder": "Detaljerad beskrivning av leken..."
+          },
+          "purposes": {
+            "title": "Syften & omslagsbild",
+            "mainLabel": "Huvudsyfte",
+            "subLabel": "Undersyften",
+            "loadingOption": "Laddar syften...",
+            "emptyHint": "Välj huvudsyfte för att se undersyften.",
+            "unknownMain": "Okänt syfte",
+            "unknownSub": "Okänt undersyfte"
+          },
+          "classification": {
+            "title": "Klassificering",
+            "energyLabel": "Energinivå",
+            "locationLabel": "Plats",
+            "timeLabel": "Tid (minuter)",
+        "artifact": {
+          "newArtifact": "Ny artefakt",
+          "defaults": {
+            "role": "Roll"
+          },
+          "common": {
+            "yes": "Ja",
+            "no": "Nej"
+          },
+          "header": {
+            "title": "Artefakter ({count})",
+            "subtitle": "Ledtrådar, keypads, dokument och media",
+            "wizard": "Wizard",
+            "add": "Lägg till"
+          },
+          "empty": {
+            "title": "Inga artefakter ännu.",
+            "description": "Använd Wizard för att snabbt skapa artefakter, eller lägg till manuellt."
+          },
+          "fields": {
+            "titlePlaceholder": "Titel",
+            "typeLabel": "Typ",
+            "tagsLabel": "Taggar (komma-separerade)",
+            "tagsPlaceholder": "mystery, clue",
+            "descriptionLabel": "Beskrivning",
+            "descriptionPlaceholder": "Kort bakgrund eller anteckningar"
+          },
+          "errors": {
+            "loadConversationDecks": "Kunde inte ladda samtalskortlekar."
+          },
+          "visibility": {
+            "public": "Publik",
+            "leaderOnly": "Endast ledare",
+            "rolePrivate": "Roll-privat"
+          },
+          "types": {
+            "card": "Kort",
+            "document": "Dokument",
+            "image": "Bild",
+            "conversationCards": "Samtalskort",
+            "keypad": "Keypad",
+            "riddle": "Gåta",
+            "multiAnswer": "Flervalssvar",
+            "audio": "Ljud",
+            "hotspot": "Hotspot",
+            "tilePuzzle": "Pusselspel",
+            "cipher": "Chiffer",
+            "logicGrid": "Logikrutnät",
+            "counter": "Räknare",
+            "qrGate": "QR-gate",
+            "hintContainer": "Tips-behållare",
+            "propConfirmation": "Rekvisita-bekräftelse",
+            "locationCheck": "Platskontroll",
+            "soundLevel": "Ljudnivå",
+            "replayMarker": "Replay-markör",
+            "signalGenerator": "Signalgenerator",
+            "timeBankStep": "Tidsbank-steg",
+            "emptyArtifact": "Tom artefakt"
+          },
+          "keypad": {
+            "title": "Pinkod-inställningar",
+            "correctCodeLabel": "Korrekt kod",
+            "correctCodePlaceholder": "1234",
+            "correctCodeHelp": "Endast siffror (max 8)",
+            "codeLengthLabel": "Kodlängd",
+            "codeLengthPlaceholder": "4",
+            "codeLengthHelp": "Antal siffror i koden (2-8)",
+            "successMessageLabel": "Meddelande vid rätt kod (valfritt)",
+            "successMessagePlaceholder": "Låst uppnådd! Du har hittat ledtråden.",
+            "advancedTitle": "Avancerade inställningar",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat",
+            "maxAttemptsHelp": "0 eller tom = obegränsat",
+            "lockOnFailLabel": "Lås vid misslyckande",
+            "lockOnFailNo": "Nej – kan försöka igen",
+            "lockOnFailYes": "Ja – låses permanent",
+            "failMessageLabel": "Meddelande vid fel kod",
+            "failMessagePlaceholder": "Fel kod! Försök igen.",
+            "lockedMessageLabel": "Meddelande när låst",
+            "lockedMessagePlaceholder": "Keypaden är låst. Kontakta spelledaren."
+          },
+          "conversation": {
+            "title": "Samtalskort",
+            "selectLabel": "Välj lek (endast publicerade)",
+            "selectPlaceholder": "— Välj —",
+            "helpText": "Artefakten visar leken read-only för deltagare och lekledare."
+          },
+          "riddle": {
+            "title": "Gåta / Fråga-inställningar",
+            "promptLabel": "Fråga / Ledtråd",
+            "promptPlaceholder": "Vad har fyra ben men kan inte gå?",
+            "answersLabel": "Korrekta svar (ett per rad)",
+            "answersPlaceholder": "bord\nett bord\ntable",
+            "answersHelp": "Flera alternativ = alla godkänns",
+            "matchModeLabel": "Matchningsläge",
+            "matchModeExact": "Exakt matchning",
+            "matchModeFlexible": "Flexibel (ignorera versaler/mellanslag)",
+            "matchModeNumeric": "Endast siffror",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat"
+          },
+          "counter": {
+            "title": "Räknare-inställningar",
+            "initialLabel": "Startvärde",
+            "initialPlaceholder": "0",
+            "targetLabel": "Målvärde",
+            "targetPlaceholder": "5",
+            "stepLabel": "Stegstorlek",
+            "stepPlaceholder": "1",
+            "labelLabel": "Etikett (valfritt)",
+            "labelPlaceholder": "Hittade ledtrådar"
+          },
+          "audio": {
+            "title": "Ljudklipp-inställningar",
+            "urlLabel": "Ljud-URL (valfritt)",
+            "urlPlaceholder": "https://example.com/audio.mp3"
+          },
+          "hotspot": {
+            "title": "Klickbar bild-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/image.jpg",
+            "requiredHitsLabel": "Antal zoner att hitta",
+            "requiredHitsPlaceholder": "Alla",
+            "showFeedbackLabel": "Visa feedback",
+            "showFeedbackYes": "Ja – visa träffar",
+            "showFeedbackNo": "Nej – tyst",
+            "helpText": "💡 Hotspot-zoner definieras i JSON-metadata: zones: [{x, y, radius, label}]"
+          },
+          "tilePuzzle": {
+            "title": "Pusselspel-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/puzzle-image.jpg",
+            "gridLabel": "Rutnätsstorlek",
+            "grid2": "2×2 (lätt)",
+            "grid3": "3×3 (normal)",
+            "grid4": "4×4 (svår)",
+            "grid5": "5×5 (expert)",
+            "previewLabel": "Visa förhandsvisning"
+          },
+          "cipher": {
+            "title": "Chiffer-inställningar",
+            "methodLabel": "Chiffermetod",
+            "methodCaesar": "Caesar (förskjutning)",
+            "methodAtbash": "Atbash (spegling)",
+            "methodVigenere": "Vigenère (nyckelord)",
+            "methodSubstitution": "Substitution (egen)",
+            "keyLabelCaesar": "Förskjutning (1-25)",
+            "keyLabelVigenere": "Nyckelord",
+            "keyPlaceholderCaesar": "3",
+            "keyPlaceholderVigenere": "hemligt",
+            "plaintextLabel": "Klartext (vad som ska krypteras)",
+            "plaintextPlaceholder": "Hemligheten finns under trappan"
+          },
+          "logicGrid": {
+            "title": "Logikrutnät-inställningar",
+            "rowsLabel": "Rader (kommaseparerade)",
+            "rowsPlaceholder": "Alice, Bob, Charlie",
+            "columnsLabel": "Kolumner (kommaseparerade)",
+            "columnsPlaceholder": "Röd, Grön, Blå",
+            "helpText": "💡 Lösningen definieras i JSON:",
+            "helpCode": "solution: {\"Alice\": \"Röd\", \"Bob\": \"Grön\"}"
+          },
+          "multiAnswer": {
+            "title": "Flervalssvar-inställningar",
+            "itemsLabel": "Saker att bocka av (ett per rad)",
+            "itemsPlaceholder": "Hitta nyckeln\nLösa gåtan\nÖppna dörren",
+            "requiredCountLabel": "Kräv antal för klart",
+            "requiredCountPlaceholder": "Alla"
+          },
+          "qrGate": {
+            "title": "QR/NFC-skanning-inställningar",
+            "expectedLabel": "Förväntat värde",
+            "expectedPlaceholder": "SECRET123",
+            "expectedHelp": "Texten som QR-koden ska innehålla",
+            "successLabel": "Meddelande vid lyckad skanning",
+            "successPlaceholder": "Rätt kod! Fortsätt till nästa ledtråd."
+          },
+          "hintContainer": {
+            "title": "Tips-behållare-inställningar",
+            "hintsLabel": "Tips (ett per rad, i ordning av avslöjande)",
+            "hintsPlaceholder": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger",
+            "maxHintsLabel": "Max tips att ge",
+            "maxHintsPlaceholder": "Alla",
+            "penaltyLabel": "Poängavdrag per tips",
+            "penaltyPlaceholder": "0"
+          },
+          "propConfirmation": {
+            "title": "Rekvisita-bekräftelse-inställningar",
+            "propNameLabel": "Rekvisitanamn",
+            "propNamePlaceholder": "Guldnyckeln",
+            "instructionLabel": "Instruktion till deltagare",
+            "instructionPlaceholder": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+          },
+          "locationCheck": {
+            "title": "Platsverifiering-inställningar",
+            "latitudeLabel": "Latitud",
+            "latitudePlaceholder": "59.3293",
+            "longitudeLabel": "Longitud",
+            "longitudePlaceholder": "18.0686",
+            "radiusLabel": "Radie (meter)",
+            "radiusPlaceholder": "50",
+            "locationNameLabel": "Platsnamn (valfritt)",
+            "locationNamePlaceholder": "Stortorget"
+          },
+          "soundLevel": {
+            "title": "Ljudnivå-detektor-inställningar",
+            "thresholdLabel": "Tröskel (0-100)",
+            "thresholdPlaceholder": "70",
+            "holdLabel": "Tid över tröskel (sek)",
+            "holdPlaceholder": "2",
+            "instructionLabel": "Instruktion",
+            "instructionPlaceholder": "Ropa högt för att öppna dörren!"
+          },
+          "replayMarker": {
+            "title": "Replay-markör-inställningar",
+            "description": "Denna artefakt låter deltagare markera viktiga ögonblick under sessionen för senare analys.",
+            "maxMarkersLabel": "Max markörer",
+            "maxMarkersPlaceholder": "Obegränsat",
+            "allowLabelsLabel": "Tillåt etiketter"
+          },
+          "variants": {
+            "title": "Varianter",
+            "subtitle": "Styr synlighet, rollåtkomst och när varianten kan låsas upp.",
+            "add": "Lägg till variant",
+            "label": "Variant",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Varianttitel",
+            "visibilityLabel": "Synlighet",
+            "roleLabel": "Roll (för privat variant)",
+            "roleNoneOption": "Ingen (syns enligt synlighet)",
+            "mediaLabel": "Mediareferens (valfri)",
+            "mediaPlaceholder": "media_id eller URL",
+            "bodyLabel": "Text/innehåll",
+            "bodyPlaceholder": "Vad visar denna variant?",
+            "stepIndexLabel": "Steg-index (0 = första)",
+            "stepIndexPlaceholder": "0",
+            "phaseIndexLabel": "Fas-index (0 = första)",
+            "phaseIndexPlaceholder": "0"
+          }
+        },
+            "minPlayersLabel": "Spelare min",
+            "maxPlayersLabel": "Spelare max",
+            "ageMinLabel": "Ålder min",
+            "ageMaxLabel": "Ålder max",
+            "timePlaceholder": "Ex. 15",
+            "minPlayersPlaceholder": "Ex. 4",
+            "maxPlayersPlaceholder": "Ex. 30",
+            "ageMinPlaceholder": "Ex. 6",
+            "ageMaxPlaceholder": "Ex. 99",
+            "energyPlaceholder": "Välj energinivå",
+            "energyLow": "Låg",
+            "energyMedium": "Medel",
+            "energyHigh": "Hög",
+            "locationPlaceholder": "Välj plats",
+            "locationIndoor": "Inomhus",
+            "locationOutdoor": "Utomhus",
+            "locationBoth": "Båda"
+          },
+          "materials": {
+            "title": "Material",
+            "description": "Lista material som behövs för att genomföra leken.",
+            "itemsLabel": "Material (ett per rad)",
+            "itemsPlaceholder": "Ex:\n8 koner\n1 boll per lag\nMusik (Spotify-spellista)",
+            "itemsCount": "{count} material tillagt",
+            "preparationLabel": "Förberedelser",
+            "preparationPlaceholder": "Vad behöver ledaren förbereda innan leken?"
+          },
+          "safety": {
+            "title": "Säkerhet & Inkludering",
+            "description": "Viktiga säkerhetsnoteringar och tips för inkludering.",
+            "safetyNotesLabel": "⚠️ Säkerhetsnoteringar",
+            "safetyNotesPlaceholder": "Ex: Se upp för väggar vid snabb rörelse. Undvik glatta golv.",
+            "accessibilityLabel": "♿ Tillgänglighetsnoteringar",
+            "accessibilityPlaceholder": "Tips för anpassning till olika förutsättningar...",
+            "spaceLabel": "🏠 Utrymmeskrav",
+            "spacePlaceholder": "Ex: Minst 10x10 meter fritt utrymme",
+            "leaderTipsLabel": "💡 Ledartips",
+            "leaderTipsPlaceholder": "Tips till ledaren för att få leken att fungera bättre..."
+          },
+          "artifacts": {
+            "title": "Artifakter",
+            "description": "Skapa artefakter med varianter som kan låsas upp per steg/fas och begränsas per roll.",
+            "rolesHint": "Tips: Lägg till roller för att kunna göra privata varianter per roll."
+          },
+          "triggers": {
+            "title": "Triggers",
+            "description": "Automatisera spelet med \"När X händer, gör Y\"-regler.",
+            "artifactsHint": "Tips: Lägg till artifakter (t.ex. keypads) för att kunna trigga på deras händelser."
+          },
+          "roles": {
+            "title": "Roller",
+            "description": "Definiera roller med hemliga instruktioner för deltagare."
+          },
+          "board": {
+            "title": "Publik Tavla",
+            "description": "Innehåll som visas på projektor/storskärm under spelet."
+          },
+          "tools": {
+            "title": "Verktyg (Toolbelt)",
+            "description": "Aktivera verktyg som kan användas under en spelsession.",
+            "availabilityLabel": "Tillgänglig för",
+            "availabilityHost": "Ledare",
+            "availabilityParticipants": "Deltagare",
+            "availabilityBoth": "Båda",
+            "availabilityHelp": "Styr om verktyget visas för ledare, deltagare eller båda."
+          },
+          "translations": {
+            "title": "Översättningar",
+            "description": "Hantera översättningar till olika språk.",
+            "languageSwedish": "Svenska",
+            "languageNorwegian": "Norska",
+            "languageEnglish": "Engelska",
+            "percent": "{percent}%",
+            "comingSoon": "Fullständig översättningshantering kommer snart."
+          },
+          "settings": {
+            "title": "Inställningar",
+            "description": "Status och synlighet för leken.",
+            "taxonomyLabel": "Taxonomi / spelkategori",
+            "taxonomyPlaceholder": "Ex. Ringlekar",
+            "taxonomyNote": "Behåller tidigare värde vid import; sparas som spelkategori i databasen.",
+            "statusLabel": "Status",
+            "statusDraft": "Utkast",
+            "statusPublished": "Publicerad",
+            "statusHelpDraft": "Utkast är endast synliga för dig.",
+            "statusHelpPublished": "Publicerade lekar är synliga för alla med tillgång.",
+            "dangerTitle": "Farozon",
+            "dangerDescription": "Permanent radering av leken. Denna åtgärd kan inte ångras.",
+            "deleteButton": "Ta bort lek",
+            "taxonomyPresets": {
+              "boardGames": "Brädspel",
+              "partyGame": "Partylek",
+              "circleGames": "Ringlekar",
+              "outdoorGames": "Utelekar",
+              "indoorGames": "Inomhuslek",
+              "icebreakers": "Isbrytare"
+            }
+          }
+        },
         "users": "Laddar användare..."
       },
       "empty": {
@@ -371,6 +1083,12 @@
         "pageDescription": "Hantera huvudsyften och undersyften som används i spel, produkter och filter.",
         "breadcrumbHome": "Startsida",
         "breadcrumbPurposes": "Syften",
+        "cookiePolicy": {
+          "fallbackTitle": "Cookiepolicy",
+          "pendingContent": "Cookiepolicy publiceras snart.",
+          "noCookies": "Inga cookies registrerade ännu.",
+          "manageDescription": "Du kan när som helst ändra dina cookie-inställningar genom att klicka på knappen nedan."
+        },
         "newPurpose": "Nytt syfte",
         "exportColumns": {
           "id": "ID",
@@ -614,79 +1332,6 @@
         "planArchiveError": "Kunde inte arkivera plan.",
         "planRestored": "Plan återställd.",
         "planRestoreError": "Kunde inte återställa plan."
-      },
-      "createWizard": {
-        "title": "Skapa ny plan",
-        "steps": {
-          "basics": {
-            "label": "Grundinfo",
-            "description": "Namn och beskrivning"
-          },
-          "template": {
-            "label": "Startläge",
-            "description": "Börja från mall eller tomt"
-          },
-          "activities": {
-            "label": "Aktiviteter",
-            "description": "Lägg till lekar"
-          },
-          "confirm": {
-            "label": "Bekräfta",
-            "description": "Granska och skapa"
-          }
-        },
-        "nameLabel": "Planens namn",
-        "namePlaceholder": "T.ex. Friskis morgonpass",
-        "nameHelp": "Ge planen ett beskrivande namn så du lätt hittar den senare.",
-        "descriptionLabel": "Beskrivning (valfritt)",
-        "descriptionPlaceholder": "Vad är syftet med planen?",
-        "templateTitle": "Välj mall",
-        "templateHelp": "Välj en mall för att komma igång snabbare, eller börja med en tom plan.",
-        "templates": {
-          "empty": {
-            "name": "Tom plan",
-            "description": "Börja från scratch och bygg din egen plan"
-          },
-          "warmup": {
-            "name": "Uppvärmning",
-            "description": "En kort uppvärmningssekvens med 3 aktiviteter"
-          },
-          "workshop": {
-            "name": "Workshop",
-            "description": "Strukturerad session med intro, aktiviteter och avslut"
-          },
-          "teambuilding": {
-            "name": "Teambuilding",
-            "description": "Halv- eller heldag med flera aktiviteter och pauser"
-          }
-        },
-        "activitiesEmptyTitle": "Lägg till aktiviteter",
-        "activitiesEmptyText": "Du kan lägga till aktiviteter efter att planen skapats.",
-        "activitiesEmptyTip": "💡 Tips: Gå till \"Upptäck\" för att hitta aktiviteter och lägg till dem i din plan.",
-        "templateBlocksInfo": "Mallen \"{templateName}\" innehåller följande block. Du kan justera dessa efter att planen skapats.",
-        "confirmTitle": "Sammanfattning",
-        "confirmName": "Namn",
-        "confirmDescription": "Beskrivning",
-        "confirmNoDescription": "(Ingen beskrivning)",
-        "confirmTemplate": "Mall",
-        "confirmBlocks": "Block",
-        "confirmNextSteps": "Efter att planen skapats kan du lägga till fler aktiviteter, justera tider och dela med din organisation.",
-        "nextStepsLabel": "Nästa steg:",
-        "blockTypes": {
-          "game": "Aktivitet",
-          "pause": "Paus",
-          "preparation": "Förberedelse",
-          "custom": "Övrigt"
-        },
-        "buttons": {
-          "back": "Tillbaka",
-          "next": "Nästa",
-          "create": "Skapa plan",
-          "creating": "Skapar..."
-        },
-        "errors": {
-          "createFailed": "Kunde inte skapa plan"
-        }
       }
     },
     "tenant": {
@@ -1374,6 +2019,10 @@
         "latency": "{ms}ms latency",
         "responding": "Responding"
       },
+      "labels": {
+        "unknown": "Okänd",
+        "notAvailable": "Ej tillgängligt"
+      },
       "metrics": {
         "errorsLastHour": "Fel senaste timmen",
         "activeUsersNow": "Aktiva användare (nu)",
@@ -1462,6 +2111,20 @@
       }
     },
     "design": {
+      "page": {
+        "title": "Design",
+        "subtitle": "Central Design Hub",
+        "badge": "System",
+        "description": "Central Design Hub – Hantera plattformens visuella identitet",
+        "lastUpdated": "Senast uppdaterad: {date}",
+        "info": "<strong>Central design</strong> påverkar hela plattformen. Organisationer kan överrida vissa delar om <em>Tenant Branding</em> är aktiverat (betald funktion).",
+        "tabs": {
+          "brand": "Varumärke",
+          "media": "Media",
+          "typography": "Typografi",
+          "advanced": "Avancerat"
+        }
+      },
       "mediaDefaults": {
         "noDefaultProfileImages": "Inga standardprofilbilder uppladdade",
         "noDefaultCoverImages": "Inga standardomslagsbilder uppladdade",
@@ -1633,6 +2296,7 @@
       "subscriptions": {
         "title": "Prenumerationer",
         "description": "Hantera aktiva prenumerationer och abonnemang",
+        "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
         "emptyTitle": "Inga prenumerationer",
         "emptyDescription": "Det finns inga prenumerationer att visa.",
         "noResultsFor": "Inga resultat för \"{query}\"",
@@ -1643,11 +2307,27 @@
           "billing": "Fakturering",
           "subscriptions": "Prenumerationer"
         },
+        "status": {
+          "active": "Aktiv",
+          "trial": "Testperiod",
+          "paused": "Pausad",
+          "canceled": "Avslutad"
+        },
         "stats": {
           "total": "Totalt",
           "active": "Aktiva",
           "trial": "Testperiod",
           "mrr": "MRR"
+        },
+        "table": {
+          "organization": "Organisation",
+          "status": "Status",
+          "amount": "Belopp",
+          "amountPerMonth": "{amount} {currency}/mån",
+          "renews": "Förnyas",
+          "missingPlan": "Plan saknas",
+          "seatsLabel": "Platser: {count}",
+          "emptyValue": "—"
         },
         "search": "Sök organisation...",
         "filter": {
@@ -1659,11 +2339,30 @@
         }
       },
       "invoices": {
+        "notLoggedIn": "Du måste vara inloggad för att se denna sida.",
         "emptyTitle": "Inga fakturor",
         "emptyDescription": "Det finns inga fakturor att visa.",
         "noResultsFor": "Inga resultat för \"{query}\"",
-        "clearSearch": "Rensa sökning"
+        "clearSearch": "Rensa sökning",
+        "table": {
+          "invoice": "Faktura",
+          "status": "Status",
+          "amount": "Belopp",
+          "dueDate": "Förfallodatum",
+          "payments": "Betalningar"
+        },
+        "paymentRef": "Ref: {reference}",
+        "form": {
+          "amountPlaceholder": "499.00",
+          "referencePlaceholder": "Transaktions-ID"
+        }
       }
+    },
+    "incidents": {
+      "title": "Incidenter & Status",
+      "description": "Visa driftincidenter, planerade avbrott och status.",
+      "emptyTitle": "Ingen incidentdata ännu",
+      "emptyDescription": "Här kommer driftstatus och incidentlogg att visas när backendkoppling finns."
     },
     "gamification": {
       "hub": {
@@ -1856,6 +2555,7 @@
       "achievements": {
         "pageTitle": "Achievements",
         "pageDescription": "Hantera achievements, tilldela till användare och konfigurera regler.",
+        "loading": "Laddar achievements...",
         "createAchievement": "Skapa achievement",
         "searchPlaceholder": "Sök achievements...",
         "breadcrumbs": {
@@ -1925,6 +2625,145 @@
           "availableCount": "{count, plural, one {# badge} other {# badges}} tillgängliga",
           "cancel": "Avbryt",
           "select": "Välj Badge"
+        },
+        "editor": {
+          "title": {
+            "edit": "Redigera achievement",
+            "create": "Skapa nytt achievement"
+          },
+          "description": {
+            "edit": "Uppdatera achievement-inställningar nedan.",
+            "create": "Fyll i informationen nedan för att skapa ett nytt achievement."
+          },
+          "fields": {
+            "name": {
+              "label": "Namn *",
+              "placeholder": "T.ex. Första spelet"
+            },
+            "description": {
+              "label": "Beskrivning",
+              "placeholder": "Beskriv hur man uppnår detta achievement..."
+            },
+            "badge": {
+              "label": "Badge/Ikon",
+              "select": "Välj Badge",
+              "change": "Byt Badge"
+            },
+            "scope": {
+              "label": "Scope *"
+            },
+            "tenant": {
+              "label": "Organisation *",
+              "placeholder": "Välj organisation"
+            },
+            "conditionType": {
+              "label": "Trigger *"
+            },
+            "conditionValue": {
+              "gamesPlayed": "Antal spel",
+              "scoreReached": "Poäng att nå",
+              "streak": "Antal dagar",
+              "placeholder": "Ange värde..."
+            },
+            "status": {
+              "label": "Status"
+            }
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Synlig för alla användare"
+            },
+            "tenant": {
+              "label": "Tenant",
+              "description": "Synlig inom en specifik organisation"
+            },
+            "private": {
+              "label": "Privat",
+              "description": "Endast synlig för tilldelade användare"
+            }
+          },
+          "conditions": {
+            "manual": {
+              "label": "Manuell",
+              "description": "Tilldelas manuellt av admin"
+            },
+            "gamesPlayed": {
+              "label": "Spelade spel",
+              "description": "Efter ett antal spelade spel"
+            },
+            "scoreReached": {
+              "label": "Poäng uppnådd",
+              "description": "När en viss poängnivå nås"
+            },
+            "streak": {
+              "label": "Streak",
+              "description": "Efter ett antal dagar i rad"
+            },
+            "firstGame": {
+              "label": "Första spelet",
+              "description": "När användaren spelar sitt första spel"
+            },
+            "perfectScore": {
+              "label": "Perfekt poäng",
+              "description": "När användaren får max poäng"
+            }
+          },
+          "status": {
+            "draft": "Utkast",
+            "active": "Aktiv",
+            "archived": "Arkiverad"
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "saving": "Sparar...",
+            "update": "Uppdatera",
+            "create": "Skapa"
+          },
+          "errors": {
+            "updateFailed": "Kunde inte uppdatera achievement",
+            "createFailed": "Kunde inte skapa achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
+        },
+        "awardModal": {
+          "title": "Tilldela achievement",
+          "description": "Tilldela \"{name}\" till användare.",
+          "mode": {
+            "tenant": "Hel organisation",
+            "users": "Specifika användare"
+          },
+          "tenant": {
+            "label": "Organisation",
+            "placeholder": "Välj organisation...",
+            "helper": "Alla användare i {tenantName} kommer att få detta achievement."
+          },
+          "users": {
+            "searchLabel": "Sök användare",
+            "searchPlaceholder": "Sök på namn eller e-post...",
+            "noName": "Inget namn",
+            "searching": "Söker...",
+            "noResults": "Inga användare hittades",
+            "selectedLabel": "Valda användare ({count})"
+          },
+          "message": {
+            "label": "Meddelande (valfritt)",
+            "placeholder": "T.ex. \"Grattis till avslutad kurs!\"",
+            "helper": "Detta meddelande kommer att visas för användaren när de får sitt achievement."
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "awarding": "Tilldelar...",
+            "award": "Tilldela"
+          },
+          "errors": {
+            "selectTenant": "Välj en organisation",
+            "fetchUsers": "Kunde inte hämta användare",
+            "noUsersInTenant": "Inga användare hittades i denna organisation",
+            "selectUsers": "Välj minst en användare",
+            "awardFailed": "Kunde inte tilldela achievement",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
         }
       },
       "shopRewards": {
@@ -2036,7 +2875,119 @@
           "noAccess": "Du har inte tillgång till några organisationer."
         },
         "loading": "Laddar shop items...",
-        "unknownTenant": "Okänd organisation"
+        "unknownTenant": "Okänd organisation",
+        "editor": {
+          "title": {
+            "edit": "Redigera shop item",
+            "create": "Skapa nytt shop item"
+          },
+          "description": {
+            "edit": "Uppdatera shop item-inställningar nedan.",
+            "create": "Fyll i informationen nedan för att skapa ett nytt shop item."
+          },
+          "fields": {
+            "name": {
+              "label": "Namn *",
+              "placeholder": "T.ex. Gyllene avatar"
+            },
+            "description": {
+              "label": "Beskrivning",
+              "placeholder": "Beskriv detta shop item..."
+            },
+            "category": {
+              "label": "Kategori *"
+            },
+            "subtype": {
+              "label": "Undertyp",
+              "placeholder": "Välj undertyp (valfri)"
+            },
+            "imageUrl": {
+              "label": "Bild-URL",
+              "placeholder": "https://example.com/image.png",
+              "previewAlt": "Förhandsvisning"
+            },
+            "price": {
+              "label": "Pris *",
+              "placeholder": "100"
+            },
+            "currency": {
+              "label": "Valuta *",
+              "placeholder": "Välj valuta"
+            },
+            "quantityLimit": {
+              "label": "Begränsad upplaga",
+              "placeholder": "Lämna tomt för obegränsad",
+              "helper": "Om ifyllt begränsas totalt antal som kan köpas av alla användare."
+            },
+            "sortOrder": {
+              "label": "Sorteringsordning",
+              "placeholder": "0",
+              "helper": "Lägre nummer visas först i shopen."
+            }
+          },
+          "categories": {
+            "cosmetic": {
+              "label": "Kosmetisk",
+              "description": "Avatarer, ramar, bakgrunder m.m."
+            },
+            "powerup": {
+              "label": "Power-up",
+              "description": "Spelhjälpmedel och boosts"
+            },
+            "bundle": {
+              "label": "Paket",
+              "description": "Kombination av flera items (Fas 2)"
+            },
+            "seasonPass": {
+              "label": "Season Pass",
+              "description": "Säsongspass med belöningar (Fas 2)"
+            }
+          },
+          "subtypes": {
+            "avatar": "Avatar",
+            "avatarFrame": "Avatarram",
+            "background": "Bakgrund",
+            "title": "Titel",
+            "badge": "Märke",
+            "hint": "Ledtråd",
+            "skip": "Hoppa över",
+            "timeExtend": "Förläng tid",
+            "doubleXp": "Dubblad XP",
+            "shield": "Sköld"
+          },
+          "toggles": {
+            "available": {
+              "title": "Tillgänglig",
+              "description": "Visa i shopen för deltagare"
+            },
+            "featured": {
+              "title": "Framhävd",
+              "description": "Visa i featured-sektion"
+            }
+          },
+          "stats": {
+            "title": "Försäljningsstatistik",
+            "sold": "Sålda",
+            "remaining": "Kvar"
+          },
+          "warnings": {
+            "noCurrency": "⚠️ Ingen valuta finns. Skapa en valuta först under Gamification → Valuta."
+          },
+          "actions": {
+            "cancel": "Avbryt",
+            "saving": "Sparar...",
+            "update": "Uppdatera",
+            "create": "Skapa"
+          },
+          "errors": {
+            "nameRequired": "Namn krävs",
+            "currencyRequired": "Välj en valuta",
+            "invalidPrice": "Ogiltigt pris",
+            "updateFailed": "Kunde inte uppdatera item",
+            "createFailed": "Kunde inte skapa item",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
+        }
       },
       "libraryExports": {
         "pageTitle": "Library Exports",
@@ -2045,6 +2996,55 @@
           "admin": "Admin",
           "gamificationHub": "Gamification hub",
           "libraryExports": "Library Exports"
+        },
+        "actions": {
+          "createTemplate": "Skapa exportmall",
+          "createTemplateShort": "Skapa mall"
+        },
+        "stats": {
+          "templates": "Exportmallar",
+          "active": "Aktiva",
+          "totalExports": "Totalt exporter",
+          "successRate": "Framgångsgrad"
+        },
+        "tabs": {
+          "templates": "Exportmallar",
+          "logs": "Exportlogg"
+        },
+        "formats": {
+          "csv": "CSV",
+          "json": "JSON",
+          "pdf": "PDF",
+          "xlsx": "Excel"
+        },
+        "status": {
+          "active": "Aktiv",
+          "draft": "Utkast",
+          "archived": "Arkiverad"
+        },
+        "logStatus": {
+          "completed": "Klar",
+          "pending": "Pågår",
+          "failed": "Misslyckad"
+        },
+        "templates": {
+          "version": "v{version}",
+          "exportCount": "{count, plural, one {# export} other {# exporter}}"
+        },
+        "logs": {
+          "empty": {
+            "title": "Ingen exporthistorik",
+            "description": "Här visas historik över genomförda exporter."
+          },
+          "table": {
+            "template": "Mall",
+            "format": "Format",
+            "status": "Status",
+            "records": "Poster",
+            "size": "Storlek",
+            "exportedBy": "Exporterad av",
+            "date": "Datum"
+          }
         },
         "empty": {
           "title": "Inga exportmallar ännu",
@@ -2736,6 +3736,266 @@
           "deleted": "Borttagen",
           "added": "Tillagd"
         },
+        "decision": {
+          "header": {
+            "title": "Omröstningar ({count})",
+            "subtitle": "Omröstningar, röstningar och quiz-frågor för deltagare",
+            "templates": "Mallar",
+            "add": "Lägg till"
+          },
+          "templatesTitle": "Välj en mall:",
+          "types": {
+            "poll": "Omröstning",
+            "vote": "Röstning",
+            "quiz": "Quiz",
+            "rating": "Betyg",
+            "ranking": "Rangordning"
+          },
+          "empty": {
+            "title": "Inga omröstningar ännu.",
+            "description": "Lägg till en omröstning eller välj från mallar."
+          },
+          "fields": {
+            "titlePlaceholder": "Titel",
+            "typeLabel": "Typ",
+            "maxChoicesLabel": "Max val",
+            "promptLabel": "Fråga / Prompt",
+            "promptPlaceholder": "Skriv frågan som visas för deltagarna..."
+          },
+          "options": {
+            "title": "Alternativ ({count})",
+            "add": "Lägg till",
+            "placeholder": "Alternativtext",
+            "markCorrect": "Markera som rätt svar"
+          },
+          "advanced": {
+            "title": "Avancerade inställningar",
+            "anonymousLabel": "Anonym röstning",
+            "anonymousHelp": "Dölj vem som röstat",
+            "multipleLabel": "Tillåt flera val",
+            "multipleHelp": "Deltagare kan välja flera",
+            "revealLabel": "Visa resultat direkt",
+            "revealHelp": "Avslöja när stängd",
+            "autoCloseLabel": "Auto-stäng (sek)",
+            "autoClosePlaceholder": "Manuell",
+            "autoCloseHelp": "0 eller tom = manuell",
+            "stepLabel": "Visa vid steg",
+            "stepPlaceholder": "Valfritt",
+            "phaseLabel": "Visa vid fas",
+            "phasePlaceholder": "Valfritt"
+          },
+          "defaults": {
+            "optionLabel": "Alternativ {index}",
+            "newTitle": "Ny omröstning"
+          },
+          "templates": {
+            "yesNo": {
+              "name": "Ja/Nej",
+              "title": "Snabb omröstning",
+              "prompt": "Vad tycker du?",
+              "optionYes": "Ja",
+              "optionNo": "Nej"
+            },
+            "multipleChoice": {
+              "name": "Flervalsfråga",
+              "title": "Flervalsfråga",
+              "prompt": "Välj ett alternativ",
+              "optionA": "Alternativ A",
+              "optionB": "Alternativ B",
+              "optionC": "Alternativ C"
+            },
+            "groupVote": {
+              "name": "Gruppomröstning",
+              "title": "Vad röstar ni på?",
+              "prompt": "Diskutera i grupp och rösta",
+              "option1": "Förslag 1",
+              "option2": "Förslag 2",
+              "option3": "Förslag 3",
+              "option4": "Förslag 4"
+            },
+            "quiz": {
+              "name": "Quiz",
+              "title": "Quizfråga",
+              "prompt": "Vilket alternativ är rätt?",
+              "optionA": "Alternativ A",
+              "optionB": "Alternativ B",
+              "optionC": "Alternativ C"
+            },
+            "rating": {
+              "name": "Betygsskala",
+              "title": "Hur nöjd är du?",
+              "prompt": "Sätt betyg 1–5",
+              "option1": "1",
+              "option2": "2",
+              "option3": "3",
+              "option4": "4",
+              "option5": "5"
+            },
+            "anonymous": {
+              "name": "Anonym omröstning",
+              "title": "Anonym fråga",
+              "prompt": "Svara anonymt",
+              "option1": "Alternativ 1",
+              "option2": "Alternativ 2"
+            }
+          }
+        },
+        "trigger": {
+          "header": {
+            "title": "Triggers ({count})"
+          },
+          "newTrigger": "Ny trigger",
+          "addTrigger": "Lägg till trigger",
+          "templates": "Mallar",
+          "wizard": "Wizard",
+          "test": "Testa",
+          "titles": {
+            "test": "Testa triggers i simulator",
+            "export": "Exportera triggers till CSV",
+            "import": "Importera triggers från CSV",
+            "templates": "Välj från mallbibliotek"
+          },
+          "whenLabel": "När",
+          "doLabel": "Gör",
+          "conditionPlaceholder": "Välj villkor...",
+          "targetPlaceholder": "Välj mål...",
+          "channelPlaceholder": "Kanal (t.ex. clue:found)",
+          "actionPlaceholder": "+ Lägg till åtgärd...",
+          "artifactPlaceholder": "Välj artefakt...",
+          "countdownMessagePlaceholder": "Meddelande...",
+          "sendMessagePlaceholder": "Skriv meddelande...",
+          "stylePlaceholder": "Stil",
+          "signalChannelPlaceholder": "Kanal...",
+          "signalMessagePlaceholder": "Meddelande...",
+          "timeBankReasonPlaceholder": "Orsak...",
+          "timerNamePlaceholder": "Namn...",
+          "secondsShort": "sek",
+          "summary": {
+            "actions": "{count} åtgärd(er)"
+          },
+          "nameLabel": "Namn",
+          "namePlaceholder": "Triggernamn...",
+          "labels": {
+            "step": "Steg {index}",
+            "phase": "Fas {index}"
+          },
+          "messageStyles": {
+            "normal": "Normal",
+            "typewriter": "Skrivmaskin",
+            "dramatic": "Dramatisk"
+          },
+          "defaults": {
+            "countdownMessage": "Gör er redo...",
+            "timeBankReason": "trigger",
+            "timerName": "Timer"
+          },
+          "conditionTypes": {
+            "step_started": "Steg startar",
+            "step_completed": "Steg slutar",
+            "phase_started": "Fas startar",
+            "phase_completed": "Fas slutar",
+            "decision_resolved": "Beslut fattas",
+            "timer_ended": "Timer tar slut",
+            "artifact_unlocked": "Artefakt avslöjad",
+            "keypad_correct": "Keypad löst",
+            "keypad_failed": "Keypad misslyckad",
+            "signal_received": "Signal mottagen",
+            "manual": "Manuell trigger"
+          },
+          "actionTypes": {
+            "reveal_artifact": "Visa artefakt",
+            "hide_artifact": "Dölj artefakt",
+            "unlock_decision": "Öppna beslut",
+            "lock_decision": "Stäng beslut",
+            "advance_step": "Gå till nästa steg",
+            "advance_phase": "Gå till nästa fas",
+            "start_timer": "Starta timer",
+            "send_message": "Skicka meddelande",
+            "send_signal": "Skicka signal",
+            "time_bank_apply_delta": "Tidsbank delta",
+            "play_sound": "Spela ljud",
+            "show_countdown": "Visa nedräkning",
+            "reset_keypad": "Nollställ keypad"
+          },
+          "import": {
+            "error": "Importfel",
+            "failed": "Import misslyckades"
+          },
+          "noTriggers": "Inga triggers ännu",
+          "noTriggersHint": "Skapa en trigger eller välj från mallar.",
+          "howItWorks": {
+            "title": "Så fungerar triggers",
+            "description": "Triggers körs automatiskt när villkoren uppfylls.",
+            "example": "Exempel: När en keypad löses visas en artefakt."
+          },
+          "unnamedTrigger": "Namnlös trigger",
+          "inactive": "Inaktiv",
+          "onceLabel": "En gång",
+          "activeLabel": "Aktiv",
+          "onceCheckboxLabel": "Kör en gång",
+          "autoDisable": "Inaktiveras automatiskt efter körning.",
+          "delayLabel": "Fördröjning",
+          "seconds": "sekunder"
+        },
+        "triggerSimulator": {
+          "title": "Trigger-simulator",
+          "badge": "Dry-run läge",
+          "reset": "Återställ",
+          "close": "Stäng",
+          "helpText": "Testa dina triggers utan att starta en riktig session. Välj en händelse eller klicka på en manuell trigger för att se vad som händer.",
+          "sections": {
+            "state": "Aktuellt tillstånd",
+            "simulate": "Simulera händelse",
+            "manual": "Manuella triggers",
+            "status": "Trigger-status",
+            "log": "Händelselogg"
+          },
+          "labels": {
+            "step": "Steg",
+            "phase": "Fas",
+            "timeBank": "Tidsbank",
+            "firedTriggers": "Avfyrade triggers",
+            "stepFallback": "Steg {index}",
+            "phaseFallback": "Fas {index}",
+            "action": "↳ {label}",
+            "event": "⚡ {label}",
+            "matched": "🎯 Trigger matchad: {name}",
+            "skipped": "⏭️ {name}",
+            "manual": "🖱️ Manuell: {name}"
+          },
+          "selectEventPlaceholder": "Välj händelse...",
+          "fireEvent": "Avfyra händelse",
+          "events": {
+            "stepStarted": "🚀 Steg startar: {name}",
+            "stepCompleted": "✅ Steg klart: {name}",
+            "phaseStarted": "🎬 Fas startar: {name}",
+            "phaseCompleted": "🏁 Fas klar: {name}",
+            "keypadCorrect": "🔓 Keypad rätt: {name}",
+            "keypadFailed": "❌ Keypad fel: {name}",
+            "artifactUnlocked": "📦 Artefakt upplåst: {name}"
+          },
+          "details": {
+            "revealArtifact": "Visar artefakt: {id}",
+            "hideArtifact": "Döljer artefakt: {id}",
+            "timeBankDelta": "{delta}s ({reason})",
+            "sendMessage": "\"{message}\" ({style})",
+            "showCountdown": "{seconds}s: \"{message}\"",
+            "advanceStep": "Går till nästa steg",
+            "advancePhase": "Går till nästa fas",
+            "sendSignal": "Kanal: {channel}",
+            "alreadyFired": "Redan avfyrad (execute_once)",
+            "delay": "Fördröjning: {seconds}s"
+          },
+          "status": {
+            "inactive": "Inaktiv",
+            "fired": "Avfyrad",
+            "ready": "Redo"
+          },
+          "empty": {
+            "title": "Inga händelser ännu.",
+            "description": "Välj en händelse att simulera i panelen till vänster."
+          }
+        },
         "phase": {
           "title": "Faser & Rundor",
           "subtitle": "Dela upp leken i tydliga faser med egna tidsbegränsningar.",
@@ -2768,6 +4028,7 @@
             "elapsed": "Uppåträkning",
             "trafficlight": "Trafikljus"
           },
+          "timerLabel": "Timer",
           "fields": {
             "name": "Fasnamn",
             "type": "Fastyp",
@@ -2789,6 +4050,15 @@
           "editRole": "Redigera roll",
           "newRole": "Ny roll",
           "addFirstRole": "Lägg till första rollen",
+          "sections": {
+            "security": {
+              "emailVerified": "E-post verifierad",
+              "emailNotVerified": "E-post ej verifierad",
+              "mfaEnabled": "MFA aktiverad",
+              "mfaDisabled": "MFA ej aktiverad",
+              "enableMfa": "Aktivera nu"
+            }
+          },
           "noRoles": "Inga roller ännu. Lägg till din första roll.",
           "noRolesYet": "Inga roller definierade ännu",
           "unnamed": "Namnlös roll",
@@ -2862,6 +4132,7 @@
         "board": {
           "title": "Publik Tavla",
           "subtitle": "Konfiguration för projektor/storskärm under spelet",
+          "backgroundPlaceholder": "#1e293b",
           "preview": {
             "title": "Förhandsvisning",
             "gameName": "Spelnamn",
@@ -2906,6 +4177,92 @@
           "welcomeMessagePlaceholder": "Välkomna till kvällens mysterium!",
           "clear": "Rensa"
         },
+        "snapshot": {
+          "title": "Versionshantering",
+          "createTitle": "Skapa ny version",
+          "versionLabelPlaceholder": "Versionsetikett (valfritt), t.ex. 'Launch version'",
+          "createButton": "Skapa snapshot",
+          "creatingButton": "Skapar...",
+          "helpText": "En snapshot fryser spelets nuvarande tillstånd. Sessioner kan använda snapshots så att ändringar i spelet inte påverkar pågående sessioner.",
+          "loading": "Laddar versioner...",
+          "emptyTitle": "Inga versioner ännu",
+          "emptyDescription": "Skapa en snapshot för att frysa spelets nuvarande tillstånd.",
+          "latestBadge": "Senaste",
+          "includes": {
+            "steps": "Steg",
+            "phases": "Faser",
+            "roles": "Roller",
+            "artifacts": "Artefakter",
+            "triggers": "Triggers",
+            "board": "Board"
+          },
+          "count": "{count, plural, one {# version} other {# versioner}}",
+          "close": "Stäng",
+          "errors": {
+            "load": "Kunde inte hämta versioner",
+            "create": "Kunde inte skapa version"
+          }
+        },
+        "validation": {
+          "emptyTitle": "Inga valideringsfel",
+          "emptyDescription": "Alla referenser är korrekta",
+          "headerTitle": "Valideringsproblem",
+          "separator": ", ",
+          "count": {
+            "errors": "{count, plural, one {# fel} other {# fel}}",
+            "warnings": "{count, plural, one {# varning} other {# varningar}}"
+          },
+          "section": {
+            "triggers": "🎯 Triggers",
+            "artifacts": "📦 Artefakter",
+            "steps": "📝 Steg",
+            "phases": "🎬 Faser",
+            "roles": "👤 Roller"
+          },
+          "itemPrefix": {
+            "triggers": "🎯 Trigger: ",
+            "artifacts": "📦 Artefakt: ",
+            "steps": "📝 Steg: ",
+            "phases": "🎬 Fas: ",
+            "roles": "👤 Roll: "
+          },
+          "navigate": "Gå till",
+          "publishBlocked": "⚠️ Spelet kan inte publiceras förrän alla fel är åtgärdade"
+        },
+        "quality": {
+          "title": "Kvalitetskontroll",
+          "optional": "valfritt",
+          "status": {
+            "incomplete": "Ofullständig",
+            "draft": "Utkast",
+            "playable": "Spelbar",
+            "publishable": "Publicerbar"
+          },
+          "sections": {
+            "draft": "Grundkrav (Utkast)",
+            "playable": "Redo att testas (Spelbar)",
+            "publishable": "Redo att publiceras"
+          },
+          "items": {
+            "draft": {
+              "name": "Namn"
+            },
+            "playable": {
+              "shortDescription": "Kort beskrivning",
+              "purposeSelected": "Syfte valt",
+              "subPurposeSelected": "Undersyfte valt",
+              "stepsOrDescription": "Steg eller beskrivning",
+              "energyLevel": "Energinivå",
+              "location": "Plats"
+            },
+            "publishable": {
+              "coverImage": "Omslagsbild eller standardbild",
+              "allRequired": "Alla krav uppfyllda",
+              "noValidationErrors": "Inga valideringsfel"
+            }
+          },
+          "published": "✓ Publicerad"
+        },
         "step": {
           "title": "Steg-för-steg",
           "subtitle": "Dra för att ändra ordning. Klicka för att redigera.",
@@ -2917,6 +4274,7 @@
           "noStepsYet": "Inga steg ännu",
           "noStepsDescription": "Lägg till steg för att guida ledaren genom leken.",
           "unnamed": "Namnlöst steg",
+          "minutesShort": "min",
           "cancel": "Avbryt",
           "clear": "Rensa",
           "selected": "Valt",
@@ -4434,6 +5792,329 @@
           "cancel": "Avbryt"
         }
       },
+      "coursesEditor": {
+        "title": {
+          "edit": "Redigera kurs",
+          "create": "Skapa ny kurs"
+        },
+        "description": {
+          "edit": "Uppdatera kursinställningar nedan.",
+          "create": "Fyll i informationen för att skapa en ny kurs."
+        },
+        "tabs": {
+          "basic": "Grundinfo",
+          "content": "Innehåll",
+          "quiz": "Quiz",
+          "rewards": "Belöningar"
+        },
+        "fields": {
+          "title": "Titel *",
+          "titlePlaceholder": "T.ex. Introduktion till Lekbanken",
+          "slug": "Slug *",
+          "slugPlaceholder": "t.ex. intro-lekbanken",
+          "description": "Beskrivning",
+          "descriptionPlaceholder": "En kort beskrivning av kursen...",
+          "scope": "Scope *",
+          "tenant": "Organisation *",
+          "tenantPlaceholder": "Välj organisation",
+          "status": "Status",
+          "difficulty": "Svårighetsgrad",
+          "duration": "Tid (min)",
+          "durationPlaceholder": "15",
+          "passScore": "Godkänt (%)",
+          "tags": "Taggar",
+          "tagsPlaceholder": "säkerhet, grundkurs, obligatorisk",
+          "tagsHelp": "Separera med komma."
+        },
+        "notice": {
+          "tenantScope": "Kursen skapas för din organisation."
+        },
+        "scope": {
+          "global": {
+            "label": "Global",
+            "description": "Synlig för alla organisationer"
+          },
+          "tenant": {
+            "label": "Organisation",
+            "description": "Synlig endast inom vald organisation"
+          }
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        },
+        "difficulty": {
+          "placeholder": "Välj nivå...",
+          "beginner": "Nybörjare",
+          "intermediate": "Medel",
+          "advanced": "Avancerad",
+          "expert": "Expert"
+        },
+        "advanced": {
+          "label": "Avancerat",
+          "jsonMode": "JSON-läge"
+        },
+        "content": {
+          "title": "Innehållssektioner",
+          "jsonPlaceholder": "[{\"id\": \"s1\", \"title\": \"...\", \"body_markdown\": \"...\"}]",
+          "empty": "Inga sektioner ännu. Lägg till din första sektion.",
+          "section": "Sektion {index}",
+          "sectionTitlePlaceholder": "Sektionsrubrik",
+          "sectionBodyPlaceholder": "Innehåll (Markdown stöds)",
+          "addSection": "Lägg till sektion"
+        },
+        "quiz": {
+          "title": "Quizfrågor",
+          "jsonPlaceholder": "[{\"id\": \"q1\", \"question\": \"...\", \"options\": [...]}]",
+          "empty": "Inga frågor ännu. Lägg till din första fråga.",
+          "questionLabel": "Fråga {index}",
+          "questionPlaceholder": "Frågetext",
+          "optionsLabel": "Svarsalternativ",
+          "correctAnswerTitle": "Markera som korrekt svar",
+          "optionPlaceholder": "Alternativ {index}",
+          "addOption": "Lägg till alternativ",
+          "explanationLabel": "Förklaring (valfritt)",
+          "explanationPlaceholder": "Förklaring som visas efter svar",
+          "addQuestion": "Lägg till fråga"
+        },
+        "rewards": {
+          "title": "Belöningar vid godkänt",
+          "jsonPlaceholder": "{\"dicecoin_amount\": 100, \"xp_amount\": 50}",
+          "dicecoin": "DiceCoin",
+          "dicecoinPlaceholder": "100",
+          "xp": "XP",
+          "xpPlaceholder": "50",
+          "achievement": "Achievement ID (valfritt)",
+          "achievementPlaceholder": "UUID för achievement"
+        },
+        "actions": {
+          "cancel": "Avbryt",
+          "saving": "Sparar...",
+          "update": "Uppdatera",
+          "create": "Skapa"
+        },
+        "errors": {
+          "titleRequired": "Titel krävs",
+          "slugRequired": "Slug krävs",
+          "tenantRequired": "Välj en organisation",
+          "updateFailed": "Kunde inte uppdatera kursen",
+          "createFailed": "Kunde inte skapa kursen",
+          "unexpected": "Ett oväntat fel uppstod"
+        }
+      },
+      "reports": {
+        "breadcrumbs": {
+          "learning": "Utbildning",
+          "reports": "Rapporter"
+        },
+        "title": "Rapporter",
+        "description": "Analysera utbildningsframsteg och statistik",
+        "actions": {
+          "refresh": "Uppdatera"
+        },
+        "filters": {
+          "days": {
+            "7": "Senaste 7 dagarna",
+            "30": "Senaste 30 dagarna",
+            "90": "Senaste 90 dagarna",
+            "365": "Senaste året"
+          },
+          "scope": {
+            "all": "Alla scope",
+            "global": "Globala kurser",
+            "tenant": "Organisation"
+          },
+          "tenants": {
+            "all": "Alla organisationer"
+          }
+        },
+        "error": {
+          "unexpected": "Ett oväntat fel uppstod"
+        },
+        "stats": {
+          "activeParticipants": "Aktiva deltagare",
+          "completedCourses": "Avklarade kurser",
+          "activeCourses": "Aktiva kurser",
+          "avgScore": "Snittresultat"
+        },
+        "table": {
+          "title": "Statistik per kurs",
+          "loading": "Laddar statistik...",
+          "empty": "Ingen kursstatistik tillgänglig för vald period.",
+          "columns": {
+            "course": "Kurs",
+            "completed30d": "Avklarade (30d)",
+            "avgScore": "Snittresultat",
+            "failed": "Underkända"
+          },
+          "unknownCourse": "Okänd kurs",
+          "emptyValue": "—",
+          "zeroPercent": "0%"
+        }
+      },
+      "paths": {
+        "breadcrumbs": {
+          "learning": "Utbildning",
+          "paths": "Lärstigar"
+        },
+        "title": "Lärstigar",
+        "description": "Bygg utbildningsvägar med ordnade kurser",
+        "actions": {
+          "create": "Skapa lärstig",
+          "readOnly": "Endast visning"
+        },
+        "notice": {
+          "title": "Endast system-admin kan skapa lärstigar",
+          "description": "Du kan se befintliga lärstigar men behöver system admin-rättigheter för att skapa eller redigera dem."
+        },
+        "status": {
+          "draft": "Utkast",
+          "active": "Aktiv",
+          "archived": "Arkiverad"
+        },
+        "kinds": {
+          "onboarding": "Onboarding",
+          "role": "Rollbaserad",
+          "theme": "Tema",
+          "compliance": "Compliance"
+        },
+        "filters": {
+          "searchPlaceholder": "Sök lärstigar...",
+          "status": {
+            "all": "Alla statusar"
+          },
+          "scope": {
+            "all": "Alla scope",
+            "global": "Globala",
+            "tenant": "Organisation"
+          },
+          "tenants": {
+            "all": "Alla organisationer"
+          }
+        },
+        "loading": "Laddar lärstigar...",
+        "empty": {
+          "title": "Inga lärstigar ännu",
+          "filtered": "Inga lärstigar matchar filtren",
+          "default": "Lärstigar kan skapas i en framtida version."
+        },
+        "badges": {
+          "global": "Global",
+          "organization": "Organisation"
+        },
+        "stats": {
+          "total": "Lärstigar",
+          "active": "Aktiva",
+          "draft": "Utkast",
+          "nodesLabel": "kurser i denna stig"
+        },
+        "pagination": {
+          "showing": "Visar {start}–{end} av {total}",
+          "previous": "Föregående",
+          "next": "Nästa"
+        },
+        "emptyValue": "—",
+        "confirmDelete": "Vill du verkligen ta bort \"{title}\"?",
+        "error": {
+          "loadFailed": "Kunde inte hämta lärstigar",
+          "deleteFailed": "Kunde inte ta bort lärvägen"
+        },
+        "editor": {
+          "title": {
+            "edit": "Redigera lärstig",
+            "create": "Skapa ny lärstig"
+          },
+          "description": {
+            "edit": "Uppdatera lärvägen och hantera kurser.",
+            "create": "Fyll i information för att skapa en ny lärväg."
+          },
+          "tabs": {
+            "basic": "Grundinfo",
+            "courses": "Kurser",
+            "prerequisites": "Förkunskaper"
+          },
+          "fields": {
+            "title": "Titel *",
+            "titlePlaceholder": "T.ex. Onboarding för nya medarbetare",
+            "slug": "Slug *",
+            "slugPlaceholder": "t.ex. onboarding-nya",
+            "description": "Beskrivning",
+            "descriptionPlaceholder": "En beskrivning av lärvägen...",
+            "scope": "Scope *",
+            "tenant": "Organisation *",
+            "tenantPlaceholder": "Välj organisation",
+            "status": "Status",
+            "kind": "Typ"
+          },
+          "scope": {
+            "global": {
+              "label": "Global",
+              "description": "Synlig för alla organisationer"
+            },
+            "tenant": {
+              "label": "Organisation",
+              "description": "Synlig endast inom vald organisation"
+            }
+          },
+          "status": {
+            "draft": "Utkast",
+            "active": "Aktiv",
+            "archived": "Arkiverad"
+          },
+          "kinds": {
+            "onboarding": "Onboarding",
+            "role": "Rollbaserad",
+            "theme": "Tema",
+            "compliance": "Compliance"
+          },
+          "nodes": {
+            "title": "Kurser i lärvägen",
+            "count": "{count} kurser",
+            "loading": "Laddar kurser...",
+            "empty": "Inga kurser ännu. Lägg till kurser nedan.",
+            "courseFallback": "Kurs",
+            "addCoursePlaceholder": "Välj kurs att lägga till...",
+            "courseScope": {
+              "org": "(org)",
+              "global": "(global)"
+            },
+            "add": "Lägg till"
+          },
+          "edges": {
+            "title": "Förkunskapskrav",
+            "count": "{count} krav",
+            "description": "Definiera vilka kurser som måste vara avklarade före andra kurser.",
+            "empty": "Inga förkunskapskrav definierade. Alla kurser kan tas i valfri ordning.",
+            "courseFallback": "Kurs",
+            "addTitle": "Lägg till förkunskapskrav",
+            "addFromPlaceholder": "Välj förkunskap...",
+            "addToPlaceholder": "Välj mål...",
+            "add": "Skapa",
+            "minimumNotice": "Lägg till minst 2 kurser för att kunna definiera förkunskapskrav."
+          },
+          "actions": {
+            "close": "Stäng",
+            "cancel": "Avbryt",
+            "saving": "Sparar...",
+            "save": "Spara",
+            "create": "Skapa"
+          },
+          "errors": {
+            "addCourseFailed": "Kunde inte lägga till kurs",
+            "removeCourseFailed": "Kunde inte ta bort kurs",
+            "sameCoursePrereq": "Kan inte skapa förkunskapskrav till samma kurs",
+            "addPrereqFailed": "Kunde inte skapa förkunskapskrav",
+            "removePrereqFailed": "Kunde inte ta bort förkunskapskrav",
+            "titleRequired": "Titel krävs",
+            "slugRequired": "Slug krävs",
+            "tenantRequired": "Välj en organisation",
+            "updateFailed": "Kunde inte uppdatera lärväg",
+            "createFailed": "Kunde inte skapa lärväg",
+            "unexpected": "Ett oväntat fel uppstod"
+          }
+        }
+      },
       "requirements": {
         "breadcrumbs": {
           "learning": "Utbildning",
@@ -4688,6 +6369,74 @@
       "createPlan": "Skapa plan",
       "browseGames": "Bläddra spel"
     },
+    "gameDetail": {
+      "notFoundTitle": "Leken hittades inte",
+      "backToBrowse": "Tillbaka till lekar",
+      "label": "Lek",
+      "descriptionFallback": "Ingen beskrivning tillgänglig",
+      "purposeFallback": "Syfte",
+      "productFallback": "Produkt",
+      "ageRange": "{min}-{max} år",
+      "playersRange": "{min}-{max} deltagare",
+      "approxMinutes": "~{minutes} min",
+      "sections": {
+        "about": "Om leken",
+        "instructions": "Så spelar du",
+        "images": "Bilder",
+        "details": "Detaljer"
+      },
+      "details": {
+        "participants": "Antal deltagare",
+        "time": "Tid",
+        "age": "Ålder",
+        "energy": "Energinivå"
+      },
+      "startGame": "Starta leken",
+      "energy": {
+        "low": "Låg energi",
+        "medium": "Medel energi",
+        "high": "Hög energi"
+      }
+    },
+    "gamification": {
+      "events": {
+        "signInRequired": "Du behöver vara inloggad för att se eventloggen.",
+        "title": "DICECOIN",
+        "subtitle": "Eventlogg (read-only)",
+        "empty": "Inga event att visa ännu."
+      }
+    },
+    "play": {
+      "startSession": {
+        "eyebrow": "Starta session",
+        "subtitle": "Skapa en deltagarsession för denna lek.",
+        "backToGame": "Tillbaka till leken",
+        "helper": "Vi skapar en ny session med en unik kod som deltagarna kan använda.",
+        "starting": "Startar...",
+        "startButton": "Starta session",
+        "createFailed": "Kunde inte skapa session"
+      },
+      "sessionDetail": {
+        "loadFailed": "Kunde inte hämta session",
+        "updateFailed": "Kunde inte uppdatera status",
+        "shareText": "Gå med i sessionen! Kod: {code}",
+        "kickFailed": "Kunde inte ta bort deltagare",
+        "blockFailed": "Kunde inte blockera deltagare",
+        "setNextStarterFailed": "Kunde inte sätta nästa startare",
+        "setPositionFailed": "Kunde inte sätta position",
+        "notFoundTitle": "Session hittades inte",
+        "backToSessions": "Tillbaka till sessioner",
+        "errorTitle": "Något gick fel",
+        "controlsTitle": "Sessionskontroller",
+        "shareTitle": "Dela session",
+        "sessionCode": "Sessionskod",
+        "participantJoinHint": "Deltagare går till {url}",
+        "copied": "Kopierad!",
+        "share": "Dela",
+        "qrCode": "QR-kod",
+        "participantsTitle": "Deltagare"
+      }
+    },
     "profile": {
       "title": "Profil",
       "editProfile": "Redigera profil",
@@ -4695,6 +6444,19 @@
       "preferences": "Preferenser",
       "security": "Säkerhet",
       "notifications": "Notifikationer",
+      "edit": {
+        "label": "Profil",
+        "title": "Redigera profil",
+        "avatarHint": "Tryck för att byta profilbild",
+        "fullNameLabel": "Namn",
+        "fullNamePlaceholder": "Ditt namn",
+        "emailLabel": "E-postadress",
+        "emailHint": "E-postadressen kan inte ändras här.",
+        "saving": "Sparar...",
+        "saved": "Sparat!",
+        "saveChanges": "Spara ändringar",
+        "savedMessage": "Dina ändringar har sparats!"
+      },
       "nav": {
         "backToApp": "Tillbaka till appen",
         "overview": "Översikt",
@@ -5589,6 +7351,7 @@
         "unlimited": "Obegränsad tillgång till alla funktioner",
         "perMonth": "per månad",
         "renews": "Förnyas: {date}",
+        "paymentMethod": "{brand} •••• {last4}",
         "changePlan": "Byt plan",
         "cancel": "Avbryt prenumeration"
       },
@@ -6116,12 +7879,82 @@
       "pricing": "Priser",
       "customers": "Kunder"
     },
+    "header": {
+      "openMenu": "Öppna menyn",
+      "closeMenu": "Stäng menyn"
+    },
     "actions": {
       "login": "Logga in",
       "signup": "Prova gratis",
       "goToApp": "Gå till appen",
       "goToAdmin": "Gå till admin",
       "goToMarketing": "Gå till startsidan"
+    },
+    "footer": {
+      "tagline": "Aktiviteter, pass och delning för coacher, lärare och ledare.",
+      "actions": {
+        "getStarted": "Kom igång"
+      },
+      "legal": {
+        "terms": "Användarvillkor",
+        "privacy": "Integritetspolicy"
+      },
+      "copyright": "© {year} Lekbanken AS. Alla rättigheter förbehållna."
+    },
+    "features": {
+      "badge": "Features",
+      "title": "Arkitekturen i korthet",
+      "description": "UI-världarna hålls åtskilda men delar komponentbibliotek. Strukturen i app/ följer Next.js App Router med route groups för marketing, app och admin.",
+      "groups": {
+        "sharedProviders": {
+          "title": "Delade providers",
+          "points": {
+            "theme": "Tema, Supabase och i18n laddas i rotlayouten.",
+            "layouts": "Layoutarna är tunna och fokuserar på navigation och chrome."
+          }
+        },
+        "uiWorlds": {
+          "title": "UI-världar",
+          "points": {
+            "marketing": "Marketing använder header och footer utan koppling till appflöden.",
+            "app": "App har bottom navigation och mobilanpassade komponenter.",
+            "admin": "Admin har vänstersidebar och topbar med sök/notifications."
+          }
+        },
+        "responsiveStrategy": {
+          "title": "Responsiv strategi",
+          "points": {
+            "marketing": "Marketing: klassisk responsiv layout.",
+            "app": "App: mobil först med luftigt desktopläge.",
+            "admin": "Admin: desktop först med fallback för mindre skärmar."
+          }
+        }
+      }
+    },
+    "pricing": {
+      "badge": "Pricing",
+      "title": "Tre produktupplevelser",
+      "description": "Arkitekturen separerar publik marketing, mobil App och desktop Admin för att varje team ska kunna utveckla i sin egen takt.",
+      "tiers": {
+        "marketing": {
+          "name": "Marketing",
+          "price": "0 kr",
+          "description": "Landningssidor och marknadsföring utan inloggning.",
+          "highlight": "Publik"
+        },
+        "app": {
+          "name": "App",
+          "price": "Pro per lekledare",
+          "description": "Mobil-first flöden med bottom navigation och delade komponenter.",
+          "highlight": "Mobil först"
+        },
+        "admin": {
+          "name": "Admin",
+          "price": "Offer",
+          "description": "Adminportal med desktopprioritet, sidebar och modulbaserad navigering.",
+          "highlight": "Desktop först"
+        }
+      }
     }
   },
   "demo": {
@@ -6570,6 +8403,399 @@
       "sessionCode": "Sessionskod",
       "noGameLinked": "Inget spel är kopplat till sessionen."
     },
+    "board": {
+      "title": "Board",
+      "loading": "Laddar...",
+      "updating": "Uppdaterar… Visar senaste kända läge.",
+      "codeLabel": "Kod",
+      "banner": {
+        "waiting": "Väntar på start. Deltagare kan ansluta med koden.",
+        "paused": "Pausad. Återkommer strax.",
+        "locked": "Sessionen är låst.",
+        "ended": "Sessionen är avslutad.",
+        "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
+        "offline": "Ingen anslutning. Visar senaste kända läge."
+      },
+      "lobby": {
+        "sessionCodeLabel": "Sessionskod",
+        "joinHint": "Skanna QR-koden eller skriv in koden för att gå med.",
+        "qrAlt": "QR-kod",
+        "qrLoading": "QR-kod laddas..."
+      },
+      "status": {
+        "paused": "Pausad",
+        "ended": "Avslutad",
+        "active": "Aktiv"
+      },
+      "currentStep": "Nuvarande steg",
+      "now": "Just nu",
+      "highlighted": "Markerat",
+      "artifact": "Artefakt",
+      "publicArtifacts": "Offentliga artefakter",
+      "noPublicArtifacts": "Inga offentliga artefakter visade ännu.",
+      "decisions": "Beslut (resultat)",
+      "decision": "Beslut",
+      "noDecisions": "Inga beslut är visade ännu.",
+      "outcomes": "Utfall",
+      "outcome": "Utfall",
+      "noOutcomes": "Inga utfall är visade ännu.",
+      "errors": {
+        "fetch": "Kunde inte hämta board."
+      }
+    },
+    "hostSessions": {
+      "header": {
+        "title": "SPELA",
+        "subtitle": "Lekledarcentralen",
+        "newSession": "Ny session"
+      },
+      "summary": {
+        "title": "Mina sessioner",
+        "activeCount": "{count, plural, one {# aktiv session} other {# aktiva sessioner}}",
+        "noneActive": "Inga aktiva sessioner"
+      },
+      "filters": {
+        "all": "Alla",
+        "active": "Aktiva",
+        "paused": "Pausade",
+        "ended": "Avslutade"
+      },
+      "empty": {
+        "titleAll": "Inga sessioner ännu",
+        "titleFiltered": "Inga {status} sessioner",
+        "descriptionAll": "Skapa din första session genom att välja ett spel.",
+        "descriptionFiltered": "Prova ett annat filter eller skapa en ny session.",
+        "action": "Välj spel"
+      },
+      "errors": {
+        "fetchFailed": "Kunde inte hämta sessioner"
+      }
+    },
+    "participantsHost": {
+      "loading": "Laddar session...",
+      "errors": {
+        "sessionNotFound": "Session kunde inte hittas",
+        "notHost": "Du är inte värd för denna session"
+      },
+      "actions": {
+        "back": "Tillbaka",
+        "backArrow": "← Tillbaka"
+      },
+      "header": {
+        "title": "Värd Dashboard",
+        "subtitle": "Hantera din session och deltagare"
+      },
+      "sessionInfo": {
+        "title": "Sessioninformation",
+        "codeLabel": "Sessionskod",
+        "participantsLabel": "Deltagare",
+        "createdLabel": "Skapad",
+        "gameIdLabel": "Spel ID"
+      },
+      "participants": {
+        "title": "Deltagare"
+      }
+    },
+    "participantRoleSelector": {
+      "roles": {
+        "observer": "Observatör",
+        "player": "Spelare",
+        "teamLead": "Lagledare",
+        "facilitator": "Facilitator"
+      },
+      "descriptions": {
+        "observer": "Kan titta men inte delta",
+        "player": "Aktiv deltagare",
+        "teamLead": "Kan koordinera lagaktiviteter",
+        "facilitator": "Kan assistera värd"
+      },
+      "errors": {
+        "updateFailed": "Kunde inte uppdatera roll"
+      }
+    },
+    "sessionActions": {
+      "actions": {
+        "archive": "Arkivera session",
+        "archiving": "Arkiverar...",
+        "restore": "Återställ session",
+        "restoring": "Återställer...",
+        "deletePermanent": "Ta bort permanent"
+      },
+      "confirm": {
+        "message": "Är du säker? Session <strong>{code}</strong> kommer att raderas permanent. Detta kan inte ångras!",
+        "confirm": "Ja, radera",
+        "cancel": "Avbryt",
+        "deleting": "Raderar..."
+      },
+      "errors": {
+        "archiveFailed": "Kunde inte arkivera session",
+        "restoreFailed": "Kunde inte återställa session",
+        "deleteFailed": "Kunde inte radera session"
+      }
+    },
+    "sessionHistory": {
+      "loading": "Laddar sessioner...",
+      "empty": "Inga sessioner hittades",
+      "errors": {
+        "fetchFailed": "Kunde inte hämta sessioner",
+        "unknown": "Okänt fel"
+      },
+      "filters": {
+        "label": "Filtrera:",
+        "all": "Alla sessioner",
+        "active": "Aktiva",
+        "paused": "Pausade",
+        "locked": "Låsta",
+        "ended": "Avslutade",
+        "cancelled": "Avbrutna",
+        "archived": "Arkiverade"
+      },
+      "summary": {
+        "count": "{count, plural, one {# session} other {# sessioner}}"
+      },
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "locked": "Låst",
+        "ended": "Avslutad",
+        "cancelled": "Avbruten",
+        "archived": "Arkiverad"
+      },
+      "metrics": {
+        "participants": "Deltagare",
+        "totalScore": "Totalt poäng",
+        "achievements": "Utmärkelser",
+        "duration": "Längd"
+      },
+      "timestamps": {
+        "created": "Skapad: {date}",
+        "ended": "Avslutad: {date}"
+      },
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      },
+      "pagination": {
+        "previous": "← Föregående",
+        "next": "Nästa →",
+        "showing": "Visar {start}-{end} av {total}"
+      }
+    },
+    "sessionHistoryPage": {
+      "title": "Sessionshistorik",
+      "description": "Visa och analysera tidigare deltagarsessioner"
+    },
+    "sessionAnalytics": {
+      "title": "Sessionsanalys",
+      "sessionCodeLabel": "Kod:",
+      "loading": "Laddar analys...",
+      "errors": {
+        "fetchFailed": "Kunde inte hämta analys",
+        "unknown": "Okänt fel",
+        "notFound": "Session hittades inte"
+      },
+      "actions": {
+        "backToHistory": "Tillbaka till historik",
+        "backToHistoryArrow": "← Tillbaka till historik"
+      },
+      "export": {
+        "participants": "📊 Exportera deltagare",
+        "activity": "📋 Exportera aktivitet",
+        "achievements": "🏆 Exportera utmärkelser",
+        "errors": {
+          "failed": "Export misslyckades"
+        }
+      },
+      "stats": {
+        "totalParticipants": "Totalt deltagare",
+        "totalScore": "Totalt poäng",
+        "achievements": "Utmärkelser",
+        "averageTime": "Genomsnittlig tid"
+      },
+      "duration": {
+        "hoursMinutes": "{hours}h {minutes}m",
+        "minutes": "{minutes}m"
+      },
+      "topScorers": {
+        "title": "Top poängtagare",
+        "empty": "Ingen data"
+      },
+      "topAchievers": {
+        "title": "Flest utmärkelser",
+        "empty": "Ingen data"
+      },
+      "participants": {
+        "title": "Alla deltagare",
+        "roles": {
+          "observer": "Observatör",
+          "player": "Spelare",
+          "teamLead": "Lagledare",
+          "facilitator": "Facilitator"
+        },
+        "status": {
+          "pending": "Väntar",
+          "active": "Aktiv",
+          "idle": "Inaktiv",
+          "disconnected": "Frånkopplad",
+          "kicked": "Kickad",
+          "blocked": "Blockerad"
+        },
+        "table": {
+          "name": "Namn",
+          "role": "Roll",
+          "status": "Status",
+          "score": "Poäng",
+          "achievements": "Utmärkelser",
+          "joined": "Gick med"
+        }
+      },
+      "recentActivity": {
+        "title": "Senaste aktivitet"
+      }
+    },
+    "participantSessionCreate": {
+      "title": "Skapa ny session",
+      "description": "Starta en ny deltagarsession för ditt spel eller aktivitet",
+      "gameId": {
+        "label": "Spel-ID (valfritt)",
+        "placeholder": "Ange spel-ID om du vill koppla session till ett spel",
+        "hint": "Lämna tomt för en fristående session"
+      },
+      "actions": {
+        "create": "Skapa session",
+        "creating": "Skapar session..."
+      },
+      "nextSteps": {
+        "title": "Vad händer härnäst?",
+        "step1": "Du får en unik sessionskod som deltagare använder för att gå med",
+        "step2": "Du kommer till värd-dashboarden där du kan hantera deltagare",
+        "step3": "Deltagare går med genom att ange koden på gå med-sidan"
+      },
+      "errors": {
+        "createFailed": "Kunde inte skapa session",
+        "unknown": "Ett fel uppstod"
+      }
+    },
+    "participantJoin": {
+      "title": "Gå med i session",
+      "description": "Ange sessionskoden du fick av din lärare",
+      "form": {
+        "sessionCodeLabel": "Sessionskod",
+        "sessionCodePlaceholder": "H3K9QF",
+        "displayNameLabel": "Ditt namn",
+        "displayNamePlaceholder": "Anna"
+      },
+      "actions": {
+        "join": "Gå med",
+        "joining": "Går med..."
+      },
+      "footerHint": "Sessionskoden består av 6 bokstäver/siffror",
+      "errors": {
+        "invalidCode": "Koden verkar vara fel. Kontrollera och försök igen.",
+        "sessionFull": "Sessionen är full. Försök igen senare.",
+        "sessionEnded": "Sessionen är avslutad.",
+        "sessionLocked": "Sessionen är låst.",
+        "joinFailed": "Kunde inte gå med i session",
+        "unknown": "Ett fel uppstod"
+      }
+    },
+    "sessionControlPanel": {
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "locked": "Låst",
+        "ended": "Avslutad",
+        "cancelled": "Avbruten",
+        "archived": "Arkiverad"
+      },
+      "ended": {
+        "title": "Session avslutad",
+        "code": "Kod: {code}"
+      },
+      "header": {
+        "title": "Sessionkontroller",
+        "codeAndCount": "Kod: {code} • {count} deltagare"
+      },
+      "actions": {
+        "pause": "Pausa",
+        "resume": "Återuppta",
+        "lock": "Lås session",
+        "unlock": "Lås upp",
+        "end": "Avsluta session"
+      },
+      "confirm": {
+        "message": "Är du säker? Detta avslutar sessionen för alla deltagare.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, avsluta",
+        "ending": "Avslutar..."
+      },
+      "reasons": {
+        "pause": "Pausad av värd",
+        "resume": "Återupptagen av värd",
+        "lock": "Inga nya deltagare tillåtna",
+        "unlock": "Nya deltagare tillåtna igen",
+        "end": "Session avslutad av värd"
+      }
+    },
+    "participantHostList": {
+      "confirm": {
+        "kick": "Säker på att du vill kicka {name}?",
+        "block": "Blockera {name}?"
+      },
+      "status": {
+        "kicked": "Kickad",
+        "blocked": "Blockerad",
+        "disconnected": "Frånkopplad",
+        "idle": "Inaktiv",
+        "active": "Aktiv"
+      },
+      "errors": {
+        "title": "Fel"
+      },
+      "header": {
+        "title": "Deltagare ({count})",
+        "code": "Kod: {code}"
+      },
+      "empty": "Inga deltagare ännu",
+      "table": {
+        "name": "Namn",
+        "role": "Roll",
+        "status": "Status",
+        "joined": "Gick med",
+        "actions": "Åtgärder"
+      },
+      "actions": {
+        "kick": "Kicka",
+        "block": "Blockera"
+      },
+      "timeAgo": {
+        "seconds": "{count, plural, one {# sek sedan} other {# sek sedan}}",
+        "minutes": "{count, plural, one {# min sedan} other {# min sedan}}",
+        "hours": "{count, plural, one {# tim sedan} other {# tim sedan}}",
+        "days": "{count, plural, one {# dag sedan} other {# dagar sedan}}"
+      }
+    },
+    "liveProgress": {
+      "unknownParticipant": "Okänd",
+      "stats": {
+        "totalScore": "Totalt poäng",
+        "achievements": "Utmärkelser",
+        "completedGames": "Klara spel",
+        "activeGames": "Aktiva spel"
+      },
+      "progress": {
+        "title": "Deltagarprogress",
+        "empty": "Ingen aktivitet än",
+        "points": "{count} poäng",
+        "achievementsCount": "{count} 🏆",
+        "complete": "{percent}% klar"
+      },
+      "achievements": {
+        "title": "Senaste utmärkelser",
+        "empty": "Inga utmärkelser än",
+        "points": "{count} poäng"
+      }
+    },
     "hostSession": {
       "tabs": {
         "participants": "Deltagare",
@@ -6670,15 +8896,70 @@
         }
       }
     },
+    "lobbyHub": {
+      "status": {
+        "draft": "Utkast",
+        "lobby": "Lobby",
+        "active": "Aktiv",
+        "completed": "Avslutad"
+      },
+      "sections": {
+        "participants": {
+          "title": "Deltagare",
+          "description": "Bjud in och hantera deltagare"
+        },
+        "roles": {
+          "title": "Roller & hemligheter",
+          "description": "Tilldela roller och hemlig information"
+        },
+        "content": {
+          "title": "Innehållsöversikt",
+          "description": "Steg, faser och artefakter"
+        },
+        "triggers": {
+          "title": "Triggers & automation",
+          "description": "Konfigurera automatiserade händelser"
+        },
+        "settings": {
+          "title": "Sessionsinställningar",
+          "description": "Tid, behörigheter och avancerade val"
+        }
+      },
+      "badges": {
+        "unassigned": "{count} utan roll",
+        "allAssigned": "Alla tilldelade",
+        "contentIssues": "{count} problem",
+        "ready": "Redo",
+        "triggers": "{count} triggers"
+      },
+      "actions": {
+        "start": "Starta session",
+        "starting": "Startar..."
+      },
+      "hints": {
+        "addParticipant": "Lägg till minst en deltagare för att starta",
+        "resolveErrors": "Åtgärda felen innan du startar"
+      }
+    },
     "cockpit": {
       "header": {
         "participants": "deltagare",
         "openChat": "Öppna chatt"
       },
       "status": {
-        "paused": "PAUSAD"
+        "paused": "PAUSAD",
+        "live": "LIVE"
       },
       "startSession": "Starta session",
+      "actions": {
+        "directorMode": "Director Mode"
+      },
+      "errors": {
+        "title": "Fel:"
+      },
+      "session": {
+        "fallbackName": "Session"
+      },
       "confirmKick": "Ta bort {name} från sessionen?",
       "confirmKickAnonymous": "Ta bort deltagaren från sessionen?",
       "signalPresets": {
@@ -6696,6 +8977,71 @@
         "pendingLabel": "väntande",
         "warningsLabel": "varningar",
         "errorsLabel": "fel"
+      },
+      "run": {
+        "banner": {
+          "waiting": "Väntar på start. Deltagare kan ansluta med koden.",
+          "paused": "Pausad. Deltagare ser pausläge.",
+          "locked": "Låst: inga nya deltagare kan gå med.",
+          "ended": "Sessionen är avslutad. Tack för att ni deltog.",
+          "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
+          "offline": "Ingen anslutning. Försök igen."
+        },
+        "status": {
+          "active": "Aktiv",
+          "paused": "Pausad",
+          "locked": "Låst",
+          "ended": "Avslutad"
+        },
+        "labels": {
+          "now": "NU",
+          "next": "NÄSTA",
+          "controls": "KONTROLLER",
+          "health": "HÄLSA"
+        },
+        "empty": {
+          "currentStep": "Inget aktivt steg",
+          "nextStep": "Inget nästa steg",
+          "dash": "—"
+        },
+        "actions": {
+          "advanceStep": "Gå vidare",
+          "start": "Starta session",
+          "pause": "Pausa",
+          "resume": "Återuppta",
+          "end": "Avsluta",
+          "artifacts": "Artefakter",
+          "triggers": "Triggers"
+        },
+        "health": {
+          "realtime": "Realtime",
+          "participants": "Deltagare",
+          "triggers": "Triggers",
+          "lastUpdated": "Senast uppdaterad",
+          "connection": {
+            "connected": "Ansluten",
+            "degraded": "Instabil",
+            "offline": "Offline"
+          },
+          "participantStatus": "{active} aktiva · {pending} väntande · {offline} offline",
+          "triggersArmed": "{count} aktiverade"
+        }
+      },
+      "board": {
+        "title": "Board",
+        "openInstruction": "Öppna boarden på en separat skärm:"
+      },
+      "settings": {
+        "title": "Sessionsinställningar",
+        "description": "Story- och fastexter ändras under Story-fliken. Fler inställningar kan återställas här senare.",
+        "openStory": "Öppna Story",
+        "sessionRoles": {
+          "title": "Sessionsroller (sessionskopia)",
+          "description": "Uppdatera rolltext och gränser för denna session utan att ändra spelmallen.",
+          "save": "Spara roller",
+          "empty": "Inga roller är snapshottade ännu. Kopiera roller i Roller-fliken för att aktivera redigering här.",
+          "copy": "Kopiera roller"
+        }
       },
       "roles": {
         "noRolesCopied": "Inga roller kopierade ännu",
@@ -6720,7 +9066,9 @@
       },
       "triggers": {
         "noTriggers": "Inga triggers i denna session.",
-        "configuredViaBuilder": "Triggers konfigureras via Spel-byggaren."
+        "configuredViaBuilder": "Triggers konfigureras via Spel-byggaren.",
+        "armedLabel": "Armerade ({count})",
+        "firedLabel": "Utlösta ({count})"
       },
       "content": {
         "stepsAndPhases": "Steg & faser",
@@ -6734,11 +9082,17 @@
       },
       "steps": {
         "unnamedStep": "Namnlöst steg",
+        "unnamedPhase": "Namnlös fas",
         "missingTitle": "Saknar rubrik",
         "missingDescription": "Saknar beskrivning"
       },
       "tabs": {
         "overview": "Översikt",
+        "run": "Run",
+        "participants": "Deltagare",
+        "board": "Board",
+        "signals": "Signaler",
+        "timebank": "Tidsbank",
         "story": "Berättelse",
         "artifacts": "Artefakter",
         "triggers": "Triggers",
@@ -6749,6 +9103,8 @@
         "title": "Berättelsen"
       },
       "analytics": {
+        "title": "Analysöversikt",
+        "description": "Session-prestanda och statistik",
         "puzzlesSolved": "Pussel lösta",
         "events": "Händelser",
         "hintsUsed": "Ledtrådar använda",
@@ -6784,8 +9140,14 @@
         "type": "Typ",
         "triggersCount": "{count} triggers",
         "triggerErrorsCount": "{count} trigger-fel",
+        "export": {
+          "json": "JSON",
+          "csv": "CSV"
+        },
         "tabs": {
-          "overview": "Översikt"
+          "overview": "Översikt",
+          "steps": "Steg",
+          "puzzles": "Pussel"
         }
       }
     },
@@ -6796,13 +9158,20 @@
         "signals": "Signaler",
         "events": "Händelser"
       },
+      "common": {
+        "dash": "–"
+      },
       "header": {
         "participants": "{count} deltagare",
+        "separator": "•",
         "statusLive": "LIVE",
         "statusPaused": "PAUSAD",
         "statusEnded": "AVSLUTAD",
         "pause": "Pausa",
         "resume": "Fortsätt"
+      },
+      "leaderScript": {
+        "title": "LEADER SCRIPT"
       },
       "steps": {
         "noSteps": "Inga steg tillgängliga ännu",
@@ -6810,6 +9179,9 @@
         "notStarted": "Ej startat"
       },
       "triggers": {
+        "armedLabel": "🟢 ARMED ({count})",
+        "errorLabel": "❌ ERROR ({count})",
+        "firedLabel": "✅ FIRED ({count})",
         "disableAll": "Inaktivera alla",
         "noTriggers": "Inga triggers i denna session"
       },
@@ -6822,6 +9194,17 @@
         "send": "Skicka",
         "recentSignals": "Senaste signaler",
         "clickToResend": "Klicka för att skicka igen",
+        "executingIndicator": "●",
+        "notificationsStatus": "Notiser: {status}",
+        "toast": {
+          "title": "Notis",
+          "body": "In-app toast",
+          "button": "Visa in-app toast"
+        },
+        "toggle": {
+          "show": "+",
+          "hide": "−"
+        },
         "presets": {
           "pause": "Paus",
           "pauseMessage": "Paus!",
@@ -6857,6 +9240,8 @@
       "eventCount": "{count} händelser",
       "errors": "{count} fel",
       "warnings": "{count} varningar",
+      "details": "Detaljer",
+      "separator": "•",
       "allEvents": "Alla händelser",
       "filters": {
         "searchPlaceholder": "Sök i händelser...",
@@ -6924,6 +9309,10 @@
       "actions": {
         "switchGame": "Byt lek",
         "reset": "Nollställ"
+      },
+      "defaults": {
+        "stepTitle": "Steg {index}",
+        "instructionsTitle": "Instruktioner"
       }
     },
     "playPlanPage": {
@@ -6959,46 +9348,11 @@
         "reset": "Nollställ"
       },
       "defaults": {
-        "continueWhenReady": "Fortsätt när gruppen är redo."
+        "continueWhenReady": "Fortsätt när gruppen är redo.",
+        "stepTitle": "Steg {index}",
+        "pauseTag": "Paus",
+        "blockTag": "Moment"
       }
-    },
-    "simplePlayView": {
-      "suggestedDuration": "Föreslaget: {minutes} min",
-      "stepOf": "Steg {current} av {total}",
-      "stepsCompleted": "({count} klara)",
-      "next": "Nästa",
-      "finish": "Avsluta"
-    },
-    "facilitatedPlayView": {
-      "phase": "Fas {current}",
-      "unknownPhase": "Okänd fas"
-    },
-    "playTimer": {
-      "pause": "Pausa",
-      "start": "Starta",
-      "continue": "Fortsätt",
-      "reset": "Återställ"
-    },
-    "instructionsCard": {
-      "title": "Instruktioner"
-    },
-    "materialsChecklist": {
-      "title": "Material"
-    },
-    "phaseNavigation": {
-      "previous": "Föregående",
-      "next": "Nästa",
-      "finish": "Avsluta"
-    },
-    "boardToggle": {
-      "showOnScreen": "Visa på skärm",
-      "publicBoard": "Publik tavla",
-      "description": "Visa tavlan på en extern skärm eller projektor för deltagarna.",
-      "sessionCode": "Sessionskod",
-      "openNewWindow": "Öppna i nytt fönster",
-      "openFullscreen": "Öppna i helskärm",
-      "copyLink": "Kopiera länk",
-      "instruction": "Dra fönstret till den externa skärmen och maximera för bästa resultat."
     },
     "decisionsPanel": {
       "loading": "Laddar beslut…",
@@ -7018,7 +9372,15 @@
       },
       "placeholders": {
         "title": "Ex: Vad gör ni nu?",
-        "prompt": "Valfri kontext…"
+        "prompt": "Valfri kontext…",
+        "optionKey": "nyckel",
+        "optionLabel": "Etikett"
+      },
+      "status": {
+        "draft": "Utkast",
+        "open": "Öppen",
+        "closed": "Stängd",
+        "revealed": "Visas"
       },
       "actions": {
         "addOption": "Lägg till",
@@ -7036,6 +9398,84 @@
       },
       "results": {
         "title": "Resultat"
+      }
+    },
+    "sessionStoryPanel": {
+      "title": "Story-innehåll",
+      "description": "Redigera steg och faser för bara den här sessionen. Ändringar påverkar inte grundspelet.",
+      "actions": {
+        "previewStory": "Förhandsvisa story",
+        "resetOverrides": "Återställ overrides",
+        "saveChanges": "Spara ändringar",
+        "show": "Visa",
+        "skip": "Hoppa över",
+        "close": "Stäng"
+      },
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
+      "errors": {
+        "loadFailed": "Kunde inte ladda story-innehåll",
+        "saveFailed": "Kunde inte spara story-ändringar",
+        "resetFailed": "Kunde inte återställa overrides"
+      },
+      "countdown": {
+        "title": "Nedräkningsoverlay",
+        "description": "Sänd en nedräkning till deltagare från lobbyn.",
+        "durationLabel": "Varaktighet (sek)",
+        "messageLabel": "Meddelande (valfritt)",
+        "messagePlaceholder": "Nästa moment börjar om...",
+        "variantLabel": "Variant",
+        "variantDefault": "Standard",
+        "variantDramatic": "Dramatisk"
+      },
+      "storyOverlay": {
+        "title": "Story-overlay",
+        "description": "Skicka en story-overlay i helskärm till deltagare.",
+        "sourceLabel": "Källa",
+        "sourceStep": "Steg",
+        "sourcePhase": "Fas",
+        "sourceCustom": "Anpassad",
+        "stepLabel": "Steg",
+        "phaseLabel": "Fas",
+        "titleLabel": "Titel",
+        "titlePlaceholder": "Valfri titel",
+        "textLabel": "Text",
+        "textPlaceholder": "Storytext att visa",
+        "speedLabel": "Hastighet",
+        "speedInstant": "Omedelbar",
+        "speedFast": "Snabb",
+        "speedNormal": "Normal",
+        "speedDramatic": "Dramatisk",
+        "themeLabel": "Tema",
+        "themeDark": "Mörkt",
+        "themeLight": "Ljust",
+        "themeDramatic": "Dramatiskt",
+        "showProgress": "Visa progress",
+        "allowSkip": "Tillåt hopp",
+        "participantSkip": "Deltagarhopp",
+        "allowClose": "Tillåt stängning"
+      },
+      "phases": {
+        "title": "Faser",
+        "description": "Namn, beskrivning, varaktighet",
+        "empty": "Inga faser definierade.",
+        "phaseLabel": "Fas {index}",
+        "durationLabel": "Varaktighet (sek)"
+      },
+      "steps": {
+        "title": "Steg",
+        "description": "Titel, beskrivning, varaktighet, visningsläge",
+        "empty": "Inga steg definierade.",
+        "stepLabel": "Steg {index}",
+        "durationLabel": "Varaktighet (min)",
+        "displayLabel": "Visning"
+      },
+      "displayModes": {
+        "instant": "Omedelbar",
+        "typewriter": "Skrivmaskin",
+        "dramatic": "Dramatisk"
       }
     },
     "facilitator": {
@@ -7095,7 +9535,8 @@
       },
       "manageTabs": {
         "roles": "Roller",
-        "settings": "Inställningar"
+        "settings": "Inställningar",
+        "rolesCount": "({count})"
       },
       "settings": {
         "title": "Spelinställningar",
@@ -7116,7 +9557,8 @@
         "offline": "Offline"
       },
       "format": {
-        "minSec": "min:sek"
+        "minSec": "min:sek",
+        "deltaSeconds": "{sign}{seconds}s"
       },
       "errors": {
         "loadFailed": "Kunde inte ladda tidsbank",
@@ -7160,6 +9602,7 @@
         "title": "Resultat"
       },
       "matches": "{count} träffar",
+      "executeOnce": "1×",
       "delay": "{seconds}s fördröjning",
       "actionCount": "{count, plural, =1 {1 åtgärd} other {# åtgärder}}",
       "noMatchingTrigger": "Ingen trigger matchar denna händelse",
@@ -7216,6 +9659,10 @@
       "addSignalsHint": "Lägg till signaler som kan triggas under spelet",
       "addSignal": "Lägg till signal",
       "copySuffix": "{name} (kopia)",
+      "defaults": {
+        "name": "Ny signal",
+        "notificationTitle": "Signal"
+      },
       "labels": {
         "name": "Namn",
         "signalType": "Signaltyp",
@@ -7289,7 +9736,13 @@
         "search": "Sök"
       },
       "categories": {
-        "all": "Alla kategorier"
+        "all": "Alla kategorier",
+        "navigation": "Navigation",
+        "puzzle": "Pussel & Gåtor",
+        "reveal": "Visa & Dölj",
+        "timing": "Tid & Timer",
+        "feedback": "Feedback",
+        "advanced": "Avancerat"
       },
       "complexity": {
         "beginner": "Enkel",
@@ -7304,6 +9757,9 @@
         "enterKeyword": "Ange sökord för att hitta mallar",
         "noMatches": "Inga mallar matchade sökningen"
       },
+      "tags": {
+        "more": "+{count} till"
+      },
       "stats": {
         "templatesCount": "{count} mallar",
         "simple": "{count} enkla",
@@ -7315,6 +9771,11 @@
         "selectPhase": "Välj fas",
         "selectArtifact": "Välj artefakt",
         "selectChannel": "Välj kanal"
+      },
+      "channels": {
+        "success": "success",
+        "warning": "warning",
+        "attention": "attention"
       },
       "configDialog": {
         "noConfiguration": "Denna mall behöver ingen konfiguration.",
@@ -7333,14 +9794,47 @@
       }
     },
     "roleCard": {
+      "yourRole": "Din roll",
+      "instructionsHeading": "Dina instruktioner",
+      "hintsHeading": "Tips",
       "showHints": "Visa tips (om du kör fast)",
       "requestHint": "Be om ledtråd av lekledaren"
     },
     "roleAssigner": {
+      "title": "Rolltilldelning",
+      "summary": {
+        "assignedOfTotal": "{assigned} av {total} tilldelade",
+        "participantsWithRoles": "{assigned} av {total} deltagare har roller",
+        "rolesAssigned": "{count} roller tilldelade"
+      },
+      "actions": {
+        "randomAssign": "Slumpa roller",
+        "randomAssignCount": "Slumpa ({count})",
+        "randomAssignAll": "Slumpa roller"
+      },
+      "status": {
+        "full": "Full"
+      },
+      "roleCounts": {
+        "assigned": "{assigned}{hasMax, select, yes { / {max}} other {}} tilldelade{hasMin, select, yes { (min {min})} other {}}"
+      },
+      "needs": "Behöver {count}",
+      "noAssignedYet": "Inga tilldelade än",
+      "unassigned": {
+        "title": "Deltagare utan roll ({count})"
+      },
+      "selectRoleFor": "Välj roll för",
+      "noRolesAvailable": "Inga roller tillgängliga",
+      "cancel": "Avbryt",
+      "minRequirements": {
+        "notSatisfied": "Minimikrav ej uppfyllda",
+        "needMore": "Behöver {count} till för {roleName}"
+      },
       "noRolesCopied": "Inga roller kopierade ännu",
       "copyRolesHint": "Klicka på \"Kopiera roller från spel\" ovan för att hämta rollerna från spelets mall.",
       "afterCopyHint": "Efter kopiering kan du tilldela roller till deltagare manuellt eller slumpmässigt.",
       "errors": {
+        "randomAssignFailed": "Slumpmässig tilldelning misslyckades",
         "loadFailed": "Kunde inte ladda data",
         "assignFailed": "Kunde inte tilldela roller",
         "unassignFailed": "Kunde inte ta bort rolltilldelning"
@@ -7369,6 +9863,16 @@
       "title": "Kortkommandon",
       "description": "Snabbåtkomst till Director Mode-funktioner",
       "pressToShow": "Tryck ? för att visa denna hjälp",
+      "keys": {
+        "ctrl": "Ctrl",
+        "alt": "Alt",
+        "shift": "⇧",
+        "meta": "⌘",
+        "space": "Mellanslag",
+        "escape": "Esc",
+        "enter": "Enter",
+        "plus": "+"
+      },
       "categories": {
         "navigation": "Navigation",
         "playback": "Uppspelning",
@@ -7403,16 +9907,22 @@
       "stepOf": "Steg {current} av {total}",
       "timerRunning": "Tid pågår",
       "timerPaused": "Tid pausad",
+      "minutesShort": "min",
+      "secondsShort": "{count}s",
       "materials": "Material",
       "note": "Anteckning",
       "safety": "Säkerhet"
     },
     "timerControl": {
+      "inputs": {
+        "minutesSeconds": "Minuter : Sekunder"
+      },
       "status": {
         "paused": "Pausad",
         "finished": "Klar!",
         "running": "Pågår"
       },
+      "quickMinutes": "{count} min",
       "startTimer": "Starta timer",
       "resume": "Fortsätt",
       "pause": "Pausa",
@@ -7424,6 +9934,7 @@
         "label": "Steg",
         "notStartedMessage": "Stegen har inte startats ännu. Klicka på knappen nedan för att starta första steget.",
         "startFirst": "Starta första steget",
+        "start": "Starta",
         "first": "Första steget",
         "last": "Sista steget",
         "goTo": "Gå till steg {number}",
@@ -7442,15 +9953,28 @@
       "ofTotal": "{current} av {total}",
       "previous": "Föregående",
       "next": "Nästa",
+      "navigation": {
+        "title": "Navigation"
+      },
+      "mediaLabel": "Media",
+      "minutesShort": "{count} min",
       "startGame": "Starta spelet",
       "description": "Beskrivning",
       "leaderScript": "Ledarskript"
     },
     "timeBankLivePanel": {
+      "title": "Tidsbank",
       "paused": "Pausad",
       "pause": "Pausa",
       "resume": "Återuppta",
       "resetToStart": "Återställ till start",
+      "format": {
+        "deltaLabel": "{time}"
+      },
+      "toggle": {
+        "show": "+",
+        "hide": "−"
+      },
       "status": {
         "critical": "Kritisk tidsnivå!",
         "warning": "Tiden är snart slut",
@@ -7474,6 +9998,7 @@
       }
     },
     "triggerLivePanel": {
+      "title": "Triggers",
       "readyCount": "{count} redo",
       "errorCount": "{count} fel",
       "description": "{count} triggers • Automatiserade händelser",
@@ -7482,6 +10007,7 @@
       "rearmAll": "Återaktivera alla",
       "noTriggersInSession": "Inga triggers i denna session",
       "firedCount": "Aktiverad {count}×",
+      "executeOnce": "1×",
       "groups": {
         "armed": "Redo",
         "error": "Fel",
@@ -7516,6 +10042,7 @@
         "actions": "Åtgärder",
         "actionsCount": "{count} st",
         "delay": "Fördröjning",
+        "delaySeconds": "{count}s",
         "totalErrors": "Fel totalt"
       },
       "dialog": {
@@ -7527,7 +10054,8 @@
     },
     "puzzleArtifactRenderer": {
       "errors": {
-        "puzzleLocked": "Pusslet är låst av spelledaren"
+        "puzzleLocked": "Pusslet är låst av spelledaren",
+        "serverError": "Serverfel"
       },
       "status": {
         "solved": "Löst",
@@ -7585,7 +10113,8 @@
       },
       "sound": {
         "title": "Ljudaktivering",
-        "defaultInstruction": "Gör ljud!"
+        "defaultInstruction": "Gör ljud!",
+        "triggered": "Aktiverad!"
       },
       "signal": {
         "defaultLabel": "Signal",
@@ -7634,6 +10163,11 @@
       "noArtifactsButton": "Om knappen inte fungerar har spelet inga artefakter definierade.",
       "variants": "{count} varianter",
       "variant": "Variant",
+      "visibility": {
+        "public": "Publik",
+        "leader_only": "Endast lekledare",
+        "role_private": "Rollprivat"
+      },
       "rolePrivate": "(roll)",
       "keypad": {
         "successMessage": "Koden är korrekt!",
@@ -7651,6 +10185,8 @@
       "loading": "Laddar samtalskort…",
       "noCards": "Inga kort i leken.",
       "card": "Kort",
+      "progress": "{current}/{total}",
+      "followupLine": "• {text}",
       "leaderTip": "Ledartips",
       "previous": "Föregående",
       "next": "Nästa",
@@ -7672,6 +10208,8 @@
       "noPendingRequests": "Inga väntande prop-förfrågningar",
       "showPhoto": "Visa foto",
       "hidePhoto": "Dölj foto",
+      "photoAlt": "Prop-bevis",
+      "notesLabel": "Anteckning (valfritt)",
       "notesPlaceholder": "T.ex. 'Bra jobbat!' eller 'Ej korrekt föremål'",
       "actions": {
         "approve": "Godkänn",
@@ -7820,6 +10358,7 @@
       "cameraError": "Kunde inte starta kameran",
       "invalidCode": "Ogiltig kod",
       "qrNotValid": "QR-koden är inte giltig för denna uppgift",
+      "verified": "Verifierad!",
       "close": "Stäng",
       "scanQrCode": "Skanna QR-kod",
       "readNfc": "Läs NFC-tagg",
@@ -7832,6 +10371,22 @@
       "viaManualCode": "(via manuell kod)",
       "defaultPrompt": "Skanna QR-koden för att fortsätta",
       "devSimulateScan": "[DEV] Simulera lyckad skanning"
+    },
+    "triggerCard": {
+      "labels": {
+        "when": "När",
+        "then": "Då"
+      },
+      "actions": {
+        "more": "{count} till"
+      },
+      "onceOnly": "Endast en gång",
+      "status": {
+        "armed": "Beväpnad",
+        "fired": "Utlöst",
+        "disabled": "Inaktiverad",
+        "error": "Fel"
+      }
     },
     "multiAnswerForm": {
       "allChecksPassed": "Alla kontroller godkända!",
@@ -7871,6 +10426,7 @@
       "startsNext": "Börjar nästa gång",
       "participantActions": "Deltagaråtgärder",
       "setPosition": "Sätt placering",
+      "approve": "Godkänn",
       "remove": "Ta bort",
       "block": "Blockera"
     },
@@ -7891,6 +10447,9 @@
       "iHaveListened": "Jag har lyssnat",
       "acknowledged": "Bekräftat",
       "loadError": "Kunde inte ladda ljudfilen",
+      "playError": "Kunde inte spela ljudet",
+      "playLabel": "Spela",
+      "pauseLabel": "Pausa",
       "headphonesRecommended": "Hörlurar rekommenderas för bästa upplevelse",
       "hideTranscript": "Dölj transkript",
       "showTranscript": "Visa transkript"
@@ -7918,6 +10477,14 @@
       "zoomIn": "Zooma in",
       "allFound": "Alla objekt hittade!"
     },
+    "joinPage": {
+      "title": "Gå med i session",
+      "description": "Ange koden som visas på skärmen och välj ett visningsnamn för att delta.",
+      "helpText": "Sessionskoden är 6 tecken lång och visas av den som håller i sessionen.",
+      "errors": {
+        "couldNotJoin": "Kunde inte gå med i sessionen"
+      }
+    },
     "joinSessionForm": {
       "sessionCodeLabel": "Sessionskod",
       "charLabel": "Tecken {current} av {total}",
@@ -7931,16 +10498,22 @@
         "invalidName": "Ange ett visningsnamn (minst 2 tecken)"
       }
     },
+      "checklist": {
+        "title": "Checklista",
+        "complete": "✓ Alla klara!"
+      },
     "participantList": {
       "title": "Deltagare ({count})",
       "noParticipants": "Inga deltagare ännu",
       "showLess": "Visa färre",
       "showMore": "+{count} till"
     },
-    "participantStatusBadge": {
+        "notConfigured": "Hotspot-bild ej konfigurerad",
+        "complete": "✓ Alla hittade!"
       "active": "Ansluten",
       "idle": "Inaktiv",
-      "disconnected": "Frånkopplad",
+        "title": "Pusselspel",
+        "missingConfig": "Pusselspel ej konfigurerat"
       "kicked": "Sparkad",
       "blocked": "Blockerad"
     },
@@ -7991,6 +10564,8 @@
     },
     "activeSessionShell": {
       "defaultTitle": "Aktiv session",
+      "backToLobby": "Till lobbyn",
+      "chatLabel": "Chatt",
       "participant": {
         "confirmTitle": "Tillbaka till Lobbyn",
         "confirmDescription": "Du är påväg att lämna sessionen. Stämmer det?",
@@ -8105,6 +10680,52 @@
         "sessionNotFound": "Session hittades inte",
         "checkCodeAndRetry": "Kontrollera att sessionskoden är korrekt och försök igen.",
         "backToStart": "Tillbaka till start",
+        "loadingSession": "Laddar session...",
+        "sessionCodeLabel": "Sessionskod:",
+        "connection": {
+          "connected": "Ansluten",
+          "degraded": "Instabil",
+          "offline": "Offline"
+        },
+        "updatesTitle": "Uppdateringar",
+        "statusLabel": "Status",
+        "statusTitle": {
+          "lobby": "Väntar",
+          "live": "Pågår",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "statusBadge": {
+          "lobby": "Väntar",
+          "live": "Live",
+          "paused": "Paus",
+          "ended": "Avslutad",
+          "locked": "Låst"
+        },
+        "pendingApproval": "Väntar på godkännande från lekledaren…",
+        "nowTitle": "Just nu",
+        "banner": {
+          "waiting": "Väntar på att lekledaren startar.",
+          "paused": "Paus. Snart kör vi igen.",
+          "locked": "Sessionen är låst.",
+          "ended": "Sessionen är avslutad. Tack för att du var med.",
+          "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
+          "offline": "Ingen anslutning. Försök igen."
+        },
+        "events": {
+          "session_paused": "Sessionen pausades",
+          "session_resumed": "Sessionen återupptogs",
+          "session_ended": "Sessionen avslutades",
+          "session_locked": "Sessionen låstes",
+          "session_unlocked": "Sessionen låstes upp",
+          "host_message": "Meddelande från lekledaren",
+          "participant_joined": "{name} anslöt",
+          "participant_left": "{name} lämnade",
+          "role_changed": "Roll uppdaterad",
+          "progress_updated": "Framsteg uppdaterat",
+          "achievement_unlocked": "Utmärkelse upplåst"
+        },
         "sessionEnded": "Sessionen har avslutats",
         "thanksForParticipating": "Tack för ditt deltagande!",
         "joinNewSession": "Gå med i en ny session",
@@ -8124,8 +10745,14 @@
         "contentWillShow": "Innehåll kommer att visas här när sessionen startar.",
         "joinSession": "Delta i sessionen",
         "sessionIsActive": "Sessionen är aktiv. Startar om",
+        "countdownSeconds": "{seconds}s",
         "joinNow": "Gå med nu",
         "notYet": "Inte ännu",
+        "inlineJoinTitle": "Gå med för att se spelet",
+        "inlineJoinDescription": "Du är inte ansluten på den här enheten/fliken ännu.",
+        "reconnectTitle": "Kan inte ansluta",
+        "reconnectDescription": "Din anslutning verkar vara ogiltig på den här enheten. Försök ansluta igen.",
+        "reconnectAction": "Anslut igen",
         "leaveSession": "Lämna session",
         "activeSession": "Aktiv session"
       },
@@ -8285,7 +10912,8 @@
         "resume": "Återuppta",
         "end": "Avsluta",
         "countdownMessage": "Nästa moment startar om",
-        "countdownTooltip": "Visa nedräkning för deltagare"
+        "countdownTooltip": "Visa nedräkning för deltagare",
+        "countdownSeconds": "{seconds}s"
       },
       "timer": {
         "title": "Timer"
@@ -8303,6 +10931,7 @@
         "channelPlaceholder": "Kanal (t.ex. READY)",
         "messagePlaceholder": "Meddelande",
         "send": "Skicka",
+        "sendError": "Kunde inte skicka signal",
         "noSignals": "Inga signals ännu."
       },
       "chat": {
@@ -8320,7 +10949,7 @@
     "outcomePanel": {
       "loading": "Laddar utfall…",
       "title": "Utfall",
-      "description": "Skriv ett utfall och reveal på tavlan.",
+      "description": "Skriv ett utfall och visa det på tavlan.",
       "errors": {
         "loadFailed": "Kunde inte ladda utfall",
         "titleRequired": "Titel krävs",
@@ -8340,12 +10969,12 @@
         "hint": "Utfall kan visas för deltagare som en sammanfattning/debrief i slutet av sessionen."
       },
       "status": {
-        "revealed": "revealed",
-        "hidden": "hidden"
+        "revealed": "Visat",
+        "hidden": "Dolt"
       },
       "actions": {
         "hide": "Dölj",
-        "reveal": "Reveal"
+        "reveal": "Visa"
       }
     },
     "preflightChecklist": {
@@ -8407,6 +11036,15 @@
       }
     },
     "leaderScriptPanel": {
+      "title": "Spelledarens manus",
+      "gameStep": "{title} · Steg {step}",
+      "noText": "Ingen text",
+      "noScript": "Inget manus",
+      "phases": {
+        "intro": "Intro",
+        "main": "Huvud",
+        "outro": "Avslut"
+      },
       "translationLabel": "Översättning ({language})",
       "noContent": "Inget innehåll i denna fas"
     },
@@ -8431,7 +11069,7 @@
       "resultSuccess": "{operation}: {count} lyckades",
       "resultWithErrors": "{operation}: {count} lyckades, {failed} misslyckades",
       "confirmTitle": "Bekräfta operation",
-      "confirmDescription": "Är du säker på att du vill {operation} {count} artefakt{plural}?",
+      "confirmDescription": "Är du säker på att du vill {operation} {count, plural, one {# artefakt} other {# artefakter}}?",
       "confirmReset": "Detta återställer alla valda pussel till ursprungsläget.",
       "confirmSolve": "Detta markerar alla valda som lösta utan att spelarna löst dem.",
       "cancel": "Avbryt",
@@ -8450,6 +11088,19 @@
         "puzzles": "Alla pussel",
         "content": "Allt innehåll"
       },
+      "types": {
+        "keypad": "Keypad",
+        "riddle": "Gåta",
+        "cipher": "Chiffer",
+        "tile_puzzle": "Pussel",
+        "logic_grid": "Logikruta",
+        "hotspot": "Hotspot",
+        "card": "Kort",
+        "document": "Dokument",
+        "image": "Bild",
+        "audio": "Ljud",
+        "unknown": "Övrigt ({type})"
+      },
       "operations": {
         "reveal": "Visa",
         "hide": "Dölj",
@@ -8457,6 +11108,14 @@
         "lock": "Lås",
         "unlock": "Lås upp",
         "solve": "Markera som löst"
+      },
+      "operationVerbs": {
+        "reveal": "visa",
+        "hide": "dölja",
+        "reset": "återställa",
+        "lock": "låsa",
+        "unlock": "låsa upp",
+        "solve": "markera som löst"
       }
     },
     "propConfirmationManager": {
@@ -8467,15 +11126,91 @@
       }
     },
     "readinessIndicator": {
+      "title": "Sessionsberedskap",
       "criticalIssues": "Måste åtgärdas innan start:",
       "warnings": "Rekommenderas att åtgärda:",
       "readyToStart": "Redo att starta session",
-      "cannotStart": "Kan inte starta - åtgärda kritiska problem"
+      "cannotStart": "Kan inte starta - åtgärda kritiska problem",
+      "categories": {
+        "participants": "Deltagare",
+        "content": "Innehåll",
+        "triggers": "Triggers",
+        "artifacts": "Artefakter",
+        "signals": "Signaler",
+        "configuration": "Konfiguration"
+      },
+      "labels": {
+        "ready": "Redo",
+        "readyToStart": "Redo att starta",
+        "almostReady": "Nästan redo",
+        "preparing": "Förbereder",
+        "notReady": "Inte redo"
+      },
+      "summary": {
+        "ready": "Sessionen är redo att starta!",
+        "canStart": "{count} sak(er) kan förbättras, men du kan starta.",
+        "blocked": "{count} kritiska problem måste lösas före start."
+      },
+      "checks": {
+        "minParticipants": {
+          "name": "Minsta antal deltagare",
+          "pass": "{count} deltagare anslutna",
+          "fail": "Behöver minst {min} deltagare"
+        },
+        "rolesAssigned": {
+          "name": "Roller tilldelade",
+          "pass": "Alla roller tilldelade",
+          "partial": "{assigned}/{total} roller tilldelade"
+        },
+        "hasSteps": {
+          "name": "Steg definierade",
+          "pass": "{count} steg definierade",
+          "fail": "Inga steg i spelet"
+        },
+        "leaderScript": {
+          "name": "Ledarmanus",
+          "pass": "Ledarmanus tillgängligt",
+          "skip": "Inget ledarmanus (valfritt)"
+        },
+        "triggersArmed": {
+          "name": "Triggers armerade",
+          "status": "{armed}/{total} triggers redo"
+        },
+        "triggersErrors": {
+          "name": "Trigger-fel",
+          "warning": "{count} trigger(s) har fel"
+        },
+        "artifactsConfigured": {
+          "name": "Artefakter konfigurerade",
+          "status": "{configured}/{total} artefakter redo"
+        },
+        "signalPresets": {
+          "name": "Signal-presets",
+          "pass": "{count} presets konfigurerade",
+          "skip": "Inga signal-presets (valfritt)"
+        },
+        "timebankConfig": {
+          "name": "Tidsbank",
+          "pass": "Tidsbank konfigurerad",
+          "skip": "Ingen tidsbank (valfritt)"
+        },
+        "joinCode": {
+          "name": "Anslutningskod",
+          "pass": "Anslutningskod genererad",
+          "fail": "Ingen anslutningskod"
+        },
+        "sessionName": {
+          "name": "Sessionsnamn",
+          "pass": "Sessionsnamn: {name}",
+          "skip": "Inget namn (valfritt)"
+        }
+      }
     },
     "sessionTimeline": {
       "title": "Session Timeline",
       "description": "{count} händelser · {steps} steg",
       "listButton": "Lista",
+      "liveLabel": "LIVE",
       "stepLabel": "Steg {number}",
       "showingRecent": "Visar senaste {maxItems} av {total} händelser",
       "solved": "{count} lösta",
@@ -8510,6 +11245,7 @@
       "description": "Testa vilka signaler din enhet stödjer",
       "signalsLabel": "Signaler",
       "availableCount": "{count}/5 tillgängliga",
+      "availableCountShort": "{count}/5",
       "testAll": "Testa alla",
       "testing": "Testar...",
       "status": {
@@ -8581,7 +11317,11 @@
       "recent": "Senaste",
       "refresh": "Uppdatera",
       "loading": "Laddar…",
-      "noSignals": "Inga signals ännu.",
+      "noSignals": "Inga signaler ännu.",
+      "status": {
+        "live": "Live",
+        "offline": "Offline"
+      },
       "presets": {
         "ready": "Redo",
         "hint": "Ledtråd",
@@ -8596,7 +11336,7 @@
         "needHelp": "Behöver hjälp"
       },
       "errors": {
-        "loadFailed": "Kunde inte ladda signals",
+        "loadFailed": "Kunde inte ladda signaler",
         "sendFailed": "Kunde inte skicka signal"
       }
     },
@@ -8606,6 +11346,8 @@
       "now": "Nu",
       "sayToGroup": "SÄGA TILL GRUPPEN",
       "goToStep": "Gå till detta steg",
+      "minutesShort": "{count} min",
+      "scriptLabel": "Manus",
       "stepsCount": "{count} steg",
       "totalDuration": "~{minutes} min totalt",
       "scriptsCount": "{count} scripts",
@@ -8613,6 +11355,7 @@
       "close": "Stäng"
     },
     "timeBankEditor": {
+      "title": "TimeBank",
       "description": "Konfigurera tidsbank och belöningsregler",
       "initialTime": "Starttid (sek)",
       "minimum": "Minimum",
@@ -8645,6 +11388,7 @@
       "maxFires": "Max antal gånger (0 = obegränsat)",
       "conditionOptional": "Villkor (valfritt)",
       "done": "Klar",
+      "maxFiresBadge": "max {count}×",
       "all": "Alla",
       "triggers": {
         "artifact_solved": "Artefakt löst",

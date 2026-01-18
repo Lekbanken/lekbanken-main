@@ -149,7 +149,7 @@ export function TimerControl({
                 disabled={disabled}
               />
             </div>
-            <p className="mt-2 text-sm text-muted-foreground">Minuter : Sekunder</p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('inputs.minutesSeconds')}</p>
             
             {/* Quick time buttons */}
             <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -162,7 +162,7 @@ export function TimerControl({
                   disabled={disabled}
                   className="text-xs"
                 >
-                  {min} min
+                  {t('quickMinutes', { count: min })}
                 </Button>
               ))}
             </div>

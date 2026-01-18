@@ -10,7 +10,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -141,12 +141,12 @@ function formatEventType(eventType: string): string {
 // Helper: Format time for display
 // =============================================================================
 
-function formatTime(date: Date): string {
-  return date.toLocaleTimeString('sv-SE', {
+function formatTime(date: Date, locale: string): string {
+  return new Intl.DateTimeFormat(locale, {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-  });
+  }).format(date);
 }
 
 // =============================================================================
@@ -211,6 +211,7 @@ interface EventRowProps {
 function EventRow({ event, compact, t }: EventRowProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasPayload = Object.keys(event.payload).length > 0;
+  const locale = useLocale();
   
   return (
     <div
@@ -260,13 +261,13 @@ function EventRow({ event, compact, t }: EventRowProps) {
             {event.actorName && (
               <span>{event.actorName}</span>
             )}
-            {event.actorName && <span>•</span>}
-            <span title={event.createdAt.toLocaleString('sv-SE')}>
-              {formatTime(event.createdAt)}
+            {event.actorName && <span aria-hidden="true">{t('separator')}</span>}
+            <span title={event.createdAt.toLocaleString(locale)}>
+              {formatTime(event.createdAt, locale)}
             </span>
             {event.correlationId && (
               <>
-                <span>•</span>
+                <span aria-hidden="true">{t('separator')}</span>
                 <span className="font-mono text-xs opacity-50">
                   {event.correlationId.slice(0, 8)}
                 </span>
@@ -284,7 +285,7 @@ function EventRow({ event, compact, t }: EventRowProps) {
                   ) : (
                     <ChevronRightIcon className="h-3 w-3" />
                   )}
-                  Detaljer
+                  {t('details')}
                 </button>
               </CollapsibleTrigger>
               <CollapsibleContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, Input } from '@/components/ui';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -45,6 +46,7 @@ export function SnapshotManager({
   onClose,
   onSnapshotCreated,
 }: SnapshotManagerProps) {
+  const t = useTranslations('admin.games.builder');
   const [snapshots, setSnapshots] = useState<SnapshotSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -64,11 +66,11 @@ export function SnapshotManager({
         setSnapshots(data.snapshots ?? []);
       }
     } catch {
-      setError('Kunde inte hämta versioner');
+      setError(t('snapshot.errors.load'));
     } finally {
       setLoading(false);
     }
-  }, [gameId]);
+  }, [gameId, t]);
 
   useEffect(() => {
     if (isOpen) {
@@ -95,7 +97,7 @@ export function SnapshotManager({
         onSnapshotCreated?.(data.snapshot);
       }
     } catch {
-      setError('Kunde inte skapa version');
+      setError(t('snapshot.errors.create'));
     } finally {
       setCreating(false);
     }
@@ -117,7 +119,7 @@ export function SnapshotManager({
         <div className="flex items-center justify-between p-4 border-b">
           <div className="flex items-center gap-2">
             <ArchiveBoxIcon className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold">Versionshantering</h2>
+            <h2 className="text-lg font-semibold">{t('snapshot.title')}</h2>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose}>
             <XMarkIcon className="h-5 w-5" />
@@ -126,10 +128,10 @@ export function SnapshotManager({
 
         {/* Create new snapshot */}
         <div className="p-4 border-b bg-surface-secondary/50">
-          <h3 className="text-sm font-medium mb-2">Skapa ny version</h3>
+          <h3 className="text-sm font-medium mb-2">{t('snapshot.createTitle')}</h3>
           <div className="flex gap-2">
             <Input
-              placeholder="Versionsetikett (valfritt), t.ex. 'Launch version'"
+              placeholder={t('snapshot.versionLabelPlaceholder')}
               value={versionLabel}
               onChange={(e) => setVersionLabel(e.target.value)}
               className="flex-1"
@@ -140,13 +142,11 @@ export function SnapshotManager({
               disabled={creating}
             >
               <PlusIcon className="h-4 w-4 mr-1" />
-              {creating ? 'Skapar...' : 'Skapa snapshot'}
+              {creating ? t('snapshot.creatingButton') : t('snapshot.createButton')}
             </Button>
           </div>
           <p className="text-xs text-foreground-secondary mt-2">
-            En snapshot fryser spelets nuvarande tillstånd. Sessioner kan
-            använda snapshots så att ändringar i spelet inte påverkar pågående
-            sessioner.
+            {t('snapshot.helpText')}
           </p>
         </div>
 
@@ -161,16 +161,16 @@ export function SnapshotManager({
         <div className="flex-1 overflow-y-auto p-4">
           {loading ? (
             <div className="text-center py-8 text-foreground-secondary">
-              Laddar versioner...
+              {t('snapshot.loading')}
             </div>
           ) : snapshots.length === 0 ? (
             <div className="text-center py-8">
               <ArchiveBoxIcon className="h-12 w-12 mx-auto mb-3 text-foreground-tertiary" />
               <p className="text-foreground-secondary">
-                Inga versioner ännu
+                {t('snapshot.emptyTitle')}
               </p>
               <p className="text-sm text-foreground-tertiary mt-1">
-                Skapa en snapshot för att frysa spelets nuvarande tillstånd.
+                {t('snapshot.emptyDescription')}
               </p>
             </div>
           ) : (
@@ -191,7 +191,7 @@ export function SnapshotManager({
                         </span>
                         {index === 0 && (
                           <Badge variant="default" size="sm">
-                            Senaste
+                            {t('snapshot.latestBadge')}
                           </Badge>
                         )}
                       </div>
@@ -203,32 +203,32 @@ export function SnapshotManager({
                     <div className="flex flex-wrap gap-1">
                       {snapshot.includes_steps && (
                         <Badge variant="outline" size="sm">
-                          Steg
+                          {t('snapshot.includes.steps')}
                         </Badge>
                       )}
                       {snapshot.includes_phases && (
                         <Badge variant="outline" size="sm">
-                          Faser
+                          {t('snapshot.includes.phases')}
                         </Badge>
                       )}
                       {snapshot.includes_roles && (
                         <Badge variant="outline" size="sm">
-                          Roller
+                          {t('snapshot.includes.roles')}
                         </Badge>
                       )}
                       {snapshot.includes_artifacts && (
                         <Badge variant="outline" size="sm">
-                          Artefakter
+                          {t('snapshot.includes.artifacts')}
                         </Badge>
                       )}
                       {snapshot.includes_triggers && (
                         <Badge variant="outline" size="sm">
-                          Triggers
+                          {t('snapshot.includes.triggers')}
                         </Badge>
                       )}
                       {snapshot.includes_board_config && (
                         <Badge variant="outline" size="sm">
-                          Board
+                          {t('snapshot.includes.board')}
                         </Badge>
                       )}
                     </div>
@@ -242,11 +242,9 @@ export function SnapshotManager({
         {/* Footer */}
         <div className="p-4 border-t bg-surface-secondary/50">
           <div className="flex items-center justify-between text-sm text-foreground-secondary">
-            <span>
-              {snapshots.length} version{snapshots.length !== 1 ? 'er' : ''}
-            </span>
+            <span>{t('snapshot.count', { count: snapshots.length })}</span>
             <Button variant="outline" size="sm" onClick={onClose}>
-              Stäng
+              {t('snapshot.close')}
             </Button>
           </div>
         </div>

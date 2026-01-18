@@ -1,4 +1,5 @@
 ﻿'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
 import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';

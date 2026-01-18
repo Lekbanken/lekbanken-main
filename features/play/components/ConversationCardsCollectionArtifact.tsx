@@ -126,7 +126,7 @@ export function ConversationCardsCollectionArtifact(props: {
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm font-semibold text-foreground">{current.card_title ?? t('card')}</p>
             <p className="text-xs text-muted-foreground">
-              {index + 1} / {cards.length}
+              {t('progress', { current: index + 1, total: cards.length })}
             </p>
           </div>
 
@@ -134,9 +134,21 @@ export function ConversationCardsCollectionArtifact(props: {
 
           {(current.followup_1 || current.followup_2 || current.followup_3) && (
             <div className="space-y-1">
-              {current.followup_1 && <p className="text-xs text-muted-foreground">• {current.followup_1}</p>}
-              {current.followup_2 && <p className="text-xs text-muted-foreground">• {current.followup_2}</p>}
-              {current.followup_3 && <p className="text-xs text-muted-foreground">• {current.followup_3}</p>}
+              {current.followup_1 && (
+                <p className="text-xs text-muted-foreground">
+                  {t('followupLine', { text: current.followup_1 })}
+                </p>
+              )}
+              {current.followup_2 && (
+                <p className="text-xs text-muted-foreground">
+                  {t('followupLine', { text: current.followup_2 })}
+                </p>
+              )}
+              {current.followup_3 && (
+                <p className="text-xs text-muted-foreground">
+                  {t('followupLine', { text: current.followup_3 })}
+                </p>
+              )}
             </div>
           )}
 

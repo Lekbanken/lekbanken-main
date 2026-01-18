@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { JoinSessionForm } from '@/components/play';
 import { joinSession } from '@/features/play-participant/api';
 import { saveParticipantAuth } from '@/features/play-participant/tokenStorage';
@@ -12,6 +13,7 @@ const SESSION_STORAGE_KEY = 'lekbanken_participant_token';
 
 export function PlayJoinClient() {
   const router = useRouter();
+  const t = useTranslations('play.joinPage');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,7 +52,7 @@ export function PlayJoinClient() {
       // Navigate to session
       router.push(`/play/session/${normalizedCode}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Kunde inte gå med i sessionen');
+      setError(err instanceof Error ? err.message : t('errors.couldNotJoin'));
       setIsLoading(false);
     }
   };
@@ -62,11 +64,9 @@ export function PlayJoinClient() {
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
           <PlayIcon className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-3xl font-bold text-foreground sm:text-4xl">
-          Gå med i session
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground sm:text-4xl">{t('title')}</h1>
         <p className="mt-2 text-muted-foreground max-w-md mx-auto">
-          Ange koden som visas på skärmen och välj ett visningsnamn för att delta.
+          {t('description')}
         </p>
       </div>
 
@@ -81,7 +81,7 @@ export function PlayJoinClient() {
 
       {/* Help text */}
       <p className="mt-6 text-sm text-muted-foreground text-center max-w-sm">
-        Sessionskoden är 6 tecken lång och visas av den som håller i sessionen.
+        {t('helpText')}
       </p>
     </div>
   );

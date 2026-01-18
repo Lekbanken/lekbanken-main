@@ -38,7 +38,7 @@ export function OutcomePanel({ sessionId }: { sessionId: string }) {
     } finally {
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   useEffect(() => {
     void load();
@@ -67,7 +67,7 @@ export function OutcomePanel({ sessionId }: { sessionId: string }) {
     setTitle('');
     setBody('');
     await load();
-  }, [sessionId, title, body, load]);
+  }, [sessionId, title, body, load, t]);
 
   const toggleReveal = useCallback(
     async (outcomeId: string, reveal: boolean) => {
@@ -86,7 +86,7 @@ export function OutcomePanel({ sessionId }: { sessionId: string }) {
 
       await load();
     },
-    [sessionId, load]
+    [sessionId, load, t]
   );
 
   if (loading) {

@@ -56,11 +56,11 @@ interface SubscriptionStats {
 
 type StatusFilter = 'all' | SubscriptionStatus;
 
-const statusConfig: Record<SubscriptionStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
-  active: { label: 'Aktiv', variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
-  trial: { label: 'Testperiod', variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
-  canceled: { label: 'Avslutad', variant: 'destructive', icon: <XCircleIcon className="h-4 w-4" /> },
-  paused: { label: 'Pausad', variant: 'outline', icon: <PauseCircleIcon className="h-4 w-4" /> },
+const statusConfig: Record<SubscriptionStatus, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; icon: React.ReactNode }> = {
+  active: { variant: 'default', icon: <CheckCircleIcon className="h-4 w-4" /> },
+  trial: { variant: 'secondary', icon: <ClockIcon className="h-4 w-4" /> },
+  canceled: { variant: 'destructive', icon: <XCircleIcon className="h-4 w-4" /> },
+  paused: { variant: 'outline', icon: <PauseCircleIcon className="h-4 w-4" /> },
 };
 
 export default function SubscriptionsPage() {
@@ -146,43 +146,46 @@ export default function SubscriptionsPage() {
   // Table columns
   const columns = [
     {
-      header: 'Organisation',
+      header: t('table.organization'),
       accessor: (row: Subscription) => (
         <div>
-          <p className="font-medium text-foreground">{row.billing_product?.name || 'Plan saknas'}</p>
-          <p className="text-xs text-muted-foreground">Seats: {row.seats_purchased}</p>
+          <p className="font-medium text-foreground">{row.billing_product?.name || t('table.missingPlan')}</p>
+          <p className="text-xs text-muted-foreground">{t('table.seatsLabel', { count: row.seats_purchased })}</p>
         </div>
       ),
     },
     {
-      header: 'Status',
+      header: t('table.status'),
       accessor: (row: Subscription) => {
         const config = statusConfig[row.status];
         return (
           <Badge variant={config.variant} size="sm" className="gap-1">
             {config.icon}
-            {config.label}
+            {t(`status.${row.status}`)}
           </Badge>
         );
       },
     },
     {
-      header: 'Belopp',
+      header: t('table.amount'),
       accessor: (row: Subscription) => (
         <span className="font-medium">
           {row.billing_product?.price_per_seat
-            ? `${(row.billing_product.price_per_seat * row.seats_purchased).toLocaleString('sv-SE')} ${row.billing_product.currency}/mån`
-            : '—'}
+            ? t('table.amountPerMonth', {
+                amount: (row.billing_product.price_per_seat * row.seats_purchased).toLocaleString('sv-SE'),
+                currency: row.billing_product.currency,
+              })
+            : t('table.emptyValue')}
         </span>
       ),
       align: 'right' as const,
       hideBelow: 'sm' as const,
     },
     {
-      header: 'Förnyas',
+      header: t('table.renews'),
       accessor: (row: Subscription) => (
         <span className={row.status === 'canceled' ? 'text-red-600' : ''}>
-          {row.renewal_date ? new Date(row.renewal_date).toLocaleDateString('sv-SE') : '—'}
+          {row.renewal_date ? new Date(row.renewal_date).toLocaleDateString('sv-SE') : t('table.emptyValue')}
         </span>
       ),
       hideBelow: 'md' as const,
@@ -193,7 +196,7 @@ export default function SubscriptionsPage() {
     return (
       <AdminPageLayout>
         <div className="flex min-h-[400px] items-center justify-center">
-          <p className="text-muted-foreground">Du måste vara inloggad för att se denna sida.</p>
+          <p className="text-muted-foreground">{t('notLoggedIn')}</p>
         </div>
       </AdminPageLayout>
     );

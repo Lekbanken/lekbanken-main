@@ -8,9 +8,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useParticipantRejoin } from '@/features/participants/hooks/useParticipantRejoin';
 
 export default function JoinSessionPage() {
+  const t = useTranslations('participantJoin');
   const [sessionCode, setSessionCode] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,7 +49,12 @@ export default function JoinSessionPage() {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Kunde inte gå med i session');
+        const status = response.status;
+        if (status === 404) throw new Error(t('errors.invalidCode'));
+        if (status === 403 && data?.error === 'Session is full') throw new Error(t('errors.sessionFull'));
+        if (status === 410) throw new Error(t('errors.sessionEnded'));
+        if (status === 403 && data?.error === 'Session is locked') throw new Error(t('errors.sessionLocked'));
+        throw new Error(data.error || t('errors.joinFailed'));
       }
       
       // Save token to localStorage for rejoin
@@ -55,12 +62,13 @@ export default function JoinSessionPage() {
       localStorage.setItem('participant_session_id', data.participant.sessionId);
       localStorage.setItem('participant_session_code', sessionCode.trim().toUpperCase());
       localStorage.setItem('participant_display_name', displayName.trim());
+      localStorage.setItem('participant_status', data.participant.status ?? 'active');
       
       // Redirect to participant view
       router.push(`/participants/view`);
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ett fel uppstod');
+      setError(err instanceof Error ? err.message : t('errors.unknown'));
     } finally {
       setLoading(false);
     }
@@ -70,21 +78,21 @@ export default function JoinSessionPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Gå med i session</h1>
-          <p className="text-gray-600">Ange sessionskoden du fick av din lärare</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('title')}</h1>
+          <p className="text-gray-600">{t('description')}</p>
         </div>
         
         <form onSubmit={handleJoin} className="space-y-6">
           <div>
             <label htmlFor="code" className="block text-sm font-medium text-gray-700 mb-2">
-              Sessionskod
+              {t('form.sessionCodeLabel')}
             </label>
             <input
               id="code"
               type="text"
               value={sessionCode}
               onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
-              placeholder="H3K9QF"
+              placeholder={t('form.sessionCodePlaceholder')}
               maxLength={6}
               className="w-full px-4 py-3 text-center text-2xl font-mono font-bold border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 uppercase"
               required
@@ -93,14 +101,14 @@ export default function JoinSessionPage() {
           
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-              Ditt namn
+              {t('form.displayNameLabel')}
             </label>
             <input
               id="name"
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Anna"
+              placeholder={t('form.displayNamePlaceholder')}
               maxLength={50}
               className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
@@ -118,12 +126,12 @@ export default function JoinSessionPage() {
             disabled={loading || sessionCode.length !== 6 || !displayName.trim()}
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            {loading ? 'Går med...' : 'Gå med'}
+            {loading ? t('actions.joining') : t('actions.join')}
           </button>
         </form>
         
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Sessionskoden består av 6 bokstäver/siffror</p>
+          <p>{t('footerHint')}</p>
         </div>
       </div>
     </div>

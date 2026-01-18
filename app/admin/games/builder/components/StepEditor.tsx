@@ -97,7 +97,7 @@ function SortableStepItem({ step, index, onEdit, onRemove, canRemove }: Sortable
           {durationMinutes && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <ClockIcon className="h-3.5 w-3.5" />
-              {durationMinutes} min
+              {durationMinutes} {t('step.minutesShort')}
             </span>
           )}
         </div>

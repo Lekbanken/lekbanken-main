@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,8 +21,21 @@ function formatSeconds(totalSeconds: number): string {
   return `${minutes}:${String(seconds).padStart(2, '0')}`;
 }
 
+function formatTimeShort(value: string, locale: string): string {
+  try {
+    return new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    }).format(new Date(value));
+  } catch {
+    return '';
+  }
+}
+
 export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProps) {
   const t = useTranslations('play.timeBankPanel');
+  const locale = useLocale();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,13 +75,16 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
   });
 
   const quickButtons = useMemo(
-    () => [
-      { label: '+30s', deltaSeconds: 30 },
-      { label: '+60s', deltaSeconds: 60 },
-      { label: '-30s', deltaSeconds: -30 },
-      { label: '-60s', deltaSeconds: -60 },
-    ],
+    () => [30, 60, -30, -60],
     []
+  );
+
+  const formatDeltaSeconds = useCallback(
+    (deltaSeconds: number) => {
+      const sign = deltaSeconds > 0 ? '+' : deltaSeconds < 0 ? '-' : '';
+      return t('format.deltaSeconds', { sign, seconds: Math.abs(deltaSeconds) });
+    },
+    [t]
   );
 
   const applyDelta = useCallback(
@@ -118,16 +134,16 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
       {error && <div className="mt-3 text-sm text-destructive">{error}</div>}
 
       <div className="mt-4 flex flex-wrap gap-2">
-        {quickButtons.map((b) => (
+        {quickButtons.map((deltaSeconds) => (
           <Button
-            key={b.label}
+            key={deltaSeconds}
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => void applyDelta(b.deltaSeconds, 'quick')}
+            onClick={() => void applyDelta(deltaSeconds, 'quick')}
             disabled={disabled || submitting}
           >
-            {b.label}
+            {formatDeltaSeconds(deltaSeconds)}
           </Button>
         ))}
       </div>
@@ -179,12 +195,12 @@ export function TimeBankPanel({ sessionId, disabled = false }: TimeBankPanelProp
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <Badge variant="secondary" size="sm">
-                      {row.delta_seconds >= 0 ? `+${row.delta_seconds}s` : `${row.delta_seconds}s`}
+                      {formatDeltaSeconds(row.delta_seconds)}
                     </Badge>
                     <span className="text-muted-foreground">{row.reason}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">
-                    {new Date(row.created_at).toLocaleTimeString()}
+                    {formatTimeShort(row.created_at, locale)}
                   </span>
                 </div>
               </div>

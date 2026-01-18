@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
@@ -11,6 +12,7 @@ type ChecklistItemProps = {
 };
 
 function ChecklistItem({ label, checked, optional }: ChecklistItemProps) {
+  const t = useTranslations('admin.games.builder');
   return (
     <div className="flex items-center gap-2 text-sm">
       {checked ? (
@@ -26,7 +28,7 @@ function ChecklistItem({ label, checked, optional }: ChecklistItemProps) {
         optional && !checked && 'italic'
       )}>
         {label}
-        {optional && !checked && ' (valfritt)'}
+        {optional && !checked && ` (${t('quality.optional')})`}
       </span>
     </div>
   );
@@ -84,24 +86,25 @@ type QualityChecklistProps = {
 };
 
 export function QualityChecklist({ state, status }: QualityChecklistProps) {
+  const t = useTranslations('admin.games.builder');
   const draftItems = useMemo(() => [
-    { label: 'Namn', checked: state.name },
-  ], [state.name]);
+    { label: t('quality.items.draft.name'), checked: state.name },
+  ], [state.name, t]);
 
   const playableItems = useMemo(() => [
-    { label: 'Kort beskrivning', checked: state.shortDescription },
-    { label: 'Syfte valt', checked: state.purposeSelected },
-    { label: 'Undersyfte valt', checked: state.subPurposeSelected, optional: true },
-    { label: 'Steg eller beskrivning', checked: state.hasStepsOrDescription },
-    { label: 'Energinivå', checked: state.energyLevel, optional: true },
-    { label: 'Plats', checked: state.location, optional: true },
-  ], [state]);
+    { label: t('quality.items.playable.shortDescription'), checked: state.shortDescription },
+    { label: t('quality.items.playable.purposeSelected'), checked: state.purposeSelected },
+    { label: t('quality.items.playable.subPurposeSelected'), checked: state.subPurposeSelected, optional: true },
+    { label: t('quality.items.playable.stepsOrDescription'), checked: state.hasStepsOrDescription },
+    { label: t('quality.items.playable.energyLevel'), checked: state.energyLevel, optional: true },
+    { label: t('quality.items.playable.location'), checked: state.location, optional: true },
+  ], [state, t]);
 
   const publishableItems = useMemo(() => [
-    { label: 'Omslagsbild eller standardbild', checked: state.coverImageSelected },
-    { label: 'Alla krav uppfyllda', checked: state.allRequiredMet },
-    { label: 'Inga valideringsfel', checked: state.noValidationErrors },
-  ], [state.allRequiredMet, state.noValidationErrors, state.coverImageSelected]);
+    { label: t('quality.items.publishable.coverImage'), checked: state.coverImageSelected },
+    { label: t('quality.items.publishable.allRequired'), checked: state.allRequiredMet },
+    { label: t('quality.items.publishable.noValidationErrors'), checked: state.noValidationErrors },
+  ], [state.allRequiredMet, state.noValidationErrors, state.coverImageSelected, t]);
 
   const draftComplete = draftItems.every((i) => i.checked);
   const playableComplete = playableItems.filter((i) => !i.optional).every((i) => i.checked);
@@ -115,16 +118,16 @@ export function QualityChecklist({ state, status }: QualityChecklistProps) {
   }, [draftComplete, playableComplete, publishableComplete]);
 
   const statusBadge = {
-    incomplete: { label: 'Ofullständig', color: 'bg-muted text-muted-foreground' },
-    draft: { label: 'Utkast', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
-    playable: { label: 'Spelbar', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
-    publishable: { label: 'Publicerbar', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
+    incomplete: { label: t('quality.status.incomplete'), color: 'bg-muted text-muted-foreground' },
+    draft: { label: t('quality.status.draft'), color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400' },
+    playable: { label: t('quality.status.playable'), color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
+    publishable: { label: t('quality.status.publishable'), color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' },
   }[overallStatus];
 
   return (
     <div className="space-y-6 p-4">
       <div>
-        <h3 className="text-sm font-semibold text-foreground mb-2">Kvalitetskontroll</h3>
+        <h3 className="text-sm font-semibold text-foreground mb-2">{t('quality.title')}</h3>
         <div className={cn(
           'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium',
           statusBadge.color
@@ -134,26 +137,26 @@ export function QualityChecklist({ state, status }: QualityChecklistProps) {
       </div>
 
       <ChecklistSection
-        title="Grundkrav (Utkast)"
+        title={t('quality.sections.draft')}
         items={draftItems}
         status={draftComplete ? 'complete' : 'incomplete'}
       />
 
       <ChecklistSection
-        title="Redo att testas (Spelbar)"
+        title={t('quality.sections.playable')}
         items={playableItems}
         status={playableComplete ? 'complete' : draftComplete ? 'warning' : 'incomplete'}
       />
 
       <ChecklistSection
-        title="Redo att publiceras"
+        title={t('quality.sections.publishable')}
         items={publishableItems}
         status={publishableComplete ? 'complete' : 'incomplete'}
       />
 
       {status === 'published' && (
         <div className="rounded-lg bg-emerald-50 dark:bg-emerald-900/20 p-3 text-sm text-emerald-700 dark:text-emerald-400">
-          ✓ Publicerad
+          {t('quality.published')}
         </div>
       )}
     </div>

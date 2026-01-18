@@ -18,7 +18,7 @@ import {
 } from '@heroicons/react/24/outline';
 import type { TriggerFormData, GamePhase, GameStep, GameArtifact } from '@/types/games';
 import type { TriggerCondition, TriggerAction, TriggerConditionType, TriggerActionType, TriggerConfig } from '@/types/trigger';
-import { CONDITION_OPTIONS, ACTION_OPTIONS, getConditionLabel, getActionLabel } from '@/types/trigger';
+import { CONDITION_OPTIONS, ACTION_OPTIONS } from '@/types/trigger';
 import { TriggerWizard } from '@/components/play/TriggerWizard';
 import { downloadTriggersCSV, importTriggersFromFile } from '@/features/admin/games/utils/trigger-csv';
 import { TemplatePickerDialog } from './TemplatePickerDialog';
@@ -59,12 +59,14 @@ function ConditionEditor({
   phases,
   steps,
   artifacts,
+  t,
   onChange,
 }: {
   condition: TriggerCondition;
   phases: GamePhase[];
   steps: GameStep[];
   artifacts: GameArtifact[];
+  t: ReturnType<typeof useTranslations>;
   onChange: (c: TriggerCondition) => void;
 }) {
   const keypads = useMemo(
@@ -74,17 +76,17 @@ function ConditionEditor({
 
   const conditionTypeOptions = CONDITION_OPTIONS.map((c) => ({
     value: c.type,
-    label: `${c.icon} ${c.label}`,
+    label: `${c.icon} ${t(`trigger.conditionTypes.${c.type}`)}`,
   }));
 
   const getTargetOptions = (type: TriggerConditionType): { value: string; label: string }[] => {
     switch (type) {
       case 'step_started':
       case 'step_completed':
-        return steps.map((s) => ({ value: s.id, label: s.title || `Steg ${s.step_order + 1}` }));
+        return steps.map((s) => ({ value: s.id, label: s.title || t('trigger.labels.step', { index: s.step_order + 1 }) }));
       case 'phase_started':
       case 'phase_completed':
-        return phases.map((p) => ({ value: p.id, label: p.name }));
+        return phases.map((p) => ({ value: p.id, label: p.name || t('trigger.labels.phase', { index: p.phase_order + 1 }) }));
       case 'keypad_correct':
       case 'keypad_failed':
         return keypads.map((k) => ({ value: k.id, label: k.title }));
@@ -148,13 +150,13 @@ function ConditionEditor({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-xs text-foreground-secondary uppercase font-medium w-12">När</span>
+      <span className="text-xs text-foreground-secondary uppercase font-medium w-12">{t('trigger.whenLabel')}</span>
       <Select
         className="w-48"
         value={condition.type}
         options={conditionTypeOptions}
         onChange={handleConditionTypeChange}
-        placeholder="Välj villkor..."
+        placeholder={t('trigger.conditionPlaceholder')}
       />
       {needsTargetSelect && targetOptions.length > 0 && (
         <Select
@@ -162,7 +164,7 @@ function ConditionEditor({
           value={currentTargetId}
           options={targetOptions}
           onChange={handleTargetChange}
-          placeholder="Välj mål..."
+          placeholder={t('trigger.targetPlaceholder')}
         />
       )}
 
@@ -171,7 +173,7 @@ function ConditionEditor({
           className="w-48"
           value={condition.channel ?? ''}
           onChange={(e) => onChange({ ...condition, channel: e.target.value })}
-          placeholder="Kanal (t.ex. clue:found)"
+          placeholder={t('trigger.channelPlaceholder')}
         />
       )}
     </div>
@@ -185,22 +187,24 @@ function ConditionEditor({
 function ActionEditor({
   actions,
   artifacts,
+  t,
   onChange,
 }: {
   actions: TriggerAction[];
   artifacts: GameArtifact[];
+  t: ReturnType<typeof useTranslations>;
   onChange: (a: TriggerAction[]) => void;
 }) {
   const actionTypeOptions = ACTION_OPTIONS.map((a) => ({
     value: a.type,
-    label: `${a.icon} ${a.label}`,
+    label: `${a.icon} ${t(`trigger.actionTypes.${a.type}`)}`,
   }));
 
   const artifactOptions = artifacts.map((a) => ({ value: a.id, label: a.title }));
   const styleOptions = [
-    { value: 'normal', label: 'Normal' },
-    { value: 'typewriter', label: 'Skrivmaskin' },
-    { value: 'dramatic', label: 'Dramatisk' },
+    { value: 'normal', label: t('trigger.messageStyles.normal') },
+    { value: 'typewriter', label: t('trigger.messageStyles.typewriter') },
+    { value: 'dramatic', label: t('trigger.messageStyles.dramatic') },
   ];
 
   const addAction = (type: TriggerActionType) => {
@@ -213,7 +217,7 @@ function ActionEditor({
         newAction = { type: 'hide_artifact', artifactId: '' };
         break;
       case 'show_countdown':
-        newAction = { type: 'show_countdown', duration: 5, message: 'Gör er redo...' };
+        newAction = { type: 'show_countdown', duration: 5, message: t('trigger.defaults.countdownMessage') };
         break;
       case 'send_message':
         newAction = { type: 'send_message', message: '', style: 'normal' };
@@ -222,7 +226,7 @@ function ActionEditor({
         newAction = { type: 'send_signal', channel: '', message: '' };
         break;
       case 'time_bank_apply_delta':
-        newAction = { type: 'time_bank_apply_delta', deltaSeconds: 30, reason: 'trigger' };
+        newAction = { type: 'time_bank_apply_delta', deltaSeconds: 30, reason: t('trigger.defaults.timeBankReason') };
         break;
       case 'advance_step':
         newAction = { type: 'advance_step' };
@@ -231,7 +235,7 @@ function ActionEditor({
         newAction = { type: 'advance_phase' };
         break;
       case 'start_timer':
-        newAction = { type: 'start_timer', duration: 60, name: 'Timer' };
+        newAction = { type: 'start_timer', duration: 60, name: t('trigger.defaults.timerName') };
         break;
       case 'reset_keypad':
         newAction = { type: 'reset_keypad', keypadId: '' };
@@ -261,19 +265,19 @@ function ActionEditor({
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
-        <span className="text-xs text-foreground-secondary uppercase font-medium w-12">Gör</span>
+        <span className="text-xs text-foreground-secondary uppercase font-medium w-12">{t('trigger.doLabel')}</span>
         <Select
           className="w-48"
           value=""
           options={actionTypeOptions}
           onChange={handleAddAction}
-          placeholder="+ Lägg till åtgärd..."
+          placeholder={t('trigger.actionPlaceholder')}
         />
       </div>
       
       {actions.map((action, idx) => (
         <div key={idx} className="ml-14 flex items-center gap-2 p-2 bg-surface-secondary rounded flex-wrap">
-          <span className="text-sm font-medium">{getActionLabel(action.type)}</span>
+          <span className="text-sm font-medium">{t(`trigger.actionTypes.${action.type}`)}</span>
           
           {/* Action-specific fields */}
           {action.type === 'reveal_artifact' && (
@@ -282,7 +286,7 @@ function ActionEditor({
               value={action.artifactId}
               options={artifactOptions}
               onChange={(e) => updateAction(idx, { ...action, artifactId: e.target.value })}
-              placeholder="Välj artefakt..."
+              placeholder={t('trigger.artifactPlaceholder')}
             />
           )}
           
@@ -292,7 +296,7 @@ function ActionEditor({
               value={action.artifactId}
               options={artifactOptions}
               onChange={(e) => updateAction(idx, { ...action, artifactId: e.target.value })}
-              placeholder="Välj artefakt..."
+              placeholder={t('trigger.artifactPlaceholder')}
             />
           )}
           
@@ -306,12 +310,12 @@ function ActionEditor({
                 min={1}
                 max={60}
               />
-              <span className="text-xs text-foreground-secondary">sek</span>
+              <span className="text-xs text-foreground-secondary">{t('trigger.secondsShort')}</span>
               <Input
                 className="w-40"
                 value={action.message}
                 onChange={(e) => updateAction(idx, { ...action, message: e.target.value })}
-                placeholder="Meddelande..."
+                placeholder={t('trigger.countdownMessagePlaceholder')}
               />
             </>
           )}
@@ -322,14 +326,14 @@ function ActionEditor({
                 className="flex-1 min-w-32"
                 value={action.message}
                 onChange={(e) => updateAction(idx, { ...action, message: e.target.value })}
-                placeholder="Skriv meddelande..."
+                placeholder={t('trigger.sendMessagePlaceholder')}
               />
               <Select
                 className="w-28"
                 value={action.style}
                 options={styleOptions}
                 onChange={(e) => updateAction(idx, { ...action, style: e.target.value as 'normal' | 'dramatic' | 'typewriter' })}
-                placeholder="Stil"
+                placeholder={t('trigger.stylePlaceholder')}
               />
             </>
           )}
@@ -340,13 +344,13 @@ function ActionEditor({
                 className="w-40"
                 value={action.channel}
                 onChange={(e) => updateAction(idx, { ...action, channel: e.target.value })}
-                placeholder="Kanal..."
+                placeholder={t('trigger.signalChannelPlaceholder')}
               />
               <Input
                 className="flex-1 min-w-32"
                 value={action.message}
                 onChange={(e) => updateAction(idx, { ...action, message: e.target.value })}
-                placeholder="Meddelande..."
+                placeholder={t('trigger.signalMessagePlaceholder')}
               />
             </>
           )}
@@ -365,12 +369,12 @@ function ActionEditor({
                 }
                 step={1}
               />
-              <span className="text-xs text-foreground-secondary">sek</span>
+              <span className="text-xs text-foreground-secondary">{t('trigger.secondsShort')}</span>
               <Input
                 className="w-40"
                 value={action.reason}
                 onChange={(e) => updateAction(idx, { ...action, reason: e.target.value })}
-                placeholder="Orsak..."
+                placeholder={t('trigger.timeBankReasonPlaceholder')}
               />
             </>
           )}
@@ -381,7 +385,7 @@ function ActionEditor({
                 className="w-24"
                 value={action.name}
                 onChange={(e) => updateAction(idx, { ...action, name: e.target.value })}
-                placeholder="Namn..."
+                placeholder={t('trigger.timerNamePlaceholder')}
               />
               <Input
                 type="number"
@@ -390,7 +394,7 @@ function ActionEditor({
                 onChange={(e) => updateAction(idx, { ...action, duration: parseInt(e.target.value) || 60 })}
                 min={1}
               />
-              <span className="text-xs text-foreground-secondary">sek</span>
+              <span className="text-xs text-foreground-secondary">{t('trigger.secondsShort')}</span>
             </>
           )}
           
@@ -432,6 +436,11 @@ export function TriggerEditor({
     [artifacts]
   );
 
+  const conditionLabel = useCallback(
+    (type: TriggerConditionType) => t(`trigger.conditionTypes.${type}`),
+    [t]
+  );
+
   const handleExport = useCallback(() => {
     downloadTriggersCSV(triggers, 'triggers.csv');
   }, [triggers]);
@@ -454,14 +463,14 @@ export function TriggerEditor({
         onChange([...triggers, ...result.triggers]);
       }
     } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Import misslyckades');
+      setImportError(err instanceof Error ? err.message : t('trigger.import.failed'));
     }
     
     // Reset input so same file can be imported again
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [triggers, onChange]);
+  }, [triggers, onChange, t]);
 
   const updateTrigger = (index: number, next: Partial<TriggerFormData>) => {
     const draft = [...triggers];
@@ -512,8 +521,8 @@ export function TriggerEditor({
             <TriggerWizard
               onComplete={handleWizardComplete}
               onCancel={() => setWizardOpen(false)}
-              steps={steps.map((s) => ({ id: s.id, name: s.title || `Steg ${s.step_order + 1}` }))}
-              phases={phases.map((p) => ({ id: p.id, name: p.name }))}
+              steps={steps.map((s) => ({ id: s.id, name: s.title || t('trigger.labels.step', { index: s.step_order + 1 }) }))}
+              phases={phases.map((p) => ({ id: p.id, name: p.name || t('trigger.labels.phase', { index: p.phase_order + 1 }) }))}
               artifacts={artifacts.map((a) => ({ id: a.id, name: a.title }))}
               keypads={keypads.map((k) => ({ id: k.id, name: k.title }))}
             />
@@ -552,7 +561,7 @@ export function TriggerEditor({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <BoltIcon className="h-5 w-5 text-yellow-500" />
-          Triggers ({triggers.length})
+          {t('trigger.header.title', { count: triggers.length })}
         </h3>
         <div className="flex items-center gap-2">
           <Button 
@@ -560,17 +569,17 @@ export function TriggerEditor({
             size="sm" 
             onClick={() => setSimulatorOpen(true)}
             disabled={triggers.length === 0}
-            title="Testa triggers i simulator"
+            title={t('trigger.titles.test')}
           >
             <PlayIcon className="h-4 w-4 mr-1" />
-            Testa
+            {t('trigger.test')}
           </Button>
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleExport}
             disabled={triggers.length === 0}
-            title="Exportera triggers till CSV"
+            title={t('trigger.titles.export')}
           >
             <ArrowDownTrayIcon className="h-4 w-4" />
           </Button>
@@ -578,7 +587,7 @@ export function TriggerEditor({
             variant="ghost" 
             size="sm" 
             onClick={handleImportClick}
-            title="Importera triggers från CSV"
+            title={t('trigger.titles.import')}
           >
             <ArrowUpTrayIcon className="h-4 w-4" />
           </Button>
@@ -586,14 +595,14 @@ export function TriggerEditor({
             variant="outline" 
             size="sm" 
             onClick={() => setTemplatePickerOpen(true)}
-            title="Välj från mallbibliotek"
+            title={t('trigger.titles.templates')}
           >
             <Squares2X2Icon className="h-4 w-4 mr-1" />
             {t('trigger.templates')}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
             <SparklesIcon className="h-4 w-4 mr-1" />
-            Wizard
+            {t('trigger.wizard')}
           </Button>
           <Button variant="outline" size="sm" onClick={addTrigger}>
             <PlusIcon className="h-4 w-4 mr-1" />
@@ -679,7 +688,7 @@ export function TriggerEditor({
             {/* Summary when collapsed */}
             {!isExpanded && (
               <div className="mt-2 text-sm text-foreground-secondary">
-                {getConditionLabel(trigger.condition.type)} → {trigger.actions.length} åtgärd(er)
+                {conditionLabel(trigger.condition.type)} → {t('trigger.summary.actions', { count: trigger.actions.length })}
               </div>
             )}
 
@@ -688,11 +697,11 @@ export function TriggerEditor({
               <div className="mt-4 space-y-4 border-t pt-4">
                 {/* Name */}
                 <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium w-20">Namn</label>
+                  <label className="text-sm font-medium w-20">{t('trigger.nameLabel')}</label>
                   <Input
                     value={trigger.name}
                     onChange={(e) => updateTrigger(index, { name: e.target.value })}
-                    placeholder="Triggernamn..."
+                    placeholder={t('trigger.namePlaceholder')}
                     className="flex-1"
                   />
                 </div>
@@ -741,6 +750,7 @@ export function TriggerEditor({
                   phases={phases}
                   steps={steps}
                   artifacts={artifacts}
+                  t={t}
                   onChange={(condition) => updateTrigger(index, { condition })}
                 />
 
@@ -748,6 +758,7 @@ export function TriggerEditor({
                 <ActionEditor
                   actions={trigger.actions}
                   artifacts={artifacts}
+                  t={t}
                   onChange={(actions) => updateTrigger(index, { actions })}
                 />
               </div>

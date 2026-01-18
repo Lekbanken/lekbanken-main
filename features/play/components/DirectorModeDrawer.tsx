@@ -9,7 +9,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -178,6 +178,7 @@ function StepNavigation({
 }
 
 function LeaderScriptPanel({ script }: { script?: string }) {
+  const t = useTranslations('play.directorDrawer');
   if (!script) return null;
   
   return (
@@ -186,7 +187,7 @@ function LeaderScriptPanel({ script }: { script?: string }) {
         <DocumentTextIcon className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
         <div>
           <div className="text-xs font-medium text-amber-700 dark:text-amber-400 mb-1">
-            LEADER SCRIPT
+            {t('leaderScript.title')}
           </div>
           <div className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
             {script}
@@ -208,6 +209,7 @@ function TriggerPanel({
   onDisableAll: () => void;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
+  const locale = useLocale();
   const armedTriggers = triggers.filter((t) => t.status === 'armed');
   const firedTriggers = triggers.filter((t) => t.status === 'fired');
   const errorTriggers = triggers.filter((t) => t.status === 'error');
@@ -233,20 +235,20 @@ function TriggerPanel({
       {armedTriggers.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground">
-            🟢 ARMED ({armedTriggers.length})
+            {t('triggers.armedLabel', { count: armedTriggers.length })}
           </div>
-          {armedTriggers.map((t) => (
+          {armedTriggers.map((trigger) => (
             <div
-              key={t.id}
+              key={trigger.id}
               className="flex items-center justify-between p-2 rounded-lg border bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-800"
             >
               <div className="min-w-0 flex-1">
-                <div className="font-medium text-sm truncate">{t.name}</div>
+                <div className="font-medium text-sm truncate">{trigger.name}</div>
                 <div className="text-xs text-muted-foreground truncate">
-                  {t.conditionSummary} → {t.actionSummary}
+                  {trigger.conditionSummary} → {trigger.actionSummary}
                 </div>
               </div>
-              <Button size="sm" variant="outline" onClick={() => onFire(t.id)}>
+              <Button size="sm" variant="outline" onClick={() => onFire(trigger.id)}>
                 <BoltIcon className="h-4 w-4" />
               </Button>
             </div>
@@ -258,15 +260,15 @@ function TriggerPanel({
       {errorTriggers.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-destructive">
-            ❌ ERROR ({errorTriggers.length})
+            {t('triggers.errorLabel', { count: errorTriggers.length })}
           </div>
-          {errorTriggers.map((t) => (
+          {errorTriggers.map((trigger) => (
             <div
-              key={t.id}
+              key={trigger.id}
               className="p-2 rounded-lg border bg-destructive/10 border-destructive/30"
             >
-              <div className="font-medium text-sm">{t.name}</div>
-              <div className="text-xs text-destructive">{t.lastError}</div>
+              <div className="font-medium text-sm">{trigger.name}</div>
+              <div className="text-xs text-destructive">{trigger.lastError}</div>
             </div>
           ))}
         </div>
@@ -276,16 +278,22 @@ function TriggerPanel({
       {firedTriggers.length > 0 && (
         <div className="space-y-2">
           <div className="text-xs font-medium text-muted-foreground">
-            ✅ FIRED ({firedTriggers.length})
+            {t('triggers.firedLabel', { count: firedTriggers.length })}
           </div>
-          {firedTriggers.slice(0, 5).map((t) => (
+          {firedTriggers.slice(0, 5).map((trigger) => (
             <div
-              key={t.id}
+              key={trigger.id}
               className="p-2 rounded-lg border bg-muted/50"
             >
-              <div className="font-medium text-sm text-muted-foreground">{t.name}</div>
+              <div className="font-medium text-sm text-muted-foreground">{trigger.name}</div>
               <div className="text-xs text-muted-foreground">
-                {t.lastFiredAt ? new Date(t.lastFiredAt).toLocaleTimeString() : '–'}
+                {trigger.lastFiredAt
+                  ? new Date(trigger.lastFiredAt).toLocaleTimeString(locale, {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })
+                  : t('common.dash')}
               </div>
             </div>
           ))}
@@ -321,6 +329,7 @@ function SignalQuickPanel({
   onExecuteSignal?: (type: string, config: Record<string, unknown>) => Promise<void>;
   t: ReturnType<typeof useTranslations<'play.directorDrawer'>>;
 }) {
+  const locale = useLocale();
   const [channel, setChannel] = useState('');
   const [message, setMessage] = useState('');
   const [executingSignal, setExecutingSignal] = useState<string | null>(null);
@@ -345,21 +354,27 @@ function SignalQuickPanel({
 
   // Quick presets - built-in
   const builtInPresets = [
-    { id: 'pause', channel: 'pause', label: `⏸ ${t('signals.presets.pause')}`, message: t('signals.presets.pauseMessage'), icon: '⏸' },
-    { id: 'hint', channel: 'hint', label: `💡 ${t('signals.presets.hint')}`, message: t('signals.presets.hintMessage'), icon: '💡' },
-    { id: 'attention', channel: 'attention', label: `⚡ ${t('signals.presets.attention')}`, message: t('signals.presets.attentionMessage'), icon: '⚡' },
-    { id: 'flash', channel: 'flash', label: `💥 ${t('signals.presets.flash')}`, message: t('signals.presets.flashMessage'), icon: '💥' },
+    { id: 'pause', channel: 'pause', label: t('signals.presets.pause'), message: t('signals.presets.pauseMessage'), icon: PauseIcon },
+    { id: 'hint', channel: 'hint', label: t('signals.presets.hint'), message: t('signals.presets.hintMessage'), icon: BookOpenIcon },
+    { id: 'attention', channel: 'attention', label: t('signals.presets.attention'), message: t('signals.presets.attentionMessage'), icon: BoltIcon },
+    { id: 'flash', channel: 'flash', label: t('signals.presets.flash'), message: t('signals.presets.flashMessage'), icon: SignalIcon },
   ];
 
   // Signal type icons
   const getSignalTypeIcon = (type: string) => {
     switch (type) {
-      case 'torch': return '🔦';
-      case 'audio': return '🔊';
-      case 'vibration': return '📳';
-      case 'screen_flash': return '💡';
-      case 'notification': return '🔔';
-      default: return '📡';
+      case 'torch':
+        return <BoltIcon className="h-4 w-4" />;
+      case 'audio':
+        return <SignalIcon className="h-4 w-4" />;
+      case 'vibration':
+        return <SignalIcon className="h-4 w-4" />;
+      case 'screen_flash':
+        return <SignalIcon className="h-4 w-4" />;
+      case 'notification':
+        return <SignalIcon className="h-4 w-4" />;
+      default:
+        return <SignalIcon className="h-4 w-4" />;
     }
   };
 
@@ -389,28 +404,30 @@ function SignalQuickPanel({
                   color: p.color,
                 } : undefined}
               >
-                <span>{getSignalTypeIcon(p.type)}</span>
+                {getSignalTypeIcon(p.type)}
                 <span>{p.name}</span>
                 {executingSignal === p.id && (
-                  <span className="animate-pulse">●</span>
+                  <span className="animate-pulse" aria-hidden>
+                    {t('signals.executingIndicator')}
+                  </span>
                 )}
               </Button>
             ))}
           </div>
           {notificationStatus && (
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Notifications: {notificationStatus}</span>
+              <span>{t('signals.notificationsStatus', { status: notificationStatus })}</span>
               {onExecuteSignal && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => void onExecuteSignal('notification', {
                     forceToast: true,
-                    title: 'Notification',
-                    body: 'In-app toast',
+                    title: t('signals.toast.title'),
+                    body: t('signals.toast.body'),
                   })}
                 >
-                  Show in-app toast
+                  {t('signals.toast.button')}
                 </Button>
               )}
             </div>
@@ -430,7 +447,9 @@ function SignalQuickPanel({
               variant="outline"
               size="sm"
               onClick={() => onSend(p.channel, { message: p.message })}
+              className="gap-1.5"
             >
+              <p.icon className="h-4 w-4" aria-hidden />
               {p.label}
             </Button>
           ))}
@@ -446,7 +465,9 @@ function SignalQuickPanel({
           className="w-full justify-between"
         >
           <span>{t('signals.customSignal')}</span>
-          <span className="text-muted-foreground">{showCustom ? '−' : '+'}</span>
+          <span className="text-muted-foreground">
+            {showCustom ? t('signals.toggle.hide') : t('signals.toggle.show')}
+          </span>
         </Button>
         
         {showCustom && (
@@ -490,10 +511,10 @@ function SignalQuickPanel({
               >
                 <span className="font-mono truncate max-w-[120px]">{s.channel}</span>
                 <span className="text-[10px] opacity-70">
-                  {new Date(s.createdAt).toLocaleTimeString('sv-SE', { 
-                    hour: '2-digit', 
+                  {new Date(s.createdAt).toLocaleTimeString(locale, {
+                    hour: '2-digit',
                     minute: '2-digit',
-                    second: '2-digit'
+                    second: '2-digit',
                   })}
                 </span>
               </div>
@@ -726,7 +747,7 @@ export function DirectorModeDrawer({
                   <div className="font-semibold text-foreground">{sessionName}</div>
                   <div className="text-xs text-muted-foreground">
                     <span className="font-mono">{sessionCode}</span>
-                    <span className="mx-2">•</span>
+                    <span className="mx-2">{t('header.separator')}</span>
                     <span>{t('header.participants', { count: participantCount })}</span>
                   </div>
                 </div>
@@ -830,13 +851,13 @@ export function DirectorModeDrawer({
                           {t('quickActions.story')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          💡 {t('quickActions.giveHint')}
+                          {t('quickActions.giveHint')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          🔄 {t('quickActions.reset')}
+                          {t('quickActions.reset')}
                         </Button>
                         <Button variant="outline" size="sm">
-                          📣 {t('quickActions.message')}
+                          {t('quickActions.message')}
                         </Button>
                       </div>
                     </Card>

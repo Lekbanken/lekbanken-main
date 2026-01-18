@@ -57,10 +57,11 @@
             "body": "In-app toast",
             "correctCode": "Riktig kode",
             "codeLength": "Kodelengde",
-            "correctCodePlaceholder": "1234"
-          "toggle": {
-            "show": "+",
-            "hide": "−"
+            "correctCodePlaceholder": "1234",
+            "toggle": {
+              "show": "+",
+              "hide": "−"
+            }
           },
       "view": "Vis",
       "hide": "Skjul",
@@ -244,8 +245,8 @@
       "published": "Publisert",
       "archived": "Arkivert",
       "enabled": "Aktivert",
-      "disabled": "Deaktivert"
-          "minutesShort": "min",
+      "disabled": "Deaktivert",
+      "minutesShort": "min"
     },
     "labels": {
       "name": "Navn",
@@ -2630,6 +2631,7 @@
               "formatSelection": "Formatvalg",
               "versioning": "Versjonering",
               "exportLog": "Eksportlogg"
+            },
             "actions": {
               "createTemplate": "Opprett eksportmal",
               "createTemplateShort": "Opprett mal"
@@ -2678,7 +2680,6 @@
                 "exportedBy": "Eksportert av",
                 "date": "Dato"
               }
-            },
             },
             "stats": {
               "templates": "Maler",
@@ -5080,7 +5081,6 @@
             "requires": "Krever",
             "excludes": "Ekskluderer"
           },
-            },
             "footer": {
               "tagline": "Aktiviteter, økter og deling for trenere, lærere og ledere.",
               "actions": {
@@ -5091,6 +5091,7 @@
                 "privacy": "Personvernpolicy"
               },
               "copyright": "© {year} Lekbanken AS. Alle rettigheter forbeholdt."
+            },
           "availability": {
             "scope": "Tilgjengelighetsomfang",
             "scopeLabel": "Omfang",
@@ -9964,11 +9965,11 @@
         "title": "Ingen roller opprettet",
         "description": "Legg til roller for å tildele deltakere",
         "createFirst": "Opprett første rolle"
-      }
+      },
       "checklist": {
         "title": "Sjekkliste",
         "complete": "✓ Alle klare!"
-      },
+      }
     },
     "participantView": {
       "header": {
@@ -9980,7 +9981,7 @@
       },
       "timer": {
         "title": "Puslespill",
-        "missingConfig": "Puslespill ikke konfigurert"
+        "missingConfig": "Puslespill ikke konfigurert",
         "timeUp": "Tiden er ute!",
         "timeRemaining": "Tid igjen"
       },

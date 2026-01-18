@@ -5057,7 +5057,6 @@
             "requires": "Requires",
             "excludes": "Excludes"
           },
-            },
             "footer": {
               "tagline": "Activities, sessions, and sharing for coaches, teachers, and leaders.",
               "actions": {
@@ -5068,6 +5067,7 @@
                 "privacy": "Privacy policy"
               },
               "copyright": "© {year} Lekbanken AS. All rights reserved."
+            },
           "availability": {
             "scope": "Availability Scope",
             "scopeLabel": "Scope",
@@ -9942,14 +9942,19 @@
       "showLess": "Show less",
       "showMore": "+{count} more"
     },
-        "notConfigured": "Hotspot image not configured",
-        "complete": "✓ All found!"
+    "hotspotImage": {
+      "notConfigured": "Hotspot image not configured",
+      "complete": "✓ All found!"
+    },
+    "participantStatusBadge": {
       "active": "Connected",
       "idle": "Idle",
-        "title": "Tile puzzle",
-        "missingConfig": "Tile puzzle not configured"
       "kicked": "Kicked",
       "blocked": "Blocked"
+    },
+    "tilePuzzle": {
+      "title": "Tile puzzle",
+      "missingConfig": "Tile puzzle not configured"
     },
     "sessionCard": {
       "time": {

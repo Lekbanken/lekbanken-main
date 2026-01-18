@@ -46,7 +46,7 @@
       "expand": "Expandera",
             "correctCode": "Korrekt kod",
             "codeLength": "Kodlängd",
-            "correctCodePlaceholder": "1234"
+            "correctCodePlaceholder": "1234",
       "less": "Mindre",
       "loading": "Laddar...",
       "saving": "Sparar...",
@@ -10508,14 +10508,19 @@
       "showLess": "Visa färre",
       "showMore": "+{count} till"
     },
-        "notConfigured": "Hotspot-bild ej konfigurerad",
-        "complete": "✓ Alla hittade!"
+    "hotspotImage": {
+      "notConfigured": "Hotspot-bild ej konfigurerad",
+      "complete": "✓ Alla hittade!"
+    },
+    "participantStatusBadge": {
       "active": "Ansluten",
       "idle": "Inaktiv",
-        "title": "Pusselspel",
-        "missingConfig": "Pusselspel ej konfigurerat"
       "kicked": "Sparkad",
       "blocked": "Blockerad"
+    },
+    "tilePuzzle": {
+      "title": "Pusselspel",
+      "missingConfig": "Pusselspel ej konfigurerat"
     },
     "sessionCard": {
       "time": {

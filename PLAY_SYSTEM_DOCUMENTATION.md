@@ -99,6 +99,30 @@
 - **2026-01-18**: I18n fortsättning i Admin Game Builder: kompletterade StepEditor (minutetikett) och lade till nyckel i sv/en/no.
 - **2026-01-18**: I18n fortsättning i Admin Game Builder: lokaliserade TriggerSimulator (UI, event-labels, status/empty) och lade till triggerSimulator-nycklar i sv/en/no.
 - **2026-01-18**: I18n fortsättning i Admin Game Builder: verifierade RoleEditor (UI-strängar, tabs, hints, counts, färg/ikon/strategi) och bekräftade role-nycklar i sv/en/no.
+- **2026-01-18**: Kvalitetsgate: `npm run type-check` + `npm test` gröna. Commit/push genomförd (main).
+- **2026-01-18**: Datamodell-align: ersatte `participant_status = 'pending'` i API/UI med enum-kompatibel `idle` för “awaiting approval” (ingen DB-migration gjord).
+- **2026-01-18**: Lokal build-fix (screenshot): `next-intl` kraschade p.g.a. ogiltig JSON i `messages/*.json` (t.ex. “trailing comma / Expected ',' or '}'”). Rensade/lagade `messages/en.json`, `messages/no.json`, `messages/sv.json` så att de är parsebara igen.
+
+### Status (2026-01-18) — Full kontroll
+
+**Genomfört (klart)**
+- Supabase: `supabase db push` körd, remote var “up to date”. (Diff-check blockerad lokalt p.g.a. Docker saknas.)
+- Lint: blockerande ESLint-fel åtgärdat (varningar kvarstår).
+- TypeScript: `npm run type-check` passerar.
+- Tester: `npm test` passerar (smoke + CSV header sync + trigger alias roundtrip + Legendary JSON roundtrip).
+- Git: ändringar committade och pushade till `main`.
+
+**Återstår / att besluta (kvar)**
+- **DB enum**: Om “awaiting approval” ska vara `idle` (som nu) eller om vi ska införa `participant_status = 'pending'` via DB-migration + typgenerering.
+- **Docker lokalt**: Installera/starta Docker Desktop för att kunna köra `supabase db diff` och verifiera migrations.
+- **ESLint warnings**: många kvarvarande varningar (ej blockerande). Prioritera de som riskerar regressions (hooks deps, react compiler hints).
+- **EOL/CRLF**: LF→CRLF-varningar i git-add på Windows. Besluta `.gitattributes`/`core.autocrlf` policy.
+- **Runtime smoke**: kör `npm run dev` och navigera GF1–GF3 manuellt (Host session, Participant join/rejoin, Board safe-mode) efter de stora ändringarna.
+
+**Screenshot (lokalt) — Build Error (sammanfattning)**
+- Fel: “Unable to make a module from invalid JSON … trailing comma …” i `messages/en.json` (och även no/sv).
+- Påverkan: Next.js/Turbopack kunde inte generera chunk för locale-filen → appen startar inte.
+- Åtgärd: rensade trasiga objekt/kommor och återställde giltig JSON.
 
 ### Progression (i18n Play)
 - **Senast kontrollerad:** 2026-01-18

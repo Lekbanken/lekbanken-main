@@ -37,13 +37,8 @@ import { useSessionEvents } from '../hooks/useSessionEvents';
 import { DirectorModeDrawer } from './DirectorModeDrawer';
 import { PreflightChecklist, type ChecklistItem } from './PreflightChecklist';
 import { ArtifactsPanel } from './ArtifactsPanel';
-import { SignalPanel } from './SignalPanel';
-import { TimeBankPanel } from './TimeBankPanel';
-import { EventFeedPanel } from './EventFeedPanel';
 import { SessionChatDrawer } from './SessionChatDrawer';
-import { SessionStoryPanel } from './SessionStoryPanel';
 import { LobbyHub } from '@/components/play';
-import { StoryViewModal } from './StoryViewModal';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
 import { approveParticipant, kickParticipant, setNextStarter } from '@/features/play-participant/api';
@@ -86,14 +81,10 @@ export interface SessionCockpitProps {
 
 type CockpitTab =
   | 'run'
-  | 'story'
   | 'participants'
   | 'artifacts'
   | 'triggers'
   | 'board'
-  | 'signals'
-  | 'timebank'
-  | 'events'
   | 'settings';
 
 // Session info for display
@@ -115,6 +106,9 @@ interface LobbyCheckInput {
 
 function RunTab({
   status,
+  startedAt,
+  pausedAt,
+  endedAt,
   steps,
   phases,
   currentStepIndex,
@@ -131,6 +125,9 @@ function RunTab({
   lastSyncAt,
 }: {
   status: SessionCockpitState['status'];
+  startedAt?: string | null;
+  pausedAt?: string | null;
+  endedAt?: string | null;
   steps: SessionCockpitState['steps'];
   phases: SessionCockpitState['phases'];
   currentStepIndex: number;
@@ -149,7 +146,9 @@ function RunTab({
   const tRun = useTranslations('play.cockpit.run');
   const uiState = resolveUiState({
     status,
-    startedAt: status === 'active' ? new Date().toISOString() : null,
+    startedAt: startedAt ?? null,
+    pausedAt: pausedAt ?? null,
+    endedAt: endedAt ?? null,
     lastPollAt: lastSyncAt ?? null,
   });
 
@@ -179,10 +178,10 @@ function RunTab({
       acc.total += 1;
       if (p.status === 'active') acc.active += 1;
       if (p.status === 'disconnected') acc.disconnected += 1;
-      if (p.status === 'pending') acc.pending += 1;
+      if (p.status === 'idle') acc.idle += 1;
       return acc;
     },
-    { total: 0, active: 0, disconnected: 0, pending: 0 }
+    { total: 0, active: 0, disconnected: 0, idle: 0 }
   );
 
   return (
@@ -255,7 +254,7 @@ function RunTab({
               <p className="text-sm text-muted-foreground">
                 {tRun('health.participantStatus', {
                   active: participantCounts.active,
-                  pending: participantCounts.pending,
+                  idle: participantCounts.idle,
                   offline: participantCounts.disconnected,
                 })}
               </p>
@@ -346,7 +345,7 @@ function SessionHeader({
         <Toolbelt
           sessionId={sessionId}
           role="host"
-          buttonLabel="🧰"
+          buttonLabel={t('header.toolbeltLabel')}
         />
 
         {status === 'lobby' && (
@@ -479,7 +478,7 @@ function ParticipantWithRoleRow({
       </div>
       
       <div className="flex items-center gap-2">
-        {participant.status === 'pending' && onApprove && (
+        {participant.status === 'idle' && onApprove && (
           <Button
             variant="secondary"
             size="sm"
@@ -755,6 +754,9 @@ export function SessionCockpit({
     displayName,
     sessionCode,
     status,
+    startedAt,
+    pausedAt,
+    endedAt,
     isLoading,
     error,
     participants,
@@ -778,7 +780,6 @@ export function SessionCockpit({
     pauseSession,
     resumeSession,
     endSession,
-    goToStep,
     nextStep,
     previousStep,
     assignRole,
@@ -792,7 +793,6 @@ export function SessionCockpit({
   } = sessionState;
 
   const showSignals = isFeatureEnabled('signals');
-  const showTimeBank = isFeatureEnabled('timeBank');
   const showEvents = isFeatureEnabled('eventLogging');
 
   const {
@@ -836,19 +836,19 @@ export function SessionCockpit({
     if (notificationDisabled) {
       switch (notificationStatus) {
         case 'denied':
-          notificationReason = 'blocked in browser';
+          notificationReason = t('notifications.reason.denied');
           break;
         case 'unavailable':
-          notificationReason = 'not supported in browser';
+          notificationReason = t('notifications.reason.unavailable');
           break;
         case 'error':
-          notificationReason = 'permission error';
+          notificationReason = t('notifications.reason.error');
           break;
         case 'unknown':
-          notificationReason = 'permission pending';
+          notificationReason = t('notifications.reason.unknown');
           break;
         default:
-          notificationReason = 'not available';
+          notificationReason = t('notifications.reason.default');
           break;
       }
     }
@@ -866,7 +866,6 @@ export function SessionCockpit({
   const [activeTab, setActiveTab] = useState<CockpitTab>('run');
   const [showChecklist, setShowChecklist] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [storyOpen, setStoryOpen] = useState(false);
   const [roleDrafts, setRoleDrafts] = useState<Record<string, SessionRoleUpdate>>({});
   const [rolesSaving, setRolesSaving] = useState(false);
   const [rolesSaveError, setRolesSaveError] = useState<string | null>(null);
@@ -895,10 +894,6 @@ export function SessionCockpit({
 
   const {
     events: sessionEvents,
-    stats: eventStats,
-    isLoading: eventsLoading,
-    error: eventsError,
-    refresh: refreshEvents,
   } = useSessionEvents({
     sessionId,
     realtime: showEvents,
@@ -930,23 +925,23 @@ export function SessionCockpit({
 
   const handleSaveRoleEdits = useCallback(async () => {
     if (sessionRoles.length === 0) return;
+    const saveErrorMessage = t('settings.sessionRoles.saveError');
     setRolesSaving(true);
     setRolesSaveError(null);
     try {
       const updates = Object.values(roleDrafts);
       const ok = await updateSessionRoles(sessionId, updates);
       if (!ok) {
-        throw new Error('Failed to save session roles');
+        setRolesSaveError(saveErrorMessage);
+        return;
       }
       await refresh();
-    } catch (error) {
-      setRolesSaveError(
-        error instanceof Error ? error.message : 'Failed to save session roles'
-      );
+    } catch {
+      setRolesSaveError(saveErrorMessage);
     } finally {
       setRolesSaving(false);
     }
-  }, [refresh, roleDrafts, sessionId, sessionRoles.length]);
+  }, [refresh, roleDrafts, sessionId, sessionRoles.length, t]);
 
   const handleExecuteSignal = useCallback(async (type: string, config: Record<string, unknown>) => {
     switch (type) {
@@ -977,7 +972,7 @@ export function SessionCockpit({
         break;
       }
       case 'notification': {
-        const title = typeof config.title === 'string' ? config.title : 'Signal';
+        const title = typeof config.title === 'string' ? config.title : t('notifications.defaultTitle');
         const body = typeof config.body === 'string' ? config.body : undefined;
         const forceToast = config.forceToast === true;
         const notificationStatus = capabilities.notification.status;
@@ -986,23 +981,23 @@ export function SessionCockpit({
           sent = await sendNotification(title, body);
         }
         if (!sent) {
-          let fallbackTitle = 'In-app notification';
+          let fallbackTitle = t('notifications.fallbackTitle.inApp');
           if (!forceToast) {
             switch (notificationStatus) {
               case 'denied':
-                fallbackTitle = 'Notifications blocked';
+                fallbackTitle = t('notifications.fallbackTitle.blocked');
                 break;
               case 'unavailable':
-                fallbackTitle = 'Notifications not supported';
+                fallbackTitle = t('notifications.fallbackTitle.unavailable');
                 break;
               case 'error':
-                fallbackTitle = 'Notification error';
+                fallbackTitle = t('notifications.fallbackTitle.error');
                 break;
               case 'unknown':
-                fallbackTitle = 'Notification pending';
+                fallbackTitle = t('notifications.fallbackTitle.unknown');
                 break;
               default:
-                fallbackTitle = 'Notification';
+                fallbackTitle = t('notifications.fallbackTitle.default');
                 break;
             }
           }
@@ -1012,7 +1007,7 @@ export function SessionCockpit({
         break;
       }
     }
-  }, [activateAudioGate, audioGateActive, capabilities.notification.status, flashScreen, flashTorch, playSound, sendNotification, toast, vibrate]);
+  }, [activateAudioGate, audioGateActive, capabilities.notification.status, flashScreen, flashTorch, playSound, sendNotification, t, toast, vibrate]);
 
   const handleKickParticipant = useCallback(async (participantId: string, displayName?: string) => {
     if (typeof window !== 'undefined') {
@@ -1030,13 +1025,13 @@ export function SessionCockpit({
   const handleApproveParticipant = useCallback(async (participantId: string, displayName?: string) => {
     try {
       await approveParticipant(sessionId, participantId);
-      toast.success(displayName ? `Godkände ${displayName}` : 'Deltagare godkänd');
+      toast.success(displayName ? t('participants.approved', { name: displayName }) : t('participants.approvedAnonymous'));
       await refresh();
     } catch (error) {
       console.warn('Failed to approve participant', error);
-      toast.error('Kunde inte godkänna deltagare');
+      toast.error(t('participants.approvalFailed'));
     }
-  }, [refresh, sessionId, toast]);
+  }, [refresh, sessionId, t, toast]);
 
   const handleMarkNext = useCallback(async (participantId: string) => {
     try {
@@ -1249,11 +1244,7 @@ export function SessionCockpit({
     { id: 'triggers', label: tTabs('triggers'), badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
     { id: 'board', label: tTabs('board') },
     { id: 'settings', label: tTabs('settings') },
-    { id: 'story', label: tTabs('story') },
-    showSignals ? { id: 'signals', label: tTabs('signals') } : null,
-    showTimeBank ? { id: 'timebank', label: tTabs('timebank') } : null,
-    showEvents ? { id: 'events', label: tTabs('events'), badge: sessionEvents.length || undefined } : null,
-  ].filter(Boolean) as Array<{ id: CockpitTab; label: string; badge?: number }>;
+  ] as Array<{ id: CockpitTab; label: string; badge?: number }>;
 
   // Map status for drawer
   const drawerStatus: 'active' | 'paused' | 'ended' = 
@@ -1314,7 +1305,7 @@ export function SessionCockpit({
                 state={lobbyState}
                 onParticipantsClick={() => setActiveTab('participants')}
                 onRolesClick={() => setActiveTab('participants')}
-                onContentClick={() => setActiveTab('story')}
+                onContentClick={() => setActiveTab('artifacts')}
                 onTriggersClick={() => setActiveTab('triggers')}
                 onSettingsClick={() => setActiveTab('settings')}
                 onStartSession={handleEnterDirectorMode}
@@ -1324,6 +1315,9 @@ export function SessionCockpit({
 
             <RunTab
               status={status}
+              startedAt={startedAt ?? null}
+              pausedAt={pausedAt ?? null}
+              endedAt={endedAt ?? null}
               steps={steps}
               phases={phases}
               currentStepIndex={currentStepIndex}
@@ -1343,12 +1337,6 @@ export function SessionCockpit({
             {children}
           </TabPanel>
 
-          <TabPanel id="story" activeTab={activeTab} className="space-y-6">
-            <SessionStoryPanel
-              sessionId={sessionId}
-              onPreview={() => setStoryOpen(true)}
-            />
-          </TabPanel>
           
           <TabPanel id="participants" activeTab={activeTab}>
             <ParticipantsTab
@@ -1389,37 +1377,11 @@ export function SessionCockpit({
             </Card>
           </TabPanel>
 
-          {showSignals && (
-            <TabPanel id="signals" activeTab={activeTab}>
-              <SignalPanel sessionId={sessionId} disabled={isLoading || status === 'ended'} />
-            </TabPanel>
-          )}
-
-          {showTimeBank && (
-            <TabPanel id="timebank" activeTab={activeTab}>
-              <TimeBankPanel sessionId={sessionId} disabled={isLoading || status === 'ended'} />
-            </TabPanel>
-          )}
-
-          {showEvents && (
-            <TabPanel id="events" activeTab={activeTab}>
-              <EventFeedPanel
-                events={sessionEvents}
-                stats={eventStats}
-                isLoading={eventsLoading}
-                error={eventsError}
-                onRefresh={refreshEvents}
-              />
-            </TabPanel>
-          )}
           
           <TabPanel id="settings" activeTab={activeTab} className="space-y-6">
             <Card className="p-6">
               <h3 className="font-medium mb-4">{t('settings.title')}</h3>
               <p className="text-sm text-muted-foreground">{t('settings.description')}</p>
-              <Button variant="outline" size="sm" className="mt-4" onClick={() => setActiveTab('story')}>
-                {t('settings.openStory')}
-              </Button>
             </Card>
 
             <Card className="p-6 space-y-4">
@@ -1468,7 +1430,7 @@ export function SessionCockpit({
                           />
                           <div className="flex gap-2 text-xs text-muted-foreground">
                             <label className="flex items-center gap-1">
-                              Min
+                              {t('settings.sessionRoles.fields.min')}
                               <input
                                 type="number"
                                 className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1488,7 +1450,7 @@ export function SessionCockpit({
                               />
                             </label>
                             <label className="flex items-center gap-1">
-                              Max
+                              {t('settings.sessionRoles.fields.max')}
                               <input
                                 type="number"
                                 className="w-16 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1508,7 +1470,7 @@ export function SessionCockpit({
                               />
                             </label>
                             <label className="flex items-center gap-1">
-                              Icon
+                              {t('settings.sessionRoles.fields.icon')}
                               <input
                                 type="text"
                                 className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1521,7 +1483,7 @@ export function SessionCockpit({
                               />
                             </label>
                             <label className="flex items-center gap-1">
-                              Color
+                              {t('settings.sessionRoles.fields.color')}
                               <input
                                 type="text"
                                 className="w-24 rounded border border-input bg-background px-2 py-1 text-sm"
@@ -1603,15 +1565,6 @@ export function SessionCockpit({
           onSend={chat.send}
         />
 
-        <StoryViewModal
-          open={storyOpen}
-          onClose={() => setStoryOpen(false)}
-          steps={steps}
-          currentStepIndex={currentStepIndex}
-          title={displayName ?? t('story.title')}
-          onNavigateToStep={(index) => void goToStep(index)}
-        />
-        
         {/* Preflight Checklist Modal */}
         {showChecklist && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">

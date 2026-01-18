@@ -20,6 +20,9 @@ export interface SessionCockpitState {
   gameId: string | null;
   sessionCode: string;
   displayName: string;
+  startedAt?: string | null;
+  pausedAt?: string | null;
+  endedAt?: string | null;
   
   // Status
   status: SessionCockpitStatus;
@@ -73,7 +76,7 @@ export interface SessionCockpitState {
 // Participant Types
 // =============================================================================
 
-export type ParticipantStatus = 'pending' | 'joined' | 'active' | 'disconnected' | 'left' | 'kicked';
+export type ParticipantStatus = 'idle' | 'joined' | 'active' | 'disconnected' | 'left' | 'kicked';
 
 export interface CockpitParticipant {
   id: string;

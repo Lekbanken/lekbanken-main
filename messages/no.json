@@ -7861,10 +7861,31 @@
       "sessionCode": "Sesjonskode",
       "noGameLinked": "Ingen spill er koblet til sesjonen."
     },
+    "lobby": {
+      "participantsSection": {
+        "title": "Deltakere",
+        "backLabel": "Tilbake",
+        "onlineCount": "{count} online",
+        "withoutRoles": "{count} uten roller",
+        "allRolesAssigned": "Alle roller tildelt",
+        "noParticipantsTitle": "Ingen deltakere ennå",
+        "noParticipantsDescription": "Inviter folk til å bli med i økten",
+        "inviteMore": "Inviter flere",
+        "randomize": "Randomiser",
+        "hostLabel": "Vert",
+        "noRoleAssigned": "Ingen rolle tildelt",
+        "assignAction": "Tildel →",
+        "status": {
+          "online": "Online",
+          "offline": "Offline"
+        }
+      }
+    },
     "board": {
       "title": "Board",
       "loading": "Laster...",
-      "updating": "Oppdaterer… Viser siste kjente tilstand.",
+      "updating": "Oppdaterer… Viser siste kjente tilstand. Sist oppdatert {time}.",
+      "timeUnknown": "ukjent tid",
       "codeLabel": "Kode",
       "banner": {
         "waiting": "Venter på start. Deltakere kan bli med med koden.",
@@ -8361,7 +8382,8 @@
     "cockpit": {
       "header": {
         "participants": "deltakere",
-        "openChat": "Åpne chat"
+        "openChat": "Åpne chat",
+        "toolbeltLabel": "Verktøykasse"
       },
       "status": {
         "paused": "PAUSET",
@@ -8372,7 +8394,8 @@
         "directorMode": "Director Mode"
       },
       "errors": {
-        "title": "Feil:"
+        "title": "Feil:",
+        "loadSession": "Kunne ikke laste økten"
       },
       "session": {
         "fallbackName": "Session"
@@ -8385,6 +8408,24 @@
         "torch": "Lommelykt",
         "audio": "Lydsignal",
         "notification": "Varsling"
+      },
+      "notifications": {
+        "defaultTitle": "Signal",
+        "reason": {
+          "denied": "Blokkert i nettleseren",
+          "unavailable": "Ikke støttet i nettleseren",
+          "error": "Tillatelsesfeil",
+          "unknown": "Tillatelse avventer",
+          "default": "Ikke tilgjengelig"
+        },
+        "fallbackTitle": {
+          "inApp": "In-app-varsel",
+          "blocked": "Varsler blokkert",
+          "unavailable": "Varsler støttes ikke",
+          "error": "Varslingsfeil",
+          "unknown": "Varsel avventer",
+          "default": "Varsel"
+        }
       },
       "preflight": {
         "title": "Forberedelseskontroll",
@@ -8440,7 +8481,7 @@
             "degraded": "Ustabil",
             "offline": "Offline"
           },
-          "participantStatus": "{active} aktive · {pending} ventende · {offline} offline",
+          "participantStatus": "{active} aktive · {idle} ventende · {offline} offline",
           "triggersArmed": "{count} klare"
         }
       },
@@ -8450,15 +8491,25 @@
       },
       "settings": {
         "title": "Øktinnstillinger",
-        "description": "Story- og fasetekster endres under Story-fanen. Flere innstillinger kan gjenopprettes her senere.",
+        "description": "Øktinnstillinger for roller og runtime-justeringer.",
         "openStory": "Åpne Story",
         "sessionRoles": {
           "title": "Øktroller (øktkopi)",
           "description": "Oppdater rolltekst og grenser for denne økten uten å endre spillmalen.",
           "save": "Lagre roller",
+          "saveError": "Kunne ikke lagre øktroller",
           "empty": "Ingen roller er snapshot'et ennå. Kopier roller i Roller-fanen for å aktivere redigering her.",
-          "copy": "Kopier roller"
-        }
+          "copy": "Kopier roller",
+          "fields": {
+            "min": "Min",
+            "max": "Maks",
+            "icon": "Ikon",
+            "color": "Farge"
+          }
+        },
+        "sessionCode": "Øktkode",
+        "codeGenerated": "Kode generert",
+        "noCodeGenerated": "Ingen kode generert"
       },
       "roles": {
         "noRolesCopied": "Ingen roller kopiert ennå",
@@ -8477,6 +8528,9 @@
         "online": "Online",
         "offline": "Offline",
         "assignRole": "Tildel rolle...",
+        "approved": "Godkjente {name}",
+        "approvedAnonymous": "Deltaker godkjent",
+        "approvalFailed": "Kunne ikke godkjenne deltaker",
         "participantsMissingRole": "{count} deltakere mangler rolle",
         "onlineCount": "{online} av {total} online",
         "rolesCount": "{assigned} av {total} har roller"
@@ -8491,11 +8545,6 @@
         "stepsAndPhases": "Steg og faser",
         "stepsDefined": "{count} steg definert",
         "noStepsDefined": "Ingen steg definert"
-      },
-      "settings": {
-        "sessionCode": "Øktkode",
-        "codeGenerated": "Kode generert",
-        "noCodeGenerated": "Ingen kode generert"
       },
       "steps": {
         "unnamedStep": "Navnløst steg",

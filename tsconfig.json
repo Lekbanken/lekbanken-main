@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -19,12 +23,16 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
+      "@/*": [
+        "./*"
+      ],
       "@/components/*": [
         "./components/*",
         "./catalyst-ui-kit/demo/typescript/src/components/*"
       ],
-      "@/data": ["./catalyst-ui-kit/demo/typescript/src/data"]
+      "@/data": [
+        "./catalyst-ui-kit/demo/typescript/src/data"
+      ]
     }
   },
   "include": [
@@ -32,7 +40,14 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.mts",
-    "tests/**/*.ts"
+    "tests/**/*.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "catalyst-ui-kit", "tests/e2e/**", "supabase/functions/**"]
+  "exclude": [
+    "node_modules",
+    "catalyst-ui-kit",
+    "tests/e2e/**",
+    "supabase/functions/**"
+  ]
 }

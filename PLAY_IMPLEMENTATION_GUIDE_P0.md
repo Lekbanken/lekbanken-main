@@ -114,6 +114,15 @@ These decisions are final for P0 and must not be changed during implementation.
 ### i18n requirement
 All user-facing strings must use i18n keys (sv/en/no). No hardcoded Play strings.
 
+### File pointers
+- `lib/play/ui-state.ts` (shared resolver)
+- `features/play/components/SessionCockpit.tsx` (Host Run view + tabs)
+- `features/play/hooks/useSessionState.ts` (Host session state)
+- `app/participants/join/page.tsx` (Join flow + validation)
+- `app/participants/view/page.tsx` (Participant single view)
+- `app/board/[code]/BoardClient.tsx` (Board templates + safe mode)
+- `messages/en.json`, `messages/sv.json`, `messages/no.json` (i18n keys)
+
 ---
 
 ## 3. Implementation tasks (ordered)
@@ -178,55 +187,3 @@ All user-facing strings must use i18n keys (sv/en/no). No hardcoded Play strings
 3. No hardcoded Play strings remain.
 4. Type-check + tests green.
 5. Document locked decisions confirmed.
-
----
-
-## Checkboxes
-
-Använd dessa för att hålla koll på progress:
-
-### Databas Verifiering
-- [ ] Kört Query 1 - Visa migrations
-- [ ] Kört Query 2 - Kolla tabeller (notera ❌)
-- [ ] Kört Query 3 - Kolla enums (notera ❌)
-- [ ] Kört Query 4 - Kolla tenants kolumner
-- [ ] Kört Query 5 - Kolla tenant_memberships kolumner
-
-### Migrations
-- [ ] Identifierat saknade migrations
-- [ ] Kört `20251208130000_role_enum_and_permissions.sql` (om behövs)
-- [ ] Kört `20251209100000_tenant_domain.sql` (om behövs)
-- [ ] Kört `20251209120000_accounts_domain.sql` (om behövs)
-- [ ] Kört `20251209150000_billing_consolidation.sql` (om behövs)
-- [ ] Verifierat alla tabeller finns (alla ✅)
-
-### Type Regeneration
-- [ ] Länkat Supabase projekt (`supabase link`)
-- [ ] Regenererat types (`npm run db:types:remote`)
-- [ ] Kört `npm run type-check` - inga errors
-- [ ] Verifierat `types/supabase.ts` innehåller nya tabeller
-
-### Code Cleanup
-- [ ] Identifierat alla 'as any' casts (~30 st)
-- [ ] Tagit bort 'as any' i mfaGuard.ts
-- [ ] Tagit bort 'as any' i billing routes
-- [ ] Tagit bort 'as any' i tenant routes
-- [ ] Tagit bort 'as any' i products routes
-- [ ] Tagit bort 'as any' i plans routes
-- [ ] Kört `npm run type-check` - inga errors
-- [ ] Kört `npm run build` - success
-
-### Git & Deploy
-- [ ] Kört `git status`
-- [ ] Kört `git add .`
-- [ ] Kört `git commit` med beskrivande message
-- [ ] Kört `git push origin main`
-- [ ] Verifierat CI/CD pipeline går igenom
-
----
-
-## Nästa Action
-
-**DU ÄR HÄR → Kör SQL queries i Supabase Dashboard**
-
-Dela resultaten så hjälper jag dig med nästa steg! 🚀

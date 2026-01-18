@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Participant, Role } from '@/types/lobby';
 import { Avatar } from '@/components/ui/avatar';
@@ -51,6 +52,7 @@ interface ParticipantCardProps {
 }
 
 function ParticipantCard({ participant, role, isHost, onClick }: ParticipantCardProps) {
+  const t = useTranslations('play.lobby.participantsSection');
   const hasRole = !!role;
 
   return (
@@ -78,16 +80,22 @@ function ParticipantCard({ participant, role, isHost, onClick }: ParticipantCard
             {participant.name}
           </span>
           {!participant.isConnected && (
-            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-foreground-secondary" title="Offline" />
+            <span
+              className="flex-shrink-0 h-2 w-2 rounded-full bg-foreground-secondary"
+              title={t('status.offline')}
+            />
           )}
           {participant.isConnected && (
-            <span className="flex-shrink-0 h-2 w-2 rounded-full bg-success" title="Online" />
+            <span
+              className="flex-shrink-0 h-2 w-2 rounded-full bg-success"
+              title={t('status.online')}
+            />
           )}
         </div>
         
         <div className="flex items-center gap-2 mt-0.5">
           {isHost && (
-            <Badge variant="primary" size="sm">Host</Badge>
+            <Badge variant="primary" size="sm">{t('hostLabel')}</Badge>
           )}
           {hasRole ? (
             <span className="text-sm text-foreground-secondary flex items-center gap-1">
@@ -97,7 +105,7 @@ function ParticipantCard({ participant, role, isHost, onClick }: ParticipantCard
           ) : (
             <span className="text-sm text-warning flex items-center gap-1">
               <ExclamationTriangleIcon className="h-3.5 w-3.5" />
-              No role assigned
+              {t('noRoleAssigned')}
             </span>
           )}
         </div>
@@ -108,7 +116,7 @@ function ParticipantCard({ participant, role, isHost, onClick }: ParticipantCard
         {hasRole ? (
           <CheckCircleIcon className="h-5 w-5 text-success" />
         ) : (
-          <span className="text-sm text-primary font-medium">Assign →</span>
+          <span className="text-sm text-primary font-medium">{t('assignAction')}</span>
         )}
       </div>
     </button>
@@ -133,6 +141,7 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
     },
     ref
   ) => {
+    const t = useTranslations('play.lobby.participantsSection');
     // Count stats
     const totalParticipants = participants.length;
     const withRoles = participants.filter(p => p.roleId).length;
@@ -159,12 +168,12 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
               type="button"
               onClick={onBack}
               className="p-2 -ml-2 rounded-lg hover:bg-surface-secondary transition-colors"
-              aria-label="Go back"
+              aria-label={t('backLabel')}
             >
               <ChevronLeftIcon className="h-5 w-5 text-foreground" />
             </button>
           )}
-          <h1 className="text-xl font-bold text-foreground flex-1">Participants</h1>
+          <h1 className="text-xl font-bold text-foreground flex-1">{t('title')}</h1>
           <Badge variant="secondary" size="md">
             {totalParticipants}/{maxParticipants}
           </Badge>
@@ -174,18 +183,18 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
         <div className="flex items-center gap-4 mb-6 text-sm text-foreground-secondary">
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-success" />
-            {connected} online
+            {t('onlineCount', { count: connected })}
           </span>
           {withoutRoles > 0 && (
             <span className="flex items-center gap-1.5 text-warning">
               <ExclamationTriangleIcon className="h-4 w-4" />
-              {withoutRoles} without roles
+              {t('withoutRoles', { count: withoutRoles })}
             </span>
           )}
           {withoutRoles === 0 && totalParticipants > 0 && (
             <span className="flex items-center gap-1.5 text-success">
               <CheckCircleIcon className="h-4 w-4" />
-              All roles assigned
+              {t('allRolesAssigned')}
             </span>
           )}
         </div>
@@ -208,9 +217,9 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
             <div className="h-16 w-16 mx-auto rounded-full bg-surface-secondary flex items-center justify-center mb-4">
               <UserPlusIcon className="h-8 w-8 text-foreground-secondary" />
             </div>
-            <h3 className="text-lg font-medium text-foreground mb-1">No participants yet</h3>
+            <h3 className="text-lg font-medium text-foreground mb-1">{t('noParticipantsTitle')}</h3>
             <p className="text-foreground-secondary text-sm">
-              Invite people to join your session
+              {t('noParticipantsDescription')}
             </p>
           </div>
         )}
@@ -220,7 +229,7 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
           {onInvite && (
             <Button variant="primary" onClick={onInvite} className="flex-1">
               <UserPlusIcon className="h-4 w-4 mr-2" />
-              Invite More
+              {t('inviteMore')}
             </Button>
           )}
           
@@ -231,7 +240,7 @@ export const ParticipantsSection = forwardRef<HTMLDivElement, ParticipantsSectio
               disabled={participants.length === 0}
             >
               <ArrowPathRoundedSquareIcon className="h-4 w-4 mr-2" />
-              Randomize
+              {t('randomize')}
             </Button>
           )}
         </div>

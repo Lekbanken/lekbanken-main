@@ -46,11 +46,14 @@ export function resolveConnectionHealth(input: {
 export function resolveUiMode(input: {
   status: string | null | undefined;
   startedAt?: string | null;
+  pausedAt?: string | null;
+  endedAt?: string | null;
 }): UiMode {
   const status = input.status ?? 'active';
 
+  if (input.endedAt) return 'ended';
   if (status === 'ended' || status === 'archived' || status === 'cancelled') return 'ended';
-  if (status === 'paused') return 'paused';
+  if (status === 'paused' || input.pausedAt) return 'paused';
   if (status === 'locked') return 'locked';
   if (status === 'active' && !input.startedAt) return 'lobby';
   if (status === 'active' && input.startedAt) return 'live';
@@ -92,10 +95,17 @@ export function resolveAllowedActions(uiMode: UiMode): AllowedActions {
 export function resolveUiState(input: {
   status: string | null | undefined;
   startedAt?: string | null;
+  pausedAt?: string | null;
+  endedAt?: string | null;
   lastRealtimeAt?: string | null;
   lastPollAt?: string | null;
 }): UiState {
-  const uiMode = resolveUiMode({ status: input.status, startedAt: input.startedAt });
+  const uiMode = resolveUiMode({
+    status: input.status,
+    startedAt: input.startedAt,
+    pausedAt: input.pausedAt,
+    endedAt: input.endedAt,
+  });
   const connection = resolveConnectionHealth({ lastRealtimeAt: input.lastRealtimeAt, lastPollAt: input.lastPollAt });
   const banner = resolveSessionBanner(uiMode, connection);
   const allowed = resolveAllowedActions(uiMode);

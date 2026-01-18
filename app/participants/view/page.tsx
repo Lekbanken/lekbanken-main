@@ -215,6 +215,8 @@ export default function ParticipantViewPage() {
   const uiState = resolveUiState({
     status: sessionState?.status,
     startedAt: sessionState?.startedAt ?? null,
+    pausedAt: sessionState?.pausedAt ?? null,
+    endedAt: sessionState?.endedAt ?? null,
     lastPollAt,
     lastRealtimeAt,
   });
@@ -251,7 +253,7 @@ export default function ParticipantViewPage() {
   
   if (!sessionInfo) return null;
 
-  const isPending = participantStatus === 'pending';
+  const isPending = participantStatus === 'idle';
 
   return (
     <div className="min-h-screen bg-muted/30 p-4">

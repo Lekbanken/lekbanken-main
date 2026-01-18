@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { resolveUiState } from '@/lib/play/ui-state';
@@ -79,6 +79,7 @@ const POLL_INTERVAL = 5000;
 
 export function BoardClient({ code, initialData = null, initialError = null }: BoardClientProps) {
   const t = useTranslations('play.board');
+  const locale = useLocale();
   const [data, setData] = useState<BoardApiResponse | null>(initialData);
   const [cachedData, setCachedData] = useState<BoardApiResponse | null>(initialData);
   const [error, setError] = useState<string | null>(initialError);
@@ -140,6 +141,7 @@ export function BoardClient({ code, initialData = null, initialError = null }: B
   const uiState = resolveUiState({
     status: displayData?.session.status,
     startedAt: displayData?.session.started_at ?? null,
+    endedAt: displayData?.session.ended_at ?? null,
     lastPollAt,
   });
 
@@ -154,6 +156,15 @@ export function BoardClient({ code, initialData = null, initialError = null }: B
   } as const;
 
   const bannerMessage = bannerCopy[uiState.banner];
+  const formatTime = (value: string | null) => {
+    if (!value) return t('timeUnknown');
+    try {
+      return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+    } catch {
+      return t('timeUnknown');
+    }
+  };
+  const updatingMessage = t('updating', { time: formatTime(lastPollAt) });
 
   if (!displayData) {
     return (
@@ -199,7 +210,7 @@ export function BoardClient({ code, initialData = null, initialError = null }: B
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       {(uiState.connection !== 'connected' || Boolean(error)) && (
         <div className="rounded-lg border border-border bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
-          {t('updating')}
+          {updatingMessage}
         </div>
       )}
       {bannerMessage && (

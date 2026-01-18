@@ -102,8 +102,56 @@
 - **2026-01-18**: Kvalitetsgate: `npm run type-check` + `npm test` gröna. Commit/push genomförd (main).
 - **2026-01-18**: Datamodell-align: ersatte `participant_status = 'pending'` i API/UI med enum-kompatibel `idle` för “awaiting approval” (ingen DB-migration gjord).
 - **2026-01-18**: Lokal build-fix (screenshot): `next-intl` kraschade p.g.a. ogiltig JSON i `messages/*.json` (t.ex. “trailing comma / Expected ',' or '}'”). Rensade/lagade `messages/en.json`, `messages/no.json`, `messages/sv.json` så att de är parsebara igen.
+- **2026-01-18**: Lokal dev-run: `next dev` blockerades av `.next/dev/lock` p.g.a. parallell instans. Åtgärd: stäng befintlig process och starta om.
 
 ### Status (2026-01-18) — Full kontroll
+
+**Status snapshot (60 sek)**
+- Build: locale-JSON fixad (next-intl), appen kan starta igen efter att ev. tidigare dev-server stängts.
+- Kvalitetsgates: lint (varningar kvar), type-check + tests gröna.
+- Databas: `db push` up to date, `db diff` kräver Docker Desktop.
+- Play-flöden: Host/Participant/Board i drift med i18n-uppdateringar och UI-state-resolver i participant view.
+
+**Done / In progress / Next / Remaining (GF1–GF3)**
+- **GF1 Host — Run a live session**
+  - **Done:** i18n-städning och UI-copy i host-ytor (bl.a. [app/app/play/sessions/client.tsx](app/app/play/sessions/client.tsx), [app/app/play/sessions/[id]/client.tsx](app/app/play/sessions/[id]/client.tsx), [components/play/LobbyHub.tsx](components/play/LobbyHub.tsx), [features/play/components/SessionCockpit.tsx](features/play/components/SessionCockpit.tsx)).
+  - **In progress:** manuella smoke-tester av host-flöden (start/pause/resume/end) i UI.
+  - **Next:** verifiera triggers/artifacts/roles i host-vy mot API-respons (t.ex. [app/api/play/sessions/[id]/game/route.ts](app/api/play/sessions/[id]/game/route.ts), [app/api/play/sessions/[id]/route.ts](app/api/play/sessions/[id]/route.ts)).
+  - **Remaining:** konsolidera IA/tabs och säkerställ att `uiMode` härledning används konsekvent.
+- **GF2 Participant — Join → wait → interact → rejoin**
+  - **Done:** UI-state-resolver och i18n i participant view ([app/participants/view/page.tsx](app/participants/view/page.tsx)), join-flow copy ([app/participants/join/page.tsx](app/participants/join/page.tsx)).
+  - **In progress:** beslut om `awaiting approval` (DB enum vs UI-status). Just nu används `idle` i [app/api/participants/sessions/join/route.ts](app/api/participants/sessions/join/route.ts) och [app/api/participants/sessions/rejoin/route.ts](app/api/participants/sessions/rejoin/route.ts).
+  - **Next:** verifiera rejoin/ended-flöden med manuella testfall och ev. textjusteringar.
+  - **Remaining:** DB-migration om `participant_status = 'pending'` ska återinföras.
+- **GF3 Board — Public display**
+  - **Done:** safe-mode cache/fallback + uppdateringsbanner i [app/board/[code]/BoardClient.tsx](app/board/[code]/BoardClient.tsx) och board-route [app/board/[code]/page.tsx](app/board/[code]/page.tsx).
+  - **In progress:** manuella tester av offline/timeout/refresh-scenarier.
+  - **Next:** säkerställ att board-data i [app/api/play/board/[code]/route.ts](app/api/play/board/[code]/route.ts) matchar UI-förväntningar.
+  - **Remaining:** formell acceptans av “safe mode” visual copy + fallback-strategi.
+
+**Risk / Open questions / Decisions (kort)**
+- **Risk:** `idle` används för “awaiting approval” utan DB-stöd för `pending`. **Beslut krävs:** behåll `idle` eller migrera enum.
+- **Open question:** vill vi köra `supabase db diff` i CI (kräver Docker) eller dokumentera att det görs manuellt?
+- **Decision:** `.next/dev/lock` ska dokumenteras som känd lokal dev-störning vid parallell `next dev`.
+
+**Verification checklist (uppdaterad)**
+- `npm run lint` (förvänta warnings, inga errors)
+- `npm run type-check`
+- `npm test`
+- Manuell: Host start/paus/resume/end → Participant join/rejoin → Board offline/refresh fallback
+
+**Audit — senaste commits (sammanfattning)**
+- 2026-01-18: Fix invalid locale JSON (next-intl) — reparerade `messages/*.json` så Turbopack kan bygga.
+- 2026-01-18: Fix typecheck and participant status — i18n-breddning, typecheck-fixar, `idle` som pending-ersättare, SimplePlayView återinförd.
+
+**Inventory (Play-ytor, snabbreferens)**
+- Marketing Play: [app/(marketing)/play](app/(marketing)/play)
+- App Play: [app/app/play](app/app/play)
+- Participant: [app/participants](app/participants)
+- Board: [app/board/[code]](app/board/[code])
+- Play API: [app/api/play](app/api/play)
+- Participant API: [app/api/participants](app/api/participants)
+- Play Components: [features/play/components](features/play/components)
 
 **Genomfört (klart)**
 - Supabase: `supabase db push` körd, remote var “up to date”. (Diff-check blockerad lokalt p.g.a. Docker saknas.)

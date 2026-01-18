@@ -16,7 +16,6 @@ import type {
   SessionCockpitConfig,
   CockpitParticipant,
   CockpitTrigger,
-  PreflightItem,
   SessionEvent,
   Signal,
   SignalOutputType,
@@ -42,6 +41,9 @@ const DEFAULT_STATE: SessionCockpitState = {
   gameId: null,
   sessionCode: '',
   displayName: '',
+  startedAt: null,
+  pausedAt: null,
+  endedAt: null,
   status: 'lobby',
   isDirectorMode: false,
   isLoading: true,
@@ -101,6 +103,7 @@ function applyRoleAssignments(
 export function useSessionState(config: SessionCockpitConfig): UseSessionStateReturn {
   const { sessionId, enableRealtime = true, pollInterval = 3000, onError } = config;
   const tPreflight = useTranslations('play.preflightChecklist');
+  const tErrors = useTranslations('play.cockpit.errors');
 
   // Core state
   const [state, setState] = useState<SessionCockpitState>({
@@ -134,15 +137,18 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         gameId: session.gameId ?? null,
         sessionCode: session.sessionCode,
         displayName: session.displayName,
+        startedAt: session.startedAt ?? null,
+        pausedAt: session.pausedAt ?? null,
+        endedAt: session.endedAt ?? null,
         status: resolvedStatus,
         error: null,
       }));
     } catch (err) {
-      const error = err instanceof Error ? err.message : 'Failed to load session';
-      setState((prev) => ({ ...prev, error }));
-      onError?.(err instanceof Error ? err : new Error(error));
+      const errorMessage = tErrors('loadSession');
+      setState((prev) => ({ ...prev, error: errorMessage }));
+      onError?.(err instanceof Error ? err : new Error(errorMessage));
     }
-  }, [sessionId, onError]);
+  }, [sessionId, onError, tErrors]);
 
   const loadParticipants = useCallback(async () => {
     try {
@@ -151,13 +157,12 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       // Map participant status to cockpit status
       const mapStatus = (status: string): CockpitParticipant['status'] => {
         switch (status) {
-          case 'pending': return 'pending';
           case 'active': return 'active';
           case 'disconnected': return 'disconnected';
           case 'kicked': return 'kicked';
           case 'blocked': return 'left';
-          case 'idle': return 'pending';
-          default: return 'pending';
+          case 'idle': return 'idle';
+          default: return 'idle';
         }
       };
       

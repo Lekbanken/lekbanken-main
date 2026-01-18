@@ -7835,10 +7835,31 @@
       "sessionCode": "Session code",
       "noGameLinked": "No game is linked to the session."
     },
+    "lobby": {
+      "participantsSection": {
+        "title": "Participants",
+        "backLabel": "Go back",
+        "onlineCount": "{count} online",
+        "withoutRoles": "{count} without roles",
+        "allRolesAssigned": "All roles assigned",
+        "noParticipantsTitle": "No participants yet",
+        "noParticipantsDescription": "Invite people to join your session",
+        "inviteMore": "Invite more",
+        "randomize": "Randomize",
+        "hostLabel": "Host",
+        "noRoleAssigned": "No role assigned",
+        "assignAction": "Assign →",
+        "status": {
+          "online": "Online",
+          "offline": "Offline"
+        }
+      }
+    },
     "board": {
       "title": "Board",
       "loading": "Loading...",
-      "updating": "Updating… Showing latest known state.",
+      "updating": "Updating… Showing last known state. Last updated {time}.",
+      "timeUnknown": "time unknown",
       "codeLabel": "Code",
       "banner": {
         "waiting": "Waiting to start. Participants can join with the code.",
@@ -8380,7 +8401,8 @@
     "cockpit": {
       "header": {
         "participants": "participants",
-        "openChat": "Open chat"
+        "openChat": "Open chat",
+        "toolbeltLabel": "Toolbelt"
       },
       "status": {
         "paused": "PAUSED",
@@ -8391,7 +8413,8 @@
         "directorMode": "Director Mode"
       },
       "errors": {
-        "title": "Error:"
+        "title": "Error:",
+        "loadSession": "Could not load session"
       },
       "session": {
         "fallbackName": "Session"
@@ -8404,6 +8427,24 @@
         "torch": "Flashlight",
         "audio": "Audio signal",
         "notification": "Notification"
+      },
+      "notifications": {
+        "defaultTitle": "Signal",
+        "reason": {
+          "denied": "Blocked in browser",
+          "unavailable": "Not supported in browser",
+          "error": "Permission error",
+          "unknown": "Permission pending",
+          "default": "Not available"
+        },
+        "fallbackTitle": {
+          "inApp": "In-app notification",
+          "blocked": "Notifications blocked",
+          "unavailable": "Notifications not supported",
+          "error": "Notification error",
+          "unknown": "Notification pending",
+          "default": "Notification"
+        }
       },
       "preflight": {
         "title": "Preflight Check",
@@ -8459,7 +8500,7 @@
             "degraded": "Degraded",
             "offline": "Offline"
           },
-          "participantStatus": "{active} active · {pending} pending · {offline} offline",
+          "participantStatus": "{active} active · {idle} idle · {offline} offline",
           "triggersArmed": "{count} armed"
         }
       },
@@ -8469,15 +8510,25 @@
       },
       "settings": {
         "title": "Session settings",
-        "description": "Story and phase text overrides live under the Story tab. More session settings can be restored here next.",
+        "description": "Session settings for roles and runtime overrides.",
         "openStory": "Open Story",
         "sessionRoles": {
           "title": "Session roles (session copy)",
           "description": "Update role text and limits for this session without changing the game template.",
           "save": "Save roles",
+          "saveError": "Could not save session roles",
           "empty": "No roles snapshotted yet. Copy roles in the Roles tab to enable edits here.",
-          "copy": "Copy roles"
-        }
+          "copy": "Copy roles",
+          "fields": {
+            "min": "Min",
+            "max": "Max",
+            "icon": "Icon",
+            "color": "Color"
+          }
+        },
+        "sessionCode": "Session code",
+        "codeGenerated": "Code generated",
+        "noCodeGenerated": "No code generated"
       },
       "roles": {
         "noRolesCopied": "No roles copied yet",
@@ -8496,6 +8547,9 @@
         "online": "Online",
         "offline": "Offline",
         "assignRole": "Assign role...",
+        "approved": "Approved {name}",
+        "approvedAnonymous": "Participant approved",
+        "approvalFailed": "Could not approve participant",
         "participantsMissingRole": "{count} participants missing role",
         "onlineCount": "{online} of {total} online",
         "rolesCount": "{assigned} of {total} have roles"
@@ -8510,11 +8564,6 @@
         "stepsAndPhases": "Steps & Phases",
         "stepsDefined": "{count} steps defined",
         "noStepsDefined": "No steps defined"
-      },
-      "settings": {
-        "sessionCode": "Session code",
-        "codeGenerated": "Code generated",
-        "noCodeGenerated": "No code generated"
       },
       "steps": {
         "unnamedStep": "Unnamed step",

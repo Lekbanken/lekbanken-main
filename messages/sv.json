@@ -34,7 +34,6 @@
       "deselectAll": "Avmarkera alla",
       "copy": "Kopiera",
       "paste": "Klistra in",
-      "duplicate": "Duplicera",
       "archive": "Arkivera",
       "restore": "Återställ",
       "publish": "Publicera",
@@ -8403,10 +8402,31 @@
       "sessionCode": "Sessionskod",
       "noGameLinked": "Inget spel är kopplat till sessionen."
     },
+    "lobby": {
+      "participantsSection": {
+        "title": "Deltagare",
+        "backLabel": "Tillbaka",
+        "onlineCount": "{count} online",
+        "withoutRoles": "{count} utan roller",
+        "allRolesAssigned": "Alla roller tilldelade",
+        "noParticipantsTitle": "Inga deltagare ännu",
+        "noParticipantsDescription": "Bjud in personer att gå med i sessionen",
+        "inviteMore": "Bjud in fler",
+        "randomize": "Slumpa",
+        "hostLabel": "Lekledare",
+        "noRoleAssigned": "Ingen roll tilldelad",
+        "assignAction": "Tilldela →",
+        "status": {
+          "online": "Online",
+          "offline": "Offline"
+        }
+      }
+    },
     "board": {
       "title": "Board",
       "loading": "Laddar...",
-      "updating": "Uppdaterar… Visar senaste kända läge.",
+      "updating": "Uppdaterar… Visar senaste kända läge. Senast uppdaterad {time}.",
+      "timeUnknown": "okänd tid",
       "codeLabel": "Kod",
       "banner": {
         "waiting": "Väntar på start. Deltagare kan ansluta med koden.",
@@ -8944,7 +8964,8 @@
     "cockpit": {
       "header": {
         "participants": "deltagare",
-        "openChat": "Öppna chatt"
+        "openChat": "Öppna chatt",
+        "toolbeltLabel": "Verktygslåda"
       },
       "status": {
         "paused": "PAUSAD",
@@ -8955,7 +8976,8 @@
         "directorMode": "Director Mode"
       },
       "errors": {
-        "title": "Fel:"
+        "title": "Fel:",
+        "loadSession": "Kunde inte läsa in sessionen"
       },
       "session": {
         "fallbackName": "Session"
@@ -8968,6 +8990,24 @@
         "torch": "Ficklampa",
         "audio": "Ljudsignal",
         "notification": "Notis"
+      },
+      "notifications": {
+        "defaultTitle": "Signal",
+        "reason": {
+          "denied": "Blockerad i webbläsaren",
+          "unavailable": "Stöds inte i webbläsaren",
+          "error": "Behörighetsfel",
+          "unknown": "Behörighet väntar",
+          "default": "Inte tillgänglig"
+        },
+        "fallbackTitle": {
+          "inApp": "In-app-notis",
+          "blocked": "Notiser blockerade",
+          "unavailable": "Notiser stöds inte",
+          "error": "Notisfel",
+          "unknown": "Notis väntar",
+          "default": "Notis"
+        }
       },
       "preflight": {
         "title": "Förberedelsekontroll",
@@ -9023,7 +9063,7 @@
             "degraded": "Instabil",
             "offline": "Offline"
           },
-          "participantStatus": "{active} aktiva · {pending} väntande · {offline} offline",
+          "participantStatus": "{active} aktiva · {idle} väntande · {offline} offline",
           "triggersArmed": "{count} aktiverade"
         }
       },
@@ -9033,15 +9073,25 @@
       },
       "settings": {
         "title": "Sessionsinställningar",
-        "description": "Story- och fastexter ändras under Story-fliken. Fler inställningar kan återställas här senare.",
+        "description": "Sessionsinställningar för roller och runtime-justeringar.",
         "openStory": "Öppna Story",
         "sessionRoles": {
           "title": "Sessionsroller (sessionskopia)",
           "description": "Uppdatera rolltext och gränser för denna session utan att ändra spelmallen.",
           "save": "Spara roller",
+          "saveError": "Kunde inte spara sessionsroller",
           "empty": "Inga roller är snapshottade ännu. Kopiera roller i Roller-fliken för att aktivera redigering här.",
-          "copy": "Kopiera roller"
-        }
+          "copy": "Kopiera roller",
+          "fields": {
+            "min": "Min",
+            "max": "Max",
+            "icon": "Ikon",
+            "color": "Färg"
+          }
+        },
+        "sessionCode": "Sessionskod",
+        "codeGenerated": "Kod genererad",
+        "noCodeGenerated": "Ingen kod genererad"
       },
       "roles": {
         "noRolesCopied": "Inga roller kopierade ännu",
@@ -9060,6 +9110,9 @@
         "online": "Online",
         "offline": "Offline",
         "assignRole": "Tilldela roll...",
+        "approved": "Godkände {name}",
+        "approvedAnonymous": "Deltagare godkänd",
+        "approvalFailed": "Kunde inte godkänna deltagare",
         "participantsMissingRole": "{count} deltagare saknar roll",
         "onlineCount": "{online} av {total} online",
         "rolesCount": "{assigned} av {total} har roller"
@@ -9074,11 +9127,6 @@
         "stepsAndPhases": "Steg & faser",
         "stepsDefined": "{count} steg definierade",
         "noStepsDefined": "Inga steg definierade"
-      },
-      "settings": {
-        "sessionCode": "Sessionskod",
-        "codeGenerated": "Kod genererad",
-        "noCodeGenerated": "Ingen kod genererad"
       },
       "steps": {
         "unnamedStep": "Namnlöst steg",
@@ -9504,7 +9552,8 @@
       "noData": "Ingen speldata tillgänglig.",
       "waiting": {
         "title": "Väntar på aktivitet",
-        "description": "Spelinnehåll visas här när värden startar."
+        "description": "Sessionsinställningar för roller och runtime-justeringar.",
+        "openStory": "Öppna Story"
       }
     },
     "hostPlayMode": {

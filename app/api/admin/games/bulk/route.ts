@@ -334,6 +334,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Forbidden - admin access required' }, { status: 403 });
   }
 
+  // This is an admin-only endpoint. Use service role to avoid RLS blocking
+  // legitimate system admin operations (e.g. deleting global games).
+  const opSupabase = supabaseAdmin;
+
   // Parse and validate body
   const body = await request.json().catch(() => ({}));
   const parsed = bulkOperationSchema.safeParse(body);
@@ -346,7 +350,7 @@ export async function POST(request: Request) {
   }
 
   const { operation, gameIds, params } = parsed.data;
-  const ctx: OperationContext = { supabase, gameIds, params };
+  const ctx: OperationContext = { supabase: opSupabase, gameIds, params };
 
   let result: BulkOperationResult;
 

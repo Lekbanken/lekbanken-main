@@ -96,6 +96,11 @@ export function GameAdminPage() {
   const [importOpen, setImportOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<GameWithRelations | null>(null);
+  const [activeSessionsWarning, setActiveSessionsWarning] = useState<{
+    gameId: string;
+    gameName: string;
+    sessionCount: number;
+  } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const selection = useTableSelection<GameWithRelations>(games, 'id');
@@ -222,16 +227,45 @@ export function GameAdminPage() {
     info(next === 'published' ? t('messages.published') : t('messages.restoredToDraft'));
   };
 
-  const handleDelete = async (id: string) => {
-    const res = await fetch(`/api/games/${id}`, { method: 'DELETE' });
+  const handleDelete = async (id: string, options?: { silent?: boolean; force?: boolean }) => {
+    const url = options?.force ? `/api/games/${id}?force=true` : `/api/games/${id}`;
+    const res = await fetch(url, { method: 'DELETE' });
+    
     if (!res.ok) {
       const json = await res.json().catch(() => ({}));
-      warning(json.error || t('errors.deleteFailed'));
-      return;
+      
+      // Handle active sessions conflict
+      if (res.status === 409 && json.code === 'ACTIVE_SESSIONS') {
+        const game = games.find(g => g.id === id);
+        setActiveSessionsWarning({
+          gameId: id,
+          gameName: game?.name || 'Okänt spel',
+          sessionCount: json.activeSessionCount || 0,
+        });
+        return false;
+      }
+      
+      if (!options?.silent) {
+        warning(json.error || t('errors.deleteFailed'));
+      }
+      return false;
     }
     setGames((prev) => prev.filter((g) => g.id !== id));
-    selection.clearSelection();
-    warning(t('messages.gameDeleted'));
+    if (!options?.silent) {
+      selection.clearSelection();
+      warning(t('messages.gameDeleted'));
+    }
+    return true;
+  };
+
+  const handleForceDelete = async () => {
+    if (!activeSessionsWarning) return;
+    
+    const ok = await handleDelete(activeSessionsWarning.gameId, { force: true });
+    if (ok) {
+      warning(t('messages.gameDeletedWithSessions'));
+    }
+    setActiveSessionsWarning(null);
   };
 
   const handleImport = async (items: ImportableGame[]) => {
@@ -365,8 +399,13 @@ export function GameAdminPage() {
           allSelected={selection.allSelected}
           actions={[
             bulkActionPresets.delete(async (items: GameWithRelations[]) => {
+              let deleted = 0;
               for (const item of items) {
-                await handleDelete(item.id);
+                const ok = await handleDelete(item.id, { silent: true });
+                if (ok) deleted++;
+              }
+              if (deleted > 0) {
+                warning(t('messages.gamesDeleted', { count: deleted }));
               }
             }),
             bulkActionPresets.activate(async (items: GameWithRelations[]) => {
@@ -627,7 +666,20 @@ export function GameAdminPage() {
         description={t('deleteDialog.description')}
         confirmLabel={t('actions.delete')}
         variant="danger"
-        onConfirm={() => (deleteTarget ? handleDelete(deleteTarget.id) : Promise.resolve())}
+        onConfirm={async () => { if (deleteTarget) await handleDelete(deleteTarget.id); }}
+      />
+
+      <AdminConfirmDialog
+        open={Boolean(activeSessionsWarning)}
+        onOpenChange={(open) => !open && setActiveSessionsWarning(null)}
+        title={t('activeSessionsDialog.title')}
+        description={t('activeSessionsDialog.description', {
+          gameName: activeSessionsWarning?.gameName || '',
+          count: activeSessionsWarning?.sessionCount || 0,
+        })}
+        confirmLabel={t('activeSessionsDialog.confirmLabel')}
+        variant="danger"
+        onConfirm={handleForceDelete}
       />
     </AdminPageLayout>
   );

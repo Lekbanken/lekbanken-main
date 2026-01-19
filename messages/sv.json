@@ -3558,6 +3558,8 @@
         "published": "Publicerad",
         "restoredToDraft": "Återställd till utkast",
         "gameDeleted": "Leken togs bort.",
+        "gamesDeleted": "{count, plural, one {# lek borttagen.} other {# lekar borttagna.}}",
+        "gameDeletedWithSessions": "Leken och dess aktiva sessioner togs bort.",
         "importComplete": "Import klar! Spellistan uppdaterad.",
         "importedGames": "Importerade {count} spel.",
         "importFailed": "Misslyckades för {count} spel.",
@@ -3576,6 +3578,11 @@
       "deleteDialog": {
         "title": "Ta bort lek?",
         "description": "Denna åtgärd kan inte ångras. Leken tas bort permanent."
+      },
+      "activeSessionsDialog": {
+        "title": "Lek har aktiva sessioner",
+        "description": "\"{gameName}\" har {count, plural, one {# aktiv session} other {# aktiva sessioner}}. Om du fortsätter avslutas alla sessioner och leken tas bort permanent.",
+        "confirmLabel": "Avsluta sessioner och ta bort"
       },
       "builder": {
         "toasts": {

@@ -481,13 +481,13 @@ export function validateGame(
       const trigger = game.triggers[i];
       const triggerName = trigger.name || `Trigger #${i + 1}`;
       
-      // Validate condition_type (ERROR - unknown types will cause runtime failures)
-      const conditionType = trigger.condition_type || (trigger.condition as Record<string, unknown>)?.type;
+      // Validate condition.type (ERROR - unknown types will cause runtime failures)
+      const conditionType = trigger.condition?.type;
       if (conditionType && typeof conditionType === 'string' && !VALID_CONDITION_TYPES.has(conditionType)) {
         errors.push({
           row: rowNumber,
           column: 'triggers',
-          message: `[game_key: ${gameKey}] Trigger "${triggerName}": okänd condition_type "${conditionType}". Se Appendix G.2 i GAME_INTEGRITY_REPORT.md.`,
+          message: `[game_key: ${gameKey}] Trigger "${triggerName}": okänd condition.type "${conditionType}". Se Appendix G.2 i GAME_INTEGRITY_REPORT.md.`,
           severity: 'error',
         });
       }

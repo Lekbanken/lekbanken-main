@@ -153,20 +153,45 @@ export function GameBulkActionsBar({
   const { success, warning, error: showError } = useToast();
   const [confirmAction, setConfirmAction] = useState<BulkActionConfig | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeSessionsWarning, setActiveSessionsWarning] = useState<{
+    gameIds: string[];
+    details: Array<{ gameId: string; gameName: string; sessionCount: number }>;
+  } | null>(null);
 
   const selectedCount = selectedGames.length;
 
-  const executeAction = useCallback(async (action: BulkActionConfig) => {
+  const executeAction = useCallback(async (action: BulkActionConfig, params?: Record<string, unknown>) => {
     setIsProcessing(true);
     
     try {
       const gameIds = selectedGames.map(g => g.id);
-      const result = await executeBulkAction(action.id, gameIds);
+      const result = await executeBulkAction(action.id, gameIds, params);
 
       if (result.success) {
         success(`${action.label}: ${result.affected} spel påverkade`);
         onClearSelection();
       } else if (result.errors?.length) {
+        // Check if any errors are ACTIVE_SESSIONS
+        const sessionErrors = result.errors.filter(e => e.error.startsWith('ACTIVE_SESSIONS:'));
+        
+        if (sessionErrors.length > 0 && action.id === 'delete') {
+          // Parse session info and show dialog
+          const details = sessionErrors.map(e => {
+            const parts = e.error.split(':');
+            return {
+              gameId: e.gameId,
+              gameName: parts[2] || 'Okänt spel',
+              sessionCount: parseInt(parts[1], 10) || 0,
+            };
+          });
+          
+          setActiveSessionsWarning({
+            gameIds: sessionErrors.map(e => e.gameId),
+            details,
+          });
+          return; // Don't call onActionComplete yet
+        }
+        
         warning(`${action.label}: ${result.failed} misslyckades`);
       }
 
@@ -178,6 +203,29 @@ export function GameBulkActionsBar({
       setConfirmAction(null);
     }
   }, [selectedGames, success, warning, showError, onClearSelection, onActionComplete]);
+
+  const handleForceDelete = useCallback(async () => {
+    if (!activeSessionsWarning) return;
+    
+    setIsProcessing(true);
+    try {
+      const result = await executeBulkAction('delete', activeSessionsWarning.gameIds, { force: true });
+      
+      if (result.success) {
+        success(`Ta bort: ${result.affected} spel och deras sessioner borttagna`);
+        onClearSelection();
+      } else {
+        warning(`Ta bort: ${result.failed} misslyckades`);
+      }
+      
+      onActionComplete(result);
+    } catch {
+      showError('Ett fel uppstod vid borttagning');
+    } finally {
+      setIsProcessing(false);
+      setActiveSessionsWarning(null);
+    }
+  }, [activeSessionsWarning, success, warning, showError, onClearSelection, onActionComplete]);
 
   const handleAction = useCallback(async (action: BulkActionConfig) => {
     if (action.requiresConfirmation) {
@@ -257,6 +305,23 @@ export function GameBulkActionsBar({
         confirmLabel={confirmAction?.confirmLabel || 'Bekräfta'}
         variant={confirmAction?.variant === 'destructive' ? 'danger' : undefined}
         onConfirm={() => { if (confirmAction) void executeAction(confirmAction); }}
+      />
+
+      {/* Active Sessions Warning Dialog */}
+      {/* eslint-disable-next-line lekbanken/no-hardcoded-strings -- TODO: Add translations for bulk actions */}
+      <AdminConfirmDialog
+        open={Boolean(activeSessionsWarning)}
+        onOpenChange={(open) => !open && setActiveSessionsWarning(null)}
+        title="Spel har aktiva sessioner"
+        description={
+          activeSessionsWarning
+            ? `${activeSessionsWarning.details.length} spel har aktiva sessioner (totalt ${activeSessionsWarning.details.reduce((sum, d) => sum + d.sessionCount, 0)} sessioner). Om du fortsätter avslutas alla sessioner och spelen tas bort permanent.`
+            : ''
+        }
+        confirmLabel="Avsluta sessioner och ta bort"
+        variant="danger"
+        onConfirm={handleForceDelete}
+        isLoading={isProcessing}
       />
     </>
   );

@@ -156,6 +156,8 @@
 | `metadata.maxAttempts` | Admin → `game_artifacts.metadata` | Lockout logic | No | `null` (unlimited) | Unlimited attempts | `null` or positive int |
 | `variant.revealed_at` | Session → `session_artifact_variants.revealed_at` | Visibility gate | No | `null` | Hidden until revealed | ISO timestamp |
 
+> **Note:** `revealed_at` is a **runtime** field (set by session, not authoring). When prompting new games, do NOT include runtime fields in specs.
+
 **Critical Sanitization:**
 ```typescript
 // app/api/play/sessions/[id]/artifacts/route.ts#L48-77
@@ -183,8 +185,8 @@ function sanitizeMetadataForParticipant(metadata, artifactType) {
 
 | ArtifactType | Required Keys | Optional Keys | Notes |
 |--------------|---------------|---------------|-------|
-| `keypad` | `correctCode` | `codeLength`, `maxAttempts`, `cooldownSeconds`, `buttonLayout`, `onSuccessTrigger` | `correctCode` NEVER sent to participants |
-| `riddle` | `acceptedAnswers[]` or `correctAnswer` | `normalizeMode`, `maxAttempts`, `promptText` | `normalizeMode`: `'exact'` \| `'fuzzy'` |
+| `keypad` | `correctCode` | `codeLength`, `maxAttempts`, `cooldownSeconds`, `buttonLayout` [VERIFY], `onSuccessTrigger` [VERIFY] | `correctCode` NEVER sent to participants |
+| `riddle` | `acceptedAnswers[]` or `correctAnswer` | `normalizeMode` [VERIFY], `maxAttempts`, `promptText` | `normalizeMode`: verify enum values in repo |
 | `counter` | — | `target`, `label` | Increments to target |
 | `audio` | `audioUrl` or `src` | `autoPlay`, `loop`, `requireAck`, `transcript` | |
 | `multi_answer` | `checks[]` or `items[]` | `requireAll`, `showProgress` | Checklist items |
@@ -434,6 +436,16 @@ currentStepTitle = snapshot.steps[session.current_step_index]?.board_text;
 ---
 
 ## E) Recommendations for Prompting New Games
+
+> **STRICT CONTRACT MODE:** All enum values and metadata keys MUST come from Appendix G or Contract 4.  
+> If a value is not listed there, mark it `[VERIFY_IN_REPO]` before using.
+
+**ID-policy (för referensintegritet i specs):**
+- Alla `id` i YAML används för att kunna referera mellan objekt (t.ex. triggers → artifacts).
+- Builder/API kan ignorera dessa och generera UUID internt.
+- AI måste dock använda konsekventa `id` inom samma spec.
+
+---
 
 ### Template 1: Minimum Viable Game Spec (Basic Mode)
 
@@ -736,7 +748,7 @@ artifacts:
 
 ### Security Violations
 1. ❌ Put secrets in `board_text` (visible on public board without auth)
-2. ❌ Put secrets in `participant_prompt` (shown to all participants)
+2. ❌ Put rollspecifika hemligheter in `participant_prompt` (den är inte roll-gated). Använd `private_instructions` (roll) eller `leader_script` (host) för hemligheter.
 3. ❌ Assume `leader_script` is private (it is, but double-check visibility)
 
 ### Data Integrity
@@ -763,6 +775,9 @@ artifacts:
 
 > **Source:** Verified from TypeScript types as of commit `44219fe`.  
 > **Rule:** When prompting new games, you MUST use only these enum values. Do NOT invent new values.
+>
+> **STRICT MODE:** If you need a metadata key or enum value not listed here, mark it `[VERIFY_IN_REPO]`.
+> Nested metadata (e.g., `buttonLayout`, `normalizeMode`) must also be verified in Contract 4.
 
 ### G.1) ArtifactType
 
@@ -957,3 +972,11 @@ Four P1 issues merit attention:
 Two P2 cleanup items for future consideration:
 1. SnapshotTrigger format consistency with GameTrigger
 2. `display_mode` missing from snapshot schema
+
+---
+
+## Next Steps
+
+For a standalone, iterable prompting guide, see: [docs/admin/GAME_PROMPTING_GUIDE.md](docs/admin/GAME_PROMPTING_GUIDE.md) (STRICT CONTRACT MODE).
+
+This integrity report should remain stable as an audit document. The prompting guide can evolve independently.

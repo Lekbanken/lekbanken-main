@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, supabaseAdmin } from '@/lib/supabase/server';
 import type { BulkOperationResult } from '@/features/admin/games/v2/types';
 
 // ============================================================================
@@ -125,12 +125,80 @@ async function handleArchive(ctx: OperationContext): Promise<BulkOperationResult
 }
 
 async function handleDelete(ctx: OperationContext): Promise<BulkOperationResult> {
-  const { supabase, gameIds } = ctx;
+  const { supabase, gameIds, params } = ctx;
+  const forceDelete = params?.force === true;
   const errors: Array<{ gameId: string; error: string }> = [];
+  const gamesWithSessions: Array<{ gameId: string; gameName: string; sessionCount: number }> = [];
   let affected = 0;
+
+  // First pass: check for active sessions (unless force delete)
+  if (!forceDelete) {
+    for (const gameId of gameIds) {
+      // Check game_sessions (uses: active, paused, completed, abandoned)
+      const { count: gameSessionCount } = await supabaseAdmin
+        .from('game_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('game_id', gameId)
+        .in('status', ['active', 'paused']);
+
+      // Check participant_sessions (uses: active, paused, locked, ended, archived, cancelled)
+      const { count: participantSessionCount } = await supabaseAdmin
+        .from('participant_sessions')
+        .select('*', { count: 'exact', head: true })
+        .eq('game_id', gameId)
+        .in('status', ['active', 'paused']);
+
+      const totalSessions = (gameSessionCount ?? 0) + (participantSessionCount ?? 0);
+
+      if (totalSessions > 0) {
+        // Get game name for better error message
+        const { data: game } = await supabase
+          .from('games')
+          .select('name')
+          .eq('id', gameId)
+          .single();
+
+        gamesWithSessions.push({
+          gameId,
+          gameName: game?.name || 'Okänt spel',
+          sessionCount: totalSessions,
+        });
+      }
+    }
+
+    // If any games have active sessions, return early with info
+    if (gamesWithSessions.length > 0) {
+      return {
+        success: false,
+        affected: 0,
+        failed: gamesWithSessions.length,
+        errors: gamesWithSessions.map(g => ({
+          gameId: g.gameId,
+          error: `ACTIVE_SESSIONS:${g.sessionCount}:${g.gameName}`,
+        })),
+      };
+    }
+  }
 
   // Delete one by one to handle individual errors
   for (const gameId of gameIds) {
+    // If force delete, end all active sessions first
+    if (forceDelete) {
+      // game_sessions uses 'completed' as end state
+      await supabaseAdmin
+        .from('game_sessions')
+        .update({ status: 'completed' })
+        .eq('game_id', gameId)
+        .in('status', ['active', 'paused']);
+
+      // participant_sessions uses 'ended' as end state
+      await supabaseAdmin
+        .from('participant_sessions')
+        .update({ status: 'ended' })
+        .eq('game_id', gameId)
+        .in('status', ['active', 'paused']);
+    }
+
     const { error } = await supabase
       .from('games')
       .delete()

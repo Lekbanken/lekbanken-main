@@ -3126,6 +3126,8 @@
         "published": "Published",
         "restoredToDraft": "Restored to draft",
         "gameDeleted": "The game was deleted.",
+        "gamesDeleted": "{count, plural, one {# game deleted.} other {# games deleted.}}",
+        "gameDeletedWithSessions": "The game and its active sessions were deleted.",
         "importComplete": "Import complete! Game list updated.",
         "importedGames": "Imported {count} games.",
         "importFailed": "Failed for {count} games.",
@@ -3144,6 +3146,11 @@
       "deleteDialog": {
         "title": "Delete game?",
         "description": "This action cannot be undone. The game will be permanently deleted."
+      },
+      "activeSessionsDialog": {
+        "title": "Game has active sessions",
+        "description": "\"{gameName}\" has {count, plural, one {# active session} other {# active sessions}}. If you continue, all sessions will be ended and the game will be permanently deleted.",
+        "confirmLabel": "End sessions and delete"
       },
       "builder": {
         "toasts": {

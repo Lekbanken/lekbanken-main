@@ -151,7 +151,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ gameId: string }> }
 ) {
   const { gameId } = await params
@@ -166,6 +166,55 @@ export async function DELETE(
 
   // System admins can delete any game, others go through RLS
   const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
+
+  // Check for active sessions (game_sessions uses: active, paused, completed, abandoned)
+  const { count: activeSessionCount } = await supabaseAdmin
+    .from('game_sessions')
+    .select('*', { count: 'exact', head: true })
+    .eq('game_id', gameId)
+    .in('status', ['active', 'paused'])
+
+  // Also check participant_sessions (uses: active, paused, locked, ended, archived, cancelled)
+  const { count: activeParticipantSessionCount } = await supabaseAdmin
+    .from('participant_sessions')
+    .select('*', { count: 'exact', head: true })
+    .eq('game_id', gameId)
+    .in('status', ['active', 'paused'])
+
+  const totalActiveSessions = (activeSessionCount ?? 0) + (activeParticipantSessionCount ?? 0)
+
+  // Check if force delete is requested
+  const { searchParams } = new URL(request.url)
+  const forceDelete = searchParams.get('force') === 'true'
+
+  if (totalActiveSessions > 0 && !forceDelete) {
+    return NextResponse.json(
+      { 
+        error: 'Game has active sessions',
+        code: 'ACTIVE_SESSIONS',
+        activeSessionCount: totalActiveSessions,
+        message: `Spelet har ${totalActiveSessions} aktiva sessioner som måste avslutas först.`
+      }, 
+      { status: 409 }
+    )
+  }
+
+  // If force delete, end all active sessions first
+  if (totalActiveSessions > 0 && forceDelete) {
+    // game_sessions uses 'completed' as end state
+    await supabaseAdmin
+      .from('game_sessions')
+      .update({ status: 'completed' })
+      .eq('game_id', gameId)
+      .in('status', ['active', 'paused'])
+
+    // participant_sessions uses 'ended' as end state
+    await supabaseAdmin
+      .from('participant_sessions')
+      .update({ status: 'ended' })
+      .eq('game_id', gameId)
+      .in('status', ['active', 'paused'])
+  }
 
   const { error } = await supabase.from('games').delete().eq('id', gameId)
 

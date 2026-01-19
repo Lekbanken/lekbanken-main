@@ -3714,6 +3714,16 @@
           "schema": "Skjema",
           "changeHistory": "Endringshistorikk",
           "changeHistoryDescription": "Vis tidligere versjoner og endringer"
+        },
+        "status": {
+          "published": "Publisert",
+          "draft": "Utkast"
+        },
+        "validation": {
+          "pending": "Venter",
+          "valid": "Gyldig",
+          "invalid": "Ugyldig",
+          "warning": "Advarsel"
         }
       },
       "noGames": {
@@ -3771,6 +3781,153 @@
           "error": "En feil oppstod",
           "deleted": "Slettet",
           "added": "Lagt til"
+        },
+        "page": {
+          "common": {
+            "required": "*"
+          },
+          "errors": {
+            "loadPurposes": "Kunne ikke laste formål",
+            "loadGame": "Kunne ikke laste spillet",
+            "loadData": "Kunne ikke laste data",
+            "saveFailed": "Kunne ikke lagre",
+            "unexpected": "En feil oppstod",
+            "publishMissingRequired": "Fyll ut obligatoriske felt og velg et forsidebilde før publisering."
+          },
+          "defaults": {
+            "triggerName": "Trigger"
+          },
+          "loadingGame": "Laster spill...",
+          "header": {
+            "backToGames": "Tilbake til spill",
+            "editTitle": "Rediger spill",
+            "createTitle": "Opprett nytt spill",
+            "preview": "Forhåndsvis",
+            "saveDraft": "Lagre utkast",
+            "publish": "Publiser"
+          },
+          "basicInfo": {
+            "title": "Grunnleggende informasjon",
+            "description": "Navn og beskrivelse som vises i spillbiblioteket.",
+            "nameLabel": "Navn",
+            "namePlaceholder": "f.eks. Samarbeidsstafett",
+            "shortDescriptionLabel": "Kort beskrivelse",
+            "shortDescriptionPlaceholder": "1–2 setninger som oppsummerer spillet.",
+            "fullDescriptionLabel": "Full beskrivelse",
+            "fullDescriptionPlaceholder": "Detaljert beskrivelse av spillet..."
+          },
+          "purposes": {
+            "title": "Formål og forsidebilde",
+            "mainLabel": "Hovedformål",
+            "subLabel": "Delformål",
+            "loadingOption": "Laster formål...",
+            "emptyHint": "Velg et hovedformål for å se delformål.",
+            "unknownMain": "Ukjent formål",
+            "unknownSub": "Ukjent delformål"
+          },
+          "classification": {
+            "title": "Klassifisering",
+            "energyLabel": "Energinivå",
+            "locationLabel": "Sted",
+            "timeLabel": "Tid (minutter)",
+            "minPlayersLabel": "Spillere min",
+            "maxPlayersLabel": "Spillere maks",
+            "ageMinLabel": "Alder min",
+            "ageMaxLabel": "Alder maks",
+            "timePlaceholder": "f.eks. 15",
+            "minPlayersPlaceholder": "f.eks. 4",
+            "maxPlayersPlaceholder": "f.eks. 30",
+            "ageMinPlaceholder": "f.eks. 6",
+            "ageMaxPlaceholder": "f.eks. 99",
+            "energyPlaceholder": "Velg energinivå",
+            "energyLow": "Lav",
+            "energyMedium": "Middels",
+            "energyHigh": "Høy",
+            "locationPlaceholder": "Velg sted",
+            "locationIndoor": "Innendørs",
+            "locationOutdoor": "Utendørs",
+            "locationBoth": "Begge"
+          },
+          "materials": {
+            "title": "Materialer",
+            "description": "List opp materialer som trengs for å kjøre spillet.",
+            "itemsLabel": "Materialer (ett per linje)",
+            "itemsPlaceholder": "Eksempel:\n8 kjegler\n1 ball per lag\nMusikk (Spotify-spilleliste)",
+            "itemsCount": "{count} materialer lagt til",
+            "preparationLabel": "Forberedelse",
+            "preparationPlaceholder": "Hva skal lederen forberede før spillet?"
+          },
+          "safety": {
+            "title": "Sikkerhet og inkludering",
+            "description": "Viktige sikkerhetsnotater og inkluderingstips.",
+            "safetyNotesLabel": "⚠️ Sikkerhetsnotater",
+            "safetyNotesPlaceholder": "Eksempel: Pass på vegger ved rask bevegelse. Unngå glatte gulv.",
+            "accessibilityLabel": "♿ Tilgjengelighetsnotater",
+            "accessibilityPlaceholder": "Tips for tilpasning til ulike behov...",
+            "spaceLabel": "🏠 Plasskrav",
+            "spacePlaceholder": "Eksempel: Minst 10x10 meter fri plass",
+            "leaderTipsLabel": "💡 Ledertips",
+            "leaderTipsPlaceholder": "Tips for lederen for å få spillet til å fungere bedre..."
+          },
+          "artifacts": {
+            "title": "Artefakter",
+            "description": "Opprett artefakter med varianter som kan låses opp per steg/fase og begrenses per rolle.",
+            "rolesHint": "Tips: Legg til roller for å aktivere private varianter per rolle."
+          },
+          "triggers": {
+            "title": "Triggere",
+            "description": "Automatiser spillet med \"Når X skjer, gjør Y\"-regler.",
+            "artifactsHint": "Tips: Legg til artefakter (f.eks. keypads) for å trigge på deres hendelser."
+          },
+          "roles": {
+            "title": "Roller",
+            "description": "Definer roller med hemmelige instruksjoner for deltakere."
+          },
+          "board": {
+            "title": "Offentlig tavle",
+            "description": "Innhold som vises på projektor/storskjerm under spillet."
+          },
+          "tools": {
+            "title": "Verktøy (Verktøybelte)",
+            "description": "Aktiver verktøy som kan brukes under en spilløkt.",
+            "availabilityLabel": "Tilgjengelig for",
+            "availabilityHost": "Leder",
+            "availabilityParticipants": "Deltakere",
+            "availabilityBoth": "Begge",
+            "availabilityHelp": "Velg om verktøyet skal være synlig for ledere, deltakere eller begge."
+          },
+          "translations": {
+            "title": "Oversettelser",
+            "description": "Administrer oversettelser for ulike språk.",
+            "languageSwedish": "Svensk",
+            "languageNorwegian": "Norsk",
+            "languageEnglish": "Engelsk",
+            "percent": "{percent}%",
+            "comingSoon": "Full oversettelseshåndtering kommer snart."
+          },
+          "settings": {
+            "title": "Innstillinger",
+            "description": "Status og synlighet for spillet.",
+            "taxonomyLabel": "Taksonomi / spillkategori",
+            "taxonomyPlaceholder": "f.eks. Sirkelspill",
+            "taxonomyNote": "Beholder tidligere verdi ved import; lagres som spillkategori i databasen.",
+            "statusLabel": "Status",
+            "statusDraft": "Utkast",
+            "statusPublished": "Publisert",
+            "statusHelpDraft": "Utkast er bare synlige for deg.",
+            "statusHelpPublished": "Publiserte spill er synlige for alle med tilgang.",
+            "dangerTitle": "Faresone",
+            "dangerDescription": "Permanent sletting av spillet. Denne handlingen kan ikke angres.",
+            "deleteButton": "Slett spill",
+            "taxonomyPresets": {
+              "boardGames": "Brettspill",
+              "partyGame": "Festspill",
+              "circleGames": "Sirkelspill",
+              "outdoorGames": "Utendørsspill",
+              "indoorGames": "Innendørsspill",
+              "icebreakers": "Isbrytere"
+            }
+          }
         },
         "decision": {
           "header": {
@@ -4359,7 +4516,8 @@
           "keypad": {
             "settings": "Keypad-innstillinger",
             "correctCode": "Korrekt kode",
-            "codeLength": "Kodelengde"
+            "codeLength": "Kodelengde",
+            "correctCodePlaceholder": "1234"
           },
           "preview": {
             "title": "Forhåndsvisning",
@@ -4383,63 +4541,161 @@
           "templates": {
             "keypadBasic": {
               "name": "Keypad (4 sifre)",
-              "description": "En enkel 4-sifret pinkode for å låse opp noe"
+              "description": "En enkel 4-sifret pinkode for å låse opp noe",
+              "title": "Hemmelig kode",
+              "correctCode": "1234",
+              "successMessage": "✅ Riktig! Du har låst opp ledetråden.",
+              "failMessage": "❌ Feil kode. Prøv igjen!"
             },
             "keypadAdvanced": {
               "name": "Keypad (med forsøksgrense)",
-              "description": "Pinkode med maks 3 forsøk før låsing"
+              "description": "Pinkode med maks 3 forsøk før låsing",
+              "title": "Sikkerhetskode",
+              "successMessage": "🎉 Riktig! Veien er åpen.",
+              "failMessage": "⚠️ Feil kode!",
+              "lockedMessage": "🚫 Keypad låst. Kontakt spillederen."
             },
             "riddle": {
               "name": "Gåte / Spørsmål",
-              "description": "En gåte med tekstinntasting for svar"
+              "description": "En gåte med tekstinntasting for svar",
+              "title": "Gåten",
+              "prompt": "Hva har fire bein men kan ikke gå?",
+              "correctAnswers": "bord\net bord\ntable"
             },
-            "cipher": {
+            "cipherCaesar": {
               "name": "Caesar-chiffer",
-              "description": "Kryptert melding med bokstavforskyvning"
+              "description": "Kryptert melding med bokstavforskyvning",
+              "title": "Kryptert melding",
+              "cipherKey": "3",
+              "plaintext": "hemmeligheten er under trappen"
             },
-            "hotspot": {
+            "hotspotImage": {
               "name": "Klikkbart bilde",
-              "description": "Bilde med skjulte soner å finne"
+              "description": "Bilde med skjulte soner å finne",
+              "title": "Søk i bildet"
             },
             "tilePuzzle": {
               "name": "Puslespill (3x3)",
-              "description": "Sliding tile puzzle for å avsløre et bilde"
+              "description": "Sliding tile puzzle for å avsløre et bilde",
+              "title": "Puslespillet"
             },
             "logicGrid": {
               "name": "Logikkrutenett",
-              "description": "Logikkpuslespill der ting skal matches"
+              "description": "Logikkpuslespill der ting skal matches",
+              "title": "Hvem gjorde hva?",
+              "rows": "Alice\nBob\nCharlie",
+              "columns": "Rød\nGrønn\nBlå",
+              "solution": "'{\"Alice\":\"Rød\",\"Bob\":\"Grønn\",\"Charlie\":\"Blå\"}'"
             },
-            "counter": {
+            "counterClues": {
               "name": "Ledetrådteller",
-              "description": "Tell fundne ledetråder eller fremgang"
+              "description": "Tell fundne ledetråder eller fremgang",
+              "title": "Funne ledetråder",
+              "label": "Ledetråder"
             },
-            "hints": {
+            "hintContainer": {
               "name": "Tips-beholder",
-              "description": "Progressive tips som kan avsløres"
+              "description": "Progressive tips som kan avsløres",
+              "title": "Tips",
+              "hints": "Se under matten\nDet er en skjult nøkkel\nNøkkelen passer i skapet til høyre"
             },
             "qrGate": {
               "name": "QR-kode checkpoint",
-              "description": "Skann QR-kode for å fortsette"
+              "description": "Skann QR-kode for å fortsette",
+              "title": "Skann koden",
+              "expectedValue": "SECRET123",
+              "successMessage": "✅ Riktig kode! Fortsett til neste ledetråd."
             },
-            "location": {
+            "locationCheckpoint": {
               "name": "Plassering-checkpoint",
-              "description": "GPS-verifisering for byspill"
+              "description": "GPS-verifisering for byspill",
+              "title": "Finn stedet",
+              "locationName": "Stortorget"
             },
             "clueCard": {
               "name": "Ledetråd/Tips",
-              "description": "Et kort med en ledetråd som kan avsløres"
+              "description": "Et kort med en ledetråd som kan avsløres",
+              "title": "Ledetråd",
+              "descriptionText": "Skjult ledetråd som spillederen kan vise",
+              "variantTitle": "Ledetråd",
+              "variantBody": "Skriv din ledetråd her..."
             },
             "secretDocument": {
               "name": "Hemmelig dokument",
-              "description": "Et dokument som avsløres på rett tidspunkt"
+              "description": "Et dokument som avsløres på rett tidspunkt",
+              "title": "Hemmelig dokument",
+              "descriptionText": "Avsløres når deltakerne finner det"
             },
             "revealCard": {
               "name": "Avslørende kort",
-              "description": "Et kort for dramatiske avsløringer"
+              "description": "Et kort for dramatiske avsløringer",
+              "title": "Avsløringen"
             },
             "roleSecret": {
               "name": "Rollehemmelighet",
-              "description": "Hemmelig informasjon synlig bare for én rolle"
+              "description": "Hemmelig informasjon synlig bare for én rolle",
+              "title": "Din hemmelighet",
+              "variantTitle": "Hemmelig informasjon",
+              "variantBody": "Bare du kan se dette..."
+            },
+            "audioClue": {
+              "name": "Lydledetråd",
+              "description": "Lydklipp som spilles for deltakerne",
+              "title": "Lytt nøye"
+            },
+            "soundTrigger": {
+              "name": "Lydaktivering",
+              "description": "Aktiveres når deltakerne lager lyd",
+              "title": "Rop høyt!",
+              "instruction": "Rop høyt for å åpne døren!"
+            },
+            "propCheck": {
+              "name": "Rekvisitt-sjekk",
+              "description": "Spillederen bekrefter at deltakere har riktig gjenstand",
+              "title": "Vis frem gjenstanden",
+              "propName": "Gullnøkkelen",
+              "instruction": "Vis gullnøkkelen til spillederen for å fortsette."
+            },
+            "quizAnswer": {
+              "name": "Quizsvar",
+              "description": "Keypad for quiz-spørsmål med tallsvar",
+              "title": "Spørsmål",
+              "descriptionText": "Skriv inn svaret med tall",
+              "successMessage": "✅ Riktig svar!",
+              "failMessage": "❌ Feil svar. Prøv igjen!"
+            },
+            "textQuestion": {
+              "name": "Tekstspørsmål",
+              "description": "Åpent spørsmål med tekstsvar",
+              "title": "Svar på spørsmålet",
+              "prompt": "Hva er hovedstaden i Norge?",
+              "correctAnswers": "oslo\nOslo"
+            },
+            "checklist": {
+              "name": "Sjekkliste",
+              "description": "Flere ting å krysse av",
+              "title": "Sjekkliste",
+              "items": "Oppgave 1\nOppgave 2\nOppgave 3"
+            },
+            "learningCard": {
+              "name": "Læringskort",
+              "description": "Kort med informasjon eller fakta",
+              "title": "Læringskort"
+            },
+            "imageReveal": {
+              "name": "Bilde å avsløre",
+              "description": "Et bilde som vises på rett tidspunkt",
+              "title": "Bilde"
+            },
+            "replayMarker": {
+              "name": "Replay-markør",
+              "description": "La deltakere markere viktige øyeblikk",
+              "title": "Marker øyeblikk"
+            },
+            "blank": {
+              "name": "Tom artefakt",
+              "description": "Start fra bunnen",
+              "title": "Ny artefakt"
             }
           }
         }
@@ -8516,7 +8772,9 @@
         "copyRolesDescription": "Kopier roller fra spillet for å tildele dem til deltakere.",
         "roleDistribution": "Rollefordeling",
         "allMinsSatisfied": "Alle minimumskrav oppfylt",
-        "minsNotSatisfied": "Minimumskrav ikke oppfylt"
+        "minsNotSatisfied": "Minimumskrav ikke oppfylt",
+        "onlineCount": "{online} av {total} online",
+        "rolesCount": "{assigned} av {total} har roller"
       },
       "participants": {
         "noParticipantsYet": "Ingen deltakere har koblet til ennå.",

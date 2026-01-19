@@ -225,14 +225,26 @@ export function AuthProvider({
       }
 
       if (event === 'SIGNED_IN' && session?.user) {
-        setUser(session.user)
-        await Promise.all([fetchProfile(session.user), fetchMemberships(session.user)])
-        router.refresh()
+        // Use getUser() for authenticated data instead of session.user from cookies
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (authUser) {
+          setUser(authUser)
+          await Promise.all([fetchProfile(authUser), fetchMemberships(authUser)])
+          router.refresh()
+        }
         return
       }
 
       if (session?.user) {
-        setUser(session.user)
+        // Use getUser() for authenticated data instead of session.user from cookies
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        if (authUser) {
+          setUser(authUser)
+        } else {
+          setUser(null)
+          setUserProfile(null)
+          setMemberships([])
+        }
       } else {
         setUser(null)
         setUserProfile(null)

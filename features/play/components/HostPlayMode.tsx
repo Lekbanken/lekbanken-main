@@ -3,6 +3,9 @@
  * 
  * Integrates FacilitatorDashboard with the existing host session view.
  * Shows play controls when a game is linked and session is active.
+ * 
+ * Uses capability-driven routing via useSessionCapabilities to select
+ * the appropriate view component (BasicPlayView, FacilitatedPlayView, etc).
  */
 
 'use client';
@@ -17,7 +20,10 @@ import { OutcomePanel } from './OutcomePanel';
 import { PuzzleProgressPanel } from './PuzzleProgressPanel';
 import { PropConfirmationManager } from './PropConfirmationManager';
 import { SimplePlayView } from './SimplePlayView';
+import { BasicPlayView } from './BasicPlayView';
+import { FacilitatedPlayView } from './FacilitatedPlayView';
 import { getHostPlaySession, updatePlaySessionState, type PlaySessionData } from '../api';
+import { useSessionCapabilities } from '@/hooks/useSessionCapabilities';
 import type { SessionTrigger } from '@/types/games';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -110,6 +116,21 @@ export function HostPlayMode({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
+  // Capability-driven UI routing
+  const caps = useSessionCapabilities(playData?.snapshotData ?? null, playData?.tools);
+  
+  // Current step/phase index state
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+  
+  // Sync step/phase index from runtime state when playData loads
+  useEffect(() => {
+    if (playData?.runtimeState) {
+      setCurrentStepIndex(playData.runtimeState.current_step_index ?? 0);
+      setCurrentPhaseIndex(playData.runtimeState.current_phase_index ?? 0);
+    }
+  }, [playData?.runtimeState]);
+  
   // UI state - simplified 3-zone navigation
   const [activeZone, setActiveZone] = useState<PlayModeZone>('play');
   const [contentSubTab, setContentSubTab] = useState<ContentSubTab>('artifacts');
@@ -190,6 +211,18 @@ export function HostPlayMode({
       });
     }
   }, [sessionId, playData?.runtimeState]);
+
+  // Handle step change (for BasicPlayView/FacilitatedPlayView)
+  const handleStepChange = useCallback((index: number) => {
+    setCurrentStepIndex(index);
+    void handleStateUpdate({ current_step_index: index });
+  }, [handleStateUpdate]);
+
+  // Handle phase change (for FacilitatedPlayView)
+  const handlePhaseChange = useCallback((index: number) => {
+    setCurrentPhaseIndex(index);
+    void handleStateUpdate({ current_phase_index: index });
+  }, [handleStateUpdate]);
 
   // Handle session end
   const handleEndSession = useCallback(() => {
@@ -282,7 +315,68 @@ export function HostPlayMode({
     );
   }
 
-  // Basic play mode - show simplified view
+  // Capability-driven routing based on viewType
+  // When snapshotData is available, use new adaptive views
+  if (playData.snapshotData) {
+    switch (caps.viewType) {
+      case 'basic':
+        return (
+          <div className="space-y-4">
+            {showExitButton && (
+              <div className="flex justify-end border-b border-border pb-4">
+                <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
+                  <ArrowLeftIcon className="h-4 w-4 mr-1" />
+                  {t('navigation.lobby')}
+                </Button>
+              </div>
+            )}
+            <BasicPlayView
+              playData={playData}
+              caps={caps}
+              sessionId={sessionId}
+              currentStepIndex={currentStepIndex}
+              onStepChange={handleStepChange}
+              onComplete={handleEndSession}
+              onBack={onExitPlayMode}
+            />
+          </div>
+        );
+
+      case 'facilitated':
+        return (
+          <div className="space-y-4">
+            {showExitButton && (
+              <div className="flex justify-end border-b border-border pb-4">
+                <Button variant="ghost" size="sm" onClick={onExitPlayMode}>
+                  <ArrowLeftIcon className="h-4 w-4 mr-1" />
+                  {t('navigation.lobby')}
+                </Button>
+              </div>
+            )}
+            <FacilitatedPlayView
+              playData={playData}
+              caps={caps}
+              sessionId={sessionId}
+              triggers={triggers}
+              currentStepIndex={currentStepIndex}
+              currentPhaseIndex={currentPhaseIndex}
+              onStepChange={handleStepChange}
+              onPhaseChange={handlePhaseChange}
+              onTriggerAction={handleTriggerAction}
+              onComplete={handleEndSession}
+              onBack={onExitPlayMode}
+            />
+          </div>
+        );
+
+      case 'participants':
+        // ParticipantPlayMode remains unchanged for now
+        // Fall through to existing facilitated view logic
+        break;
+    }
+  }
+
+  // Fallback: Legacy basic play mode (when no snapshotData available)
   if (playData.playMode === 'basic') {
     const run = playDataToRun(playData);
     return (

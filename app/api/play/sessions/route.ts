@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { createServerRlsClient } from '@/lib/supabase/server';
+import { createServerRlsClient, getRequestTenantId } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import { applyRateLimitMiddleware } from '@/lib/utils/rate-limiter';
 import type { CreateSessionOptions } from '@/lib/services/participants/session-service';
@@ -48,13 +48,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { data: membership } = await supabase
-    .from('user_tenant_memberships')
-    .select('tenant_id')
-    .eq('user_id', user.id)
-    .single();
+  // Get tenant ID from header (set by proxy) or fall back to membership lookup
+  let tenantId = await getRequestTenantId();
+  
+  if (!tenantId) {
+    // Fall back to user's membership (use limit 1 to handle multiple memberships)
+    const { data: membership } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle();
+    
+    tenantId = membership?.tenant_id ?? null;
+  }
 
-  if (!membership?.tenant_id) {
+  if (!tenantId) {
     return NextResponse.json({ error: 'No tenant membership' }, { status: 403 });
   }
 
@@ -86,7 +95,7 @@ export async function POST(request: NextRequest) {
   }
 
   const session = await ParticipantSessionService.createSession({
-    tenantId: membership.tenant_id,
+    tenantId,
     hostUserId: user.id,
     displayName: displayName.trim(),
     description: description?.trim(),

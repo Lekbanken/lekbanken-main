@@ -60,166 +60,6 @@
       "rejected": "Avvisad",
       "draft": "Utkast",
       "published": "Publicerad",
-          "templates": {
-            "keypadBasic": {
-              "name": "Keypad (4 siffror)",
-              "description": "En enkel 4-siffrig pinkod för att låsa upp något",
-              "title": "Hemlig kod",
-              "correctCode": "1234",
-              "successMessage": "✅ Korrekt! Du har låst upp ledtråden.",
-              "failMessage": "❌ Fel kod. Försök igen!"
-            },
-            "keypadAdvanced": {
-              "name": "Keypad (med försöksbegränsning)",
-              "description": "Pinkod med max 3 försök innan låsning",
-              "title": "Säkerhetskod",
-              "successMessage": "🎉 Korrekt! Vägen är öppen.",
-              "failMessage": "⚠️ Fel kod!",
-              "lockedMessage": "🚫 Keypad låst. Kontakta spelledaren."
-            },
-            "riddle": {
-              "name": "Gåta / Fråga",
-              "description": "En gåta med textinmatning för svar",
-              "title": "Gåtan",
-              "prompt": "Vad har fyra ben men kan inte gå?",
-              "correctAnswers": "bord\nett bord\ntable"
-            },
-            "cipherCaesar": {
-              "name": "Caesar-chiffer",
-              "description": "Krypterat meddelande med bokstavsförskjutning",
-              "title": "Krypterat meddelande",
-              "cipherKey": "3",
-              "plaintext": "hemligheten finns under trappan"
-            },
-            "hotspotImage": {
-              "name": "Klickbar bild",
-              "description": "Bild med dolda zoner att hitta",
-              "title": "Sök i bilden"
-            },
-            "tilePuzzle": {
-              "name": "Pusselspel (3x3)",
-              "description": "Sliding tile puzzle för att avslöja en bild",
-              "title": "Pusslet"
-            },
-            "logicGrid": {
-              "name": "Logikrutnät",
-              "description": "Logikpussel där saker ska matchas",
-              "title": "Vem gjorde vad?",
-              "rows": "Alice\nBob\nCharlie",
-              "columns": "Röd\nGrön\nBlå",
-              "solution": "{\"Alice\":\"Röd\",\"Bob\":\"Grön\",\"Charlie\":\"Blå\"}"
-            },
-            "counterClues": {
-              "name": "Ledtrådsräknare",
-              "description": "Räkna hittade ledtrådar eller framsteg",
-              "title": "Hittade ledtrådar",
-              "label": "Ledtrådar"
-            },
-            "hintContainer": {
-              "name": "Tips-behållare",
-              "description": "Progressiva tips som kan avslöjas",
-              "title": "Tips",
-              "hints": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger"
-            },
-            "qrGate": {
-              "name": "QR-kod checkpoint",
-              "description": "Skanna QR-kod för att fortsätta",
-              "title": "Skanna koden",
-              "expectedValue": "SECRET123",
-              "successMessage": "✅ Rätt kod! Fortsätt till nästa ledtråd."
-            },
-            "locationCheckpoint": {
-              "name": "Plats-checkpoint",
-              "description": "GPS-verifiering för stadsspel",
-              "title": "Hitta platsen",
-              "locationName": "Stortorget"
-            },
-            "clueCard": {
-              "name": "Ledtråd/Hint",
-              "description": "Ett kort med en ledtråd som kan avslöjas",
-              "title": "Ledtråd",
-              "descriptionText": "Dold ledtråd som spelledaren kan visa",
-              "variantTitle": "Ledtråd",
-              "variantBody": "Skriv din ledtråd här..."
-            },
-            "secretDocument": {
-              "name": "Hemligt dokument",
-              "description": "Ett dokument som avslöjas vid rätt tidpunkt",
-              "title": "Hemligt dokument",
-              "descriptionText": "Avslöjas när deltagarna hittar det"
-            },
-            "revealCard": {
-              "name": "Avslöjande kort",
-              "description": "Ett kort för dramatiska avslöjanden",
-              "title": "Avslöjandet"
-            },
-            "roleSecret": {
-              "name": "Rollhemlighet",
-              "description": "Hemlig information synlig endast för en roll",
-              "title": "Din hemlighet",
-              "variantTitle": "Hemlig information",
-              "variantBody": "Endast du kan se detta..."
-            },
-            "audioClue": {
-              "name": "Ljudledtråd",
-              "description": "Ljudklipp som spelas upp för deltagarna",
-              "title": "Lyssna noga"
-            },
-            "soundTrigger": {
-              "name": "Ljudaktivering",
-              "description": "Aktiveras när deltagarna gör ljud",
-              "title": "Ropa högt!",
-              "instruction": "Ropa högt för att öppna dörren!"
-            },
-            "propCheck": {
-              "name": "Rekvisita-check",
-              "description": "Spelledaren bekräftar att deltagare har rätt sak",
-              "title": "Visa upp föremålet",
-              "propName": "Guldnyckeln",
-              "instruction": "Visa upp guldnyckeln för spelledaren för att fortsätta."
-            },
-            "quizAnswer": {
-              "name": "Quizsvar",
-              "description": "Keypad för quiz-frågor med siffersvar",
-              "title": "Fråga",
-              "descriptionText": "Skriv in svaret med siffror",
-              "successMessage": "✅ Rätt svar!",
-              "failMessage": "❌ Fel svar. Försök igen!"
-            },
-            "textQuestion": {
-              "name": "Textfråga",
-              "description": "Öppen fråga med textsvar",
-              "title": "Svara på frågan",
-              "prompt": "Vad är huvudstaden i Sverige?",
-              "correctAnswers": "stockholm\nStockholm"
-            },
-            "checklist": {
-              "name": "Checklista",
-              "description": "Flera saker att bocka av",
-              "title": "Checklista",
-              "items": "Uppgift 1\nUppgift 2\nUppgift 3"
-            },
-            "learningCard": {
-              "name": "Lärokort",
-              "description": "Kort med information eller fakta",
-              "title": "Lärokort"
-            },
-            "imageReveal": {
-              "name": "Bild att avslöja",
-              "description": "En bild som visas vid rätt tillfälle",
-              "title": "Bild"
-            },
-            "replayMarker": {
-              "name": "Replay-markör",
-              "description": "Låt deltagare markera viktiga ögonblick",
-              "title": "Markera ögonblick"
-            },
-            "blank": {
-              "name": "Tom artefakt",
-              "description": "Börja från scratch",
-              "title": "Ny artefakt"
-            }
-          },
       "archived": "Arkiverad",
       "enabled": "Aktiverad",
       "disabled": "Inaktiverad"
@@ -3677,6 +3517,16 @@
           "schema": "Schema",
           "changeHistory": "Ändringshistorik",
           "changeHistoryDescription": "Visa tidigare versioner och ändringar"
+        },
+        "status": {
+          "published": "Publicerad",
+          "draft": "Utkast"
+        },
+        "validation": {
+          "pending": "Väntar",
+          "valid": "Giltig",
+          "invalid": "Ogiltig",
+          "warning": "Varning"
         }
       },
       "noGames": {
@@ -3734,6 +3584,393 @@
           "error": "Ett fel uppstod",
           "deleted": "Borttagen",
           "added": "Tillagd"
+        },
+        "page": {
+          "common": {
+            "required": "*"
+          },
+          "errors": {
+            "loadPurposes": "Kunde inte läsa in syften",
+            "loadGame": "Kunde inte läsa in spelet",
+            "loadData": "Kunde inte läsa in data",
+            "saveFailed": "Kunde inte spara",
+            "unexpected": "Ett fel uppstod",
+            "publishMissingRequired": "Fyll i obligatoriska fält och välj en omslagsbild innan publicering."
+          },
+          "defaults": {
+            "triggerName": "Trigger"
+          },
+          "loadingGame": "Läser in spel...",
+          "header": {
+            "backToGames": "Tillbaka till spel",
+            "editTitle": "Redigera spel",
+            "createTitle": "Skapa nytt spel",
+            "preview": "Förhandsgranska",
+            "saveDraft": "Spara utkast",
+            "publish": "Publicera"
+          },
+          "basicInfo": {
+            "title": "Grundinformation",
+            "description": "Namn och beskrivning som visas i spelbiblioteket.",
+            "nameLabel": "Namn",
+            "namePlaceholder": "t.ex. Samarbetsstafett",
+            "shortDescriptionLabel": "Kort beskrivning",
+            "shortDescriptionPlaceholder": "1–2 meningar som sammanfattar spelet.",
+            "fullDescriptionLabel": "Fullständig beskrivning",
+            "fullDescriptionPlaceholder": "Detaljerad beskrivning av spelet..."
+          },
+          "purposes": {
+            "title": "Syften & omslagsbild",
+            "mainLabel": "Huvudsyfte",
+            "subLabel": "Delsyften",
+            "loadingOption": "Läser in syften...",
+            "emptyHint": "Välj ett huvudsyfte för att se delsyften.",
+            "unknownMain": "Okänt syfte",
+            "unknownSub": "Okänt delsyfte"
+          },
+          "classification": {
+            "title": "Klassificering",
+            "energyLabel": "Energinivå",
+            "locationLabel": "Plats",
+            "timeLabel": "Tid (minuter)",
+            "minPlayersLabel": "Spelare min",
+            "maxPlayersLabel": "Spelare max",
+            "ageMinLabel": "Ålder min",
+            "ageMaxLabel": "Ålder max",
+            "timePlaceholder": "t.ex. 15",
+            "minPlayersPlaceholder": "t.ex. 4",
+            "maxPlayersPlaceholder": "t.ex. 30",
+            "ageMinPlaceholder": "t.ex. 6",
+            "ageMaxPlaceholder": "t.ex. 99",
+            "energyPlaceholder": "Välj energinivå",
+            "energyLow": "Låg",
+            "energyMedium": "Medel",
+            "energyHigh": "Hög",
+            "locationPlaceholder": "Välj plats",
+            "locationIndoor": "Inomhus",
+            "locationOutdoor": "Utomhus",
+            "locationBoth": "Båda"
+          },
+          "materials": {
+            "title": "Material",
+            "description": "Lista material som behövs för att köra spelet.",
+            "itemsLabel": "Material (ett per rad)",
+            "itemsPlaceholder": "Exempel:\n8 koner\n1 boll per lag\nMusik (Spotify-spellista)",
+            "itemsCount": "{count} material tillagt",
+            "preparationLabel": "Förberedelse",
+            "preparationPlaceholder": "Vad ska ledaren förbereda innan spelet?"
+          },
+          "safety": {
+            "title": "Säkerhet & inkludering",
+            "description": "Viktiga säkerhetsnoteringar och inkluderingstips.",
+            "safetyNotesLabel": "⚠️ Säkerhetsnoteringar",
+            "safetyNotesPlaceholder": "Exempel: Se upp för väggar vid snabb rörelse. Undvik hala golv.",
+            "accessibilityLabel": "♿ Tillgänglighetsnoteringar",
+            "accessibilityPlaceholder": "Tips för att anpassa till olika behov...",
+            "spaceLabel": "🏠 Utrymmeskrav",
+            "spacePlaceholder": "Exempel: Minst 10x10 meter fritt utrymme",
+            "leaderTipsLabel": "💡 Ledartips",
+            "leaderTipsPlaceholder": "Tips för ledaren att få spelet att fungera bättre..."
+          },
+          "artifacts": {
+            "title": "Artefakter",
+            "description": "Skapa artefakter med varianter som kan låsas upp per steg/fas och begränsas per roll.",
+            "rolesHint": "Tips: Lägg till roller för att aktivera privata varianter per roll."
+          },
+          "triggers": {
+            "title": "Triggers",
+            "description": "Automatisera spelet med \"När X händer, gör Y\"-regler.",
+            "artifactsHint": "Tips: Lägg till artefakter (t.ex. keypads) för att trigga på deras händelser."
+          },
+          "roles": {
+            "title": "Roller",
+            "description": "Definiera roller med hemliga instruktioner för deltagare."
+          },
+          "board": {
+            "title": "Publik tavla",
+            "description": "Innehåll som visas på projektor/storskärm under spelet."
+          },
+          "tools": {
+            "title": "Verktyg (Verktygsbälte)",
+            "description": "Aktivera verktyg som kan användas under en spelsession.",
+            "availabilityLabel": "Tillgänglig för",
+            "availabilityHost": "Ledare",
+            "availabilityParticipants": "Deltagare",
+            "availabilityBoth": "Båda",
+            "availabilityHelp": "Välj om verktyget ska vara synligt för ledare, deltagare eller båda."
+          },
+          "translations": {
+            "title": "Översättningar",
+            "description": "Hantera översättningar för olika språk.",
+            "languageSwedish": "Svenska",
+            "languageNorwegian": "Norska",
+            "languageEnglish": "Engelska",
+            "percent": "{percent}%",
+            "comingSoon": "Full översättningshantering kommer snart."
+          },
+          "settings": {
+            "title": "Inställningar",
+            "description": "Status och synlighet för spelet.",
+            "taxonomyLabel": "Taxonomi / spelkategori",
+            "taxonomyPlaceholder": "t.ex. Cirkellekar",
+            "taxonomyNote": "Behåller tidigare värde vid import; sparas som spelkategori i databasen.",
+            "statusLabel": "Status",
+            "statusDraft": "Utkast",
+            "statusPublished": "Publicerad",
+            "statusHelpDraft": "Utkast är bara synliga för dig.",
+            "statusHelpPublished": "Publicerade spel är synliga för alla med åtkomst.",
+            "dangerTitle": "Farozon",
+            "dangerDescription": "Permanent radering av spelet. Denna åtgärd kan inte ångras.",
+            "deleteButton": "Ta bort spel",
+            "taxonomyPresets": {
+              "boardGames": "Brädspel",
+              "partyGame": "Partyspel",
+              "circleGames": "Cirkellekar",
+              "outdoorGames": "Utomhuslekar",
+              "indoorGames": "Inomhuslekar",
+              "icebreakers": "Isbrytare"
+            }
+          }
+        },
+        "artifact": {
+          "newArtifact": "Ny artefakt",
+          "defaults": {
+            "role": "Roll"
+          },
+          "common": {
+            "yes": "Ja",
+            "no": "Nej"
+          },
+          "header": {
+            "title": "Artefakter ({count})",
+            "subtitle": "Ledtrådar, keypads, dokument och media",
+            "wizard": "Wizard",
+            "add": "Lägg till"
+          },
+          "empty": {
+            "title": "Inga artefakter ännu.",
+            "description": "Använd Wizard för att snabbt skapa artefakter, eller lägg till manuellt."
+          },
+          "fields": {
+            "titlePlaceholder": "Titel",
+            "typeLabel": "Typ",
+            "tagsLabel": "Taggar (komma-separerade)",
+            "tagsPlaceholder": "mystery, clue",
+            "descriptionLabel": "Beskrivning",
+            "descriptionPlaceholder": "Kort bakgrund eller anteckningar"
+          },
+          "errors": {
+            "loadConversationDecks": "Kunde inte ladda samtalskortlekar."
+          },
+          "visibility": {
+            "public": "Publik",
+            "leaderOnly": "Endast ledare",
+            "rolePrivate": "Roll-privat"
+          },
+          "types": {
+            "card": "Kort",
+            "document": "Dokument",
+            "image": "Bild",
+            "conversationCards": "Samtalskort",
+            "keypad": "Keypad",
+            "riddle": "Gåta",
+            "multiAnswer": "Flervalssvar",
+            "audio": "Ljud",
+            "hotspot": "Hotspot",
+            "tilePuzzle": "Pusselspel",
+            "cipher": "Chiffer",
+            "logicGrid": "Logikrutnät",
+            "counter": "Räknare",
+            "qrGate": "QR-gate",
+            "hintContainer": "Tips-behållare",
+            "propConfirmation": "Rekvisita-bekräftelse",
+            "locationCheck": "Platskontroll",
+            "soundLevel": "Ljudnivå",
+            "replayMarker": "Replay-markör",
+            "signalGenerator": "Signalgenerator",
+            "timeBankStep": "Tidsbank-steg",
+            "emptyArtifact": "Tom artefakt"
+          },
+          "keypad": {
+            "title": "Pinkod-inställningar",
+            "correctCodeLabel": "Korrekt kod",
+            "correctCodePlaceholder": "1234",
+            "correctCodeHelp": "Endast siffror (max 8)",
+            "codeLengthLabel": "Kodlängd",
+            "codeLengthPlaceholder": "4",
+            "codeLengthHelp": "Antal siffror i koden (2-8)",
+            "successMessageLabel": "Meddelande vid rätt kod (valfritt)",
+            "successMessagePlaceholder": "Låst uppnådd! Du har hittat ledtråden.",
+            "advancedTitle": "Avancerade inställningar",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat",
+            "maxAttemptsHelp": "0 eller tom = obegränsat",
+            "lockOnFailLabel": "Lås vid misslyckande",
+            "lockOnFailNo": "Nej – kan försöka igen",
+            "lockOnFailYes": "Ja – låses permanent",
+            "failMessageLabel": "Meddelande vid fel kod",
+            "failMessagePlaceholder": "Fel kod! Försök igen.",
+            "lockedMessageLabel": "Meddelande när låst",
+            "lockedMessagePlaceholder": "Keypaden är låst. Kontakta spelledaren."
+          },
+          "conversation": {
+            "title": "Samtalskort",
+            "selectLabel": "Välj lek (endast publicerade)",
+            "selectPlaceholder": "— Välj —",
+            "helpText": "Artefakten visar leken read-only för deltagare och lekledare."
+          },
+          "riddle": {
+            "title": "Gåta / Fråga-inställningar",
+            "promptLabel": "Fråga / Ledtråd",
+            "promptPlaceholder": "Vad har fyra ben men kan inte gå?",
+            "answersLabel": "Korrekta svar (ett per rad)",
+            "answersPlaceholder": "bord\nett bord\ntable",
+            "answersHelp": "Flera alternativ = alla godkänns",
+            "matchModeLabel": "Matchningsläge",
+            "matchModeExact": "Exakt matchning",
+            "matchModeFlexible": "Flexibel (ignorera versaler/mellanslag)",
+            "matchModeNumeric": "Endast siffror",
+            "maxAttemptsLabel": "Max försök",
+            "maxAttemptsPlaceholder": "Obegränsat"
+          },
+          "counter": {
+            "title": "Räknare-inställningar",
+            "initialLabel": "Startvärde",
+            "initialPlaceholder": "0",
+            "targetLabel": "Målvärde",
+            "targetPlaceholder": "5",
+            "stepLabel": "Stegstorlek",
+            "stepPlaceholder": "1",
+            "labelLabel": "Etikett (valfritt)",
+            "labelPlaceholder": "Hittade ledtrådar"
+          },
+          "audio": {
+            "title": "Ljudklipp-inställningar",
+            "urlLabel": "Ljud-URL (valfritt)",
+            "urlPlaceholder": "https://example.com/audio.mp3"
+          },
+          "hotspot": {
+            "title": "Klickbar bild-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/image.jpg",
+            "requiredHitsLabel": "Antal zoner att hitta",
+            "requiredHitsPlaceholder": "Alla",
+            "showFeedbackLabel": "Visa feedback",
+            "showFeedbackYes": "Ja – visa träffar",
+            "showFeedbackNo": "Nej – tyst",
+            "helpText": "💡 Hotspot-zoner definieras i JSON-metadata: zones: [{x, y, radius, label}]"
+          },
+          "tilePuzzle": {
+            "title": "Pusselspel-inställningar",
+            "imageLabel": "Bild-URL",
+            "imagePlaceholder": "https://example.com/puzzle-image.jpg",
+            "gridLabel": "Rutnätsstorlek",
+            "grid2": "2×2 (lätt)",
+            "grid3": "3×3 (normal)",
+            "grid4": "4×4 (svår)",
+            "grid5": "5×5 (expert)",
+            "previewLabel": "Visa förhandsvisning"
+          },
+          "cipher": {
+            "title": "Chiffer-inställningar",
+            "methodLabel": "Chiffermetod",
+            "methodCaesar": "Caesar (förskjutning)",
+            "methodAtbash": "Atbash (spegling)",
+            "methodVigenere": "Vigenère (nyckelord)",
+            "methodSubstitution": "Substitution (egen)",
+            "keyLabelCaesar": "Förskjutning (1-25)",
+            "keyLabelVigenere": "Nyckelord",
+            "keyPlaceholderCaesar": "3",
+            "keyPlaceholderVigenere": "hemligt",
+            "plaintextLabel": "Klartext (vad som ska krypteras)",
+            "plaintextPlaceholder": "Hemligheten finns under trappan"
+          },
+          "logicGrid": {
+            "title": "Logikrutnät-inställningar",
+            "rowsLabel": "Rader (kommaseparerade)",
+            "rowsPlaceholder": "Alice, Bob, Charlie",
+            "columnsLabel": "Kolumner (kommaseparerade)",
+            "columnsPlaceholder": "Röd, Grön, Blå",
+            "helpText": "💡 Lösningen definieras i JSON:",
+            "helpCode": "solution: {\"Alice\": \"Röd\", \"Bob\": \"Grön\"}"
+          },
+          "multiAnswer": {
+            "title": "Flervalssvar-inställningar",
+            "itemsLabel": "Saker att bocka av (ett per rad)",
+            "itemsPlaceholder": "Hitta nyckeln\nLösa gåtan\nÖppna dörren",
+            "requiredCountLabel": "Kräv antal för klart",
+            "requiredCountPlaceholder": "Alla"
+          },
+          "qrGate": {
+            "title": "QR/NFC-skanning-inställningar",
+            "expectedLabel": "Förväntat värde",
+            "expectedPlaceholder": "SECRET123",
+            "expectedHelp": "Texten som QR-koden ska innehålla",
+            "successLabel": "Meddelande vid lyckad skanning",
+            "successPlaceholder": "Rätt kod! Fortsätt till nästa ledtråd."
+          },
+          "hintContainer": {
+            "title": "Tips-behållare-inställningar",
+            "hintsLabel": "Tips (ett per rad, i ordning av avslöjande)",
+            "hintsPlaceholder": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger",
+            "maxHintsLabel": "Max tips att ge",
+            "maxHintsPlaceholder": "Alla",
+            "penaltyLabel": "Poängavdrag per tips",
+            "penaltyPlaceholder": "0"
+          },
+          "propConfirmation": {
+            "title": "Rekvisita-bekräftelse-inställningar",
+            "propNameLabel": "Rekvisitanamn",
+            "propNamePlaceholder": "Guldnyckeln",
+            "instructionLabel": "Instruktion till deltagare",
+            "instructionPlaceholder": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+          },
+          "locationCheck": {
+            "title": "Platsverifiering-inställningar",
+            "latitudeLabel": "Latitud",
+            "latitudePlaceholder": "59.3293",
+            "longitudeLabel": "Longitud",
+            "longitudePlaceholder": "18.0686",
+            "radiusLabel": "Radie (meter)",
+            "radiusPlaceholder": "50",
+            "locationNameLabel": "Platsnamn (valfritt)",
+            "locationNamePlaceholder": "Stortorget"
+          },
+          "soundLevel": {
+            "title": "Ljudnivå-detektor-inställningar",
+            "thresholdLabel": "Tröskel (0-100)",
+            "thresholdPlaceholder": "70",
+            "holdLabel": "Tid över tröskel (sek)",
+            "holdPlaceholder": "2",
+            "instructionLabel": "Instruktion",
+            "instructionPlaceholder": "Ropa högt för att öppna dörren!"
+          },
+          "replayMarker": {
+            "title": "Replay-markör-inställningar",
+            "description": "Denna artefakt låter deltagare markera viktiga ögonblick under sessionen för senare analys.",
+            "maxMarkersLabel": "Max markörer",
+            "maxMarkersPlaceholder": "Obegränsat",
+            "allowLabelsLabel": "Tillåt etiketter"
+          },
+          "variants": {
+            "title": "Varianter",
+            "subtitle": "Styr synlighet, rollåtkomst och när varianten kan låsas upp.",
+            "add": "Lägg till variant",
+            "label": "Variant",
+            "titleLabel": "Titel",
+            "titlePlaceholder": "Varianttitel",
+            "visibilityLabel": "Synlighet",
+            "roleLabel": "Roll (för privat variant)",
+            "roleNoneOption": "Ingen (syns enligt synlighet)",
+            "mediaLabel": "Mediareferens (valfri)",
+            "mediaPlaceholder": "media_id eller URL",
+            "bodyLabel": "Text/innehåll",
+            "bodyPlaceholder": "Vad visar denna variant?",
+            "stepIndexLabel": "Steg-index (0 = första)",
+            "stepIndexPlaceholder": "0",
+            "phaseIndexLabel": "Fas-index (0 = första)",
+            "phaseIndexPlaceholder": "0"
+          }
         },
         "decision": {
           "header": {
@@ -4332,7 +4569,8 @@
           "keypad": {
             "settings": "Keypad-inställningar",
             "correctCode": "Korrekt kod",
-            "codeLength": "Kodlängd"
+            "codeLength": "Kodlängd",
+            "correctCodePlaceholder": "1234"
           },
           "preview": {
             "title": "Förhandsvisning",
@@ -4356,63 +4594,161 @@
           "templates": {
             "keypadBasic": {
               "name": "Keypad (4 siffror)",
-              "description": "En enkel 4-siffrig pinkod för att låsa upp något"
+              "description": "En enkel 4-siffrig pinkod för att låsa upp något",
+              "title": "Hemlig kod",
+              "correctCode": "1234",
+              "successMessage": "✅ Korrekt! Du har låst upp ledtråden.",
+              "failMessage": "❌ Fel kod. Försök igen!"
             },
             "keypadAdvanced": {
               "name": "Keypad (med försöksbegränsning)",
-              "description": "Pinkod med max 3 försök innan låsning"
+              "description": "Pinkod med max 3 försök innan låsning",
+              "title": "Säkerhetskod",
+              "successMessage": "🎉 Korrekt! Vägen är öppen.",
+              "failMessage": "⚠️ Fel kod!",
+              "lockedMessage": "🚫 Keypad låst. Kontakta spelledaren."
             },
             "riddle": {
               "name": "Gåta / Fråga",
-              "description": "En gåta med textinmatning för svar"
+              "description": "En gåta med textinmatning för svar",
+              "title": "Gåtan",
+              "prompt": "Vad har fyra ben men kan inte gå?",
+              "correctAnswers": "bord\nett bord\ntable"
             },
-            "cipher": {
+            "cipherCaesar": {
               "name": "Caesar-chiffer",
-              "description": "Krypterat meddelande med bokstavsförskjutning"
+              "description": "Krypterat meddelande med bokstavsförskjutning",
+              "title": "Krypterat meddelande",
+              "cipherKey": "3",
+              "plaintext": "hemligheten finns under trappan"
             },
-            "hotspot": {
+            "hotspotImage": {
               "name": "Klickbar bild",
-              "description": "Bild med dolda zoner att hitta"
+              "description": "Bild med dolda zoner att hitta",
+              "title": "Sök i bilden"
             },
             "tilePuzzle": {
               "name": "Pusselspel (3x3)",
-              "description": "Sliding tile puzzle för att avslöja en bild"
+              "description": "Sliding tile puzzle för att avslöja en bild",
+              "title": "Pusslet"
             },
             "logicGrid": {
               "name": "Logikrutnät",
-              "description": "Logikpussel där saker ska matchas"
+              "description": "Logikpussel där saker ska matchas",
+              "title": "Vem gjorde vad?",
+              "rows": "Alice\nBob\nCharlie",
+              "columns": "Röd\nGrön\nBlå",
+              "solution": "'{\"Alice\":\"Röd\",\"Bob\":\"Grön\",\"Charlie\":\"Blå\"}'"
             },
-            "counter": {
+            "counterClues": {
               "name": "Ledtrådsräknare",
-              "description": "Räkna hittade ledtrådar eller framsteg"
+              "description": "Räkna hittade ledtrådar eller framsteg",
+              "title": "Hittade ledtrådar",
+              "label": "Ledtrådar"
             },
-            "hints": {
+            "hintContainer": {
               "name": "Tips-behållare",
-              "description": "Progressiva tips som kan avslöjas"
+              "description": "Progressiva tips som kan avslöjas",
+              "title": "Tips",
+              "hints": "Titta under mattan\nDet finns en nyckel gömd\nNyckeln passar i skåpet till höger"
             },
             "qrGate": {
               "name": "QR-kod checkpoint",
-              "description": "Skanna QR-kod för att fortsätta"
+              "description": "Skanna QR-kod för att fortsätta",
+              "title": "Skanna koden",
+              "expectedValue": "SECRET123",
+              "successMessage": "✅ Rätt kod! Fortsätt till nästa ledtråd."
             },
-            "location": {
+            "locationCheckpoint": {
               "name": "Plats-checkpoint",
-              "description": "GPS-verifiering för stadsspel"
+              "description": "GPS-verifiering för stadsspel",
+              "title": "Hitta platsen",
+              "locationName": "Stortorget"
             },
             "clueCard": {
               "name": "Ledtråd/Hint",
-              "description": "Ett kort med en ledtråd som kan avslöjas"
+              "description": "Ett kort med en ledtråd som kan avslöjas",
+              "title": "Ledtråd",
+              "descriptionText": "Dold ledtråd som spelledaren kan visa",
+              "variantTitle": "Ledtråd",
+              "variantBody": "Skriv din ledtråd här..."
             },
             "secretDocument": {
               "name": "Hemligt dokument",
-              "description": "Ett dokument som avslöjas vid rätt tidpunkt"
+              "description": "Ett dokument som avslöjas vid rätt tidpunkt",
+              "title": "Hemligt dokument",
+              "descriptionText": "Avslöjas när deltagarna hittar det"
             },
             "revealCard": {
               "name": "Avslöjande kort",
-              "description": "Ett kort för dramatiska avslöjanden"
+              "description": "Ett kort för dramatiska avslöjanden",
+              "title": "Avslöjandet"
             },
             "roleSecret": {
               "name": "Rollhemlighet",
-              "description": "Hemlig information synlig endast för en roll"
+              "description": "Hemlig information synlig endast för en roll",
+              "title": "Din hemlighet",
+              "variantTitle": "Hemlig information",
+              "variantBody": "Endast du kan se detta..."
+            },
+            "audioClue": {
+              "name": "Ljudledtråd",
+              "description": "Ljudklipp som spelas upp för deltagarna",
+              "title": "Lyssna noga"
+            },
+            "soundTrigger": {
+              "name": "Ljudaktivering",
+              "description": "Aktiveras när deltagarna gör ljud",
+              "title": "Ropa högt!",
+              "instruction": "Ropa högt för att öppna dörren!"
+            },
+            "propCheck": {
+              "name": "Rekvisita-check",
+              "description": "Spelledaren bekräftar att deltagare har rätt sak",
+              "title": "Visa upp föremålet",
+              "propName": "Guldnyckeln",
+              "instruction": "Visa upp guldnyckeln för spelledaren för att fortsätta."
+            },
+            "quizAnswer": {
+              "name": "Quizsvar",
+              "description": "Keypad för quiz-frågor med siffersvar",
+              "title": "Fråga",
+              "descriptionText": "Skriv in svaret med siffror",
+              "successMessage": "✅ Rätt svar!",
+              "failMessage": "❌ Fel svar. Försök igen!"
+            },
+            "textQuestion": {
+              "name": "Textfråga",
+              "description": "Öppen fråga med textsvar",
+              "title": "Svara på frågan",
+              "prompt": "Vad är huvudstaden i Sverige?",
+              "correctAnswers": "stockholm\nStockholm"
+            },
+            "checklist": {
+              "name": "Checklista",
+              "description": "Flera saker att bocka av",
+              "title": "Checklista",
+              "items": "Uppgift 1\nUppgift 2\nUppgift 3"
+            },
+            "learningCard": {
+              "name": "Lärokort",
+              "description": "Kort med information eller fakta",
+              "title": "Lärokort"
+            },
+            "imageReveal": {
+              "name": "Bild att avslöja",
+              "description": "En bild som visas vid rätt tidpunkt",
+              "title": "Bild"
+            },
+            "replayMarker": {
+              "name": "Replay-markör",
+              "description": "Låt deltagare markera viktiga ögonblick",
+              "title": "Markera ögonblick"
+            },
+            "blank": {
+              "name": "Tom artefakt",
+              "description": "Börja från scratch",
+              "title": "Ny artefakt"
             }
           }
         }
@@ -6574,6 +6910,11 @@
           "currentPasswordWrong": "Nuvarande lösenord är fel"
         },
         "security": {
+          "emailVerified": "E-post verifierad",
+          "emailNotVerified": "E-post ej verifierad",
+          "mfaEnabled": "MFA aktiverad",
+          "mfaDisabled": "MFA ej aktiverad",
+          "enableMfa": "Aktivera nu",
           "title": "Säkerhetsinställningar",
           "description": "Hantera tvåfaktorsautentisering och sessioner",
           "mfa": {
@@ -9098,7 +9439,9 @@
         "copyRolesDescription": "Kopiera roller från spelet för att kunna tilldela dem till deltagare.",
         "roleDistribution": "Rollfördelning",
         "allMinsSatisfied": "Alla minimikrav uppfyllda",
-        "minsNotSatisfied": "Minimikrav ej uppfyllda"
+        "minsNotSatisfied": "Minimikrav ej uppfyllda",
+        "onlineCount": "{online} av {total} online",
+        "rolesCount": "{assigned} av {total} har roller"
       },
       "participants": {
         "noParticipantsYet": "Inga deltagare har anslutit ännu.",
@@ -9961,6 +10304,38 @@
       "materials": "Material",
       "note": "Anteckning",
       "safety": "Säkerhet"
+    },
+    "basicView": {
+      "stepProgress": "Steg {current} av {total}",
+      "previous": "Föregående",
+      "next": "Nästa",
+      "complete": "Slutför",
+      "exitPlay": "Avsluta spelläge"
+    },
+    "facilitatedView": {
+      "phaseProgress": "Fas {current} av {total}: {phaseName}",
+      "tabs": {
+        "play": "Spela",
+        "content": "Innehåll",
+        "manage": "Hantera"
+      },
+      "content": {
+        "artifacts": "Artefakter",
+        "puzzles": "Pussel",
+        "decisions": "Beslut",
+        "outcome": "Utfall"
+      },
+      "manage": {
+        "roles": "Roller",
+        "triggers": "Triggers",
+        "settings": "Inställningar",
+        "rolesPlaceholder": "Rollhantering kommer här",
+        "settingsPlaceholder": "Sessionsinställningar"
+      },
+      "previous": "Föregående",
+      "next": "Nästa",
+      "exitPlay": "Avsluta",
+      "endSession": "Avsluta session"
     },
     "timerControl": {
       "inputs": {

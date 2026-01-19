@@ -3085,6 +3085,16 @@
           "schema": "Schema",
           "changeHistory": "Change history",
           "changeHistoryDescription": "View previous versions and changes"
+        },
+        "status": {
+          "published": "Published",
+          "draft": "Draft"
+        },
+        "validation": {
+          "pending": "Pending",
+          "valid": "Valid",
+          "invalid": "Invalid",
+          "warning": "Warning"
         }
       },
       "noGames": {
@@ -4233,7 +4243,7 @@
               "title": "Who did what?",
               "rows": "Alice\nBob\nCharlie",
               "columns": "Red\nGreen\nBlue",
-              "solution": "{\"Alice\":\"Red\",\"Bob\":\"Green\",\"Charlie\":\"Blue\"}"
+              "solution": "'{\"Alice\":\"Red\",\"Bob\":\"Green\",\"Charlie\":\"Blue\"}'"
             },
             "counterClues": {
               "name": "Clue counter",
@@ -8535,7 +8545,9 @@
         "copyRolesDescription": "Copy roles from the game to assign them to participants.",
         "roleDistribution": "Role distribution",
         "allMinsSatisfied": "All minimum requirements met",
-        "minsNotSatisfied": "Minimum requirements not met"
+        "minsNotSatisfied": "Minimum requirements not met",
+        "onlineCount": "{online} of {total} online",
+        "rolesCount": "{assigned} of {total} have roles"
       },
       "participants": {
         "noParticipantsYet": "No participants have connected yet.",
@@ -9397,6 +9409,38 @@
       "materials": "Materials",
       "note": "Note",
       "safety": "Safety"
+    },
+    "basicView": {
+      "stepProgress": "Step {current} of {total}",
+      "previous": "Previous",
+      "next": "Next",
+      "complete": "Complete",
+      "exitPlay": "Exit play mode"
+    },
+    "facilitatedView": {
+      "phaseProgress": "Phase {current} of {total}: {phaseName}",
+      "tabs": {
+        "play": "Play",
+        "content": "Content",
+        "manage": "Manage"
+      },
+      "content": {
+        "artifacts": "Artifacts",
+        "puzzles": "Puzzles",
+        "decisions": "Decisions",
+        "outcome": "Outcome"
+      },
+      "manage": {
+        "roles": "Roles",
+        "triggers": "Triggers",
+        "settings": "Settings",
+        "rolesPlaceholder": "Role management will appear here",
+        "settingsPlaceholder": "Session settings"
+      },
+      "previous": "Previous",
+      "next": "Next",
+      "exitPlay": "Exit",
+      "endSession": "End session"
     },
     "timerControl": {
       "inputs": {

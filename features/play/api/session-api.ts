@@ -10,6 +10,7 @@
 import type { SessionRuntimeState, SessionRole } from '@/types/play-runtime';
 import type { BoardTheme } from '@/types/games';
 import type { PlayMode } from '@/features/admin/games/v2/types';
+import type { GameSnapshotData } from '@/types/game-snapshot';
 
 // Local step/phase types for API responses
 // Must match StepPhaseNavigation.StepInfo and ParticipantPlayView.StepData
@@ -89,6 +90,8 @@ export interface PlaySessionData {
   tools: Array<{ tool_key: string; enabled?: boolean; scope?: string }>;
   /** Participant count */
   participantCount: number;
+  /** Game snapshot data for adaptive UI (optional, loaded when needed) */
+  snapshotData?: GameSnapshotData | null;
 }
 
 export interface ParticipantPlayData extends PlaySessionData {

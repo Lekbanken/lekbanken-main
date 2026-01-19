@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { PlayIcon, ArrowPathIcon, BoltIcon, ClockIcon, SparklesIcon, LockClosedIcon, UsersIcon, SpeakerWaveIcon, BookOpenIcon } from '@heroicons/react/24/solid';
+import Link from 'next/link';
+import { PlayIcon, ArrowPathIcon, BoltIcon, ClockIcon, SparklesIcon, LockClosedIcon, UsersIcon, SpeakerWaveIcon, BookOpenIcon, CogIcon, EyeIcon, CubeIcon } from '@heroicons/react/24/solid';
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -209,10 +211,94 @@ export default function PlaySandboxPage() {
   return (
     <SandboxShell
       moduleId="play"
-      title={playModule?.module.label ?? 'Play Immersion'}
-      description={playModule?.module.description ?? 'Play components sandbox'}
+      title={playModule?.module.label ?? 'Play Sandbox Hub'}
+      description={playModule?.module.description ?? 'Fullständig Play-testmiljö'}
     >
       <div className="space-y-12">
+        {/* Navigation Hub */}
+        <section className="space-y-4">
+          <h2 className="text-2xl font-semibold text-foreground">Play Sandbox Navigation</h2>
+          <p className="text-sm text-muted-foreground">
+            Utforska olika delar av Play-systemet
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <Link href="/sandbox/play/modes" className="block">
+              <Card className="h-full hover:border-primary transition-colors cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CogIcon className="h-5 w-5 text-blue-600" />
+                    Play Modes
+                  </CardTitle>
+                  <CardDescription>
+                    Jämför Basic, Facilitated och Participants lägen sida vid sida
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    <Badge variant="outline" className="text-xs">Basic</Badge>
+                    <Badge variant="outline" className="text-xs">Facilitated</Badge>
+                    <Badge variant="outline" className="text-xs">Participants</Badge>
+                  </div>
+                  <div className="flex items-center text-sm text-primary">
+                    Utforska lägen <ArrowRightIcon className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/sandbox/play/components" className="block">
+              <Card className="h-full hover:border-primary transition-colors cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <CubeIcon className="h-5 w-5 text-green-600" />
+                    Components
+                  </CardTitle>
+                  <CardDescription>
+                    Alla play-komponenter isolerat: Navigation, Content, Controls, Panels
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    <Badge variant="outline" className="text-xs">StepViewer</Badge>
+                    <Badge variant="outline" className="text-xs">Timer</Badge>
+                    <Badge variant="outline" className="text-xs">Triggers</Badge>
+                  </div>
+                  <div className="flex items-center text-sm text-primary">
+                    Visa komponenter <ArrowRightIcon className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/sandbox/play/participant" className="block">
+              <Card className="h-full hover:border-primary transition-colors cursor-pointer">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <EyeIcon className="h-5 w-5 text-purple-600" />
+                    Participant View
+                  </CardTitle>
+                  <CardDescription>
+                    Deltagarens perspektiv med mobil/tablet/desktop preview
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    <Badge variant="outline" className="text-xs">Mobil</Badge>
+                    <Badge variant="outline" className="text-xs">Med roll</Badge>
+                    <Badge variant="outline" className="text-xs">Åskådare</Badge>
+                  </div>
+                  <div className="flex items-center text-sm text-primary">
+                    Testa deltagarvy <ArrowRightIcon className="h-4 w-4 ml-1" />
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </div>
+        </section>
+
+        <hr className="border-border" />
+
+        {/* Original content continues below */}
         <div className="flex items-center justify-between gap-4">
           <div>
             <h2 className="text-2xl font-semibold text-foreground">Play Immersion Components</h2>

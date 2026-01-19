@@ -21,24 +21,67 @@
 
 ---
 
-## ID-policy (för referensintegritet i specs)
+## Referensmodell (Builder vs Import)
 
-- Alla `id` i YAML används för att kunna referera mellan objekt (t.ex. triggers → artifacts).
-- Builder/API kan ignorera dessa och generera UUID internt.
-- AI måste dock använda konsekventa `id` inom samma spec.
+Det finns **två referensmodeller** beroende på kontext:
 
-**Exempel:**
+### Builder/API (ID-baserad)
+
+I admin builder och direkta API-anrop används **UUID-baserade** referenser:
+
 ```yaml
 artifacts:
-  - id: "keypad-1"          # Client-side reference ID
+  - id: "550e8400-e29b-41d4-a716-446655440001"
     artifact_type: keypad
     ...
 
 triggers:
-  - condition_type: keypad_correct
-    condition_config:
-      keypadId: "keypad-1"  # References artifact above
+  - condition_config:
+      keypadId: "550e8400-e29b-41d4-a716-446655440001"
 ```
+
+### Import/Export (Order-baserad) — REKOMMENDERAD FÖR AI
+
+Vid CSV/JSON **import** och **export** används **order-baserade alias** för portabilitet:
+
+| Import-fält | Resolveras till | Används av condition_type |
+|-------------|-----------------|---------------------------|
+| `stepOrder` | `stepId` (UUID) | `step_started`, `step_completed` |
+| `phaseOrder` | `phaseId` (UUID) | `phase_started`, `phase_completed` |
+| `artifactOrder` | `artifactId` / `keypadId` | `keypad_correct`, `keypad_failed`, `artifact_unlocked`, `reveal_artifact`, `hide_artifact` |
+
+> ⚠️ **AI-genererade specs för import MÅSTE använda order-alias.**
+> UUID:er genereras automatiskt vid import.
+
+**Exempel (för import):**
+```yaml
+artifacts:
+  - artifact_order: 1               # Order-baserad referens
+    artifact_type: keypad
+    title: "Kodlås"
+    metadata:
+      correctCode: "1234"
+
+triggers:
+  - name: "Kodlås löst"
+    condition_type: keypad_correct
+    condition_config:
+      artifactOrder: 1              # Refererar artifact_order ovan (inte UUID)
+    actions:
+      - type: reveal_artifact
+        artifactOrder: 2            # Refererar annan artifact via order
+    execute_once: true
+```
+
+### Import/Export Round-trip Contract
+
+| Aspekt | Beteende |
+|--------|----------|
+| **Format** | CSV (flat), JSON (full fidelity) |
+| **Bevaras** | Alla fält, triggers, artifacts, variants |
+| **Regenereras** | UUID:er (för portabilitet) |
+| **Referensmodell** | Order-alias (`artifactOrder`, `stepOrder`, `phaseOrder`) |
+| **Begränsning** | CSV max 20 inline steg; JSON för artifacts/triggers |
 
 ---
 
@@ -94,27 +137,32 @@ game:
   max_players: 12
 
 phases:
-  - name: "Intro"
+  - phase_order: 1
+    name: "Intro"
     phase_type: intro                         # See Appendix: intro | round | finale | break
     duration_seconds: 120
     auto_advance: false
-  - name: "Omgång 1"
+  - phase_order: 2
+    name: "Omgång 1"
     phase_type: round
     duration_seconds: 600
-  - name: "Finale"
+  - phase_order: 3
+    name: "Finale"
     phase_type: finale
     duration_seconds: 300
 
 steps:
-  - title: "Samla ledtrådar"
+  - step_order: 1
+    title: "Samla ledtrådar"
     body: "Teamet ska hitta alla dolda ledtrådar."
     leader_script: "Ge tips om de fastnar efter 5 minuter."
     board_text: "Sök i rummet!"
-  - title: "Lös gåtan"
+  - step_order: 2
+    title: "Lös gåtan"
     body: "Kombinera ledtrådarna för att knäcka koden."
 
 artifacts:
-  - id: "keypad-1"
+  - artifact_order: 1
     title: "Kodlås"
     artifact_type: keypad                     # See Appendix G.1
     metadata:
@@ -127,7 +175,7 @@ triggers:
   - name: "Kodlås löst"
     condition_type: keypad_correct            # See Appendix G.2
     condition_config:
-      keypadId: "keypad-1"                    # References artifact.id above
+      artifactOrder: 1                        # References artifact_order above (for import)
     actions:
       - type: advance_step                    # See Appendix G.3
     execute_once: true
@@ -147,7 +195,7 @@ game:
   max_players: 10
 
 roles:
-  - id: "role-detective"
+  - role_order: 1
     name: "Detektiven"
     icon: "🔍"
     color: "blue"
@@ -160,7 +208,7 @@ roles:
     max_count: 1
     assignment_strategy: leader_picks         # random | leader_picks | player_picks
 
-  - id: "role-butler"
+  - role_order: 2
     name: "Butlern"
     icon: "🎩"
     color: "gray"
@@ -172,7 +220,7 @@ roles:
     max_count: 1
     assignment_strategy: random
 
-  - id: "role-guest"
+  - role_order: 3
     name: "Gäst"
     icon: "👤"
     color: "green"
@@ -183,22 +231,24 @@ roles:
     assignment_strategy: random
 
 steps:
-  - title: "Rollutdelning"
+  - step_order: 1
+    title: "Rollutdelning"
     body: "Varje deltagare får sin hemliga roll."
     participant_prompt: "Läs dina hemliga instruktioner!"
-  - title: "Utredning"
+  - step_order: 2
+    title: "Utredning"
     body: "Mingla och samla information."
     participant_prompt: "Prata med andra och sök ledtrådar."
 
 artifacts:
-  - id: "letter-detective"
+  - artifact_order: 1
     title: "Brevet"
     artifact_type: document
     variants:
       - title: "Till Detektiven"
         body: "Hemligt bevis som bara detektiven ser."
         visibility: role_private
-        visible_to_role_id: "role-detective"  # References role.id above
+        visible_to_role_order: 1              # References role_order above (for import)
       - title: "Offentlig version"
         body: "Ett mystiskt brev hittades..."
         visibility: public
@@ -213,6 +263,7 @@ artifacts:
 1. ❌ **Sätt ALDRIG hemligheter i `board_text`** — visas på public board utan auth
 2. ❌ **Lägg aldrig rollspecifika hemligheter i `participant_prompt`** — den är inte roll-gated. Använd `private_instructions` (roll) eller `leader_script` (host) för hemligheter.
 3. ❌ **Glöm inte `correctCode` i keypad metadata** — keypad fungerar inte utan
+4. ❌ **`correctCode` MÅSTE vara sträng** — `"0042"` inte `42` (leading zeros försvinner)
 
 ### Mode Mismatches
 
@@ -302,14 +353,30 @@ public | leader_only | role_private
 
 ## Checklist Before Submitting Spec
 
+### Grundkrav
 - [ ] `game.name` och `game.short_description` är ifyllda
-- [ ] `game.main_purpose_id` är giltig UUID
+- [ ] `game.main_purpose_id` är giltig UUID (eller tom med varning)
 - [ ] Minst 1 step med `title`
+
+### Enum-validering (STRICT)
 - [ ] Alla `artifact_type` finns i Appendix G.1
 - [ ] Alla `condition_type` finns i Appendix G.2
 - [ ] Alla `actions[].type` finns i Appendix G.3
-- [ ] Alla ID-referenser (`keypadId`, `visible_to_role_id`, etc.) matchar definierade `id`
+
+### Referensintegritet (för import)
+- [ ] Triggers använder `artifactOrder`/`stepOrder`/`phaseOrder` (inte UUID)
+- [ ] `visible_to_role_order` matchar definierade `role_order`
+- [ ] Om triggers använder `stepOrder`/`phaseOrder`: verifiera att index finns (1..n)
+
+### Säkerhet
+- [ ] Inga hemligheter i `board_text` eller `participant_prompt`
+- [ ] `correctCode` är en **sträng** (t.ex. `"0042"` inte `42`)
+- [ ] `role_private` variants har `visible_to_role_order`
+
+### Play Mode
 - [ ] Om `play_mode: participants`: minst 1 roll med `private_instructions`
-- [ ] Om triggers använder `stepIndex`/`phaseIndex`: verifiera att index finns (0..n-1)
+- [ ] Om `play_mode: facilitated`: minst 1 fas definierad
+
+### Förbjudet
 - [ ] Inga runtime-fält (`revealed_at`, `status`, etc.)
 - [ ] Inga o-verifierade metadata-nycklar utan `[VERIFY_IN_REPO]`

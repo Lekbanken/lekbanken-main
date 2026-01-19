@@ -37,6 +37,54 @@ export type BatchValidationResult = {
 // Constants
 // =============================================================================
 
+/**
+ * Valid artifact types from types/games.ts ArtifactType union.
+ * Used for import validation warnings.
+ */
+const VALID_ARTIFACT_TYPES = new Set([
+  'card', 'document', 'image', 'conversation_cards_collection',
+  'keypad', 'riddle', 'multi_answer', 'audio', 'hotspot', 'tile_puzzle',
+  'cipher', 'logic_grid', 'counter', 'qr_gate', 'hint_container',
+  'prop_confirmation', 'location_check', 'sound_level', 'replay_marker',
+  'signal_generator', 'time_bank_step', 'empty_artifact'
+]);
+
+/**
+ * Valid trigger condition types from types/trigger.ts TriggerConditionType.
+ * Used for import validation errors.
+ */
+const VALID_CONDITION_TYPES = new Set([
+  'step_started', 'step_completed', 'phase_started', 'phase_completed',
+  'decision_resolved', 'timer_ended', 'artifact_unlocked',
+  'keypad_correct', 'keypad_failed', 'manual', 'signal_received',
+  'counter_reached', 'riddle_correct', 'audio_acknowledged',
+  'multi_answer_complete', 'scan_verified', 'hint_requested',
+  'hotspot_found', 'hotspot_hunt_complete', 'tile_puzzle_complete',
+  'cipher_decoded', 'prop_confirmed', 'prop_rejected', 'location_verified',
+  'logic_grid_solved', 'sound_level_triggered', 'replay_marker_added',
+  'time_bank_expired', 'signal_generator_triggered'
+]);
+
+/**
+ * Valid trigger action types from types/trigger.ts TriggerActionType.
+ * Used for import validation errors.
+ */
+const VALID_ACTION_TYPES = new Set([
+  'reveal_artifact', 'hide_artifact', 'unlock_decision', 'lock_decision',
+  'advance_step', 'advance_phase', 'start_timer', 'send_message',
+  'play_sound', 'show_countdown', 'reset_keypad', 'send_signal',
+  'time_bank_apply_delta', 'increment_counter', 'reset_counter',
+  'reset_riddle', 'send_hint', 'reset_scan_gate', 'reset_hotspot_hunt',
+  'reset_tile_puzzle', 'reset_cipher', 'reset_prop', 'reset_location',
+  'reset_logic_grid', 'reset_sound_meter', 'add_replay_marker',
+  'show_leader_script', 'trigger_signal', 'time_bank_pause'
+]);
+
+/**
+ * Regex pattern to detect potential secrets (4-6 digit codes) in public fields.
+ */
+const SECRET_PATTERN = /\b\d{4,6}\b/;
+
 // =============================================================================
 // Single Game Validation
 // =============================================================================
@@ -339,6 +387,16 @@ export function validateGame(
       const artifact = game.artifacts[i];
       const artifactTitle = artifact.title || `Artifact #${i + 1}`;
       
+      // Validate artifact_type against known types (WARNING - allows unknown for future types)
+      if (artifact.artifact_type && !VALID_ARTIFACT_TYPES.has(artifact.artifact_type)) {
+        warnings.push({
+          row: rowNumber,
+          column: 'artifacts',
+          message: `[game_key: ${gameKey}] Artefakt "${artifactTitle}": okänd artifact_type "${artifact.artifact_type}". Verifiera mot Appendix G.1 i GAME_INTEGRITY_REPORT.md.`,
+          severity: 'warning',
+        });
+      }
+      
       // Keypad-specific validation
       if (artifact.artifact_type === 'keypad') {
         const metadata = artifact.metadata as Record<string, unknown> | null | undefined;
@@ -397,7 +455,88 @@ export function validateGame(
               });
             }
           }
+          
+          // Security: Check for potential secrets in public variant body
+          if (variant.visibility === 'public' && variant.body && SECRET_PATTERN.test(variant.body)) {
+            warnings.push({
+              row: rowNumber,
+              column: 'artifacts',
+              message: `[game_key: ${gameKey}] Artefakt "${artifactTitle}", variant #${j + 1}: public variant innehåller vad som kan vara en kod (${variant.body.match(SECRET_PATTERN)?.[0]}). Säkerställ att detta inte är en hemlighet.`,
+              severity: 'warning',
+            });
+          }
         }
+      }
+    }
+  }
+  
+  // ==========================================================================
+  // Trigger validation (applies to JSON imports with triggers)
+  // ==========================================================================
+  
+  if (game.triggers && game.triggers.length > 0) {
+    const gameKey = game.game_key || 'unknown';
+    
+    for (let i = 0; i < game.triggers.length; i++) {
+      const trigger = game.triggers[i];
+      const triggerName = trigger.name || `Trigger #${i + 1}`;
+      
+      // Validate condition_type (ERROR - unknown types will cause runtime failures)
+      const conditionType = trigger.condition_type || (trigger.condition as Record<string, unknown>)?.type;
+      if (conditionType && typeof conditionType === 'string' && !VALID_CONDITION_TYPES.has(conditionType)) {
+        errors.push({
+          row: rowNumber,
+          column: 'triggers',
+          message: `[game_key: ${gameKey}] Trigger "${triggerName}": okänd condition_type "${conditionType}". Se Appendix G.2 i GAME_INTEGRITY_REPORT.md.`,
+          severity: 'error',
+        });
+      }
+      
+      // Validate action types (ERROR - unknown action types will cause runtime failures)
+      const actions = trigger.actions || [];
+      for (let j = 0; j < actions.length; j++) {
+        const action = actions[j] as Record<string, unknown>;
+        const actionType = action?.type;
+        if (actionType && typeof actionType === 'string' && !VALID_ACTION_TYPES.has(actionType)) {
+          errors.push({
+            row: rowNumber,
+            column: 'triggers',
+            message: `[game_key: ${gameKey}] Trigger "${triggerName}", action #${j + 1}: okänd action type "${actionType}". Se Appendix G.3 i GAME_INTEGRITY_REPORT.md.`,
+            severity: 'error',
+          });
+        }
+      }
+    }
+  }
+  
+  // ==========================================================================
+  // Security: Check for potential secrets in step public fields
+  // ==========================================================================
+  
+  if (game.steps) {
+    const gameKey = game.game_key || 'unknown';
+    
+    for (let i = 0; i < game.steps.length; i++) {
+      const step = game.steps[i];
+      
+      // Check board_text for potential secrets
+      if (step.board_text && SECRET_PATTERN.test(step.board_text)) {
+        warnings.push({
+          row: rowNumber,
+          column: `step_${i + 1}_board_text`,
+          message: `[game_key: ${gameKey}] Steg ${i + 1} board_text innehåller vad som kan vara en kod (${step.board_text.match(SECRET_PATTERN)?.[0]}). board_text visas publikt utan auth!`,
+          severity: 'warning',
+        });
+      }
+      
+      // Check participant_prompt for potential secrets
+      if (step.participant_prompt && SECRET_PATTERN.test(step.participant_prompt)) {
+        warnings.push({
+          row: rowNumber,
+          column: `step_${i + 1}_participant_prompt`,
+          message: `[game_key: ${gameKey}] Steg ${i + 1} participant_prompt innehåller vad som kan vara en kod (${step.participant_prompt.match(SECRET_PATTERN)?.[0]}). participant_prompt visas till alla deltagare!`,
+          severity: 'warning',
+        });
       }
     }
   }

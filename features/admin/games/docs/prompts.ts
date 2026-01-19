@@ -8,6 +8,12 @@ const CSV_ESCAPING = `ESCAPING (kritiskt):
 - Om en cell innehåller citattecken \" ska det skrivas som \"\" (dubbelcitat).
 - JSON i en CSV-cell måste vara giltig JSON och dessutom korrekt CSV-escaped (dvs alla \" i JSON blir \"\").`;
 
+const SECURITY_CHECKLIST = `SÄKERHET (kontrollera före import):
+- [ ] correctCode är STRÄNG (inte tal) — "0042" inte 42 (leading zeros försvinner!)
+- [ ] Inga hemligheter i board_text (visas publikt utan auth)
+- [ ] Inga hemligheter i participant_prompt (visas till alla deltagare)
+- [ ] role_private variants har visible_to_role_order`;
+
 export const PROMPT_BASIC_CSV = `DU ÄR: Lekbanks-importgenerator för CSV (basic play_mode).
 MÅL: Skapa exakt 1 CSV-rad (en lek) som kan importeras direkt i Lekbanken utan manuella ändringar.
 
@@ -130,6 +136,11 @@ VIKTIGT:
 - Du får och ska använda: steps, artifacts, triggers.
 - Triggers måste referera med stepOrder/phaseOrder/artifactOrder (inte UUID), eftersom importen resolverar.
 
+REFERENSMODELL (kritiskt för triggers):
+- Använd ALLTID order-baserade alias: artifactOrder, stepOrder, phaseOrder
+- ALDRIG UUID:er som keypadId, stepId, artifactId — dessa genereras vid import
+- Exempel: condition_config: { artifactOrder: 1 } (refererar artifact med artifact_order: 1)
+
 SKAPA:
 1) Grundfält:
 - game_key, name, short_description, description, play_mode="participants", status, locale="sv-SE"
@@ -139,7 +150,7 @@ SKAPA:
 2) steps (6–12):
 - Varje step: step_order, title, body, duration_seconds
 - Inkludera leader_script där relevant
-- Om stöds: participant_prompt, board_text, optional
+- SÄKERHET: Inga hemligheter i board_text eller participant_prompt!
 
 3) phases (rekommenderat):
 - 2–4 faser med: phase_order, name, phase_type, timer_style, duration_seconds, timer_visible, auto_advance
@@ -149,10 +160,26 @@ SKAPA:
 
 5) artifacts (minst 6):
 - Varje artifact: artifact_order, artifact_type, title, description, tags, metadata, variants[]
+- SÄKERHET för keypad: correctCode MÅSTE vara sträng ("0042" inte 42)
+- role_private variants: använd visible_to_role_order (inte visible_to_role_id)
 
 6) triggers (minst 5):
 - execute_once när relevant
 - condition + actions (referera med *Order alias*)
+- Exempel keypad trigger:
+  {
+    "name": "Kodlås löst",
+    "condition_type": "keypad_correct",
+    "condition_config": { "artifactOrder": 1 },
+    "actions": [{ "type": "reveal_artifact", "artifactOrder": 2 }],
+    "execute_once": true
+  }
+
+SÄKERHET (kontrollera före import):
+- [ ] correctCode är STRÄNG (inte tal) — "0042" inte 42
+- [ ] Inga hemligheter i board_text (visas publikt utan auth)
+- [ ] Inga hemligheter i participant_prompt (visas till alla deltagare)
+- [ ] role_private variants har visible_to_role_order
 
 OUTPUT:
 - Endast JSON (ingen extra text före).

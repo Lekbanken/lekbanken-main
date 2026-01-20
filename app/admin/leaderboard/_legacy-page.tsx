@@ -183,7 +183,7 @@ export default function LeaderboardAdminPage() {
     };
 
     loadData();
-  }, [tenantId, timeframe]);
+  }, [tenantId, timeframe, t]);
 
   // Filter and sort data
   const filteredEntries = entries.filter((entry) => {

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ProfileMenu } from "@/components/navigation/ProfileMenu";
 import { ThemeToggle } from "@/components/navigation/ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ function Breadcrumbs() {
 }
 
 export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
+  const t = useTranslations("admin.nav");
   const { setOpen: setCommandPaletteOpen } = useCommandPalette();
   const [baseNow] = useState(() => Date.now());
   const { 
@@ -108,7 +110,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
           type="button"
           onClick={onToggleSidebar}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
-          aria-label="Öppna navigering"
+          aria-label={t("openNavigation")}
         >
           <Bars3Icon className="h-5 w-5" />
         </button>
@@ -124,7 +126,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
         >
           <div className="flex h-9 w-full items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
             <MagnifyingGlassIcon className="h-4 w-4" />
-            <span className="flex-1 text-left">Sök Användare, organisationer...</span>
+            <span className="flex-1 text-left">{t("topbar.searchPlaceholder")}</span>
             <kbd className="hidden rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground lg:inline-block">
               ⌘K
             </kbd>
@@ -136,7 +138,7 @@ export function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
       <div className="flex items-center gap-2">
         <Button variant="outline" size="sm" className="hidden gap-2 xl:inline-flex">
           <UserIcon className="h-4 w-4" />
-          Ny Användare
+          {t("topbar.newUser")}
         </Button>
 
         <AdminNotificationsCenter

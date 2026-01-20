@@ -2,6 +2,7 @@
 
 import { useTenant } from '@/lib/context/TenantContext';
 import { useRbac } from '@/features/admin/shared/hooks/useRbac';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { XMarkIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 
@@ -23,6 +24,7 @@ export function ActingAsTenantBanner({
   onExitTenantContext,
   className = '' 
 }: ActingAsTenantBannerProps) {
+  const t = useTranslations('admin.nav.tenantContext');
   const { currentTenant } = useTenant();
   const { isSystemAdmin, currentTenantId } = useRbac();
 
@@ -43,7 +45,7 @@ export function ActingAsTenantBanner({
             <BuildingOfficeIcon className="h-4 w-4 text-amber-600" />
           </div>
           <span className="text-amber-700 dark:text-amber-400">
-            <span className="font-medium">Agerar som:</span>{' '}
+            <span className="font-medium">{t('actingAsLabel')}</span>{' '}
             <span className="font-semibold">{currentTenant.name}</span>
           </span>
         </div>
@@ -56,7 +58,7 @@ export function ActingAsTenantBanner({
             className="h-7 px-2 text-amber-700 hover:text-amber-900 hover:bg-amber-500/20"
           >
             <XMarkIcon className="h-4 w-4 mr-1" />
-            <span className="hidden sm:inline">Avsluta</span>
+            <span className="hidden sm:inline">{t('exit')}</span>
           </Button>
         )}
       </div>

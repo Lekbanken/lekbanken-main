@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Button,
   Dialog,
@@ -12,6 +13,8 @@ import {
 import { Tabs, TabPanel, useTabs } from '@/components/ui/tabs';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { CONVERSATION_CARDS_CSV_HEADERS } from '@/features/conversation-cards/csv-format';
+
+type TranslationFn = ReturnType<typeof useTranslations>;
 
 // ============================================
 // CSV-format dokumentation
@@ -137,6 +140,8 @@ function CodeBlock({ children }: { children: string }) {
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const tActions = useTranslations('common.actions');
+  const tMessages = useTranslations('common.messages');
 
   const handleCopy = async () => {
     try {
@@ -150,7 +155,7 @@ function CopyButton({ text }: { text: string }) {
 
   return (
     <Button variant="ghost" size="sm" onClick={handleCopy}>
-      {copied ? 'Kopierat!' : 'Kopiera'}
+      {copied ? tMessages('copied') : tActions('copy')}
     </Button>
   );
 }
@@ -161,7 +166,7 @@ type InfoTab = {
   render: () => ReactNode;
 };
 
-function getInfoTabs(): InfoTab[] {
+function getInfoTabs(t: TranslationFn): InfoTab[] {
   const csvHeader = CONVERSATION_CARDS_CSV_HEADERS.join(',');
 
   const exampleCsv = `collection_title,collection_description,main_purpose,sub_purpose,card_title,primary_prompt,followup_1,followup_2,followup_3,leader_tip
@@ -171,34 +176,31 @@ function getInfoTabs(): InfoTab[] {
   return [
     {
       id: 'overview',
-      label: 'Översikt',
+      label: t('tabs.overview'),
       render: () => (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">Vad är samtalskort?</h3>
+            <h3 className="font-semibold mb-2">{t('overview.whatAreTitle')}</h3>
             <p className="text-muted-foreground text-sm">
-              Samtalskort är strukturerade frågor som underlättar meningsfulla samtal i grupper.
-              Varje kort har en huvudfråga (primary_prompt) och kan ha uppföljningsfrågor.
+              {t('overview.whatAreBody')}
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Import via CSV</h3>
+            <h3 className="font-semibold mb-2">{t('overview.importTitle')}</h3>
             <p className="text-muted-foreground text-sm">
-              Du kan importera samtalskort via CSV. Om du importerar till en ny samling
-              behöver du ange collection_title på första raden. Alla kort i samma fil
-              läggs till samma samling.
+              {t('overview.importBody')}
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Arbetsflöde</h3>
+            <h3 className="font-semibold mb-2">{t('overview.workflowTitle')}</h3>
             <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Skapa CSV-fil med dina samtalskort (eller använd AI-prompt)</li>
-              <li>Klicka på &quot;Importera&quot; på huvudsidan</li>
-              <li>Välj scope (Global eller Tenant)</li>
-              <li>Klistra in eller ladda upp CSV</li>
-              <li>Validera och importera</li>
+              <li>{t('overview.workflowStep1')}</li>
+              <li>{t('overview.workflowStep2')}</li>
+              <li>{t('overview.workflowStep3')}</li>
+              <li>{t('overview.workflowStep4')}</li>
+              <li>{t('overview.workflowStep5')}</li>
             </ol>
           </div>
         </div>
@@ -206,28 +208,30 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'csv-format',
-      label: 'CSV-format',
+      label: t('tabs.csvFormat'),
       render: () => (
         <div className="space-y-4">
           {/* Varning om citattecken */}
           <div className="rounded-lg border border-amber-500/50 bg-amber-500/10 p-3">
             <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-              ⚠️ Viktigt: Citattecken i CSV
+              {t('csvFormat.quoteWarningTitle')}
             </p>
             <p className="text-sm text-amber-600 dark:text-amber-300 mt-1">
-              Om ett fält innehåller <strong>kommatecken</strong>, måste hela fältet omslutas med citattecken (&quot;).
-              Exempel: <code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 rounded">&quot;Text med, kommatecken&quot;</code>
+              {t('csvFormat.quoteWarningBodyPrefix')}{' '}
+              <strong>{t('csvFormat.quoteWarningBodyComma')}</strong>
+              {t('csvFormat.quoteWarningBodySuffix')}{' '}
+              <code className="bg-amber-200/50 dark:bg-amber-900/50 px-1 rounded">{t('csvFormat.quoteWarningExample')}</code>
             </p>
           </div>
 
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">CSV Header</h3>
+            <h3 className="font-semibold">{t('csvFormat.headerTitle')}</h3>
             <CopyButton text={csvHeader} />
           </div>
           <CodeBlock>{csvHeader}</CodeBlock>
 
           <div>
-            <h3 className="font-semibold mb-3">Fältbeskrivningar</h3>
+            <h3 className="font-semibold mb-3">{t('csvFormat.fieldDescriptionsTitle')}</h3>
             <div className="space-y-3">
               {CONVERSATION_CARDS_CSV_HEADERS.map((header) => {
                 const field = CSV_FIELD_DESCRIPTIONS[header];
@@ -237,12 +241,12 @@ function getInfoTabs(): InfoTab[] {
                     <div className="flex items-center gap-2">
                       <code className="text-sm font-mono bg-muted px-1 rounded">{header}</code>
                       {field.required && (
-                        <span className="text-xs text-destructive font-medium">Obligatorisk</span>
+                        <span className="text-xs text-destructive font-medium">{t('csvFormat.requiredLabel')}</span>
                       )}
                     </div>
                     <p className="text-sm text-muted-foreground">{field.description}</p>
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-medium">Exempel:</span> {field.example}
+                      <span className="font-medium">{t('csvFormat.exampleLabel')}</span> {field.example}
                     </p>
                   </div>
                 );
@@ -251,7 +255,7 @@ function getInfoTabs(): InfoTab[] {
           </div>
 
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Exempelfil</h3>
+            <h3 className="font-semibold">{t('csvFormat.exampleFileTitle')}</h3>
             <CopyButton text={exampleCsv} />
           </div>
           <CodeBlock>{exampleCsv}</CodeBlock>
@@ -260,31 +264,31 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'ai-prompts',
-      label: 'AI-prompts',
+      label: t('tabs.aiPrompts'),
       render: () => (
         <div className="space-y-6">
           <p className="text-sm text-muted-foreground">
-            Använd dessa prompts med ChatGPT, Claude eller annan AI för att generera samtalskort.
+            {t('aiPrompts.intro')}
           </p>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Basic Prompt</h3>
+              <h3 className="font-semibold">{t('aiPrompts.basicTitle')}</h3>
               <CopyButton text={AI_PROMPT_BASIC} />
             </div>
             <p className="text-xs text-muted-foreground">
-              Enkel prompt för att snabbt skapa en samling samtalskort.
+              {t('aiPrompts.basicDescription')}
             </p>
             <CodeBlock>{AI_PROMPT_BASIC}</CodeBlock>
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Advanced Prompt</h3>
+              <h3 className="font-semibold">{t('aiPrompts.advancedTitle')}</h3>
               <CopyButton text={AI_PROMPT_ADVANCED} />
             </div>
             <p className="text-xs text-muted-foreground">
-              Mer detaljerad prompt för högkvalitativa samtalskort med best practices.
+              {t('aiPrompts.advancedDescription')}
             </p>
             <CodeBlock>{AI_PROMPT_ADVANCED}</CodeBlock>
           </div>
@@ -293,61 +297,63 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'tips',
-      label: 'Tips & tricks',
+      label: t('tabs.tips'),
       render: () => (
         <div className="space-y-4">
           <div>
-            <h3 className="font-semibold mb-2">Bra samtalskort</h3>
+            <h3 className="font-semibold mb-2">{t('tips.goodCardsTitle')}</h3>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Är öppna och inbjuder till reflektion</li>
-              <li>Har ingen &quot;rätt&quot; eller &quot;fel&quot; svar</li>
-              <li>Anpassas till målgruppens kontext</li>
-              <li>Börjar enkelt och ökar gradvis i djup</li>
+              <li>{t('tips.goodCardsItem1')}</li>
+              <li>{t('tips.goodCardsItem2')}</li>
+              <li>{t('tips.goodCardsItem3')}</li>
+              <li>{t('tips.goodCardsItem4')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Uppföljningsfrågor</h3>
+            <h3 className="font-semibold mb-2">{t('tips.followupsTitle')}</h3>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Hjälper till att fördjupa samtalet</li>
-              <li>Bör bygga på svaret på huvudfrågan</li>
-              <li>Kan vara mer personliga eller actionorienterade</li>
+              <li>{t('tips.followupsItem1')}</li>
+              <li>{t('tips.followupsItem2')}</li>
+              <li>{t('tips.followupsItem3')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Leader tips</h3>
+            <h3 className="font-semibold mb-2">{t('tips.leaderTipsTitle')}</h3>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Ge konkret vägledning för facilitatorn</li>
-              <li>Inkludera timing-förslag</li>
-              <li>Nämn potentiella utmaningar och hur man hanterar dem</li>
+              <li>{t('tips.leaderTipsItem1')}</li>
+              <li>{t('tips.leaderTipsItem2')}</li>
+              <li>{t('tips.leaderTipsItem3')}</li>
             </ul>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">Syften (purposes)</h3>
+            <h3 className="font-semibold mb-2">{t('tips.purposesTitle')}</h3>
             <p className="text-sm text-muted-foreground mb-2">
-              Du kan koppla samtalskort till syften för bättre filtrering. Använd <code className="bg-muted px-1 rounded">purpose_key</code> (snake_case):
+              {t('tips.purposesIntroPrefix')}{' '}
+              <code className="bg-muted px-1 rounded">purpose_key</code>
+              {t('tips.purposesIntroSuffix')}
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li><code className="bg-muted px-1 rounded">collaboration_and_community</code> - Samarbete & gemenskap</li>
-              <li><code className="bg-muted px-1 rounded">feedback_and_development</code> - Feedback & utveckling</li>
-              <li><code className="bg-muted px-1 rounded">creative_thinking</code> - Kreativt tänkande</li>
-              <li><code className="bg-muted px-1 rounded">reflection_and_insight</code> - Reflektion & insikt</li>
-              <li><code className="bg-muted px-1 rounded">leadership_and_roles</code> - Ledarskap & roller</li>
+              <li><code className="bg-muted px-1 rounded">collaboration_and_community</code> - {t('tips.purposeLabels.collaborationAndCommunity')}</li>
+              <li><code className="bg-muted px-1 rounded">feedback_and_development</code> - {t('tips.purposeLabels.feedbackAndDevelopment')}</li>
+              <li><code className="bg-muted px-1 rounded">creative_thinking</code> - {t('tips.purposeLabels.creativeThinking')}</li>
+              <li><code className="bg-muted px-1 rounded">reflection_and_insight</code> - {t('tips.purposeLabels.reflectionAndInsight')}</li>
+              <li><code className="bg-muted px-1 rounded">leadership_and_roles</code> - {t('tips.purposeLabels.leadershipAndRoles')}</li>
             </ul>
             <p className="text-xs text-muted-foreground mt-2">
-              Se alla syften i admin under &quot;Syften&quot;-fliken.
+              {t('tips.purposesAdminHint')}
             </p>
           </div>
 
           <div>
-            <h3 className="font-semibold mb-2">CSV-tips</h3>
+            <h3 className="font-semibold mb-2">{t('tips.csvTipsTitle')}</h3>
             <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-              <li>Omge alltid textfält med citattecken (&quot;) för säkerhet</li>
-              <li>Om ett fält innehåller citattecken, dubbla dem (&quot;&quot;)</li>
-              <li>Spara som UTF-8 för korrekt hantering av svenska tecken</li>
-              <li>Excel kan exportera CSV med citattecken automatiskt</li>
+              <li>{t('tips.csvTipsItem1')}</li>
+              <li>{t('tips.csvTipsItem2')}</li>
+              <li>{t('tips.csvTipsItem3')}</li>
+              <li>{t('tips.csvTipsItem4')}</li>
             </ul>
           </div>
         </div>
@@ -362,19 +368,20 @@ function getInfoTabs(): InfoTab[] {
 
 export function ConversationCardsInfoDialog() {
   const { activeTab, setActiveTab } = useTabs('overview');
-  const tabs = getInfoTabs();
+  const t = useTranslations('admin.conversationCards.infoDialog');
+  const tabs = getInfoTabs(t);
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <InformationCircleIcon className="mr-2 h-4 w-4" />
-          Information
+          {t('buttonLabel')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Information om samtalskort</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
         <Tabs
           tabs={tabs.map((t) => ({ id: t.id, label: t.label }))}

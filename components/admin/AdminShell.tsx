@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { ActingAsTenantBanner } from "./ActingAsTenantBanner";
@@ -16,6 +17,7 @@ type AdminShellProps = {
 };
 
 export function AdminShell({ children }: AdminShellProps) {
+  const t = useTranslations("admin.nav.shell");
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [loadingTimedOut, setLoadingTimedOut] = useState(false);
@@ -59,24 +61,24 @@ export function AdminShell({ children }: AdminShellProps) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
         <div className="text-center space-y-2">
-          <p>Laddar...</p>
+          <p>{t("loading")}</p>
           {loadingTimedOut && (
             <div className="space-y-2">
-              <p className="text-sm">Det tar ovanligt lång tid. Testa att ladda om eller logga in igen.</p>
+              <p className="text-sm">{t("loadingTimeoutHint")}</p>
               <div className="flex justify-center gap-2">
                 <button
                   type="button"
                   className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
                   onClick={handleLogin}
                 >
-                  Gå till login
+                  {t("goToLogin")}
                 </button>
                 <button
                   type="button"
                   className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
                   onClick={handleReset}
                 >
-                  Rensa session
+                  {t("clearSession")}
                 </button>
               </div>
             </div>
@@ -102,11 +104,11 @@ export function AdminShell({ children }: AdminShellProps) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="space-y-4 rounded-xl border border-border bg-card p-6 text-center">
-          <p className="text-sm font-semibold text-foreground">Ingen admin-åtkomst</p>
+          <p className="text-sm font-semibold text-foreground">{t("noAccessTitle")}</p>
           <p className="text-sm text-muted-foreground">
             {user
-              ? `Din roll (${effectiveGlobalRole || 'ingen'}) saknar åtkomst. Logga in med ett admin-konto.`
-              : "Du är inte inloggad."}
+              ? t("noAccessLoggedIn", { role: effectiveGlobalRole || t("roleNone") })
+              : t("noAccessLoggedOut")}
           </p>
           <div className="flex justify-center gap-2">
             <button
@@ -114,14 +116,14 @@ export function AdminShell({ children }: AdminShellProps) {
               className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
               onClick={handleLogin}
             >
-              Gå till login
+              {t("goToLogin")}
             </button>
             <button
               type="button"
               className="rounded-lg border border-border px-3 py-1.5 text-sm hover:bg-muted"
               onClick={handleReset}
             >
-              Rensa session
+              {t("clearSession")}
             </button>
           </div>
         </div>

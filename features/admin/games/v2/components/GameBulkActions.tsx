@@ -308,7 +308,6 @@ export function GameBulkActionsBar({
       />
 
       {/* Active Sessions Warning Dialog */}
-      {/* eslint-disable-next-line lekbanken/no-hardcoded-strings -- TODO: Add translations for bulk actions */}
       <AdminConfirmDialog
         open={Boolean(activeSessionsWarning)}
         onOpenChange={(open) => !open && setActiveSessionsWarning(null)}

@@ -70,7 +70,7 @@ export default function ModerationAdminPage() {
     };
 
     void loadData();
-  }, [tenantId]);
+  }, [tenantId, t]);
 
   const handleResolveReport = async (report: ContentReport, action: string) => {
     if (!user || !currentTenant) return;

@@ -252,7 +252,7 @@ export interface CookieConsentUpdate {
 }
 
 // Tables we override with stricter enum types
-type LegalTableNames =
+export type LegalTableNames =
   | 'legal_documents'
   | 'user_legal_acceptances'
   | 'cookie_catalog'

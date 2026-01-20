@@ -101,7 +101,7 @@ export function ProductsTab() {
 
     void loadProducts();
     return () => { isMounted = false; };
-  }, []);
+   }, [t]);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

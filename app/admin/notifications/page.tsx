@@ -73,7 +73,7 @@ export default function NotificationsAdminPage() {
     };
 
     void loadUsers();
-  }, [userId, tenantId]);
+  }, [userId, tenantId, t]);
 
   const canSend = useMemo(() => {
     if (!currentTenant) return false;

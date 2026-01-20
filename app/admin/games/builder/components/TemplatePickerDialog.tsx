@@ -5,6 +5,7 @@ import { Button } from '@/components/ui';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 import {
   TEMPLATE_CATEGORIES,
   TRIGGER_TEMPLATES,
@@ -26,6 +27,9 @@ export function TemplatePickerDialog({
   onClose,
   onSelect,
 }: TemplatePickerDialogProps) {
+  const t = useTranslations('admin.games.builder.templatePickerDialog');
+  const tActions = useTranslations('common.actions');
+
   const [selectedCategory, setSelectedCategory] = useState<TemplateCategory | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<TriggerTemplate | null>(null);
 
@@ -56,7 +60,7 @@ export function TemplatePickerDialog({
       <div className="w-full max-w-3xl max-h-[85vh] bg-background rounded-lg shadow-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b">
-          <h2 className="text-lg font-semibold">Trigger-mallar</h2>
+          <h2 className="text-lg font-semibold">{t('title')}</h2>
           <Button variant="ghost" size="sm" onClick={handleClose}>
             <XMarkIcon className="h-5 w-5" />
           </Button>
@@ -74,7 +78,7 @@ export function TemplatePickerDialog({
                   : 'hover:bg-surface-secondary'
               }`}
             >
-              Alla mallar
+              {t('allTemplates')}
             </button>
             {TEMPLATE_CATEGORIES.map((cat) => (
               <button
@@ -121,12 +125,12 @@ export function TemplatePickerDialog({
                           {template.description}
                         </p>
                         <p className="text-xs text-foreground-tertiary mt-1">
-                          {template.triggers.length} trigger{template.triggers.length !== 1 ? 's' : ''}
+                          {t('triggersCount', { count: template.triggers.length })}
                         </p>
                       </div>
                       {isSelected && (
                         <div className="flex-shrink-0">
-                          <Badge variant="default" size="sm">Vald</Badge>
+                          <Badge variant="default" size="sm">{t('selectedBadge')}</Badge>
                         </div>
                       )}
                     </div>
@@ -141,12 +145,15 @@ export function TemplatePickerDialog({
         <div className="flex items-center justify-between p-4 border-t bg-surface-secondary/50">
           <p className="text-sm text-foreground-secondary">
             {selectedTemplate
-              ? `Lägg till "${selectedTemplate.name}" (${selectedTemplate.triggers.length} trigger${selectedTemplate.triggers.length !== 1 ? 's' : ''})`
-              : 'Välj en mall att lägga till'}
+              ? t('footerSelectedTemplate', {
+                  name: selectedTemplate.name,
+                  triggers: t('triggersCount', { count: selectedTemplate.triggers.length }),
+                })
+              : t('footerNoSelection')}
           </p>
           <div className="flex gap-2">
             <Button variant="outline" onClick={handleClose}>
-              Avbryt
+              {tActions('cancel')}
             </Button>
             <Button
               variant="default"
@@ -154,7 +161,7 @@ export function TemplatePickerDialog({
               disabled={!selectedTemplate}
             >
               <PlusIcon className="h-4 w-4 mr-1" />
-              Lägg till
+              {tActions('add')}
             </Button>
           </div>
         </div>

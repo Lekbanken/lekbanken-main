@@ -145,7 +145,7 @@ export function LicensesTab() {
 
     void loadLicenses();
     return () => { isMounted = false; };
-  }, []);
+  }, [t]);
 
   const filteredLicenses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

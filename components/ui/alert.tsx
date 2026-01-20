@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 type AlertVariant = "info" | "success" | "warning" | "error";
@@ -60,6 +63,8 @@ export function Alert({
   onClose,
   className,
 }: AlertProps) {
+  const tActions = useTranslations("common.actions");
+
   return (
     <div
       role="alert"
@@ -74,7 +79,7 @@ export function Alert({
         <button
           onClick={onClose}
           className="absolute right-2 top-2 rounded-md p-1 opacity-70 transition-opacity hover:opacity-100"
-          aria-label="Stäng"
+          aria-label={tActions("close")}
           type="button"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

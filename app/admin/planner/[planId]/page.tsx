@@ -90,7 +90,7 @@ export default function AdminPlannerDetailPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [planId, canView]);
+  }, [planId, canView, t]);
 
   const loadVersions = useCallback(async () => {
     if (!planId || !canView) return;

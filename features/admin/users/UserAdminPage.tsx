@@ -161,7 +161,7 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  }, [success, toastError, handleRefresh]);
+  }, [success, toastError, handleRefresh, t]);
 
   const handleRemove = useCallback(async (userId: string) => {
     try {
@@ -185,7 +185,7 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  }, [success, toastError, handleRefresh]);
+  }, [success, toastError, handleRefresh, t]);
 
   const handleInviteSubmit = useCallback(async (payload: InvitePayload) => {
     try {
@@ -215,12 +215,12 @@ export function UserAdminPage({
       setError(message);
       toastError(message);
     }
-  }, [success, info, toastError, handleRefresh]);
+  }, [success, info, toastError, handleRefresh, t]);
 
   const handleCreateSuccess = useCallback((_userId: string) => {
     success(t('messages.userCreated'), t('messages.newUser'));
     handleRefresh();
-  }, [success, handleRefresh]);
+  }, [success, handleRefresh, t]);
 
   const filteredUsers = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -26,13 +27,12 @@ function CodeBlock({ children }: { children: string }) {
 }
 
 function CopyHeaderRow({ label, value, copy }: { label: string; value: string; copy: (text: string) => void }) {
+  const t = useTranslations('admin.games.import');
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <p className="font-semibold">{label}</p>
-        <Button variant="ghost" size="sm" onClick={() => copy(value)}>
-          Kopiera
-        </Button>
+        <Button variant="ghost" size="sm" onClick={() => copy(value)}>{t('copy')}</Button>
       </div>
       <div className="rounded-lg border border-dashed border-border bg-muted/30 p-3 text-xs font-mono break-all">
         {value}
@@ -42,6 +42,7 @@ function CopyHeaderRow({ label, value, copy }: { label: string; value: string; c
 }
 
 function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
+  const t = useTranslations('admin.games.import');
   const [selected, setSelected] = useState<'basic' | 'facilitated' | 'participants-light' | 'legendary'>('basic');
 
   const prompt =
@@ -55,54 +56,55 @@ function AiPromptsTab({ copy }: { copy: (text: string) => void }) {
 
   const title =
     selected === 'basic'
-      ? 'Basic (CSV)'
+      ? t('prompt.basic')
       : selected === 'facilitated'
-        ? 'Facilitated (CSV)'
+        ? t('prompt.facilitated')
         : selected === 'participants-light'
-          ? 'Participants Light (CSV)'
-          : 'Legendary (JSON)';
+          ? t('prompt.participantsLight')
+          : t('prompt.legendary');
+
+  const rich = {
+    strong: (chunks: ReactNode) => <strong>{chunks}</strong>,
+    code: (chunks: ReactNode) => <code>{chunks}</code>,
+  };
 
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <p className="font-semibold">Välj prompt</p>
-        <p className="text-sm text-muted-foreground">
-          Behöver du artifacts eller triggers? Välj <strong>Legendary (JSON)</strong>.
-        </p>
+        <p className="font-semibold">{t('selectPrompt')}</p>
+        <p className="text-sm text-muted-foreground">{t.rich('artifactsOrTriggers', rich)}</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
         <Button variant={selected === 'basic' ? 'default' : 'outline'} size="sm" onClick={() => setSelected('basic')}>
-          Basic (CSV)
+          {t('prompt.basic')}
         </Button>
         <Button
           variant={selected === 'facilitated' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSelected('facilitated')}
         >
-          Facilitated (CSV)
+          {t('prompt.facilitated')}
         </Button>
         <Button
           variant={selected === 'participants-light' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSelected('participants-light')}
         >
-          Participants Light (CSV)
+          {t('prompt.participantsLight')}
         </Button>
         <Button
           variant={selected === 'legendary' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSelected('legendary')}
         >
-          Legendary (JSON)
+          {t('prompt.legendary')}
         </Button>
       </div>
 
       <div className="flex items-center justify-between">
         <p className="font-semibold">{title}</p>
-        <Button variant="ghost" size="sm" onClick={() => copy(prompt)}>
-          Kopiera
-        </Button>
+        <Button variant="ghost" size="sm" onClick={() => copy(prompt)}>{t('copy')}</Button>
       </div>
 
       <CodeBlock>{prompt}</CodeBlock>
@@ -120,7 +122,14 @@ type InfoTab = {
   render: (copy: (text: string) => void) => ReactNode;
 };
 
-function getInfoTabs(): InfoTab[] {
+type ImportT = ReturnType<typeof useTranslations>;
+
+function getInfoTabs(t: ImportT): InfoTab[] {
+  const rich = {
+    strong: (chunks: ReactNode) => <strong>{chunks}</strong>,
+    code: (chunks: ReactNode) => <code>{chunks}</code>,
+  };
+
   const minimalJsonExample = `[
   {
     "game_key": "mysteriet-001",
@@ -148,50 +157,40 @@ function getInfoTabs(): InfoTab[] {
   return [
     {
       id: 'overview',
-      label: 'Översikt',
+      label: t('overviewTab'),
       render: () => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">Vad importen gör</p>
+            <p className="font-semibold">{t('whatImportDoes')}</p>
             <p className="text-sm text-foreground">
-              Importen kan läsa <strong>CSV</strong> (bulk/massimport) och <strong>JSON</strong> (full fidelity).
+              {t.rich('importCanRead', rich)}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">CSV vs JSON</p>
+            <p className="font-semibold">{t('csvVsJson')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>
-                <strong>CSV:</strong> basic/facilitated + participants-light inom canonical header.
-              </li>
-              <li>
-                <strong>JSON:</strong> Legendary/escape-room (artifacts + triggers + avancerade step-fält).
-              </li>
+              <li>{t.rich('csvBasic', rich)}</li>
+              <li>{t.rich('jsonLegendary', rich)}</li>
             </ul>
             <p className="text-sm text-muted-foreground">{CANONICAL_CSV_SCOPE_NOTE}</p>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Start här (3 steg)</p>
+            <p className="font-semibold">{t('startHere')}</p>
             <ol className="list-decimal pl-5 space-y-1 text-foreground">
-              <li>Välj spelläge (basic/facilitated/participants).</li>
-              <li>Välj format: CSV (enkelt/bulk) eller JSON (Legendary/full fidelity).</li>
-              <li>Validera i Import-dialogen (dry-run) innan import.</li>
+              <li>{t('step1')}</li>
+              <li>{t('step2')}</li>
+              <li>{t('step3')}</li>
             </ol>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Vanliga fel</p>
+            <p className="font-semibold">{t('commonErrors')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>
-                <strong>Ogiltigt purpose-id:</strong> main_purpose_id/sub_purpose_ids måste vara riktiga UUID från databasen.
-              </li>
-              <li>
-                <strong>JSON escaping i CSV:</strong> citat i JSON måste skrivas som <code>{'""'}</code> i CSV-cellen.
-              </li>
-              <li>
-                <strong>Saknade steg:</strong> om step_N_title finns måste step_N_body finnas.
-              </li>
+              <li>{t.rich('invalidPurpose', rich)}</li>
+              <li>{t.rich('jsonEscaping', rich)}</li>
+              <li>{t.rich('missingSteps', rich)}</li>
             </ul>
           </div>
         </div>
@@ -199,27 +198,24 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'modes',
-      label: 'Spellägen',
+      label: t('playModesTab'),
       render: () => (
         <div className="space-y-3">
-          <p className="font-semibold">Spellägen (play_mode)</p>
+          <p className="font-semibold">{t('playModes')}</p>
           <div className="space-y-2 text-muted-foreground">
-            <p className="text-sm">Välj läge tidigt – QA, UI och runtime förväntar sig rätt struktur.</p>
+            <p className="text-sm">{t('chooseEarly')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li><strong>Enkel lek (basic):</strong> steg + material. Ingen digital interaktion.</li>
-              <li><strong>Ledd aktivitet (facilitated):</strong> steg + faser/timer, ev. publik tavla.</li>
-              <li>
-                <strong>Deltagarlek (participants):</strong> steg + faser + roller + ev. publik tavla. För Legendary (artifacts/triggers)
-                ska du använda JSON-import.
-              </li>
+              <li>{t.rich('basicMode', rich)}</li>
+              <li>{t.rich('facilitatedMode', rich)}</li>
+              <li>{t.rich('participantsMode', rich)}</li>
             </ul>
           </div>
           <div className="space-y-1">
-            <p className="font-semibold">Minimum required</p>
+            <p className="font-semibold">{t('minimumRequired')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li><strong>basic:</strong> minst step_1_title + step_1_body.</li>
-              <li><strong>facilitated:</strong> steg krävs; phases_json starkt rekommenderat.</li>
-              <li><strong>participants:</strong> steg krävs; roles_json rekommenderas starkt.</li>
+              <li>{t.rich('basicReq', rich)}</li>
+              <li>{t.rich('facilitatedReq', rich)}</li>
+              <li>{t.rich('participantsReq', rich)}</li>
             </ul>
           </div>
         </div>
@@ -227,34 +223,34 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'csv',
-      label: 'CSV',
+      label: t('csvTab'),
       render: (copy) => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">CSV-format (canonical)</p>
+            <p className="font-semibold">{t('csvFormat')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>UTF-8 (med/utan BOM), separator ,</li>
-              <li>Celler med komma/radbrytning/citat omsluts av &quot;...&quot;; citat skrivs som &quot;&quot;</li>
-              <li>En rad = en lek</li>
+              <li>{t('csvFormatList1')}</li>
+              <li>{t('csvFormatList2')}</li>
+              <li>{t('csvFormatList3')}</li>
             </ul>
           </div>
 
-          <CopyHeaderRow label="Canonical CSV-header (kopiera exakt)" value={CANONICAL_CSV_HEADER} copy={copy} />
+          <CopyHeaderRow label={t('canonicalCsvHeader')} value={CANONICAL_CSV_HEADER} copy={copy} />
 
           <div className="space-y-1">
-            <p className="font-semibold">JSON-kolumner som stöds i CSV</p>
+            <p className="font-semibold">{t('jsonColumnsInCsv')}</p>
             <p className="text-sm text-foreground">{CANONICAL_CSV_JSON_COLUMNS.join(', ')}</p>
             <p className="text-sm text-muted-foreground">
-              Vill du använda artifacts eller triggers? CSV-kontraktet innehåller inte det. Välj JSON-import (Legendary).
+              {t('useJsonForArtifacts')}
             </p>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Vanligaste felen</p>
+            <p className="font-semibold">{t('commonMistakes')}</p>
             <ul className="list-disc pl-5 space-y-1 text-foreground">
-              <li>Ogiltig JSON i JSON-kolumn (oftast fel citat/escaping).</li>
-              <li>step_N_title ifyllt men step_N_body saknas.</li>
-              <li>main_purpose_id/sub_purpose_ids är inte giltiga UUID.</li>
+              <li>{t('invalidJsonInColumn')}</li>
+              <li>{t('stepTitleWithoutBody')}</li>
+              <li>{t('invalidUuid')}</li>
             </ul>
           </div>
         </div>
@@ -262,26 +258,25 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'json',
-      label: 'JSON',
+      label: t('jsonTab'),
       render: () => (
         <div className="space-y-4">
           <div className="space-y-1">
-            <p className="font-semibold">JSON-import (full fidelity)</p>
+            <p className="font-semibold">{t('jsonImportFull')}</p>
             <p className="text-sm text-foreground">
-              JSON är formatet för Legendary/escape-room: artifacts + triggers + avancerade step-fält.
+              {t('jsonLegendaryDesc')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <p className="font-semibold">Minimal JSON (1 lek)</p>
+            <p className="font-semibold">{t('minimalJson')}</p>
             <CodeBlock>{minimalJsonExample}</CodeBlock>
           </div>
 
           <div className="space-y-1">
-            <p className="font-semibold">Order-resolution i triggers</p>
+            <p className="font-semibold">{t('orderResolution')}</p>
             <p className="text-sm text-foreground">
-              Triggers kan referera till <code>stepOrder</code>/<code>phaseOrder</code>/<code>artifactOrder</code> i condition/actions.
-              Importen resolverar det till faktiska ID:n.
+              {t('orderResolutionDesc')}
             </p>
           </div>
         </div>
@@ -289,7 +284,7 @@ function getInfoTabs(): InfoTab[] {
     },
     {
       id: 'ai',
-      label: 'AI Prompts',
+      label: t('aiPromptsTab'),
       render: (copy) => <AiPromptsTab copy={copy} />,
     },
   ];
@@ -299,31 +294,52 @@ function getInfoTabs(): InfoTab[] {
 // MAIN COMPONENT
 // ============================================================================
 
+// Helper for hydration-safe client-only rendering
+const emptySubscribe = () => () => {};
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function GameInfoDialog() {
+  const t = useTranslations('admin.games.import');
+
+  // Hydration-safe: false on server, true on client
+  const isClient = useSyncExternalStore(emptySubscribe, getClientSnapshot, getServerSnapshot);
   const { activeTab, setActiveTab } = useTabs('overview');
 
-  const infoTabs = getInfoTabs();
+  const infoTabs = getInfoTabs(t);
 
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text);
     } catch (err) {
-      console.error('Copy failed', err);
+      console.error(err);
     }
   };
+
+  // Radix Dialog can produce hydration warnings with React/Next SSR when generated IDs
+  // differ between server and client. Rendering the Dialog only after mount keeps the
+  // server and initial client HTML identical.
+  if (!isClient) {
+    return (
+      <Button variant="outline" size="sm" disabled>
+        <InformationCircleIcon className="mr-2 h-4 w-4" />
+        {t('infoButton')}
+      </Button>
+    );
+  }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <InformationCircleIcon className="mr-2 h-4 w-4" />
-          Information
+          {t('infoButton')}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-5xl h-[80vh] flex flex-col">
         <div className="shrink-0 px-6 pt-6">
           <DialogHeader>
-            <DialogTitle>Information om lekar</DialogTitle>
+            <DialogTitle>{t('infoDialogTitle')}</DialogTitle>
           </DialogHeader>
           <Tabs
             tabs={infoTabs.map((t) => ({ id: t.id, label: t.label }))}

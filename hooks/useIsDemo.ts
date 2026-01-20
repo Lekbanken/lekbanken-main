@@ -160,7 +160,7 @@ export function formatTimeRemaining(milliseconds: number): string {
 export function useTrackDemoFeature() {
   const { isDemoMode } = useIsDemo();
 
-  return async (feature: string, metadata?: Record<string, any>) => {
+  return async (feature: string, metadata?: Record<string, unknown>) => {
     if (!isDemoMode) {
       return;
     }
@@ -192,7 +192,7 @@ export function useConvertDemo() {
   return async (
     type: 'signup' | 'contact_sales',
     plan?: string,
-    metadata?: Record<string, any>
+    metadata?: Record<string, unknown>
   ) => {
     try {
       const res = await fetch('/api/demo/convert', {

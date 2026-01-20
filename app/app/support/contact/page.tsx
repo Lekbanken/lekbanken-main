@@ -3,7 +3,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button, Card, CardContent, Input, Textarea, Select } from '@/components/ui';
 import {
   ArrowLeftIcon,
@@ -30,7 +29,6 @@ const PRIORITY_OPTIONS = [
 ];
 
 export default function ContactSupportPage() {
-  const router = useRouter();
   const [reason, setReason] = useState('general');
   const [priority, setPriority] = useState('medium');
   const [subject, setSubject] = useState('');

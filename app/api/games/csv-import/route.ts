@@ -30,6 +30,42 @@ type ImportPayload = {
   tenant_id?: string;
 };
 
+function normalizeLegacyArtifactTypesForImport(games: ParsedGame[]): {
+  games: ParsedGame[];
+  warnings: ImportError[];
+} {
+  const legacyAliases: Record<string, string> = {
+    text: 'card',
+    note: 'card',
+  };
+
+  // Intentionally silent: we normalize legacy values to keep imports smooth.
+  const warnings: ImportError[] = [];
+
+  const normalized = games.map((game) => {
+    if (!game.artifacts?.length) return game;
+
+    let changed = false;
+    const artifacts = game.artifacts.map((artifact) => {
+      const current = (artifact as { artifact_type?: unknown }).artifact_type;
+      if (typeof current !== 'string') return artifact;
+
+      const next = legacyAliases[current];
+      if (!next) return artifact;
+
+      changed = true;
+      return { ...(artifact as object), artifact_type: next } as typeof artifact;
+    });
+
+    // No warning emitted for normalization.
+
+    if (!changed) return game;
+    return { ...game, artifacts };
+  });
+
+  return { games: normalized, warnings };
+}
+
 export async function POST(request: Request) {
   try {
     // Authentication check
@@ -80,6 +116,10 @@ export async function POST(request: Request) {
       // JSON format
       try {
         parsedGames = parseGamesFromJsonPayload(data);
+
+        const normalized = normalizeLegacyArtifactTypesForImport(parsedGames);
+        parsedGames = normalized.games;
+        parseWarnings = [...parseWarnings, ...normalized.warnings];
       } catch {
         return NextResponse.json(
           { error: 'Kunde inte tolka JSON-data' },

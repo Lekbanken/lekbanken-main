@@ -83,7 +83,7 @@ export default function HostDashboardPage() {
     };
 
     fetchSession();
-  }, [sessionId, router]);
+  }, [sessionId, router, t]);
 
   // Fetch participant count
   useEffect(() => {

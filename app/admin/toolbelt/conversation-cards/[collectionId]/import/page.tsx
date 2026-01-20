@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import {
   AdminBreadcrumbs,
   AdminErrorState,
@@ -25,12 +26,16 @@ function getImportedCount(payload: unknown): number {
 
 function getErrorPayload(payload: unknown): { error: string; details?: { errors?: ImportIssue[] } } {
   const maybe = payload as { error?: unknown; details?: unknown }
-  const error = typeof maybe.error === 'string' && maybe.error.trim() ? maybe.error : 'Import misslyckades'
+  const error = typeof maybe.error === 'string' && maybe.error.trim() ? maybe.error : ''
   const details = typeof maybe.details === 'object' && maybe.details ? (maybe.details as { errors?: ImportIssue[] }) : undefined
   return { error, details }
 }
 
 export default function ConversationCardsImportPage() {
+  const t = useTranslations('admin.conversationCards')
+  const tImport = useTranslations('admin.conversationCards.importPage')
+  const tActions = useTranslations('common.actions')
+
   const params = useParams<{ collectionId: string }>()
   const collectionId = params.collectionId
   const router = useRouter()
@@ -67,7 +72,7 @@ export default function ConversationCardsImportPage() {
 
       setResult({ ok: true, imported: getImportedCount(payload) })
     } catch (e) {
-      setResult({ ok: false, error: e instanceof Error ? e.message : 'Import misslyckades' })
+      setResult({ ok: false, error: e instanceof Error ? e.message : tImport('errorTitle') })
     } finally {
       setSubmitting(false)
     }
@@ -79,24 +84,24 @@ export default function ConversationCardsImportPage() {
     <AdminPageLayout>
       <AdminBreadcrumbs
         items={[
-          { label: 'Startsida', href: '/admin' },
-          { label: 'Samtalskort', href: '/admin/toolbelt/conversation-cards' },
-          { label: 'Samling', href: `/admin/toolbelt/conversation-cards/${collectionId}` },
-          { label: 'Import (CSV)' },
+          { label: t('breadcrumbHome'), href: '/admin' },
+          { label: t('breadcrumbTitle'), href: '/admin/toolbelt/conversation-cards' },
+          { label: t('edit.breadcrumbCollection'), href: `/admin/toolbelt/conversation-cards/${collectionId}` },
+          { label: t('edit.importCsv') },
         ]}
       />
 
       <AdminPageHeader
-        title="Importera kort (CSV)"
-        description="Importerar kort till samlingen. Importen publicerar inte automatiskt."
+        title={tImport('title')}
+        description={tImport('description')}
         icon={<ChatBubbleLeftRightIcon className="h-8 w-8 text-primary" />}
         actions={
           <div className="flex items-center gap-2">
             <Button variant="outline" href={`/admin/toolbelt/conversation-cards/${collectionId}`}>
-              Tillbaka
+              {tActions('back')}
             </Button>
             <Button onClick={onSubmit} disabled={submitting || !csvText.trim()}>
-              {submitting ? 'Importerar…' : 'Importera'}
+              {submitting ? tImport('importingLabel') : tActions('import')}
             </Button>
           </div>
         }
@@ -104,15 +109,15 @@ export default function ConversationCardsImportPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>CSV-format</CardTitle>
+          <CardTitle>{tImport('csvFormatTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
           <div className="text-sm text-muted-foreground">
-            Header måste matcha exakt (ordning och stavning):
+            {tImport('csvFormatHeaderHint')}
           </div>
           <div className="rounded-md border border-border bg-muted p-3 text-xs break-all">{expectedHeader}</div>
           <div className="text-sm text-muted-foreground">
-            Obs: Den här importen lägger till nya kort. Kör du import flera gånger kan du få dubletter.
+            {tImport('csvFormatNote')}
           </div>
         </CardContent>
       </Card>
@@ -120,12 +125,14 @@ export default function ConversationCardsImportPage() {
       {result && 'ok' in result && result.ok ? (
         <Card>
           <CardHeader>
-            <CardTitle>Klart</CardTitle>
+            <CardTitle>{tImport('successTitle')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-sm">Importerade {result.imported} kort.</div>
+            <div className="text-sm">{tImport('successImported', { count: result.imported })}</div>
             <div className="mt-3">
-              <Button onClick={() => router.push(`/admin/toolbelt/conversation-cards/${collectionId}`)}>Till samlingen</Button>
+              <Button onClick={() => router.push(`/admin/toolbelt/conversation-cards/${collectionId}`)}>
+                {tImport('goToCollection')}
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -133,25 +140,26 @@ export default function ConversationCardsImportPage() {
 
       {result && (!('ok' in result) || !result.ok) ? (
         <AdminErrorState
-          title="Import misslyckades"
-          description={result.error || 'Valideringsfel'}
+          title={tImport('errorTitle')}
+          description={result.error || tImport('validationErrorFallback')}
         />
       ) : null}
 
       {issues && issues.length ? (
         <Card>
           <CardHeader>
-            <CardTitle>Fel</CardTitle>
+            <CardTitle>{tImport('issuesTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
             {issues.slice(0, 50).map((i, idx) => (
               <div key={idx} className="text-sm">
-                Rad {i.row}
-                {i.column ? ` (${i.column})` : ''}: {i.message}
+                {i.column
+                  ? tImport('issueRowWithColumn', { row: i.row, column: i.column, message: i.message })
+                  : tImport('issueRowWithoutColumn', { row: i.row, message: i.message })}
               </div>
             ))}
             {issues.length > 50 ? (
-              <div className="text-sm text-muted-foreground">Visar 50 av {issues.length} fel.</div>
+              <div className="text-sm text-muted-foreground">{tImport('issuesShowing50', { count: issues.length })}</div>
             ) : null}
           </CardContent>
         </Card>
@@ -159,7 +167,7 @@ export default function ConversationCardsImportPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>CSV-innehåll</CardTitle>
+          <CardTitle>{tImport('csvContentTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="text-sm">
@@ -172,7 +180,7 @@ export default function ConversationCardsImportPage() {
           <Textarea
             value={csvText}
             onChange={(e) => setCsvText(e.target.value)}
-            placeholder="Klistra in CSV här eller välj fil ovan"
+            placeholder={tImport('csvPlaceholder')}
             className="min-h-[240px]"
           />
         </CardContent>

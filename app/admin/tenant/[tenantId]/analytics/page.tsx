@@ -54,7 +54,7 @@ export default function TenantAnalyticsPage() {
       }
     };
     void load();
-  }, [tenantId, dateRange]);
+  }, [tenantId, dateRange, t]);
 
   if (!tenantId) {
     return (

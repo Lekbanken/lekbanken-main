@@ -1,13 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import { ConfirmDialog } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
+import { SkeletonCard } from '@/components/ui/skeleton'
+import { useToast } from '@/components/ui/toast'
 import { MediaPicker } from '@/components/ui/media-picker'
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
+import { ClipboardIcon, MagnifyingGlassIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { logger } from '@/lib/utils/logger'
 
 type MediaTemplate = {
@@ -58,11 +63,21 @@ type StandardImagesManagerProps = {
 }
 
 export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) {
+  const t = useTranslations('admin.media.standardImagesManager')
+  const toast = useToast()
+
   const [templates, setTemplates] = useState<MediaTemplate[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [purposes, setPurposes] = useState<Purpose[]>([])
   const [loading, setLoading] = useState(true)
   const [showCreateDialog, setShowCreateDialog] = useState(false)
+
+  const [listQuery, setListQuery] = useState('')
+  const [listProductFilter, setListProductFilter] = useState<string>('')
+  const [listPurposeFilter, setListPurposeFilter] = useState<string>('')
+
+  const [deleteTarget, setDeleteTarget] = useState<MediaTemplate | null>(null)
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   // Create form state
   const [selectedProduct, setSelectedProduct] = useState<string>('')
@@ -152,6 +167,7 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       if (!response.ok) throw new Error('Failed to create template')
 
       await loadTemplates()
+      toast.success(t('toast.saved'))
       setShowCreateDialog(false)
       setSelectedProduct('')
       setSelectedMainPurpose('')
@@ -166,14 +182,13 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
         tenantId,
         templateKey
       })
-      alert('Failed to create template')
+      toast.error(t('toast.saveFailed'))
     }
   }
 
   const handleDeleteTemplate = async (templateId: string) => {
-    if (!confirm('Are you sure you want to delete this standard image mapping?')) return
-
     try {
+      setDeleteLoading(true)
       const response = await fetch(`/api/media/templates/${templateId}`, {
         method: 'DELETE',
       })
@@ -181,117 +196,178 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
       if (!response.ok) throw new Error('Failed to delete template')
 
       await loadTemplates()
+      toast.success(t('toast.deleted'))
     } catch (error) {
       logger.error('Failed to delete media template', error instanceof Error ? error : undefined, {
         component: 'StandardImagesManager',
         tenantId,
         templateId
       })
-      alert('Failed to delete template')
+      toast.error(t('toast.deleteFailed'))
+    } finally {
+      setDeleteLoading(false)
     }
   }
 
-  const getProductName = (productId: string | null) => {
-    if (!productId) return 'Global (All Products)'
-    return products.find((p) => p.id === productId)?.name || 'Unknown Product'
+  const getProductName = useCallback(
+    (productId: string | null) => {
+      if (!productId) return t('labels.globalProduct')
+      return products.find((p) => p.id === productId)?.name || t('labels.unknownProduct')
+    },
+    [products, t]
+  )
+
+  const filteredTemplates = useMemo(() => {
+    const q = listQuery.trim().toLowerCase()
+    return templates.filter((t) => {
+      if (listProductFilter) {
+        if (listProductFilter === '__global__') {
+          if (t.product_id !== null) return false
+        } else if ((t.product_id ?? '') !== listProductFilter) {
+          return false
+        }
+      }
+      if (listPurposeFilter) {
+        if ((t.main_purpose_id ?? '') !== listPurposeFilter) return false
+      }
+      if (!q) return true
+
+      const haystack = [
+        t.name,
+        t.template_key,
+        t.description ?? '',
+        t.main_purpose?.name ?? '',
+        t.sub_purpose?.name ?? '',
+        getProductName(t.product_id),
+        t.media?.name ?? '',
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      return haystack.includes(q)
+    })
+  }, [templates, listProductFilter, listPurposeFilter, listQuery, getProductName])
+
+  const copyToClipboard = async (value: string) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      toast.success(t('toast.copied'))
+    } catch {
+      toast.error(t('toast.copyFailed'))
+    }
   }
 
   return (
     <div className="space-y-6">
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => {
+          if (deleteLoading) return
+          setDeleteTarget(null)
+        }}
+        onConfirm={async () => {
+          if (!deleteTarget) return
+          await handleDeleteTemplate(deleteTarget.id)
+          setDeleteTarget(null)
+        }}
+        title={t('delete.title')}
+        description={
+          deleteTarget
+            ? t('delete.description', { name: deleteTarget.name })
+            : ''
+        }
+        confirmLabel={t('delete.confirm')}
+        cancelLabel={t('delete.cancel')}
+        variant="danger"
+        loading={deleteLoading}
+      />
+
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Standard Images</h2>
-          <p className="text-sm text-muted-foreground">
-            Define default images for specific product+purpose combinations
-          </p>
+          <h2 className="text-2xl font-bold">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button onClick={() => setShowCreateDialog(!showCreateDialog)}>
           <PlusIcon className="w-4 h-4 mr-2" />
-          Add Standard Image
+          {t('actions.add')}
         </Button>
       </div>
 
       {showCreateDialog && (
         <Card className="p-6 space-y-4">
-          <h3 className="text-lg font-semibold">Create Standard Image Mapping</h3>
+          <h3 className="text-lg font-semibold">{t('create.title')}</h3>
 
           <div>
-            <Label htmlFor="template-key">Template Key * (e.g., game_bg_product_winter)</Label>
-            <input
+            <Label htmlFor="template-key">{t('create.templateKeyLabel')}</Label>
+            <Input
               id="template-key"
-              type="text"
               value={templateKey}
               onChange={(e) => setTemplateKey(e.target.value)}
-              placeholder="unique_template_key"
-              className="w-full px-3 py-2 border rounded-md"
+              placeholder={t('create.templateKeyPlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="template-name">Template Name *</Label>
-            <input
+            <Label htmlFor="template-name">{t('create.nameLabel')}</Label>
+            <Input
               id="template-name"
-              type="text"
               value={templateName}
               onChange={(e) => setTemplateName(e.target.value)}
-              placeholder="Descriptive name"
-              className="w-full px-3 py-2 border rounded-md"
+              placeholder={t('create.namePlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="template-description">Description (optional)</Label>
-            <input
+            <Label htmlFor="template-description">{t('create.descriptionLabel')}</Label>
+            <Input
               id="template-description"
-              type="text"
               value={templateDescription}
               onChange={(e) => setTemplateDescription(e.target.value)}
-              placeholder="Template description"
-              className="w-full px-3 py-2 border rounded-md"
+              placeholder={t('create.descriptionPlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="product">Product (optional)</Label>
+            <Label htmlFor="product">{t('create.productLabel')}</Label>
             <Select
               id="product"
               value={selectedProduct}
               onChange={(e) => setSelectedProduct(e.target.value)}
               options={[
-                { value: '', label: 'Global (All Products)' },
+                { value: '', label: t('labels.globalProduct') },
                 ...products.map((p) => ({ value: p.id, label: p.name })),
               ]}
-              placeholder="Global (All Products)"
+              placeholder={t('create.productPlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="main-purpose">Main Purpose *</Label>
+            <Label htmlFor="main-purpose">{t('create.mainPurposeLabel')}</Label>
             <Select
               id="main-purpose"
               value={selectedMainPurpose}
               onChange={(e) => setSelectedMainPurpose(e.target.value)}
               options={purposes.map((p) => ({ value: p.id, label: p.name }))}
-              placeholder="Select main purpose"
+              placeholder={t('create.mainPurposePlaceholder')}
             />
           </div>
 
           <div>
-            <Label htmlFor="sub-purpose">Sub-Purpose (optional)</Label>
+            <Label htmlFor="sub-purpose">{t('create.subPurposeLabel')}</Label>
             <Select
               id="sub-purpose"
               value={selectedSubPurpose}
               onChange={(e) => setSelectedSubPurpose(e.target.value)}
               options={[
-                { value: '', label: 'None' },
+                { value: '', label: t('create.subPurposeNone') },
                 ...purposes.map((p) => ({ value: p.id, label: p.name })),
               ]}
-              placeholder="Select sub-purpose"
+              placeholder={t('create.subPurposePlaceholder')}
             />
           </div>
 
           <div>
-            <Label>Select Image *</Label>
+            <Label>{t('create.selectImageLabel')}</Label>
             <MediaPicker
               value={selectedMediaId}
               onSelect={(mediaId) => setSelectedMediaId(mediaId)}
@@ -307,7 +383,7 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
               disabled={!selectedMediaId || !selectedMainPurpose || !templateKey || !templateName}
               className="flex-1"
             >
-              Create Mapping
+              {t('actions.create')}
             </Button>
             <Button
               variant="outline"
@@ -323,25 +399,69 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
               }}
               className="flex-1"
             >
-              Cancel
+              {t('actions.cancel')}
             </Button>
           </div>
         </Card>
       )}
 
       <div>
-        <h3 className="text-lg font-semibold mb-4">
-          Current Standard Images ({templates.length})
-        </h3>
+        <h3 className="text-lg font-semibold mb-4">{t('list.title', { count: filteredTemplates.length })}</h3>
+
+        <div className="mb-4 grid gap-3 sm:grid-cols-3">
+          <div className="sm:col-span-2">
+            <Label htmlFor="templates-search">{t('list.searchLabel')}</Label>
+            <div className="relative">
+              <MagnifyingGlassIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="templates-search"
+                value={listQuery}
+                onChange={(e) => setListQuery(e.target.value)}
+                placeholder={t('list.searchPlaceholder')}
+                className="pl-9"
+              />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor="templates-product-filter">{t('list.productFilterLabel')}</Label>
+            <Select
+              id="templates-product-filter"
+              value={listProductFilter}
+              onChange={(e) => setListProductFilter(e.target.value)}
+              options={[
+                { value: '', label: t('list.productFilterAll') },
+                { value: '__global__', label: t('list.productFilterGlobalOnly') },
+                ...products.map((p) => ({ value: p.id, label: p.name })),
+              ]}
+            />
+          </div>
+          <div>
+            <Label htmlFor="templates-purpose-filter">{t('list.purposeFilterLabel')}</Label>
+            <Select
+              id="templates-purpose-filter"
+              value={listPurposeFilter}
+              onChange={(e) => setListPurposeFilter(e.target.value)}
+              options={[
+                { value: '', label: t('list.purposeFilterAll') },
+                ...purposes.map((p) => ({ value: p.id, label: p.name })),
+              ]}
+            />
+          </div>
+        </div>
+
         {loading ? (
-          <div className="text-center py-12 text-muted-foreground">Loading...</div>
-        ) : templates.length === 0 ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
+        ) : filteredTemplates.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
-            No standard images configured yet
+            {t('list.empty')}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {templates.map((template) => (
+            {filteredTemplates.map((template) => (
               <Card key={template.id} className="p-4 space-y-3">
                 {template.media && (
                   <div className="relative aspect-video w-full overflow-hidden rounded-md bg-muted">
@@ -356,7 +476,7 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
                 <div className="space-y-1">
                   <p className="font-medium">{template.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {template.main_purpose?.name || 'Unknown purpose'}
+                    {template.main_purpose?.name || t('labels.unknownPurpose')}
                     {template.sub_purpose && ` → ${template.sub_purpose.name}`}
                   </p>
                   {template.description && (
@@ -369,21 +489,33 @@ export function StandardImagesManager({ tenantId }: StandardImagesManagerProps) 
                   </p>
                   {template.media && (
                     <p className="text-xs text-muted-foreground truncate">
-                      Media: {template.media.name}
+                      {t('labels.mediaPrefix')} {template.media.name}
                     </p>
                   )}
-                  <p className="text-xs text-muted-foreground">
-                    Key: {template.template_key}
-                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-muted-foreground truncate">
+                      {t('labels.keyPrefix')} {template.template_key}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(template.template_key)}
+                      className="h-8 px-2"
+                      aria-label={t('actions.copyKeyAria')}
+                    >
+                      <ClipboardIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
                 <Button
                   variant="destructive"
                   size="sm"
-                  onClick={() => handleDeleteTemplate(template.id)}
+                  onClick={() => setDeleteTarget(template)}
                   className="w-full"
                 >
                   <TrashIcon className="w-4 h-4 mr-2" />
-                  Delete Mapping
+                  {t('actions.deleteMapping')}
                 </Button>
               </Card>
             ))}

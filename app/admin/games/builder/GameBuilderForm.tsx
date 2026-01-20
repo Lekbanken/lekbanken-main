@@ -131,7 +131,7 @@ export function GameBuilderForm({ gameId }: { gameId?: string }) {
         setLoading(false);
       }
     })();
-  }, [gameId]);
+  }, [gameId, t]);
 
   const updateStep = (index: number, patch: Partial<StepForm>) => {
     setSteps((prev) => prev.map((s, i) => (i === index ? { ...s, ...patch } : s)));

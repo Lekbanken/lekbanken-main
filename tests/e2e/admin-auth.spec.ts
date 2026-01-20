@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import path from 'path';
 import dotenv from 'dotenv';
 
@@ -27,7 +28,7 @@ const OTHER_TENANT_ID = process.env.OTHER_TENANT_ID || 'other-tenant-id';
 /**
  * Helper to dismiss cookie consent dialog if present
  */
-async function dismissCookieConsent(page: import('@playwright/test').Page) {
+async function dismissCookieConsent(page: Page) {
   const acceptAllButton = page.locator('button').filter({ hasText: /godta alle|accept all|acceptera alla/i }).first();
   if (await acceptAllButton.isVisible({ timeout: 1000 }).catch(() => false)) {
     await acceptAllButton.click();
@@ -39,7 +40,7 @@ async function dismissCookieConsent(page: import('@playwright/test').Page) {
  * Helper to check if stuck on legal accept page (RLS or other issues)
  * Returns true if user is stuck and test should be skipped
  */
-async function isStuckOnLegalAccept(page: import('@playwright/test').Page): Promise<boolean> {
+async function isStuckOnLegalAccept(page: Page): Promise<boolean> {
   return page.url().includes('/legal/accept');
 }
 
@@ -47,7 +48,7 @@ async function isStuckOnLegalAccept(page: import('@playwright/test').Page): Prom
  * Helper to handle legal acceptance if redirected.
  * Note: May fail if RLS policies block the insert - caller should check isStuckOnLegalAccept
  */
-async function handleLegalAcceptIfNeeded(page: import('@playwright/test').Page) {
+async function handleLegalAcceptIfNeeded(page: Page) {
   if (!page.url().includes('/legal/accept')) {
     return;
   }

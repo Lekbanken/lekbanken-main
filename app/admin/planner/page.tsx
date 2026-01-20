@@ -178,6 +178,7 @@ export default function AdminPlannerPage() {
       pagination.pageSize,
       scope,
       search,
+      t,
     ]
   );
 

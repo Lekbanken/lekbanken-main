@@ -68,7 +68,7 @@ export function ConversationCardsV1() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (!activeCollectionId) return;

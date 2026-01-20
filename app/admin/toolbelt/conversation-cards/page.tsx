@@ -82,7 +82,7 @@ export default function ConversationCardsAdminPage() {
         setLoadingPurposes(false)
       }
     })()
-  }, [])
+  }, [t])
 
   const mainPurposes = useMemo(() => purposes.filter((p) => p.type === 'main'), [purposes])
 
@@ -122,7 +122,7 @@ export default function ConversationCardsAdminPage() {
     } finally {
       setLoading(false)
     }
-  }, [filters, currentTenantId, currentTenant?.id])
+  }, [filters, currentTenantId, currentTenant?.id, t])
 
   useEffect(() => {
     void loadCollections()

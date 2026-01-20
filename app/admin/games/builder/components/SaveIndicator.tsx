@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircleIcon, ArrowPathIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline';
+import { useTranslations } from 'next-intl';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
 
@@ -26,12 +27,15 @@ function formatRelativeTime(date: Date): string {
 }
 
 export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicatorProps) {
+  const t = useTranslations('admin.games.builder.saveIndicator');
+  const tActions = useTranslations('common.actions');
+
   return (
     <div className="flex items-center gap-2 text-sm">
       {status === 'saving' && (
         <>
           <ArrowPathIcon className="h-4 w-4 animate-spin text-muted-foreground" />
-          <span className="text-muted-foreground">Sparar...</span>
+          <span className="text-muted-foreground">{tActions('saving')}</span>
         </>
       )}
 
@@ -39,7 +43,9 @@ export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicat
         <>
           <CheckCircleIcon className="h-4 w-4 text-emerald-500" />
           <span className="text-muted-foreground">
-            Sparat {lastSaved && formatRelativeTime(lastSaved)}
+            {lastSaved
+              ? t('savedWithTime', { time: formatRelativeTime(lastSaved) })
+              : t('saved')}
           </span>
         </>
       )}
@@ -48,7 +54,7 @@ export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicat
         <>
           <ExclamationCircleIcon className="h-4 w-4 text-destructive" />
           <span className="text-destructive">
-            {error ? `Kunde inte spara: ${error}` : 'Kunde inte spara'}
+            {error ? t('saveFailedWithDetails', { error }) : t('saveFailed')}
           </span>
           {onRetry && (
             <button
@@ -56,7 +62,7 @@ export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicat
               onClick={onRetry}
               className="text-primary hover:underline"
             >
-              Försök igen
+              {tActions('retry')}
             </button>
           )}
         </>
@@ -64,7 +70,7 @@ export function SaveIndicator({ status, lastSaved, error, onRetry }: SaveIndicat
 
       {status === 'idle' && lastSaved && (
         <span className="text-muted-foreground">
-          Sparat {formatRelativeTime(lastSaved)}
+          {t('savedWithTime', { time: formatRelativeTime(lastSaved) })}
         </span>
       )}
     </div>

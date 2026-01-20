@@ -169,7 +169,7 @@ export function CoachDiagramBuilderV1({
     } finally {
       setLoading(false);
     }
-  }, [isParticipant]);
+  }, [isParticipant, t]);
 
   useEffect(() => {
     void fetchSessionDiagramIds();
@@ -214,7 +214,7 @@ export function CoachDiagramBuilderV1({
     } finally {
       setSaving(false);
     }
-  }, [doc, isParticipant, selectedDiagramId]);
+  }, [doc, isParticipant, selectedDiagramId, t]);
 
   const setTitle = (title: string) => {
     if (!doc) return;

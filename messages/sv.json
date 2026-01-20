@@ -127,6 +127,41 @@
       "notFound": "Sidan kunde inte hittas",
       "serverError": "Serverfel. Försök igen senare."
     },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Något gick fel"
+      },
+      "networkErrorState": {
+        "title": "Ingen anslutning",
+        "description": "Kunde inte ansluta till servern. Kontrollera din internetanslutning och försök igen."
+      },
+      "notFoundState": {
+        "title": "Hittades inte",
+        "defaultItemName": "sidan",
+        "description": "Vi kunde inte hitta {itemName} du letade efter."
+      },
+      "permissionErrorState": {
+        "title": "Åtkomst nekad",
+        "description": "Du har inte behörighet att visa denna sida."
+      },
+      "emptySearchState": {
+        "title": "Inga resultat hittades",
+        "descriptionWithQuery": "Inga resultat för \"{query}\". Prova ett annat sökord.",
+        "descriptionNoQuery": "Prova att justera din sökning eller filter.",
+        "clearAction": "Rensa sökning"
+      },
+      "emptyListState": {
+        "defaultItemName": "objekt",
+        "title": "Inga {itemName} än",
+        "description": "Det finns inga {itemName} att visa just nu.",
+        "addAction": "Lägg till {itemName}"
+      },
+      "emptyFavoritesState": {
+        "title": "Inga favoriter",
+        "description": "Du har inte lagt till några favoriter än. Utforska och spara dina favoritaktiviteter!",
+        "browseAction": "Utforska aktiviteter"
+      }
+    },
     "time": {
       "today": "Idag",
       "yesterday": "Igår",
@@ -229,6 +264,26 @@
       "noOrganisationSelected": "Ingen organisation vald.",
       "noPagesToShow": "Inga sidor att visa.",
       "selectOrganisationHint": "Välj organisation för att se tenant-menyn.",
+      "openNavigation": "Öppna navigering",
+      "chooseAdminMode": "Välj admin-läge",
+      "topbar": {
+        "searchPlaceholder": "Sök användare, organisationer...",
+        "newUser": "Ny användare"
+      },
+      "shell": {
+        "loading": "Laddar...",
+        "loadingTimeoutHint": "Det tar ovanligt lång tid. Testa att ladda om eller logga in igen.",
+        "goToLogin": "Gå till login",
+        "clearSession": "Rensa session",
+        "noAccessTitle": "Ingen admin-åtkomst",
+        "noAccessLoggedIn": "Din roll ({role}) saknar åtkomst. Logga in med ett admin-konto.",
+        "noAccessLoggedOut": "Du är inte inloggad.",
+        "roleNone": "ingen"
+      },
+      "tenantContext": {
+        "actingAsLabel": "Agerar som:",
+        "exit": "Avsluta"
+      },
       "dashboard": "Översikt",
       "overview": "Översikt",
       "organizations": "Organisationer",
@@ -242,6 +297,7 @@
       "plannerTool": "Planläggaren",
       "products": "Produkter",
       "allProducts": "Alla produkter",
+      "defaultImages": "Standardbilder",
       "purposes": "Syften",
       "badges": "Badges",
       "coachDiagrams": "Coach Diagrams",
@@ -302,6 +358,69 @@
       "general": "Allmänt",
       "branding": "Varumärke",
       "domains": "Domäner"
+    },
+    "media": {
+      "standardImagesManager": {
+        "title": "Standardbilder",
+        "subtitle": "Koppla en standardbild till kombinationer av produkt + syfte",
+        "actions": {
+          "add": "Lägg till standardbild",
+          "create": "Skapa",
+          "cancel": "Avbryt",
+          "deleteMapping": "Ta bort mappning",
+          "copy": "Kopiera",
+          "copyKeyAria": "Kopiera template key"
+        },
+        "create": {
+          "title": "Skapa standardbild-mappning",
+          "templateKeyLabel": "Template Key * (t.ex. game_bg_product_winter)",
+          "templateKeyPlaceholder": "unique_template_key",
+          "nameLabel": "Namn *",
+          "namePlaceholder": "Beskrivande namn",
+          "descriptionLabel": "Beskrivning (valfri)",
+          "descriptionPlaceholder": "Beskrivning",
+          "productLabel": "Produkt (valfri)",
+          "productPlaceholder": "Global (Alla produkter)",
+          "mainPurposeLabel": "Huvudsyfte *",
+          "mainPurposePlaceholder": "Välj huvudsyfte",
+          "subPurposeLabel": "Delsyfte (valfri)",
+          "subPurposePlaceholder": "Välj delsyfte",
+          "subPurposeNone": "Ingen",
+          "selectImageLabel": "Välj bild *"
+        },
+        "list": {
+          "title": "Befintliga standardbilder ({count})",
+          "searchLabel": "Sök",
+          "searchPlaceholder": "Sök namn, key, syfte, produkt...",
+          "productFilterLabel": "Produkt",
+          "productFilterAll": "Alla produkter",
+          "productFilterGlobalOnly": "Endast global",
+          "purposeFilterLabel": "Huvudsyfte",
+          "purposeFilterAll": "Alla syften",
+          "empty": "Inga standardbilder hittades"
+        },
+        "delete": {
+          "title": "Ta bort standardbild?",
+          "description": "Detta tar bort mappningen “{name}”. Själva bilden i biblioteket påverkas inte.",
+          "confirm": "Ta bort",
+          "cancel": "Avbryt"
+        },
+        "labels": {
+          "globalProduct": "Global (Alla produkter)",
+          "unknownProduct": "Okänd produkt",
+          "unknownPurpose": "Okänt syfte",
+          "mediaPrefix": "Media:",
+          "keyPrefix": "Key:"
+        },
+        "toast": {
+          "saved": "Standardbild sparad",
+          "saveFailed": "Kunde inte spara standardbild",
+          "deleted": "Standardbild borttagen",
+          "deleteFailed": "Kunde inte ta bort standardbild",
+          "copied": "Kopierat",
+          "copyFailed": "Kunde inte kopiera"
+        }
+      }
     },
     "analyticsErrors": {
       "title": "Felhantering",
@@ -469,6 +588,7 @@
       "organizations": "Organisationer",
       "users": "Användare",
       "products": "Produkter",
+      "games": "Lekar",
       "library": "Bibliotek",
       "gamification": "Gamification",
       "learning": "Utbildning",
@@ -955,6 +1075,32 @@
         "loading": "Laddar...",
         "subPurposesCount": "{count} undersyften",
         "standardLabel": "(standard)",
+        "ui": {
+          "searchPlaceholder": "Sök syften...",
+          "expandAll": "Expandera",
+          "collapseAll": "Fäll ihop",
+          "expand": "Expandera",
+          "collapse": "Fäll ihop",
+          "usageTitle": "Användning",
+          "usageGamesMain": "{count} spel (main)",
+          "usageGamesSecondary": "{count} spel (secondary)",
+          "usageProducts": "{count} produkter",
+          "usageMedia": "{count} media",
+          "usageChildSubs": "{count} undersyften",
+          "confirmDeleteTitle": "Ta bort syfte",
+          "confirmDetachTitle": "Koppla loss & ta bort syfte",
+          "confirmDeleteHelp": "Detta försöker ta bort syftet direkt. Om det används någonstans kan borttagning misslyckas.",
+          "confirmDetachHelp": "Detta kopplar loss syftet från relaterade objekt och tar sedan bort det.",
+          "confirmDelete": "Ta bort",
+          "confirmDetach": "Koppla loss & ta bort",
+          "noSelection": "Ingen vald post.",
+          "copyKey": "Kopiera nyckel",
+          "copied": "Kopierat",
+          "copyFailed": "Kunde inte kopiera",
+          "toastCreated": "Syfte skapat",
+          "toastUpdated": "Syfte uppdaterat",
+          "toastDeleted": "Syfte borttaget"
+        },
         "actions": {
           "edit": "Redigera",
           "quickDelete": "Snabb ta bort",
@@ -1499,6 +1645,140 @@
       "breadcrumbTitle": "Samtalskort",
       "pageTitle": "Samtalskort",
       "pageDescription": "Hantera samtalskortssamlingar (Toolbelt) och importera kort via CSV.",
+      "importPage": {
+        "title": "Importera kort (CSV)",
+        "description": "Importerar kort till samlingen. Importen publicerar inte automatiskt.",
+        "importingLabel": "Importerar…",
+        "csvFormatTitle": "CSV-format",
+        "csvFormatHeaderHint": "Header måste matcha exakt (ordning och stavning):",
+        "csvFormatNote": "Obs: Den här importen lägger till nya kort. Kör du import flera gånger kan du få dubletter.",
+        "successTitle": "Klart",
+        "successImported": "Importerade {count} kort.",
+        "goToCollection": "Till samlingen",
+        "errorTitle": "Import misslyckades",
+        "validationErrorFallback": "Valideringsfel",
+        "issuesTitle": "Fel",
+        "issueRowWithColumn": "Rad {row} ({column}): {message}",
+        "issueRowWithoutColumn": "Rad {row}: {message}",
+        "issuesShowing50": "Visar 50 av {count} fel.",
+        "csvContentTitle": "CSV-innehåll",
+        "csvPlaceholder": "Klistra in CSV här eller välj fil ovan"
+      },
+      "importDialog": {
+        "title": "Importera samtalskort",
+        "description": "Importera samtalskort via CSV. Om samlingen inte finns skapas den automatiskt.",
+        "scopeLabel": "Scope",
+        "scope": {
+          "global": "Global (alla kan se)",
+          "tenant": "Tenant (endast din organisation)",
+          "tenantOnlyHint": "Du kan endast importera till din organisation."
+        },
+        "csvDataLabel": "CSV-data",
+        "chooseFile": "Välj fil",
+        "textareaPlaceholder": "Klistra in CSV här...\n\nFörväntad header:\n{csvHeader}",
+        "expectedHeaderLabel": "Förväntad header:",
+        "errors": {
+          "readFileFailed": "Kunde inte läsa filen",
+          "validateFailed": "Kunde inte validera data",
+          "importFailed": "Import misslyckades"
+        },
+        "validation": {
+          "success": "Validering lyckades",
+          "failed": "Validering misslyckades"
+        },
+        "summary": {
+          "collectionLabel": "Samling:",
+          "untitledCollection": "(Ingen titel)",
+          "cardsCountLabel": "Antal kort:",
+          "badges": {
+            "willCreateCollection": "Ny samling skapas",
+            "willAppendToExisting": "Läggs till i befintlig samling"
+          }
+        },
+        "issues": {
+          "errorsTitle": "Fel:",
+          "warningsTitle": "Varningar:",
+          "moreErrors": "...och {count} fler fel"
+        },
+        "doneMessage": "Import slutförd!",
+        "validate": "Validera",
+        "validating": "Validerar…",
+        "importCards": "Importera {count} kort",
+        "editAndTryAgain": "Redigera och försök igen",
+        "importing": "Importerar…"
+      },
+      "infoDialog": {
+        "buttonLabel": "Information",
+        "title": "Information om samtalskort",
+        "tabs": {
+          "overview": "Översikt",
+          "csvFormat": "CSV-format",
+          "aiPrompts": "AI-prompts",
+          "tips": "Tips & tricks"
+        },
+        "overview": {
+          "whatAreTitle": "Vad är samtalskort?",
+          "whatAreBody": "Samtalskort är strukturerade frågor som underlättar meningsfulla samtal i grupper. Varje kort har en huvudfråga (primary_prompt) och kan ha uppföljningsfrågor.",
+          "importTitle": "Import via CSV",
+          "importBody": "Du kan importera samtalskort via CSV. Om du importerar till en ny samling behöver du ange collection_title på första raden. Alla kort i samma fil läggs till samma samling.",
+          "workflowTitle": "Arbetsflöde",
+          "workflowStep1": "Skapa CSV-fil med dina samtalskort (eller använd AI-prompt)",
+          "workflowStep2": "Klicka på \"Importera\" på huvudsidan",
+          "workflowStep3": "Välj scope (Global eller Tenant)",
+          "workflowStep4": "Klistra in eller ladda upp CSV",
+          "workflowStep5": "Validera och importera"
+        },
+        "csvFormat": {
+          "quoteWarningTitle": "⚠️ Viktigt: Citattecken i CSV",
+          "quoteWarningBodyPrefix": "Om ett fält innehåller",
+          "quoteWarningBodyComma": "kommatecken",
+          "quoteWarningBodySuffix": ", måste hela fältet omslutas med citattecken (\"). Exempel:",
+          "quoteWarningExample": "\"Text med, kommatecken\"",
+          "headerTitle": "CSV Header",
+          "fieldDescriptionsTitle": "Fältbeskrivningar",
+          "requiredLabel": "Obligatorisk",
+          "exampleLabel": "Exempel:",
+          "exampleFileTitle": "Exempelfil"
+        },
+        "aiPrompts": {
+          "intro": "Använd dessa prompts med ChatGPT, Claude eller annan AI för att generera samtalskort.",
+          "basicTitle": "Basic Prompt",
+          "basicDescription": "Enkel prompt för att snabbt skapa en samling samtalskort.",
+          "advancedTitle": "Advanced Prompt",
+          "advancedDescription": "Mer detaljerad prompt för högkvalitativa samtalskort med best practices."
+        },
+        "tips": {
+          "goodCardsTitle": "Bra samtalskort",
+          "goodCardsItem1": "Är öppna och inbjuder till reflektion",
+          "goodCardsItem2": "Har ingen \"rätt\" eller \"fel\" svar",
+          "goodCardsItem3": "Anpassas till målgruppens kontext",
+          "goodCardsItem4": "Börjar enkelt och ökar gradvis i djup",
+          "followupsTitle": "Uppföljningsfrågor",
+          "followupsItem1": "Hjälper till att fördjupa samtalet",
+          "followupsItem2": "Bör bygga på svaret på huvudfrågan",
+          "followupsItem3": "Kan vara mer personliga eller actionorienterade",
+          "leaderTipsTitle": "Ledartips",
+          "leaderTipsItem1": "Ge konkret vägledning för facilitatorn",
+          "leaderTipsItem2": "Inkludera timing-förslag",
+          "leaderTipsItem3": "Nämn potentiella utmaningar och hur man hanterar dem",
+          "purposesTitle": "Syften (purposes)",
+          "purposesIntroPrefix": "Du kan koppla samtalskort till syften för bättre filtrering. Använd",
+          "purposesIntroSuffix": " (snake_case):",
+          "purposeLabels": {
+            "collaborationAndCommunity": "Samarbete & gemenskap",
+            "feedbackAndDevelopment": "Feedback & utveckling",
+            "creativeThinking": "Kreativt tänkande",
+            "reflectionAndInsight": "Reflektion & insikt",
+            "leadershipAndRoles": "Ledarskap & roller"
+          },
+          "purposesAdminHint": "Se alla syften i admin under \"Syften\"-fliken.",
+          "csvTipsTitle": "CSV-tips",
+          "csvTipsItem1": "Omge alltid textfält med citattecken (\") för säkerhet",
+          "csvTipsItem2": "Om ett fält innehåller citattecken, dubbla dem (\"\")",
+          "csvTipsItem3": "Spara som UTF-8 för korrekt hantering av svenska tecken",
+          "csvTipsItem4": "Excel kan exportera CSV med citattecken automatiskt"
+        }
+      },
       "importButton": "Importera",
       "createCollectionButton": "Skapa samling",
       "filterTitle": "Filter",
@@ -3176,7 +3456,14 @@
     "games": {
       "pageTitle": "Spelhantering",
       "import": {
+        "infoButton": "Information",
         "selectPrompt": "Välj prompt",
+        "prompt": {
+          "basic": "Basic (CSV)",
+          "facilitated": "Facilitated (CSV)",
+          "participantsLight": "Participants Light (CSV)",
+          "legendary": "Legendary (JSON)"
+        },
         "artifactsOrTriggers": "Behöver du artifacts eller triggers? Välj <strong>Legendary (JSON)</strong>.",
         "copy": "Kopiera",
         "overviewTab": "Översikt",
@@ -3591,6 +3878,36 @@
           "error": "Ett fel uppstod",
           "deleted": "Borttagen",
           "added": "Tillagd"
+        },
+        "playModeSelector": {
+          "title": "Välj spelläge",
+          "description": "Välj vilken typ av lek du vill skapa. Du kan uppgradera senare.",
+          "tip": "Osäker? Börja enkelt – du kan uppgradera senare."
+        },
+        "saveIndicator": {
+          "saved": "Sparat",
+          "savedWithTime": "Sparat {time}",
+          "saveFailed": "Kunde inte spara",
+          "saveFailedWithDetails": "Kunde inte spara: {error}"
+        },
+        "standardImagePicker": {
+          "selectPurposeHint": "Välj ett huvudsyfte ovan för att se standardbilder",
+          "coverImageLabel": "Omslagsbild",
+          "clearImage": "Rensa bild",
+          "selectedCoverImageAlt": "Vald omslagsbild",
+          "selectedCoverImageTitle": "Vald omslagsbild",
+          "selectedCoverImageDescription": "Bilden visas på lekens kort",
+          "standardImagesFor": "Standardbilder för",
+          "noStandardImagesFound": "Inga standardbilder hittades för detta syfte",
+          "loadError": "Kunde inte ladda standardbilder"
+        },
+        "templatePickerDialog": {
+          "title": "Trigger-mallar",
+          "allTemplates": "Alla mallar",
+          "triggersCount": "{count, plural, one {# trigger} other {# triggers}}",
+          "selectedBadge": "Vald",
+          "footerSelectedTemplate": "Lägg till \"{name}\" ({triggers})",
+          "footerNoSelection": "Välj en mall att lägga till"
         },
         "page": {
           "common": {
@@ -5848,6 +6165,64 @@
       }
     },
     "support": {
+      "hub": {
+        "pageTitle": "Support",
+        "pageDescription": "Översikt för kundsupport",
+        "noAccess": "Åtkomst nekad",
+        "allOrganizations": "Alla organisationer",
+        "unknown": "Okänd",
+        "anonymous": "Anonym",
+        "viewAll": "Visa alla",
+        "cards": {
+          "tickets": "Ärenden",
+          "activeCount": "Aktiva: {count}",
+          "knowledgeBase": "Kunskapsbas",
+          "faqAndArticles": "FAQ och hjälpartiklar",
+          "bugReports": "Buggrapporter",
+          "openCount": "Öppna: {count}",
+          "feedback": "Feedback",
+          "newCount": "Nya: {count}",
+          "notifications": "Notifikationer",
+          "historyAndTroubleshooting": "Historik och felsökning",
+          "automation": "Automation",
+          "rulesAndSla": "Regler och SLA"
+        },
+        "stats": {
+          "open": "Öppna",
+          "inProgress": "Pågår",
+          "waitingForUser": "Väntar på användare",
+          "urgent": "Akuta",
+          "resolved30d": "Lösta (30d)"
+        },
+        "sections": {
+          "urgentTickets": "Akuta ärenden",
+          "myAssignedTickets": "Mina tilldelade",
+          "recentTickets": "Senaste ärenden",
+          "newFeedback": "Ny feedback",
+          "openBugReports": "Öppna buggrapporter"
+        },
+        "empty": {
+          "noActiveTickets": "Inga aktiva ärenden",
+          "noNewFeedback": "Ingen ny feedback",
+          "noOpenBugReports": "Inga öppna buggrapporter"
+        },
+        "status": {
+          "open": "Öppen",
+          "inProgress": "Pågår",
+          "waitingForUser": "Väntar på användare",
+          "resolved": "Löst",
+          "closed": "Stängd"
+        },
+        "priority": {
+          "urgent": "Akut"
+        },
+        "timeAgo": {
+          "minutes": "{count, plural, one {# minut sedan} other {# minuter sedan}}",
+          "hours": "{count, plural, one {# timme sedan} other {# timmar sedan}}",
+          "days": "{count, plural, one {# dag sedan} other {# dagar sedan}}",
+          "yesterday": "igår"
+        }
+      },
       "kb": {
         "pageTitle": "Kunskapsbas",
         "pageDescription": "Hantera FAQ och hjälpartiklar",

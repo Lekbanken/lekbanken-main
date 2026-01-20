@@ -149,6 +149,22 @@ export function parseCSV<T extends Record<string, string> = Record<string, strin
   // Extract headers
   const headers = hasHeaders ? rows[0] : rows[0].map((_, i) => `column_${i + 1}`);
   const dataRows = hasHeaders ? rows.slice(1) : rows;
+
+  // Validate row widths. Extra columns usually mean an unescaped delimiter inside a value.
+  // Example: a description containing a comma that is not wrapped in quotes.
+  if (hasHeaders) {
+    const expected = headers.length;
+    for (let i = 0; i < dataRows.length; i++) {
+      const actual = dataRows[i].length;
+      if (actual > expected) {
+        errors.push({
+          row: i + 2, // +2 because headers are row 1
+          message:
+            `Row has ${actual} columns but header has ${expected}. This usually means a value contains an unescaped comma. Wrap values containing commas/newlines in double quotes.`,
+        });
+      }
+    }
+  }
   
   // Convert to objects
   const data: T[] = dataRows.map((row) => {

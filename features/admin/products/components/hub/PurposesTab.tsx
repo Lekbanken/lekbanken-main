@@ -102,7 +102,7 @@ export function PurposesTab() {
 
     void loadPurposes();
     return () => { isMounted = false; };
-  }, []);
+  }, [t]);
 
   const filteredPurposes = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();

@@ -4,7 +4,7 @@ import type { Database } from '@/types/supabase'
 import { env } from '@/lib/config/env'
 import { deriveEffectiveGlobalRoleFromClaims, resolveTenantForMiddlewareRequest } from '@/lib/auth/middleware-helpers'
 import { setTenantCookie, clearTenantCookie } from '@/lib/utils/tenantCookie'
-import { locales, defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
+import { defaultLocale, LOCALE_COOKIE, isValidLocale, type Locale } from '@/lib/i18n/config'
 import { checkMFAStatus, MFA_TRUST_COOKIE, buildMFAChallengeUrl, buildMFAEnrollUrl, extractDeviceFingerprint } from '@/lib/auth/mfa-aal'
 
 const guestOnlyPaths = new Set(['/auth/login', '/auth/signup'])

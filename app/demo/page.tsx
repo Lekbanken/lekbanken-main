@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,7 +59,6 @@ const FEATURE_NAMES: Record<string, string> = {
 };
 
 export default function DemoPage() {
-  const router = useRouter();
   const t = useTranslations('demo');
   const [isStarting, setIsStarting] = useState(false);
   const [error, setError] = useState<string | null>(null);

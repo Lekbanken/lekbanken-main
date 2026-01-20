@@ -255,7 +255,7 @@ export function OrganisationAdminPage({
         label: language?.toUpperCase() ?? t('unknown'),
       })),
     ];
-  }, [organisations]);
+  }, [organisations, t]);
 
   const filteredOrganisations = useMemo(() => {
     const query = debouncedSearch.trim().toLowerCase();

@@ -87,8 +87,17 @@ const systemAdminCategories: AdminNavCategory[] = [
     icon: 'products',
     items: [
       { id: 'product-list', labelKey: 'allProducts', href: '/admin/products', icon: 'products', permission: 'admin.products.list' },
+      { id: 'default-images', labelKey: 'defaultImages', href: '/admin/media', icon: 'content', permission: 'admin.products.list' },
+    ],
+  },
+  {
+    id: 'games',
+    labelKey: 'games',
+    icon: 'games',
+    items: [
       { id: 'games', labelKey: 'gameManager', href: '/admin/games', icon: 'games', permission: 'admin.games.list' },
       { id: 'planner', labelKey: 'plannerTool', href: '/admin/planner', icon: 'content', permission: 'admin.planner.list' },
+      { id: 'purposes', labelKey: 'purposes', href: '/admin/purposes', icon: 'content' },
     ],
   },
   {
@@ -98,7 +107,7 @@ const systemAdminCategories: AdminNavCategory[] = [
     items: [
       { id: 'badges', labelKey: 'badges', href: '/admin/library/badges', icon: 'achievements', permission: 'admin.achievements.list' },
       { id: 'coach-diagrams', labelKey: 'coachDiagrams', href: '/admin/library/coach-diagrams', icon: 'content', permission: 'admin.content.list' },
-      { id: 'media', labelKey: 'mediaFiles', href: '/admin/media', icon: 'content', permission: 'admin.media.list' },
+      { id: 'media', labelKey: 'mediaFiles', href: '/admin/media', icon: 'content', permission: 'admin.content.list' },
     ],
   },
   {

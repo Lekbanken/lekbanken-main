@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import {
-  formatCurrencyWithDecimals as formatCurrency,
   formatDateLong as formatDate,
   formatDateTimeLong as formatDateTime,
 } from '@/lib/i18n/format-utils';
@@ -14,7 +13,6 @@ import {
   ArrowRightIcon,
   CubeIcon,
   CheckCircleIcon,
-  ClipboardDocumentIcon,
   ExclamationTriangleIcon,
   XCircleIcon,
   LinkIcon,
@@ -45,7 +43,6 @@ import type {
   ProductStatus,
   StripeLinkageStatus,
   HealthStatus,
-  UnitLabel,
 } from './types';
 import {
   PRODUCT_STATUS_META,
@@ -53,11 +50,8 @@ import {
   STRIPE_LINKAGE_META,
   HEALTH_STATUS_META,
   AVAILABILITY_SCOPE_META,
-  PRICE_INTERVAL_META,
   AUDIT_EVENT_META,
 } from './types';
-import { SyncStatusBadge, DriftWarning } from '@/components/admin/SyncStatusBadge';
-import { type StripeSyncStatus, STRIPE_SYNC_STATUS } from '@/lib/stripe/product-sync-types';
 import { PriceManager } from './PriceManager';
 import { StripeTab as StripeTabComponent } from './StripeTab';
 import { CopyButton } from '@/components/ui/copy-button';
@@ -133,7 +127,7 @@ function StatCard({ label, value, icon: Icon }: { label: string; value: number |
 // TAB COMPONENTS (simplified versions)
 // ============================================================================
 
-function OverviewTab({ product, onRefresh, onNavigateToTab }: { 
+function OverviewTab({ product, onRefresh: _onRefresh, onNavigateToTab }: { 
   product: ProductDetail; 
   onRefresh: () => void;
   onNavigateToTab: (tab: ProductCardTab) => void;
@@ -838,7 +832,7 @@ function EventDetails({ eventType, data }: { eventType: string; data: Record<str
 }
 
 // AuditTab is now merged into LifecycleTab - keeping stub for backwards compatibility
-function AuditTab({ product }: { product: ProductDetail }) {
+export function AuditTab({ product }: { product: ProductDetail }) {
   const t = useTranslations('admin.products.v2.detail');
   const events = product.recent_audit_events || [];
 
@@ -892,7 +886,7 @@ function AuditTab({ product }: { product: ProductDetail }) {
 // SETTINGS TAB - Lekbanken Product Settings (non-Stripe)
 // ============================================================================
 
-function SettingsTab({ product, onRefresh }: { product: ProductDetail; onRefresh: () => void }) {
+function SettingsTab({ product, onRefresh: _onRefresh }: { product: ProductDetail; onRefresh: () => void }) {
   const t = useTranslations('admin.products.v2.detail');
   const { success, error: toastError } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -934,13 +928,13 @@ function SettingsTab({ product, onRefresh }: { product: ProductDetail; onRefresh
       }
       
       success(t('settings.saved'));
-      onRefresh();
+      _onRefresh();
     } catch (err) {
       toastError(err instanceof Error ? err.message : t('settings.saveSettingsError'));
     } finally {
       setIsLoading(false);
     }
-  }, [product.id, customerDescription, minSeats, maxSeats, success, toastError, onRefresh, t]);
+  }, [product.id, customerDescription, minSeats, maxSeats, success, toastError, _onRefresh, t]);
   
   const handleReset = useCallback(() => {
     setCustomerDescription(product.customer_description || '');

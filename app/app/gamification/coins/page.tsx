@@ -60,7 +60,7 @@ export default function CoinsHistoryPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [t]);
 
   const filteredTransactions = useMemo(() => {
     if (filter === 'earn') return transactions.filter((tx) => tx.type === 'earn');

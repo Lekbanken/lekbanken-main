@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui';
 import { PhotoIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon } from '@heroicons/react/24/solid';
+import { useTranslations } from 'next-intl';
 
 type Media = {
   id: string;
@@ -31,6 +32,8 @@ export function StandardImagePicker({
   onSelect,
   onClear,
 }: StandardImagePickerProps) {
+  const t = useTranslations('admin.games.builder.standardImagePicker');
+
   const [templates, setTemplates] = useState<Media[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -50,25 +53,25 @@ export function StandardImagePicker({
           mainPurposeId,
         });
         const res = await fetch(`/api/media?${params}`);
-        if (!res.ok) throw new Error('Kunde inte ladda standardbilder');
+        if (!res.ok) throw new Error(t('loadError'));
         const data = await res.json();
         setTemplates(data.media || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Fel vid laddning');
+        setError(err instanceof Error ? err.message : t('loadError'));
       } finally {
         setLoading(false);
       }
     };
 
     void loadTemplates();
-  }, [mainPurposeId]);
+  }, [mainPurposeId, t]);
 
   if (!mainPurposeId) {
     return (
       <div className="rounded-lg border border-border bg-muted/30 p-4">
         <div className="flex items-center gap-2 text-muted-foreground">
           <PhotoIcon className="h-5 w-5" />
-          <span className="text-sm">Välj ett huvudsyfte ovan för att se standardbilder</span>
+          <span className="text-sm">{t('selectPurposeHint')}</span>
         </div>
       </div>
     );
@@ -78,11 +81,11 @@ export function StandardImagePicker({
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-sm font-medium text-foreground">
-          Omslagsbild
+          {t('coverImageLabel')}
         </label>
         {selectedMediaId && (
           <Button variant="ghost" size="sm" onClick={onClear}>
-            Rensa bild
+            {t('clearImage')}
           </Button>
         )}
       </div>
@@ -93,15 +96,15 @@ export function StandardImagePicker({
           <div className="relative h-12 w-20 overflow-hidden rounded-md border border-border">
             <Image
               src={selectedUrl}
-              alt="Vald omslagsbild"
+              alt={t('selectedCoverImageAlt')}
               fill
               className="object-cover"
               sizes="80px"
             />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium text-foreground">Vald omslagsbild</p>
-            <p className="text-xs text-muted-foreground">Bilden visas på lekens kort</p>
+            <p className="text-sm font-medium text-foreground">{t('selectedCoverImageTitle')}</p>
+            <p className="text-xs text-muted-foreground">{t('selectedCoverImageDescription')}</p>
           </div>
           <CheckCircleIcon className="h-5 w-5 text-primary" />
         </div>
@@ -111,7 +114,8 @@ export function StandardImagePicker({
       <div className="space-y-2">
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">
-            Standardbilder för <span className="font-medium">{mainPurposeName}</span>
+            {t('standardImagesFor')}{' '}
+            <span className="font-medium">{mainPurposeName}</span>
           </span>
           {loading && <ArrowPathIcon className="h-3 w-3 animate-spin text-muted-foreground" />}
         </div>
@@ -124,7 +128,7 @@ export function StandardImagePicker({
 
         {!loading && templates.length === 0 && !error && (
           <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg p-3 text-center">
-            Inga standardbilder hittades för detta syfte
+            {t('noStandardImagesFound')}
           </div>
         )}
 

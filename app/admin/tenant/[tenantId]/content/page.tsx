@@ -43,7 +43,7 @@ export default function TenantContentPage() {
       }
     };
     void load();
-  }, [tenantId]);
+  }, [tenantId, t]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();

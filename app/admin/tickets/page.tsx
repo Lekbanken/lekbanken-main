@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { Card, Badge, Input, Button, Select } from '@/components/ui';
+import { Card, Badge, Input, Button } from '@/components/ui';
 import { 
   TicketIcon, 
   ArrowPathIcon, 
@@ -24,7 +24,6 @@ import {
   type TicketRow,
   type TicketMessageRowWithUser,
   type TenantOption,
-  type ListTicketsResult,
   type TicketStatsResult,
 } from '@/app/actions/tickets-admin';
 import {
@@ -72,7 +71,7 @@ export default function AdminTicketsPage() {
   // Access state
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [isSystemAdmin, setIsSystemAdmin] = useState(false);
-  const [userTenantIds, setUserTenantIds] = useState<string[]>([]);
+  const [_userTenantIds, setUserTenantIds] = useState<string[]>([]);
 
   // Data state
   const [tickets, setTickets] = useState<TicketRow[]>([]);
@@ -170,7 +169,7 @@ export default function AdminTicketsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [hasAccess, currentPage, searchDebounced, statusFilter, priorityFilter, tenantFilter, assignedToMe, unassigned, needsFirstResponse]);
+  }, [hasAccess, currentPage, searchDebounced, statusFilter, priorityFilter, tenantFilter, assignedToMe, unassigned, needsFirstResponse, t]);
 
   useEffect(() => {
     if (hasAccess === true) {

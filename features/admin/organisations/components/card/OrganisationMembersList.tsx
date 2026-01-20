@@ -475,7 +475,7 @@ export function OrganisationMembersList({
     } finally {
       setIsLoading(false);
     }
-  }, [tenantId, toastError]);
+  }, [tenantId, toastError, t]);
   
   useEffect(() => {
     loadMembers();

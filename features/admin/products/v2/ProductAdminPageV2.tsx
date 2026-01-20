@@ -344,7 +344,7 @@ type ProductRowProps = {
     typeLabels: Record<string, string>;
     stripeLinkageLabels: Record<string, string>;
     healthLabels: Record<string, string>;
-    selectProduct: string;
+    selectProduct: (name: string) => string;
     viewProduct: string;
     syncWithStripe: string;
   };
@@ -373,7 +373,7 @@ function ProductRow({
           type="checkbox"
           checked={isSelected}
           onChange={onToggleSelect}
-          aria-label={labels.selectProduct.replace('{name}', product.name)}
+          aria-label={labels.selectProduct(product.name)}
           className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
         />
       </td>
@@ -543,7 +543,6 @@ function useBulkSelection(products: ProductAdminRow[]) {
 export function ProductAdminPageV2() {
   const t = useTranslations('admin.products.v2');
   const { can } = useRbac();
-  const { warning } = useToast();
   const router = useRouter();
 
   // Create labels object for ProductRow
@@ -575,7 +574,7 @@ export function ProductAdminPageV2() {
       availability_misconfig: t('health.availability_misconfig'),
       no_price: t('health.no_price'),
     },
-    selectProduct: t('table.selectProduct'),
+    selectProduct: (name: string) => t('table.selectProduct', { name }),
     viewProduct: t('table.viewProduct'),
     syncWithStripe: t('table.syncWithStripe'),
   }), [t]);
@@ -667,10 +666,6 @@ export function ProductAdminPageV2() {
   const handlePageChange = useCallback((page: number) => {
     setFilters((prev) => ({ ...prev, page }));
   }, []);
-
-  const handleRefresh = useCallback(() => {
-    void loadProducts();
-  }, [loadProducts]);
 
   // Permission check
   if (!canView) {

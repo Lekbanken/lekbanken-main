@@ -113,7 +113,7 @@ export function GameDetailPage({ gameId }: GameDetailPageProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [canView, gameId]);
+  }, [canView, gameId, t]);
 
   useEffect(() => {
     void load();

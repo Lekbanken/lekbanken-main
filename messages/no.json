@@ -311,6 +311,41 @@
       "notFound": "Siden ble ikke funnet",
       "serverError": "Serverfeil. Prøv igjen senere."
     },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Noe gikk galt"
+      },
+      "networkErrorState": {
+        "title": "Ingen tilkobling",
+        "description": "Kunne ikke koble til serveren. Sjekk internettforbindelsen din og prøv igjen."
+      },
+      "notFoundState": {
+        "title": "Ikke funnet",
+        "defaultItemName": "siden",
+        "description": "Vi fant ikke {itemName} du lette etter."
+      },
+      "permissionErrorState": {
+        "title": "Tilgang nektet",
+        "description": "Du har ikke tilgang til å se denne siden."
+      },
+      "emptySearchState": {
+        "title": "Ingen resultater funnet",
+        "descriptionWithQuery": "Ingen resultater for \"{query}\". Prøv et annet søkeord.",
+        "descriptionNoQuery": "Prøv å justere søket eller filtrene dine.",
+        "clearAction": "Tøm søk"
+      },
+      "emptyListState": {
+        "defaultItemName": "elementer",
+        "title": "Ingen {itemName} ennå",
+        "description": "Det er ingen {itemName} å vise akkurat nå.",
+        "addAction": "Legg til {itemName}"
+      },
+      "emptyFavoritesState": {
+        "title": "Ingen favoritter",
+        "description": "Du har ikke lagt til noen favoritter ennå. Utforsk og lagre favorittaktivitetene dine!",
+        "browseAction": "Utforsk aktiviteter"
+      }
+    },
     "time": {
       "today": "I dag",
       "yesterday": "I går",
@@ -413,6 +448,26 @@
       "noOrganisationSelected": "Ingen organisasjon valgt.",
       "noPagesToShow": "Ingen sider å vise.",
       "selectOrganisationHint": "Velg organisasjon for å se tenant-menyen.",
+      "openNavigation": "Åpne navigering",
+      "chooseAdminMode": "Velg admin-modus",
+      "topbar": {
+        "searchPlaceholder": "Søk brukere, organisasjoner...",
+        "newUser": "Ny bruker"
+      },
+      "shell": {
+        "loading": "Laster...",
+        "loadingTimeoutHint": "Dette tar uvanlig lang tid. Prøv å laste inn på nytt eller logge inn igjen.",
+        "goToLogin": "Gå til innlogging",
+        "clearSession": "Tøm økt",
+        "noAccessTitle": "Ingen admin-tilgang",
+        "noAccessLoggedIn": "Rollen din ({role}) har ikke tilgang. Logg inn med en admin-konto.",
+        "noAccessLoggedOut": "Du er ikke logget inn.",
+        "roleNone": "ingen"
+      },
+      "tenantContext": {
+        "actingAsLabel": "Handler som:",
+        "exit": "Avslutt"
+      },
       "dashboard": "Dashboard",
       "overview": "Oversikt",
       "organizations": "Organisasjoner",
@@ -426,6 +481,7 @@
       "plannerTool": "Planlegger",
       "products": "Produkter",
       "allProducts": "Alle produkter",
+      "defaultImages": "Standardbilder",
       "purposes": "Formål",
       "badges": "Badges",
       "coachDiagrams": "Coach Diagrams",
@@ -486,6 +542,69 @@
       "general": "Generelt",
       "branding": "Merkevare",
       "domains": "Domener"
+    },
+    "media": {
+      "standardImagesManager": {
+        "title": "Standardbilder",
+        "subtitle": "Koble et standardbilde til kombinasjoner av produkt + formål",
+        "actions": {
+          "add": "Legg til standardbilde",
+          "create": "Opprett",
+          "cancel": "Avbryt",
+          "deleteMapping": "Fjern mapping",
+          "copy": "Kopier",
+          "copyKeyAria": "Kopier template key"
+        },
+        "create": {
+          "title": "Opprett standardbilde-mapping",
+          "templateKeyLabel": "Template Key * (f.eks. game_bg_product_winter)",
+          "templateKeyPlaceholder": "unique_template_key",
+          "nameLabel": "Navn *",
+          "namePlaceholder": "Beskrivende navn",
+          "descriptionLabel": "Beskrivelse (valgfritt)",
+          "descriptionPlaceholder": "Beskrivelse",
+          "productLabel": "Produkt (valgfritt)",
+          "productPlaceholder": "Global (Alle produkter)",
+          "mainPurposeLabel": "Hovedformål *",
+          "mainPurposePlaceholder": "Velg hovedformål",
+          "subPurposeLabel": "Delformål (valgfritt)",
+          "subPurposePlaceholder": "Velg delformål",
+          "subPurposeNone": "Ingen",
+          "selectImageLabel": "Velg bilde *"
+        },
+        "list": {
+          "title": "Eksisterende standardbilder ({count})",
+          "searchLabel": "Søk",
+          "searchPlaceholder": "Søk navn, key, formål, produkt...",
+          "productFilterLabel": "Produkt",
+          "productFilterAll": "Alle produkter",
+          "productFilterGlobalOnly": "Kun global",
+          "purposeFilterLabel": "Hovedformål",
+          "purposeFilterAll": "Alle formål",
+          "empty": "Ingen standardbilder funnet"
+        },
+        "delete": {
+          "title": "Fjern standardbilde?",
+          "description": "Dette fjerner mappingen “{name}”. Selve bildet i biblioteket påvirkes ikke.",
+          "confirm": "Fjern",
+          "cancel": "Avbryt"
+        },
+        "labels": {
+          "globalProduct": "Global (Alle produkter)",
+          "unknownProduct": "Ukjent produkt",
+          "unknownPurpose": "Ukjent formål",
+          "mediaPrefix": "Media:",
+          "keyPrefix": "Key:"
+        },
+        "toast": {
+          "saved": "Standardbilde lagret",
+          "saveFailed": "Kunne ikke lagre standardbilde",
+          "deleted": "Standardbilde fjernet",
+          "deleteFailed": "Kunne ikke fjerne standardbilde",
+          "copied": "Kopiert",
+          "copyFailed": "Kunne ikke kopiere"
+        }
+      }
     },
     "analyticsErrors": {
       "title": "Feilhåndtering",
@@ -653,6 +772,7 @@
       "organizations": "Organisasjoner",
       "users": "Brukere",
       "products": "Produkter",
+      "games": "Leker",
       "library": "Bibliotek",
       "gamification": "Gamification",
       "learning": "Opplæring",
@@ -1139,6 +1259,32 @@
         "loading": "Laster...",
         "subPurposesCount": "{count} underformål",
         "standardLabel": "(standard)",
+        "ui": {
+          "searchPlaceholder": "Søk formål...",
+          "expandAll": "Utvid alle",
+          "collapseAll": "Fell sammen alle",
+          "expand": "Utvid",
+          "collapse": "Fell sammen",
+          "usageTitle": "Bruk",
+          "usageGamesMain": "{count} spill (hoved)",
+          "usageGamesSecondary": "{count} spill (sekundær)",
+          "usageProducts": "{count} produkter",
+          "usageMedia": "{count} medier",
+          "usageChildSubs": "{count} underformål",
+          "confirmDeleteTitle": "Slett formål",
+          "confirmDetachTitle": "Koble fra og slett formål",
+          "confirmDeleteHelp": "Dette forsøker å slette formålet direkte. Hvis det brukes et sted, kan sletting mislykkes.",
+          "confirmDetachHelp": "Dette kobler fra formålet fra relaterte objekter og sletter det deretter.",
+          "confirmDelete": "Slett",
+          "confirmDetach": "Koble fra og slett",
+          "noSelection": "Ingen valgt post.",
+          "copyKey": "Kopier nøkkel",
+          "copied": "Kopiert",
+          "copyFailed": "Kunne ikke kopiere",
+          "toastCreated": "Formål opprettet",
+          "toastUpdated": "Formål oppdatert",
+          "toastDeleted": "Formål slettet"
+        },
         "actions": {
           "edit": "Rediger",
           "quickDelete": "Hurtig sletting",
@@ -1648,6 +1794,140 @@
       "breadcrumbTitle": "Samtalekort",
       "pageTitle": "Samtalekort",
       "pageDescription": "Administrer samtalekortsamlinger (Toolbelt) og importer kort via CSV.",
+      "importPage": {
+        "title": "Importer kort (CSV)",
+        "description": "Importerer kort til samlingen. Importen publiserer ikke automatisk.",
+        "importingLabel": "Importerer…",
+        "csvFormatTitle": "CSV-format",
+        "csvFormatHeaderHint": "Header må matche nøyaktig (rekkefølge og stavemåte):",
+        "csvFormatNote": "Merk: Denne importen legger til nye kort. Hvis du importerer flere ganger kan du få duplikater.",
+        "successTitle": "Ferdig",
+        "successImported": "Importerte {count} kort.",
+        "goToCollection": "Til samlingen",
+        "errorTitle": "Import mislyktes",
+        "validationErrorFallback": "Valideringsfeil",
+        "issuesTitle": "Feil",
+        "issueRowWithColumn": "Rad {row} ({column}): {message}",
+        "issueRowWithoutColumn": "Rad {row}: {message}",
+        "issuesShowing50": "Viser 50 av {count} feil.",
+        "csvContentTitle": "CSV-innhold",
+        "csvPlaceholder": "Lim inn CSV her eller velg fil over"
+      },
+      "importDialog": {
+        "title": "Importer samtalekort",
+        "description": "Importer samtalekort via CSV. Hvis samlingen ikke finnes, opprettes den automatisk.",
+        "scopeLabel": "Omfang",
+        "scope": {
+          "global": "Global (alle kan se)",
+          "tenant": "Tenant (kun din organisasjon)",
+          "tenantOnlyHint": "Du kan bare importere til din organisasjon."
+        },
+        "csvDataLabel": "CSV-data",
+        "chooseFile": "Velg fil",
+        "textareaPlaceholder": "Lim inn CSV her...\n\nForventet header:\n{csvHeader}",
+        "expectedHeaderLabel": "Forventet header:",
+        "errors": {
+          "readFileFailed": "Kunne ikke lese filen",
+          "validateFailed": "Kunne ikke validere data",
+          "importFailed": "Import mislyktes"
+        },
+        "validation": {
+          "success": "Validering lyktes",
+          "failed": "Validering mislyktes"
+        },
+        "summary": {
+          "collectionLabel": "Samling:",
+          "untitledCollection": "(Ingen tittel)",
+          "cardsCountLabel": "Antall kort:",
+          "badges": {
+            "willCreateCollection": "Ny samling opprettes",
+            "willAppendToExisting": "Legges til i eksisterende samling"
+          }
+        },
+        "issues": {
+          "errorsTitle": "Feil:",
+          "warningsTitle": "Advarsler:",
+          "moreErrors": "...og {count} flere feil"
+        },
+        "doneMessage": "Import fullført!",
+        "validate": "Valider",
+        "validating": "Validerer…",
+        "importCards": "Importer {count} kort",
+        "editAndTryAgain": "Rediger og prøv igjen",
+        "importing": "Importerer…"
+      },
+      "infoDialog": {
+        "buttonLabel": "Informasjon",
+        "title": "Informasjon om samtalekort",
+        "tabs": {
+          "overview": "Oversikt",
+          "csvFormat": "CSV-format",
+          "aiPrompts": "AI-prompter",
+          "tips": "Tips og triks"
+        },
+        "overview": {
+          "whatAreTitle": "Hva er samtalekort?",
+          "whatAreBody": "Samtalekort er strukturerte spørsmål som legger til rette for meningsfulle samtaler i grupper. Hvert kort har et hovedspørsmål (primary_prompt) og kan ha oppfølgingsspørsmål.",
+          "importTitle": "Import via CSV",
+          "importBody": "Du kan importere samtalekort via CSV. Når du importerer til en ny samling, må du angi collection_title på første rad. Alle kort i samme fil legges til samme samling.",
+          "workflowTitle": "Arbeidsflyt",
+          "workflowStep1": "Lag en CSV-fil med samtalekortene dine (eller bruk en AI-prompt)",
+          "workflowStep2": "Klikk \"Importer\" på hovedsiden",
+          "workflowStep3": "Velg omfang (Global eller Tenant)",
+          "workflowStep4": "Lim inn eller last opp CSV",
+          "workflowStep5": "Valider og importer"
+        },
+        "csvFormat": {
+          "quoteWarningTitle": "⚠️ Viktig: Anførselstegn i CSV",
+          "quoteWarningBodyPrefix": "Hvis et felt inneholder",
+          "quoteWarningBodyComma": "komma",
+          "quoteWarningBodySuffix": ", må hele feltet omsluttes av anførselstegn (\"). Eksempel:",
+          "quoteWarningExample": "\"Tekst med, komma\"",
+          "headerTitle": "CSV Header",
+          "fieldDescriptionsTitle": "Feltbeskrivelser",
+          "requiredLabel": "Påkrevd",
+          "exampleLabel": "Eksempel:",
+          "exampleFileTitle": "Eksempelfil"
+        },
+        "aiPrompts": {
+          "intro": "Bruk disse promptene med ChatGPT, Claude eller en annen AI for å generere samtalekort.",
+          "basicTitle": "Basic Prompt",
+          "basicDescription": "En enkel prompt for raskt å lage en samling samtalekort.",
+          "advancedTitle": "Advanced Prompt",
+          "advancedDescription": "En mer detaljert prompt for samtalekort av høy kvalitet med best practices."
+        },
+        "tips": {
+          "goodCardsTitle": "Gode samtalekort",
+          "goodCardsItem1": "Er åpne og inviterer til refleksjon",
+          "goodCardsItem2": "Har ingen \"riktige\" eller \"gale\" svar",
+          "goodCardsItem3": "Tilpasses målgruppens kontekst",
+          "goodCardsItem4": "Starter enkelt og blir gradvis dypere",
+          "followupsTitle": "Oppfølgingsspørsmål",
+          "followupsItem1": "Hjelper med å fordype samtalen",
+          "followupsItem2": "Bør bygge på svaret på hovedspørsmålet",
+          "followupsItem3": "Kan være mer personlige eller handlingsorienterte",
+          "leaderTipsTitle": "Ledertips",
+          "leaderTipsItem1": "Gi konkrete råd til fasilitatoren",
+          "leaderTipsItem2": "Inkluder forslag til timing",
+          "leaderTipsItem3": "Nevn mulige utfordringer og hvordan de håndteres",
+          "purposesTitle": "Formål",
+          "purposesIntroPrefix": "Du kan koble samtalekort til formål for bedre filtrering. Bruk",
+          "purposesIntroSuffix": " (snake_case):",
+          "purposeLabels": {
+            "collaborationAndCommunity": "Samarbeid og fellesskap",
+            "feedbackAndDevelopment": "Tilbakemelding og utvikling",
+            "creativeThinking": "Kreativ tenkning",
+            "reflectionAndInsight": "Refleksjon og innsikt",
+            "leadershipAndRoles": "Ledelse og roller"
+          },
+          "purposesAdminHint": "Se alle formål i admin under fanen \"Syften\".",
+          "csvTipsTitle": "CSV-tips",
+          "csvTipsItem1": "Omslutt alltid tekstfelt med anførselstegn (\")",
+          "csvTipsItem2": "Hvis et felt inneholder anførselstegn, dobbelt dem (\"\")",
+          "csvTipsItem3": "Lagre som UTF-8 for korrekt tegnhåndtering",
+          "csvTipsItem4": "Excel kan eksportere CSV med anførselstegn automatisk"
+        }
+      },
       "importButton": "Importer",
       "createCollectionButton": "Opprett samling",
       "filterTitle": "Filter",
@@ -3369,7 +3649,14 @@
     "games": {
       "pageTitle": "Spilladministrasjon",
       "import": {
+        "infoButton": "Informasjon",
         "selectPrompt": "Velg prompt",
+        "prompt": {
+          "basic": "Basic (CSV)",
+          "facilitated": "Facilitated (CSV)",
+          "participantsLight": "Participants Light (CSV)",
+          "legendary": "Legendary (JSON)"
+        },
         "artifactsOrTriggers": "Trenger du artefakter eller triggere? Velg <strong>Legendary (JSON)</strong>.",
         "copy": "Kopier",
         "overviewTab": "Oversikt",
@@ -3781,6 +4068,36 @@
           "error": "En feil oppstod",
           "deleted": "Slettet",
           "added": "Lagt til"
+        },
+        "playModeSelector": {
+          "title": "Velg spillmodus",
+          "description": "Velg hvilken type spill du vil lage. Du kan oppgradere senere.",
+          "tip": "Usikker? Start enkelt – du kan oppgradere senere."
+        },
+        "saveIndicator": {
+          "saved": "Lagret",
+          "savedWithTime": "Lagret {time}",
+          "saveFailed": "Kunne ikke lagre",
+          "saveFailedWithDetails": "Kunne ikke lagre: {error}"
+        },
+        "standardImagePicker": {
+          "selectPurposeHint": "Velg et hovedformål over for å se standardbilder",
+          "coverImageLabel": "Forsidebilde",
+          "clearImage": "Fjern bilde",
+          "selectedCoverImageAlt": "Valgt forsidebilde",
+          "selectedCoverImageTitle": "Valgt forsidebilde",
+          "selectedCoverImageDescription": "Bildet vises på spillkortet",
+          "standardImagesFor": "Standardbilder for",
+          "noStandardImagesFound": "Ingen standardbilder ble funnet for dette formålet",
+          "loadError": "Kunne ikke laste standardbilder"
+        },
+        "templatePickerDialog": {
+          "title": "Trigger-maler",
+          "allTemplates": "Alle maler",
+          "triggersCount": "{count, plural, one {# trigger} other {# triggers}}",
+          "selectedBadge": "Valgt",
+          "footerSelectedTemplate": "Legg til \"{name}\" ({triggers})",
+          "footerNoSelection": "Velg en mal å legge til"
         },
         "page": {
           "common": {
@@ -5792,6 +6109,64 @@
       }
     },
     "support": {
+      "hub": {
+        "pageTitle": "Support",
+        "pageDescription": "Oversikt for kundestøtte",
+        "noAccess": "Tilgang nektet",
+        "allOrganizations": "Alle organisasjoner",
+        "unknown": "Ukjent",
+        "anonymous": "Anonym",
+        "viewAll": "Se alle",
+        "cards": {
+          "tickets": "Saker",
+          "activeCount": "Aktive: {count}",
+          "knowledgeBase": "Kunnskapsbase",
+          "faqAndArticles": "FAQ og hjelpeartikler",
+          "bugReports": "Buggrapporter",
+          "openCount": "Åpne: {count}",
+          "feedback": "Tilbakemelding",
+          "newCount": "Nye: {count}",
+          "notifications": "Varsler",
+          "historyAndTroubleshooting": "Historikk og feilsøking",
+          "automation": "Automatisering",
+          "rulesAndSla": "Regler og SLA"
+        },
+        "stats": {
+          "open": "Åpne",
+          "inProgress": "Pågår",
+          "waitingForUser": "Venter på bruker",
+          "urgent": "Kritisk",
+          "resolved30d": "Løst (30d)"
+        },
+        "sections": {
+          "urgentTickets": "Kritiske saker",
+          "myAssignedTickets": "Mine tildelte",
+          "recentTickets": "Siste saker",
+          "newFeedback": "Ny tilbakemelding",
+          "openBugReports": "Åpne buggrapporter"
+        },
+        "empty": {
+          "noActiveTickets": "Ingen aktive saker",
+          "noNewFeedback": "Ingen ny tilbakemelding",
+          "noOpenBugReports": "Ingen åpne buggrapporter"
+        },
+        "status": {
+          "open": "Åpen",
+          "inProgress": "Pågår",
+          "waitingForUser": "Venter på bruker",
+          "resolved": "Løst",
+          "closed": "Lukket"
+        },
+        "priority": {
+          "urgent": "Kritisk"
+        },
+        "timeAgo": {
+          "minutes": "{count, plural, one {# minutt siden} other {# minutter siden}}",
+          "hours": "{count, plural, one {# time siden} other {# timer siden}}",
+          "days": "{count, plural, one {# dag siden} other {# dager siden}}",
+          "yesterday": "i går"
+        }
+      },
       "kb": {
         "pageTitle": "Kunnskapsbase",
         "pageDescription": "Administrer FAQ og hjelpeartikler",

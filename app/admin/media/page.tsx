@@ -1,5 +1,7 @@
-﻿import { redirect } from 'next/navigation'
+﻿import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin'
+import MediaLegacyPage from './_legacy-page'
 
-export default function MediaRedirect() {
-  redirect('/admin/library/badges')
+export default async function MediaPage() {
+  await requireSystemAdmin('/admin')
+  return <MediaLegacyPage />
 }

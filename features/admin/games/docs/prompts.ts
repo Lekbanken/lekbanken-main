@@ -8,7 +8,7 @@ const CSV_ESCAPING = `ESCAPING (kritiskt):
 - Om en cell innehåller citattecken \" ska det skrivas som \"\" (dubbelcitat).
 - JSON i en CSV-cell måste vara giltig JSON och dessutom korrekt CSV-escaped (dvs alla \" i JSON blir \"\").`;
 
-const SECURITY_CHECKLIST = `SÄKERHET (kontrollera före import):
+export const SECURITY_CHECKLIST = `SÄKERHET (kontrollera före import):
 - [ ] correctCode är STRÄNG (inte tal) — "0042" inte 42 (leading zeros försvinner!)
 - [ ] Inga hemligheter i board_text (visas publikt utan auth)
 - [ ] Inga hemligheter i participant_prompt (visas till alla deltagare)

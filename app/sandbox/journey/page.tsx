@@ -719,7 +719,7 @@ interface SkillNode {
   connectsFrom?: string[]
 }
 
-interface FactionSkillTree {
+interface _FactionSkillTree {
   factionId: FactionId
   nodes: SkillNode[]
 }
@@ -832,7 +832,6 @@ function SkillTreeModal({
 }) {
   const factions = getAllFactions()
   const factionList = Object.values(factions) as { id: FactionId; name: string }[]
-  const currentIndex = factionList.findIndex(f => f.id === currentFaction)
   
   const [viewingFaction, setViewingFaction] = useState<FactionId>(currentFaction)
   const viewingIndex = factionList.findIndex(f => f.id === viewingFaction)
@@ -1473,7 +1472,7 @@ export default function JourneySandboxPage() {
 
   // Skill Tree state
   const [isSkillTreeOpen, setIsSkillTreeOpen] = useState(false)
-  const [completedPerFaction, setCompletedPerFaction] = useState<Record<NonNullFactionId, number>>({
+  const [completedPerFaction, _setCompletedPerFaction] = useState<Record<NonNullFactionId, number>>({
     explorer: 1,
     guardian: 0,
     trickster: 5,
@@ -1505,7 +1504,6 @@ export default function JourneySandboxPage() {
 
   // Text color based on mode
   const textColor = settings.isDarkMode ? 'white' : '#1a1a2e'
-  const textColorMuted = settings.isDarkMode ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.5)'
 
   const journey = createMockJourney(
     settings.mockLevel, 

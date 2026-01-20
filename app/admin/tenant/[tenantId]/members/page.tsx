@@ -67,7 +67,7 @@ export default function TenantMembersPage() {
     return () => {
       active = false;
     };
-  }, [tenantId]);
+  }, [tenantId, t]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();

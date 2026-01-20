@@ -57,7 +57,7 @@ export default function AdminPlannerVersionsPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [planId, canView]);
+  }, [planId, canView, t]);
 
   useEffect(() => {
     void loadVersions();

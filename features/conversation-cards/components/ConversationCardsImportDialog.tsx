@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Button,
   Dialog,
@@ -59,6 +60,10 @@ export function ConversationCardsImportDialog({
   currentTenantId,
   isSystemAdmin,
 }: ConversationCardsImportDialogProps) {
+  const t = useTranslations('admin.conversationCards.importDialog');
+  const tActions = useTranslations('common.actions');
+  const tImportPage = useTranslations('admin.conversationCards.importPage');
+
   const [scopeType, setScopeType] = useState<ScopeType>(isSystemAdmin ? 'global' : 'tenant');
   const [raw, setRaw] = useState('');
   const [fileName, setFileName] = useState<string | null>(null);
@@ -90,7 +95,7 @@ export function ConversationCardsImportDialog({
       setRaw(content);
     };
     reader.onerror = () => {
-      setError('Kunde inte läsa filen');
+      setError(t('errors.readFileFailed'));
     };
     reader.readAsText(file);
   };
@@ -114,7 +119,7 @@ export function ConversationCardsImportDialog({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Valideringsfel');
+        setError(result.error || tImportPage('validationErrorFallback'));
         setState('idle');
         return;
       }
@@ -123,7 +128,7 @@ export function ConversationCardsImportDialog({
       setState('validated');
     } catch (err) {
       console.error('Validation failed:', err);
-      setError('Kunde inte validera data');
+      setError(t('errors.validateFailed'));
       setState('idle');
     }
   };
@@ -147,7 +152,7 @@ export function ConversationCardsImportDialog({
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Import misslyckades');
+        setError(result.error || t('errors.importFailed'));
         setState('validated');
         return;
       }
@@ -162,7 +167,7 @@ export function ConversationCardsImportDialog({
       }, 1500);
     } catch (err) {
       console.error('Import failed:', err);
-      setError('Import misslyckades');
+      setError(t('errors.importFailed'));
       setState('validated');
     }
   };
@@ -180,36 +185,36 @@ export function ConversationCardsImportDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ArrowUpTrayIcon className="h-5 w-5" />
-            Importera samtalskort
+            {t('title')}
           </DialogTitle>
           <DialogDescription>
-            Importera samtalskort via CSV. Om samlingen inte finns skapas den automatiskt.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           {/* Scope selector */}
           <div className="space-y-2">
-            <Label>Scope</Label>
+            <Label>{t('scopeLabel')}</Label>
             <Select
               value={scopeType}
               onChange={(e) => setScopeType(e.target.value as ScopeType)}
               disabled={!isSystemAdmin || state !== 'idle'}
               options={[
-                { value: 'global', label: 'Global (alla kan se)' },
-                { value: 'tenant', label: 'Tenant (endast din organisation)' },
+                { value: 'global', label: t('scope.global') },
+                { value: 'tenant', label: t('scope.tenant') },
               ]}
             />
             {!isSystemAdmin && (
               <p className="text-xs text-muted-foreground">
-                Du kan endast importera till din organisation.
+                {t('scope.tenantOnlyHint')}
               </p>
             )}
           </div>
 
           {/* File upload or paste */}
           <div className="space-y-2">
-            <Label>CSV-data</Label>
+            <Label>{t('csvDataLabel')}</Label>
             <div className="flex gap-2 mb-2">
               <input
                 ref={fileInputRef}
@@ -226,7 +231,7 @@ export function ConversationCardsImportDialog({
                 disabled={state !== 'idle'}
               >
                 <DocumentTextIcon className="mr-2 h-4 w-4" />
-                Välj fil
+                {t('chooseFile')}
               </Button>
               {fileName && (
                 <Badge variant="secondary">{fileName}</Badge>
@@ -234,7 +239,7 @@ export function ConversationCardsImportDialog({
             </div>
 
             <Textarea
-              placeholder={`Klistra in CSV här...\n\nFörväntad header:\n${csvHeader}`}
+              placeholder={t('textareaPlaceholder', { csvHeader })}
               value={raw}
               onChange={(e) => {
                 setRaw(e.target.value);
@@ -248,7 +253,7 @@ export function ConversationCardsImportDialog({
             />
 
             <p className="text-xs text-muted-foreground">
-              <strong>Förväntad header:</strong> {csvHeader}
+              <strong>{t('expectedHeaderLabel')}</strong> {csvHeader}
             </p>
           </div>
 
@@ -273,44 +278,52 @@ export function ConversationCardsImportDialog({
                   <ExclamationTriangleIcon className="h-5 w-5 text-yellow-600" />
                 )}
                 <span className="font-medium">
-                  {dryRunResult.valid ? 'Validering lyckades' : 'Validering misslyckades'}
+                  {dryRunResult.valid ? t('validation.success') : t('validation.failed')}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div>
-                  <span className="text-muted-foreground">Samling:</span>{' '}
-                  <span className="font-medium">{dryRunResult.collection_title || '(Ingen titel)'}</span>
+                  <span className="text-muted-foreground">{t('summary.collectionLabel')}</span>{' '}
+                  <span className="font-medium">{dryRunResult.collection_title || t('summary.untitledCollection')}</span>
                 </div>
                 <div>
-                  <span className="text-muted-foreground">Antal kort:</span>{' '}
+                  <span className="text-muted-foreground">{t('summary.cardsCountLabel')}</span>{' '}
                   <span className="font-medium">{dryRunResult.cards_count}</span>
                 </div>
                 <div className="col-span-2">
                   {dryRunResult.will_create_collection ? (
-                    <Badge variant="secondary">Ny samling skapas</Badge>
+                    <Badge variant="secondary">{t('summary.badges.willCreateCollection')}</Badge>
                   ) : (
-                    <Badge variant="outline">Läggs till i befintlig samling</Badge>
+                    <Badge variant="outline">{t('summary.badges.willAppendToExisting')}</Badge>
                   )}
                 </div>
               </div>
 
               {dryRunResult.errors.length > 0 && (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-destructive">Fel:</p>
+                  <p className="text-sm font-medium text-destructive">{t('issues.errorsTitle')}</p>
                   <ul className="text-xs space-y-1">
                     {dryRunResult.errors.slice(0, 5).map((err, i) => (
                       <li key={i} className="flex items-start gap-1">
                         <XCircleIcon className="h-3 w-3 mt-0.5 flex-shrink-0 text-destructive" />
                         <span>
-                          Rad {err.row}
-                          {err.column && ` (${err.column})`}: {err.message}
+                          {err.column
+                            ? tImportPage('issueRowWithColumn', {
+                                row: err.row,
+                                column: err.column,
+                                message: err.message,
+                              })
+                            : tImportPage('issueRowWithoutColumn', {
+                                row: err.row,
+                                message: err.message,
+                              })}
                         </span>
                       </li>
                     ))}
                     {dryRunResult.errors.length > 5 && (
                       <li className="text-muted-foreground">
-                        ...och {dryRunResult.errors.length - 5} fler fel
+                        {t('issues.moreErrors', { count: dryRunResult.errors.length - 5 })}
                       </li>
                     )}
                   </ul>
@@ -319,14 +332,22 @@ export function ConversationCardsImportDialog({
 
               {dryRunResult.warnings.length > 0 && (
                 <div className="space-y-1">
-                  <p className="text-sm font-medium text-yellow-600">Varningar:</p>
+                  <p className="text-sm font-medium text-yellow-600">{t('issues.warningsTitle')}</p>
                   <ul className="text-xs space-y-1">
                     {dryRunResult.warnings.slice(0, 3).map((warn, i) => (
                       <li key={i} className="flex items-start gap-1">
                         <ExclamationTriangleIcon className="h-3 w-3 mt-0.5 flex-shrink-0 text-yellow-600" />
                         <span>
-                          Rad {warn.row}
-                          {warn.column && ` (${warn.column})`}: {warn.message}
+                          {warn.column
+                            ? tImportPage('issueRowWithColumn', {
+                                row: warn.row,
+                                column: warn.column,
+                                message: warn.message,
+                              })
+                            : tImportPage('issueRowWithoutColumn', {
+                                row: warn.row,
+                                message: warn.message,
+                              })}
                         </span>
                       </li>
                     ))}
@@ -341,7 +362,7 @@ export function ConversationCardsImportDialog({
             <div className="rounded-lg border border-green-500 bg-green-50 dark:bg-green-950/20 p-4 flex items-center gap-2">
               <CheckCircleIcon className="h-5 w-5 text-green-600" />
               <span className="font-medium text-green-700 dark:text-green-400">
-                Import slutförd!
+                {t('doneMessage')}
               </span>
             </div>
           )}
@@ -349,7 +370,7 @@ export function ConversationCardsImportDialog({
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={handleClose}>
-            {state === 'done' ? 'Stäng' : 'Avbryt'}
+            {state === 'done' ? tActions('close') : tActions('cancel')}
           </Button>
 
           {state === 'idle' && (
@@ -357,19 +378,19 @@ export function ConversationCardsImportDialog({
               onClick={handleValidate}
               disabled={!raw.trim()}
             >
-              Validera
+              {t('validate')}
             </Button>
           )}
 
           {state === 'validating' && (
             <Button disabled>
-              Validerar...
+              {t('validating')}
             </Button>
           )}
 
           {state === 'validated' && dryRunResult?.valid && (
             <Button onClick={handleImport}>
-              Importera {dryRunResult.cards_count} kort
+              {t('importCards', { count: dryRunResult.cards_count })}
             </Button>
           )}
 
@@ -381,13 +402,13 @@ export function ConversationCardsImportDialog({
                 setDryRunResult(null);
               }}
             >
-              Redigera och försök igen
+              {t('editAndTryAgain')}
             </Button>
           )}
 
           {state === 'importing' && (
             <Button disabled>
-              Importerar...
+              {t('importing')}
             </Button>
           )}
         </DialogFooter>

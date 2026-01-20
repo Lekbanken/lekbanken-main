@@ -68,7 +68,7 @@ const toggleItem = <T,>(items: T[], item: T) => {
 
 export const useAtlasStore = create<AtlasState>()(
   persist(
-    (set, get) => ({
+    (set, _get) => ({
       mode: 'data',
       searchQuery: '',
       filters: createDefaultFilters(),

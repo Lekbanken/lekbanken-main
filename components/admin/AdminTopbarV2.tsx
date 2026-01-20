@@ -1,6 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ProfileMenu } from '@/components/navigation/ProfileMenu'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
 import { AdminNotificationsCenter, useAdminNotifications } from './AdminNotificationsCenter'
@@ -130,6 +131,7 @@ function ModeIndicator() {
 // ---------------------------------------------------------------------------
 
 export function AdminTopbarV2({ onToggleSidebar }: AdminTopbarV2Props) {
+  const t = useTranslations('admin.nav')
   const [baseNow] = useState(() => Date.now())
   const { notifications, markAsRead, markAllAsRead, dismiss } = useAdminNotifications([
     // Demo notifications - in real app these would come from a server/subscription
@@ -159,7 +161,7 @@ export function AdminTopbarV2({ onToggleSidebar }: AdminTopbarV2Props) {
           type="button"
           onClick={onToggleSidebar}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground lg:hidden"
-          aria-label="Öppna navigering"
+          aria-label={t('openNavigation')}
         >
           <Bars3Icon className="h-5 w-5" />
         </button>

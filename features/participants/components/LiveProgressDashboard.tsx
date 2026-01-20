@@ -142,7 +142,7 @@ export function LiveProgressDashboard({ sessionId }: LiveProgressDashboardProps)
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [sessionId]);
+  }, [sessionId, t]);
 
   if (loading) {
     return (

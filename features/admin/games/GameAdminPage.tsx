@@ -155,7 +155,7 @@ export function GameAdminPage() {
     } finally {
       setIsLoading(false);
     }
-  }, [canView, filters.status, filters.tenant]);
+  }, [canView, filters.status, filters.tenant, t]);
 
   useEffect(() => {
     let active = true;

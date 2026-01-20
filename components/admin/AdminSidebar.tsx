@@ -211,7 +211,7 @@ function SidebarContent({
               ? "flex flex-col gap-2"
               : "flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/40 p-1"
           }
-          aria-label="Välj admin-läge"
+          aria-label={t('admin.nav.chooseAdminMode')}
         >
           <button
             type="button"

@@ -124,6 +124,41 @@
       "notFound": "Page not found",
       "serverError": "Server error. Please try again later."
     },
+    "states": {
+      "errorState": {
+        "defaultTitle": "Something went wrong"
+      },
+      "networkErrorState": {
+        "title": "No connection",
+        "description": "Could not connect to the server. Check your internet connection and try again."
+      },
+      "notFoundState": {
+        "title": "Not found",
+        "defaultItemName": "the page",
+        "description": "We couldn't find the {itemName} you were looking for."
+      },
+      "permissionErrorState": {
+        "title": "Access denied",
+        "description": "You don't have permission to view this page."
+      },
+      "emptySearchState": {
+        "title": "No results found",
+        "descriptionWithQuery": "No results for \"{query}\". Try a different search term.",
+        "descriptionNoQuery": "Try adjusting your search or filters.",
+        "clearAction": "Clear search"
+      },
+      "emptyListState": {
+        "defaultItemName": "items",
+        "title": "No {itemName} yet",
+        "description": "There are no {itemName} to show right now.",
+        "addAction": "Add {itemName}"
+      },
+      "emptyFavoritesState": {
+        "title": "No favorites",
+        "description": "You haven't added any favorites yet. Explore and save your favorite activities!",
+        "browseAction": "Browse activities"
+      }
+    },
     "time": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -226,6 +261,26 @@
       "noOrganisationSelected": "No organisation selected.",
       "noPagesToShow": "No pages to show.",
       "selectOrganisationHint": "Select an organisation to see the tenant menu.",
+      "openNavigation": "Open navigation",
+      "chooseAdminMode": "Choose admin mode",
+      "topbar": {
+        "searchPlaceholder": "Search users, organisations...",
+        "newUser": "New user"
+      },
+      "shell": {
+        "loading": "Loading...",
+        "loadingTimeoutHint": "This is taking unusually long. Try reloading or logging in again.",
+        "goToLogin": "Go to login",
+        "clearSession": "Clear session",
+        "noAccessTitle": "No admin access",
+        "noAccessLoggedIn": "Your role ({role}) has no access. Log in with an admin account.",
+        "noAccessLoggedOut": "You are not logged in.",
+        "roleNone": "none"
+      },
+      "tenantContext": {
+        "actingAsLabel": "Acting as:",
+        "exit": "Exit"
+      },
       "dashboard": "Dashboard",
       "overview": "Overview",
       "organizations": "Organizations",
@@ -239,6 +294,7 @@
       "plannerTool": "Planner",
       "products": "Products",
       "allProducts": "All Products",
+      "defaultImages": "Default images",
       "purposes": "Purposes",
       "badges": "Badges",
       "coachDiagrams": "Coach Diagrams",
@@ -299,6 +355,69 @@
       "general": "General",
       "branding": "Branding",
       "domains": "Domains"
+    },
+    "media": {
+      "standardImagesManager": {
+        "title": "Default images",
+        "subtitle": "Link a default image to combinations of product + purpose",
+        "actions": {
+          "add": "Add default image",
+          "create": "Create",
+          "cancel": "Cancel",
+          "deleteMapping": "Remove mapping",
+          "copy": "Copy",
+          "copyKeyAria": "Copy template key"
+        },
+        "create": {
+          "title": "Create default image mapping",
+          "templateKeyLabel": "Template Key * (e.g. game_bg_product_winter)",
+          "templateKeyPlaceholder": "unique_template_key",
+          "nameLabel": "Name *",
+          "namePlaceholder": "Descriptive name",
+          "descriptionLabel": "Description (optional)",
+          "descriptionPlaceholder": "Description",
+          "productLabel": "Product (optional)",
+          "productPlaceholder": "Global (All products)",
+          "mainPurposeLabel": "Main purpose *",
+          "mainPurposePlaceholder": "Select main purpose",
+          "subPurposeLabel": "Sub-purpose (optional)",
+          "subPurposePlaceholder": "Select sub-purpose",
+          "subPurposeNone": "None",
+          "selectImageLabel": "Select image *"
+        },
+        "list": {
+          "title": "Existing default images ({count})",
+          "searchLabel": "Search",
+          "searchPlaceholder": "Search name, key, purpose, product...",
+          "productFilterLabel": "Product",
+          "productFilterAll": "All products",
+          "productFilterGlobalOnly": "Global only",
+          "purposeFilterLabel": "Main purpose",
+          "purposeFilterAll": "All purposes",
+          "empty": "No default images found"
+        },
+        "delete": {
+          "title": "Remove default image?",
+          "description": "This removes the mapping “{name}”. The image in the library is not affected.",
+          "confirm": "Remove",
+          "cancel": "Cancel"
+        },
+        "labels": {
+          "globalProduct": "Global (All products)",
+          "unknownProduct": "Unknown product",
+          "unknownPurpose": "Unknown purpose",
+          "mediaPrefix": "Media:",
+          "keyPrefix": "Key:"
+        },
+        "toast": {
+          "saved": "Default image saved",
+          "saveFailed": "Could not save default image",
+          "deleted": "Default image removed",
+          "deleteFailed": "Could not remove default image",
+          "copied": "Copied",
+          "copyFailed": "Could not copy"
+        }
+      }
     },
     "analyticsErrors": {
       "title": "Error management",
@@ -417,6 +536,7 @@
       "organizations": "Organizations",
       "users": "Users",
       "products": "Products",
+      "games": "Games",
       "library": "Library",
       "gamification": "Gamification",
       "learning": "Learning",
@@ -510,6 +630,32 @@
         "loading": "Loading...",
         "subPurposesCount": "{count} sub-purposes",
         "standardLabel": "(standard)",
+        "ui": {
+          "searchPlaceholder": "Search purposes...",
+          "expandAll": "Expand all",
+          "collapseAll": "Collapse all",
+          "expand": "Expand",
+          "collapse": "Collapse",
+          "usageTitle": "Usage",
+          "usageGamesMain": "{count} games (main)",
+          "usageGamesSecondary": "{count} games (secondary)",
+          "usageProducts": "{count} products",
+          "usageMedia": "{count} media",
+          "usageChildSubs": "{count} sub-purposes",
+          "confirmDeleteTitle": "Delete purpose",
+          "confirmDetachTitle": "Detach & delete purpose",
+          "confirmDeleteHelp": "This attempts to delete the purpose directly. If it is used anywhere, deletion may fail.",
+          "confirmDetachHelp": "This detaches the purpose from related objects and then deletes it.",
+          "confirmDelete": "Delete",
+          "confirmDetach": "Detach & delete",
+          "noSelection": "No item selected.",
+          "copyKey": "Copy key",
+          "copied": "Copied",
+          "copyFailed": "Could not copy",
+          "toastCreated": "Purpose created",
+          "toastUpdated": "Purpose updated",
+          "toastDeleted": "Purpose deleted"
+        },
         "actions": {
           "edit": "Edit",
           "quickDelete": "Quick delete",
@@ -1019,6 +1165,140 @@
       "breadcrumbTitle": "Conversation Cards",
       "pageTitle": "Conversation Cards",
       "pageDescription": "Manage conversation card collections (Toolbelt) and import cards via CSV.",
+      "importPage": {
+        "title": "Import cards (CSV)",
+        "description": "Imports cards into the collection. Import does not publish automatically.",
+        "importingLabel": "Importing…",
+        "csvFormatTitle": "CSV format",
+        "csvFormatHeaderHint": "Header must match exactly (order and spelling):",
+        "csvFormatNote": "Note: This import adds new cards. Running the import multiple times can create duplicates.",
+        "successTitle": "Done",
+        "successImported": "Imported {count} cards.",
+        "goToCollection": "Go to collection",
+        "errorTitle": "Import failed",
+        "validationErrorFallback": "Validation error",
+        "issuesTitle": "Errors",
+        "issueRowWithColumn": "Row {row} ({column}): {message}",
+        "issueRowWithoutColumn": "Row {row}: {message}",
+        "issuesShowing50": "Showing 50 of {count} errors.",
+        "csvContentTitle": "CSV content",
+        "csvPlaceholder": "Paste CSV here or choose a file above"
+      },
+      "importDialog": {
+        "title": "Import conversation cards",
+        "description": "Import conversation cards via CSV. If the collection doesn't exist, it will be created automatically.",
+        "scopeLabel": "Scope",
+        "scope": {
+          "global": "Global (visible to everyone)",
+          "tenant": "Tenant (only your organization)",
+          "tenantOnlyHint": "You can only import into your organization."
+        },
+        "csvDataLabel": "CSV data",
+        "chooseFile": "Choose file",
+        "textareaPlaceholder": "Paste CSV here...\n\nExpected header:\n{csvHeader}",
+        "expectedHeaderLabel": "Expected header:",
+        "errors": {
+          "readFileFailed": "Could not read file",
+          "validateFailed": "Could not validate data",
+          "importFailed": "Import failed"
+        },
+        "validation": {
+          "success": "Validation succeeded",
+          "failed": "Validation failed"
+        },
+        "summary": {
+          "collectionLabel": "Collection:",
+          "untitledCollection": "(Untitled)",
+          "cardsCountLabel": "Cards:",
+          "badges": {
+            "willCreateCollection": "A new collection will be created",
+            "willAppendToExisting": "Will be added to an existing collection"
+          }
+        },
+        "issues": {
+          "errorsTitle": "Errors:",
+          "warningsTitle": "Warnings:",
+          "moreErrors": "...and {count} more errors"
+        },
+        "doneMessage": "Import complete!",
+        "validate": "Validate",
+        "validating": "Validating…",
+        "importCards": "Import {count} cards",
+        "editAndTryAgain": "Edit and try again",
+        "importing": "Importing…"
+      },
+      "infoDialog": {
+        "buttonLabel": "Info",
+        "title": "Conversation cards info",
+        "tabs": {
+          "overview": "Overview",
+          "csvFormat": "CSV format",
+          "aiPrompts": "AI prompts",
+          "tips": "Tips"
+        },
+        "overview": {
+          "whatAreTitle": "What are conversation cards?",
+          "whatAreBody": "Conversation cards are structured questions that help facilitate meaningful group conversations. Each card has a primary prompt (primary_prompt) and can include follow-up questions.",
+          "importTitle": "Import via CSV",
+          "importBody": "You can import conversation cards via CSV. When importing into a new collection, set collection_title on the first row. All cards in the same file will be added to the same collection.",
+          "workflowTitle": "Workflow",
+          "workflowStep1": "Create a CSV file with your conversation cards (or use an AI prompt)",
+          "workflowStep2": "Click \"Import\" on the main page",
+          "workflowStep3": "Choose scope (Global or Tenant)",
+          "workflowStep4": "Paste or upload the CSV",
+          "workflowStep5": "Validate and import"
+        },
+        "csvFormat": {
+          "quoteWarningTitle": "⚠️ Important: Quotes in CSV",
+          "quoteWarningBodyPrefix": "If a field contains",
+          "quoteWarningBodyComma": "commas",
+          "quoteWarningBodySuffix": ", the entire field must be wrapped in quotes (\"). Example:",
+          "quoteWarningExample": "\"Text with, a comma\"",
+          "headerTitle": "CSV Header",
+          "fieldDescriptionsTitle": "Field descriptions",
+          "requiredLabel": "Required",
+          "exampleLabel": "Example:",
+          "exampleFileTitle": "Example file"
+        },
+        "aiPrompts": {
+          "intro": "Use these prompts with ChatGPT, Claude or another AI to generate conversation cards.",
+          "basicTitle": "Basic Prompt",
+          "basicDescription": "A simple prompt to quickly create a collection of conversation cards.",
+          "advancedTitle": "Advanced Prompt",
+          "advancedDescription": "A more detailed prompt for high-quality conversation cards with best practices."
+        },
+        "tips": {
+          "goodCardsTitle": "Good conversation cards",
+          "goodCardsItem1": "Are open and invite reflection",
+          "goodCardsItem2": "Have no \"right\" or \"wrong\" answers",
+          "goodCardsItem3": "Are adapted to the audience's context",
+          "goodCardsItem4": "Start simple and gradually deepen",
+          "followupsTitle": "Follow-up questions",
+          "followupsItem1": "Help deepen the conversation",
+          "followupsItem2": "Should build on the primary prompt",
+          "followupsItem3": "Can be more personal or action-oriented",
+          "leaderTipsTitle": "Leader tips",
+          "leaderTipsItem1": "Provide concrete guidance for the facilitator",
+          "leaderTipsItem2": "Include timing suggestions",
+          "leaderTipsItem3": "Mention potential challenges and how to handle them",
+          "purposesTitle": "Purposes",
+          "purposesIntroPrefix": "You can link conversation cards to purposes for better filtering. Use",
+          "purposesIntroSuffix": " (snake_case):",
+          "purposeLabels": {
+            "collaborationAndCommunity": "Collaboration & community",
+            "feedbackAndDevelopment": "Feedback & development",
+            "creativeThinking": "Creative thinking",
+            "reflectionAndInsight": "Reflection & insight",
+            "leadershipAndRoles": "Leadership & roles"
+          },
+          "purposesAdminHint": "See all purposes in admin under the \"Purposes\" tab.",
+          "csvTipsTitle": "CSV tips",
+          "csvTipsItem1": "Always wrap text fields in quotes (\")",
+          "csvTipsItem2": "If a field contains quotes, double them (\"\")",
+          "csvTipsItem3": "Save as UTF-8 for correct character handling",
+          "csvTipsItem4": "Excel can export CSV with quotes automatically"
+        }
+      },
       "importButton": "Import",
       "createCollectionButton": "Create collection",
       "filterTitle": "Filter",
@@ -2744,7 +3024,14 @@
     "games": {
       "pageTitle": "Game Management",
       "import": {
+        "infoButton": "Information",
         "selectPrompt": "Select prompt",
+        "prompt": {
+          "basic": "Basic (CSV)",
+          "facilitated": "Facilitated (CSV)",
+          "participantsLight": "Participants Light (CSV)",
+          "legendary": "Legendary (JSON)"
+        },
         "artifactsOrTriggers": "Need artifacts or triggers? Choose <strong>Legendary (JSON)</strong>.",
         "copy": "Copy",
         "overviewTab": "Overview",
@@ -3159,6 +3446,36 @@
           "error": "An error occurred",
           "deleted": "Deleted",
           "added": "Added"
+        },
+        "playModeSelector": {
+          "title": "Choose play mode",
+          "description": "Choose what type of game you want to create. You can upgrade later.",
+          "tip": "Not sure? Start simple — you can upgrade later."
+        },
+        "saveIndicator": {
+          "saved": "Saved",
+          "savedWithTime": "Saved {time}",
+          "saveFailed": "Could not save",
+          "saveFailedWithDetails": "Could not save: {error}"
+        },
+        "standardImagePicker": {
+          "selectPurposeHint": "Select a main purpose above to see standard images",
+          "coverImageLabel": "Cover image",
+          "clearImage": "Clear image",
+          "selectedCoverImageAlt": "Selected cover image",
+          "selectedCoverImageTitle": "Selected cover image",
+          "selectedCoverImageDescription": "Shown on the game card",
+          "standardImagesFor": "Standard images for",
+          "noStandardImagesFound": "No standard images found for this purpose",
+          "loadError": "Could not load standard images"
+        },
+        "templatePickerDialog": {
+          "title": "Trigger templates",
+          "allTemplates": "All templates",
+          "triggersCount": "{count, plural, one {# trigger} other {# triggers}}",
+          "selectedBadge": "Selected",
+          "footerSelectedTemplate": "Add \"{name}\" ({triggers})",
+          "footerNoSelection": "Select a template to add"
         },
         "form": {
           "loading": "Loading...",
@@ -5529,6 +5846,64 @@
       }
     },
     "support": {
+      "hub": {
+        "pageTitle": "Support",
+        "pageDescription": "Customer support overview",
+        "noAccess": "Access denied",
+        "allOrganizations": "All organizations",
+        "unknown": "Unknown",
+        "anonymous": "Anonymous",
+        "viewAll": "View all",
+        "cards": {
+          "tickets": "Tickets",
+          "activeCount": "Active: {count}",
+          "knowledgeBase": "Knowledge Base",
+          "faqAndArticles": "FAQ and help articles",
+          "bugReports": "Bug reports",
+          "openCount": "Open: {count}",
+          "feedback": "Feedback",
+          "newCount": "New: {count}",
+          "notifications": "Notifications",
+          "historyAndTroubleshooting": "History and troubleshooting",
+          "automation": "Automation",
+          "rulesAndSla": "Rules and SLA"
+        },
+        "stats": {
+          "open": "Open",
+          "inProgress": "In progress",
+          "waitingForUser": "Waiting for user",
+          "urgent": "Urgent",
+          "resolved30d": "Resolved (30d)"
+        },
+        "sections": {
+          "urgentTickets": "Urgent tickets",
+          "myAssignedTickets": "My assigned tickets",
+          "recentTickets": "Recent tickets",
+          "newFeedback": "New feedback",
+          "openBugReports": "Open bug reports"
+        },
+        "empty": {
+          "noActiveTickets": "No active tickets",
+          "noNewFeedback": "No new feedback",
+          "noOpenBugReports": "No open bug reports"
+        },
+        "status": {
+          "open": "Open",
+          "inProgress": "In progress",
+          "waitingForUser": "Waiting for user",
+          "resolved": "Resolved",
+          "closed": "Closed"
+        },
+        "priority": {
+          "urgent": "Urgent"
+        },
+        "timeAgo": {
+          "minutes": "{count, plural, one {# minute ago} other {# minutes ago}}",
+          "hours": "{count, plural, one {# hour ago} other {# hours ago}}",
+          "days": "{count, plural, one {# day ago} other {# days ago}}",
+          "yesterday": "yesterday"
+        }
+      },
       "kb": {
         "pageTitle": "Knowledge Base",
         "pageDescription": "Manage FAQ and help articles",

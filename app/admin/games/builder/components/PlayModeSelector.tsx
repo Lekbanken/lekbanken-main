@@ -1,6 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 type PlayMode = 'basic' | 'facilitated' | 'participants';
 
@@ -46,12 +47,14 @@ type PlayModeSelectorProps = {
 };
 
 export function PlayModeSelector({ value, onChange }: PlayModeSelectorProps) {
+  const t = useTranslations('admin.games.builder.playModeSelector');
+
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold text-foreground mb-1">Välj spelläge</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-1">{t('title')}</h3>
         <p className="text-sm text-muted-foreground">
-          Välj vilken typ av lek du vill skapa. Du kan uppgradera senare.
+          {t('description')}
         </p>
       </div>
 
@@ -115,7 +118,7 @@ export function PlayModeSelector({ value, onChange }: PlayModeSelectorProps) {
 
       <p className="text-xs text-muted-foreground flex items-center gap-1.5">
         <span>💡</span>
-        <span>Osäker? Börja enkelt – du kan uppgradera senare.</span>
+        <span>{t('tip')}</span>
       </p>
     </div>
   );

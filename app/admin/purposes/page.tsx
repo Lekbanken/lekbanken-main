@@ -1,10 +1,7 @@
-import { redirect } from 'next/navigation';
 import { requireSystemAdmin } from '@/lib/auth/requireSystemAdmin';
+import PurposesLegacyPage from './_legacy-page';
 
-/**
- * Legacy route: redirects to the new Products hub with Purposes tab active.
- */
-export default async function PurposesRedirect() {
+export default async function PurposesPage() {
   await requireSystemAdmin('/admin');
-  redirect('/admin/products?tab=purposes');
+  return <PurposesLegacyPage />;
 }

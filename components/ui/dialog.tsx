@@ -2,6 +2,7 @@
 
 import * as React from 'react'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from './button'
 
@@ -29,27 +30,31 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 export const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-card p-6 shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-        <span className="sr-only">Stang</span>
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M18 6 6 18M6 6l12 12" />
-        </svg>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-))
+>(({ className, children, ...props }, ref) => {
+  const tActions = useTranslations('common.actions')
+
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(
+          'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-2xl border border-border bg-card p-6 shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=open]:zoom-in-95 data-[state=closed]:zoom-out-95',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-lg p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+          <span className="sr-only">{tActions('close')}</span>
+          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  )
+})
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 export const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -100,11 +105,15 @@ export function ConfirmDialog({
   onConfirm,
   title,
   description,
-  confirmLabel = 'Bekrafta',
-  cancelLabel = 'Avbryt',
+  confirmLabel,
+  cancelLabel,
   variant = 'default',
   loading = false,
 }: ConfirmDialogProps) {
+  const tActions = useTranslations('common.actions')
+  const confirmLabelText = confirmLabel ?? tActions('confirm')
+  const cancelLabelText = cancelLabel ?? tActions('cancel')
+
   const iconColors = {
     danger: 'bg-red-100 text-red-600',
     warning: 'bg-yellow-100 text-yellow-600',
@@ -144,7 +153,7 @@ export function ConfirmDialog({
 
           <DialogFooter className="mt-6">
             <Button variant="outline" className="flex-1" onClick={onClose} disabled={loading}>
-              {cancelLabel}
+              {cancelLabelText}
             </Button>
             <Button
               variant={confirmVariants[variant]}
@@ -162,10 +171,10 @@ export function ConfirmDialog({
                       d="M4 12a8 8 0 0 1 8-8V0C5.37 0 0 5.37 0 12h4Zm2 5.29A7.96 7.96 0 0 1 4 12H0c0 3.04 1.14 5.82 3 7.94l3-2.65Z"
                     />
                   </svg>
-                  Laddar...
+                  {tActions('loading')}
                 </>
               ) : (
-                confirmLabel
+                confirmLabelText
               )}
             </Button>
           </DialogFooter>

@@ -39,7 +39,7 @@ export default function TenantGamesPage() {
       }
     };
     void load();
-  }, [tenantId]);
+  }, [tenantId, t]);
 
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();

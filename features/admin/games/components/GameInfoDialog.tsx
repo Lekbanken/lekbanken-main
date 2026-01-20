@@ -320,22 +320,32 @@ export function GameInfoDialog() {
           Information
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Information om lekar</DialogTitle>
-        </DialogHeader>
-        <Tabs
-          tabs={infoTabs.map((t) => ({ id: t.id, label: t.label }))}
-          activeTab={activeTab}
-          onChange={setActiveTab}
-          variant="underline"
-          className="mb-4"
-        />
-        {infoTabs.map((tab) => (
-          <TabPanel key={tab.id} id={tab.id} activeTab={activeTab} className="space-y-4 text-sm leading-6 text-foreground">
-            {tab.render(handleCopy)}
-          </TabPanel>
-        ))}
+      <DialogContent className="max-w-5xl h-[80vh] flex flex-col">
+        <div className="shrink-0 px-6 pt-6">
+          <DialogHeader>
+            <DialogTitle>Information om lekar</DialogTitle>
+          </DialogHeader>
+          <Tabs
+            tabs={infoTabs.map((t) => ({ id: t.id, label: t.label }))}
+            activeTab={activeTab}
+            onChange={setActiveTab}
+            variant="underline"
+            className="mt-4"
+          />
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-y-auto px-6 pb-6 pt-4">
+          {infoTabs.map((tab) => (
+            <TabPanel
+              key={tab.id}
+              id={tab.id}
+              activeTab={activeTab}
+              className="min-w-0 space-y-4 text-sm leading-6 text-foreground"
+            >
+              {tab.render(handleCopy)}
+            </TabPanel>
+          ))}
+        </div>
       </DialogContent>
     </Dialog>
   );

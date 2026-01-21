@@ -18,7 +18,8 @@
     "db:verify": "echo 'Run scripts/verify-migrations.sql in Supabase SQL Editor'",
     "db:check-any": "pwsh -File scripts/find-any-casts.ps1",
     "upload:utmarkelser": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/upload-utmarkelser.ts",
-    "sync:utmarkelser:local": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-utmarkelser-local.ts"
+    "sync:utmarkelser:local": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/sync-utmarkelser-local.ts",
+    "smoke:licensing": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/smoke-licensing.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

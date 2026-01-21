@@ -12,7 +12,6 @@ import { Input } from '@/components/ui/input'
 import { usePreferences } from '@/lib/context/PreferencesContext'
 import { getUiCopy } from '@/lib/i18n/ui'
 import { useAuth } from '@/lib/supabase/auth'
-import { useTenant } from '@/lib/context/TenantContext'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,12 +20,9 @@ export default function SignupPage() {
   const { language } = usePreferences()
   const copy = useMemo(() => getUiCopy(language), [language])
   const { signUp } = useAuth()
-  const { createTenant } = useTenant()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
-  const [createOrgTenant, setCreateOrgTenant] = useState(false)
-  const [organizationName, setOrganizationName] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
@@ -50,14 +46,6 @@ export default function SignupPage() {
       }
 
       await signUp(email, password, fullName)
-
-      if (createOrgTenant && organizationName) {
-        try {
-          await createTenant(organizationName, 'organization')
-        } catch (tenantErr) {
-          console.error('Tenant creation failed:', tenantErr)
-        }
-      }
 
       alert('Sign up successful! Please log in with your credentials.')
       setTimeout(() => router.push('/auth/login'), 500)
@@ -143,25 +131,12 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={createOrgTenant}
-                    onChange={(e) => setCreateOrgTenant(e.target.checked)}
-                    className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  />
-                  <span className="ml-2 block text-sm text-muted-foreground">Create an organization</span>
-                </label>
-
-                {createOrgTenant && (
-                  <Input
-                    type="text"
-                    value={organizationName}
-                    onChange={(e) => setOrganizationName(e.target.value)}
-                    placeholder="Organization name"
-                  />
-                )}
+              <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                Organisationer skapas efter genomfört köp (Stripe-bekräftelse). Se{' '}
+                <Link href="/pricing" className="font-medium text-primary hover:text-primary/80">
+                  priser
+                </Link>{' '}
+                för att köpa en licens.
               </div>
 
               <Button type="submit" disabled={isLoading || registrationClosed} className="w-full">

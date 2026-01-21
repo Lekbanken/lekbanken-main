@@ -9,6 +9,184 @@ export const dynamic = 'force-dynamic'
 
 type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'canceled'
 
+function slugifyTenant(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[åä]/g, 'a')
+    .replace(/ö/g, 'o')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 100)
+}
+
+async function provisionFromPurchaseIntent(params: {
+  intentId: string
+  stripeSession: Stripe.Checkout.Session
+}) {
+  const { intentId, stripeSession } = params
+
+  const { data: intent, error: intentError } = await supabaseAdmin
+    .from('purchase_intents')
+    .select(
+      'id,status,user_id,email,tenant_id,tenant_name,product_id,product_price_id,quantity_seats,stripe_checkout_session_id,stripe_customer_id,stripe_subscription_id'
+    )
+    .eq('id', intentId)
+    .maybeSingle()
+
+  if (intentError) {
+    console.error('[stripe-webhook] purchase_intent lookup error', intentError)
+    return
+  }
+  if (!intent) {
+    console.warn('[stripe-webhook] purchase_intent not found', intentId)
+    return
+  }
+
+  if (intent.status === 'provisioned' && intent.tenant_id) {
+    return
+  }
+
+  const stripeCustomerId = typeof stripeSession.customer === 'string' ? stripeSession.customer : null
+  const stripeSubscriptionId = typeof stripeSession.subscription === 'string' ? stripeSession.subscription : null
+  const stripeCheckoutSessionId = stripeSession.id
+
+  const nextPaidStatus =
+    intent.status === 'draft' || intent.status === 'awaiting_payment' ? 'paid' : intent.status
+
+  // Mark paid (best-effort) before provisioning
+  const { error: paidUpdateError } = await supabaseAdmin
+    .from('purchase_intents')
+    .update({
+      status: nextPaidStatus,
+      stripe_customer_id: stripeCustomerId ?? intent.stripe_customer_id,
+      stripe_subscription_id: stripeSubscriptionId ?? intent.stripe_subscription_id,
+      stripe_checkout_session_id: stripeCheckoutSessionId ?? intent.stripe_checkout_session_id,
+    })
+    .eq('id', intent.id)
+
+  if (paidUpdateError) {
+    console.error('[stripe-webhook] purchase_intent paid update error', paidUpdateError)
+  }
+
+  if (!intent.user_id) {
+    console.error('[stripe-webhook] purchase_intent missing user_id', intent.id)
+    await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+    return
+  }
+  if (!intent.product_id) {
+    console.error('[stripe-webhook] purchase_intent missing product_id', intent.id)
+    await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+    return
+  }
+
+  let tenantId = intent.tenant_id
+
+  if (!tenantId) {
+    const tenantName = (intent.tenant_name || '').trim() || 'Organisation'
+    const slug = slugifyTenant(tenantName) || null
+
+    const { data: tenant, error: tenantError } = await supabaseAdmin
+      .from('tenants')
+      .insert({
+        name: tenantName,
+        slug,
+        type: 'organisation',
+        status: 'active',
+        created_by: intent.user_id,
+        updated_by: intent.user_id,
+        metadata: {
+          purchase_intent_id: intent.id,
+          stripe_checkout_session_id: stripeCheckoutSessionId,
+          stripe_customer_id: stripeCustomerId,
+          stripe_subscription_id: stripeSubscriptionId,
+        } as unknown as Json,
+      })
+      .select('id')
+      .single()
+
+    if (tenantError || !tenant) {
+      console.error('[stripe-webhook] tenant create error', tenantError)
+      await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+      return
+    }
+
+    tenantId = tenant.id
+
+    const { error: membershipError } = await supabaseAdmin
+      .from('user_tenant_memberships')
+      .insert({
+        tenant_id: tenantId,
+        user_id: intent.user_id,
+        role: 'owner',
+        is_primary: true,
+        status: 'active',
+      })
+
+    if (membershipError && membershipError.code !== '23505') {
+      console.error('[stripe-webhook] membership insert error', membershipError)
+      // Non-fatal: entitlement gating may still work if membership exists via other path.
+    }
+  }
+
+  // Ensure entitlement exists (idempotent-ish)
+  const { data: existingEntitlement, error: entitlementLookupError } = await supabaseAdmin
+    .from('tenant_product_entitlements')
+    .select('id')
+    .eq('tenant_id', tenantId)
+    .eq('product_id', intent.product_id)
+    .eq('status', 'active')
+    .maybeSingle()
+
+  if (entitlementLookupError) {
+    console.error('[stripe-webhook] entitlement lookup error', entitlementLookupError)
+  }
+
+  if (!existingEntitlement) {
+    const source = stripeSubscriptionId ? 'stripe_subscription' : 'stripe_checkout'
+    const { error: entitlementInsertError } = await supabaseAdmin
+      .from('tenant_product_entitlements')
+      .insert({
+        tenant_id: tenantId,
+        product_id: intent.product_id,
+        status: 'active',
+        source,
+        quantity_seats: intent.quantity_seats ?? 1,
+        created_by: intent.user_id,
+        metadata: {
+          purchase_intent_id: intent.id,
+          stripe_checkout_session_id: stripeCheckoutSessionId,
+          stripe_customer_id: stripeCustomerId,
+          stripe_subscription_id: stripeSubscriptionId,
+          product_price_id: intent.product_price_id,
+        } as unknown as Json,
+      })
+
+    if (entitlementInsertError) {
+      console.error('[stripe-webhook] entitlement insert error', entitlementInsertError)
+      await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
+      return
+    }
+  }
+
+  const { error: finalUpdateError } = await supabaseAdmin
+    .from('purchase_intents')
+    .update({
+      status: 'provisioned',
+      tenant_id: tenantId,
+      stripe_customer_id: stripeCustomerId ?? intent.stripe_customer_id,
+      stripe_subscription_id: stripeSubscriptionId ?? intent.stripe_subscription_id,
+      stripe_checkout_session_id: stripeCheckoutSessionId ?? intent.stripe_checkout_session_id,
+    })
+    .eq('id', intent.id)
+
+  if (finalUpdateError) {
+    console.error('[stripe-webhook] purchase_intent final update error', finalUpdateError)
+  }
+}
+
 function toMajorUnits(amount?: number | null) {
   if (typeof amount !== 'number') return null
   return amount / 100
@@ -129,6 +307,39 @@ export async function POST(request: Request) {
   // Handle selected Stripe events → local billing tables
   try {
     switch (event.type) {
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session
+
+        // Only proceed once Stripe considers the session paid/complete.
+        const paymentStatus = (session.payment_status || '').toLowerCase()
+        const sessionStatus = (session.status || '').toLowerCase()
+        const isConfirmed = paymentStatus === 'paid' || paymentStatus === 'no_payment_required' || sessionStatus === 'complete'
+
+        if (!isConfirmed) {
+          break
+        }
+
+        const metadataIntentId = session.metadata?.purchase_intent_id
+        let intentId = metadataIntentId || null
+
+        if (!intentId) {
+          const { data: intent } = await supabaseAdmin
+            .from('purchase_intents')
+            .select('id')
+            .eq('stripe_checkout_session_id', session.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          intentId = intent?.id ?? null
+        }
+
+        if (intentId) {
+          await provisionFromPurchaseIntent({ intentId, stripeSession: session })
+        }
+
+        break
+      }
+
       // Subscription events
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {

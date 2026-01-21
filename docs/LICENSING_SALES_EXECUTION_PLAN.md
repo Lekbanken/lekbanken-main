@@ -8,6 +8,8 @@
 ## Progress log
 - **2026-01-21:** Synced DB schema/types for licensing work: pushed remote migration(s) and regenerated `types/supabase.ts` from the linked Supabase project.
 - **2026-01-21:** Prepared Phase 4 DB support for entitlement-based seat assignments (capacity enforced at DB layer).
+- **2026-01-21:** Restored Phase 1 purchase-first flow: signup no longer creates orgs; checkout creates `purchase_intents`; Stripe webhook provisions tenant + entitlement on `checkout.session.completed`.
+- **2026-01-21:** Restored Phase 2 public pricing: `GET /api/public/pricing` + marketing pricing renders DB-backed products/prices.
 
 ---
 
@@ -37,9 +39,9 @@
 **Goal:** No org tenant created before Stripe payment confirmation.
 
 **TODO**
-- [ ] Remove org creation from marketing signup (or gate it behind purchase intent state).
-- [ ] Introduce `purchase_intents` state machine + server endpoint to start checkout.
-- [ ] Stripe webhook provisions tenant + entitlements only after verified success.
+- [x] Remove org creation from marketing signup (or gate it behind purchase intent state).
+- [x] Introduce `purchase_intents` state machine + server endpoint to start checkout.
+- [x] Stripe webhook provisions tenant + entitlements only after verified success.
 
 **Acceptance criteria**
 - [ ] Impossible to create a new org tenant without a corresponding, paid + provisioned purchase intent.
@@ -50,8 +52,8 @@
 **Goal:** Marketing pricing displays real products/prices.
 
 **TODO**
-- [ ] Public endpoint `GET /api/public/pricing` backed by `products/product_prices`.
-- [ ] Ensure anon RLS allows only published products/prices.
+- [x] Public endpoint `GET /api/public/pricing` backed by `products/product_prices`.
+- [x] Ensure anon RLS allows only published products/prices.
 
 ---
 
@@ -85,7 +87,8 @@
 ---
 
 ## 3) Concrete next steps
-- Apply/re-apply the app-side flows (checkout → webhook provisioning → entitlements gating).
+- Continue: entitlements-first gating (switch game access checks to `tenant_product_entitlements`).
+- Restore admin tooling (grant/revoke entitlements; seat allocation UI/APIs).
 - Re-run: `npm run type-check`.
 - Recommended checks before merge:
   - `npm run lint`

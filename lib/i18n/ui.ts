@@ -26,6 +26,10 @@ export type AuthCopy = {
   signupPrompt: string
   signupAction: string
   signupTitle: string
+  creatingAccount: string
+  orgCreationNoticePrefix: string
+  orgCreationNoticeLinkText: string
+  orgCreationNoticeSuffix: string
   passwordResetTitle: string
   passwordResetDescription: string
   passwordResetAction: string
@@ -60,6 +64,10 @@ const uiCopy: Record<LanguageCode, { marketing: MarketingCopy; auth: AuthCopy }>
       signupPrompt: 'Har du ikke konto?',
       signupAction: 'Opprett konto',
       signupTitle: 'Opprett konto',
+      creatingAccount: 'Oppretter konto...',
+      orgCreationNoticePrefix: 'Organisasjoner opprettes etter gjennomført kjøp (Stripe-bekreftelse). Se',
+      orgCreationNoticeLinkText: 'priser',
+      orgCreationNoticeSuffix: 'for å kjøpe en lisens.',
       passwordResetTitle: 'Tilbakestill passord',
       passwordResetDescription: 'Skriv inn e-posten din så sender vi en lenke.',
       passwordResetAction: 'Send lenke',
@@ -93,6 +101,10 @@ const uiCopy: Record<LanguageCode, { marketing: MarketingCopy; auth: AuthCopy }>
       signupPrompt: 'Har du inget konto?',
       signupAction: 'Skapa konto',
       signupTitle: 'Skapa konto',
+      creatingAccount: 'Skapar konto...',
+      orgCreationNoticePrefix: 'Organisationer skapas efter genomfört köp (Stripe-bekräftelse). Se',
+      orgCreationNoticeLinkText: 'priser',
+      orgCreationNoticeSuffix: 'för att köpa en licens.',
       passwordResetTitle: 'Återställ lösenord',
       passwordResetDescription: 'Ange din e-post så skickar vi en länk.',
       passwordResetAction: 'Skicka länk',
@@ -126,6 +138,10 @@ const uiCopy: Record<LanguageCode, { marketing: MarketingCopy; auth: AuthCopy }>
       signupPrompt: 'No account yet?',
       signupAction: 'Create account',
       signupTitle: 'Create account',
+      creatingAccount: 'Creating account...',
+      orgCreationNoticePrefix: 'Organizations are created after a completed purchase (Stripe confirmation). See',
+      orgCreationNoticeLinkText: 'pricing',
+      orgCreationNoticeSuffix: 'to buy a license.',
       passwordResetTitle: 'Reset password',
       passwordResetDescription: 'Enter your email and we will send you a link.',
       passwordResetAction: 'Send reset link',

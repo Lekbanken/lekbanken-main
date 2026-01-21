@@ -61,7 +61,7 @@ export async function POST(request: Request) {
   const role = (user?.app_metadata as { role?: string } | undefined)?.role ?? null
   const isElevated = role === 'system_admin' || role === 'superadmin' || role === 'admin' || role === 'owner'
 
-  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId)
+  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
   if (tenantId && allowedProductIds.length === 0 && !isElevated) {
     return NextResponse.json({ games: [], total: 0, page, pageSize, hasMore: false, metadata: { allowedProducts: allowedProductIds } })
   }

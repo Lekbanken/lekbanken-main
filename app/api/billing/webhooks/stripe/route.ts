@@ -144,9 +144,11 @@ async function provisionFromPurchaseIntent(params: {
     console.error('[stripe-webhook] entitlement lookup error', entitlementLookupError)
   }
 
+  let entitlementId = existingEntitlement?.id ?? null
+
   if (!existingEntitlement) {
     const source = stripeSubscriptionId ? 'stripe_subscription' : 'stripe_checkout'
-    const { error: entitlementInsertError } = await supabaseAdmin
+    const { data: insertedEntitlement, error: entitlementInsertError } = await supabaseAdmin
       .from('tenant_product_entitlements')
       .insert({
         tenant_id: tenantId,
@@ -163,11 +165,33 @@ async function provisionFromPurchaseIntent(params: {
           product_price_id: intent.product_price_id,
         } as unknown as Json,
       })
+      .select('id')
+      .single()
 
     if (entitlementInsertError) {
       console.error('[stripe-webhook] entitlement insert error', entitlementInsertError)
       await supabaseAdmin.from('purchase_intents').update({ status: 'failed' }).eq('id', intent.id)
       return
+    }
+
+    entitlementId = insertedEntitlement?.id ?? null
+  }
+
+  // Best-effort: auto-assign a seat to the purchaser/owner so they can access gated content.
+  if (entitlementId) {
+    const { error: seatAssignError } = await supabaseAdmin
+      .from('tenant_entitlement_seat_assignments')
+      .insert({
+        tenant_id: tenantId,
+        entitlement_id: entitlementId,
+        user_id: intent.user_id,
+        assigned_by: intent.user_id,
+        status: 'active',
+      })
+
+    if (seatAssignError && seatAssignError.code !== '23505') {
+      console.error('[stripe-webhook] seat assignment insert error', seatAssignError)
+      // Non-fatal: tenant admins can assign seats later.
     }
   }
 

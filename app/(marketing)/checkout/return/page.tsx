@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { Alert } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -19,6 +20,7 @@ type PurchaseIntent = {
 }
 
 export default function CheckoutReturnPage() {
+  const t = useTranslations('marketing.checkout')
   const router = useRouter()
   const searchParams = useSearchParams()
   const purchaseIntentId = searchParams.get('purchase_intent_id')
@@ -48,7 +50,7 @@ export default function CheckoutReturnPage() {
         }
 
         const json = (await res.json()) as { intent?: PurchaseIntent; error?: string }
-        if (!res.ok) throw new Error(json.error || 'Kunde inte läsa status')
+        if (!res.ok) throw new Error(json.error || t('return.errors.readStatusFailed'))
 
         if (cancelled) return
         setIntent(json.intent ?? null)
@@ -62,7 +64,7 @@ export default function CheckoutReturnPage() {
         timer = window.setTimeout(poll, 2000)
       } catch (e) {
         if (cancelled) return
-        setError(e instanceof Error ? e.message : 'Ett fel uppstod')
+        setError(e instanceof Error ? e.message : t('return.errors.generic'))
         timer = window.setTimeout(poll, 4000)
       }
     }
@@ -73,12 +75,12 @@ export default function CheckoutReturnPage() {
       cancelled = true
       if (timer) window.clearTimeout(timer)
     }
-  }, [purchaseIntentId, router])
+  }, [purchaseIntentId, router, t])
 
   if (!purchaseIntentId) {
     return (
       <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col gap-6 px-4 py-12">
-        <Alert variant="error">Saknar purchase_intent_id.</Alert>
+        <Alert variant="error">{t('return.errors.missingIntentId')}</Alert>
       </div>
     )
   }
@@ -86,9 +88,9 @@ export default function CheckoutReturnPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col gap-6 px-4 py-12">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold">Tack!</h1>
+        <h1 className="text-3xl font-semibold">{t('return.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Vi bekräftar betalningen och skapar organisationen. Det kan ta någon minut.
+          {t('return.subtitle')}
         </p>
       </div>
 
@@ -97,18 +99,18 @@ export default function CheckoutReturnPage() {
       <div className="rounded-lg border border-border p-4">
         <div className="text-sm">
           <div>
-            <span className="text-muted-foreground">Status:</span>{' '}
-            <span className="font-medium">{intent?.status ?? 'Laddar…'}</span>
+            <span className="text-muted-foreground">{t('return.labels.status')}</span>{' '}
+            <span className="font-medium">{intent?.status ?? t('return.labels.loading')}</span>
           </div>
           {intent?.tenant_name && (
             <div>
-              <span className="text-muted-foreground">Organisation:</span>{' '}
+              <span className="text-muted-foreground">{t('return.labels.organization')}</span>{' '}
               <span className="font-medium">{intent.tenant_name}</span>
             </div>
           )}
           {intent?.quantity_seats ? (
             <div>
-              <span className="text-muted-foreground">Platser:</span>{' '}
+              <span className="text-muted-foreground">{t('return.labels.seats')}</span>{' '}
               <span className="font-medium">{intent.quantity_seats}</span>
             </div>
           ) : null}
@@ -117,9 +119,9 @@ export default function CheckoutReturnPage() {
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={() => router.push('/checkout/start')}>
-          Tillbaka
+          {t('return.actions.back')}
         </Button>
-        <Button onClick={() => router.push('/app/select-tenant')}>Gå vidare</Button>
+        <Button onClick={() => router.push('/app/select-tenant')}>{t('return.actions.continue')}</Button>
       </div>
     </div>
   )

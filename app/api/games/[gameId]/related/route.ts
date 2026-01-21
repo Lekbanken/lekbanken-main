@@ -38,6 +38,9 @@ function scoreGame(
 export async function GET(request: NextRequest, { params }: { params: Promise<{ gameId: string }> }) {
   const { gameId } = await params
   const supabase = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { searchParams } = new URL(request.url)
   const parsed = querySchema.safeParse({
     tenantId: searchParams.get('tenantId'),
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
 
-  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId)
+  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
 
   if (tenantId && allowedProductIds.length === 0) {
     return NextResponse.json({ games: [], metadata: { allowedProducts: allowedProductIds } })

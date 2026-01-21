@@ -10,6 +10,9 @@ const querySchema = z.object({
 
 export async function GET(request: Request) {
   const supabase = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { searchParams } = new URL(request.url)
   const parsed = querySchema.safeParse({
     tenantId: searchParams.get('tenantId'),
@@ -21,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   const { tenantId = null, limit } = parsed.data
-  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId)
+  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, user?.id ?? null)
 
   if (tenantId && allowedProductIds.length === 0) {
     return NextResponse.json({ games: [], metadata: { allowedProducts: allowedProductIds } })

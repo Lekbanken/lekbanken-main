@@ -114,7 +114,29 @@
       "noData": "No data available",
       "emptyState": "Nothing here yet",
       "confirmDelete": "Are you sure you want to delete this?",
-      "confirmAction": "Are you sure you want to continue?",
+        "member": "Member",
+        "licensing": {
+          "title": "Licenses",
+          "selectPlaceholder": "Select license…",
+          "emptyAssignments": "No active seat assignments.",
+          "labels": {
+            "assignedAt": "Assigned {date}"
+          },
+          "actions": {
+            "assign": "Assign",
+            "release": "Release"
+          },
+          "errors": {
+            "unknownUserId": "Unknown user id."
+          },
+          "toasts": {
+            "selectLicense": "Select a license.",
+            "seatAssigned": "Seat assigned.",
+            "assignFailed": "Could not assign seat (no seats left or already assigned).",
+            "seatReleased": "Seat released.",
+            "releaseFailed": "Could not release seat."
+          }
+        }
       "unsavedChanges": "You have unsaved changes. Do you want to leave this page?",
       "loadingError": "Could not load data",
       "saveError": "Could not save",
@@ -874,6 +896,44 @@
         "planRestoreError": "Could not restore plan."
       }
     },
+    "organisations": {
+      "licensing": {
+        "errorTitle": "Could not load",
+        "errorDescription": "Could not load licenses/entitlements.",
+        "grantCard": {
+          "title": "Grant free license",
+          "description": "Creates a row in tenant_product_entitlements (source: admin_grant)."
+        },
+        "labels": {
+          "product": "Product",
+          "seats": "Number of seats",
+          "validToOptional": "Valid until (optional)",
+          "reasonOptional": "Reason (optional)",
+          "source": "Source",
+          "created": "Created",
+          "validFrom": "Valid: {date}",
+          "seatsUsed": "{count} seats"
+        },
+        "placeholders": {
+          "reason": "e.g. goodwill, pilot, internal"
+        },
+        "actions": {
+          "createEntitlement": "Create entitlement",
+          "revoke": "Revoke"
+        },
+        "loading": "Loading…",
+        "emptyTitle": "No entitlements",
+        "emptyDescription": "The organization has no licenses yet.",
+        "unknownProduct": "Unknown product",
+        "toasts": {
+          "selectProduct": "Select a product.",
+          "entitlementCreated": "Entitlement created.",
+          "createFailed": "Could not create entitlement.",
+          "entitlementRevoked": "Entitlement revoked.",
+          "revokeFailed": "Could not revoke entitlement."
+        }
+      }
+    },
     "tenant": {
       "members": {
         "title": "Members",
@@ -890,6 +950,37 @@
         "noEmail": "No email",
         "primaryContact": "Primary contact",
         "member": "Member"
+      },
+      "licenses": {
+        "title": "Licenses",
+        "description": "Assign and release seats for the organization’s licenses.",
+        "noOrganizationTitle": "No organization selected",
+        "noOrganizationDescription": "Select an organization to manage licenses.",
+        "errorTitle": "Could not load",
+        "errorDescription": "Could not load licenses.",
+        "loading": "Loading…",
+        "emptyTitle": "No licenses",
+        "emptyDescription": "This organization has no active or historical entitlements yet.",
+        "unknownProduct": "Unknown product",
+        "emptyAssignments": "No active assignments.",
+        "labels": {
+          "source": "Source",
+          "valid": "Valid",
+          "seatsUsed": "{used}/{max} seats",
+          "selectMember": "Select member…",
+          "assignedAt": "Assigned {date}"
+        },
+        "actions": {
+          "assignSeat": "Assign seat",
+          "release": "Release"
+        },
+        "toasts": {
+          "selectMember": "Select a member.",
+          "seatAssigned": "Seat assigned.",
+          "assignFailed": "Could not assign seat (no seats left or already assigned).",
+          "seatReleased": "Seat released.",
+          "releaseFailed": "Could not release seat."
+        }
       },
       "games": {
         "title": "Games",
@@ -7718,6 +7809,60 @@
       "goToApp": "Go to app",
       "goToAdmin": "Go to admin",
       "goToMarketing": "Go to marketing site"
+    },
+    "checkout": {
+      "start": {
+        "title": "Buy a license",
+        "subtitle": "Create your organization and proceed to payment. The organization is created only after Stripe confirms the purchase.",
+        "canceled": "Payment was canceled. You can try again anytime.",
+        "cardTitle": "Details",
+        "fields": {
+          "orgName": {
+            "label": "Organization name",
+            "placeholder": "e.g. Lekbanken AB"
+          },
+          "seats": {
+            "label": "Number of seats"
+          },
+          "plan": {
+            "label": "Plan",
+            "loading": "Loading plans…"
+          }
+        },
+        "noAccount": "Don’t have an account?",
+        "actions": {
+          "createAccount": "Create account",
+          "starting": "Starting…",
+          "goToPayment": "Go to payment",
+          "backToPricing": "Back to pricing"
+        },
+        "errors": {
+          "pickProduct": "Choose a plan.",
+          "enterOrgName": "Enter an organization name.",
+          "startCheckoutFailed": "Could not start checkout.",
+          "missingCheckoutUrl": "Missing checkout URL.",
+          "generic": "Something went wrong. Please try again."
+        }
+      },
+      "return": {
+        "title": "Thank you!",
+        "subtitle": "We’re confirming your payment and setting up your organization. This usually only takes a moment.",
+        "labels": {
+          "status": "Status:",
+          "loading": "Loading…",
+          "organization": "Organization:",
+          "seats": "Seats:"
+        },
+        "actions": {
+          "back": "Back",
+          "continue": "Continue to the app"
+        },
+        "errors": {
+          "missingIntentId": "Missing purchase_intent_id.",
+          "readStatusFailed": "Could not read status.",
+          "generic": "Something went wrong. Please try again."
+        }
+      }
     }
   },
   "demo": {

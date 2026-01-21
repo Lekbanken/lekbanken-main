@@ -1503,6 +1503,44 @@
         "planRestoreError": "Kunne ikke gjenopprette plan."
       }
     },
+    "organisations": {
+      "licensing": {
+        "errorTitle": "Kunne ikke laste",
+        "errorDescription": "Kunne ikke laste lisenser/entitlements.",
+        "grantCard": {
+          "title": "Gi gratis lisens",
+          "description": "Oppretter en rad i tenant_product_entitlements (kilde: admin_grant)."
+        },
+        "labels": {
+          "product": "Produkt",
+          "seats": "Antall plasser",
+          "validToOptional": "Gyldig til (valgfritt)",
+          "reasonOptional": "Årsak (valgfritt)",
+          "source": "Kilde",
+          "created": "Opprettet",
+          "validFrom": "Gyldig: {date}",
+          "seatsUsed": "{count} plasser"
+        },
+        "placeholders": {
+          "reason": "f.eks. goodwill, pilot, internt"
+        },
+        "actions": {
+          "createEntitlement": "Opprett entitlement",
+          "revoke": "Tilbakekall"
+        },
+        "loading": "Laster…",
+        "emptyTitle": "Ingen entitlements",
+        "emptyDescription": "Organisasjonen har ingen lisenser ennå.",
+        "unknownProduct": "Ukjent produkt",
+        "toasts": {
+          "selectProduct": "Velg et produkt.",
+          "entitlementCreated": "Entitlement opprettet.",
+          "createFailed": "Kunne ikke opprette entitlement.",
+          "entitlementRevoked": "Entitlement tilbakekalt.",
+          "revokeFailed": "Kunne ikke tilbakekalle entitlement."
+        }
+      }
+    },
     "tenant": {
       "members": {
         "title": "Medlemmer",
@@ -1518,7 +1556,60 @@
         "unknownUser": "Ukjent bruker",
         "noEmail": "Ingen e-post",
         "primaryContact": "Primærkontakt",
-        "member": "Medlem"
+        "member": "Medlem",
+        "licensing": {
+          "title": "Lisenser",
+          "selectPlaceholder": "Velg lisens…",
+          "emptyAssignments": "Ingen aktive plass-tildelinger.",
+          "labels": {
+            "assignedAt": "Tildelt {date}"
+          },
+          "actions": {
+            "assign": "Tildel",
+            "release": "Frigi"
+          },
+          "errors": {
+            "unknownUserId": "Ukjent user-id."
+          },
+          "toasts": {
+            "selectLicense": "Velg en lisens.",
+            "seatAssigned": "Plass tildelt.",
+            "assignFailed": "Kunne ikke tildele plass (ingen plasser igjen eller allerede tildelt).",
+            "seatReleased": "Plass frigitt.",
+            "releaseFailed": "Kunne ikke frigi plass."
+          }
+        }
+      },
+      "licenses": {
+        "title": "Lisenser",
+        "description": "Tildel og frigjør plasser for organisasjonens lisenser.",
+        "noOrganizationTitle": "Ingen organisasjon valgt",
+        "noOrganizationDescription": "Velg en organisasjon for å administrere lisenser.",
+        "errorTitle": "Kunne ikke laste",
+        "errorDescription": "Kunne ikke laste lisenser.",
+        "loading": "Laster…",
+        "emptyTitle": "Ingen lisenser",
+        "emptyDescription": "Denne organisasjonen har ingen aktive eller historiske entitlements ennå.",
+        "unknownProduct": "Ukjent produkt",
+        "emptyAssignments": "Ingen aktive tildelinger.",
+        "labels": {
+          "source": "Kilde",
+          "valid": "Gyldig",
+          "seatsUsed": "{used}/{max} plasser",
+          "selectMember": "Velg medlem…",
+          "assignedAt": "Tildelt {date}"
+        },
+        "actions": {
+          "assignSeat": "Tildel plass",
+          "release": "Frigi"
+        },
+        "toasts": {
+          "selectMember": "Velg et medlem.",
+          "seatAssigned": "Plass tildelt.",
+          "assignFailed": "Kunne ikke tildele plass (ingen plasser igjen eller allerede tildelt).",
+          "seatReleased": "Plass frigitt.",
+          "releaseFailed": "Kunne ikke frigi plass."
+        }
       },
       "games": {
         "title": "Spill",
@@ -7981,6 +8072,60 @@
       "goToApp": "Gå til appen",
       "goToAdmin": "Gå til admin",
       "goToMarketing": "Gå til markedssiden"
+    },
+    "checkout": {
+      "start": {
+        "title": "Kjøp lisens",
+        "subtitle": "Opprett organisasjonen din og gå videre til betaling. Organisasjonen opprettes først når Stripe bekrefter kjøpet.",
+        "canceled": "Betalingen ble avbrutt. Du kan prøve igjen når som helst.",
+        "cardTitle": "Detaljer",
+        "fields": {
+          "orgName": {
+            "label": "Organisasjonsnavn",
+            "placeholder": "f.eks. Lekbanken AS"
+          },
+          "seats": {
+            "label": "Antall plasser"
+          },
+          "plan": {
+            "label": "Plan",
+            "loading": "Laster planer…"
+          }
+        },
+        "noAccount": "Har du ikke en konto?",
+        "actions": {
+          "createAccount": "Opprett konto",
+          "starting": "Starter…",
+          "goToPayment": "Gå til betaling",
+          "backToPricing": "Tilbake til priser"
+        },
+        "errors": {
+          "pickProduct": "Velg en plan.",
+          "enterOrgName": "Skriv inn organisasjonsnavn.",
+          "startCheckoutFailed": "Kunne ikke starte checkout.",
+          "missingCheckoutUrl": "Mangler checkout-lenke.",
+          "generic": "Noe gikk galt. Prøv igjen."
+        }
+      },
+      "return": {
+        "title": "Takk!",
+        "subtitle": "Vi bekrefter betalingen din og setter opp organisasjonen. Dette tar som regel bare et øyeblikk.",
+        "labels": {
+          "status": "Status:",
+          "loading": "Laster…",
+          "organization": "Organisasjon:",
+          "seats": "Plasser:"
+        },
+        "actions": {
+          "back": "Tilbake",
+          "continue": "Fortsett til appen"
+        },
+        "errors": {
+          "missingIntentId": "Mangler purchase_intent_id.",
+          "readStatusFailed": "Kunne ikke lese status.",
+          "generic": "Noe gikk galt. Prøv igjen."
+        }
+      }
     }
   },
   "demo": {

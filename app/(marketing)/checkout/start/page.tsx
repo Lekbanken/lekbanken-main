@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -29,6 +30,7 @@ type PricingApiResponse = {
 }
 
 export default function CheckoutStartPage() {
+  const t = useTranslations('marketing.checkout')
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -85,11 +87,11 @@ export default function CheckoutStartPage() {
   async function handleStart() {
     setError('')
     if (!selectedPriceId) {
-      setError('Välj en produkt först.')
+      setError(t('start.errors.pickProduct'))
       return
     }
     if (!tenantName.trim()) {
-      setError('Ange organisationsnamn.')
+      setError(t('start.errors.enterOrgName'))
       return
     }
 
@@ -113,7 +115,7 @@ export default function CheckoutStartPage() {
 
       const json = (await res.json()) as { checkout_url?: string; purchase_intent_id?: string; error?: string }
       if (!res.ok) {
-        throw new Error(json.error || 'Kunde inte starta checkout')
+        throw new Error(json.error || t('start.errors.startCheckoutFailed'))
       }
 
       if (json.checkout_url) {
@@ -126,9 +128,9 @@ export default function CheckoutStartPage() {
         return
       }
 
-      throw new Error('Saknar checkout-url')
+      throw new Error(t('start.errors.missingCheckoutUrl'))
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Ett fel uppstod')
+      setError(e instanceof Error ? e.message : t('start.errors.generic'))
     } finally {
       setIsLoading(false)
     }
@@ -137,15 +139,15 @@ export default function CheckoutStartPage() {
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-xl flex-col gap-6 px-4 py-12">
       <div className="space-y-2">
-        <h1 className="text-3xl font-semibold">Köp licens</h1>
+        <h1 className="text-3xl font-semibold">{t('start.title')}</h1>
         <p className="text-sm text-muted-foreground">
-          Organisationen skapas först när Stripe bekräftat betalningen.
+          {t('start.subtitle')}
         </p>
       </div>
 
       {canceled && (
         <Alert variant="warning">
-          Betalningen avbröts. Du kan försöka igen.
+          {t('start.canceled')}
         </Alert>
       )}
 
@@ -153,16 +155,20 @@ export default function CheckoutStartPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Uppgifter</CardTitle>
+          <CardTitle>{t('start.cardTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Organisationsnamn</label>
-            <Input value={tenantName} onChange={(e) => setTenantName(e.target.value)} placeholder="Ex: Lekbanken AB" />
+            <label className="text-sm font-medium">{t('start.fields.orgName.label')}</label>
+            <Input
+              value={tenantName}
+              onChange={(e) => setTenantName(e.target.value)}
+              placeholder={t('start.fields.orgName.placeholder')}
+            />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Antal platser</label>
+            <label className="text-sm font-medium">{t('start.fields.seats.label')}</label>
             <Input
               type="number"
               min={1}
@@ -172,7 +178,7 @@ export default function CheckoutStartPage() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium">Plan</label>
+            <label className="text-sm font-medium">{t('start.fields.plan.label')}</label>
             <select
               className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
               value={selectedPriceId}
@@ -180,7 +186,7 @@ export default function CheckoutStartPage() {
               disabled={priceOptions.length === 0}
             >
               {priceOptions.length === 0 ? (
-                <option value="">Laddar priser...</option>
+                <option value="">{t('start.fields.plan.loading')}</option>
               ) : (
                 priceOptions.map((opt) => (
                   <option key={opt.id} value={opt.id}>
@@ -190,23 +196,23 @@ export default function CheckoutStartPage() {
               )}
             </select>
             <p className="text-xs text-muted-foreground">
-              Saknar du inlogg?{' '}
+              {t('start.noAccount')}{' '}
               <Link href="/auth/signup" className="text-primary hover:text-primary/80">
-                Skapa konto
+                {t('start.actions.createAccount')}
               </Link>
               .
             </p>
           </div>
 
           <Button className="w-full" onClick={handleStart} disabled={isLoading}>
-            {isLoading ? 'Startar…' : 'Gå till betalning'}
+            {isLoading ? t('start.actions.starting') : t('start.actions.goToPayment')}
           </Button>
         </CardContent>
       </Card>
 
       <div className="text-xs text-muted-foreground">
         <Link href="/pricing" className="text-primary hover:text-primary/80">
-          Tillbaka till priser
+          {t('start.actions.backToPricing')}
         </Link>
       </div>
     </div>

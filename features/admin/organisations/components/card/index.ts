@@ -11,3 +11,4 @@ export { OrganisationMembersList } from './OrganisationMembersList';
 export { OrganisationAuditSection } from './OrganisationAuditSection';
 export { OrganisationAuditFull } from './OrganisationAuditFull';
 export { OrganisationDangerZone } from './OrganisationDangerZone';
+export { OrganisationLicensingSection } from './OrganisationLicensingSection';

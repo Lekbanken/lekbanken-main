@@ -132,15 +132,15 @@ export default function SignupPage() {
               </div>
 
               <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
-                Organisationer skapas efter genomfört köp (Stripe-bekräftelse). Se{' '}
+                {copy.auth.orgCreationNoticePrefix}{' '}
                 <Link href="/pricing" className="font-medium text-primary hover:text-primary/80">
-                  priser
+                  {copy.auth.orgCreationNoticeLinkText}
                 </Link>{' '}
-                för att köpa en licens.
+                {copy.auth.orgCreationNoticeSuffix}
               </div>
 
               <Button type="submit" disabled={isLoading || registrationClosed} className="w-full">
-                {isLoading ? 'Creating account...' : copy.auth.signupAction}
+                {isLoading ? copy.auth.creatingAccount : copy.auth.signupAction}
               </Button>
             </form>
 

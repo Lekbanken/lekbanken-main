@@ -50,6 +50,7 @@ import {
   OrganisationAuditSection,
   OrganisationAuditFull,
   OrganisationDangerZone,
+  OrganisationLicensingSection,
 } from "./components/card";
 
 type OrganisationDetailPageProps = {
@@ -122,7 +123,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
   const [error, setError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const requestedTab = searchParams.get("tab");
-  const validTabs = ["overview", "members", "features", "domains", "audit"] as const;
+  const validTabs = ["overview", "members", "features", "domains", "licenses", "audit"] as const;
   const initialTab = validTabs.includes(requestedTab as typeof validTabs[number])
     ? (requestedTab as typeof validTabs[number])
     : "overview";
@@ -386,6 +387,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
             { id: 'members', label: 'Medlemmar' },
             { id: 'features', label: 'Funktioner' },
             { id: 'domains', label: 'Domäner' },
+            { id: 'licenses', label: 'Licenser' },
             { id: 'audit', label: 'Aktivitet' },
           ]}
           activeTab={activeTab}
@@ -468,6 +470,11 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
             onArchive={() => handleStatusChange('archived')}
             onDelete={handleDelete}
           />
+        </TabPanel>
+
+        {/* Licenses Tab */}
+        <TabPanel id="licenses" activeTab={activeTab} className="space-y-6">
+          <OrganisationLicensingSection tenantId={tenantId} />
         </TabPanel>
 
         {/* Members Tab */}

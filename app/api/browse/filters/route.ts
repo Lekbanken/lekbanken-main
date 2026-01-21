@@ -35,16 +35,23 @@ function setCachedFilters(key: string, value: CachedFilters) {
 
 export async function GET(request: Request) {
   const supabase = await createServerRlsClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   const { searchParams } = new URL(request.url)
   const tenantId = searchParams.get('tenantId')
 
-  const cacheId = cacheKey(tenantId)
+  const userId = user?.id ?? null
+
+  // IMPORTANT: tenant-scoped filters depend on seat assignments (user-specific).
+  // Cache by (tenantId,userId) to avoid leaking filter availability across users.
+  const cacheId = tenantId ? `${tenantId}:${userId ?? 'anon'}` : cacheKey(null)
   const cached = getCachedFilters(cacheId)
   if (cached) {
     return NextResponse.json(cached)
   }
 
-  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId)
+  const { allowedProductIds } = await getAllowedProductIds(supabase, tenantId, userId)
 
   if (tenantId && allowedProductIds.length === 0) {
     const payload = { products: [], purposes: [], subPurposes: [], metadata: { allowedProducts: allowedProductIds } }

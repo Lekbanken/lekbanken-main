@@ -29,7 +29,7 @@ export async function GET(
   const supabase = isSystemAdmin ? supabaseAdmin : rlsClient
   const activeTenantId = isSystemAdmin ? null : await readTenantIdFromCookies(cookieStore)
 
-  const { allowedProductIds } = await getAllowedProductIds(supabase, activeTenantId || null)
+  const { allowedProductIds } = await getAllowedProductIds(supabase, activeTenantId || null, user?.id ?? null)
   if (activeTenantId && allowedProductIds.length === 0 && !isElevated) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }

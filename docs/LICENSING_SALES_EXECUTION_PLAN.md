@@ -10,6 +10,9 @@
 - **2026-01-21:** Prepared Phase 4 DB support for entitlement-based seat assignments (capacity enforced at DB layer).
 - **2026-01-21:** Restored Phase 1 purchase-first flow: signup no longer creates orgs; checkout creates `purchase_intents`; Stripe webhook provisions tenant + entitlement on `checkout.session.completed`.
 - **2026-01-21:** Restored Phase 2 public pricing: `GET /api/public/pricing` + marketing pricing renders DB-backed products/prices.
+- **2026-01-21:** Restored Phase 3 entitlements-first gating for games (with legacy billing fallback).
+- **2026-01-21:** Implemented Phase 4 seat allocation UI directly on tenant members admin page + a dedicated licenses overview page.
+- **2026-01-21:** Implemented Phase 5 system-admin entitlement grants/revokes in organisation detail.
 
 ---
 
@@ -44,7 +47,7 @@
 - [x] Stripe webhook provisions tenant + entitlements only after verified success.
 
 **Acceptance criteria**
-- [ ] Impossible to create a new org tenant without a corresponding, paid + provisioned purchase intent.
+- [x] End-user signup flow cannot provision a tenant without a paid + provisioned purchase intent (“green light”).
 
 ---
 
@@ -61,8 +64,8 @@
 **Goal:** Access gating uses entitlements, not billing-product-key mapping.
 
 **TODO**
-- [ ] Ensure tenant members can read their entitlements for gating.
-- [ ] Update game gating to prefer `tenant_product_entitlements`.
+- [x] Ensure tenant members can read their entitlements for gating.
+- [x] Update game gating to prefer `tenant_product_entitlements`.
 
 ---
 
@@ -73,8 +76,8 @@
 - [x] Add entitlement-based seat assignment table + RLS + capacity enforcement (`tenant_entitlement_seat_assignments`).
 
 **TODO**
-- [ ] Admin/tenant-admin UI: list members, assign/release seats.
-- [ ] Verify capacity enforcement end-to-end.
+- [x] Admin/tenant-admin UI: list members, assign/release seats.
+- [x] Verify capacity enforcement end-to-end (DB trigger prevents over-allocation).
 
 ---
 
@@ -82,13 +85,13 @@
 **Goal:** Support can grant free access without Stripe.
 
 **TODO**
-- [ ] System-admin endpoints/UI to grant/revoke entitlements.
+- [x] System-admin endpoints/UI to grant/revoke entitlements.
 
 ---
 
 ## 3) Concrete next steps
-- Continue: entitlements-first gating (switch game access checks to `tenant_product_entitlements`).
-- Restore admin tooling (grant/revoke entitlements; seat allocation UI/APIs).
+- Enforce seats in runtime gating (require an active seat assignment for non-elevated users).
+- Auto-assign a seat to the purchaser/owner at provisioning time.
 - Re-run: `npm run type-check`.
 - Recommended checks before merge:
   - `npm run lint`

@@ -1319,6 +1319,44 @@
         "planRestoreError": "Kunde inte återställa plan."
       }
     },
+    "organisations": {
+      "licensing": {
+        "errorTitle": "Kunde inte ladda",
+        "errorDescription": "Kunde inte ladda licenser/entitlements.",
+        "grantCard": {
+          "title": "Ge gratis licens",
+          "description": "Skapar en rad i tenant_product_entitlements (källa: admin_grant)."
+        },
+        "labels": {
+          "product": "Produkt",
+          "seats": "Antal platser",
+          "validToOptional": "Giltig till (valfritt)",
+          "reasonOptional": "Orsak (valfritt)",
+          "source": "Källa",
+          "created": "Skapad",
+          "validFrom": "Giltig: {date}",
+          "seatsUsed": "{count} platser"
+        },
+        "placeholders": {
+          "reason": "t.ex. goodwill, pilot, intern"
+        },
+        "actions": {
+          "createEntitlement": "Skapa entitlement",
+          "revoke": "Återkalla"
+        },
+        "loading": "Laddar…",
+        "emptyTitle": "Inga entitlements",
+        "emptyDescription": "Organisationen har inga licenser ännu.",
+        "unknownProduct": "Okänd produkt",
+        "toasts": {
+          "selectProduct": "Välj en produkt.",
+          "entitlementCreated": "Entitlement skapad.",
+          "createFailed": "Kunde inte skapa entitlement.",
+          "entitlementRevoked": "Entitlement återkallad.",
+          "revokeFailed": "Kunde inte återkalla entitlement."
+        }
+      }
+    },
     "tenant": {
       "members": {
         "title": "Medlemmar",
@@ -1334,7 +1372,60 @@
         "unknownUser": "Okänd användare",
         "noEmail": "Ingen e-post",
         "primaryContact": "Primär kontakt",
-        "member": "Medlem"
+        "member": "Medlem",
+        "licensing": {
+          "title": "Licenser",
+          "selectPlaceholder": "Välj licens…",
+          "emptyAssignments": "Inga aktiva plats-tilldelningar.",
+          "labels": {
+            "assignedAt": "Tilldelad {date}"
+          },
+          "actions": {
+            "assign": "Tilldela",
+            "release": "Släpp"
+          },
+          "errors": {
+            "unknownUserId": "Okänt user-id."
+          },
+          "toasts": {
+            "selectLicense": "Välj en licens.",
+            "seatAssigned": "Plats tilldelad.",
+            "assignFailed": "Kunde inte tilldela plats (ingen plats kvar eller redan tilldelad).",
+            "seatReleased": "Plats släppt.",
+            "releaseFailed": "Kunde inte släppa plats."
+          }
+        }
+      },
+      "licenses": {
+        "title": "Licenser",
+        "description": "Tilldela och släpp platser (seats) för organisationens licenser.",
+        "noOrganizationTitle": "Ingen organisation vald",
+        "noOrganizationDescription": "Välj en organisation för att administrera licenser.",
+        "errorTitle": "Kunde inte ladda",
+        "errorDescription": "Kunde inte ladda licenser.",
+        "loading": "Laddar…",
+        "emptyTitle": "Inga licenser",
+        "emptyDescription": "Den här organisationen har inga aktiva eller historiska entitlements ännu.",
+        "unknownProduct": "Okänd produkt",
+        "emptyAssignments": "Inga aktiva tilldelningar.",
+        "labels": {
+          "source": "Källa",
+          "valid": "Giltig",
+          "seatsUsed": "{used}/{max} platser",
+          "selectMember": "Välj medlem…",
+          "assignedAt": "Tilldelad {date}"
+        },
+        "actions": {
+          "assignSeat": "Tilldela plats",
+          "release": "Släpp"
+        },
+        "toasts": {
+          "selectMember": "Välj en medlem.",
+          "seatAssigned": "Plats tilldelad.",
+          "assignFailed": "Kunde inte tilldela plats (ingen plats kvar eller redan tilldelad).",
+          "seatReleased": "Plats släppt.",
+          "releaseFailed": "Kunde inte släppa plats."
+        }
       },
       "games": {
         "title": "Spel",
@@ -8611,6 +8702,60 @@
       "goToApp": "Gå till appen",
       "goToAdmin": "Gå till admin",
       "goToMarketing": "Gå till startsidan"
+    },
+    "checkout": {
+      "start": {
+        "title": "Köp licens",
+        "subtitle": "Skapa din organisation och gå vidare till betalning. Organisationen skapas först när Stripe bekräftar köpet.",
+        "canceled": "Betalningen avbröts. Du kan prova igen när du vill.",
+        "cardTitle": "Uppgifter",
+        "fields": {
+          "orgName": {
+            "label": "Organisationsnamn",
+            "placeholder": "t.ex. Lekbanken AB"
+          },
+          "seats": {
+            "label": "Antal platser"
+          },
+          "plan": {
+            "label": "Plan",
+            "loading": "Laddar planer…"
+          }
+        },
+        "noAccount": "Har du inget konto?",
+        "actions": {
+          "createAccount": "Skapa konto",
+          "starting": "Startar…",
+          "goToPayment": "Gå till betalning",
+          "backToPricing": "Tillbaka till priser"
+        },
+        "errors": {
+          "pickProduct": "Välj en plan.",
+          "enterOrgName": "Ange organisationsnamn.",
+          "startCheckoutFailed": "Kunde inte starta checkout.",
+          "missingCheckoutUrl": "Saknar checkout-länk.",
+          "generic": "Något gick fel. Försök igen."
+        }
+      },
+      "return": {
+        "title": "Tack!",
+        "subtitle": "Vi bekräftar din betalning och sätter upp din organisation. Det brukar gå snabbt.",
+        "labels": {
+          "status": "Status:",
+          "loading": "Laddar…",
+          "organization": "Organisation:",
+          "seats": "Platser:"
+        },
+        "actions": {
+          "back": "Tillbaka",
+          "continue": "Fortsätt till appen"
+        },
+        "errors": {
+          "missingIntentId": "Saknar purchase_intent_id.",
+          "readStatusFailed": "Kunde inte läsa status.",
+          "generic": "Något gick fel. Försök igen."
+        }
+      }
     },
     "footer": {
       "tagline": "Aktiviteter, pass och delning för coacher, lärare och ledare.",

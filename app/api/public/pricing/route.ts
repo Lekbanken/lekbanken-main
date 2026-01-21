@@ -3,6 +3,16 @@ import { createServerRlsClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
+type ProductRow = {
+  id: string
+  name: string
+  description: string | null
+  product_key: string | null
+  product_type: string | null
+  category: string | null
+  status: string
+}
+
 type PricingProduct = {
   id: string
   name: string
@@ -69,13 +79,15 @@ export async function GET(request: Request) {
     })
   }
 
-  const resultProducts: PricingProduct[] = (products ?? []).map((p) => ({
+  const typedProducts = ((products as ProductRow[] | null) ?? []).filter((p) => typeof p?.id === 'string')
+
+  const resultProducts: PricingProduct[] = typedProducts.map((p) => ({
     id: p.id,
     name: p.name,
     description: p.description ?? null,
-    product_key: (p as any).product_key ?? null,
-    product_type: (p as any).product_type ?? null,
-    category: (p as any).category ?? null,
+    product_key: p.product_key ?? null,
+    product_type: p.product_type ?? null,
+    category: p.category ?? null,
     prices: pricesByProductId.get(p.id) ?? [],
   }))
 

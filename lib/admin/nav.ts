@@ -235,6 +235,7 @@ const organisationAdminCategories: AdminNavCategory[] = [
     items: [
       { id: 'org-subscription', labelKey: 'subscription', href: '/admin/tenant/[tenantId]/subscription', icon: 'billing' },
       { id: 'org-invoices', labelKey: 'invoices', href: '/admin/tenant/[tenantId]/invoices', icon: 'billing' },
+      { id: 'org-licenses', labelKey: 'licenses', href: '/admin/tenant/[tenantId]/licenses', icon: 'licenses' },
     ],
   },
   {

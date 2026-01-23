@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { ArrowLeftIcon, BoltIcon, ClockIcon, UsersIcon, UserIcon } from '@heroicons/react/24/outline'
 import { getGameById, getRelatedGames, type GameWithRelations } from '@/lib/services/games.server'
+import { StartSessionCta } from './start-session-cta'
 
 type Instruction = { title?: string; description?: string; duration_minutes?: number | null }
 
@@ -268,12 +269,7 @@ export default async function GameDetailPage({ params }: Props) {
         {/* Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           {/* Play Button */}
-          <Link
-            href={`/app/play/${game.id}`}
-            className="block text-center w-full bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-500 text-white font-bold py-4 px-6 rounded-xl text-lg transition shadow-sm"
-          >
-            {t('startGame')}
-          </Link>
+          <StartSessionCta gameId={game.id} gameName={game.name} />
 
           {/* Quick Info Card */}
           <div className="rounded-2xl border border-border/60 bg-card p-5">

@@ -10,11 +10,28 @@
 
 import { createContext, useContext, useMemo, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
+import { toDataURL } from 'qrcode';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabPanel } from '@/components/ui/tabs';
 import { useToast } from '@/components/ui/toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import { isFeatureEnabled } from '@/lib/config/env';
 import { resolveUiState } from '@/lib/play/ui-state';
@@ -24,11 +41,19 @@ import {
   BoltIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
-  ChevronRightIcon,
-  ClipboardDocumentCheckIcon,
+  XCircleIcon,
   ChatBubbleLeftRightIcon,
-  FlagIcon,
-  UserMinusIcon,
+  PresentationChartBarIcon,
+  QrCodeIcon,
+  WrenchScrewdriverIcon,
+  ClipboardIcon,
+  Cog6ToothIcon,
+  DocumentTextIcon,
+  BookOpenIcon,
+  ChevronRightIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+  EyeSlashIcon,
 } from '@heroicons/react/24/outline';
 import { useSessionState } from '../hooks/useSessionState';
 import { useSignalCapabilities } from '../hooks/useSignalCapabilities';
@@ -37,16 +62,14 @@ import { useSessionEvents } from '../hooks/useSessionEvents';
 import { DirectorModeDrawer } from './DirectorModeDrawer';
 import { PreflightChecklist, type ChecklistItem } from './PreflightChecklist';
 import { ArtifactsPanel } from './ArtifactsPanel';
-import { SessionChatDrawer } from './SessionChatDrawer';
-import { LobbyHub } from '@/components/play';
+import { SessionChatModal } from './SessionChatModal';
+import { StorylineModal } from './StorylineModal';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
 import { approveParticipant, kickParticipant, setNextStarter } from '@/features/play-participant/api';
 import type { SessionCockpitState, CockpitParticipant, UseSessionStateReturn, SessionEvent as CockpitEvent } from '@/types/session-cockpit';
 import type { SessionEvent as EventFeedEvent } from '@/types/session-event';
 import type { SessionRole } from '@/types/play-runtime';
-import type { LobbyState, SectionReadiness, ReadinessLevel } from '@/types/lobby';
-import { DEFAULT_SESSION_SETTINGS } from '@/types/lobby';
 
 // =============================================================================
 // Context
@@ -84,20 +107,12 @@ type CockpitTab =
   | 'participants'
   | 'artifacts'
   | 'triggers'
-  | 'board'
   | 'settings';
 
 // Session info for display
 interface SessionInfo {
   name: string;
   code: string;
-}
-
-interface LobbyCheckInput {
-  id: string;
-  label: string;
-  status: 'ready' | 'warning' | 'error' | 'pending';
-  detail?: string;
 }
 
 // =============================================================================
@@ -279,52 +294,45 @@ function RunTab({
 function SessionHeader({
   session,
   status,
-  participantCount,
   sessionId,
-  onEnterDirectorMode,
-  isPending,
   onOpenChat,
   chatUnreadCount,
 }: {
-  session: SessionInfo | null;
+  session: SessionInfo;
   status: SessionCockpitState['status'];
-  participantCount: number;
   sessionId: string;
-  onEnterDirectorMode: () => void;
-  isPending: boolean;
   onOpenChat?: () => void;
   chatUnreadCount?: number;
 }) {
   const t = useTranslations('play.cockpit');
-  if (!session) return null;
 
   return (
-    <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="min-w-0">
+    <header className="flex items-center justify-between p-4 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      {/* Left: Game name */}
+      <div className="min-w-0 flex-1">
         <h1 className="text-xl font-semibold text-foreground truncate">
           {session.name}
         </h1>
-        <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-          <span className="font-mono tracking-wider">{session.code}</span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            <UserGroupIcon className="h-4 w-4" />
-            {participantCount} {t('header.participants')}
-          </span>
-          {status === 'active' && (
-            <Badge variant="success" size="sm">
-              ● {t('status.live')}
-            </Badge>
-          )}
-          {status === 'paused' && (
-            <Badge variant="warning" size="sm">
-              ⏸ {t('status.paused')}
-            </Badge>
-          )}
-        </div>
       </div>
       
+      {/* Right: Status badge, chat, toolbelt */}
       <div className="flex items-center gap-2">
+        {status === 'lobby' && (
+          <Badge variant="secondary" size="sm">
+            {t('status.lobby')}
+          </Badge>
+        )}
+        {status === 'active' && (
+          <Badge variant="success" size="sm">
+            ● {t('status.live')}
+          </Badge>
+        )}
+        {status === 'paused' && (
+          <Badge variant="warning" size="sm">
+            ⏸ {t('status.paused')}
+          </Badge>
+        )}
+        
         {onOpenChat && (
           <Button
             onClick={onOpenChat}
@@ -345,30 +353,143 @@ function SessionHeader({
         <Toolbelt
           sessionId={sessionId}
           role="host"
-          buttonLabel={t('header.toolbeltLabel')}
+          buttonIcon={<WrenchScrewdriverIcon className="h-4 w-4" />}
         />
-
-        {status === 'lobby' && (
-          <Button
-            onClick={onEnterDirectorMode}
-            disabled={isPending}
-            size="lg"
-          >
-            <PlayIcon className="h-5 w-5 mr-2" />
-            {t('startSession')}
-          </Button>
-        )}
-        {(status === 'active' || status === 'paused') && (
-          <Button
-            onClick={onEnterDirectorMode}
-            variant="outline"
-          >
-            <ChevronRightIcon className="h-5 w-5 mr-1" />
-            {t('actions.directorMode')}
-          </Button>
-        )}
       </div>
     </header>
+  );
+}
+
+function estimateTotalMinutes(steps: SessionCockpitState['steps']): number | null {
+  const minutes = steps
+    .map((s) => (typeof s.durationMinutes === 'number' ? s.durationMinutes : null))
+    .filter((m): m is number => typeof m === 'number')
+    .reduce((acc, m) => acc + m, 0);
+
+  if (!Number.isFinite(minutes) || minutes <= 0) return null;
+  return minutes;
+}
+
+function SessionSummaryCard({
+  sessionCode,
+  participantCount,
+  totalMinutes,
+  onOpenBoard,
+}: {
+  sessionCode: string;
+  participantCount: number;
+  totalMinutes: number | null;
+  onOpenBoard: () => void;
+}) {
+  const t = useTranslations('play.cockpit.lobbySummary');
+  const { success: toastSuccess } = useToast();
+  const [qrOpen, setQrOpen] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
+
+  // Generate QR code when modal opens
+  useEffect(() => {
+    if (!qrOpen || !sessionCode || sessionCode === '—') return;
+    let active = true;
+    const joinUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/participants/join?code=${encodeURIComponent(sessionCode)}`;
+    void toDataURL(joinUrl, { margin: 1, width: 256 })
+      .then((url: string) => {
+        if (active) setQrDataUrl(url);
+      })
+      .catch(() => {
+        if (active) setQrDataUrl(null);
+      });
+    return () => { active = false; };
+  }, [qrOpen, sessionCode]);
+
+  const handleCopyCode = useCallback(() => {
+    if (sessionCode && sessionCode !== '—') {
+      navigator.clipboard.writeText(sessionCode).then(() => {
+        toastSuccess(t('codeCopied'));
+      }).catch(() => {
+        // Silent fail
+      });
+    }
+  }, [sessionCode, toastSuccess, t]);
+
+  return (
+    <>
+      <Card className="p-4 sm:p-6 border-border/40">
+        {/* Session Code with Board and QR icons */}
+        <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
+          <div className="text-xs font-medium text-muted-foreground text-center mb-2">{t('sessionCodeLabel')}</div>
+          <div className="flex items-center justify-center gap-6">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onOpenBoard}
+              className="p-2"
+              title={t('openBoard')}
+            >
+              <PresentationChartBarIcon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
+              <span className="sr-only">{t('openBoard')}</span>
+            </Button>
+            
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              className="group relative text-3xl sm:text-4xl font-mono font-bold tracking-widest text-foreground hover:text-primary transition-colors cursor-pointer"
+              title={t('copyCode')}
+            >
+              {sessionCode}
+              <ClipboardIcon className="absolute -right-5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-0 group-hover:opacity-60 transition-opacity" />
+            </button>
+            
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setQrOpen(true)}
+              className="p-2"
+              title={t('showQrCode')}
+            >
+              <QrCodeIcon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
+              <span className="sr-only">{t('showQrCode')}</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Participants and Total Time */}
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
+            <div className="text-xs font-medium text-muted-foreground">{t('participantsLabel')}</div>
+            <div className="mt-1 text-xl font-semibold text-foreground">{participantCount}</div>
+          </div>
+          <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
+            <div className="text-xs font-medium text-muted-foreground">{t('totalTimeLabel')}</div>
+            <div className="mt-1 text-xl font-semibold text-foreground">
+              {totalMinutes ? t('minutes', { minutes: totalMinutes }) : t('unknown')}
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* QR Code Modal */}
+      <Dialog open={qrOpen} onOpenChange={setQrOpen}>
+        <DialogContent className="max-w-xs sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-center">{t('qrTitle')}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4">
+            {qrDataUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element -- data URL, no optimization benefit from next/image */
+              <img src={qrDataUrl} alt="QR Code" className="rounded-lg" />
+            ) : (
+              <div className="h-64 w-64 flex items-center justify-center bg-muted rounded-lg">
+                <span className="text-muted-foreground">{t('generatingQr')}</span>
+              </div>
+            )}
+            <div className="text-center">
+              <div className="text-2xl font-mono font-bold tracking-widest">{sessionCode}</div>
+              <div className="text-sm text-muted-foreground mt-1">{t('qrDescription')}</div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -377,162 +498,177 @@ interface PreflightState {
   items: ChecklistItem[];
 }
 
-function ReadinessIndicator({
+/**
+ * LobbyPreflightCard - Unified checklist and start button component
+ * 
+ * Shows all preflight checks with their status, and includes the "Start Session" 
+ * button. When requirements aren't met, the button is grayed but still clickable,
+ * triggering a confirmation dialog.
+ */
+function LobbyPreflightCard({
   preflight,
-  onShowChecklist,
+  onShowFullChecklist,
+  onStartSession,
+  isStarting,
 }: {
   preflight: PreflightState;
-  onShowChecklist: () => void;
+  onShowFullChecklist: () => void;
+  onStartSession: () => void;
+  isStarting: boolean;
 }) {
   const t = useTranslations('play.cockpit.preflight');
   const { ready, items } = preflight;
-  const pendingCount = items.filter((i: ChecklistItem) => i.status === 'pending').length;
-  const errorCount = items.filter((i: ChecklistItem) => i.status === 'error').length;
-  const warningCount = items.filter((i: ChecklistItem) => i.status === 'warning').length;
-  
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+  const visibleItems = items.slice(0, 6);
+  const remaining = Math.max(0, items.length - visibleItems.length);
+
+  const errorCount = items.filter((i) => i.status === 'error').length;
+  const warningCount = items.filter((i) => i.status === 'warning').length;
+  const pendingCount = items.filter((i) => i.status === 'pending').length;
+  const readyCount = items.filter((i) => i.status === 'ready').length;
+
+  const iconFor = (status: ChecklistItem['status']) => {
+    switch (status) {
+      case 'ready':
+        return <CheckCircleIcon className="h-5 w-5 text-green-600 shrink-0" />;
+      case 'warning':
+        return <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 shrink-0" />;
+      case 'error':
+        return <XCircleIcon className="h-5 w-5 text-destructive shrink-0" />;
+      case 'pending':
+      default:
+        return <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />;
+    }
+  };
+
+  const handleStartClick = () => {
+    if (ready) {
+      onStartSession();
+    } else {
+      setShowConfirmDialog(true);
+    }
+  };
+
+  const handleConfirmStart = () => {
+    setShowConfirmDialog(false);
+    onStartSession();
+  };
+
   return (
-    <Card
-      className={cn(
-        'p-4 cursor-pointer transition-colors hover:bg-muted/50',
-        ready 
-          ? 'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950/20' 
-          : errorCount > 0 
-            ? 'border-destructive/50 bg-destructive/10' 
-            : 'border-amber-300 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/20'
-      )}
-      onClick={onShowChecklist}
-    >
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {ready ? (
-            <CheckCircleIcon className="h-6 w-6 text-green-600" />
+    <>
+      <Card className="p-4">
+        {/* Header with title and summary */}
+        <div className="mb-4">
+          <div className="text-base font-semibold text-foreground">{t('title')}</div>
+          <div className="text-sm text-muted-foreground">
+            {ready 
+              ? t('allChecksOk')
+              : `${readyCount} ${t('readyLabel')}, ${pendingCount + warningCount + errorCount} ${t('remainingLabel')}`
+            }
+          </div>
+        </div>
+
+        {/* Checklist items */}
+        <div className="space-y-2 mb-4">
+          {visibleItems.map((item) => (
+            <div 
+              key={item.id} 
+              className={cn(
+                "flex items-start gap-3 rounded-lg border px-3 py-2 transition-colors",
+                item.status === 'ready' 
+                  ? 'bg-green-50/50 border-green-200 dark:bg-green-950/20 dark:border-green-900'
+                  : item.status === 'error'
+                    ? 'bg-destructive/5 border-destructive/30'
+                    : item.status === 'warning'
+                      ? 'bg-amber-50/50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-900'
+                      : 'bg-muted/20 border-border'
+              )}
+            >
+              {iconFor(item.status)}
+              <div className="min-w-0 flex-1">
+                <div className="text-sm font-medium text-foreground">{item.label}</div>
+                {item.detail && (
+                  <div className="text-xs text-muted-foreground line-clamp-1">{item.detail}</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {remaining > 0 && (
+          <div className="mb-4">
+            <Button variant="ghost" size="sm" onClick={onShowFullChecklist} className="px-2 text-xs">
+              {t('showAll', { count: remaining })}
+            </Button>
+          </div>
+        )}
+
+        {/* Start Session Button */}
+        <Button
+          onClick={handleStartClick}
+          disabled={isStarting}
+          className={cn(
+            "w-full h-12 text-base font-medium transition-all",
+            ready
+              ? "bg-green-600 hover:bg-green-700 text-white"
+              : "bg-muted hover:bg-muted/80 text-muted-foreground border border-border"
+          )}
+        >
+          {isStarting ? (
+            <span className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              {t('starting')}
+            </span>
           ) : (
-            <ClipboardDocumentCheckIcon className="h-6 w-6 text-amber-600" />
+            <span className="flex items-center gap-2">
+              <PlayIcon className="h-5 w-5" />
+              {t('startSession')}
+            </span>
           )}
-          <div>
-            <div className="font-medium text-foreground">
-              {ready ? t('readyToStart') : t('preparingSession')}
-            </div>
-            <div className="text-sm text-muted-foreground">
-              {ready 
-                ? t('allChecksOk')
-                : `${pendingCount} ${t('pendingLabel')}${warningCount > 0 ? `, ${warningCount} ${t('warningsLabel')}` : ''}${errorCount > 0 ? `, ${errorCount} ${t('errorsLabel')}` : ''}`
-              }
-            </div>
-          </div>
-        </div>
-        <ChevronRightIcon className="h-5 w-5 text-muted-foreground" />
-      </div>
-    </Card>
-  );
-}
-
-function ParticipantWithRoleRow({
-  participant,
-  roles,
-  onAssignRole,
-  onUnassignRole,
-  onKick,
-  onApprove,
-  onMarkNext,
-  isDisabled,
-}: {
-  participant: CockpitParticipant;
-  roles: SessionRole[];
-  onAssignRole: (participantId: string, roleId: string | null) => void;
-  onUnassignRole: (participantId: string) => void;
-  onKick: (participantId: string, displayName?: string) => void;
-  onApprove?: (participantId: string, displayName?: string) => void;
-  onMarkNext: (participantId: string) => void;
-  isDisabled: boolean;
-}) {
-  const t = useTranslations('play.cockpit.participants');
-  const currentRole = roles.find((r) => r.id === participant.assignedRoleId);
-
-  // Map status to connection state
-  const isConnected = participant.status === 'active' || participant.status === 'joined';
-
-  return (
-    <div className="flex items-center justify-between p-3 border rounded-lg bg-card">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-          {participant.displayName?.charAt(0)?.toUpperCase() ?? '?'}
-        </div>
-        <div className="min-w-0">
-          <div className="font-medium text-foreground truncate">
-            {participant.displayName ?? t('anonymous')}
-          </div>
-          {participant.isNextStarter && (
-            <Badge variant="outline" className="mt-1 w-fit text-[10px]">
-              {t('nextTurn')}
-            </Badge>
-          )}
-          <div className="text-xs text-muted-foreground flex items-center gap-1">
-            {isConnected ? (
-              <span className="text-green-600">● {t('online')}</span>
-            ) : (
-              <span className="text-muted-foreground">○ {t('offline')}</span>
-            )}
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-2">
-        {participant.status === 'idle' && onApprove && (
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => onApprove(participant.id, participant.displayName)}
-            disabled={isDisabled}
-            className="px-2"
-          >
-            {t('approve')}
-          </Button>
-        )}
-        {currentRole ? (
-          <Badge
-            variant="secondary"
-            className="cursor-pointer"
-            onClick={() => !isDisabled && onUnassignRole(participant.id)}
-          >
-            {currentRole.name}
-            <span className="ml-1 opacity-60">×</span>
-          </Badge>
-        ) : (
-          <select
-            className="text-sm border rounded-lg px-2 py-1 bg-background"
-            value=""
-            onChange={(e) => e.target.value && onAssignRole(participant.id, e.target.value)}
-            disabled={isDisabled}
-          >
-            <option value="">{t('assignRole')}</option>
-            {roles.map((role) => (
-              <option key={role.id} value={role.id}>
-                {role.name}
-              </option>
-            ))}
-          </select>
-        )}
-        <Button
-          variant={participant.isNextStarter ? 'primary' : 'outline'}
-          size="sm"
-          onClick={() => onMarkNext(participant.id)}
-          disabled={isDisabled}
-          className="px-2"
-        >
-          <FlagIcon className="h-4 w-4" />
         </Button>
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => onKick(participant.id, participant.displayName)}
-          disabled={isDisabled}
-          className="px-2"
-        >
-          <UserMinusIcon className="h-4 w-4" />
-        </Button>
-      </div>
-    </div>
+
+        {!ready && (
+          <p className="text-xs text-muted-foreground text-center mt-2">
+            {errorCount > 0 
+              ? t('hasErrors', { count: errorCount })
+              : warningCount > 0 
+                ? t('hasWarnings', { count: warningCount })
+                : t('hasPending', { count: pendingCount })
+            }
+          </p>
+        )}
+      </Card>
+
+      {/* Confirmation Dialog for starting without requirements met */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmStart.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('confirmStart.description')}
+              <ul className="mt-3 space-y-1">
+                {items
+                  .filter((i) => i.status !== 'ready')
+                  .slice(0, 5)
+                  .map((item) => (
+                    <li key={item.id} className="flex items-center gap-2 text-sm">
+                      {iconFor(item.status)}
+                      <span>{item.label}</span>
+                    </li>
+                  ))}
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmStart.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmStart}>
+              {t('confirmStart.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
 
@@ -542,9 +678,9 @@ function ParticipantsTab({
   onAssignRole,
   onUnassignRole,
   onSnapshotRoles,
-  onKickParticipant,
-  onApproveParticipant,
-  onMarkNext,
+  onKickParticipant: _onKickParticipant,
+  onApproveParticipant: _onApproveParticipant,
+  onMarkNext: _onMarkNext,
   isReadOnly,
   isLoading,
 }: {
@@ -562,117 +698,364 @@ function ParticipantsTab({
   const t = useTranslations('play.cockpit.roles');
   const tParticipants = useTranslations('play.cockpit.participants');
   const tHostSession = useTranslations('play.hostSession.roles');
+  
+  // State
+  const [expandedRoleId, setExpandedRoleId] = useState<string | null>(null);
+  const [allSecretsUnlocked, setAllSecretsUnlocked] = useState(false);
+  const [assigningRandomly, setAssigningRandomly] = useState(false);
+  
+  // Computed values
   const connectedCount = participants.filter((p) => p.status === 'active' || p.status === 'joined').length;
   const assignedCount = participants.filter((p) => p.assignedRoleId).length;
+  const unassignedParticipants = participants.filter((p) => !p.assignedRoleId);
   
-  // Calculate role distribution
-  const roleDistribution = roles.map((role) => {
-    const assigned = participants.filter((p) => p.assignedRoleId === role.id).length;
-    const min = (role as { min_count?: number }).min_count ?? 0;
-    const max = (role as { max_count?: number | null }).max_count;
-    const maxLabel = max === null || max === undefined ? '+' : `-${max}`;
+  // Role data with assignments
+  const rolesWithAssignments = roles.map((role) => {
+    const assignedParticipants = participants.filter((p) => p.assignedRoleId === role.id);
+    const min = role.min_count ?? 0;
+    const max = role.max_count;
     return {
-      id: role.id,
-      name: role.name,
-      assigned,
+      ...role,
+      assignedParticipants,
       min,
       max,
-      maxLabel,
-      isSatisfied: assigned >= min,
+      isSatisfied: assignedParticipants.length >= min,
+      isFull: max !== null && max !== undefined && assignedParticipants.length >= max,
     };
   });
 
-  const allMinsSatisfied = roleDistribution.every((r) => r.isSatisfied);
-  const unassignedParticipants = participants.filter((p) => !p.assignedRoleId);
+  const allMinsSatisfied = rolesWithAssignments.every((r) => r.isSatisfied);
+  const hasSecretContent = roles.some(r => r.private_instructions || r.private_hints);
+
+  // Random assignment handler
+  const handleRandomAssign = () => {
+    if (unassignedParticipants.length === 0 || isReadOnly) return;
+    setAssigningRandomly(true);
+    
+    // Simple random assignment logic - assign each unassigned participant to a random available role
+    const shuffled = [...unassignedParticipants].sort(() => Math.random() - 0.5);
+    for (const participant of shuffled) {
+      const availableRoles = rolesWithAssignments.filter(r => !r.isFull);
+      if (availableRoles.length === 0) break;
+      const randomRole = availableRoles[Math.floor(Math.random() * availableRoles.length)];
+      onAssignRole(participant.id, randomRole.id);
+    }
+    
+    setAssigningRandomly(false);
+  };
+
+  // Toggle all secrets
+  const toggleAllSecrets = () => {
+    setAllSecretsUnlocked(prev => !prev);
+  };
+
+  // No roles state
+  if (roles.length === 0) {
+    return (
+      <Card className="p-6 text-center space-y-3">
+        <UserGroupIcon className="h-12 w-12 mx-auto opacity-30" />
+        <h3 className="text-base font-semibold text-foreground">{t('noRolesCopied')}</h3>
+        <p className="text-sm text-muted-foreground">
+          {t('copyRolesDescription')}
+        </p>
+        <Button
+          size="sm"
+          onClick={onSnapshotRoles}
+          disabled={!onSnapshotRoles || isReadOnly || isLoading}
+        >
+          {tHostSession('copyFromGame')}
+        </Button>
+      </Card>
+    );
+  }
 
   return (
-    <div className="space-y-6">
-      {roles.length === 0 && (
-        <Card className="p-6 text-center space-y-3">
-          <h3 className="text-base font-semibold text-foreground">{t('noRolesCopied')}</h3>
-          <p className="text-sm text-muted-foreground">
-            {t('copyRolesDescription')}
-          </p>
-          <Button
-            size="sm"
-            onClick={onSnapshotRoles}
-            disabled={!onSnapshotRoles || isReadOnly || isLoading}
-          >
-            {tHostSession('copyFromGame')}
-          </Button>
-        </Card>
-      )}
-      {/* Role summary section */}
-      {roles.length > 0 && (
-        <Card className="p-4 border-l-4 border-l-primary">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-foreground">{t('roleDistribution')}</h4>
-            {allMinsSatisfied ? (
-              <Badge variant="success" size="sm">✓ {t('allMinsSatisfied')}</Badge>
-            ) : (
-              <Badge variant="warning" size="sm">⚠ {t('minsNotSatisfied')}</Badge>
-            )}
+    <div className="space-y-4">
+      {/* Quick Actions Bar */}
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/30 rounded-lg">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm font-medium text-foreground">
+            {connectedCount} online • {assignedCount}/{participants.length} {t('assigned')}
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-            {roleDistribution.map((role) => (
-              <div
-                key={role.id}
-                className={cn(
-                  'flex items-center justify-between p-2 rounded-lg text-sm',
-                  role.isSatisfied ? 'bg-muted/50' : 'bg-warning/10 border border-warning/30'
-                )}
+          {!allMinsSatisfied && (
+            <div className="text-xs text-warning flex items-center gap-1 mt-0.5">
+              <ExclamationTriangleIcon className="h-3.5 w-3.5" />
+              {t('minsNotSatisfied')}
+            </div>
+          )}
+        </div>
+        <div className="flex gap-2">
+          {unassignedParticipants.length > 0 && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleRandomAssign}
+              disabled={isReadOnly || assigningRandomly}
+              className="gap-1.5"
+            >
+              <BoltIcon className="h-4 w-4" />
+              <span className="hidden sm:inline">{t('randomAssign')}</span>
+              <span className="sm:hidden">🎲</span>
+            </Button>
+          )}
+          {hasSecretContent && (
+            <Button
+              variant={allSecretsUnlocked ? 'outline' : 'secondary'}
+              size="sm"
+              onClick={toggleAllSecrets}
+              className="gap-1.5"
+            >
+              {allSecretsUnlocked ? (
+                <>
+                  <LockClosedIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t('lockAllSecrets')}</span>
+                </>
+              ) : (
+                <>
+                  <LockOpenIcon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{t('unlockAllSecrets')}</span>
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Participants Overview - Show unassigned first */}
+      {unassignedParticipants.length > 0 && (
+        <Card className="p-3 border-dashed border-border/50 bg-muted/10">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-muted-foreground">
+              {t('unassignedParticipants')} ({unassignedParticipants.length})
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {unassignedParticipants.map((p) => (
+              <div 
+                key={p.id}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 text-sm"
               >
-                <span className="font-medium truncate">{role.name}</span>
-                <span className={cn(
-                  'ml-2 whitespace-nowrap',
-                  role.isSatisfied ? 'text-muted-foreground' : 'text-warning font-medium'
-                )}>
-                  {role.assigned}/{role.min}{role.maxLabel}
-                </span>
+                <span className="font-medium">{p.displayName || tParticipants('anonymous')}</span>
+                {(p.status === 'active' || p.status === 'joined') && (
+                  <span className="text-green-500 text-xs">●</span>
+                )}
+                <select
+                  className="text-xs border-0 bg-transparent p-0 pr-4 -mr-2 cursor-pointer"
+                  value=""
+                  onChange={(e) => e.target.value && onAssignRole(p.id, e.target.value)}
+                  disabled={isReadOnly}
+                >
+                  <option value="">→</option>
+                  {rolesWithAssignments.filter(r => !r.isFull).map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             ))}
           </div>
-          {unassignedParticipants.length > 0 && (
-            <div className="mt-3 text-sm text-muted-foreground">
-              {t('participantsMissingRole', { count: unassignedParticipants.length })}
-            </div>
-          )}
         </Card>
       )}
 
-      {/* Summary stats */}
-      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-        <span>{t('onlineCount', { online: connectedCount, total: participants.length })}</span>
-        <span>•</span>
-        <span>{t('rolesCount', { assigned: assignedCount, total: participants.length })}</span>
+      {/* Unified Role Cards with Participants */}
+      <div className="space-y-3">
+        {rolesWithAssignments.map((role) => {
+          const isExpanded = expandedRoleId === role.id;
+          const secretsVisible = allSecretsUnlocked;
+          const hasSecrets = Boolean(role.private_instructions || role.private_hints);
+
+          return (
+            <Card 
+              key={role.id} 
+              className={cn(
+                'overflow-hidden transition-all border-border/50',
+                !role.isSatisfied && 'border-warning/50 bg-warning/5'
+              )}
+            >
+              {/* Role Header - Always visible */}
+              <button
+                type="button"
+                onClick={() => setExpandedRoleId(isExpanded ? null : role.id)}
+                className="w-full p-3 flex items-center gap-3 hover:bg-muted/30 transition-colors text-left"
+              >
+                {/* Role icon/avatar */}
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                  style={{ 
+                    backgroundColor: role.color || '#6366f1', 
+                    color: 'white' 
+                  }}
+                >
+                  {role.icon || role.name.charAt(0).toUpperCase()}
+                </div>
+
+                {/* Role info */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium text-foreground truncate">{role.name}</span>
+                    {hasSecrets && (
+                      <LockClosedIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                    <span className={cn(
+                      !role.isSatisfied && 'text-warning font-medium'
+                    )}>
+                      {role.assignedParticipants.length}/{role.min}{role.max === null || role.max === undefined ? '+' : `-${role.max}`}
+                    </span>
+                    {role.assignedParticipants.length > 0 && (
+                      <>
+                        <span>•</span>
+                        <span className="truncate">
+                          {role.assignedParticipants.map(p => p.displayName || tParticipants('anonymous')).join(', ')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Assigned avatars (mobile-friendly) */}
+                <div className="flex -space-x-2 shrink-0">
+                  {role.assignedParticipants.slice(0, 3).map((p) => (
+                    <div
+                      key={p.id}
+                      className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium border-2 border-background"
+                      title={p.displayName || tParticipants('anonymous')}
+                    >
+                      {p.displayName?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  ))}
+                  {role.assignedParticipants.length > 3 && (
+                    <div className="w-7 h-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-medium border-2 border-background">
+                      +{role.assignedParticipants.length - 3}
+                    </div>
+                  )}
+                </div>
+
+                <ChevronRightIcon className={cn(
+                  'h-5 w-5 text-muted-foreground transition-transform shrink-0',
+                  isExpanded && 'rotate-90'
+                )} />
+              </button>
+
+              {/* Expanded Content */}
+              {isExpanded && (
+                <div className="border-t border-border/50 px-3 py-3 space-y-4 bg-muted/10">
+                  {/* Role Description */}
+                  {role.public_description && (
+                    <p className="text-sm text-muted-foreground">
+                      {role.public_description}
+                    </p>
+                  )}
+
+                  {/* Secret Instructions */}
+                  {hasSecrets && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                        {secretsVisible ? <LockOpenIcon className="h-3.5 w-3.5" /> : <LockClosedIcon className="h-3.5 w-3.5" />}
+                        {t('secretInstructions')}
+                      </div>
+                      {secretsVisible ? (
+                        <div className="space-y-2">
+                          {role.private_instructions && (
+                            <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                              <p className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
+                                {role.private_instructions}
+                              </p>
+                            </div>
+                          )}
+                          {role.private_hints && (
+                            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                              <div className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">💡 Tips</div>
+                              <p className="text-sm text-blue-900 dark:text-blue-100 whitespace-pre-wrap">
+                                {role.private_hints}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground italic flex items-center gap-2">
+                          <EyeSlashIcon className="h-4 w-4" />
+                          {t('secretInstructionsLocked')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Assigned Participants */}
+                  <div className="space-y-2">
+                    <span className="text-xs font-medium text-muted-foreground">
+                      {t('assignedToRole')} ({role.assignedParticipants.length})
+                    </span>
+                    {role.assignedParticipants.length > 0 ? (
+                      <div className="space-y-1.5">
+                        {role.assignedParticipants.map((p) => (
+                          <div 
+                            key={p.id} 
+                            className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border/30"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                                {p.displayName?.charAt(0)?.toUpperCase() || '?'}
+                              </div>
+                              <span className="text-sm font-medium truncate">
+                                {p.displayName || tParticipants('anonymous')}
+                              </span>
+                              {(p.status === 'active' || p.status === 'joined') && (
+                                <span className="text-green-500 text-xs">●</span>
+                              )}
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onUnassignRole(p.id)}
+                              disabled={isReadOnly}
+                              className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                            >
+                              <XCircleIcon className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-sm text-muted-foreground italic p-2">
+                        {t('noParticipantsAssigned')}
+                      </div>
+                    )}
+
+                    {/* Quick assign dropdown */}
+                    {unassignedParticipants.length > 0 && !role.isFull && (
+                      <select
+                        className="w-full text-sm border border-border/50 rounded-lg px-3 py-2 bg-muted/20 mt-2"
+                        value=""
+                        onChange={(e) => e.target.value && onAssignRole(e.target.value, role.id)}
+                        disabled={isReadOnly}
+                      >
+                        <option value="">{t('addParticipantToRole')}</option>
+                        {unassignedParticipants.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.displayName || tParticipants('anonymous')}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
+              )}
+            </Card>
+          );
+        })}
       </div>
-      
-      {/* Participant list */}
-      <div className="space-y-2">
-        {participants.length === 0 ? (
-          <Card className="p-8 text-center text-muted-foreground">
-            <UserGroupIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-            <p>{tParticipants('noParticipantsYet')}</p>
-            <p className="text-sm mt-2">
-              {tParticipants('shareCodeToInvite')}
-            </p>
-          </Card>
-        ) : (
-          participants.map((p) => (
-            <ParticipantWithRoleRow
-              key={p.id}
-              participant={p}
-              roles={roles}
-              onAssignRole={onAssignRole}
-              onUnassignRole={onUnassignRole}
-              onKick={onKickParticipant}
-              onApprove={onApproveParticipant}
-              onMarkNext={onMarkNext}
-              isDisabled={isReadOnly}
-            />
-          ))
-        )}
-      </div>
+
+      {/* No Participants State */}
+      {participants.length === 0 && (
+        <Card className="p-8 text-center text-muted-foreground">
+          <UserGroupIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <p>{tParticipants('noParticipantsYet')}</p>
+          <p className="text-sm mt-2">{tParticipants('shareCodeToInvite')}</p>
+        </Card>
+      )}
     </div>
   );
 }
@@ -748,6 +1131,7 @@ export function SessionCockpit({
 }: SessionCockpitProps) {
   const t = useTranslations('play.cockpit');
   const tTabs = useTranslations('play.cockpit.tabs');
+  const tStoryline = useTranslations('play.storyline');
   const sessionState = useSessionState({ sessionId });
   const {
     // State
@@ -771,6 +1155,7 @@ export function SessionCockpit({
     recentSignals,
     timeBankBalance,
     timeBankPaused,
+    safetyInfo,
     preflightItems,
     canStartDirectorMode,
     // Actions
@@ -865,18 +1250,31 @@ export function SessionCockpit({
 
   const [activeTab, setActiveTab] = useState<CockpitTab>('run');
   const [showChecklist, setShowChecklist] = useState(false);
+  const [showStoryline, setShowStoryline] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [roleDrafts, setRoleDrafts] = useState<Record<string, SessionRoleUpdate>>({});
   const [rolesSaving, setRolesSaving] = useState(false);
   const [rolesSaveError, setRolesSaveError] = useState<string | null>(null);
   
-  // Initialize director mode state based on session status
-  const [directorModeOpen, setDirectorModeOpen] = useState(
-    status === 'active' || status === 'paused'
-  );
+  // Director mode drawer state
+  const [directorModeOpen, setDirectorModeOpen] = useState(false);
 
-  // Session info for header
-  const session: SessionInfo | null = displayName ? { name: displayName, code: sessionCode } : null;
+  // Sync director mode with session status (open when live/paused, close when lobby)
+  useEffect(() => {
+    if (status === 'active' || status === 'paused') {
+      setDirectorModeOpen(true);
+    } else if (status === 'lobby' || status === 'draft') {
+      setDirectorModeOpen(false);
+    }
+  }, [status]);
+
+  // Session info for header (always show; fall back while loading)
+  const session: SessionInfo = {
+    name: displayName || t('session.fallbackName'),
+    code: sessionCode || '—',
+  };
+
+  const totalMinutes = useMemo(() => estimateTotalMinutes(steps), [steps]);
 
   const chatEnabled = status === 'active' || status === 'paused';
 
@@ -1062,153 +1460,6 @@ export function SessionCockpit({
     }));
   }, [sessionEvents, showEvents]);
 
-  const lobbyState = useMemo<LobbyState>(() => {
-    const mapStatus = (status: LobbyCheckInput['status']): ReadinessLevel => {
-      switch (status) {
-        case 'ready':
-          return 'ready';
-        case 'error':
-          return 'error';
-        case 'warning':
-        case 'pending':
-        default:
-          return 'warning';
-      }
-    };
-
-    const buildSection = (section: string, items: LobbyCheckInput[]): SectionReadiness => {
-      const checks = items.map((item) => ({
-        key: item.id,
-        label: item.label,
-        status: mapStatus(item.status),
-        message: item.detail,
-      }));
-
-      const level = checks.reduce<ReadinessLevel>((acc, check) => {
-        if (check.status === 'error') return 'error';
-        if (check.status === 'warning' && acc !== 'error') return 'warning';
-        if (check.status === 'ready' && acc === 'unknown') return 'ready';
-        return acc;
-      }, 'unknown');
-
-      return {
-        section,
-        level,
-        checks,
-      };
-    };
-
-    const participantsChecks: LobbyCheckInput[] = [
-      {
-        id: 'participants',
-        label: tTabs('participants'),
-        status: participants.length > 0 ? 'ready' : 'warning',
-        detail: participants.length > 0
-          ? t('participants.participantsConnected', { count: participants.length })
-          : t('participants.noParticipantsConnected'),
-      },
-    ];
-
-    const rolesChecks: LobbyCheckInput[] = preflightItems.filter((item) =>
-      ['roles-snapshot', 'roles-assigned', 'secrets'].includes(item.id)
-    );
-
-    const contentChecks: LobbyCheckInput[] = [
-      {
-        id: 'steps',
-        label: t('content.stepsAndPhases'),
-        status: steps.length > 0 ? 'ready' : 'error',
-        detail: steps.length > 0
-          ? t('content.stepsDefined', { count: steps.length })
-          : t('content.noStepsDefined'),
-      },
-      ...preflightItems.filter((item) => item.id === 'artifacts'),
-    ];
-
-    const triggerChecks: LobbyCheckInput[] = preflightItems.filter((item) => item.id === 'triggers');
-
-    const settingsChecks: LobbyCheckInput[] = [
-      {
-        id: 'session-code',
-        label: t('settings.sessionCode'),
-        status: sessionCode ? 'ready' : 'error',
-        detail: sessionCode ? t('settings.codeGenerated') : t('settings.noCodeGenerated'),
-      },
-    ];
-
-    const phaseMap = new Map<string, { id: string; title: string; steps: LobbyState['phases'][number]['steps'] }>();
-
-    phases.forEach((phase) => {
-      phaseMap.set(phase.id, {
-        id: phase.id,
-        title: phase.name,
-        steps: [],
-      });
-    });
-
-    const fallbackPhaseId = phases[0]?.id ?? 'phase-default';
-    const fallbackPhaseTitle = phases[0]?.name ?? t('steps.unnamedPhase');
-
-    steps.forEach((step) => {
-      const missingTitle = !step.title?.trim();
-      const missingDescription = !step.description?.trim();
-      const targetPhaseId = step.phaseId && phaseMap.has(step.phaseId) ? step.phaseId : fallbackPhaseId;
-      if (!phaseMap.has(targetPhaseId)) {
-        phaseMap.set(targetPhaseId, {
-          id: targetPhaseId,
-          title: fallbackPhaseTitle,
-          steps: [],
-        });
-      }
-
-      phaseMap.get(targetPhaseId)!.steps.push({
-        id: step.id,
-        title: step.title || t('steps.unnamedStep'),
-        type: 'activity',
-        isReady: !missingTitle && !missingDescription,
-        issues: [
-          ...(missingTitle ? [t('steps.missingTitle')] : []),
-          ...(missingDescription ? [t('steps.missingDescription')] : []),
-        ],
-      });
-    });
-
-    const lobbyPhases = Array.from(phaseMap.values());
-
-    return {
-      sessionId,
-      sessionName: displayName || t('session.fallbackName'),
-      sessionStatus: status === 'ended' ? 'completed' : status === 'active' || status === 'paused' ? 'active' : 'lobby',
-      participants: participants.map((participant) => ({
-        id: participant.id,
-        name: participant.displayName || t('participants.anonymous'),
-        roleId: participant.assignedRoleId,
-        isConnected: participant.status === 'active' || participant.status === 'joined',
-        joinedAt: new Date(participant.joinedAt),
-      })),
-      roles: sessionRoles.map((role) => ({
-        id: role.id,
-        name: role.name,
-        description: (role as { public_description?: string | null }).public_description ?? undefined,
-        color: role.color ?? undefined,
-        icon: role.icon ?? undefined,
-      })),
-      phases: lobbyPhases,
-      triggerCount: triggers.length,
-      settings: {
-        ...DEFAULT_SESSION_SETTINGS,
-        maxParticipants: Math.max(DEFAULT_SESSION_SETTINGS.maxParticipants, participants.length),
-      },
-      readiness: [
-        buildSection('participants', participantsChecks),
-        buildSection('roles', rolesChecks),
-        buildSection('content', contentChecks),
-        buildSection('triggers', triggerChecks),
-        buildSection('settings', settingsChecks),
-      ],
-    };
-  }, [sessionId, displayName, status, participants, sessionRoles, phases, steps, triggers, preflightItems, sessionCode, t, tTabs]);
-
   // Enter director mode
   const handleEnterDirectorMode = useCallback(async () => {
     if (status === 'lobby') {
@@ -1236,15 +1487,14 @@ export function SessionCockpit({
     };
   }, [canStartDirectorMode, preflightItems]);
 
-  // Tabs configuration
+  // Tabs configuration - icon-only tabs
   const tabs = [
-    { id: 'run', label: tTabs('run') },
-    { id: 'participants', label: tTabs('participants'), badge: participants.length },
-    { id: 'artifacts', label: tTabs('artifacts'), badge: artifacts.length },
-    { id: 'triggers', label: tTabs('triggers'), badge: triggers.filter((tr) => tr.status === 'armed').length || undefined },
-    { id: 'board', label: tTabs('board') },
-    { id: 'settings', label: tTabs('settings') },
-  ] as Array<{ id: CockpitTab; label: string; badge?: number }>;
+    { id: 'run', label: '', icon: <PlayIcon className="h-5 w-5" />, title: tTabs('run') },
+    { id: 'participants', label: '', icon: <UserGroupIcon className="h-5 w-5" />, title: tTabs('participants') },
+    { id: 'artifacts', label: '', icon: <DocumentTextIcon className="h-5 w-5" />, badge: artifacts.length, title: tTabs('artifacts') },
+    { id: 'triggers', label: '', icon: <BoltIcon className="h-5 w-5" />, badge: triggers.filter((tr) => tr.status === 'armed').length || undefined, title: tTabs('triggers') },
+    { id: 'settings', label: '', icon: <Cog6ToothIcon className="h-5 w-5" />, title: tTabs('settings') },
+  ] as Array<{ id: CockpitTab; label: string; icon?: ReactNode; badge?: number; title?: string }>;
 
   // Map status for drawer
   const drawerStatus: 'active' | 'paused' | 'ended' = 
@@ -1259,10 +1509,7 @@ export function SessionCockpit({
         <SessionHeader
           session={session}
           status={status}
-          participantCount={participants.length}
           sessionId={sessionId}
-          onEnterDirectorMode={handleEnterDirectorMode}
-          isPending={isLoading}
           onOpenChat={chatEnabled ? () => setChatOpen(true) : undefined}
           chatUnreadCount={chat.unreadCount}
         />
@@ -1280,12 +1527,19 @@ export function SessionCockpit({
             </Card>
           )}
           
-          {/* Readiness */}
-          {status === 'lobby' && (
-            <div className="mb-6">
-              <ReadinessIndicator
-                preflight={checklistData}
-                onShowChecklist={() => setShowChecklist(true)}
+          {/* Session Summary */}
+          {status !== 'ended' && (
+            <div className="mb-6 space-y-4">
+              <SessionSummaryCard
+                sessionCode={sessionCode || '—'}
+                participantCount={participants.length}
+                totalMinutes={totalMinutes}
+                onOpenBoard={() => {
+                  // Open board in new tab
+                  if (sessionCode) {
+                    window.open(`/board/${sessionCode}`, '_blank');
+                  }
+                }}
               />
             </div>
           )}
@@ -1300,39 +1554,59 @@ export function SessionCockpit({
           />
           
           <TabPanel id="run" activeTab={activeTab} className="space-y-6">
-            {status === 'lobby' && (
-              <LobbyHub
-                state={lobbyState}
-                onParticipantsClick={() => setActiveTab('participants')}
-                onRolesClick={() => setActiveTab('participants')}
-                onContentClick={() => setActiveTab('artifacts')}
-                onTriggersClick={() => setActiveTab('triggers')}
-                onSettingsClick={() => setActiveTab('settings')}
-                onStartSession={handleEnterDirectorMode}
-                isStarting={isLoading}
-              />
+            {(status === 'lobby' || status === 'draft') && (
+              <>
+                <LobbyPreflightCard
+                  preflight={checklistData}
+                  onShowFullChecklist={() => setShowChecklist(true)}
+                  onStartSession={handleEnterDirectorMode}
+                  isStarting={isLoading}
+                />
+
+                {/* Storyline button */}
+                {steps.length > 0 && (
+                  <Card className="p-4 border-border/40">
+                    <button
+                      type="button"
+                      onClick={() => setShowStoryline(true)}
+                      className="w-full flex items-center gap-3 text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors"
+                    >
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                        <BookOpenIcon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-foreground">{tStoryline('buttonLabel')}</div>
+                        <div className="text-sm text-muted-foreground">{tStoryline('buttonDescription')}</div>
+                      </div>
+                      <ChevronRightIcon className="h-5 w-5 text-muted-foreground shrink-0" />
+                    </button>
+                  </Card>
+                )}
+              </>
             )}
 
-            <RunTab
-              status={status}
-              startedAt={startedAt ?? null}
-              pausedAt={pausedAt ?? null}
-              endedAt={endedAt ?? null}
-              steps={steps}
-              phases={phases}
-              currentStepIndex={currentStepIndex}
-              currentPhaseIndex={currentPhaseIndex}
-              participants={participants}
-              triggers={triggers}
-              onStart={startSession}
-              onPause={pauseSession}
-              onResume={resumeSession}
-              onEnd={endSession}
-              onNextStep={nextStep}
-              onOpenArtifacts={() => setActiveTab('artifacts')}
-              onOpenTriggers={() => setActiveTab('triggers')}
-              lastSyncAt={lastSyncAt ?? null}
-            />
+            {status !== 'lobby' && status !== 'draft' && (
+              <RunTab
+                status={status}
+                startedAt={startedAt ?? null}
+                pausedAt={pausedAt ?? null}
+                endedAt={endedAt ?? null}
+                steps={steps}
+                phases={phases}
+                currentStepIndex={currentStepIndex}
+                currentPhaseIndex={currentPhaseIndex}
+                participants={participants}
+                triggers={triggers}
+                onStart={startSession}
+                onPause={pauseSession}
+                onResume={resumeSession}
+                onEnd={endSession}
+                onNextStep={nextStep}
+                onOpenArtifacts={() => setActiveTab('artifacts')}
+                onOpenTriggers={() => setActiveTab('triggers')}
+                lastSyncAt={lastSyncAt ?? null}
+              />
+            )}
 
             {children}
           </TabPanel>
@@ -1365,16 +1639,6 @@ export function SessionCockpit({
           
           <TabPanel id="triggers" activeTab={activeTab}>
             <TriggersTab triggers={triggers} />
-          </TabPanel>
-
-          <TabPanel id="board" activeTab={activeTab}>
-            <Card className="p-6 space-y-3">
-              <p className="text-sm font-semibold text-foreground">{t('board.title')}</p>
-              <p className="text-sm text-muted-foreground">{t('board.openInstruction')}</p>
-              <div className="rounded-md bg-muted/50 px-3 py-2 text-sm font-mono">
-                /board/{sessionCode}
-              </div>
-            </Card>
           </TabPanel>
 
           
@@ -1555,7 +1819,7 @@ export function SessionCockpit({
           onTimeBankDelta={applyTimeBankDelta}
         />
 
-        <SessionChatDrawer
+        <SessionChatModal
           open={chatOpen}
           onClose={() => setChatOpen(false)}
           role="host"
@@ -1563,6 +1827,10 @@ export function SessionCockpit({
           error={chat.error}
           sending={chat.sending}
           onSend={chat.send}
+          participants={participants.map(p => ({
+            id: p.id,
+            displayName: p.displayName || 'Anonym',
+          }))}
         />
 
         {/* Preflight Checklist Modal */}
@@ -1587,6 +1855,16 @@ export function SessionCockpit({
             </Card>
           </div>
         )}
+
+        {/* Storyline Modal */}
+        <StorylineModal
+          open={showStoryline}
+          onClose={() => setShowStoryline(false)}
+          title={displayName || tStoryline('title')}
+          steps={steps}
+          phases={phases}
+          safetyInfo={safetyInfo}
+        />
       </div>
     </SessionCockpitContext.Provider>
   );

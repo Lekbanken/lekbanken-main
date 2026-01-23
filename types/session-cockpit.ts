@@ -67,9 +67,23 @@ export interface SessionCockpitState {
   // Event Log
   eventLog: SessionEvent[];
   
+  // Safety & Inclusion (from game)
+  safetyInfo: SafetyInfo;
+  
   // Readiness (computed)
   preflightItems: PreflightItem[];
   canStartDirectorMode: boolean;
+}
+
+// =============================================================================
+// Safety & Inclusion Types
+// =============================================================================
+
+export interface SafetyInfo {
+  safetyNotes?: string;
+  accessibilityNotes?: string;
+  spaceRequirements?: string;
+  leaderTips?: string;
 }
 
 // =============================================================================

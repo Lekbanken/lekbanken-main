@@ -10,7 +10,7 @@ type SessionRow = {
   tenantName: string
   host: string
   participants: number
-  startedAt: string
+  startedAt: string | null
   status: 'active' | 'completed' | 'flagged'
 }
 
@@ -63,7 +63,7 @@ export async function GET(request: Request) {
         tenantName: (row as { tenant?: { name?: string | null } }).tenant?.name || 'Okänd',
         host: (row as { host_user_id?: string | null }).host_user_id || 'Okänd',
         participants: (row as { participant_count?: number | null }).participant_count ?? 0,
-        startedAt: (row as { started_at?: string | null }).started_at || '',
+        startedAt: (row as { started_at?: string | null }).started_at ?? null,
         status,
       }
     })

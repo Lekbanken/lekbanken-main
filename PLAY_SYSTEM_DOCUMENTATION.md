@@ -1662,7 +1662,11 @@ app/app/play/
 │       ├── page.tsx           # Sessionsdetalj
 │       └── client.tsx         # Host-kontroller
 ├── plan/                      # Lektionsplaner
-└── [gameId]/                  # Starta session för specifikt spel
+└── [gameId]/                  # Legacy start route (redirect → /app/games/[gameId])
+
+**Obs:** Session startas numera från spelsidan:
+- `/app/games/[gameId]` (Starta session-CTA skapar session + går till cockpit Lobby)
+- `/app/play/[gameId]` finns kvar som legacy och redirectar.
 ```
 
 ### 9.2 Participant-vyer (`app/participants/`)
@@ -1726,22 +1730,19 @@ app/board/
 1. Välj spel i /app/browse
          │
          ▼
-2. Klicka "Starta session"
+2. Klicka "Starta session" på spelsidan (/app/games/[gameId])
          │
          ▼
-3. Konfigurera session (namn, inställningar)
+3. Skapa session → cockpit öppnas i Lobby och visar sessionskod (t.ex. "H3K9QF")
          │
          ▼
-4. Få sessionskod (t.ex. "H3K9QF")
+4. Vänta på deltagare i /app/play/sessions/[id]
          │
          ▼
-5. Vänta på deltagare i /app/play/sessions/[id]
+5. Starta session (går från Lobby → Live)
          │
          ▼
-6. Starta session
-         │
-         ▼
-7. Kör genom faser/steg
+6. Kör genom faser/steg
          │
          ├─ Utlös triggers manuellt
          ├─ Hantera deltagare (kick/block)
@@ -1749,7 +1750,7 @@ app/board/
          └─ Kontrollera timer
          │
          ▼
-8. Avsluta session
+7. Avsluta session
 ```
 
 ### 10.2 Gå med som deltagare

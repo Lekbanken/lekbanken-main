@@ -92,7 +92,7 @@ export async function GET(
   let query = service
     .from('play_chat_messages')
     .select(
-      'id, session_id, visibility, message, anonymous, sender_participant_id, sender_user_id, sender_name, created_at'
+      'id, session_id, visibility, message, anonymous, sender_participant_id, sender_user_id, sender_name, recipient_participant_id, created_at'
     )
     .eq('session_id', sessionId)
     .order('created_at', { ascending: true });
@@ -116,8 +116,14 @@ export async function GET(
   const visible = (data ?? []).filter((row) => {
     if (viewer.type === 'host') return true;
     if (row.visibility === 'public') return true;
-    // Private-to-host: only sender sees their own
-    return row.sender_participant_id === viewer.participantId;
+    // Private messages: participant sees their own sent messages OR messages addressed to them
+    if (row.visibility === 'host') {
+      // Sent by this participant
+      if (row.sender_participant_id === viewer.participantId) return true;
+      // Addressed to this participant by host
+      if (row.recipient_participant_id === viewer.participantId) return true;
+    }
+    return false;
   });
 
   const messages = visible.map((row) => {
@@ -141,6 +147,9 @@ export async function GET(
       return row.sender_name;
     })();
 
+    // Include participantId for host to identify conversation threads
+    const participantId = row.sender_participant_id ?? row.recipient_participant_id ?? undefined;
+
     return {
       id: row.id as string,
       createdAt: row.created_at as string,
@@ -148,6 +157,7 @@ export async function GET(
       message: row.message as string,
       senderLabel,
       isMine,
+      participantId: participantId as string | undefined,
     };
   });
 
@@ -187,17 +197,33 @@ export async function POST(
 
   const anonymous = Boolean(bodyObj.anonymous);
 
+  // Create service client for database operations
+  const service = await createServiceRoleClient();
+
   // Enforce anonymity rules
   if (visibility === 'public' && anonymous) {
     return jsonError('Anonymous is only allowed for private messages to host', 400);
   }
 
-  // Enforce that host only sends public messages
-  if (viewer.type === 'host' && visibility !== 'public') {
-    return jsonError('Host can only send public messages', 400);
+  // Host can now send private messages to specific participants
+  if (viewer.type === 'host' && visibility === 'host') {
+    const recipientParticipantId = bodyObj.recipientParticipantId;
+    if (!recipientParticipantId || typeof recipientParticipantId !== 'string') {
+      return jsonError('Host must specify recipientParticipantId for private messages', 400);
+    }
+    
+    // Verify the participant exists
+    const { data: participant } = await service
+      .from('participants')
+      .select('id, display_name')
+      .eq('id', recipientParticipantId)
+      .eq('session_id', sessionId)
+      .single();
+      
+    if (!participant) {
+      return jsonError('Recipient participant not found', 404);
+    }
   }
-
-  const service = await createServiceRoleClient();
 
   const insert = {
     session_id: sessionId,
@@ -207,6 +233,9 @@ export async function POST(
     sender_participant_id: viewer.type === 'participant' ? viewer.participantId : null,
     sender_user_id: viewer.type === 'host' ? viewer.userId : null,
     sender_name: viewer.type === 'participant' ? viewer.participantName : 'Lekledare',
+    recipient_participant_id: viewer.type === 'host' && visibility === 'host' 
+      ? (bodyObj.recipientParticipantId as string) 
+      : null,
   };
 
   const { data, error } = await service

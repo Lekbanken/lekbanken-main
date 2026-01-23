@@ -154,23 +154,25 @@ app/app/play/
 ```
 [Authenticated User]
        │
-       ▼ Navigate to /app/play/[gameId]
+   ▼ Navigate to /app/games/[gameId]
 ┌──────────────────────┐
-│  PlayPage Component  │
-│  (localStorage state)│
+│  Game Detail Page     │
+│  (Start Session CTA)  │
 └──────────────────────┘
-       │ Fetches game instructions
+   │ Creates participant session
        ▼
 ┌──────────────────────┐
-│  API: /api/games/[id]│
+│  API: /api/play/sessions │
 └──────────────────────┘
-       │ Returns game data
+   │ Returns session id + code
        ▼
 ┌──────────────────────┐
-│  StepViewer          │
-│  (instruction display)│
+│  Host Cockpit         │
+│  /app/play/sessions/[id] │
 └──────────────────────┘
 ```
+
+Note: `/app/play/[gameId]` is a legacy route and now redirects to `/app/games/[gameId]`.
 
 **Critical Gap:** The current "Play" flow is a **single-user instruction viewer**, not a multi-participant session system.
 

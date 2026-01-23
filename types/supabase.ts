@@ -1,4 +1,4 @@
-export type Json =
+﻿export type Json =
   | string
   | number
   | boolean
@@ -7270,7 +7270,7 @@ export type Database = {
           secret_instructions_unlocked_by: string | null
           session_code: string
           settings: Json
-          started_at: string
+          started_at: string | null
           status: Database["public"]["Enums"]["participant_session_status"]
           tenant_id: string
           timer_state: Json | null
@@ -7297,7 +7297,7 @@ export type Database = {
           secret_instructions_unlocked_by?: string | null
           session_code: string
           settings?: Json
-          started_at?: string
+          started_at?: string | null
           status?: Database["public"]["Enums"]["participant_session_status"]
           tenant_id: string
           timer_state?: Json | null
@@ -7324,7 +7324,7 @@ export type Database = {
           secret_instructions_unlocked_by?: string | null
           session_code?: string
           settings?: Json
-          started_at?: string
+          started_at?: string | null
           status?: Database["public"]["Enums"]["participant_session_status"]
           tenant_id?: string
           timer_state?: Json | null
@@ -8068,6 +8068,7 @@ export type Database = {
           created_at: string
           id: string
           message: string
+          recipient_participant_id: string | null
           sender_name: string
           sender_participant_id: string | null
           sender_user_id: string | null
@@ -8079,6 +8080,7 @@ export type Database = {
           created_at?: string
           id?: string
           message: string
+          recipient_participant_id?: string | null
           sender_name: string
           sender_participant_id?: string | null
           sender_user_id?: string | null
@@ -8090,6 +8092,7 @@ export type Database = {
           created_at?: string
           id?: string
           message?: string
+          recipient_participant_id?: string | null
           sender_name?: string
           sender_participant_id?: string | null
           sender_user_id?: string | null
@@ -8097,6 +8100,13 @@ export type Database = {
           visibility?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "play_chat_messages_recipient_participant_id_fkey"
+            columns: ["recipient_participant_id"]
+            isOneToOne: false
+            referencedRelation: "participants"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "play_chat_messages_sender_participant_id_fkey"
             columns: ["sender_participant_id"]

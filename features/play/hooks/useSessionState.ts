@@ -69,6 +69,7 @@ const DEFAULT_STATE: SessionCockpitState = {
   secretsUnlockedAt: null,
   secretsRevealedBy: {},
   eventLog: [],
+  safetyInfo: {},
   preflightItems: [],
   canStartDirectorMode: false,
 };
@@ -243,13 +244,27 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       const session = (data as { session?: Record<string, unknown> }).session ?? {};
       const currentStepIndex = session.current_step_index as number | undefined;
       const currentPhaseIndex = session.current_phase_index as number | undefined;
-      const status = session.status as SessionCockpitState['status'] | undefined;
+      const rawStatus = session.status as string | undefined;
+      const startedAt = session.started_at as string | null | undefined;
+
+      // Resolve status using the same lobby-vs-active logic as loadSession
+      // to avoid flickering between 'lobby' and 'active' during polling
+      const resolvedStatus: SessionCockpitState['status'] | undefined = (() => {
+        if (!rawStatus) return undefined;
+        if (rawStatus === 'paused') return 'paused';
+        if (rawStatus === 'locked') return 'locked';
+        if (rawStatus === 'ended' || rawStatus === 'archived' || rawStatus === 'cancelled') return 'ended';
+        if (rawStatus === 'active' && !startedAt) return 'lobby';
+        if (rawStatus === 'active' && startedAt) return 'active';
+        return 'lobby';
+      })();
 
       setState((prev) => ({
         ...prev,
         currentStepIndex: Number.isFinite(currentStepIndex) ? (currentStepIndex as number) : prev.currentStepIndex,
         currentPhaseIndex: Number.isFinite(currentPhaseIndex) ? (currentPhaseIndex as number) : prev.currentPhaseIndex,
-        status: status ?? prev.status,
+        status: resolvedStatus ?? prev.status,
+        startedAt: startedAt ?? prev.startedAt,
         lastSyncAt: new Date().toISOString(),
       }));
     } catch (err) {
@@ -282,10 +297,20 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         phaseType: 'round' as const,
       }));
 
+      // Extract safety/inclusion info
+      const safetyData = data.safety as Record<string, unknown> | undefined;
+      const safetyInfo = {
+        safetyNotes: (safetyData?.safetyNotes as string | undefined) ?? undefined,
+        accessibilityNotes: (safetyData?.accessibilityNotes as string | undefined) ?? undefined,
+        spaceRequirements: (safetyData?.spaceRequirements as string | undefined) ?? undefined,
+        leaderTips: (safetyData?.leaderTips as string | undefined) ?? undefined,
+      };
+
       setState((prev) => ({
         ...prev,
         steps,
         phases,
+        safetyInfo,
       }));
     } catch (err) {
       console.warn('Failed to load game content:', err);

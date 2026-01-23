@@ -25,7 +25,7 @@ import {
 } from '@/components/play';
 import { ParticipantPlayMode } from './ParticipantPlayMode';
 import { ActiveSessionShell } from './ActiveSessionShell';
-import { SessionChatDrawer } from '@/features/play/components/SessionChatDrawer';
+import { SessionChatModal } from '@/features/play/components/SessionChatModal';
 import { useSessionChat } from '@/features/play/hooks/useSessionChat';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -444,7 +444,7 @@ export function ParticipantSessionWithPlayClient({ code }: ParticipantSessionWit
             showRole={true}
           />
 
-          <SessionChatDrawer
+          <SessionChatModal
             open={chatOpen}
             onClose={() => setChatOpen(false)}
             role="participant"

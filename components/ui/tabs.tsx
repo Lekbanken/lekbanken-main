@@ -10,6 +10,7 @@ interface Tab {
   icon?: ReactNode
   badge?: string | number
   disabled?: boolean
+  title?: string
 }
 
 interface TabsProps {
@@ -31,20 +32,20 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'default', size = 'm
 
   const variantClasses = {
     default: {
-      container: 'flex gap-1 rounded-lg bg-muted p-1',
-      tab: 'rounded-md',
+      container: 'flex gap-1 rounded-lg bg-muted p-1 overflow-x-auto overflow-y-hidden',
+      tab: 'rounded-md flex-shrink-0',
       active: 'bg-card text-foreground shadow-sm',
       inactive: 'text-muted-foreground hover:text-foreground',
     },
     pills: {
-      container: 'flex gap-2',
-      tab: 'rounded-full',
+      container: 'flex gap-2 overflow-x-auto overflow-y-hidden',
+      tab: 'rounded-full flex-shrink-0',
       active: 'bg-primary text-white',
       inactive: 'text-muted-foreground hover:bg-muted hover:text-foreground',
     },
     underline: {
-      container: 'flex gap-6 border-b border-border',
-      tab: '-mb-px border-b-2',
+      container: 'flex gap-4 sm:gap-6 border-b border-border/40 overflow-x-auto overflow-y-hidden',
+      tab: '-mb-px border-b-2 flex-shrink-0',
       active: 'border-primary text-foreground',
       inactive: 'border-transparent text-muted-foreground hover:border-muted hover:text-foreground',
     },
@@ -53,7 +54,7 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'default', size = 'm
   const styles = variantClasses[variant]
 
   return (
-    <div className={cn(styles.container, className)} role="tablist">
+    <div className={cn(styles.container, 'justify-center', className)} role="tablist">
       {tabs.map((tab) => {
         const isActive = tab.id === activeTab
 
@@ -64,6 +65,8 @@ export function Tabs({ tabs, activeTab, onChange, variant = 'default', size = 'm
             role="tab"
             aria-selected={isActive}
             aria-controls={`tabpanel-${tab.id}`}
+            aria-label={tab.title ?? tab.label}
+            title={tab.title}
             disabled={tab.disabled}
             onClick={() => onChange(tab.id)}
             className={cn(

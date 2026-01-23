@@ -9175,9 +9175,11 @@
       "header": {
         "participants": "deltakere",
         "openChat": "Åpne chat",
+        "openSettings": "Åpne innstillinger",
         "toolbeltLabel": "Verktøykasse"
       },
       "status": {
+        "lobby": "Lobby",
         "paused": "PAUSET",
         "live": "LIVE"
       },
@@ -9224,9 +9226,38 @@
         "readyToStart": "Klar til å starte",
         "preparingSession": "Forbereder økt",
         "allChecksOk": "Alle kontroller godkjent",
+        "openChecklist": "Åpne sjekklisten",
+        "showAll": "Vis alle (+{count})",
         "pendingLabel": "ventende",
         "warningsLabel": "advarsler",
-        "errorsLabel": "feil"
+        "errorsLabel": "feil",
+        "readyLabel": "klare",
+        "remainingLabel": "gjenstår",
+        "startSession": "Start økt",
+        "starting": "Starter...",
+        "hasErrors": "{count} feil må løses",
+        "hasWarnings": "{count} advarsler",
+        "hasPending": "{count} gjenstår å forberede",
+        "confirmStart": {
+          "title": "Kravene er ikke oppfylt",
+          "description": "Ikke alle forberedelser er fullført. Vil du likevel starte økten?",
+          "cancel": "Avbryt",
+          "confirm": "Start likevel"
+        }
+      },
+      "lobbySummary": {
+        "sessionCodeLabel": "ØKTKODE",
+        "participantsLabel": "Deltakere",
+        "totalTimeLabel": "Total tid",
+        "minutes": "{minutes} min",
+        "unknown": "—",
+        "openBoard": "Åpne board",
+        "showQrCode": "Vis QR-kode",
+        "copyCode": "Kopier kode",
+        "codeCopied": "Kode kopiert!",
+        "qrTitle": "Bli med i økten",
+        "qrDescription": "Skann for å koble til",
+        "generatingQr": "Laster..."
       },
       "run": {
         "banner": {
@@ -9310,7 +9341,25 @@
         "allMinsSatisfied": "Alle minimumskrav oppfylt",
         "minsNotSatisfied": "Minimumskrav ikke oppfylt",
         "onlineCount": "{online} av {total} online",
-        "rolesCount": "{assigned} av {total} har roller"
+        "rolesCount": "{assigned} av {total} har roller",
+        "participantsMissingRole": "{count} deltakere mangler rolle",
+        "viewRoleDetails": "Vis rolledetaljer",
+        "roleInfo": "Rolleinformasjon",
+        "secretInstructions": "Hemmelige instruksjoner",
+        "secretInstructionsLocked": "Hemmelige instruksjoner er låst",
+        "unlockSecretInstructions": "Lås opp hemmelige instruksjoner",
+        "lockSecretInstructions": "Lås hemmelige instruksjoner",
+        "noSecretInstructions": "Ingen hemmelige instruksjoner for denne rollen",
+        "roleDescription": "Rollebeskrivelse",
+        "noRoleDescription": "Ingen beskrivelse tilgjengelig",
+        "assigned": "tildelt",
+        "randomAssign": "Tildel tilfeldig",
+        "lockAllSecrets": "Lås alle",
+        "unlockAllSecrets": "Lås opp alle",
+        "assignedToRole": "Tildelte",
+        "noParticipantsAssigned": "Ingen deltakere tildelt denne rollen",
+        "addParticipantToRole": "Legg til deltaker...",
+        "unassignedParticipants": "Ikke-tildelte deltakere"
       },
       "participants": {
         "noParticipantsYet": "Ingen deltakere har koblet til ennå.",
@@ -10140,6 +10189,30 @@
       "placeholders": {
         "public": "Skriv til alle…",
         "private": "Skriv privat til verten…"
+      },
+      "send": "Send"
+    },
+    "sessionChatModal": {
+      "title": "Chat",
+      "tabs": {
+        "wall": "Vegg",
+        "private": "Privat"
+      },
+      "toAll": "Til alle",
+      "toHost": "Privat til vert",
+      "noMessages": "Ingen meldinger ennå.",
+      "noPrivateMessages": "Ingen private meldinger ennå.",
+      "allConversations": "Alle",
+      "you": "Du",
+      "private": "Privat",
+      "anonymous": "Anonym",
+      "sendAnonymously": "Send anonymt",
+      "selectParticipantToReply": "Velg en deltaker ovenfor for å svare privat",
+      "replyingTo": "Svarer til {name}",
+      "participant": "deltaker",
+      "placeholders": {
+        "public": "Skriv til alle…",
+        "private": "Skriv privat…"
       },
       "send": "Send"
     },
@@ -11609,6 +11682,44 @@
       "totalDuration": "~{minutes} min totalt",
       "scriptsCount": "{count} scripts",
       "noStepsYet": "Ingen steg i dette spillet ennå.",
+      "close": "Lukk"
+    },
+    "storyline": {
+      "title": "Storyline",
+      "buttonLabel": "Vis storyline",
+      "buttonDescription": "Gå gjennom spillets flyt og forbered deg",
+      "tabIntro": "Intro",
+      "tabPhases": "Faser",
+      "tabSteps": "Steg",
+      "noPhasesAvailable": "Ingen faser definert for dette spillet.",
+      "noStepsAvailable": "Ingen steg definert for dette spillet.",
+      "stepsCount": "{count} steg",
+      "phasesCount": "{count} faser",
+      "totalDuration": "~{minutes} min",
+      "introductionLabel": "Introduksjon",
+      "safetyAndInclusion": "Sikkerhet & Inkludering",
+      "safetyNotes": "Sikkerhetsnotater",
+      "accessibilityNotes": "Tilgjengelighetsnotater",
+      "spaceRequirements": "Plasskrav",
+      "leaderTips": "Ledertips",
+      "swipeHint": "Sveip eller bruk pilene for å navigere",
+      "stepOf": "Steg {current} av {total}",
+      "phaseOf": "Fase {current} av {total}",
+      "pageOf": "Side {current} av {total}",
+      "unnamedStep": "Uten navn",
+      "unnamedPhase": "Uten navn",
+      "noPhaseDescription": "Ingen beskrivelse for denne fasen.",
+      "phaseType": {
+        "intro": "Intro",
+        "round": "Runde",
+        "finale": "Finale",
+        "break": "Pause"
+      },
+      "sayToGroup": "SI TIL GRUPPEN",
+      "participantSees": "DELTAKER SER",
+      "boardMessage": "BOARD-MELDING",
+      "previous": "Forrige",
+      "next": "Neste",
       "close": "Lukk"
     },
     "timeBankEditor": {

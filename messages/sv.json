@@ -9849,9 +9849,11 @@
       "header": {
         "participants": "deltagare",
         "openChat": "Öppna chatt",
+        "openSettings": "Öppna inställningar",
         "toolbeltLabel": "Verktygslåda"
       },
       "status": {
+        "lobby": "Lobby",
         "paused": "PAUSAD",
         "live": "LIVE"
       },
@@ -9898,9 +9900,38 @@
         "readyToStart": "Redo att starta",
         "preparingSession": "Förbereda session",
         "allChecksOk": "Alla kontroller godkända",
+        "openChecklist": "Öppna checklistan",
+        "showAll": "Visa alla (+{count})",
         "pendingLabel": "väntande",
         "warningsLabel": "varningar",
-        "errorsLabel": "fel"
+        "errorsLabel": "fel",
+        "readyLabel": "klara",
+        "remainingLabel": "kvar",
+        "startSession": "Starta session",
+        "starting": "Startar...",
+        "hasErrors": "{count} fel måste åtgärdas",
+        "hasWarnings": "{count} varningar",
+        "hasPending": "{count} kvar att förbereda",
+        "confirmStart": {
+          "title": "Kraven är inte uppfyllda",
+          "description": "Alla förberedelser är inte klara. Vill du ändå starta sessionen?",
+          "cancel": "Avbryt",
+          "confirm": "Starta ändå"
+        }
+      },
+      "lobbySummary": {
+        "sessionCodeLabel": "SESSIONSKOD",
+        "participantsLabel": "Deltagare",
+        "totalTimeLabel": "Total tid",
+        "minutes": "{minutes} min",
+        "unknown": "—",
+        "openBoard": "Öppna board",
+        "showQrCode": "Visa QR-kod",
+        "copyCode": "Kopiera kod",
+        "codeCopied": "Kod kopierad!",
+        "qrTitle": "Gå med i sessionen",
+        "qrDescription": "Skanna för att ansluta",
+        "generatingQr": "Laddar..."
       },
       "run": {
         "banner": {
@@ -9984,7 +10015,25 @@
         "allMinsSatisfied": "Alla minimikrav uppfyllda",
         "minsNotSatisfied": "Minimikrav ej uppfyllda",
         "onlineCount": "{online} av {total} online",
-        "rolesCount": "{assigned} av {total} har roller"
+        "rolesCount": "{assigned} av {total} har roller",
+        "participantsMissingRole": "{count} deltagare saknar roll",
+        "viewRoleDetails": "Visa rolldetaljer",
+        "roleInfo": "Rollinformation",
+        "secretInstructions": "Hemliga instruktioner",
+        "secretInstructionsLocked": "Hemliga instruktioner är låsta",
+        "unlockSecretInstructions": "Lås upp hemliga instruktioner",
+        "lockSecretInstructions": "Lås hemliga instruktioner",
+        "noSecretInstructions": "Inga hemliga instruktioner för denna roll",
+        "roleDescription": "Rollbeskrivning",
+        "noRoleDescription": "Ingen beskrivning tillgänglig",
+        "assigned": "tilldelade",
+        "randomAssign": "Tilldela slumpmässigt",
+        "lockAllSecrets": "Lås alla",
+        "unlockAllSecrets": "Lås upp alla",
+        "assignedToRole": "Tilldelade",
+        "noParticipantsAssigned": "Inga deltagare tilldelade denna roll",
+        "addParticipantToRole": "Lägg till deltagare...",
+        "unassignedParticipants": "Otilldelade deltagare"
       },
       "participants": {
         "noParticipantsYet": "Inga deltagare har anslutit ännu.",
@@ -10791,6 +10840,30 @@
       "placeholders": {
         "public": "Skriv till alla…",
         "private": "Skriv privat till lekledaren…"
+      },
+      "send": "Skicka"
+    },
+    "sessionChatModal": {
+      "title": "Chatt",
+      "tabs": {
+        "wall": "Vägg",
+        "private": "Privat"
+      },
+      "toAll": "Till alla",
+      "toHost": "Privat till lekledare",
+      "noMessages": "Inga meddelanden ännu.",
+      "noPrivateMessages": "Inga privata meddelanden ännu.",
+      "allConversations": "Alla",
+      "you": "Du",
+      "private": "Privat",
+      "anonymous": "Anonym",
+      "sendAnonymously": "Skicka anonymt",
+      "selectParticipantToReply": "Välj en deltagare ovan för att svara privat",
+      "replyingTo": "Svarar till {name}",
+      "participant": "deltagare",
+      "placeholders": {
+        "public": "Skriv till alla…",
+        "private": "Skriv privat…"
       },
       "send": "Skicka"
     },
@@ -12408,6 +12481,44 @@
       "totalDuration": "~{minutes} min totalt",
       "scriptsCount": "{count} scripts",
       "noStepsYet": "Inga steg i detta spel ännu.",
+      "close": "Stäng"
+    },
+    "storyline": {
+      "title": "Storyline",
+      "buttonLabel": "Visa storyline",
+      "buttonDescription": "Gå igenom spelets flöde och förbered dig",
+      "tabIntro": "Intro",
+      "tabPhases": "Faser",
+      "tabSteps": "Steg",
+      "noPhasesAvailable": "Inga faser definierade för detta spel.",
+      "noStepsAvailable": "Inga steg definierade för detta spel.",
+      "stepsCount": "{count} steg",
+      "phasesCount": "{count} faser",
+      "totalDuration": "~{minutes} min",
+      "introductionLabel": "Introduktion",
+      "safetyAndInclusion": "Säkerhet & Inkludering",
+      "safetyNotes": "Säkerhetsnoteringar",
+      "accessibilityNotes": "Tillgänglighetsnoteringar",
+      "spaceRequirements": "Utrymmeskrav",
+      "leaderTips": "Ledartips",
+      "swipeHint": "Svep eller använd pilarna för att navigera",
+      "stepOf": "Steg {current} av {total}",
+      "phaseOf": "Fas {current} av {total}",
+      "pageOf": "Sida {current} av {total}",
+      "unnamedStep": "Namnlöst steg",
+      "unnamedPhase": "Namnlös fas",
+      "noPhaseDescription": "Ingen beskrivning för denna fas.",
+      "phaseType": {
+        "intro": "Intro",
+        "round": "Runda",
+        "finale": "Final",
+        "break": "Paus"
+      },
+      "sayToGroup": "SÄGA TILL GRUPPEN",
+      "participantSees": "DELTAGAREN SER",
+      "boardMessage": "BOARD-MEDDELANDE",
+      "previous": "Föregående",
+      "next": "Nästa",
       "close": "Stäng"
     },
     "timeBankEditor": {

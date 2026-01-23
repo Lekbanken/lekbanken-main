@@ -8,7 +8,7 @@ type SessionDetail = {
   tenantName: string;
   host: string;
   participants: number;
-  startedAt: string;
+  startedAt: string | null;
   status: 'active' | 'completed' | 'flagged';
   notes?: string | null;
 };
@@ -65,7 +65,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ sessionId:
       tenantName: r.tenant?.name ?? 'Okänd',
       host: r.host_user_id ?? 'Okänd',
       participants: r.participant_count ?? 0,
-      startedAt: r.started_at ?? r.created_at ?? new Date().toISOString(),
+      startedAt: r.started_at ?? null,
       status: normalizedStatus,
       notes: (r as { description?: string | null }).description ?? null,
     };

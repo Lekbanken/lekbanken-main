@@ -22,7 +22,7 @@ type SessionDetail = {
   tenantName: string;
   host: string;
   participants: number;
-  startedAt: string;
+  startedAt: string | null;
   status: Status;
   notes?: string;
 };
@@ -158,7 +158,9 @@ export function SessionDetailPage({ sessionId }: Props) {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground">{tDetail('organisation')}: {session.tenantName}</p>
-          <p className="text-sm text-muted-foreground">{tDetail('start')}: {new Date(session.startedAt).toLocaleString()}</p>
+          <p className="text-sm text-muted-foreground">
+            {tDetail('start')}: {session.startedAt ? new Date(session.startedAt).toLocaleString() : '—'}
+          </p>
           <p className="text-sm text-muted-foreground">{tDetail('notes')}: {session.notes || tDetail('noNotes')}</p>
         </CardContent>
       </Card>

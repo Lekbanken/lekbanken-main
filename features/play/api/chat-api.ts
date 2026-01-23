@@ -5,6 +5,8 @@ export interface ChatMessage {
   message: string;
   senderLabel: string;
   isMine: boolean;
+  /** For private messages: the participant this message is to/from (for host view) */
+  participantId?: string;
 }
 
 export async function getSessionChatMessages(
@@ -32,7 +34,13 @@ export async function getSessionChatMessages(
 
 export async function sendSessionChatMessage(
   sessionId: string,
-  payload: { message: string; visibility: 'public' | 'host'; anonymous?: boolean },
+  payload: { 
+    message: string; 
+    visibility: 'public' | 'host'; 
+    anonymous?: boolean;
+    /** For host replying to a specific participant */
+    recipientParticipantId?: string;
+  },
   options?: { participantToken?: string }
 ): Promise<void> {
   const res = await fetch(`/api/play/sessions/${sessionId}/chat`, {

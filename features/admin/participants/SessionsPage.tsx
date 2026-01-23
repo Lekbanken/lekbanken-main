@@ -25,7 +25,7 @@ type SessionRow = {
   tenantName: string;
   host: string;
   participants: number;
-  startedAt: string;
+  startedAt: string | null;
   status: SessionStatus;
 };
 
@@ -190,7 +190,10 @@ export function SessionsPage({ tenantId, onSelectSession }: Props) {
                   </Badge>
                 ),
               },
-              { header: t('columns.startedAt'), accessor: (row) => new Date(row.startedAt).toLocaleString() },
+              {
+                header: t('columns.startedAt'),
+                accessor: (row) => (row.startedAt ? new Date(row.startedAt).toLocaleString() : '—'),
+              },
             ]}
           />
         </CardContent>

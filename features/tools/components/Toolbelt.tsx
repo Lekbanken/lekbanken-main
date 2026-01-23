@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui/button';
@@ -38,12 +39,14 @@ export function Toolbelt({
   role,
   participantToken,
   buttonLabel,
+  buttonIcon,
   buttonClassName,
 }: {
   sessionId: string;
   role: ToolRole;
   participantToken?: string;
   buttonLabel?: string;
+  buttonIcon?: ReactNode;
   buttonClassName?: string;
 }) {
   const t = useTranslations('tools.toolbelt');
@@ -82,11 +85,26 @@ export function Toolbelt({
     }
   };
 
+  // Don't render until client-side to avoid hydration mismatch with Radix dialog IDs
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) {
+    return (
+      <Button type="button" variant="outline" size="sm" className={buttonClassName} disabled>
+        {buttonIcon}
+        {buttonLabel ?? (buttonIcon ? null : t('button'))}
+        {buttonIcon && !buttonLabel && <span className="sr-only">{t('button')}</span>}
+      </Button>
+    );
+  }
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetTrigger asChild>
         <Button type="button" variant="outline" size="sm" className={buttonClassName} disabled={tools === null}>
-          {buttonLabel ?? t('button')}
+          {buttonIcon}
+          {buttonLabel ?? (buttonIcon ? null : t('button'))}
+          {buttonIcon && !buttonLabel && <span className="sr-only">{t('button')}</span>}
         </Button>
       </SheetTrigger>
       <SheetContent

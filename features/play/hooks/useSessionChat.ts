@@ -168,7 +168,12 @@ export function useSessionChat({
     setUnreadCount(unread);
   }, [enabled, isOpen, messages, latestTimestamp, persistLastReadAt]);
 
-  const send = useCallback(async (payload: { message: string; visibility: 'public' | 'host'; anonymous?: boolean }) => {
+  const send = useCallback(async (payload: { 
+    message: string; 
+    visibility: 'public' | 'host'; 
+    anonymous?: boolean;
+    recipientParticipantId?: string;
+  }) => {
     if (!enabled) return;
     if (role === 'participant' && !participantToken) return;
 
@@ -182,8 +187,9 @@ export function useSessionChat({
         sessionId,
         {
           message: trimmed,
-          visibility: role === 'host' ? 'public' : payload.visibility,
+          visibility: payload.visibility,
           anonymous: role === 'participant' && payload.visibility === 'host' ? Boolean(payload.anonymous) : false,
+          recipientParticipantId: role === 'host' && payload.visibility === 'host' ? payload.recipientParticipantId : undefined,
         },
         { participantToken: role === 'participant' ? participantToken : undefined }
       );

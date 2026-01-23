@@ -8955,9 +8955,11 @@
       "header": {
         "participants": "participants",
         "openChat": "Open chat",
+        "openSettings": "Open settings",
         "toolbeltLabel": "Toolbelt"
       },
       "status": {
+        "lobby": "Lobby",
         "paused": "PAUSED",
         "live": "LIVE"
       },
@@ -9004,9 +9006,38 @@
         "readyToStart": "Ready to start",
         "preparingSession": "Preparing session",
         "allChecksOk": "All checks passed",
+        "openChecklist": "Open checklist",
+        "showAll": "Show all (+{count})",
         "pendingLabel": "pending",
         "warningsLabel": "warnings",
-        "errorsLabel": "errors"
+        "errorsLabel": "errors",
+        "readyLabel": "ready",
+        "remainingLabel": "remaining",
+        "startSession": "Start Session",
+        "starting": "Starting...",
+        "hasErrors": "{count} errors must be resolved",
+        "hasWarnings": "{count} warnings",
+        "hasPending": "{count} items to prepare",
+        "confirmStart": {
+          "title": "Requirements not met",
+          "description": "Not all preparations are complete. Do you want to start the session anyway?",
+          "cancel": "Cancel",
+          "confirm": "Start anyway"
+        }
+      },
+      "lobbySummary": {
+        "sessionCodeLabel": "SESSION CODE",
+        "participantsLabel": "Participants",
+        "totalTimeLabel": "Total time",
+        "minutes": "{minutes} min",
+        "unknown": "—",
+        "openBoard": "Open board",
+        "showQrCode": "Show QR code",
+        "copyCode": "Copy code",
+        "codeCopied": "Code copied!",
+        "qrTitle": "Join session",
+        "qrDescription": "Scan to connect",
+        "generatingQr": "Loading..."
       },
       "run": {
         "banner": {
@@ -9090,7 +9121,25 @@
         "allMinsSatisfied": "All minimum requirements met",
         "minsNotSatisfied": "Minimum requirements not met",
         "onlineCount": "{online} of {total} online",
-        "rolesCount": "{assigned} of {total} have roles"
+        "rolesCount": "{assigned} of {total} have roles",
+        "participantsMissingRole": "{count} participants missing role",
+        "viewRoleDetails": "View role details",
+        "roleInfo": "Role information",
+        "secretInstructions": "Secret instructions",
+        "secretInstructionsLocked": "Secret instructions are locked",
+        "unlockSecretInstructions": "Unlock secret instructions",
+        "lockSecretInstructions": "Lock secret instructions",
+        "noSecretInstructions": "No secret instructions for this role",
+        "roleDescription": "Role description",
+        "noRoleDescription": "No description available",
+        "assigned": "assigned",
+        "randomAssign": "Assign randomly",
+        "lockAllSecrets": "Lock all",
+        "unlockAllSecrets": "Unlock all",
+        "assignedToRole": "Assigned",
+        "noParticipantsAssigned": "No participants assigned to this role",
+        "addParticipantToRole": "Add participant...",
+        "unassignedParticipants": "Unassigned participants"
       },
       "participants": {
         "noParticipantsYet": "No participants have connected yet.",
@@ -9896,6 +9945,30 @@
       "placeholders": {
         "public": "Write to everyone…",
         "private": "Write privately to host…"
+      },
+      "send": "Send"
+    },
+    "sessionChatModal": {
+      "title": "Chat",
+      "tabs": {
+        "wall": "Wall",
+        "private": "Private"
+      },
+      "toAll": "To everyone",
+      "toHost": "Private to host",
+      "noMessages": "No messages yet.",
+      "noPrivateMessages": "No private messages yet.",
+      "allConversations": "All",
+      "you": "You",
+      "private": "Private",
+      "anonymous": "Anonymous",
+      "sendAnonymously": "Send anonymously",
+      "selectParticipantToReply": "Select a participant above to reply privately",
+      "replyingTo": "Replying to {name}",
+      "participant": "participant",
+      "placeholders": {
+        "public": "Write to everyone…",
+        "private": "Write privately…"
       },
       "send": "Send"
     },
@@ -11463,6 +11536,44 @@
       "totalDuration": "~{minutes} min total",
       "scriptsCount": "{count} scripts",
       "noStepsYet": "No steps in this game yet.",
+      "close": "Close"
+    },
+    "storyline": {
+      "title": "Storyline",
+      "buttonLabel": "View storyline",
+      "buttonDescription": "Walk through the game flow and prepare",
+      "tabIntro": "Intro",
+      "tabPhases": "Phases",
+      "tabSteps": "Steps",
+      "noPhasesAvailable": "No phases defined for this game.",
+      "noStepsAvailable": "No steps defined for this game.",
+      "stepsCount": "{count} steps",
+      "phasesCount": "{count} phases",
+      "totalDuration": "~{minutes} min",
+      "introductionLabel": "Introduction",
+      "safetyAndInclusion": "Safety & Inclusion",
+      "safetyNotes": "Safety Notes",
+      "accessibilityNotes": "Accessibility Notes",
+      "spaceRequirements": "Space Requirements",
+      "leaderTips": "Leader Tips",
+      "swipeHint": "Swipe or use arrows to navigate",
+      "stepOf": "Step {current} of {total}",
+      "phaseOf": "Phase {current} of {total}",
+      "pageOf": "Page {current} of {total}",
+      "unnamedStep": "Unnamed step",
+      "unnamedPhase": "Unnamed phase",
+      "noPhaseDescription": "No description for this phase.",
+      "phaseType": {
+        "intro": "Intro",
+        "round": "Round",
+        "finale": "Finale",
+        "break": "Break"
+      },
+      "sayToGroup": "SAY TO THE GROUP",
+      "participantSees": "PARTICIPANT SEES",
+      "boardMessage": "BOARD MESSAGE",
+      "previous": "Previous",
+      "next": "Next",
       "close": "Close"
     },
     "timeBankEditor": {

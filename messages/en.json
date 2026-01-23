@@ -136,7 +136,7 @@
             "seatReleased": "Seat released.",
             "releaseFailed": "Could not release seat."
           }
-        }
+        },
       "unsavedChanges": "You have unsaved changes. Do you want to leave this page?",
       "loadingError": "Could not load data",
       "saveError": "Could not save",
@@ -726,6 +726,12 @@
       }
     },
     "licenses": {
+        "confirmReset": {
+          "title": "Reset trigger?",
+          "description": "This will reset the trigger “{name}” so it can be fired again.",
+          "cancel": "Cancel",
+          "confirm": "Reset"
+        },
       "legacy": {
         "pageTitle": "Licenses",
         "pageDescription": "Overview of customer licenses, status and usage.",
@@ -8401,6 +8407,10 @@
       "banner": {
         "waiting": "Waiting to start. Participants can join with the code.",
         "paused": "Paused. We'll be back shortly.",
+      "meta": {
+        "manual": "Manual trigger",
+        "automatic": "Automatic trigger"
+      },
         "locked": "Session is locked.",
         "ended": "Session has ended.",
         "degraded": "Connection is unstable. Showing latest known state.",
@@ -8409,6 +8419,12 @@
       "lobby": {
         "sessionCodeLabel": "Session code",
         "joinHint": "Scan the QR code or enter the code to join.",
+      "confirmFire": {
+        "title": "Fire trigger now?",
+        "description": "This will fire the trigger “{name}” immediately and may affect everyone in the session.",
+        "cancel": "Cancel",
+        "confirm": "Fire"
+      },
         "qrAlt": "QR code",
         "qrLoading": "Loading QR code..."
       },
@@ -9942,10 +9958,17 @@
       "previous": "Previous",
       "next": "Next",
       "complete": "Complete",
-      "exitPlay": "Exit play mode"
+      "exitPlay": "Exit play mode",
+      "confirmComplete": {
+        "title": "End session?",
+        "description": "This will end the session for everyone.",
+        "cancel": "Cancel",
+        "confirm": "Yes, end session"
+      }
     },
     "facilitatedView": {
       "phaseProgress": "Phase {current} of {total}: {phaseName}",
+      "stepProgress": "Step {current} of {total}: {stepName}",
       "tabs": {
         "play": "Play",
         "content": "Content",
@@ -9967,7 +9990,13 @@
       "previous": "Previous",
       "next": "Next",
       "exitPlay": "Exit",
-      "endSession": "End session"
+      "endSession": "End session",
+      "confirmEndSession": {
+        "title": "End session?",
+        "description": "This will end the session for everyone.",
+        "cancel": "Cancel",
+        "confirm": "Yes, end session"
+      }
     },
     "timerControl": {
       "inputs": {
@@ -9982,7 +10011,13 @@
       "startTimer": "Start timer",
       "resume": "Resume",
       "pause": "Pause",
-      "reset": "Reset"
+      "reset": "Reset",
+      "confirmReset": {
+        "title": "Reset timer?",
+        "description": "This will reset the timer for everyone in the session.",
+        "cancel": "Cancel",
+        "confirm": "Reset"
+      }
     },
     "stepPhaseNavigation": {
       "steps": {
@@ -10024,6 +10059,12 @@
       "pause": "Pause",
       "resume": "Resume",
       "resetToStart": "Reset to start",
+      "confirmReset": {
+        "title": "Reset time bank?",
+        "description": "This will reset the time bank to its initial state for everyone.",
+        "cancel": "Cancel",
+        "confirm": "Reset"
+      },
       "format": {
         "deltaLabel": "{time}"
       },
@@ -10363,7 +10404,34 @@
       "unlockSession": "Unlock session",
       "endSession": "End session",
       "resetSession": "Reset session",
-      "deletePermanently": "Delete permanently"
+      "deletePermanently": "Delete permanently",
+      "statusLabel": "Status",
+      "status": {
+        "active": "Active",
+        "paused": "Paused",
+        "locked": "Locked",
+        "ended": "Ended",
+        "archived": "Archived",
+        "unknown": "Unknown"
+      },
+      "confirmEnd": {
+        "title": "End session?",
+        "description": "This will stop the session for everyone. You can’t resume after ending.",
+        "cancel": "Cancel",
+        "confirm": "End session"
+      },
+      "confirmReset": {
+        "title": "Reset session?",
+        "description": "This will reset the session state. Participants may need to rejoin.",
+        "cancel": "Cancel",
+        "confirm": "Reset"
+      },
+      "confirmDelete": {
+        "title": "Delete session permanently?",
+        "description": "This cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      }
     },
     "cipherDecoder": {
       "encodedMessage": "Encoded message ({type})",
@@ -10432,9 +10500,29 @@
         "then": "Then"
       },
       "actions": {
-        "more": "{count} more"
+        "more": "{count} more",
+        "edit": "Edit",
+        "fire": "Fire",
+        "reset": "Reset",
+        "enable": "Enable",
+        "disable": "Disable",
+        "delete": "Delete"
       },
       "onceOnly": "Once only",
+      "delaySeconds": "{seconds}s delay",
+      "firedTimes": "Fired {count}×",
+      "confirmDisable": {
+        "title": "Disable trigger?",
+        "description": "Disable \"{name}\" so it won’t fire automatically.",
+        "cancel": "Cancel",
+        "confirm": "Disable"
+      },
+      "confirmDelete": {
+        "title": "Delete trigger?",
+        "description": "Delete \"{name}\" permanently. This cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete"
+      },
       "status": {
         "armed": "Armed",
         "fired": "Fired",
@@ -10482,7 +10570,19 @@
       "setPosition": "Set position",
       "approve": "Approve",
       "remove": "Remove",
-      "block": "Block"
+      "block": "Block",
+      "confirmKick": {
+        "title": "Remove participant?",
+        "description": "Remove {name} from this session? They can rejoin if they have the code.",
+        "cancel": "Cancel",
+        "confirm": "Remove"
+      },
+      "confirmBlock": {
+        "title": "Block participant?",
+        "description": "Block {name} from rejoining this session.",
+        "cancel": "Cancel",
+        "confirm": "Block"
+      }
     },
     "sessionFeedback": {
       "reconnecting": "Reconnecting",

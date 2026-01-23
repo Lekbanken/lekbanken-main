@@ -1149,6 +1149,12 @@
       }
     },
     "licenses": {
+        "confirmReset": {
+          "title": "Återställ trigger?",
+          "description": "Detta återställer triggern “{name}” så att den kan aktiveras igen.",
+          "cancel": "Avbryt",
+          "confirm": "Återställ"
+        },
       "legacy": {
         "pageTitle": "Licenser",
         "pageDescription": "Översikt över kunders licenser, status och användning.",
@@ -9299,6 +9305,10 @@
       "banner": {
         "waiting": "Väntar på start. Deltagare kan ansluta med koden.",
         "paused": "Pausad. Återkommer strax.",
+      "meta": {
+        "manual": "Manuell trigger",
+        "automatic": "Automatisk trigger"
+      },
         "locked": "Sessionen är låst.",
         "ended": "Sessionen är avslutad.",
         "degraded": "Uppkopplingen är instabil. Visar senaste kända läge.",
@@ -9307,6 +9317,12 @@
       "lobby": {
         "sessionCodeLabel": "Sessionskod",
         "joinHint": "Skanna QR-koden eller skriv in koden för att gå med.",
+      "confirmFire": {
+        "title": "Aktivera trigger nu?",
+        "description": "Detta aktiverar triggern “{name}” direkt och kan påverka alla i sessionen.",
+        "cancel": "Avbryt",
+        "confirm": "Aktivera"
+      },
         "qrAlt": "QR-kod",
         "qrLoading": "QR-kod laddas..."
       },
@@ -10837,10 +10853,17 @@
       "previous": "Föregående",
       "next": "Nästa",
       "complete": "Slutför",
-      "exitPlay": "Avsluta spelläge"
+      "exitPlay": "Avsluta spelläge",
+      "confirmComplete": {
+        "title": "Avsluta sessionen?",
+        "description": "Detta avslutar sessionen för alla deltagare.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, avsluta session"
+      }
     },
     "facilitatedView": {
       "phaseProgress": "Fas {current} av {total}: {phaseName}",
+      "stepProgress": "Steg {current} av {total}: {stepName}",
       "tabs": {
         "play": "Spela",
         "content": "Innehåll",
@@ -10862,7 +10885,13 @@
       "previous": "Föregående",
       "next": "Nästa",
       "exitPlay": "Avsluta",
-      "endSession": "Avsluta session"
+      "endSession": "Avsluta session",
+      "confirmEndSession": {
+        "title": "Avsluta sessionen?",
+        "description": "Detta avslutar sessionen för alla deltagare.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, avsluta session"
+      }
     },
     "timerControl": {
       "inputs": {
@@ -10877,7 +10906,13 @@
       "startTimer": "Starta timer",
       "resume": "Fortsätt",
       "pause": "Pausa",
-      "reset": "Återställ"
+      "reset": "Återställ",
+      "confirmReset": {
+        "title": "Återställ timer?",
+        "description": "Detta återställer timern för alla i sessionen.",
+        "cancel": "Avbryt",
+        "confirm": "Återställ"
+      }
     },
     "stepPhaseNavigation": {
       "steps": {
@@ -10919,6 +10954,12 @@
       "pause": "Pausa",
       "resume": "Återuppta",
       "resetToStart": "Återställ till start",
+      "confirmReset": {
+        "title": "Återställ tidsbank?",
+        "description": "Detta återställer tidsbanken till sitt startläge för alla.",
+        "cancel": "Avbryt",
+        "confirm": "Återställ"
+      },
       "format": {
         "deltaLabel": "{time}"
       },
@@ -11260,7 +11301,34 @@
       "unlockSession": "Lås upp session",
       "endSession": "Avsluta session",
       "resetSession": "Återställ session",
-      "deletePermanently": "Ta bort permanent"
+      "deletePermanently": "Ta bort permanent",
+      "statusLabel": "Status",
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pausad",
+        "locked": "Låst",
+        "ended": "Avslutad",
+        "archived": "Arkiverad",
+        "unknown": "Okänd"
+      },
+      "confirmEnd": {
+        "title": "Avsluta sessionen?",
+        "description": "Detta stoppar sessionen för alla. Du kan inte återuppta efter att den avslutats.",
+        "cancel": "Avbryt",
+        "confirm": "Avsluta session"
+      },
+      "confirmReset": {
+        "title": "Återställ sessionen?",
+        "description": "Detta återställer sessionens tillstånd. Deltagare kan behöva ansluta igen.",
+        "cancel": "Avbryt",
+        "confirm": "Återställ"
+      },
+      "confirmDelete": {
+        "title": "Ta bort sessionen permanent?",
+        "description": "Detta går inte att ångra.",
+        "cancel": "Avbryt",
+        "confirm": "Ta bort"
+      }
     },
     "cipherDecoder": {
       "encodedMessage": "Kodat meddelande ({type})",
@@ -11329,9 +11397,29 @@
         "then": "Då"
       },
       "actions": {
-        "more": "{count} till"
+        "more": "{count} till",
+        "edit": "Redigera",
+        "fire": "Utlös",
+        "reset": "Återställ",
+        "enable": "Aktivera",
+        "disable": "Inaktivera",
+        "delete": "Ta bort"
       },
       "onceOnly": "Endast en gång",
+      "delaySeconds": "{seconds}s fördröjning",
+      "firedTimes": "Utlöst {count}×",
+      "confirmDisable": {
+        "title": "Inaktivera trigger?",
+        "description": "Inaktivera \"{name}\" så att den inte utlöses automatiskt.",
+        "cancel": "Avbryt",
+        "confirm": "Inaktivera"
+      },
+      "confirmDelete": {
+        "title": "Ta bort trigger?",
+        "description": "Ta bort \"{name}\" permanent. Detta går inte att ångra.",
+        "cancel": "Avbryt",
+        "confirm": "Ta bort"
+      },
       "status": {
         "armed": "Beväpnad",
         "fired": "Utlöst",
@@ -11379,7 +11467,19 @@
       "setPosition": "Sätt placering",
       "approve": "Godkänn",
       "remove": "Ta bort",
-      "block": "Blockera"
+      "block": "Blockera",
+      "confirmKick": {
+        "title": "Ta bort deltagare?",
+        "description": "Ta bort {name} från den här sessionen? Personen kan gå med igen om den har koden.",
+        "cancel": "Avbryt",
+        "confirm": "Ta bort"
+      },
+      "confirmBlock": {
+        "title": "Blockera deltagare?",
+        "description": "Blockera {name} från att gå med i sessionen igen.",
+        "cancel": "Avbryt",
+        "confirm": "Blockera"
+      }
     },
     "sessionFeedback": {
       "reconnecting": "Återansluter",

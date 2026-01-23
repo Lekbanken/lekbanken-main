@@ -1333,6 +1333,12 @@
       }
     },
     "licenses": {
+        "confirmReset": {
+          "title": "Tilbakestill trigger?",
+          "description": "Dette vil tilbakestille triggeren “{name}” slik at den kan utløses igjen.",
+          "cancel": "Avbryt",
+          "confirm": "Tilbakestill"
+        },
       "legacy": {
         "pageTitle": "Lisenser",
         "pageDescription": "Oversikt over kundelisenser, status og bruk.",
@@ -8596,6 +8602,10 @@
       "triggersActive": "Triggere aktive",
       "emergencyStop": "Nødstopp",
       "reactivate": "Reaktiver",
+        "meta": {
+          "manual": "Manuell trigger",
+          "automatic": "Automatisk trigger"
+        },
       "reactivateTriggers": "Reaktiver triggere",
       "tooltips": {
         "emergencyStopActive": "Nødstopp aktivt - triggere deaktivert",
@@ -8604,6 +8614,12 @@
         "disableAllTriggers": "Deaktiver alle {count} aktive triggere"
       },
       "status": {
+        "confirmFire": {
+          "title": "Utløs trigger nå?",
+          "description": "Dette vil utløse triggeren “{name}” umiddelbart og kan påvirke alle i økten.",
+          "cancel": "Avbryt",
+          "confirm": "Utløs"
+        },
         "disabled": "{disabled} av {total} deaktivert",
         "ready": "{armed} av {total} klare",
         "disabledOfTotal": "{disabled} av {total} deaktivert",
@@ -10181,6 +10197,51 @@
       "note": "Notat",
       "safety": "Sikkerhet"
     },
+    "basicView": {
+      "stepProgress": "Steg {current} av {total}",
+      "previous": "Forrige",
+      "next": "Neste",
+      "complete": "Fullfør",
+      "exitPlay": "Avslutt spillmodus",
+      "confirmComplete": {
+        "title": "Avslutte økten?",
+        "description": "Dette vil avslutte økten for alle deltakere.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, avslutt økt"
+      }
+    },
+    "facilitatedView": {
+      "phaseProgress": "Fase {current} av {total}: {phaseName}",
+      "stepProgress": "Steg {current} av {total}: {stepName}",
+      "tabs": {
+        "play": "Spill",
+        "content": "Innhold",
+        "manage": "Administrer"
+      },
+      "content": {
+        "artifacts": "Artefakter",
+        "puzzles": "Pusler",
+        "decisions": "Beslutninger",
+        "outcome": "Utfall"
+      },
+      "manage": {
+        "roles": "Roller",
+        "triggers": "Triggere",
+        "settings": "Innstillinger",
+        "rolesPlaceholder": "Rollehåndtering kommer her",
+        "settingsPlaceholder": "Øktinnstillinger"
+      },
+      "previous": "Forrige",
+      "next": "Neste",
+      "exitPlay": "Avslutt",
+      "endSession": "Avslutt økt",
+      "confirmEndSession": {
+        "title": "Avslutte økten?",
+        "description": "Dette vil avslutte økten for alle deltakere.",
+        "cancel": "Avbryt",
+        "confirm": "Ja, avslutt økt"
+      }
+    },
     "timerControl": {
       "inputs": {
         "minutesSeconds": "Minutter : Sekunder"
@@ -10194,7 +10255,13 @@
       "startTimer": "Start timer",
       "resume": "Fortsett",
       "pause": "Pause",
-      "reset": "Tilbakestill"
+      "reset": "Tilbakestill",
+      "confirmReset": {
+        "title": "Tilbakestill timer?",
+        "description": "Dette vil tilbakestille timeren for alle i økten.",
+        "cancel": "Avbryt",
+        "confirm": "Tilbakestill"
+      }
     },
     "stepPhaseNavigation": {
       "steps": {
@@ -10236,6 +10303,12 @@
       "pause": "Pause",
       "resume": "Fortsett",
       "resetToStart": "Tilbakestill til start",
+      "confirmReset": {
+        "title": "Tilbakestill tidsbank?",
+        "description": "Dette vil tilbakestille tidsbanken til starttilstanden for alle.",
+        "cancel": "Avbryt",
+        "confirm": "Tilbakestill"
+      },
       "format": {
         "deltaLabel": "{time}"
       },
@@ -10575,7 +10648,34 @@
       "unlockSession": "Lås opp sesjon",
       "endSession": "Avslutt sesjon",
       "resetSession": "Tilbakestill sesjon",
-      "deletePermanently": "Slett permanent"
+      "deletePermanently": "Slett permanent",
+      "statusLabel": "Status",
+      "status": {
+        "active": "Aktiv",
+        "paused": "Pauset",
+        "locked": "Låst",
+        "ended": "Avsluttet",
+        "archived": "Arkivert",
+        "unknown": "Ukjent"
+      },
+      "confirmEnd": {
+        "title": "Avslutte sesjonen?",
+        "description": "Dette stopper sesjonen for alle. Du kan ikke fortsette etter at den er avsluttet.",
+        "cancel": "Avbryt",
+        "confirm": "Avslutt sesjon"
+      },
+      "confirmReset": {
+        "title": "Tilbakestille sesjonen?",
+        "description": "Dette tilbakestiller sesjonstilstanden. Deltakere kan måtte bli med på nytt.",
+        "cancel": "Avbryt",
+        "confirm": "Tilbakestill"
+      },
+      "confirmDelete": {
+        "title": "Slette sesjonen permanent?",
+        "description": "Dette kan ikke angres.",
+        "cancel": "Avbryt",
+        "confirm": "Slett"
+      }
     },
     "cipherDecoder": {
       "encodedMessage": "Kodet melding ({type})",
@@ -10644,9 +10744,29 @@
         "then": "Da"
       },
       "actions": {
-        "more": "{count} til"
+        "more": "{count} til",
+        "edit": "Rediger",
+        "fire": "Utløs",
+        "reset": "Tilbakestill",
+        "enable": "Aktiver",
+        "disable": "Deaktiver",
+        "delete": "Slett"
       },
       "onceOnly": "Kun én gang",
+      "delaySeconds": "{seconds}s forsinkelse",
+      "firedTimes": "Utløst {count}×",
+      "confirmDisable": {
+        "title": "Deaktivere trigger?",
+        "description": "Deaktiver \"{name}\" slik at den ikke utløses automatisk.",
+        "cancel": "Avbryt",
+        "confirm": "Deaktiver"
+      },
+      "confirmDelete": {
+        "title": "Slette trigger?",
+        "description": "Slett \"{name}\" permanent. Dette kan ikke angres.",
+        "cancel": "Avbryt",
+        "confirm": "Slett"
+      },
       "status": {
         "armed": "Bevæpnet",
         "fired": "Utløst",
@@ -10694,7 +10814,19 @@
       "setPosition": "Sett plassering",
       "approve": "Godkjenn",
       "remove": "Fjern",
-      "block": "Blokker"
+      "block": "Blokker",
+      "confirmKick": {
+        "title": "Fjerne deltaker?",
+        "description": "Fjerne {name} fra denne sesjonen? Personen kan bli med igjen hvis de har koden.",
+        "cancel": "Avbryt",
+        "confirm": "Fjern"
+      },
+      "confirmBlock": {
+        "title": "Blokkere deltaker?",
+        "description": "Blokker {name} fra å bli med i denne sesjonen igjen.",
+        "cancel": "Avbryt",
+        "confirm": "Blokker"
+      }
     },
     "sessionFeedback": {
       "reconnecting": "Kobler til på nytt",

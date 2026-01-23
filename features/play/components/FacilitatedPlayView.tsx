@@ -15,6 +15,7 @@
  * @see PLAY_MODE_UI_AUDIT.md section 12.3
  */
 
+
 'use client';
 
 import { useState } from 'react';
@@ -22,6 +23,16 @@ import { useTranslations } from 'next-intl';
 import { Tabs, TabPanel } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { StepViewer } from './StepViewer';
 import { StepPhaseNavigation } from './StepPhaseNavigation';
 import { ArtifactsPanel } from './ArtifactsPanel';
@@ -95,10 +106,23 @@ export function FacilitatedPlayView({
   const [activeTab, setActiveTab] = useState<string>(caps.visibleTabs[0] ?? 'play');
   const [contentTab, setContentTab] = useState<string>(caps.contentSubTabs[0] ?? 'artifacts');
   const [manageTab, setManageTab] = useState<string>(caps.manageSubTabs[0] ?? 'settings');
+  const [confirmEndSessionOpen, setConfirmEndSessionOpen] = useState(false);
 
   const steps = playData.steps;
   const phases = playData.phases;
   const step = steps[currentStepIndex];
+
+  // Keep navigation lightweight (avoid duplicating StepViewer content)
+  const navigationSteps = steps.map((s) => ({
+    id: s.id,
+    title: s.title,
+    durationMinutes: s.durationMinutes,
+  }));
+  const navigationPhases = phases.map((p) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+  }));
 
   // Handle trigger fire action
   const handleFireTrigger = async (triggerId: string) => {
@@ -118,6 +142,15 @@ export function FacilitatedPlayView({
                   current: currentPhaseIndex + 1,
                   total: phases.length,
                   phaseName: phases[currentPhaseIndex]?.name ?? '',
+                })}
+              </p>
+            )}
+            {step && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('stepProgress', {
+                  current: currentStepIndex + 1,
+                  total: steps.length,
+                  stepName: step.title,
                 })}
               </p>
             )}
@@ -143,13 +176,14 @@ export function FacilitatedPlayView({
           <StepPhaseNavigation
             currentStepIndex={currentStepIndex}
             totalSteps={steps.length}
-            steps={steps}
+            steps={navigationSteps}
             currentPhaseIndex={currentPhaseIndex}
             totalPhases={phases.length}
-            phases={phases}
+            phases={navigationPhases}
             onStepChange={onStepChange}
             onPhaseChange={onPhaseChange}
             showPhases={caps.showPhaseNavigation}
+            unified
           />
 
           {/* Current Step */}
@@ -245,10 +279,29 @@ export function FacilitatedPlayView({
             {t('exitPlay')}
           </Button>
         )}
-        <Button onClick={onComplete} className="ml-auto">
+        <Button
+          onClick={() => setConfirmEndSessionOpen(true)}
+          className="ml-auto"
+          variant="destructive"
+        >
           {t('endSession')}
         </Button>
       </div>
+
+      <AlertDialog open={confirmEndSessionOpen} onOpenChange={setConfirmEndSessionOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmEndSession.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('confirmEndSession.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmEndSession.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={onComplete}>
+              {t('confirmEndSession.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Props manager (floating) */}
       {caps.showPropsManager && <PropConfirmationManager sessionId={sessionId} />}

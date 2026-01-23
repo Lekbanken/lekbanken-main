@@ -17,6 +17,16 @@ import {
 } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import { useLiveTimer } from '@/features/play/hooks/useLiveSession';
 import { formatTime, getTrafficLightColor } from '@/lib/utils/timer-utils';
 import type { TimerState } from '@/types/play-runtime';
@@ -59,6 +69,7 @@ export function TimerControl({
   size = 'md',
 }: TimerControlProps) {
   const t = useTranslations('play.timerControl');
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
   // Input for setting timer duration
   const [inputMinutes, setInputMinutes] = useState(Math.floor(defaultDuration / 60));
   const [inputSeconds, setInputSeconds] = useState(defaultDuration % 60);
@@ -99,7 +110,25 @@ export function TimerControl({
     red: 'text-red-500',
   };
 
+  const confirmResetDialog = timerState ? (
+    <AlertDialog open={confirmResetOpen} onOpenChange={setConfirmResetOpen}>
+      <AlertDialogContent variant="destructive">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('confirmReset.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmReset.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('confirmReset.cancel')}</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={onReset}>
+            {t('confirmReset.confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : null;
+
   return (
+    <>
     <div className="space-y-4">
       {/* Timer Display */}
       <div className="flex flex-col items-center justify-center rounded-2xl bg-muted/50 p-6">
@@ -213,7 +242,7 @@ export function TimerControl({
             <Button
               size="lg"
               variant="outline"
-              onClick={onReset}
+              onClick={() => setConfirmResetOpen(true)}
               disabled={disabled}
               className="gap-2"
             >
@@ -224,5 +253,7 @@ export function TimerControl({
         )}
       </div>
     </div>
+    {confirmResetDialog}
+    </>
   );
 }

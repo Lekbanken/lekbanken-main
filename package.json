@@ -5,10 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "prebuild": "npm run validate:i18n",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
     "type-check:watch": "tsc --noEmit --watch",
+    "validate:i18n": "node scripts/validate-messages-json.mjs",
+    "pretest": "npm run validate:i18n",
     "test": "node tests/browse/search-helpers.test.cjs && npm run test:csv-header-sync && npm run test:trigger-alias-roundtrip && npm run test:legendary-json-roundtrip",
     "test:csv-header-sync": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/verify-csv-header-sync.ts",
     "test:trigger-alias-roundtrip": "ts-node -T --skip-project --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\" scripts/test-trigger-order-alias-roundtrip.ts",

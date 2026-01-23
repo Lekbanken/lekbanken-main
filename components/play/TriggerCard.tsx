@@ -1,11 +1,21 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import type { Trigger, TriggerStatus } from '@/types/trigger';
 import { getConditionLabel, getConditionIcon, getActionLabel } from '@/types/trigger';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import {
   BoltIcon,
   PencilIcon,
@@ -102,23 +112,116 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
     ref
   ) => {
     const t = useTranslations('play.triggerCard');
+    const [confirmDisableOpen, setConfirmDisableOpen] = useState(false);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [confirmFireOpen, setConfirmFireOpen] = useState(false);
+    const [confirmResetOpen, setConfirmResetOpen] = useState(false);
     const isManual = trigger.when.type === 'manual';
     const canFire = isManual && trigger.enabled && trigger.status === 'armed';
     const canReset = trigger.status === 'fired';
 
+    const confirmDisableDialog = onToggle ? (
+      <AlertDialog open={confirmDisableOpen} onOpenChange={setConfirmDisableOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmDisable.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('confirmDisable.description', { name: trigger.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmDisable.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => onToggle(trigger)}
+            >
+              {t('confirmDisable.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    ) : null;
+
+    const confirmDeleteDialog = onDelete ? (
+      <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmDelete.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('confirmDelete.description', { name: trigger.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmDelete.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => onDelete(trigger)}
+            >
+              {t('confirmDelete.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    ) : null;
+
+    const confirmFireDialog = onFire ? (
+      <AlertDialog open={confirmFireOpen} onOpenChange={setConfirmFireOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmFire.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('confirmFire.description', { name: trigger.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmFire.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => onFire(trigger)}
+            >
+              {t('confirmFire.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    ) : null;
+
+    const confirmResetDialog = onReset ? (
+      <AlertDialog open={confirmResetOpen} onOpenChange={setConfirmResetOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmReset.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('confirmReset.description', { name: trigger.name })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmReset.cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => onReset(trigger)}
+            >
+              {t('confirmReset.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    ) : null;
+
     return (
-      <div
-        ref={ref}
-        onClick={() => onClick?.(trigger)}
-        className={cn(
-          'rounded-lg border bg-surface-primary p-4 transition-all',
-          'hover:shadow-md',
-          selected && 'ring-2 ring-primary',
-          !trigger.enabled && 'opacity-60',
-          onClick && 'cursor-pointer',
-          className
-        )}
-      >
+      <>
+        <div
+          ref={ref}
+          onClick={() => onClick?.(trigger)}
+          className={cn(
+            'rounded-lg border bg-surface-primary p-4 transition-all',
+            'hover:shadow-md',
+            selected && 'ring-2 ring-primary',
+            !trigger.enabled && 'opacity-60',
+            onClick && 'cursor-pointer',
+            className
+          )}
+        >
         {/* Header */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">
@@ -158,6 +261,10 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
         {/* Meta info */}
         {!compact && (
           <div className="mt-3 flex items-center gap-3 text-xs text-foreground-secondary">
+            <span className="flex items-center gap-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-foreground-secondary" />
+              {isManual ? t('meta.manual') : t('meta.automatic')}
+            </span>
             {trigger.executeOnce && (
               <span className="flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-foreground-secondary" />
@@ -167,13 +274,13 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
             {trigger.delaySeconds && trigger.delaySeconds > 0 && (
               <span className="flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-foreground-secondary" />
-                {trigger.delaySeconds}s delay
+                {t('delaySeconds', { seconds: trigger.delaySeconds })}
               </span>
             )}
             {trigger.firedCount > 0 && (
               <span className="flex items-center gap-1">
                 <span className="h-1.5 w-1.5 rounded-full bg-foreground-secondary" />
-                Fired {trigger.firedCount}×
+                {t('firedTimes', { count: trigger.firedCount })}
               </span>
             )}
           </div>
@@ -189,11 +296,11 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
                   e.stopPropagation();
                   onEdit(trigger);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-foreground-secondary hover:text-foreground rounded-md hover:bg-surface-secondary transition-colors"
-                aria-label="Edit trigger"
+                className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-sm text-foreground-secondary hover:text-foreground rounded-md hover:bg-surface-secondary transition-colors"
+                aria-label={t('actions.edit')}
               >
                 <PencilIcon className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">Edit</span>
+                <span className="sr-only sm:not-sr-only">{t('actions.edit')}</span>
               </button>
             )}
 
@@ -202,13 +309,13 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onFire(trigger);
+                  setConfirmFireOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-primary hover:text-primary/80 rounded-md hover:bg-primary/10 transition-colors"
-                aria-label="Fire trigger manually"
+                className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-sm text-primary hover:text-primary/80 rounded-md hover:bg-primary/10 transition-colors"
+                aria-label={t('actions.fire')}
               >
                 <PlayIcon className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">Fire</span>
+                <span className="sr-only sm:not-sr-only">{t('actions.fire')}</span>
               </button>
             )}
 
@@ -217,13 +324,13 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onReset(trigger);
+                  setConfirmResetOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-foreground-secondary hover:text-foreground rounded-md hover:bg-surface-secondary transition-colors"
-                aria-label="Reset trigger"
+                className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-sm text-foreground-secondary hover:text-foreground rounded-md hover:bg-surface-secondary transition-colors"
+                aria-label={t('actions.reset')}
               >
                 <ArrowPathIcon className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">Reset</span>
+                <span className="sr-only sm:not-sr-only">{t('actions.reset')}</span>
               </button>
             )}
 
@@ -232,25 +339,29 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
+                  if (trigger.enabled) {
+                    setConfirmDisableOpen(true);
+                    return;
+                  }
                   onToggle(trigger);
                 }}
                 className={cn(
-                  'flex items-center gap-1.5 px-2.5 py-1.5 text-sm rounded-md transition-colors',
+                  'flex min-h-11 items-center gap-1.5 px-3 py-2 text-sm rounded-md transition-colors',
                   trigger.enabled
                     ? 'text-foreground-secondary hover:text-foreground hover:bg-surface-secondary'
                     : 'text-accent hover:text-accent/80 hover:bg-accent/10'
                 )}
-                aria-label={trigger.enabled ? 'Disable trigger' : 'Enable trigger'}
+                aria-label={trigger.enabled ? t('actions.disable') : t('actions.enable')}
               >
                 {trigger.enabled ? (
                   <>
                     <StopIcon className="h-4 w-4" />
-                    <span className="sr-only sm:not-sr-only">Disable</span>
+                    <span className="sr-only sm:not-sr-only">{t('actions.disable')}</span>
                   </>
                 ) : (
                   <>
                     <PlayIcon className="h-4 w-4" />
-                    <span className="sr-only sm:not-sr-only">Enable</span>
+                    <span className="sr-only sm:not-sr-only">{t('actions.enable')}</span>
                   </>
                 )}
               </button>
@@ -261,18 +372,24 @@ export const TriggerCard = forwardRef<HTMLDivElement, TriggerCardProps>(
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(trigger);
+                  setConfirmDeleteOpen(true);
                 }}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-sm text-error hover:text-error/80 rounded-md hover:bg-error/10 transition-colors ml-auto"
-                aria-label="Delete trigger"
+                className="flex min-h-11 items-center gap-1.5 px-3 py-2 text-sm text-error hover:text-error/80 rounded-md hover:bg-error/10 transition-colors ml-auto"
+                aria-label={t('actions.delete')}
               >
                 <TrashIcon className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">Delete</span>
+                <span className="sr-only sm:not-sr-only">{t('actions.delete')}</span>
               </button>
             )}
           </div>
         )}
-      </div>
+        </div>
+
+        {confirmDisableDialog}
+        {confirmDeleteDialog}
+        {confirmFireDialog}
+        {confirmResetDialog}
+      </>
     );
   }
 );

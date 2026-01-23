@@ -319,13 +319,13 @@ export function StepPhaseNavigation({
 
         {/* Step dots row */}
         {!stepNotStarted && (
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {Array.from({ length: totalSteps }).map((_, i) => (
               <button
                 key={i}
                 onClick={() => onStepChange(i)}
                 disabled={disabled}
-                className={`h-3 w-3 rounded-full transition-all hover:scale-125 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
+                className={`h-4 w-4 rounded-full transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                   i === currentStepIndex
                     ? 'bg-primary scale-125 ring-2 ring-primary ring-offset-2'
                     : i < currentStepIndex

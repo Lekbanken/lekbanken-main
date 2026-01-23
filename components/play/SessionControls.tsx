@@ -1,8 +1,19 @@
 'use client';
 
+import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import {
   PlayIcon,
   PauseIcon,
@@ -54,6 +65,10 @@ export function SessionControls({
   className = '',
 }: SessionControlsProps) {
   const t = useTranslations('play.sessionControls');
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
   const isActive = status === 'active';
   const isPaused = status === 'paused';
   const isLocked = status === 'locked';
@@ -61,10 +76,98 @@ export function SessionControls({
   const isArchived = status === 'archived';
   const isLive = isActive || isPaused || isLocked;
 
+  const statusKey = isActive
+    ? 'active'
+    : isPaused
+      ? 'paused'
+      : isLocked
+        ? 'locked'
+        : isEnded
+          ? 'ended'
+          : isArchived
+            ? 'archived'
+            : 'unknown';
+
+  const statusBadgeClassName =
+    statusKey === 'active'
+      ? 'bg-emerald-100 text-emerald-800'
+      : statusKey === 'paused'
+        ? 'bg-amber-100 text-amber-900'
+        : statusKey === 'locked'
+          ? 'bg-sky-100 text-sky-900'
+          : statusKey === 'ended'
+            ? 'bg-slate-100 text-slate-800'
+            : statusKey === 'archived'
+              ? 'bg-slate-100 text-slate-800'
+              : 'bg-muted text-muted-foreground';
+
   const getButtonProps = (action: string) => ({
     loading: isLoading && loadingAction === action,
     disabled: isLoading,
   });
+
+  const confirmEndDialog = onEnd ? (
+    <AlertDialog open={confirmEndOpen} onOpenChange={setConfirmEndOpen}>
+      <AlertDialogContent variant="destructive">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('confirmEnd.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmEnd.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>{t('confirmEnd.cancel')}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={onEnd}
+            disabled={isLoading}
+          >
+            {t('confirmEnd.confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : null;
+
+  const confirmResetDialog = onReset ? (
+    <AlertDialog open={confirmResetOpen} onOpenChange={setConfirmResetOpen}>
+      <AlertDialogContent variant="destructive">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('confirmReset.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmReset.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>{t('confirmReset.cancel')}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={onReset}
+            disabled={isLoading}
+          >
+            {t('confirmReset.confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : null;
+
+  const confirmDeleteDialog = onDelete ? (
+    <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+      <AlertDialogContent variant="destructive">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('confirmDelete.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmDelete.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isLoading}>{t('confirmDelete.cancel')}</AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={onDelete}
+            disabled={isLoading}
+          >
+            {t('confirmDelete.confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : null;
 
   // Minimal variant - just the most important action
   if (variant === 'minimal') {
@@ -96,7 +199,7 @@ export function SessionControls({
           <Button
             variant="destructive"
             size="sm"
-            onClick={onEnd}
+            onClick={() => setConfirmEndOpen(true)}
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
@@ -107,13 +210,15 @@ export function SessionControls({
           <Button
             variant="outline"
             size="sm"
-            onClick={onReset}
+            onClick={() => setConfirmResetOpen(true)}
             {...getButtonProps('reset')}
           >
             <ArrowPathIcon className="h-4 w-4" />
             {t('reset')}
           </Button>
         )}
+        {confirmEndDialog}
+        {confirmResetDialog}
       </div>
     );
   }
@@ -122,6 +227,12 @@ export function SessionControls({
   if (variant === 'compact') {
     return (
       <div className={cn('flex flex-wrap items-center gap-2', className)}>
+        <div className="mr-1 inline-flex items-center gap-2 text-sm">
+          <span className="text-muted-foreground">{t('statusLabel')}:</span>
+          <span className={cn('rounded-full px-2 py-0.5 font-medium', statusBadgeClassName)}>
+            {t(`status.${statusKey}`)}
+          </span>
+        </div>
         {/* Play/Pause */}
         {isActive && onPause && (
           <Button
@@ -170,7 +281,7 @@ export function SessionControls({
         {isLive && onEnd && (
           <Button
             variant="destructive"
-            onClick={onEnd}
+            onClick={() => setConfirmEndOpen(true)}
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
@@ -184,7 +295,7 @@ export function SessionControls({
             {onReset && (
               <Button
                 variant="outline"
-                onClick={onReset}
+                onClick={() => setConfirmResetOpen(true)}
                 {...getButtonProps('reset')}
               >
                 <ArrowPathIcon className="h-4 w-4" />
@@ -194,7 +305,7 @@ export function SessionControls({
             {onDelete && (
               <Button
                 variant="destructive"
-                onClick={onDelete}
+                onClick={() => setConfirmDeleteOpen(true)}
                 {...getButtonProps('delete')}
               >
                 <TrashIcon className="h-4 w-4" />
@@ -203,6 +314,10 @@ export function SessionControls({
             )}
           </>
         )}
+
+        {confirmEndDialog}
+        {confirmResetDialog}
+        {confirmDeleteDialog}
       </div>
     );
   }
@@ -210,6 +325,13 @@ export function SessionControls({
   // Full variant - all controls organized in groups
   return (
     <div className={cn('space-y-4', className)}>
+      <div className="flex items-center gap-2 text-sm">
+        <span className="text-muted-foreground">{t('statusLabel')}:</span>
+        <span className={cn('rounded-full px-2 py-0.5 font-medium', statusBadgeClassName)}>
+          {t(`status.${statusKey}`)}
+        </span>
+      </div>
+
       {/* Primary controls */}
       <div className="flex flex-wrap items-center gap-3">
         {/* Play/Pause control */}
@@ -296,7 +418,7 @@ export function SessionControls({
         {isLive && onEnd && (
           <Button
             variant="destructive"
-            onClick={onEnd}
+            onClick={() => setConfirmEndOpen(true)}
             {...getButtonProps('end')}
           >
             <StopIcon className="h-4 w-4" />
@@ -311,7 +433,7 @@ export function SessionControls({
           {onReset && (
             <Button
               variant="outline"
-              onClick={onReset}
+              onClick={() => setConfirmResetOpen(true)}
               {...getButtonProps('reset')}
             >
               <ArrowPathIcon className="h-4 w-4" />
@@ -321,7 +443,7 @@ export function SessionControls({
           {onDelete && (
             <Button
               variant="destructive"
-              onClick={onDelete}
+              onClick={() => setConfirmDeleteOpen(true)}
               {...getButtonProps('delete')}
             >
               <TrashIcon className="h-4 w-4" />
@@ -330,6 +452,10 @@ export function SessionControls({
           )}
         </div>
       )}
+
+      {confirmEndDialog}
+      {confirmResetDialog}
+      {confirmDeleteDialog}
     </div>
   );
 }

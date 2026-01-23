@@ -10,9 +10,11 @@
  * @see PLAY_MODE_UI_AUDIT.md section 12.2
  */
 
+
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { StepViewer } from './StepViewer';
 import { ArtifactsPanel } from './ArtifactsPanel';
 import { PuzzleProgressPanel } from './PuzzleProgressPanel';
@@ -20,6 +22,16 @@ import { PropConfirmationManager } from './PropConfirmationManager';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 import type { PlaySessionData, StepInfo } from '../api/session-api';
 import type { SessionCapabilities } from '@/hooks/useSessionCapabilities';
 
@@ -66,6 +78,7 @@ export function BasicPlayView({
   onBack,
 }: BasicPlayViewProps) {
   const t = useTranslations('play.basicView');
+  const [confirmCompleteOpen, setConfirmCompleteOpen] = useState(false);
 
   const steps = playData.steps;
   const step = steps[currentStepIndex];
@@ -125,12 +138,27 @@ export function BasicPlayView({
             {t('previous')}
           </Button>
           {isLast ? (
-            <Button onClick={onComplete}>{t('complete')}</Button>
+            <Button onClick={() => setConfirmCompleteOpen(true)}>{t('complete')}</Button>
           ) : (
             <Button onClick={handleNext}>{t('next')}</Button>
           )}
         </div>
       </div>
+
+      <AlertDialog open={confirmCompleteOpen} onOpenChange={setConfirmCompleteOpen}>
+        <AlertDialogContent variant="destructive">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('confirmComplete.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('confirmComplete.description')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('confirmComplete.cancel')}</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={onComplete}>
+              {t('confirmComplete.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

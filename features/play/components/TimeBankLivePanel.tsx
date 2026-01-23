@@ -22,6 +22,16 @@ import {
 } from '@/components/ui/card';
 import { Tooltip } from '@/components/ui/tooltip';
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
+import {
   ClockIcon,
   PlusIcon,
   MinusIcon,
@@ -282,6 +292,24 @@ export function TimeBankLivePanel({
   const [customDelta, setCustomDelta] = useState<string>('');
   const [customReason, setCustomReason] = useState<string>('');
   const [showHistory, setShowHistory] = useState(false);
+  const [confirmResetOpen, setConfirmResetOpen] = useState(false);
+
+  const confirmResetDialog = onReset ? (
+    <AlertDialog open={confirmResetOpen} onOpenChange={setConfirmResetOpen}>
+      <AlertDialogContent variant="destructive">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{t('confirmReset.title')}</AlertDialogTitle>
+          <AlertDialogDescription>{t('confirmReset.description')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>{t('confirmReset.cancel')}</AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={onReset}>
+            {t('confirmReset.confirm')}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ) : null;
 
   const formatDeltaLabel = useCallback(
     (delta: number) => t('format.deltaLabel', { time: formatTime(delta, true) }),
@@ -326,7 +354,7 @@ export function TimeBankLivePanel({
               variant="ghost"
               size="sm"
               onClick={() => handleQuickAdjust(30)}
-              className="h-7 w-7 p-0"
+              className="h-9 w-9 p-0"
             >
               <PlusIcon className="h-4 w-4" />
             </Button>
@@ -337,7 +365,7 @@ export function TimeBankLivePanel({
               variant="ghost"
               size="sm"
               onClick={() => handleQuickAdjust(-30)}
-              className="h-7 w-7 p-0"
+              className="h-9 w-9 p-0"
             >
               <MinusIcon className="h-4 w-4" />
             </Button>
@@ -348,7 +376,7 @@ export function TimeBankLivePanel({
               variant="ghost"
               size="sm"
               onClick={onTogglePause}
-              className="h-7 w-7 p-0"
+              className="h-9 w-9 p-0"
             >
               {state.paused ? (
                 <PlayIcon className="h-4 w-4" />
@@ -364,6 +392,7 @@ export function TimeBankLivePanel({
   
   // Full panel
   return (
+    <>
     <Card className={className}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
@@ -397,8 +426,8 @@ export function TimeBankLivePanel({
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={onReset}
-                  className="h-8 w-8 p-0"
+                  onClick={() => setConfirmResetOpen(true)}
+                  className="h-11 w-11 p-0"
                 >
                   <ArrowPathIcon className="h-4 w-4" />
                 </Button>
@@ -509,5 +538,7 @@ export function TimeBankLivePanel({
         )}
       </CardContent>
     </Card>
+    {confirmResetDialog}
+    </>
   );
 }

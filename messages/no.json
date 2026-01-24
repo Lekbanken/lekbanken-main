@@ -2215,7 +2215,6 @@
         "noSessions": "Ingen demoøkter funnet.",
         "user": "Bruker",
         "created": "Opprettet",
-        "status": "Status",
         "sessionId": "Økt-ID",
         "anonymousUser": "Anonym demo-bruker",
         "status": {
@@ -3057,10 +3056,6 @@
                 "exportedBy": "Eksportert av",
                 "date": "Dato"
               }
-            },
-            "stats": {
-              "templates": "Maler",
-              "exports": "Eksporter"
             }
           }
         }
@@ -3946,7 +3941,6 @@
         "low": "Lav",
         "medium": "Medium",
         "high": "Høy",
-        "energy": "Energi",
         "allPlayModes": "Alle spillmoduser",
         "basicPlay": "Enkel lek",
         "facilitatedActivity": "Ledet aktivitet",
@@ -3954,8 +3948,6 @@
         "playMode": "Spillmodus",
         "allOwners": "Alle eiere",
         "global": "Global",
-        "owner": "Eier",
-        "status": "Status",
         "removeFilter": "Fjern filter {label}",
         "purposes": "Formål",
         "tenants": "Leietakere",
@@ -8727,9 +8719,13 @@
       },
       "filters": {
         "all": "Alle",
+        "activeAll": "Pågående",
         "active": "Aktive",
         "paused": "Pauset",
-        "ended": "Avsluttet"
+        "ended": "Avsluttet",
+        "draft": "Utkast",
+        "lobby": "Lobby",
+        "showEnded": "Vis avsluttede ({count})"
       },
       "empty": {
         "titleAll": "Ingen økter ennå",
@@ -8966,6 +8962,7 @@
         "sessionFull": "Økten er full. Prøv igjen senere.",
         "sessionEnded": "Økten er avsluttet.",
         "sessionLocked": "Økten er låst.",
+        "sessionOffline": "Økten er ikke åpen ennå. Vent til leklederen publiserer den.",
         "joinFailed": "Kunne ikke bli med i økten",
         "unknown": "Det oppstod en feil"
       }
@@ -9223,6 +9220,8 @@
       },
       "preflight": {
         "title": "Forberedelseskontroll",
+        "titleOffline": "Forberedelser (offline)",
+        "titleOnline": "Forberedelser (online)",
         "readyToStart": "Klar til å starte",
         "preparingSession": "Forbereder økt",
         "allChecksOk": "Alle kontroller godkjent",
@@ -9234,7 +9233,9 @@
         "readyLabel": "klare",
         "remainingLabel": "gjenstår",
         "startSession": "Start økt",
+        "publishSession": "Publiser økt",
         "starting": "Starter...",
+        "publishing": "Publiserer...",
         "hasErrors": "{count} feil må løses",
         "hasWarnings": "{count} advarsler",
         "hasPending": "{count} gjenstår å forberede",
@@ -9257,7 +9258,41 @@
         "codeCopied": "Kode kopiert!",
         "qrTitle": "Bli med i økten",
         "qrDescription": "Skann for å koble til",
-        "generatingQr": "Laster..."
+        "generatingQr": "Laster...",
+        "status": {
+          "lobby": "LOBBY",
+          "draft": "UTKAST",
+          "active": "LIVE",
+          "paused": "PAUSET",
+          "ended": "AVSLUTTET",
+          "locked": "LÅST"
+        },
+        "connectivity": {
+          "offline": "OFFLINE",
+          "online": "ONLINE"
+        },
+        "controls": {
+          "back": "Tilbake",
+          "start": "Start",
+          "publish": "Publiser",
+          "starting": "Starter...",
+          "pause": "Pause",
+          "resume": "Gjenoppta",
+          "ended": "Avsluttet",
+          "directorMode": "Director Mode"
+        },
+        "backDialog": {
+          "title": "Forlat økten?",
+          "description": "Velg om du vil gå tilbake til øktsoversikten eller avslutte økten permanent.",
+          "cancel": "Avbryt",
+          "takeOffline": "Ta offline",
+          "takeOfflineDescription": "Steng for deltakere, fortsett å forberede",
+          "takeOfflineActiveDescription": "Pause og lagre for å fortsette senere",
+          "goBack": "Tilbake til oversikt",
+          "goBackDescription": "Økten fortsetter å kjøre i bakgrunnen",
+          "endSession": "Avslutt økt",
+          "endSessionDescription": "Avslutter økten permanent for alle"
+        }
       },
       "run": {
         "banner": {
@@ -9514,6 +9549,7 @@
       },
       "header": {
         "participants": "{count} deltakere",
+        "separator": "•",
         "statusLive": "LIVE",
         "statusPaused": "PAUSET",
         "statusEnded": "AVSLUTTET",
@@ -11638,6 +11674,16 @@
       "copyCode": "Kopier kode",
       "copiedCode": "Kopiert!",
       "joinUrl": "Bli med-lenke"
+    },
+    "sessionStatusBadge": {
+      "draft": "Utkast",
+      "lobby": "Lobby",
+      "active": "Aktiv",
+      "paused": "Pauset",
+      "locked": "Låst",
+      "ended": "Avsluttet",
+      "archived": "Arkivert",
+      "cancelled": "Avbrutt"
     },
     "signalPanel": {
       "title": "Signaler",

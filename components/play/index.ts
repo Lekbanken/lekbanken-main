@@ -8,7 +8,7 @@
  */
 
 // Status badges
-export { SessionStatusBadge } from './SessionStatusBadge';
+export { SessionStatusBadge, type SessionStatus } from './SessionStatusBadge';
 export { ParticipantStatusBadge, ParticipantStatusDot } from './ParticipantStatusBadge';
 
 // Participant components
@@ -17,6 +17,7 @@ export { ParticipantList } from './ParticipantList';
 
 // Session components
 export { SessionCard, SessionCardSkeleton } from './SessionCard';
+export { SessionListItem, SessionListItemSkeleton } from './SessionListItem';
 export { SessionHeader } from './SessionHeader';
 export { SessionControls } from './SessionControls';
 

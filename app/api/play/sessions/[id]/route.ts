@@ -3,7 +3,7 @@ import { createServerRlsClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
 import { logGamificationEventV1 } from '@/lib/services/gamification-events.server';
 
-type SessionStatus = 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
+type SessionStatus = 'draft' | 'lobby' | 'active' | 'paused' | 'locked' | 'ended' | 'archived' | 'cancelled';
 
 async function broadcastPlayEvent(sessionId: string, event: unknown) {
   try {
@@ -81,6 +81,8 @@ export async function PATCH(
   if (session.host_user_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
   let nextStatus: SessionStatus | null = null;
+  if (action === 'publish') nextStatus = 'lobby';  // draft → lobby (open for participants)
+  if (action === 'unpublish') nextStatus = 'draft'; // lobby → draft (take offline)
   if (action === 'start' || action === 'resume') nextStatus = 'active';
   if (action === 'pause') nextStatus = 'paused';
   if (action === 'end') nextStatus = 'ended';

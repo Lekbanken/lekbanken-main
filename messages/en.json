@@ -8462,9 +8462,13 @@
       },
       "filters": {
         "all": "All",
+        "activeAll": "Ongoing",
         "active": "Active",
         "paused": "Paused",
-        "ended": "Ended"
+        "ended": "Ended",
+        "draft": "Draft",
+        "lobby": "Lobby",
+        "showEnded": "Show ended ({count})"
       },
       "empty": {
         "titleAll": "No sessions yet",
@@ -8701,6 +8705,7 @@
         "sessionFull": "The session is full. Try again later.",
         "sessionEnded": "The session has ended.",
         "sessionLocked": "The session is locked.",
+        "sessionOffline": "The session is not open yet. Wait for the host to publish it.",
         "joinFailed": "Could not join the session",
         "unknown": "An error occurred"
       }
@@ -9003,6 +9008,8 @@
       },
       "preflight": {
         "title": "Preflight Check",
+        "titleOffline": "Preparation (offline)",
+        "titleOnline": "Preparation (online)",
         "readyToStart": "Ready to start",
         "preparingSession": "Preparing session",
         "allChecksOk": "All checks passed",
@@ -9014,7 +9021,9 @@
         "readyLabel": "ready",
         "remainingLabel": "remaining",
         "startSession": "Start Session",
+        "publishSession": "Publish Session",
         "starting": "Starting...",
+        "publishing": "Publishing...",
         "hasErrors": "{count} errors must be resolved",
         "hasWarnings": "{count} warnings",
         "hasPending": "{count} items to prepare",
@@ -9037,7 +9046,41 @@
         "codeCopied": "Code copied!",
         "qrTitle": "Join session",
         "qrDescription": "Scan to connect",
-        "generatingQr": "Loading..."
+        "generatingQr": "Loading...",
+        "status": {
+          "lobby": "LOBBY",
+          "draft": "DRAFT",
+          "active": "LIVE",
+          "paused": "PAUSED",
+          "ended": "ENDED",
+          "locked": "LOCKED"
+        },
+        "connectivity": {
+          "offline": "OFFLINE",
+          "online": "ONLINE"
+        },
+        "controls": {
+          "back": "Back",
+          "start": "Start",
+          "publish": "Publish",
+          "starting": "Starting...",
+          "pause": "Pause",
+          "resume": "Resume",
+          "ended": "Ended",
+          "directorMode": "Director Mode"
+        },
+        "backDialog": {
+          "title": "Leave session?",
+          "description": "Choose whether to return to the sessions overview or end the session permanently.",
+          "cancel": "Cancel",
+          "takeOffline": "Take offline",
+          "takeOfflineDescription": "Close to participants, continue preparing",
+          "takeOfflineActiveDescription": "Pause and save to continue later",
+          "goBack": "Back to overview",
+          "goBackDescription": "Session continues running in the background",
+          "endSession": "End session",
+          "endSessionDescription": "Ends the session permanently for everyone"
+        }
       },
       "run": {
         "banner": {
@@ -10771,6 +10814,8 @@
       "joinUrl": "Join link"
     },
     "sessionStatusBadge": {
+      "draft": "Draft",
+      "lobby": "Lobby",
       "active": "Active",
       "paused": "Paused",
       "locked": "Locked",

@@ -19,7 +19,6 @@ import {
   UserIcon,
   EyeSlashIcon,
   PaperAirplaneIcon,
-  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 export interface SessionChatModalProps {
@@ -151,15 +150,10 @@ export function SessionChatModal({
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-lg h-[80vh] max-h-[600px] flex flex-col p-0 gap-0">
         <DialogHeader className="px-4 py-3 border-b border-border/50 shrink-0">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <ChatBubbleLeftRightIcon className="h-5 w-5" />
-              {t('title')}
-            </DialogTitle>
-            <Button variant="ghost" size="sm" onClick={handleClose} className="h-8 w-8 p-0">
-              <XMarkIcon className="h-4 w-4" />
-            </Button>
-          </div>
+          <DialogTitle className="flex items-center gap-2">
+            <ChatBubbleLeftRightIcon className="h-5 w-5" />
+            {t('title')}
+          </DialogTitle>
         </DialogHeader>
 
         {/* Tab bar */}
@@ -321,7 +315,7 @@ export function SessionChatModal({
             </div>
           )}
 
-          <div className="flex gap-2">
+          <div className="relative w-full">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -333,16 +327,17 @@ export function SessionChatModal({
                 }
               }}
               disabled={sending || (tab === 'private' && !canSendPrivate)}
-              className="flex-1"
+              className="w-full pr-12"
             />
             <Button
               type="button"
               onClick={() => void handleSend()}
               disabled={sending || !input.trim() || (tab === 'private' && !canSendPrivate)}
-              className="gap-1.5 px-4"
+              size="sm"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
             >
               <PaperAirplaneIcon className="h-4 w-4" />
-              <span className="hidden sm:inline">{t('send')}</span>
+              <span className="sr-only">{t('send')}</span>
             </Button>
           </div>
         </div>

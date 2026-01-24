@@ -9360,9 +9360,13 @@
       },
       "filters": {
         "all": "Alla",
+        "activeAll": "Pågående",
         "active": "Aktiva",
         "paused": "Pausade",
-        "ended": "Avslutade"
+        "ended": "Avslutade",
+        "draft": "Utkast",
+        "lobby": "Lobby",
+        "showEnded": "Visa avslutade ({count})"
       },
       "empty": {
         "titleAll": "Inga sessioner ännu",
@@ -9599,6 +9603,7 @@
         "sessionFull": "Sessionen är full. Försök igen senare.",
         "sessionEnded": "Sessionen är avslutad.",
         "sessionLocked": "Sessionen är låst.",
+        "sessionOffline": "Sessionen är inte öppen ännu. Vänta tills lekledaren publicerar den.",
         "joinFailed": "Kunde inte gå med i session",
         "unknown": "Ett fel uppstod"
       }
@@ -9897,6 +9902,8 @@
       },
       "preflight": {
         "title": "Förberedelsekontroll",
+        "titleOffline": "Förberedelser (offline)",
+        "titleOnline": "Förberedelser (online)",
         "readyToStart": "Redo att starta",
         "preparingSession": "Förbereda session",
         "allChecksOk": "Alla kontroller godkända",
@@ -9908,7 +9915,9 @@
         "readyLabel": "klara",
         "remainingLabel": "kvar",
         "startSession": "Starta session",
+        "publishSession": "Publicera session",
         "starting": "Startar...",
+        "publishing": "Publicerar...",
         "hasErrors": "{count} fel måste åtgärdas",
         "hasWarnings": "{count} varningar",
         "hasPending": "{count} kvar att förbereda",
@@ -9931,7 +9940,41 @@
         "codeCopied": "Kod kopierad!",
         "qrTitle": "Gå med i sessionen",
         "qrDescription": "Skanna för att ansluta",
-        "generatingQr": "Laddar..."
+        "generatingQr": "Laddar...",
+        "status": {
+          "lobby": "LOBBY",
+          "draft": "UTKAST",
+          "active": "LIVE",
+          "paused": "PAUSAD",
+          "ended": "AVSLUTAD",
+          "locked": "LÅST"
+        },
+        "connectivity": {
+          "offline": "OFFLINE",
+          "online": "ONLINE"
+        },
+        "controls": {
+          "back": "Tillbaka",
+          "start": "Starta",
+          "publish": "Publicera",
+          "starting": "Startar...",
+          "pause": "Pausa",
+          "resume": "Återuppta",
+          "ended": "Avslutad",
+          "directorMode": "Director Mode"
+        },
+        "backDialog": {
+          "title": "Lämna sessionen?",
+          "description": "Välj om du vill gå tillbaka till sessionsöversikten eller avsluta sessionen permanent.",
+          "cancel": "Avbryt",
+          "takeOffline": "Ta offline",
+          "takeOfflineDescription": "Stäng för deltagare, fortsätt förbereda",
+          "takeOfflineActiveDescription": "Pausa och spara för att fortsätta senare",
+          "goBack": "Tillbaka till översikt",
+          "goBackDescription": "Sessionen fortsätter köra i bakgrunden",
+          "endSession": "Avsluta session",
+          "endSessionDescription": "Avslutar sessionen permanent för alla"
+        }
       },
       "run": {
         "banner": {
@@ -11668,6 +11711,8 @@
       "joinUrl": "Anslutningslänk"
     },
     "sessionStatusBadge": {
+      "draft": "Utkast",
+      "lobby": "Lobby",
       "active": "Aktiv",
       "paused": "Pausad",
       "locked": "Låst",

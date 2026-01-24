@@ -10,10 +10,13 @@ import {
   CheckCircleIcon,
   ArchiveBoxIcon,
   XCircleIcon,
+  PencilSquareIcon,
+  UsersIcon,
 } from '@heroicons/react/24/solid';
 import type { ComponentType, SVGProps } from 'react';
 
-type SessionStatus = Database['public']['Enums']['participant_session_status'];
+// Extended type until Supabase types are regenerated with draft/lobby
+export type SessionStatus = Database['public']['Enums']['participant_session_status'] | 'draft' | 'lobby';
 
 type StatusConfig = {
   labelKey: string;
@@ -22,6 +25,8 @@ type StatusConfig = {
 };
 
 const statusConfig: Record<SessionStatus, StatusConfig> = {
+  draft: { labelKey: 'draft', variant: 'outline', Icon: PencilSquareIcon },
+  lobby: { labelKey: 'lobby', variant: 'secondary', Icon: UsersIcon },
   active: { labelKey: 'active', variant: 'success', Icon: PlayCircleIcon },
   paused: { labelKey: 'paused', variant: 'warning', Icon: PauseCircleIcon },
   locked: { labelKey: 'locked', variant: 'secondary', Icon: LockClosedIcon },

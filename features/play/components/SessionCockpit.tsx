@@ -54,7 +54,10 @@ import {
   LockClosedIcon,
   LockOpenIcon,
   EyeSlashIcon,
+  ChevronUpDownIcon,
 } from '@heroicons/react/24/outline';
+import { CheckIcon } from '@heroicons/react/20/solid';
+import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from '@headlessui/react';
 import { useSessionState } from '../hooks/useSessionState';
 import { useSignalCapabilities } from '../hooks/useSignalCapabilities';
 import { useSessionChat } from '../hooks/useSessionChat';
@@ -64,6 +67,7 @@ import { PreflightChecklist, type ChecklistItem } from './PreflightChecklist';
 import { ArtifactsPanel } from './ArtifactsPanel';
 import { SessionChatModal } from './SessionChatModal';
 import { StorylineModal } from './StorylineModal';
+import { LeaveSessionModal } from './LeaveSessionModal';
 import { Toolbelt } from '@/features/tools/components/Toolbelt';
 import { updateSessionRoles, type SessionRoleUpdate } from '@/features/play/api/session-api';
 import { approveParticipant, kickParticipant, setNextStarter } from '@/features/play-participant/api';
@@ -119,6 +123,141 @@ interface SessionInfo {
 // Sub-components
 // =============================================================================
 
+/**
+ * ParticipantRoleListbox - Assign a role to a participant
+ * Uses Headless UI Listbox with online indicator
+ */
+function ParticipantRoleListbox({
+  participant,
+  availableRoles,
+  onAssign,
+  disabled,
+}: {
+  participant: { id: string; displayName?: string | null; status?: string };
+  availableRoles: Array<{ id: string; name: string; color?: string | null }>;
+  onAssign: (participantId: string, roleId: string) => void;
+  disabled?: boolean;
+}) {
+  const isOnline = participant.status === 'active' || participant.status === 'joined';
+  
+  return (
+    <Listbox
+      value={null}
+      onChange={(role: { id: string; name: string; color?: string | null } | null) => role && onAssign(participant.id, role.id)}
+      disabled={disabled}
+    >
+      <div className="relative">
+        <ListboxButton className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-background text-sm cursor-pointer hover:bg-muted/50 transition-colors shadow-sm">
+          <span
+            aria-label={isOnline ? 'Online' : 'Offline'}
+            className={cn(
+              'inline-block size-2.5 shrink-0 rounded-full ring-2 ring-background',
+              isOnline ? 'bg-green-500' : 'bg-gray-400'
+            )}
+          />
+          <span className="font-medium text-foreground truncate max-w-[120px]">
+            {participant.displayName || 'Anonym'}
+          </span>
+          <ChevronUpDownIcon className="h-4 w-4 text-muted-foreground" />
+        </ListboxButton>
+
+        <ListboxOptions
+          transition
+          anchor="bottom start"
+          className="z-[100] mt-1 max-h-60 min-w-[180px] overflow-auto rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 shadow-xl focus:outline-none data-[leave]:transition data-[leave]:duration-100 data-[leave]:ease-in data-[closed]:data-[leave]:opacity-0"
+        >
+          {availableRoles.map((role) => (
+            <ListboxOption
+              key={role.id}
+              value={role}
+              className="group relative cursor-pointer py-2.5 px-3 text-gray-900 dark:text-gray-100 select-none data-[focus]:bg-violet-100 dark:data-[focus]:bg-violet-900/40 data-[focus]:text-violet-900 dark:data-[focus]:text-violet-100"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className="inline-block size-3 shrink-0 rounded-full ring-1 ring-black/10"
+                  style={{ backgroundColor: role.color || '#6366f1' }}
+                />
+                <span className="block truncate text-sm font-medium group-data-[selected]:font-bold">
+                  {role.name}
+                </span>
+              </div>
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-violet-600 dark:text-violet-400 group-[&:not([data-selected])]:hidden">
+                <CheckIcon aria-hidden="true" className="size-5" />
+              </span>
+            </ListboxOption>
+          ))}
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  );
+}
+
+/**
+ * RoleParticipantListbox - Assign a participant to a role
+ * Uses Headless UI Listbox with online indicator
+ */
+function RoleParticipantListbox({
+  roleId,
+  unassignedParticipants,
+  onAssign,
+  disabled,
+  placeholder,
+}: {
+  roleId: string;
+  unassignedParticipants: Array<{ id: string; displayName?: string | null; status?: string }>;
+  onAssign: (participantId: string, roleId: string) => void;
+  disabled?: boolean;
+  placeholder: string;
+}) {
+  return (
+    <Listbox
+      value={null}
+      onChange={(p: { id: string; displayName?: string | null; status?: string } | null) => p && onAssign(p.id, roleId)}
+      disabled={disabled}
+    >
+      <div className="relative mt-2">
+        <ListboxButton className="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg border border-border bg-background text-sm cursor-pointer hover:bg-muted/50 transition-colors shadow-sm">
+          <span className="text-muted-foreground truncate">{placeholder}</span>
+          <ChevronUpDownIcon className="h-4 w-4 text-muted-foreground shrink-0" />
+        </ListboxButton>
+
+        <ListboxOptions
+          transition
+          anchor="bottom"
+          className="z-[100] mt-1 max-h-60 w-[var(--button-width)] overflow-auto rounded-lg bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 py-1 shadow-xl focus:outline-none data-[leave]:transition data-[leave]:duration-100 data-[leave]:ease-in data-[closed]:data-[leave]:opacity-0"
+        >
+          {unassignedParticipants.map((p) => {
+            const isOnline = p.status === 'active' || p.status === 'joined';
+            return (
+              <ListboxOption
+                key={p.id}
+                value={p}
+                className="group relative cursor-pointer py-2.5 px-3 text-gray-900 dark:text-gray-100 select-none data-[focus]:bg-violet-100 dark:data-[focus]:bg-violet-900/40 data-[focus]:text-violet-900 dark:data-[focus]:text-violet-100"
+              >
+                <div className="flex items-center gap-3">
+                  <span
+                    aria-label={isOnline ? 'Online' : 'Offline'}
+                    className={cn(
+                      'inline-block size-2.5 shrink-0 rounded-full ring-1 ring-black/10',
+                      isOnline ? 'bg-green-500' : 'bg-gray-400'
+                    )}
+                  />
+                  <span className="block truncate text-sm font-medium group-data-[selected]:font-bold">
+                    {p.displayName || 'Anonym'}
+                  </span>
+                </div>
+                <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-violet-600 dark:text-violet-400 group-[&:not([data-selected])]:hidden">
+                  <CheckIcon aria-hidden="true" className="size-5" />
+                </span>
+              </ListboxOption>
+            );
+          })}
+        </ListboxOptions>
+      </div>
+    </Listbox>
+  );
+}
+
 function RunTab({
   status,
   startedAt,
@@ -130,13 +269,7 @@ function RunTab({
   currentPhaseIndex,
   participants,
   triggers,
-  onStart,
-  onPause,
-  onResume,
-  onEnd,
   onNextStep,
-  onOpenArtifacts,
-  onOpenTriggers,
   lastSyncAt,
 }: {
   status: SessionCockpitState['status'];
@@ -149,13 +282,7 @@ function RunTab({
   currentPhaseIndex: number;
   participants: SessionCockpitState['participants'];
   triggers: SessionCockpitState['triggers'];
-  onStart: () => void;
-  onPause: () => void;
-  onResume: () => void;
-  onEnd: () => void;
   onNextStep: () => void;
-  onOpenArtifacts: () => void;
-  onOpenTriggers: () => void;
   lastSyncAt?: string | null;
 }) {
   const tRun = useTranslations('play.cockpit.run');
@@ -242,24 +369,10 @@ function RunTab({
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6">
         <Card className="p-6 space-y-3">
-          <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.controls')}</p>
-          <div className="flex flex-col gap-2">
-            {uiState.allowed.start && <Button onClick={onStart}>{tRun('actions.start')}</Button>}
-            {uiState.allowed.pause && <Button variant="outline" onClick={onPause}>{tRun('actions.pause')}</Button>}
-            {uiState.allowed.resume && <Button onClick={onResume}>{tRun('actions.resume')}</Button>}
-            {uiState.allowed.end && <Button variant="destructive" onClick={onEnd}>{tRun('actions.end')}</Button>}
-          </div>
-          <div className="flex flex-col gap-2 pt-2">
-            <Button variant="ghost" onClick={onOpenArtifacts}>{tRun('actions.artifacts')}</Button>
-            <Button variant="ghost" onClick={onOpenTriggers}>{tRun('actions.triggers')}</Button>
-          </div>
-        </Card>
-
-        <Card className="p-6 space-y-3 lg:col-span-2">
           <p className="text-xs font-semibold text-muted-foreground">{tRun('labels.health')}</p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div>
               <p className="text-sm font-medium text-foreground">{tRun('health.realtime')}</p>
               <p className="text-sm text-muted-foreground">{tRun(`health.connection.${uiState.connection}`)}</p>
@@ -293,13 +406,13 @@ function RunTab({
 
 function SessionHeader({
   session,
-  status,
+  _status,
   sessionId,
   onOpenChat,
   chatUnreadCount,
 }: {
   session: SessionInfo;
-  status: SessionCockpitState['status'];
+  _status: SessionCockpitState['status'];
   sessionId: string;
   onOpenChat?: () => void;
   chatUnreadCount?: number;
@@ -315,24 +428,8 @@ function SessionHeader({
         </h1>
       </div>
       
-      {/* Right: Status badge, chat, toolbelt */}
+      {/* Right: Chat, toolbelt */}
       <div className="flex items-center gap-2">
-        {status === 'lobby' && (
-          <Badge variant="secondary" size="sm">
-            {t('status.lobby')}
-          </Badge>
-        )}
-        {status === 'active' && (
-          <Badge variant="success" size="sm">
-            ● {t('status.live')}
-          </Badge>
-        )}
-        {status === 'paused' && (
-          <Badge variant="warning" size="sm">
-            ⏸ {t('status.paused')}
-          </Badge>
-        )}
-        
         {onOpenChat && (
           <Button
             onClick={onOpenChat}
@@ -375,13 +472,34 @@ function SessionSummaryCard({
   participantCount,
   totalMinutes,
   onOpenBoard,
+  status,
+  onStart,
+  onPublish,
+  onPause,
+  onResume,
+  onOpenDirectorMode,
+  onBack,
+  onEndSession,
+  onTakeOffline,
+  isLoading,
 }: {
   sessionCode: string;
   participantCount: number;
   totalMinutes: number | null;
   onOpenBoard: () => void;
+  status: SessionCockpitState['status'];
+  onStart: () => void;
+  onPublish?: () => void;
+  onPause: () => void;
+  onResume: () => void;
+  onOpenDirectorMode: () => void;
+  onBack: () => void;
+  onEndSession: () => void;
+  onTakeOffline?: () => void;
+  isLoading?: boolean;
 }) {
   const t = useTranslations('play.cockpit.lobbySummary');
+  const [showBackDialog, setShowBackDialog] = useState(false);
   const { success: toastSuccess } = useToast();
   const [qrOpen, setQrOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
@@ -411,13 +529,53 @@ function SessionSummaryCard({
     }
   }, [sessionCode, toastSuccess, t]);
 
+  // Status display config
+  const statusConfig = {
+    lobby: { label: t('status.lobby'), bgClass: 'bg-slate-500/5', textClass: 'text-slate-400/60 dark:text-slate-500/60' },
+    draft: { label: t('status.draft'), bgClass: 'bg-slate-500/5', textClass: 'text-slate-400/60 dark:text-slate-500/60' },
+    active: { label: t('status.active'), bgClass: 'bg-green-500/5', textClass: 'text-green-600/60 dark:text-green-400/60' },
+    paused: { label: t('status.paused'), bgClass: 'bg-amber-500/5', textClass: 'text-amber-600/60 dark:text-amber-400/60' },
+    ended: { label: t('status.ended'), bgClass: 'bg-gray-500/5', textClass: 'text-gray-500/60 dark:text-gray-400/60' },
+    locked: { label: t('status.locked'), bgClass: 'bg-red-500/5', textClass: 'text-red-500/60 dark:text-red-400/60' },
+  };
+  const currentStatus = statusConfig[status] || statusConfig.lobby;
+
+  // Connectivity mode: draft = offline, lobby+ = online
+  const isOffline = status === 'draft';
+  const connectivityLabel = isOffline ? t('connectivity.offline') : t('connectivity.online');
+  const connectivityClass = isOffline 
+    ? 'text-orange-500/70 dark:text-orange-400/70' 
+    : 'text-green-500/70 dark:text-green-400/70';
+
   return (
     <>
       <Card className="p-4 sm:p-6 border-border/40">
-        {/* Session Code with Board and QR icons */}
-        <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
-          <div className="text-xs font-medium text-muted-foreground text-center mb-2">{t('sessionCodeLabel')}</div>
-          <div className="flex items-center justify-center gap-6">
+          {/* Session Code with Board and QR icons - with status watermark */}
+          <div className={cn('relative overflow-hidden rounded-xl border border-border/40 px-4 py-3', currentStatus.bgClass)}>
+            {/* Connectivity indicator - top left corner */}
+            <div className="absolute top-2 left-3 pointer-events-none select-none">
+              <span className={cn(
+                'text-sm font-bold tracking-wide uppercase',
+                connectivityClass
+              )}>
+                {connectivityLabel}
+              </span>
+            </div>
+            
+            {/* Status watermark - top right corner */}
+            <div className="absolute top-2 right-3 pointer-events-none select-none">
+              <span className={cn(
+                'text-sm font-bold tracking-wide uppercase',
+                currentStatus.textClass
+              )}>
+                {currentStatus.label}
+              </span>
+            </div>
+            
+            {/* Content - positioned above watermark */}
+            <div className="relative z-10">
+              <div className="text-xs font-medium text-muted-foreground text-center mb-2">{t('sessionCodeLabel')}</div>
+              <div className="flex items-center justify-center gap-6">
             <Button
               variant="ghost"
               size="sm"
@@ -449,23 +607,123 @@ function SessionSummaryCard({
               <QrCodeIcon className="h-6 w-6 text-muted-foreground hover:text-foreground" />
               <span className="sr-only">{t('showQrCode')}</span>
             </Button>
+              </div>
+            </div>
           </div>
-        </div>
 
         {/* Participants and Total Time */}
         <div className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
+          <div className="rounded-xl border border-border/40 bg-background/80 backdrop-blur-sm px-4 py-3">
             <div className="text-xs font-medium text-muted-foreground">{t('participantsLabel')}</div>
             <div className="mt-1 text-xl font-semibold text-foreground">{participantCount}</div>
           </div>
-          <div className="rounded-xl border border-border/40 bg-muted/10 px-4 py-3">
+          <div className="rounded-xl border border-border/40 bg-background/80 backdrop-blur-sm px-4 py-3">
             <div className="text-xs font-medium text-muted-foreground">{t('totalTimeLabel')}</div>
             <div className="mt-1 text-xl font-semibold text-foreground">
               {totalMinutes ? t('minutes', { minutes: totalMinutes }) : t('unknown')}
             </div>
           </div>
         </div>
+
+        {/* Session Controls - fixed width layout for symmetry */}
+        <div className="mt-4 flex items-center gap-2">
+          {/* Back button (small, left) - 20% width */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowBackDialog(true)}
+            className="w-[20%] min-w-[70px]"
+          >
+            {t('controls.back')}
+          </Button>
+          
+          {/* Director Mode button (large, center) - 60% width */}
+          <Button
+            variant="default"
+            onClick={onOpenDirectorMode}
+            className="w-[60%] h-10"
+          >
+            {t('controls.directorMode')}
+          </Button>
+          
+          {/* Dynamic Start/Pause/Resume/Publish button (small, right) - 20% width */}
+          <div className="w-[20%] min-w-[70px]">
+            {status === 'draft' && onPublish && (
+              <Button
+                onClick={onPublish}
+                disabled={isLoading}
+                size="sm"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-1">
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  </span>
+                ) : (
+                  t('controls.publish')
+                )}
+              </Button>
+            )}
+            {status === 'lobby' && (
+              <Button
+                onClick={onStart}
+                disabled={isLoading}
+                size="sm"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                {isLoading ? (
+                  <span className="flex items-center gap-1">
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  </span>
+                ) : (
+                  t('controls.start')
+                )}
+              </Button>
+            )}
+            {status === 'active' && (
+              <Button
+                variant="outline"
+                onClick={onPause}
+                disabled={isLoading}
+                size="sm"
+                className="w-full"
+              >
+                {t('controls.pause')}
+              </Button>
+            )}
+            {status === 'paused' && (
+              <Button
+                onClick={onResume}
+                disabled={isLoading}
+                size="sm"
+                className="w-full bg-green-600 hover:bg-green-700 text-white"
+              >
+                {t('controls.resume')}
+              </Button>
+            )}
+            {status === 'ended' && (
+              <Button
+                variant="secondary"
+                disabled
+                size="sm"
+                className="w-full"
+              >
+                {t('controls.ended')}
+              </Button>
+            )}
+          </div>
+        </div>
       </Card>
+
+      {/* Leave Session Modal */}
+      <LeaveSessionModal
+        open={showBackDialog}
+        onClose={() => setShowBackDialog(false)}
+        status={status}
+        onGoBack={onBack}
+        onTakeOffline={onTakeOffline}
+        onEndSession={onEndSession}
+      />
 
       {/* QR Code Modal */}
       <Dialog open={qrOpen} onOpenChange={setQrOpen}>
@@ -501,32 +759,48 @@ interface PreflightState {
 /**
  * LobbyPreflightCard - Unified checklist and start button component
  * 
- * Shows all preflight checks with their status, and includes the "Start Session" 
- * button. When requirements aren't met, the button is grayed but still clickable,
- * triggering a confirmation dialog.
+ * Shows all preflight checks with their status, separated by phase (offline/online).
+ * In draft mode: shows offline items and "Publish" button
+ * In lobby mode: shows online items and "Start Session" button
  */
 function LobbyPreflightCard({
   preflight,
   onShowFullChecklist,
   onStartSession,
+  onPublishSession,
   isStarting,
+  sessionStatus,
 }: {
   preflight: PreflightState;
   onShowFullChecklist: () => void;
   onStartSession: () => void;
+  onPublishSession?: () => void;
   isStarting: boolean;
+  sessionStatus: SessionCockpitState['status'];
 }) {
   const t = useTranslations('play.cockpit.preflight');
-  const { ready, items } = preflight;
+  const { items } = preflight;
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
-  const visibleItems = items.slice(0, 6);
-  const remaining = Math.max(0, items.length - visibleItems.length);
+  const isOfflineMode = sessionStatus === 'draft';
+  
+  // Separate items by phase
+  const offlineItems = items.filter((i) => i.phase === 'offline' || !i.phase);
+  const onlineItems = items.filter((i) => i.phase === 'online');
+  
+  // In draft mode, show offline items. In lobby mode, show online items.
+  const currentPhaseItems = isOfflineMode ? offlineItems : onlineItems;
+  const visibleItems = currentPhaseItems.slice(0, 6);
+  const remaining = Math.max(0, currentPhaseItems.length - visibleItems.length);
 
-  const errorCount = items.filter((i) => i.status === 'error').length;
-  const warningCount = items.filter((i) => i.status === 'warning').length;
-  const pendingCount = items.filter((i) => i.status === 'pending').length;
-  const readyCount = items.filter((i) => i.status === 'ready').length;
+  // Calculate status counts for current phase
+  const errorCount = currentPhaseItems.filter((i) => i.status === 'error').length;
+  const warningCount = currentPhaseItems.filter((i) => i.status === 'warning').length;
+  const pendingCount = currentPhaseItems.filter((i) => i.status === 'pending').length;
+  const readyCount = currentPhaseItems.filter((i) => i.status === 'ready').length;
+  
+  // Check if current phase is ready (no errors)
+  const phaseReady = !currentPhaseItems.some((i) => i.status === 'error');
 
   const iconFor = (status: ChecklistItem['status']) => {
     switch (status) {
@@ -538,21 +812,35 @@ function LobbyPreflightCard({
         return <XCircleIcon className="h-5 w-5 text-destructive shrink-0" />;
       case 'pending':
       default:
-        return <div className="h-5 w-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />;
+        return <span className="inline-block h-5 w-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />;
     }
   };
 
   const handleStartClick = () => {
-    if (ready) {
-      onStartSession();
+    if (isOfflineMode) {
+      // In offline mode, publish the session
+      if (phaseReady && onPublishSession) {
+        onPublishSession();
+      } else if (onPublishSession) {
+        setShowConfirmDialog(true);
+      }
     } else {
-      setShowConfirmDialog(true);
+      // In lobby mode, start the session
+      if (phaseReady) {
+        onStartSession();
+      } else {
+        setShowConfirmDialog(true);
+      }
     }
   };
 
   const handleConfirmStart = () => {
     setShowConfirmDialog(false);
-    onStartSession();
+    if (isOfflineMode && onPublishSession) {
+      onPublishSession();
+    } else {
+      onStartSession();
+    }
   };
 
   return (
@@ -560,9 +848,11 @@ function LobbyPreflightCard({
       <Card className="p-4">
         {/* Header with title and summary */}
         <div className="mb-4">
-          <div className="text-base font-semibold text-foreground">{t('title')}</div>
+          <div className="text-base font-semibold text-foreground">
+            {isOfflineMode ? t('titleOffline') : t('titleOnline')}
+          </div>
           <div className="text-sm text-muted-foreground">
-            {ready 
+            {phaseReady 
               ? t('allChecksOk')
               : `${readyCount} ${t('readyLabel')}, ${pendingCount + warningCount + errorCount} ${t('remainingLabel')}`
             }
@@ -604,31 +894,33 @@ function LobbyPreflightCard({
           </div>
         )}
 
-        {/* Start Session Button */}
+        {/* Action Button - Publish (offline) or Start Session (online) */}
         <Button
           onClick={handleStartClick}
           disabled={isStarting}
           className={cn(
             "w-full h-12 text-base font-medium transition-all",
-            ready
-              ? "bg-green-600 hover:bg-green-700 text-white"
+            phaseReady
+              ? isOfflineMode 
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-green-600 hover:bg-green-700 text-white"
               : "bg-muted hover:bg-muted/80 text-muted-foreground border border-border"
           )}
         >
           {isStarting ? (
             <span className="flex items-center gap-2">
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-              {t('starting')}
+              {isOfflineMode ? t('publishing') : t('starting')}
             </span>
           ) : (
             <span className="flex items-center gap-2">
               <PlayIcon className="h-5 w-5" />
-              {t('startSession')}
+              {isOfflineMode ? t('publishSession') : t('startSession')}
             </span>
           )}
         </Button>
 
-        {!ready && (
+        {!phaseReady && (
           <p className="text-xs text-muted-foreground text-center mt-2">
             {errorCount > 0 
               ? t('hasErrors', { count: errorCount })
@@ -647,19 +939,19 @@ function LobbyPreflightCard({
             <AlertDialogTitle>{t('confirmStart.title')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('confirmStart.description')}
-              <ul className="mt-3 space-y-1">
-                {items
-                  .filter((i) => i.status !== 'ready')
-                  .slice(0, 5)
-                  .map((item) => (
-                    <li key={item.id} className="flex items-center gap-2 text-sm">
-                      {iconFor(item.status)}
-                      <span>{item.label}</span>
-                    </li>
-                  ))}
-              </ul>
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <ul className="mt-3 space-y-1">
+            {items
+              .filter((i) => i.status !== 'ready')
+              .slice(0, 5)
+              .map((item) => (
+                <li key={item.id} className="flex items-center gap-2 text-sm">
+                  {iconFor(item.status)}
+                  <span>{item.label}</span>
+                </li>
+              ))}
+          </ul>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('confirmStart.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={handleConfirmStart}>
@@ -770,16 +1062,16 @@ function ParticipantsTab({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {/* Quick Actions Bar */}
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-muted/30 rounded-lg">
+      <div className="flex flex-wrap items-center gap-2 p-2 bg-muted/30 rounded-lg">
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-foreground">
             {connectedCount} online • {assignedCount}/{participants.length} {t('assigned')}
           </div>
           {!allMinsSatisfied && (
-            <div className="text-xs text-warning flex items-center gap-1 mt-0.5">
-              <ExclamationTriangleIcon className="h-3.5 w-3.5" />
+            <div className="text-xs text-warning flex items-center gap-1">
+              <ExclamationTriangleIcon className="h-3 w-3" />
               {t('minsNotSatisfied')}
             </div>
           )}
@@ -823,43 +1115,28 @@ function ParticipantsTab({
 
       {/* Participants Overview - Show unassigned first */}
       {unassignedParticipants.length > 0 && (
-        <Card className="p-3 border-dashed border-border/50 bg-muted/10">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">
+        <Card className="p-2 border-dashed border-border/50 bg-muted/10">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-xs font-medium text-muted-foreground">
               {t('unassignedParticipants')} ({unassignedParticipants.length})
             </span>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {unassignedParticipants.map((p) => (
-              <div 
+              <ParticipantRoleListbox
                 key={p.id}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 text-sm"
-              >
-                <span className="font-medium">{p.displayName || tParticipants('anonymous')}</span>
-                {(p.status === 'active' || p.status === 'joined') && (
-                  <span className="text-green-500 text-xs">●</span>
-                )}
-                <select
-                  className="text-xs border-0 bg-transparent p-0 pr-4 -mr-2 cursor-pointer"
-                  value=""
-                  onChange={(e) => e.target.value && onAssignRole(p.id, e.target.value)}
-                  disabled={isReadOnly}
-                >
-                  <option value="">→</option>
-                  {rolesWithAssignments.filter(r => !r.isFull).map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                participant={p}
+                availableRoles={rolesWithAssignments.filter(r => !r.isFull)}
+                onAssign={onAssignRole}
+                disabled={isReadOnly}
+              />
             ))}
           </div>
         </Card>
       )}
 
       {/* Unified Role Cards with Participants */}
-      <div className="space-y-3">
+      <div className="space-y-1.5">
         {rolesWithAssignments.map((role) => {
           const isExpanded = expandedRoleId === role.id;
           const secretsVisible = allSecretsUnlocked;
@@ -877,11 +1154,11 @@ function ParticipantsTab({
               <button
                 type="button"
                 onClick={() => setExpandedRoleId(isExpanded ? null : role.id)}
-                className="w-full p-3 flex items-center gap-3 hover:bg-muted/30 transition-colors text-left"
+                className="w-full px-3 py-2 flex items-center gap-2 hover:bg-muted/30 transition-colors text-left"
               >
                 {/* Role icon/avatar */}
                 <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
                   style={{ 
                     backgroundColor: role.color || '#6366f1', 
                     color: 'white' 
@@ -892,13 +1169,13 @@ function ParticipantsTab({
 
                 {/* Role info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-foreground truncate">{role.name}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm font-medium text-foreground truncate">{role.name}</span>
                     {hasSecrets && (
-                      <LockClosedIcon className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+                      <LockClosedIcon className="h-3 w-3 text-muted-foreground shrink-0" />
                     )}
                   </div>
-                  <div className="text-xs text-muted-foreground flex items-center gap-2">
+                  <div className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <span className={cn(
                       !role.isSatisfied && 'text-warning font-medium'
                     )}>
@@ -916,32 +1193,32 @@ function ParticipantsTab({
                 </div>
 
                 {/* Assigned avatars (mobile-friendly) */}
-                <div className="flex -space-x-2 shrink-0">
+                <div className="flex -space-x-1.5 shrink-0">
                   {role.assignedParticipants.slice(0, 3).map((p) => (
                     <div
                       key={p.id}
-                      className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium border-2 border-background"
+                      className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-[10px] font-medium border-2 border-background"
                       title={p.displayName || tParticipants('anonymous')}
                     >
                       {p.displayName?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   ))}
                   {role.assignedParticipants.length > 3 && (
-                    <div className="w-7 h-7 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-xs font-medium border-2 border-background">
+                    <div className="w-6 h-6 rounded-full bg-muted text-muted-foreground flex items-center justify-center text-[10px] font-medium border-2 border-background">
                       +{role.assignedParticipants.length - 3}
                     </div>
                   )}
                 </div>
 
                 <ChevronRightIcon className={cn(
-                  'h-5 w-5 text-muted-foreground transition-transform shrink-0',
+                  'h-4 w-4 text-muted-foreground transition-transform shrink-0',
                   isExpanded && 'rotate-90'
                 )} />
               </button>
 
               {/* Expanded Content */}
               {isExpanded && (
-                <div className="border-t border-border/50 px-3 py-3 space-y-4 bg-muted/10">
+                <div className="border-t border-border/50 px-3 py-2 space-y-3 bg-muted/10">
                   {/* Role Description */}
                   {role.public_description && (
                     <p className="text-sm text-muted-foreground">
@@ -951,32 +1228,32 @@ function ParticipantsTab({
 
                   {/* Secret Instructions */}
                   {hasSecrets && (
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                       <div className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
-                        {secretsVisible ? <LockOpenIcon className="h-3.5 w-3.5" /> : <LockClosedIcon className="h-3.5 w-3.5" />}
+                        {secretsVisible ? <LockOpenIcon className="h-3 w-3" /> : <LockClosedIcon className="h-3 w-3" />}
                         {t('secretInstructions')}
                       </div>
                       {secretsVisible ? (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5">
                           {role.private_instructions && (
-                            <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
-                              <p className="text-sm text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
+                            <div className="p-2 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                              <p className="text-xs text-amber-900 dark:text-amber-100 whitespace-pre-wrap">
                                 {role.private_instructions}
                               </p>
                             </div>
                           )}
                           {role.private_hints && (
-                            <div className="p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                              <div className="text-xs font-medium text-blue-700 dark:text-blue-400 mb-1">💡 Tips</div>
-                              <p className="text-sm text-blue-900 dark:text-blue-100 whitespace-pre-wrap">
+                            <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
+                              <div className="text-[10px] font-medium text-blue-700 dark:text-blue-400 mb-0.5">💡 Tips</div>
+                              <p className="text-xs text-blue-900 dark:text-blue-100 whitespace-pre-wrap">
                                 {role.private_hints}
                               </p>
                             </div>
                           )}
                         </div>
                       ) : (
-                        <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground italic flex items-center gap-2">
-                          <EyeSlashIcon className="h-4 w-4" />
+                        <div className="p-2 rounded-lg bg-muted/50 text-xs text-muted-foreground italic flex items-center gap-1.5">
+                          <EyeSlashIcon className="h-3.5 w-3.5" />
                           {t('secretInstructionsLocked')}
                         </div>
                       )}
@@ -984,22 +1261,22 @@ function ParticipantsTab({
                   )}
 
                   {/* Assigned Participants */}
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <span className="text-xs font-medium text-muted-foreground">
                       {t('assignedToRole')} ({role.assignedParticipants.length})
                     </span>
                     {role.assignedParticipants.length > 0 ? (
-                      <div className="space-y-1.5">
+                      <div className="space-y-1">
                         {role.assignedParticipants.map((p) => (
                           <div 
                             key={p.id} 
-                            className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border/30"
+                            className="flex items-center justify-between p-1.5 rounded-lg bg-muted/30 border border-border/30"
                           >
-                            <div className="flex items-center gap-2 min-w-0">
-                              <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-medium">
                                 {p.displayName?.charAt(0)?.toUpperCase() || '?'}
                               </div>
-                              <span className="text-sm font-medium truncate">
+                              <span className="text-xs font-medium truncate">
                                 {p.displayName || tParticipants('anonymous')}
                               </span>
                               {(p.status === 'active' || p.status === 'joined') && (
@@ -1011,34 +1288,28 @@ function ParticipantsTab({
                               size="sm"
                               onClick={() => onUnassignRole(p.id)}
                               disabled={isReadOnly}
-                              className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                              className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
                             >
-                              <XCircleIcon className="h-4 w-4" />
+                              <XCircleIcon className="h-3.5 w-3.5" />
                             </Button>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="text-sm text-muted-foreground italic p-2">
+                      <div className="text-xs text-muted-foreground italic py-1">
                         {t('noParticipantsAssigned')}
                       </div>
                     )}
 
                     {/* Quick assign dropdown */}
                     {unassignedParticipants.length > 0 && !role.isFull && (
-                      <select
-                        className="w-full text-sm border border-border/50 rounded-lg px-3 py-2 bg-muted/20 mt-2"
-                        value=""
-                        onChange={(e) => e.target.value && onAssignRole(e.target.value, role.id)}
+                      <RoleParticipantListbox
+                        roleId={role.id}
+                        unassignedParticipants={unassignedParticipants}
+                        onAssign={onAssignRole}
                         disabled={isReadOnly}
-                      >
-                        <option value="">{t('addParticipantToRole')}</option>
-                        {unassignedParticipants.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.displayName || tParticipants('anonymous')}
-                          </option>
-                        ))}
-                      </select>
+                        placeholder={t('addParticipantToRole')}
+                      />
                     )}
                   </div>
                 </div>
@@ -1162,6 +1433,8 @@ export function SessionCockpit({
     enterDirectorMode,
     exitDirectorMode,
     startSession,
+    publishSession,
+    unpublishSession,
     pauseSession,
     resumeSession,
     endSession,
@@ -1276,7 +1549,8 @@ export function SessionCockpit({
 
   const totalMinutes = useMemo(() => estimateTotalMinutes(steps), [steps]);
 
-  const chatEnabled = status === 'active' || status === 'paused';
+  // Chat is always enabled - host can write on wall before session starts
+  const chatEnabled = true;
 
   const chat = useSessionChat({
     sessionId,
@@ -1508,7 +1782,7 @@ export function SessionCockpit({
         {/* Header */}
         <SessionHeader
           session={session}
-          status={status}
+          _status={status}
           sessionId={sessionId}
           onOpenChat={chatEnabled ? () => setChatOpen(true) : undefined}
           chatUnreadCount={chat.unreadCount}
@@ -1540,6 +1814,19 @@ export function SessionCockpit({
                     window.open(`/board/${sessionCode}`, '_blank');
                   }
                 }}
+                status={status}
+                onStart={handleEnterDirectorMode}
+                onPublish={publishSession}
+                onPause={pauseSession}
+                onResume={resumeSession}
+                onOpenDirectorMode={() => setDirectorModeOpen(true)}
+                onBack={() => {
+                  // Navigate back to sessions list
+                  window.location.href = '/app/play';
+                }}
+                onEndSession={endSession}
+                onTakeOffline={unpublishSession}
+                isLoading={isLoading}
               />
             </div>
           )}
@@ -1560,7 +1847,9 @@ export function SessionCockpit({
                   preflight={checklistData}
                   onShowFullChecklist={() => setShowChecklist(true)}
                   onStartSession={handleEnterDirectorMode}
+                  onPublishSession={publishSession}
                   isStarting={isLoading}
+                  sessionStatus={status}
                 />
 
                 {/* Storyline button */}
@@ -1597,13 +1886,7 @@ export function SessionCockpit({
                 currentPhaseIndex={currentPhaseIndex}
                 participants={participants}
                 triggers={triggers}
-                onStart={startSession}
-                onPause={pauseSession}
-                onResume={resumeSession}
-                onEnd={endSession}
                 onNextStep={nextStep}
-                onOpenArtifacts={() => setActiveTab('artifacts')}
-                onOpenTriggers={() => setActiveTab('triggers')}
                 lastSyncAt={lastSyncAt ?? null}
               />
             )}

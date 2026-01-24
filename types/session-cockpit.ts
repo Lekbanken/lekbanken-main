@@ -413,6 +413,8 @@ export interface SessionCockpitActions {
   
   // Session lifecycle
   startSession: () => Promise<void>;
+  publishSession: () => Promise<void>;
+  unpublishSession: () => Promise<void>;
   pauseSession: () => Promise<void>;
   resumeSession: () => Promise<void>;
   endSession: () => Promise<void>;

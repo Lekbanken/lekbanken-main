@@ -125,6 +125,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       const { session } = await getHostSession(sessionId);
       
       const resolvedStatus: SessionCockpitState['status'] = (() => {
+        if (session.status === 'draft') return 'draft';
+        if (session.status === 'lobby') return 'lobby';
         if (session.status === 'paused') return 'paused';
         if (session.status === 'locked') return 'locked';
         if (session.status === 'ended' || session.status === 'archived' || session.status === 'cancelled') return 'ended';
@@ -251,6 +253,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       // to avoid flickering between 'lobby' and 'active' during polling
       const resolvedStatus: SessionCockpitState['status'] | undefined = (() => {
         if (!rawStatus) return undefined;
+        if (rawStatus === 'draft') return 'draft';
+        if (rawStatus === 'lobby') return 'lobby';
         if (rawStatus === 'paused') return 'paused';
         if (rawStatus === 'locked') return 'locked';
         if (rawStatus === 'ended' || rawStatus === 'archived' || rawStatus === 'cancelled') return 'ended';
@@ -511,6 +515,24 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
       setState((prev) => ({ ...prev, status: 'active' }));
     } catch (err) {
       onError?.(err instanceof Error ? err : new Error('Failed to start session'));
+    }
+  }, [sessionId, onError]);
+
+  const publishSession = useCallback(async () => {
+    try {
+      await updateSessionStatus(sessionId, 'publish');
+      setState((prev) => ({ ...prev, status: 'lobby' }));
+    } catch (err) {
+      onError?.(err instanceof Error ? err : new Error('Failed to publish session'));
+    }
+  }, [sessionId, onError]);
+
+  const unpublishSession = useCallback(async () => {
+    try {
+      await updateSessionStatus(sessionId, 'unpublish');
+      setState((prev) => ({ ...prev, status: 'draft' }));
+    } catch (err) {
+      onError?.(err instanceof Error ? err : new Error('Failed to unpublish session'));
     }
   }, [sessionId, onError]);
 
@@ -1050,21 +1072,28 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     void loadAll();
   }, [loadAll]);
 
-  // Polling
+  // Polling - reduced in draft mode since no participants can join
   useEffect(() => {
     if (!enableRealtime) return;
 
+    // In draft mode, skip participant polling entirely (no participants can join)
+    // Only poll runtime state at a reduced rate
+    const isDraft = state.status === 'draft';
+    const effectivePollInterval = isDraft ? pollInterval * 5 : pollInterval; // 5x slower in draft
+
     pollRef.current = setInterval(() => {
-      void loadParticipants();
+      if (!isDraft) {
+        void loadParticipants();
+      }
       void loadRuntimeState();
-    }, pollInterval);
+    }, effectivePollInterval);
 
     return () => {
       if (pollRef.current) {
         clearInterval(pollRef.current);
       }
     };
-  }, [enableRealtime, pollInterval, loadParticipants, loadRuntimeState]);
+  }, [enableRealtime, pollInterval, loadParticipants, loadRuntimeState, state.status]);
 
   // ==========================================================================
   // Return
@@ -1074,6 +1103,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     enterDirectorMode,
     exitDirectorMode,
     startSession,
+    publishSession,
+    unpublishSession,
     pauseSession,
     resumeSession,
     endSession,

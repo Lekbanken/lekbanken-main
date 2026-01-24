@@ -67,6 +67,13 @@ export async function POST(request: NextRequest) {
     }
     
     // Check session status
+    if (session.status === 'draft') {
+      return NextResponse.json(
+        { error: 'Session not available', details: 'Session is not open for participants yet.', code: 'SESSION_OFFLINE' },
+        { status: 403 }
+      );
+    }
+
     if (session.status === 'locked') {
       return NextResponse.json(
         { error: 'Session is locked', details: 'Session is locked. No new participants can join.' },
@@ -81,7 +88,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (session.status !== 'active' && session.status !== 'paused') {
+    // Allow joining during: lobby (waiting), active (running), paused (temporarily stopped)
+    if (session.status !== 'lobby' && session.status !== 'active' && session.status !== 'paused') {
       return NextResponse.json(
         { 
           error: 'Session not available',

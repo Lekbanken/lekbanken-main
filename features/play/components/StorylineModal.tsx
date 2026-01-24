@@ -462,7 +462,7 @@ export function StorylineModal({
       />
       
       {/* Modal */}
-      <div className="relative w-full max-w-2xl max-h-[90vh] bg-background rounded-xl shadow-2xl flex flex-col mx-4">
+      <div className="relative w-full max-w-2xl h-[80vh] max-h-[600px] bg-background rounded-xl shadow-2xl flex flex-col mx-4">
         {/* Header with close button */}
         <div className="flex items-center justify-between border-b border-border/40 px-6 py-3">
           <div className="flex items-center gap-3">

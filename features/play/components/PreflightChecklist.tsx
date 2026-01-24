@@ -23,12 +23,15 @@ import { cn } from '@/lib/utils';
 // =============================================================================
 
 export type ChecklistItemStatus = 'ready' | 'warning' | 'error' | 'pending';
+export type ChecklistPhase = 'offline' | 'online';
 
 export interface ChecklistItem {
   id: string;
   label: string;
   status: ChecklistItemStatus;
   detail?: string;
+  /** Which phase this item belongs to: offline (can be done before publish) or online (requires participants) */
+  phase?: ChecklistPhase;
   action?: {
     label: string;
     onClick: () => void;
@@ -212,34 +215,37 @@ export function buildPreflightItems(
 ): ChecklistItem[] {
   const items: ChecklistItem[] = [];
 
-  // 1. Participants check
+  // 1. Participants check - ONLINE phase (requires published session)
   items.push({
     id: 'participants',
     label: t('items.participants.label'),
     status: state.participantCount > 0 ? 'ready' : 'warning',
+    phase: 'online',
     detail:
       state.participantCount > 0
         ? t('items.participants.joined', { count: state.participantCount })
         : t('items.participants.noneJoined'),
   });
 
-  // 2. Game check
+  // 2. Game check - OFFLINE phase
   if (!state.hasGame) {
     items.push({
       id: 'game',
       label: t('items.game.label'),
       status: 'error',
+      phase: 'offline',
       detail: t('items.game.noGame'),
     });
     return items; // Early return - can't continue without game
   }
 
-  // 3. Roles snapshot check
+  // 3. Roles snapshot check - OFFLINE phase
   if (!state.rolesSnapshotted) {
     items.push({
       id: 'roles-snapshot',
       label: t('items.rolesSnapshot.label'),
       status: 'error',
+      phase: 'offline',
       detail: t('items.rolesSnapshot.notCopied'),
       action: actions.onSnapshotRoles
         ? { label: t('items.rolesSnapshot.copyAction'), onClick: actions.onSnapshotRoles }
@@ -250,10 +256,11 @@ export function buildPreflightItems(
       id: 'roles-snapshot',
       label: t('items.rolesSnapshot.label'),
       status: 'ready',
+      phase: 'offline',
       detail: t('items.rolesSnapshot.copied', { count: state.totalRoles }),
     });
 
-    // 4. Roles assignment check
+    // 4. Roles assignment check - ONLINE phase (requires participants)
     if (state.roleMinCountsStatus && state.roleMinCountsStatus.length > 0) {
       const minCountsMet = state.roleMinCountsStatus.every((r) => r.met);
       const someAssigned = state.rolesAssignedCount > 0;
@@ -262,6 +269,7 @@ export function buildPreflightItems(
         id: 'roles-assigned',
         label: t('items.rolesAssigned.label'),
         status: minCountsMet ? 'ready' : someAssigned ? 'warning' : 'pending',
+        phase: 'online',
         detail: minCountsMet
           ? t('items.rolesAssigned.allMinMet')
           : state.roleMinCountsStatus
@@ -274,7 +282,7 @@ export function buildPreflightItems(
             : undefined,
       });
     } else {
-      // Fallback for simpler role check
+      // Fallback for simpler role check - ONLINE phase
       const allAssigned =
         state.participantCount > 0 &&
         state.rolesAssignedCount >= state.participantCount;
@@ -284,6 +292,7 @@ export function buildPreflightItems(
         id: 'roles-assigned',
         label: t('items.rolesAssigned.label'),
         status: allAssigned ? 'ready' : someAssigned ? 'warning' : 'pending',
+        phase: 'online',
         detail: allAssigned
           ? t('items.rolesAssigned.allAssigned')
           : someAssigned
@@ -297,7 +306,7 @@ export function buildPreflightItems(
     }
   }
 
-  // 5. Secrets check (if applicable)
+  // 5. Secrets check (if applicable) - OFFLINE phase (unlocking secrets for roles)
   if (state.hasSecretInstructions) {
     const allRolesAssigned = state.rolesAssignedCount >= state.participantCount;
     const secretsRevealedCount = state.secretsRevealedCount ?? 0;
@@ -305,6 +314,7 @@ export function buildPreflightItems(
     items.push({
       id: 'secrets',
       label: t('items.secrets.label'),
+      phase: 'offline',
       status: state.secretsUnlocked
         ? 'ready'
         : allRolesAssigned
@@ -322,36 +332,39 @@ export function buildPreflightItems(
     });
   }
 
-  // 6. Artifacts check
+  // 6. Artifacts check - OFFLINE phase
   if (state.artifactsSnapshotted !== undefined) {
     items.push({
       id: 'artifacts',
       label: t('items.artifacts.label'),
       status: state.artifactsSnapshotted ? 'ready' : 'pending',
+      phase: 'offline',
       detail: state.artifactsSnapshotted
         ? t('items.artifacts.ready')
         : t('items.artifacts.loading'),
     });
   }
 
-  // 7. Triggers check
+  // 7. Triggers check - OFFLINE phase
   if (state.hasTriggers) {
     items.push({
       id: 'triggers',
       label: t('items.triggers.label'),
       status: state.triggersSnapshotted ? 'ready' : 'pending',
+      phase: 'offline',
       detail: state.triggersSnapshotted
         ? t('items.triggers.ready', { count: state.armedTriggersCount ?? 0 })
         : t('items.triggers.loading'),
     });
   }
 
-  // 8. Signal capabilities check
+  // 8. Signal capabilities check - OFFLINE phase
   if (state.signalCapabilitiesTested !== undefined) {
     items.push({
       id: 'signals',
       label: t('items.signals.label'),
       status: state.signalCapabilitiesTested ? 'ready' : 'pending',
+      phase: 'offline',
       detail: state.signalCapabilitiesTested
         ? t('items.signals.tested')
         : t('items.signals.notTested'),

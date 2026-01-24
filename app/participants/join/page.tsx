@@ -54,6 +54,7 @@ export default function JoinSessionPage() {
         if (status === 403 && data?.error === 'Session is full') throw new Error(t('errors.sessionFull'));
         if (status === 410) throw new Error(t('errors.sessionEnded'));
         if (status === 403 && data?.error === 'Session is locked') throw new Error(t('errors.sessionLocked'));
+        if (status === 403 && data?.code === 'SESSION_OFFLINE') throw new Error(t('errors.sessionOffline'));
         throw new Error(data.error || t('errors.joinFailed'));
       }
       

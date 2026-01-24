@@ -60,7 +60,7 @@ export async function getHostSession(id: string): Promise<{ session: PlaySession
   return parseJson(res);
 }
 
-export async function updateSessionStatus(id: string, action: 'start' | 'pause' | 'resume' | 'end' | 'lock' | 'unlock') {
+export async function updateSessionStatus(id: string, action: 'start' | 'pause' | 'resume' | 'end' | 'lock' | 'unlock' | 'publish' | 'unpublish') {
   const res = await fetch(`/api/play/sessions/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

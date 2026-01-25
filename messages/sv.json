@@ -258,6 +258,18 @@
       "continuePlayingDesc": "Tjäna XP genom att spela fler lekar",
       "planSession": "Planera ett pass",
       "planSessionDesc": "Tjäna XP genom att skapa pass"
+    },
+    "nav": {
+      "courses": "Kurser",
+      "coursesDesc": "Lär dig nya färdigheter",
+      "achievements": "Prestationer",
+      "achievementsDesc": "Se dina badges och mål",
+      "dicecoin": "DiceCoin",
+      "dicecoinDesc": "Ditt myntsaldo och historik",
+      "shop": "Butik",
+      "shopDesc": "Använd mynt för belöningar",
+      "eventlog": "Eventlogg",
+      "eventlogDesc": "Din aktivitetshistorik"
     }
   },
   "admin": {

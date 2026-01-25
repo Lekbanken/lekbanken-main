@@ -277,6 +277,18 @@
       "continuePlayingDesc": "Earn XP by playing more games",
       "planSession": "Plan a session",
       "planSessionDesc": "Earn XP by creating sessions"
+    },
+    "nav": {
+      "courses": "Courses",
+      "coursesDesc": "Learn new skills",
+      "achievements": "Achievements",
+      "achievementsDesc": "See your badges and goals",
+      "dicecoin": "DiceCoin",
+      "dicecoinDesc": "Your coin balance and history",
+      "shop": "Shop",
+      "shopDesc": "Use coins for rewards",
+      "eventlog": "Event log",
+      "eventlogDesc": "Your activity history"
     }
   },
   "admin": {

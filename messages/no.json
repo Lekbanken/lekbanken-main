@@ -442,6 +442,18 @@
       "continuePlayingDesc": "Tjen XP ved å spille flere spill",
       "planSession": "Planlegg en økt",
       "planSessionDesc": "Tjen XP ved å opprette økter"
+    },
+    "nav": {
+      "courses": "Kurs",
+      "coursesDesc": "Lær nye ferdigheter",
+      "achievements": "Prestasjoner",
+      "achievementsDesc": "Se dine badges og mål",
+      "dicecoin": "DiceCoin",
+      "dicecoinDesc": "Din myntbalanse og historikk",
+      "shop": "Butikk",
+      "shopDesc": "Bruk mynter til belønninger",
+      "eventlog": "Eventlogg",
+      "eventlogDesc": "Din aktivitetshistorikk"
     }
   },
   "admin": {

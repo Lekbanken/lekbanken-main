@@ -333,8 +333,20 @@
       "placeholder": "Sök planer..."
     },
     "filters": {
+      "all": "Alla",
+      "draft": "Utkast",
+      "published": "Publicerade",
+      "modified": "Ändrade",
+      "archived": "Arkiverade",
+      "private": "Privat",
       "tenant": "Organisation",
       "public": "Publik"
+    },
+    "sort": {
+      "newest": "Nyast först",
+      "oldest": "Äldst först",
+      "aToZ": "A till Ö",
+      "zToA": "Ö till A"
     },
     "status": {
       "unpublishedChanges": "Opublicerade ändringar"

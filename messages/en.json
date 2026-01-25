@@ -352,8 +352,20 @@
       "placeholder": "Search plans..."
     },
     "filters": {
+      "all": "All",
+      "draft": "Draft",
+      "published": "Published",
+      "modified": "Modified",
+      "archived": "Archived",
+      "private": "Private",
       "tenant": "Organization",
       "public": "Public"
+    },
+    "sort": {
+      "newest": "Newest first",
+      "oldest": "Oldest first",
+      "aToZ": "A to Z",
+      "zToA": "Z to A"
     },
     "status": {
       "unpublishedChanges": "Unpublished changes"

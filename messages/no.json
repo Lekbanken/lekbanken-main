@@ -517,8 +517,20 @@
       "placeholder": "Søk planer..."
     },
     "filters": {
+      "all": "Alle",
+      "draft": "Utkast",
+      "published": "Publisert",
+      "modified": "Endret",
+      "archived": "Arkivert",
+      "private": "Privat",
       "tenant": "Organisasjon",
       "public": "Offentlig"
+    },
+    "sort": {
+      "newest": "Nyeste først",
+      "oldest": "Eldste først",
+      "aToZ": "A til Å",
+      "zToA": "Å til A"
     },
     "status": {
       "unpublishedChanges": "Upubliserte endringer"

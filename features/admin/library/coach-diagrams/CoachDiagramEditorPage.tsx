@@ -109,7 +109,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
   // Visual style options
   const [usePlayerImages, setUsePlayerImages] = useState(true);
   const [useBallImages, setUseBallImages] = useState(true);
-  const [zoneOpacity, setZoneOpacity] = useState(0.2);
+  const [zoneOpacity, _setZoneOpacity] = useState(0.2);
 
   const [drag, setDrag] = useState<
     | null
@@ -1024,7 +1024,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                 const y = o.position.y * diagramViewBox.height;
                 const size = o.style.size as PrimitiveSize;
                 const r = radiusForSize(size);
-                const imageSize = imageSizeForSize(size);
+                const _imageSize = imageSizeForSize(size);
                 const isSelected = selection.kind === 'object' && selection.id === o.id;
                 const label = o.style.label?.trim() ? o.style.label : null;
                 const isShort = label ? label.length <= 2 : false;

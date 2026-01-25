@@ -8,8 +8,6 @@ import { Input, Textarea, Select, Button, Card } from '@/components/ui';
 import { 
   ArrowLeftIcon, 
   EyeIcon, 
-  ArrowUturnLeftIcon, 
-  ArrowUturnRightIcon,
   InformationCircleIcon,
 } from '@heroicons/react/24/outline';
 import {
@@ -36,19 +34,12 @@ import { TOOL_REGISTRY } from '@/features/tools/registry';
 import type { ToolScope } from '@/features/tools/types';
 import { useGameBuilder } from '@/hooks/useGameBuilder';
 import {
-  type GameBuilderState,
   type StepData,
   type PhaseData,
   type RoleData,
   type BoardConfigData,
-  type CoreForm,
-  type MaterialsForm,
   type GameToolForm,
-  type PlayMode,
   defaultCore,
-  defaultMaterials,
-  defaultBoardConfig,
-  defaultCover,
 } from '@/types/game-builder-state';
 
 type Purpose = {
@@ -115,7 +106,6 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     setGameTools,
     setSubPurposeIds,
     setCover,
-    loadFromApi,
   } = builder;
 
   // Destructure state for convenience
@@ -241,11 +231,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     if (!core.main_purpose_id && mainPurposeOptions.length > 0) {
       setCore((prev) => ({ ...prev, main_purpose_id: prev.main_purpose_id || mainPurposeOptions[0].value }));
     }
-  }, [core.main_purpose_id, mainPurposeOptions]);
+  }, [core.main_purpose_id, mainPurposeOptions, setCore]);
 
   useEffect(() => {
     setSubPurposeIds((prev) => prev.filter((id) => subPurposeOptions.some((opt) => opt.value === id)));
-  }, [subPurposeOptions]);
+  }, [subPurposeOptions, setSubPurposeIds]);
 
   // Load existing game
   useEffect(() => {
@@ -459,7 +449,8 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
         setLoading(false);
       }
     })();
-  }, [gameId, t]);
+    // All set* functions are stable and never change
+  }, [gameId, t, setCore, setSteps, setPhases, setRoles, setArtifacts, setTriggers, setMaterials, setBoardConfig, setCover, setSubPurposeIds, setGameTools]);
 
   // Validation result (Task 2.6)
   const validationResult = useMemo(() => {
@@ -682,7 +673,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
     }
     setCore((prev) => ({ ...prev, status: 'published' }));
     await handleSave({ status: 'published' });
-  }, [handleSave, qualityState.allRequiredMet, t]);
+  }, [handleSave, qualityState.allRequiredMet, t, setCore]);
 
   if (loading) {
     return (
@@ -998,9 +989,9 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             <section>
               <GameFlowCanvas
                 state={state}
-                onNavigate={(section, entityId) => {
+                onNavigate={(section, _entityId) => {
                   setActiveSection(section);
-                  // If entityId is provided, we could scroll to or focus that entity
+                  // If _entityId is provided, we could scroll to or focus that entity
                   // For now, just navigate to the section
                 }}
               />

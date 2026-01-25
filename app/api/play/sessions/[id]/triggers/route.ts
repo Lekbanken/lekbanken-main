@@ -133,7 +133,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
  * V2: DEPRECATED - Snapshot is no longer needed.
  * Triggers are read directly from game_triggers with state from session_trigger_state.
  */
-export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_request: Request, { params: _params }: { params: Promise<{ id: string }> }) {
   return NextResponse.json(
     {
       deprecated: true,

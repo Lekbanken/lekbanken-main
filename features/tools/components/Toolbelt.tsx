@@ -87,6 +87,7 @@ export function Toolbelt({
 
   // Don't render until client-side to avoid hydration mismatch with Radix dialog IDs
   const [mounted, setMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: standard hydration pattern
   useEffect(() => setMounted(true), []);
   if (!mounted) {
     return (

@@ -291,6 +291,40 @@
       "eventlogDesc": "Your activity history"
     }
   },
+  "browse": {
+    "pageTitle": "Explore",
+    "pageSubtitle": "Find activities for your session",
+    "search": {
+      "placeholder": "Search activities...",
+      "ariaLabel": "Search activities",
+      "clearAriaLabel": "Clear search"
+    },
+    "activitiesCount": "{count} activities",
+    "sort": "Sort",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "featured": {
+      "label": "Featured",
+      "title": "Featured activities",
+      "count": "{count} activities"
+    },
+    "filter": {
+      "title": "Filter",
+      "description": "Select filters to find the right activity",
+      "clearAll": "Clear all",
+      "apply": "Apply"
+    },
+    "environment": "Environment",
+    "players": "Players",
+    "count": "Count",
+    "age": "Age",
+    "years": "Years",
+    "noAccess": "You don't have access to any products yet.",
+    "errorTitle": "Could not load",
+    "emptyTitle": "No activities found",
+    "emptyDescription": "Try different filters or search terms.",
+    "loadMore": "Load more"
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",

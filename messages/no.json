@@ -456,6 +456,40 @@
       "eventlogDesc": "Din aktivitetshistorikk"
     }
   },
+  "browse": {
+    "pageTitle": "Utforsk",
+    "pageSubtitle": "Finn aktiviteter for økten din",
+    "search": {
+      "placeholder": "Søk aktiviteter...",
+      "ariaLabel": "Søk aktiviteter",
+      "clearAriaLabel": "Tøm søk"
+    },
+    "activitiesCount": "{count} aktiviteter",
+    "sort": "Sorter",
+    "gridView": "Rutenettvisning",
+    "listView": "Listevisning",
+    "featured": {
+      "label": "Anbefalt",
+      "title": "Utmerkede aktiviteter",
+      "count": "{count} aktiviteter"
+    },
+    "filter": {
+      "title": "Filter",
+      "description": "Velg filtre for å finne riktig aktivitet",
+      "clearAll": "Tøm alle",
+      "apply": "Bruk"
+    },
+    "environment": "Miljø",
+    "players": "Spillere",
+    "count": "Antall",
+    "age": "Alder",
+    "years": "År",
+    "noAccess": "Du har ikke tilgang til noen produkter ennå.",
+    "errorTitle": "Kunne ikke laste",
+    "emptyTitle": "Ingen aktiviteter funnet",
+    "emptyDescription": "Prøv andre filtre eller søkeord.",
+    "loadMore": "Last inn flere"
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",

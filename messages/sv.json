@@ -272,6 +272,40 @@
       "eventlogDesc": "Din aktivitetshistorik"
     }
   },
+  "browse": {
+    "pageTitle": "Utforska",
+    "pageSubtitle": "Hitta aktiviteter för ditt pass",
+    "search": {
+      "placeholder": "Sök aktiviteter...",
+      "ariaLabel": "Sök aktiviteter",
+      "clearAriaLabel": "Rensa sökning"
+    },
+    "activitiesCount": "{count} aktiviteter",
+    "sort": "Sortera",
+    "gridView": "Rutnätsvy",
+    "listView": "Listvy",
+    "featured": {
+      "label": "Rekommenderat",
+      "title": "Utmärkta aktiviteter",
+      "count": "{count} aktiviteter"
+    },
+    "filter": {
+      "title": "Filtrera",
+      "description": "Välj filter för att hitta rätt aktivitet",
+      "clearAll": "Rensa alla",
+      "apply": "Tillämpa"
+    },
+    "environment": "Miljö",
+    "players": "Spelare",
+    "count": "Antal",
+    "age": "Ålder",
+    "years": "År",
+    "noAccess": "Du har inte tillgång till några produkter ännu.",
+    "errorTitle": "Kunde inte ladda",
+    "emptyTitle": "Inga aktiviteter hittades",
+    "emptyDescription": "Försök med andra filter eller sökord.",
+    "loadMore": "Ladda fler"
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",

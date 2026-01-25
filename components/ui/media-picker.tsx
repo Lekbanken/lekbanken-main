@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs } from '@/components/ui/tabs'
+import { DiagramThumbnail } from '@/components/ui/diagram-thumbnail'
 import { cn } from '@/lib/utils'
 import { logger } from '@/lib/utils/logger'
 
@@ -229,13 +230,22 @@ export function MediaPicker({
                         selectedId === item.id ? 'border-primary ring-2 ring-primary' : 'border-border'
                       )}
                     >
-                      <Image
-                        src={item.url}
-                        alt={item.alt_text || item.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                      />
+                      {/* Use DiagramThumbnail for diagrams to show court background, native img fallback */}
+                      {item.type === 'diagram' ? (
+                        <DiagramThumbnail
+                          url={item.url}
+                          alt={item.alt_text || item.name}
+                          className="absolute inset-0 w-full h-full bg-white"
+                        />
+                      ) : (
+                        <Image
+                          src={item.url}
+                          alt={item.alt_text || item.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                        />
+                      )}
                     </button>
                   ))}
                 </div>

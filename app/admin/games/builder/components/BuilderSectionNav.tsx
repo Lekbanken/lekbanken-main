@@ -15,10 +15,12 @@ import {
   WrenchScrewdriverIcon,
   Squares2X2Icon,
   BoltIcon,
+  MapIcon,
 } from '@heroicons/react/24/outline';
 
 export type BuilderSection = 
   | 'grundinfo'
+  | 'oversikt'
   | 'steg'
   | 'material'
   | 'sakerhet'
@@ -42,6 +44,7 @@ type SectionConfig = {
 
 const sections: SectionConfig[] = [
   { id: 'grundinfo', label: 'Grundinformation', icon: InformationCircleIcon },
+  { id: 'oversikt', label: 'Översikt', icon: MapIcon },
   { id: 'steg', label: 'Steg-för-steg', icon: ListBulletIcon },
   { id: 'material', label: 'Material', icon: CubeIcon },
   { id: 'sakerhet', label: 'Säkerhet & Inkludering', icon: ShieldCheckIcon },

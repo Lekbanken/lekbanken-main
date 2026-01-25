@@ -14,3 +14,5 @@ export { TemplatePickerDialog } from './TemplatePickerDialog';
 export { TriggerSimulator } from './TriggerSimulator';
 export { SnapshotManager } from './SnapshotManager';
 export { DecisionEditor } from './DecisionEditor';
+export { MaterialEditor } from './MaterialEditor';
+export { GameOverview, GameFlowCanvas } from './overview';

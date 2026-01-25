@@ -31,12 +31,22 @@ const nextConfig: NextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
-        pathname: "/storage/v1/object/public/**",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "127.0.0.1",
-        pathname: "/storage/v1/object/public/**",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "www.lekbanken.no",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "lekbanken.no",
+        pathname: "/**",
       },
     ],
   },

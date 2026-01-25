@@ -76,6 +76,8 @@ export function SessionControlPanel({
   
   const getStatusBadge = () => {
     const badges = {
+      draft: { bg: 'bg-gray-100', text: 'text-gray-600', label: t('status.draft') },
+      lobby: { bg: 'bg-blue-100', text: 'text-blue-700', label: t('status.lobby') },
       active: { bg: 'bg-green-100', text: 'text-green-700', label: t('status.active') },
       paused: { bg: 'bg-yellow-100', text: 'text-yellow-700', label: t('status.paused') },
       locked: { bg: 'bg-orange-100', text: 'text-orange-700', label: t('status.locked') },

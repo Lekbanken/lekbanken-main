@@ -1,8 +1,39 @@
 import type { CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
+import { getCourtBackgroundUrl } from './courtBackgrounds';
 
 // Portrait canvas (mobile-first)
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 1000;
+
+// Sport-specific marker images (relative URLs)
+const PLAYER_MARKER_BY_SPORT: Record<string, string> = {
+  basketball: '/coach-diagram/markers/basketball-player.png',
+  football: '/coach-diagram/markers/football-player.png',
+  handball: '/coach-diagram/markers/football-player.png',
+  hockey: '/coach-diagram/markers/hockeyjersey-player.png',
+  innebandy: '/coach-diagram/markers/football-player.png',
+  custom: '/coach-diagram/markers/football-player.png',
+};
+
+const BALL_MARKER_BY_SPORT: Record<string, string> = {
+  basketball: '/coach-diagram/markers/basketball-ball.png',
+  football: '/coach-diagram/markers/football-ball.png',
+  handball: '/coach-diagram/markers/handball-ball.png',
+  hockey: '/coach-diagram/markers/hockeypuck-ball.png',
+  innebandy: '/coach-diagram/markers/innebandyball-ball.png',
+  custom: '/coach-diagram/markers/football-ball.png',
+};
+
+function imageSizeForSize(size: 'sm' | 'md' | 'lg'): number {
+  switch (size) {
+    case 'sm':
+      return 34;
+    case 'lg':
+      return 62;
+    default:
+      return 48;
+  }
+}
 
 
 function clamp01(value: number): number {
@@ -39,13 +70,67 @@ function escapeXml(text: string): string {
     .replaceAll("'", '&#39;');
 }
 
-export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
+export function renderDiagramSvg(doc: CoachDiagramDocumentV1, options?: { baseUrl?: string }): string {
+  const baseUrl = options?.baseUrl ?? '';
+  
   const defs = `
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="currentColor" />
     </marker>
   </defs>`;
+
+  // Background court image
+  const courtUrl = getCourtBackgroundUrl(doc.sportType);
+  const background = courtUrl
+    ? `<image href="${baseUrl}${courtUrl}" x="0" y="0" width="${VIEWBOX_WIDTH}" height="${VIEWBOX_HEIGHT}" preserveAspectRatio="xMidYMid meet" />`
+    : '';
+
+  // Sport-specific marker URLs
+  const playerImageUrl = `${baseUrl}${PLAYER_MARKER_BY_SPORT[doc.sportType] || PLAYER_MARKER_BY_SPORT.football}`;
+  const ballImageUrl = `${baseUrl}${BALL_MARKER_BY_SPORT[doc.sportType] || BALL_MARKER_BY_SPORT.football}`;
+
+  // Render zones first (background layer)
+  const zones = (doc.zones ?? [])
+    .map((zone) => {
+      const fill = escapeXml(zone.style.fill);
+      const fillOpacity = zone.style.fillOpacity ?? 0.2;
+      const strokeOpacity = 0.35;
+
+      if (zone.type === 'rect') {
+        const x = clamp01(zone.x) * VIEWBOX_WIDTH;
+        const y = clamp01(zone.y) * VIEWBOX_HEIGHT;
+        const width = clamp01(zone.width) * VIEWBOX_WIDTH;
+        const height = clamp01(zone.height) * VIEWBOX_HEIGHT;
+        return `
+  <g data-zone-id="${escapeXml(zone.id)}">
+    <rect x="${x}" y="${y}" width="${width}" height="${height}" fill="${fill}" fill-opacity="${fillOpacity}" stroke="${fill}" stroke-opacity="${strokeOpacity}" stroke-width="2" />
+  </g>`;
+      }
+
+      if (zone.type === 'circle') {
+        const cx = clamp01(zone.cx) * VIEWBOX_WIDTH;
+        const cy = clamp01(zone.cy) * VIEWBOX_HEIGHT;
+        const r = clamp01(zone.r) * Math.min(VIEWBOX_WIDTH, VIEWBOX_HEIGHT);
+        return `
+  <g data-zone-id="${escapeXml(zone.id)}">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill}" fill-opacity="${fillOpacity}" stroke="${fill}" stroke-opacity="${strokeOpacity}" stroke-width="2" />
+  </g>`;
+      }
+
+      if (zone.type === 'triangle') {
+        const points = zone.points
+          .map((p) => `${clamp01(p.x) * VIEWBOX_WIDTH},${clamp01(p.y) * VIEWBOX_HEIGHT}`)
+          .join(' ');
+        return `
+  <g data-zone-id="${escapeXml(zone.id)}">
+    <polygon points="${points}" fill="${fill}" fill-opacity="${fillOpacity}" stroke="${fill}" stroke-opacity="${strokeOpacity}" stroke-width="2" />
+  </g>`;
+      }
+
+      return '';
+    })
+    .join('');
 
   const arrows = doc.arrows
     .map((a) => {
@@ -74,30 +159,51 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
     .map((o) => {
       const { x, y } = posToPx(o.position);
       const r = radiusForSize(o.style.size);
+      const imageSize = imageSizeForSize(o.style.size);
 
       if (o.type === 'ball') {
+        // Render ball as PNG image
+        const imgX = x - imageSize / 2;
+        const imgY = y - imageSize / 2;
         return `
   <g data-object-id="${escapeXml(o.id)}">
-    <circle cx="${x}" cy="${y}" r="${Math.max(10, r - 6)}" fill="currentColor" fill-opacity="0.9" />
-    <circle cx="${x}" cy="${y}" r="${Math.max(10, r - 6)}" fill="none" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" />
+    <image href="${ballImageUrl}" x="${imgX}" y="${imgY}" width="${imageSize}" height="${imageSize}" preserveAspectRatio="xMidYMid meet" />
   </g>`;
       }
 
-      const fill = o.type === 'marker' ? 'fill="currentColor" fill-opacity="0.12"' : 'fill="none"';
+      if (o.type === 'player') {
+        // Render player as PNG image
+        const imgX = x - imageSize / 2;
+        const imgY = y - imageSize / 2;
+        const labelValue = o.style.label?.trim() ? escapeXml(o.style.label) : '';
+        const labelY = y - imageSize / 2 - 8;
+        const label = labelValue
+          ? `
+    <text x="${x}" y="${labelY}" font-size="14" text-anchor="middle" fill="none" stroke="white" stroke-opacity="0.9" stroke-width="4" stroke-linejoin="round">${labelValue}</text>
+    <text x="${x}" y="${labelY}" font-size="14" text-anchor="middle" fill="currentColor" fill-opacity="0.9">${labelValue}</text>`
+          : '';
+        return `
+  <g data-object-id="${escapeXml(o.id)}">
+    <image href="${playerImageUrl}" x="${imgX}" y="${imgY}" width="${imageSize}" height="${imageSize}" preserveAspectRatio="xMidYMid meet" />
+    ${label}
+  </g>`;
+      }
+
+      // Marker (cross) - keep as SVG shape
+      const half = r * 0.9;
       const labelValue = o.style.label?.trim() ? escapeXml(o.style.label) : '';
-      const isShort = labelValue.length > 0 && labelValue.length <= 2;
-      const labelX = x;
-      const labelY = isShort ? y + 5 : y - r - 8;
-      const labelFontSize = isShort ? 16 : 14;
+      const labelY = y - r - 8;
       const label = labelValue
         ? `
-    <text x="${labelX}" y="${labelY}" font-size="${labelFontSize}" text-anchor="middle" fill="none" stroke="white" stroke-opacity="0.9" stroke-width="4" stroke-linejoin="round">${labelValue}</text>
-    <text x="${labelX}" y="${labelY}" font-size="${labelFontSize}" text-anchor="middle" fill="currentColor" fill-opacity="0.9">${labelValue}</text>`
+    <text x="${x}" y="${labelY}" font-size="14" text-anchor="middle" fill="none" stroke="white" stroke-opacity="0.9" stroke-width="4" stroke-linejoin="round">${labelValue}</text>
+    <text x="${x}" y="${labelY}" font-size="14" text-anchor="middle" fill="currentColor" fill-opacity="0.9">${labelValue}</text>`
         : '';
 
       return `
   <g data-object-id="${escapeXml(o.id)}">
-    <circle cx="${x}" cy="${y}" r="${r}" ${fill} stroke="currentColor" stroke-width="3" stroke-opacity="0.85" />
+    <circle cx="${x}" cy="${y}" r="${half}" fill="currentColor" fill-opacity="0.12" />
+    <line x1="${x - half}" y1="${y - half}" x2="${x + half}" y2="${y + half}" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-opacity="0.85" />
+    <line x1="${x - half}" y1="${y + half}" x2="${x + half}" y2="${y - half}" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-opacity="0.85" />
     ${label}
   </g>`;
     })
@@ -106,8 +212,10 @@ export function renderDiagramSvg(doc: CoachDiagramDocumentV1): string {
   const title = escapeXml(doc.title);
 
   return `<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}" width="${VIEWBOX_WIDTH}" height="${VIEWBOX_HEIGHT}" role="img" aria-label="${title}">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}" width="${VIEWBOX_WIDTH}" height="${VIEWBOX_HEIGHT}" role="img" aria-label="${title}">
 ${defs}
+${background}
+${zones}
 ${arrows}
 ${objects}
 </svg>`;

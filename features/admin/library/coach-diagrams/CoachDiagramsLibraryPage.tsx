@@ -10,6 +10,7 @@ import { useTenant } from '@/lib/context/TenantContext';
 import { AdminEmptyState, AdminPageHeader, AdminPageLayout } from '@/components/admin/shared';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DiagramThumbnail } from '@/components/ui/diagram-thumbnail';
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1 } from '@/lib/validation/coachDiagramSchemaV1';
 import { renderDiagramSvg } from './svg';
 
@@ -36,6 +37,8 @@ export function CoachDiagramsLibraryPage() {
   const [error, setError] = useState<string | null>(null);
   const [diagrams, setDiagrams] = useState<DiagramListRow[]>([]);
   const [creating, setCreating] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [filterTenantId, setFilterTenantId] = useState<string | 'all'>('all');
 
   const canLoad = Boolean(currentTenant?.id);
 
@@ -45,14 +48,33 @@ export function CoachDiagramsLibraryPage() {
     setLoading(true);
     setError(null);
     try {
-      const params = new URLSearchParams({ scopeType: 'tenant', tenantId: currentTenant.id });
-      const res = await fetch(`/api/admin/coach-diagrams?${params.toString()}`);
-      if (!res.ok) {
-        const body = (await res.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(body?.error || `Request failed (${res.status})`);
+      // Fetch all diagrams (both tenant and global scope)
+      const tenantParams = new URLSearchParams({ scopeType: 'tenant', tenantId: currentTenant.id });
+      const globalParams = new URLSearchParams({ scopeType: 'global' });
+      
+      const [tenantRes, globalRes] = await Promise.all([
+        fetch(`/api/admin/coach-diagrams?${tenantParams.toString()}`),
+        fetch(`/api/admin/coach-diagrams?${globalParams.toString()}`).catch(() => null),
+      ]);
+      
+      if (!tenantRes.ok) {
+        const body = (await tenantRes.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error || `Request failed (${tenantRes.status})`);
       }
-      const json = (await res.json()) as { diagrams?: DiagramListRow[] };
-      setDiagrams(json.diagrams ?? []);
+      
+      const tenantJson = (await tenantRes.json()) as { diagrams?: DiagramListRow[] };
+      const globalJson = globalRes?.ok 
+        ? (await globalRes.json()) as { diagrams?: DiagramListRow[] }
+        : { diagrams: [] };
+      
+      // Combine and dedupe by id
+      const allDiagrams = [...(tenantJson.diagrams ?? []), ...(globalJson.diagrams ?? [])];
+      const uniqueDiagrams = Array.from(new Map(allDiagrams.map(d => [d.id, d])).values());
+      
+      // Sort by updated_at descending
+      uniqueDiagrams.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      
+      setDiagrams(uniqueDiagrams);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load');
     } finally {
@@ -63,6 +85,43 @@ export function CoachDiagramsLibraryPage() {
   useEffect(() => {
     void fetchDiagrams();
   }, [fetchDiagrams]);
+
+  const deleteDiagram = useCallback(async (id: string) => {
+    if (!confirm('Är du säker på att du vill ta bort detta diagram?')) return;
+    
+    setDeleting(id);
+    try {
+      const res = await fetch(`/api/admin/coach-diagrams/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (!res.ok) {
+        const body = (await res.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(body?.error || `Delete failed (${res.status})`);
+      }
+      
+      // Remove from local state
+      setDiagrams(prev => prev.filter(d => d.id !== id));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to delete');
+    } finally {
+      setDeleting(null);
+    }
+  }, []);
+
+  // Filter diagrams by selected tenant
+  const filteredDiagrams = useMemo(() => {
+    if (filterTenantId === 'all') return diagrams;
+    if (filterTenantId === 'global') return diagrams.filter(d => !d.tenant_id);
+    return diagrams.filter(d => d.tenant_id === filterTenantId);
+  }, [diagrams, filterTenantId]);
+
+  // Get unique tenant IDs for filter
+  const tenantOptions = useMemo(() => {
+    const tenantIds = new Set(diagrams.map(d => d.tenant_id).filter(Boolean));
+    const hasGlobal = diagrams.some(d => !d.tenant_id);
+    return { tenantIds: Array.from(tenantIds) as string[], hasGlobal };
+  }, [diagrams]);
 
   const makeUuidV4 = () => {
     const webCrypto = (globalThis as unknown as { crypto?: Crypto }).crypto;
@@ -103,6 +162,7 @@ export function CoachDiagramsLibraryPage() {
         fieldTemplateId: 'default',
         objects: [],
         arrows: [],
+        zones: [],
         metadata: {},
         createdAt: now,
         updatedAt: now,
@@ -162,7 +222,7 @@ export function CoachDiagramsLibraryPage() {
       );
     }
 
-    if (diagrams.length === 0) {
+    if (filteredDiagrams.length === 0) {
       return (
         <AdminEmptyState
           icon={<PhotoIcon className="h-6 w-6" />}
@@ -174,34 +234,60 @@ export function CoachDiagramsLibraryPage() {
 
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {diagrams.map((d) => (
-          <Card key={d.id} className="p-4">
-            <div className="space-y-1">
+        {filteredDiagrams.map((d) => (
+          <Card key={d.id} className="overflow-hidden">
+            {/* Diagram thumbnail preview */}
+            <div className="aspect-[3/4] bg-muted/50 border-b">
+              <DiagramThumbnail
+                url={`/api/coach-diagrams/${d.id}/svg`}
+                alt={d.title}
+                className="w-full h-full"
+              />
+            </div>
+            <div className="p-4 space-y-1">
               <div className="text-sm font-semibold text-foreground">{d.title}</div>
               <div className="text-xs text-muted-foreground">
                 {t('updated')}: {new Date(d.updated_at).toLocaleString()}
               </div>
-              <div className="pt-2 text-xs text-muted-foreground">
-                <Link className="underline" href={`/admin/library/coach-diagrams/${d.id}`}>
+              {/* Tenant indicator */}
+              <div className="text-xs text-muted-foreground">
+                {d.tenant_id ? (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                    Tenant
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300">
+                    Global
+                  </span>
+                )}
+              </div>
+              <div className="pt-2 flex items-center gap-3 text-xs">
+                <Link className="underline text-muted-foreground hover:text-foreground" href={`/admin/library/coach-diagrams/${d.id}`}>
                   {t('openEditor')}
                 </Link>
-              </div>
-              <div className="pt-2 text-xs text-muted-foreground">
                 <a
-                  className="underline"
+                  className="underline text-muted-foreground hover:text-foreground"
                   href={`/api/coach-diagrams/${d.id}/svg`}
                   target="_blank"
                   rel="noreferrer"
                 >
                   {t('openSvg')}
                 </a>
+                <button
+                  type="button"
+                  onClick={() => deleteDiagram(d.id)}
+                  disabled={deleting === d.id}
+                  className="underline text-red-600 hover:text-red-700 disabled:opacity-50"
+                >
+                  {deleting === d.id ? 'Tar bort...' : 'Ta bort'}
+                </button>
               </div>
             </div>
           </Card>
         ))}
       </div>
     );
-  }, [canLoad, diagrams, error, fetchDiagrams, loading, t]);
+  }, [canLoad, filteredDiagrams, deleting, deleteDiagram, error, fetchDiagrams, loading, t]);
 
   return (
     <AdminPageLayout>
@@ -215,6 +301,29 @@ export function CoachDiagramsLibraryPage() {
           </Button>
         }
       />
+
+      {/* Filter */}
+      {diagrams.length > 0 && (
+        <div className="flex items-center gap-3 mb-4">
+          <label className="text-sm font-medium text-muted-foreground">Filter:</label>
+          <select
+            value={filterTenantId}
+            onChange={(e) => setFilterTenantId(e.target.value)}
+            className="text-sm border rounded-md px-2 py-1 bg-background"
+          >
+            <option value="all">Alla ({diagrams.length})</option>
+            {tenantOptions.hasGlobal && <option value="global">Globala</option>}
+            {tenantOptions.tenantIds.map((id) => (
+              <option key={id} value={id}>
+                Tenant: {id.slice(0, 8)}...
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-muted-foreground">
+            Visar {filteredDiagrams.length} av {diagrams.length} diagram
+          </span>
+        </div>
+      )}
 
       <div className="space-y-4">{content}</div>
     </AdminPageLayout>

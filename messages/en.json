@@ -3143,7 +3143,7 @@
         "step3": "Validate in Import dialog (dry-run) before import.",
         "commonErrors": "Common errors",
         "invalidPurpose": "<strong>Invalid purpose-id:</strong> main_purpose_id/sub_purpose_ids must be valid UUIDs from the database.",
-        "jsonEscaping": "<strong>JSON escaping in CSV:</strong> quotes in JSON must be written as <code>{'\"\"'}</code> in CSV cell.",
+        "jsonEscaping": "<strong>JSON escaping in CSV:</strong> quotes in JSON must be written as <code>\"\"</code> in CSV cell.",
         "missingSteps": "<strong>Missing steps:</strong> if step_N_title exists, step_N_body must also exist.",
         "playModesTab": "Play Modes",
         "playModes": "Play Modes (play_mode)",
@@ -3652,10 +3652,13 @@
             "description": "Name and description shown in the game library.",
             "nameLabel": "Name",
             "namePlaceholder": "e.g. Cooperation relay",
+            "nameHint": "Give the game a short and descriptive name",
             "shortDescriptionLabel": "Short description",
             "shortDescriptionPlaceholder": "1–2 sentences summarizing the game.",
+            "shortDescriptionHint": "Shown on the game card in the library. Max 150 characters recommended.",
             "fullDescriptionLabel": "Full description",
-            "fullDescriptionPlaceholder": "Detailed description of the game..."
+            "fullDescriptionPlaceholder": "Detailed description of the game...",
+            "fullDescriptionHint": "Describe game rules, goals, and tips for the leader"
           },
           "purposes": {
             "title": "Purposes & cover image",
@@ -3670,16 +3673,21 @@
             "title": "Classification",
             "energyLabel": "Energy level",
             "locationLabel": "Location",
-            "timeLabel": "Time (minutes)",
+            "timeLabel": "Time",
+            "timeUnit": "minutes",
+            "playersLabel": "Number of players",
+            "playersUnit": "players",
+            "ageLabel": "Age",
+            "ageUnit": "years",
             "minPlayersLabel": "Players min",
             "maxPlayersLabel": "Players max",
             "ageMinLabel": "Age min",
             "ageMaxLabel": "Age max",
-            "timePlaceholder": "e.g. 15",
-            "minPlayersPlaceholder": "e.g. 4",
-            "maxPlayersPlaceholder": "e.g. 30",
-            "ageMinPlaceholder": "e.g. 6",
-            "ageMaxPlaceholder": "e.g. 99",
+            "timePlaceholder": "15",
+            "minPlayersPlaceholder": "4",
+            "maxPlayersPlaceholder": "30",
+            "ageMinPlaceholder": "6",
+            "ageMaxPlaceholder": "99",
             "energyPlaceholder": "Select energy level",
             "energyLow": "Low",
             "energyMedium": "Medium",
@@ -3692,9 +3700,14 @@
           "materials": {
             "title": "Materials",
             "description": "List materials needed to run the game.",
-            "itemsLabel": "Materials (one per line)",
+            "itemsLabel": "Materials",
             "itemsPlaceholder": "Example:\n8 cones\n1 ball per team\nMusic (Spotify playlist)",
-            "itemsCount": "{count} materials added",
+            "itemsCount": "{count, plural, =0 {No materials} one {# material} other {# materials}}",
+            "addItem": "Add",
+            "addItemPlaceholder": "Add material...",
+            "showSuggestions": "Show common suggestions",
+            "hideSuggestions": "Hide suggestions",
+            "noItems": "No materials added yet. Add materials needed for the game.",
             "preparationLabel": "Preparation",
             "preparationPlaceholder": "What should the leader prepare before the game?"
           },
@@ -4442,6 +4455,45 @@
           "welcomeMessagePlaceholder": "Welcome to tonight's mystery!",
           "clear": "Clear"
         },
+        "overview": {
+          "title": "Overview",
+          "description": "Visual overview of the game structure: phases, steps, artifacts and triggers.",
+          "phaseLabel": "Phase",
+          "noSteps": "No steps in this phase",
+          "orphanPhase": "Steps without phase",
+          "orphanDescription": "These steps don't belong to any phase",
+          "empty": {
+            "title": "Empty game",
+            "description": "Add phases and steps to build the game structure.",
+            "addSteps": "Add steps",
+            "addPhases": "Add phases"
+          },
+          "unresolvedWarning": "{count, plural, one {# trigger has unresolved references} other {# triggers have unresolved references}}",
+          "legend": {
+            "phase": "Phase",
+            "step": "Step",
+            "artifact": "Artifact",
+            "unlocks": "Unlocks",
+            "reveals": "Reveals",
+            "error": "Validation error"
+          },
+          "autoLayout": "Auto-layout",
+          "contextMenu": {
+            "addPhase": "Add phase",
+            "addStep": "Add step",
+            "addArtifact": "Add artifact",
+            "addTrigger": "Add trigger"
+          },
+          "artifactsSection": "Artifacts",
+          "triggersSection": "{count, plural, one {# trigger} other {# triggers}}",
+          "more": "more",
+          "stats": {
+            "phases": "Phases",
+            "steps": "Steps",
+            "artifacts": "Artifacts",
+            "triggers": "Triggers"
+          }
+        },
         "snapshot": {
           "title": "Version management",
           "createTitle": "Create new version",
@@ -4534,6 +4586,7 @@
           "addStep": "Add step",
           "editStep": "Edit step",
           "saveStep": "Save step",
+          "removeStep": "Remove step",
           "addFirstStep": "Add first step",
           "noSteps": "No steps yet. Add your first step.",
           "noStepsYet": "No steps yet",
@@ -4546,10 +4599,12 @@
           "selectedDiagram": "Selected diagram",
           "selectDiagram": "Select diagram",
           "titlePlaceholder": "E.g. Gather the group",
+          "titleHint": "Short and clear title describing the step",
           "descriptionPlaceholder": "What should participants do in this step?",
-          "leaderScriptPlaceholder": "Tell the group: 'Now we will...'",
-          "leaderScriptHelp": "Exactly what the leader can say to the group",
-          "durationPlaceholder": "E.g. 120 (2 minutes)",
+          "descriptionHint": "This text is shown to participants during the game",
+          "leaderScriptPlaceholderStructured": "Goal: Everyone gets their role.\nLeader does: Start the game and ask everyone to read their instruction.\nGroup does: Takes in their role.\nDone when: Everyone is ready.\nIf things go wrong: Read the roles aloud and distribute verbally.\nTime: 2 minutes.",
+          "durationPlaceholder": "120",
+          "durationUnit": "seconds",
           "displayModeHelp": "How the description is displayed to participants",
           "displayModes": {
             "instant": "Instant (default)",
@@ -4559,10 +4614,27 @@
           "fields": {
             "title": "Title",
             "description": "Description",
-            "duration": "Estimated time (seconds)",
+            "duration": "Estimated time",
             "leaderScript": "Leader script (optional)",
             "displayMode": "Text display",
             "diagram": "Diagram (optional)"
+          },
+          "preview": {
+            "goal": "Goal",
+            "leaderDoes": "Leader does",
+            "groupDoes": "Group does",
+            "doneWhen": "Done when",
+            "troubleshoot": "If things go wrong",
+            "time": "Time"
+          },
+          "structureGuide": {
+            "title": "Tip: Use structured sections",
+            "goal": "What should be achieved in the step",
+            "leaderDoes": "What the leader actively does",
+            "groupDoes": "What participants do",
+            "doneWhen": "How to know the step is complete",
+            "troubleshoot": "What to do if it doesn't work",
+            "time": "Approximate time for the step"
           }
         },
         "wizard": {

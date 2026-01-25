@@ -5,7 +5,13 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { Input, Textarea, Select, Button, Card } from '@/components/ui';
-import { ArrowLeftIcon, EyeIcon } from '@heroicons/react/24/outline';
+import { 
+  ArrowLeftIcon, 
+  EyeIcon, 
+  ArrowUturnLeftIcon, 
+  ArrowUturnRightIcon,
+  InformationCircleIcon,
+} from '@heroicons/react/24/outline';
 import {
   BuilderSectionNav,
   QualityChecklist,
@@ -18,78 +24,38 @@ import {
   StandardImagePicker,
   ArtifactEditor,
   TriggerEditor,
+  GameFlowCanvas,
+  MaterialEditor,
   type BuilderSection,
   type QualityState,
-  type StepData,
-  type PhaseData,
-  type RoleData,
-  type BoardConfigData,
 } from './components';
 import { ValidationPanel } from './components/ValidationPanel';
 import { validateGameRefs, type GameDataForValidation } from './utils/validateGameRefs';
 import type { ArtifactFormData, ArtifactVariantFormData, TriggerFormData } from '@/types/games';
 import { TOOL_REGISTRY } from '@/features/tools/registry';
-import type { ToolKey, ToolScope } from '@/features/tools/types';
-
-type PlayMode = 'basic' | 'facilitated' | 'participants';
+import type { ToolScope } from '@/features/tools/types';
+import { useGameBuilder } from '@/hooks/useGameBuilder';
+import {
+  type GameBuilderState,
+  type StepData,
+  type PhaseData,
+  type RoleData,
+  type BoardConfigData,
+  type CoreForm,
+  type MaterialsForm,
+  type GameToolForm,
+  type PlayMode,
+  defaultCore,
+  defaultMaterials,
+  defaultBoardConfig,
+  defaultCover,
+} from '@/types/game-builder-state';
 
 type Purpose = {
   id: string;
   name: string | null;
   type?: string | null;
   parent_id?: string | null;
-};
-
-type CoreForm = {
-  name: string;
-  short_description: string;
-  description: string;
-  status: 'draft' | 'published';
-  play_mode: PlayMode;
-  main_purpose_id: string;
-  product_id: string | null;
-  taxonomy_category: string;
-  energy_level: string | null;
-  location_type: string | null;
-  time_estimate_min: number | null;
-  duration_max: number | null;
-  min_players: number | null;
-  max_players: number | null;
-  age_min: number | null;
-  age_max: number | null;
-  difficulty: string | null;
-  accessibility_notes: string;
-  space_requirements: string;
-  leader_tips: string;
-};
-
-type MaterialsForm = {
-  items: string[];
-  safety_notes: string;
-  preparation: string;
-};
-
-const defaultCore: CoreForm = {
-  name: '',
-  short_description: '',
-  description: '',
-  status: 'draft',
-  play_mode: 'basic',
-  main_purpose_id: '',
-  product_id: null,
-  taxonomy_category: '',
-  energy_level: null,
-  location_type: null,
-  time_estimate_min: null,
-  duration_max: null,
-  min_players: null,
-  max_players: null,
-  age_min: null,
-  age_max: null,
-  difficulty: null,
-  accessibility_notes: '',
-  space_requirements: '',
-  leader_tips: '',
 };
 
 const makeId = () =>
@@ -113,12 +79,6 @@ type GameBuilderPageProps = {
   gameId?: string;
 };
 
-type GameToolForm = {
-  tool_key: ToolKey;
-  enabled: boolean;
-  scope: ToolScope;
-};
-
 const DEFAULT_GAME_TOOLS: GameToolForm[] = TOOL_REGISTRY.map((tool) => ({
   tool_key: tool.key,
   enabled: false,
@@ -130,42 +90,84 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
   const t = useTranslations('admin.games.builder.page');
   const isEditing = Boolean(gameId);
 
-  // Form state
-  const [core, setCore] = useState<CoreForm>(defaultCore);
-  const [steps, setSteps] = useState<StepData[]>([]);
-  const [materials, setMaterials] = useState<MaterialsForm>({
-    items: [],
-    safety_notes: '',
-    preparation: '',
-  });
-  const [phases, setPhases] = useState<PhaseData[]>([]);
-  const [roles, setRoles] = useState<RoleData[]>([]);
-  const [artifacts, setArtifacts] = useState<ArtifactFormData[]>([]);
-  const [triggers, setTriggers] = useState<TriggerFormData[]>([]);
-  const [purposes, setPurposes] = useState<Purpose[]>([]);
-  const [subPurposeIds, setSubPurposeIds] = useState<string[]>([]);
-  const [cover, setCover] = useState<{ mediaId: string | null; url: string | null }>({ mediaId: null, url: null });
-  const [gameTools, setGameTools] = useState<GameToolForm[]>(DEFAULT_GAME_TOOLS);
-  const [boardConfig, setBoardConfig] = useState<BoardConfigData>({
-    show_game_name: true,
-    show_current_phase: true,
-    show_timer: true,
-    show_participants: true,
-    show_public_roles: true,
-    show_leaderboard: false,
-    show_qr_code: false,
-    welcome_message: '',
-    theme: 'neutral',
-    background_color: '',
-    layout_variant: 'standard',
-  });
+  // Use the centralized builder hook with history support
+  const builder = useGameBuilder({ gameId });
+  const {
+    state,
+    canUndo,
+    canRedo,
+    undo,
+    redo,
+    setCore,
+    setSteps,
+    setPhases,
+    setRoles,
+    setArtifacts,
+    setTriggers,
+    setMaterials,
+    setBoardConfig,
+    setGameTools,
+    setSubPurposeIds,
+    setCover,
+    loadFromApi,
+  } = builder;
 
-  // UI state
+  // Destructure state for convenience
+  const {
+    core,
+    steps,
+    materials,
+    phases,
+    roles,
+    artifacts,
+    triggers,
+    boardConfig,
+    gameTools,
+    subPurposeIds,
+    cover,
+  } = state;
+
+  // Purposes are loaded separately (not part of builder state)
+  const [purposes, setPurposes] = useState<Purpose[]>([]);
+
+  // UI state (not part of builder state)
   const [activeSection, setActiveSection] = useState<BuilderSection>('grundinfo');
   const [loading, setLoading] = useState(isEditing);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger in text inputs
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+        // Allow undo/redo in text fields only with Ctrl+Z/Y
+        if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+          // Let browser handle undo in text fields
+          return;
+        }
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+          // Let browser handle redo in text fields
+          return;
+        }
+        return;
+      }
+
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        if (canUndo) undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        if (canRedo) redo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [canUndo, canRedo, undo, redo]);
 
   const energyOptions = useMemo(
     () => [
@@ -767,43 +769,67 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                 </p>
               </div>
 
-              <Card className="p-6 space-y-4">
+              {/* Card 1: Namn & Beskrivningar */}
+              <Card className="p-6 space-y-5">
+                {/* Namn */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    {t('basicInfo.nameLabel')} <span className="text-destructive">{t('common.required')}</span>
+                  <label className="text-sm font-medium text-foreground flex items-center gap-1">
+                    {t('basicInfo.nameLabel')} <span className="text-destructive">*</span>
                   </label>
                   <Input
                     value={core.name}
-                    onChange={(e) => setCore({ ...core, name: e.target.value })}
+                    onChange={(e) => setCore({ name: e.target.value })}
                     placeholder={t('basicInfo.namePlaceholder')}
+                    className={!core.name ? 'border-amber-300 focus:border-amber-500' : ''}
                   />
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <InformationCircleIcon className="h-3.5 w-3.5" />
+                    {t('basicInfo.nameHint')}
+                  </p>
                 </div>
 
+                {/* Kort beskrivning */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    {t('basicInfo.shortDescriptionLabel')} <span className="text-destructive">{t('common.required')}</span>
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-sm font-medium text-foreground flex items-center gap-1">
+                      {t('basicInfo.shortDescriptionLabel')} <span className="text-destructive">*</span>
+                    </label>
+                    <span className={`text-xs ${(core.short_description?.length || 0) > 150 ? 'text-amber-500' : 'text-muted-foreground'}`}>
+                      {core.short_description?.length || 0}/150
+                    </span>
+                  </div>
                   <Textarea
                     value={core.short_description}
-                    onChange={(e) => setCore({ ...core, short_description: e.target.value })}
+                    onChange={(e) => setCore({ short_description: e.target.value })}
                     rows={2}
                     placeholder={t('basicInfo.shortDescriptionPlaceholder')}
+                    className={!core.short_description ? 'border-amber-300 focus:border-amber-500' : ''}
                   />
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <InformationCircleIcon className="h-3.5 w-3.5" />
+                    {t('basicInfo.shortDescriptionHint')}
+                  </p>
                 </div>
 
+                {/* Fullständig beskrivning */}
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-foreground">
                     {t('basicInfo.fullDescriptionLabel')}
                   </label>
                   <Textarea
                     value={core.description}
-                    onChange={(e) => setCore({ ...core, description: e.target.value })}
+                    onChange={(e) => setCore({ description: e.target.value })}
                     rows={5}
                     placeholder={t('basicInfo.fullDescriptionPlaceholder')}
                   />
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <InformationCircleIcon className="h-3.5 w-3.5" />
+                    {t('basicInfo.fullDescriptionHint')}
+                  </p>
                 </div>
               </Card>
 
+              {/* Card 2: Syfte & Omslagsbild */}
               <Card className="p-6 space-y-4">
                 <h3 className="font-medium text-foreground">{t('purposes.title')}</h3>
 
@@ -814,7 +840,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                     </label>
                     <Select
                       value={core.main_purpose_id}
-                      onChange={(e) => setCore({ ...core, main_purpose_id: e.target.value })}
+                      onChange={(e) => setCore({ main_purpose_id: e.target.value })}
                       options={
                         mainPurposeOptions.length > 0
                           ? mainPurposeOptions
@@ -859,15 +885,17 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                 />
               </Card>
 
-              <Card className="p-6 space-y-4">
+              {/* Card 3: Klassificering */}
+              <Card className="p-6 space-y-5">
                 <h3 className="font-medium text-foreground">{t('classification.title')}</h3>
 
+                {/* Energi & Plats */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">{t('classification.energyLabel')}</label>
                     <Select
                       value={core.energy_level || ''}
-                      onChange={(e) => setCore({ ...core, energy_level: e.target.value || null })}
+                      onChange={(e) => setCore({ energy_level: e.target.value || null })}
                       options={energyOptions}
                     />
                   </div>
@@ -876,71 +904,92 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                     <label className="text-sm font-medium text-foreground">{t('classification.locationLabel')}</label>
                     <Select
                       value={core.location_type || ''}
-                      onChange={(e) => setCore({ ...core, location_type: e.target.value || null })}
+                      onChange={(e) => setCore({ location_type: e.target.value || null })}
                       options={locationOptions}
                     />
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">{t('classification.timeLabel')}</label>
+                {/* Tid */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">{t('classification.timeLabel')}</label>
+                  <div className="flex items-center gap-2">
                     <Input
                       type="number"
                       min={0}
                       value={core.time_estimate_min ?? ''}
-                      onChange={(e) => setCore({ ...core, time_estimate_min: e.target.value ? Number(e.target.value) : null })}
+                      onChange={(e) => setCore({ time_estimate_min: e.target.value ? Number(e.target.value) : null })}
                       placeholder={t('classification.timePlaceholder')}
+                      className="max-w-[120px]"
                     />
+                    <span className="text-sm text-muted-foreground">{t('classification.timeUnit')}</span>
                   </div>
+                </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">{t('classification.minPlayersLabel')}</label>
+                {/* Antal spelare - grupperat */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">{t('classification.playersLabel')}</label>
+                  <div className="flex items-center gap-2">
                     <Input
                       type="number"
                       min={0}
                       value={core.min_players ?? ''}
-                      onChange={(e) => setCore({ ...core, min_players: e.target.value ? Number(e.target.value) : null })}
+                      onChange={(e) => setCore({ min_players: e.target.value ? Number(e.target.value) : null })}
                       placeholder={t('classification.minPlayersPlaceholder')}
+                      className="max-w-[100px]"
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">{t('classification.maxPlayersLabel')}</label>
+                    <span className="text-sm text-muted-foreground">–</span>
                     <Input
                       type="number"
                       min={0}
                       value={core.max_players ?? ''}
-                      onChange={(e) => setCore({ ...core, max_players: e.target.value ? Number(e.target.value) : null })}
+                      onChange={(e) => setCore({ max_players: e.target.value ? Number(e.target.value) : null })}
                       placeholder={t('classification.maxPlayersPlaceholder')}
+                      className="max-w-[100px]"
                     />
+                    <span className="text-sm text-muted-foreground">{t('classification.playersUnit')}</span>
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">{t('classification.ageMinLabel')}</label>
+                {/* Ålder - grupperat */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">{t('classification.ageLabel')}</label>
+                  <div className="flex items-center gap-2">
                     <Input
                       type="number"
                       min={0}
                       value={core.age_min ?? ''}
-                      onChange={(e) => setCore({ ...core, age_min: e.target.value ? Number(e.target.value) : null })}
+                      onChange={(e) => setCore({ age_min: e.target.value ? Number(e.target.value) : null })}
                       placeholder={t('classification.ageMinPlaceholder')}
+                      className="max-w-[100px]"
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium text-foreground">{t('classification.ageMaxLabel')}</label>
+                    <span className="text-sm text-muted-foreground">–</span>
                     <Input
                       type="number"
                       min={0}
                       value={core.age_max ?? ''}
-                      onChange={(e) => setCore({ ...core, age_max: e.target.value ? Number(e.target.value) : null })}
+                      onChange={(e) => setCore({ age_max: e.target.value ? Number(e.target.value) : null })}
                       placeholder={t('classification.ageMaxPlaceholder')}
+                      className="max-w-[100px]"
                     />
+                    <span className="text-sm text-muted-foreground">{t('classification.ageUnit')}</span>
                   </div>
                 </div>
               </Card>
+            </section>
+          )}
+
+          {/* Översikt Section */}
+          {activeSection === 'oversikt' && (
+            <section>
+              <GameFlowCanvas
+                state={state}
+                onNavigate={(section, entityId) => {
+                  setActiveSection(section);
+                  // If entityId is provided, we could scroll to or focus that entity
+                  // For now, just navigate to the section
+                }}
+              />
             </section>
           )}
 
@@ -964,33 +1013,11 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                 </p>
               </div>
 
-              <Card className="p-6 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    {t('materials.itemsLabel')}
-                  </label>
-                  <Textarea
-                    value={materials.items.join('\n')}
-                    onChange={(e) => setMaterials({ ...materials, items: e.target.value.split('\n').filter(Boolean) })}
-                    rows={6}
-                    placeholder={t('materials.itemsPlaceholder')}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    {t('materials.itemsCount', { count: materials.items.length })}
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
-                    {t('materials.preparationLabel')}
-                  </label>
-                  <Textarea
-                    value={materials.preparation}
-                    onChange={(e) => setMaterials({ ...materials, preparation: e.target.value })}
-                    rows={3}
-                    placeholder={t('materials.preparationPlaceholder')}
-                  />
-                </div>
+              <Card className="p-6">
+                <MaterialEditor
+                  materials={materials}
+                  onChange={setMaterials}
+                />
               </Card>
             </section>
           )}
@@ -1012,7 +1039,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </label>
                   <Textarea
                     value={materials.safety_notes}
-                    onChange={(e) => setMaterials({ ...materials, safety_notes: e.target.value })}
+                    onChange={(e) => setMaterials({ safety_notes: e.target.value })}
                     rows={4}
                     placeholder={t('safety.safetyNotesPlaceholder')}
                   />
@@ -1024,7 +1051,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </label>
                   <Textarea
                     value={core.accessibility_notes}
-                    onChange={(e) => setCore({ ...core, accessibility_notes: e.target.value })}
+                    onChange={(e) => setCore({ accessibility_notes: e.target.value })}
                     rows={3}
                     placeholder={t('safety.accessibilityPlaceholder')}
                   />
@@ -1036,7 +1063,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </label>
                   <Textarea
                     value={core.space_requirements}
-                    onChange={(e) => setCore({ ...core, space_requirements: e.target.value })}
+                    onChange={(e) => setCore({ space_requirements: e.target.value })}
                     rows={2}
                     placeholder={t('safety.spacePlaceholder')}
                   />
@@ -1048,7 +1075,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   </label>
                   <Textarea
                     value={core.leader_tips}
-                    onChange={(e) => setCore({ ...core, leader_tips: e.target.value })}
+                    onChange={(e) => setCore({ leader_tips: e.target.value })}
                     rows={3}
                     placeholder={t('safety.leaderTipsPlaceholder')}
                   />
@@ -1062,7 +1089,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             <section className="space-y-6">
               <PlayModeSelector
                 value={core.play_mode}
-                onChange={(mode) => setCore({ ...core, play_mode: mode })}
+                onChange={(mode) => setCore({ play_mode: mode })}
               />
             </section>
           )}
@@ -1303,7 +1330,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   <Input
                     value={core.taxonomy_category}
                     placeholder={t('settings.taxonomyPlaceholder')}
-                    onChange={(e) => setCore({ ...core, taxonomy_category: e.target.value })}
+                    onChange={(e) => setCore({ taxonomy_category: e.target.value })}
                   />
                   <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
                     {taxonomyPresets.map((preset) => (
@@ -1326,7 +1353,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
                   <label className="text-sm font-medium text-foreground">{t('settings.statusLabel')}</label>
                   <Select
                     value={core.status}
-                    onChange={(e) => setCore({ ...core, status: e.target.value as 'draft' | 'published' })}
+                    onChange={(e) => setCore({ status: e.target.value as 'draft' | 'published' })}
                     options={[
                       { value: 'draft', label: t('settings.statusDraft') },
                       { value: 'published', label: t('settings.statusPublished') },

@@ -8380,6 +8380,17 @@
           "features": ["Alt i Pro", "SSO-innlogging", "Admin-dashboard", "Dedikert suksessleder", "Tilpasset onboarding"]
         }
       }
+    },
+    "cta": {
+      "title": "Klar til å komme i gang?",
+      "description": "Bli med tusenvis av aktivitetsledere som allerede bruker Lekbanken for å planlegge og gjennomføre aktiviteter.",
+      "startFree": "Start gratis",
+      "login": "Logg inn",
+      "seePlans": "Se priser",
+      "badges": {
+        "swedishOnboarding": "Norsk onboarding",
+        "supportResponse": "Svar innen 24 timer"
+      }
     }
   },
   "demo": {

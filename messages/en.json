@@ -8227,6 +8227,17 @@
           "features": ["Everything in Pro", "SSO login", "Admin dashboard", "Dedicated success manager", "Custom onboarding"]
         }
       }
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "description": "Join thousands of activity leaders already using Lekbanken to plan and run activities.",
+      "startFree": "Start free",
+      "login": "Log in",
+      "seePlans": "See plans",
+      "badges": {
+        "swedishOnboarding": "Local onboarding",
+        "supportResponse": "Response within 24 hours"
+      }
     }
   },
   "demo": {

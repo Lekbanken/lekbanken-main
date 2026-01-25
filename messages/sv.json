@@ -8951,6 +8951,17 @@
           "features": ["Allt i Pro", "SSO-inloggning", "Admin-dashboard", "Dedikerad success manager", "Anpassad onboarding"]
         }
       }
+    },
+    "cta": {
+      "title": "Redo att komma igång?",
+      "description": "Gå med tusentals aktivitetsledare som redan använder Lekbanken för att planera och genomföra aktiviteter.",
+      "startFree": "Starta gratis",
+      "login": "Logga in",
+      "seePlans": "Se priser",
+      "badges": {
+        "swedishOnboarding": "Svensk onboarding",
+        "supportResponse": "Svar inom 24 timmar"
+      }
     }
   },
   "demo": {

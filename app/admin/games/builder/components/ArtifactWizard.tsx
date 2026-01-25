@@ -9,6 +9,7 @@ import {
   SparklesIcon,
   LockClosedIcon,
   PlusIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVisibility } from '@/types/games';
 
@@ -461,11 +462,35 @@ const getArtifactTemplates = (t: ReturnType<typeof useTranslations>): ArtifactTe
 ];
 
 const CATEGORIES = [
-  { id: 'escape_room', labelKey: 'wizard.categories.escape_room', icon: '🔐' },
-  { id: 'party', labelKey: 'wizard.categories.party', icon: '🎉' },
-  { id: 'educational', labelKey: 'wizard.categories.educational', icon: '📚' },
-  { id: 'general', labelKey: 'wizard.categories.general', icon: '📦' },
+  { id: 'escape_room', labelKey: 'wizard.categories.escape_room', icon: '🔐', color: 'bg-amber-500/10 border-amber-500/40 text-amber-600 dark:text-amber-400' },
+  { id: 'party', labelKey: 'wizard.categories.party', icon: '🎉', color: 'bg-pink-500/10 border-pink-500/40 text-pink-600 dark:text-pink-400' },
+  { id: 'educational', labelKey: 'wizard.categories.educational', icon: '📚', color: 'bg-blue-500/10 border-blue-500/40 text-blue-600 dark:text-blue-400' },
+  { id: 'general', labelKey: 'wizard.categories.general', icon: '📦', color: 'bg-slate-500/10 border-slate-500/40 text-slate-600 dark:text-slate-400' },
 ] as const;
+
+// Artifact type styling (same as ArtifactEditor)
+type ArtifactTypeStyle = { emoji: string; bg: string; border: string; text: string };
+const ARTIFACT_STYLES: Record<string, ArtifactTypeStyle> = {
+  card: { emoji: '📇', bg: 'bg-slate-500/10', border: 'border-slate-500/40', text: 'text-slate-600 dark:text-slate-400' },
+  document: { emoji: '📄', bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-600 dark:text-blue-400' },
+  image: { emoji: '🖼️', bg: 'bg-purple-500/10', border: 'border-purple-500/40', text: 'text-purple-600 dark:text-purple-400' },
+  keypad: { emoji: '🔐', bg: 'bg-amber-500/10', border: 'border-amber-500/40', text: 'text-amber-600 dark:text-amber-400' },
+  riddle: { emoji: '❓', bg: 'bg-emerald-500/10', border: 'border-emerald-500/40', text: 'text-emerald-600 dark:text-emerald-400' },
+  cipher: { emoji: '🔒', bg: 'bg-rose-500/10', border: 'border-rose-500/40', text: 'text-rose-600 dark:text-rose-400' },
+  logic_grid: { emoji: '🧩', bg: 'bg-indigo-500/10', border: 'border-indigo-500/40', text: 'text-indigo-600 dark:text-indigo-400' },
+  multi_answer: { emoji: '✅', bg: 'bg-teal-500/10', border: 'border-teal-500/40', text: 'text-teal-600 dark:text-teal-400' },
+  audio: { emoji: '🔊', bg: 'bg-pink-500/10', border: 'border-pink-500/40', text: 'text-pink-600 dark:text-pink-400' },
+  hotspot: { emoji: '📍', bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-600 dark:text-orange-400' },
+  tile_puzzle: { emoji: '🧱', bg: 'bg-cyan-500/10', border: 'border-cyan-500/40', text: 'text-cyan-600 dark:text-cyan-400' },
+  conversation_cards_collection: { emoji: '💬', bg: 'bg-violet-500/10', border: 'border-violet-500/40', text: 'text-violet-600 dark:text-violet-400' },
+  counter: { emoji: '🔢', bg: 'bg-lime-500/10', border: 'border-lime-500/40', text: 'text-lime-600 dark:text-lime-400' },
+  qr_gate: { emoji: '📱', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/40', text: 'text-fuchsia-600 dark:text-fuchsia-400' },
+  hint_container: { emoji: '💡', bg: 'bg-yellow-500/10', border: 'border-yellow-500/40', text: 'text-yellow-600 dark:text-yellow-400' },
+  location_check: { emoji: '🗺️', bg: 'bg-green-500/10', border: 'border-green-500/40', text: 'text-green-600 dark:text-green-400' },
+  replay_marker: { emoji: '🔄', bg: 'bg-neutral-500/10', border: 'border-neutral-500/40', text: 'text-neutral-600 dark:text-neutral-400' },
+};
+const getStyle = (type: string): ArtifactTypeStyle => ARTIFACT_STYLES[type] ?? ARTIFACT_STYLES.card;
+const getCategoryColor = (catId: string) => CATEGORIES.find(c => c.id === catId)?.color ?? '';
 
 // =============================================================================
 // Helpers
@@ -518,13 +543,24 @@ export function ArtifactWizard({
   const [selectedTemplate, setSelectedTemplate] = useState<ArtifactTemplate | null>(null);
   const [customizing, setCustomizing] = useState(false);
   const [artifact, setArtifact] = useState<ArtifactFormData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const templates = useMemo(() => getArtifactTemplates(t), [t]);
 
   const filteredTemplates = useMemo(() => {
-    if (!selectedCategory) return templates;
-    return templates.filter((t) => t.category === selectedCategory);
-  }, [selectedCategory, templates]);
+    let result = templates;
+    if (selectedCategory) {
+      result = result.filter((t) => t.category === selectedCategory);
+    }
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter((t) => 
+        t.name.toLowerCase().includes(query) || 
+        t.description.toLowerCase().includes(query)
+      );
+    }
+    return result;
+  }, [selectedCategory, templates, searchQuery]);
 
   const handleSelectTemplate = (template: ArtifactTemplate) => {
     setSelectedTemplate(template);
@@ -566,10 +602,20 @@ export function ArtifactWizard({
 
         {/* Intro help */}
         {!customizing && (
-          <div className="px-4 pt-3">
+          <div className="px-4 pt-3 space-y-3">
             <HelpText>
               {t('wizard.helpText')}
             </HelpText>
+            {/* Search field */}
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('wizard.searchPlaceholder')}
+                className="pl-9"
+              />
+            </div>
           </div>
         )}
 
@@ -606,32 +652,44 @@ export function ArtifactWizard({
 
             {/* Template Grid */}
             <div className="flex-1 p-4 overflow-y-auto">
+              {filteredTemplates.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
+                  <MagnifyingGlassIcon className="h-8 w-8 mb-2" />
+                  <p className="text-sm">{t('wizard.noResults')}</p>
+                </div>
+              ) : (
               <div className="grid grid-cols-2 gap-3">
                 {filteredTemplates.map((template) => {
                   const isSelected = selectedTemplate?.id === template.id;
+                  const catColor = getCategoryColor(template.category);
+                  const typeStyle = getStyle(template.artifact.artifact_type ?? 'card');
                   return (
                     <Card
                       key={template.id}
-                      className={`p-4 cursor-pointer transition-colors ${
+                      className={`p-4 cursor-pointer transition-all border-2 ${
                         isSelected
-                          ? 'ring-2 ring-primary bg-primary/5'
-                          : 'hover:bg-surface-secondary'
-                      }`}
+                          ? 'ring-2 ring-primary border-primary'
+                          : `${typeStyle.border} hover:shadow-md`
+                      } ${typeStyle.bg}`}
                       onClick={() => handleSelectTemplate(template)}
                     >
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">{template.icon}</span>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium truncate">{template.name}</p>
-                          <p className="text-xs text-foreground-secondary mt-1">
+                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
                             {template.description}
                           </p>
+                          <span className={`inline-block mt-2 text-xs px-1.5 py-0.5 rounded ${catColor}`}>
+                            {t(`wizard.categories.${template.category}`)}
+                          </span>
                         </div>
                       </div>
                     </Card>
                   );
                 })}
               </div>
+              )}
             </div>
           </div>
         ) : (
@@ -716,27 +774,28 @@ export function ArtifactWizard({
                 {/* Preview */}
                 <Card className="p-4 bg-surface-secondary">
                   <h3 className="text-sm font-medium mb-2">{t('wizard.preview.title')}</h3>
-                  <div className="flex items-start gap-3 p-3 bg-background rounded border">
-                    <span className="text-2xl">
-                      {artifact.artifact_type === 'keypad' ? '🔐' :
-                       artifact.artifact_type === 'document' ? '📄' :
-                       artifact.artifact_type === 'image' ? '🖼️' : '📇'}
-                    </span>
-                    <div>
-                      <p className="font-medium">{artifact.title || t('wizard.preview.unnamed')}</p>
-                      <p className="text-sm text-foreground-secondary">
-                        {artifact.description || t('wizard.preview.noDescription')}
-                      </p>
-                      <div className="flex gap-1 mt-2">
-                        <Badge variant="outline" size="sm">
-                          {artifact.artifact_type}
-                        </Badge>
-                        <Badge variant="outline" size="sm">
-                          {artifact.variants?.length ?? 1} {t('wizard.preview.variants')}
-                        </Badge>
+                  {(() => {
+                    const previewStyle = ARTIFACT_STYLES[artifact.artifact_type as keyof typeof ARTIFACT_STYLES] || ARTIFACT_STYLES.item;
+                    return (
+                      <div className={`flex items-start gap-3 p-3 rounded border ${previewStyle.border} ${previewStyle.bg}`}>
+                        <span className="text-2xl">{previewStyle.emoji}</span>
+                        <div>
+                          <p className="font-medium">{artifact.title || t('wizard.preview.unnamed')}</p>
+                          <p className="text-sm text-foreground-secondary">
+                            {artifact.description || t('wizard.preview.noDescription')}
+                          </p>
+                          <div className="flex gap-1 mt-2">
+                            <Badge variant="outline" size="sm" className={previewStyle.text}>
+                              {artifact.artifact_type}
+                            </Badge>
+                            <Badge variant="outline" size="sm">
+                              {artifact.variants?.length ?? 1} {t('wizard.preview.variants')}
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
                 </Card>
               </>
             )}

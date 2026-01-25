@@ -284,7 +284,7 @@ export async function POST(request: Request) {
 
   if (body.materials) {
     const m = body.materials;
-    await supabase.from('game_materials').upsert({
+    await supabase.from('game_materials').insert({
       game_id: game.id,
       locale: m.locale ?? null,
       items: m.items ?? [],

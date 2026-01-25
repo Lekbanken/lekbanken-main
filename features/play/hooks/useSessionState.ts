@@ -323,38 +323,11 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
 
   const loadArtifacts = useCallback(async () => {
     try {
-      // First, try to get existing session artifacts
+      // V2: Artifacts are read directly from game_* tables, no snapshot needed
       const res = await fetch(`/api/play/sessions/${sessionId}/artifacts`, { cache: 'no-store' });
       if (!res.ok) return;
 
       const data = await res.json();
-      
-      // If no artifacts exist, try to snapshot from game
-      if (!data.artifacts || data.artifacts.length === 0) {
-        const snapshotRes = await fetch(`/api/play/sessions/${sessionId}/artifacts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({}),
-        });
-        
-        if (snapshotRes.ok) {
-          // Reload artifacts after snapshot
-          const reloadRes = await fetch(`/api/play/sessions/${sessionId}/artifacts`, { cache: 'no-store' });
-          if (reloadRes.ok) {
-            const reloadData = await reloadRes.json();
-            const artifacts = (reloadData.artifacts ?? []).map((artifact: Record<string, unknown>) => ({
-              id: artifact.id as string,
-              title: artifact.title as string,
-              description: (artifact.description as string | undefined) ?? undefined,
-              artifactType: (artifact.artifact_type as string | undefined) ?? 'unknown',
-              artifactOrder: (artifact.artifact_order as number | undefined) ?? 0,
-              metadata: (artifact.metadata as Record<string, unknown> | null) ?? null,
-            }));
-            setState((prev) => ({ ...prev, artifacts }));
-            return;
-          }
-        }
-      }
       
       const artifacts = (data.artifacts ?? []).map((artifact: Record<string, unknown>) => ({
         id: artifact.id as string,
@@ -363,6 +336,8 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
         artifactType: (artifact.artifact_type as string | undefined) ?? 'unknown',
         artifactOrder: (artifact.artifact_order as number | undefined) ?? 0,
         metadata: (artifact.metadata as Record<string, unknown> | null) ?? null,
+        // V2: Include state if present
+        state: (artifact.state as Record<string, unknown> | null) ?? null,
       }));
 
       setState((prev) => ({
@@ -441,44 +416,14 @@ export function useSessionState(config: SessionCockpitConfig): UseSessionStateRe
     }
   }, [sessionId]);
 
+  // V2: Load triggers directly - no snapshot needed
   const loadTriggers = useCallback(async () => {
     try {
-      // First, try to get existing session triggers
+      // V2: GET returns triggers directly from game_triggers + session_trigger_state
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, { cache: 'no-store' });
       if (!res.ok) return;
       
       const data = await res.json();
-      
-      // If no triggers exist, try to snapshot from game
-      if (!data.triggers || data.triggers.length === 0) {
-        const snapshotRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        
-        if (snapshotRes.ok) {
-          // Reload triggers after snapshot
-          const reloadRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, { cache: 'no-store' });
-          if (reloadRes.ok) {
-            const reloadData = await reloadRes.json();
-            const triggers = (reloadData.triggers ?? []).map((t: Record<string, unknown>): CockpitTrigger => ({
-              id: t.id as string,
-              name: t.name as string,
-              description: t.description as string | undefined,
-              enabled: t.enabled as boolean,
-              status: (t.status as CockpitTrigger['status']) ?? 'armed',
-              executeOnce: t.execute_once as boolean ?? true,
-              firedCount: t.fired_count as number ?? 0,
-              lastFiredAt: t.fired_at as string | undefined,
-              lastError: t.last_error as string | undefined,
-              conditionSummary: formatCondition(t.condition as Record<string, unknown>),
-              actionSummary: formatActions(t.actions as Record<string, unknown>[]),
-            }));
-            setState((prev) => ({ ...prev, triggers }));
-            return;
-          }
-        }
-      }
       
       const triggers = (data.triggers ?? []).map((t: Record<string, unknown>): CockpitTrigger => ({
         id: t.id as string,

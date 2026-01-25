@@ -1,23 +1,33 @@
 /**
- * Host Prop Confirmations API
+ * Host Prop Confirmations API (V2)
  * 
  * GET: List all prop confirmation requests
  * PATCH: Approve or reject a prop request
+ * 
+ * V2 Architecture:
+ * - Config (propDescription, propImageUrl) read from game_artifacts.metadata
+ * - Runtime state (puzzleState) stored in session_artifact_state.state
  */
 
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/server';
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
+import type { Json } from '@/types/supabase';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
 
-interface ArtifactRow {
+interface GameArtifactRow {
   id: string;
   title: string | null;
   artifact_type: string | null;
   metadata: Record<string, unknown> | null;
+}
+
+interface StateRow {
+  game_artifact_id: string;
+  state: Record<string, unknown> | null;
 }
 
 interface ParticipantRow {
@@ -48,22 +58,47 @@ export async function GET(
 
   const service = await createServiceRoleClient() as SupabaseAny;
 
-  // Get all prop_confirmation artifacts with pending requests
+  // V2: Get prop_confirmation artifacts from game_artifacts via session
+  const { data: sessionData } = await service
+    .from('participant_sessions')
+    .select('game_id')
+    .eq('id', sessionId)
+    .single();
+
+  if (!sessionData?.game_id) {
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  }
+
+  // Get game artifacts config
   const { data: artifacts, error: artifactsError } = await service
-    .from('session_artifacts')
+    .from('game_artifacts')
     .select(`
       id,
       title,
       artifact_type,
       metadata
     `)
-    .eq('session_id', sessionId)
+    .eq('game_id', sessionData.game_id)
     .eq('artifact_type', 'prop_confirmation');
 
   if (artifactsError) {
-    console.error('[Props API] Error fetching artifacts:', artifactsError);
+    console.error('[Props API V2] Error fetching artifacts:', artifactsError);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
+
+  // V2: Get runtime state from session_artifact_state
+  const artifactIds = (artifacts || []).map((a: GameArtifactRow) => a.id);
+  const { data: stateRows } = artifactIds.length > 0 
+    ? await service
+        .from('session_artifact_state')
+        .select('game_artifact_id, state')
+        .eq('session_id', sessionId)
+        .in('game_artifact_id', artifactIds)
+    : { data: [] };
+
+  const stateMap = new Map(
+    ((stateRows || []) as StateRow[]).map(s => [s.game_artifact_id, s.state])
+  );
 
   // Get participants for name lookup
   const { data: participants } = await service
@@ -80,11 +115,12 @@ export async function GET(
     typedParticipants.map(p => [p.id, p])
   );
 
-  // Build request list from artifact metadata
-  const typedArtifacts = (artifacts || []) as ArtifactRow[];
+  // Build request list from artifact config + session state
+  const typedArtifacts = (artifacts || []) as GameArtifactRow[];
   const requests = typedArtifacts.flatMap(artifact => {
     const meta = artifact.metadata as Record<string, unknown> | null;
-    const puzzleState = meta?.puzzleState as Record<string, unknown> | undefined;
+    const stateData = stateMap.get(artifact.id) || {};
+    const puzzleState = (stateData as Record<string, unknown>)?.puzzleState as Record<string, unknown> | undefined;
     
     if (!puzzleState) return [];
     
@@ -155,26 +191,32 @@ export async function PATCH(
     return NextResponse.json({ error: 'Missing requestId or action' }, { status: 400 });
   }
 
-  // Extract artifact ID from requestId (format: artifactId-participantId)
-  const artifactId = requestId.split('-')[0];
+  // Extract artifact ID from requestId (format: gameArtifactId-participantId)
+  const gameArtifactId = requestId.split('-')[0];
 
   const service = await createServiceRoleClient() as SupabaseAny;
 
-  // Get current artifact
+  // V2: Verify artifact exists in game_artifacts
   const { data: artifact, error: fetchError } = await service
-    .from('session_artifacts')
-    .select('id, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
+    .from('game_artifacts')
+    .select('id')
+    .eq('id', gameArtifactId)
     .single();
 
   if (fetchError || !artifact) {
     return NextResponse.json({ error: 'Artifact not found' }, { status: 404 });
   }
 
-  // Update puzzle state
-  const currentMeta = (artifact.metadata as Record<string, unknown>) || {};
-  const currentPuzzleState = (currentMeta.puzzleState as Record<string, unknown>) || {};
+  // V2: Get current state from session_artifact_state
+  const { data: stateRow } = await service
+    .from('session_artifact_state')
+    .select('state')
+    .eq('session_id', sessionId)
+    .eq('game_artifact_id', gameArtifactId)
+    .single();
+
+  const currentState = (stateRow?.state as Record<string, unknown>) || {};
+  const currentPuzzleState = (currentState.puzzleState as Record<string, unknown>) || {};
 
   const newPuzzleState = {
     ...currentPuzzleState,
@@ -187,18 +229,21 @@ export async function PATCH(
     hostNotes,
   };
 
+  // V2: Upsert state in session_artifact_state
   const { error: updateError } = await service
-    .from('session_artifacts')
-    .update({
-      metadata: {
-        ...currentMeta,
-        puzzleState: newPuzzleState,
+    .from('session_artifact_state')
+    .upsert(
+      {
+        session_id: sessionId,
+        game_artifact_id: gameArtifactId,
+        state: { puzzleState: newPuzzleState } as unknown as Json,
+        updated_at: new Date().toISOString(),
       },
-    })
-    .eq('id', artifactId);
+      { onConflict: 'session_id,game_artifact_id' }
+    );
 
   if (updateError) {
-    console.error('[Props API] Error updating artifact:', updateError);
+    console.error('[Props API V2] Error updating state:', updateError);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
 

@@ -152,37 +152,18 @@ export function HostPlayMode({
       setLoading(false);
     }
   }, [sessionId, t]);
-  // Load triggers (snapshot if needed)
+
+  // V2: Load triggers directly - no snapshot needed
   const loadTriggers = useCallback(async () => {
     try {
-      // Try to get existing session triggers
+      // V2: GET returns triggers directly from game_triggers + session_trigger_state
       const res = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
         cache: 'no-store',
       });
       
       if (res.ok) {
         const data = await res.json();
-        if (data.triggers && data.triggers.length > 0) {
-          setTriggers(data.triggers);
-          return;
-        }
-      }
-
-      // If no triggers exist, try to snapshot from game
-      const snapshotRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      if (snapshotRes.ok) {
-        // Reload triggers after snapshot
-        const reloadRes = await fetch(`/api/play/sessions/${sessionId}/triggers`, {
-          cache: 'no-store',
-        });
-        if (reloadRes.ok) {
-          const reloadData = await reloadRes.json();
-          setTriggers(reloadData.triggers || []);
-        }
+        setTriggers(data.triggers || []);
       }
     } catch (err) {
       console.warn('[HostPlayMode] Failed to load triggers:', err);

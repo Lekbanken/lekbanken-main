@@ -58,6 +58,12 @@ type Purpose = {
   parent_id?: string | null;
 };
 
+// Helper to check if a string is a valid UUID
+function isUuid(value: unknown): value is string {
+  if (typeof value !== 'string') return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 const makeId = () =>
   typeof crypto !== 'undefined' && 'randomUUID' in crypto && typeof crypto.randomUUID === 'function'
     ? crypto.randomUUID()
@@ -284,6 +290,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             body: s.body || '',
             duration_seconds: s.duration_seconds ?? null,
             leader_script: s.leader_script || '',
+            phase_id: (s as { phase_id?: string | null }).phase_id ?? null,
             media_ref: (s as { media_ref?: string | null }).media_ref ?? '',
           })
         );
@@ -532,11 +539,13 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           description: core.description || null,
         },
         steps: steps.map((s, idx) => ({
+          id: isUuid(s.id) ? s.id : undefined,
           title: s.title,
           body: s.body,
           duration_seconds: s.duration_seconds,
           leader_script: s.leader_script || null,
           step_order: idx,
+          phase_id: s.phase_id || null,
           media_ref: s.media_ref || null,
         })),
         materials: {
@@ -545,6 +554,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           preparation: materials.preparation || null,
         },
         phases: phases.map((p, idx) => ({
+          id: isUuid(p.id) ? p.id : undefined,
           name: p.name,
           phase_type: p.phase_type,
           phase_order: idx,
@@ -556,6 +566,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           auto_advance: p.auto_advance,
         })),
         roles: roles.map((r, idx) => ({
+          id: isUuid(r.id) ? r.id : undefined,
           name: r.name,
           icon: r.icon || null,
           color: r.color || null,
@@ -577,6 +588,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             const hasMeta = Object.keys(meta).length > 0;
 
             return {
+              id: isUuid(v.id) ? v.id : undefined,
               title: v.title || null,
               body: v.body || null,
               media_ref: v.media_ref || null,
@@ -590,6 +602,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           });
 
           return {
+            id: isUuid(a.id) ? a.id : undefined,
             title: a.title,
             description: a.description || null,
             artifact_type: a.artifact_type || 'card',
@@ -613,6 +626,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
           layout_variant: boardConfig.layout_variant,
         },
         triggers: triggers.map((t, idx) => ({
+          id: isUuid(t.id) ? t.id : undefined,
           name: t.name,
           description: t.description || null,
           enabled: t.enabled,
@@ -998,6 +1012,7 @@ export function GameBuilderPage({ gameId }: GameBuilderPageProps) {
             <section>
               <StepEditor
                 steps={steps}
+                phases={phases.map((p) => ({ id: p.id, name: p.name }))}
                 onChange={setSteps}
               />
             </section>

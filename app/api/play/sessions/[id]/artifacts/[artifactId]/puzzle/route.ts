@@ -8,6 +8,15 @@ import {
 } from '@/types/puzzle-modules';
 
 // =============================================================================
+// V2 Architecture Notes:
+// =============================================================================
+// This route now uses the V2 artifacts pattern:
+// - Config (correctAnswers, target, etc.) is read from game_artifacts.metadata
+// - Runtime state (puzzleState) is stored in session_artifact_state.state
+// - The artifactId parameter is the game_artifact_id (NOT session_artifact_id)
+// =============================================================================
+
+// =============================================================================
 // Types
 // =============================================================================
 
@@ -61,35 +70,87 @@ async function resolveParticipant(
 }
 
 // =============================================================================
-// Riddle Logic
+// V2 State Helpers
+// =============================================================================
+
+async function getArtifactConfig(
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
+  gameArtifactId: string
+): Promise<{ metadata: Record<string, unknown>; artifact_type: string } | null> {
+  const { data } = await supabase
+    .from('game_artifacts')
+    .select('metadata, artifact_type')
+    .eq('id', gameArtifactId)
+    .single();
+  
+  if (!data) return null;
+  return {
+    metadata: (data.metadata || {}) as Record<string, unknown>,
+    artifact_type: data.artifact_type,
+  };
+}
+
+async function getPuzzleState(
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
+  sessionId: string,
+  gameArtifactId: string
+): Promise<Record<string, unknown>> {
+  const { data } = await supabase
+    .from('session_artifact_state')
+    .select('state')
+    .eq('session_id', sessionId)
+    .eq('game_artifact_id', gameArtifactId)
+    .single();
+  
+  if (!data?.state) return {};
+  return (data.state as Record<string, unknown>) || {};
+}
+
+async function updatePuzzleState(
+  supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
+  sessionId: string,
+  gameArtifactId: string,
+  puzzleState: Record<string, unknown>
+): Promise<void> {
+  // Upsert state record
+  await supabase
+    .from('session_artifact_state')
+    .upsert(
+      {
+        session_id: sessionId,
+        game_artifact_id: gameArtifactId,
+        state: { puzzleState } as unknown as Json,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'session_id,game_artifact_id' }
+    );
+}
+
+// =============================================================================
+// Riddle Logic (V2)
 // =============================================================================
 
 async function handleRiddleSubmit(
   supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
   sessionId: string,
-  artifactId: string,
+  gameArtifactId: string,
   answer: string,
   participantId: string
 ): Promise<PuzzleSubmitResponse> {
-  // Get session artifact with metadata
-  const { data: artifact, error: artifactError } = await supabase
-    .from('session_artifacts')
-    .select('id, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (artifactError || !artifact) {
+  // V2: Get config from game_artifacts
+  const config = await getArtifactConfig(supabase, gameArtifactId);
+  if (!config) {
     return { status: 'error', message: 'Artefakt hittades inte' };
   }
 
-  const metadata = (artifact.metadata || {}) as Record<string, unknown>;
+  const { metadata } = config;
   const correctAnswers = (metadata.correctAnswers || []) as string[];
   const normalizeMode = (metadata.normalizeMode || 'fuzzy') as RiddleNormalizeMode;
   const maxAttempts = typeof metadata.maxAttempts === 'number' ? metadata.maxAttempts : null;
 
-  // Get or initialize puzzle state
-  const puzzleState = (metadata.puzzleState || {
+  // V2: Get runtime state from session_artifact_state
+  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
+  const puzzleState = (stateData.puzzleState || {
     solved: false,
     locked: false,
     attempts: [],
@@ -124,13 +185,8 @@ async function handleRiddleSubmit(
   if (isCorrect) {
     puzzleState.solved = true;
 
-    // Update artifact metadata
-    await supabase
-      .from('session_artifacts')
-      .update({
-        metadata: { ...metadata, puzzleState } as unknown as Json,
-      })
-      .eq('id', artifactId);
+    // V2: Update state in session_artifact_state
+    await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
 
     return {
       status: 'success',
@@ -145,13 +201,8 @@ async function handleRiddleSubmit(
     puzzleState.locked = true;
   }
 
-  // Update artifact metadata
-  await supabase
-    .from('session_artifacts')
-    .update({
-      metadata: { ...metadata, puzzleState } as unknown as Json,
-    })
-    .eq('id', artifactId);
+  // V2: Update state in session_artifact_state
+  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
 
   return {
     status: puzzleState.locked ? 'locked' : 'fail',
@@ -167,32 +218,30 @@ async function handleRiddleSubmit(
 // =============================================================================
 // Counter Logic
 // =============================================================================
+// Counter Logic (V2)
+// =============================================================================
 
 async function handleCounterAction(
   supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
   sessionId: string,
-  artifactId: string,
+  gameArtifactId: string,
   action: 'increment' | 'decrement',
   participantId: string
 ): Promise<PuzzleSubmitResponse> {
-  const { data: artifact, error: artifactError } = await supabase
-    .from('session_artifacts')
-    .select('id, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (artifactError || !artifact) {
+  // V2: Get config from game_artifacts
+  const config = await getArtifactConfig(supabase, gameArtifactId);
+  if (!config) {
     return { status: 'error', message: 'Artefakt hittades inte' };
   }
 
-  const metadata = (artifact.metadata || {}) as Record<string, unknown>;
+  const { metadata } = config;
   const target = typeof metadata.target === 'number' ? metadata.target : null;
   const step = typeof metadata.step === 'number' ? metadata.step : 1;
   const initialValue = typeof metadata.initialValue === 'number' ? metadata.initialValue : 0;
 
-  // Get or initialize state
-  const puzzleState = (metadata.puzzleState || {
+  // V2: Get runtime state from session_artifact_state
+  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
+  const puzzleState = (stateData.puzzleState || {
     currentValue: initialValue,
     completed: false,
     history: [],
@@ -224,13 +273,8 @@ async function handleCounterAction(
     puzzleState.completed = true;
   }
 
-  // Update artifact
-  await supabase
-    .from('session_artifacts')
-    .update({
-      metadata: { ...metadata, puzzleState } as unknown as Json,
-    })
-    .eq('id', artifactId);
+  // V2: Update state in session_artifact_state
+  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
 
   return {
     status: puzzleState.completed ? 'success' : 'fail',
@@ -243,33 +287,29 @@ async function handleCounterAction(
 }
 
 // =============================================================================
-// Multi-Answer Logic
+// Multi-Answer Logic (V2)
 // =============================================================================
 
 async function handleMultiAnswerCheck(
   supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
   sessionId: string,
-  artifactId: string,
+  gameArtifactId: string,
   itemId: string,
   _participantId: string
 ): Promise<PuzzleSubmitResponse> {
-  const { data: artifact, error: artifactError } = await supabase
-    .from('session_artifacts')
-    .select('id, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (artifactError || !artifact) {
+  // V2: Get config from game_artifacts
+  const config = await getArtifactConfig(supabase, gameArtifactId);
+  if (!config) {
     return { status: 'error', message: 'Artefakt hittades inte' };
   }
 
-  const metadata = (artifact.metadata || {}) as Record<string, unknown>;
+  const { metadata } = config;
   const items = (metadata.items || []) as string[];
   const requiredCount = typeof metadata.requiredCount === 'number' ? metadata.requiredCount : items.length;
 
-  // Get or initialize state
-  const puzzleState = (metadata.puzzleState || {
+  // V2: Get runtime state from session_artifact_state
+  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
+  const puzzleState = (stateData.puzzleState || {
     checked: [] as string[],
     completed: false,
   }) as {
@@ -294,13 +334,8 @@ async function handleMultiAnswerCheck(
     puzzleState.completed = true;
   }
 
-  // Update artifact
-  await supabase
-    .from('session_artifacts')
-    .update({
-      metadata: { ...metadata, puzzleState } as unknown as Json,
-    })
-    .eq('id', artifactId);
+  // V2: Update state in session_artifact_state
+  await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
 
   return {
     status: puzzleState.completed ? 'success' : 'fail',
@@ -313,31 +348,28 @@ async function handleMultiAnswerCheck(
 }
 
 // =============================================================================
-// QR Gate Logic
+// QR Gate Logic (V2)
 // =============================================================================
 
 async function handleQRVerify(
   supabase: Awaited<ReturnType<typeof createServiceRoleClient>>,
   sessionId: string,
-  artifactId: string,
+  gameArtifactId: string,
   scannedValue: string,
   _participantId: string
 ): Promise<PuzzleSubmitResponse> {
-  const { data: artifact, error: artifactError } = await supabase
-    .from('session_artifacts')
-    .select('id, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
-    .single();
-
-  if (artifactError || !artifact) {
+  // V2: Get config from game_artifacts
+  const config = await getArtifactConfig(supabase, gameArtifactId);
+  if (!config) {
     return { status: 'error', message: 'Artefakt hittades inte' };
   }
 
-  const metadata = (artifact.metadata || {}) as Record<string, unknown>;
+  const { metadata } = config;
   const expectedValue = (metadata.expectedValue || '') as string;
 
-  const puzzleState = (metadata.puzzleState || {
+  // V2: Get runtime state from session_artifact_state
+  const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
+  const puzzleState = (stateData.puzzleState || {
     verified: false,
     scannedAt: null,
   }) as {
@@ -355,12 +387,8 @@ async function handleQRVerify(
     puzzleState.verified = true;
     puzzleState.scannedAt = new Date().toISOString();
 
-    await supabase
-      .from('session_artifacts')
-      .update({
-        metadata: { ...metadata, puzzleState } as unknown as Json,
-      })
-      .eq('id', artifactId);
+    // V2: Update state in session_artifact_state
+    await updatePuzzleState(supabase, sessionId, gameArtifactId, puzzleState);
 
     return {
       status: 'success',
@@ -379,15 +407,16 @@ async function handleQRVerify(
 }
 
 // =============================================================================
-// POST Handler
+// POST Handler (V2)
 // =============================================================================
+// NOTE: artifactId is now game_artifact_id (not session_artifact_id)
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string; artifactId: string }> }
 ) {
   try {
-    const { id: sessionId, artifactId } = await params;
+    const { id: sessionId, artifactId: gameArtifactId } = await params;
 
     // Resolve participant
     const participant = await resolveParticipant(sessionId, request);
@@ -410,7 +439,7 @@ export async function POST(
         response = await handleRiddleSubmit(
           supabase,
           sessionId,
-          artifactId,
+          gameArtifactId,
           answer,
           participant.participantId
         );
@@ -423,7 +452,7 @@ export async function POST(
         response = await handleCounterAction(
           supabase,
           sessionId,
-          artifactId,
+          gameArtifactId,
           action as 'increment' | 'decrement',
           participant.participantId
         );
@@ -436,7 +465,7 @@ export async function POST(
         response = await handleMultiAnswerCheck(
           supabase,
           sessionId,
-          artifactId,
+          gameArtifactId,
           itemId,
           participant.participantId
         );
@@ -449,7 +478,7 @@ export async function POST(
         response = await handleQRVerify(
           supabase,
           sessionId,
-          artifactId,
+          gameArtifactId,
           answer,
           participant.participantId
         );
@@ -467,15 +496,16 @@ export async function POST(
 }
 
 // =============================================================================
-// GET Handler - Get puzzle state
+// GET Handler - Get puzzle state (V2)
 // =============================================================================
+// NOTE: artifactId is now game_artifact_id (not session_artifact_id)
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; artifactId: string }> }
 ) {
   try {
-    const { id: sessionId, artifactId } = await params;
+    const { id: sessionId, artifactId: gameArtifactId } = await params;
 
     const participant = await resolveParticipant(sessionId, request);
     if (!participant) {
@@ -484,24 +514,20 @@ export async function GET(
 
     const supabase = await createServiceRoleClient();
 
-    const { data: artifact, error } = await supabase
-      .from('session_artifacts')
-      .select('id, artifact_type, metadata')
-      .eq('id', artifactId)
-      .eq('session_id', sessionId)
-      .single();
-
-    if (error || !artifact) {
+    // V2: Get config from game_artifacts
+    const config = await getArtifactConfig(supabase, gameArtifactId);
+    if (!config) {
       return jsonError('Artifact not found', 404);
     }
 
-    const metadata = (artifact.metadata || {}) as Record<string, unknown>;
-    const puzzleState = metadata.puzzleState || null;
+    // V2: Get runtime state from session_artifact_state
+    const stateData = await getPuzzleState(supabase, sessionId, gameArtifactId);
+    const puzzleState = stateData.puzzleState || null;
 
     // Return sanitized state (no answers/solutions)
     return NextResponse.json({
-      artifactId: artifact.id,
-      artifactType: artifact.artifact_type,
+      artifactId: gameArtifactId,
+      artifactType: config.artifact_type,
       state: puzzleState,
     });
   } catch (error) {

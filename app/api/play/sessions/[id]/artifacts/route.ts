@@ -3,6 +3,10 @@ import { createServerRlsClient, createServiceRoleClient } from '@/lib/supabase/s
 import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { Json } from '@/types/supabase';
 
+// =============================================================================
+// Artifacts V2: Read config from game_artifacts, state from session_*_state
+// =============================================================================
+
 type Viewer =
   | { type: 'host'; userId: string }
   | { type: 'participant'; participantId: string; participantName: string; token: string };
@@ -46,18 +50,24 @@ function readStepPhaseFromMetadata(metadata: Json | null | undefined) {
 /**
  * Sanitize artifact metadata for participant view.
  * SECURITY: Removes correctCode and other host-only fields.
- * Preserves keypadState for UI display and non-sensitive config.
+ * Merges runtime state from session_artifact_state.
  */
-function sanitizeMetadataForParticipant(metadata: Json | null, artifactType: string | null): Json | null {
-  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
-    return null;
-  }
+function sanitizeMetadataForParticipant(
+  configMetadata: Json | null,
+  stateMetadata: Json | null,
+  artifactType: string | null
+): Json | null {
+  const config = (configMetadata && typeof configMetadata === 'object' && !Array.isArray(configMetadata))
+    ? configMetadata as Record<string, unknown>
+    : {};
+  
+  const state = (stateMetadata && typeof stateMetadata === 'object' && !Array.isArray(stateMetadata))
+    ? stateMetadata as Record<string, unknown>
+    : {};
 
-  const m = metadata as Record<string, unknown>;
-
-  // For keypads, return sanitized config + state
+  // For keypads, return sanitized config + state from state table
   if (artifactType === 'keypad') {
-    const keypadState = m.keypadState as Record<string, unknown> | undefined;
+    const keypadState = state.keypadState as Record<string, unknown> | undefined;
     const safeKeypadState = {
       isUnlocked: Boolean(keypadState?.isUnlocked),
       isLockedOut: Boolean(keypadState?.isLockedOut),
@@ -65,20 +75,22 @@ function sanitizeMetadataForParticipant(metadata: Json | null, artifactType: str
       unlockedAt: typeof keypadState?.unlockedAt === 'string' ? keypadState.unlockedAt : null,
     };
     return {
-      // Safe config fields (no correctCode!)
-      codeLength: typeof m.codeLength === 'number' ? m.codeLength : 4,
-      maxAttempts: typeof m.maxAttempts === 'number' ? m.maxAttempts : null,
-      successMessage: typeof m.successMessage === 'string' ? m.successMessage : null,
-      failMessage: typeof m.failMessage === 'string' ? m.failMessage : null,
-      lockedMessage: typeof m.lockedMessage === 'string' ? m.lockedMessage : null,
-      // Keypad state (session-global)
+      // Safe config fields from game_artifacts (no correctCode!)
+      codeLength: typeof config.codeLength === 'number' ? config.codeLength : 4,
+      maxAttempts: typeof config.maxAttempts === 'number' ? config.maxAttempts : null,
+      successMessage: typeof config.successMessage === 'string' ? config.successMessage : null,
+      failMessage: typeof config.failMessage === 'string' ? config.failMessage : null,
+      lockedMessage: typeof config.lockedMessage === 'string' ? config.lockedMessage : null,
+      // Keypad state from session_artifact_state
       keypadState: safeKeypadState,
     } as unknown as Json;
   }
 
   // Conversation cards artifact: safe to expose collection id (no secrets)
   if (artifactType === 'conversation_cards_collection') {
-    const collectionId = typeof m.conversation_card_collection_id === 'string' ? m.conversation_card_collection_id : null;
+    const collectionId = typeof config.conversation_card_collection_id === 'string' 
+      ? config.conversation_card_collection_id 
+      : null;
     if (!collectionId) return null;
     return { conversation_card_collection_id: collectionId } as unknown as Json;
   }
@@ -142,11 +154,16 @@ async function broadcastPlayEvent(sessionId: string, event: unknown) {
   }
 }
 
+// =============================================================================
+// GET: Read artifacts from game_artifacts + state from session_*_state
+// =============================================================================
+
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: sessionId } = await params;
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
+  if (!session.game_id) return jsonError('Session has no associated game', 400);
 
   const current = getCurrentStepPhase(session);
 
@@ -155,139 +172,254 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
   const service = await createServiceRoleClient();
 
-  if (viewer.type === 'host') {
-    const { data: artifacts, error: aErr } = await service
-      .from('session_artifacts')
-      .select('id, session_id, title, description, artifact_type, artifact_order, tags, metadata, created_at')
-      .eq('session_id', sessionId)
-      .order('artifact_order', { ascending: true });
+  // Get session roles for role mapping (game_role -> session_role)
+  const { data: sessionRoles } = await service
+    .from('session_roles')
+    .select('id, source_role_id')
+    .eq('session_id', sessionId);
 
-    if (aErr) return jsonError('Failed to load artifacts', 500);
-
-    const artifactIds = (artifacts ?? []).map((a) => a.id as string);
-
-    const { data: variants, error: vErr } = artifactIds.length
-      ? await service
-          .from('session_artifact_variants')
-          .select(
-            'id, session_artifact_id, title, body, media_ref, variant_order, metadata, visibility, visible_to_session_role_id, revealed_at, highlighted_at'
-          )
-          .in('session_artifact_id', artifactIds)
-          .order('variant_order', { ascending: true })
-      : { data: [], error: null };
-
-    if (vErr) return jsonError('Failed to load artifact variants', 500);
-
-    const { data: assignments, error: asErr } = await service
-      .from('session_artifact_assignments')
-      .select('id, session_id, participant_id, session_artifact_variant_id, assigned_at')
-      .eq('session_id', sessionId);
-
-    if (asErr) return jsonError('Failed to load artifact assignments', 500);
-
-    return NextResponse.json(
-      {
-        artifacts: artifacts ?? [],
-        variants: variants ?? [],
-        assignments: assignments ?? [],
-      },
-      { status: 200 }
-    );
+  const gameRoleToSessionRole = new Map<string, string>();
+  for (const r of sessionRoles ?? []) {
+    if (r.source_role_id) {
+      gameRoleToSessionRole.set(r.source_role_id as string, r.id as string);
+    }
   }
 
-  // Participant view: only accessible variants
+  // Determine locale (prefer session locale, fallback to null)
+  const locale = (session as { locale?: string | null }).locale ?? null;
+
+  // Fetch game artifacts (config)
+  let artifactsQuery = service
+    .from('game_artifacts')
+    .select('id, title, description, artifact_type, artifact_order, tags, metadata')
+    .eq('game_id', session.game_id);
+
+  artifactsQuery = locale ? artifactsQuery.eq('locale', locale) : artifactsQuery.is('locale', null);
+
+  let { data: gameArtifacts, error: aErr } = await artifactsQuery.order('artifact_order', { ascending: true });
+
+  if (aErr) return jsonError('Failed to load artifacts', 500);
+
+  // Fallback to default locale if no artifacts found
+  if ((gameArtifacts ?? []).length === 0 && locale) {
+    const fallback = await service
+      .from('game_artifacts')
+      .select('id, title, description, artifact_type, artifact_order, tags, metadata')
+      .eq('game_id', session.game_id)
+      .is('locale', null)
+      .order('artifact_order', { ascending: true });
+
+    if (fallback.error) return jsonError('Failed to load artifacts', 500);
+    gameArtifacts = fallback.data ?? [];
+  }
+
+  const artifactIds = (gameArtifacts ?? []).map((a) => a.id as string);
+
+  if (artifactIds.length === 0) {
+    return NextResponse.json({ artifacts: [], variants: [], assignments: [] }, { status: 200 });
+  }
+
+  // Fetch game artifact variants (config)
+  const { data: gameVariants, error: vErr } = await service
+    .from('game_artifact_variants')
+    .select('id, artifact_id, title, body, media_ref, variant_order, metadata, visibility, visible_to_role_id')
+    .in('artifact_id', artifactIds)
+    .order('variant_order', { ascending: true });
+
+  if (vErr) return jsonError('Failed to load artifact variants', 500);
+
+  // Fetch session artifact state (runtime state)
+  const { data: artifactStates } = await service
+    .from('session_artifact_state')
+    .select('game_artifact_id, state')
+    .eq('session_id', sessionId)
+    .in('game_artifact_id', artifactIds);
+
+  const stateByArtifact = new Map<string, Json>();
+  for (const s of artifactStates ?? []) {
+    stateByArtifact.set(s.game_artifact_id as string, s.state as Json);
+  }
+
+  // Fetch session variant state (reveal/highlight)
+  const variantIds = (gameVariants ?? []).map((v) => v.id as string);
+  const { data: variantStates } = variantIds.length
+    ? await service
+        .from('session_artifact_variant_state')
+        .select('game_artifact_variant_id, revealed_at, highlighted_at')
+        .eq('session_id', sessionId)
+        .in('game_artifact_variant_id', variantIds)
+    : { data: [] };
+
+  const variantStateMap = new Map<string, { revealed_at: string | null; highlighted_at: string | null }>();
+  for (const vs of variantStates ?? []) {
+    variantStateMap.set(vs.game_artifact_variant_id as string, {
+      revealed_at: vs.revealed_at as string | null,
+      highlighted_at: vs.highlighted_at as string | null,
+    });
+  }
+
+  // Fetch assignments (V2)
+  const { data: assignmentsV2 } = await service
+    .from('session_artifact_variant_assignments_v2')
+    .select('id, session_id, participant_id, game_artifact_variant_id, assigned_at')
+    .eq('session_id', sessionId);
+
+  // ==========================================================================
+  // HOST VIEW: Return all artifacts/variants with full metadata + state
+  // ==========================================================================
+  if (viewer.type === 'host') {
+    // Transform artifacts: game config + session state
+    const artifacts = (gameArtifacts ?? []).map((a) => ({
+      id: a.id,
+      session_id: sessionId, // For backward compatibility
+      title: a.title,
+      description: a.description,
+      artifact_type: a.artifact_type,
+      artifact_order: a.artifact_order,
+      tags: a.tags,
+      metadata: a.metadata, // Host sees full metadata including correctCode
+      // Merge runtime state
+      state: stateByArtifact.get(a.id as string) ?? null,
+      created_at: null, // Not available from game_artifacts
+    }));
+
+    // Transform variants: game config + session state (reveal/highlight)
+    const variants = (gameVariants ?? []).map((v) => {
+      const gameRoleId = v.visible_to_role_id as string | null;
+      const sessionRoleId = gameRoleId ? gameRoleToSessionRole.get(gameRoleId) ?? null : null;
+      const variantState = variantStateMap.get(v.id as string);
+
+      return {
+        id: v.id,
+        session_artifact_id: v.artifact_id, // For backward compatibility (now game_artifact_id)
+        title: v.title,
+        body: v.body,
+        media_ref: v.media_ref,
+        variant_order: v.variant_order,
+        metadata: v.metadata,
+        visibility: v.visibility,
+        visible_to_session_role_id: sessionRoleId,
+        revealed_at: variantState?.revealed_at ?? null,
+        highlighted_at: variantState?.highlighted_at ?? null,
+      };
+    });
+
+    // Transform assignments
+    const assignments = (assignmentsV2 ?? []).map((a) => ({
+      id: a.id,
+      session_id: a.session_id,
+      participant_id: a.participant_id,
+      session_artifact_variant_id: a.game_artifact_variant_id, // For backward compat
+      assigned_at: a.assigned_at,
+    }));
+
+    return NextResponse.json({ artifacts, variants, assignments }, { status: 200 });
+  }
+
+  // ==========================================================================
+  // PARTICIPANT VIEW: Filter by visibility, reveal state, role, assignments
+  // ==========================================================================
+
+  // Get participant's roles
   const { data: myRoles } = await service
     .from('participant_role_assignments')
     .select('session_role_id')
     .eq('session_id', sessionId)
     .eq('participant_id', viewer.participantId);
 
-  const myRoleIds = (myRoles ?? []).map((r) => r.session_role_id as string).filter(Boolean);
+  const mySessionRoleIds = new Set((myRoles ?? []).map((r) => r.session_role_id as string).filter(Boolean));
 
-  // Assigned variants (explicit)
-  const { data: myAssignments } = await service
-    .from('session_artifact_assignments')
-    .select('session_artifact_variant_id')
-    .eq('session_id', sessionId)
-    .eq('participant_id', viewer.participantId);
+  // Get participant's explicit assignments
+  const myAssignedVariantIds = new Set(
+    (assignmentsV2 ?? [])
+      .filter((a) => a.participant_id === viewer.participantId)
+      .map((a) => a.game_artifact_variant_id as string)
+  );
 
-  const assignedVariantIds = (myAssignments ?? [])
-    .map((a) => a.session_artifact_variant_id as string)
-    .filter(Boolean);
-
-  // Fetch all session artifacts (for revealed public variants)
-  // Include artifact_type and metadata for keypad state (sanitized below)
-  const { data: artifacts, error: aErr } = await service
-    .from('session_artifacts')
-    .select('id, title, description, artifact_type, artifact_order, metadata')
-    .eq('session_id', sessionId)
-    .order('artifact_order', { ascending: true });
-
-  if (aErr) return jsonError('Failed to load artifacts', 500);
-
-  const artifactIds = (artifacts ?? []).map((a) => a.id as string);
-  if (artifactIds.length === 0) {
-    return NextResponse.json({ artifacts: [], variants: [] }, { status: 200 });
-  }
-
-  const { data: allVariants, error: vErr } = await service
-    .from('session_artifact_variants')
-    .select(
-      'id, session_artifact_id, title, body, media_ref, variant_order, metadata, visibility, visible_to_session_role_id, revealed_at, highlighted_at'
-    )
-    .in('session_artifact_id', artifactIds)
-    .order('variant_order', { ascending: true });
-
-  if (vErr) return jsonError('Failed to load artifact variants', 500);
-
+  // Filter variants by visibility rules
   const accessibleVariantIds = new Set<string>();
 
-  for (const v of allVariants ?? []) {
-    const id = v.id as string;
+  for (const v of gameVariants ?? []) {
+    const variantId = v.id as string;
     const visibility = v.visibility as string;
-    const revealedAt = v.revealed_at as string | null;
-    const visibleToRoleId = v.visible_to_session_role_id as string | null;
+    const gameRoleId = v.visible_to_role_id as string | null;
+    const sessionRoleId = gameRoleId ? gameRoleToSessionRole.get(gameRoleId) ?? null : null;
+    const variantState = variantStateMap.get(variantId);
 
+    // Check step/phase unlock
     const { stepIndex, phaseIndex } = readStepPhaseFromMetadata((v.metadata as Json | null) ?? null);
     if (!isUnlockedForPosition(stepIndex, phaseIndex, current)) continue;
 
+    // Leader only: not visible to participants
     if (visibility === 'leader_only') continue;
 
-    if (visibility === 'public' && revealedAt) {
-      accessibleVariantIds.add(id);
+    // Public + revealed
+    if (visibility === 'public' && variantState?.revealed_at) {
+      accessibleVariantIds.add(variantId);
       continue;
     }
 
-    if (visibility === 'role_private' && visibleToRoleId && myRoleIds.includes(visibleToRoleId)) {
-      accessibleVariantIds.add(id);
+    // Role private + participant has the role
+    if (visibility === 'role_private' && sessionRoleId && mySessionRoleIds.has(sessionRoleId)) {
+      accessibleVariantIds.add(variantId);
       continue;
     }
 
-    if (assignedVariantIds.includes(id)) {
-      accessibleVariantIds.add(id);
+    // Explicitly assigned to this participant
+    if (myAssignedVariantIds.has(variantId)) {
+      accessibleVariantIds.add(variantId);
     }
   }
 
-  const variants = (allVariants ?? []).filter((v) => accessibleVariantIds.has(v.id as string));
+  // Build filtered response
+  const filteredVariants = (gameVariants ?? [])
+    .filter((v) => accessibleVariantIds.has(v.id as string))
+    .map((v) => {
+      const variantState = variantStateMap.get(v.id as string);
+      const gameRoleId = v.visible_to_role_id as string | null;
+      const sessionRoleId = gameRoleId ? gameRoleToSessionRole.get(gameRoleId) ?? null : null;
 
-  // Sanitize artifacts for participant view (remove correctCode, etc.)
-  const sanitizedArtifacts = (artifacts ?? []).map((a) => ({
+      return {
+        id: v.id,
+        session_artifact_id: v.artifact_id,
+        title: v.title,
+        body: v.body,
+        media_ref: v.media_ref,
+        variant_order: v.variant_order,
+        metadata: v.metadata,
+        visibility: v.visibility,
+        visible_to_session_role_id: sessionRoleId,
+        revealed_at: variantState?.revealed_at ?? null,
+        highlighted_at: variantState?.highlighted_at ?? null,
+      };
+    });
+
+  // Sanitize artifacts for participant (no correctCode, merge state)
+  const sanitizedArtifacts = (gameArtifacts ?? []).map((a) => ({
     id: a.id,
     title: a.title,
     description: a.description,
     artifact_type: a.artifact_type,
     artifact_order: a.artifact_order,
-    metadata: sanitizeMetadataForParticipant(a.metadata as Json | null, a.artifact_type as string | null),
+    metadata: sanitizeMetadataForParticipant(
+      a.metadata as Json | null,
+      stateByArtifact.get(a.id as string) ?? null,
+      a.artifact_type as string | null
+    ),
   }));
 
   return NextResponse.json(
     {
       artifacts: sanitizedArtifacts,
-      variants,
+      variants: filteredVariants,
     },
     { status: 200 }
   );
 }
+
+// =============================================================================
+// POST: Deprecated snapshot endpoint - now returns deprecation notice
+// =============================================================================
 
 export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id: sessionId } = await params;
@@ -301,162 +433,24 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const session = await ParticipantSessionService.getSessionById(sessionId);
   if (!session) return jsonError('Session not found', 404);
-  if (session.host_user_id !== user.id) return jsonError('Only host can snapshot artifacts', 403);
-  if (!session.game_id) return jsonError('Session has no associated game', 400);
+  if (session.host_user_id !== user.id) return jsonError('Only host can manage artifacts', 403);
 
-  const service = await createServiceRoleClient();
-
-  // Prevent double-snapshot
-  const { data: existing } = await service
-    .from('session_artifacts')
-    .select('id')
-    .eq('session_id', sessionId)
-    .limit(1);
-
-  if ((existing ?? []).length > 0) {
-    return jsonError('Artifacts already snapshotted for this session', 409);
-  }
-
-  const body = await request.json().catch(() => ({}));
-  const locale = typeof body?.locale === 'string' ? (body.locale as string) : null;
-
-  // Prefer locale-specific artifacts; fallback to default locale (NULL)
-  let localeQuery = service
-    .from('game_artifacts')
-    .select('id, title, description, artifact_type, artifact_order, tags, metadata')
-    .eq('game_id', session.game_id);
-
-  localeQuery = locale === null ? localeQuery.is('locale', null) : localeQuery.eq('locale', locale);
-
-  const { data: gameArtifactsLocale, error: gaErr } = await localeQuery.order('artifact_order', { ascending: true });
-
-  if (gaErr) return jsonError('Failed to load game artifacts', 500);
-
-  let gameArtifacts = gameArtifactsLocale ?? [];
-
-  if (gameArtifacts.length === 0) {
-    const fallback = await service
-      .from('game_artifacts')
-      .select('id, title, description, artifact_type, artifact_order, tags, metadata')
-      .eq('game_id', session.game_id)
-      .is('locale', null)
-      .order('artifact_order', { ascending: true });
-
-    if (fallback.error) return jsonError('Failed to load game artifacts', 500);
-    gameArtifacts = fallback.data ?? [];
-  }
-
-  const gameArtifactIds = gameArtifacts.map((a) => a.id as string);
-
-  const { data: gameVariants, error: gvErr } = gameArtifactIds.length
-    ? await service
-        .from('game_artifact_variants')
-        .select('id, artifact_id, title, body, media_ref, variant_order, metadata, visibility, visible_to_role_id')
-        .in('artifact_id', gameArtifactIds)
-        .order('variant_order', { ascending: true })
-    : { data: [], error: null };
-
-  if (gvErr) return jsonError('Failed to load game artifact variants', 500);
-
-  const { data: sessionRoles, error: srErr } = await service
-    .from('session_roles')
-    .select('id, source_role_id')
-    .eq('session_id', sessionId);
-
-  if (srErr) return jsonError('Failed to load session roles', 500);
-
-  const roleMap = new Map<string, string>();
-  for (const r of sessionRoles ?? []) {
-    if (r.source_role_id) roleMap.set(r.source_role_id as string, r.id as string);
-  }
-
-  // Insert session_artifacts
-  const artifactInserts = gameArtifacts.map((a) => ({
-    session_id: sessionId,
-    source_artifact_id: a.id,
-    title: a.title,
-    description: a.description,
-    artifact_type: a.artifact_type,
-    artifact_order: a.artifact_order,
-    tags: a.tags,
-    metadata: a.metadata,
-  }));
-
-  const { data: insertedArtifacts, error: iaErr } = await service
-    .from('session_artifacts')
-    .insert(artifactInserts)
-    .select('id, source_artifact_id');
-
-  if (iaErr || !insertedArtifacts) return jsonError('Failed to snapshot session artifacts', 500);
-
-  const artifactIdMap = new Map<string, string>();
-  for (const row of insertedArtifacts) {
-    if (row.source_artifact_id) artifactIdMap.set(row.source_artifact_id as string, row.id as string);
-  }
-
-  // Insert session_artifact_variants
-  const variantInserts: Array<{
-    session_artifact_id: string
-    source_variant_id: string | null
-    visibility: string
-    visible_to_session_role_id: string | null
-    title: string | null
-    body: string | null
-    media_ref: string | null
-    variant_order: number
-    metadata: Json
-  }> = [];
-
-  for (const v of gameVariants ?? []) {
-    const sessionArtifactId = artifactIdMap.get(v.artifact_id as string);
-    if (!sessionArtifactId) continue;
-
-    const visibility = (v.visibility as string) ?? 'public';
-
-    let mappedVisibility = visibility;
-    let visibleToSessionRoleId: string | null = null;
-
-    if (visibility === 'role_private') {
-      const sourceRoleId = v.visible_to_role_id as string | null;
-      const mapped = sourceRoleId ? roleMap.get(sourceRoleId) ?? null : null;
-      if (mapped) {
-        visibleToSessionRoleId = mapped;
-      } else {
-        // If role can't be mapped, fall back to leader_only to avoid leaking.
-        mappedVisibility = 'leader_only';
-      }
-    }
-
-    variantInserts.push({
-      session_artifact_id: sessionArtifactId,
-      source_variant_id: (v.id as string) ?? null,
-      visibility: mappedVisibility,
-      visible_to_session_role_id: visibleToSessionRoleId,
-      title: (v.title as string | null) ?? null,
-      body: (v.body as string | null) ?? null,
-      media_ref: (v.media_ref as string | null) ?? null,
-      variant_order: (v.variant_order as number) ?? 0,
-      metadata: ((v.metadata ?? null) as Json) ?? null,
-    });
-  }
-
-  if (variantInserts.length > 0) {
-    const { error: ivErr } = await service.from('session_artifact_variants').insert(variantInserts);
-    if (ivErr) return jsonError('Failed to snapshot session artifact variants', 500);
-  }
-
+  // V2: Snapshot is no longer needed - artifacts are read directly from game_*
+  // Return success with deprecation notice for backward compatibility
   await broadcastPlayEvent(sessionId, {
     type: 'artifact_update',
-    payload: { action: 'snapshot' },
+    payload: { action: 'refresh' },
     timestamp: new Date().toISOString(),
   });
 
   return NextResponse.json(
     {
       success: true,
-      artifacts: insertedArtifacts.length,
-      variants: variantInserts.length,
+      deprecated: true,
+      message: 'Artifacts V2: Snapshot is no longer required. Artifacts are now read directly from game configuration.',
+      artifacts: 0,
+      variants: 0,
     },
-    { status: 201 }
+    { status: 200 }
   );
 }

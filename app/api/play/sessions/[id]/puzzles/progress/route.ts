@@ -1,8 +1,12 @@
 /**
- * Host Puzzle Progress API
+ * Host Puzzle Progress API (V2)
  * 
  * Returns puzzle progress for all participants/teams in a session.
  * Used by PuzzleProgressPanel component.
+ * 
+ * V2 Architecture:
+ * - Config (hotspots count, etc.) read from game_artifacts.metadata
+ * - Runtime state (puzzleState) read from session_artifact_state.state
  */
 
 import type { NextRequest } from 'next/server';
@@ -13,11 +17,16 @@ import { ParticipantSessionService } from '@/lib/services/participants/session-s
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type SupabaseAny = any;
 
-interface ArtifactRow {
+interface GameArtifactRow {
   id: string;
   title: string | null;
   artifact_type: string | null;
   metadata: Record<string, unknown> | null;
+}
+
+interface StateRow {
+  game_artifact_id: string;
+  state: Record<string, unknown> | null;
 }
 
 interface ParticipantRow {
@@ -55,22 +64,47 @@ export async function GET(
 
   const service = await createServiceRoleClient() as SupabaseAny;
 
-  // Get session artifacts
+  // V2: Get session's game_id
+  const { data: sessionData } = await service
+    .from('participant_sessions')
+    .select('game_id')
+    .eq('id', sessionId)
+    .single();
+
+  if (!sessionData?.game_id) {
+    return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+  }
+
+  // V2: Get game artifacts config
   const { data: artifacts, error: artifactsError } = await service
-    .from('session_artifacts')
+    .from('game_artifacts')
     .select(`
       id,
       title,
       artifact_type,
       metadata
     `)
-    .eq('session_id', sessionId)
+    .eq('game_id', sessionData.game_id)
     .in('artifact_type', puzzleTypes);
 
   if (artifactsError) {
-    console.error('[Puzzle Progress] Error fetching artifacts:', artifactsError);
+    console.error('[Puzzle Progress V2] Error fetching artifacts:', artifactsError);
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
+
+  // V2: Get runtime state from session_artifact_state
+  const artifactIds = (artifacts || []).map((a: GameArtifactRow) => a.id);
+  const { data: stateRows } = artifactIds.length > 0
+    ? await service
+        .from('session_artifact_state')
+        .select('game_artifact_id, state')
+        .eq('session_id', sessionId)
+        .in('game_artifact_id', artifactIds)
+    : { data: [] };
+
+  const stateMap = new Map(
+    ((stateRows || []) as StateRow[]).map(s => [s.game_artifact_id, s.state])
+  );
 
   // Get session participants
   const { data: participants } = await service
@@ -83,8 +117,9 @@ export async function GET(
     .eq('session_id', sessionId);
 
   // Build puzzle status list
-  const puzzles = ((artifacts || []) as ArtifactRow[]).map(artifact => {
-    const puzzleState = (artifact.metadata as Record<string, unknown>)?.puzzleState as Record<string, unknown> | undefined;
+  const puzzles = ((artifacts || []) as GameArtifactRow[]).map(artifact => {
+    const stateData = stateMap.get(artifact.id) || {};
+    const puzzleState = (stateData as Record<string, unknown>)?.puzzleState as Record<string, unknown> | undefined;
     
     // Determine status based on puzzleState
     let status: 'not_started' | 'in_progress' | 'solved' | 'locked' | 'pending_approval' = 'not_started';
@@ -107,10 +142,10 @@ export async function GET(
       ) {
         status = 'in_progress';
         
-        // Calculate progress for specific types
+        // Calculate progress for specific types (config from game_artifacts.metadata)
         if (Array.isArray(puzzleState.foundIds) && artifact.artifact_type === 'hotspot') {
           const meta = artifact.metadata as Record<string, unknown>;
-          const totalHotspots = Array.isArray(meta.hotspots) ? meta.hotspots.length : 0;
+          const totalHotspots = Array.isArray(meta?.hotspots) ? meta.hotspots.length : 0;
           if (totalHotspots > 0) {
             progress = Math.round(((puzzleState.foundIds as unknown[]).length / totalHotspots) * 100);
           }

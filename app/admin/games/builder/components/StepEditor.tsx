@@ -40,6 +40,12 @@ export type StepData = {
   leader_script?: string;
   display_mode?: 'instant' | 'typewriter' | 'dramatic';
   media_ref?: string;
+  phase_id?: string | null;
+};
+
+export type PhaseData = {
+  id: string;
+  name: string;
 };
 
 type SortableStepItemProps = {
@@ -218,16 +224,17 @@ function SortableStepItem({ step, index, onEdit, onRemove, canRemove }: Sortable
 
 type StepEditorDrawerProps = {
   step: StepData | null;
+  phases: PhaseData[];
   onSave: (step: StepData) => void;
   onClose: () => void;
 };
 
-function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
+function StepEditorDrawer({ step, phases, onSave, onClose }: StepEditorDrawerProps) {
   const t = useTranslations('admin.games.builder');
   const [formData, setFormData] = useState<StepData>(() =>
     step
-      ? { ...step, media_ref: step.media_ref ?? '' }
-      : { id: '', title: '', body: '', duration_seconds: null, media_ref: '' }
+      ? { ...step, media_ref: step.media_ref ?? '', phase_id: step.phase_id ?? null }
+      : { id: '', title: '', body: '', duration_seconds: null, media_ref: '', phase_id: null }
   );
   const [diagramUrl, setDiagramUrl] = useState<string | null>(() =>
     step?.media_ref ? `/api/coach-diagrams/${step.media_ref}/svg` : null
@@ -276,6 +283,32 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
               {t('step.titleHint')}
             </p>
           </div>
+
+          {/* Phase selector */}
+          {phases.length > 0 && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">
+                📂 {t('step.fields.phase')}
+              </label>
+              <Select
+                value={formData.phase_id || ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    phase_id: e.target.value || null,
+                  })
+                }
+                options={[
+                  { value: '', label: t('step.noPhase') },
+                  ...phases.map((p) => ({ value: p.id, label: p.name || t('step.unnamedPhase') })),
+                ]}
+              />
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <InformationCircleIcon className="h-3.5 w-3.5" />
+                {t('step.phaseHint')}
+              </p>
+            </div>
+          )}
 
           {/* Description - shown to participants */}
           <div className="space-y-2">
@@ -432,10 +465,11 @@ function StepEditorDrawer({ step, onSave, onClose }: StepEditorDrawerProps) {
 
 type StepEditorProps = {
   steps: StepData[];
+  phases?: PhaseData[];
   onChange: (steps: StepData[]) => void;
 };
 
-export function StepEditor({ steps, onChange }: StepEditorProps) {
+export function StepEditor({ steps, phases = [], onChange }: StepEditorProps) {
   const t = useTranslations('admin.games.builder');
   const [editingStep, setEditingStep] = useState<StepData | null>(null);
 
@@ -551,6 +585,7 @@ export function StepEditor({ steps, onChange }: StepEditorProps) {
           />
           <StepEditorDrawer
             step={editingStep}
+            phases={phases}
             onSave={updateStep}
             onClose={() => setEditingStep(null)}
           />

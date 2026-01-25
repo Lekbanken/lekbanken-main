@@ -82,41 +82,88 @@ export async function GET(
     }
   }
 
-  // Revealed public artifacts + highlighted variant
-  const { data: sArtifacts } = await service
-    .from('session_artifacts')
-    .select('id, title, artifact_order')
-    .eq('session_id', session.id);
-
-  const artifactIds = (sArtifacts ?? []).map((a) => a.id as string).filter(Boolean);
-
-  const { data: variants } = artifactIds.length
+  // V2: Revealed public artifacts + highlighted variant from game_* + session_*_state
+  // Fetch game artifacts for this session's game
+  const { data: gameArtifacts } = session.game_id
     ? await service
-        .from('session_artifact_variants')
-        .select(
-          'id, session_artifact_id, title, body, media_ref, variant_order, visibility, revealed_at, highlighted_at'
-        )
-        .in('session_artifact_id', artifactIds)
+        .from('game_artifacts')
+        .select('id, title, artifact_order')
+        .eq('game_id', session.game_id)
+        .is('locale', null)
+        .order('artifact_order', { ascending: true })
+    : { data: [] };
+
+  const artifactIds = (gameArtifacts ?? []).map((a) => a.id as string).filter(Boolean);
+
+  // Fetch game artifact variants
+  const { data: gameVariants } = artifactIds.length
+    ? await service
+        .from('game_artifact_variants')
+        .select('id, artifact_id, title, body, media_ref, variant_order, visibility')
+        .in('artifact_id', artifactIds)
         .order('variant_order', { ascending: true })
-    : {
-        data: [] as Array<{
-          id?: unknown;
-          session_artifact_id?: unknown;
-          title?: unknown;
-          body?: unknown;
-          media_ref?: unknown;
-          variant_order?: unknown;
-          visibility?: unknown;
-          revealed_at?: unknown;
-          highlighted_at?: unknown;
-        }>,
+    : { data: [] };
+
+  const variantIds = (gameVariants ?? []).map((v) => v.id as string);
+
+  // Fetch variant state for this session
+  const { data: variantStates } = variantIds.length
+    ? await service
+        .from('session_artifact_variant_state')
+        .select('game_artifact_variant_id, revealed_at, highlighted_at')
+        .eq('session_id', session.id)
+        .in('game_artifact_variant_id', variantIds)
+    : { data: [] };
+
+  const variantStateMap = new Map<string, { revealed_at: string | null; highlighted_at: string | null }>();
+  for (const vs of variantStates ?? []) {
+    variantStateMap.set(vs.game_artifact_variant_id as string, {
+      revealed_at: vs.revealed_at as string | null,
+      highlighted_at: vs.highlighted_at as string | null,
+    });
+  }
+
+  // Build revealed variants (public + revealed_at set)
+  const revealed = (gameVariants ?? [])
+    .filter((v) => {
+      const visibility = v.visibility as string;
+      const state = variantStateMap.get(v.id as string);
+      return visibility === 'public' && state?.revealed_at;
+    })
+    .map((v) => {
+      const state = variantStateMap.get(v.id as string);
+      return {
+        id: v.id,
+        session_artifact_id: v.artifact_id, // For backward compat
+        title: v.title,
+        body: v.body,
+        media_ref: v.media_ref,
+        variant_order: v.variant_order,
+        visibility: v.visibility,
+        revealed_at: state?.revealed_at ?? null,
+        highlighted_at: state?.highlighted_at ?? null,
       };
+    });
 
-  const revealed = (variants ?? []).filter(
-    (v) => (v.visibility as string) === 'public' && Boolean(v.revealed_at)
-  );
+  // Find highlighted variant
+  const highlightedVariant = (gameVariants ?? []).find((v) => {
+    const state = variantStateMap.get(v.id as string);
+    return state?.highlighted_at;
+  });
 
-  const highlighted = (variants ?? []).find((v) => Boolean(v.highlighted_at)) ?? null;
+  const highlighted = highlightedVariant
+    ? {
+        id: highlightedVariant.id,
+        session_artifact_id: highlightedVariant.artifact_id,
+        title: highlightedVariant.title,
+        body: highlightedVariant.body,
+        media_ref: highlightedVariant.media_ref,
+        variant_order: highlightedVariant.variant_order,
+        visibility: highlightedVariant.visibility,
+        revealed_at: variantStateMap.get(highlightedVariant.id as string)?.revealed_at ?? null,
+        highlighted_at: variantStateMap.get(highlightedVariant.id as string)?.highlighted_at ?? null,
+      }
+    : null;
 
   // Revealed decision results
   const { data: decisions } = await service

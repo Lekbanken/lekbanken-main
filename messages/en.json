@@ -4614,11 +4614,15 @@
           "fields": {
             "title": "Title",
             "description": "Description",
+            "phase": "Phase",
             "duration": "Estimated time",
             "leaderScript": "Leader script (optional)",
             "displayMode": "Text display",
             "diagram": "Diagram (optional)"
           },
+          "noPhase": "No phase",
+          "unnamedPhase": "Unnamed phase",
+          "phaseHint": "Group the step under a phase for better overview",
           "preview": {
             "goal": "Goal",
             "leaderDoes": "Leader does",

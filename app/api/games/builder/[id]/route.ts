@@ -125,6 +125,7 @@ type CorePayload = {
 };
 
 type StepPayload = {
+  id?: string;
   locale?: string | null;
   step_order?: number;
   title?: string;
@@ -146,6 +147,7 @@ type MaterialsPayload = {
 };
 
 type ArtifactVariantPayload = {
+  id?: string;
   title?: string | null;
   body?: string | null;
   media_ref?: string | null;
@@ -158,6 +160,7 @@ type ArtifactVariantPayload = {
 };
 
 type ArtifactPayload = {
+  id?: string;
   title?: string;
   description?: string | null;
   artifact_type?: string;
@@ -169,6 +172,7 @@ type ArtifactPayload = {
 };
 
 type PhasePayload = {
+  id?: string;
   locale?: string | null;
   name: string;
   phase_type?: string;
@@ -182,6 +186,7 @@ type PhasePayload = {
 };
 
 type RolePayload = {
+  id?: string;
   locale?: string | null;
   name: string;
   icon?: string | null;
@@ -214,6 +219,7 @@ type BoardConfigPayload = {
 };
 
 type TriggerPayload = {
+  id?: string;
   name: string;
   description?: string | null;
   enabled?: boolean;
@@ -488,11 +494,20 @@ export async function PUT(
     refs: [...rawStepRefs, ...rawVariantRefs],
   });
 
-  // Replace steps
-  await supabase.from('game_steps').delete().eq('game_id', id);
+  // Update steps - preserve IDs for existing steps, create new for new ones
   const steps = body.steps ?? [];
+  const stepIdsToKeep = steps.filter((s) => isUuid(s.id)).map((s) => s.id as string);
+  
+  // Delete steps that are no longer present
+  if (stepIdsToKeep.length > 0) {
+    await supabase.from('game_steps').delete().eq('game_id', id).not('id', 'in', `(${stepIdsToKeep.join(',')})`);
+  } else {
+    await supabase.from('game_steps').delete().eq('game_id', id);
+  }
+  
   if (steps.length > 0) {
     const rows = steps.map((s, idx) => ({
+      ...(isUuid(s.id) ? { id: s.id } : {}),
       game_id: id,
       locale: s.locale ?? null,
       step_order: s.step_order ?? idx,
@@ -506,20 +521,27 @@ export async function PUT(
       optional: s.optional ?? false,
       conditional: s.conditional ?? null,
     }));
-    await supabase.from('game_steps').insert(rows);
+    await supabase.from('game_steps').upsert(rows, { onConflict: 'id' });
   }
 
   if (body.materials) {
     const m = body.materials;
+    const materialLocale = m.locale ?? null;
+    // Delete existing materials for this game+locale, then insert fresh
+    // (materials are not referenced by triggers, so ID change is safe)
     await supabase
       .from('game_materials')
-      .upsert({
-        game_id: id,
-        locale: m.locale ?? null,
-        items: m.items ?? [],
-        safety_notes: m.safety_notes ?? null,
-        preparation: m.preparation ?? null,
-      });
+      .delete()
+      .eq('game_id', id)
+      .is('locale', materialLocale);
+    
+    await supabase.from('game_materials').insert({
+      game_id: id,
+      locale: materialLocale,
+      items: m.items ?? [],
+      safety_notes: m.safety_notes ?? null,
+      preparation: m.preparation ?? null,
+    });
   }
 
   // Replace secondary purposes
@@ -577,11 +599,19 @@ export async function PUT(
     }
   }
 
-  // Replace phases (upsert pattern: delete all, insert new)
+  // Update phases - preserve IDs for existing phases
   const phases = body.phases ?? [];
-  await supabase.from('game_phases').delete().eq('game_id', id);
+  const phaseIdsToKeep = phases.filter((p) => isUuid(p.id)).map((p) => p.id as string);
+  
+  if (phaseIdsToKeep.length > 0) {
+    await supabase.from('game_phases').delete().eq('game_id', id).not('id', 'in', `(${phaseIdsToKeep.join(',')})`);
+  } else {
+    await supabase.from('game_phases').delete().eq('game_id', id);
+  }
+  
   if (phases.length > 0) {
     const phaseRows = phases.map((p, idx) => ({
+      ...(isUuid(p.id) ? { id: p.id } : {}),
       game_id: id,
       locale: p.locale ?? null,
       name: p.name,
@@ -594,14 +624,22 @@ export async function PUT(
       board_message: p.board_message ?? null,
       auto_advance: p.auto_advance ?? false,
     }));
-    await supabase.from('game_phases').insert(phaseRows);
+    await supabase.from('game_phases').upsert(phaseRows, { onConflict: 'id' });
   }
 
-  // Replace roles (upsert pattern: delete all, insert new)
+  // Update roles - preserve IDs for existing roles
   const roles = body.roles ?? [];
-  await supabase.from('game_roles').delete().eq('game_id', id);
+  const roleIdsToKeep = roles.filter((r) => isUuid(r.id)).map((r) => r.id as string);
+  
+  if (roleIdsToKeep.length > 0) {
+    await supabase.from('game_roles').delete().eq('game_id', id).not('id', 'in', `(${roleIdsToKeep.join(',')})`);
+  } else {
+    await supabase.from('game_roles').delete().eq('game_id', id);
+  }
+  
   if (roles.length > 0) {
     const roleRows = roles.map((r, idx) => ({
+      ...(isUuid(r.id) ? { id: r.id } : {}),
       game_id: id,
       locale: r.locale ?? null,
       name: r.name,
@@ -617,11 +655,10 @@ export async function PUT(
       scaling_rules: r.scaling_rules ?? null,
       conflicts_with: r.conflicts_with ?? null,
     }));
-    await supabase.from('game_roles').insert(roleRows);
+    await supabase.from('game_roles').upsert(roleRows, { onConflict: 'id' });
   }
 
-  // Replace board config (upsert pattern: delete all, insert new)
-  await supabase.from('game_board_config').delete().eq('game_id', id);
+  // Update board config (upsert pattern)
   if (body.boardConfig) {
     const bc = body.boardConfig;
     // Validate: at least one element visible OR welcome_message set
@@ -630,7 +667,7 @@ export async function PUT(
       bc.show_leaderboard || bc.show_qr_code || bc.welcome_message?.trim();
     
     if (hasContent) {
-      await supabase.from('game_board_config').insert({
+      await supabase.from('game_board_config').upsert({
         game_id: id,
         locale: bc.locale ?? null,
         show_game_name: bc.show_game_name ?? true,
@@ -645,7 +682,10 @@ export async function PUT(
         background_media_id: bc.background_media_id ?? null,
         background_color: bc.background_color ?? null,
         layout_variant: bc.layout_variant ?? 'standard',
-      });
+      }, { onConflict: 'game_id,locale', ignoreDuplicates: false });
+    } else {
+      // No content - remove any existing board config
+      await supabase.from('game_board_config').delete().eq('game_id', id);
     }
   }
 
@@ -661,21 +701,33 @@ export async function PUT(
     });
   }
 
-  // Replace artifacts and variants
+  // Update artifacts and variants - preserve IDs for existing artifacts
   const artifacts = body.artifacts ?? [];
+  const artifactIdsToKeep = artifacts.filter((a) => isUuid(a.id)).map((a) => a.id as string);
+  
+  // Get existing artifact IDs to clean up orphaned variants
   const { data: existingArtifacts } = await supabase
     .from('game_artifacts')
     .select('id')
     .eq('game_id', id);
 
-  const artifactIds = (existingArtifacts ?? []).map((a: { id: string }) => a.id as string);
-  if (artifactIds.length > 0) {
-    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIds);
+  const existingArtifactIds = (existingArtifacts ?? []).map((a: { id: string }) => a.id as string);
+  const artifactIdsToDelete = existingArtifactIds.filter((eId) => !artifactIdsToKeep.includes(eId));
+  
+  // Delete variants for artifacts that will be removed
+  if (artifactIdsToDelete.length > 0) {
+    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToDelete);
+    await supabase.from('game_artifacts').delete().in('id', artifactIdsToDelete);
   }
-  await supabase.from('game_artifacts').delete().eq('game_id', id);
+  
+  // Also delete all variants for artifacts we're keeping (we'll re-insert them)
+  if (artifactIdsToKeep.length > 0) {
+    await supabase.from('game_artifact_variants').delete().in('artifact_id', artifactIdsToKeep);
+  }
 
   if (artifacts.length > 0) {
     const artifactRows = artifacts.map((a, idx) => ({
+      ...(isUuid(a.id) ? { id: a.id } : {}),
       game_id: id,
       artifact_order: a.artifact_order ?? idx,
       artifact_type: a.artifact_type ?? 'card',
@@ -686,19 +738,27 @@ export async function PUT(
       locale: a.locale ?? null,
     }));
 
-    const { data: insertedArtifacts, error: artifactsError } = await supabase
+    const { data: upsertedArtifacts, error: artifactsError } = await supabase
       .from('game_artifacts')
-      .insert(artifactRows)
+      .upsert(artifactRows, { onConflict: 'id' })
       .select();
 
     if (artifactsError) {
       return NextResponse.json({ error: 'Failed to save artifacts', details: artifactsError.message }, { status: 500 });
     }
 
-    const insertedArtifactsSafe = (insertedArtifacts ?? []) as Array<{ id: string }>;
+    const upsertedArtifactsSafe = (upsertedArtifacts ?? []) as Array<{ id: string }>;
 
-    const variantRows = insertedArtifactsSafe.flatMap((art: { id: string }, idx: number) => {
-      const source = artifacts[idx];
+    // Build a map from frontend artifact order to the actual artifact ID
+    const artifactIdByOrder = new Map<number, string>();
+    upsertedArtifactsSafe.forEach((art, idx) => {
+      artifactIdByOrder.set(idx, art.id);
+    });
+
+    const variantRows = artifacts.flatMap((source, idx) => {
+      const artifactId = artifactIdByOrder.get(idx);
+      if (!artifactId) return [];
+      
       const variants = source?.variants ?? [];
 
       return variants.map((v, j) => {
@@ -708,7 +768,7 @@ export async function PUT(
         const hasMetadata = Object.keys(meta).length > 0;
 
         return {
-          artifact_id: art.id,
+          artifact_id: artifactId,
           variant_order: v.variant_order ?? j,
           visibility: v.visibility ?? 'public',
           visible_to_role_id: v.visible_to_role_id ?? null,
@@ -730,11 +790,19 @@ export async function PUT(
     }
   }
 
-  // Replace triggers (delete all, insert new)
+  // Update triggers - preserve IDs for existing triggers
   const triggers = body.triggers ?? [];
-  await supabase.from('game_triggers').delete().eq('game_id', id);
+  const triggerIdsToKeep = triggers.filter((t) => isUuid(t.id)).map((t) => t.id as string);
+  
+  if (triggerIdsToKeep.length > 0) {
+    await supabase.from('game_triggers').delete().eq('game_id', id).not('id', 'in', `(${triggerIdsToKeep.join(',')})`);
+  } else {
+    await supabase.from('game_triggers').delete().eq('game_id', id);
+  }
+  
   if (triggers.length > 0) {
     const triggerRows = triggers.map((t, idx) => ({
+      ...(isUuid(t.id) ? { id: t.id } : {}),
       game_id: id,
       name: t.name || 'Trigger',
       description: t.description ?? null,
@@ -745,7 +813,7 @@ export async function PUT(
       delay_seconds: t.delay_seconds ?? 0,
       sort_order: t.sort_order ?? idx,
     }));
-    const { error: triggersError } = await supabase.from('game_triggers').insert(triggerRows);
+    const { error: triggersError } = await supabase.from('game_triggers').upsert(triggerRows, { onConflict: 'id' });
     if (triggersError) {
       return NextResponse.json({ error: 'Failed to save triggers', details: triggersError.message }, { status: 500 });
     }

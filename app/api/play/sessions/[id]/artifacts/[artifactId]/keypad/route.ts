@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { ParticipantSessionService } from '@/lib/services/participants/session-service';
 import type { Json } from '@/types/supabase';
 
 /**
  * POST /api/play/sessions/[id]/artifacts/[artifactId]/keypad
  * 
- * Server-side keypad code validation.
- * - Participant submits enteredCode
- * - Server validates against correctCode (never exposed to client)
- * - Server updates session_artifacts.metadata with keypad state
- * - Returns status + message + variant IDs to reveal
+ * Artifacts V2: Server-side keypad code validation.
+ * - artifactId now refers to game_artifacts.id
+ * - Config (correctCode, maxAttempts) read from game_artifacts.metadata
+ * - State (attemptCount, isUnlocked) stored in session_artifact_state
  * 
  * Security: correctCode is NEVER sent to participants.
  */
@@ -64,12 +64,11 @@ function parseKeypadConfig(metadata: Json | null): KeypadConfig {
   };
 }
 
-function parseKeypadState(metadata: Json | null): KeypadState {
-  if (!metadata || typeof metadata !== 'object' || Array.isArray(metadata)) {
+function parseKeypadStateFromState(stateJson: Json | null): KeypadState {
+  if (!stateJson || typeof stateJson !== 'object' || Array.isArray(stateJson)) {
     return { attemptCount: 0, isUnlocked: false, isLockedOut: false, unlockedAt: null, unlockedByParticipantId: null };
   }
-  const m = metadata as Record<string, unknown>;
-  const state = m.keypadState as Record<string, unknown> | undefined;
+  const state = (stateJson as Record<string, unknown>).keypadState as Record<string, unknown> | undefined;
   if (!state || typeof state !== 'object') {
     return { attemptCount: 0, isUnlocked: false, isLockedOut: false, unlockedAt: null, unlockedByParticipantId: null };
   }
@@ -128,7 +127,7 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string; artifactId: string }> }
 ) {
-  const { id: sessionId, artifactId } = await params;
+  const { id: sessionId, artifactId: gameArtifactId } = await params;
 
   // Parse request body
   let enteredCode: string;
@@ -149,28 +148,36 @@ export async function POST(
     return jsonError('Unauthorized - participant token required', 401);
   }
 
+  // V2: Verify session and that artifact belongs to session's game
+  const session = await ParticipantSessionService.getSessionById(sessionId);
+  if (!session) return jsonError('Session not found', 404);
+  if (!session.game_id) return jsonError('Session has no associated game', 400);
+
   const supabase = await createServiceRoleClient();
 
-  // Verify artifact belongs to this session first
+  // V2: Check game_artifacts instead of session_artifacts
   const { data: artifact, error: artifactErr } = await supabase
-    .from('session_artifacts')
-    .select('id, session_id, artifact_type, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
+    .from('game_artifacts')
+    .select('id, game_id, artifact_type, metadata')
+    .eq('id', gameArtifactId)
     .single();
 
   if (artifactErr || !artifact) {
     return jsonError('Artifact not found', 404);
   }
 
+  if (artifact.game_id !== session.game_id) {
+    return jsonError('Artifact does not belong to session game', 400);
+  }
+
   if (artifact.artifact_type !== 'keypad') {
     return jsonError('Artifact is not a keypad', 400);
   }
 
-  // Use atomic RPC function to prevent race conditions
-  // This uses FOR UPDATE lock to ensure only one attempt can succeed
-  const { data: rpcResult, error: rpcError } = await supabase.rpc('attempt_keypad_unlock', {
-    p_artifact_id: artifactId,
+  // V2: Use the new RPC function that works with game_artifacts + session_artifact_state
+  const { data: rpcResult, error: rpcError } = await supabase.rpc('attempt_keypad_unlock_v2', {
+    p_session_id: sessionId,
+    p_game_artifact_id: gameArtifactId,
     p_entered_code: enteredCode,
     p_participant_id: participant.participantId,
     p_participant_name: participant.displayName,
@@ -205,28 +212,47 @@ export async function POST(
 
   // Handle post-unlock actions (reveal variants, broadcast)
   if (result.status === 'success') {
-    // Find public variants to reveal
+    // V2: Find public game_artifact_variants to reveal
     const { data: variants } = await supabase
-      .from('session_artifact_variants')
-      .select('id, visibility, revealed_at')
-      .eq('session_artifact_id', artifactId);
+      .from('game_artifact_variants')
+      .select('id, visibility')
+      .eq('artifact_id', gameArtifactId);
 
-    const variantsToReveal = (variants ?? [])
-      .filter((v) => v.visibility === 'public' && !v.revealed_at)
-      .map((v) => v.id as string);
+    // Check which are not yet revealed
+    const variantIds = (variants ?? []).filter(v => v.visibility === 'public').map(v => v.id as string);
+    
+    const { data: existingStates } = variantIds.length ? await supabase
+      .from('session_artifact_variant_state')
+      .select('game_artifact_variant_id, revealed_at')
+      .eq('session_id', sessionId)
+      .in('game_artifact_variant_id', variantIds)
+    : { data: [] };
 
-    // Auto-reveal public variants
+    const revealedSet = new Set(
+      (existingStates ?? [])
+        .filter(s => s.revealed_at)
+        .map(s => s.game_artifact_variant_id as string)
+    );
+
+    const variantsToReveal = variantIds.filter(id => !revealedSet.has(id));
+
+    // V2: Auto-reveal public variants via session_artifact_variant_state
     if (variantsToReveal.length > 0) {
+      const inserts = variantsToReveal.map(variantId => ({
+        session_id: sessionId,
+        game_artifact_variant_id: variantId,
+        revealed_at: new Date().toISOString(),
+      }));
+
       await supabase
-        .from('session_artifact_variants')
-        .update({ revealed_at: new Date().toISOString() })
-        .in('id', variantsToReveal);
+        .from('session_artifact_variant_state')
+        .upsert(inserts, { onConflict: 'session_id,game_artifact_variant_id' });
     }
 
     response.revealVariantIds = variantsToReveal;
 
     // Broadcast unlock event (no enteredCode or correctCode!)
-    await broadcastKeypadEvent(sessionId, artifactId, 'keypad_unlocked', {
+    await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_unlocked', {
       unlockedBy: participant.displayName,
       participantId: participant.participantId,
       revealedVariants: variantsToReveal.length,
@@ -234,7 +260,7 @@ export async function POST(
 
   } else if (result.status === 'locked') {
     // Broadcast lockout event
-    await broadcastKeypadEvent(sessionId, artifactId, 'keypad_locked_out', {
+    await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_locked_out', {
       lockedBy: participant.displayName,
       participantId: participant.participantId,
       totalAttempts: result.attempt_count,
@@ -242,7 +268,7 @@ export async function POST(
 
   } else if (result.status === 'fail') {
     // Broadcast failed attempt (no enteredCode!)
-    await broadcastKeypadEvent(sessionId, artifactId, 'keypad_attempt_failed', {
+    await broadcastKeypadEvent(sessionId, gameArtifactId, 'keypad_attempt_failed', {
       attemptBy: participant.displayName,
       participantId: participant.participantId,
       attemptCount: result.attempt_count,
@@ -256,39 +282,56 @@ export async function POST(
 /**
  * GET /api/play/sessions/[id]/artifacts/[artifactId]/keypad
  * 
- * Returns the current keypad state (without correctCode).
- * Useful for syncing state on page load.
+ * V2: Returns current keypad state (without correctCode).
+ * Reads config from game_artifacts, state from session_artifact_state.
  */
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string; artifactId: string }> }
 ) {
-  const { id: sessionId, artifactId } = await params;
+  const { id: sessionId, artifactId: gameArtifactId } = await params;
 
   const participant = await resolveParticipant(sessionId, request);
   if (!participant) {
     return jsonError('Unauthorized - participant token required', 401);
   }
 
+  // V2: Verify session and artifact belong together
+  const session = await ParticipantSessionService.getSessionById(sessionId);
+  if (!session) return jsonError('Session not found', 404);
+  if (!session.game_id) return jsonError('Session has no associated game', 400);
+
   const supabase = await createServiceRoleClient();
 
+  // V2: Get config from game_artifacts
   const { data: artifact, error } = await supabase
-    .from('session_artifacts')
-    .select('id, title, artifact_type, metadata')
-    .eq('id', artifactId)
-    .eq('session_id', sessionId)
+    .from('game_artifacts')
+    .select('id, title, game_id, artifact_type, metadata')
+    .eq('id', gameArtifactId)
     .single();
 
   if (error || !artifact) {
     return jsonError('Artifact not found', 404);
   }
 
+  if (artifact.game_id !== session.game_id) {
+    return jsonError('Artifact does not belong to session game', 400);
+  }
+
   if (artifact.artifact_type !== 'keypad') {
     return jsonError('Artifact is not a keypad', 400);
   }
 
+  // V2: Get state from session_artifact_state
+  const { data: stateRow } = await supabase
+    .from('session_artifact_state')
+    .select('state')
+    .eq('session_id', sessionId)
+    .eq('game_artifact_id', gameArtifactId)
+    .single();
+
   const config = parseKeypadConfig(artifact.metadata);
-  const state = parseKeypadState(artifact.metadata);
+  const state = parseKeypadStateFromState(stateRow?.state as Json | null);
 
   // Calculate attempts left (without exposing correctCode)
   const attemptsLeft = config.maxAttempts 

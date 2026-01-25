@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card, Button, Input, Textarea, Select } from '@/components/ui';
-import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ArrowUpIcon, PlusIcon, TrashIcon, SparklesIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import type { ArtifactFormData, ArtifactVariantFormData, ArtifactVisibility } from '@/types/games';
 import type { RoleData } from './RoleEditor';
 import { ArtifactWizard } from './ArtifactWizard';
@@ -36,6 +36,34 @@ const makeId = () =>
     ? crypto.randomUUID()
     : `id-${Math.random().toString(36).slice(2, 9)}`;
 
+// Artifact type styling configuration
+type ArtifactTypeStyle = { emoji: string; bg: string; border: string; text: string };
+const ARTIFACT_STYLES: Record<string, ArtifactTypeStyle> = {
+  card: { emoji: '📇', bg: 'bg-slate-500/10', border: 'border-slate-500/40', text: 'text-slate-600 dark:text-slate-400' },
+  document: { emoji: '📄', bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-600 dark:text-blue-400' },
+  image: { emoji: '🖼️', bg: 'bg-purple-500/10', border: 'border-purple-500/40', text: 'text-purple-600 dark:text-purple-400' },
+  keypad: { emoji: '🔐', bg: 'bg-amber-500/10', border: 'border-amber-500/40', text: 'text-amber-600 dark:text-amber-400' },
+  riddle: { emoji: '❓', bg: 'bg-emerald-500/10', border: 'border-emerald-500/40', text: 'text-emerald-600 dark:text-emerald-400' },
+  cipher: { emoji: '🔒', bg: 'bg-rose-500/10', border: 'border-rose-500/40', text: 'text-rose-600 dark:text-rose-400' },
+  logic_grid: { emoji: '🧩', bg: 'bg-indigo-500/10', border: 'border-indigo-500/40', text: 'text-indigo-600 dark:text-indigo-400' },
+  multi_answer: { emoji: '✅', bg: 'bg-teal-500/10', border: 'border-teal-500/40', text: 'text-teal-600 dark:text-teal-400' },
+  audio: { emoji: '🔊', bg: 'bg-pink-500/10', border: 'border-pink-500/40', text: 'text-pink-600 dark:text-pink-400' },
+  hotspot: { emoji: '📍', bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-600 dark:text-orange-400' },
+  tile_puzzle: { emoji: '🧱', bg: 'bg-cyan-500/10', border: 'border-cyan-500/40', text: 'text-cyan-600 dark:text-cyan-400' },
+  conversation_cards_collection: { emoji: '💬', bg: 'bg-violet-500/10', border: 'border-violet-500/40', text: 'text-violet-600 dark:text-violet-400' },
+  counter: { emoji: '🔢', bg: 'bg-lime-500/10', border: 'border-lime-500/40', text: 'text-lime-600 dark:text-lime-400' },
+  qr_gate: { emoji: '📱', bg: 'bg-fuchsia-500/10', border: 'border-fuchsia-500/40', text: 'text-fuchsia-600 dark:text-fuchsia-400' },
+  hint_container: { emoji: '💡', bg: 'bg-yellow-500/10', border: 'border-yellow-500/40', text: 'text-yellow-600 dark:text-yellow-400' },
+  location_check: { emoji: '🗺️', bg: 'bg-green-500/10', border: 'border-green-500/40', text: 'text-green-600 dark:text-green-400' },
+  prop_confirmation: { emoji: '🎭', bg: 'bg-red-500/10', border: 'border-red-500/40', text: 'text-red-600 dark:text-red-400' },
+  sound_level: { emoji: '📢', bg: 'bg-sky-500/10', border: 'border-sky-500/40', text: 'text-sky-600 dark:text-sky-400' },
+  replay_marker: { emoji: '🔄', bg: 'bg-neutral-500/10', border: 'border-neutral-500/40', text: 'text-neutral-600 dark:text-neutral-400' },
+  signal_generator: { emoji: '📡', bg: 'bg-blue-500/10', border: 'border-blue-500/40', text: 'text-blue-600 dark:text-blue-400' },
+  time_bank_step: { emoji: '⏱️', bg: 'bg-orange-500/10', border: 'border-orange-500/40', text: 'text-orange-600 dark:text-orange-400' },
+  empty_artifact: { emoji: '📦', bg: 'bg-gray-500/10', border: 'border-gray-500/40', text: 'text-gray-600 dark:text-gray-400' },
+};
+const getStyle = (type: string): ArtifactTypeStyle => ARTIFACT_STYLES[type] ?? ARTIFACT_STYLES.card;
+
 function createVariant(): ArtifactVariantFormData {
   return {
     id: makeId(),
@@ -65,6 +93,19 @@ function createArtifact(t: ReturnType<typeof useTranslations>): ArtifactFormData
 export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChange }: ArtifactEditorProps) {
   const t = useTranslations('admin.games.builder');
   const [wizardOpen, setWizardOpen] = useState(false);
+  // Track which artifacts are expanded (by ID) - start with all collapsed
+  const [expandedArtifacts, setExpandedArtifacts] = useState<Set<string>>(new Set());
+
+  const toggleExpanded = (id: string) => {
+    setExpandedArtifacts((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+  const expandAll = () => setExpandedArtifacts(new Set(artifacts.map((a) => a.id)));
+  const collapseAll = () => setExpandedArtifacts(new Set());
 
   // Translated options using useMemo
   const visibilityOptions = useMemo(() => [
@@ -215,11 +256,25 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
           <p className="text-sm text-muted-foreground">{t('artifact.header.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2">
+          {artifacts.length > 0 && (
+            <>
+              <Button variant="ghost" size="sm" onClick={expandAll} title="Expandera alla">
+                <ChevronDownIcon className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="sm" onClick={collapseAll} title="Kollapsa alla">
+                <ChevronUpIcon className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           <Button variant="outline" size="sm" onClick={() => setWizardOpen(true)}>
             <SparklesIcon className="h-4 w-4 mr-1" />
             {t('artifact.header.wizard')}
           </Button>
-          <Button size="sm" onClick={() => onChange([...artifacts, createArtifact(t)])}>
+          <Button size="sm" onClick={() => {
+            const newArtifact = createArtifact(t);
+            onChange([...artifacts, newArtifact]);
+            setExpandedArtifacts((prev) => new Set([...prev, newArtifact.id]));
+          }}>
             <PlusIcon className="h-4 w-4 mr-1" />
             {t('artifact.header.add')}
           </Button>
@@ -233,15 +288,60 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
         </Card>
       )}
 
-      {artifacts.map((artifact, idx) => (
-        <Card key={artifact.id} className="p-4 space-y-4 border-border/70">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <span className="text-xl">
-                {artifact.artifact_type === 'keypad' ? '🔐' :
-                 artifact.artifact_type === 'document' ? '📄' :
-                 artifact.artifact_type === 'image' ? '🖼️' : '📇'}
-              </span>
+      {artifacts.map((artifact, idx) => {
+        const style = getStyle(artifact.artifact_type);
+        const isExpanded = expandedArtifacts.has(artifact.id);
+        const variantCount = artifact.variants.length;
+        
+        return (
+        <Card key={artifact.id} className={`border-2 transition-colors ${style.border} ${style.bg}`}>
+          {/* Collapsed header - always visible */}
+          <div className="p-3 flex items-center gap-3">
+            <button
+              type="button"
+              className="flex items-center gap-3 flex-1 text-left min-w-0"
+              onClick={() => toggleExpanded(artifact.id)}
+            >
+              <span className="text-xl shrink-0">{style.emoji}</span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-semibold text-foreground truncate">
+                    {artifact.title || t('artifact.fields.titlePlaceholder')}
+                  </span>
+                  <span className={`text-xs px-1.5 py-0.5 rounded ${style.bg} ${style.text} shrink-0`}>
+                    {variantCount} variant{variantCount !== 1 ? 'er' : ''}
+                  </span>
+                  {artifact.tags.length > 0 && (
+                    <span className="text-xs text-muted-foreground truncate hidden sm:inline">
+                      {artifact.tags.slice(0, 2).join(', ')}{artifact.tags.length > 2 ? '...' : ''}
+                    </span>
+                  )}
+                </div>
+                {artifact.description && !isExpanded && (
+                  <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{artifact.description}</p>
+                )}
+              </div>
+              <ChevronDownIcon className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
+            <div className="flex items-center gap-1 shrink-0">
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => moveArtifact(idx, -1)} disabled={idx === 0}>
+                <ArrowUpIcon className="h-4 w-4" />
+              </Button>
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => moveArtifact(idx, 1)} disabled={idx === artifacts.length - 1}>
+                <ArrowDownIcon className="h-4 w-4" />
+              </Button>
+              <Button type="button" variant="ghost" size="sm" className="h-8 w-8 p-0 text-destructive hover:text-destructive" onClick={() => removeArtifact(idx)}>
+                <TrashIcon className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Expanded content */}
+          {isExpanded && (
+          <div className="px-4 pb-4 space-y-4 border-t border-border/50">
+            {/* Title input */}
+            <div className="pt-4 space-y-2">
+              <label className="text-sm font-medium text-foreground">{t('artifact.fields.titlePlaceholder')}</label>
               <Input
                 value={artifact.title}
                 onChange={(e) => updateArtifact(idx, { title: e.target.value })}
@@ -249,38 +349,6 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
                 className="font-medium"
               />
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0"
-                onClick={() => moveArtifact(idx, -1)}
-                disabled={idx === 0}
-              >
-                <ArrowUpIcon className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0"
-                onClick={() => moveArtifact(idx, 1)}
-                disabled={idx === artifacts.length - 1}
-              >
-                <ArrowDownIcon className="h-4 w-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-9 w-9 p-0"
-                onClick={() => removeArtifact(idx)}
-              >
-                <TrashIcon className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-2">
@@ -1389,8 +1457,11 @@ export function ArtifactEditor({ artifacts, roles, stepCount, phaseCount, onChan
               ))}
             </div>
           </div>
+          </div>
+          )}
         </Card>
-      ))}
+        );
+      })}
 
     </div>
   );

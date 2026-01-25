@@ -99,20 +99,7 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
     return map;
   }, [variants]);
 
-  const snapshot = useCallback(async () => {
-    setError(null);
-    const res = await fetch(`/api/play/sessions/${sessionId}/artifacts`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({}),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      setError(data.error || t('errors.snapshotFailed'));
-      return;
-    }
-    await load();
-  }, [sessionId, load, t]);
+  // V2: Snapshot functionality removed - artifacts are read directly from game_* tables
 
   const updateVariant = useCallback(
     async (body: unknown) => {
@@ -211,11 +198,9 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
             <p className="text-sm text-muted-foreground">{t('description')}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="outline" onClick={load}>
+            {/* V2: Single refresh button - config is read from game_* tables */}
+            <Button size="sm" onClick={load}>
               {t('actions.update')}
-            </Button>
-            <Button size="sm" onClick={snapshot}>
-              {t('actions.snapshotFromGame')}
             </Button>
           </div>
         </div>
@@ -234,12 +219,10 @@ export function ArtifactsPanel({ sessionId }: { sessionId: string }) {
           <p className="text-sm text-muted-foreground">
             {t('noArtifactsHint')}
           </p>
-          <Button size="sm" onClick={snapshot}>
-            {t('empty.description')}
+          {/* V2: Load artifacts from game_* tables - no snapshot needed */}
+          <Button size="sm" onClick={load}>
+            {t('actions.update')}
           </Button>
-          <p className="text-xs text-muted-foreground">
-            {t('noArtifactsButton')}
-          </p>
         </Card>
       ) : (
         artifacts.map((a) => {

@@ -4934,11 +4934,15 @@
           "fields": {
             "title": "Tittel",
             "description": "Beskrivelse",
+            "phase": "Fase",
             "duration": "Estimert tid",
             "leaderScript": "Lederskript (valgfritt)",
             "displayMode": "Tekstvisning",
             "diagram": "Diagram (valgfritt)"
           },
+          "noPhase": "Ingen fase",
+          "unnamedPhase": "Navnløs fase",
+          "phaseHint": "Grupper trinnet under en fase for bedre oversikt",
           "preview": {
             "goal": "Mål",
             "leaderDoes": "Lederen gjør",

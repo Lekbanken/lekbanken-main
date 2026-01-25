@@ -7313,14 +7313,6 @@
         "high": "Hög energi"
       }
     },
-    "gamification": {
-      "events": {
-        "signInRequired": "Du behöver vara inloggad för att se eventloggen.",
-        "title": "DICECOIN",
-        "subtitle": "Eventlogg (read-only)",
-        "empty": "Inga event att visa ännu."
-      }
-    },
     "play": {
       "startSession": {
         "eyebrow": "Starta session",
@@ -7921,6 +7913,12 @@
       "notifications": "Notifikationer"
     },
     "gamification": {
+      "events": {
+        "signInRequired": "Du behöver vara inloggad för att se eventloggen.",
+        "title": "DICECOIN",
+        "subtitle": "Eventlogg (read-only)",
+        "empty": "Inga event att visa ännu."
+      },
       "achievements": {
         "celebration": {
           "title": "Utmärkelse upplåst!",

@@ -7247,6 +7247,15 @@
         "title": "DICECOIN",
         "subtitle": "Event log (read-only)",
         "empty": "No events to show yet."
+      },
+      "achievements": {
+        "celebration": {
+          "title": "Achievement unlocked!",
+          "tapToClose": "Tap anywhere to close"
+        },
+        "detail": {
+          "unlockedPrefix": "Unlocked"
+        }
       }
     },
     "play": {

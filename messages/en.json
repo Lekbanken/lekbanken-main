@@ -329,6 +329,15 @@
       "ageYears": "{age} years"
     }
   },
+  "profile": {
+    "achievements": {
+      "title": "Achievements",
+      "noAchievementsYet": "No achievements yet",
+      "viewAll": "View all",
+      "unlockedCount": "{unlocked} of {total} unlocked",
+      "clickBadgeHint": "Click a badge to see details"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",

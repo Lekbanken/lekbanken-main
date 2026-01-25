@@ -494,6 +494,15 @@
       "ageYears": "{age} år"
     }
   },
+  "profile": {
+    "achievements": {
+      "title": "Prestasjoner",
+      "noAchievementsYet": "Ingen prestasjoner ennå",
+      "viewAll": "Vis alle",
+      "unlockedCount": "{unlocked} av {total} opplåst",
+      "clickBadgeHint": "Klikk på en badge for å se detaljer"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",

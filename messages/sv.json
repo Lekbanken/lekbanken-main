@@ -310,6 +310,15 @@
       "ageYears": "{age} år"
     }
   },
+  "profile": {
+    "achievements": {
+      "title": "Prestationer",
+      "noAchievementsYet": "Inga prestationer ännu",
+      "viewAll": "Visa alla",
+      "unlockedCount": "{unlocked} av {total} upplåsta",
+      "clickBadgeHint": "Klicka på en badge för att se detaljer"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",
@@ -7660,9 +7669,7 @@
           "title": "Preferenser",
           "description": "Anpassa din upplevelse i Lekbanken",
           "language": "Språk",
-          "theme": {
-            "label": "Tema"
-          },
+          "theme": "Tema",
           "showThemeToggle": "Visa tema-omkopplare i headern",
           "showThemeToggleHint": "Styr om snabb-knappen för ljust/mörkt läge syns högst upp.",
           "timezone": "Tidszon",

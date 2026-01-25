@@ -8177,6 +8177,17 @@
         "reusableTemplates": "Reusable templates",
         "login": "Log in →"
       }
+    },
+    "howItWorks": {
+      "tagline": "How it works",
+      "title": "From idea to execution in minutes",
+      "description": "Four simple steps to plan and run activities that engage."
+    },
+    "spotlight": {
+      "tagline": "Powerful features",
+      "title": "Everything you need for activity management",
+      "description": "Build, share and run activities with tools made for leaders, coaches and teachers.",
+      "imagePlaceholder": "Product image coming soon"
     }
   },
   "demo": {

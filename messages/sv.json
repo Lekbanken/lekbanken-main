@@ -8901,6 +8901,17 @@
           "highlight": "Desktop först"
         }
       }
+    },
+    "howItWorks": {
+      "tagline": "Så funkar det",
+      "title": "Från idé till genomförande på minuter",
+      "description": "Fyra enkla steg för att planera och genomföra aktiviteter som engagerar."
+    },
+    "spotlight": {
+      "tagline": "Kraftfulla funktioner",
+      "title": "Allt du behöver för aktivitetsledning",
+      "description": "Bygg, dela och genomför aktiviteter med verktyg skapade för ledare, coacher och lärare.",
+      "imagePlaceholder": "Produktbild kommer snart"
     }
   },
   "demo": {

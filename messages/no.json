@@ -8330,6 +8330,17 @@
         "reusableTemplates": "Gjenbrukbare maler",
         "login": "Logg inn →"
       }
+    },
+    "howItWorks": {
+      "tagline": "Slik fungerer det",
+      "title": "Fra idé til gjennomføring på minutter",
+      "description": "Fire enkle steg for å planlegge og gjennomføre aktiviteter som engasjerer."
+    },
+    "spotlight": {
+      "tagline": "Kraftige funksjoner",
+      "title": "Alt du trenger for aktivitetsledelse",
+      "description": "Bygg, del og gjennomfør aktiviteter med verktøy laget for ledere, trenere og lærere.",
+      "imagePlaceholder": "Produktbilde kommer snart"
     }
   },
   "demo": {

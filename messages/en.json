@@ -323,7 +323,11 @@
     "errorTitle": "Could not load",
     "emptyTitle": "No activities found",
     "emptyDescription": "Try different filters or search terms.",
-    "loadMore": "Load more"
+    "loadMore": "Load more",
+    "filterHint": "Tip: Use filters to find the right activity",
+    "gameCard": {
+      "ageYears": "{age} years"
+    }
   },
   "admin": {
     "commandPalette": {

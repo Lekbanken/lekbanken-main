@@ -304,7 +304,11 @@
     "errorTitle": "Kunde inte ladda",
     "emptyTitle": "Inga aktiviteter hittades",
     "emptyDescription": "Försök med andra filter eller sökord.",
-    "loadMore": "Ladda fler"
+    "loadMore": "Ladda fler",
+    "filterHint": "Tips: Använd filter för att hitta rätt aktivitet",
+    "gameCard": {
+      "ageYears": "{age} år"
+    }
   },
   "admin": {
     "commandPalette": {

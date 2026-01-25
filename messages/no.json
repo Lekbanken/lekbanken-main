@@ -488,7 +488,11 @@
     "errorTitle": "Kunne ikke laste",
     "emptyTitle": "Ingen aktiviteter funnet",
     "emptyDescription": "Prøv andre filtre eller søkeord.",
-    "loadMore": "Last inn flere"
+    "loadMore": "Last inn flere",
+    "filterHint": "Tips: Bruk filtre for å finne riktig aktivitet",
+    "gameCard": {
+      "ageYears": "{age} år"
+    }
   },
   "admin": {
     "commandPalette": {

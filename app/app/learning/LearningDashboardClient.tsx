@@ -63,7 +63,7 @@ export function LearningDashboardClient({ data }: LearningDashboardClientProps) 
   const isEmpty = courses.length === 0;
   
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
+    <div className="space-y-8">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center gap-3">

@@ -141,11 +141,11 @@ export function CourseRunnerClient({ course, tenantId }: CourseRunnerClientProps
   const hasQuiz = course.quiz_questions.length > 0;
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
+    <div className="space-y-6">
       {/* Back link */}
       <Link
         href="/app/learning"
-        className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+        className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeftIcon className="h-4 w-4" />
         {t('backToLearning')}

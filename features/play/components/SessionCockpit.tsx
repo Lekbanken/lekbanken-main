@@ -420,7 +420,7 @@ function SessionHeader({
   const t = useTranslations('play.cockpit');
 
   return (
-    <header className="flex items-center justify-between p-4 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <header className="flex items-center justify-between p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       {/* Left: Game name */}
       <div className="min-w-0 flex-1">
         <h1 className="text-xl font-semibold text-foreground truncate">
@@ -549,7 +549,7 @@ function SessionSummaryCard({
 
   return (
     <>
-      <Card className="p-4 sm:p-6 border-border/40">
+      <div>
           {/* Session Code with Board and QR icons - with status watermark */}
           <div className={cn('relative overflow-hidden rounded-xl border border-border/40 px-4 py-3', currentStatus.bgClass)}>
             {/* Connectivity indicator - top left corner */}
@@ -713,7 +713,7 @@ function SessionSummaryCard({
             )}
           </div>
         </div>
-      </Card>
+      </div>
 
       {/* Leave Session Modal */}
       <LeaveSessionModal
@@ -1778,7 +1778,7 @@ export function SessionCockpit({
 
   return (
     <SessionCockpitContext.Provider value={sessionState}>
-      <div className={cn('flex flex-col min-h-screen bg-muted/30', className)}>
+      <div className={cn('flex flex-col', className)}>
         {/* Header */}
         <SessionHeader
           session={session}
@@ -1788,8 +1788,8 @@ export function SessionCockpit({
           chatUnreadCount={chat.unreadCount}
         />
         
-        {/* Main content */}
-        <main className="flex-1 container max-w-5xl mx-auto py-6 px-4">
+        {/* Main content - uses AppShell's padding, only add vertical spacing */}
+        <main className="flex-1 space-y-6">
           {/* Error banner */}
           {error && (
             <Card className="p-4 mb-6 border-destructive bg-destructive/10">

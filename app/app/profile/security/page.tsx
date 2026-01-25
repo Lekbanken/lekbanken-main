@@ -36,7 +36,7 @@ export default async function SecuritySettingsPage() {
   const totpFactor = factors?.totp?.find(f => f.status === 'verified');
   
   return (
-    <div className="container max-w-3xl py-8 px-4">
+    <div className="py-8">
       <div className="space-y-6">
         {/* Header */}
         <div>

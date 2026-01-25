@@ -8341,6 +8341,45 @@
       "title": "Alt du trenger for aktivitetsledelse",
       "description": "Bygg, del og gjennomfør aktiviteter med verktøy laget for ledere, trenere og lærere.",
       "imagePlaceholder": "Produktbilde kommer snart"
+    },
+    "testimonials": {
+      "tagline": "Hva andre sier",
+      "title": "Elsket av aktivitetsledere"
+    },
+    "pricing": {
+      "tagline": "Priser",
+      "title": "Enkel, transparent prising",
+      "description": "Velg planen som passer ditt team. Oppgrader eller nedgrader når som helst.",
+      "frequencyLabel": "Betalingsfrekvens",
+      "save15": "Spar 15%",
+      "mostPopular": "Mest populær",
+      "frequencies": {
+        "monthly": { "label": "Månedlig", "suffix": "/måned" },
+        "annually": { "label": "Årlig", "suffix": "/år" }
+      },
+      "tiers": {
+        "free": {
+          "name": "Gratis",
+          "description": "Perfekt for å komme i gang og utforske plattformen.",
+          "price": { "monthly": "0 kr", "annually": "0 kr" },
+          "cta": "Kom i gang",
+          "features": ["5 aktiviteter", "1 økt per uke", "Grunnleggende filter", "PDF-eksport"]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For aktive ledere som vil ha mer.",
+          "price": { "monthly": "99 kr", "annually": "999 kr" },
+          "cta": "Prøv Pro gratis",
+          "features": ["Ubegrensede aktiviteter", "Ubegrensede økter", "Avanserte filtre", "Teamdeling", "Prioritert støtte"]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For organisasjoner med flere ledere.",
+          "price": "Kontakt oss",
+          "cta": "Kontakt salg",
+          "features": ["Alt i Pro", "SSO-innlogging", "Admin-dashboard", "Dedikert suksessleder", "Tilpasset onboarding"]
+        }
+      }
     }
   },
   "demo": {

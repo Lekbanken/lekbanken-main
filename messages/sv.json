@@ -8912,6 +8912,45 @@
       "title": "Allt du behöver för aktivitetsledning",
       "description": "Bygg, dela och genomför aktiviteter med verktyg skapade för ledare, coacher och lärare.",
       "imagePlaceholder": "Produktbild kommer snart"
+    },
+    "testimonials": {
+      "tagline": "Vad andra säger",
+      "title": "Älskad av aktivitetsledare"
+    },
+    "pricing": {
+      "tagline": "Priser",
+      "title": "Enkel, transparent prissättning",
+      "description": "Välj planen som passar ditt team. Uppgradera eller nedgradera när som helst.",
+      "frequencyLabel": "Betalningsfrekvens",
+      "save15": "Spara 15%",
+      "mostPopular": "Mest populär",
+      "frequencies": {
+        "monthly": { "label": "Månatlig", "suffix": "/månad" },
+        "annually": { "label": "Årlig", "suffix": "/år" }
+      },
+      "tiers": {
+        "free": {
+          "name": "Gratis",
+          "description": "Perfekt för att komma igång och utforska plattformen.",
+          "price": { "monthly": "0 kr", "annually": "0 kr" },
+          "cta": "Kom igång",
+          "features": ["5 aktiviteter", "1 pass per vecka", "Grundläggande filter", "PDF-export"]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "För aktiva ledare som vill ha mer.",
+          "price": { "monthly": "99 kr", "annually": "999 kr" },
+          "cta": "Prova Pro gratis",
+          "features": ["Obegränsade aktiviteter", "Obegränsade pass", "Avancerade filter", "Teamdelning", "Prioriterad support"]
+        },
+        "team": {
+          "name": "Team",
+          "description": "För organisationer med flera ledare.",
+          "price": "Kontakta oss",
+          "cta": "Kontakta sälj",
+          "features": ["Allt i Pro", "SSO-inloggning", "Admin-dashboard", "Dedikerad success manager", "Anpassad onboarding"]
+        }
+      }
     }
   },
   "demo": {

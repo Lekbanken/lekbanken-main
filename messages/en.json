@@ -8188,6 +8188,45 @@
       "title": "Everything you need for activity management",
       "description": "Build, share and run activities with tools made for leaders, coaches and teachers.",
       "imagePlaceholder": "Product image coming soon"
+    },
+    "testimonials": {
+      "tagline": "What others say",
+      "title": "Loved by activity leaders"
+    },
+    "pricing": {
+      "tagline": "Pricing",
+      "title": "Simple, transparent pricing",
+      "description": "Choose the plan that fits your team. Upgrade or downgrade anytime.",
+      "frequencyLabel": "Payment frequency",
+      "save15": "Save 15%",
+      "mostPopular": "Most popular",
+      "frequencies": {
+        "monthly": { "label": "Monthly", "suffix": "/month" },
+        "annually": { "label": "Annually", "suffix": "/year" }
+      },
+      "tiers": {
+        "free": {
+          "name": "Free",
+          "description": "Perfect for getting started and exploring the platform.",
+          "price": { "monthly": "$0", "annually": "$0" },
+          "cta": "Get started",
+          "features": ["5 activities", "1 session per week", "Basic filters", "PDF export"]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For active leaders who want more.",
+          "price": { "monthly": "$9", "annually": "$99" },
+          "cta": "Try Pro free",
+          "features": ["Unlimited activities", "Unlimited sessions", "Advanced filters", "Team sharing", "Priority support"]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For organizations with multiple leaders.",
+          "price": "Contact us",
+          "cta": "Contact sales",
+          "features": ["Everything in Pro", "SSO login", "Admin dashboard", "Dedicated success manager", "Custom onboarding"]
+        }
+      }
     }
   },
   "demo": {

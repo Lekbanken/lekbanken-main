@@ -181,6 +181,33 @@
         "browseAction": "Browse activities"
       }
     },
+    "ui": {
+      "audioEditor": {
+        "autoplay": "Autoplay",
+        "autoplayDescription": "Try to play automatically (may be blocked on mobile).",
+        "requireAck": "Require confirmation",
+        "requireAckDescription": "Show \"I have listened\" after playback.",
+        "uploadToPreview": "Upload an audio file to preview."
+      },
+      "imageEditor": {
+        "clickToAddHotspot": "Click on the image to add a hotspot.",
+        "uploadToStart": "Upload an image to get started.",
+        "clear": "Clear",
+        "noHotspotsYet": "No hotspots yet.",
+        "selectHotspotToEdit": "Select a hotspot in the image to edit."
+      },
+      "emptyState": {
+        "noItemsYet": "You have no {itemName} yet.",
+        "addItemsFor": "Add {itemName} for {benefit}."
+      },
+      "mediaPicker": {
+        "showingTemplatesFor": "Showing templates for",
+        "selectPurposeFirst": "Select a main purpose first to see templates",
+        "loading": "Loading...",
+        "noTemplatesForPurpose": "No templates for this purpose",
+        "noTemplatesFound": "No templates found"
+      }
+    },
     "time": {
       "today": "Today",
       "yesterday": "Yesterday",
@@ -900,6 +927,41 @@
         "planArchiveError": "Could not archive plan.",
         "planRestored": "Plan restored.",
         "planRestoreError": "Could not restore plan."
+      },
+      "filters": {
+        "all": "All",
+        "draft": "Drafts",
+        "published": "Published",
+        "modified": "Modified",
+        "archived": "Archived",
+        "private": "Private",
+        "tenant": "Organization",
+        "public": "Public"
+      },
+      "sort": {
+        "newest": "Newest",
+        "oldest": "Oldest",
+        "aToZ": "A-Z",
+        "zToA": "Z-A"
+      },
+      "noPlansYet": "No plans yet",
+      "noBlocksInPlanYet": "No blocks in this plan yet.",
+      "preview": {
+        "title": "Preview"
+      },
+      "share": {
+        "privatePlan": "Private plan",
+        "privatePlanWarning": "This plan is private and cannot be shared. Change visibility to \"Organization\" or \"Public\" to share it.",
+        "shareLink": "Share link",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "visibilityLabel": "Visibility:",
+        "tenantVisibilityDescription": "Only members of your organization can see this plan.",
+        "publicVisibilityDescription": "Anyone with the link can see this plan."
+      },
+      "versions": {
+        "noPublishedVersionsYet": "No published versions yet",
+        "publishToCreateVersion": "Publish the plan to create a version"
       }
     },
     "organisations": {
@@ -938,6 +1000,69 @@
           "entitlementRevoked": "Entitlement revoked.",
           "revokeFailed": "Could not revoke entitlement."
         }
+      },
+      "billing": {
+        "paymentOverdue": "Payment overdue",
+        "overdueDescription": "There is an overdue payment. Check the billing information in Stripe to avoid service interruption."
+      },
+      "domains": {
+        "howToTitle": "How to connect a custom domain",
+        "step1": "Add a DNS CNAME record: ",
+        "step2": "Add the domain in the list above",
+        "step3": "Wait for verification (usually within 24h)",
+        "step4": "Change status to \"Active\" when DNS has propagated",
+        "addDomainTitle": "Add domain",
+        "addDomainDescription": "Add a custom domain or subdomain for this organization."
+      },
+      "identity": {
+        "slugReadOnly": "cannot be changed"
+      },
+      "locale": {
+        "title": "Language & Region",
+        "undo": "Undo",
+        "save": "Save",
+        "saving": "Saving...",
+        "mainLanguage": "Main language (content)",
+        "selectLanguage": "Select language",
+        "mainLanguageDescription": "Language for game content and media.",
+        "defaultLanguage": "Default language (interface)",
+        "defaultLanguageDescription": "Default language for the user interface. Users can change it themselves.",
+        "defaultTheme": "Default theme",
+        "selectTheme": "Select theme",
+        "defaultThemeDescription": "Default theme for new users. Users can change it in their settings.",
+        "languageSupportTitle": "Language support",
+        "languageSupportDescription": "Lekbanken supports multiple languages. The main language determines which content is displayed for games and activities. Users can always change their interface language via their personal settings."
+      },
+      "members": {
+        "pendingInvites": "{count, plural, one {# invite waiting for response} other {# invites waiting for response}}"
+      },
+      "list": {
+        "openOrganisation": "Open {name}",
+        "copyUuid": "Copy UUID for {name}",
+        "copy": "Copy",
+        "createdAt": "Created {date}",
+        "quickActions": "Quick actions",
+        "viewOrganisation": "View organisation",
+        "edit": "Edit",
+        "manageMembers": "Manage members",
+        "manageBilling": "Manage billing",
+        "openStripe": "Open Stripe",
+        "reactivate": "Reactivate",
+        "suspend": "Suspend",
+        "removeOrganisation": "Remove organisation",
+        "domainActive": "Domain active",
+        "domainPending": "Domain pending",
+        "noDomain": "No domain",
+        "contact": "Contact",
+        "members": "Members",
+        "billing": "Billing",
+        "domain": "Domain",
+        "billingConnected": "Connected",
+        "noBilling": "No billing",
+        "removeDialogTitle": "Remove organisation?",
+        "removeDialogDescription": "This cannot be undone. The organisation and connected data may be permanently deleted.",
+        "cancel": "Cancel",
+        "remove": "Remove"
       }
     },
     "tenant": {
@@ -1783,7 +1908,53 @@
             "updateFailed": "Could not update achievement",
             "createFailed": "Could not create achievement",
             "unexpected": "An unexpected error occurred"
-          }
+          },
+          "steps": {
+            "layers": {
+              "name": "Layer Selection",
+              "description": "Choose base, backgrounds and symbol"
+            },
+            "themeColors": {
+              "name": "Theme & Colors",
+              "description": "Customize colors and theme"
+            },
+            "metadata": {
+              "name": "Metadata",
+              "description": "Title and description"
+            },
+            "publishing": {
+              "name": "Publishing",
+              "description": "Review and publish"
+            }
+          },
+          "themeAndColors": "Theme & Colors",
+          "themeAndColorsDescription": "Choose theme or customize colors individually for each layer.",
+          "randomizeColors": "Randomize colors",
+          "quickThemeSelect": "Quick theme select",
+          "customColorsPerLayer": "Custom colors per layer",
+          "foreground": "Foreground",
+          "layerLabels": {
+            "base": "Base",
+            "background": "Background",
+            "symbol": "Symbol"
+          },
+          "backgrounds": {
+            "label": "Background",
+            "black": "Black",
+            "white": "White",
+            "light": "Light",
+            "dark": "Dark",
+            "gray": "Gray",
+            "transparent": "Transparent"
+          },
+          "selectCustomColor": "Select custom color",
+          "custom": "Custom",
+          "customEllipsis": "Custom...",
+          "textColor": "Text color",
+          "selectCustomTextColor": "Select custom text color",
+          "circleBackground": "Circle background",
+          "customColor": "Custom color",
+          "cardBackground": "Card background"
         },
         "awardModal": {
           "title": "Award achievement",

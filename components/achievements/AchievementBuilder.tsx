@@ -9,6 +9,7 @@
  */
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Tabs } from '@/components/ui/tabs'
@@ -54,6 +55,7 @@ export function AchievementBuilder() {
   const setProfileFrameEnabled = useAchievementBuilderStore((s) => s.setProfileFrameEnabled)
   const [activeTab, setActiveTab] = useState('theme')
   const [previewSize, setPreviewSize] = useState<'sm' | 'md' | 'lg'>('md')
+  const t = useTranslations('achievements')
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
@@ -62,7 +64,7 @@ export function AchievementBuilder() {
         <Card className="overflow-hidden border-2">
           <CardHeader className="border-b bg-muted/30 pb-4">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-base">Bygg din Achievement</CardTitle>
+              <CardTitle className="text-base">{t('builder.title')}</CardTitle>
               <Badge variant="primary" size="sm">
                 Builder v1.0
               </Badge>
@@ -82,7 +84,7 @@ export function AchievementBuilder() {
                 <ThemeSelector />
                 <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4">
                   <p className="text-xs text-muted-foreground">
-                    Tips: Välj ett tema som passar din achievement. Temafärger påverkar hur färger visas i preview.
+                    {t('builder.themeTip')}
                   </p>
                 </div>
               </div>
@@ -191,7 +193,7 @@ export function AchievementBuilder() {
       <div className="space-y-4 lg:col-span-3">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Export & Metadata</CardTitle>
+            <CardTitle className="text-base">{t('builder.exportMetadata')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ExportPanel />
@@ -203,13 +205,13 @@ export function AchievementBuilder() {
           <CardContent className="p-5">
             <div className="mb-3 flex items-center gap-2">
               <span className="text-xl">ðŸ›ï¸</span>
-              <h4 className="font-semibold text-foreground">Marketplace</h4>
+              <h4 className="font-semibold text-foreground">{t('builder.marketplace.title')}</h4>
               <Badge variant="accent" size="sm">
-                Snart
+                {t('builder.marketplace.comingSoon')}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              Kommer snart: KÃ¶p och sÃ¤lj skins, badge-packs, ramar och symboler. Skapa unika achievements med premium-innehÃ¥ll.
+              {t('builder.marketplace.description')}
             </p>
             <div className="mt-3 flex gap-2">
               <Badge variant="outline" size="sm">

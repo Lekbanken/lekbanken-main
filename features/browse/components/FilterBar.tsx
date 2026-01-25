@@ -1,5 +1,6 @@
 import { AdjustmentsHorizontalIcon, Squares2X2Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ListBulletIcon } from "@heroicons/react/24/solid";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { BrowseFilters, FilterOptions, SortOption } from "../types";
 
@@ -37,6 +38,7 @@ const sortLabels: Record<SortOption, string> = {
 };
 
 export function FilterBar({ filters, options, sort, view, total, onOpen, onClearFilter, onSortChange, onViewChange }: FilterBarProps) {
+  const t = useTranslations("browse");
   const activeFilters = [
     ...filters.products.map((value) => ({ key: "products" as const, value, label: options?.products.find((p) => p.id === value)?.name || "Produkt" })),
     ...filters.mainPurposes.map((value) => ({ key: "mainPurposes" as const, value, label: options?.mainPurposes.find((p) => p.id === value)?.name || "Syfte" })),
@@ -97,9 +99,9 @@ export function FilterBar({ filters, options, sort, view, total, onOpen, onClear
       </div>
 
       <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="hidden sm:inline">{total} aktiviteter</span>
+        <span className="hidden sm:inline">{t("activitiesCount", { count: total })}</span>
         <label className="flex items-center gap-1">
-          <span className="text-xs text-muted-foreground">Sortera</span>
+          <span className="text-xs text-muted-foreground">{t("sort")}</span>
           <select
             value={sort}
             onChange={(e) => onSortChange(e.target.value as SortOption)}
@@ -121,7 +123,7 @@ export function FilterBar({ filters, options, sort, view, total, onOpen, onClear
               "rounded-full p-1.5 text-muted-foreground transition-colors",
               view === "grid" && "bg-primary/10 text-primary"
             )}
-            aria-label="Rutnätsvy"
+            aria-label={t('gridView')}
           >
             <Squares2X2Icon className="h-4 w-4" />
           </button>
@@ -132,7 +134,7 @@ export function FilterBar({ filters, options, sort, view, total, onOpen, onClear
               "rounded-full p-1.5 text-muted-foreground transition-colors",
               view === "list" && "bg-primary/10 text-primary"
             )}
-            aria-label="Listvy"
+            aria-label={t('listView')}
           >
             <ListBulletIcon className="h-4 w-4" />
           </button>

@@ -1,4 +1,5 @@
-﻿import Image from "next/image";
+﻿import { useTranslations } from 'next-intl';
+import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,7 @@ const social = [
 ];
 
 export function Footer() {
+  const t = useTranslations('marketing');
   return (
     <footer className="bg-foreground" aria-labelledby="footer-heading">
       <h2 id="footer-heading" className="sr-only">
@@ -80,8 +82,7 @@ export function Footer() {
               <span className="text-xl font-semibold text-background">Lekbanken</span>
             </div>
             <p className="max-w-xs text-sm leading-relaxed text-background/70">
-              Gör planeringen lekfull, snabb och delbar. Perfekt för träningar, lektioner och
-              teambuilding.
+              {t('footer.description')}
             </p>
             <div className="flex gap-3">
               {social.map((item) => (
@@ -152,7 +153,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-background/10 pt-8 md:flex md:items-center md:justify-between">
           <p className="text-xs text-background/70">
-            &copy; {new Date().getFullYear()} Lekbanken AB. Alla rättigheter förbehållna.
+            &copy; {new Date().getFullYear()} {t('footer.copyright')}
           </p>
           <div className="mt-4 flex gap-3 md:mt-0">
             <Button
@@ -161,10 +162,10 @@ export function Footer() {
               href="/auth/login"
               className="border-background/20 text-background/70 hover:bg-background/10 hover:text-background transition-all"
             >
-              Logga in
+              {t('footer.login')}
             </Button>
             <Button size="sm" href="/auth/signup" className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:shadow-xl">
-              Kom igång gratis
+              {t('footer.getStartedFree')}
             </Button>
           </div>
         </div>

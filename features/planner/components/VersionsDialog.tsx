@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ export function VersionsDialog({
   planId,
   versionsOverride,
 }: VersionsDialogProps) {
+  const t = useTranslations('planner');
   const [versions, setVersions] = React.useState<VersionWithCurrent[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -130,10 +132,10 @@ export function VersionsDialog({
                 />
               </svg>
               <p className="mt-2 text-sm text-muted-foreground">
-                Inga publicerade versioner ännu
+                {t('versions.noPublishedVersionsYet')}
               </p>
               <p className="mt-1 text-xs text-muted-foreground/70">
-                Publicera planen för att skapa en version
+                {t('versions.publishToCreateVersion')}
               </p>
             </div>
           )}

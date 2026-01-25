@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Button,
   Dialog,
@@ -37,6 +38,7 @@ type GameImportDialogProps = {
 type ImportState = 'idle' | 'validating' | 'validated' | 'importing' | 'done';
 
 export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDialogProps) {
+  const t = useTranslations('admin.games.import');
   const [format, setFormat] = useState<ImportFormat>('csv');
   const [raw, setRaw] = useState('');
   const [fileName, setFileName] = useState<string | null>(null);
@@ -76,7 +78,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       setRaw(content);
     };
     reader.onerror = () => {
-      setError('Kunde inte läsa filen');
+      setError(t('couldNotReadFile'));
     };
     reader.readAsText(file);
   };
@@ -100,7 +102,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Valideringsfel');
+        setError(result.error || t('validationError'));
         setState('idle');
         return;
       }
@@ -109,7 +111,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       setState('validated');
     } catch (err) {
       console.error('Validation failed:', err);
-      setError('Kunde inte validera data');
+      setError(t('couldNotValidate'));
       setState('idle');
     }
   };
@@ -133,7 +135,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
       const result = await response.json();
 
       if (!response.ok) {
-        setError(result.error || 'Import misslyckades');
+        setError(result.error || t('importFailed'));
         setState('validated');
         return;
       }
@@ -152,7 +154,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
 
     } catch (err) {
       console.error('Import failed:', err);
-      setError('Import misslyckades');
+      setError(t('importFailed'));
       setState('validated');
     }
   };
@@ -169,13 +171,13 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <ArrowUpTrayIcon className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle>Importera spel</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription className="space-y-1">
             <span className="block">
-              Importera spel från CSV eller JSON. Stöder Legendary Play: keypads, roller, faser och artefakter.
+              {t('description')}
             </span>
             <span className="block text-xs text-muted-foreground">
-              CSV: max 20 steg, keypads, roller, faser (ej decisions/outcomes). JSON: fullständig struktur.
+              {t('formatNote')}
             </span>
           </DialogDescription>
         </DialogHeader>
@@ -183,7 +185,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
         <div className="space-y-6">
           {/* Format selection */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">Format</label>
+            <label className="text-sm font-medium text-foreground">{t('format')}</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -198,7 +200,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                 <TableCellsIcon className="h-8 w-8 text-muted-foreground" />
                 <div className="text-center">
                   <div className="font-medium">CSV</div>
-                  <div className="text-xs text-muted-foreground">Flat fil med inline steg</div>
+                  <div className="text-xs text-muted-foreground">{t('csvDescription')}</div>
                 </div>
               </button>
               <button
@@ -214,7 +216,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                 <DocumentTextIcon className="h-8 w-8 text-muted-foreground" />
                 <div className="text-center">
                   <div className="font-medium">JSON</div>
-                  <div className="text-xs text-muted-foreground">Komplett struktur</div>
+                  <div className="text-xs text-muted-foreground">{t('jsonDescription')}</div>
                 </div>
               </button>
             </div>
@@ -222,7 +224,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
 
           {/* File upload */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">Fil eller data</label>
+            <label className="text-sm font-medium text-foreground">{t('fileOrData')}</label>
             <div className="flex gap-3">
               <input
                 ref={fileInputRef}
@@ -237,7 +239,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                 className="flex-shrink-0"
               >
                 <ArrowUpTrayIcon className="mr-2 h-4 w-4" />
-                Välj fil
+                {t('selectFile')}
               </Button>
               {fileName && (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -266,10 +268,10 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
           <div className="flex items-center justify-between rounded-lg border border-border p-4">
             <div>
               <Label htmlFor="upsertMode" className="cursor-pointer font-medium">
-                Upsert-läge
+                {t('upsertMode')}
               </Label>
               <p className="text-xs text-muted-foreground max-w-md">
-                När aktiverat: spel med samma <code className="px-1 py-0.5 bg-muted rounded">game_key</code> uppdateras istället för att skapa dubbletter. Relaterad data (steg, roller, artefakter) ersätts helt.
+                {t('upsertModeDescription')}
               </p>
             </div>
             <Switch
@@ -296,12 +298,12 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                 {dryRunResult.valid ? (
                   <>
                     <CheckCircleIcon className="h-5 w-5 text-green-600" />
-                    <span className="text-green-600">Valideringen lyckades</span>
+                    <span className="text-green-600">{t('validationSuccess')}</span>
                   </>
                 ) : (
                   <>
                     <ExclamationTriangleIcon className="h-5 w-5 text-amber-600" />
-                    <span className="text-amber-600">Valideringsfel hittades</span>
+                    <span className="text-amber-600">{t('validationErrors')}</span>
                   </>
                 )}
               </div>
@@ -310,36 +312,36 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
               <div className="grid grid-cols-4 gap-3">
                 <div className="rounded-lg border border-border p-3 text-center">
                   <div className="text-2xl font-bold">{dryRunResult.total_rows}</div>
-                  <div className="text-xs text-muted-foreground">Totalt</div>
+                  <div className="text-xs text-muted-foreground">{t('total')}</div>
                 </div>
                 <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-center">
                   <div className="text-2xl font-bold text-green-700">{dryRunResult.valid_count}</div>
-                  <div className="text-xs text-green-600">Giltiga</div>
+                  <div className="text-xs text-green-600">{t('valid')}</div>
                 </div>
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-center">
                   <div className="text-2xl font-bold text-amber-700">{dryRunResult.warning_count}</div>
-                  <div className="text-xs text-amber-600">Varningar</div>
+                  <div className="text-xs text-amber-600">{t('warnings')}</div>
                 </div>
                 <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
                   <div className="text-2xl font-bold text-red-700">{dryRunResult.error_count}</div>
-                  <div className="text-xs text-red-600">Fel</div>
+                  <div className="text-xs text-red-600">{t('errors')}</div>
                 </div>
               </div>
 
               {/* Game preview */}
               {dryRunResult.games && dryRunResult.games.length > 0 && (
                 <div className="space-y-2">
-                  <div className="text-sm font-medium">Förhandsvisning</div>
+                  <div className="text-sm font-medium">{t('preview')}</div>
                   <div className="max-h-48 overflow-y-auto rounded-lg border border-border">
                     <table className="w-full text-sm">
                       <thead className="sticky top-0 bg-muted">
                         <tr>
-                          <th className="px-3 py-2 text-left font-medium">Rad</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.row')}</th>
                           <th className="px-3 py-2 text-left font-medium">game_key</th>
-                          <th className="px-3 py-2 text-left font-medium">Namn</th>
-                          <th className="px-3 py-2 text-left font-medium">Läge</th>
-                          <th className="px-3 py-2 text-left font-medium">Status</th>
-                          <th className="px-3 py-2 text-left font-medium">Steg</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.name')}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.mode')}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.status')}</th>
+                          <th className="px-3 py-2 text-left font-medium">{t('tableHeaders.steps')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -358,7 +360,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
                                 variant={game.status === 'published' ? 'default' : 'secondary'}
                                 className="text-xs"
                               >
-                                {game.status === 'published' ? 'Publicerad' : 'Utkast'}
+                                {game.status === 'published' ? t('statusPublished') : t('statusDraft')}
                               </Badge>
                             </td>
                             <td className="px-3 py-2">{game.steps?.length || 0}</td>
@@ -426,7 +428,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
             <div className="rounded-lg border border-green-200 bg-green-50 p-4">
               <div className="flex items-center gap-2 text-green-700">
                 <CheckCircleIcon className="h-5 w-5" />
-                <span className="font-medium">Import slutförd!</span>
+                <span className="font-medium">{t('importComplete')}</span>
               </div>
             </div>
           )}
@@ -434,7 +436,7 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
 
         <DialogFooter>
           <Button variant="ghost" onClick={handleClose}>
-            Avbryt
+            {t('cancel')}
           </Button>
           
           {state === 'idle' && (
@@ -442,13 +444,13 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
               onClick={handleValidate} 
               disabled={raw.trim().length === 0}
             >
-              Validera
+              {t('validate')}
             </Button>
           )}
 
           {state === 'validating' && (
             <Button disabled>
-              Validerar...
+              {t('validating')}
             </Button>
           )}
 
@@ -457,13 +459,13 @@ export function GameImportDialog({ open, onOpenChange, onImport }: GameImportDia
               onClick={handleImport}
               disabled={!dryRunResult.valid || dryRunResult.error_count > 0}
             >
-              Importera {dryRunResult.valid_count} spel
+              {t('importGames', { count: dryRunResult.valid_count })}
             </Button>
           )}
 
           {state === 'importing' && (
             <Button disabled>
-              Importerar...
+              {t('importing')}
             </Button>
           )}
         </DialogFooter>

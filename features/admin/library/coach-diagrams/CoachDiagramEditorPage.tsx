@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 
 import { coachDiagramDocumentSchemaV1, type CoachDiagramDocumentV1, type ZoneV1 } from '@/lib/validation/coachDiagramSchemaV1';
 import { renderDiagramSvg, diagramViewBox } from './svg';
@@ -95,6 +96,7 @@ function makeId() {
 }
 
 export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
+  const t = useTranslations('admin.coachDiagrams');
   const router = useRouter();
   const svgRef = useRef<SVGSVGElement | null>(null);
 
@@ -619,7 +621,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
   if (loading) {
     return (
       <AdminPageLayout>
-        <div className="text-sm text-muted-foreground">Laddar…</div>
+        <div className="text-sm text-muted-foreground">{t('loading')}</div>
       </AdminPageLayout>
     );
   }
@@ -628,9 +630,9 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
-          title="Kunde inte öppna diagram"
-          description={error ?? 'Okänt fel'}
-          action={{ label: 'Tillbaka', onClick: () => router.push('/admin/library/coach-diagrams') }}
+          title={t('couldNotOpen')}
+          description={error ?? t('unknownError')}
+          action={{ label: t('back'), onClick: () => router.push('/admin/library/coach-diagrams') }}
         />
       </AdminPageLayout>
     );
@@ -640,16 +642,16 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
     <AdminPageLayout>
       <AdminPageHeader
         title={doc.title}
-        description="Redigera diagram (SVG)."
+        description={t('editDiagram')}
         actions={
           <div className="flex items-center gap-2">
             <Button type="button" variant="outline" onClick={() => router.push('/admin/library/coach-diagrams')}
               disabled={saving}
             >
-              Tillbaka
+              {t('back')}
             </Button>
             <Button type="button" onClick={save} disabled={saving}>
-              {saving ? 'Sparar…' : 'Spara'}
+              {saving ? t('saving') : t('save')}
             </Button>
           </div>
         }
@@ -695,34 +697,34 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                 Flytta
               </Button>
               <Button type="button" variant={mode === 'arrow' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('arrow'); setPendingArrowStart(null); setPendingZoneStart(null); }}>
-                Pilar
+                {t('arrows')}
               </Button>
               <Button type="button" variant={mode === 'zone-rect' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('zone-rect'); setPendingArrowStart(null); setPendingZoneStart(null); }}>
-                + Rektangel
+                {t('addRectangle')}
               </Button>
               <Button type="button" variant={mode === 'zone-circle' ? 'default' : 'outline'} size="sm" onClick={() => { setMode('zone-circle'); setPendingArrowStart(null); setPendingZoneStart(null); }}>
-                + Cirkel
+                {t('addCircle')}
               </Button>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button type="button" variant="outline" size="sm" onClick={() => addObject('player')}>
-                + Spelare
+                {t('addPlayer')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => addObject('marker')}>
-                + Markör
+                {t('addMarker')}
               </Button>
               <Button type="button" variant="outline" size="sm" onClick={() => addObject('ball')}>
-                + Boll
+                {t('addBall')}
               </Button>
             </div>
             {mode === 'arrow' && (
               <p className="text-xs text-muted-foreground">
-                Klicka startpunkt, klicka slutpunkt.
+                {t('arrowInstructions')}
               </p>
             )}
             {(mode === 'zone-rect' || mode === 'zone-circle') && (
               <p className="text-xs text-muted-foreground">
-                {mode === 'zone-rect' ? 'Klicka ett hörn, klicka motstående hörn.' : 'Klicka mittpunkt, klicka kant.'}
+                {mode === 'zone-rect' ? t('rectInstructions') : t('circleInstructions')}
               </p>
             )}
           </div>
@@ -791,13 +793,13 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Pilhuvud</label>
+                  <label className="text-sm font-medium">{t('arrowhead')}</label>
                   <Select
                     value={String(selectedArrow.style.arrowhead)}
                     onChange={(e) => setArrowHead(e.target.value === 'true')}
                     options={[
-                      { value: 'true', label: 'Ja' },
-                      { value: 'false', label: 'Nej' },
+                      { value: 'true', label: t('yes') },
+                      { value: 'false', label: t('no') },
                     ]}
                   />
                 </div>
@@ -807,9 +809,9 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
 
           {selection.kind === 'zone' && selectedZone && (
             <div className="space-y-3 pt-2 border-t">
-              <div className="text-sm font-medium">Vald: zon ({selectedZone.type})</div>
+              <div className="text-sm font-medium">{t('selectedZone', { type: selectedZone.type })}</div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Färg</label>
+                <label className="text-sm font-medium">{t('color')}</label>
                 <Select
                   value={selectedZone.style.fill}
                   onChange={(e) => setZoneColor(e.target.value)}
@@ -818,7 +820,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">Genomskinlighet</span>
+                  <span className="font-medium">{t('transparency')}</span>
                   <span className="text-muted-foreground">{((selectedZone.style.fillOpacity ?? 0.2) * 100).toFixed(0)}%</span>
                 </div>
                 <Slider
@@ -838,7 +840,7 @@ export function CoachDiagramEditorPage({ diagramId }: { diagramId: string }) {
         </Card>
 
         <Card className="p-4">
-          <div className="text-sm font-medium mb-3">Förhandsvisning</div>
+          <div className="text-sm font-medium mb-3">{t('preview')}</div>
 
           <div className="aspect-[3/5] w-full overflow-hidden rounded-xl border bg-background">
             <div className="relative h-full w-full">

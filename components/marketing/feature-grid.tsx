@@ -1,11 +1,5 @@
+import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui/button";
-import type { JSX } from "react";
-
-type Feature = {
-  title: string;
-  description: string;
-  Icon: (props: React.SVGProps<SVGSVGElement>) => JSX.Element;
-};
 
 const FunnelIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
@@ -38,30 +32,11 @@ const ShieldIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const features: Feature[] = [
-  {
-    title: "Smarta filter",
-    description: "Hitta aktiviteter efter ålder, gruppstorlek, tema och tid.",
-    Icon: FunnelIcon,
-  },
-  {
-    title: "Passbyggare",
-    description: "Kombinera lek-kort till färdiga pass och spara som mallar.",
-    Icon: LayoutIcon,
-  },
-  {
-    title: "Delning & export",
-    description: "Skicka pass med länk eller skriv ut kort för offline-läge.",
-    Icon: ShareIcon,
-  },
-  {
-    title: "Säkerhet & samtycke",
-    description: "Samla säkerhetsnotiser och behörigheter per aktivitet.",
-    Icon: ShieldIcon,
-  },
-];
+const featureIcons = [FunnelIcon, LayoutIcon, ShareIcon, ShieldIcon];
+const featureKeys = ['smartFilters', 'sessionBuilder', 'sharingExport', 'safetyConsent'] as const;
 
 export function FeatureGrid() {
+  const t = useTranslations('marketing');
   return (
     <section
       id="features"
@@ -70,53 +45,55 @@ export function FeatureGrid() {
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col gap-6 sm:items-center sm:text-center">
-          <p className="text-sm font-semibold text-primary">Värde för laget</p>
+          <p className="text-sm font-semibold text-primary">{t('features.tagline')}</p>
           <div>
             <h2
               id="features-title"
               className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
             >
-              Bygg, anpassa och dela utan friktion.
+              {t('features.title')}
             </h2>
             <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-              Lekbanken sparar tid för coacher, lärare och ledare genom tydliga verktyg och
-              smidig delning.
+              {t('features.description')}
             </p>
           </div>
         </div>
 
         <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => (
-            <div
-              key={feature.title}
-              className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg"
-            >
-              <div className="space-y-4">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-[#00c7b0]/10 transition-transform group-hover:scale-110">
-                  <feature.Icon className="h-5 w-5 text-primary" />
-                </span>
-                <h3 className="text-lg font-semibold text-foreground">{feature.title}</h3>
-                <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+          {featureKeys.map((key, index) => {
+            const Icon = featureIcons[index];
+            return (
+              <div
+                key={key}
+                className="group flex h-full flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-primary/20 hover:shadow-lg"
+              >
+                <div className="space-y-4">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-[#00c7b0]/10 transition-transform group-hover:scale-110">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </span>
+                  <h3 className="text-lg font-semibold text-foreground">{t(`features.items.${key}.title`)}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{t(`features.items.${key}.description`)}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-12 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
           <span className="rounded-full bg-muted px-4 py-1.5 font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary">
-            Login + SSO
+            {t('features.badges.loginSso')}
           </span>
           <span className="rounded-full bg-muted px-4 py-1.5 font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary">
-            Delade mappar
+            {t('features.badges.sharedFolders')}
           </span>
           <span className="rounded-full bg-muted px-4 py-1.5 font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary">
-            PDF & utskrift
+            {t('features.badges.pdfPrint')}
           </span>
           <span className="rounded-full bg-muted px-4 py-1.5 font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary">
-            Återanvändbara mallar
+            {t('features.badges.reusableTemplates')}
           </span>
           <Button size="sm" variant="ghost" href="/auth/login" className="font-medium">
-            Logga in →
+            {t('features.badges.login')}
           </Button>
         </div>
       </div>

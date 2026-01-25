@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +38,7 @@ type FilterSheetProps = {
 
 export function FilterSheet({ open, onOpenChange, filters, options, onApply, onClearAll }: FilterSheetProps) {
   const [localFilters, setLocalFilters] = useState<BrowseFilters>(filters);
+  const t = useTranslations("browse");
 
   const activeCount = useMemo(() => {
     const { products, mainPurposes, subPurposes, groupSizes, energyLevels, environment, minPlayers, maxPlayers, minAge, maxAge, minTime, maxTime } = localFilters;
@@ -85,8 +87,8 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
       <SheetContent side="bottom" className="h-[80vh] overflow-y-auto px-4 py-6 sm:max-w-xl sm:rounded-t-3xl">
         <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-muted" aria-hidden />
         <SheetHeader>
-          <SheetTitle className="text-lg">Filter</SheetTitle>
-          <p className="text-sm text-muted-foreground">Välj ålder, energi, gruppstorlek m.m.</p>
+          <SheetTitle className="text-lg">{t("filter.title")}</SheetTitle>
+          <p className="text-sm text-muted-foreground">{t("filter.description")}</p>
         </SheetHeader>
 
         <div className="mt-5 space-y-5 divide-y divide-border/40">
@@ -124,7 +126,7 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
             onToggle={(value) => toggleValue("energyLevels", value)}
           />
           <FilterSection
-            title="Miljö"
+            title={t('environment')}
             options={environmentOptions}
             selected={localFilters.environment ? [localFilters.environment] : []}
             onToggle={(value) =>
@@ -133,20 +135,20 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
           />
 
           <NumberSection
-            title="Spelare"
+            title={t('players')}
             minValue={localFilters.minPlayers}
             maxValue={localFilters.maxPlayers}
             onMinChange={(value) => setField("minPlayers", value)}
             onMaxChange={(value) => setField("maxPlayers", value)}
-            placeholder="Antal"
+            placeholder={t('count')}
           />
           <NumberSection
-            title="Ålder"
+            title={t('age')}
             minValue={localFilters.minAge}
             maxValue={localFilters.maxAge}
             onMinChange={(value) => setField("minAge", value)}
             onMaxChange={(value) => setField("maxAge", value)}
-            placeholder="År"
+            placeholder={t('years')}
           />
           <NumberSection
             title="Tid (min)"
@@ -160,10 +162,10 @@ export function FilterSheet({ open, onOpenChange, filters, options, onApply, onC
 
         <SheetFooter className="sticky bottom-0 mt-6 flex flex-col gap-3 border-t border-border/50 bg-card/95 pt-4 backdrop-blur sm:flex-row sm:justify-between sm:space-x-3 sm:space-y-0">
           <Button variant="outline" onClick={onClearAll} className="w-full sm:w-auto">
-            Rensa alla
+            {t("filter.clearAll")}
           </Button>
           <Button onClick={handleApply} className="w-full shadow-lg shadow-primary/20 sm:w-auto">
-            Använd filter {activeCount > 0 ? `(${activeCount})` : ""}
+            {t("filter.apply")} {activeCount > 0 ? `(${activeCount})` : ""}
           </Button>
         </SheetFooter>
       </SheetContent>

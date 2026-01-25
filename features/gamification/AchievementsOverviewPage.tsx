@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowLeftIcon, TrophyIcon } from "@heroicons/react/24/outline";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,6 +20,7 @@ type AchievementsOverviewPageProps = {
 export function AchievementsOverviewPage({
   fetcher = fetchGamificationSnapshot,
 }: AchievementsOverviewPageProps) {
+  const t = useTranslations("gamification");
   const { currentTenant } = useTenant();
   const [data, setData] = useState<GamificationPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +82,7 @@ export function AchievementsOverviewPage({
   if (error) {
     return (
       <ErrorState
-        title="Något gick fel"
+        title={t("errorTitle")}
         description={error}
         onRetry={() => {
           setIsLoading(true);
@@ -131,7 +133,7 @@ export function AchievementsOverviewPage({
           <ArrowLeftIcon className="h-5 w-5 text-foreground" />
         </Link>
         <div className="flex-1">
-          <PageTitleHeader icon={dicecoinIcon} title="UTMÄRKELSER" subtitle="Alla dina achievements" />
+          <PageTitleHeader icon={dicecoinIcon} title={t("achievementsTitle")} subtitle={t("achievementsSubtitle")} />
         </div>
       </div>
 
@@ -139,7 +141,7 @@ export function AchievementsOverviewPage({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <TrophyIcon className="h-5 w-5 text-primary" />
-            <h2 className="text-sm font-semibold text-foreground">Översikt</h2>
+            <h2 className="text-sm font-semibold text-foreground">{t("overview")}</h2>
           </div>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
             {unlockedCount}/{data.achievements.length}
@@ -149,9 +151,9 @@ export function AchievementsOverviewPage({
         {data.achievements.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/20 p-8 text-center">
             <TrophyIcon className="mb-2 h-10 w-10 text-muted-foreground/40" />
-            <p className="text-sm font-medium text-muted-foreground">Inga utmärkelser ännu</p>
+            <p className="text-sm font-medium text-muted-foreground">{t("noAchievementsYet")}</p>
             <p className="text-xs text-muted-foreground/70">
-              Spela och planera för att börja låsa upp utmärkelser.
+              {t("playToUnlock")}
             </p>
           </div>
         ) : (

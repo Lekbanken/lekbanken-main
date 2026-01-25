@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   UsersIcon,
   UserIcon,
@@ -22,6 +23,7 @@ export function OrganisationMembersSummary({
   summary,
 }: OrganisationMembersSummaryProps) {
   const router = useRouter();
+  const t = useTranslations('admin.organisations.members');
 
   const stats = [
     { label: 'Totalt', value: summary.total, icon: UsersIcon, color: 'text-primary' },
@@ -67,7 +69,7 @@ export function OrganisationMembersSummary({
         {summary.pendingInvites > 0 && (
           <div className="mt-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
             <p className="text-sm text-amber-800 dark:text-amber-300">
-              {summary.pendingInvites} inbjudan{summary.pendingInvites > 1 ? 'ar' : ''} väntar på svar
+              {t('pendingInvites', { count: summary.pendingInvites })}
             </p>
           </div>
         )}

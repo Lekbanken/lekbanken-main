@@ -2,6 +2,7 @@
 
 import { use, useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { useTenant } from '@/lib/context/TenantContext'
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui'
 
@@ -34,6 +35,7 @@ function formatNumber(n: number) {
 }
 
 export default function CampaignDetailAdminPage(props: { params: Promise<{ campaignId: string }> }) {
+  const t = useTranslations('admin.gamification.campaigns')
   const { currentTenant } = useTenant()
   const { campaignId } = use(props.params)
 
@@ -141,8 +143,8 @@ export default function CampaignDetailAdminPage(props: { params: Promise<{ campa
   if (!currentTenant) {
     return (
       <div className="p-6">
-        <h1 className="text-xl font-semibold">Gamification – Kampanj</h1>
-        <p className="text-sm text-muted-foreground mt-2">Välj en tenant för att se kampanjer.</p>
+        <h1 className="text-xl font-semibold">{t('title')}</h1>
+        <p className="text-sm text-muted-foreground mt-2">{t('selectTenant')}</p>
       </div>
     )
   }
@@ -154,7 +156,7 @@ export default function CampaignDetailAdminPage(props: { params: Promise<{ campa
           <h1 className="text-xl font-semibold truncate">Gamification – {header}</h1>
           <div className="text-sm text-muted-foreground mt-1">
             <Link href="/admin/gamification/campaigns" className="hover:underline">
-              ← Tillbaka till kampanjer
+              {t('backToCampaigns')}
             </Link>
           </div>
         </div>
@@ -176,7 +178,7 @@ export default function CampaignDetailAdminPage(props: { params: Promise<{ campa
       {error ? (
         <Card>
           <CardHeader>
-            <CardTitle>Fel</CardTitle>
+            <CardTitle>{t('error')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-red-600">{error}</p>
@@ -187,26 +189,26 @@ export default function CampaignDetailAdminPage(props: { params: Promise<{ campa
       {loading ? (
         <Card>
           <CardContent>
-            <p className="text-sm text-muted-foreground p-4">Laddar…</p>
+            <p className="text-sm text-muted-foreground p-4">{t('loading')}</p>
           </CardContent>
         </Card>
       ) : campaign ? (
         <Card>
           <CardHeader>
-            <CardTitle>Översikt</CardTitle>
+            <CardTitle>{t('overview')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
               <div>
-                <div className="text-muted-foreground">Event type</div>
+                <div className="text-muted-foreground">{t('eventType')}</div>
                 <div className="font-mono">{campaign.event_type}</div>
               </div>
               <div>
-                <div className="text-muted-foreground">Bonus</div>
-                <div>+{formatNumber(campaign.bonus_amount)} coins</div>
+                <div className="text-muted-foreground">{t('bonus')}</div>
+                <div>+{formatNumber(campaign.bonus_amount)} {t('coins')}</div>
               </div>
               <div>
-                <div className="text-muted-foreground">Tidsfönster</div>
+                <div className="text-muted-foreground">{t('timeWindow')}</div>
                 <div>
                   {new Date(campaign.starts_at).toLocaleString('sv-SE')} → {new Date(campaign.ends_at).toLocaleString('sv-SE')}
                 </div>
@@ -223,7 +225,7 @@ export default function CampaignDetailAdminPage(props: { params: Promise<{ campa
       ) : (
         <Card>
           <CardContent>
-            <p className="text-sm text-muted-foreground p-4">Kampanjen hittades inte i denna tenant.</p>
+            <p className="text-sm text-muted-foreground p-4">{t('campaignNotFound')}</p>
           </CardContent>
         </Card>
       )}

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
@@ -43,6 +44,7 @@ export function MediaPicker({
   allowTemplate = true,
   libraryType = 'upload',
 }: MediaPickerProps) {
+  const t = useTranslations('common.ui');
   const [open, setOpen] = useState(false)
   const [media, setMedia] = useState<Media[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(value ?? null)
@@ -257,19 +259,19 @@ export function MediaPicker({
             <div className="space-y-4">
               {mainPurposeId && mainPurposeName && (
                 <div className="text-sm text-muted-foreground bg-muted/50 rounded-lg px-3 py-2">
-                  Visar standardbilder för <span className="font-medium text-foreground">{mainPurposeName}</span>
+                  {t('mediaPicker.showingTemplatesFor')} <span className="font-medium text-foreground">{mainPurposeName}</span>
                 </div>
               )}
               {!mainPurposeId && (
                 <div className="text-center py-4 text-muted-foreground bg-amber-50 dark:bg-amber-950/20 rounded-lg">
-                  <p className="text-sm">Välj ett huvudsyfte först för att se standardbilder</p>
+                  <p className="text-sm">{t('mediaPicker.selectPurposeFirst')}</p>
                 </div>
               )}
               {loading ? (
-                <div className="text-center py-8 text-muted-foreground">Laddar...</div>
+                <div className="text-center py-8 text-muted-foreground">{t('mediaPicker.loading')}</div>
               ) : media.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
-                  {mainPurposeId ? 'Inga standardbilder för detta syfte' : 'Inga standardbilder hittades'}
+                  {mainPurposeId ? t('mediaPicker.noTemplatesForPurpose') : t('mediaPicker.noTemplatesFound')}
                 </div>
               ) : (
                 <div className="grid grid-cols-5 gap-3">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   getUserAchievementProgress,
   type AchievementProgress,
@@ -32,6 +33,7 @@ export function AchievementHistory({
 }: AchievementHistoryProps) {
   const [recentAchievements, setRecentAchievements] = useState<AchievementProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations('profile');
 
   useEffect(() => {
     if (!userId) {
@@ -115,7 +117,7 @@ export function AchievementHistory({
         </CardHeader>
         <CardContent className="py-6 text-center">
           <p className="text-sm text-muted-foreground">
-            Inga prestationer upplåsta ännu. Fortsätt spela!
+            {t('achievements.noUnlockedYet')}
           </p>
         </CardContent>
       </Card>

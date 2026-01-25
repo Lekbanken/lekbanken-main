@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { formatDateLong } from '@/lib/i18n/format-utils';
 import {
   CreditCardIcon,
@@ -76,6 +77,7 @@ export function OrganisationBillingSection({
   trialEndsAt,
 }: OrganisationBillingSectionProps) {
   const [isOpeningPortal, setIsOpeningPortal] = useState(false);
+  const t = useTranslations('admin.organisations.billing');
   
   // Get status config
   const statusConfig = subscription 
@@ -123,7 +125,7 @@ export function OrganisationBillingSection({
             disabled={isOpeningPortal}
           >
             <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-1" />
-            Stripe Dashboard
+            {t('stripeDashboard')}
           </Button>
         )}
       </CardHeader>
@@ -132,9 +134,9 @@ export function OrganisationBillingSection({
         {!subscription && !isTrialActive && (
           <div className="text-center py-6 text-muted-foreground">
             <CreditCardIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Ingen aktiv prenumeration</p>
+            <p className="text-sm">{t('noSubscription')}</p>
             <p className="text-xs mt-1">
-              Kontakta support för att konfigurera fakturering.
+              {t('contactSupport')}
             </p>
           </div>
         )}
@@ -145,11 +147,10 @@ export function OrganisationBillingSection({
             <ClockIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                Provperiod aktiv
+                {t('trialActive')}
               </p>
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                {trialDaysRemaining} {trialDaysRemaining === 1 ? 'dag' : 'dagar'} kvar 
-                (slutar {formatDate(trialEndsAt)})
+                {t('trialDaysRemaining', { count: trialDaysRemaining, date: formatDate(trialEndsAt) })}
               </p>
             </div>
           </div>
@@ -230,11 +231,10 @@ export function OrganisationBillingSection({
             <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
             <div>
               <p className="text-sm font-medium text-amber-900 dark:text-amber-100">
-                Betalning förfallen
+                {t('paymentOverdue')}
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
-                Det finns en förfallen betalning. Kontrollera faktureringsinformationen i Stripe 
-                för att undvika avbrott i tjänsten.
+                {t('overdueDescription')}
               </p>
             </div>
           </div>

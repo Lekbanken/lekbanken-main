@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 
@@ -43,11 +44,12 @@ export function AdminPageHeader({
   helpText,
   className = '',
 }: AdminPageHeaderProps) {
+  const t = useTranslations('admin.pageHeader');
   return (
     <header className={`mb-8 ${className}`}>
       {/* Breadcrumbs */}
       {breadcrumbs && breadcrumbs.length > 0 && (
-        <nav aria-label="Brödsmulor" className="mb-4">
+        <nav aria-label={t('breadcrumbsLabel')} className="mb-4">
           <ol className="flex items-center gap-1 text-sm">
             {breadcrumbs.map((crumb, index) => (
               <li key={crumb.label} className="flex items-center">

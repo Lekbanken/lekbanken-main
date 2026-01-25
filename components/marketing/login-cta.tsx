@@ -1,6 +1,8 @@
-﻿import { Button } from "@/components/ui/button";
+﻿import { useTranslations } from 'next-intl';
+import { Button } from "@/components/ui/button";
 
 export function LoginCta() {
+  const t = useTranslations('marketing');
   return (
     <section
       id="cta"
@@ -20,11 +22,10 @@ export function LoginCta() {
           id="cta-title"
           className="text-3xl font-semibold tracking-tight text-primary-foreground sm:text-4xl"
         >
-          Redo att effektivisera planeringen?
+          {t('cta.title')}
         </h2>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-primary-foreground">
-          Kom igång gratis, logga in när du vill fortsätta och bjud enkelt in kollegor. Ingen
-          bindningstid.
+          {t('cta.description')}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -36,7 +37,7 @@ export function LoginCta() {
             <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Starta gratis
+            {t('cta.startFree')}
           </Button>
           <Button
             size="lg"
@@ -47,7 +48,7 @@ export function LoginCta() {
             <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
             </svg>
-            Logga in
+            {t('cta.login')}
           </Button>
           <Button
             size="lg"
@@ -55,7 +56,7 @@ export function LoginCta() {
             href="#pricing"
             className="text-primary-foreground hover:bg-white/10 transition-all"
           >
-            Se planer
+            {t('cta.seePlans')}
           </Button>
         </div>
 
@@ -64,13 +65,13 @@ export function LoginCta() {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
             </svg>
-            Onboarding på svenska
+            {t('cta.badges.swedishOnboarding')}
           </span>
           <span className="inline-flex items-center gap-1.5">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            Support svarar inom en arbetsdag.
+            {t('cta.badges.supportResponse')}
           </span>
         </div>
       </div>

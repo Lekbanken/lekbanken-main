@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   EyeIcon,
   EyeSlashIcon,
@@ -103,12 +104,14 @@ export function LayerStackPanel({
     return result.sort((a, b) => b.order - a.order);
   }, [icon]);
 
+  const t = useTranslations('admin.achievements.editor');
+
   if (layers.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border/50 bg-muted/20 p-4 text-center">
         <Square3Stack3DIcon className="mx-auto h-8 w-8 text-muted-foreground/50" />
-        <p className="mt-2 text-sm text-muted-foreground">Inga lager valda</p>
-        <p className="text-xs text-muted-foreground/70">Välj en base shape för att börja</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('layers.noLayersSelected')}</p>
+        <p className="text-xs text-muted-foreground/70">{t('layers.selectBaseToStart')}</p>
       </div>
     );
   }
@@ -118,9 +121,9 @@ export function LayerStackPanel({
       <div className="flex items-center justify-between px-1">
         <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
           <Square3Stack3DIcon className="h-3.5 w-3.5" />
-          Lager ({layers.length})
+          {t('layers.title')} ({layers.length})
         </h4>
-        <span className="text-[10px] text-muted-foreground/60">Topp → Botten</span>
+        <span className="text-[10px] text-muted-foreground/60">{t('layers.topToBottom')}</span>
       </div>
 
       <div className="space-y-1 rounded-lg border border-border/40 bg-muted/10 p-1.5">

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   Sheet,
   SheetContent,
@@ -53,6 +54,7 @@ export function BlockDetailDrawer({
   canDelete,
   isSaving = false,
 }: BlockDetailDrawerProps) {
+  const t = useTranslations('planner');
   // Use block id to reset form state when switching blocks
   const blockId = block?.id;
   const [duration, setDuration] = useState(() => String(block?.durationMinutes ?? 15));
@@ -106,9 +108,9 @@ export function BlockDetailDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>Redigera block</SheetTitle>
+          <SheetTitle>{t('blockDetail.title')}</SheetTitle>
           <SheetDescription>
-            Anpassa inställningar för detta block
+            {t('blockDetail.description')}
           </SheetDescription>
         </SheetHeader>
 
@@ -138,7 +140,7 @@ export function BlockDetailDrawer({
             <div className="space-y-2">
               <Label htmlFor="block-duration" className="flex items-center gap-2">
                 <ClockIcon />
-                Tid (minuter)
+                {t('blockDetail.duration')}
               </Label>
               <Input
                 id="block-duration"
@@ -155,17 +157,17 @@ export function BlockDetailDrawer({
             <div className="space-y-2">
               <Label htmlFor="block-notes" className="flex items-center gap-2">
                 <StickyNoteIcon />
-                Anteckningar
+                {t('blockDetail.notes')}
               </Label>
               <Textarea
                 id="block-notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Lägg till anteckningar för detta block..."
+                placeholder={t('blockDetail.notesPlaceholder')}
                 rows={3}
               />
               <p className="text-xs text-muted-foreground">
-                Visas vid plangenomgång och i presentationsläge
+                {t('blockDetail.notesHelpText')}
               </p>
             </div>
 
@@ -175,10 +177,10 @@ export function BlockDetailDrawer({
                 <CircleDotIcon />
                 <div>
                   <Label htmlFor="block-optional" className="cursor-pointer">
-                    Valfritt block
+                    {t('blockDetail.optional')}
                   </Label>
                   <p className="text-xs text-muted-foreground">
-                    Kan hoppas över vid körning
+                    {t('blockDetail.optionalDescription')}
                   </p>
                 </div>
               </div>
@@ -201,21 +203,21 @@ export function BlockDetailDrawer({
               }}
               className="text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
             >
-              Ta bort
+              {t('actions.delete')}
             </Button>
           )}
           <div className="flex gap-2 ml-auto">
             <Button variant="ghost" onClick={() => onOpenChange(false)}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button onClick={handleSave} disabled={isSaving}>
               {isSaving ? (
                 <>
                   <LoaderIcon />
-                  <span className="ml-1.5">Sparar...</span>
+                  <span className="ml-1.5">{t('actions.saving')}</span>
                 </>
               ) : (
-                "Spara"
+                t('actions.save')
               )}
             </Button>
           </div>

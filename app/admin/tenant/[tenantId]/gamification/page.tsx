@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 import { TrophyIcon, StarIcon } from "@heroicons/react/24/outline";
 import { AdminPageHeader, AdminPageLayout, AdminCard } from "@/components/admin/shared";
 import { useTenant } from "@/lib/context/TenantContext";
@@ -20,12 +21,13 @@ const gamificationFeatures = [
 export default function TenantGamificationHubPage() {
   const { currentTenant } = useTenant();
   const tenantId = currentTenant?.id;
+  const t = useTranslations('admin.gamification');
 
   return (
     <AdminPageLayout>
       <AdminPageHeader
-        title="Gamification"
-        description="Engagera deltagare med utmärkelser, utmaningar och belöningar"
+        title={t('title')}
+        description={t('description')}
       />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -65,7 +67,7 @@ export default function TenantGamificationHubPage() {
           <div className="flex items-center gap-3 text-slate-500">
             <StarIcon className="h-5 w-5" />
             <p className="text-sm">
-              Fler gamification-funktioner kommer snart: tävlingar, leaderboards, belöningar och mer.
+              {t('moreFeaturesComing')}
             </p>
           </div>
         </AdminCard>

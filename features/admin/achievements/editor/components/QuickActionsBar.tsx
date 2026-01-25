@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui';
 import {
   ArrowUturnLeftIcon,
@@ -33,6 +34,7 @@ export function QuickActionsBar({
   canUndo,
   canRedo,
 }: QuickActionsBarProps) {
+  const t = useTranslations('admin.achievements.editor');
   return (
     <div className="flex items-center justify-center gap-1 rounded-xl border border-border/50 bg-muted/30 backdrop-blur-sm p-1.5">
       {/* Undo */}
@@ -42,7 +44,7 @@ export function QuickActionsBar({
         onClick={onUndo}
         disabled={!canUndo}
         className="h-8 w-8 p-0"
-        title="Ångra (Ctrl+Z)"
+        title={t('undo')}
       >
         <ArrowUturnLeftIcon className="h-4 w-4" />
       </Button>
@@ -54,7 +56,7 @@ export function QuickActionsBar({
         onClick={onRedo}
         disabled={!canRedo}
         className="h-8 w-8 p-0"
-        title="Gör om (Ctrl+Y)"
+        title={t('redo')}
       >
         <ArrowUturnRightIcon className="h-4 w-4" />
       </Button>
@@ -67,7 +69,7 @@ export function QuickActionsBar({
         size="sm"
         onClick={onReset}
         className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive"
-        title="Återställ till ursprungligt (Ctrl+Shift+R)"
+        title={t('reset')}
       >
         <ArrowPathIcon className="h-4 w-4" />
       </Button>

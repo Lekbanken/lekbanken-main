@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import {
   getUserAchievementProgress,
   type AchievementProgress,
@@ -30,6 +31,7 @@ export function ProfileAchievementsShowcase({
 }: ProfileAchievementsShowcaseProps) {
   const [achievements, setAchievements] = useState<AchievementProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const t = useTranslations('profile');
 
   useEffect(() => {
     if (!userId) {
@@ -85,7 +87,7 @@ export function ProfileAchievementsShowcase({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrophyIcon className="h-5 w-5 text-amber-500" />
-            Prestationer
+            {t('achievements.title')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -103,12 +105,12 @@ export function ProfileAchievementsShowcase({
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrophyIcon className="h-5 w-5 text-amber-500" />
-            Prestationer
+            {t('achievements.title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="py-8 text-center">
           <p className="text-sm text-muted-foreground">
-            Inga prestationer tillgängliga ännu.
+            {t('achievements.noAchievementsYet')}
           </p>
         </CardContent>
       </Card>
@@ -121,13 +123,13 @@ export function ProfileAchievementsShowcase({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <TrophyIcon className="h-5 w-5 text-amber-500" />
-            Prestationer
+            {t('achievements.title')}
           </CardTitle>
           <Link
             href="/app/profile/achievements"
             className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
           >
-            Visa alla
+            {t('achievements.viewAll')}
             <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
@@ -137,7 +139,7 @@ export function ProfileAchievementsShowcase({
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">
-              {unlockedCount} av {totalCount} upplåsta
+              {t('achievements.unlockedCount', { unlocked: unlockedCount, total: totalCount })}
             </span>
             <span className="font-semibold text-foreground">{progressPercent}%</span>
           </div>
@@ -167,7 +169,7 @@ export function ProfileAchievementsShowcase({
         {/* Recent unlock message */}
         {displayAchievements.some((a) => a.isUnlocked) && (
           <div className="text-center text-xs text-muted-foreground">
-            Klicka på ett märke för att se detaljer
+            {t('achievements.clickBadgeHint')}
           </div>
         )}
       </CardContent>

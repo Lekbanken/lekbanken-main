@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactElement } from "react";
+import { useTranslations } from "next-intl";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Badge } from "@/components/ui/badge";
@@ -103,6 +104,7 @@ export function BlockRow({
   onDelete,
   onDurationChange,
 }: BlockRowProps) {
+  const t = useTranslations('planner');
   const [isEditingDuration, setIsEditingDuration] = useState(false);
   const [durationValue, setDurationValue] = useState(String(block.durationMinutes ?? 15));
 
@@ -157,7 +159,7 @@ export function BlockRow({
             {...attributes}
             {...listeners}
             className="mt-1 flex items-center gap-2 text-muted-foreground/60 hover:text-muted-foreground active:cursor-grabbing"
-            aria-label="Dra för att sortera"
+            aria-label={t('dragToSort')}
           >
             <GripVerticalIcon />
             <span className="text-xs font-medium">{index}</span>

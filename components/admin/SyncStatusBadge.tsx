@@ -7,8 +7,11 @@
 
 'use client';
 
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowPathIcon, CheckCircleIcon, ExclamationTriangleIcon, XCircleIcon, LockClosedIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { type StripeSyncStatus, STRIPE_SYNC_STATUS, getSyncStatusInfo } from '@/lib/stripe/product-sync-types';
 import { cn } from '@/lib/utils';
 
@@ -105,6 +108,7 @@ export function SyncButton({
   onSyncComplete,
   className,
 }: SyncButtonProps) {
+  const t = useTranslations('admin.sync');
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -125,12 +129,12 @@ export function SyncButton({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Synkronisering misslyckades');
+        throw new Error(data.error || t('syncFailed'));
       }
 
       onSyncComplete?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Okänt fel');
+      setError(err instanceof Error ? err.message : t('unknownError'));
     } finally {
       setIsSyncing(false);
     }
@@ -148,7 +152,7 @@ export function SyncButton({
         disabled={isSyncing}
       >
         <ArrowPathIcon className={cn('mr-2 h-4 w-4', isSyncing && 'animate-spin')} />
-        {isSyncing ? 'Synkar...' : 'Synka Stripe'}
+        {isSyncing ? t('syncing') : t('syncStripe')}
       </Button>
 
       {showForceSync && (
@@ -157,9 +161,9 @@ export function SyncButton({
           size="sm"
           onClick={() => handleSync(true)}
           disabled={isSyncing}
-          title="Skriv över Stripe-data med Lekbanken-data"
+          title={t('forceSyncTooltip')}
         >
-          Tvinga synk
+          {t('forceSync')}
         </Button>
       )}
 
@@ -169,10 +173,6 @@ export function SyncButton({
     </div>
   );
 }
-
-// Import useState for SyncButton
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 
 // =============================================================================
 // DRIFT WARNING COMPONENT
@@ -184,6 +184,7 @@ interface DriftWarningProps {
 }
 
 export function DriftWarning({ productId, className }: DriftWarningProps) {
+  const t = useTranslations('admin.sync');
   const [drift, setDrift] = useState<{
     hasDrift: boolean;
     overallSeverity: string | null;
@@ -222,7 +223,7 @@ export function DriftWarning({ productId, className }: DriftWarningProps) {
         className={className}
       >
         <ExclamationTriangleIcon className="mr-2 h-4 w-4" />
-        {isLoading ? 'Kontrollerar...' : 'Kontrollera drift'}
+        {isLoading ? t('checking') : t('checkDrift')}
       </Button>
     );
   }
@@ -231,7 +232,7 @@ export function DriftWarning({ productId, className }: DriftWarningProps) {
     return (
       <div className={cn('flex items-center gap-2 text-sm text-emerald-600', className)}>
         <CheckCircleIcon className="h-4 w-4" />
-        Ingen drift upptäckt
+        {t('noDriftDetected')}
       </div>
     );
   }
@@ -246,7 +247,7 @@ export function DriftWarning({ productId, className }: DriftWarningProps) {
     <div className={cn('rounded-lg border p-4 space-y-3', severityColors[drift.overallSeverity || 'info'], className)}>
       <div className="flex items-center gap-2 font-medium">
         <ExclamationTriangleIcon className="h-5 w-5" />
-        Drift upptäckt mellan Lekbanken och Stripe
+        {t('driftDetected')}
       </div>
       
       <div className="space-y-2">
@@ -259,7 +260,7 @@ export function DriftWarning({ productId, className }: DriftWarningProps) {
       </div>
       
       <div className="text-xs opacity-75">
-        Använd &quot;Tvinga synk&quot; för att skriva över Stripe med Lekbanken-data.
+        {t('forceSyncHint')}
       </div>
     </div>
   );

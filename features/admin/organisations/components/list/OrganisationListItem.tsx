@@ -5,6 +5,7 @@ import { formatDate } from '@/lib/i18n/format-utils';
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ArrowTopRightOnSquareIcon,
   EllipsisHorizontalIcon,
@@ -100,6 +101,7 @@ export function OrganisationListItem({
   onStatusChange,
   onRemove,
 }: OrganisationListItemProps) {
+  const t = useTranslations('admin.organisations');
   const router = useRouter();
   const { success, error } = useToast();
   const [removeOpen, setRemoveOpen] = useState(false);
@@ -140,7 +142,7 @@ export function OrganisationListItem({
               role="button"
               tabIndex={0}
               onClick={handleRowClick}
-              aria-label={`Öppna ${organisation.name}`}
+              aria-label={t('openOrg', { name: organisation.name })}
               onKeyDown={(event) => {
                 if (event.key === "Enter") handleRowClick();
               }}
@@ -173,16 +175,16 @@ export function OrganisationListItem({
                     variant="ghost"
                     size="sm"
                     className="h-6 px-2 text-xs"
-                    aria-label={`Kopiera UUID för ${organisation.name}`}
+                    aria-label={t('copyUuid', { name: organisation.name })}
                     onClick={(event) => {
                       event.stopPropagation();
                       void handleCopy();
                     }}
                   >
-                    Kopiera
+                    {t('copy')}
                   </Button>
                   <span className="text-muted-foreground/60">•</span>
-                  <span>Skapad {formatDate(organisation.createdAt)}</span>
+                  <span>{t('created')} {formatDate(organisation.createdAt)}</span>
                 </div>
               </div>
             </div>
@@ -195,7 +197,7 @@ export function OrganisationListItem({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Snabbåtgärder</DropdownMenuLabel>
+                  <DropdownMenuLabel>{t('quickActions')}</DropdownMenuLabel>
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/organisations/${organisation.id}`}>
                       <ArrowTopRightOnSquareIcon className="h-4 w-4" />
@@ -219,7 +221,7 @@ export function OrganisationListItem({
                   <DropdownMenuItem asChild>
                     <Link href={`/admin/organisations/${organisation.id}?tab=overview#billing`}>
                       <CreditCardIcon className="h-4 w-4" />
-                      Hantera billing
+                      {t('manageBilling')}
                     </Link>
                   </DropdownMenuItem>
                   {canManageBilling && organisation.billing.customerId && (
@@ -230,7 +232,7 @@ export function OrganisationListItem({
                         rel="noreferrer"
                       >
                         <LinkIcon className="h-4 w-4" />
-                        Öppna Stripe
+                        {t('openStripe')}
                       </a>
                     </DropdownMenuItem>
                   )}
@@ -246,12 +248,12 @@ export function OrganisationListItem({
                         {isInactive ? (
                           <>
                             <PlayIcon className="h-4 w-4" />
-                            Återaktivera
+                            {t('reactivate')}
                           </>
                         ) : (
                           <>
                             <PauseCircleIcon className="h-4 w-4" />
-                            Stäng av
+                            {t('suspend')}
                           </>
                         )}
                       </DropdownMenuItem>
@@ -265,7 +267,7 @@ export function OrganisationListItem({
                         onSelect={() => setRemoveOpen(true)}
                       >
                         <TrashIcon className="h-4 w-4" />
-                        Ta bort organisation
+                        {t('deleteOrg')}
                       </DropdownMenuItem>
                     </>
                   )}
@@ -286,18 +288,18 @@ export function OrganisationListItem({
                 variant={organisation.domain.status === "active" ? "success" : "warning"}
                 size="sm"
               >
-                Domän {organisation.domain.status === "active" ? "aktiv" : "väntande"}
+                {t('domain')} {organisation.domain.status === "active" ? t('domainActive') : t('domainPending')}
               </Badge>
             ) : (
               <Badge variant="secondary" size="sm">
-                Ingen domän
+                {t('noDomain')}
               </Badge>
             )}
           </div>
 
           <div className="grid gap-4 text-sm text-muted-foreground md:grid-cols-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Kontakt</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('contact')}</p>
               <p className="mt-1 text-sm text-foreground">{contactLine}</p>
               {organisation.contactEmail && hasContactName && (
                 <p className="text-xs text-muted-foreground">{organisation.contactEmail}</p>
@@ -318,12 +320,12 @@ export function OrganisationListItem({
                 {organisation.billing.status
                   ? subscriptionStatusLabels[organisation.billing.status] ?? organisation.billing.status
                   : organisation.billing.connected
-                    ? "Kopplad"
-                    : "Ingen billing"}
+                    ? t('connected')
+                    : t('noBilling')}
               </p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Domän</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">{t('domain')}</p>
               <p className="mt-1 text-sm text-foreground">{domainLabel}</p>
             </div>
           </div>
@@ -334,19 +336,18 @@ export function OrganisationListItem({
         <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
           <AlertDialogContent variant="destructive">
             <AlertDialogHeader>
-              <AlertDialogTitle>Ta bort organisation?</AlertDialogTitle>
+              <AlertDialogTitle>{t('deleteOrgTitle')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Detta går inte att ångra. Organisationen och kopplade data kan
-                försvinna permanent.
+                {t('deleteOrgWarning')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Avbryt</AlertDialogCancel>
+              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
                 onClick={() => onRemove && void onRemove(organisation.id)}
               >
-                Ta bort
+                {t('delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

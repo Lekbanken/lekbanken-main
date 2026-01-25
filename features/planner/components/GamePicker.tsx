@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +39,7 @@ export function GamePicker({
   seedResults,
   initialQuery,
 }: GamePickerProps) {
+  const t = useTranslations('planner');
   const [query, setQuery] = React.useState(initialQuery ?? "");
   const [results, setResults] = React.useState<GameSearchResult[]>(seedResults ?? []);
   const [isSearching, setIsSearching] = React.useState(false);
@@ -103,7 +105,7 @@ export function GamePicker({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg">
         <SheetHeader>
-          <SheetTitle>Lägg till lek</SheetTitle>
+          <SheetTitle>{t('gamePicker.title')}</SheetTitle>
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
@@ -112,7 +114,7 @@ export function GamePicker({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Sök efter lek..."
+              placeholder={t('gamePicker.searchPlaceholder')}
               className="flex-1"
               autoFocus
             />
@@ -120,20 +122,20 @@ export function GamePicker({
               onClick={() => void searchGames()}
               disabled={isSearching || !query.trim()}
             >
-              {isSearching ? "Söker..." : "Sök"}
+              {isSearching ? t('gamePicker.searching') : t('gamePicker.search')}
             </Button>
           </div>
 
           <div className="max-h-[calc(100vh-200px)] space-y-2 overflow-y-auto">
             {!hasSearched && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                Sök efter en lek för att lägga till i din plan
+                {t('gamePicker.emptyState')}
               </p>
             )}
 
             {hasSearched && results.length === 0 && !isSearching && (
               <p className="py-8 text-center text-sm text-muted-foreground">
-                Inga lekar hittades för &quot;{query}&quot;
+                {t('gamePicker.noResults', { query })}
               </p>
             )}
 

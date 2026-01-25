@@ -110,6 +110,7 @@ function StatusBadge({ status }: { status: TenantStatus }) {
 }
 
 export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps) {
+  const t = useTranslations('admin.organizations.detail');
   const router = useRouter();
   const { success, error: toastError } = useToast();
   // Dynamic import to avoid circular dependency issues
@@ -317,15 +318,15 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
           <div className="hidden lg:flex items-center gap-6 text-sm">
             <div className="text-center">
               <div className="text-lg font-semibold">{organisation.memberSummary.total}</div>
-              <div className="text-muted-foreground text-xs">Medlemmar</div>
+              <div className="text-muted-foreground text-xs">{t('detail.stats.members')}</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-semibold">{organisation.features.filter(f => f.enabled).length}</div>
-              <div className="text-muted-foreground text-xs">Funktioner</div>
+              <div className="text-muted-foreground text-xs">{t('detail.stats.features')}</div>
             </div>
             <div className="text-center">
               <div className="text-lg font-semibold">{organisation.domains.length}</div>
-              <div className="text-muted-foreground text-xs">Domäner</div>
+              <div className="text-muted-foreground text-xs">{t('detail.stats.domains')}</div>
             </div>
           </div>
 
@@ -335,7 +336,7 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
               variant="ghost"
               size="sm"
               onClick={loadOrganisation}
-              title="Uppdatera"
+              title={t('detail.actions.refresh')}
             >
               <ArrowPathIcon className="h-4 w-4" />
             </Button>
@@ -349,14 +350,14 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={() => setActiveTab('overview')}>
                   <PencilIcon className="h-4 w-4 mr-2" />
-                  Redigera
+                  {t('detail.actions.edit')}
                 </DropdownMenuItem>
                 {organisation.slug && (
                   <DropdownMenuItem
                     onClick={() => window.open(`https://${organisation.slug}.lekbanken.no/app`, '_blank')}
                   >
                     <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-2" />
-                    Öppna app
+                    {t('detail.actions.openApp')}
                   </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
@@ -364,14 +365,14 @@ export function OrganisationDetailPage({ tenantId }: OrganisationDetailPageProps
                   onClick={() => handleStatusChange(organisation.status === 'suspended' ? 'active' : 'suspended')}
                   className={organisation.status === 'suspended' ? 'text-emerald-600' : 'text-amber-600'}
                 >
-                  {organisation.status === 'suspended' ? 'Återaktivera' : 'Stäng av'}
+                  {organisation.status === 'suspended' ? t('detail.actions.reactivate') : t('detail.actions.suspend')}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={handleDelete}
                   className="text-destructive focus:text-destructive"
                 >
                   <TrashIcon className="h-4 w-4 mr-2" />
-                  Radera
+                  {t('detail.actions.delete')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

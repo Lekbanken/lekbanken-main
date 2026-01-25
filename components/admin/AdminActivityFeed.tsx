@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-
+import { useTranslations } from 'next-intl';
 import { useState, useEffect, useMemo } from 'react';
 import { 
   UserPlusIcon,
@@ -127,6 +127,7 @@ export function AdminActivityFeed({
   showTimestamps = true,
   className = '',
 }: AdminActivityFeedProps) {
+  const t = useTranslations('admin.activityFeed');
   const displayedActivities = useMemo(
     () => activities.slice(0, maxItems),
     [activities, maxItems]
@@ -153,7 +154,7 @@ export function AdminActivityFeed({
       <div className={`flex flex-col items-center justify-center py-8 text-center ${className}`}>
         <ClockIcon className="h-10 w-10 text-muted-foreground/50" />
         <p className="mt-2 text-sm text-muted-foreground">
-          Ingen aktivitet ännu
+          {t('noActivity')}
         </p>
       </div>
     );

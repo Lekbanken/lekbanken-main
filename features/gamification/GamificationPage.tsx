@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
@@ -18,6 +19,7 @@ type GamificationPageProps = {
 };
 
 export function GamificationPage({ fetcher = fetchGamificationSnapshot }: GamificationPageProps) {
+  const t = useTranslations("gamification");
   const [data, setData] = useState<GamificationPayload | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +49,7 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
   if (error) {
     return (
       <ErrorState
-        title="Något gick fel"
+        title={t("errorTitle")}
         description={error}
         onRetry={() => {
           setIsLoading(true);
@@ -105,36 +107,36 @@ export function GamificationPage({ fetcher = fetchGamificationSnapshot }: Gamifi
           href="/app/learning"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
-          Kurser
-          <p className="mt-1 text-xs font-normal text-muted-foreground">Utbildningar och certifikat</p>
+          {t("nav.courses")}
+          <p className="mt-1 text-xs font-normal text-muted-foreground">{t("nav.coursesDesc")}</p>
         </Link>
         <Link
           href="/app/gamification/achievements"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
-          Utmärkelser
-          <p className="mt-1 text-xs font-normal text-muted-foreground">Visa alla och pinna till dashboard</p>
+          {t("nav.achievements")}
+          <p className="mt-1 text-xs font-normal text-muted-foreground">{t("nav.achievementsDesc")}</p>
         </Link>
         <Link
           href="/app/gamification/coins"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
-          DiceCoin
-          <p className="mt-1 text-xs font-normal text-muted-foreground">Senaste transaktioner och saldo</p>
+          {t("nav.dicecoin")}
+          <p className="mt-1 text-xs font-normal text-muted-foreground">{t("nav.dicecoinDesc")}</p>
         </Link>
         <Link
           href="/app/shop"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
-          Butik
-          <p className="mt-1 text-xs font-normal text-muted-foreground">Cosmetics och powerups</p>
+          {t("nav.shop")}
+          <p className="mt-1 text-xs font-normal text-muted-foreground">{t("nav.shopDesc")}</p>
         </Link>
         <Link
           href="/app/gamification/events"
           className="rounded-2xl border border-border/60 bg-card px-4 py-3 text-sm font-semibold text-foreground hover:border-primary/40"
         >
-          Eventlogg
-          <p className="mt-1 text-xs font-normal text-muted-foreground">Read-only, senaste händelser</p>
+          {t("nav.eventlog")}
+          <p className="mt-1 text-xs font-normal text-muted-foreground">{t("nav.eventlogDesc")}</p>
         </Link>
       </div>
 

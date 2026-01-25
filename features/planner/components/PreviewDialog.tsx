@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -103,6 +104,7 @@ function getBlockColor(type: PlannerBlock["blockType"]): string {
 }
 
 export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) {
+  const t = useTranslations('planner');
   const totalDuration = plan.blocks.reduce(
     (sum, block) => sum + (block.durationMinutes ?? 0),
     0
@@ -132,7 +134,7 @@ export function PreviewDialog({ open, onOpenChange, plan }: PreviewDialogProps) 
                 d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
               />
             </svg>
-            Förhandsgranskning
+            {t('preview.title')}
           </DialogTitle>
         </DialogHeader>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +26,7 @@ export function ShareDialog({
   planName: _planName,
   visibility,
 }: ShareDialogProps) {
+  const t = useTranslations('planner');
   const [copied, setCopied] = React.useState(false);
 
   const shareUrl =
@@ -70,11 +72,10 @@ export function ShareDialog({
                 </svg>
                 <div>
                   <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                    Privat plan
+                    {t('share.privatePlan')}
                   </p>
                   <p className="mt-1 text-xs text-amber-700 dark:text-amber-300">
-                    Den här planen är privat och kan inte delas. Ändra synlighet
-                    till &quot;Organisation&quot; eller &quot;Publik&quot; för att dela den.
+                    {t('share.privatePlanWarning')}
                   </p>
                 </div>
               </div>
@@ -83,7 +84,7 @@ export function ShareDialog({
             <>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">
-                  Delningslänk
+                  {t('share.shareLink')}
                 </label>
                 <div className="flex gap-2">
                   <Input value={shareUrl} readOnly className="flex-1 text-sm" />
@@ -103,7 +104,7 @@ export function ShareDialog({
                             d="M5 13l4 4L19 7"
                           />
                         </svg>
-                        Kopierad!
+                        {t('share.copied')}
                       </>
                     ) : (
                       <>
@@ -120,7 +121,7 @@ export function ShareDialog({
                             d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
                           />
                         </svg>
-                        Kopiera
+                        {t('share.copy')}
                       </>
                     )}
                   </Button>
@@ -129,13 +130,13 @@ export function ShareDialog({
 
               <div className="rounded-xl bg-muted/50 p-3">
                 <p className="text-xs text-muted-foreground">
-                  <span className="font-medium">Synlighet:</span>{" "}
-                  {visibility === "tenant" ? "Organisation" : "Publik"}
+                  <span className="font-medium">{t('share.visibilityLabel')}</span>{" "}
+                  {visibility === "tenant" ? t('filters.tenant') : t('filters.public')}
                 </p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {visibility === "tenant"
-                    ? "Bara medlemmar i din organisation kan se denna plan."
-                    : "Alla med länken kan se denna plan."}
+                    ? t('share.tenantVisibilityDescription')
+                    : t('share.publicVisibilityDescription')}
                 </p>
               </div>
             </>

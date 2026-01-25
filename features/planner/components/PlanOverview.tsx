@@ -1,7 +1,9 @@
+import { useTranslations } from "next-intl";
 import { ClockIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import type { PlannerPlan } from "../types";
 
 export function PlanOverview({ plan }: { plan: PlannerPlan }) {
+  const t = useTranslations('planner');
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-sm">
@@ -25,7 +27,7 @@ export function PlanOverview({ plan }: { plan: PlannerPlan }) {
         </div>
         {plan.blocks.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-muted/20 p-4 text-sm text-muted-foreground">
-            Inga block i denna plan ännu.
+            {t('noBlocksInPlanYet')}
           </div>
         ) : (
           plan.blocks.map((block) => (

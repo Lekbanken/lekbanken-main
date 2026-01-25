@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ExclamationTriangleIcon,
   PauseCircleIcon,
@@ -35,6 +36,7 @@ export function OrganisationDangerZone({
   onArchive,
   onDelete,
 }: OrganisationDangerZoneProps) {
+  const t = useTranslations('admin.organisations.dangerZone');
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -72,7 +74,7 @@ export function OrganisationDangerZone({
       <CardHeader className="pb-2">
         <div className="flex items-center gap-2">
           <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
-          <CardTitle className="text-base font-semibold text-red-600">Danger Zone</CardTitle>
+          <CardTitle className="text-base font-semibold text-red-600">{t('title')}</CardTitle>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -80,23 +82,23 @@ export function OrganisationDangerZone({
         <div className="flex items-center justify-between p-4 rounded-lg border border-border/40">
           <div>
             <h4 className="text-sm font-medium">
-              {isSuspended ? 'Återaktivera organisation' : 'Stäng av organisation'}
+              {isSuspended ? t('reactivateOrg') : t('suspendOrg')}
             </h4>
             <p className="text-xs text-muted-foreground mt-0.5">
               {isSuspended
-                ? 'Återställ åtkomst för alla medlemmar.'
-                : 'Tillfälligt inaktivera åtkomst för alla medlemmar.'}
+                ? t('reactivateDescription')
+                : t('suspendDescription')}
             </p>
           </div>
           {isSuspended ? (
             <Button variant="outline" onClick={onReactivate}>
               <PlayCircleIcon className="h-4 w-4 mr-2" />
-              Återaktivera
+              {t('reactivate')}
             </Button>
           ) : (
             <Button variant="outline" onClick={onSuspend} disabled={isArchived}>
               <PauseCircleIcon className="h-4 w-4 mr-2" />
-              Stäng av
+              {t('suspend')}
             </Button>
           )}
         </div>
@@ -104,9 +106,9 @@ export function OrganisationDangerZone({
         {/* Archive */}
         <div className="flex items-center justify-between p-4 rounded-lg border border-border/40">
           <div>
-            <h4 className="text-sm font-medium">Arkivera organisation</h4>
+            <h4 className="text-sm font-medium">{t('archiveOrg')}</h4>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Markera som arkiverad. Medlemmar förlorar åtkomst men data bevaras.
+              {t('archiveDescription')}
             </p>
           </div>
           <Button
@@ -115,7 +117,7 @@ export function OrganisationDangerZone({
             disabled={isArchived}
           >
             <ArchiveBoxIcon className="h-4 w-4 mr-2" />
-            Arkivera
+            {t('archive')}
           </Button>
         </div>
 
@@ -123,10 +125,10 @@ export function OrganisationDangerZone({
         <div className="flex items-center justify-between p-4 rounded-lg border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20">
           <div>
             <h4 className="text-sm font-medium text-red-700 dark:text-red-400">
-              Radera organisation permanent
+              {t('deleteOrgPermanently')}
             </h4>
             <p className="text-xs text-red-600 dark:text-red-500 mt-0.5">
-              Denna åtgärd kan inte ångras. All data kommer att raderas.
+              {t('deleteWarning')}
             </p>
           </div>
           <Button
@@ -134,7 +136,7 @@ export function OrganisationDangerZone({
             onClick={() => setIsDeleteDialogOpen(true)}
           >
             <TrashIcon className="h-4 w-4 mr-2" />
-            Radera
+            {t('delete')}
           </Button>
         </div>
       </CardContent>
@@ -143,18 +145,17 @@ export function OrganisationDangerZone({
       <Dialog open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Arkivera organisation?</DialogTitle>
+            <DialogTitle>{t('archiveDialog.title')}</DialogTitle>
             <DialogDescription>
-              <strong>{organisation.name}</strong> kommer att arkiveras. Alla medlemmar förlorar 
-              åtkomst men data bevaras. Du kan återaktivera organisationen senare.
+              <strong>{organisation.name}</strong> {t('archiveDialog.description')}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsArchiveDialogOpen(false)}>
-              Avbryt
+              {t('cancel')}
             </Button>
             <Button onClick={handleArchive} disabled={isArchiving}>
-              {isArchiving ? 'Arkiverar...' : 'Arkivera'}
+              {isArchiving ? t('archiving') : t('archive')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -164,25 +165,25 @@ export function OrganisationDangerZone({
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-red-600">Radera organisation permanent</DialogTitle>
+            <DialogTitle className="text-red-600">{t('deleteDialog.title')}</DialogTitle>
             <DialogDescription>
-              Du håller på att permanent radera <strong>{organisation.name}</strong>.
+              {t('deleteDialog.description', { name: organisation.name })}
               <br /><br />
-              Detta kommer att:
+              {t('deleteDialog.willRemove')}
               <ul className="list-disc list-inside mt-2 space-y-1">
-                <li>Ta bort alla medlemskap</li>
-                <li>Ta bort all konfiguration</li>
-                <li>Ta bort alla domäner</li>
-                <li>Ta bort all audit-historik</li>
+                <li>{t('deleteDialog.removeMemberships')}</li>
+                <li>{t('deleteDialog.removeConfig')}</li>
+                <li>{t('deleteDialog.removeDomains')}</li>
+                <li>{t('deleteDialog.removeAudit')}</li>
               </ul>
               <br />
-              <strong className="text-red-600">Denna åtgärd kan inte ångras.</strong>
+              <strong className="text-red-600">{t('deleteDialog.cannotBeUndone')}</strong>
             </DialogDescription>
           </DialogHeader>
           
           <div className="py-4">
             <label className="text-sm font-medium">
-              Skriv <code className="bg-muted px-1 rounded">{confirmSlug}</code> för att bekräfta:
+              {t('deleteDialog.confirmPrompt', { slug: confirmSlug })}
             </label>
             <Input
               value={deleteConfirmation}
@@ -194,14 +195,14 @@ export function OrganisationDangerZone({
 
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Avbryt
+              {t('cancel')}
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               disabled={isDeleting || deleteConfirmation !== confirmSlug}
             >
-              {isDeleting ? 'Raderar...' : 'Radera permanent'}
+              {isDeleting ? t('deleting') : t('deletePermanently')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 
 type PreviewBackgroundPickerProps = {
   value: string;
@@ -9,26 +10,26 @@ type PreviewBackgroundPickerProps = {
 
 // Predefined backgrounds for circle - with labels for button style
 const CIRCLE_BACKGROUNDS = [
-  { color: 'transparent', label: 'Transparent' },
-  { color: '#1F2937', label: 'Mörk' },
-  { color: '#000000', label: 'Svart' },
-  { color: '#FFFFFF', label: 'Vit' },
-  { color: '#F3F4F6', label: 'Ljus' },
+  { color: 'transparent', labelKey: 'backgrounds.transparent' },
+  { color: '#1F2937', labelKey: 'backgrounds.dark' },
+  { color: '#000000', labelKey: 'backgrounds.black' },
+  { color: '#FFFFFF', labelKey: 'backgrounds.white' },
+  { color: '#F3F4F6', labelKey: 'backgrounds.light' },
 ];
 
 // Predefined backgrounds for card - with labels for button style
 const CARD_BACKGROUNDS = [
-  { color: '#FFFFFF', label: 'Vit' },
-  { color: '#F3F4F6', label: 'Ljus' },
-  { color: '#1F2937', label: 'Mörk' },
-  { color: '#000000', label: 'Svart' },
+  { color: '#FFFFFF', labelKey: 'backgrounds.white' },
+  { color: '#F3F4F6', labelKey: 'backgrounds.light' },
+  { color: '#1F2937', labelKey: 'backgrounds.dark' },
+  { color: '#000000', labelKey: 'backgrounds.black' },
 ];
 
 // Text color presets
 const TEXT_COLOR_PRESETS = [
-  { color: '#1F2937', label: 'Mörk' },
-  { color: '#6B7280', label: 'Grå' },
-  { color: '#FFFFFF', label: 'Ljus' },
+  { color: '#1F2937', labelKey: 'backgrounds.dark' },
+  { color: '#6B7280', labelKey: 'backgrounds.gray' },
+  { color: '#FFFFFF', labelKey: 'backgrounds.light' },
 ];
 
 /**
@@ -36,16 +37,17 @@ const TEXT_COLOR_PRESETS = [
  * Helps users see how their badge looks on different backgrounds
  */
 export function PreviewBackgroundPicker({ value, onChange }: PreviewBackgroundPickerProps) {
+  const t = useTranslations('admin.achievements.editor');
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs text-muted-foreground">Bakgrund:</span>
+      <span className="text-xs text-muted-foreground">{t('backgrounds.label')}:</span>
       <div className="flex gap-1">
         {CIRCLE_BACKGROUNDS.map((bg) => (
           <button
             key={bg.color}
             type="button"
             onClick={() => onChange(bg.color)}
-            title={bg.label}
+            title={t(bg.labelKey)}
             className={`
               w-6 h-6 rounded-md border-2 transition-all text-xs
               ${value === bg.color 
@@ -56,7 +58,7 @@ export function PreviewBackgroundPicker({ value, onChange }: PreviewBackgroundPi
             `}
             style={bg.color !== 'transparent' ? { backgroundColor: bg.color } : undefined}
           >
-            <span className="sr-only">{bg.label}</span>
+            <span className="sr-only">{t(bg.labelKey)}</span>
           </button>
         ))}
       </div>
@@ -74,19 +76,20 @@ type CircleBackgroundPickerProps = {
 };
 
 export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPickerProps) {
+  const t = useTranslations('admin.achievements.editor');
   const inputRef = useRef<HTMLInputElement>(null);
   const isCustom = !CIRCLE_BACKGROUNDS.some(bg => bg.color === value);
 
   return (
     <div className="space-y-1.5">
-      <span className="text-xs font-medium text-muted-foreground">Cirkelbakgrund:</span>
+      <span className="text-xs font-medium text-muted-foreground">{t('backgrounds.circleBackground')}:</span>
       <div className="flex items-center gap-1.5 flex-wrap">
         {CIRCLE_BACKGROUNDS.map((bg) => (
           <button
             key={bg.color}
             type="button"
             onClick={() => onChange(bg.color)}
-            title={bg.label}
+            title={t(bg.labelKey)}
             className={`
               px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
               ${value === bg.color 
@@ -95,7 +98,7 @@ export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPick
               }
             `}
           >
-            {bg.label}
+            {t(bg.labelKey)}
           </button>
         ))}
         
@@ -111,7 +114,7 @@ export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPick
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            title="Välj egen färg"
+            title={t('backgrounds.selectCustomColor')}
             className={`
               px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
               ${isCustom && value !== 'transparent'
@@ -126,10 +129,10 @@ export function CircleBackgroundPicker({ value, onChange }: CircleBackgroundPick
                   className="w-3 h-3 rounded-full border border-border/50"
                   style={{ backgroundColor: value }}
                 />
-                Egen
+                {t('backgrounds.custom')}
               </>
             ) : (
-              'Egen...'
+              t('backgrounds.customEllipsis')
             )}
           </button>
         </div>
@@ -155,6 +158,7 @@ export function CardBackgroundPicker({
   textColor,
   onTextColorChange,
 }: CardBackgroundPickerProps) {
+  const t = useTranslations('admin.achievements.editor');
   const bgInputRef = useRef<HTMLInputElement>(null);
   const textInputRef = useRef<HTMLInputElement>(null);
   
@@ -165,14 +169,14 @@ export function CardBackgroundPicker({
     <div className="space-y-3">
       {/* Card Background - button style with labels */}
       <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Kortbakgrund:</span>
+        <span className="text-xs font-medium text-muted-foreground">{t('cardBackground')}:</span>
         <div className="flex items-center gap-1.5 flex-wrap">
           {CARD_BACKGROUNDS.map((bg) => (
             <button
               key={bg.color}
               type="button"
               onClick={() => onCardBackgroundChange(bg.color)}
-              title={bg.label}
+              title={t(bg.labelKey)}
               className={`
                 px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
                 ${cardBackground === bg.color 
@@ -181,7 +185,7 @@ export function CardBackgroundPicker({
                 }
               `}
             >
-              {bg.label}
+              {t(bg.labelKey)}
             </button>
           ))}
           
@@ -197,7 +201,7 @@ export function CardBackgroundPicker({
             <button
               type="button"
               onClick={() => bgInputRef.current?.click()}
-              title="Välj egen färg"
+              title={t('selectCustomColor')}
               className={`
                 px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
                 ${isCustomBg 
@@ -212,10 +216,10 @@ export function CardBackgroundPicker({
                     className="w-3 h-3 rounded-full border border-border/50"
                     style={{ backgroundColor: cardBackground }}
                   />
-                  Egen
+                  {t('custom')}
                 </>
               ) : (
-                'Egen...'
+                t('customEllipsis')
               )}
             </button>
           </div>
@@ -224,14 +228,14 @@ export function CardBackgroundPicker({
 
       {/* Text Color - button style with labels */}
       <div className="space-y-1.5">
-        <span className="text-xs font-medium text-muted-foreground">Textfärg:</span>
+        <span className="text-xs font-medium text-muted-foreground">{t('textColor')}:</span>
         <div className="flex items-center gap-1.5 flex-wrap">
           {TEXT_COLOR_PRESETS.map((tc) => (
             <button
               key={tc.color}
               type="button"
               onClick={() => onTextColorChange(tc.color)}
-              title={tc.label}
+              title={t(tc.labelKey)}
               className={`
                 px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all
                 ${textColor === tc.color 
@@ -240,7 +244,7 @@ export function CardBackgroundPicker({
                 }
               `}
             >
-              {tc.label}
+              {t(tc.labelKey)}
             </button>
           ))}
           
@@ -256,7 +260,7 @@ export function CardBackgroundPicker({
             <button
               type="button"
               onClick={() => textInputRef.current?.click()}
-              title="Välj egen textfärg"
+              title={t('selectCustomTextColor')}
               className={`
                 px-2.5 py-1 rounded-md text-xs font-medium border-2 transition-all flex items-center gap-1
                 ${isCustomText 
@@ -271,10 +275,10 @@ export function CardBackgroundPicker({
                     className="w-3 h-3 rounded-full border border-border/50"
                     style={{ backgroundColor: textColor }}
                   />
-                  Egen
+                  {t('custom')}
                 </>
               ) : (
-                'Egen...'
+                t('customEllipsis')
               )}
             </button>
           </div>
@@ -298,12 +302,13 @@ export function PreviewBackgroundPickerExtended({
   onChange, 
   showCustom = true 
 }: PreviewBackgroundPickerExtendedProps) {
+  const t = useTranslations('admin.achievements.editor');
   const [showPicker, setShowPicker] = useState(false);
   const isCustom = !CIRCLE_BACKGROUNDS.some(bg => bg.color === value);
 
   return (
     <div className="space-y-1.5">
-      <span className="text-xs font-medium text-muted-foreground">Cirkelbakgrund:</span>
+      <span className="text-xs font-medium text-muted-foreground">{t('circleBackground')}:</span>
       
       <div className="flex items-center gap-1.5 flex-wrap">
         {CIRCLE_BACKGROUNDS.map((bg) => (
@@ -311,7 +316,7 @@ export function PreviewBackgroundPickerExtended({
             key={bg.color}
             type="button"
             onClick={() => onChange(bg.color)}
-            title={bg.label}
+            title={t(bg.labelKey)}
             className={`
               w-7 h-7 rounded-lg border-2 transition-all
               ${value === bg.color 
@@ -322,7 +327,7 @@ export function PreviewBackgroundPickerExtended({
             `}
             style={bg.color !== 'transparent' ? { backgroundColor: bg.color } : undefined}
           >
-            <span className="sr-only">{bg.label}</span>
+            <span className="sr-only">{t(bg.labelKey)}</span>
           </button>
         ))}
 
@@ -339,7 +344,7 @@ export function PreviewBackgroundPickerExtended({
                 }
               `}
               style={isCustom ? { backgroundColor: value } : undefined}
-              title="Egen färg"
+              title={t('customColor')}
             >
               {!isCustom && '+'}
             </button>

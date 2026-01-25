@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { LanguageIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +39,7 @@ export function OrganisationLocaleSection({
   organisation,
   onRefresh,
 }: OrganisationLocaleSectionProps) {
+  const t = useTranslations('admin.organisations.locale');
   const { success, error: toastError } = useToast();
   
   const [isSaving, setIsSaving] = useState(false);
@@ -102,7 +104,7 @@ export function OrganisationLocaleSection({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-medium flex items-center gap-2">
           <LanguageIcon className="h-4 w-4" />
-          Språk & Region
+          {t('title')}
         </CardTitle>
         <div className="flex items-center gap-2">
           {hasChanges && (
@@ -112,7 +114,7 @@ export function OrganisationLocaleSection({
               onClick={handleReset}
               className="text-muted-foreground"
             >
-              Ångra
+              {t('undo')}
             </Button>
           )}
           <Button
@@ -120,50 +122,50 @@ export function OrganisationLocaleSection({
             onClick={handleSave}
             disabled={isSaving || !hasChanges}
           >
-            {isSaving ? "Sparar..." : "Spara"}
+            {isSaving ? t('saving') : t('save')}
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Main language (content language) */}
         <div className="space-y-1.5">
-          <Label className="text-xs">Huvudspråk (innehåll)</Label>
+          <Label className="text-xs">{t('mainLanguage')}</Label>
           <Select
             value={mainLanguage}
             onChange={(e) => setMainLanguage(e.target.value as LanguageCode)}
             options={languageOptions.map((o) => ({ value: o.value, label: `${o.flag} ${o.label}` }))}
-            placeholder="Välj språk"
+            placeholder={t('selectLanguage')}
           />
           <p className="text-xs text-muted-foreground">
-            Språk för spelinnehåll och media.
+            {t('mainLanguageDescription')}
           </p>
         </div>
         
         {/* Default UI language */}
         <div className="space-y-1.5">
-          <Label className="text-xs">Standardspråk (gränssnitt)</Label>
+          <Label className="text-xs">{t('defaultLanguage')}</Label>
           <Select
             value={defaultLanguage}
             onChange={(e) => setDefaultLanguage(e.target.value)}
             options={languageOptions.map((o) => ({ value: o.value, label: `${o.flag} ${o.label}` }))}
-            placeholder="Välj språk"
+            placeholder={t('selectLanguage')}
           />
           <p className="text-xs text-muted-foreground">
-            Standardspråk för användargränssnittet. Användare kan ändra själva.
+            {t('defaultLanguageDescription')}
           </p>
         </div>
         
         {/* Default theme */}
         <div className="space-y-1.5">
-          <Label className="text-xs">Standardtema</Label>
+          <Label className="text-xs">{t('defaultTheme')}</Label>
           <Select
             value={defaultTheme}
             onChange={(e) => setDefaultTheme(e.target.value)}
             options={themeOptions}
-            placeholder="Välj tema"
+            placeholder={t('selectTheme')}
           />
           <p className="text-xs text-muted-foreground">
-            Standardtema för nya användare. Användare kan ändra i sina inställningar.
+            {t('defaultThemeDescription')}
           </p>
         </div>
         
@@ -171,11 +173,9 @@ export function OrganisationLocaleSection({
         <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
           <LanguageIcon className="h-4 w-4 mt-0.5 shrink-0" />
           <div>
-            <p className="font-medium text-foreground mb-1">Språkstöd</p>
+            <p className="font-medium text-foreground mb-1">{t('languageSupportTitle')}</p>
             <p>
-              Lekbanken stödjer flera språk. Huvudspråket avgör vilket innehåll som visas 
-              för spel och aktiviteter. Användare kan alltid ändra sitt gränssnittsspråk 
-              via sina personliga inställningar.
+              {t('languageSupportDescription')}
             </p>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { CoinsSummary } from "../types";
 
@@ -7,12 +8,13 @@ type CoinsSectionProps = {
 };
 
 export function CoinsSection({ summary }: CoinsSectionProps) {
+  const t = useTranslations("gamification");
   return (
     <section className="space-y-4">
       {/* Section Header */}
       <div className="flex items-center gap-2">
         <span className="text-xl">🪙</span>
-        <h2 className="text-sm font-semibold text-foreground">Mynt</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("coins")}</h2>
       </div>
 
       {/* Balance Card with Shimmer */}
@@ -36,7 +38,7 @@ export function CoinsSection({ summary }: CoinsSectionProps) {
         <div className="rounded-2xl border border-border/50 bg-card overflow-hidden">
           {summary.recentTransactions.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
-              Ingen aktivitet ännu. Spela för att tjäna DiceCoin!
+              {t("noCoinsActivityYet")}
             </div>
           ) : (
             summary.recentTransactions.slice(0, 3).map((tx, index) => {

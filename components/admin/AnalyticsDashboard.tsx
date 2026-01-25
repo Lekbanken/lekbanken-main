@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button, HelpText } from '@/components/ui';
 import {
   ChartBarIcon,
@@ -83,6 +84,7 @@ function StatCard({
 }
 
 export function AnalyticsDashboard() {
+  const t = useTranslations('admin.analytics');
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +112,7 @@ export function AnalyticsDashboard() {
     return (
       <div className="p-8 text-center">
         <ArrowPathIcon className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">Laddar statistik...</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('loading')}</p>
       </div>
     );
   }
@@ -120,7 +122,7 @@ export function AnalyticsDashboard() {
       <div className="p-8 text-center">
         <p className="text-sm text-destructive">{error}</p>
         <Button variant="outline" size="sm" onClick={fetchOverview} className="mt-4">
-          Försök igen
+          {t('retry')}
         </Button>
       </div>
     );
@@ -133,41 +135,41 @@ export function AnalyticsDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold">Analysöversikt</h2>
-          <p className="text-sm text-muted-foreground">Statistik och insikter från dina sessioner</p>
+          <h2 className="text-xl font-semibold">{t('title')}</h2>
+          <p className="text-sm text-muted-foreground">{t('subtitle')}</p>
         </div>
         <Button variant="outline" size="sm" onClick={fetchOverview}>
           <ArrowPathIcon className="h-4 w-4 mr-1" />
-          Uppdatera
+          {t('refresh')}
         </Button>
       </div>
 
       <HelpText variant="info">
-        Statistiken uppdateras i realtid. Klicka på &quot;Uppdatera&quot; för att hämta senaste data.
+        {t('helpText')}
       </HelpText>
 
       {/* Stat cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          title="Totalt antal spel"
+          title={t('stats.totalGames')}
           value={overview.total_games}
           icon={ChartBarIcon}
           color="primary"
         />
         <StatCard
-          title="Totala sessioner"
+          title={t('stats.totalSessions')}
           value={overview.total_sessions}
           icon={PlayCircleIcon}
           color="blue"
         />
         <StatCard
-          title="Aktiva sessioner"
+          title={t('stats.activeSessions')}
           value={overview.active_sessions}
           icon={BoltIcon}
           color="green"
         />
         <StatCard
-          title="Totala deltagare"
+          title={t('stats.totalParticipants')}
           value={overview.total_participants}
           icon={UserGroupIcon}
           color="amber"
@@ -178,16 +180,16 @@ export function AnalyticsDashboard() {
         {/* Recent sessions */}
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Senaste sessioner</h3>
+            <h3 className="text-lg font-semibold">{t('recentSessions.title')}</h3>
             <ClockIcon className="h-5 w-5 text-muted-foreground" />
           </div>
           <HelpText className="mb-3">
-            Visar de senaste spelsessionerna med status och antal deltagare.
+            {t('recentSessions.helpText')}
           </HelpText>
           
           {overview.recent_sessions.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Inga sessioner ännu
+              {t('recentSessions.empty')}
             </p>
           ) : (
             <div className="space-y-3">
@@ -219,16 +221,16 @@ export function AnalyticsDashboard() {
         {/* Popular games */}
         <Card className="p-4">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Populära spel</h3>
+            <h3 className="text-lg font-semibold">{t('popularGames.title')}</h3>
             <ChatBubbleBottomCenterTextIcon className="h-5 w-5 text-muted-foreground" />
           </div>
           <HelpText className="mb-3">
-            Spel rankade efter antal genomförda sessioner.
+            {t('popularGames.helpText')}
           </HelpText>
           
           {overview.popular_games.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Inga spel har körts ännu
+              {t('popularGames.empty')}
             </p>
           ) : (
             <div className="space-y-3">

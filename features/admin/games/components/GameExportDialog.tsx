@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Button,
   Dialog,
@@ -56,6 +57,7 @@ export function GameExportDialog({
   totalCount,
   tenantId,
 }: GameExportDialogProps) {
+  const t = useTranslations('admin.games.export');
   const [options, setOptions] = useState<ExportOptions>(defaultOptions);
   const [isExporting, setIsExporting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +92,7 @@ export function GameExportDialog({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || 'Export misslyckades');
+        throw new Error(errorData.error || t('exportFailed'));
       }
 
       // Get filename from Content-Disposition header
@@ -113,7 +115,7 @@ export function GameExportDialog({
       onOpenChange(false);
     } catch (err) {
       console.error('Export failed:', err);
-      setError(err instanceof Error ? err.message : 'Ett oväntat fel uppstod');
+      setError(err instanceof Error ? err.message : t('unexpectedError'));
     } finally {
       setIsExporting(false);
     }
@@ -130,16 +132,16 @@ export function GameExportDialog({
           <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-accent/20">
             <ArrowDownTrayIcon className="h-6 w-6 text-primary" />
           </div>
-          <DialogTitle>Exportera lekar</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Välj format och innehåll för exporten. CSV-format fungerar bra i Excel och Google Sheets.
+            {t('description')}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-4">
           {/* Format selection */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">Välj exportformat</label>
+            <label className="text-sm font-medium text-foreground">{t('selectFormat')}</label>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -170,7 +172,7 @@ export function GameExportDialog({
                 <DocumentTextIcon className="h-8 w-8 text-muted-foreground" />
                 <div className="text-center">
                   <div className="font-medium">JSON</div>
-                  <div className="text-xs text-muted-foreground">Fullständig backup</div>
+                  <div className="text-xs text-muted-foreground">{t('fullBackup')}</div>
                 </div>
               </button>
             </div>
@@ -178,11 +180,11 @@ export function GameExportDialog({
 
           {/* Content selection */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">Inkludera</label>
+            <label className="text-sm font-medium text-foreground">{t('include')}</label>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="includeSteps" className="text-sm cursor-pointer">
-                  Steg / instruktioner
+                  {t('stepsInstructions')}
                 </Label>
                 <Switch
                   id="includeSteps"
@@ -192,7 +194,7 @@ export function GameExportDialog({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="includeMaterials" className="text-sm cursor-pointer">
-                  Material och förberedelser
+                  {t('materialsPreparation')}
                 </Label>
                 <Switch
                   id="includeMaterials"
@@ -202,7 +204,7 @@ export function GameExportDialog({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="includePhases" className="text-sm cursor-pointer">
-                  Faser (om tillämpligt)
+                  {t('phasesIfApplicable')}
                 </Label>
                 <Switch
                   id="includePhases"
@@ -212,7 +214,7 @@ export function GameExportDialog({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="includeRoles" className="text-sm cursor-pointer">
-                  Roller (om tillämpligt)
+                  {t('rolesIfApplicable')}
                 </Label>
                 <Switch
                   id="includeRoles"
@@ -222,7 +224,7 @@ export function GameExportDialog({
               </div>
               <div className="flex items-center justify-between">
                 <Label htmlFor="includeBoardConfig" className="text-sm cursor-pointer">
-                  Tavla-inställningar (om tillämpligt)
+                  {t('boardConfigIfApplicable')}
                 </Label>
                 <Switch
                   id="includeBoardConfig"
@@ -235,7 +237,7 @@ export function GameExportDialog({
 
           {/* Scope selection */}
           <div className="space-y-3">
-            <label className="text-sm font-medium text-foreground">Lekar att exportera</label>
+            <label className="text-sm font-medium text-foreground">{t('gamesToExport')}</label>
             <div className="space-y-2">
               <label className="flex items-center gap-3">
                 <input
@@ -246,7 +248,7 @@ export function GameExportDialog({
                   className="h-4 w-4 text-primary focus:ring-primary"
                 />
                 <span className="text-sm">
-                  Alla synliga lekar <span className="text-muted-foreground">({totalCount} st)</span>
+                  {t('allVisibleGames')} <span className="text-muted-foreground">({totalCount} {t('count')})</span>
                 </span>
               </label>
               <label className={cn('flex items-center gap-3', !hasSelection && 'opacity-50')}>
@@ -259,9 +261,9 @@ export function GameExportDialog({
                   className="h-4 w-4 text-primary focus:ring-primary"
                 />
                 <span className="text-sm">
-                  Markerade lekar{' '}
+                  {t('selectedGames')}{' '}
                   <span className="text-muted-foreground">
-                    ({hasSelection ? `${selectedIds.length} st` : 'ingen markerad'})
+                    ({hasSelection ? `${selectedIds.length} ${t('count')}` : t('noneSelected')})
                   </span>
                 </span>
               </label>
@@ -275,11 +277,11 @@ export function GameExportDialog({
 
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Avbryt
+            {t('cancel')}
           </Button>
           <Button onClick={handleExport} disabled={isExporting || exportCount === 0}>
             <ArrowDownTrayIcon className="mr-2 h-4 w-4" />
-            {isExporting ? 'Exporterar...' : `Ladda ner (${exportCount} lekar)`}
+            {isExporting ? t('exporting') : t('download', { count: exportCount })}
           </Button>
         </DialogFooter>
       </DialogContent>

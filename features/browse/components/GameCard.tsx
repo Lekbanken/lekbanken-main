@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { BoltIcon, ClockIcon, HomeIcon, SunIcon, UsersIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -46,6 +47,7 @@ const playModeConfig: Record<
 };
 
 export function GameCard({ game, layout = "grid" }: GameCardProps) {
+  const t = useTranslations("browse");
   const energy = energyConfig[game.energyLevel];
   const EnvIcon = environmentConfig[game.environment].icon;
   const isList = layout === "list";
@@ -123,7 +125,7 @@ export function GameCard({ game, layout = "grid" }: GameCardProps) {
               <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              {game.ageRange} år
+              {t("gameCard.ageYears", { age: game.ageRange })}
             </span>
             <span className="inline-flex items-center gap-1 rounded-full bg-muted/60 px-2.5 py-1 text-muted-foreground">
               <EnvIcon className="h-3 w-3" aria-hidden />

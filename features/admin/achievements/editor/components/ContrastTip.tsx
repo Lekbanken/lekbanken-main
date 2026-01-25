@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { LightBulbIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import { getContrastRatio } from '../hooks/useContrastCheck';
 
@@ -14,11 +15,14 @@ type ContrastTipProps = {
   compact?: boolean;
 };
 
-function getContrastLabel(ratio: number): string {
-  if (ratio >= 7) return 'Utmärkt';
-  if (ratio >= 4.5) return 'Bra';
-  if (ratio >= 3) return 'Acceptabel';
-  return 'Låg';
+function useContrastLabel() {
+  const t = useTranslations('admin.achievements.editor');
+  return (ratio: number): string => {
+    if (ratio >= 7) return t('contrast.excellent');
+    if (ratio >= 4.5) return t('contrast.good');
+    if (ratio >= 3) return t('contrast.acceptable');
+    return t('contrast.low');
+  };
 }
 
 /**
@@ -31,6 +35,8 @@ export function ContrastTip({
   showAlways = false,
   compact = false 
 }: ContrastTipProps) {
+  const t = useTranslations('admin.achievements.editor');
+  const getContrastLabel = useContrastLabel();
   const contrast = getContrastRatio(foreground, background);
   const meetsAA = contrast >= 4.5;
   const meetsAAA = contrast >= 7;
@@ -69,13 +75,13 @@ export function ContrastTip({
         </div>
         <div className="flex-1 space-y-1">
           <p className={`text-sm font-medium ${colors.text}`}>
-            {colors.icon} Kontrast: {label}
+            {colors.icon} {t('contrast.label')}: {label}
           </p>
           <p className="text-xs text-muted-foreground">
-            Kontrastförhållande {contrast.toFixed(2)}:1. 
-            {!meetsAA && ' Överväg att använda mer kontrasterande färger för bättre synlighet.'}
-            {meetsAA && !meetsAAA && ' Bra för de flesta användningsområden.'}
-            {meetsAAA && ' Utmärkt synlighet.'}
+            {t('contrast.ratio')} {contrast.toFixed(2)}:1. 
+            {!meetsAA && ` ${t('contrast.considerMoreContrast')}`}
+            {meetsAA && !meetsAAA && ` ${t('contrast.goodForMostUses')}`}
+            {meetsAAA && ` ${t('contrast.excellentVisibility')}`}
           </p>
         </div>
       </div>
@@ -92,6 +98,7 @@ type ContrastIndicatorProps = {
 };
 
 export function ContrastIndicator({ foreground, background }: ContrastIndicatorProps) {
+  const t = useTranslations('admin.achievements.editor');
   const contrast = getContrastRatio(foreground, background);
   const meetsAA = contrast >= 4.5;
   const meetsAAA = contrast >= 7;
@@ -106,7 +113,7 @@ export function ContrastIndicator({ foreground, background }: ContrastIndicatorP
   return (
     <span 
       className="inline-flex items-center gap-1 text-xs text-muted-foreground"
-      title={`Kontrast: ${contrast.toFixed(2)}:1`}
+      title={`${t('contrast.label')}: ${contrast.toFixed(2)}:1`}
     >
       <span>{getIcon()}</span>
       <span>{contrast.toFixed(1)}:1</span>
@@ -123,11 +130,12 @@ type ContrastPanelProps = {
 };
 
 export function ContrastPanel({ layers, baseColor }: ContrastPanelProps) {
+  const t = useTranslations('admin.achievements.editor');
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <InformationCircleIcon className="h-4 w-4 text-primary" />
-        <h4 className="text-sm font-medium text-foreground">Färgkontrast</h4>
+        <h4 className="text-sm font-medium text-foreground">{t('contrast.colorContrast')}</h4>
       </div>
       
       <div className="grid gap-1.5">
@@ -136,7 +144,7 @@ export function ContrastPanel({ layers, baseColor }: ContrastPanelProps) {
             key={layer.name}
             className="flex items-center justify-between px-2 py-1 rounded-lg bg-muted/30"
           >
-            <span className="text-xs text-muted-foreground">{layer.name} mot bas:</span>
+            <span className="text-xs text-muted-foreground">{layer.name} {t('contrast.vsBase')}:</span>
             <ContrastIndicator foreground={layer.color} background={baseColor} />
           </div>
         ))}

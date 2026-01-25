@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ interface AdminCommandPaletteProps {
 }
 
 export function AdminCommandPalette({ open, onOpenChange }: AdminCommandPaletteProps) {
+  const t = useTranslations('admin.commandPalette');
   const router = useRouter();
   const { can, isSystemAdmin } = useRbac();
   const [query, setQuery] = useState('');
@@ -276,7 +278,7 @@ export function AdminCommandPalette({ open, onOpenChange }: AdminCommandPaletteP
           <MagnifyingGlassIcon className="h-5 w-5 text-muted-foreground shrink-0" />
           <Input
             type="text"
-            placeholder="Sök kommandon..."
+            placeholder={t('searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="border-0 p-0 text-base placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -293,7 +295,7 @@ export function AdminCommandPalette({ open, onOpenChange }: AdminCommandPaletteP
             <div className="py-12 text-center">
               <CommandLineIcon className="mx-auto h-10 w-10 text-muted-foreground/50" />
               <p className="mt-3 text-sm text-muted-foreground">
-                Inga kommandon hittades för &ldquo;{query}&rdquo;
+                {t('noCommandsFound', { query })}
               </p>
             </div>
           ) : (
@@ -356,17 +358,17 @@ export function AdminCommandPalette({ open, onOpenChange }: AdminCommandPaletteP
             <span className="flex items-center gap-1">
               <kbd className="rounded border border-border bg-background px-1.5 py-0.5">↑</kbd>
               <kbd className="rounded border border-border bg-background px-1.5 py-0.5">↓</kbd>
-              navigera
+              {t('keyboard.navigate')}
             </span>
             <span className="flex items-center gap-1">
               <kbd className="rounded border border-border bg-background px-1.5 py-0.5">↵</kbd>
-              välj
+              {t('keyboard.select')}
             </span>
           </div>
           <span className="flex items-center gap-1">
             <kbd className="rounded border border-border bg-background px-1.5 py-0.5">⌘</kbd>
             <kbd className="rounded border border-border bg-background px-1.5 py-0.5">K</kbd>
-            öppna/stäng
+            {t('keyboard.openClose')}
           </span>
         </div>
       </DialogContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button } from '@/components/ui';
 import {
   ArrowPathIcon,
@@ -98,6 +99,7 @@ type SessionAnalyticsViewerProps = {
 };
 
 export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProps) {
+  const t = useTranslations('admin.sessionAnalytics');
   const [data, setData] = useState<SessionAnalyticsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -126,7 +128,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
     return (
       <div className="p-8 text-center">
         <ArrowPathIcon className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">Laddar sessionsdata...</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('loading')}</p>
       </div>
     );
   }
@@ -134,9 +136,9 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
   if (error || !data) {
     return (
       <div className="p-8 text-center">
-        <p className="text-sm text-destructive">{error || 'Data saknas'}</p>
+        <p className="text-sm text-destructive">{error || t('noData')}</p>
         <Button variant="outline" size="sm" onClick={fetchAnalytics} className="mt-4">
-          Försök igen
+          {t('retry')}
         </Button>
       </div>
     );
@@ -156,7 +158,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
         </div>
         <Button variant="outline" size="sm" onClick={fetchAnalytics}>
           <ArrowPathIcon className="h-4 w-4 mr-1" />
-          Uppdatera
+          {t('refresh')}
         </Button>
       </div>
 
@@ -204,7 +206,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           }`}
         >
           <ChartBarIcon className="h-4 w-4 inline mr-1" />
-          Översikt
+          {t('tabs.overview')}
         </button>
         <button
           onClick={() => setActiveTab('timeline')}
@@ -215,7 +217,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           }`}
         >
           <ChatBubbleBottomCenterTextIcon className="h-4 w-4 inline mr-1" />
-          Tidslinje ({timeline.length})
+          {t('tabs.timeline')} ({timeline.length})
         </button>
         <button
           onClick={() => setActiveTab('timebank')}
@@ -226,7 +228,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           }`}
         >
           <ClockIcon className="h-4 w-4 inline mr-1" />
-          Tidsbank ({time_bank_history.length})
+          {t('tabs.timebank')} ({time_bank_history.length})
         </button>
       </div>
 
@@ -237,10 +239,10 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <SignalIcon className="h-4 w-4" />
-              Händelser per typ
+              {t('overview.eventsByType')}
             </h3>
             {Object.keys(analytics.events_by_type).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Inga händelser</p>
+              <p className="text-sm text-muted-foreground">{t('overview.noEvents')}</p>
             ) : (
               <div className="space-y-2">
                 {Object.entries(analytics.events_by_type)
@@ -259,10 +261,10 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
               <BoltIcon className="h-4 w-4" />
-              Signaler per typ
+              {t('overview.signalsByType')}
             </h3>
             {Object.keys(analytics.signals_by_type).length === 0 ? (
-              <p className="text-sm text-muted-foreground">Inga signaler</p>
+              <p className="text-sm text-muted-foreground">{t('overview.noSignals')}</p>
             ) : (
               <div className="space-y-2">
                 {Object.entries(analytics.signals_by_type)
@@ -280,7 +282,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           {/* Decisions summary */}
           <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              🗳️ Omröstningar
+              🗳️ {t('decisions.title')}
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -301,7 +303,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
           {/* Session info */}
           <Card className="p-4">
             <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
-              📋 Sessioninfo
+              📋 {t('sessionInfo.title')}
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -329,7 +331,7 @@ export function SessionAnalyticsViewer({ sessionId }: SessionAnalyticsViewerProp
         <Card className="p-4">
           {timeline.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Inga händelser att visa
+              {t('timeline.empty')}
             </p>
           ) : (
             <div className="space-y-2 max-h-[500px] overflow-y-auto">

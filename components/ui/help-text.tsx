@@ -1,4 +1,7 @@
+'use client'
+
 import { type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { InformationCircleIcon, LightBulbIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 
 // =============================================================================
@@ -188,15 +191,16 @@ export function EmptyStateGuide({
   onAction,
   className = '',
 }: EmptyStateGuideProps) {
+  const t = useTranslations('common.ui');
   return (
     <div
       className={`text-center py-8 px-4 border-2 border-dashed border-muted rounded-lg ${className}`}
     >
       <p className="text-sm text-muted-foreground mb-1">
-        Du har inga {itemName} ännu.
+        {t('emptyState.noItemsYet', { itemName })}
       </p>
       <p className="text-xs text-muted-foreground mb-4">
-        Lägg till {itemName} för {benefit}.
+        {t('emptyState.addItemsFor', { itemName, benefit })}
       </p>
       {onAction && (
         <button

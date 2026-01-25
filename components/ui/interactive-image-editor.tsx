@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -121,6 +122,7 @@ async function resolvePreviewUrlFromRef(ref: StorageRef): Promise<string> {
 }
 
 export function InteractiveImageEditor({ value, tenantId, disabled = false, onChange }: InteractiveImageEditorProps) {
+  const t = useTranslations('common.ui')
   const containerRef = useRef<HTMLDivElement>(null)
 
   const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null)
@@ -259,7 +261,7 @@ export function InteractiveImageEditor({ value, tenantId, disabled = false, onCh
 
       <Card className="p-4 space-y-3">
         <p className="text-sm text-muted-foreground">
-          Klicka i bilden för att lägga ut en hotspot.
+          {t('imageEditor.clickToAddHotspot')}
         </p>
 
         {effectivePreviewError && (
@@ -268,7 +270,7 @@ export function InteractiveImageEditor({ value, tenantId, disabled = false, onCh
 
         {!effectivePreviewUrl ? (
           <div className="rounded-md border border-border p-4 text-sm text-muted-foreground">
-            Ladda upp en bild för att börja.
+            {t('imageEditor.uploadToStart')}
           </div>
         ) : (
           <div
@@ -328,12 +330,12 @@ export function InteractiveImageEditor({ value, tenantId, disabled = false, onCh
               setSelectedZoneId(null)
             }}
           >
-            Rensa
+            {t('imageEditor.clear')}
           </Button>
         </div>
 
         {zones.length === 0 ? (
-          <p className="text-sm text-muted-foreground">Inga hotspots ännu.</p>
+          <p className="text-sm text-muted-foreground">{t('imageEditor.noHotspotsYet')}</p>
         ) : (
           <div className="space-y-3">
             {selectedZone ? (
@@ -385,7 +387,7 @@ export function InteractiveImageEditor({ value, tenantId, disabled = false, onCh
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Välj en hotspot i bilden för att redigera.</p>
+              <p className="text-sm text-muted-foreground">{t('imageEditor.selectHotspotToEdit')}</p>
             )}
 
             <div className="rounded-md border border-border">

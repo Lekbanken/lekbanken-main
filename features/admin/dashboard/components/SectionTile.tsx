@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 
@@ -17,6 +18,7 @@ type SectionTileProps = {
 const defaultGradient = "from-primary to-purple-600";
 
 export function SectionTile({ title, description, href, icon, badge, iconGradient, stat }: SectionTileProps) {
+  const t = useTranslations('admin.dashboard');
   const gradient = iconGradient || defaultGradient;
   
   return (
@@ -51,7 +53,7 @@ export function SectionTile({ title, description, href, icon, badge, iconGradien
           
           {/* Footer action */}
           <div className="flex items-center gap-1 text-sm font-medium text-primary">
-            Öppna
+            {t('sectionTile.open')}
             <ChevronRightIcon className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
           </div>
         </CardContent>

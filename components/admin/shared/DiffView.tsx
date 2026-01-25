@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { ArrowRightIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
@@ -52,17 +53,21 @@ interface DiffViewProps {
  */
 export function DiffView({
   diffs,
-  localLabel = 'Lokalt',
-  remoteLabel = 'Stripe',
+  localLabel,
+  remoteLabel,
   onUseLocal,
   onUseRemote,
   isLoading = false,
   className,
 }: DiffViewProps) {
+  const t = useTranslations('admin.diff');
+  const displayLocalLabel = localLabel || t('defaultLocalLabel');
+  const displayRemoteLabel = remoteLabel || t('defaultRemoteLabel');
+  
   if (diffs.length === 0) {
     return (
       <div className={cn('p-4 text-center text-muted-foreground text-sm', className)}>
-        Inga skillnader hittades
+        {t('noDifferences')}
       </div>
     );
   }
@@ -73,7 +78,7 @@ export function DiffView({
       <div className="px-4 py-2 border-b border-amber-200 dark:border-amber-800 flex items-center gap-2">
         <span className="text-amber-600 dark:text-amber-400">⚠️</span>
         <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
-          Ändringar ej synkade ({diffs.length} fält)
+          {t('changesNotSynced', { count: diffs.length })}
         </span>
       </div>
 
@@ -83,16 +88,16 @@ export function DiffView({
           <thead>
             <tr className="border-b border-amber-200 dark:border-amber-800">
               <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-200">
-                Fält
+                {t('fieldHeader')}
               </th>
               <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-200">
-                {localLabel}
+                {displayLocalLabel}
               </th>
               <th className="px-4 py-2 text-center text-amber-600 dark:text-amber-400">
                 →
               </th>
               <th className="px-4 py-2 text-left font-medium text-amber-800 dark:text-amber-200">
-                {remoteLabel}
+                {displayRemoteLabel}
               </th>
             </tr>
           </thead>
@@ -131,9 +136,9 @@ export function DiffView({
               disabled={isLoading}
               className="gap-1"
             >
-              Använd {localLabel}
+              {t('useLocal', { local: displayLocalLabel })}
               <ArrowRightIcon className="h-3 w-3" />
-              {remoteLabel}
+              {displayRemoteLabel}
             </Button>
           )}
           {onUseRemote && (
@@ -145,7 +150,7 @@ export function DiffView({
               className="gap-1"
             >
               <ArrowLeftIcon className="h-3 w-3" />
-              Hämta från {remoteLabel}
+              {t('fetchFrom', { remote: displayRemoteLabel })}
             </Button>
           )}
         </div>
@@ -164,10 +169,11 @@ interface DiffValueProps {
 }
 
 function DiffValue({ value, variant }: DiffValueProps) {
+  const t = useTranslations('admin.diff');
   if (value === null || value === '') {
     return (
       <span className="text-muted-foreground italic text-xs">
-        (tomt)
+        {t('emptyValue')}
       </span>
     );
   }

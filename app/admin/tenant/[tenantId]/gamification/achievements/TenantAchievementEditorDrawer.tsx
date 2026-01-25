@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useTransition, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button, Input, Textarea } from '@/components/ui';
 import { Label } from '@/components/ui/label';
 import {
@@ -51,6 +52,7 @@ function AchievementForm({
   onClose: () => void;
   onSave: () => void;
 }) {
+  const t = useTranslations('admin.achievements');
   const isEditing = !!achievement;
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -85,19 +87,19 @@ function AchievementForm({
         if (isEditing && achievement) {
           const result = await updateTenantAchievement(tenantId, achievement.id, formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte uppdatera utmärkelsen');
+            setError(result.error || t('errors.couldNotUpdate'));
             return;
           }
         } else {
           const result = await createTenantAchievement(tenantId, formData);
           if (!result.success) {
-            setError(result.error || 'Kunde inte skapa utmärkelsen');
+            setError(result.error || t('errors.couldNotCreate'));
             return;
           }
         }
         onSave();
       } catch (err) {
-        setError('Ett oväntat fel uppstod');
+        setError(t('errors.unexpected'));
         console.error(err);
       }
     });
@@ -110,12 +112,12 @@ function AchievementForm({
       <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
-            {isEditing ? 'Redigera utmärkelse' : 'Skapa ny utmärkelse'}
+            {isEditing ? t('drawer.editTitle') : t('drawer.createTitle')}
           </SheetTitle>
           <SheetDescription>
             {isEditing
-              ? 'Uppdatera utmärkelsens inställningar.'
-              : 'Fyll i informationen för att skapa en ny utmärkelse.'}
+              ? t('drawer.editDescription')
+              : t('drawer.createDescription')}
           </SheetDescription>
         </SheetHeader>
 
@@ -129,12 +131,12 @@ function AchievementForm({
 
           {/* Name */}
           <div className="space-y-2">
-            <Label htmlFor="name">Namn *</Label>
+            <Label htmlFor="name">{t('labels.name')} *</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="T.ex. Första spelet"
+              placeholder={t('drawer.namePlaceholder')}
               required
               maxLength={100}
             />
@@ -142,12 +144,12 @@ function AchievementForm({
 
           {/* Description */}
           <div className="space-y-2">
-            <Label htmlFor="description">Beskrivning</Label>
+            <Label htmlFor="description">{t('labels.description')}</Label>
             <Textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Beskriv hur man uppnår denna utmärkelse..."
+              placeholder={t('drawer.descriptionPlaceholder')}
               rows={3}
               maxLength={500}
             />
@@ -155,22 +157,22 @@ function AchievementForm({
 
           {/* Achievement Key */}
           <div className="space-y-2">
-            <Label htmlFor="achievementKey">Nyckel (valfritt)</Label>
+            <Label htmlFor="achievementKey">{t('labels.key')}</Label>
             <Input
               id="achievementKey"
               value={achievementKey}
               onChange={(e) => setAchievementKey(e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ''))}
-              placeholder="t.ex. first-game"
+              placeholder={t('labels.keyPlaceholder')}
               maxLength={50}
             />
             <p className="text-xs text-slate-500">
-              Unik identifierare för programmatisk referens. Endast små bokstäver, siffror, bindestreck och understreck.
+              {t('labels.keyHelper')}
             </p>
           </div>
 
           {/* Condition Type */}
           <div className="space-y-2">
-            <Label>Villkor *</Label>
+            <Label>{t('labels.condition')} *</Label>
             <div className="grid gap-2">
               {CONDITION_TYPES.map((option) => (
                 <label
@@ -201,24 +203,24 @@ function AchievementForm({
           {/* Condition Value */}
           {showConditionValue && (
             <div className="space-y-2">
-              <Label htmlFor="conditionValue">Tröskelvärde</Label>
+              <Label htmlFor="conditionValue">{t('labels.threshold')}</Label>
               <Input
                 id="conditionValue"
                 type="number"
                 min="1"
                 value={conditionValue}
                 onChange={(e) => setConditionValue(e.target.value)}
-                placeholder="T.ex. 10"
+                placeholder={t('drawer.thresholdPlaceholder')}
               />
               <p className="text-xs text-slate-500">
-                Antal som krävs för att uppnå utmärkelsen.
+                {t('labels.thresholdHelper')}
               </p>
             </div>
           )}
 
           {/* Status */}
           <div className="space-y-2">
-            <Label>Status *</Label>
+            <Label>{t('labels.status')} *</Label>
             <div className="grid gap-2">
               {STATUS_OPTIONS.map((option) => (
                 <label
@@ -249,10 +251,10 @@ function AchievementForm({
           {/* Footer */}
           <SheetFooter className="flex gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-              Avbryt
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" disabled={isPending || !name.trim()}>
-              {isPending ? 'Sparar...' : isEditing ? 'Spara ändringar' : 'Skapa utmärkelse'}
+              {isPending ? t('actions.saving') : isEditing ? t('actions.saveChanges') : t('actions.create')}
             </Button>
           </SheetFooter>
         </form>

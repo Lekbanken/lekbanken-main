@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { BellIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { BellAlertIcon } from '@heroicons/react/24/solid';
 
@@ -56,6 +57,7 @@ export function AdminNotificationsCenter({
   onDismiss,
   className = '',
 }: AdminNotificationsCenterProps) {
+  const t = useTranslations('admin.notifications');
   const [isOpen, setIsOpen] = useState(false);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -143,7 +145,7 @@ export function AdminNotificationsCenter({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border px-4 py-3">
               <h3 className="text-sm font-semibold text-foreground">
-                Notifikationer
+                {t('title')}
               </h3>
               {unreadCount > 0 && onMarkAllAsRead && (
                 <button
@@ -153,7 +155,7 @@ export function AdminNotificationsCenter({
                   className="flex items-center gap-1 text-xs text-primary hover:underline"
                 >
                   <CheckIcon className="h-3.5 w-3.5" />
-                  Markera alla som lästa
+                  {t('markAllAsRead')}
                 </button>
               )}
             </div>
@@ -164,7 +166,7 @@ export function AdminNotificationsCenter({
                 <div className="px-4 py-12 text-center">
                   <BellIcon className="mx-auto h-10 w-10 text-muted-foreground/40" />
                   <p className="mt-3 text-sm text-muted-foreground">
-                    Inga notifikationer
+                    {t('empty')}
                   </p>
                 </div>
               ) : (

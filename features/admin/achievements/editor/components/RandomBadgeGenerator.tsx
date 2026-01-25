@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 import { getAssetsByType } from '../../assets';
 import type { AchievementIconConfig, AchievementAssetType } from '../../types';
@@ -205,12 +206,13 @@ type RandomToolbarProps = {
 };
 
 export function RandomToolbar({ current, onChange }: RandomToolbarProps) {
+  const t = useTranslations('admin.achievements.editor');
   const { randomizeAll, randomizeColors } = useRandomBadge(current, onChange);
 
   return (
     <div className="flex flex-wrap gap-2">
-      <RandomizeButton onClick={randomizeAll} label="Slumpa allt" />
-      <RandomizeButton onClick={randomizeColors} label="Slumpa färger" small />
+      <RandomizeButton onClick={randomizeAll} label={t('randomizeAll')} />
+      <RandomizeButton onClick={randomizeColors} label={t('randomizeColors')} small />
     </div>
   );
 }

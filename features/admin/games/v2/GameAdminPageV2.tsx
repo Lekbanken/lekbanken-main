@@ -574,7 +574,7 @@ export function GameAdminPageV2() {
         <Card className="flex-1 overflow-hidden">
           <CardHeader className="border-b border-border bg-muted/30 px-6 py-4">
             <div className="flex items-center justify-between">
-              <CardTitle>Spelöversikt</CardTitle>
+              <CardTitle>{t('gameOverview')}</CardTitle>
               <Button
                 variant="ghost"
                 size="sm"

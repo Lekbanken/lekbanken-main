@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { AchievementAsset, AchievementAssetType, AchievementLayerStackItem } from "../../types";
 import Image from "next/image";
@@ -14,6 +15,7 @@ type MultiLayerSelectorProps = {
 };
 
 export function MultiLayerSelector({ title, description, type: _type, assets, selected, onChange }: MultiLayerSelectorProps) {
+  const t = useTranslations('admin.achievements.editor');
   const selectedMap = new Set(selected.map((s) => s.id));
   const assetMap = new Map(assets.map((a) => [a.id, a]));
 
@@ -49,7 +51,7 @@ export function MultiLayerSelector({ title, description, type: _type, assets, se
       {/* Selected stack */}
       <div className="space-y-2 rounded-xl border border-border/60 bg-muted/20 p-3">
         {selected.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Inga valda {title.toLowerCase()} än.</p>
+          <p className="text-xs text-muted-foreground">{t('layers.noneSelectedYet', { type: title.toLowerCase() })}</p>
         ) : (
           selected.map((item, idx) => {
             const asset = assetMap.get(item.id);

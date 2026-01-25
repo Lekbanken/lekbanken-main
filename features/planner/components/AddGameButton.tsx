@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { PlusIcon, PauseIcon, PencilSquareIcon, RectangleGroupIcon } from "@heroicons/react/24/outline";
 import {
   DropdownMenu,
@@ -11,6 +12,7 @@ type AddBlockButtonProps = {
 };
 
 export function AddGameButton({ onAdd }: AddBlockButtonProps) {
+  const t = useTranslations('planner');
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -22,27 +24,27 @@ export function AddGameButton({ onAdd }: AddBlockButtonProps) {
             <PlusIcon className="h-4 w-4" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-medium">Lägg till block</p>
-            <p className="text-xs opacity-70">Välj blocktyp</p>
+            <p className="text-sm font-medium">{t('addBlock.title')}</p>
+            <p className="text-xs opacity-70">{t('addBlock.subtitle')}</p>
           </div>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => onAdd("game")}>
           <RectangleGroupIcon className="mr-2 h-4 w-4" />
-          Lägg till lek
+          {t('addBlock.game')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onAdd("pause")}>
           <PauseIcon className="mr-2 h-4 w-4" />
-          Lägg till paus
+          {t('addBlock.pause')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onAdd("preparation")}>
           <PencilSquareIcon className="mr-2 h-4 w-4" />
-          Lägg till förberedelse
+          {t('addBlock.preparation')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onAdd("custom")}>
           <PencilSquareIcon className="mr-2 h-4 w-4" />
-          Lägg till notis
+          {t('addBlock.custom')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -346,6 +346,33 @@
         "browseAction": "Utforsk aktiviteter"
       }
     },
+    "ui": {
+      "audioEditor": {
+        "autoplay": "Autoavspilling",
+        "autoplayDescription": "Prøv å spille automatisk (kan bli blokkert på mobil).",
+        "requireAck": "Krev bekreftelse",
+        "requireAckDescription": "Vis \"Jeg har lyttet\" etter avspilling.",
+        "uploadToPreview": "Last opp en lydfil for å forhåndsvise."
+      },
+      "imageEditor": {
+        "clickToAddHotspot": "Klikk i bildet for å legge til et hotspot.",
+        "uploadToStart": "Last opp et bilde for å starte.",
+        "clear": "Tøm",
+        "noHotspotsYet": "Ingen hotspots ennå.",
+        "selectHotspotToEdit": "Velg et hotspot i bildet for å redigere."
+      },
+      "emptyState": {
+        "noItemsYet": "Du har ingen {itemName} ennå.",
+        "addItemsFor": "Legg til {itemName} for {benefit}."
+      },
+      "mediaPicker": {
+        "showingTemplatesFor": "Viser standardbilder for",
+        "selectPurposeFirst": "Velg et hovedformål først for å se standardbilder",
+        "loading": "Laster...",
+        "noTemplatesForPurpose": "Ingen standardbilder for dette formålet",
+        "noTemplatesFound": "Ingen standardbilder funnet"
+      }
+    },
     "time": {
       "today": "I dag",
       "yesterday": "I går",
@@ -2411,7 +2438,53 @@
             "updateFailed": "Kunne ikke oppdatere achievement",
             "createFailed": "Kunne ikke opprette achievement",
             "unexpected": "En uventet feil oppstod"
-          }
+          },
+          "steps": {
+            "layers": {
+              "name": "Lagvalg",
+              "description": "Velg base, bakgrunner og symbol"
+            },
+            "themeColors": {
+              "name": "Tema og farger",
+              "description": "Tilpass farger og tema"
+            },
+            "metadata": {
+              "name": "Metadata",
+              "description": "Tittel og beskrivelse"
+            },
+            "publishing": {
+              "name": "Publisering",
+              "description": "Gjennomgå og publiser"
+            }
+          },
+          "themeAndColors": "Tema og farger",
+          "themeAndColorsDescription": "Velg tema eller tilpass farger individuelt for hvert lag.",
+          "randomizeColors": "Tilfeldiggjør farger",
+          "quickThemeSelect": "Hurtigvalg tema",
+          "customColorsPerLayer": "Egendefinerte farger per lag",
+          "foreground": "Forgrunn",
+          "layerLabels": {
+            "base": "Base",
+            "background": "Bakgrunn",
+            "symbol": "Symbol"
+          },
+          "backgrounds": {
+            "label": "Bakgrunn",
+            "black": "Svart",
+            "white": "Hvit",
+            "light": "Lys",
+            "dark": "Mørk",
+            "gray": "Grå",
+            "transparent": "Gjennomsiktig"
+          },
+          "selectCustomColor": "Velg egendefinert farge",
+          "custom": "Egendefinert",
+          "customEllipsis": "Egendefinert...",
+          "textColor": "Tekstfarge",
+          "selectCustomTextColor": "Velg egendefinert tekstfarge",
+          "circleBackground": "Sirkelbakgrunn",
+          "customColor": "Egendefinert farge",
+          "cardBackground": "Kortbakgrunn"
         },
         "awardModal": {
           "title": "Tildel achievement",

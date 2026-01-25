@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { 
   TrashIcon, 
   PencilIcon, 
@@ -56,6 +57,7 @@ export function AdminBulkActions<T>({
   allSelected = false,
   className = '',
 }: AdminBulkActionsProps<T>) {
+  const t = useTranslations('admin.bulk');
   const [confirmAction, setConfirmAction] = useState<BulkAction<T> | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -104,9 +106,9 @@ export function AdminBulkActions<T>({
             {selectedItems.length}
           </span>
           <span className="text-sm font-medium text-foreground">
-            {selectedItems.length === 1 ? '1 objekt valt' : `${selectedItems.length} objekt valda`}
+            {selectedItems.length === 1 ? t('oneSelected') : t('multipleSelected', { count: selectedItems.length })}
             {totalItems > selectedItems.length && (
-              <span className="text-muted-foreground"> av {totalItems}</span>
+              <span className="text-muted-foreground"> {t('ofTotal', { total: totalItems })}</span>
             )}
           </span>
 
@@ -115,7 +117,7 @@ export function AdminBulkActions<T>({
               onClick={onSelectAll}
               className="text-sm text-primary hover:underline"
             >
-              Välj alla {totalItems}
+              {t('selectAll', { count: totalItems })}
             </button>
           )}
         </div>
@@ -146,7 +148,7 @@ export function AdminBulkActions<T>({
             className="text-muted-foreground"
           >
             <XMarkIcon className="mr-1 h-4 w-4" />
-            Avmarkera
+            {t('deselect')}
           </Button>
         </div>
       </div>

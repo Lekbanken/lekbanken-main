@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { EyeDropperIcon } from '@heroicons/react/24/outline';
 import { CheckIcon } from '@heroicons/react/24/solid';
@@ -47,6 +48,7 @@ export function ColorInputWithPicker({
   layerName,
   compact = false,
 }: ColorInputWithPickerProps) {
+  const t = useTranslations('admin.achievements.editor');
   const [hexInput, setHexInput] = useState(value);
   const colorInputRef = useRef<HTMLInputElement>(null);
 
@@ -147,7 +149,7 @@ export function ColorInputWithPicker({
             <button
               type="button"
               onClick={openNativeColorPicker}
-              title="Välj egen färg"
+              title={t('colorPicker.selectCustomColor')}
               className={`
                 h-6 w-6 rounded-full border-2 border-dashed border-muted-foreground/50 
                 hover:border-primary transition-all flex items-center justify-center
@@ -207,7 +209,7 @@ export function ColorInputWithPicker({
               className="h-7 w-7 rounded-lg border border-border shadow-inner cursor-pointer hover:ring-2 hover:ring-primary/30 transition-all"
               style={{ backgroundColor: value }}
               onClick={openNativeColorPicker}
-              title="Klicka för att välja egen färg"
+              title={t('colorPicker.clickToSelectColor')}
             />
           </div>
           <input

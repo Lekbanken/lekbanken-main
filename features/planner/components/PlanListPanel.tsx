@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
@@ -24,26 +25,26 @@ interface PlanListPanelProps {
 
 type SortOption = "name-asc" | "name-desc" | "updated-desc" | "updated-asc";
 
-const STATUS_BUTTONS: { value: PlannerStatus | "all"; label: string }[] = [
-  { value: "all", label: "Alla" },
-  { value: "draft", label: "Utkast" },
-  { value: "published", label: "Publicerade" },
-  { value: "modified", label: "Ändrade" },
-  { value: "archived", label: "Arkiverade" },
+const STATUS_BUTTONS: { value: PlannerStatus | "all"; labelKey: string }[] = [
+  { value: "all", labelKey: "filters.all" },
+  { value: "draft", labelKey: "filters.draft" },
+  { value: "published", labelKey: "filters.published" },
+  { value: "modified", labelKey: "filters.modified" },
+  { value: "archived", labelKey: "filters.archived" },
 ];
 
-const VISIBILITY_OPTIONS = [
-  { value: "all", label: "Alla" },
-  { value: "private", label: "Privat" },
-  { value: "tenant", label: "Organisation" },
-  { value: "public", label: "Publik" },
+const VISIBILITY_OPTIONS_KEYS = [
+  { value: "all", labelKey: "filters.all" },
+  { value: "private", labelKey: "filters.private" },
+  { value: "tenant", labelKey: "filters.tenant" },
+  { value: "public", labelKey: "filters.public" },
 ];
 
-const SORT_OPTIONS = [
-  { value: "updated-desc", label: "Nyast" },
-  { value: "updated-asc", label: "Äldst" },
-  { value: "name-asc", label: "A-Ö" },
-  { value: "name-desc", label: "Ö-A" },
+const SORT_OPTIONS_KEYS = [
+  { value: "updated-desc", labelKey: "sort.newest" },
+  { value: "updated-asc", labelKey: "sort.oldest" },
+  { value: "name-asc", labelKey: "sort.aToZ" },
+  { value: "name-desc", labelKey: "sort.zToA" },
 ];
 
 export function PlanListPanel({
@@ -54,6 +55,7 @@ export function PlanListPanel({
   onCreatePlan,
   isCreating = false,
 }: PlanListPanelProps) {
+  const t = useTranslations('planner');
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<PlannerStatus | "all">("all");
   const [visibilityFilter, setVisibilityFilter] = useState<PlannerVisibility | "all">("all");
@@ -101,14 +103,14 @@ export function PlanListPanel({
     <Card className="border-border/60 h-full flex flex-col">
       <CardHeader className="space-y-4">
         <div className="flex items-center justify-between">
-          <CardTitle>Mina planer</CardTitle>
+          <CardTitle>{t('myPlans')}</CardTitle>
           <Button size="sm" variant="outline" className="gap-1" onClick={onCreatePlan} disabled={isCreating}>
             <PlusIcon />
-            Ny plan
+            {t('newPlan')}
           </Button>
         </div>
         <Input
-          placeholder="Sök planer..."
+          placeholder={t('search.placeholder')}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />
@@ -120,7 +122,7 @@ export function PlanListPanel({
               variant={statusFilter === button.value ? "default" : "outline"}
               onClick={() => setStatusFilter(button.value)}
             >
-              {button.label}
+              {t(button.labelKey)}
             </Button>
           ))}
         </div>
@@ -128,13 +130,13 @@ export function PlanListPanel({
           <Select
             value={visibilityFilter}
             onChange={(event) => setVisibilityFilter(event.target.value as PlannerVisibility | "all")}
-            options={VISIBILITY_OPTIONS}
+            options={VISIBILITY_OPTIONS_KEYS.map(o => ({ value: o.value, label: t(o.labelKey) }))}
             className="h-8 text-xs flex-1"
           />
           <Select
             value={sort}
             onChange={(event) => setSort(event.target.value as SortOption)}
-            options={SORT_OPTIONS}
+            options={SORT_OPTIONS_KEYS.map(o => ({ value: o.value, label: t(o.labelKey) }))}
             className="h-8 text-xs w-[120px]"
           />
         </div>
@@ -151,8 +153,8 @@ export function PlanListPanel({
         ) : filteredAndSortedPlans.length === 0 ? (
           <div className="text-center py-8 text-sm text-muted-foreground">
             {search || statusFilter !== "all" || visibilityFilter !== "all"
-              ? "Inga planer matchar filtret"
-              : "Inga planer ännu"}
+              ? t('noPlansByFilter')
+              : t('noPlansYet')}
           </div>
         ) : (
           filteredAndSortedPlans.map((plan) => (

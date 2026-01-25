@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { EmptyState } from "@/components/ui/empty-state";
 import { ErrorState } from "@/components/ui/error-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -308,23 +309,24 @@ export function BrowsePage() {
 
 
   const browseIcon = appNavItems.find((item) => item.href === "/app/browse")?.icon;
+  const t = useTranslations("browse");
 
   return (
     <div className="space-y-4">
                   <PageTitleHeader
         icon={browseIcon}
-        title="UPPTÄCK"
-        subtitle="Hitta rätt aktivitet"
+        title={t("pageTitle")}
+        subtitle={t("pageSubtitle")}
       />
 
       {featuredGames.length > 0 && (
         <section className="rounded-2xl border border-border/60 bg-gradient-to-r from-primary/5 via-card to-card px-4 py-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Utvalda</p>
-              <h2 className="text-lg font-semibold text-foreground">Tips från redaktionen</h2>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">{t("featured.label")}</p>
+              <h2 className="text-lg font-semibold text-foreground">{t("featured.title")}</h2>
             </div>
-            <span className="text-xs text-muted-foreground">{featuredGames.length} aktiviteter</span>
+            <span className="text-xs text-muted-foreground">{t("featured.count", { count: featuredGames.length })}</span>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {featuredGames.map((game) => (
@@ -370,14 +372,14 @@ export function BrowsePage() {
 
       {noAccess && (
         <div className="rounded-xl border border-border/60 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Du saknar tillgång till produkter i denna tenant. Kontakta admin eller välj annan tenant.
+          {t("noAccess")}
         </div>
       )}
 
       {error ? (
         <ErrorState
-          title="Kunde inte ladda aktiviteter"
-          description="Prova att uppdatera sidan eller försök igen senare."
+          title={t("error.title")}
+          description={t("error.description")}
           onRetry={() => window.location.reload()}
         />
       ) : isLoading ? (
@@ -406,9 +408,9 @@ export function BrowsePage() {
         </div>
       ) : games.length === 0 ? (
         <EmptyState
-          title="Inga lekar matchar"
-          description="Prova att ändra sökningen eller justera filtren."
-          action={{ label: "Rensa filter", onClick: handleClearAll }}
+          title={t("empty.title")}
+          description={t("empty.description")}
+          action={{ label: t("empty.clearFilters"), onClick: handleClearAll }}
         />
       ) : (
         <div className="space-y-4">
@@ -417,7 +419,7 @@ export function BrowsePage() {
               <svg className="h-4 w-4 shrink-0 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
-              <span>Använd filter för att hitta aktiviteter som passar din grupp.</span>
+              <span>{t("filterHint")}</span>
             </div>
           )}
           <div

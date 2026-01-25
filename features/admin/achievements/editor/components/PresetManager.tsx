@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Button } from '@/components/ui';
 import {
   BookmarkIcon,
@@ -51,6 +52,7 @@ function savePresetsToStorage(presets: BadgePreset[]) {
  * Stores presets in localStorage for persistence.
  */
 export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: PresetManagerProps) {
+  const t = useTranslations('admin.achievements.editor');
   const [presets, setPresets] = useState<BadgePreset[]>(() => loadPresetsFromStorage());
   const [isNaming, setIsNaming] = useState(false);
   const [newPresetName, setNewPresetName] = useState('');
@@ -85,7 +87,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
     const duplicated: BadgePreset = {
       ...preset,
       id: `preset-${timestamp}`,
-      name: `${preset.name} (kopia)`,
+      name: `${preset.name} (${t('presets.copy')})`,
       createdAt: new Date(timestamp).toISOString(),
     };
     setPresets((prev) => {
@@ -93,7 +95,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
       savePresetsToStorage(updated);
       return updated;
     });
-  }, []);
+  }, [t]);
 
   const handleLoadPreset = (preset: BadgePreset) => {
     onLoadPreset(preset.icon);
@@ -105,7 +107,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
       <div className="flex items-center justify-between">
         <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <BookmarkIcon className="h-4 w-4 text-primary" />
-          Mina Presets
+          {t('presets.myPresets')}
         </h4>
         <Button
           variant="outline"
@@ -114,7 +116,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
           className="h-7 text-xs gap-1"
         >
           <PlusIcon className="h-3.5 w-3.5" />
-          Spara som preset
+          {t('presets.saveAsPreset')}
         </Button>
       </div>
 
@@ -125,7 +127,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
             type="text"
             value={newPresetName}
             onChange={(e) => setNewPresetName(e.target.value)}
-            placeholder="Ge din preset ett namn..."
+            placeholder={t('presets.namePlaceholder')}
             className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             autoFocus
             onKeyDown={(e) => {
@@ -134,10 +136,10 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
             }}
           />
           <Button size="sm" onClick={handleSavePreset} disabled={!newPresetName.trim()} className="h-7">
-            Spara
+            {t('presets.save')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setIsNaming(false)} className="h-7">
-            Avbryt
+            {t('presets.cancel')}
           </Button>
         </div>
       )}
@@ -146,8 +148,8 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
       {presets.length === 0 ? (
         <div className="text-center py-6 text-sm text-muted-foreground">
           <BookmarkIcon className="h-8 w-8 mx-auto mb-2 opacity-30" />
-          <p>Inga sparade presets ännu</p>
-          <p className="text-xs">Spara din nuvarande badge som en preset för att återanvända den</p>
+          <p>{t('presets.noPresetsYet')}</p>
+          <p className="text-xs">{t('presets.noPresetsHint')}</p>
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -191,7 +193,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
                       handleDuplicatePreset(preset);
                     }}
                     className="p-1 rounded bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
-                    title="Duplicera"
+                    title={t('presets.duplicate')}
                   >
                     <DocumentDuplicateIcon className="h-3.5 w-3.5" />
                   </button>
@@ -202,7 +204,7 @@ export function PresetManager({ currentIcon, onLoadPreset, currentTheme }: Prese
                       handleDeletePreset(preset.id);
                     }}
                     className="p-1 rounded bg-muted/80 hover:bg-red-500/20 text-muted-foreground hover:text-red-600 transition-colors"
-                    title="Ta bort"
+                    title={t('presets.delete')}
                   >
                     <TrashIcon className="h-3.5 w-3.5" />
                   </button>

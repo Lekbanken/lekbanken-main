@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   CheckCircleIcon,
   ArrowDownTrayIcon,
@@ -149,8 +150,7 @@ export function GameBulkActionsBar({
   allSelected,
   onActionComplete,
   className = '',
-}: GameBulkActionsBarProps) {
-  const { success, warning, error: showError } = useToast();
+}: GameBulkActionsBarProps) {  const t = useTranslations('admin.games.bulk');  const { success, warning, error: showError } = useToast();
   const [confirmAction, setConfirmAction] = useState<BulkActionConfig | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeSessionsWarning, setActiveSessionsWarning] = useState<{
@@ -258,18 +258,18 @@ export function GameBulkActionsBar({
         {/* Selection Info */}
         <div className="flex items-center gap-3">
           <Badge variant="default" className="text-sm">
-            {selectedCount} valda
+            {t('selectedCount', { count: selectedCount })}
           </Badge>
           <span className="text-sm text-muted-foreground">
-            av {totalGames} spel
+            {t('ofTotal', { total: totalGames })}
           </span>
           {!allSelected && selectedCount < totalGames && (
             <Button variant="link" size="sm" onClick={onSelectAll} className="h-auto p-0">
-              Välj alla {totalGames}
+              {t('selectAll', { count: totalGames })}
             </Button>
           )}
           <Button variant="link" size="sm" onClick={onClearSelection} className="h-auto p-0 text-muted-foreground">
-            Avmarkera
+            {t('deselect')}
           </Button>
         </div>
 
@@ -343,6 +343,7 @@ export function GameExportDialog({
   selectedGames,
   onExport,
 }: ExportDialogProps) {
+  const t = useTranslations('admin.games.bulk.export');
   const [format, setFormat] = useState<'csv' | 'json'>('csv');
   const [includeRelations, setIncludeRelations] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -361,15 +362,15 @@ export function GameExportDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Exportera spel</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
           <DialogDescription>
-            Exportera {selectedGames.length} valda spel.
+            {t('description', { count: selectedGames.length })}
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Format</label>
+            <label className="text-sm font-medium">{t('formatLabel')}</label>
             <div className="flex gap-2">
               <Button
                 variant={format === 'csv' ? 'default' : 'outline'}
@@ -397,15 +398,14 @@ export function GameExportDialog({
               className="rounded"
             />
             <label htmlFor="includeRelations" className="text-sm">
-              Inkludera relationer (steg, faser, roller)
+              {t('includeRelations')}
             </label>
           </div>
 
           {format === 'json' && (
             <div className="rounded-lg border border-border bg-muted/50 p-3">
               <p className="text-xs text-muted-foreground">
-                JSON-export inkluderar fullständig data och är kompatibel med 
-                Legendary-import för återställning.
+                {t('jsonNote')}
               </p>
             </div>
           )}
@@ -413,10 +413,10 @@ export function GameExportDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Avbryt
+            {t('cancel')}
           </Button>
           <Button onClick={handleExport} disabled={isExporting}>
-            {isExporting ? 'Exporterar...' : 'Exportera'}
+            {isExporting ? t('exporting') : t('exportButton')}
           </Button>
         </DialogFooter>
       </DialogContent>

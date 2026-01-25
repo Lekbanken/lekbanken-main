@@ -1,13 +1,15 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { PlayIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 export function CallToActionSection() {
+  const t = useTranslations("gamification");
   return (
     <section className="space-y-4">
       {/* Section Header */}
       <div className="flex items-center gap-2">
         <span className="text-xl">✨</span>
-        <h2 className="text-sm font-semibold text-foreground">Fortsätt tjäna poäng</h2>
+        <h2 className="text-sm font-semibold text-foreground">{t("cta.keepEarning")}</h2>
       </div>
 
       {/* CTA Cards */}
@@ -20,8 +22,8 @@ export function CallToActionSection() {
             <PlayIcon className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-foreground">Fortsätt spela</p>
-            <p className="text-xs text-muted-foreground">Kör nästa lek i din session</p>
+            <p className="text-sm font-semibold text-foreground">{t("cta.continuePlaying")}</p>
+            <p className="text-xs text-muted-foreground">{t("cta.continuePlayingDesc")}</p>
           </div>
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
             +25 XP
@@ -36,8 +38,8 @@ export function CallToActionSection() {
             <ClipboardDocumentListIcon className="h-5 w-5 text-accent" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-foreground">Planera en session</p>
-            <p className="text-xs text-muted-foreground">Bygg nästa träningspass</p>
+            <p className="text-sm font-semibold text-foreground">{t("cta.planSession")}</p>
+            <p className="text-xs text-muted-foreground">{t("cta.planSessionDesc")}</p>
           </div>
           <span className="rounded-full bg-accent/10 px-2.5 py-1 text-xs font-semibold text-accent">
             +15 XP

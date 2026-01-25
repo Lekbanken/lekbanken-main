@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import { ExclamationTriangleIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface AdminErrorStateProps {
@@ -28,26 +29,29 @@ interface AdminErrorStateProps {
  * />
  */
 export function AdminErrorState({
-  title = 'Något gick fel',
-  description = 'Ett fel uppstod. Försök igen senare.',
+  title,
+  description,
   onRetry,
   icon,
   className = '',
 }: AdminErrorStateProps) {
+  const t = useTranslations('admin.states.error');
+  const displayTitle = title || t('defaultTitle');
+  const displayDescription = description || t('defaultDescription');
   return (
     <div className={`flex flex-col items-center justify-center py-12 text-center ${className}`}>
       <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
         {icon || <ExclamationTriangleIcon className="h-7 w-7" />}
       </div>
-      <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{description}</p>
+      <h3 className="text-lg font-semibold text-foreground">{displayTitle}</h3>
+      <p className="mt-1.5 max-w-sm text-sm text-muted-foreground">{displayDescription}</p>
       {onRetry && (
         <button
           onClick={onRetry}
           className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           <ArrowPathIcon className="h-4 w-4" />
-          Försök igen
+          {t('retryButton')}
         </button>
       )}
     </div>

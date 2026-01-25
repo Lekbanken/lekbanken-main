@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAchievementBuilderStore } from './store'
@@ -24,40 +25,32 @@ import {
   CrownDecoration,
 } from './svg'
 
-const baseOptions: { type: BaseType; label: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
-  { type: 'circle', label: 'Cirkel', Icon: CircleBase },
-  { type: 'shield', label: 'Sköld', Icon: ShieldBase },
-]
-
-const symbolOptions: { type: SymbolType; label: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
-  { type: 'flame', label: 'Flamma', Icon: FlameSymbol },
-  { type: 'star', label: 'Stjärna', Icon: StarSymbol },
-  { type: 'shield', label: 'Sköld', Icon: ShieldSymbol },
-  { type: 'wings', label: 'Vingar', Icon: WingsSymbol },
-  { type: 'medal', label: 'Medalj', Icon: MedalSymbol },
-  { type: 'bolt', label: 'Blixt', Icon: BoltSymbol },
-]
-
-const decorationOptions: { type: DecorationType; label: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
-  { type: 'wings', label: 'Vingar', Icon: WingsDecoration },
-  { type: 'laurels', label: 'Lager', Icon: LaurelsDecoration },
-  { type: 'flames', label: 'Flammor', Icon: FlamesDecoration },
-  { type: 'ribbon', label: 'Band', Icon: RibbonDecoration },
-  { type: 'stars', label: 'Stjärnor', Icon: StarsDecoration },
-  { type: 'crown', label: 'Krona', Icon: CrownDecoration },
+const decorationOptions: { type: DecorationType; labelKey: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
+  { type: 'wings', labelKey: 'decorationTypes.wings', Icon: WingsDecoration },
+  { type: 'laurels', labelKey: 'decorationTypes.laurels', Icon: LaurelsDecoration },
+  { type: 'flames', labelKey: 'decorationTypes.flames', Icon: FlamesDecoration },
+  { type: 'ribbon', labelKey: 'decorationTypes.ribbon', Icon: RibbonDecoration },
+  { type: 'stars', labelKey: 'decorationTypes.stars', Icon: StarsDecoration },
+  { type: 'crown', labelKey: 'decorationTypes.crown', Icon: CrownDecoration },
 ]
 
 export function BaseSelector() {
+  const t = useTranslations('achievements')
   const base = useAchievementBuilderStore((s) => s.state.base)
   const setBase = useAchievementBuilderStore((s) => s.setBase)
   const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
 
+  const baseOptions: { type: BaseType; labelKey: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
+    { type: 'circle', labelKey: 'baseTypes.circle', Icon: CircleBase },
+    { type: 'shield', labelKey: 'baseTypes.shield', Icon: ShieldBase },
+  ]
+
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">Välj basform</label>
+        <label className="mb-2 block text-sm font-medium text-foreground">{t('selectBaseShape')}</label>
         <div className="grid grid-cols-2 gap-3">
-          {baseOptions.map(({ type, label, Icon }) => {
+          {baseOptions.map(({ type, labelKey, Icon }) => {
             const isActive = base.type === type
             const color = base.color.mode === 'token' ? tokenToHex(base.color.token) : '#f59e0b'
             return (
@@ -76,7 +69,7 @@ export function BaseSelector() {
                   <Icon color={color} size={48} />
                 </div>
                 <span className={cn('text-sm font-medium', isActive ? 'text-primary' : 'text-muted-foreground')}>
-                  {label}
+                  {t(labelKey)}
                 </span>
               </button>
             )
@@ -89,23 +82,33 @@ export function BaseSelector() {
         value={base.color}
         onChange={(color) => setBase({ ...base, color })}
         currentTheme={currentTheme}
-        label="Basfärg"
+        label={t('baseColor')}
       />
     </div>
   )
 }
 
 export function SymbolSelector() {
+  const t = useTranslations('achievements')
   const symbol = useAchievementBuilderStore((s) => s.state.symbol)
   const setSymbol = useAchievementBuilderStore((s) => s.setSymbol)
   const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
 
+  const symbolOptions: { type: SymbolType; labelKey: string; Icon: React.ComponentType<{ color: string; size: number }> }[] = [
+    { type: 'flame', labelKey: 'symbolTypes.flame', Icon: FlameSymbol },
+    { type: 'star', labelKey: 'symbolTypes.star', Icon: StarSymbol },
+    { type: 'shield', labelKey: 'symbolTypes.shield', Icon: ShieldSymbol },
+    { type: 'wings', labelKey: 'symbolTypes.wings', Icon: WingsSymbol },
+    { type: 'medal', labelKey: 'symbolTypes.medal', Icon: MedalSymbol },
+    { type: 'bolt', labelKey: 'symbolTypes.bolt', Icon: BoltSymbol },
+  ]
+
   return (
     <div className="space-y-4">
       <div>
-        <label className="mb-2 block text-sm font-medium text-foreground">Välj symbol</label>
+        <label className="mb-2 block text-sm font-medium text-foreground">{t('selectSymbol')}</label>
         <div className="grid grid-cols-3 gap-2">
-          {symbolOptions.map(({ type, label, Icon }) => {
+          {symbolOptions.map(({ type, labelKey, Icon }) => {
             const isActive = symbol.type === type
             const color = symbol.color.mode === 'token' ? tokenToHex(symbol.color.token) : '#f59e0b'
             return (
@@ -124,7 +127,7 @@ export function SymbolSelector() {
                   <Icon color={color} size={32} />
                 </div>
                 <span className={cn('text-xs font-medium', isActive ? 'text-primary' : 'text-muted-foreground')}>
-                  {label}
+                  {t(labelKey)}
                 </span>
               </button>
             )
@@ -137,13 +140,14 @@ export function SymbolSelector() {
         value={symbol.color}
         onChange={(color) => setSymbol({ ...symbol, color })}
         currentTheme={currentTheme}
-        label="Symbolf?rg"
+        label={t('symbolColor')}
       />
     </div>
   )
 }
 
 export function DecorationSelector({ position }: { position: 'back' | 'front' }) {
+  const t = useTranslations('achievements')
   const [isAdding, setIsAdding] = useState(false)
   const items = useAchievementBuilderStore((s) =>
     position === 'back' ? s.state.backDecorations : s.state.frontDecorations
@@ -173,30 +177,30 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
     setItems(items.filter((_, i) => i !== idx))
   }
 
-  const positionLabel = position === 'back' ? 'Bakre' : 'Främre'
+  const positionLabel = position === 'back' ? t('positions.back') : t('positions.front')
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-foreground">{positionLabel} dekorationer</span>
+        <span className="text-sm font-medium text-foreground">{t('decorations', { position: positionLabel })}</span>
         <Button size="sm" variant="outline" onClick={() => setIsAdding(!isAdding)}>
-          {isAdding ? 'Avbryt' : '+ Lägg till'}
+          {isAdding ? t('cancel') : t('addDecoration')}
         </Button>
       </div>
 
       {/* Add decoration picker */}
       {isAdding && (
         <div className="rounded-xl border border-dashed border-primary/50 bg-primary/5 p-3">
-          <p className="mb-2 text-xs text-muted-foreground">Välj dekoration att lägga till:</p>
+          <p className="mb-2 text-xs text-muted-foreground">{t('selectDecorationToAdd')}</p>
           <div className="grid grid-cols-3 gap-2">
-            {decorationOptions.map(({ type, label, Icon }) => (
+            {decorationOptions.map(({ type, labelKey, Icon }) => (
               <button
                 key={type}
                 onClick={() => addItem(type)}
                 className="group flex flex-col items-center gap-1 rounded-lg border border-border bg-card p-2 transition-all hover:border-primary hover:shadow-sm"
               >
                 <Icon color="#9ca3af" size={36} />
-                <span className="text-[10px] text-muted-foreground group-hover:text-foreground">{label}</span>
+                <span className="text-[10px] text-muted-foreground group-hover:text-foreground">{t(labelKey)}</span>
               </button>
             ))}
           </div>
@@ -204,7 +208,7 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
       )}
 
       {items.length === 0 && !isAdding && (
-        <p className="text-center text-xs text-muted-foreground">Inga {positionLabel.toLowerCase()} dekorationer</p>
+        <p className="text-center text-xs text-muted-foreground">{t('noDecorations', { position: positionLabel.toLowerCase() })}</p>
       )}
 
       {/* Active decorations */}
@@ -221,7 +225,7 @@ export function DecorationSelector({ position }: { position: 'back' | 'front' })
             >
               {Icon && <Icon color={color} size={40} />}
               <div className="flex-1 space-y-1">
-                <span className="text-sm font-medium text-foreground">{decoration?.label}</span>
+                <span className="text-sm font-medium text-foreground">{decoration?.labelKey ? t(decoration.labelKey) : ''}</span>
                 <ColorSelector
                   value={item.color}
                   onChange={(color) => updateColor(idx, color)}

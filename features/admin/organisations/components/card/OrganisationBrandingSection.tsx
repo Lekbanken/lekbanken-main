@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import {
   PhotoIcon,
   SwatchIcon,
@@ -102,6 +103,7 @@ export function OrganisationBrandingSection({
   isSystemAdmin = false,
   onRefresh,
 }: OrganisationBrandingSectionProps) {
+  const t = useTranslations('admin.organisations.branding');
   const { success, error: toastError } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
@@ -280,7 +282,7 @@ export function OrganisationBrandingSection({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-base font-medium flex items-center gap-2">
           <SwatchIcon className="h-4 w-4" />
-          Branding
+          {t('title')}
         </CardTitle>
         <div className="flex items-center gap-2">
           <Button
@@ -290,14 +292,14 @@ export function OrganisationBrandingSection({
             className="text-muted-foreground"
           >
             <ArrowPathIcon className="h-4 w-4 mr-1" />
-            Återställ
+            {t('reset')}
           </Button>
           <Button
             size="sm"
             onClick={handleSave}
             disabled={isSaving}
           >
-            {isSaving ? "Sparar..." : "Spara"}
+            {isSaving ? t('saving') : t('save')}
           </Button>
         </div>
       </CardHeader>
@@ -309,11 +311,11 @@ export function OrganisationBrandingSection({
               <SparklesIcon className="h-5 w-5 text-primary" />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">Tenant Branding</span>
-                  <Badge variant="outline" className="text-[10px]">Betald funktion</Badge>
+                  <span className="text-sm font-medium">{t('tenantBranding')}</span>
+                  <Badge variant="outline" className="text-[10px]">{t('paidFeature')}</Badge>
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Tillåter organisationen att anpassa logotyp och varumärkesfärger
+                  {t('tenantBrandingDescription')}
                 </p>
               </div>
             </div>
@@ -327,7 +329,7 @@ export function OrganisationBrandingSection({
 
         {/* Logo section */}
         <div className="space-y-3">
-          <Label className="text-sm font-medium">Logotyp</Label>
+          <Label className="text-sm font-medium">{t('logo')}</Label>
           <div className="flex items-start gap-4">
             {/* Logo preview */}
             <div className="h-20 w-20 rounded-xl border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted/30 overflow-hidden">
@@ -359,10 +361,10 @@ export function OrganisationBrandingSection({
                 disabled={isUploading}
               >
                 <PhotoIcon className="h-4 w-4 mr-2" />
-                {isUploading ? "Laddar upp..." : "Ladda upp logo"}
+                {isUploading ? t('uploading') : t('uploadLogo')}
               </Button>
               <p className="text-xs text-muted-foreground">
-                PNG, JPG eller SVG. Max 2MB. Rekommenderad storlek: 200x200px.
+                {t('logoHint')}
               </p>
             </div>
           </div>
@@ -370,7 +372,7 @@ export function OrganisationBrandingSection({
         
         {/* Brand name override */}
         <div className="space-y-1.5">
-          <Label className="text-xs">Varumärkesnamn (override)</Label>
+          <Label className="text-xs">{t('brandNameOverride')}</Label>
           <Input
             value={brandNameOverride}
             onChange={(e) => setBrandNameOverride(e.target.value)}
@@ -378,35 +380,35 @@ export function OrganisationBrandingSection({
             className="h-9"
           />
           <p className="text-xs text-muted-foreground">
-            Lämna tomt för att använda organisationsnamnet.
+            {t('brandNameOverrideHint')}
           </p>
         </div>
         
         {/* Theme selector */}
         <div className="space-y-1.5">
-          <Label className="text-xs">Tema</Label>
+          <Label className="text-xs">{t('theme')}</Label>
           <Select
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
             options={themeOptions.map(o => ({ value: o.value, label: o.label }))}
-            placeholder="Välj tema"
+            placeholder={t('selectTheme')}
           />
         </div>
         
         {/* Color pickers */}
         <div className="grid gap-4 md:grid-cols-3">
           <ColorPicker
-            label="Primär färg"
+            label={t('primaryColor')}
             value={primaryColor}
             onChange={setPrimaryColor}
           />
           <ColorPicker
-            label="Sekundär färg"
+            label={t('secondaryColor')}
             value={secondaryColor}
             onChange={setSecondaryColor}
           />
           <ColorPicker
-            label="Accentfärg"
+            label={t('accentColor')}
             value={accentColor}
             onChange={setAccentColor}
           />
@@ -427,7 +429,7 @@ export function OrganisationBrandingSection({
             style={{ backgroundColor: accentColor || '#f59e0b' }}
           />
           <span className="text-xs text-muted-foreground ml-2">
-            Förhandsgranskning av färgpalett
+            {t('colorPreview')}
           </span>
         </div>
       </CardContent>

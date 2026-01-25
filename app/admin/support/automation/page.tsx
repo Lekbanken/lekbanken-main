@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 import { checkIsSystemAdmin } from '@/app/actions/tickets-admin';
 import { 
   listRoutingRules, 
@@ -55,7 +56,9 @@ export const metadata: Metadata = {
 // ESCALATION BUTTON COMPONENT
 // ============================================
 
-function EscalationButton() {
+async function EscalationButton() {
+  const t = await getTranslations('admin.support.automation');
+  
   async function handleEscalation() {
     'use server';
     const result = await runSlaEscalation();
@@ -69,7 +72,7 @@ function EscalationButton() {
     <form action={handleEscalation}>
       <Button type="submit" variant="primary" className="gap-2">
         <PlayIcon className="h-4 w-4" />
-        Kör SLA-eskalering nu
+        {t('runSlaEscalation')}
       </Button>
     </form>
   );
@@ -80,6 +83,7 @@ function EscalationButton() {
 // ============================================
 
 async function RoutingRulesSection() {
+  const t = await getTranslations('admin.support.automation');
   const result = await listRoutingRules();
   const rules = result.data || [];
 
@@ -88,41 +92,40 @@ async function RoutingRulesSection() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <CogIcon className="h-6 w-6 text-zinc-500" />
-          <Subheading>Routingregler</Subheading>
+          <Subheading>{t('routingRules.title')}</Subheading>
         </div>
         <Button href="/admin/support/automation/rules/new" variant="default" className="gap-2">
           <PlusIcon className="h-4 w-4" />
-          Ny regel
+          {t('routingRules.newRule')}
         </Button>
       </div>
       
       <Text>
-        Routingregler tilldelas automatiskt när nya ärenden skapas. 
-        Regler med lägre prioritetsnummer utvärderas först.
+        {t('routingRules.description')}
       </Text>
 
       {rules.length === 0 ? (
         <div className="rounded-lg border border-dashed border-zinc-300 p-8 text-center dark:border-zinc-700">
           <CogIcon className="mx-auto h-12 w-12 text-zinc-400" />
-          <Text className="mt-2">Inga routingregler har skapats än.</Text>
+          <Text className="mt-2">{t('routingRules.noRulesYet')}</Text>
           <Button 
             href="/admin/support/automation/rules/new" 
             variant="default" 
             className="mt-4 gap-2"
           >
             <PlusIcon className="h-4 w-4" />
-            Skapa första regeln
+            {t('routingRules.createFirstRule')}
           </Button>
         </div>
       ) : (
         <Table className="mt-4">
           <TableHeader>
             <TableRow>
-              <TableHead>Namn</TableHead>
-              <TableHead>Matchning</TableHead>
-              <TableHead>Åtgärd</TableHead>
-              <TableHead>Prioritet</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>{t('table.name')}</TableHead>
+              <TableHead>{t('table.match')}</TableHead>
+              <TableHead>{t('table.action')}</TableHead>
+              <TableHead>{t('table.priority')}</TableHead>
+              <TableHead>{t('table.status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,13 +139,13 @@ async function RoutingRulesSection() {
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {rule.match_category && (
-                      <Badge variant="primary">Kategori: {rule.match_category}</Badge>
+                      <Badge variant="primary">{t('match.category')}: {rule.match_category}</Badge>
                     )}
                     {rule.match_priority && (
-                      <Badge variant="warning">Prioritet: {rule.match_priority}</Badge>
+                      <Badge variant="warning">{t('match.priority')}: {rule.match_priority}</Badge>
                     )}
                     {!rule.match_category && !rule.match_priority && (
-                      <Badge variant="default">Alla ärenden</Badge>
+                      <Badge variant="default">{t('match.allTickets')}</Badge>
                     )}
                   </div>
                 </TableCell>
@@ -152,7 +155,7 @@ async function RoutingRulesSection() {
                       <Badge variant="success">→ {rule.assign_to_user_email}</Badge>
                     )}
                     {rule.set_priority && (
-                      <Badge variant="warning">Prioritet: {rule.set_priority}</Badge>
+                      <Badge variant="warning">{t('match.priority')}: {rule.set_priority}</Badge>
                     )}
                     {rule.set_sla_hours && (
                       <Badge variant="accent">SLA: {rule.set_sla_hours}h</Badge>
@@ -179,6 +182,7 @@ async function RoutingRulesSection() {
 // ============================================
 
 async function NotificationTemplatesSection() {
+  const t = await getTranslations('admin.support.automation');
   const result = await listNotificationTemplates({ includeSystem: true });
   const templates = result.data || [];
 
@@ -187,17 +191,16 @@ async function NotificationTemplatesSection() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <BellIcon className="h-6 w-6 text-zinc-500" />
-          <Subheading>Notifikationsmallar</Subheading>
+          <Subheading>{t('templates.title')}</Subheading>
         </div>
         <Button href="/admin/support/automation/templates/new" variant="default" className="gap-2">
           <PlusIcon className="h-4 w-4" />
-          Ny mall
+          {t('templates.newTemplate')}
         </Button>
       </div>
       
       <Text>
-        Notifikationsmallar styr innehållet i automatiska meddelanden. 
-        Använd variabler som {"{{ticket_title}}"} för dynamiskt innehåll.
+        {t('templates.description')}
       </Text>
 
       <Table className="mt-4">
@@ -263,39 +266,39 @@ async function NotificationTemplatesSection() {
 // ============================================
 
 async function SlaSettingsSection() {
+  const t = await getTranslations('admin.support.automation');
   const isAdmin = await checkIsSystemAdmin();
 
   return (
     <section className="space-y-4">
       <div className="flex items-center gap-3">
         <ClockIcon className="h-6 w-6 text-zinc-500" />
-        <Subheading>SLA & Eskalering</Subheading>
+        <Subheading>{t('sla.title')}</Subheading>
       </div>
       
       <Text>
-        SLA-eskalering körs automatiskt varje timme. 
-        Ärenden som passerat sin deadline eskaleras till högre prioritet.
+        {t('sla.description')}
       </Text>
 
       <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-700">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <Text className="text-sm text-zinc-500">Eskaleringssteg</Text>
+            <Text className="text-sm text-zinc-500">{t('sla.escalationSteps')}</Text>
             <Text className="text-lg font-semibold">
               low → medium → high → urgent
             </Text>
           </div>
           <div>
-            <Text className="text-sm text-zinc-500">Minsta tid mellan eskaleringar</Text>
-            <Text className="text-lg font-semibold">1 timme</Text>
+            <Text className="text-sm text-zinc-500">{t('sla.minTimeBetween')}</Text>
+            <Text className="text-lg font-semibold">{t('sla.oneHour')}</Text>
           </div>
           <div>
-            <Text className="text-sm text-zinc-500">Automatisk körning</Text>
-            <Text className="text-lg font-semibold">Varje timme (cron)</Text>
+            <Text className="text-sm text-zinc-500">{t('sla.autoRun')}</Text>
+            <Text className="text-lg font-semibold">{t('sla.everyHour')}</Text>
           </div>
           <div>
-            <Text className="text-sm text-zinc-500">Status</Text>
-            <Badge variant="success">Aktiv</Badge>
+            <Text className="text-sm text-zinc-500">{t('table.status')}</Text>
+            <Badge variant="success">{t('status.active')}</Badge>
           </div>
         </div>
 
@@ -303,7 +306,7 @@ async function SlaSettingsSection() {
           <div className="mt-6 flex items-center gap-4 border-t border-zinc-200 pt-6 dark:border-zinc-700">
             <EscalationButton />
             <Text className="text-sm text-zinc-500">
-              Manuell körning eskalar alla ärenden som passerat deadline just nu.
+              {t('sla.manualRunDescription')}
             </Text>
           </div>
         )}
@@ -331,6 +334,7 @@ function SectionSkeleton() {
 // ============================================
 
 export default async function SupportAutomationPage() {
+  const t = await getTranslations('admin.support.automation');
   // Check admin access
   const isAdmin = await checkIsSystemAdmin();
   
@@ -345,14 +349,14 @@ export default async function SupportAutomationPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <Heading>Automation</Heading>
+          <Heading>{t('title')}</Heading>
           <Text className="mt-1">
-            Konfigurera automatiska regler, mallar och SLA-inställningar för ärendehantering.
+            {t('pageDescription')}
           </Text>
         </div>
         <Button href="/admin/support" variant="outline" className="gap-2">
           <ArrowPathIcon className="h-4 w-4" />
-          Tillbaka till Support
+          {t('backToSupport')}
         </Button>
       </div>
 

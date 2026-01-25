@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { CurrencyDollarIcon, SparklesIcon } from '@heroicons/react/24/solid';
 import { BadgePreviewEnhanced } from './BadgePreviewEnhanced';
 import type { AchievementIconConfig, AchievementAssetType } from '../../types';
@@ -217,6 +218,8 @@ type PreviewModeToggleProps = {
 };
 
 export function PreviewModeToggle({ mode, onChange }: PreviewModeToggleProps) {
+  const t = useTranslations('admin.achievements.editor');
+
   return (
     <div className="inline-flex rounded-lg border border-border bg-muted/50 p-0.5">
       <button
@@ -230,7 +233,7 @@ export function PreviewModeToggle({ mode, onChange }: PreviewModeToggleProps) {
           }
         `}
       >
-        Bara Utmärkelsen
+        {t('previewMode.badgeOnly')}
       </button>
       <button
         type="button"
@@ -243,7 +246,7 @@ export function PreviewModeToggle({ mode, onChange }: PreviewModeToggleProps) {
           }
         `}
       >
-        Hela Kortet
+        {t('previewMode.fullCard')}
       </button>
     </div>
   );

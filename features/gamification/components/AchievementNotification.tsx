@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { TrophyIcon, XMarkIcon, SparklesIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -69,6 +70,7 @@ export function AchievementNotification({
   onDismiss,
   autoHideDuration = 6000,
 }: AchievementNotificationProps) {
+  const t = useTranslations('gamification');
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -153,7 +155,7 @@ export function AchievementNotification({
               'dark:bg-amber-800/50 dark:hover:bg-amber-700/50',
               'transition-colors',
             )}
-            aria-label="Stäng"
+            aria-label={t('close')}
           >
             <XMarkIcon className="w-4 h-4 text-amber-700 dark:text-amber-300" />
           </button>
@@ -167,7 +169,7 @@ export function AchievementNotification({
           <div className="flex items-center gap-2 mb-4">
             <TrophyIcon className="w-5 h-5 text-amber-600 dark:text-amber-400" />
             <span className="text-sm font-medium text-amber-700 dark:text-amber-300 uppercase tracking-wide">
-              Prestation Upplåst!
+              {t('achievementUnlocked')}
             </span>
           </div>
 
@@ -207,7 +209,7 @@ export function AchievementNotification({
               </p>
               {achievement.points && achievement.points > 0 && (
                 <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-1 animate-fade-in-delayed">
-                  +{achievement.points} poäng
+                  +{achievement.points} {t('points')}
                 </p>
               )}
             </div>

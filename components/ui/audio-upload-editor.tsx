@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -103,6 +104,7 @@ async function resolvePreviewUrlFromRef(ref: StorageRef): Promise<string> {
 }
 
 export function AudioUploadEditor({ value, tenantId, disabled = false, onChange }: AudioUploadEditorProps) {
+  const t = useTranslations('common.ui')
   const [file, setFile] = useState<File | null>(null)
   const [uploadState, setUploadState] = useState<UploadState>({ status: 'idle' })
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
@@ -199,8 +201,8 @@ export function AudioUploadEditor({ value, tenantId, disabled = false, onChange 
       <Card className="p-4 space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-sm font-medium">Autoplay</p>
-            <p className="text-xs text-muted-foreground">Försök spela automatiskt (kan blockas på mobil).</p>
+            <p className="text-sm font-medium">{t('audioEditor.autoplay')}</p>
+            <p className="text-xs text-muted-foreground">{t('audioEditor.autoplayDescription')}</p>
           </div>
           <Switch
             checked={value.autoPlay}
@@ -215,8 +217,8 @@ export function AudioUploadEditor({ value, tenantId, disabled = false, onChange 
 
         <div className="flex items-center justify-between gap-3">
           <div className="space-y-1">
-            <p className="text-sm font-medium">Kräv bekräftelse</p>
-            <p className="text-xs text-muted-foreground">Visa {'"Jag har lyssnat"'} efter uppspelning.</p>
+            <p className="text-sm font-medium">{t('audioEditor.requireAck')}</p>
+            <p className="text-xs text-muted-foreground">{t('audioEditor.requireAckDescription')}</p>
           </div>
           <Switch
             checked={value.requireAck}
@@ -228,7 +230,7 @@ export function AudioUploadEditor({ value, tenantId, disabled = false, onChange 
         {effectivePreviewUrl ? (
           <audio controls src={effectivePreviewUrl} className="w-full" />
         ) : (
-          <p className="text-sm text-muted-foreground">Ladda upp en ljudfil för att förhandslyssna.</p>
+          <p className="text-sm text-muted-foreground">{t('audioEditor.uploadToPreview')}</p>
         )}
       </Card>
     </div>

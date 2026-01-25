@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import { 
   AcademicCapIcon, 
   LockClosedIcon,
@@ -22,6 +23,8 @@ export function TrainingRequiredModal({
   result,
   targetName = 'denna aktivitet',
 }: TrainingRequiredModalProps) {
+  const t = useTranslations('learning')
+  
   if (!isOpen || !result) return null
 
   return (
@@ -34,9 +37,9 @@ export function TrainingRequiredModal({
               <LockClosedIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="font-semibold text-foreground">Utbildning krävs</h2>
+              <h2 className="font-semibold text-foreground">{t('trainingRequired.title')}</h2>
               <p className="text-sm text-muted-foreground">
-                {result.remaining} av {result.total} kurser kvar
+                {t('trainingRequired.remaining', { remaining: result.remaining, total: result.total })}
               </p>
             </div>
           </div>
@@ -51,7 +54,7 @@ export function TrainingRequiredModal({
         {/* Content */}
         <div className="p-4">
           <p className="text-sm text-muted-foreground">
-            Du måste slutföra följande utbildning innan du kan starta {targetName}:
+            {t('trainingRequired.mustComplete', { targetName })}
           </p>
 
           <ul className="mt-4 space-y-2">
@@ -76,7 +79,7 @@ export function TrainingRequiredModal({
           {result.completed > 0 && (
             <div className="mt-4 rounded-lg bg-green-50 p-3 dark:bg-green-900/20">
               <p className="text-sm text-green-700 dark:text-green-400">
-                ✓ Du har redan slutfört {result.completed} av {result.total} kurser!
+                {t('trainingRequired.alreadyCompleted', { completed: result.completed, total: result.total })}
               </p>
             </div>
           )}
@@ -88,14 +91,14 @@ export function TrainingRequiredModal({
             onClick={onClose}
             className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
           >
-            Stäng
+            {t('trainingRequired.close')}
           </button>
           <Link
             href="/app/learning"
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             <AcademicCapIcon className="h-4 w-4" />
-            Gå till utbildning
+            {t('trainingRequired.goToLearning')}
           </Link>
         </div>
       </div>
@@ -112,6 +115,8 @@ type TrainingRequiredBadgeProps = {
 }
 
 export function TrainingRequiredBadge({ result, onClick }: TrainingRequiredBadgeProps) {
+  const t = useTranslations('learning')
+  
   if (!result || result.satisfied) return null
 
   return (
@@ -120,7 +125,7 @@ export function TrainingRequiredBadge({ result, onClick }: TrainingRequiredBadge
       className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:hover:bg-amber-900/50"
     >
       <LockClosedIcon className="h-3 w-3" />
-      {result.remaining} kurs{result.remaining > 1 ? 'er' : ''} krävs
+      {t('trainingRequired.coursesRequired', { count: result.remaining })}
     </button>
   )
 }
@@ -143,6 +148,8 @@ export function RequirementGate({
   children,
   fallback,
 }: RequirementGateProps) {
+  const t = useTranslations('learning')
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -162,16 +169,16 @@ export function RequirementGate({
           </div>
           <div>
             <h3 className="font-semibold text-amber-900 dark:text-amber-200">
-              Utbildning krävs
+              {t('trainingRequired.title')}
             </h3>
             <p className="mt-1 text-sm text-amber-700 dark:text-amber-300">
-              Du måste slutföra {result.remaining} kurs{result.remaining > 1 ? 'er' : ''} innan du kan {targetName || 'använda denna funktion'}.
+              {t('trainingRequired.mustCompleteCount', { count: result.remaining, targetName: targetName || t('trainingRequired.defaultTarget') })}
             </p>
             <Link
               href="/app/learning"
               className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-amber-700 underline hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-100"
             >
-              Gå till utbildning
+              {t('trainingRequired.goToLearning')}
               <ChevronRightIcon className="h-4 w-4" />
             </Link>
           </div>

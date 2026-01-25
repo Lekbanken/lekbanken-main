@@ -435,10 +435,10 @@ export function GameFilterPanel({
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => {
-                        const name = prompt('Namn på filterpreset:');
+                        const name = prompt(t('presets.promptName'));
                         if (name) onSavePreset(name);
                       }}>
-                        Spara nuvarande filter...
+                        {t('presets.saveCurrent')}
                       </DropdownMenuItem>
                     </>
                   )}

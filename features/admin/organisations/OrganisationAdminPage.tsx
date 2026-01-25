@@ -370,17 +370,17 @@ export function OrganisationAdminPage({
 
   return (
     <AdminPageLayout>
-      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Organisationer" }]} />
+      <AdminBreadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: t('breadcrumb') }]} />
 
       <AdminPageHeader
-        title="Organisationer"
-        description="Hantera organisationer, kontaktinfo och prenumerationsstatus."
+        title={t('title')}
+        description={t('description')}
         icon={<BuildingOffice2Icon className="h-6 w-6" />}
         actions={
           canCreateTenant && (
             <Button onClick={() => setCreateOpen(true)} className="gap-2">
               <PlusIcon className="h-4 w-4" />
-              Skapa organisation
+              {t('createButton')}
             </Button>
           )
         }

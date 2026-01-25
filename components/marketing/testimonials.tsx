@@ -1,4 +1,5 @@
 ﻿/* eslint-disable @next/next/no-img-element */
+import { useTranslations } from 'next-intl';
 
 const featuredTestimonial = {
   body: "Lekbanken sparar oss timmar varje vecka och gör det enkelt att dela pass med vikarier.",
@@ -120,6 +121,7 @@ const cx = (...classes: Array<string | false | null | undefined>) =>
   classes.filter(Boolean).join(" ");
 
 export function Testimonials() {
+  const t = useTranslations('marketing');
   return (
     <section
       id="testimonials"
@@ -128,12 +130,12 @@ export function Testimonials() {
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-sm font-semibold text-primary">Testimonials</p>
+          <p className="text-sm font-semibold text-primary">{t('testimonials.tagline')}</p>
           <h2
             id="testimonials-title"
             className="mt-2 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl"
           >
-            Ledare och lärare som redan använder Lekbanken.
+            {t('testimonials.title')}
           </h2>
         </div>
 

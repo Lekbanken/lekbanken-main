@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { PencilIcon, CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button, Input, Textarea } from "@/components/ui";
@@ -15,6 +16,7 @@ export function OrganisationContactSection({
   organisation,
   onUpdate,
 }: OrganisationContactSectionProps) {
+  const t = useTranslations('admin.organisations.contact');
   const [isEditing, setIsEditing] = useState(false);
   const [contactName, setContactName] = useState(organisation.contactName ?? '');
   const [contactEmail, setContactEmail] = useState(organisation.contactEmail ?? '');
@@ -48,7 +50,7 @@ export function OrganisationContactSection({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-base font-semibold">Kontakt & Ägarskap</CardTitle>
+        <CardTitle className="text-base font-semibold">{t('title')}</CardTitle>
         {!isEditing ? (
           <Button variant="ghost" size="sm" onClick={() => setIsEditing(true)}>
             <PencilIcon className="h-4 w-4" />
@@ -67,22 +69,22 @@ export function OrganisationContactSection({
       <CardContent className="space-y-4">
         {/* Contact Name */}
         <div>
-          <label className="text-xs font-medium text-muted-foreground">Primär kontaktperson</label>
+          <label className="text-xs font-medium text-muted-foreground">{t('primaryContact')}</label>
           {isEditing ? (
             <Input
               value={contactName}
               onChange={(e) => setContactName(e.target.value)}
-              placeholder="Namn"
+              placeholder={t('namePlaceholder')}
               className="mt-1"
             />
           ) : (
-            <p className="text-sm">{organisation.contactName || <span className="text-muted-foreground italic">Ej angiven</span>}</p>
+            <p className="text-sm">{organisation.contactName || <span className="text-muted-foreground italic">{t('notSpecified')}</span>}</p>
           )}
         </div>
 
         {/* Contact Email */}
         <div>
-          <label className="text-xs font-medium text-muted-foreground">Kontakt-email</label>
+          <label className="text-xs font-medium text-muted-foreground">{t('contactEmail')}</label>
           {isEditing ? (
             <Input
               type="email"
@@ -98,7 +100,7 @@ export function OrganisationContactSection({
                   {organisation.contactEmail}
                 </a>
               ) : (
-                <span className="text-muted-foreground italic">Ej angiven</span>
+                <span className="text-muted-foreground italic">{t('notSpecified')}</span>
               )}
             </p>
           )}
@@ -106,7 +108,7 @@ export function OrganisationContactSection({
 
         {/* Contact Phone */}
         <div>
-          <label className="text-xs font-medium text-muted-foreground">Telefonnummer</label>
+          <label className="text-xs font-medium text-muted-foreground">{t('phone')}</label>
           {isEditing ? (
             <Input
               type="tel"
@@ -122,7 +124,7 @@ export function OrganisationContactSection({
                   {organisation.contactPhone}
                 </a>
               ) : (
-                <span className="text-muted-foreground italic">Ej angivet</span>
+                <span className="text-muted-foreground italic">{t('notSpecifiedNeutral')}</span>
               )}
             </p>
           )}
@@ -131,19 +133,19 @@ export function OrganisationContactSection({
         {/* Admin Notes */}
         <div className="pt-2 border-t border-border/40">
           <label className="text-xs font-medium text-muted-foreground">
-            Intern anteckning <span className="text-amber-600">(endast system admin)</span>
+            {t('internalNote')} <span className="text-amber-600">{t('systemAdminOnly')}</span>
           </label>
           {isEditing ? (
             <Textarea
               value={adminNotes}
               onChange={(e) => setAdminNotes(e.target.value)}
-              placeholder="Interna anteckningar om denna organisation..."
+              placeholder={t('internalNotePlaceholder')}
               className="mt-1"
               rows={3}
             />
           ) : (
             <p className="text-sm mt-1">
-              {organisation.adminNotes || <span className="text-muted-foreground italic">Inga anteckningar</span>}
+              {organisation.adminNotes || <span className="text-muted-foreground italic">{t('noNotes')}</span>}
             </p>
           )}
         </div>

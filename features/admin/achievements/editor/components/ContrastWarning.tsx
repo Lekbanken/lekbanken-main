@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { ExclamationTriangleIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui';
 import { checkBadgeContrast } from '../hooks/useContrastCheck';
@@ -18,6 +19,7 @@ type ContrastWarningProps = {
  * Provides auto-fix suggestions.
  */
 export function ContrastWarning({ colors, onAutoFix }: ContrastWarningProps) {
+  const t = useTranslations('admin.achievements.editor');
   const result = checkBadgeContrast(colors);
 
   if (result.overallAccessible) {
@@ -29,13 +31,13 @@ export function ContrastWarning({ colors, onAutoFix }: ContrastWarningProps) {
       <div className="flex items-start gap-2">
         <ExclamationTriangleIcon className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1 space-y-1">
-          <p className="text-sm font-medium text-amber-800">Låg kontrast</p>
+          <p className="text-sm font-medium text-amber-800">{t('contrast.lowContrast')}</p>
           
           {!result.symbolOnBase.passes && (
             <div className="text-xs text-amber-700">
-              <p>Symbol kan vara svår att se mot basen.</p>
+              <p>{t('contrast.symbolHardToSee')}</p>
               <p className="text-muted-foreground">
-                Kontrast: {result.symbolOnBase.ratio.toFixed(1)}:1 (rekommenderat: 4.5:1)
+                {t('contrast.ratio')}: {result.symbolOnBase.ratio.toFixed(1)}:1 ({t('contrast.recommended')}: 4.5:1)
               </p>
               {result.symbolOnBase.suggestion && onAutoFix && (
                 <Button
@@ -47,7 +49,7 @@ export function ContrastWarning({ colors, onAutoFix }: ContrastWarningProps) {
                     if (match) onAutoFix(match[0], 'symbol');
                   }}
                 >
-                  Föreslå fix
+                  {t('contrast.suggestFix')}
                 </Button>
               )}
             </div>
@@ -55,9 +57,9 @@ export function ContrastWarning({ colors, onAutoFix }: ContrastWarningProps) {
 
           {!result.baseOnBackground.passes && (
             <div className="text-xs text-amber-700">
-              <p>Basen kan smälta ihop med bakgrunden.</p>
+              <p>{t('contrast.baseMayBlend')}</p>
               <p className="text-muted-foreground">
-                Kontrast: {result.baseOnBackground.ratio.toFixed(1)}:1
+                {t('contrast.ratio')}: {result.baseOnBackground.ratio.toFixed(1)}:1
               </p>
             </div>
           )}
@@ -71,10 +73,11 @@ export function ContrastWarning({ colors, onAutoFix }: ContrastWarningProps) {
  * Success indicator when contrast is good
  */
 export function ContrastSuccess() {
+  const t = useTranslations('admin.achievements.editor');
   return (
     <div className="flex items-center gap-1.5 text-xs text-green-600">
       <CheckCircleIcon className="h-4 w-4" />
-      <span>Bra kontrast</span>
+      <span>{t('contrast.goodContrast')}</span>
     </div>
   );
 }

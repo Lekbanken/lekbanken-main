@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback, type ReactNode } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -89,6 +90,7 @@ export function AdminConfirmDialog({
   confirmPlaceholder,
   isLoading = false,
 }: AdminConfirmDialogProps) {
+  const t = useTranslations('admin.confirm');
   const [inputValue, setInputValue] = useState('');
   const [isConfirming, setIsConfirming] = useState(false);
 
@@ -121,6 +123,10 @@ export function AdminConfirmDialog({
 
   const loading = isLoading || isConfirming;
 
+  // Get button labels with fallback to props
+  const finalConfirmLabel = confirmLabel === 'Bekräfta' ? t('defaultConfirm') : confirmLabel;
+  const finalCancelLabel = cancelLabel === 'Avbryt' ? t('defaultCancel') : cancelLabel;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -139,12 +145,12 @@ export function AdminConfirmDialog({
         {confirmText && (
           <div className="py-4">
             <label className="block text-sm font-medium mb-2">
-              Skriv <code className="px-1 py-0.5 bg-muted rounded text-destructive font-mono">{confirmText}</code> för att bekräfta:
+              {t('typeToConfirm', { confirmText })} <code className="px-1 py-0.5 bg-muted rounded text-destructive font-mono">{confirmText}</code>
             </label>
             <Input
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder={confirmPlaceholder ?? `Skriv ${confirmText}`}
+              placeholder={confirmPlaceholder ?? t('typePlaceholder', { confirmText })}
               autoComplete="off"
               disabled={loading}
             />
@@ -158,7 +164,7 @@ export function AdminConfirmDialog({
             onClick={handleCancel}
             disabled={loading}
           >
-            {cancelLabel}
+            {finalCancelLabel}
           </Button>
           <Button
             type="button"
@@ -166,7 +172,7 @@ export function AdminConfirmDialog({
             onClick={handleConfirm}
             disabled={!isConfirmEnabled || loading}
           >
-            {loading ? 'Vänta...' : confirmLabel}
+            {loading ? t('waiting') : finalConfirmLabel}
           </Button>
         </DialogFooter>
       </DialogContent>

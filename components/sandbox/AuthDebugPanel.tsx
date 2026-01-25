@@ -1,17 +1,19 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 
 export default function AuthDebugPanel() {
+  const t = useTranslations('sandbox')
   const { user, userProfile, effectiveGlobalRole, memberships, isLoading } = useAuth()
   const { currentTenant, tenantRole, isLoadingTenants } = useTenant()
 
   return (
     <div className="rounded-xl border border-border bg-card p-4 shadow-sm">
-      <h2 className="text-lg font-semibold text-foreground">Auth Debug</h2>
+      <h2 className="text-lg font-semibold text-foreground">{t('authDebug.title')}</h2>
       {(isLoading || isLoadingTenants) && (
-        <p className="text-sm text-muted-foreground">Laddar auth/tenant-data...</p>
+        <p className="text-sm text-muted-foreground">{t('authDebug.loading')}</p>
       )}
       {!isLoading && (
         <div className="mt-3 space-y-3 text-sm">

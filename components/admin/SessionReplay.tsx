@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { Card, Button } from '@/components/ui';
 import {
   PlayIcon,
@@ -49,6 +50,7 @@ function EventIcon({ type }: { type: string }) {
 }
 
 export function SessionReplay({ sessionId, events: initialEvents, autoLoad = true }: SessionReplayProps) {
+  const t = useTranslations('admin.sessionReplay');
   const [events, setEvents] = useState<TimelineEvent[]>(initialEvents || []);
   const [loading, setLoading] = useState(!initialEvents);
   const [error, setError] = useState<string | null>(null);
@@ -183,7 +185,7 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
     return (
       <div className="p-8 text-center">
         <ArrowPathIcon className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
-        <p className="mt-2 text-sm text-muted-foreground">Laddar sessionhändelser...</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('loading')}</p>
       </div>
     );
   }
@@ -193,7 +195,7 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
       <div className="p-8 text-center">
         <p className="text-sm text-destructive">{error}</p>
         <Button variant="outline" size="sm" onClick={loadEvents} className="mt-4">
-          Försök igen
+          {t('retry')}
         </Button>
       </div>
     );
@@ -202,7 +204,7 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
   if (events.length === 0) {
     return (
       <Card className="p-6 text-center text-muted-foreground">
-        <p className="text-sm">Inga händelser att spela upp</p>
+        <p className="text-sm">{t('noEvents')}</p>
       </Card>
     );
   }
@@ -214,9 +216,9 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Sessionsuppspelning</h3>
+          <h3 className="text-lg font-semibold">{t('title')}</h3>
           <p className="text-sm text-muted-foreground">
-            {events.length} händelser · {formatTimestamp(events[events.length - 1].timestamp, startTime)} total
+            {t('eventCount', { count: events.length })} · {formatTimestamp(events[events.length - 1].timestamp, startTime)} {t('total')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -283,12 +285,12 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
         {playbackState === 'playing' ? (
           <Button onClick={handlePause} className="px-6">
             <PauseIcon className="h-5 w-5 mr-1" />
-            Pausa
+            {t('controls.pause')}
           </Button>
         ) : (
           <Button onClick={handlePlay} className="px-6">
             <PlayIcon className="h-5 w-5 mr-1" />
-            {currentIndex >= events.length ? 'Börja om' : 'Spela'}
+            {currentIndex >= events.length ? t('controls.restart') : t('controls.play')}
           </Button>
         )}
 
@@ -310,7 +312,7 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
         >
           {visibleEvents.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Tryck på Spela för att börja uppspelningen
+              {t('pressPlayToStart')}
             </p>
           ) : (
             visibleEvents.map((event, idx) => (
@@ -344,7 +346,7 @@ export function SessionReplay({ sessionId, events: initialEvents, autoLoad = tru
       <details className="group">
         <summary className="cursor-pointer text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-2">
           <span className="group-open:rotate-90 transition-transform">▶</span>
-          Alla händelser ({events.length})
+          {t('allEvents', { count: events.length })}
         </summary>
         <Card className="mt-2 p-0 overflow-hidden">
           <div className="max-h-[300px] overflow-y-auto divide-y divide-border">

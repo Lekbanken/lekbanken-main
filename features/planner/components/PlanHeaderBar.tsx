@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -123,6 +124,7 @@ export function PlanHeaderBar({
   isSaving = false,
   isCopying = false,
 }: PlanHeaderBarProps) {
+  const t = useTranslations('planner');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const showPublishButton =
     capabilities.canPublish && (plan.status === "draft" || plan.status === "modified");
@@ -143,7 +145,7 @@ export function PlanHeaderBar({
         {plan.status === "modified" && (
           <span className="flex items-center gap-1 text-xs text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
-            Opublicerade ändringar
+            {t('status.unpublishedChanges')}
           </span>
         )}
 
@@ -179,7 +181,7 @@ export function PlanHeaderBar({
         {isSaving && (
           <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <LoaderIcon />
-            Sparar...
+            {t('actions.saving')}
           </span>
         )}
       </div>
@@ -188,23 +190,23 @@ export function PlanHeaderBar({
         {capabilities.canViewHistory && (
           <Button variant="outline" size="sm" onClick={onOpenVersions}>
             <HistoryIcon />
-            <span className="ml-1.5">Versioner</span>
+            <span className="ml-1.5">{t('header.versions')}</span>
           </Button>
         )}
         <Button variant="outline" size="sm" onClick={onPreview} disabled={!hasBlocks}>
           <EyeIcon />
-          <span className="ml-1.5">Förhandsgranska</span>
+          <span className="ml-1.5">{t('header.preview')}</span>
         </Button>
         {capabilities.canShare && (
           <Button variant="outline" size="sm" onClick={onShare} disabled={!isPlanPublished}>
             <Share2Icon />
-            <span className="ml-1.5">Dela</span>
+            <span className="ml-1.5">{t('header.share')}</span>
           </Button>
         )}
         {capabilities.canExport && (
           <Button variant="outline" size="sm" onClick={onExport} disabled={!hasBlocks}>
             <DownloadIcon />
-            <span className="ml-1.5">Exportera</span>
+            <span className="ml-1.5">{t('header.export')}</span>
           </Button>
         )}
         {capabilities.canCopy && (
@@ -212,12 +214,12 @@ export function PlanHeaderBar({
             {isCopying ? (
               <>
                 <LoaderIcon />
-                <span className="ml-1.5">Kopierar...</span>
+                <span className="ml-1.5">{t('header.copying')}</span>
               </>
             ) : (
               <>
                 <CopyIcon />
-                <span className="ml-1.5">Kopiera</span>
+                <span className="ml-1.5">{t('header.copy')}</span>
               </>
             )}
           </Button>
@@ -227,12 +229,12 @@ export function PlanHeaderBar({
             {isPublishing ? (
               <>
                 <LoaderIcon />
-                Publicerar...
+                {t('header.publishing')}
               </>
             ) : (
               <>
                 <SendIcon />
-                Publicera
+                {t('header.publish')}
               </>
             )}
           </Button>
@@ -251,7 +253,7 @@ export function PlanHeaderBar({
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2Icon />
-                <span className="ml-2">Ta bort plan</span>
+                <span className="ml-2">{t('header.deletePlan')}</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -262,36 +264,36 @@ export function PlanHeaderBar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
-              Åtgärder
+              {t('header.actions')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {capabilities.canViewHistory && (
               <DropdownMenuItem onClick={onOpenVersions}>
                 <HistoryIcon />
-                Versioner
+                {t('header.versions')}
               </DropdownMenuItem>
             )}
             <DropdownMenuItem onClick={onPreview} disabled={!hasBlocks}>
               <EyeIcon />
-              Förhandsgranska
+              {t('header.preview')}
             </DropdownMenuItem>
             {capabilities.canShare && (
               <DropdownMenuItem onClick={onShare} disabled={!isPlanPublished}>
                 <Share2Icon />
-                Dela
+                {t('header.share')}
               </DropdownMenuItem>
             )}
             {capabilities.canExport && (
               <DropdownMenuItem onClick={onExport} disabled={!hasBlocks}>
                 <DownloadIcon />
-                Exportera
+                {t('header.export')}
               </DropdownMenuItem>
             )}
             {capabilities.canCopy && (
               <DropdownMenuItem onClick={onCopy} disabled={isCopying}>
                 <CopyIcon />
-                Kopiera plan
+                {t('header.copyPlan')}
               </DropdownMenuItem>
             )}
             {capabilities.canDelete && (
@@ -302,7 +304,7 @@ export function PlanHeaderBar({
                   className="text-destructive focus:text-destructive"
                 >
                   <Trash2Icon />
-                  Ta bort plan
+                  {t('header.deletePlan')}
                 </DropdownMenuItem>
               </>
             )}
@@ -313,12 +315,12 @@ export function PlanHeaderBar({
             {isPublishing ? (
               <>
                 <LoaderIcon />
-                Publicerar...
+                {t('header.publishing')}
               </>
             ) : (
               <>
                 <SendIcon />
-                Publicera
+                {t('header.publish')}
               </>
             )}
           </Button>
@@ -328,16 +330,15 @@ export function PlanHeaderBar({
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ta bort plan?</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteDialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Är du säker på att du vill ta bort &quot;{plan.name}&quot;? Denna åtgärd kan inte
-              ångras och all data inklusive versioner kommer att raderas permanent.
+              {t('deleteDialog.description', { name: plan.name })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Avbryt</AlertDialogCancel>
+            <AlertDialogCancel>{t('actions.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={onDelete} className="bg-destructive hover:bg-destructive/90">
-              Ta bort
+              {t('actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CheckIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -18,6 +19,7 @@ export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const selectedLang = languages.find((l) => l.code === value);
+  const t = useTranslations('profile');
 
   useEffect(() => {
     const frame = requestAnimationFrame(() => setMounted(true));
@@ -48,7 +50,7 @@ export function LanguageSelector({ value, onChange }: LanguageSelectorProps) {
         <SheetHeader className="text-left">
           <div className="flex items-center gap-2">
             <GlobeAltIcon className="h-5 w-5 text-muted-foreground" />
-            <SheetTitle>Välj språk</SheetTitle>
+            <SheetTitle>{t('selectLanguage')}</SheetTitle>
           </div>
         </SheetHeader>
 

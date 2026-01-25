@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -18,6 +19,7 @@ const RARITY_OPTIONS: { value: Rarity; label: string; color: string }[] = [
 ] as const
 
 export function ExportPanel() {
+  const t = useTranslations('achievements')
   const exportAchievement = useAchievementBuilderStore((s) => s.exportAchievement)
   const [createdBy, setCreatedBy] = useState('')
   const [name, setName] = useState('')
@@ -82,18 +84,18 @@ export function ExportPanel() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-medium text-muted-foreground">Beskrivning</label>
+          <label className="text-xs font-medium text-muted-foreground">{t('export.descriptionLabel')}</label>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Beskriv hur man får denna achievement..."
+            placeholder={t('export.descriptionPlaceholder')}
             rows={2}
             className="w-full resize-none rounded-lg border border-border bg-card px-3 py-2 text-sm placeholder:text-muted-foreground/60 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-xs font-medium text-muted-foreground">Raritet</label>
+          <label className="text-xs font-medium text-muted-foreground">{t('export.rarity')}</label>
           <div className="flex flex-wrap gap-2">
             {RARITY_OPTIONS.map((opt) => (
               <button

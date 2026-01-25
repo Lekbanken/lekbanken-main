@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
+import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { AdminSidebarV2 } from './AdminSidebarV2'
 import { AdminTopbarV2 } from './AdminTopbarV2'
@@ -25,6 +26,7 @@ interface AdminShellV2Props {
 // ---------------------------------------------------------------------------
 
 export function AdminShellV2({ children, systemDesign }: AdminShellV2Props) {
+  const t = useTranslations('admin.nav.shell')
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [loadingTimedOut, setLoadingTimedOut] = useState(false)
@@ -75,11 +77,11 @@ export function AdminShellV2({ children, systemDesign }: AdminShellV2Props) {
           <div className="flex items-center justify-center">
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
           </div>
-          <p className="text-sm">Laddar adminpanelen...</p>
+          <p className="text-sm">{t('loading')}</p>
           {loadingTimedOut && (
             <div className="space-y-3 pt-2">
               <p className="text-xs text-muted-foreground">
-                Det tar ovanligt lång tid. Testa att ladda om eller logga in igen.
+                {t('loadingTimeoutHint')}
               </p>
               <div className="flex justify-center gap-2">
                 <button
@@ -87,14 +89,14 @@ export function AdminShellV2({ children, systemDesign }: AdminShellV2Props) {
                   className="rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-muted transition-colors"
                   onClick={handleLogin}
                 >
-                  Gå till login
+                  {t('goToLogin')}
                 </button>
                 <button
                   type="button"
                   className="rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-muted transition-colors"
                   onClick={handleReset}
                 >
-                  Rensa session
+                  {t('clearSession')}
                 </button>
               </div>
             </div>
@@ -120,11 +122,11 @@ export function AdminShellV2({ children, systemDesign }: AdminShellV2Props) {
             </div>
           </div>
           <div>
-            <p className="text-base font-semibold text-foreground">Ingen admin-åtkomst</p>
+            <p className="text-base font-semibold text-foreground">{t('noAccessTitle')}</p>
             <p className="mt-1 text-sm text-muted-foreground">
               {user
-                ? `Din roll (${effectiveGlobalRole || 'ingen'}) saknar åtkomst till adminpanelen.`
-                : 'Du är inte inloggad.'}
+                ? t('noAccessLoggedIn', { role: effectiveGlobalRole || t('roleNone') })
+                : t('noAccessLoggedOut')}
             </p>
           </div>
           <div className="flex justify-center gap-2 pt-2">

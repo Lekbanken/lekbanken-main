@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { PlanListPanel } from "./components/PlanListPanel";
 import { PlanHeaderBar } from "./components/PlanHeaderBar";
 import { BlockList } from "./components/BlockList";
@@ -71,6 +72,7 @@ type PlannerUICapabilities = PlanCapabilities & {
 };
 
 export function PlannerPage() {
+  const t = useTranslations('planner');
   const router = useRouter();
   const [plans, setPlans] = useState<PlannerPlan[]>([]);
   const [activePlanId, setActivePlanId] = useState<string>("");
@@ -685,9 +687,9 @@ export function PlannerPage() {
                 <Card className="border-border/60">
                   <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div className="space-y-1">
-                      <CardTitle>Block i planen</CardTitle>
+                      <CardTitle>{t('blocks.title')}</CardTitle>
                       <p className="text-sm text-muted-foreground">
-                        Dra, byt ordning och justera tidsåtgång.
+                        {t('blocks.description')}
                       </p>
                     </div>
                   </CardHeader>
@@ -711,17 +713,17 @@ export function PlannerPage() {
                   <Card className="border-border/60">
                     <CardHeader className="flex flex-row items-center justify-between">
                       <div>
-                        <CardTitle>Privata anteckningar</CardTitle>
-                        <p className="text-sm text-muted-foreground">Syns bara för dig.</p>
+                        <CardTitle>{t('notes.private.title')}</CardTitle>
+                        <p className="text-sm text-muted-foreground">{t('notes.private.description')}</p>
                       </div>
-                      <span className="text-xs text-muted-foreground">Autosparar</span>
+                      <span className="text-xs text-muted-foreground">{t('notes.autosave')}</span>
                     </CardHeader>
                     <CardContent>
                       <Textarea
                         value={privateNotes}
                         onChange={(e) => setPrivateNotes(e.target.value)}
                         onBlur={() => void handleSavePrivateNotes()}
-                        placeholder="Anteckningar som bara du kan se..."
+                        placeholder={t('notes.private.placeholder')}
                         className="text-sm resize-none"
                         rows={4}
                       />
@@ -732,17 +734,17 @@ export function PlannerPage() {
                     <Card className="border-border/60">
                       <CardHeader className="flex flex-row items-center justify-between">
                         <div>
-                          <CardTitle>Delade anteckningar</CardTitle>
-                          <p className="text-sm text-muted-foreground">Syns för organisationen.</p>
+                          <CardTitle>{t('notes.shared.title')}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{t('notes.shared.description')}</p>
                         </div>
-                        <span className="text-xs text-muted-foreground">Delad</span>
+                        <span className="text-xs text-muted-foreground">{t('notes.shared.badge')}</span>
                       </CardHeader>
                       <CardContent>
                         <Textarea
                           value={tenantNotes}
                           onChange={(e) => setTenantNotes(e.target.value)}
                           onBlur={() => void handleSaveTenantNotes()}
-                          placeholder="Anteckningar som delas med organisationen..."
+                          placeholder={t('notes.shared.placeholder')}
                           className="text-sm resize-none"
                           rows={4}
                           disabled={!canEditTenantNotes}
@@ -808,8 +810,8 @@ export function PlannerPage() {
                     </div>
                   ) : (
                     <div className="text-center space-y-2">
-                      <div className="text-xl font-semibold text-foreground">Ingen plan vald</div>
-                      <p className="text-muted-foreground">Välj en plan eller skapa en ny</p>
+                      <div className="text-xl font-semibold text-foreground">{t('emptyState.noPlanSelected')}</div>
+                      <p className="text-muted-foreground">{t('emptyState.selectOrCreate')}</p>
                     </div>
                   )}
                 </CardContent>

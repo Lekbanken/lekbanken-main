@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import type { ColorConfig, ColorToken, ThemeId } from '@/types/achievements-builder'
 import { tokenToHex } from './color-utils'
@@ -14,23 +15,16 @@ interface ColorSelectorProps {
   compact?: boolean
 }
 
-const COLOR_TOKENS: { token: ColorToken; label: string }[] = [
-  { token: 'gold', label: 'Guld' },
-  { token: 'silver', label: 'Silver' },
-  { token: 'bronze', label: 'Brons' },
-  { token: 'onyx', label: 'Onyx' },
-  { token: 'emerald', label: 'Smaragd' },
-  { token: 'sapphire', label: 'Safir' },
-  { token: 'ruby', label: 'Rubin' },
-]
+const COLOR_TOKEN_KEYS: ColorToken[] = ['gold', 'silver', 'bronze', 'onyx', 'emerald', 'sapphire', 'ruby']
 
 type ColorMode = 'token' | 'theme' | 'custom'
 
 export function ColorSelector({ value, onChange, currentTheme, label, compact }: ColorSelectorProps) {
+  const t = useTranslations('achievements')
   const [mode, setMode] = useState<ColorMode>(value.mode)
   const [customColor, setCustomColor] = useState(value.mode === 'custom' ? value.value : '#f59e0b')
 
-  const theme = THEME_PRESETS.find((t) => t.id === currentTheme) ?? THEME_PRESETS[0]
+  const theme = THEME_PRESETS.find((th) => th.id === currentTheme) ?? THEME_PRESETS[0]
 
   const handleModeChange = (newMode: ColorMode) => {
     setMode(newMode)
@@ -61,7 +55,7 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
       <div className="space-y-2">
         {label && <label className="text-xs font-medium text-muted-foreground">{label}</label>}
         <div className="flex flex-wrap gap-1">
-          {COLOR_TOKENS.slice(0, 4).map(({ token }) => {
+          {COLOR_TOKEN_KEYS.slice(0, 4).map((token) => {
             const isActive = value.mode === 'token' && value.token === token
             const hex = tokenToHex(token)
             return (
@@ -73,7 +67,7 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
                   isActive ? 'ring-primary ring-2' : 'ring-black/10'
                 )}
                 style={{ backgroundColor: hex }}
-                title={token}
+                title={t(`colorTokens.${token}`)}
               />
             )
           })}
@@ -99,7 +93,7 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
                 : 'text-muted-foreground hover:text-foreground'
             )}
           >
-            {m === 'token' ? 'Token' : m === 'theme' ? 'Tema' : 'Custom'}
+            {t(`colorModes.${m}`)}
           </button>
         ))}
       </div>
@@ -107,9 +101,10 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
       {/* Token colors */}
       {mode === 'token' && (
         <div className="grid grid-cols-4 gap-2">
-          {COLOR_TOKENS.map(({ token, label: tokenLabel }) => {
+          {COLOR_TOKEN_KEYS.map((token) => {
             const isActive = value.mode === 'token' && value.token === token
             const hex = tokenToHex(token)
+            const tokenLabel = t(`colorTokens.${token}`)
             return (
               <button
                 key={token}
@@ -143,7 +138,6 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
           {(['primary', 'secondary', 'accent'] as const).map((from) => {
             const isActive = value.mode === 'theme' && value.from === from
             const hex = theme.colors[from]
-            const labels = { primary: 'Primär', secondary: 'Sekundär', accent: 'Accent' }
             return (
               <button
                 key={from}
@@ -163,7 +157,7 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
                   )}
                   style={{ backgroundColor: hex }}
                 />
-                <span className="text-xs text-muted-foreground">{labels[from]}</span>
+                <span className="text-xs text-muted-foreground">{t(`themeColors.${from}`)}</span>
               </button>
             )
           })}
@@ -183,7 +177,7 @@ export function ColorSelector({ value, onChange, currentTheme, label, compact }:
               />
             </div>
             <div className="flex-1">
-              <label className="mb-1 block text-xs text-muted-foreground">Hex-värde</label>
+              <label className="mb-1 block text-xs text-muted-foreground">{t('hexValue')}</label>
               <input
                 type="text"
                 value={customColor}

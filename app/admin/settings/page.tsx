@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/supabase/auth';
 import { useTenant } from '@/lib/context/TenantContext';
 import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
@@ -23,6 +24,7 @@ interface TenantInfo {
 }
 
 export default function SettingsPage() {
+  const t = useTranslations('admin.settings');
   const { user } = useAuth();
   const { currentTenant } = useTenant();
 
@@ -138,8 +140,8 @@ export default function SettingsPage() {
       <div className="min-h-screen bg-background p-4">
         <div className="max-w-6xl mx-auto pt-20">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-foreground mb-4">Organization Settings</h1>
-            <p className="text-muted-foreground">Du måste vara admin i en organisation för att komma åt denna sidan.</p>
+            <h1 className="text-3xl font-bold text-foreground mb-4">{t('title')}</h1>
+            <p className="text-muted-foreground">{t('requiresAdmin')}</p>
           </div>
         </div>
       </div>
@@ -154,14 +156,14 @@ export default function SettingsPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Cog6ToothIcon className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold text-foreground">Organization Settings</h1>
+            <h1 className="text-4xl font-bold text-foreground">{t('title')}</h1>
           </div>
-          <p className="text-muted-foreground">Hantera organisationsinställningar och information</p>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Laddar...</p>
+            <p className="text-muted-foreground">{t('loading')}</p>
           </div>
         ) : tenantInfo ? (
           <div className="space-y-6">
@@ -169,34 +171,34 @@ export default function SettingsPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm font-medium mb-1">Medlemmar</p>
+                  <p className="text-muted-foreground text-sm font-medium mb-1">{t('members')}</p>
                   <p className="text-3xl font-bold text-foreground">{tenantInfo.member_count}</p>
-                  <p className="text-xs text-muted-foreground mt-2">i organisationen</p>
+                  <p className="text-xs text-muted-foreground mt-2">{t('inOrganization')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm font-medium mb-1">Spel</p>
+                  <p className="text-muted-foreground text-sm font-medium mb-1">{t('games')}</p>
                   <p className="text-3xl font-bold text-foreground">{tenantInfo.game_count}</p>
-                  <p className="text-xs text-muted-foreground mt-2">tillgängliga</p>
+                  <p className="text-xs text-muted-foreground mt-2">{t('available')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm font-medium mb-1">Gamesessioner</p>
+                  <p className="text-muted-foreground text-sm font-medium mb-1">{t('gameSessions')}</p>
                   <p className="text-3xl font-bold text-foreground">{tenantInfo.session_count.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-2">totalt</p>
+                  <p className="text-xs text-muted-foreground mt-2">{t('total')}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardContent className="p-6">
-                  <p className="text-muted-foreground text-sm font-medium mb-1">Prenumerationsstatus</p>
+                  <p className="text-muted-foreground text-sm font-medium mb-1">{t('subscriptionStatus')}</p>
                   <p className="text-lg font-bold text-foreground capitalize mb-2">{tenantInfo.subscription_tier}</p>
                   <Badge variant={tenantInfo.subscription_status === 'active' ? 'default' : 'secondary'}>
-                    {tenantInfo.subscription_status === 'active' ? 'Aktiv' : 'Auktoriserad'}
+                    {tenantInfo.subscription_status === 'active' ? t('active') : t('authorized')}
                   </Badge>
                 </CardContent>
               </Card>
@@ -205,7 +207,7 @@ export default function SettingsPage() {
             {/* Organization Info */}
             <Card>
               <CardHeader className="bg-primary p-4 flex flex-row justify-between items-center">
-                <CardTitle className="text-white">Organisationsinformation</CardTitle>
+                <CardTitle className="text-white">{t('organizationInfo')}</CardTitle>
                 {!isEditing && (
                   <Button
                     variant="outline"
@@ -213,7 +215,7 @@ export default function SettingsPage() {
                     onClick={() => setIsEditing(true)}
                     className="bg-white text-primary hover:bg-muted"
                   >
-                    Redigera
+                    {t('edit')}
                   </Button>
                 )}
               </CardHeader>
@@ -222,7 +224,7 @@ export default function SettingsPage() {
                 {/* Name */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Organisationsnamn
+                    {t('organizationName')}
                   </label>
                   {isEditing ? (
                     <input
@@ -239,16 +241,16 @@ export default function SettingsPage() {
                 {/* Slug */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Slug (URL-vänlig)
+                    {t('slug')}
                   </label>
                   <p className="text-muted-foreground text-sm">{tenantInfo.slug}</p>
-                  <p className="text-xs text-muted-foreground mt-1">Kan inte ändras efter skapande</p>
+                  <p className="text-xs text-muted-foreground mt-1">{t('slugReadonly')}</p>
                 </div>
 
                 {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Beskrivning
+                    {t('description')}
                   </label>
                   {isEditing ? (
                     <textarea
@@ -312,25 +314,25 @@ export default function SettingsPage() {
             {/* Danger Zone */}
             <Card className="border-red-200 bg-red-50">
               <CardHeader className="bg-red-100 p-4">
-                <CardTitle className="text-red-900">Farlig Zon</CardTitle>
+                <CardTitle className="text-red-900">{t('dangerZone')}</CardTitle>
               </CardHeader>
               <CardContent className="p-6">
                 <p className="text-red-900 mb-4">
-                  Dessa åtgärder kan inte ångras. Var försiktig.
+                  {t('dangerWarning')}
                 </p>
                 <Button
                   variant="destructive"
                   disabled
-                  title="Funktionen är inte tillgänglig ännu"
+                  title={t('featureNotAvailable')}
                 >
-                  Ta Bort Organisation
+                  {t('deleteOrganization')}
                 </Button>
               </CardContent>
             </Card>
           </div>
         ) : (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Ingen organisationsinformation tillgänglig</p>
+            <p className="text-muted-foreground">{t('noOrganizationInfo')}</p>
           </div>
         )}
       </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { formatDate } from '@/lib/i18n/format-utils';
 import {
   ClockIcon,
@@ -78,6 +79,7 @@ export function OrganisationAuditSection({
   expanded = false,
 }: OrganisationAuditSectionProps) {
   const router = useRouter();
+  const t = useTranslations('admin.organisations.audit');
   const displayEvents = expanded ? events : events.slice(0, 5);
 
   return (
@@ -85,7 +87,7 @@ export function OrganisationAuditSection({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <ClockIcon className="h-5 w-5 text-primary" />
-          <CardTitle className="text-base font-semibold">Senaste aktivitet</CardTitle>
+          <CardTitle className="text-base font-semibold">{t('title')}</CardTitle>
         </div>
         {!expanded && (
           <Button
@@ -94,7 +96,7 @@ export function OrganisationAuditSection({
             onClick={() => router.push(`/admin/organisations/${tenantId}?tab=audit`)}
             className="text-primary"
           >
-            Full logg
+            {t('fullLog')}
             <ArrowRightIcon className="h-4 w-4 ml-1" />
           </Button>
         )}
@@ -103,7 +105,7 @@ export function OrganisationAuditSection({
         {events.length === 0 ? (
           <div className="text-center py-8">
             <ClockIcon className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">Ingen aktivitet registrerad ännu</p>
+            <p className="text-sm text-muted-foreground">{t('noActivity')}</p>
           </div>
         ) : (
           <div className="space-y-1">
@@ -142,7 +144,7 @@ export function OrganisationAuditSection({
 
         {!expanded && events.length > 5 && (
           <p className="text-xs text-muted-foreground text-center mt-4">
-            +{events.length - 5} fler händelser
+            {t('moreEvents', { count: events.length - 5 })}
           </p>
         )}
       </CardContent>

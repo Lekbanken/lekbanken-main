@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode, ReactElement } from 'react';
+import { useTranslations } from 'next-intl';
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import { MinusIcon } from '@heroicons/react/24/solid';
@@ -238,7 +239,7 @@ export function AdminDataTable<T>({
                     checked={allSelected || someSelected}
                     indeterminate={someSelected && !allSelected}
                     onChange={onToggleAll}
-                    label={allSelected ? 'Avmarkera alla' : 'Markera alla'}
+                    label={allSelected ? 'Deselect all' : 'Select all'}
                   />
                 </th>
               )}
@@ -274,7 +275,7 @@ export function AdminDataTable<T>({
                       <SelectionCheckbox
                         checked={isSelected || false}
                         onChange={() => onToggleRow(row)}
-                        label={isSelected ? 'Avmarkera rad' : 'Markera rad'}
+                        label={isSelected ? 'Deselect row' : 'Select row'}
                       />
                     </td>
                   )}
@@ -317,11 +318,13 @@ interface AdminTableToolbarProps {
 export function AdminTableToolbar({
   searchValue,
   onSearchChange,
-  searchPlaceholder = 'Sök...',
+  searchPlaceholder,
   filters,
   actions,
   className = '',
 }: AdminTableToolbarProps) {
+  const t = useTranslations('admin.table');
+  const placeholder = searchPlaceholder || t('searchPlaceholder');
   return (
     <div className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${className}`}>
       <div className="flex flex-1 flex-wrap items-center gap-2">
@@ -335,9 +338,9 @@ export function AdminTableToolbar({
               type="search"
               value={searchValue || ''}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder={searchPlaceholder}
+              placeholder={placeholder}
               className="w-full rounded-lg border border-border bg-background py-2.5 pl-9 pr-3 text-sm placeholder:text-muted-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              aria-label={searchPlaceholder}
+              aria-label={placeholder}
             />
           </div>
         )}
@@ -374,6 +377,7 @@ export function AdminPagination({
   itemsPerPage,
   className = '',
 }: AdminPaginationProps) {
+  const t = useTranslations('admin.table.pagination');
   if (totalPages <= 1) return null;
 
   const startItem = totalItems && itemsPerPage ? (currentPage - 1) * itemsPerPage + 1 : null;
@@ -382,11 +386,11 @@ export function AdminPagination({
   return (
     <nav 
       className={`flex flex-col items-center justify-between gap-3 sm:flex-row ${className}`}
-      aria-label="Paginering"
+      aria-label={t('ariaLabel')}
     >
       {totalItems !== undefined && startItem && endItem && (
         <p className="text-sm text-muted-foreground">
-          Visar <span className="font-medium text-foreground">{startItem}</span>–<span className="font-medium text-foreground">{endItem}</span> av <span className="font-medium text-foreground">{totalItems}</span>
+          {t('showing')} <span className="font-medium text-foreground">{startItem}</span>–<span className="font-medium text-foreground">{endItem}</span> {t('of')} <span className="font-medium text-foreground">{totalItems}</span>
         </p>
       )}
       <div className="flex items-center gap-1">
@@ -394,10 +398,10 @@ export function AdminPagination({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage <= 1}
           className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Föregående sida"
+          aria-label={t('previousPage')}
         >
           <ChevronLeftIcon className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden sm:inline">Föregående</span>
+          <span className="hidden sm:inline">{t('previous')}</span>
         </button>
         <span className="px-3 text-sm text-muted-foreground" aria-current="page">
           <span className="font-medium text-foreground">{currentPage}</span> / {totalPages}
@@ -406,9 +410,9 @@ export function AdminPagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage >= totalPages}
           className="inline-flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label="Nästa sida"
+          aria-label={t('nextPage')}
         >
-          <span className="hidden sm:inline">Nästa</span>
+          <span className="hidden sm:inline">{t('next')}</span>
           <ChevronRightIcon className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>

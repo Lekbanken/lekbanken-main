@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   useSensors,
   useSensor,
@@ -43,6 +45,7 @@ export function BlockList({
   onDurationChange,
   isReordering = false,
 }: BlockListProps) {
+  const t = useTranslations('planner');
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -64,9 +67,9 @@ export function BlockList({
   if (blocks.length === 0) {
     return (
       <div className="rounded-xl border border-dashed border-border/60 bg-muted/30 p-6 text-center">
-        <p className="text-sm font-medium text-foreground">Inga block ännu</p>
+        <p className="text-sm font-medium text-foreground">{t('blockList.emptyTitle')}</p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Lägg till första blocket för att börja bygga planen.
+          {t('blockList.emptyDescription')}
         </p>
       </div>
     );

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   formatDateLong as formatDateUtil,
   formatRelativeTime as formatRelativeTimeUtil,
@@ -22,6 +23,7 @@ export function OrganisationIdentitySection({
   onUpdate,
   onStatusChange,
 }: OrganisationIdentitySectionProps) {
+  const t = useTranslations('admin.organisations.identity');
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(organisation.name);
   const [isSaving, setIsSaving] = useState(false);
@@ -82,7 +84,7 @@ export function OrganisationIdentitySection({
         {/* Slug - Read only */}
         <div>
           <label className="text-xs font-medium text-muted-foreground">
-            Slug <span className="text-muted-foreground/60">(kan ej ändras)</span>
+            Slug <span className="text-muted-foreground/60">({t('slugReadOnly')})</span>
           </label>
           <p className="text-sm font-mono">{organisation.slug || '-'}</p>
         </div>

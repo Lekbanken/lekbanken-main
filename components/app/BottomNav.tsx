@@ -175,7 +175,7 @@ export function BottomNav() {
           {/* Profile Header */}
           <div className="mt-2 flex flex-col items-center text-center">
             <Avatar src={avatarUrl || undefined} name={displayName} size="xl" className="h-20 w-20 ring-4 ring-primary/20" />
-            <p className="mt-1 text-xs text-muted-foreground">Du är inloggad som</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('app.nav.loggedInAs')}</p>
             <h2 className="mt-1 text-lg font-semibold text-foreground">{displayName}</h2>
             <SheetClose asChild>
               <Link
@@ -186,7 +186,7 @@ export function BottomNav() {
                   <circle cx="12" cy="8" r="5" />
                   <path d="M20 21a8 8 0 1 0-16 0" />
                 </svg>
-                Visa profil
+                {t('app.nav.viewProfile')}
               </Link>
             </SheetClose>
           </div>
@@ -227,8 +227,8 @@ export function BottomNav() {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <span className="font-semibold">Dashboard</span>
-                  <p className="text-xs text-muted-foreground">Gå till startsidan</p>
+                  <span className="font-semibold">{t('app.nav.dashboard')}</span>
+                  <p className="text-xs text-muted-foreground">{t('app.nav.goToDashboard')}</p>
                 </div>
               </Link>
             </SheetClose>
@@ -244,8 +244,8 @@ export function BottomNav() {
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <span className="font-semibold">Marknadsföring</span>
-                  <p className="text-xs text-muted-foreground">Besök hemsidan</p>
+                  <span className="font-semibold">{t('app.nav.marketing')}</span>
+                  <p className="text-xs text-muted-foreground">{t('app.nav.visitWebsite')}</p>
                 </div>
               </Link>
             </SheetClose>
@@ -266,7 +266,7 @@ export function BottomNav() {
                 <polyline points="16 17 21 12 16 7" />
                 <line x1="21" y1="12" x2="9" y2="12" />
               </svg>
-              Logga ut
+              {t('app.nav.logout')}
             </Button>
           </form>
         </SheetContent>

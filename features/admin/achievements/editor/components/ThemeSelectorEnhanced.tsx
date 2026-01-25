@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckIcon, SwatchIcon } from "@heroicons/react/24/outline";
+import { useTranslations } from 'next-intl';
 import type { AchievementTheme } from "../../types";
 import { Badge } from "@/components/ui";
 
@@ -13,12 +14,13 @@ type ThemeSelectorEnhancedProps = {
 };
 
 export function ThemeSelectorEnhanced({ themes, value, mode, onModeChange, onChange }: ThemeSelectorEnhancedProps) {
+  const t = useTranslations('admin.achievements.editor');
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
           <SwatchIcon className="h-4 w-4 text-primary" />
-          Theme presets & mode
+          {t('themePresetsMode')}
         </div>
         <div className="flex rounded-lg border border-border/50 bg-muted/40 p-1 text-xs font-medium">
           {(["theme", "custom"] as const).map((opt) => (
@@ -87,7 +89,7 @@ export function ThemeSelectorEnhanced({ themes, value, mode, onModeChange, onCha
         </div>
       ) : (
         <Badge variant="secondary" size="sm">
-          Custom mode aktivt – använd färgreglagen nedan.
+          {t('customModeActive')}
         </Badge>
       )}
     </div>

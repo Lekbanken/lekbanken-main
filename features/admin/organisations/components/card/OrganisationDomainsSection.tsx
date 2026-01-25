@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { formatDate } from '@/lib/i18n/format-utils';
 import {
   GlobeAltIcon,
@@ -46,6 +47,7 @@ export function OrganisationDomainsSection({
   onRefresh,
   expanded = false,
 }: OrganisationDomainsSectionProps) {
+  const t = useTranslations('admin.organisations.domains');
   const { success, error: toastError } = useToast();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [newHostname, setNewHostname] = useState('');
@@ -149,11 +151,11 @@ export function OrganisationDomainsSection({
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="flex items-center gap-2">
           <GlobeAltIcon className="h-5 w-5 text-primary" />
-          <CardTitle className="text-base font-semibold">Domäner</CardTitle>
+          <CardTitle className="text-base font-semibold">{t('title')}</CardTitle>
         </div>
         <Button size="sm" onClick={() => setIsAddDialogOpen(true)}>
           <PlusIcon className="h-4 w-4 mr-1" />
-          Lägg till
+          {t('add')}
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -164,7 +166,7 @@ export function OrganisationDomainsSection({
               <CheckCircleIcon className="h-5 w-5 text-emerald-600" />
               <div>
                 <p className="text-sm font-medium">{platformDomain}</p>
-                <p className="text-xs text-muted-foreground">Standard plattformsdomän</p>
+                <p className="text-xs text-muted-foreground">{t('platformDomain')}</p>
               </div>
             </div>
             <a
@@ -181,7 +183,7 @@ export function OrganisationDomainsSection({
         {/* Custom domains list */}
         {domains.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
-            Ingen egen domän konfigurerad.
+            {t('noCustomDomain')}
           </p>
         ) : (
           <div className="space-y-2">
@@ -245,13 +247,13 @@ export function OrganisationDomainsSection({
         {expanded && (
           <div className="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
             <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-300 mb-2">
-              📖 Så här kopplar du en egen domän
+              📖 {t('howToTitle')}
             </h4>
             <ol className="text-sm text-blue-700 dark:text-blue-400 space-y-1 list-decimal list-inside">
-              <li>Lägg en DNS CNAME-post: <code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">example.com → cname.vercel-dns.com</code></li>
-              <li>Lägg till domänen i listan ovan</li>
-              <li>Vänta på verifiering (vanligtvis inom 24h)</li>
-              <li>Ändra status till &quot;Aktiv&quot; när DNS är propagerat</li>
+              <li>{t('step1')}<code className="bg-blue-100 dark:bg-blue-800 px-1 rounded">example.com → cname.vercel-dns.com</code></li>
+              <li>{t('step2')}</li>
+              <li>{t('step3')}</li>
+              <li>{t('step4')}</li>
             </ol>
           </div>
         )}
@@ -261,9 +263,9 @@ export function OrganisationDomainsSection({
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Lägg till domän</DialogTitle>
+            <DialogTitle>{t('addDomainTitle')}</DialogTitle>
             <DialogDescription>
-              Lägg till en egen domän eller subdomän för denna organisation.
+              {t('addDomainDescription')}
             </DialogDescription>
           </DialogHeader>
           

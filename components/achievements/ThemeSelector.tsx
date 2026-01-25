@@ -1,10 +1,12 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { THEME_PRESETS } from './themes'
 import { useAchievementBuilderStore } from './store'
 
 export function ThemeSelector() {
+  const t = useTranslations('achievements')
   const currentTheme = useAchievementBuilderStore((s) => s.state.theme)
   const setTheme = useAchievementBuilderStore((s) => s.setTheme)
 
@@ -67,36 +69,36 @@ export function ThemeSelector() {
 
       {/* Theme details */}
       <div className="rounded-lg border border-border bg-muted/30 p-3">
-        <div className="mb-2 text-xs font-medium text-muted-foreground">Temafärger</div>
+        <div className="mb-2 text-xs font-medium text-muted-foreground">{t('themeColors.title')}</div>
         <div className="flex items-center gap-3">
-          {THEME_PRESETS.find((t) => t.id === currentTheme) && (
+          {THEME_PRESETS.find((th) => th.id === currentTheme) && (
             <>
               <div className="flex items-center gap-1.5">
                 <div
                   className="h-4 w-4 rounded-full ring-1 ring-black/10"
                   style={{
-                    backgroundColor: THEME_PRESETS.find((t) => t.id === currentTheme)!.colors.primary,
+                    backgroundColor: THEME_PRESETS.find((th) => th.id === currentTheme)!.colors.primary,
                   }}
                 />
-                <span className="text-xs text-muted-foreground">Primär</span>
+                <span className="text-xs text-muted-foreground">{t('themeColors.primary')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div
                   className="h-4 w-4 rounded-full ring-1 ring-black/10"
                   style={{
-                    backgroundColor: THEME_PRESETS.find((t) => t.id === currentTheme)!.colors.secondary,
+                    backgroundColor: THEME_PRESETS.find((th) => th.id === currentTheme)!.colors.secondary,
                   }}
                 />
-                <span className="text-xs text-muted-foreground">Sekundär</span>
+                <span className="text-xs text-muted-foreground">{t('themeColors.secondary')}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <div
                   className="h-4 w-4 rounded-full ring-1 ring-black/10"
                   style={{
-                    backgroundColor: THEME_PRESETS.find((t) => t.id === currentTheme)!.colors.accent,
+                    backgroundColor: THEME_PRESETS.find((th) => th.id === currentTheme)!.colors.accent,
                   }}
                 />
-                <span className="text-xs text-muted-foreground">Accent</span>
+                <span className="text-xs text-muted-foreground">{t('themeColors.accent')}</span>
               </div>
             </>
           )}

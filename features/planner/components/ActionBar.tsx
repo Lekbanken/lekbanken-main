@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -32,6 +33,7 @@ export function ActionBar({
   onStartRun,
   isStartingRun = false,
 }: ActionBarProps) {
+  const t = useTranslations('planner');
   const isReady = canRun && hasBlocks && isPlanPublished;
 
   return (
@@ -42,12 +44,12 @@ export function ActionBar({
             <PlayIcon />
           </div>
           <div>
-            <p className="text-sm text-muted-foreground">Redo att köra planen?</p>
-            <p className="font-semibold text-foreground">Starta plan i Play</p>
+            <p className="text-sm text-muted-foreground">{t('actionBar.ready')}</p>
+            <p className="font-semibold text-foreground">{t('actionBar.startInPlay')}</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Tooltip content={hasBlocks ? "Visa planen i presentationsläge" : "Lägg till block först"}>
+          <Tooltip content={hasBlocks ? t('actionBar.previewTooltip') : t('actionBar.addBlocksFirst')}>
             <Button
               variant="outline"
               onClick={onPreview}
@@ -55,16 +57,16 @@ export function ActionBar({
               className="gap-1.5"
             >
               <EyeIcon />
-              Förhandsgranska
+              {t('actionBar.preview')}
             </Button>
           </Tooltip>
           <Tooltip
             content={
               !hasBlocks
-                ? "Lägg till block först"
+                ? t('actionBar.addBlocksFirst')
                 : !isPlanPublished
-                ? "Publicera planen för att köra"
-                : "Starta körning av planen"
+                ? t('actionBar.publishToRun')
+                : t('actionBar.startRunTooltip')
             }
             disabled={isReady}
           >
@@ -72,12 +74,12 @@ export function ActionBar({
               {isStartingRun ? (
                 <>
                   <LoaderIcon />
-                  Startar...
+                  {t('actionBar.starting')}
                 </>
               ) : (
                 <>
                   <PlayIcon />
-                  Starta plan
+                  {t('actionBar.startPlan')}
                 </>
               )}
             </Button>

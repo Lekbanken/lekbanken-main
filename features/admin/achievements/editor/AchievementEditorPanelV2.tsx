@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState, useCallback } from "react";
+import { useTranslations } from 'next-intl';
 import { Button, Badge } from "@/components/ui";
 import type {
   AchievementAssetSize,
@@ -97,6 +98,8 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
   );
 
   const { state: draft, setState: setDraft, undo, redo, reset, canUndo, canRedo, historyLength } = useBadgeHistory(initialValue);
+
+  const t = useTranslations('admin.achievements.editor');
 
   const [previewSize, setPreviewSize] = useState<AchievementAssetSize>(draft.icon.size || "lg");
   const [hiddenLayers, setHiddenLayers] = useState<Set<string>>(new Set());
@@ -247,7 +250,7 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
                 <SwatchIcon className="h-4 w-4 text-primary" />
-                Förhandsvisning
+                {t('preview')}
               </h3>
               <div className="flex rounded-lg border border-border/40 bg-muted/30 p-1">
                 {(["sm", "md", "lg"] as const).map((size) => (
@@ -283,7 +286,7 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
               />
               {hoverPreview && (
                 <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs text-muted-foreground bg-muted/80 px-2 py-0.5 rounded">
-                  Förhandsvisning: {formatLayerLabel(hoverPreview.id)}
+                  {t('previewingLayer', { layer: formatLayerLabel(hoverPreview.id) })}
                 </div>
               )}
             </div>
@@ -341,9 +344,9 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
         <div className="space-y-4">
           {/* Theme & Colors */}
           <CollapsibleSection
-            title="Tema & Färger"
+            title={t('themeAndColors')}
             icon={SwatchIcon}
-            badge={draft.icon.mode === 'theme' ? currentTheme?.name : 'Anpassad'}
+            badge={draft.icon.mode === 'theme' ? currentTheme?.name : t('custom')}
             defaultOpen={true}
           >
             <ThemeSelectorEnhanced
@@ -362,15 +365,15 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
 
           {/* Layer Selection */}
           <CollapsibleSection
-            title="Lagerval"
+            title={t('layerSelection')}
             icon={Square3Stack3DIcon}
-            badge={`${(draft.icon.backgrounds?.length ?? 0) + (draft.icon.foregrounds?.length ?? 0) + (draft.icon.base ? 1 : 0) + (draft.icon.symbol ? 1 : 0)} valda`}
+            badge={t('selectedCount', { count: (draft.icon.backgrounds?.length ?? 0) + (draft.icon.foregrounds?.length ?? 0) + (draft.icon.base ? 1 : 0) + (draft.icon.symbol ? 1 : 0) })}
             defaultOpen={true}
           >
             <div className="grid gap-4 sm:grid-cols-2">
               <LayerSelectorEnhanced
-                title="Basform"
-                description="Grunden för din badge"
+                title={t('baseShape')}
+                description={t('baseDescription')}
                 type="base"
                 assets={getAssetsByType("base")}
                 selectedId={draft.icon.base?.id || ""}
@@ -378,8 +381,8 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
                 onHover={(type, id) => setHoverPreview(id ? { type, id } : null)}
               />
               <LayerSelectorEnhanced
-                title="Symbol"
-                description="Den centrala ikonen"
+                title={t('symbol')}
+                description={t('symbolDescription')}
                 type="symbol"
                 assets={getAssetsByType("symbol")}
                 selectedId={draft.icon.symbol?.id || ""}
@@ -389,8 +392,8 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
             </div>
 
             <MultiLayerSelector
-              title="Bakgrundsdekorationer"
-              description="Vingar, lagerkrans, spikar (stapelbara)"
+              title={t('backgroundDecorations')}
+              description={t('backgroundDecorationsDesc')}
               type="background"
               assets={getAssetsByType("background")}
               selected={draft.icon.backgrounds ?? []}
@@ -398,8 +401,8 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
             />
 
             <MultiLayerSelector
-              title="Förgrundsdekorationer"
-              description="Stjärnor, kronor, band (stapelbara)"
+              title={t('foregroundDecorations')}
+              description={t('foregroundDecorationsDesc')}
               type="foreground"
               assets={getAssetsByType("foreground")}
               selected={draft.icon.foregrounds ?? []}
@@ -418,7 +421,7 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
 
           {/* Presets */}
           <CollapsibleSection
-            title="Mina Presets"
+            title={t('myPresets')}
             icon={BookmarkIcon}
             defaultOpen={false}
           >
@@ -431,9 +434,9 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
 
           {/* Publishing & Sync */}
           <CollapsibleSection
-            title="Publicering & Synk"
+            title={t('publishingAndSync')}
             icon={GlobeAltIcon}
-            badge={draft.status === 'published' ? 'Publicerad' : 'Utkast'}
+            badge={draft.status === 'published' ? t('published') : t('draft')}
             defaultOpen={false}
           >
             <PublishingControls value={draft} onChange={handleMetaChange} />
@@ -442,14 +445,14 @@ export function AchievementEditorPanelV2({ value, themes, onChange, onCancel }: 
           {/* Actions */}
           <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/40 bg-muted/20 p-4">
             <div className="text-xs text-muted-foreground">
-              {historyLength > 0 && `${historyLength} ändringar`}
+              {historyLength > 0 && t('changesCount', { count: historyLength })}
             </div>
             <div className="flex items-center gap-3">
               <Button variant="outline" onClick={onCancel}>
-                Avbryt
+                {t('cancel')}
               </Button>
               <Button onClick={handleSave} className="gap-2">
-                💾 Spara Badge
+                💾 {t('saveBadge')}
               </Button>
             </div>
           </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { SwatchIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { Badge } from "@/components/ui";
 
@@ -17,6 +18,7 @@ const colorLabels: Record<keyof ColorControlsEnhancedProps['value'], { label: st
 };
 
 export function ColorControlsEnhanced({ value, onChange, hasCustomColors }: ColorControlsEnhancedProps) {
+  const t = useTranslations('admin.achievements.editor');
   const handleChange = (key: keyof typeof value, color: string) => {
     onChange({ [key]: color });
   };
@@ -26,18 +28,18 @@ export function ColorControlsEnhanced({ value, onChange, hasCustomColors }: Colo
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
           <SwatchIcon className="h-4 w-4 text-primary" />
-          Color Controls
+          {t('colorControls.title')}
         </h3>
         {hasCustomColors && (
           <Badge variant="warning" size="sm" className="gap-1">
             <SparklesIcon className="h-3 w-3" />
-            Custom
+            {t('colorControls.custom')}
           </Badge>
         )}
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Fine-tune colors for each layer. Editing colors will override the theme preset.
+        {t('colorControls.description')}
       </p>
 
       <div className="grid grid-cols-2 gap-3">

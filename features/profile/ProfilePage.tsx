@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 import { PageTitleHeader } from "@/components/app/PageTitleHeader";
 import { TenantSwitcher } from "@/components/app/TenantSwitcher";
@@ -248,13 +249,15 @@ export function ProfilePage() {
     setRecoveryCodes(json.recovery_codes ?? []);
   };
 
+  const t = useTranslations('profile');
+
   // Show loading state while auth is loading or profile not yet initialized
   if (authLoading || (!profileInitialized && !userProfile)) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
-          <p className="text-muted-foreground">Laddar profil...</p>
+          <p className="text-muted-foreground">{t('loading')}</p>
         </div>
       </div>
     );
@@ -270,29 +273,29 @@ export function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Personuppgifter</CardTitle>
+          <CardTitle>{t('sections.personalInfo.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-foreground" htmlFor="fullName">
-              Namn
+              {t('sections.general.personalInfo.fullName')}
             </label>
             <Input
               id="fullName"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="Ditt namn"
+              placeholder={t('sections.general.personalInfo.fullNamePlaceholder')}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-foreground">E-post</label>
+            <label className="block text-sm font-medium text-foreground">{t('sections.account.email')}</label>
             <div className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-muted-foreground">
-              {email || "Ingen e-post tillgänglig"}
+              {email || t('noEmailAvailable')}
             </div>
           </div>
           <div className="flex flex-wrap gap-3">
             <Button onClick={handleSaveProfile} disabled={savingProfile}>
-              {savingProfile ? "Sparar..." : "Spara ändringar"}
+              {savingProfile ? t('edit.saving') : t('edit.saveChanges')}
             </Button>
             {statusMessage && (
               <span className="text-sm font-medium text-success-foreground">{statusMessage}</span>
@@ -304,7 +307,7 @@ export function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Profilbild</CardTitle>
+          <CardTitle>{t('sections.general.avatar.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -328,10 +331,10 @@ export function ProfilePage() {
           </div>
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => handleAvatarSelect(null)}>
-              Ta bort bild
+              {t('sections.general.avatar.remove')}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Använd initialer om du inte vill visa en bild.
+              {t('avatarInitialsHint')}
             </p>
           </div>
         </CardContent>
@@ -340,14 +343,14 @@ export function ProfilePage() {
       {/* Organisation / Tenant Selection */}
       <Card>
         <CardHeader>
-          <CardTitle>Organisation</CardTitle>
+          <CardTitle>{t('nav.organizations')}</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoadingTenants ? (
-            <div className="text-sm text-muted-foreground">Laddar organisationer...</div>
+            <div className="text-sm text-muted-foreground">{t('loadingOrganizations')}</div>
           ) : userTenants.length === 0 ? (
             <div className="text-sm text-muted-foreground">
-              Du tillhör ingen organisation ännu.
+              {t('noOrganization')}
             </div>
           ) : (
             <>
@@ -380,46 +383,46 @@ export function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Säkerhet & MFA</CardTitle>
+          <CardTitle>{t('sections.security.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {securityError && <div className="text-sm text-destructive">{securityError}</div>}
           {loadingSecurity ? (
-            <div className="text-sm text-muted-foreground">Laddar...</div>
+            <div className="text-sm text-muted-foreground">{t('sections.general.loading')}</div>
           ) : (
             <>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">MFA-status</p>
+                  <p className="text-sm font-semibold text-foreground">{t('sections.security.mfa.status')}</p>
                   <p className="text-xs text-muted-foreground">
-                    {mfaStatus?.user_mfa?.enrolled_at ? "Aktiverad" : "Inte aktiverad"}
+                    {mfaStatus?.user_mfa?.enrolled_at ? t('sections.security.mfaEnabled') : t('sections.security.mfaDisabled')}
                   </p>
                 </div>
                   {mfaStatus?.user_mfa?.enrolled_at && mfaStatus.totp?.id ? (
                     <Button variant="outline" onClick={() => void handleDisableMfa(mfaStatus.totp!.id!)}>
-                      Stäng av
+                      {t('sections.security.mfa.disable')}
                     </Button>
                   ) : (
-                    <Button onClick={() => void handleStartMfa()}>Aktivera MFA</Button>
+                    <Button onClick={() => void handleStartMfa()}>{t('sections.security.mfa.enable')}</Button>
                   )}
               </div>
               {mfaStatus?.user_mfa?.enrolled_at && (
                 <div className="flex flex-wrap gap-2">
                   <Button variant="outline" onClick={() => void handleRecoveryCodes()}>
-                    Visa recovery-koder
+                    {t('showRecoveryCodes')}
                   </Button>
                 </div>
               )}
               {mfaEnroll && (
                 <div className="mt-3 space-y-3 rounded-lg border border-border/60 p-3">
                   <div className="text-sm">
-                    <p className="font-semibold text-foreground">Steg 1: Skanna QR eller ange hemlighet</p>
+                    <p className="font-semibold text-foreground">{t('mfaStep1')}</p>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     {mfaEnroll.qr && <img src={mfaEnroll.qr} alt="MFA QR" className="mt-2 h-32 w-32" />}
                     <div className="mt-2 rounded bg-muted px-2 py-1 text-xs font-mono break-all">{mfaEnroll.secret}</div>
                   </div>
                   <div className="space-y-2">
-                    <p className="text-sm font-semibold text-foreground">Steg 2: Ange kod</p>
+                    <p className="text-sm font-semibold text-foreground">{t('mfaStep2')}</p>
                     <Input value={mfaCode} onChange={(e) => setMfaCode(e.target.value)} placeholder="123 456" />
                     <div className="flex gap-2">
                       <Button onClick={() => void handleVerifyMfa()} disabled={!mfaCode}>
@@ -508,13 +511,13 @@ export function ProfilePage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Preferenser</CardTitle>
+          <CardTitle>{t('preferences')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Select
-                label="Språk"
+                label={t('sections.preferences.language')}
                 options={languageOptions}
                 value={language}
                 onChange={(e) => void setLanguage(e.target.value as typeof language)}
@@ -522,7 +525,7 @@ export function ProfilePage() {
             </div>
             <div>
               <Select
-                label="Tema"
+                label={t('sections.preferences.theme.label')}
                 options={themeOptions}
                 value={theme}
                 onChange={(e) => void setTheme(e.target.value as ThemePreference)}
@@ -531,9 +534,9 @@ export function ProfilePage() {
           </div>
           <div className="flex items-center justify-between rounded-lg border border-border/60 bg-muted/30 px-4 py-3">
             <div>
-              <p className="text-sm font-semibold text-foreground">Visa tema-omkopplare i headern</p>
+              <p className="text-sm font-semibold text-foreground">{t('sections.preferences.showThemeToggle')}</p>
               <p className="text-xs text-muted-foreground">
-                Styr om snabb-knappen för ljust/mörkt läge syns högst upp.
+                {t('sections.preferences.showThemeToggleHint')}
               </p>
             </div>
             <Switch checked={showThemeToggleInHeader} onCheckedChange={(val) => void setShowThemeToggleInHeader(val)} />
@@ -542,7 +545,7 @@ export function ProfilePage() {
       </Card>
 
       <div className="flex flex-col gap-3">
-        <p className="text-sm font-semibold text-foreground">Konto</p>
+        <p className="text-sm font-semibold text-foreground">{t('nav.account')}</p>
         <LogoutButton />
       </div>
     </div>

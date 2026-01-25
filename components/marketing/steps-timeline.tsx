@@ -1,4 +1,6 @@
-﻿const steps = [
+﻿import { useTranslations } from 'next-intl';
+
+const steps = [
   {
     title: "Planera",
     description: "Välj lek/övning efter ålder, mål och tidsåtgång. Spara som mall.",
@@ -26,6 +28,7 @@
 ];
 
 export function StepsTimeline() {
+  const t = useTranslations('marketing');
   return (
     <section
       id="how-it-works"
@@ -34,15 +37,15 @@ export function StepsTimeline() {
     >
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-primary">Så funkar det</p>
+          <p className="text-sm font-semibold text-primary">{t('howItWorks.tagline')}</p>
           <h2
             id="how-it-works-title"
             className="mt-2 text-3xl font-semibold tracking-tight text-foreground"
           >
-            Från idé till genomfört pass på minuter.
+            {t('howItWorks.title')}
           </h2>
           <p className="mt-3 text-lg text-muted-foreground">
-            En enkel tidslinje med fyra moment som du kan upprepa för varje tillfälle.
+            {t('howItWorks.description')}
           </p>
         </div>
 

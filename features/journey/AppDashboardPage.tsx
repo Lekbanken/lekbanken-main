@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useAuth } from '@/lib/supabase/auth'
 import { useTenant } from '@/lib/context/TenantContext'
 import { PageTitleHeader } from '@/components/app/PageTitleHeader'
@@ -243,13 +244,14 @@ export default function AppDashboardPage() {
   const unlockedAchievements = snapshot?.unlockedAchievements ?? null
   const userLevel = snapshot?.level ?? 1
   const isCosmeticLoadoutUnlocked = userLevel >= COSMETIC_LOADOUT_REQUIRED_LEVEL
+  const t = useTranslations('app')
 
   if (authLoading || isLoadingTenants) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto" />
-          <p className="text-muted-foreground">Laddar...</p>
+          <p className="text-muted-foreground">{t('dashboard.loading')}</p>
         </div>
       </div>
     )
@@ -266,9 +268,9 @@ export default function AppDashboardPage() {
       <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-background to-accent/5 border border-border/50 p-6 md:p-8">
         <div className="relative z-10">
           <p className="text-sm font-medium text-muted-foreground mb-1">{currentTenant?.name || 'Lekbanken'}</p>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">Redo för nya upplevelser?</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-2">{t('dashboard.heroTitle')}</h1>
           <p className="text-muted-foreground max-w-md">
-            Utforska vår samling eller fortsätt där du slutade senast.
+            {t('dashboard.heroSubtitle')}
           </p>
         </div>
 
@@ -278,7 +280,7 @@ export default function AppDashboardPage() {
 
       {/* Quick Actions */}
       <section>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Snabbåtgärder</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">{t('dashboard.quickActions')}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {quickActions.map((action) => (
             <Link
@@ -303,7 +305,7 @@ export default function AppDashboardPage() {
               <FireIcon className="h-5 w-5 text-orange-500" />
               <span className="text-2xl font-bold">{streakDays ?? '—'}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Dagars streak</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.streakDays')}</p>
           </CardContent>
         </Card>
 
@@ -313,7 +315,7 @@ export default function AppDashboardPage() {
               <SparklesIcon className="h-5 w-5 text-amber-500" />
               <span className="text-2xl font-bold">{coinsBalance ?? '—'}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Mynt</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.coins')}</p>
           </CardContent>
         </Card>
 
@@ -323,7 +325,7 @@ export default function AppDashboardPage() {
               <TrophyIcon className="h-5 w-5 text-violet-500" />
               <span className="text-2xl font-bold">{unlockedAchievements ?? '—'}</span>
             </div>
-            <p className="text-xs text-muted-foreground">Achievements</p>
+            <p className="text-xs text-muted-foreground">{t('dashboard.stats.achievements')}</p>
           </CardContent>
         </Card>
       </section>
@@ -331,9 +333,9 @@ export default function AppDashboardPage() {
       {/* Pinned Achievements */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Visas på din dashboard</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('dashboard.pinnedAchievements.title')}</h2>
           <Link href="/app/gamification/achievements" className="text-sm text-primary hover:underline">
-            Hantera
+            {t('dashboard.pinnedAchievements.manage')}
           </Link>
         </div>
 
@@ -361,11 +363,11 @@ export default function AppDashboardPage() {
           <Card className="border-border/50">
             <CardContent className="pt-6">
               <p className="text-sm text-muted-foreground">
-                Välj upp till 3 utmärkelser som ska visas här.
+                {t('dashboard.pinnedAchievements.emptyHint')}
               </p>
               <div className="mt-3">
                 <Link href="/app/gamification/achievements" className="inline-flex text-sm font-semibold text-primary hover:underline">
-                  Gå till utmärkelser
+                  {t('dashboard.pinnedAchievements.goToAchievements')}
                   <ArrowRightIcon className="h-4 w-4 ml-1" />
                 </Link>
               </div>
@@ -377,9 +379,9 @@ export default function AppDashboardPage() {
       {/* Cosmetic Loadout */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Cosmetics</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('dashboard.cosmetics.title')}</h2>
           <Link href="/app/shop" className="text-sm text-primary hover:underline">
-            Till butiken
+            {t('dashboard.cosmetics.toShop')}
           </Link>
         </div>
 
@@ -388,19 +390,19 @@ export default function AppDashboardPage() {
             {!isCosmeticLoadoutUnlocked ? (
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-foreground">Utrustning låst</p>
-                  <p className="text-sm text-muted-foreground">Lås upp genom att nå nästa nivå.</p>
+                  <p className="text-sm font-semibold text-foreground">{t('dashboard.cosmetics.locked')}</p>
+                  <p className="text-sm text-muted-foreground">{t('dashboard.cosmetics.unlockHint')}</p>
                 </div>
-                <Badge variant="secondary">Låst: nivå {COSMETIC_LOADOUT_REQUIRED_LEVEL}</Badge>
+                <Badge variant="secondary">{t('dashboard.cosmetics.lockedLevel', { level: COSMETIC_LOADOUT_REQUIRED_LEVEL })}</Badge>
               </div>
             ) : (
               <div className="space-y-4">
                 {cosmeticsError ? <InlineAlert variant="error">{cosmeticsError}</InlineAlert> : null}
 
                 {isCosmeticsLoading ? (
-                  <div className="py-2 text-sm text-muted-foreground">Laddar cosmetics…</div>
+                  <div className="py-2 text-sm text-muted-foreground">{t('dashboard.cosmetics.loading')}</div>
                 ) : cosmeticItems.length === 0 ? (
-                  <div className="py-2 text-sm text-muted-foreground">Du har inga cosmetics än.</div>
+                  <div className="py-2 text-sm text-muted-foreground">{t('dashboard.cosmetics.empty')}</div>
                 ) : (
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {cosmeticItems.map((item) => (
@@ -433,15 +435,15 @@ export default function AppDashboardPage() {
       {/* Recent Activity */}
       <section>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Senaste aktivitet</h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('dashboard.recentActivity.title')}</h2>
         </div>
 
         <Card>
           <CardContent className="divide-y divide-border">
             {isActivitiesLoading ? (
-              <div className="py-6 text-sm text-muted-foreground">Laddar aktivitet…</div>
+              <div className="py-6 text-sm text-muted-foreground">{t('dashboard.recentActivity.loading')}</div>
             ) : activities.length === 0 ? (
-              <div className="py-6 text-sm text-muted-foreground">Ingen aktivitet än.</div>
+              <div className="py-6 text-sm text-muted-foreground">{t('dashboard.recentActivity.empty')}</div>
             ) : (
               activities.map((activity) => {
                 const Icon = activityIcon(activity)
@@ -476,14 +478,14 @@ export default function AppDashboardPage() {
 
       {/* Continue Where You Left Off */}
       <section>
-        <h2 className="text-lg font-semibold text-foreground mb-4">Fortsätt utforska</h2>
+        <h2 className="text-lg font-semibold text-foreground mb-4">{t('dashboard.continue.title')}</h2>
         <Link
           href="/app/browse"
           className="flex items-center justify-between rounded-2xl border border-border/50 bg-gradient-to-r from-primary/5 to-accent/5 p-6 transition-all hover:border-primary/30 hover:shadow-lg group"
         >
           <div>
-            <p className="font-semibold text-foreground mb-1">Hitta nya lekar</p>
-            <p className="text-sm text-muted-foreground">Utforska 100+ aktiviteter för alla åldrar och gruppstorlekar</p>
+            <p className="font-semibold text-foreground mb-1">{t('dashboard.continue.findGames')}</p>
+            <p className="text-sm text-muted-foreground">{t('dashboard.continue.exploreDescription')}</p>
           </div>
           <div className="rounded-full bg-primary/10 p-3 transition-transform group-hover:translate-x-1">
             <ArrowRightIcon className="h-5 w-5 text-primary" />

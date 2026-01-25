@@ -1,29 +1,29 @@
-﻿import { Button } from "@/components/ui/button";
+﻿import { useTranslations } from 'next-intl';
+import { Button } from "@/components/ui/button";
 
-const stats = [
-  { label: "Aktiviteter", value: "1 240+", icon: "📚" },
-  { label: "Sparad tid/vecka", value: "-6h", icon: "⏱️" },
-  { label: "Delningar", value: "+320%", icon: "📤" },
-];
+const statKeys = ['activities', 'timeSaved', 'shares'] as const;
+const statIcons = ['📚', '⏱️', '📤'];
 
 export function Hero() {
+  const t = useTranslations('marketing');
   return (
     <section className="relative isolate overflow-hidden bg-gradient-to-b from-primary/5 via-primary/[0.02] to-muted/30">
       <div className="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:flex lg:items-center lg:gap-x-10 lg:px-8">
         <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary ring-1 ring-primary/15">
-            Ny plattform för aktiviteter
+            {t('hero.badge')}
           </div>
           <h1 className="mt-8 text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-            Lekbanken gör planeringen{" "}
-            <span className="bg-gradient-to-r from-primary via-[#00c7b0] to-primary bg-clip-text text-transparent">
-              lekfull
-            </span>
-            , snabb och delbar.
+            {t.rich('hero.title', {
+              highlight: (chunks) => (
+                <span className="bg-gradient-to-r from-primary via-[#00c7b0] to-primary bg-clip-text text-transparent">
+                  {chunks}
+                </span>
+              )
+            })}
           </h1>
           <p className="mt-6 text-lg text-muted-foreground">
-            Bygg, anpassa och dela aktiviteter på sekunder. Perfekt för träningar, lektioner och
-            teambuilding.
+            {t('hero.description')}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <Button 
@@ -31,7 +31,7 @@ export function Hero() {
               href="/auth/signup"
               className="shadow-lg shadow-primary/25 transition-all duration-200 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02]"
             >
-              Prova gratis
+              {t('hero.tryFree')}
             </Button>
             <Button 
               size="lg" 
@@ -39,20 +39,20 @@ export function Hero() {
               href="/demo"
               className="transition-all duration-200 hover:scale-[1.02] hover:border-primary/50"
             >
-              Testa demo
+              {t('hero.tryDemo')}
             </Button>
           </div>
           <dl className="mt-10 grid max-w-xl grid-cols-3 gap-4 text-sm text-muted-foreground">
-            {stats.map((item) => (
+            {statKeys.map((key, index) => (
               <div
-                key={item.label}
+                key={key}
                 className="group rounded-xl border border-border/60 bg-card/60 p-4 backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:border-primary/30 hover:shadow-md"
               >
-                <div className="mb-1 text-lg" aria-hidden>{item.icon}</div>
+                <div className="mb-1 text-lg" aria-hidden>{statIcons[index]}</div>
                 <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {item.label}
+                  {t(`hero.stats.${key}.label`)}
                 </dt>
-                <dd className="text-xl font-bold text-foreground">{item.value}</dd>
+                <dd className="text-xl font-bold text-foreground">{t(`hero.stats.${key}.value`)}</dd>
               </div>
             ))}
           </dl>
@@ -96,8 +96,8 @@ export function Hero() {
                 <div className="mt-3 h-2 w-full rounded bg-muted-foreground/20" />
                 <div className="mt-1 h-2 w-3/4 rounded bg-muted-foreground/20" />
                 <div className="mt-4 flex gap-2">
-                  <div className="h-6 w-16 rounded-full bg-primary text-[8px] font-medium text-primary-foreground flex items-center justify-center">Planera</div>
-                  <div className="h-6 w-14 rounded-full bg-muted text-[8px] font-medium text-muted-foreground flex items-center justify-center">6-12 år</div>
+                  <div className="h-6 w-16 rounded-full bg-primary text-[8px] font-medium text-primary-foreground flex items-center justify-center">{t('hero.mockup.plan')}</div>
+                  <div className="h-6 w-14 rounded-full bg-muted text-[8px] font-medium text-muted-foreground flex items-center justify-center">{t('hero.mockup.ageRange')}</div>
                 </div>
               </div>
             </div>

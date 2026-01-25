@@ -162,6 +162,33 @@
         "browseAction": "Utforska aktiviteter"
       }
     },
+    "ui": {
+      "audioEditor": {
+        "autoplay": "Autoplay",
+        "autoplayDescription": "Försök spela automatiskt (kan blockas på mobil).",
+        "requireAck": "Kräv bekräftelse",
+        "requireAckDescription": "Visa \"Jag har lyssnat\" efter uppspelning.",
+        "uploadToPreview": "Ladda upp en ljudfil för att förhandslyssna."
+      },
+      "imageEditor": {
+        "clickToAddHotspot": "Klicka i bilden för att lägga ut en hotspot.",
+        "uploadToStart": "Ladda upp en bild för att börja.",
+        "clear": "Rensa",
+        "noHotspotsYet": "Inga hotspots ännu.",
+        "selectHotspotToEdit": "Välj en hotspot i bilden för att redigera."
+      },
+      "emptyState": {
+        "noItemsYet": "Du har inga {itemName} ännu.",
+        "addItemsFor": "Lägg till {itemName} för {benefit}."
+      },
+      "mediaPicker": {
+        "showingTemplatesFor": "Visar standardbilder för",
+        "selectPurposeFirst": "Välj ett huvudsyfte först för att se standardbilder",
+        "loading": "Laddar...",
+        "noTemplatesForPurpose": "Inga standardbilder för detta syfte",
+        "noTemplatesFound": "Inga standardbilder hittades"
+      }
+    },
     "time": {
       "today": "Idag",
       "yesterday": "Igår",
@@ -936,6 +963,41 @@
         "planArchiveError": "Kunde inte arkivera plan.",
         "planRestored": "Plan återställd.",
         "planRestoreError": "Kunde inte återställa plan."
+      },
+      "filters": {
+        "all": "Alla",
+        "draft": "Utkast",
+        "published": "Publicerade",
+        "modified": "Ändrade",
+        "archived": "Arkiverade",
+        "private": "Privat",
+        "tenant": "Organisation",
+        "public": "Publik"
+      },
+      "sort": {
+        "newest": "Nyast",
+        "oldest": "Äldst",
+        "aToZ": "A-Ö",
+        "zToA": "Ö-A"
+      },
+      "noPlansYet": "Inga planer ännu",
+      "noBlocksInPlanYet": "Inga block i denna plan ännu.",
+      "preview": {
+        "title": "Förhandsgranskning"
+      },
+      "share": {
+        "privatePlan": "Privat plan",
+        "privatePlanWarning": "Den här planen är privat och kan inte delas. Ändra synlighet till \"Organisation\" eller \"Publik\" för att dela den.",
+        "shareLink": "Delningslänk",
+        "copy": "Kopiera",
+        "copied": "Kopierad!",
+        "visibilityLabel": "Synlighet:",
+        "tenantVisibilityDescription": "Bara medlemmar i din organisation kan se denna plan.",
+        "publicVisibilityDescription": "Alla med länken kan se denna plan."
+      },
+      "versions": {
+        "noPublishedVersionsYet": "Inga publicerade versioner ännu",
+        "publishToCreateVersion": "Publicera planen för att skapa en version"
       }
     },
     "organisations": {
@@ -974,9 +1036,87 @@
           "entitlementRevoked": "Entitlement återkallad.",
           "revokeFailed": "Kunde inte återkalla entitlement."
         }
+      },
+      "billing": {
+        "paymentOverdue": "Betalning förfallen",
+        "overdueDescription": "Det finns en förfallen betalning. Kontrollera faktureringsinformationen i Stripe för att undvika avbrott i tjänsten."
+      },
+      "domains": {
+        "howToTitle": "Så här kopplar du en egen domän",
+        "step1": "Lägg en DNS CNAME-post: ",
+        "step2": "Lägg till domänen i listan ovan",
+        "step3": "Vänta på verifiering (vanligtvis inom 24h)",
+        "step4": "Ändra status till \"Aktiv\" när DNS är propagerat",
+        "addDomainTitle": "Lägg till domän",
+        "addDomainDescription": "Lägg till en egen domän eller subdomän för denna organisation."
+      },
+      "identity": {
+        "slugReadOnly": "kan ej ändras"
+      },
+      "locale": {
+        "title": "Språk & Region",
+        "undo": "Ångra",
+        "save": "Spara",
+        "saving": "Sparar...",
+        "mainLanguage": "Huvudspråk (innehåll)",
+        "selectLanguage": "Välj språk",
+        "mainLanguageDescription": "Språk för spelinnehåll och media.",
+        "defaultLanguage": "Standardspråk (gränssnitt)",
+        "defaultLanguageDescription": "Standardspråk för användargränssnittet. Användare kan ändra själva.",
+        "defaultTheme": "Standardtema",
+        "selectTheme": "Välj tema",
+        "defaultThemeDescription": "Standardtema för nya användare. Användare kan ändra i sina inställningar.",
+        "languageSupportTitle": "Språkstöd",
+        "languageSupportDescription": "Lekbanken stödjer flera språk. Huvudspråket avgör vilket innehåll som visas för spel och aktiviteter. Användare kan alltid ändra sitt gränssnittsspråk via sina personliga inställningar."
+      },
+      "members": {
+        "pendingInvites": "{count, plural, one {# inbjudan väntar på svar} other {# inbjudningar väntar på svar}}"
+      },
+      "list": {
+        "openOrganisation": "Öppna {name}",
+        "copyUuid": "Kopiera UUID för {name}",
+        "copy": "Kopiera",
+        "createdAt": "Skapad {date}",
+        "quickActions": "Snabbåtgärder",
+        "viewOrganisation": "Visa organisation",
+        "edit": "Redigera",
+        "manageMembers": "Hantera medlemmar",
+        "manageBilling": "Hantera billing",
+        "openStripe": "Öppna Stripe",
+        "reactivate": "Återaktivera",
+        "suspend": "Stäng av",
+        "removeOrganisation": "Ta bort organisation",
+        "domainActive": "Domän aktiv",
+        "domainPending": "Domän väntande",
+        "noDomain": "Ingen domän",
+        "contact": "Kontakt",
+        "members": "Medlemmar",
+        "billing": "Billing",
+        "domain": "Domän",
+        "billingConnected": "Kopplad",
+        "noBilling": "Ingen billing",
+        "removeDialogTitle": "Ta bort organisation?",
+        "removeDialogDescription": "Detta går inte att ångra. Organisationen och kopplade data kan försvinna permanent.",
+        "cancel": "Avbryt",
+        "remove": "Ta bort"
       }
     },
     "tenant": {
+      "dashboard": {
+        "title": "Organisation",
+        "welcome": "Välkommen till din organisationsöversikt.",
+        "quickActions": "Snabbåtgärder",
+        "underDevelopment": "Fler snabbåtgärder kommer snart.",
+        "cards": {
+          "members": "Medlemmar",
+          "membersDescription": "Totalt antal medlemmar",
+          "activeSessions": "Aktiva sessioner",
+          "activeSessionsDescription": "Senaste 30 dagarna",
+          "subscription": "Prenumeration",
+          "subscriptionActive": "Aktiv",
+          "nextInvoice": "Nästa faktura: {date}"
+        }
+      },
       "members": {
         "title": "Medlemmar",
         "description": "Hantera organisationens medlemmar och roller.",
@@ -1347,6 +1487,78 @@
           "activateDescription": "Vill du aktivera \"{name}\"?",
           "deleteLabel": "Ta bort",
           "confirmLabel": "Bekräfta"
+        },
+        "drawer": {
+          "editTitle": "Redigera utmärkelse",
+          "createTitle": "Skapa utmärkelse",
+          "editDescription": "Ändra inställningar för denna utmärkelse.",
+          "createDescription": "Skapa en ny utmärkelse för din organisation.",
+          "namePlaceholder": "T.ex. Första spelet",
+          "descriptionPlaceholder": "Beskriv hur man uppnår denna utmärkelse...",
+          "thresholdPlaceholder": "T.ex. 10"
+        },
+        "labels": {
+          "name": "Namn",
+          "description": "Beskrivning",
+          "key": "Nyckel (valfritt)",
+          "keyPlaceholder": "t.ex. first-game",
+          "keyHelper": "Unik identifierare för programmatisk referens. Endast små bokstäver, siffror, bindestreck och understreck.",
+          "condition": "Villkor",
+          "threshold": "Tröskelvärde",
+          "thresholdHelper": "Antal som krävs för att uppnå utmärkelsen.",
+          "status": "Status"
+        },
+        "conditions": {
+          "manual": "Manuell",
+          "manualDesc": "Tilldelas manuellt av admin",
+          "gamesPlayed": "Spelade spel",
+          "gamesPlayedDesc": "Efter ett antal spelade spel",
+          "scoreReached": "Poäng uppnådd",
+          "scoreReachedDesc": "När en viss poängnivå nås",
+          "streak": "Streak",
+          "streakDesc": "Efter ett antal dagar i rad",
+          "firstGame": "Första spelet",
+          "firstGameDesc": "När användaren spelar sitt första spel",
+          "perfectScore": "Perfekt poäng",
+          "perfectScoreDesc": "När användaren får max poäng"
+        },
+        "statusOptions": {
+          "draft": "Utkast",
+          "draftDesc": "Ej synlig eller delbar",
+          "active": "Aktiv",
+          "activeDesc": "Synlig och kan delas ut",
+          "archived": "Arkiverad",
+          "archivedDesc": "Dold från listor"
+        },
+        "award": {
+          "title": "Dela ut utmärkelse",
+          "description": "Dela ut \"{name}\" till medlemmar i din organisation.",
+          "selectRecipients": "Välj mottagare",
+          "searchPlaceholder": "Sök medlemmar...",
+          "selectAll": "Välj alla ({count})",
+          "clearSelection": "Rensa ({count})",
+          "usersSelected": "{count} användare valda",
+          "messageLabel": "Meddelande (valfritt)",
+          "messagePlaceholder": "Grattis till din nya utmärkelse!",
+          "messageHelper": "Visas för mottagarna när de får utmärkelsen.",
+          "unknownUser": "Okänd användare",
+          "member": "medlem",
+          "cancel": "Avbryt",
+          "awarding": "Tilldelar...",
+          "awardToUsers": "Dela ut till {count} användare",
+          "errors": {
+            "couldNotLoadMembers": "Kunde inte ladda medlemmar",
+            "selectAtLeastOne": "Välj minst en mottagare",
+            "couldNotAward": "Kunde inte dela ut utmärkelse",
+            "unexpected": "Ett oväntat fel uppstod"
+          },
+          "noMembersMatchSearch": "Inga medlemmar matchar sökningen",
+          "noMembersInOrg": "Inga medlemmar i organisationen"
+        },
+        "errors": {
+          "couldNotUpdate": "Kunde inte uppdatera utmärkelse",
+          "couldNotCreate": "Kunde inte skapa utmärkelse",
+          "unexpected": "Ett oväntat fel uppstod"
         }
       }
     },
@@ -2553,7 +2765,53 @@
             "updateFailed": "Kunde inte uppdatera achievement",
             "createFailed": "Kunde inte skapa achievement",
             "unexpected": "Ett oväntat fel uppstod"
-          }
+          },
+          "steps": {
+            "layers": {
+              "name": "Lagerval",
+              "description": "Välj bas, bakgrunder och symbol"
+            },
+            "themeColors": {
+              "name": "Tema & Färger",
+              "description": "Anpassa färger och tema"
+            },
+            "metadata": {
+              "name": "Metadata",
+              "description": "Titel och beskrivning"
+            },
+            "publishing": {
+              "name": "Publicering",
+              "description": "Granska och publicera"
+            }
+          },
+          "themeAndColors": "Tema & Färger",
+          "themeAndColorsDescription": "Välj tema eller anpassa färger individuellt för varje lager.",
+          "randomizeColors": "Slumpa färger",
+          "quickThemeSelect": "Snabbval tema",
+          "customColorsPerLayer": "Anpassade färger per lager",
+          "foreground": "Förgrund",
+          "layerLabels": {
+            "base": "Bas",
+            "background": "Bakgrund",
+            "symbol": "Symbol"
+          },
+          "backgrounds": {
+            "label": "Bakgrund",
+            "black": "Svart",
+            "white": "Vit",
+            "light": "Ljus",
+            "dark": "Mörk",
+            "gray": "Grå",
+            "transparent": "Transparent"
+          },
+          "selectCustomColor": "Välj anpassad färg",
+          "custom": "Anpassad",
+          "customEllipsis": "Anpassad...",
+          "textColor": "Textfärg",
+          "selectCustomTextColor": "Välj anpassad textfärg",
+          "circleBackground": "Cirkelbakgrund",
+          "customColor": "Anpassad färg",
+          "cardBackground": "Kortbakgrund"
         },
         "awardModal": {
           "title": "Tilldela achievement",
@@ -6870,13 +7128,17 @@
       "settings": "Inställningar",
       "help": "Hjälp",
       "logout": "Logga ut",
-      "goToDashboard": "Gå till dashboard",
+      "goToDashboard": "Gå till startsidan",
       "logoAlt": "Lekbanken ikon",
       "gamification": "Din resa",
       "browse": "Upptäck",
       "play": "Spela",
       "tip": "Tips",
-      "tipText": "Lägg till dina mest använda filter som snabbval för snabbare planering."
+      "tipText": "Lägg till dina mest använda filter som snabbval för snabbare planering.",
+      "loggedInAs": "Du är inloggad som",
+      "viewProfile": "Visa profil",
+      "marketing": "Marknadsföring",
+      "visitWebsite": "Besök hemsidan"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -6886,7 +7148,40 @@
       "quickActions": "Snabbåtgärder",
       "startSession": "Starta session",
       "createPlan": "Skapa plan",
-      "browseGames": "Bläddra spel"
+      "browseGames": "Bläddra spel",
+      "loading": "Laddar...",
+      "heroTitle": "Redo för nya upplevelser?",
+      "heroSubtitle": "Utforska vår samling eller fortsätt där du slutade senast.",
+      "stats": {
+        "streakDays": "Dagars streak",
+        "coins": "Mynt",
+        "achievements": "Achievements"
+      },
+      "pinnedAchievements": {
+        "title": "Visas på din dashboard",
+        "manage": "Hantera",
+        "emptyHint": "Välj upp till 3 utmärkelser som ska visas här.",
+        "goToAchievements": "Gå till utmärkelser"
+      },
+      "cosmetics": {
+        "title": "Cosmetics",
+        "toShop": "Till butiken",
+        "locked": "Utrustning låst",
+        "unlockHint": "Lås upp genom att nå nästa nivå.",
+        "lockedLevel": "Låst: nivå {level}",
+        "loading": "Laddar cosmetics…",
+        "empty": "Du har inga cosmetics än."
+      },
+      "recentActivity": {
+        "title": "Senaste aktivitet",
+        "loading": "Laddar aktivitet…",
+        "empty": "Ingen aktivitet än."
+      },
+      "continue": {
+        "title": "Fortsätt utforska",
+        "findGames": "Hitta nya lekar",
+        "exploreDescription": "Utforska 100+ aktiviteter för alla åldrar och gruppstorlekar"
+      }
     },
     "gameDetail": {
       "notFoundTitle": "Leken hittades inte",
@@ -6963,6 +7258,20 @@
       "preferences": "Preferenser",
       "security": "Säkerhet",
       "notifications": "Notifikationer",
+      "loading": "Laddar profil...",
+      "noEmailAvailable": "Ingen e-post tillgänglig",
+      "avatarInitialsHint": "Använd initialer om du inte vill visa en bild.",
+      "loadingOrganizations": "Laddar organisationer...",
+      "noOrganization": "Du tillhör ingen organisation ännu.",
+      "selectLanguage": "Välj språk",
+      "achievements": {
+        "title": "Prestationer",
+        "viewAll": "Visa alla",
+        "unlockedCount": "{unlocked} av {total} upplåsta",
+        "clickBadgeHint": "Klicka på ett märke för att se detaljer",
+        "noAchievementsYet": "Inga prestationer tillgängliga ännu.",
+        "noUnlockedYet": "Inga prestationer upplåsta ännu. Fortsätt spela!"
+      },
       "edit": {
         "label": "Profil",
         "title": "Redigera profil",
@@ -7099,14 +7408,15 @@
           "mfaEnabled": "MFA aktiverad",
           "mfaDisabled": "MFA ej aktiverad",
           "enableMfa": "Aktivera nu",
-          "title": "Säkerhetsinställningar",
+          "title": "Säkerhet & MFA",
           "description": "Hantera tvåfaktorsautentisering och sessioner",
           "mfa": {
             "title": "Tvåfaktorsautentisering",
+            "status": "MFA-status",
             "enabled": "Aktiverad",
             "disabled": "Ej aktiverad",
             "enable": "Aktivera MFA",
-            "disable": "Inaktivera MFA",
+            "disable": "Stäng av",
             "description": "Lägg till ett extra säkerhetslager på ditt konto"
           },
           "sessions": {
@@ -7261,7 +7571,11 @@
           "title": "Preferenser",
           "description": "Anpassa din upplevelse i Lekbanken",
           "language": "Språk",
-          "theme": "Tema",
+          "theme": {
+            "label": "Tema"
+          },
+          "showThemeToggle": "Visa tema-omkopplare i headern",
+          "showThemeToggleHint": "Styr om snabb-knappen för ljust/mörkt läge syns högst upp.",
           "timezone": "Tidszon",
           "accessibility": "Tillgänglighet",
           "fontSize": "Textstorlek",

@@ -8822,9 +8822,35 @@
       }
     },
     "features": {
+      "tagline": "Allt du behöver",
       "badge": "Features",
-      "title": "Arkitekturen i korthet",
-      "description": "UI-världarna hålls åtskilda men delar komponentbibliotek. Strukturen i app/ följer Next.js App Router med route groups för marketing, app och admin.",
+      "title": "Byggd för aktivitetsledare",
+      "description": "Kraftfulla verktyg för att hitta, planera och dela aktiviteter med ditt team och deltagare.",
+      "items": {
+        "smartFilters": {
+          "title": "Smarta filter",
+          "description": "Hitta rätt aktivitet snabbt med filter för ålder, gruppstorlek, utrustning och mer."
+        },
+        "sessionBuilder": {
+          "title": "Pass-byggare",
+          "description": "Dra och släpp aktiviteter i pass. Sätt tider och anteckningar för varje aktivitet."
+        },
+        "sharingExport": {
+          "title": "Delning & export",
+          "description": "Dela pass med kollegor eller exportera till PDF för offline-användning."
+        },
+        "safetyConsent": {
+          "title": "Säkerhet & samtycke",
+          "description": "Inbyggda säkerhetskontroller och samtyckesinsamling för deltagarnas välbefinnande."
+        }
+      },
+      "badges": {
+        "loginSso": "SSO-inloggning",
+        "sharedFolders": "Delade mappar",
+        "pdfPrint": "PDF & utskrift",
+        "reusableTemplates": "Återanvändbara mallar",
+        "login": "Logga in →"
+      },
       "groups": {
         "sharedProviders": {
           "title": "Delade providers",

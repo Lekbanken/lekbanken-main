@@ -8300,6 +8300,36 @@
         "plan": "Ukeplan",
         "ageRange": "6-12 år"
       }
+    },
+    "features": {
+      "tagline": "Alt du trenger",
+      "title": "Bygget for aktivitetsledere",
+      "description": "Kraftige verktøy for å finne, planlegge og dele aktiviteter med teamet og deltakerne dine.",
+      "items": {
+        "smartFilters": {
+          "title": "Smarte filtre",
+          "description": "Finn den perfekte aktiviteten raskt med filtre for alder, gruppestørrelse, utstyr og mer."
+        },
+        "sessionBuilder": {
+          "title": "Økt-bygger",
+          "description": "Dra og slipp aktiviteter i økter. Sett tider og notater for hver aktivitet."
+        },
+        "sharingExport": {
+          "title": "Deling og eksport",
+          "description": "Del økter med kolleger eller eksporter til PDF for offline-bruk."
+        },
+        "safetyConsent": {
+          "title": "Sikkerhet og samtykke",
+          "description": "Innebygde sikkerhetssjekker og samtykkeinnsamling for deltakernes velvære."
+        }
+      },
+      "badges": {
+        "loginSso": "SSO-innlogging",
+        "sharedFolders": "Delte mapper",
+        "pdfPrint": "PDF og utskrift",
+        "reusableTemplates": "Gjenbrukbare maler",
+        "login": "Logg inn →"
+      }
     }
   },
   "demo": {

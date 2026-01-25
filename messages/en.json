@@ -8147,6 +8147,36 @@
         "plan": "Weekly plan",
         "ageRange": "Ages 6-12"
       }
+    },
+    "features": {
+      "tagline": "Everything you need",
+      "title": "Built for activity leaders",
+      "description": "Powerful tools to find, plan, and share activities with your team and participants.",
+      "items": {
+        "smartFilters": {
+          "title": "Smart filters",
+          "description": "Find the perfect activity fast with filters for age, group size, equipment, and more."
+        },
+        "sessionBuilder": {
+          "title": "Session builder",
+          "description": "Drag and drop activities into sessions. Set timings and notes for each activity."
+        },
+        "sharingExport": {
+          "title": "Sharing & export",
+          "description": "Share sessions with colleagues or export to PDF for offline use."
+        },
+        "safetyConsent": {
+          "title": "Safety & consent",
+          "description": "Built-in safety checks and consent collection for participant welfare."
+        }
+      },
+      "badges": {
+        "loginSso": "SSO login",
+        "sharedFolders": "Shared folders",
+        "pdfPrint": "PDF & print",
+        "reusableTemplates": "Reusable templates",
+        "login": "Log in →"
+      }
     }
   },
   "demo": {

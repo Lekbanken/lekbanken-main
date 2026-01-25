@@ -329,6 +329,15 @@
     "noPlansByFilter": "Inga planer matchar dina filter",
     "noBlocksInPlanYet": "Inga block i planen ännu",
     "dragToSort": "Dra för att sortera",
+    "editBlock": "Redigera block",
+    "deleteBlock": "Ta bort block",
+    "optional": "Valfri",
+    "blockTypes": {
+      "game": "Lek",
+      "pause": "Paus",
+      "preparation": "Förberedelse",
+      "custom": "Notis"
+    },
     "search": {
       "placeholder": "Sök planer..."
     },
@@ -453,6 +462,143 @@
       "visibilityLabel": "Synlighet:",
       "tenantVisibilityDescription": "Synlig för alla i din organisation",
       "publicVisibilityDescription": "Synlig för alla användare"
+    },
+    "wizard": {
+      "tabs": {
+        "plans": "Mina planer",
+        "edit": "Planera",
+        "calendar": "Kalender"
+      },
+      "steps": {
+        "grund": {
+          "title": "Grund",
+          "description": "Ange grundläggande information om din plan",
+          "nameLabel": "Titel",
+          "namePlaceholder": "T.ex. Morgonsamling måndag",
+          "descriptionLabel": "Beskrivning",
+          "descriptionPlaceholder": "Kort beskrivning av planens syfte...",
+          "visibilityLabel": "Synlighet",
+          "visibilityPrivate": "Endast du kan se denna plan.",
+          "visibilityTenant": "Alla i din organisation kan se denna plan.",
+          "visibilityPublic": "Alla användare kan se denna plan.",
+          "saveButton": "Spara",
+          "saving": "Sparar...",
+          "continueButton": "Fortsätt till block"
+        },
+        "bygg": {
+          "title": "Bygg plan",
+          "description": "Lägg till och ordna aktiviteter",
+          "continueButton": "Fortsätt till anteckningar"
+        },
+        "anteckningar": {
+          "title": "Anteckningar",
+          "description": "Lägg till anteckningar för dig själv och ditt team",
+          "privateNotesLabel": "Privata anteckningar",
+          "privateNotesHint": "Endast synliga för dig",
+          "privateNotesPlaceholder": "Egna anteckningar, tankar, förberedelser...",
+          "privateNotesDescription": "Dessa anteckningar sparas automatiskt och är endast synliga för dig.",
+          "tenantNotesLabel": "Delade anteckningar",
+          "tenantNotesHint": "Synliga för organisationen",
+          "tenantNotesPlaceholder": "Information att dela med kollegor...",
+          "tenantNotesDescription": "Dessa anteckningar delas med alla i din organisation som har tillgång till planen.",
+          "tenantNotesDisabled": "Delade anteckningar blir tillgängliga när planens synlighet ändras till \"Organisation\" eller \"Publik\".",
+          "backButton": "Tillbaka",
+          "continueButton": "Fortsätt till granskning"
+        },
+        "granska": {
+          "title": "Granska & Publicera",
+          "description": "Förhandsgranska och publicera din plan",
+          "previewButton": "Förhandsgranska",
+          "versionsButton": "Versionshistorik",
+          "shareButton": "Dela plan",
+          "exportButton": "Exportera CSV",
+          "publishTitle": "Redo att publicera?",
+          "publishDescriptionDraft": "Publicera planen för att kunna köra den och dela med andra.",
+          "publishDescriptionModified": "Du har gjort ändringar sedan senaste publicering. Publicera för att uppdatera.",
+          "publishButton": "Publicera plan",
+          "publishUpdateButton": "Publicera uppdatering",
+          "publishing": "Publicerar...",
+          "addBlocksFirst": "Lägg till minst ett block innan du publicerar.",
+          "publishedTitle": "Planen är publicerad",
+          "publishedDescription": "Version {version} är aktiv och redo att köras.",
+          "backButton": "Tillbaka",
+          "continueButton": "Fortsätt till körning"
+        },
+        "kor": {
+          "title": "Kör",
+          "description": "Starta och genomför din plan",
+          "readyTitle": "Redo att köra!",
+          "readyDescription": "Planen är publicerad och klar att genomföras.",
+          "startButton": "Starta körning",
+          "notReadyTitle": "Kan inte köra ännu",
+          "notReadyNotPublished": "Planen måste publiceras innan den kan köras.",
+          "notReadyNoBlocks": "Lägg till minst ett block i planen.",
+          "notReadyNoPermission": "Du har inte behörighet att köra planer.",
+          "goToGranska": "Gå till Granska & Publicera",
+          "goToBygg": "Gå till Bygg plan",
+          "tipsTitle": "Tips för genomförande",
+          "tip1": "Förbered eventuellt material innan du startar",
+          "tip2": "Använd timern för att hålla koll på tiden per block",
+          "tip3": "Du kan pausa och återuppta körningen när som helst",
+          "backButton": "Tillbaka"
+        }
+      },
+      "calendar": {
+        "title": "Kalender",
+        "comingSoonTitle": "Kalendervyn kommer snart",
+        "comingSoonDescription": "Här kommer du kunna se schemalagda aktiviteter och planera genomföranden i en kalendervy.",
+        "today": "Idag",
+        "previousPeriod": "Föregående period",
+        "nextPeriod": "Nästa period",
+        "monthView": "Månad",
+        "weekView": "Vecka",
+        "noData": "Ingen kalenderdata tillgänglig",
+        "selectDay": "Välj en dag",
+        "selectDayDescription": "Klicka på en dag i kalendern för att se schemalagda planer.",
+        "addSchedule": "Schemalägg",
+        "noSchedulesForDay": "Inga schemalagda planer denna dag",
+        "scheduleFirst": "Schemalägg din första plan",
+        "blocks": "block",
+        "startPlan": "Starta plan",
+        "markComplete": "Klar",
+        "markSkipped": "Hoppa över",
+        "status": {
+          "scheduled": "Schemalagd",
+          "completed": "Genomförd",
+          "skipped": "Överhoppad"
+        }
+      },
+      "navigation": {
+        "previousStep": "Föregående steg",
+        "nextStep": "Nästa steg",
+        "goToStep": "Gå till {stepName}",
+        "stepOf": "Steg {current} av {total}"
+      },
+      "visibility": {
+        "private": "Privat",
+        "tenant": "Organisation",
+        "public": "Publik"
+      },
+      "createDialog": {
+        "title": "Skapa ny plan",
+        "description": "Ge din plan ett namn och en valfri beskrivning.",
+        "nameLabel": "Namn",
+        "namePlaceholder": "Min aktivitetsplan",
+        "descriptionLabel": "Beskrivning",
+        "descriptionPlaceholder": "Beskriv vad planen innehåller...",
+        "cancelButton": "Avbryt",
+        "createButton": "Skapa plan",
+        "creating": "Skapar..."
+      },
+      "readOnly": {
+        "notice": "Du visar en delad plan. Du har endast läsbehörighet."
+      },
+      "errors": {
+        "planNotFound": "Planen kunde inte hittas",
+        "loadFailed": "Något gick fel vid hämtning av planen.",
+        "checkLink": "Kontrollera att du har rätt länk eller skapa en ny plan.",
+        "goToPlans": "Gå till mina planer"
+      }
     }
   },
   "admin": {

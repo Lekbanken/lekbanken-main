@@ -1,0 +1,442 @@
+/**
+ * Planner Animations CSS Module
+ * 
+ * CSS-based animations for the planner feature.
+ * Uses CSS animations and transitions for smooth performance.
+ */
+
+/* =============================================================================
+   Base Animation Utilities
+   ============================================================================= */
+
+/* Fade In */
+.fadeIn {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Fade Out */
+.fadeOut {
+  animation: fadeOut 0.2s ease-in forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Slide Up */
+.slideUp {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide Down */
+.slideDown {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide In from Right */
+.slideInRight {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide In from Left */
+.slideInLeft {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale In */
+.scaleIn {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =============================================================================
+   List Animations
+   ============================================================================= */
+
+/* Staggered list item animation */
+.listItem {
+  opacity: 0;
+  animation: listItemIn 0.3s ease-out forwards;
+}
+
+.listItem:nth-child(1) { animation-delay: 0ms; }
+.listItem:nth-child(2) { animation-delay: 50ms; }
+.listItem:nth-child(3) { animation-delay: 100ms; }
+.listItem:nth-child(4) { animation-delay: 150ms; }
+.listItem:nth-child(5) { animation-delay: 200ms; }
+.listItem:nth-child(6) { animation-delay: 250ms; }
+.listItem:nth-child(7) { animation-delay: 300ms; }
+.listItem:nth-child(8) { animation-delay: 350ms; }
+.listItem:nth-child(9) { animation-delay: 400ms; }
+.listItem:nth-child(10) { animation-delay: 450ms; }
+
+@keyframes listItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* List item removal */
+.listItemOut {
+  animation: listItemOut 0.2s ease-in forwards;
+}
+
+@keyframes listItemOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+}
+
+/* =============================================================================
+   Card Animations
+   ============================================================================= */
+
+.cardEnter {
+  animation: cardEnter 0.3s ease-out forwards;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.cardExit {
+  animation: cardExit 0.2s ease-in forwards;
+}
+
+@keyframes cardExit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Card hover lift effect */
+.cardHover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cardHover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 4px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================================
+   Wizard Step Transitions
+   ============================================================================= */
+
+.stepForward {
+  animation: stepForward 0.35s ease-out forwards;
+}
+
+@keyframes stepForward {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.stepBackward {
+  animation: stepBackward 0.35s ease-out forwards;
+}
+
+@keyframes stepBackward {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* =============================================================================
+   Button & Interactive Animations
+   ============================================================================= */
+
+.buttonPress {
+  transition: transform 0.1s ease;
+}
+
+.buttonPress:active {
+  transform: scale(0.97);
+}
+
+.pulseOnce {
+  animation: pulseOnce 0.6s ease-in-out;
+}
+
+@keyframes pulseOnce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Success checkmark animation */
+.successCheck {
+  animation: successCheck 0.4s ease-out forwards;
+}
+
+@keyframes successCheck {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* =============================================================================
+   Loading & Skeleton Animations
+   ============================================================================= */
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =============================================================================
+   Swipe Action Animations
+   ============================================================================= */
+
+.swipeReveal {
+  transition: transform 0.2s ease-out;
+}
+
+.swipeActionButton {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.swipeActionButton:active {
+  transform: scale(0.95);
+}
+
+/* =============================================================================
+   Calendar Animations
+   ============================================================================= */
+
+.calendarDayHover {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.calendarDayHover:hover {
+  transform: scale(1.05);
+}
+
+.calendarMonthChange {
+  animation: calendarMonthChange 0.3s ease-out forwards;
+}
+
+@keyframes calendarMonthChange {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* =============================================================================
+   Toast/Notification Animations
+   ============================================================================= */
+
+.toastEnter {
+  animation: toastEnter 0.3s ease-out forwards;
+}
+
+@keyframes toastEnter {
+  from {
+    opacity: 0;
+    transform: translateY(100%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.toastExit {
+  animation: toastExit 0.2s ease-in forwards;
+}
+
+@keyframes toastExit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.95);
+  }
+}
+
+/* =============================================================================
+   Reduced Motion
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .fadeIn,
+  .fadeOut,
+  .slideUp,
+  .slideDown,
+  .slideInRight,
+  .slideInLeft,
+  .scaleIn,
+  .listItem,
+  .listItemOut,
+  .cardEnter,
+  .cardExit,
+  .stepForward,
+  .stepBackward,
+  .pulseOnce,
+  .successCheck,
+  .shimmer,
+  .spin,
+  .calendarMonthChange,
+  .toastEnter,
+  .toastExit {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  
+  .cardHover,
+  .buttonPress,
+  .calendarDayHover,
+  .swipeReveal,
+  .swipeActionButton {
+    transition: none !important;
+  }
+}

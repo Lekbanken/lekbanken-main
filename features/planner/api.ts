@@ -51,8 +51,8 @@ export async function fetchPlansWithPagination(query?: { search?: string; tenant
 
 export async function fetchPlan(planId: string) {
   const res = await fetch(`/api/plans/${planId}`)
-  const data = await handleJson<{ plan: PlannerPlan }>(res)
-  return data.plan
+  const data = await handleJson<{ plan: PlannerPlan; _capabilities?: PlanCapabilities }>(res)
+  return { plan: data.plan, capabilities: data._capabilities }
 }
 
 export async function createPlan(payload: {

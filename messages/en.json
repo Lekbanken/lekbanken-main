@@ -348,6 +348,15 @@
     "noPlansByFilter": "No plans match your filters",
     "noBlocksInPlanYet": "No blocks in the plan yet",
     "dragToSort": "Drag to sort",
+    "editBlock": "Edit block",
+    "deleteBlock": "Delete block",
+    "optional": "Optional",
+    "blockTypes": {
+      "game": "Game",
+      "pause": "Pause",
+      "preparation": "Preparation",
+      "custom": "Note"
+    },
     "search": {
       "placeholder": "Search plans..."
     },
@@ -472,6 +481,143 @@
       "visibilityLabel": "Visibility:",
       "tenantVisibilityDescription": "Visible to everyone in your organization",
       "publicVisibilityDescription": "Visible to all users"
+    },
+    "wizard": {
+      "tabs": {
+        "plans": "My plans",
+        "edit": "Plan",
+        "calendar": "Calendar"
+      },
+      "steps": {
+        "grund": {
+          "title": "Basics",
+          "description": "Enter basic information about your plan",
+          "nameLabel": "Title",
+          "namePlaceholder": "E.g. Monday morning assembly",
+          "descriptionLabel": "Description",
+          "descriptionPlaceholder": "Brief description of the plan's purpose...",
+          "visibilityLabel": "Visibility",
+          "visibilityPrivate": "Only you can see this plan.",
+          "visibilityTenant": "Everyone in your organization can see this plan.",
+          "visibilityPublic": "All users can see this plan.",
+          "saveButton": "Save",
+          "saving": "Saving...",
+          "continueButton": "Continue to blocks"
+        },
+        "bygg": {
+          "title": "Build plan",
+          "description": "Add and organize activities",
+          "continueButton": "Continue to notes"
+        },
+        "anteckningar": {
+          "title": "Notes",
+          "description": "Add notes for yourself and your team",
+          "privateNotesLabel": "Private notes",
+          "privateNotesHint": "Only visible to you",
+          "privateNotesPlaceholder": "Personal notes, thoughts, preparations...",
+          "privateNotesDescription": "These notes are saved automatically and only visible to you.",
+          "tenantNotesLabel": "Shared notes",
+          "tenantNotesHint": "Visible to organization",
+          "tenantNotesPlaceholder": "Information to share with colleagues...",
+          "tenantNotesDescription": "These notes are shared with everyone in your organization who has access to the plan.",
+          "tenantNotesDisabled": "Shared notes become available when plan visibility is changed to \"Organization\" or \"Public\".",
+          "backButton": "Back",
+          "continueButton": "Continue to review"
+        },
+        "granska": {
+          "title": "Review & Publish",
+          "description": "Preview and publish your plan",
+          "previewButton": "Preview",
+          "versionsButton": "Version history",
+          "shareButton": "Share plan",
+          "exportButton": "Export CSV",
+          "publishTitle": "Ready to publish?",
+          "publishDescriptionDraft": "Publish the plan to run it and share with others.",
+          "publishDescriptionModified": "You have made changes since the last publish. Publish to update.",
+          "publishButton": "Publish plan",
+          "publishUpdateButton": "Publish update",
+          "publishing": "Publishing...",
+          "addBlocksFirst": "Add at least one block before publishing.",
+          "publishedTitle": "Plan is published",
+          "publishedDescription": "Version {version} is active and ready to run.",
+          "backButton": "Back",
+          "continueButton": "Continue to run"
+        },
+        "kor": {
+          "title": "Run",
+          "description": "Start and execute your plan",
+          "readyTitle": "Ready to run!",
+          "readyDescription": "The plan is published and ready to be executed.",
+          "startButton": "Start run",
+          "notReadyTitle": "Cannot run yet",
+          "notReadyNotPublished": "The plan must be published before it can be run.",
+          "notReadyNoBlocks": "Add at least one block to the plan.",
+          "notReadyNoPermission": "You don't have permission to run plans.",
+          "goToGranska": "Go to Review & Publish",
+          "goToBygg": "Go to Build plan",
+          "tipsTitle": "Tips for execution",
+          "tip1": "Prepare any materials before starting",
+          "tip2": "Use the timer to keep track of time per block",
+          "tip3": "You can pause and resume the run at any time",
+          "backButton": "Back"
+        }
+      },
+      "calendar": {
+        "title": "Calendar",
+        "comingSoonTitle": "Calendar view coming soon",
+        "comingSoonDescription": "Here you'll be able to see scheduled activities and plan executions in a calendar view.",
+        "today": "Today",
+        "previousPeriod": "Previous period",
+        "nextPeriod": "Next period",
+        "monthView": "Month",
+        "weekView": "Week",
+        "noData": "No calendar data available",
+        "selectDay": "Select a day",
+        "selectDayDescription": "Click on a day in the calendar to see scheduled plans.",
+        "addSchedule": "Schedule",
+        "noSchedulesForDay": "No scheduled plans for this day",
+        "scheduleFirst": "Schedule your first plan",
+        "blocks": "blocks",
+        "startPlan": "Start plan",
+        "markComplete": "Complete",
+        "markSkipped": "Skip",
+        "status": {
+          "scheduled": "Scheduled",
+          "completed": "Completed",
+          "skipped": "Skipped"
+        }
+      },
+      "navigation": {
+        "previousStep": "Previous step",
+        "nextStep": "Next step",
+        "goToStep": "Go to {stepName}",
+        "stepOf": "Step {current} of {total}"
+      },
+      "visibility": {
+        "private": "Private",
+        "tenant": "Organization",
+        "public": "Public"
+      },
+      "createDialog": {
+        "title": "Create new plan",
+        "description": "Give your plan a name and an optional description.",
+        "nameLabel": "Name",
+        "namePlaceholder": "My activity plan",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Describe what the plan contains...",
+        "cancelButton": "Cancel",
+        "createButton": "Create plan",
+        "creating": "Creating..."
+      },
+      "readOnly": {
+        "notice": "You are viewing a shared plan. You have read-only access."
+      },
+      "errors": {
+        "planNotFound": "Plan not found",
+        "loadFailed": "Something went wrong while loading the plan.",
+        "checkLink": "Check that you have the correct link or create a new plan.",
+        "goToPlans": "Go to my plans"
+      }
     }
   },
   "admin": {

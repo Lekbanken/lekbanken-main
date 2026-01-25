@@ -17,8 +17,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { BlockRow } from "./BlockRow";
+import { TouchBlockRow } from "./TouchBlockRow";
 import { cn } from "@/lib/utils";
 import type { PlannerBlock } from "@/types/planner";
+import { usePlannerFeature } from "@/lib/features/planner-features";
 
 interface ExtendedCapabilities {
   canEditBlocks: boolean;
@@ -46,6 +48,7 @@ export function BlockList({
   isReordering = false,
 }: BlockListProps) {
   const t = useTranslations('planner');
+  const useTouchUI = usePlannerFeature('planner_gestures');
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -88,17 +91,29 @@ export function BlockList({
         >
           <ul className="space-y-3">
             {blocks.map((block, index) => (
-              <BlockRow
-                key={block.id}
-                block={block}
-                index={index + 1}
-                canEdit={capabilities.canEditBlocks}
-                canDelete={capabilities.canDeleteBlocks}
-                canReorder={capabilities.canReorderBlocks}
-                onEdit={() => onEditBlock(block)}
-                onDelete={() => onDeleteBlock(block.id)}
-                onDurationChange={(duration: number) => onDurationChange(block.id, duration)}
-              />
+              useTouchUI ? (
+                <TouchBlockRow
+                  key={block.id}
+                  block={block}
+                  index={index + 1}
+                  canEdit={capabilities.canEditBlocks}
+                  canDelete={capabilities.canDeleteBlocks}
+                  onEdit={() => onEditBlock(block)}
+                  onDelete={() => onDeleteBlock(block.id)}
+                />
+              ) : (
+                <BlockRow
+                  key={block.id}
+                  block={block}
+                  index={index + 1}
+                  canEdit={capabilities.canEditBlocks}
+                  canDelete={capabilities.canDeleteBlocks}
+                  canReorder={capabilities.canReorderBlocks}
+                  onEdit={() => onEditBlock(block)}
+                  onDelete={() => onDeleteBlock(block.id)}
+                  onDurationChange={(duration: number) => onDurationChange(block.id, duration)}
+                />
+              )
             ))}
           </ul>
         </SortableContext>

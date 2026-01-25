@@ -1,7 +1,10 @@
-"use client";
+import { redirect } from "next/navigation";
 
-import { PlannerPage } from "@/features/planner/PlannerPage";
-
-export default function PlannerRoutePage() {
-  return <PlannerPage />;
+/**
+ * Planner Root Page (/app/planner)
+ *
+ * Redirects to the plan library.
+ */
+export default function PlannerRootPage() {
+  redirect("/app/planner/plans");
 }

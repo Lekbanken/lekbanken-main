@@ -230,6 +230,36 @@
       "maxLength": "Max {max} tecken"
     }
   },
+  "gamification": {
+    "errorTitle": "Kunde inte ladda",
+    "yourJourney": "Din resa",
+    "level": "Nivå",
+    "progress": "Framsteg",
+    "achievementsLabel": "Prestationer",
+    "nextReward": "Nästa belöning",
+    "achievements": "Prestationer",
+    "noAchievementsYet": "Inga prestationer än",
+    "playToEarnBadges": "Spela för att tjäna badges!",
+    "viewAllAchievements": "Visa alla prestationer",
+    "coins": "Mynt",
+    "noCoinsActivityYet": "Ingen myntaktivitet än",
+    "viewAllTransactions": "Visa alla transaktioner",
+    "streak": {
+      "yourStreak": "Din streak",
+      "daysInARow": "dagar i rad",
+      "best": "Bäst",
+      "days": "dagar",
+      "lastActive": "Senast aktiv",
+      "thisWeek": "Denna vecka"
+    },
+    "cta": {
+      "keepEarning": "Fortsätt tjäna",
+      "continuePlaying": "Fortsätt spela",
+      "continuePlayingDesc": "Tjäna XP genom att spela fler lekar",
+      "planSession": "Planera ett pass",
+      "planSessionDesc": "Tjäna XP genom att skapa pass"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",

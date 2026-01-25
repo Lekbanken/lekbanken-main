@@ -414,6 +414,36 @@
       "maxLength": "Maks {max} tegn"
     }
   },
+  "gamification": {
+    "errorTitle": "Kunne ikke laste",
+    "yourJourney": "Din reise",
+    "level": "Nivå",
+    "progress": "Fremgang",
+    "achievementsLabel": "Prestasjoner",
+    "nextReward": "Neste belønning",
+    "achievements": "Prestasjoner",
+    "noAchievementsYet": "Ingen prestasjoner ennå",
+    "playToEarnBadges": "Spill for å tjene badges!",
+    "viewAllAchievements": "Vis alle prestasjoner",
+    "coins": "Mynter",
+    "noCoinsActivityYet": "Ingen myntaktivitet ennå",
+    "viewAllTransactions": "Vis alle transaksjoner",
+    "streak": {
+      "yourStreak": "Din streak",
+      "daysInARow": "dager på rad",
+      "best": "Best",
+      "days": "dager",
+      "lastActive": "Sist aktiv",
+      "thisWeek": "Denne uken"
+    },
+    "cta": {
+      "keepEarning": "Fortsett å tjene",
+      "continuePlaying": "Fortsett å spille",
+      "continuePlayingDesc": "Tjen XP ved å spille flere spill",
+      "planSession": "Planlegg en økt",
+      "planSessionDesc": "Tjen XP ved å opprette økter"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",

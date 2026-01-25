@@ -249,6 +249,36 @@
       "maxLength": "Maximum {max} characters"
     }
   },
+  "gamification": {
+    "errorTitle": "Could not load",
+    "yourJourney": "Your journey",
+    "level": "Level",
+    "progress": "Progress",
+    "achievementsLabel": "Achievements",
+    "nextReward": "Next reward",
+    "achievements": "Achievements",
+    "noAchievementsYet": "No achievements yet",
+    "playToEarnBadges": "Play to earn badges!",
+    "viewAllAchievements": "View all achievements",
+    "coins": "Coins",
+    "noCoinsActivityYet": "No coin activity yet",
+    "viewAllTransactions": "View all transactions",
+    "streak": {
+      "yourStreak": "Your streak",
+      "daysInARow": "days in a row",
+      "best": "Best",
+      "days": "days",
+      "lastActive": "Last active",
+      "thisWeek": "This week"
+    },
+    "cta": {
+      "keepEarning": "Keep earning",
+      "continuePlaying": "Continue playing",
+      "continuePlayingDesc": "Earn XP by playing more games",
+      "planSession": "Plan a session",
+      "planSessionDesc": "Earn XP by creating sessions"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",

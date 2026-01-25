@@ -8116,6 +8116,37 @@
           "generic": "Something went wrong. Please try again."
         }
       }
+    },
+    "footer": {
+      "description": "Lekbanken helps you plan, organize and run activities with children and youth. Save time and create better experiences.",
+      "login": "Log in",
+      "getStartedFree": "Get started free",
+      "copyright": "Lekbanken AS. All rights reserved."
+    },
+    "hero": {
+      "badge": "✨ New: AI-powered activity plans",
+      "title": "Plan <highlight>activities</highlight> that engage",
+      "description": "Lekbanken is your digital toolbox for planning, running and sharing activities. Perfect for sports coaches, teachers and activity leaders.",
+      "tryFree": "Try free",
+      "tryDemo": "See demo",
+      "stats": {
+        "activities": {
+          "label": "Activities",
+          "value": "500+"
+        },
+        "timeSaved": {
+          "label": "Time saved",
+          "value": "10h/week"
+        },
+        "shares": {
+          "label": "Shares",
+          "value": "1000+"
+        }
+      },
+      "mockup": {
+        "plan": "Weekly plan",
+        "ageRange": "Ages 6-12"
+      }
     }
   },
   "demo": {

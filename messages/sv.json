@@ -8784,6 +8784,9 @@
     },
     "footer": {
       "tagline": "Aktiviteter, pass och delning för coacher, lärare och ledare.",
+      "description": "Lekbanken hjälper dig planera, organisera och genomföra aktiviteter med barn och unga. Spara tid och skapa bättre upplevelser.",
+      "login": "Logga in",
+      "getStartedFree": "Kom igång gratis",
       "actions": {
         "getStarted": "Kom igång"
       },
@@ -8791,7 +8794,32 @@
         "terms": "Användarvillkor",
         "privacy": "Integritetspolicy"
       },
-      "copyright": "© {year} Lekbanken AS. Alla rättigheter förbehållna."
+      "copyright": "Lekbanken AS. Alla rättigheter förbehållna."
+    },
+    "hero": {
+      "badge": "✨ Nyhet: AI-drivna spelplaner",
+      "title": "Planera <highlight>aktiviteter</highlight> som engagerar",
+      "description": "Lekbanken är din digitala verktygslåda för att planera, genomföra och dela aktiviteter. Perfekt för idrottsledare, lärare och fritidspedagoger.",
+      "tryFree": "Prova gratis",
+      "tryDemo": "Se demo",
+      "stats": {
+        "activities": {
+          "label": "Aktiviteter",
+          "value": "500+"
+        },
+        "timeSaved": {
+          "label": "Tid sparad",
+          "value": "10h/vecka"
+        },
+        "shares": {
+          "label": "Delningar",
+          "value": "1000+"
+        }
+      },
+      "mockup": {
+        "plan": "Veckoplan",
+        "ageRange": "6-12 år"
+      }
     },
     "features": {
       "badge": "Features",

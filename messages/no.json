@@ -8269,6 +8269,37 @@
           "generic": "Noe gikk galt. Prøv igjen."
         }
       }
+    },
+    "footer": {
+      "description": "Lekbanken hjelper deg planlegge, organisere og gjennomføre aktiviteter med barn og unge. Spar tid og skap bedre opplevelser.",
+      "login": "Logg inn",
+      "getStartedFree": "Kom i gang gratis",
+      "copyright": "Lekbanken AS. Alle rettigheter forbeholdt."
+    },
+    "hero": {
+      "badge": "✨ Nyhet: AI-drevne aktivitetsplaner",
+      "title": "Planlegg <highlight>aktiviteter</highlight> som engasjerer",
+      "description": "Lekbanken er din digitale verktøykasse for å planlegge, gjennomføre og dele aktiviteter. Perfekt for idrettsledere, lærere og fritidspedagoger.",
+      "tryFree": "Prøv gratis",
+      "tryDemo": "Se demo",
+      "stats": {
+        "activities": {
+          "label": "Aktiviteter",
+          "value": "500+"
+        },
+        "timeSaved": {
+          "label": "Tid spart",
+          "value": "10t/uke"
+        },
+        "shares": {
+          "label": "Delinger",
+          "value": "1000+"
+        }
+      },
+      "mockup": {
+        "plan": "Ukeplan",
+        "ageRange": "6-12 år"
+      }
     }
   },
   "demo": {

@@ -270,7 +270,10 @@
       "shopDesc": "Använd mynt för belöningar",
       "eventlog": "Eventlogg",
       "eventlogDesc": "Din aktivitetshistorik"
-    }
+    },
+    "achievementsTitle": "Prestationer",
+    "achievementsSubtitle": "Din samling av badges och mål",
+    "overview": "Översikt"
   },
   "browse": {
     "pageTitle": "Utforska",

@@ -454,7 +454,10 @@
       "shopDesc": "Bruk mynter til belønninger",
       "eventlog": "Eventlogg",
       "eventlogDesc": "Din aktivitetshistorikk"
-    }
+    },
+    "achievementsTitle": "Prestasjoner",
+    "achievementsSubtitle": "Din samling av badges og mål",
+    "overview": "Oversikt"
   },
   "browse": {
     "pageTitle": "Utforsk",

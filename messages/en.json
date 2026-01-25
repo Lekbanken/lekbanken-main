@@ -289,7 +289,10 @@
       "shopDesc": "Use coins for rewards",
       "eventlog": "Event log",
       "eventlogDesc": "Your activity history"
-    }
+    },
+    "achievementsTitle": "Achievements",
+    "achievementsSubtitle": "Your collection of badges and goals",
+    "overview": "Overview"
   },
   "browse": {
     "pageTitle": "Explore",

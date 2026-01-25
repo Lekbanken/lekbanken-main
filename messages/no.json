@@ -506,6 +506,127 @@
       "clickBadgeHint": "Klikk på en badge for å se detaljer"
     }
   },
+  "planner": {
+    "myPlans": "Mine planer",
+    "newPlan": "Ny plan",
+    "noPlansYet": "Du har ingen planer ennå",
+    "noPlansByFilter": "Ingen planer matcher filtrene dine",
+    "noBlocksInPlanYet": "Ingen blokker i planen ennå",
+    "dragToSort": "Dra for å sortere",
+    "search": {
+      "placeholder": "Søk planer..."
+    },
+    "filters": {
+      "tenant": "Organisasjon",
+      "public": "Offentlig"
+    },
+    "status": {
+      "unpublishedChanges": "Upubliserte endringer"
+    },
+    "actions": {
+      "saving": "Lagrer...",
+      "cancel": "Avbryt",
+      "delete": "Slett",
+      "save": "Lagre"
+    },
+    "header": {
+      "versions": "Versjoner",
+      "preview": "Forhåndsvisning",
+      "share": "Del",
+      "export": "Eksporter",
+      "copying": "Kopierer...",
+      "copy": "Kopier",
+      "copyPlan": "Kopier plan",
+      "publishing": "Publiserer...",
+      "publish": "Publiser",
+      "deletePlan": "Slett plan",
+      "actions": "Handlinger"
+    },
+    "deleteDialog": {
+      "title": "Slette plan?",
+      "description": "Er du sikker på at du vil slette \"{name}\"? Dette kan ikke angres."
+    },
+    "blocks": {
+      "title": "Blokker",
+      "description": "Legg til og organiser aktiviteter i planen din"
+    },
+    "blockList": {
+      "emptyTitle": "Ingen blokker ennå",
+      "emptyDescription": "Legg til aktiviteter for å bygge planen din"
+    },
+    "notes": {
+      "autosave": "Lagres automatisk",
+      "private": {
+        "title": "Private notater",
+        "description": "Kun synlig for deg",
+        "placeholder": "Skriv private notater her..."
+      },
+      "shared": {
+        "title": "Delte notater",
+        "description": "Synlig for alle i organisasjonen",
+        "badge": "Synlig for organisasjonen",
+        "placeholder": "Skriv delte notater her..."
+      }
+    },
+    "emptyState": {
+      "noPlanSelected": "Ingen plan valgt",
+      "selectOrCreate": "Velg en plan eller opprett en ny"
+    },
+    "actionBar": {
+      "ready": "Klar til å kjøre",
+      "startInPlay": "Start i Play-modus",
+      "previewTooltip": "Forhåndsvis planen",
+      "addBlocksFirst": "Legg til blokker først",
+      "preview": "Forhåndsvisning",
+      "publishToRun": "Publiser for å kjøre",
+      "startRunTooltip": "Start en kjøring av planen",
+      "starting": "Starter...",
+      "startPlan": "Start plan"
+    },
+    "addBlock": {
+      "title": "Legg til blokk",
+      "subtitle": "Velg aktivitetstype",
+      "game": "Lek",
+      "pause": "Pause",
+      "preparation": "Forberedelse",
+      "custom": "Tilpasset"
+    },
+    "blockDetail": {
+      "title": "Blokkdetaljer",
+      "description": "Rediger blokkinnstillinger",
+      "duration": "Varighet (minutter)",
+      "notes": "Notater",
+      "notesPlaceholder": "Legg til notater for denne blokken...",
+      "notesHelpText": "Notater er kun synlige for deg under kjøring",
+      "optional": "Valgfritt",
+      "optionalDescription": "Merk som valgfritt hvis blokken kan hoppes over"
+    },
+    "gamePicker": {
+      "title": "Velg lek",
+      "searchPlaceholder": "Søk etter leker...",
+      "searching": "Søker...",
+      "search": "Søk",
+      "emptyState": "Søk etter leker å legge til",
+      "noResults": "Ingen resultater for \"{query}\""
+    },
+    "versions": {
+      "noPublishedVersionsYet": "Ingen publiserte versjoner ennå",
+      "publishToCreateVersion": "Publiser planen for å opprette en versjon"
+    },
+    "preview": {
+      "title": "Forhåndsvisning"
+    },
+    "share": {
+      "privatePlan": "Privat plan",
+      "privatePlanWarning": "Denne planen er privat og kan ikke deles",
+      "shareLink": "Delingslenke",
+      "copied": "Kopiert!",
+      "copy": "Kopier",
+      "visibilityLabel": "Synlighet:",
+      "tenantVisibilityDescription": "Synlig for alle i organisasjonen din",
+      "publicVisibilityDescription": "Synlig for alle brukere"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",

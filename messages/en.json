@@ -341,6 +341,127 @@
       "clickBadgeHint": "Click a badge to see details"
     }
   },
+  "planner": {
+    "myPlans": "My plans",
+    "newPlan": "New plan",
+    "noPlansYet": "You have no plans yet",
+    "noPlansByFilter": "No plans match your filters",
+    "noBlocksInPlanYet": "No blocks in the plan yet",
+    "dragToSort": "Drag to sort",
+    "search": {
+      "placeholder": "Search plans..."
+    },
+    "filters": {
+      "tenant": "Organization",
+      "public": "Public"
+    },
+    "status": {
+      "unpublishedChanges": "Unpublished changes"
+    },
+    "actions": {
+      "saving": "Saving...",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "save": "Save"
+    },
+    "header": {
+      "versions": "Versions",
+      "preview": "Preview",
+      "share": "Share",
+      "export": "Export",
+      "copying": "Copying...",
+      "copy": "Copy",
+      "copyPlan": "Copy plan",
+      "publishing": "Publishing...",
+      "publish": "Publish",
+      "deletePlan": "Delete plan",
+      "actions": "Actions"
+    },
+    "deleteDialog": {
+      "title": "Delete plan?",
+      "description": "Are you sure you want to delete \"{name}\"? This cannot be undone."
+    },
+    "blocks": {
+      "title": "Blocks",
+      "description": "Add and organize activities in your plan"
+    },
+    "blockList": {
+      "emptyTitle": "No blocks yet",
+      "emptyDescription": "Add activities to build your plan"
+    },
+    "notes": {
+      "autosave": "Auto-saved",
+      "private": {
+        "title": "Private notes",
+        "description": "Only visible to you",
+        "placeholder": "Write private notes here..."
+      },
+      "shared": {
+        "title": "Shared notes",
+        "description": "Visible to everyone in the organization",
+        "badge": "Visible to organization",
+        "placeholder": "Write shared notes here..."
+      }
+    },
+    "emptyState": {
+      "noPlanSelected": "No plan selected",
+      "selectOrCreate": "Select a plan or create a new one"
+    },
+    "actionBar": {
+      "ready": "Ready to run",
+      "startInPlay": "Start in Play mode",
+      "previewTooltip": "Preview the plan",
+      "addBlocksFirst": "Add blocks first",
+      "preview": "Preview",
+      "publishToRun": "Publish to run",
+      "startRunTooltip": "Start a run of the plan",
+      "starting": "Starting...",
+      "startPlan": "Start plan"
+    },
+    "addBlock": {
+      "title": "Add block",
+      "subtitle": "Choose activity type",
+      "game": "Game",
+      "pause": "Break",
+      "preparation": "Preparation",
+      "custom": "Custom"
+    },
+    "blockDetail": {
+      "title": "Block details",
+      "description": "Edit block settings",
+      "duration": "Duration (minutes)",
+      "notes": "Notes",
+      "notesPlaceholder": "Add notes for this block...",
+      "notesHelpText": "Notes are only visible to you during a run",
+      "optional": "Optional",
+      "optionalDescription": "Mark as optional if the block can be skipped"
+    },
+    "gamePicker": {
+      "title": "Select game",
+      "searchPlaceholder": "Search for games...",
+      "searching": "Searching...",
+      "search": "Search",
+      "emptyState": "Search for games to add",
+      "noResults": "No results for \"{query}\""
+    },
+    "versions": {
+      "noPublishedVersionsYet": "No published versions yet",
+      "publishToCreateVersion": "Publish the plan to create a version"
+    },
+    "preview": {
+      "title": "Preview"
+    },
+    "share": {
+      "privatePlan": "Private plan",
+      "privatePlanWarning": "This plan is private and cannot be shared",
+      "shareLink": "Share link",
+      "copied": "Copied!",
+      "copy": "Copy",
+      "visibilityLabel": "Visibility:",
+      "tenantVisibilityDescription": "Visible to everyone in your organization",
+      "publicVisibilityDescription": "Visible to all users"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",

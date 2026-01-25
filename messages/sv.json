@@ -322,6 +322,127 @@
       "clickBadgeHint": "Klicka på en badge för att se detaljer"
     }
   },
+  "planner": {
+    "myPlans": "Mina planer",
+    "newPlan": "Ny plan",
+    "noPlansYet": "Du har inga planer ännu",
+    "noPlansByFilter": "Inga planer matchar dina filter",
+    "noBlocksInPlanYet": "Inga block i planen ännu",
+    "dragToSort": "Dra för att sortera",
+    "search": {
+      "placeholder": "Sök planer..."
+    },
+    "filters": {
+      "tenant": "Organisation",
+      "public": "Publik"
+    },
+    "status": {
+      "unpublishedChanges": "Opublicerade ändringar"
+    },
+    "actions": {
+      "saving": "Sparar...",
+      "cancel": "Avbryt",
+      "delete": "Radera",
+      "save": "Spara"
+    },
+    "header": {
+      "versions": "Versioner",
+      "preview": "Förhandsgranska",
+      "share": "Dela",
+      "export": "Exportera",
+      "copying": "Kopierar...",
+      "copy": "Kopiera",
+      "copyPlan": "Kopiera plan",
+      "publishing": "Publicerar...",
+      "publish": "Publicera",
+      "deletePlan": "Radera plan",
+      "actions": "Åtgärder"
+    },
+    "deleteDialog": {
+      "title": "Radera plan?",
+      "description": "Är du säker på att du vill radera \"{name}\"? Detta kan inte ångras."
+    },
+    "blocks": {
+      "title": "Block",
+      "description": "Lägg till och ordna aktiviteter i din plan"
+    },
+    "blockList": {
+      "emptyTitle": "Inga block ännu",
+      "emptyDescription": "Lägg till aktiviteter för att bygga din plan"
+    },
+    "notes": {
+      "autosave": "Sparas automatiskt",
+      "private": {
+        "title": "Privata anteckningar",
+        "description": "Endast synliga för dig",
+        "placeholder": "Skriv privata anteckningar här..."
+      },
+      "shared": {
+        "title": "Delade anteckningar",
+        "description": "Synliga för alla i organisationen",
+        "badge": "Synlig för organisationen",
+        "placeholder": "Skriv delade anteckningar här..."
+      }
+    },
+    "emptyState": {
+      "noPlanSelected": "Ingen plan vald",
+      "selectOrCreate": "Välj en plan eller skapa en ny"
+    },
+    "actionBar": {
+      "ready": "Redo att köra",
+      "startInPlay": "Starta i Play-läge",
+      "previewTooltip": "Förhandsgranska planen",
+      "addBlocksFirst": "Lägg till block först",
+      "preview": "Förhandsgranska",
+      "publishToRun": "Publicera för att köra",
+      "startRunTooltip": "Starta en körning av planen",
+      "starting": "Startar...",
+      "startPlan": "Starta plan"
+    },
+    "addBlock": {
+      "title": "Lägg till block",
+      "subtitle": "Välj typ av aktivitet",
+      "game": "Lek",
+      "pause": "Paus",
+      "preparation": "Förberedelse",
+      "custom": "Anpassad"
+    },
+    "blockDetail": {
+      "title": "Blockdetaljer",
+      "description": "Redigera blockens inställningar",
+      "duration": "Längd (minuter)",
+      "notes": "Anteckningar",
+      "notesPlaceholder": "Lägg till anteckningar för detta block...",
+      "notesHelpText": "Anteckningar visas endast för dig under körning",
+      "optional": "Valfritt",
+      "optionalDescription": "Markera som valfritt om blocket kan hoppas över"
+    },
+    "gamePicker": {
+      "title": "Välj lek",
+      "searchPlaceholder": "Sök efter lekar...",
+      "searching": "Söker...",
+      "search": "Sök",
+      "emptyState": "Sök efter lekar att lägga till",
+      "noResults": "Inga resultat för \"{query}\""
+    },
+    "versions": {
+      "noPublishedVersionsYet": "Inga publicerade versioner ännu",
+      "publishToCreateVersion": "Publicera planen för att skapa en version"
+    },
+    "preview": {
+      "title": "Förhandsgranskning"
+    },
+    "share": {
+      "privatePlan": "Privat plan",
+      "privatePlanWarning": "Denna plan är privat och kan inte delas",
+      "shareLink": "Delningslänk",
+      "copied": "Kopierad!",
+      "copy": "Kopiera",
+      "visibilityLabel": "Synlighet:",
+      "tenantVisibilityDescription": "Synlig för alla i din organisation",
+      "publicVisibilityDescription": "Synlig för alla användare"
+    }
+  },
   "admin": {
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",

@@ -415,6 +415,15 @@
     }
   },
   "admin": {
+    "commandPalette": {
+      "searchPlaceholder": "Søk kommandoer, naviger...",
+      "noCommandsFound": "Ingen kommandoer funnet for \"{query}\"",
+      "keyboard": {
+        "navigate": "naviger",
+        "select": "velg",
+        "openClose": "åpne/lukk"
+      }
+    },
     "nav": {
       "groups": {
         "overview": "Oversikt",

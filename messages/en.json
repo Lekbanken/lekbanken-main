@@ -250,6 +250,15 @@
     }
   },
   "admin": {
+    "commandPalette": {
+      "searchPlaceholder": "Search commands, navigate...",
+      "noCommandsFound": "No commands found for \"{query}\"",
+      "keyboard": {
+        "navigate": "navigate",
+        "select": "select",
+        "openClose": "open/close"
+      }
+    },
     "nav": {
       "groups": {
         "overview": "Overview",

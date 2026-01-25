@@ -231,6 +231,15 @@
     }
   },
   "admin": {
+    "commandPalette": {
+      "searchPlaceholder": "Sök kommandon, navigera...",
+      "noCommandsFound": "Inga kommandon hittades för \"{query}\"",
+      "keyboard": {
+        "navigate": "navigera",
+        "select": "välj",
+        "openClose": "öppna/stäng"
+      }
+    },
     "nav": {
       "groups": {
         "overview": "Översikt",

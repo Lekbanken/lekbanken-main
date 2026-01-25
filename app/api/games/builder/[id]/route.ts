@@ -529,11 +529,17 @@ export async function PUT(
     const materialLocale = m.locale ?? null;
     // Delete existing materials for this game+locale, then insert fresh
     // (materials are not referenced by triggers, so ID change is safe)
-    await supabase
+    const deleteQuery = supabase
       .from('game_materials')
       .delete()
-      .eq('game_id', id)
-      .is('locale', materialLocale);
+      .eq('game_id', id);
+    
+    // Use .is() for null, .eq() for string values
+    if (materialLocale === null) {
+      await deleteQuery.is('locale', null);
+    } else {
+      await deleteQuery.eq('locale', materialLocale);
+    }
     
     await supabase.from('game_materials').insert({
       game_id: id,

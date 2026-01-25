@@ -6,7 +6,7 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -48,6 +48,12 @@
     "node_modules",
     "catalyst-ui-kit",
     "tests/e2e/**",
-    "supabase/functions/**"
+    "supabase/functions/**",
+    ".next/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    ".turbo/**",
+    ".vercel/**"
   ]
 }

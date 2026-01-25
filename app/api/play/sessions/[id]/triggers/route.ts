@@ -51,7 +51,6 @@ interface TriggerStateRow {
   status: string;
   fired_count: number;
   fired_at: string | null;
-  enabled: boolean;
 }
 
 /**
@@ -94,7 +93,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
   // V2: Get session trigger state (runtime state)
   const { data: triggerStates } = await service
     .from('session_trigger_state')
-    .select('game_trigger_id, status, fired_count, fired_at, enabled')
+    .select('game_trigger_id, status, fired_count, fired_at')
     .eq('session_id', sessionId)
     .in('game_trigger_id', triggerIds);
 
@@ -113,7 +112,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       source_trigger_id: t.id, // For backward compatibility
       name: t.name,
       description: t.description,
-      enabled: state?.enabled ?? t.enabled,
+      enabled: t.enabled, // enabled comes from game_triggers only
       condition: t.condition,
       actions: t.actions,
       execute_once: t.execute_once,

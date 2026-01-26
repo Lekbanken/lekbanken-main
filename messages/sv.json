@@ -602,6 +602,11 @@
     }
   },
   "admin": {
+    "confirm": {
+      "defaultConfirm": "Bekräfta",
+      "defaultCancel": "Avbryt",
+      "typeToConfirm": "Skriv följande för att bekräfta:"
+    },
     "commandPalette": {
       "searchPlaceholder": "Sök kommandon, navigera...",
       "noCommandsFound": "Inga kommandon hittades för \"{query}\"",
@@ -764,7 +769,48 @@
       "invoices": "Fakturor",
       "general": "Allmänt",
       "branding": "Varumärke",
-      "domains": "Domäner"
+      "domains": "Domäner",
+      "marketing": "Marketing",
+      "marketingFeatures": "Funktioner",
+      "marketingUpdates": "Senaste nytt",
+      "marketingAdmin": {
+        "newFeature": "Ny funktion",
+        "editFeature": "Redigera funktion",
+        "newUpdate": "Ny uppdatering",
+        "editUpdate": "Redigera uppdatering",
+        "title": "Titel",
+        "subtitle": "Undertitel",
+        "description": "Beskrivning",
+        "iconName": "Ikon",
+        "imageUrl": "Bild-URL",
+        "audience": "Målgrupp",
+        "useCase": "Användningsfall",
+        "context": "Kontext",
+        "tags": "Taggar",
+        "addTag": "Lägg till",
+        "addTagPlaceholder": "Lägg till tagg...",
+        "relatedGamesCount": "Antal relaterade lekar",
+        "priority": "Prioritet",
+        "isFeatured": "Utvald funktion (visas på startsidan)",
+        "roleVisibility": "Synlig för roll",
+        "roleVisibilityDescription": "Välj vilka roller som denna funktion riktar sig till (för filtrering på sidan)",
+        "roleLeader": "Lekledare",
+        "roleParticipant": "Deltagare",
+        "status": "Status",
+        "type": "Typ",
+        "body": "Innehåll",
+        "publishedAt": "Publicerad",
+        "save": "Spara",
+        "cancel": "Avbryt",
+        "publish": "Publicera",
+        "delete": "Ta bort",
+        "confirmDelete": "Ta bort \"{name}\"?",
+        "searchFeatures": "Sök funktioner...",
+        "searchUpdates": "Sök uppdateringar...",
+        "subtitlePlaceholder": "Kort värdeproposition",
+        "descriptionPlaceholder": "Längre beskrivning av funktionen...",
+        "titlePlaceholderUpdate": "T.ex. Nytt: Spelläge med realtidspoäng"
+      }
     },
     "media": {
       "standardImagesManager": {
@@ -1001,6 +1047,7 @@
       "learning": "Utbildning",
       "support": "Support",
       "operations": "Drift",
+      "marketing": "Marketing",
       "system": "System",
       "members": "Medlemmar",
       "content": "Innehåll",
@@ -9279,6 +9326,10 @@
           "description": "Inbyggda säkerhetskontroller och samtyckesinsamling för deltagarnas välbefinnande."
         }
       },
+      "showLess": "Visa färre funktioner",
+      "showMore": "Visa fler funktioner",
+      "exploreAll": "Utforska alla funktioner",
+      "noFeaturesForFilter": "Inga funktioner hittades för detta filter.",
       "badges": {
         "loginSso": "SSO-inloggning",
         "sharedFolders": "Delade mappar",
@@ -9286,23 +9337,189 @@
         "reusableTemplates": "Återanvändbara mallar",
         "login": "Logga in →"
       },
-      "groups": {
-        "sharedProviders": {
-          "title": "Delade providers",
-          "points": {
-            "theme": "Tema, Supabase och i18n laddas i rotlayouten.",
-            "layouts": "Layoutarna är tunna och fokuserar på navigation och chrome."
-          }
+      "activity": {
+        "tagline": "Senaste nytt",
+        "title": "Vad händer i Lekbanken?",
+        "description": "Följ vår utveckling – nya funktioner, förbättringar och milstolpar.",
+        "types": {
+          "feature": "Ny funktion",
+          "improvement": "Förbättring",
+          "fix": "Buggfix",
+          "milestone": "Milstolpe",
+          "content": "Nytt innehåll"
+        }
+      }
+    },
+    "howItWorks": {
+      "tagline": "Så funkar det",
+      "title": "Kom igång på minuter",
+      "description": "Tre enkla steg för att börja planera bättre aktiviteter.",
+      "steps": {
+        "step1": {
+          "title": "Skapa konto",
+          "description": "Registrera dig gratis och kom igång direkt."
         },
-        "uiWorlds": {
-          "title": "UI-världar",
-          "points": {
-            "marketing": "Marketing använder header och footer utan koppling till appflöden.",
-            "app": "App har bottom navigation och mobilanpassade komponenter.",
-            "admin": "Admin har vänstersidebar och topbar med sök/notifications."
-          }
+        "step2": {
+          "title": "Bygg ditt pass",
+          "description": "Välj aktiviteter och dra dem till din planering."
         },
-        "responsiveStrategy": {
+        "step3": {
+          "title": "Dela med teamet",
+          "description": "Exportera till PDF eller dela digitalt med kollegor."
+        }
+      }
+    },
+    "spotlight": {
+      "tagline": "I fokus",
+      "title": "Designad för verkliga behov",
+      "description": "Lekbanken är byggd av och för aktivitetsledare. Vi förstår dina utmaningar.",
+      "imagePlaceholder": "Produktbild"
+    },
+    "testimonials": {
+      "tagline": "Vad våra användare säger",
+      "title": "Älskad av tusentals ledare"
+    },
+    "pricing": {
+      "tagline": "Priser",
+      "title": "Enkla och transparenta priser",
+      "description": "Välj den plan som passar dig bäst. Ingen bindningstid.",
+      "frequencyLabel": "Välj betalningsfrekvens",
+      "save15": "Spara 15%",
+      "frequencies": {
+        "monthly": {
+          "label": "Månadsvis",
+          "suffix": "/mån"
+        },
+        "annually": {
+          "label": "Årsvis",
+          "suffix": "/år"
+        }
+      },
+      "tiers": {
+        "free": {
+          "name": "Gratis",
+          "description": "Perfekt för att testa och komma igång.",
+          "price": {
+            "monthly": "0 kr",
+            "annually": "0 kr"
+          },
+          "cta": "Kom igång gratis",
+          "features": [
+            "Upp till 10 aktiviteter",
+            "1 pass per vecka",
+            "Grundläggande filter",
+            "E-postsupport"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "För dig som vill ha mer kraft och flexibilitet.",
+          "price": {
+            "monthly": "99 kr",
+            "annually": "999 kr"
+          },
+          "cta": "Prova Pro gratis",
+          "features": [
+            "Obegränsade aktiviteter",
+            "Obegränsade pass",
+            "Avancerade filter",
+            "PDF-export",
+            "Delade mappar",
+            "Prioriterad support"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "För organisationer med flera användare.",
+          "price": "Kontakta oss",
+          "cta": "Kontakta sälj",
+          "features": [
+            "Allt i Pro",
+            "Teamhantering",
+            "SSO-inloggning",
+            "Anpassad onboarding",
+            "Dedikerad support",
+            "SLA-garanti"
+          ]
+        }
+      },
+      "mostPopular": "Mest populär"
+    },
+    "cta": {
+      "title": "Redo att komma igång?",
+      "description": "Börja planera bättre aktiviteter idag. Gratis att prova.",
+      "startFree": "Kom igång gratis",
+      "login": "Logga in",
+      "seePlans": "Se priser",
+      "badges": {
+        "swedishOnboarding": "Svensk support",
+        "supportResponse": "Svar inom 24h"
+      }
+    },
+    "featuresPage": {
+      "title": "Alla funktioner",
+      "description": "Utforska alla verktyg och funktioner som gör Lekbanken till det bästa valet för aktivitetsledare.",
+      "backToHome": "Tillbaka till startsidan",
+      "featuresCount": "funktioner",
+      "featured": "Populär",
+      "relatedGames": "lekar",
+      "searchPlaceholder": "Sök bland funktioner...",
+      "filters": "Filter",
+      "clearFilters": "Rensa filter",
+      "noResults": "Inga funktioner hittades",
+      "noResultsDescription": "Prova att ändra dina sökord eller filter.",
+      "filterLabels": {
+        "audience": "Målgrupp",
+        "useCase": "Användning",
+        "context": "Kontext"
+      },
+      "audiences": {
+        "all": "Alla",
+        "school": "Skola",
+        "business": "Företag",
+        "sports": "Idrott",
+        "event": "Event"
+      },
+      "useCases": {
+        "all": "Alla",
+        "planning": "Planering",
+        "execution": "Genomförande",
+        "export": "Export",
+        "collaboration": "Samarbete",
+        "safety": "Säkerhet"
+      },
+      "contexts": {
+        "all": "Alla",
+        "indoor": "Inomhus",
+        "outdoor": "Utomhus",
+        "digital": "Digitalt",
+        "hybrid": "Hybrid",
+        "any": "Alla"
+      },
+      "cta": {
+        "title": "Redo att komma igång?",
+        "description": "Testa Lekbanken gratis och se hur det kan förenkla din vardag.",
+        "tryFree": "Prova gratis",
+        "viewPricing": "Se priser"
+      }
+    },
+    "groups": {
+      "sharedProviders": {
+        "title": "Delade providers",
+        "points": {
+          "theme": "Tema, Supabase och i18n laddas i rotlayouten.",
+          "layouts": "Layoutarna är tunna och fokuserar på navigation och chrome."
+        }
+      },
+      "uiWorlds": {
+        "title": "UI-världar",
+        "points": {
+          "marketing": "Marketing använder header och footer utan koppling till appflöden.",
+          "app": "App har bottom navigation och mobilanpassade komponenter.",
+          "admin": "Admin har vänstersidebar och topbar med sök/notifications."
+        }
+      },
+      "responsiveStrategy": {
           "title": "Responsiv strategi",
           "points": {
             "marketing": "Marketing: klassisk responsiv layout.",

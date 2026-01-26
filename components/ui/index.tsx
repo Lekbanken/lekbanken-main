@@ -10,6 +10,7 @@ export { Badge } from "./badge";
 export { Input } from "./input";
 export { Textarea } from "./textarea";
 export { Select } from "./select";
+export { Label } from "./label";
 
 // Feedback & States
 export { EmptyState, EmptySearchState, EmptyListState, EmptyFavoritesState } from "./empty-state";

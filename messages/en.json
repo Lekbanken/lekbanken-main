@@ -621,6 +621,11 @@
     }
   },
   "admin": {
+    "confirm": {
+      "defaultConfirm": "Confirm",
+      "defaultCancel": "Cancel",
+      "typeToConfirm": "Type the following to confirm:"
+    },
     "commandPalette": {
       "searchPlaceholder": "Search commands, navigate...",
       "noCommandsFound": "No commands found for \"{query}\"",
@@ -783,7 +788,48 @@
       "invoices": "Invoices",
       "general": "General",
       "branding": "Branding",
-      "domains": "Domains"
+      "domains": "Domains",
+      "marketing": "Marketing",
+      "marketingFeatures": "Features",
+      "marketingUpdates": "Latest News",
+      "marketingAdmin": {
+        "newFeature": "New feature",
+        "editFeature": "Edit feature",
+        "newUpdate": "New update",
+        "editUpdate": "Edit update",
+        "title": "Title",
+        "subtitle": "Subtitle",
+        "description": "Description",
+        "iconName": "Icon",
+        "imageUrl": "Image URL",
+        "audience": "Audience",
+        "useCase": "Use case",
+        "context": "Context",
+        "tags": "Tags",
+        "addTag": "Add",
+        "addTagPlaceholder": "Add tag...",
+        "relatedGamesCount": "Related games count",
+        "priority": "Priority",
+        "isFeatured": "Featured function (shown on homepage)",
+        "roleVisibility": "Visible for role",
+        "roleVisibilityDescription": "Select which roles this feature is aimed at (for filtering on the page)",
+        "roleLeader": "Activity Leader",
+        "roleParticipant": "Participant",
+        "status": "Status",
+        "type": "Type",
+        "body": "Content",
+        "publishedAt": "Published",
+        "save": "Save",
+        "cancel": "Cancel",
+        "publish": "Publish",
+        "delete": "Delete",
+        "confirmDelete": "Delete \"{name}\"?",
+        "searchFeatures": "Search features...",
+        "searchUpdates": "Search updates...",
+        "subtitlePlaceholder": "Short value proposition",
+        "descriptionPlaceholder": "Longer description of the feature...",
+        "titlePlaceholderUpdate": "E.g. New: Game mode with real-time scoring"
+      }
     },
     "media": {
       "standardImagesManager": {
@@ -971,6 +1017,7 @@
       "learning": "Learning",
       "support": "Support",
       "operations": "Operations",
+      "marketing": "Marketing",
       "system": "System",
       "members": "Members",
       "content": "Content",
@@ -8559,12 +8606,181 @@
           "description": "Built-in safety checks and consent collection for participant welfare."
         }
       },
+      "showLess": "Show fewer features",
+      "showMore": "Show more features",
+      "exploreAll": "Explore all features",
+      "noFeaturesForFilter": "No features found for this filter.",
       "badges": {
         "loginSso": "SSO login",
         "sharedFolders": "Shared folders",
         "pdfPrint": "PDF & print",
         "reusableTemplates": "Reusable templates",
         "login": "Log in →"
+      },
+      "activity": {
+        "tagline": "What's new",
+        "title": "What's happening in Lekbanken?",
+        "description": "Follow our development – new features, improvements and milestones.",
+        "types": {
+          "feature": "New feature",
+          "improvement": "Improvement",
+          "fix": "Bug fix",
+          "milestone": "Milestone",
+          "content": "New content"
+        }
+      }
+    },
+    "howItWorks": {
+      "tagline": "How it works",
+      "title": "Get started in minutes",
+      "description": "Three simple steps to start planning better activities.",
+      "steps": {
+        "step1": {
+          "title": "Create account",
+          "description": "Sign up for free and get started right away."
+        },
+        "step2": {
+          "title": "Build your session",
+          "description": "Choose activities and drag them to your plan."
+        },
+        "step3": {
+          "title": "Share with your team",
+          "description": "Export to PDF or share digitally with colleagues."
+        }
+      }
+    },
+    "spotlight": {
+      "tagline": "Spotlight",
+      "title": "Designed for real needs",
+      "description": "Lekbanken is built by and for activity leaders. We understand your challenges.",
+      "imagePlaceholder": "Product image"
+    },
+    "testimonials": {
+      "tagline": "What our users say",
+      "title": "Loved by thousands of leaders"
+    },
+    "pricing": {
+      "tagline": "Pricing",
+      "title": "Simple and transparent pricing",
+      "description": "Choose the plan that suits you best. No commitment.",
+      "frequencyLabel": "Choose payment frequency",
+      "save15": "Save 15%",
+      "frequencies": {
+        "monthly": {
+          "label": "Monthly",
+          "suffix": "/month"
+        },
+        "annually": {
+          "label": "Annually",
+          "suffix": "/year"
+        }
+      },
+      "tiers": {
+        "free": {
+          "name": "Free",
+          "description": "Perfect for testing and getting started.",
+          "price": {
+            "monthly": "$0",
+            "annually": "$0"
+          },
+          "cta": "Get started free",
+          "features": [
+            "Up to 10 activities",
+            "1 session per week",
+            "Basic filters",
+            "Email support"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For those who want more power and flexibility.",
+          "price": {
+            "monthly": "$9",
+            "annually": "$99"
+          },
+          "cta": "Try Pro free",
+          "features": [
+            "Unlimited activities",
+            "Unlimited sessions",
+            "Advanced filters",
+            "PDF export",
+            "Shared folders",
+            "Priority support"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For organizations with multiple users.",
+          "price": "Contact us",
+          "cta": "Contact sales",
+          "features": [
+            "Everything in Pro",
+            "Team management",
+            "SSO login",
+            "Custom onboarding",
+            "Dedicated support",
+            "SLA guarantee"
+          ]
+        }
+      },
+      "mostPopular": "Most popular"
+    },
+    "cta": {
+      "title": "Ready to get started?",
+      "description": "Start planning better activities today. Free to try.",
+      "startFree": "Get started free",
+      "login": "Log in",
+      "seePlans": "See pricing",
+      "badges": {
+        "swedishOnboarding": "Swedish support",
+        "supportResponse": "Response within 24h"
+      }
+    },
+    "featuresPage": {
+      "title": "All Features",
+      "description": "Explore all the tools and features that make Lekbanken the best choice for activity leaders.",
+      "backToHome": "Back to home",
+      "featuresCount": "features",
+      "featured": "Popular",
+      "relatedGames": "games",
+      "searchPlaceholder": "Search features...",
+      "filters": "Filters",
+      "clearFilters": "Clear filters",
+      "noResults": "No features found",
+      "noResultsDescription": "Try adjusting your search or filters.",
+      "filterLabels": {
+        "audience": "Audience",
+        "useCase": "Use Case",
+        "context": "Context"
+      },
+      "audiences": {
+        "all": "All",
+        "school": "School",
+        "business": "Business",
+        "sports": "Sports",
+        "event": "Event"
+      },
+      "useCases": {
+        "all": "All",
+        "planning": "Planning",
+        "execution": "Execution",
+        "export": "Export",
+        "collaboration": "Collaboration",
+        "safety": "Safety"
+      },
+      "contexts": {
+        "all": "All",
+        "indoor": "Indoor",
+        "outdoor": "Outdoor",
+        "digital": "Digital",
+        "hybrid": "Hybrid",
+        "any": "Any"
+      },
+      "cta": {
+        "title": "Ready to get started?",
+        "description": "Try Lekbanken for free and see how it can simplify your work.",
+        "tryFree": "Try for free",
+        "viewPricing": "View pricing"
       }
     },
     "howItWorks": {

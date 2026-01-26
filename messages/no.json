@@ -645,6 +645,11 @@
     }
   },
   "admin": {
+    "confirm": {
+      "defaultConfirm": "Bekreft",
+      "defaultCancel": "Avbryt",
+      "typeToConfirm": "Skriv følgende for å bekrefte:"
+    },
     "commandPalette": {
       "searchPlaceholder": "Søk kommandoer, naviger...",
       "noCommandsFound": "Ingen kommandoer funnet for \"{query}\"",
@@ -807,7 +812,48 @@
       "invoices": "Fakturaer",
       "general": "Generelt",
       "branding": "Merkevare",
-      "domains": "Domener"
+      "domains": "Domener",
+      "marketing": "Marketing",
+      "marketingFeatures": "Funksjoner",
+      "marketingUpdates": "Siste nytt",
+      "marketingAdmin": {
+        "newFeature": "Ny funksjon",
+        "editFeature": "Rediger funksjon",
+        "newUpdate": "Ny oppdatering",
+        "editUpdate": "Rediger oppdatering",
+        "title": "Tittel",
+        "subtitle": "Undertittel",
+        "description": "Beskrivelse",
+        "iconName": "Ikon",
+        "imageUrl": "Bilde-URL",
+        "audience": "Målgruppe",
+        "useCase": "Bruksområde",
+        "context": "Kontekst",
+        "tags": "Tagger",
+        "addTag": "Legg til",
+        "addTagPlaceholder": "Legg til tagg...",
+        "relatedGamesCount": "Antall relaterte leker",
+        "priority": "Prioritet",
+        "isFeatured": "Utvalgt funksjon (vises på startsiden)",
+        "roleVisibility": "Synlig for rolle",
+        "roleVisibilityDescription": "Velg hvilke roller denne funksjonen retter seg mot (for filtrering på siden)",
+        "roleLeader": "Lekleder",
+        "roleParticipant": "Deltaker",
+        "status": "Status",
+        "type": "Type",
+        "body": "Innhold",
+        "publishedAt": "Publisert",
+        "save": "Lagre",
+        "cancel": "Avbryt",
+        "publish": "Publiser",
+        "delete": "Slett",
+        "confirmDelete": "Slette \"{name}\"?",
+        "searchFeatures": "Søk funksjoner...",
+        "searchUpdates": "Søk oppdateringer...",
+        "subtitlePlaceholder": "Kort verdiforslag",
+        "descriptionPlaceholder": "Lengre beskrivelse av funksjonen...",
+        "titlePlaceholderUpdate": "F.eks. Nytt: Spillmodus med sanntidspoeng"
+      }
     },
     "media": {
       "standardImagesManager": {
@@ -1044,6 +1090,7 @@
       "learning": "Opplæring",
       "support": "Support",
       "operations": "Drift",
+      "marketing": "Marketing",
       "system": "System",
       "members": "Medlemmer",
       "content": "Innhold",
@@ -8652,12 +8699,181 @@
           "description": "Innebygde sikkerhetssjekker og samtykkeinnsamling for deltakernes velvære."
         }
       },
+      "showLess": "Vis færre funksjoner",
+      "showMore": "Vis flere funksjoner",
+      "exploreAll": "Utforsk alle funksjoner",
+      "noFeaturesForFilter": "Ingen funksjoner funnet for dette filteret.",
       "badges": {
         "loginSso": "SSO-innlogging",
         "sharedFolders": "Delte mapper",
         "pdfPrint": "PDF og utskrift",
         "reusableTemplates": "Gjenbrukbare maler",
         "login": "Logg inn →"
+      },
+      "activity": {
+        "tagline": "Siste nytt",
+        "title": "Hva skjer i Lekbanken?",
+        "description": "Følg utviklingen vår – nye funksjoner, forbedringer og milepæler.",
+        "types": {
+          "feature": "Ny funksjon",
+          "improvement": "Forbedring",
+          "fix": "Feilretting",
+          "milestone": "Milepæl",
+          "content": "Nytt innhold"
+        }
+      }
+    },
+    "howItWorks": {
+      "tagline": "Slik fungerer det",
+      "title": "Kom i gang på minutter",
+      "description": "Tre enkle steg for å begynne å planlegge bedre aktiviteter.",
+      "steps": {
+        "step1": {
+          "title": "Opprett konto",
+          "description": "Registrer deg gratis og kom i gang med en gang."
+        },
+        "step2": {
+          "title": "Bygg økten din",
+          "description": "Velg aktiviteter og dra dem til planen din."
+        },
+        "step3": {
+          "title": "Del med teamet",
+          "description": "Eksporter til PDF eller del digitalt med kolleger."
+        }
+      }
+    },
+    "spotlight": {
+      "tagline": "I fokus",
+      "title": "Designet for virkelige behov",
+      "description": "Lekbanken er bygget av og for aktivitetsledere. Vi forstår utfordringene dine.",
+      "imagePlaceholder": "Produktbilde"
+    },
+    "testimonials": {
+      "tagline": "Hva brukerne våre sier",
+      "title": "Elsket av tusenvis av ledere"
+    },
+    "pricing": {
+      "tagline": "Priser",
+      "title": "Enkle og transparente priser",
+      "description": "Velg planen som passer deg best. Ingen binding.",
+      "frequencyLabel": "Velg betalingsfrekvens",
+      "save15": "Spar 15%",
+      "frequencies": {
+        "monthly": {
+          "label": "Månedlig",
+          "suffix": "/mnd"
+        },
+        "annually": {
+          "label": "Årlig",
+          "suffix": "/år"
+        }
+      },
+      "tiers": {
+        "free": {
+          "name": "Gratis",
+          "description": "Perfekt for å teste og komme i gang.",
+          "price": {
+            "monthly": "0 kr",
+            "annually": "0 kr"
+          },
+          "cta": "Kom i gang gratis",
+          "features": [
+            "Opptil 10 aktiviteter",
+            "1 økt per uke",
+            "Grunnleggende filter",
+            "E-poststøtte"
+          ]
+        },
+        "pro": {
+          "name": "Pro",
+          "description": "For deg som vil ha mer kraft og fleksibilitet.",
+          "price": {
+            "monthly": "99 kr",
+            "annually": "999 kr"
+          },
+          "cta": "Prøv Pro gratis",
+          "features": [
+            "Ubegrensede aktiviteter",
+            "Ubegrensede økter",
+            "Avanserte filter",
+            "PDF-eksport",
+            "Delte mapper",
+            "Prioritert støtte"
+          ]
+        },
+        "team": {
+          "name": "Team",
+          "description": "For organisasjoner med flere brukere.",
+          "price": "Kontakt oss",
+          "cta": "Kontakt salg",
+          "features": [
+            "Alt i Pro",
+            "Teamadministrasjon",
+            "SSO-innlogging",
+            "Tilpasset onboarding",
+            "Dedikert støtte",
+            "SLA-garanti"
+          ]
+        }
+      },
+      "mostPopular": "Mest populær"
+    },
+    "cta": {
+      "title": "Klar til å komme i gang?",
+      "description": "Begynn å planlegge bedre aktiviteter i dag. Gratis å prøve.",
+      "startFree": "Kom i gang gratis",
+      "login": "Logg inn",
+      "seePlans": "Se priser",
+      "badges": {
+        "swedishOnboarding": "Norsk støtte",
+        "supportResponse": "Svar innen 24t"
+      }
+    },
+    "featuresPage": {
+      "title": "Alle funksjoner",
+      "description": "Utforsk alle verktøyene og funksjonene som gjør Lekbanken til det beste valget for aktivitetsledere.",
+      "backToHome": "Tilbake til forsiden",
+      "featuresCount": "funksjoner",
+      "featured": "Populær",
+      "relatedGames": "leker",
+      "searchPlaceholder": "Søk blant funksjoner...",
+      "filters": "Filter",
+      "clearFilters": "Fjern filter",
+      "noResults": "Ingen funksjoner funnet",
+      "noResultsDescription": "Prøv å justere søkeordene eller filtrene.",
+      "filterLabels": {
+        "audience": "Målgruppe",
+        "useCase": "Bruksområde",
+        "context": "Kontekst"
+      },
+      "audiences": {
+        "all": "Alle",
+        "school": "Skole",
+        "business": "Bedrift",
+        "sports": "Idrett",
+        "event": "Event"
+      },
+      "useCases": {
+        "all": "Alle",
+        "planning": "Planlegging",
+        "execution": "Gjennomføring",
+        "export": "Eksport",
+        "collaboration": "Samarbeid",
+        "safety": "Sikkerhet"
+      },
+      "contexts": {
+        "all": "Alle",
+        "indoor": "Innendørs",
+        "outdoor": "Utendørs",
+        "digital": "Digitalt",
+        "hybrid": "Hybrid",
+        "any": "Alle"
+      },
+      "cta": {
+        "title": "Klar til å komme i gang?",
+        "description": "Prøv Lekbanken gratis og se hvordan det kan forenkle hverdagen din.",
+        "tryFree": "Prøv gratis",
+        "viewPricing": "Se priser"
       }
     },
     "howItWorks": {

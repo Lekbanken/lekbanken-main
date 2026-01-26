@@ -157,6 +157,15 @@ const systemAdminCategories: AdminNavCategory[] = [
     ],
   },
   {
+    id: 'marketing',
+    labelKey: 'marketing',
+    icon: 'megaphone',
+    items: [
+      { id: 'marketing-features', labelKey: 'marketingFeatures', href: '/admin/marketing/features', icon: 'content', permission: 'admin.system.view', systemAdminOnly: true },
+      { id: 'marketing-updates', labelKey: 'marketingUpdates', href: '/admin/marketing/updates', icon: 'notifications', permission: 'admin.system.view', systemAdminOnly: true },
+    ],
+  },
+  {
     id: 'system',
     labelKey: 'system',
     icon: 'settings',

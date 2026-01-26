@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { ActivityFeed } from "@/components/marketing/activity-feed";
 import { FeatureGrid } from "@/components/marketing/feature-grid";
 import { Hero } from "@/components/marketing/hero";
 import { LoginCta } from "@/components/marketing/login-cta";
@@ -43,6 +44,7 @@ function MarketingContent() {
       <StepsTimeline />
       <StepsSpotlight />
       <Testimonials />
+      <ActivityFeed />
       <PricingSection />
       <LoginCta />
     </>

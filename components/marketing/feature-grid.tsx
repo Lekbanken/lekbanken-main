@@ -1,5 +1,80 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { FeatureGridDynamic } from './feature-grid-dynamic';
+import { fetchPublishedFeaturesAction } from './actions';
+import type { MarketingFeature } from '@/lib/marketing/types';
+
+// =============================================================================
+// Skeleton Loading Component
+// =============================================================================
+
+function FeatureGridSkeleton() {
+  const t = useTranslations('marketing');
+  
+  return (
+    <section
+      id="features"
+      className="bg-background py-24 sm:py-32"
+      aria-labelledby="features-title"
+    >
+      <div className="mx-auto max-w-7xl px-6 lg:px-8">
+        {/* Header - real content, no skeleton */}
+        <div className="flex flex-col gap-6 sm:items-center sm:text-center">
+          <p className="text-sm font-semibold text-primary">{t('features.tagline')}</p>
+          <div>
+            <h2
+              id="features-title"
+              className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
+            >
+              {t('features.title')}
+            </h2>
+            <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
+              {t('features.description')}
+            </p>
+          </div>
+        </div>
+
+        {/* Skeleton Cards */}
+        <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div
+              key={i}
+              className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-sm"
+            >
+              <div className="space-y-4">
+                {/* Icon skeleton */}
+                <Skeleton className="h-10 w-10 rounded-xl" />
+                {/* Title skeleton */}
+                <Skeleton className="h-6 w-3/4" />
+                {/* Description skeleton - 3 lines */}
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Badges skeleton */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
+          {[1, 2, 3, 4].map((i) => (
+            <Skeleton key={i} className="h-8 w-24 rounded-full" />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// Static Fallback Component (only used if DB has no features)
+// =============================================================================
 
 const FunnelIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" {...props}>
@@ -35,8 +110,13 @@ const ShieldIcon = (props: React.SVGProps<SVGSVGElement>) => (
 const featureIcons = [FunnelIcon, LayoutIcon, ShareIcon, ShieldIcon];
 const featureKeys = ['smartFilters', 'sessionBuilder', 'sharingExport', 'safetyConsent'] as const;
 
-export function FeatureGrid() {
+// =============================================================================
+// Static Fallback Component
+// =============================================================================
+
+function FeatureGridStatic() {
   const t = useTranslations('marketing');
+  
   return (
     <section
       id="features"
@@ -99,4 +179,47 @@ export function FeatureGrid() {
       </div>
     </section>
   );
+}
+
+// =============================================================================
+// Main Component with Data Fetching
+// =============================================================================
+
+export function FeatureGrid() {
+  const [features, setFeatures] = useState<MarketingFeature[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [useFallback, setUseFallback] = useState(false);
+
+  useEffect(() => {
+    async function loadFeatures() {
+      try {
+        const result = await fetchPublishedFeaturesAction();
+        if (result.success && result.data && result.data.features.length > 0) {
+          setFeatures(result.data.features);
+        } else {
+          // No features in DB, use fallback
+          setUseFallback(true);
+        }
+      } catch (error) {
+        console.error('Failed to load features:', error);
+        setUseFallback(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadFeatures();
+  }, []);
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <FeatureGridSkeleton />;
+  }
+
+  // Use static fallback if no DB features
+  if (useFallback || !features) {
+    return <FeatureGridStatic />;
+  }
+
+  // Render dynamic grid with filters
+  return <FeatureGridDynamic initialFeatures={features} />;
 }

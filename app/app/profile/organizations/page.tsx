@@ -37,7 +37,7 @@ const orgTypeIcons: Record<string, React.ElementType> = {
 
 export default function OrganizationsPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
   const roleLabels = useMemo(() => getRoleLabels(t), [t]);
 
@@ -53,6 +53,9 @@ export default function OrganizationsPage() {
 
   useEffect(() => {
     const loadMemberships = async () => {
+      // Wait for auth to finish loading before deciding there's no user
+      if (authLoading) return;
+      
       if (!user?.id || !supabase) {
         setIsLoading(false);
         return;
@@ -74,7 +77,7 @@ export default function OrganizationsPage() {
     };
 
     loadMemberships();
-  }, [user?.id, supabase]);
+  }, [user?.id, supabase, authLoading]);
 
   const ownedOrgs = memberships.filter((m) => m.role === 'owner');
   const adminOrgs = memberships.filter((m) => m.role === 'admin');

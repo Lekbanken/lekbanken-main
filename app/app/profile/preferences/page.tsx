@@ -67,7 +67,7 @@ export default function PreferencesPage() {
   const t = useTranslations('app.profile');
   const locale = useLocale();
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
 
   // Initialize supabase client only in browser
@@ -88,6 +88,9 @@ export default function PreferencesPage() {
 
   useEffect(() => {
     const loadPreferences = async () => {
+      // Wait for auth to finish loading before deciding there's no user
+      if (authLoading) return;
+      
       if (!user?.id || !supabase) {
         setIsLoading(false);
         return;
@@ -111,7 +114,7 @@ export default function PreferencesPage() {
     };
 
     loadPreferences();
-  }, [user?.id, supabase]);
+  }, [user?.id, supabase, authLoading]);
 
   const handlePreferenceChange = useCallback((key: keyof UserPreferences, value: unknown) => {
     setPreferences((prev) => ({ ...prev, [key]: value }));

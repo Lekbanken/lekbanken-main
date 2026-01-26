@@ -24,7 +24,7 @@ interface FriendInfo {
 
 export default function FriendsPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   const userId = user?.id;
 
@@ -38,6 +38,9 @@ export default function FriendsPage() {
   const [searchResults, setSearchResults] = useState<FriendInfo[]>([]);
 
   useEffect(() => {
+    // Wait for auth to finish loading before deciding there's no user
+    if (authLoading) return;
+    
     if (!userId) {
       setIsLoading(false);
       return;
@@ -73,7 +76,7 @@ export default function FriendsPage() {
     };
 
     loadData();
-  }, [userId]);
+  }, [userId, authLoading]);
 
   const handleSearchUsers = async (email: string) => {
     if (!email.trim()) {

@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils';
 
 export default function PrivacySettingsPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
 
   // Initialize supabase client only in browser
@@ -51,6 +51,9 @@ export default function PrivacySettingsPage() {
 
   useEffect(() => {
     const loadPrivacyData = async () => {
+      // Wait for auth to finish loading before deciding there's no user
+      if (authLoading) return;
+      
       if (!user?.id || !supabase) {
         setIsLoading(false);
         return;
@@ -75,7 +78,7 @@ export default function PrivacySettingsPage() {
     };
 
     loadPrivacyData();
-  }, [user?.id, supabase]);
+  }, [user?.id, supabase, authLoading]);
 
   const handleDataExportRequest = useCallback(async () => {
     if (!user?.id || !supabase) return;

@@ -1060,7 +1060,10 @@
       "pageDescription": "Skicka meddelanden till organisationens användare.",
       "noTenantTitle": "Ingen organisation vald",
       "noTenantDescription": "Välj en organisation för att skicka notifikationer.",
+      "noAccessTitle": "Ingen åtkomst",
+      "noAccessDescription": "Du har inte behörighet att skicka notifikationer.",
       "errorTitle": "Ett fel inträffade",
+      "optional": "valfritt",
       "form": {
         "sendNotification": "Skicka notifikation",
         "title": "Titel",
@@ -1069,8 +1072,26 @@
         "category": "Kategori",
         "targetAudience": "Målgrupp",
         "selectRecipients": "Välj mottagare",
-        "actionUrl": "Action URL (valfritt)",
-        "actionLabel": "Action label (valfritt)"
+        "selectOrg": "Välj organisation",
+        "scope": "Mottagare",
+        "actionUrl": "Action URL",
+        "actionLabel": "Action label"
+      },
+      "scope": {
+        "global": "Alla organisationer",
+        "globalDesc": "Skicka till alla användare i systemet",
+        "tenant": "En organisation",
+        "tenantDesc": "Skicka till alla i vald organisation",
+        "users": "Specifika användare",
+        "usersDesc": "Välj enskilda mottagare"
+      },
+      "categories": {
+        "system": "System",
+        "support": "Support",
+        "billing": "Fakturering",
+        "learning": "Lärande",
+        "gamification": "Gamification",
+        "announcement": "Nyhet"
       },
       "placeholders": {
         "title": "Uppdatering i appen",
@@ -1079,24 +1100,39 @@
       },
       "options": {
         "allInOrg": "Alla i organisationen",
-        "specificUsers": "Specifika användare"
+        "specificUsers": "Specifika användare",
+        "selectOrg": "-- Välj organisation --"
       },
       "loading": {
         "users": "Laddar användare..."
       },
       "empty": {
-        "noUsers": "Inga användare att välja."
+        "noUsers": "Inga användare i denna organisation."
       },
       "recipients": {
         "title": "Mottagare",
         "count": "{count} användare i organisationen.",
-        "hint": "När du väljer specifika användare kan du välja från listan. Annars skickas till alla."
+        "hint": "När du väljer specifika användare kan du välja från listan. Annars skickas till alla.",
+        "globalDesc": "Broadcast till {count} organisationer",
+        "tenantDesc": "{name} ({count} medlemmar)",
+        "usersDesc": "{count} valda användare",
+        "selectTenant": "Välj en organisation först"
+      },
+      "preview": {
+        "title": "Förhandsvisning",
+        "empty": "Skriv titel och meddelande för att se förhandsvisning."
       },
       "actions": {
         "sending": "Skickar...",
-        "send": "Skicka notifikation"
+        "send": "Skicka notifikation",
+        "selectAll": "Välj alla",
+        "deselectAll": "Avmarkera alla"
+      },
+      "success": {
+        "sent": "Notifikation skickad till {count} mottagare."
       },
       "errors": {
+        "noAccess": "Du har inte behörighet att skicka notifikationer.",
         "loadUsers": "Kunde inte ladda användare för organisationen.",
         "loadUsersFailed": "Kunde inte ladda användare.",
         "noUsersToSend": "Det finns inga användare att skicka till.",
@@ -6822,6 +6858,9 @@
         }
       },
       "notifications": {
+        "title": "Notifikationer",
+        "markAllAsRead": "Markera alla som lästa",
+        "empty": "Inga notifikationer",
         "pageTitle": "Notifikationshistorik",
         "pageDescription": "Se och hantera skickade notifikationer",
         "noAccess": "Du har inte åtkomst till notifikationshistorik",

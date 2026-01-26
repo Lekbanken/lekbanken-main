@@ -34,7 +34,7 @@ const defaultSettings: Partial<NotificationSettings> = {
 
 export default function NotificationSettingsPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
 
   // Initialize supabase client only in browser
@@ -52,6 +52,9 @@ export default function NotificationSettingsPage() {
 
   useEffect(() => {
     const loadSettings = async () => {
+      // Wait for auth to finish loading before deciding there's no user
+      if (authLoading) return;
+      
       if (!user?.id || !supabase) {
         setIsLoading(false);
         return;
@@ -72,7 +75,7 @@ export default function NotificationSettingsPage() {
     };
 
     loadSettings();
-  }, [user?.id, supabase]);
+  }, [user?.id, supabase, authLoading]);
 
   const handleSettingChange = useCallback((key: keyof NotificationSettings, value: boolean | string) => {
     setSettings((prev) => ({ ...prev, [key]: value }));

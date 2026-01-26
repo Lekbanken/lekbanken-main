@@ -1030,7 +1030,10 @@
       "pageDescription": "Send messages to organization users.",
       "noTenantTitle": "No organization selected",
       "noTenantDescription": "Select an organization to send notifications.",
+      "noAccessTitle": "No access",
+      "noAccessDescription": "You do not have permission to send notifications.",
       "errorTitle": "An error occurred",
+      "optional": "optional",
       "form": {
         "sendNotification": "Send notification",
         "title": "Title",
@@ -1039,8 +1042,26 @@
         "category": "Category",
         "targetAudience": "Target audience",
         "selectRecipients": "Select recipients",
-        "actionUrl": "Action URL (optional)",
-        "actionLabel": "Action label (optional)"
+        "selectOrg": "Select organization",
+        "scope": "Recipients",
+        "actionUrl": "Action URL",
+        "actionLabel": "Action label"
+      },
+      "scope": {
+        "global": "All organizations",
+        "globalDesc": "Send to all users in the system",
+        "tenant": "One organization",
+        "tenantDesc": "Send to all in selected organization",
+        "users": "Specific users",
+        "usersDesc": "Choose individual recipients"
+      },
+      "categories": {
+        "system": "System",
+        "support": "Support",
+        "billing": "Billing",
+        "learning": "Learning",
+        "gamification": "Gamification",
+        "announcement": "Announcement"
       },
       "placeholders": {
         "title": "App update",
@@ -1049,24 +1070,39 @@
       },
       "options": {
         "allInOrg": "All in organization",
-        "specificUsers": "Specific users"
+        "specificUsers": "Specific users",
+        "selectOrg": "-- Select organization --"
       },
       "loading": {
         "users": "Loading users..."
       },
       "empty": {
-        "noUsers": "No users to select."
+        "noUsers": "No users in this organization."
       },
       "recipients": {
         "title": "Recipients",
         "count": "{count} users in the organization.",
-        "hint": "When selecting specific users, you can choose from the list. Otherwise, it will be sent to everyone."
+        "hint": "When selecting specific users, you can choose from the list. Otherwise, it will be sent to everyone.",
+        "globalDesc": "Broadcast to {count} organizations",
+        "tenantDesc": "{name} ({count} members)",
+        "usersDesc": "{count} selected users",
+        "selectTenant": "Select an organization first"
+      },
+      "preview": {
+        "title": "Preview",
+        "empty": "Enter title and message to see preview."
       },
       "actions": {
         "sending": "Sending...",
-        "send": "Send notification"
+        "send": "Send notification",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all"
+      },
+      "success": {
+        "sent": "Notification sent to {count} recipients."
       },
       "errors": {
+        "noAccess": "You do not have permission to send notifications.",
         "loadUsers": "Could not load users for the organization.",
         "loadUsersFailed": "Could not load users.",
         "noUsersToSend": "There are no users to send to.",
@@ -6728,6 +6764,9 @@
         }
       },
       "notifications": {
+        "title": "Notifications",
+        "markAllAsRead": "Mark all as read",
+        "empty": "No notifications",
         "pageTitle": "Notification History",
         "pageDescription": "View and manage sent notifications",
         "noAccess": "You do not have access to notification history",

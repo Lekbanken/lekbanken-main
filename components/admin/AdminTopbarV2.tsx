@@ -4,12 +4,12 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { ProfileMenu } from '@/components/navigation/ProfileMenu'
 import { ThemeToggle } from '@/components/navigation/ThemeToggle'
-import { AdminNotificationsCenter, useAdminNotifications } from './AdminNotificationsCenter'
+import { AdminNotificationsCenter } from './AdminNotificationsCenter'
+import { useRealAdminNotifications } from './useRealAdminNotifications'
 import { useAdminMode } from './useAdminMode'
 import { useRbac } from '@/features/admin/shared/hooks/useRbac'
 import { useTenant } from '@/lib/context/TenantContext'
 import { Bars3Icon, ChevronRightIcon, HomeIcon, Cog6ToothIcon, BuildingOffice2Icon } from '@heroicons/react/24/outline'
-import { useState } from 'react'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -132,26 +132,8 @@ function ModeIndicator() {
 
 export function AdminTopbarV2({ onToggleSidebar }: AdminTopbarV2Props) {
   const t = useTranslations('admin.nav')
-  const [baseNow] = useState(() => Date.now())
-  const { notifications, markAsRead, markAllAsRead, dismiss } = useAdminNotifications([
-    // Demo notifications - in real app these would come from a server/subscription
-    {
-      id: '1',
-      title: 'Ny användare registrerad',
-      message: 'En ny användare väntar på godkännande.',
-      type: 'info',
-      timestamp: new Date(baseNow - 5 * 60 * 1000),
-      read: false,
-    },
-    {
-      id: '2',
-      title: 'Fakturabetalning förfallen',
-      message: 'Organisation "Skola ABC" har en förfallen faktura.',
-      type: 'warning',
-      timestamp: new Date(baseNow - 2 * 60 * 60 * 1000),
-      read: false,
-    },
-  ])
+  // Use real notifications from database instead of demo data
+  const { notifications, markAsRead, markAllAsRead, dismiss } = useRealAdminNotifications()
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center justify-between gap-4 border-b border-border bg-background/95 px-4 backdrop-blur-sm lg:px-6">

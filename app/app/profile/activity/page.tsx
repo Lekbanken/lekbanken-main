@@ -75,7 +75,7 @@ const getActivityFilters = (t: (key: string) => string) => [
 
 export default function ActivityPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [supabase, setSupabase] = useState<ReturnType<typeof createBrowserClient> | null>(null);
   const activityFilters = useMemo(() => getActivityFilters(t), [t]);
 
@@ -94,6 +94,9 @@ export default function ActivityPage() {
 
   useEffect(() => {
     const loadActivityData = async () => {
+      // Wait for auth to finish loading before deciding there's no user
+      if (authLoading) return;
+      
       if (!user?.id || !supabase) {
         setIsLoading(false);
         return;
@@ -118,7 +121,7 @@ export default function ActivityPage() {
     };
 
     loadActivityData();
-  }, [user?.id, supabase]);
+  }, [user?.id, supabase, authLoading]);
 
   const handleRevokeSession = useCallback(async (sessionId: string) => {
     if (!user?.id || !supabase) return;

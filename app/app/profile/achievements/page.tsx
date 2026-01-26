@@ -20,7 +20,7 @@ import {
 
 export default function AchievementsPage() {
   const t = useTranslations('app.profile');
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
 
   const userId = user?.id;
 
@@ -29,6 +29,9 @@ export default function AchievementsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for auth to finish loading before deciding there's no user
+    if (authLoading) return;
+    
     if (!userId) {
       setIsLoading(false);
       return;
@@ -47,7 +50,7 @@ export default function AchievementsPage() {
     };
 
     loadAchievements();
-  }, [userId]);
+  }, [userId, authLoading]);
 
   const filteredAchievements = achievements.filter((item) => {
     if (filterType === 'unlocked') return item.isUnlocked;

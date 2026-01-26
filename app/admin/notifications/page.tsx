@@ -1,36 +1,47 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/lib/supabase/auth';
-import { useTenant } from '@/lib/context/TenantContext';
-import { SystemAdminClientGuard } from '@/components/admin/SystemAdminClientGuard';
-import { sendBulkNotifications } from '@/lib/services/notificationsService';
-import { supabase } from '@/lib/supabase/client';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
-import { BellIcon } from '@heroicons/react/24/outline';
+import { BellIcon, GlobeAltIcon, BuildingOfficeIcon, UsersIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 import { AdminPageLayout, AdminPageHeader, AdminEmptyState, AdminErrorState } from '@/components/admin/shared';
+import {
+  checkNotificationAdminAccess,
+  listTenantsForNotifications,
+  listUsersInTenant,
+  sendAdminNotification,
+  type SendNotificationParams,
+} from '@/app/actions/notifications-admin';
+
+interface Tenant {
+  id: string;
+  name: string;
+}
 
 interface User {
   id: string;
   email: string | null;
 }
 
+type NotificationScope = 'global' | 'tenant' | 'users';
+
 export default function NotificationsAdminPage() {
-  const { user } = useAuth();
-  const { currentTenant } = useTenant();
   const t = useTranslations('admin.notifications');
 
-  const userId = user?.id;
-  const tenantId = currentTenant?.id;
+  // Access state
+  const [hasAccess, setHasAccess] = useState(false);
+  const [isSystemAdmin, setIsSystemAdmin] = useState(false);
+  const [accessLoading, setAccessLoading] = useState(true);
+  const [accessError, setAccessError] = useState<string | null>(null);
 
-  const [tenantUsers, setTenantUsers] = useState<User[]>([]);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  // Data state
+  const [tenants, setTenants] = useState<Tenant[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   // Form state
-  const [targetType, setTargetType] = useState<'all' | 'specific'>('all');
+  const [scope, setScope] = useState<NotificationScope>('tenant');
+  const [selectedTenantId, setSelectedTenantId] = useState<string>('');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [notificationTitle, setNotificationTitle] = useState('');
   const [notificationMessage, setNotificationMessage] = useState('');
@@ -39,103 +50,167 @@ export default function NotificationsAdminPage() {
   const [actionUrl, setActionUrl] = useState('');
   const [actionLabel, setActionLabel] = useState('');
 
+  // UI state
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Check access and load tenants on mount
   useEffect(() => {
-    if (!userId || !tenantId) return;
+    const init = async () => {
+      setAccessLoading(true);
+      setAccessError(null);
 
-    const loadUsers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const { data, error: queryError } = await supabase
-          .from('user_tenant_memberships')
-          .select('user_id, users(id, email)')
-          .eq('tenant_id', tenantId)
-          .limit(200);
-
-        if (queryError) {
-          setError(t('errors.loadUsers'));
-          return;
-        }
-
-        const mapped = (data || [])
-          .map((row) => ({
-            id: (row as { user_id: string }).user_id,
-            email: (row as { users?: { email?: string | null } | null }).users?.email ?? null,
-          }))
-          .filter((u) => !!u.id);
-        setTenantUsers(mapped);
-      } catch (err) {
-        console.error(err);
-        setError(t('errors.loadUsersFailed'));
-      } finally {
-        setLoading(false);
+      const accessResult = await checkNotificationAdminAccess();
+      if (!accessResult.hasAccess) {
+        setAccessError(accessResult.error || t('errors.noAccess'));
+        setAccessLoading(false);
+        return;
       }
+
+      setHasAccess(true);
+      setIsSystemAdmin(accessResult.isSystemAdmin);
+
+      // Load tenants
+      const tenantsResult = await listTenantsForNotifications();
+      if (tenantsResult.success && tenantsResult.data) {
+        setTenants(tenantsResult.data);
+        // Auto-select first tenant for non-system admins
+        if (!accessResult.isSystemAdmin && tenantsResult.data.length > 0) {
+          setSelectedTenantId(tenantsResult.data[0].id);
+        }
+      }
+
+      setAccessLoading(false);
     };
 
-    void loadUsers();
-  }, [userId, tenantId, t]);
+    void init();
+  }, [t]);
 
-  const canSend = useMemo(() => {
-    if (!currentTenant) return false;
-    if (!notificationTitle.trim() || !notificationMessage.trim()) return false;
-    if (targetType === 'specific' && selectedUserIds.length === 0) return false;
-    if (targetType === 'all' && tenantUsers.length === 0) return false;
-    return true;
-  }, [currentTenant, notificationTitle, notificationMessage, targetType, selectedUserIds, tenantUsers.length]);
-
-  const handleSend = async () => {
-    if (!canSend) return;
-    if (!currentTenant) return;
-
-    const userIds = targetType === 'specific'
-      ? selectedUserIds
-      : tenantUsers.map((u) => u.id).filter(Boolean);
-
-    if (userIds.length === 0) {
-      setError(t('errors.noUsersToSend'));
+  // Load users when tenant changes
+  const loadUsers = useCallback(async (tenantId: string) => {
+    if (!tenantId) {
+      setUsers([]);
       return;
     }
 
+    setUsersLoading(true);
+    const result = await listUsersInTenant(tenantId);
+    if (result.success && result.data) {
+      setUsers(result.data);
+    } else {
+      setUsers([]);
+    }
+    setUsersLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (selectedTenantId && (scope === 'tenant' || scope === 'users')) {
+      void loadUsers(selectedTenantId);
+    }
+  }, [selectedTenantId, scope, loadUsers]);
+
+  // Reset user selection when scope or tenant changes
+  useEffect(() => {
+    setSelectedUserIds([]);
+  }, [scope, selectedTenantId]);
+
+  // Validation
+  const canSend = useMemo(() => {
+    if (!notificationTitle.trim() || !notificationMessage.trim()) return false;
+
+    switch (scope) {
+      case 'global':
+        return isSystemAdmin && tenants.length > 0;
+      case 'tenant':
+        return !!selectedTenantId;
+      case 'users':
+        return !!selectedTenantId && selectedUserIds.length > 0;
+      default:
+        return false;
+    }
+  }, [scope, isSystemAdmin, tenants.length, selectedTenantId, selectedUserIds.length, notificationTitle, notificationMessage]);
+
+  // Get recipient description for sidebar
+  const getRecipientDescription = () => {
+    switch (scope) {
+      case 'global':
+        return t('recipients.globalDesc', { count: tenants.length });
+      case 'tenant': {
+        const tenant = tenants.find((t) => t.id === selectedTenantId);
+        return tenant ? t('recipients.tenantDesc', { name: tenant.name, count: users.length }) : t('recipients.selectTenant');
+      }
+      case 'users':
+        return t('recipients.usersDesc', { count: selectedUserIds.length });
+      default:
+        return '';
+    }
+  };
+
+  // Handle send
+  const handleSend = async () => {
+    if (!canSend) return;
+
     setIsSending(true);
     setError(null);
-    try {
-      await sendBulkNotifications({
-        userIds,
-        tenantId: currentTenant.id,
-        title: notificationTitle,
-        message: notificationMessage,
-        type: notificationType,
-        category: notificationCategory,
-        actionUrl: actionUrl || undefined,
-        actionLabel: actionLabel || undefined,
-      });
+    setSuccessMessage(null);
+
+    const params: SendNotificationParams = {
+      scope,
+      tenantId: scope !== 'global' ? selectedTenantId : undefined,
+      userIds: scope === 'users' ? selectedUserIds : undefined,
+      title: notificationTitle.trim(),
+      message: notificationMessage.trim(),
+      type: notificationType,
+      category: notificationCategory,
+      actionUrl: actionUrl || undefined,
+      actionLabel: actionLabel || undefined,
+    };
+
+    const result = await sendAdminNotification(params);
+
+    if (result.success) {
+      setSuccessMessage(t('success.sent', { count: result.sentCount ?? 1 }));
+      // Reset form
       setNotificationTitle('');
       setNotificationMessage('');
       setActionUrl('');
       setActionLabel('');
       setSelectedUserIds([]);
-    } catch (err) {
-      console.error(err);
-      setError(t('errors.sendFailed'));
-    } finally {
-      setIsSending(false);
+      // Clear success after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } else {
+      setError(result.error || t('errors.sendFailed'));
     }
+
+    setIsSending(false);
   };
 
-  if (!currentTenant) {
+  // Loading state
+  if (accessLoading) {
+    return (
+      <AdminPageLayout>
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+        </div>
+      </AdminPageLayout>
+    );
+  }
+
+  // No access
+  if (!hasAccess) {
     return (
       <AdminPageLayout>
         <AdminEmptyState
           icon={<BellIcon className="h-6 w-6" />}
-          title={t('noTenantTitle')}
-          description={t('noTenantDescription')}
+          title={t('noAccessTitle')}
+          description={accessError || t('noAccessDescription')}
         />
       </AdminPageLayout>
     );
   }
 
   return (
-    <SystemAdminClientGuard>
     <AdminPageLayout>
       <AdminPageHeader
         title={t('pageTitle')}
@@ -156,12 +231,146 @@ export default function NotificationsAdminPage() {
         />
       )}
 
+      {successMessage && (
+        <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-950 dark:text-green-200">
+          <CheckCircleIcon className="h-5 w-5" />
+          <span>{successMessage}</span>
+        </div>
+      )}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle>{t('form.sendNotification')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            {/* Scope selector */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">{t('form.scope')}</label>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {isSystemAdmin && (
+                  <button
+                    type="button"
+                    onClick={() => setScope('global')}
+                    className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+                      scope === 'global'
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                        : 'border-border hover:border-primary/50'
+                    }`}
+                  >
+                    <GlobeAltIcon className="h-6 w-6 text-primary" />
+                    <div>
+                      <div className="font-medium">{t('scope.global')}</div>
+                      <div className="text-xs text-muted-foreground">{t('scope.globalDesc')}</div>
+                    </div>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setScope('tenant')}
+                  className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+                    scope === 'tenant'
+                      ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <BuildingOfficeIcon className="h-6 w-6 text-primary" />
+                  <div>
+                    <div className="font-medium">{t('scope.tenant')}</div>
+                    <div className="text-xs text-muted-foreground">{t('scope.tenantDesc')}</div>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setScope('users')}
+                  className={`flex items-center gap-3 rounded-lg border p-4 text-left transition-colors ${
+                    scope === 'users'
+                      ? 'border-primary bg-primary/5 ring-2 ring-primary'
+                      : 'border-border hover:border-primary/50'
+                  }`}
+                >
+                  <UsersIcon className="h-6 w-6 text-primary" />
+                  <div>
+                    <div className="font-medium">{t('scope.users')}</div>
+                    <div className="text-xs text-muted-foreground">{t('scope.usersDesc')}</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Tenant selector (for tenant and users scope) */}
+            {(scope === 'tenant' || scope === 'users') && (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">{t('form.selectOrg')}</label>
+                <select
+                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+                  value={selectedTenantId}
+                  onChange={(e) => setSelectedTenantId(e.target.value)}
+                >
+                  <option value="">{t('options.selectOrg')}</option>
+                  {tenants.map((tenant) => (
+                    <option key={tenant.id} value={tenant.id}>
+                      {tenant.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            {/* User selector (for users scope) */}
+            {scope === 'users' && selectedTenantId && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium text-foreground">{t('form.selectRecipients')}</label>
+                  {users.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (selectedUserIds.length === users.length) {
+                          setSelectedUserIds([]);
+                        } else {
+                          setSelectedUserIds(users.map((u) => u.id));
+                        }
+                      }}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      {selectedUserIds.length === users.length ? t('actions.deselectAll') : t('actions.selectAll')}
+                    </button>
+                  )}
+                </div>
+                {usersLoading ? (
+                  <p className="text-sm text-muted-foreground">{t('loading.users')}</p>
+                ) : users.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">{t('empty.noUsers')}</p>
+                ) : (
+                  <div className="max-h-48 overflow-y-auto rounded-lg border border-border p-3">
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {users.map((u) => (
+                        <label key={u.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted/50 rounded px-2 py-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedUserIds.includes(u.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedUserIds((prev) => [...prev, u.id]);
+                              } else {
+                                setSelectedUserIds((prev) => prev.filter((id) => id !== u.id));
+                              }
+                            }}
+                            className="rounded"
+                          />
+                          <span className="truncate">{u.email || u.id.slice(0, 8)}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <hr className="border-border" />
+
+            {/* Notification content */}
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">{t('form.title')}</label>
@@ -202,59 +411,23 @@ export default function NotificationsAdminPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">{t('form.category')}</label>
-                <input
+                <select
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={notificationCategory}
                   onChange={(e) => setNotificationCategory(e.target.value)}
-                  placeholder="system"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.targetAudience')}</label>
-                <select
-                  className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
-                  value={targetType}
-                  onChange={(e) => setTargetType(e.target.value as typeof targetType)}
                 >
-                  <option value="all">{t('options.allInOrg')}</option>
-                  <option value="specific">{t('options.specificUsers')}</option>
+                  <option value="system">{t('categories.system')}</option>
+                  <option value="support">{t('categories.support')}</option>
+                  <option value="billing">{t('categories.billing')}</option>
+                  <option value="learning">{t('categories.learning')}</option>
+                  <option value="gamification">{t('categories.gamification')}</option>
+                  <option value="announcement">{t('categories.announcement')}</option>
                 </select>
               </div>
-            </div>
-
-            {targetType === 'specific' && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.selectRecipients')}</label>
-                {loading ? (
-                  <p className="text-sm text-muted-foreground">{t('loading.users')}</p>
-                ) : tenantUsers.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">{t('empty.noUsers')}</p>
-                ) : (
-                  <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-                    {tenantUsers.map((u) => (
-                      <label key={u.id} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
-                          checked={selectedUserIds.includes(u.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedUserIds((prev) => [...prev, u.id]);
-                            } else {
-                              setSelectedUserIds((prev) => prev.filter((id) => id !== u.id));
-                            }
-                          }}
-                        />
-                        <span>{u.email || u.id}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.actionUrl')}</label>
+                <label className="text-sm font-medium text-foreground">
+                  {t('form.actionUrl')} <span className="text-muted-foreground">({t('optional')})</span>
+                </label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={actionUrl}
@@ -262,8 +435,13 @@ export default function NotificationsAdminPage() {
                   placeholder="https://..."
                 />
               </div>
+            </div>
+
+            {actionUrl && (
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">{t('form.actionLabel')}</label>
+                <label className="text-sm font-medium text-foreground">
+                  {t('form.actionLabel')} <span className="text-muted-foreground">({t('optional')})</span>
+                </label>
                 <input
                   className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
                   value={actionLabel}
@@ -271,29 +449,67 @@ export default function NotificationsAdminPage() {
                   placeholder={t('placeholders.actionLabel')}
                 />
               </div>
-            </div>
+            )}
 
-            <Button onClick={handleSend} disabled={isSending || !canSend}>
+            <Button onClick={handleSend} disabled={isSending || !canSend} className="w-full sm:w-auto">
               {isSending ? t('actions.sending') : t('actions.send')}
             </Button>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('recipients.title')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <p className="text-sm text-muted-foreground">
-              {t('recipients.count', { count: tenantUsers.length })}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {t('recipients.hint')}
-            </p>
-          </CardContent>
-        </Card>
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('recipients.title')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2">
+                {scope === 'global' && <GlobeAltIcon className="h-5 w-5 text-primary" />}
+                {scope === 'tenant' && <BuildingOfficeIcon className="h-5 w-5 text-primary" />}
+                {scope === 'users' && <UsersIcon className="h-5 w-5 text-primary" />}
+                <span className="font-medium">
+                  {scope === 'global' && t('scope.global')}
+                  {scope === 'tenant' && t('scope.tenant')}
+                  {scope === 'users' && t('scope.users')}
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">{getRecipientDescription()}</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>{t('preview.title')}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {notificationTitle || notificationMessage ? (
+                <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-2">
+                  <div className="flex items-start gap-3">
+                    <div className={`rounded-full p-2 ${
+                      notificationType === 'success' ? 'bg-green-100 text-green-600' :
+                      notificationType === 'warning' ? 'bg-yellow-100 text-yellow-600' :
+                      notificationType === 'error' ? 'bg-red-100 text-red-600' :
+                      'bg-blue-100 text-blue-600'
+                    }`}>
+                      <BellIcon className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-sm truncate">{notificationTitle || t('placeholders.title')}</p>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{notificationMessage || t('placeholders.message')}</p>
+                      {actionUrl && (
+                        <p className="text-xs text-primary mt-1">{actionLabel || actionUrl}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">{t('preview.empty')}</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </AdminPageLayout>
-    </SystemAdminClientGuard>
   );
 }

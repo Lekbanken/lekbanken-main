@@ -42,15 +42,24 @@ export async function getUserNotifications(params?: {
   }
   
   try {
+    // Get user's tenant memberships for broadcast notifications
+    const { data: memberships } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+    
+    const tenantIds = (memberships ?? []).map((m) => m.tenant_id).filter(Boolean)
+    
+    // Build query to get both personal AND broadcast notifications
+    // Personal: user_id = current user
+    // Broadcast: user_id IS NULL AND tenant_id in user's tenants
     let query = supabase
       .from('notifications')
       .select('*', { count: 'exact' })
-      .eq('user_id', user.id)
+      .or(`user_id.eq.${user.id}${tenantIds.length > 0 ? `,and(user_id.is.null,tenant_id.in.(${tenantIds.join(',')}))` : ''}`)
       .order('created_at', { ascending: false })
     
-    if (params?.unreadOnly) {
-      query = query.eq('is_read', false)
-    }
+    // Note: unreadOnly filter is handled after we merge with read_status
     
     const limit = params?.limit ?? 50
     const offset = params?.offset ?? 0
@@ -63,14 +72,45 @@ export async function getUserNotifications(params?: {
       return { success: false, error: 'Kunde inte hämta notifikationer' }
     }
     
-    // Map to ensure is_read is always boolean
-    const notifications: UserNotification[] = (data ?? []).map((n) => ({
-      ...n,
-      is_read: n.is_read ?? false,
-      tenant_id: n.tenant_id ?? '',
-      created_at: n.created_at ?? new Date().toISOString(),
-      updated_at: n.updated_at ?? new Date().toISOString(),
-    }))
+    // Get read status for broadcast notifications
+    const broadcastNotificationIds = (data ?? [])
+      .filter((n) => n.user_id === null)
+      .map((n) => n.id)
+    
+    let readStatusMap = new Map<string, boolean>()
+    
+    if (broadcastNotificationIds.length > 0) {
+      const { data: readStatuses } = await supabase
+        .from('notification_read_status')
+        .select('notification_id')
+        .eq('user_id', user.id)
+        .in('notification_id', broadcastNotificationIds)
+      
+      readStatuses?.forEach((rs) => {
+        readStatusMap.set(rs.notification_id, true)
+      })
+    }
+    
+    // Map notifications with correct is_read status
+    let notifications: UserNotification[] = (data ?? []).map((n) => {
+      // For broadcast notifications, check the read_status table
+      const isRead = n.user_id === null 
+        ? readStatusMap.has(n.id)
+        : n.is_read ?? false
+      
+      return {
+        ...n,
+        is_read: isRead,
+        tenant_id: n.tenant_id ?? '',
+        created_at: n.created_at ?? new Date().toISOString(),
+        updated_at: n.updated_at ?? new Date().toISOString(),
+      }
+    })
+    
+    // Apply unreadOnly filter after merging
+    if (params?.unreadOnly) {
+      notifications = notifications.filter((n) => !n.is_read)
+    }
     
     return { success: true, data: notifications, total: count ?? 0 }
   } catch (err) {
@@ -92,18 +132,53 @@ export async function getUnreadNotificationCount(): Promise<{ success: boolean; 
   }
   
   try {
-    const { count, error: queryError } = await supabase
+    // Get user's tenant memberships for broadcast notifications
+    const { data: memberships } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+    
+    const tenantIds = (memberships ?? []).map((m) => m.tenant_id).filter(Boolean)
+    
+    // Count personal unread notifications
+    const { count: personalCount, error: personalError } = await supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('is_read', false)
     
-    if (queryError) {
-      console.error('getUnreadNotificationCount error:', queryError)
+    if (personalError) {
+      console.error('getUnreadNotificationCount personal error:', personalError)
       return { success: false, error: 'Kunde inte hämta antal' }
     }
     
-    return { success: true, count: count ?? 0 }
+    // Count broadcast unread notifications (not in read_status table)
+    let broadcastUnreadCount = 0
+    
+    if (tenantIds.length > 0) {
+      // Get all broadcast notifications for user's tenants
+      const { data: broadcastNotifs } = await supabase
+        .from('notifications')
+        .select('id')
+        .is('user_id', null)
+        .in('tenant_id', tenantIds)
+      
+      const broadcastIds = (broadcastNotifs ?? []).map((n) => n.id)
+      
+      if (broadcastIds.length > 0) {
+        // Get which ones user has already read
+        const { data: readStatuses } = await supabase
+          .from('notification_read_status')
+          .select('notification_id')
+          .eq('user_id', user.id)
+          .in('notification_id', broadcastIds)
+        
+        const readIds = new Set((readStatuses ?? []).map((rs) => rs.notification_id))
+        broadcastUnreadCount = broadcastIds.filter((id) => !readIds.has(id)).length
+      }
+    }
+    
+    return { success: true, count: (personalCount ?? 0) + broadcastUnreadCount }
   } catch (err) {
     console.error('getUnreadNotificationCount error:', err)
     return { success: false, error: 'Kunde inte hämta antal' }
@@ -123,19 +198,49 @@ export async function markNotificationAsRead(notificationId: string): Promise<{ 
   }
   
   try {
-    const { error: updateError } = await supabase
+    // First check if this is a personal or broadcast notification
+    const { data: notification, error: fetchError } = await supabase
       .from('notifications')
-      .update({
-        is_read: true,
-        read_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
+      .select('id, user_id')
       .eq('id', notificationId)
-      .eq('user_id', user.id)
+      .single()
     
-    if (updateError) {
-      console.error('markNotificationAsRead error:', updateError)
-      return { success: false, error: 'Kunde inte markera som läst' }
+    if (fetchError || !notification) {
+      return { success: false, error: 'Notifikation hittades inte' }
+    }
+    
+    if (notification.user_id === user.id) {
+      // Personal notification - update is_read directly
+      const { error: updateError } = await supabase
+        .from('notifications')
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', notificationId)
+        .eq('user_id', user.id)
+      
+      if (updateError) {
+        console.error('markNotificationAsRead error:', updateError)
+        return { success: false, error: 'Kunde inte markera som läst' }
+      }
+    } else {
+      // Broadcast notification (user_id is NULL) - insert into read_status table
+      const { error: insertError } = await supabase
+        .from('notification_read_status')
+        .upsert({
+          notification_id: notificationId,
+          user_id: user.id,
+          read_at: new Date().toISOString(),
+        }, {
+          onConflict: 'notification_id,user_id',
+        })
+      
+      if (insertError) {
+        console.error('markNotificationAsRead (broadcast) error:', insertError)
+        return { success: false, error: 'Kunde inte markera som läst' }
+      }
     }
     
     return { success: true }
@@ -158,6 +263,7 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean; 
   }
   
   try {
+    // 1. Mark personal notifications as read
     const { error: updateError } = await supabase
       .from('notifications')
       .update({
@@ -169,8 +275,54 @@ export async function markAllNotificationsAsRead(): Promise<{ success: boolean; 
       .eq('is_read', false)
     
     if (updateError) {
-      console.error('markAllNotificationsAsRead error:', updateError)
-      return { success: false, error: 'Kunde inte markera som läst' }
+      console.error('markAllNotificationsAsRead personal error:', updateError)
+    }
+    
+    // 2. Get user's tenant memberships for broadcast notifications
+    const { data: memberships } = await supabase
+      .from('user_tenant_memberships')
+      .select('tenant_id')
+      .eq('user_id', user.id)
+    
+    const tenantIds = (memberships ?? []).map((m) => m.tenant_id).filter(Boolean)
+    
+    if (tenantIds.length > 0) {
+      // 3. Get unread broadcast notifications (user_id IS NULL) for user's tenants
+      const { data: broadcastNotifications } = await supabase
+        .from('notifications')
+        .select('id')
+        .is('user_id', null)
+        .in('tenant_id', tenantIds)
+      
+      if (broadcastNotifications && broadcastNotifications.length > 0) {
+        // 4. Get already read broadcast notification IDs
+        const { data: alreadyRead } = await supabase
+          .from('notification_read_status')
+          .select('notification_id')
+          .eq('user_id', user.id)
+          .in('notification_id', broadcastNotifications.map((n) => n.id))
+        
+        const alreadyReadIds = new Set((alreadyRead ?? []).map((r) => r.notification_id))
+        
+        // 5. Insert read status for unread broadcast notifications
+        const toInsert = broadcastNotifications
+          .filter((n) => !alreadyReadIds.has(n.id))
+          .map((n) => ({
+            notification_id: n.id,
+            user_id: user.id,
+            read_at: new Date().toISOString(),
+          }))
+        
+        if (toInsert.length > 0) {
+          const { error: insertError } = await supabase
+            .from('notification_read_status')
+            .insert(toInsert)
+          
+          if (insertError) {
+            console.error('markAllNotificationsAsRead broadcast error:', insertError)
+          }
+        }
+      }
     }
     
     return { success: true }

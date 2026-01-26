@@ -2891,6 +2891,39 @@ export type Database = {
           },
         ]
       }
+      notification_read_status: {
+        Row: {
+          notification_id: string
+          user_id: string
+          read_at: string
+        }
+        Insert: {
+          notification_id: string
+          user_id: string
+          read_at?: string
+        }
+        Update: {
+          notification_id?: string
+          user_id?: string
+          read_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_read_status_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_read_status_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       page_views: {
         Row: {
           browser_name: string | null

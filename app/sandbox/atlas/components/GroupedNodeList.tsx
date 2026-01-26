@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import {
   ChevronDownIcon,
@@ -90,6 +90,7 @@ function NodeRow({
 
   return (
     <button
+      data-node-id={node.id}
       onClick={onClick}
       className={cn(
         'w-full text-left px-3 py-2 rounded-md transition-colors',
@@ -186,6 +187,8 @@ export function GroupedNodeList({
   onToggleGroup,
   onSelectNode,
 }: GroupedNodeListProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
   // Calculate total stats
   const stats = useMemo(() => {
     let total = 0;
@@ -201,6 +204,71 @@ export function GroupedNodeList({
     return { total, unknown, critical };
   }, [groups]);
 
+  // Flatten visible nodes for keyboard navigation
+  const visibleNodes = useMemo(() => {
+    const nodes: { id: string; groupId: string }[] = [];
+    groups.forEach((group) => {
+      if (expandedGroupIds.has(group.id)) {
+        group.nodes.forEach((node) => {
+          nodes.push({ id: node.id, groupId: group.id });
+        });
+      }
+    });
+    return nodes;
+  }, [groups, expandedGroupIds]);
+
+  // Get current index
+  const currentIndex = useMemo(() => {
+    if (!selectedNodeId) return -1;
+    return visibleNodes.findIndex((n) => n.id === selectedNodeId);
+  }, [selectedNodeId, visibleNodes]);
+
+  // Keyboard navigation handler
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Only handle arrow keys when not in an input
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+        return;
+      }
+
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        if (visibleNodes.length === 0) return;
+        
+        const nextIndex = currentIndex < visibleNodes.length - 1 ? currentIndex + 1 : 0;
+        onSelectNode(visibleNodes[nextIndex].id);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        if (visibleNodes.length === 0) return;
+        
+        const prevIndex = currentIndex > 0 ? currentIndex - 1 : visibleNodes.length - 1;
+        onSelectNode(visibleNodes[prevIndex].id);
+      } else if (e.key === 'Enter' && selectedNodeId) {
+        // Enter could be used for expand/collapse or other actions
+        e.preventDefault();
+      }
+    },
+    [currentIndex, visibleNodes, onSelectNode, selectedNodeId]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Scroll selected node into view
+  useEffect(() => {
+    if (selectedNodeId && containerRef.current) {
+      const selectedElement = containerRef.current.querySelector(
+        `[data-node-id="${selectedNodeId}"]`
+      );
+      if (selectedElement) {
+        selectedElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [selectedNodeId]);
+
   if (groups.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -212,7 +280,7 @@ export function GroupedNodeList({
   }
 
   return (
-    <div className="space-y-2">
+    <div ref={containerRef} className="space-y-2">
       {/* Summary header */}
       <div className="flex items-center justify-between px-3 py-2 bg-muted/30 rounded-lg">
         <div className="text-sm">
@@ -234,6 +302,9 @@ export function GroupedNodeList({
               {stats.critical} critical
             </span>
           )}
+          <span className="text-muted-foreground" title="Use ↑/↓ or j/k to navigate">
+            ⌨️ ↑↓
+          </span>
         </div>
       </div>
 

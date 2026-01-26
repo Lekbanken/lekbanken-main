@@ -56,6 +56,7 @@ export interface AtlasFrame {
   name: string;
   route: string;
   domain: AtlasDomain;
+  inventoryDomain?: string;
   roles: AtlasRole[];
   components: string[];
   reads: string[];

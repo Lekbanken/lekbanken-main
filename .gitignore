@@ -48,6 +48,10 @@ supabase/.temp/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Atlas annotations - remove this line if you want to share review state
+.atlas/annotations.json
+
 # Ignore Supabase inspect reports (regenerate with: npx supabase inspect report)
 2026-*/
 scripts/*-output.txt

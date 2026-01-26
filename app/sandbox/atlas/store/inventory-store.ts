@@ -81,6 +81,7 @@ interface InventoryStoreState {
   toggleTypeFilter: (type: InventoryNodeType) => void;
   toggleUsageFilter: (usage: InventoryUsageStatus) => void;
   toggleRiskFilter: (risk: InventoryRiskLevel) => void;
+  toggleSafetyFilter: (safety: 'safe' | 'partial' | 'not-safe') => void;
   clearFilters: () => void;
   selectNode: (nodeId: string | null) => void;
   toggleGroupExpanded: (groupId: string) => void;
@@ -94,6 +95,7 @@ const createDefaultFilters = (): AtlasInventoryFilters => ({
   usageStatuses: [],
   riskLevels: [],
   searchQuery: '',
+  safetyLevels: [],
 });
 
 const toggleItem = <T>(items: T[], item: T): T[] => {
@@ -337,6 +339,25 @@ export const useInventoryStore = create<InventoryStoreState>()(
         set({ filters: newFilters, nodeGroups: groups, filteredNodes: filteredNodes.map(mapNode) });
       },
 
+      toggleSafetyFilter: (safety) => {
+        const state = get();
+        const newSafety = toggleItem(state.filters.safetyLevels, safety);
+        const newFilters = { ...state.filters, safetyLevels: newSafety };
+
+        if (!state.inventoryData) {
+          set({ filters: newFilters });
+          return;
+        }
+
+        const filteredNodes = filterNodes(state.inventoryData.nodes, {
+          ...newFilters,
+          searchQuery: state.searchQuery,
+        });
+        const groups = groupNodes(filteredNodes, state.viewMode);
+
+        set({ filters: newFilters, nodeGroups: groups, filteredNodes: filteredNodes.map(mapNode) });
+      },
+
       clearFilters: () => {
         const state = get();
         const newFilters = createDefaultFilters();
@@ -479,13 +500,25 @@ export const useInventoryStore = create<InventoryStoreState>()(
     }),
     {
       name: 'atlas-inventory-store',
-      version: 1,
+      version: 2, // Bumped version for safetyLevels addition
       partialize: (state) => ({
         // Only persist view preferences, not data
         viewMode: state.viewMode,
         filters: state.filters,
         lastLoadedAt: state.lastLoadedAt,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<InventoryStoreState>;
+        return {
+          ...currentState,
+          ...persisted,
+          // Ensure filters has all required properties (handles migration)
+          filters: {
+            ...createDefaultFilters(),
+            ...(persisted.filters || {}),
+          },
+        };
+      },
     }
   )
 );

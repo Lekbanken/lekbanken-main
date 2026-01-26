@@ -259,6 +259,8 @@ export interface AtlasInventoryFilters {
   usageStatuses: InventoryUsageStatus[];
   riskLevels: InventoryRiskLevel[];
   searchQuery: string;
+  /** Filter by "safe to refactor" level */
+  safetyLevels: ('safe' | 'partial' | 'not-safe')[];
 }
 
 /**

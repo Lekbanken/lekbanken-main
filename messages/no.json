@@ -491,6 +491,11 @@
     "errorTitle": "Kunne ikke laste",
     "emptyTitle": "Ingen aktiviteter funnet",
     "emptyDescription": "Prøv andre filtre eller søkeord.",
+    "empty": {
+      "title": "Ingen aktiviteter funnet",
+      "description": "Prøv andre filtre eller søkeord.",
+      "clearFilters": "Tøm filtre"
+    },
     "loadMore": "Last inn flere",
     "filterHint": "Tips: Bruk filtre for å finne riktig aktivitet",
     "gameCard": {
@@ -7486,7 +7491,11 @@
       "browse": "Utforsk",
       "play": "Spill",
       "tip": "Tips",
-      "tipText": "Legg til dine mest brukte filtre som hurtigvalg for raskere planlegging."
+      "tipText": "Legg til dine mest brukte filtre som hurtigvalg for raskere planlegging.",
+      "loggedInAs": "Du er logget inn som",
+      "viewProfile": "Vis profil",
+      "marketing": "Markedsføring",
+      "visitWebsite": "Besøk nettsiden"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -7496,7 +7505,40 @@
       "quickActions": "Hurtighandlinger",
       "startSession": "Start økt",
       "createPlan": "Opprett plan",
-      "browseGames": "Bla i spill"
+      "browseGames": "Bla i spill",
+      "loading": "Laster...",
+      "heroTitle": "Klar for nye opplevelser?",
+      "heroSubtitle": "Utforsk samlingen vår eller fortsett der du slapp sist.",
+      "stats": {
+        "streakDays": "Dagers streak",
+        "coins": "Mynter",
+        "achievements": "Utmerkelser"
+      },
+      "pinnedAchievements": {
+        "title": "Vises på dashboardet ditt",
+        "manage": "Administrer",
+        "emptyHint": "Velg opptil 3 utmerkelser som skal vises her.",
+        "goToAchievements": "Gå til utmerkelser"
+      },
+      "cosmetics": {
+        "title": "Cosmetics",
+        "toShop": "Til butikken",
+        "locked": "Utstyr låst",
+        "unlockHint": "Lås opp ved å nå neste nivå.",
+        "lockedLevel": "Låst: nivå {level}",
+        "loading": "Laster cosmetics…",
+        "empty": "Du har ingen cosmetics ennå."
+      },
+      "recentActivity": {
+        "title": "Nylig aktivitet",
+        "loading": "Laster aktivitet…",
+        "empty": "Ingen aktivitet ennå."
+      },
+      "continue": {
+        "title": "Fortsett å utforske",
+        "findGames": "Finn nye leker",
+        "exploreDescription": "Utforsk 100+ aktiviteter for alle aldre og gruppestørrelser"
+      }
     },
     "gameDetail": {
       "notFoundTitle": "Spillet ble ikke funnet",
@@ -7582,6 +7624,20 @@
       "preferences": "Preferanser",
       "security": "Sikkerhet",
       "notifications": "Varsler",
+      "loading": "Laster profil...",
+      "noEmailAvailable": "Ingen e-post tilgjengelig",
+      "avatarInitialsHint": "Bruk initialer hvis du ikke vil vise et bilde.",
+      "loadingOrganizations": "Laster organisasjoner...",
+      "noOrganization": "Du tilhører ingen organisasjon ennå.",
+      "selectLanguage": "Velg språk",
+      "achievements": {
+        "title": "Utmerkelser",
+        "viewAll": "Vis alle",
+        "unlockedCount": "{unlocked} av {total} opplåst",
+        "clickBadgeHint": "Klikk på et merke for å se detaljer",
+        "noAchievementsYet": "Ingen utmerkelser tilgjengelige ennå.",
+        "noUnlockedYet": "Ingen utmerkelser opplåst ennå. Fortsett å spille!"
+      },
       "edit": {
         "label": "Profil",
         "title": "Rediger profil",
@@ -7595,14 +7651,44 @@
         "saveChanges": "Lagre endringer",
         "savedMessage": "Endringene dine er lagret!"
       },
+      "nav": {
+        "backToApp": "Tilbake til appen",
+        "overview": "Oversikt",
+        "overviewDesc": "Se profiloversikten din",
+        "general": "Generelt",
+        "generalDesc": "Navn, avatar og kontaktinfo",
+        "account": "Konto",
+        "accountDesc": "E-post og passord",
+        "security": "Sikkerhet",
+        "securityDesc": "MFA og økter",
+        "privacy": "Personvern",
+        "privacyDesc": "GDPR og databeskyttelse",
+        "notifications": "Varsler",
+        "notificationsDesc": "E-post og push-innstillinger",
+        "preferences": "Preferanser",
+        "preferencesDesc": "Språk, tema og tilgjengelighet",
+        "organizations": "Organisasjoner",
+        "organizationsDesc": "Dine organisasjoner og roller",
+        "activity": "Aktivitet",
+        "activityDesc": "Nylig aktivitet og historikk"
+      },
       "sections": {
+        "personalInfo": {
+          "title": "Personopplysninger",
+          "description": "Administrer navn, avatar og kontaktinformasjon"
+        },
         "security": {
+          "title": "Sikkerhet",
           "emailVerified": "E-post bekreftet",
           "emailNotVerified": "E-post ikke bekreftet",
           "mfaEnabled": "MFA aktivert",
           "mfaDisabled": "MFA ikke aktivert",
           "enableMfa": "Aktiver nå"
         }
+      },
+      "achievementsShowcase": {
+        "title": "Utmerkelser",
+        "viewAll": "Vis alle"
       },
       "tenant": {
         "title": "Organisasjon",

@@ -10,6 +10,9 @@ import type {
   AtlasSelection,
 } from '../types';
 import { createDefaultReviewFlags } from '../types';
+import type { InventoryDomain } from '../lib/inventory-types';
+
+export type AtlasViewMode = 'list' | 'graph';
 
 interface AtlasFilters {
   domains: AtlasDomain[];
@@ -27,6 +30,8 @@ interface FrameReviewEntry {
 
 interface AtlasState {
   mode: AtlasMode;
+  viewMode: AtlasViewMode;
+  activeDomain: InventoryDomain | null;
   searchQuery: string;
   filters: AtlasFilters;
   selection: AtlasSelection | null;
@@ -35,6 +40,8 @@ interface AtlasState {
   systemSyncSource: string | null;
 
   setMode: (mode: AtlasMode) => void;
+  setViewMode: (viewMode: AtlasViewMode) => void;
+  setActiveDomain: (domain: InventoryDomain | null) => void;
   setSearchQuery: (query: string) => void;
   toggleDomain: (domain: AtlasDomain) => void;
   toggleRole: (role: AtlasRole) => void;
@@ -70,6 +77,8 @@ export const useAtlasStore = create<AtlasState>()(
   persist(
     (set, _get) => ({
       mode: 'data',
+      viewMode: 'list',
+      activeDomain: null,
       searchQuery: '',
       filters: createDefaultFilters(),
       selection: null,
@@ -78,6 +87,8 @@ export const useAtlasStore = create<AtlasState>()(
       systemSyncSource: null,
 
       setMode: (mode) => set({ mode }),
+      setViewMode: (viewMode) => set({ viewMode }),
+      setActiveDomain: (domain) => set({ activeDomain: domain }),
       setSearchQuery: (query) => set({ searchQuery: query }),
       toggleDomain: (domain) =>
         set((state) => ({

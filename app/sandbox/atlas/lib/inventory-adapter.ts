@@ -338,6 +338,13 @@ export function filterNodes(
     usageStatuses?: string[];
     riskLevels?: string[];
     searchQuery?: string;
+    safetyLevels?: ('safe' | 'partial' | 'not-safe')[];
+    /** Optional callback to get annotation for safety filtering */
+    getAnnotation?: (nodeId: string) => { 
+      reviewFlags: { ux_reviewed: boolean; data_linked: boolean; rls_checked: boolean; tested: boolean };
+      cleanup_status: string;
+      owner?: string;
+    } | undefined;
   }
 ): InventoryNode[] {
   return nodes.filter((node) => {
@@ -367,8 +374,37 @@ export function filterNodes(
         return false;
       }
     }
+    // Safety level filter
+    if (filters.safetyLevels?.length && filters.getAnnotation) {
+      const annotation = filters.getAnnotation(node.id);
+      const safety = getSafetyLevel(annotation);
+      if (!filters.safetyLevels.includes(safety)) {
+        return false;
+      }
+    }
     return true;
   });
+}
+
+/**
+ * Compute safety level from annotation
+ */
+function getSafetyLevel(annotation?: { 
+  reviewFlags: { ux_reviewed: boolean; data_linked: boolean; rls_checked: boolean; tested: boolean };
+  cleanup_status: string;
+  owner?: string;
+}): 'safe' | 'partial' | 'not-safe' {
+  if (!annotation) return 'not-safe';
+
+  const flagsTrue = Object.values(annotation.reviewFlags).filter(Boolean).length;
+  const hasOwner = Boolean(annotation.owner);
+  const isCleanedOrLocked = annotation.cleanup_status === 'cleaned' || annotation.cleanup_status === 'locked';
+
+  // All flags true + owner + cleaned/locked = safe
+  if (flagsTrue === 4 && hasOwner && isCleanedOrLocked) return 'safe';
+  // Some progress = partial
+  if (flagsTrue > 0 || hasOwner || isCleanedOrLocked) return 'partial';
+  return 'not-safe';
 }
 
 /**
@@ -377,8 +413,8 @@ export function filterNodes(
  */
 export async function loadInventoryData(): Promise<InventoryData | null> {
   try {
-    // Fetch inventory.json from public or root
-    const response = await fetch('/api/sandbox/inventory');
+    // Fetch inventory.json via API route (handles BOM removal)
+    const response = await fetch('/api/atlas/inventory');
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
